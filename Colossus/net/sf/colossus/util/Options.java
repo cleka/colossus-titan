@@ -18,8 +18,9 @@ public final class Options
     // and server packages.  (With separate data.)
 
     // Constants related to the options config files
-    public static final String optionsPath = "Colossus";
-    public static final String optionsSep = "-";
+    public static final String optionsPath = 
+        System.getProperty("user.home") + "/Colossus/";
+    public static final String optionsBase = "Colossus-";
     public static final String optionsServerName = "server";
     public static final String optionsExtension = ".cfg";
 
@@ -39,9 +40,12 @@ public final class Options
     public static final String aiDelay = "AI delay";  // int
     public static final String variant = "Variant";   // string
     // t-port option
-    public static final String noFirstTurnT2TTeleport = "No tower-to-tower Teleport on first turn";
-    public static final String noFirstTurnTeleport = "No Teleport on first turn";
-    public static final String towerToTowerTeleportOnly = "Tower-to-Tower Teleport only";
+    public static final String noFirstTurnT2TTeleport = 
+        "No tower-to-tower Teleport on first turn";
+    public static final String noFirstTurnTeleport = 
+        "No Teleport on first turn";
+    public static final String towerToTowerTeleportOnly = 
+        "Tower-to-Tower Teleport only";
     public static final String noTowerTeleport = "No Tower Teleport";
     public static final String noTitanTeleport = "No Titan Teleport";
     
@@ -88,11 +92,15 @@ public final class Options
         this.owner = owner;
     }
 
+
+    public String getOptionsFilename()
+    {
+        return optionsPath + optionsBase + owner + optionsExtension;
+    }
+
     public void loadOptions()
     {
-        final String optionsFile = optionsPath + optionsSep +
-            owner + optionsExtension;
-        loadOptions(optionsFile);
+        loadOptions(getOptionsFilename());
     }
 
     public void loadOptions(String optionsFile)
@@ -112,8 +120,7 @@ public final class Options
     
     public void saveOptions()
     {
-        final String optionsFile = optionsPath + optionsSep +
-            owner + optionsExtension;
+        String optionsFile = getOptionsFilename();
         try
         {
             FileOutputStream out = new FileOutputStream(optionsFile);

@@ -1123,8 +1123,8 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
              }
         }
 
-        String filename = Constants.saveDirname + File.separator +
-            date.getTime() + Constants.saveExtension;
+        String filename = Constants.saveDirname + date.getTime() + 
+            Constants.saveExtension;
 
         saveGame(filename);
     }
@@ -1158,12 +1158,12 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
                 Log.error("No savegames found in saves directory");
                 dispose();
             }
-            file = new File(Constants.saveDirname + File.separator +
+            file = new File(Constants.saveDirname + 
                 latestSaveFilename(filenames));
         }
         else
         {
-            file = new File(Constants.saveDirname + File.separator + filename);
+            file = new File(Constants.saveDirname + filename);
         }
 
         try

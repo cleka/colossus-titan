@@ -24,7 +24,10 @@ public final class Constants
 
 
     // Constants for savegames
-    public static final String saveDirname = "saves";
+
+    /** Must include trailing slash. */
+    public static final String saveDirname = 
+        System.getProperty("user.home") + "/Colossus/saves/";
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
         "Colossus savegame version 11";

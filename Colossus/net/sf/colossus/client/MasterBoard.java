@@ -431,7 +431,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                JFileChooser chooser = new JFileChooser();
+                JFileChooser chooser = new JFileChooser(Options.optionsPath);
                 chooser.setFileFilter(new ConfigFileFilter());
                 int returnVal = chooser.showOpenDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)

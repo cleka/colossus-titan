@@ -1,5 +1,7 @@
 Implement auto stop when all human players dead.
 
+Add some full board repaints, including frame, to fix menu corruption.
+
 Add unit tests for server options.
 Add JUnit section to build docs.
 Document test procedures.
@@ -8,7 +10,6 @@ Add remaining command-line options.
 
 Save/load/test scale.
 
-Force cfg files and savegames to load from user.home/Colossus
 
 Bug: All stacks visible is broken.
 
