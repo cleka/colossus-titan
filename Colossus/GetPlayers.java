@@ -3,7 +3,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
-//import java.lang.reflect.*;  Needed?
+//import java.lang.reflect.*;
 
 /**
  * Class GetPlayers is a dialog used to enter players' names.
@@ -442,11 +442,6 @@ public final class GetPlayers extends JDialog implements WindowListener,
             if (varIS == null)
             {
                 varIS = new FileInputStream(varName);
-            }
-            if (varIS == null)
-            {
-                varIS = 
-                    Class.forName("GetPlayers").getResourceAsStream(varName);
             }
             if (varIS == null) 
             {

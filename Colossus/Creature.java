@@ -83,19 +83,19 @@ public class Creature implements Comparable
         try 
         {
             creatures.clear();
+            ClassLoader cl = Game.class.getClassLoader();
             InputStream creIS = 
-                java.lang.ClassLoader.getSystemResourceAsStream(
-                    GetPlayers.getCreaturesName());
+                cl.getResourceAsStream(GetPlayers.getCreaturesName());
             if (creIS == null)
             {
-                    creIS = new FileInputStream(GetPlayers.getCreaturesName());
+                creIS = new FileInputStream(GetPlayers.getCreaturesName());
             }
             if (creIS == null) 
             {
                 throw new FileNotFoundException(GetPlayers.getCreaturesName());
             }
-            CreatureLoader cl = new CreatureLoader(creIS);
-            while (cl.oneCreature(creatures) >= 0) {}
+            CreatureLoader creatureLoader = new CreatureLoader(creIS);
+            while (creatureLoader.oneCreature(creatures) >= 0) {}
         }
         catch (Exception e) 
         {
