@@ -8,7 +8,8 @@ import java.awt.event.*;
  */
 
 public class BattleMap extends Frame implements MouseListener,
-    MouseMotionListener, WindowListener
+    MouseMotionListener, WindowListener, AdjustmentListener,
+    ActionListener
 {
     public static final double SQRT3 = Math.sqrt(3.0);
     private Hex[][] h = new Hex[6][6];
@@ -30,18 +31,30 @@ public class BattleMap extends Frame implements MouseListener,
     private boolean needToClear;
     private MediaTracker tracker;
     private boolean imagesLoaded;
+
     private int scale;
+    private int cx;
+    private int cy;
+    Dimension preferredSize;
+    Scrollbar vert;
+    Scrollbar horz; 
+    int tx = 0;
+    int ty = 0;
+    MenuBar mb;
+    Menu m1;
+    MenuItem mi1_1, mi1_2;
+
 
     public BattleMap()
     {
         super("BattleMap");
 
         scale = 25;
-        int cx = 3 * scale;
-        int cy = 3 * scale;
+        cx = 3 * scale;
+        cy = 3 * scale;
+        preferredSize = new Dimension(28 * scale, 28 * scale);
         
-        pack();
-        setSize(28 * scale, 28 * scale);
+        setSize(preferredSize);
         setBackground(java.awt.Color.white);
         setVisible(true);
         addWindowListener(this);
@@ -51,6 +64,27 @@ public class BattleMap extends Frame implements MouseListener,
         tracking = -1;
         needToClear = false;
         imagesLoaded = false;
+
+        horz = new Scrollbar(Scrollbar.HORIZONTAL);
+        vert = new Scrollbar(Scrollbar.VERTICAL);
+        add("East", vert);
+        add("South", horz);
+        
+        mb = new MenuBar();
+        m1 = new Menu("Size", false);
+        mb.add(m1);
+        mi1_1 = new MenuItem("Shrink");
+        m1.add(mi1_1);
+        mi1_2 = new MenuItem("Grow");
+        m1.add(mi1_2);
+        setMenuBar(mb);
+        mi1_1.addActionListener(this);
+        mi1_2.addActionListener(this);
+        vert.addAdjustmentListener(this);
+        horz.addAdjustmentListener(this);
+
+        pack();
+        validate();
 
         for (int i = 0; i < h.length; i++)
         {
@@ -115,9 +149,11 @@ public class BattleMap extends Frame implements MouseListener,
     void rescale(int scale)
     {
         this.scale = scale;
-        int cx = 3 * scale;
-        int cy = 2 * scale; 
-        setSize(28 * scale, 28 * scale);
+        cx = 3 * scale;
+        cy = 3 * scale; 
+        preferredSize.width = 28 * scale;
+        preferredSize.height = 28 * scale;
+        setSize(preferredSize);
         
         for (int i = 0; i < h.length; i++)
         {
@@ -125,14 +161,17 @@ public class BattleMap extends Frame implements MouseListener,
             {
                 if (show[i][j])
                 {
-                    h[i][j].rescale(cx, cy, scale);
+                    h[i][j].rescale
+                        ((int) Math.round(cx + 3 * i * scale),
+                        (int) Math.round(cy + (2 * j + i % 2) *
+                        SQRT3 * scale), scale);
                 }
             }
         }
-        
+
+        validate();
         repaint();
     }
-
 
 
     public void mouseDragged(MouseEvent e)
@@ -140,16 +179,14 @@ public class BattleMap extends Frame implements MouseListener,
         if (tracking != -1)
         {
             Point point = e.getPoint();
-            point.x = Math.max(point.x, 30);
-            point.y = Math.max(point.y, 60);
-            point.x = Math.min(point.x, getSize().width - 30);
-            point.y = Math.min(point.y, getSize().height - 30);
+            point.x += tx;
+            point.y += ty;
 
             Rectangle clip = new Rectangle(chits[tracking].getBounds());
             chits[tracking].setLocation(point);
             clip.add(chits[tracking].getBounds());
             needToClear = true;
-            repaint(clip.x, clip.y, clip.width, clip.height);
+            repaint(clip.x - tx, clip.y - ty, clip.width, clip.height);
         }
     }
 
@@ -161,6 +198,9 @@ public class BattleMap extends Frame implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
+        point.x += tx;
+        point.y += ty;
+
         for (int i=0; i < chits.length; i++)
         {
             if (chits[i].select(point))
@@ -177,7 +217,7 @@ public class BattleMap extends Frame implements MouseListener,
                     }
                     chits[0] = tmpchit;
                     Rectangle clip = new Rectangle(chits[0].getBounds());
-                    repaint(clip.x, clip.y, clip.width, clip.height);
+                    repaint(clip.x - tx, clip.y - ty, clip.width, clip.height);
                 }
                 return;
             }
@@ -188,11 +228,10 @@ public class BattleMap extends Frame implements MouseListener,
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j] && h[i][j].contains(point))
+                if (show[i][j] && h[i][j].select(point))
                 {
-                    h[i][j].select(point);
                     Rectangle clip = new Rectangle(h[i][j].getBounds());
-                    repaint(clip.x, clip.y, clip.width, clip.height);
+                    repaint(clip.x - tx, clip.y - ty, clip.width, clip.height);
                     return;
                 }
             }
@@ -216,38 +255,69 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    public void windowActivated(WindowEvent event)
+    public void windowActivated(WindowEvent e)
     {
     }
 
-    public void windowClosed(WindowEvent event)
+    public void windowClosed(WindowEvent e)
     {
     }
 
-    public void windowClosing(WindowEvent event)
+    public void windowClosing(WindowEvent e)
     {
         System.exit(0);
     }
 
-    public void windowDeactivated(WindowEvent event)
+    public void windowDeactivated(WindowEvent e)
     {
     }
     
-    public void windowDeiconified(WindowEvent event)
+    public void windowDeiconified(WindowEvent e)
     {
     }
 
-    public void windowIconified(WindowEvent event)
+    public void windowIconified(WindowEvent e)
     {
     }
 
-    public void windowOpened(WindowEvent event)
+    public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    public void adjustmentValueChanged(AdjustmentEvent e)
+    {
+        // Horizontal or vertical?
+        if (e.getAdjustable() == horz)
+        {
+            tx = e.getValue();
+        }
+        else
+        {
+            ty = e.getValue();
+        }
+
+        repaint();
+    }
+
+
+    public void actionPerformed(ActionEvent e)
+    {
+        if (e.getActionCommand() == "Shrink")
+        {
+            rescale(scale - 1);
+        }
+        else  // "Grow"
+        {
+            rescale(scale + 1);            
+        }
     }
 
 
     public void paint(Graphics g)
     {
+        g.translate(-tx, -ty);
+
         if (!imagesLoaded)
         {
             return;
@@ -278,6 +348,8 @@ public class BattleMap extends Frame implements MouseListener,
 
     public void update(Graphics g)
     {
+        g.translate(-tx, -ty);
+
         Dimension d = getSize();
         rectClip = g.getClipBounds();
         
@@ -326,12 +398,12 @@ public class BattleMap extends Frame implements MouseListener,
     
     public Dimension getMinimumSize()
     {
-        return new Dimension(400, 400);
+        return new Dimension(100, 100);
     }
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(700, 700);
+        return preferredSize;
     }
 
 
