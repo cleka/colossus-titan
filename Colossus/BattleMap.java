@@ -31,9 +31,9 @@ public class BattleMap extends Frame implements MouseListener,
     private Image offImage;
     private Graphics gBack;
     private Dimension offDimension;
-    private boolean needToClear;
     private MediaTracker tracker;
-    private boolean imagesLoaded;
+    private boolean imagesLoaded = false;
+    private boolean eraseFlag = false;
 
     private static int scale = 30;
     private static int chitScale = 2 * scale;
@@ -78,9 +78,6 @@ public class BattleMap extends Frame implements MouseListener,
         addMouseListener(this);
         addMouseMotionListener(this);
         
-        needToClear = false;
-        imagesLoaded = false;
-
         pack();
         validate();
 
@@ -169,6 +166,7 @@ public class BattleMap extends Frame implements MouseListener,
                     {
                         // Mark that hex as a legal move.
                         neighbor.select();
+                        neighbor.repaint();
 
                         // If there are movement points remaining, continue
                         // checking moves from there.  Fliers skip this
@@ -231,18 +229,18 @@ public class BattleMap extends Frame implements MouseListener,
 
 
         // Initialize entrances.
-        entrances[0] = new Hex(cx + 14 * scale,
-            (int) Math.round(cy + 0 * Hex.SQRT3 * scale), scale, this);
-        entrances[1] = new Hex(cx + 37 * scale / 2,
-            (int) Math.round(cy + 4.5 * Hex.SQRT3 * scale), scale, this);
-        entrances[2] = new Hex(cx + 16 * scale,
-            (int) Math.round(cy + 11 * Hex.SQRT3 * scale), scale, this);
-        entrances[3] = new Hex(cx + 0 * scale,
-            (int) Math.round(cy + 11 * Hex.SQRT3 * scale), scale, this);
-        entrances[4] = new Hex(cx - 5 * scale,
-            (int) Math.round(cy + 5.5 * Hex.SQRT3 * scale), scale, this);
-        entrances[5] = new Hex(cx + 0 * scale,
-            (int) Math.round(cy - 1 * Hex.SQRT3 * scale), scale, this);
+        entrances[0] = new Hex(cx + 15 * scale,
+            (int) Math.round(cy + 1 * scale), scale, this);
+        entrances[1] = new Hex(cx + 38 * scale,
+            (int) Math.round(cy + 9 * scale), scale, this);
+        entrances[2] = new Hex(cx + 17 * scale,
+            (int) Math.round(cy + 22 * scale), scale, this);
+        entrances[3] = new Hex(cx + 1 * scale,
+            (int) Math.round(cy + 19 * scale), scale, this);
+        entrances[4] = new Hex(cx - 4 * scale,
+            (int) Math.round(cy + 9 * scale), scale, this);
+        entrances[5] = new Hex(cx + 1 * scale,
+            (int) Math.round(cy + 1 * scale), scale, this);
 
 
         // Add terrain, hexsides, elevation, and exits to hexes.
@@ -551,25 +549,25 @@ public class BattleMap extends Frame implements MouseListener,
         entrances[1].setNeighbor(3, h[5][1]);
         entrances[1].setNeighbor(4, h[5][2]);
         entrances[1].setNeighbor(5, h[5][3]);
-        entrances[1].setNeighbor(6, h[5][4]);
+        entrances[1].setNeighbor(0, h[5][4]);
         
         entrances[2].setNeighbor(4, h[5][4]);
         entrances[2].setNeighbor(5, h[4][5]);
-        entrances[2].setNeighbor(0, h[3][3]);
+        entrances[2].setNeighbor(0, h[3][5]);
         
-        entrances[3].setNeighbor(0, h[3][5]);
-        entrances[3].setNeighbor(1, h[2][5]);
-        entrances[3].setNeighbor(2, h[1][4]);
-        entrances[3].setNeighbor(3, h[0][4]);
+        entrances[3].setNeighbor(5, h[3][5]);
+        entrances[3].setNeighbor(0, h[2][5]);
+        entrances[3].setNeighbor(1, h[1][4]);
+        entrances[3].setNeighbor(2, h[0][4]);
         
         entrances[4].setNeighbor(0, h[0][4]);
         entrances[4].setNeighbor(1, h[0][3]);
         entrances[4].setNeighbor(2, h[0][2]);
         
-        entrances[5].setNeighbor(2, h[0][2]);
-        entrances[5].setNeighbor(3, h[1][1]);
-        entrances[5].setNeighbor(4, h[2][1]);
-        entrances[5].setNeighbor(5, h[3][0]);
+        entrances[5].setNeighbor(1, h[0][2]);
+        entrances[5].setNeighbor(2, h[1][1]);
+        entrances[5].setNeighbor(3, h[2][1]);
+        entrances[5].setNeighbor(4, h[3][0]);
     }
 
 
@@ -613,21 +611,10 @@ public class BattleMap extends Frame implements MouseListener,
 
     public void mouseDragged(MouseEvent e)
     {
-        if (tracking != -1)
-        {
-            Point point = e.getPoint();
-
-            Rectangle clip = new Rectangle(chits[tracking].getBounds());
-            chits[tracking].setLocation(point);
-            clip.add(chits[tracking].getBounds());
-            needToClear = true;
-            repaint(clip.x, clip.y, clip.width, clip.height);
-        }
     }
 
     public void mouseReleased(MouseEvent e)
     {
-        tracking = -1;
     }
     
     public void mousePressed(MouseEvent e)
@@ -640,7 +627,7 @@ public class BattleMap extends Frame implements MouseListener,
             {
                 tracking = 0;
 
-                // Don't swap if it is already on top.
+                // Put selected chit at the top of the Z-order.
                 if (i != 0)
                 {
                     BattleChit tmpchit = chits[i];
@@ -649,9 +636,12 @@ public class BattleMap extends Frame implements MouseListener,
                         chits[j] = chits[j - 1];
                     }
                     chits[0] = tmpchit;
-                    Rectangle clip = new Rectangle(chits[0].getBounds());
-                    repaint(clip.x, clip.y, clip.width, clip.height);
+                    chits[0].repaint();
                 }
+
+                // Highlight all legal destinations for this chit.
+                showMoves(chits[0]);
+
                 return;
             }
         }
@@ -661,10 +651,13 @@ public class BattleMap extends Frame implements MouseListener,
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j] && h[i][j].select(point))
+                if (show[i][j] && h[i][j].isSelected(point))
                 {
-                    Rectangle clip = new Rectangle(h[i][j].getBounds());
-                    repaint(clip.x, clip.y, clip.width, clip.height);
+                    chits[0].moveToHex(h[i][j]);
+                    unselectAllHexes();
+                    //chits[0].getStartingHex().repaint();
+                    //h[i][j].repaint();
+                    repaint();
                     return;
                 }
             }
@@ -718,35 +711,19 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    // This is used to fix artifacts from chits outside hexes.
+    void setEraseFlag()
+    {
+        eraseFlag = true;
+    }
+
+
     public void paint(Graphics g)
     {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        rectClip = g.getClipBounds();
-
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
-                {
-                    h[i][j].paint(g);
-                }
-            }
-        }
-
-        // Draw chits from back to front.
-        for (int i = numChits - 1; i >= 0; i--)
-        {
-            if (rectClip.intersects(chits[i].getBounds()))
-            {
-                chits[i].paint(g);
-            }
-        }
+        // Double-buffer everything.
+        update(g);
     }
+
 
     public void update(Graphics g)
     {
@@ -756,6 +733,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
 
         Dimension d = getSize();
+        rectClip = g.getClipBounds();
         
         // Create the back buffer only if we don't have a good one.
         if (gBack == null || d.width != offDimension.width || 
@@ -766,16 +744,11 @@ public class BattleMap extends Frame implements MouseListener,
             gBack = offImage.getGraphics();
         }
 
-        rectClip = g.getClipBounds();
-
-        // Clear the background only when chits are dragged.
-        if (needToClear)
+        // If the erase flag is set, erase the background.
+        if (eraseFlag)
         {
-            gBack.setColor(getBackground());
-            gBack.fillRect(rectClip.x, rectClip.y, rectClip.width, 
-                rectClip.height);
-            gBack.setColor(getForeground());
-            needToClear = false;
+            gBack.clearRect(0, 0, d.width, d.height);
+            eraseFlag = false;
         }
 
         for (int i = 0; i < h.length; i++)
@@ -832,6 +805,6 @@ public class BattleMap extends Frame implements MouseListener,
             null, Creature.centaur, Creature.lion, Creature.gargoyle, 
             Creature.cyclops, Creature.gorgon, Creature.guardian, null, null,
             player2);
-        new BattleMap(attacker, defender, 'p', 'r');
+        new BattleMap(attacker, defender, 'p', 'l');
     }
 }
