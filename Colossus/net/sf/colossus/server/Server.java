@@ -609,15 +609,8 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     void reinforce(Legion legion)
     {
 Log.debug("Called Server.reinforce()");
-        if (legion.getPlayer().isAI())
-        {
-            legion.getPlayer().aiReinforce(legion);
-        }
-        else
-        {
-            IClient client = getClient(legion.getPlayerName());
-            client.doReinforce(legion.getMarkerId());
-        }
+        IClient client = getClient(legion.getPlayerName());
+        client.doReinforce(legion.getMarkerId());
     }
 
     public void doSummon(String markerId, String donorId, String angel)

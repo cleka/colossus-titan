@@ -10,6 +10,9 @@ Big picture:
 
 Bug: Failing LOSTest -- problems with slopes and cliffs.
 Bug: Auto forced strike is taking strikes when there's > 1 target.
+Bug: run -i 6 -g sometimes spins forever on fixName.  Sometimes okay.  Race.
+
+Need to re-highlight after undo split, undo battle move.
 
 Allow players to specify that they automatically refuse to negotiate.
    Check for this before showing negotiation dialog to opponent.

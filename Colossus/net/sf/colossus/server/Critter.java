@@ -17,7 +17,7 @@ import net.sf.colossus.client.HexMap;
 
 final class Critter extends Creature implements Comparable
 {
-    private Creature creature;
+    private Creature creature;  // XXX
     private String markerId;
     private Battle battle;
     private boolean struck;
@@ -69,11 +69,8 @@ final class Critter extends Creature implements Comparable
         this.battle = battle;
     }
 
-    void setGame(Game game)
-    {
-        this.game = game;
-    }
 
+    // XXX
     Creature getCreature()
     {
         return creature;

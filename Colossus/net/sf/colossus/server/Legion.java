@@ -258,14 +258,6 @@ public final class Legion implements Comparable
         return newLegion;
     }
 
-    // We could remove this method, and have the various dialogs
-    // that use it take game as an argument.
-    Game getGame()
-    {
-        return game;
-    }
-
-
     int getPointValue()
     {
         int pointValue = 0;
@@ -601,7 +593,7 @@ public final class Legion implements Comparable
     /** Do the cleanup required before this legion can be removed. */
     void prepareToRemove()
     {
-        // TODO Use critters.toString() rather than doing it manually.
+        // XXX Use critters.toString() rather than doing it manually.
         StringBuffer log = new StringBuffer("Legion ");
         log.append(getLongMarkerName());
         log.append(" ");
@@ -902,8 +894,7 @@ public final class Legion implements Comparable
 
     Creature getCreature(int i)
     {
-        Critter critter = getCritter(i);
-        return critter.getCreature();
+        return getCritter(i).getCreature();
     }
 
 
@@ -1005,10 +996,8 @@ public final class Legion implements Comparable
             }
         }
 
-        // TODO Join packet.
         // Let the client know that the legions have recombined.
         game.getServer().oneRevealLegion(legion, legion.getPlayerName());
-        // TODO Just update the one legion's height.
         game.getServer().allFullyUpdateLegionHeights();   
 
         if (remove)

@@ -18,8 +18,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 /**
  * Simple implementation of a Titan AI
  * @version $Id$
- * @author Bruce Sherrod
- * @author David Ripton
+ * @author Bruce Sherrod, David Ripton
  */
 
 
@@ -72,72 +71,68 @@ public class SimpleAI implements AI
     }
 
 
-    public void muster(Game game)
+    /** Runs on client side */
+    public void muster(Client client)
     {
         // Do not recruit if this legion is a scooby snack.
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor *
-            game.getAverageLegionPointValue());
-        Player player = game.getActivePlayer();
-        List legions = player.getLegions();
-        Iterator it = legions.iterator();
+            client.getAverageLegionPointValue());
+        List markerIds = client.getLegionsByPlayer(client.getPlayerName());
+        Iterator it = markerIds.iterator();
         while (it.hasNext())
         {
-            Legion legion = (Legion)it.next();
+            String markerId = (String)it.next();
+            LegionInfo legion = client.getLegionInfo(markerId);
 
             if (legion.hasMoved() && legion.canRecruit() &&
                 (legion.hasTitan() || legion.getPointValue() >=
-                minimumSizeToRecruit))
+                    minimumSizeToRecruit))
             {
-                Creature recruit = chooseRecruit(game, legion,
-                    legion.getCurrentHex());
+                Creature recruit = chooseRecruit(client, legion,
+                    legion.getHexLabel());
 
                 if (recruit != null)
                 {
-                    java.util.List recruiters = game.findEligibleRecruiters(
-                        legion.getMarkerId(), recruit.getName());
+                    java.util.List recruiters = client.findEligibleRecruiters(
+                        markerId, recruit.getName());
 
-                    Creature recruiter = null;
+                    String recruiterName = null;
                     if (!recruiters.isEmpty())
                     {
                         // Just take the first one.
-                        recruiter = (Creature)recruiters.get(0);
+                        recruiterName = (String)recruiters.get(0);
                     }
-                    game.doRecruit(legion, recruit, recruiter);
-                    game.getServer().didRecruit(legion, recruit, recruiter);
+                    client.doRecruit(markerId, recruit.getName(), 
+                        recruiterName);
                 }
             }
         }
     }
 
 
-    public void reinforce(Legion legion, Game game)
+    /** Runs on client side. */
+    public void reinforce(LegionInfo legion, Client client)
     {
-Log.debug("Called SimpleAI.reinforce()");
-        Creature recruit = chooseRecruit(game, legion, legion.getCurrentHex());
-Log.debug("recruit is " + recruit.getName());
+        Creature recruit = chooseRecruit(client, legion, legion.getHexLabel());
+        String recruitName = null;
+        String recruiterName = null;
         if (recruit != null)
         {
-            java.util.List recruiters = game.findEligibleRecruiters(
+            recruitName = recruit.getName();
+            java.util.List recruiters = client.findEligibleRecruiters(
                 legion.getMarkerId(), recruit.getName());
-Log.debug("recruiters.size() is " + recruiters.size());
             if (!recruiters.isEmpty())
             {
-                Creature recruiter = (Creature)recruiters.get(0);
-                game.doRecruit(legion, recruit, recruiter);
+                recruiterName = (String)recruiters.get(0);
             }
         }
-        if (game.getBattle() != null)
-        {
-            game.getBattle().doneReinforcing();
-        }
-        else
-        {
-            game.doneReinforcing();
-        }
+        // Call regardless to advance past recruiting.
+        client.doRecruit(legion.getMarkerId(), recruitName, recruiterName);
     }
 
 
+    /* Server side */
     private static Creature chooseRecruit(Game game, Legion legion, 
         MasterHex hex)
     {
@@ -166,14 +161,14 @@ Log.debug("recruiters.size() is " + recruiters.size());
         else if (recruits.contains(Creature.getCreatureByName("Lion"))
             && recruits.contains(Creature.getCreatureByName("Ranger"))
             && legion.numCreature(Creature.getCreatureByName("Lion")) == 2
-            && getNumberOfWaysToTerrain(legion, hex, 'D') > 0)
+            && getNumberOfWaysToTerrain(legion, hex, 'D', game) > 0)
         {
             recruit = Creature.getCreatureByName("Lion");
         }
         else if (recruits.contains(Creature.getCreatureByName("Troll"))
             && recruits.contains(Creature.getCreatureByName("Ranger"))
             && legion.numCreature(Creature.getCreatureByName("Troll")) == 2
-            && getNumberOfWaysToTerrain(legion, hex, 'S') > 0)
+            && getNumberOfWaysToTerrain(legion, hex, 'S', game) > 0)
         {
             recruit = Creature.getCreatureByName("Troll");
         }
@@ -259,6 +254,142 @@ Log.debug("recruiters.size() is " + recruiters.size());
                 // take a centaur
             }
             else if ((game.getCaretaker().getCount(
+                          Creature.getCreatureByName("Lion")) > 6) &&
+                     (legion.numCreature(
+                          Creature.getCreatureByName("Centaur")) < 2))
+            {
+                recruit = Creature.getCreatureByName("Centaur");
+                // else we don't really care; take anything
+            }
+        }
+
+        return recruit;
+    }
+
+    /* Client side */
+    private static Creature chooseRecruit(Client client, LegionInfo legion,
+        String hexLabel)
+    {
+        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+
+        List recruits = client.findEligibleRecruits(legion.getMarkerId(), 
+            hexLabel);
+
+        if (recruits.size() == 0)
+        {
+            return null;
+        }
+
+        // pick the last creature in the list (which is the
+        // best/highest recruit)
+        Creature recruit = (Creature)recruits.get(recruits.size() - 1);
+
+        // take third cyclops in brush
+        if (recruit == Creature.getCreatureByName("Gorgon")
+            && recruits.contains(Creature.getCreatureByName("Cyclops"))
+            && legion.numCreature(Creature.getCreatureByName("Behemoth")) == 0
+            && legion.numCreature(Creature.getCreatureByName("Cyclops")) == 2)
+        {
+            recruit = Creature.getCreatureByName("Cyclops");
+        }
+        // take a third lion/troll if we've got at least 1 way to desert/swamp
+        // from here and we're not about to be attacked
+        else if (recruits.contains(Creature.getCreatureByName("Lion"))
+            && recruits.contains(Creature.getCreatureByName("Ranger"))
+            && legion.numCreature(Creature.getCreatureByName("Lion")) == 2
+            && getNumberOfWaysToTerrain(legion, hex, 'D', client) > 0)
+        {
+            recruit = Creature.getCreatureByName("Lion");
+        }
+        else if (recruits.contains(Creature.getCreatureByName("Troll"))
+            && recruits.contains(Creature.getCreatureByName("Ranger"))
+            && legion.numCreature(Creature.getCreatureByName("Troll")) == 2
+            && getNumberOfWaysToTerrain(legion, hex, 'S', client) > 0)
+        {
+            recruit = Creature.getCreatureByName("Troll");
+        }
+        // tower creature selection:
+        else if (recruits.contains(Creature.getCreatureByName("Ogre")) &&
+                 recruits.contains(Creature.getCreatureByName("Centaur")) &&
+                 recruits.contains(Creature.getCreatureByName("Gargoyle")) &&
+                 recruits.size() == 3)
+        {
+            // if we have 2 centaurs or ogres, take a third
+            if (legion.numCreature(Creature.getCreatureByName("Ogre")) == 2)
+            {
+                recruit = Creature.getCreatureByName("Ogre");
+            }
+            else if (legion.numCreature(
+                Creature.getCreatureByName("Centaur")) == 2)
+            {
+                recruit = Creature.getCreatureByName("Centaur");
+                // else if we have 1 of a tower creature, take a matching one
+                // if more than one tower creature is a possible recruit,
+                // take the one with the more higher-level creatures
+                // still available
+            }
+            else if ((legion.numCreature(
+                          Creature.getCreatureByName("Gargoyle")) == 1) ||
+                     (legion.numCreature(
+                          Creature.getCreatureByName("Ogre")) == 1) ||
+                     (legion.numCreature(
+                          Creature.getCreatureByName("Centaur")) == 1))
+            {
+                int cyclopsLeft = client.getCreatureCount(
+                    Creature.getCreatureByName("Cyclops"));
+                int lionLeft = client.getCreatureCount(
+                    Creature.getCreatureByName("Lion"));
+                int trollLeft = client.getCreatureCount(
+                    Creature.getCreatureByName("Troll"));
+                if (legion.numCreature(
+                        Creature.getCreatureByName("Gargoyle")) != 1)
+                { // don't take a gargoyle -> ignore cyclops
+                    cyclopsLeft = -1;
+                }
+                if (legion.numCreature(
+                        Creature.getCreatureByName("Ogre")) != 1)
+                { // don't take an ogre -> ignore troll
+                    trollLeft = -1;
+                }
+                if (legion.numCreature(
+                        Creature.getCreatureByName("Centaur")) != 1)
+                { // don't take a centaur -> ignore lion
+                    lionLeft = -1;
+                }
+                if ((cyclopsLeft >= trollLeft) && (cyclopsLeft >= lionLeft))
+                {
+                    recruit = Creature.getCreatureByName("Gargoyle");
+                }
+                else if ((trollLeft >= cyclopsLeft) && (trollLeft >= lionLeft))
+                {
+                    recruit = Creature.getCreatureByName("Ogre");
+                }
+                else if ((lionLeft >= trollLeft) && (lionLeft >= cyclopsLeft))
+                {
+                    recruit = Creature.getCreatureByName("Centaur");
+                }
+                // else if there's cyclops left and we don't have 2
+                // gargoyles, take a gargoyle
+            }
+            else if ((client.getCreatureCount(
+                          Creature.getCreatureByName("Cyclops")) > 6) &&
+                     (legion.numCreature(
+                          Creature.getCreatureByName("Gargoyle")) < 2))
+            {
+                recruit = Creature.getCreatureByName("Gargoyle");
+                // else if there's trolls left and we don't have 2 ogres,
+                // take an ogre
+            }
+            else if ((client.getCreatureCount(
+                          Creature.getCreatureByName("Troll")) > 6) &&
+                     (legion.numCreature(
+                          Creature.getCreatureByName("Ogre")) < 2))
+            {
+                recruit = Creature.getCreatureByName("Ogre");
+                // else if there's lions left and we don't have 2 lions,
+                // take a centaur
+            }
+            else if ((client.getCreatureCount(
                           Creature.getCreatureByName("Lion")) > 6) &&
                      (legion.numCreature(
                           Creature.getCreatureByName("Centaur")) < 2))
@@ -597,7 +728,7 @@ Log.debug("recruiters.size() is " + recruiters.size());
     }
 
 
-    // Keep the gargoyles together.
+    /** Keep the gargoyles together. */
     private static List CMUsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature, String label)
     {
@@ -652,7 +783,7 @@ Log.debug("recruiters.size() is " + recruiters.size());
         return splitoffs;
     }
 
-    // Split the gargoyles.
+    /** Split the gargoyles. */
     private static List MITsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature, String label)
     {
@@ -1544,8 +1675,9 @@ Log.debug("recruiters.size() is " + recruiters.size());
         }
     }
 
+    /** Server side. */
     private static int getNumberOfWaysToTerrain(Legion legion, MasterHex hex,
-        char terrainType)
+        char terrainType, Game game)
     {
         // if moves[i] is true, then a roll of i can get us to terrainType.
         boolean[] moves = new boolean[7];
@@ -1562,7 +1694,7 @@ Log.debug("recruiters.size() is " + recruiters.size());
         }
 
         findNormalMovesToTerrain(legion, legion.getPlayer(), hex, 6, block,
-            Constants.NOWHERE, terrainType, moves);
+            Constants.NOWHERE, terrainType, moves, game);
 
         // consider tower teleport
         if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0
@@ -1576,7 +1708,7 @@ Log.debug("recruiters.size() is " + recruiters.size());
         }
 
         int count = 0;
-        for (int i = 0; i < moves.length; i++)
+        for (int i = 1; i < moves.length; i++)
         {
             if (moves[i])
             {
@@ -1586,15 +1718,46 @@ Log.debug("recruiters.size() is " + recruiters.size());
         return count;
     }
 
+    /** Client side. */
+    private static int getNumberOfWaysToTerrain(LegionInfo legion, 
+        MasterHex hex, char terrainType, Client client)
+    {
+        int total = 0;
+        for (int roll = 1; roll <= 6; roll++)
+        {
+            Set set = client.getMovement().listAllMoves(legion, hex, roll);
+            if (setContainsHexWithTerrain(set, terrainType))
+            {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    private static boolean setContainsHexWithTerrain(Set set, char terrainType)
+    {
+        Iterator it = set.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            char terrain = MasterBoard.getHexByLabel(
+                hexLabel).getTerrain();
+            if (terrain == terrainType)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void findNormalMovesToTerrain(Legion legion, Player player,
         MasterHex hex, int roll, int block, int cameFrom, char terrainType,
-        boolean[] moves)
+        boolean[] moves, Game game)
     {
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
         // also a friendly legion there, just stop recursing.
         String hexLabel = hex.getLabel();
-        Game game = legion.getGame();
         if (game.getNumEnemyLegions(hexLabel, player) > 0)
         {
             if (game.getNumFriendlyLegions(hexLabel, player) == 0)
@@ -1634,8 +1797,8 @@ Log.debug("recruiters.size() is " + recruiters.size());
         if (block >= 0)
         {
             findNormalMovesToTerrain(legion, player, hex.getNeighbor(block),
-                    roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, 
-                    terrainType, moves);
+                roll - 1, Constants.ARROWS_ONLY, (block + 3) % 6, 
+                terrainType, moves, game);
         }
         else if (block == Constants.ARCHES_AND_ARROWS)
         {
@@ -1644,9 +1807,8 @@ Log.debug("recruiters.size() is " + recruiters.size());
                 if (hex.getExitType(i) >= Constants.ARCH && i != cameFrom)
                 {
                     findNormalMovesToTerrain(legion, player,
-                            hex.getNeighbor(i), roll - 1, 
-                            Constants.ARROWS_ONLY, (i + 3) % 6, terrainType,
-                            moves);
+                        hex.getNeighbor(i), roll - 1, Constants.ARROWS_ONLY, 
+                        (i + 3) % 6, terrainType, moves, game);
                 }
             }
         }
@@ -1657,15 +1819,15 @@ Log.debug("recruiters.size() is " + recruiters.size());
                 if (hex.getExitType(i) >= Constants.ARROW && i != cameFrom)
                 {
                     findNormalMovesToTerrain(legion, player,
-                            hex.getNeighbor(i), roll - 1, 
-                            Constants.ARROWS_ONLY, (i + 3) % 6, terrainType, 
-                            moves);
+                        hex.getNeighbor(i), roll - 1, Constants.ARROWS_ONLY, 
+                        (i + 3) % 6, terrainType, moves, game);
                 }
             }
         }
 
         return;
     }
+
 
     // This is a really dumb placeholder.  TODO Make it smarter.
     // In particular, the AI should pick a side that will let it enter

@@ -28,7 +28,7 @@ public final class Movement
 
 
     /** Set the entry side relative to the hex label. */
-    private int findEntrySide(MasterHex hex, int cameFrom)
+    private static int findEntrySide(MasterHex hex, int cameFrom)
     {
         int entrySide = -1;
         if (cameFrom != -1)
@@ -164,7 +164,7 @@ public final class Movement
 
 
     /** Return set of hexLabels describing where this legion can move. */
-    Set listAllMoves(LegionInfo legion, MasterHex hex, int movementRoll)
+    public Set listAllMoves(LegionInfo legion, MasterHex hex, int movementRoll)
     {
         Set set = listNormalMoves(legion, hex, movementRoll);
         set.addAll(listTeleportMoves(legion, hex, movementRoll));
@@ -172,7 +172,7 @@ public final class Movement
     }
 
 
-    private int findBlock(MasterHex hex)
+    private static int findBlock(MasterHex hex)
     {
         int block = Constants.ARCHES_AND_ARROWS;
         for (int j = 0; j < 6; j++)

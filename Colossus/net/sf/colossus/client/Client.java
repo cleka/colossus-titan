@@ -615,6 +615,21 @@ public final class Client implements IClient
     }
 
 
+    public int getAverageLegionPointValue()
+    {
+        int totalValue = 0;
+        int totalLegions = 0;
+
+        for (int i = 0; i < playerInfo.length; i++)
+        {
+            PlayerInfo info = playerInfo[i];
+            totalLegions += info.getNumLegions();
+            totalValue += info.getCreatureValue();
+        }
+        return (int)(Math.round((double)totalValue / totalLegions));
+    }
+
+
     public void setColor(String color)
     {
         this.color = color;
@@ -1537,7 +1552,7 @@ public final class Client implements IClient
     }
 
 
-    /** Currently used for human players only. */
+    /** Used for human players only.  */
     void doRecruit(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
@@ -1567,31 +1582,45 @@ public final class Client implements IClient
             return;
         }
 
+        doRecruit(markerId, recruitName, recruiterName);
+    }
+
+    public void doRecruit(String markerId, String recruitName, 
+        String recruiterName)
+    {
+        // Call server even if some arguments are null, to get past
+        // reinforcement.
         server.doRecruit(markerId, recruitName, recruiterName);
     }
 
-    /** Currently used for human players only.  Always needs to call
-     *  server.doRecruit(), even if no recruit is wanted, to get past
-     *  the reinforcing phase. */
+
+    /** Always needs to call server.doRecruit(), even if no recruit is 
+     *  wanted, to get past the reinforcing phase. */
     public void doReinforce(String markerId)
     {
-        String hexLabel = getHexForLegion(markerId);
-
-        java.util.List recruits = findEligibleRecruits(markerId, hexLabel);
-        String hexDescription =
-            MasterBoard.getHexByLabel(hexLabel).getDescription();
-
-        String recruitName = PickRecruit.pickRecruit(board.getFrame(),
-            recruits, hexDescription, markerId, this);
-
-        String recruiterName = null;
-        if (recruitName != null)
+        if (getOption(Options.autoReinforce))
         {
-            recruiterName = findRecruiterName(hexLabel, markerId, recruitName,
-                hexDescription);
+            ai.reinforce(getLegionInfo(markerId), this);
         }
+        else
+        {
+            String hexLabel = getHexForLegion(markerId);
 
-        server.doRecruit(markerId, recruitName, recruiterName);
+            java.util.List recruits = findEligibleRecruits(markerId, hexLabel);
+            String hexDescription =
+                MasterBoard.getHexByLabel(hexLabel).getDescription();
+
+            String recruitName = PickRecruit.pickRecruit(board.getFrame(),
+                recruits, hexDescription, markerId, this);
+
+            String recruiterName = null;
+            if (recruitName != null)
+            {
+                recruiterName = findRecruiterName(hexLabel, markerId, 
+                    recruitName, hexDescription);
+            }
+            doRecruit(markerId, recruitName, recruiterName);
+        }
     }
 
     public void didRecruit(String markerId, String recruitName,
@@ -1756,6 +1785,12 @@ public final class Client implements IClient
             board.setupMusterMenu();
         }
         updateStatusScreen();
+
+        if (getOption(Options.autoRecruit))
+        {
+            ai.muster(this);
+            doneWithRecruits();
+        }
     }
 
 
@@ -2330,7 +2365,8 @@ public final class Client implements IClient
     }
 
     /** Return a list of Creatures. */
-    java.util.List findEligibleRecruits(String markerId, String hexLabel)
+    public java.util.List findEligibleRecruits(String markerId, 
+        String hexLabel)
     {
         java.util.List recruits = new ArrayList();
 
@@ -2380,7 +2416,8 @@ public final class Client implements IClient
     }
 
     /** Return a list of creature name strings. */
-    java.util.List findEligibleRecruiters(String markerId, String recruitName)
+    public java.util.List findEligibleRecruiters(String markerId, 
+        String recruitName)
     {
         java.util.List recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
@@ -2462,6 +2499,11 @@ public final class Client implements IClient
         return set;
     }
 
+    public Movement getMovement()
+    {
+        return movement;
+    }
+
     /** Return a set of hexLabels. */
     Set listTeleportMoves(String markerId)
     {
@@ -2495,7 +2537,7 @@ public final class Client implements IClient
         return count.intValue();
     }
 
-    int getCreatureCount(Creature creature)
+    public int getCreatureCount(Creature creature)
     {
         return getCreatureCount(creature.getName());
     }
@@ -2521,7 +2563,7 @@ public final class Client implements IClient
     }
 
     /** Returns a list of markerIds. */
-    java.util.List getLegionsByPlayer(String name)
+    public java.util.List getLegionsByPlayer(String name)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();

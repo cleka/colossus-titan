@@ -872,28 +872,6 @@ Log.debug("Called Player.setType() for " + name + " " + type);
         }
     }
 
-    void aiRecruit()
-    {
-        if (isAI())
-        {
-            ai.muster(game);
-            // Keep the AI from continuing to play after winning.
-            if (!game.isOver())
-            {
-                game.advancePhase(Constants.MUSTER, getName());
-            }
-        }
-    }
-
-
-    void aiReinforce(Legion legion)
-    {
-        if (isAI())
-        {
-            ai.reinforce(legion, game);
-        }
-    }
-
 
     boolean aiFlee(Legion legion, Legion enemy)
     {

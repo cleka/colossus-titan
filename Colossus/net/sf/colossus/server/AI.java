@@ -4,6 +4,7 @@ package net.sf.colossus.server;
 import java.util.*;
 
 import net.sf.colossus.client.Client;
+import net.sf.colossus.client.LegionInfo;
 
 
 /**
@@ -22,10 +23,10 @@ public interface AI
     void split(Game game);
 
     /** make recruits for current player */
-    void muster(Game game);
+    void muster(Client client);
 
     /** pick one reinforcement for legion */
-    void reinforce(Legion legion, Game game);
+    void reinforce(LegionInfo legion, Client client);
 
     /** choose whether legion should flee from enemy */
     boolean flee(Legion legion, Legion enemy, Game game);

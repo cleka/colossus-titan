@@ -69,7 +69,7 @@ public final class LegionInfo
         this.hexLabel = hexLabel;
     }
 
-    String getHexLabel()
+    public String getHexLabel()
     {
         return hexLabel; 
     }
@@ -113,7 +113,7 @@ public final class LegionInfo
         return count;
     }
 
-    int numCreature(Creature creature)
+    public int numCreature(Creature creature)
     {
         return numCreature(creature.getName());
     }
@@ -261,7 +261,7 @@ public final class LegionInfo
     }
 
 
-    boolean hasTitan()
+    public boolean hasTitan()
     {
         return getContents().contains("Titan");
     }
@@ -311,7 +311,7 @@ public final class LegionInfo
     }
 
     /** Return the point value of *known* contents of this legion. */
-    private int getPointValue()
+    public int getPointValue()
     {
         int sum = 0;
         Iterator it = getContents().iterator();
@@ -383,7 +383,7 @@ public final class LegionInfo
         this.moved = moved;
     }
 
-    boolean hasMoved()
+    public boolean hasMoved()
     {
         return moved;
     }
@@ -410,7 +410,7 @@ public final class LegionInfo
     }
 
     /** Return true if the legion has moved and can recruit. */
-    boolean canRecruit()
+    public boolean canRecruit()
     {
         return hasMoved() && getHeight() < 7 &&
             !hasRecruited() && !getPlayerInfo().isDead() &&

@@ -922,7 +922,6 @@ Log.debug("Called Game.newGame2()");
         else
         {
             server.allSetupMuster();
-            player.aiRecruit();
         }
     }
 

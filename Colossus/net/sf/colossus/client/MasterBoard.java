@@ -522,7 +522,9 @@ public final class MasterBoard extends JPanel
         addCheckBox(playerMenu, Options.autoRangeSingle, KeyEvent.VK_G);
         addCheckBox(playerMenu, Options.autoSummonAngels, KeyEvent.VK_O);
         addCheckBox(playerMenu, Options.autoAcquireAngels, KeyEvent.VK_A);
+        addCheckBox(playerMenu, Options.autoRecruit, KeyEvent.VK_R);
         addCheckBox(playerMenu, Options.autoPickRecruiter, KeyEvent.VK_U);
+        addCheckBox(playerMenu, Options.autoReinforce, KeyEvent.VK_N);
 
         // Then per-client GUI options
         JMenu graphicsMenu = new JMenu("Graphics");
