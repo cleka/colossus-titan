@@ -282,7 +282,7 @@ class Legion
     // battle as well as during the muster phase.
     public boolean canRecruit()
     {
-        if (recruited || height > 6 ||
+        if (recruited || height > 6 || !getPlayer().isAlive() ||
             PickRecruit.findEligibleRecruits(this, new Creature[5]) == 0)
         {
             return false;
