@@ -1500,15 +1500,13 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     /** Allow the player to choose whether to take a penalty (fewer dice
-     *  or higher strike number) in order to be allowed to carry.
-     *  Used by human players only. */
+     *  or higher strike number) in order to be allowed to carry. */
     public void askChooseStrikePenalty(List choices)
     {
         if (getOption(Options.autoPlay))
         {
-            // TODO Teach AI to handle strike penalties.  This just takes
-            // the last one.
-            assignStrikePenalty((String)choices.get(choices.size() - 1));
+            String choice = ai.pickStrikePenalty(choices);
+            assignStrikePenalty(choice);
         }
         else
         {

@@ -2260,6 +2260,13 @@ public class SimpleAI implements AI
         }
     }
 
+    /** Pick one of the list of String strike penalty options. */
+    public String pickStrikePenalty(List choices)
+    {
+        // XXX Stupid placeholder.
+        return (String)choices.get(choices.size() - 1);
+    }
+
     /** Simple one-ply group strike algorithm.  Return false if there were
      *  no strike targets. */
     public boolean strike(LegionInfo legion)

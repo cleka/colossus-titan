@@ -65,4 +65,7 @@ public interface AI
 
     /** choose carry target */
     void handleCarries(int carryDamage, Set carryTargets);
+
+    /** pick an optional strike penalty */
+    String pickStrikePenalty(List choices);
 }
