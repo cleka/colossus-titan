@@ -11,13 +11,15 @@ import com.sun.java.swing.*;
 
 class PickRecruit extends JDialog implements MouseListener, WindowListener
 {
-    private int numEligible = 0;
+    private int numEligible;
     private Creature [] recruits;
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private Player player;
     private Legion legion;
     private Chit [] markers;
+    private int [] counts;
+    private int scale = 60;
 
 
     PickRecruit(JFrame parentFrame, Legion legion)
@@ -37,12 +39,10 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         player = legion.getPlayer();
 
         recruits = new Creature[5];
-        markers = new Chit[recruits.length];
 
         addMouseListener(this);
         addWindowListener(this);
 
-        int scale = 60;
         getContentPane().setLayout(null);
         setBackground(java.awt.Color.lightGray);
 
@@ -54,7 +54,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         }
 
         pack();
-        setSize(scale * (numEligible + 1), (21 * scale / 10));
+        setSize(scale * (numEligible + 1), (23 * scale / 10));
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, 
@@ -63,11 +63,15 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         int cx = scale / 2;
         int cy = scale * 2 / 3;
 
+        markers = new Chit[numEligible];
+        counts = new int[numEligible]; 
         for (int i = 0; i < numEligible; i++)
         {
             markers[i] = new Chit(cx + i * (21 * scale / 20), cy, scale,
                 recruits[i].getImageName(), this, false);
+            counts[i] = recruits[i].getCount();
         }
+
 
         imagesLoaded = false;
         tracker = new MediaTracker(this);
@@ -406,6 +410,10 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
             {
                 markers[i].paint(g);
             }
+
+            String countLabel = Integer.toString(counts[i]);
+            g.drawString(countLabel, scale * (21 * i / 20 + 1) -
+                g.getFontMetrics().stringWidth(countLabel) / 2, 2 * scale);
         }
     }
 
