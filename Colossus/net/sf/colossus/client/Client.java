@@ -2810,6 +2810,15 @@ public final class Client implements IClient
         return getCreatureCount(creature.getName());
     }
 
+    int getCreatureMaxCount(String creatureName)
+    {
+        return getCreatureMaxCount(Creature.getCreatureByName(creatureName));
+    }
+
+    int getCreatureMaxCount(Creature creature)
+    {
+        return creature.getMaxCount();
+    }
 
     /** Returns a list of markerIds. */
     java.util.List getLegionsByHex(String hexLabel)

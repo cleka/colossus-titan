@@ -69,8 +69,10 @@ class CreatureCollectionView extends KDialog implements WindowListener
             setBorder(BorderFactory.createLineBorder(Color.black));
 
             Chit chit = new Chit(4 * Scale.get(), name, this);
-            JLabel label = new JLabel(Integer.toString(
-                client.getCreatureCount(name)), SwingConstants.CENTER);
+            JLabel label = new JLabel((
+                Integer.toString(client.getCreatureCount(name)) + " / " +
+                Integer.toString(client.getCreatureMaxCount(name))),
+                SwingConstants.CENTER);
             countMap.put(name, label);
 
             // jikes whines because add is defined in both JPanel and JDialog.
@@ -103,13 +105,13 @@ class CreatureCollectionView extends KDialog implements WindowListener
             String name = (String)entry.getKey();
             JLabel label = (JLabel)entry.getValue();
             int count = client.getCreatureCount(name);
+            int maxcount = client.getCreatureMaxCount(name);
             String color;
             if (count == 0)
             {
                 color = "red";
             }
-            else if (count == Creature.getCreatureByName(name).
-                getMaxCount())
+            else if (count == maxcount)
             {
                 color = "green";
             }
@@ -117,25 +119,41 @@ class CreatureCollectionView extends KDialog implements WindowListener
             {
                 color = "black";
             }
-            String htmlCount = htmlColorize(Integer.toString(count), color);
-            label.setText(htmlCount);
+            String htmlCount =
+                htmlColorizeOnly(Integer.toString(count), color);
+            String htmlTotalCount =
+                htmlColorizeOnly(Integer.toString(maxcount),
+                                 "blue");
+            String htmlSlash = htmlColorizeOnly(" / ", "black");
+            label.setText(htmlizeOnly(htmlCount + htmlSlash + htmlTotalCount));
         }
 
         repaint();
     }
 
+    private String htmlColorizeOnly(String input, String color)
+    {
+        StringBuffer sb = new StringBuffer("<font color=");
+        sb.append(color);
+        sb.append(">");
+        sb.append(input);
+        sb.append("</font>");
+        return sb.toString();
+    }
+
+    private String htmlizeOnly(String input)
+    {
+        StringBuffer sb = new StringBuffer("<html>");
+        sb.append(input);
+        sb.append("</html>");
+        return sb.toString();
+    }
 
     /** Wrap the input string with html font color tags. */
     private String htmlColorize(String input, String color)
     {
-        StringBuffer sb = new StringBuffer("<html><font color=");
-        sb.append(color);
-        sb.append(">");
-        sb.append(input);
-        sb.append("</font></html>");
-        return sb.toString();
+        return htmlizeOnly(htmlColorizeOnly(input, color));
     }
-
 
     public void dispose()
     {
