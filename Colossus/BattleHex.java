@@ -148,6 +148,13 @@ class Hex
         return selected;
     }
 
+    boolean isSelected(Point point)
+    {
+        return (p.contains(point) && selected == true);
+    }
+
+
+
 
     Point getCenter()
     {
@@ -186,18 +193,40 @@ class Hex
         {
             chits[numChits] = chit;
             numChits++;
+            alignChits();
         }
     }
     
     
     void removeChit(int i)
     {
-        for (int j = i; j < numChits - 1; j++)
+        if (i >= 0 && i < numChits)
         {
-            chits[j] = chits[j + 1];
+            for (int j = i; j < numChits - 1; j++)
+            {
+                chits[j] = chits[j + 1];
+            }
+            chits[numChits - 1] = null;
+            numChits--;
+
+            // XXX: Do only for entrances?
+            map.setEraseFlag();
+
+            // Reposition all chits within the hex.
+            alignChits();
         }
-        chits[numChits - 1] = null;
-        numChits--;
+    }
+
+
+    void removeChit(Chit chit)
+    {
+        for (int i = 0; i < numChits; i++)
+        {
+            if (chits[i] == chit)
+            {
+                removeChit(i);
+            }
+        }
     }
 
 
@@ -216,7 +245,7 @@ class Hex
 
     BattleChit getChit(int i)
     {
-        if (numChits > i)
+        if (i >= 0 && i < numChits)
         {
             return chits[i];
         }
@@ -238,8 +267,8 @@ class Hex
         Point point = getCenter();
 
         // Cascade chits diagonally.
-        point.x -= chitScale * (numChits / 2) / 4;
-        point.y -= chitScale * (numChits / 2) / 4;
+        point.x -= chitScale * (1 + (numChits)) / 4;
+        point.y -= chitScale * (1 + (numChits)) / 4;
 
         for (int i = 0; i < numChits; i++)
         {
@@ -292,7 +321,14 @@ class Hex
 
     void setNeighbor(int i, Hex hex)
     {
-        neighbors[i] = hex;
+        if (i >= 0 && i < 6)
+        {
+            neighbors[i] = hex;
+        }
+        else
+        {
+            System.out.println("bad setNeighbor " + i);
+        }
     }
 
     Hex getNeighbor(int i)
