@@ -207,7 +207,7 @@ public final class Legion
 
             while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
             {
-                recruits = Game.findEligibleAngels(this, tmpScore / 500 >
+                recruits = game.findEligibleAngels(this, tmpScore / 500 >
                     (score - points) / 500 && !didArchangel);
                 String type = AcquireAngel.acquireAngel(masterFrame,
                     player.getName(), recruits);
@@ -424,7 +424,7 @@ public final class Legion
                 }
                 if (critter.isImmortal())
                 {
-                    critter.putOneBack();
+		    getPlayer().getGame().getCaretaker().putOneBack(critter);
                 }
             }
             log.append("] ");
@@ -509,7 +509,7 @@ public final class Legion
     public boolean canRecruit()
     {
         if (recruited || getHeight() > 6 || getPlayer().isDead() ||
-            Game.findEligibleRecruits(this).isEmpty())
+            getPlayer().getGame().findEligibleRecruits(this).isEmpty())
         {
             return false;
         }
@@ -525,7 +525,7 @@ public final class Legion
             ListIterator lit = critters.listIterator(critters.size());
             Critter critter = (Critter)lit.previous();
 
-            critter.putOneBack();
+	    getPlayer().getGame().getCaretaker().putOneBack(critter);
             removeCreature(critter, false, true);
 
             recruited = false;
@@ -593,9 +593,10 @@ public final class Legion
     {
         if (takeFromStack)
         {
-            if (creature.getCount() > 0)
+	    Caretaker caretaker = getPlayer().getGame().getCaretaker();
+            if (caretaker.getCount(creature) > 0)
             {
-                creature.takeOne();
+		caretaker.takeOne(creature);
             }
             else
             {
@@ -618,7 +619,7 @@ public final class Legion
         // If the creature is a lord or demi-lord, put it back in the stacks.
         if (returnImmortalToStack && critter.isImmortal())
         {
-            critter.putOneBack();
+	    getPlayer().getGame().getCaretaker().putOneBack(critter);
         }
 
         // If there are no critters left, disband the legion.
@@ -710,7 +711,7 @@ public final class Legion
             // Keep removeLegion() from returning lords to stacks.
             if (critter.isLord())
             {
-                critter.takeOne();
+		getPlayer().getGame().getCaretaker().takeOne(critter);
             }
         }
         if (remove)

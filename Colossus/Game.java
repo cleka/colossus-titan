@@ -24,6 +24,7 @@ public final class Game
     private MovementDie movementDie;
     private SummonAngel summonAngel;
     private AI ai = new SimpleAI();
+    private Caretaker caretaker = new Caretaker();
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -109,7 +110,7 @@ public final class Game
 
         turnNumber = 1;
 
-        Creature.resetAllCounts();
+        caretaker.resetAllCounts();
         if (board != null)
         {
             board.clearLegions();
@@ -264,6 +265,10 @@ public final class Game
         }
     }
 
+    public Caretaker getCaretaker()
+    {
+	return caretaker;
+    }
 
     public int getNumPlayers()
     {
@@ -777,7 +782,7 @@ public final class Game
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
-            out.println(creature.getCount());
+            out.println(caretaker.getCount(creature));
         }
 
         it = players.iterator();
@@ -957,7 +962,7 @@ public final class Game
                 Creature creature = (Creature)it.next();
                 buf = in.readLine();
                 int count = Integer.parseInt(buf);
-                creature.setCount(count);
+                caretaker.setCount(creature,count);
             }
 
             players.clear();
@@ -1847,14 +1852,14 @@ public final class Game
 
 
     /** Return a list of eligible recruits, as Creatures. */
-    public static ArrayList findEligibleRecruits(Legion legion)
+    public ArrayList findEligibleRecruits(Legion legion)
     {
         return findEligibleRecruits(legion, legion.getCurrentHex());
     }
 
 
     /** Return a list of eligible recruits, as Creatures. */
-    public static ArrayList findEligibleRecruits(Legion legion, MasterHex hex)
+    public ArrayList findEligibleRecruits(Legion legion, MasterHex hex)
     {
         ArrayList recruits;
 
@@ -1961,7 +1966,7 @@ public final class Game
         while (it.hasNext())
         {
             Creature recruit = (Creature)it.next();
-            if (recruit.getCount() < 1)
+            if (caretaker.getCount(recruit) < 1)
             {
                 it.remove();
             }
@@ -1973,8 +1978,7 @@ public final class Game
 
     /** Return a list of eligible recruiters. Use Critters instead
      *  of Creatures so that Titan power is shown properly. */
-    public static ArrayList findEligibleRecruiters(Legion legion,
-        Creature recruit)
+    public ArrayList findEligibleRecruiters(Legion legion, Creature recruit)
     {
         ArrayList recruiters = new ArrayList(4);
 
@@ -2128,7 +2132,7 @@ public final class Game
     }
 
     /** Return a list of names of angel types that can be acquired. */
-    public static ArrayList findEligibleAngels(Legion legion, boolean archangel)
+    public ArrayList findEligibleAngels(Legion legion, boolean archangel)
     {
         if (legion.getHeight() >= 7)
         {
@@ -2137,11 +2141,11 @@ public final class Game
 
         ArrayList recruits = new ArrayList(2);
 
-        if (Creature.angel.getCount() >= 1)
+        if (caretaker.getCount(Creature.angel) >= 1)
         {
             recruits.add(Creature.angel.toString());
         }
-        if (archangel && Creature.archangel.getCount() >= 1)
+        if (archangel && caretaker.getCount(Creature.archangel) >= 1)
         {
             recruits.add(Creature.archangel.toString());
         }
@@ -2232,14 +2236,14 @@ public final class Game
         MasterHex hex = MasterBoard.getHexFromLabel(String.valueOf(
             100 * player.getTower()));
 
-        Creature.titan.takeOne();
-        Creature.angel.takeOne();
-        Creature.ogre.takeOne();
-        Creature.ogre.takeOne();
-        Creature.centaur.takeOne();
-        Creature.centaur.takeOne();
-        Creature.gargoyle.takeOne();
-        Creature.gargoyle.takeOne();
+        caretaker.takeOne(Creature.titan);
+        caretaker.takeOne(Creature.angel);
+        caretaker.takeOne(Creature.ogre);
+        caretaker.takeOne(Creature.ogre);
+        caretaker.takeOne(Creature.centaur);
+        caretaker.takeOne(Creature.centaur);
+        caretaker.takeOne(Creature.gargoyle);
+        caretaker.takeOne(Creature.gargoyle);
 
         Legion legion = new Legion(selectedMarkerId, null, hex, hex,
             Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,

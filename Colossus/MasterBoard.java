@@ -312,7 +312,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 MasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowMasterHex(masterFrame, hex, lastPoint);
+                    new ShowMasterHex(masterFrame, game, hex, lastPoint);
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }

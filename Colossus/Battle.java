@@ -810,7 +810,7 @@ public final class Battle
                     else
                     {
                         // Reinforcement.
-                        critter.putOneBack();
+			legion.getPlayer().getGame().getCaretaker().putOneBack(critter);
                         // This recruit doesn't count.
                         legion.setRecruited(false);
                     }
@@ -837,7 +837,7 @@ public final class Battle
                 // of the stack, then the count must be adjusted.
                 if (donor != null)
                 {
-                    critter.takeOne();
+		    legion.getPlayer().getGame().getCaretaker().takeOne(critter);
                     donor = null;
                 }
 

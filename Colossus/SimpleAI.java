@@ -10,6 +10,7 @@ import java.util.*;
 
 class SimpleAI implements AI
 {
+    private static final boolean DEBUG = true;
     private Minimax minimax = new Minimax();
 
     public void muster (Game game)
@@ -63,6 +64,7 @@ class SimpleAI implements AI
 
 	    // create the new legion
 	    String selectedMarkerId = player.getFirstAvailableMarker();
+            selectedMarkerId = player.selectMarkerId(selectedMarkerId);
 	    if (selectedMarkerId == null)
 	    {
 		// ack! we're out of legion markers!
@@ -86,8 +88,7 @@ class SimpleAI implements AI
 	    if (legion.getHeight() == 8)
 	    {
 		// initial game split:
-		//
-		// move either titan or angel at random (this giving away no info)
+		// move either titan or angel at random (thus giving away no info)
 		//
 		// CMU style: if we're in an odd tower, split ogres.
 		// if we're in an even tower, split centaurs.
@@ -232,6 +233,7 @@ class SimpleAI implements AI
 	Legion enemyLegion = hex.getEnemyLegion(legion.getPlayer());
 	if (enemyLegion != null)
 	{
+	    // very conservative attack here
 	    int discountedPointValue = (3 * legion.getPointValue()) / 4;
 	    if (legion.numCreature(Creature.titan) > 0)
 		discountedPointValue -= 10; // be a bit cautious attacking w/titan
@@ -253,15 +255,75 @@ class SimpleAI implements AI
 	// consider what we can recruit
 	if (canRecruitHere)
 	{
+	    // TODO: this should be a call to our recruiting code
+	    // to see what recruit we'd actually take
 	    List recruits = game.findEligibleRecruits(legion,hex);
+	    if (DEBUG) System.out.println("recruits " + recruits);
 	    if (recruits.size() > 0)
 	    {
+		int oldval = value;
 		Creature recruit = (Creature)recruits.get(recruits.size() - 1);
-		value += recruit.getSkill() * recruit.getPower();
+		if (legion.getHeight() < 6)
+		    value += recruit.getSkill() * recruit.getPower();
+		else
+		{
+		    // Idea:
+		    // if we're 6-high, then the value of a recruit is
+		    // equal to the improvement in the value of the
+		    // pieces we'll have after splitting.
+
+		    // TODO this should call our splitting code to see
+		    // what split decision we would make
+
+		    if (DEBUG) System.out.println("--- 6-HIGH SPECIAL CASE");
+		    
+		    Critter weakest1 = null;
+		    Critter weakest2 = null;
+		    for (Iterator critterIt = legion.getCritters().iterator(); 
+			 critterIt.hasNext(); )
+		    {
+			Critter critter = (Critter) critterIt.next();
+			if (weakest1 == null)
+			    weakest1 = critter;
+			else if (weakest2 == null)
+			    weakest2 = critter;
+			else if (critter.getPointValue() < weakest1.getPointValue())
+			    weakest1 = critter;
+			else if (critter.getPointValue() < weakest2.getPointValue())
+			    weakest2 = critter;
+			else if ( critter.getPointValue() == weakest1.getPointValue()
+				  && critter.getPointValue() == weakest2.getPointValue())
+			{
+			    if (critter.getName().equals(weakest1.getName()))
+				weakest2 = critter;
+			else if (critter.getName().equals(weakest2.getName()))
+			    weakest1 = critter;
+			}
+		    }
+		    int minCreaturePV 
+			= Math.min(weakest1.getPointValue(),weakest2.getPointValue());
+		    int maxCreaturePV 
+			= Math.max(weakest1.getPointValue(),weakest2.getPointValue());
+		    // point value of my best 5 pieces right now
+		    int oldPV = legion.getPointValue() - minCreaturePV;
+		    // point value of my best 5 pieces after adding this recruit
+		    // and then splitting off my 2 weakest
+		    int newPV = legion.getPointValue() 
+			- weakest1.getPointValue()
+			- weakest2.getPointValue() 
+			+ Math.max(maxCreaturePV,recruit.getPointValue());
+		    value += newPV - oldPV;
+		} 
+		if (DEBUG) System.out.println("--- if " + legion
+				   + " moves to " + hex
+				   + " then it could recruit " 
+				   +  recruit.toString()
+				   + " (adding " + (value-oldval) + " to score)" );
 	    }
 	}
 
 	// consider what we might be able to recruit next turn, from here
+	int nextTurnValue = 0;
 	for (int roll = 1; roll <= 6; roll++)
 	{
 	    Set moves = game.listMoves(legion,true,hex,roll);
@@ -283,16 +345,21 @@ class SimpleAI implements AI
 		    bestRecruit = nextRecruit;
 		}
 	    }
-	    value += bestRecruitVal / 6; // 1/6 chance of rolling "roll" to get this
-	    if (bestRecruit != null)
+	    nextTurnValue += bestRecruitVal; 
+	    if (DEBUG && bestRecruit != null)
 		System.out.println("--- if " + legion
 				   + " moves to " + hex
 				   + " then it could recruit " 
 				   +  bestRecruit.toString()
 				   + " on a " + roll +  " next turn..."
-				   + " (adding " + (bestRecruitVal/6) + " to score)"
+				   + " (adding " + (bestRecruitVal/6.0) + " to score)"
 				   );
 	}
+	nextTurnValue /= 6; // 1/6 chance of each happening
+	value += nextTurnValue;
+	System.out.println("--- if " + legion
+			   + " moves to " + hex
+			   + " total score " + value);
 		
 	// TODO: consider mobility.  e.g., penalty for suckdown
 	// squares, bonus if next to tower
@@ -306,7 +373,7 @@ class SimpleAI implements AI
 	// TODO: consider risk of being scooby snacked (this might be inherent)
 
 	// TODO: consider splitting up our good recruitment rolls
-	// (i.e. if another legion has a warbears under the top that
+	// (i.e. if another legion has warbears under the top that
 	// recruit on 1,3,5, and we have a behemoth with choice of 3/5
 	// to jungle or 2/6 to jungle, prefer the 2/6 location).
 	return value;
@@ -367,6 +434,4 @@ class SimpleAI implements AI
 	public void setValue(int value) { this.value = value; }
 	public int getValue() { return value; }
     }
-
-
 }

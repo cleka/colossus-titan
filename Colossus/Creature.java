@@ -1,29 +1,31 @@
 import java.util.*;
 
 /**
- * Class Creature represents a Titan Character
+ *
+ * Class Creature represents the CONSTANT information about a Titan Creature.
+ *
+ * Game related info is in Critter.  Counts of recruited/available/dead are in Caretaker.
+ *
  * @version $Id$
- * @author David Ripton
+ * @author David Ripton, Bruce Sherrod
  */
 
 public class Creature implements Comparable
 {
-    protected String name;
-    protected String pluralName;
-    protected int power;
-    protected int skill;
-    protected boolean rangestrikes;
-    protected boolean flies;
-    protected boolean nativeBramble;
-    protected boolean nativeDrift;
-    protected boolean nativeBog;
-    protected boolean nativeSandDune;
-    protected boolean nativeSlope;
-    protected boolean lord;
-    protected boolean demilord;
-    protected int count;
-    protected final int maxCount;
-
+    private final String name;
+    private final String pluralName;
+    private final int power;
+    private final int skill;
+    private final boolean rangestrikes;
+    private final boolean flies;
+    private final boolean nativeBramble;
+    private final boolean nativeDrift;
+    private final boolean nativeBog;
+    private final boolean nativeSandDune;
+    private final boolean nativeSlope;
+    private final boolean lord;
+    private final boolean demilord;
+    private final int maxCount; 
 
     // Add various Creature archetypes as class members
     public static final Creature angel = new Creature("Angel", 6, 4,
@@ -116,7 +118,7 @@ public class Creature implements Comparable
     private Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
-        boolean lord, boolean demilord, int count, String pluralName)
+        boolean lord, boolean demilord, int maxCount, String pluralName)
     {
         this.name = name;
         this.power = power;
@@ -130,8 +132,7 @@ public class Creature implements Comparable
         this.nativeSlope = nativeSlope;
         this.lord = lord;
         this.demilord = demilord;
-        this.maxCount = count;
-        this.count = count;
+        this.maxCount = maxCount;
         this.pluralName = pluralName;
     }
 
@@ -150,8 +151,7 @@ public class Creature implements Comparable
         this.nativeSlope = creature.nativeSlope;
         this.lord = creature.lord;
         this.demilord = creature.demilord;
-        this.maxCount = creature.count;
-        this.count = creature.count;
+        this.maxCount = creature.maxCount;
         this.pluralName = creature.pluralName;
     }
 
@@ -161,41 +161,10 @@ public class Creature implements Comparable
         return creatures;
     }
 
-
-    public int getCount()
+    public int getMaxCount()
     {
-        return count;
+        return maxCount;
     }
-
-
-    public void setCount(int count)
-    {
-        this.count = count;
-    }
-
-
-    public static void resetAllCounts()
-    {
-        Iterator it = creatures.iterator();
-        while (it.hasNext())
-        {
-            Creature creature = (Creature)it.next();
-            creature.count = creature.maxCount;
-        }
-    }
-
-
-    public void takeOne()
-    {
-        count--;
-    }
-
-
-    public void putOneBack()
-    {
-        count++;
-    }
-
 
     public boolean isLord()
     {
@@ -244,18 +213,15 @@ public class Creature implements Comparable
         return power;
     }
 
-
-    protected void setPower(int power)
-    {
-        this.power = power;
-    }
-
-
     public int getSkill()
     {
         return skill;
     }
 
+    public int getPointValue()
+    {
+        return getPower() * getSkill();
+    } 
 
     public boolean isRangestriker()
     {
