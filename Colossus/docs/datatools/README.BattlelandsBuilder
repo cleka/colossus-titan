@@ -1,0 +1,34 @@
+### BattlelandsBuilder ### README FILE ###
+
+BattlelandsBuilder is a (crude) tools to create Battlelands
+for use with the "Colossus" Game. It requires a JDK or
+JRE >= 1.2.1.
+
+See <http://colossus.sourceforge.net/>
+
+To create the program, just type "make datatools".
+This should create all the datatools for Colossus.
+
+You can use it directly, starting from a bare plain,
+or you can give a pre-existing Battlelands as a
+starting point. Just give the path to the file as
+the first argument to the command.
+
+Exemples:
+* java -jar BattlelandsBuilder.jar
+* java -jar BattlelandsBuilder.jar Battlelands/Woods
+
+Editing is point-and-click : click in the middle
+of an hex to get a popup-menu to change the type
+and elevation of the hex ; click near the border of
+an hex to get a popup-menu to change this border of
+this hex (warning: beware slope or wall who can
+easily be put on the wrong hex, as their not much
+visual clue of their orientation).
+
+ATM, the 'Save' and 'Save As' menu aren't working,
+they both dump the Battleland on the standard output.
+Copy/Paste them (or use a redirection) to the proper
+file.
+
+File Version: $Header$

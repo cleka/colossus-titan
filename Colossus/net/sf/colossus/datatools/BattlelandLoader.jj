@@ -1,0 +1,159 @@
+options
+{
+  IGNORE_CASE = false;
+  STATIC = false;
+}
+
+PARSER_BEGIN(BattlelandLoader)
+package net.sf.colossus.datatools;
+
+import java.util.*;
+
+/**
+ * BattlelandLoader load the Battlelands descriptions into a BuilderHex array.
+ * @author Romain Dolbeau
+ * @version $Id$
+ * @see net.sf.colossus.client.BuilderHex
+ */
+public class BattlelandLoader
+{
+    /**
+     * hexSide is used internally to represent data about the side of an Hex.
+     * @author Romain Dolbeau
+     * @version $Id$
+     */
+    class hexSide 
+    {
+        /**
+         * Position of the hexSide, between 0 and 5.
+         */
+        int pos;
+        /**
+         * Type of the hexSide
+         * @see net.sf.colossus.client.BuilderHex
+         */
+        char type;
+        hexSide(int p, char t) { pos = p; type = t; }
+    }
+}
+
+PARSER_END(BattlelandLoader)
+
+SKIP :
+{
+        " "
+  |     "\r"
+  |     "\t"
+}
+
+TOKEN :
+{
+        < COMMENT : "#"(<NOTNEWLINE>)*"\r" | "#"(<NOTNEWLINE>)*"\n" >
+|       < #NOTNEWLINE : ~["\n","\r"] >
+}
+
+String b_comment() :
+{}
+{
+    <COMMENT>
+    {
+        return(new String(token.image));
+    }
+}
+
+TOKEN :
+{
+        < EOL: "\n" >
+}
+
+TOKEN :
+{
+        < NUMBER : (<DIGIT>)+ >
+|       < #DIGIT: ["0" - "9"] >
+}
+
+TOKEN :
+{
+        < TERRAIN : ["a"-"z","A"-"Z"] >
+}
+
+int b_number() :
+{}
+{
+    <NUMBER>
+    {
+        return(Integer.parseInt(token.image));
+    }
+}
+
+char b_terrain() :
+{}
+{
+    <TERRAIN>
+    {
+        return(token.image.charAt(0));
+    }
+}
+
+hexSide b_hexSide() :
+{
+    int p;
+    char t;
+}
+{
+    (p = b_number()) (t = b_terrain())
+    {
+        return new hexSide(p, t );
+    }
+}
+
+ArrayList b_allHexSide() :
+{
+    ArrayList temp;
+    hexSide hs;
+}
+{
+    (hs = b_hexSide()) (temp = b_allHexSide())
+    { temp.add(0, hs); return temp; }
+|   /* empty */
+    { return new ArrayList(); }
+}
+
+/**
+ * @param h The BuilderHex in which the case will be added.
+ * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
+ * @see net.sf.colossus.client.BuilderHex
+ */
+int oneBattlelandCase(BuilderHex [][] h) :
+{
+    int x,y,e;
+    char t;
+    ArrayList hsl;
+    String s;
+}
+{
+    (x = b_number()) (y = b_number()) (t = b_terrain()) (e = b_number()) (hsl = b_allHexSide())
+    {
+        h[x][y].setTerrain(t);
+        h[x][y].setElevation(e);
+        for (int i = 0; i < hsl.size() ; i++)
+        {
+            hexSide hs = (hexSide)hsl.get(i);
+            h[x][y].setHexside(hs.pos, hs.type);
+        }
+        return(1);
+    }
+|   <EOL>
+    {
+        return(0);
+    }
+|   (s = b_comment())
+    {
+        System.err.println("Found comment : " + s);
+        return(0);
+    }
+|   <EOF>
+    {
+        return(-1);
+    }
+}

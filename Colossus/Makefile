@@ -125,3 +125,26 @@ javadoc:
         net/sf/colossus/client/*.java net/sf/colossus/server/*.java \
         net/sf/colossus/util/*.java net/sf/colossus/parser/*.java
 
+# Make the Colossus-related tools
+BBJAR=BattlelandsBuilder.jar
+BBSRC=net/sf/colossus/datatools/BattlelandsBuilder.java \
+      net/sf/colossus/datatools/BuilderHex.java \
+      net/sf/colossus/datatools/BuilderHexMap.java \
+      net/sf/colossus/datatools/GUIBuilderHex.java \
+      net/sf/colossus/datatools/Hex.java \
+      net/sf/colossus/datatools/ShowBuilderHexMap.java \
+      net/sf/colossus/util/HTMLColor.java \
+      net/sf/colossus/datatools/BattlelandLoader.java
+BBCLASS=$(addsuffix .class,$(basename $(BBSRC)))
+BBMANIFEST=META-INF/datatools/BattlelandsBuilder/MANIFEST.MF
+
+datatools: $(BBJAR)
+
+
+$(BBJAR): $(BBCLASS)
+	jar -cmf $(BBMANIFEST) $@ net/sf/colossus/datatools/*.class \
+                                  net/sf/colossus/util/HTMLColor.class
+	chmod +x $@
+
+net/sf/colossus/datatools/BattlelandLoader.java: net/sf/colossus/datatools/BattlelandLoader.jj
+	$(JAVACC) -STATIC=false -OUTPUT_DIRECTORY=net/sf/colossus/datatools $<
