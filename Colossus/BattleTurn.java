@@ -24,6 +24,7 @@ class BattleTurn extends Dialog implements ActionListener
     private int turnNumber = 1;
     private int phase = MOVE;
     private SummonAngel summonAngel;
+    private boolean summoningAngel = false;
 
 
     BattleTurn(Frame parentFrame, BattleMap map, Legion attacker, Legion
@@ -86,6 +87,7 @@ System.out.println("summonState = " + summonState);
                 attacker.getPlayer().canSummonAngel())
             {
 System.out.println("SummonAngel");
+                summoningAngel = true;
                 summonAngel = new SummonAngel(map.getBoard(), attacker);
                 // This is the last chance to summon an angel until the
                 // battle is over.
@@ -93,14 +95,14 @@ System.out.println("SummonAngel");
             }
         }
 
-        if (summonAngel == null)
+        if (!summoningAngel)
         {
-System.out.println("summonAngel is null");
+System.out.println("summoningAngel is false");
             advancePhase();
         }
         else
         {
-System.out.println("summonAngel is not null");
+System.out.println("summoningAngel is true");
         }
     }
 
@@ -115,7 +117,7 @@ System.out.println("placeNewChit");
             map.placeNewChit(attacker);
         }
 
-        summonAngel = null;
+        summoningAngel = false;
 
         if (phase == SUMMON)
         {
