@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<variant name="Pantheon">
+    <strategic_map filename="PantheonMap.xml" />
+    <creatures filename="PantheonCre.xml" />
+    <terrain_recruits filename="PantheonTer.xml" />
+    <depends>
+        <depend variant="ExtTitan" />
+    </depends>
+    <hint classname="Pantheon.PantheonHint" />
+</variant>
