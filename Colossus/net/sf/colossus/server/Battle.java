@@ -75,6 +75,8 @@ final class Battle
         }
         Legion defender = getDefender();
         defender.setEntrySide((side + 3) % 6);
+        // Make sure defender can recruit, even if savegame is off.
+        defender.setRecruitName(null);
 
         Log.event(attacker.getLongMarkerName() + " (" +
             attacker.getPlayerName() + ") attacks " +
@@ -137,7 +139,7 @@ final class Battle
      *  is non-null earlier. */
     void init()
     {
-        server.allInitBattleMap(masterHexLabel);
+        server.allInitBattle(masterHexLabel);
         initBattleChits(getAttacker(), false);
         initBattleChits(getDefender(), true);
 
@@ -909,9 +911,21 @@ final class Battle
 
     void leaveCarryMode()
     {
-        carryDamage = 0;
-        carryTargets.clear();
-        server.allClearCarries();
+        boolean notify = false;
+        if (carryDamage > 0)
+        {
+            carryDamage = 0;
+            notify = true;
+        }
+        if (!carryTargets.isEmpty())
+        {
+            carryTargets.clear();
+            notify = true;
+        }
+        if (notify)
+        {
+            server.allDoneWithCarries();
+        }
     }
 
 
@@ -946,8 +960,6 @@ final class Battle
                             Player player = legion.getPlayer();
                             donor = player.getDonor();
                             donor.addCreature(critter, false);
-                            server.allRepaintHex(
-                                donor.getCurrentHexLabel());
                             // This summon doesn't count; the player can
                             // summon again later this turn.
                             player.setSummoned(false);
@@ -998,7 +1010,6 @@ final class Battle
                     // prevent concurrent modification problems.
                     it.remove();
                     server.allRemoveBattleChit(critter.getTag());
-                    server.allRepaintBattleHex(hexLabel);
                 }
                 else  // critter is alive
                 {
@@ -1312,13 +1323,6 @@ final class Battle
     void removeCarryTarget(String hexLabel)
     {
         carryTargets.remove(hexLabel);
-    }
-
-
-    void applyCarries(String hexLabel)
-    {
-        Critter target = getCritter(hexLabel);
-        applyCarries(target);
     }
 
     void applyCarries(Critter target)

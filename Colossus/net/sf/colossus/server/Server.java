@@ -90,13 +90,14 @@ public final class Server
         }
     }
 
-    void allClearCarries()
+    // TODO Merge with setBattleValues, setCarries, etc.
+    void allDoneWithCarries()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.clearCarries();
+            client.doneWithCarries();
         }
     }
 
@@ -137,10 +138,12 @@ public final class Server
     }
 
 
-    public void makeForcedStrikes(boolean rangestrike)
+    public void makeForcedStrikes(String playerName, boolean rangestrike)
     {
-        Battle battle = game.getBattle();
-        battle.makeForcedStrikes(rangestrike);
+        if (playerName.equals(getBattleActivePlayerName()))
+        {
+            game.getBattle().makeForcedStrikes(rangestrike);
+        }
     }
 
 
@@ -250,7 +253,6 @@ public final class Server
     }
 
 
-    /** XXX temp */
     void allInitBoard()
     {
         Iterator it = clients.iterator();
@@ -261,23 +263,15 @@ public final class Server
         }
     }
 
-    void allLoadInitialMarkerImages()
+    void allAddMarkers()
     {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.loadInitialMarkerImages();
-        }
-    }
+        java.util.List markerIds = game.getAllLegionIds();
 
-    void allSetupPlayerLabel()
-    {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setupPlayerLabel();
+            client.addMarkers(markerIds);
         }
     }
 
@@ -382,12 +376,9 @@ public final class Server
 
     void allAlignLegions(String hexLabel)
     {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.alignLegions(hexLabel);
-        }
+        Set set = new HashSet();
+        set.add(hexLabel);
+        allAlignLegions(set);
     }
 
     void allAlignLegions(Set hexLabels)
@@ -421,66 +412,6 @@ public final class Server
         }
     }
 
-    void allUnselectHexByLabel(String hexLabel)
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.unselectHexByLabel(hexLabel);
-        }
-    }
-
-    void allUnselectAllHexes()
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.unselectAllHexes();
-        }
-    }
-
-    void allRepaintHex(String hexLabel)
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.repaintMasterHex(hexLabel);
-        }
-    }
-
-
-    void allUnselectBattleHexByLabel(String hexLabel)
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.unselectBattleHexByLabel(hexLabel);
-        }
-    }
-
-    void allUnselectAllBattleHexes()
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.unselectAllBattleHexes();
-        }
-    }
-
-    void allRepaintBattleHex(String hexLabel)
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.repaintBattleHex(hexLabel);
-        }
-    }
 
     void allAlignBattleChits(Set hexLabels)
     {
@@ -540,7 +471,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.highlightEngagements();
+            client.highlightEngagements(game.findEngagements());
         }
     }
 
@@ -658,7 +589,6 @@ public final class Server
     void didMuster(Legion legion)
     {
         allUpdateStatusScreen();
-        allUnselectHexByLabel(legion.getCurrentHexLabel());
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
@@ -802,7 +732,8 @@ public final class Server
     public void applyCarries(String hexLabel)
     {
         Battle battle = game.getBattle();
-        battle.applyCarries(hexLabel);
+        Critter target = battle.getCritter(hexLabel);
+        battle.applyCarries(target);
     }
 
     public int getCarryDamage()
@@ -928,7 +859,7 @@ public final class Server
     /** Takes a Set of PenaltyOptions. */
     void askChooseStrikePenalty(SortedSet penaltyOptions)
     {
-        String playerName = game.getActivePlayerName();
+        String playerName = getBattleActivePlayerName();
         Client client = getClient(playerName);
         ArrayList choices = new ArrayList();
         Iterator it = penaltyOptions.iterator();
@@ -947,33 +878,27 @@ public final class Server
         striker = null;
     }
 
-    void allInitBattleMap(String masterHexLabel)
+    void allInitBattle(String masterHexLabel)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.initBattleMap(masterHexLabel);
+            client.initBattle(masterHexLabel);
         }
     }
 
 
-    void allDisposeBattleMap()
+    void allCleanupBattle()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.disposeBattleMap();
+            client.cleanupBattle();
         }
     }
 
-
-    void setupPlayerLabel(String playerName)
-    {
-        Client client = getClient(playerName);
-        client.setupPlayerLabel();
-    }
 
     /** Return the new die roll, or -1 on error. */
     public int mulligan(String playerName)
@@ -1297,8 +1222,6 @@ public final class Server
     void didSplit(String hexLabel, String parentId, String childId, int height)
     {
         allUpdateStatusScreen();
-        allUnselectHexByLabel(hexLabel);
-        allAlignLegions(hexLabel);
 
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -1375,11 +1298,6 @@ public final class Server
         return game.getPossibleEntrySides(markerId, hexLabel, teleport);
     }
 
-
-    public List getAllLegionIds()
-    {
-        return game.getAllLegionIds();
-    }
 
     public int getActivePlayerNum()
     {

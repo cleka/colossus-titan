@@ -300,10 +300,9 @@ public final class Game
             Player player = (Player)it.next();
             // XXX Need to let player pick first marker along with color.
             placeInitialLegion(player, player.getFirstAvailableMarker());
-            server.setupPlayerLabel(player.getName());
             server.allUpdateStatusScreen();
         }
-        server.allLoadInitialMarkerImages();
+        server.allAddMarkers();
 
         autoSave();
 
@@ -311,12 +310,7 @@ public final class Game
 
         server.allUpdateStatusScreen();
         server.allUpdateCaretakerDisplay();
-
-        // Reset the color of the player label now that it's known.
-        server.allSetupPlayerLabel();
     }
-
-
 
 
     private static String getPhaseName(int phase)
@@ -1043,7 +1037,7 @@ public final class Game
             players.clear();
             if (battle != null)
             {
-                server.allDisposeBattleMap();
+                server.allCleanupBattle();
             }
 
             // Players
@@ -1192,7 +1186,7 @@ public final class Game
 
             // Setup MasterBoard
             server.allInitBoard();
-            server.allLoadInitialMarkerImages();
+            server.allAddMarkers();
             setupPhase();
 
             server.allUpdateStatusScreen();
@@ -1532,7 +1526,7 @@ public final class Game
     /** Add recruit to legion. */
     void doRecruit(Legion legion, Creature recruit, Creature recruiter)
     {
-        // TODO Check for recruiter legality.
+        // XXX TODO Check for recruiter legality.
 
         legion.addCreature(recruit, true);
         MasterHex hex = legion.getCurrentHex();
@@ -1556,8 +1550,6 @@ public final class Game
 
         // Recruits are one to a customer.
         legion.setRecruitName(recruit.getName());
-        // XXX Handle repaints on client side.
-        server.allRepaintHex(legion.getCurrentHexLabel());
 
         reinforcing = false;
     }
@@ -2059,7 +2051,7 @@ reinforcing + " acquiring=" + acquiring);
     void finishBattle(String hexLabel, boolean attackerEntered)
     {
         battle = null;
-        server.allDisposeBattleMap();
+        server.allCleanupBattle();
 
         // Handle any after-battle angel summoning or recruiting.
         if (getNumLegions(hexLabel) == 1)
@@ -2235,9 +2227,6 @@ reinforcing + " acquiring=" + acquiring);
         }
 
         legion.moveToHex(hex, entrySide, teleport);
-        // XXX Handle repaints on client side.
-        server.allRepaintHex(legion.getStartingHexLabel());
-        server.allRepaintHex(hexLabel);
         return true;
     }
 
@@ -2483,10 +2472,6 @@ reinforcing + " acquiring=" + acquiring);
         {
             losingPlayer.die(winner.getPlayerName(), true);
         }
-
-        // Unselect and repaint the hex.
-        String hexLabel = winner.getCurrentHexLabel();
-        server.allUnselectHexByLabel(hexLabel);
 
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering

@@ -745,13 +745,15 @@ final class Legion implements Comparable
      *  battle as well as during the muster phase. */
     boolean canRecruit()
     {
-        if (recruitName != null || getHeight() > 6 || getPlayer().isDead() ||
-            game.findEligibleRecruits(
-                getMarkerId(), getCurrentHexLabel()).isEmpty())
-        {
-            return false;
-        }
-        return true;
+Log.debug("recruitName is " + recruitName + " height is "  +getHeight() +
+" dead is " + getPlayer().isDead() + 
+" numEligibleRecruits is " + game.findEligibleRecruits(
+                getMarkerId(), getCurrentHexLabel()).size());
+
+        return (recruitName == null && getHeight() <= 6 && 
+            !getPlayer().isDead() &&
+            !(game.findEligibleRecruits(
+                getMarkerId(), getCurrentHexLabel()).isEmpty()));
     }
 
 
@@ -765,7 +767,6 @@ final class Legion implements Comparable
             recruitName = null;
             Log.event("Legion " + getLongMarkerName() +
                 " undoes its recruit");
-            game.getServer().allRepaintHex(currentHexLabel);
         }
     }
 

@@ -215,8 +215,6 @@ final class Critter extends Creature implements Comparable
             {
                 setDead(true);
             }
-
-            battle.getGame().getServer().allRepaintBattleHex(currentHexLabel);
         }
 
         return excess;
@@ -652,7 +650,7 @@ Log.debug("calling Critter.assignStrikePenalty() with " + prompt);
         PenaltyOption po = matchingPenaltyOption(prompt); 
         if (po != null)
         {
-Log.debug("Valid penalty option");
+            Log.debug("Valid penalty option " + po.toString());
             Critter target = po.getTarget();
             int dice = po.getDice();
             int strikeNumber = po.getStrikeNumber();
@@ -835,7 +833,6 @@ Log.debug("new penalty option: " + po.toString());
         // Record that this attacker has struck.
         struck = true;
 
-        // Display the rolls in the BattleDice dialog.
         if (game != null)
         {
             game.getServer().allSetBattleValues(getName(), target.getName(), 

@@ -9,11 +9,15 @@ Optional post-engagement status dialog showing which legions/players
    reinforcements, and points.
 
 Change some dialogs to show info in a label instead of the title, 
-   and add explicit cancel buttons.  AcquireAngel...
+   and add explicit cancel buttons.
 
-Move code to center a dialog on screen to one place.
+Move code to center a dialog on screen to one place.  Maybe add a
+   parent dialog class?
 
 Change StatusScreen to use a JTable.
+
+Maybe add NullMap and NullBoard instances for AI clients, to reduce
+    the number of null checks.
 
 Cache known legion contents in Client.
 Cache hex location of each legion in Client.

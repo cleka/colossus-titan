@@ -107,28 +107,8 @@ public final class MasterBoard extends JPanel
     /* a Set of label (String) of all Tower hex */
     private static Set towerSet;
 
-    /*
-    static
-    {
-        plainHexes.clear();
+    boolean playerLabelDone;
 
-        // Initialize plain hexes.
-        for (int i = 0; i < plain.length; i++)
-        {
-            for (int j = 0; j < plain[0].length; j++)
-            {
-                if (show[i][j])
-                {
-                    MasterHex hex = new MasterHex();
-                    plain[i][j] = hex;
-                    plainHexes.add(hex);
-                }
-            }
-        }
-
-        setupHexesGameState(plain);
-    }
-    */
 
     MasterBoard(Client client)
     {
@@ -613,6 +593,10 @@ public final class MasterBoard extends JPanel
     /** Show which player owns this board. */
     void setupPlayerLabel()
     {
+        if (playerLabelDone)
+        {
+            return;
+        }
         String playerName = client.getPlayerName();
         if (playerLabel == null)
         {
@@ -632,6 +616,8 @@ public final class MasterBoard extends JPanel
         {
             Color color = PickColor.getBackgroundColor(colorName);
             playerLabel.setForeground(color);
+            // Don't do this again.
+            playerLabelDone = true;
         }
     }
 
@@ -1224,21 +1210,6 @@ public final class MasterBoard extends JPanel
     }
 
 
-    /** Create markers for all existing legions. */
-    void loadInitialMarkerImages()
-    {
-        Iterator it = client.getAllLegionIds().iterator();
-        while (it.hasNext())
-        {
-            String markerId = (String)it.next();
-            client.addMarker(markerId);
-        }
-        alignAllLegions();
-        masterFrame.setVisible(true);
-        repaint();
-    }
-
-
     void alignLegions(String hexLabel)
     {
         GUIMasterHex hex = getGUIHexByLabel(hexLabel);
@@ -1347,8 +1318,9 @@ public final class MasterBoard extends JPanel
     }
 
 
-    private void highlightTallLegions()
+    void highlightTallLegions()
     {
+        unselectAllHexes();
         selectHexesByLabels(client.findTallLegionHexes());
     }
 
@@ -1397,7 +1369,6 @@ public final class MasterBoard extends JPanel
     }
 
 
-    /** Return number of engagements found. */
     void highlightEngagements()
     {
         Set set = client.findEngagements();
@@ -1416,8 +1387,9 @@ public final class MasterBoard extends JPanel
     }
 
 
-    private void highlightPossibleRecruits()
+    void highlightPossibleRecruits()
     {
+        unselectAllHexes();
         selectHexesByLabels(client.findAllEligibleRecruitHexes());
     }
 
@@ -1866,9 +1838,8 @@ public final class MasterBoard extends JPanel
 
     void rescale()
     {
-        // XXX setupHexesGUI() should be sufficient but fails.
         setupHexes();
-        loadInitialMarkerImages();
+        client.recreateMarkers();
     }
 
 

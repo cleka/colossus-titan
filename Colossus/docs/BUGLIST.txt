@@ -127,6 +127,8 @@ MinimaxAI advances phases and turns illegally while a human player is trying
 Turn 1, AI in tower 600 rolled 6, moved legions to 136 and 38.  One of those
    moves was illegal.
 
+Carry cursor is invisible in Windows.  Works fine in Unix.
+
 
 PROGRAMMING BUGS:
 
@@ -199,3 +201,108 @@ Stuff (markers, LogWindow) that is painted before the MasterBoard is ready
    Need to setVisible(false) on master frame until later?
 
 Need to re-highlight strikers or carries after choosing a strike penalty.
+
+Battle log window dump showing several AI carry / strike penalty problems:
+Gr02 (Dagger) (Green) attacks Bk01 (Axes) (Black) in Hills hex 18
+Centaur moves from X2 to E3
+Ogre moves from X2 to C1
+Ogre moves from X2 to E2
+Centaur moves from X2 to F1
+Angel moves from X2 to D2
+Battle phase advances to Fight
+Battle phase advances to Strikeback
+Green's battle turn, number 1
+Battle phase advances to Move
+Centaur moves from X5 to F3
+Centaur moves from X5 to D3
+Lion moves from X5 to D4
+Lion moves from X5 to E4
+Angel moves from X5 to B1
+Gargoyle moves from X5 to F4
+Gargoyle moves from X5 to B3
+Battle phase advances to Fight
+Angel in B1 strikes Ogre in Plains hex C1 with strike number 2 : 525211: 4 hits
+Lion in D4 strikes Centaur in Plains (1) hex E3 with strike number 5 : 21141: 0 hits
+Lion in E4 strikes Centaur in Plains (1) hex E3 with strike number 5 : 22455: 2 hits
+Centaur in F3 strikes Centaur in Plains (1) hex E3 with strike number 5 : 465: 2 hits
+Centaur in D3 strikes Angel in Plains (1) hex D2 with strike number 5 : 125: 1 hit
+Battle phase advances to Strikeback
+Angel in D2 strikes Centaur in Plains hex D3 with strike number 4 : 626554: 5 hits
+Ogre in C1 strikes Angel in Plains (1) hex B1 with strike number 6 : 134232: 0 hits
+Centaur in E3 strikes Lion in Plains hex D4 with strike number 3 : 414: 2 hits
+Black's battle turn, number 2
+Battle phase advances to Move
+Angel moves from D2 to E3
+Ogre moves from E2 to D2
+Battle phase advances to Fight
+Ogre in C1 strikes Angel in Plains (1) hex B1 with strike number 6 : 614413: 1 hit
+Warn: Called BattleHex.getHexside() with -1
+Warn: Called BattleHex.getHexside() with -1
+Error: aiChooseStrikePenalty returned null!
+Angel in E3 strikes Lion in Plains hex D4 with strike number 3 : 653131: 4 hits
+1 carry available
+1 hit carries to Lion in Plains hex E4
+Battle phase advances to Strikeback
+Angel in B1 strikes Ogre in Plains hex C1 with strike number 2 : 645665: 6 hits
+Lion in D4 strikes Angel in Plains (1) hex E3 with strike number 5 : 41261: 1 hit
+Lion in E4 strikes Angel in Plains (1) hex E3 with strike number 5 : 43256: 2 hits
+Centaur in F3 strikes Angel in Plains (1) hex E3 with strike number 5 : 236: 1 hit
+Green's battle turn, number 2
+Battle phase advances to Move
+Angel moves from B1 to E2
+Gargoyle moves from B3 to C1
+Battle phase advances to Fight
+Lion in E4 strikes Angel in Plains (1) hex E3 with strike number 5 : 33523: 1 hit
+Gargoyle in C1 strikes Ogre in Plains (1) hex D2 with strike number 4 : 2431: 1 hit
+Angel in E2 strikes Centaur in Plains hex F1 with strike number 4 : 543222: 2 hits
+Battle phase advances to Strikeback
+Centaur in F1 strikes Angel in Plains hex E2 with strike number 4 : 454: 3 hits
+Ogre in D2 strikes Angel in Plains hex E2 with strike number 6 : 3136516: 2 hits
+Warn: Called BattleHex.getHexside() with -1
+Warn: Called BattleHex.getHexside() with -1
+Angel in E3 strikes Angel in Plains (1) hex E3 with strike number 3 : 562565: 5 hits
+Black's battle turn, number 3
+Battle phase advances to Move
+Battle phase advances to Fight
+Ogre in D2 strikes Gargoyle in Plains hex C1 with strike number 5 : 4242333: 0 hits
+Battle phase advances to Strikeback
+Gargoyle in C1 strikes Ogre in Plains (1) hex D2 with strike number 4 : 6431: 2 hits
+Green's battle turn, number 3
+Battle phase advances to Move
+Centaur moves from F3 to E1
+Lion moves from E4 to E2
+Gargoyle moves from F4 to E3
+Battle phase advances to Fight
+Gargoyle in C1 strikes Ogre in Plains (1) hex D2 with strike number 4 : 5251: 2 hits
+Warn: Called BattleHex.getHexside() with -1
+Warn: Called BattleHex.getHexside() with -1
+Error: aiChooseStrikePenalty returned null!
+Centaur in E1 strikes Ogre in Plains (1) hex D2 with strike number 3 : 543: 3 hits
+2 carries available
+Warn: No carry target but 2 points of available carry damage
+Lion in E2 strikes Centaur in Plains hex F1 with strike number 5 : 46311: 1 hit
+Battle phase advances to Strikeback
+Centaur in F1 strikes Lion in Plains hex E2 with strike number 3 : 233: 2 hits
+Warn: Called BattleHex.getHexside() with -1
+Warn: Called BattleHex.getHexside() with -1
+Ogre in D2 strikes Ogre in Plains (1) hex D2 with strike number 5 : 4413135: 1 hit
+Green earns 72.0 points
+Legion Bk01 (Axes) is eliminated
+
+SimpleAI:
+Black's turn, number 1
+4 creatures are split off from legion Bk01 (Axes) into new legion Bk02 (Eye)
+Phase advances to Move
+Black rolls a 6 for movement
+...
+(Should be happy to move...)
+...
+Ack! forced to move a split group
+forced to move split legion Bk01 to Brush hex 24 taking penalty 16 in order to handle illegal legion Bk01
+Move failed
+forced to move split legion Bk01 to Tower hex 600 taking penalty 16 in order to handle illegal legion Bk01
+Warn: Tried to enter invalid side of tower
+Legion Bk01 (Axes) in 400 tower teleports (null) to Tower hex 600 entering on Bottom
+(Should mention titan.)
+
+Human forced strikes not taken after carry.  Fixed?

@@ -206,6 +206,7 @@ class Chit extends JPanel
     void setDead(boolean dead)
     {
         this.dead = dead;
+        repaint();
     }
 
     void toggleDead()

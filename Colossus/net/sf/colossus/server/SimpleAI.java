@@ -60,7 +60,6 @@ public class SimpleAI implements AI
     public void muster(Game game)
     {
         // Do not recruit if this legion is a scooby snack.
-        boolean recruited = false;
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor *
             game.getAverageLegionPointValue());
@@ -87,15 +86,10 @@ public class SimpleAI implements AI
                         // Just take the first one.
                         Creature recruiter = (Creature)recruiters.get(0);
                         game.doRecruit(legion, recruit, recruiter);
-                        recruited = true;
+                        game.getServer().didMuster(legion);
                     }
                 }
             }
-        }
-        game.getServer().allUnselectAllHexes();
-        if (recruited)
-        {
-            game.getServer().allUpdateStatusScreen();
         }
     }
 
@@ -2073,8 +2067,8 @@ public class SimpleAI implements AI
                 po.getStrikeNumber());
             int hitsNeeded = target.getPower() - target.getHits();
 
-            if (Probs.probHitsOrMore(dice, strikeNumber, hitsNeeded) >=
-                carryThreshold)
+            if (choice == null || Probs.probHitsOrMore(dice, strikeNumber, 
+                hitsNeeded) >= carryThreshold)
             {
                 choice = po;
             }

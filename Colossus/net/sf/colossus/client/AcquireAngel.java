@@ -15,7 +15,7 @@ import java.util.*;
 
 
 final class AcquireAngel extends JDialog implements MouseListener,
-    WindowListener
+    WindowListener, ActionListener
 {
     private java.util.List chits = new ArrayList();
     private java.util.List recruits;
@@ -40,7 +40,6 @@ final class AcquireAngel extends JDialog implements MouseListener,
         Container contentPane = getContentPane();
         contentPane.setLayout(new FlowLayout());
 
-        pack();
         setBackground(Color.lightGray);
 
         Iterator it = recruits.iterator();
@@ -52,6 +51,10 @@ final class AcquireAngel extends JDialog implements MouseListener,
             contentPane.add(chit);
             chit.addMouseListener(this);
         }
+
+        JButton cancelButton = new JButton("Cancel");
+        contentPane.add(cancelButton);
+        cancelButton.addActionListener(this);
 
         pack();
 
@@ -126,5 +129,11 @@ final class AcquireAngel extends JDialog implements MouseListener,
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+        // Only button is cancel.
+        cleanup(null);
     }
 }

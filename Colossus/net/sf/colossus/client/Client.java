@@ -81,7 +81,6 @@ public final class Client
     private AI ai = new SimpleAI();
 
 
-    /** Temporary constructor. */
     public Client(Server server, String playerName)
     {
         this.server = server;
@@ -124,6 +123,7 @@ public final class Client
         server.doSummon(summoner, donor, unit);
         board.repaint();
         summonAngel = null;
+        // TODO Make this consistent.
         board.highlightEngagements();
         // XXX Repaint just the two legions' hexes.
         board.repaint();
@@ -233,6 +233,7 @@ public final class Client
 
     // XXX All the public option methods need to be non-public.
     // XXX Server-side options need to be tracked on the server.
+    //    (Pass from controlling client at initialization.)
     public boolean getOption(String name)
     {
         // If autoplay is set, then return true for all other auto* options.
@@ -392,6 +393,8 @@ public final class Client
     }
 
 
+    // TODO Update the status screen model regardless of whether the
+    // dialog is visible.  Rename to something less GUI-centric.
     public void updateStatusScreen(String [] playerInfo)
     {
         if (getOption(Options.showStatusScreen))
@@ -421,9 +424,12 @@ public final class Client
             }
             this.statusScreen = null;
         }
+        setupPlayerLabel();
     }
 
 
+    // TODO Rename.  Should take all caretaker counts as a parameter
+    // rather than having the display call back to server.
     public void updateCaretakerDisplay()
     {
         if (getOption(Options.showCaretaker))
@@ -484,20 +490,20 @@ public final class Client
 
     public void dispose()
     {
-        disposeBattleMap();
+        cleanupBattle();
         disposeMovementDie();
         disposeStatusScreen();
         disposeMasterBoard();
     }
 
 
-    /** Called from server to clear carry cursor on client. */
-    public void clearCarries()
+    public void doneWithCarries()
     {
         if (map != null)
         {
             map.clearCarries();
         }
+        makeForcedStrikes();
     }
 
 
@@ -525,16 +531,18 @@ public final class Client
         return server.doneWithStrikes();
     }
 
-
-    void makeForcedStrikes(boolean rangestrike)
+    private void makeForcedStrikes()
     {
-        server.makeForcedStrikes(rangestrike);
+        if (playerName.equals(getBattleActivePlayerName()))
+        {
+            server.makeForcedStrikes(playerName, false);
+        }
     }
 
 
     java.util.List getMarkers()
     {
-        return markers;
+        return Collections.unmodifiableList(markers);
     }
 
     /** Get the first marker with this id. */
@@ -552,19 +560,7 @@ public final class Client
         return null;
     }
 
-    /** Create a new marker and add it to the end of the list. */
-    public void addMarker(String markerId)
-    {
-        if (board != null)
-        {
-            Marker marker = new Marker(3 * Scale.get(), markerId,
-                board.getFrame(), this);
-            setMarker(markerId, marker);
-        }
-    }
-
-
-    // TODO Cache legion heights on client side?
+    // TODO Cache legion heights on client.
     int getLegionHeight(String markerId)
     {
         return server.getLegionHeight(markerId);
@@ -578,6 +574,7 @@ public final class Client
         markers.add(marker);
     }
 
+    // TODO Rename, align legions in this hex.
     /** Remove the first marker with this id from the list. Return
      *  the removed marker. */
     public void removeMarker(String id)
@@ -624,6 +621,7 @@ public final class Client
     }
 
 
+    // TODO Rename.
     /** Remove the first BattleChit with this tag from the list. */
     public void removeBattleChit(int tag)
     {
@@ -636,41 +634,19 @@ public final class Client
                 it.remove();
             }
         }
+        // XXX Repaint just the chit's hex.
+        if (map != null)
+        {
+            map.repaint();
+        }
     }
 
+    // Rename
     public void placeNewChit(String imageName, int tag, String hexLabel)
     {
         if (map != null)
         {
             map.placeNewChit(imageName, tag, hexLabel);
-        }
-    }
-
-    public void setBattleChitDead(int tag)
-    {
-        Iterator it = battleChits.iterator();
-        while (it.hasNext())
-        {
-            BattleChit chit = (BattleChit)it.next();
-            if (chit.getTag() == tag)
-            {
-                chit.setDead(true);
-                return;
-            }
-        }
-    }
-
-    public void setBattleChitHits(int tag, int hits)
-    {
-        Iterator it = battleChits.iterator();
-        while (it.hasNext())
-        {
-            BattleChit chit = (BattleChit)it.next();
-            if (chit.getTag() == tag)
-            {
-                chit.setHits(hits);
-                return;
-            }
         }
     }
 
@@ -733,6 +709,7 @@ public final class Client
         return board;
     }
 
+    // TODO Should take board data from variant file, or stream, as argument.
     public void initBoard()
     {
         // Do not show boards for AI players.
@@ -854,7 +831,13 @@ public final class Client
     {
         if (choices == null || choices.isEmpty())
         {
-            Log.error("called Client.askChooseStrikePenalty with no prompts");
+            Log.error("Called Client.askChooseStrikePenalty with no prompts");
+            return;
+        }
+        if (map == null)
+        {
+            Log.error("Called Client.askChooseStrikePenalty with null map");
+            return;
         }
         new PickStrikePenalty(map.getFrame(), this, choices);
     }
@@ -885,23 +868,6 @@ public final class Client
         if (frame != null)
         {
             JOptionPane.showMessageDialog(frame, message);
-        }
-    }
-
-
-    public void repaintMasterHex(String hexLabel)
-    {
-        if (board != null)
-        {
-            board.getGUIHexByLabel(hexLabel).repaint();
-        }
-    }
-
-    public void repaintBattleHex(String hexLabel)
-    {
-        if (map != null)
-        {
-            map.getGUIHexByLabel(hexLabel).repaint();
         }
     }
 
@@ -1031,19 +997,57 @@ public final class Client
             battleDice.showRoll();
             if (carryDamage > 0)
             {
-Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() + 
-" carry targets");
                 map.highlightCarries(carryDamage, carryTargets);
+            }
+            else
+            {
+                makeForcedStrikes();
+                map.highlightCrittersWithTargets();
+                // XXX Needed?
+                map.repaint();
             }
         }
     }
 
     public void setCarries(int carryDamage, Set carryTargets)
     {
-        battleDice.setCarries(carryDamage);
-        if (carryDamage > 0)
+        if (battleDice != null)
+        {
+            battleDice.setCarries(carryDamage);
+        }
+        if (map != null && carryDamage > 0)
         {
             map.highlightCarries(carryDamage, carryTargets);
+        }
+    }
+
+    // TODO Handle this from setBattleValues()
+    public void setBattleChitDead(int tag)
+    {
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getTag() == tag)
+            {
+                chit.setDead(true);
+                return;
+            }
+        }
+    }
+
+    // TODO Handle this from setBattleValues()
+    public void setBattleChitHits(int tag, int hits)
+    {
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getTag() == tag)
+            {
+                chit.setHits(hits);
+                return;
+            }
         }
     }
 
@@ -1063,7 +1067,7 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
     }
 
 
-    public void initBattleMap(String masterHexLabel)
+    public void initBattle(String masterHexLabel)
     {
         cleanupNegotiationDialogs();
 
@@ -1082,7 +1086,7 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
     }
 
 
-    public void disposeBattleMap()
+    public void cleanupBattle()
     {
         if (map != null)
         {
@@ -1092,16 +1096,17 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
         battleChits.clear();
     }
 
-
-    public void highlightEngagements()
+    // TODO Change to inform and let client control highlighting.
+    public void highlightEngagements(Set hexLabels)
     {
         if (board != null)
         {
-            board.highlightEngagements();
+            board.unselectAllHexes();
+            board.selectHexesByLabels(hexLabels);
         }
     }
 
-
+    // TODO This should be controlled by the client.
     public void setBattleWaitCursor()
     {
         if (map != null)
@@ -1157,6 +1162,7 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
      *  the reinforcing phase. */
     public void doReinforce(String markerId)
     {
+Log.debug("Called Client.reinforce for " + markerId);
         // TODO Cache this on the client side.
         String hexLabel = server.getHexForLegion(markerId);
 
@@ -1179,11 +1185,16 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
         server.doMuster(markerId, recruitName, recruiterName);
     }
 
+    // TODO Remember remaining recruiting hexes.
     public void didMuster(String markerId)
     {
         if (isMyLegion(markerId))
         {
             pushUndoStack(markerId);
+        }
+        if (board != null)
+        {
+            board.highlightPossibleRecruits();
         }
     }
 
@@ -1256,36 +1267,12 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
         }
     }
 
-    public void alignLegions(String hexLabel)
-    {
-        if (board != null)
-        {
-            board.alignLegions(hexLabel);
-        }
-    }
 
     public void alignLegions(Set hexLabels)
     {
         if (board != null)
         {
             board.alignLegions(hexLabels);
-        }
-    }
-
-
-    public void unselectHexByLabel(String hexLabel)
-    {
-        if (board != null)
-        {
-            board.unselectHexByLabel(hexLabel);
-        }
-    }
-
-    public void unselectAllHexes()
-    {
-        if (board != null)
-        {
-            board.unselectAllHexes();
         }
     }
 
@@ -1326,30 +1313,9 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
         }
     }
 
-    public void unselectBattleHexByLabel(String hexLabel)
-    {
-        if (map != null)
-        {
-            map.unselectHexByLabel(hexLabel);
-        }
-    }
 
-    public void unselectAllBattleHexes()
-    {
-        if (map != null)
-        {
-            map.unselectAllHexes();
-        }
-    }
-
-    public void alignBattleChits(String hexLabel)
-    {
-        if (map != null)
-        {
-            map.alignChits(hexLabel);
-        }
-    }
-
+    // TODO Need to cache hex for each battle chit on client,
+    // and notify moves instead of aligns.
     public void alignBattleChits(Set hexLabels)
     {
         if (map != null)
@@ -1359,15 +1325,48 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
     }
 
 
-    public void loadInitialMarkerImages()
+    // TODO This should happen based on notification of a split.
+    /** Create a new marker and add it to the end of the list. */
+    public void addMarker(String markerId)
     {
         if (board != null)
         {
-            board.loadInitialMarkerImages();
+            Marker marker = new Marker(3 * Scale.get(), markerId,
+                board.getFrame(), this);
+            setMarker(markerId, marker);
         }
     }
 
-    public void setupPlayerLabel()
+    /** Create new markers for all passed legions ids. */
+    public void addMarkers(Collection markerIds)
+    {
+        if (board != null)
+        {
+            Iterator it = markerIds.iterator();
+            while (it.hasNext())
+            {
+                String markerId = (String)it.next();
+                addMarker(markerId);
+            }
+            board.alignAllLegions();
+            board.getFrame().setVisible(true);
+            board.repaint();
+        }
+    }
+
+    /** Create new markers in response to a rescale. */
+    void recreateMarkers()
+    {
+        Iterator it = markers.iterator();
+        while (it.hasNext())
+        {
+            Marker marker = (Marker)it.next();
+            String markerId = marker.getId();
+            addMarker(markerId);
+        }
+    }
+
+    private void setupPlayerLabel()
     {
         if (board != null)
         {
@@ -1613,11 +1612,6 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
         return server.listNormalMoves(markerId);
     }
 
-    java.util.List getAllLegionIds()
-    {
-        return server.getAllLegionIds();
-    }
-
     int getActivePlayerNum()
     {
         return server.getActivePlayerNum();
@@ -1707,6 +1701,8 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
         {
             String markerId = (String)popUndoStack();
             server.undoRecruit(playerName, markerId);
+            // XXX Repaint just markerId's hex
+            board.repaint();
         }
     }
 
@@ -1887,6 +1883,13 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
             markersAvailable.remove(childId);
         }
         numSplitsThisTurn++;
+
+        if (board != null)
+        {
+            // XXX Align only the split hex.
+            board.alignAllLegions();
+            board.highlightTallLegions();
+        }
     }
 
 

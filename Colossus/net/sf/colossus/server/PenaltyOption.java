@@ -3,6 +3,8 @@ package net.sf.colossus.server;
 
 import java.util.*;
 
+import net.sf.colossus.util.Log;
+
 
 /**
  * Holds the information for one possible strike penalty, including
@@ -25,6 +27,10 @@ final class PenaltyOption implements Comparable
         this.target = target;
         this.dice = dice;
         this.strikeNumber = strikeNumber;
+        if (striker == target)
+        {
+            Log.error("Penalty option with striker and target identical!");
+        }
     }
 
 
@@ -35,7 +41,7 @@ final class PenaltyOption implements Comparable
 
     Critter getTarget()
     {
-        return striker;
+        return target;
     }
 
     int getDice()
@@ -143,8 +149,8 @@ final class PenaltyOption implements Comparable
                 if (!first)
                 {
                     sb.append(", ");
-                    first = true;
                 }
+                first = false;
                 String hexLabel = (String)it.next();
                 Critter critter = striker.getBattle().getCritter(hexLabel);
                 sb.append(critter.getDescription());

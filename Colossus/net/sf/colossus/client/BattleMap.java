@@ -457,7 +457,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
     /** Select hexes containing critters that have valid strike targets. */
-    private void highlightCrittersWithTargets()
+    void highlightCrittersWithTargets()
     {
         Set set = client.findCrittersWithTargets();
         unselectAllHexes();
@@ -490,7 +490,6 @@ public final class BattleMap extends HexMap implements MouseListener,
     private void setupCarryCursor(int numCarries)
     {
         Cursor cursor = null;
-
         if (numCarries == 0)
         {
             setDefaultCursor();
@@ -501,10 +500,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             {
                 Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(
                     2 * Scale.get(), 2 * Scale.get());
-                int numPixels = d.width * d.height;
-                int [] pixels = new int[numPixels];
-
-                Point point = new Point(0, 0);
+Log.debug("Best cursor size is "  + d.width + "x" + d.height);
 
                 // Use a special image for unlikely huge carries.
                 String basename;
@@ -520,11 +516,12 @@ public final class BattleMap extends HexMap implements MouseListener,
 
                 ImageIcon icon = Chit.getImageIcon(imageFilename);
                 Image image = icon.getImage();
-
-                cursor = Toolkit.getDefaultToolkit().createCustomCursor(
-                    image, point, basename);
-
-                battleFrame.setCursor(cursor);
+                if (image != null)
+                {
+                    cursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                        image, new Point(0, 0), basename);
+                    battleFrame.setCursor(cursor);
+                }
             }
             catch (Exception e)
             {
@@ -532,7 +529,6 @@ public final class BattleMap extends HexMap implements MouseListener,
                 Log.error("Problem creating custom cursor: " + e);
                 return;
             }
-            battleFrame.setCursor(cursor);
         }
     }
 
@@ -612,15 +608,6 @@ public final class BattleMap extends HexMap implements MouseListener,
                 {
                     client.strike(selectedCritterTag, hexLabel);
                     selectedCritterTag = -1;
-                }
-
-                if (client.getCarryDamage() == 0)
-                {
-                    if (client.getOption(Options.autoForcedStrike))
-                    {
-                        client.makeForcedStrikes(false);
-                    }
-                    highlightCrittersWithTargets();
                 }
                 break;
 
