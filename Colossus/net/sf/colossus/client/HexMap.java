@@ -760,8 +760,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
         if (t2n == null)
         {
+            /*
             Log.debug("Terrain " + terrain +
                       " doesn't exist in this variant.");
+            */
         }
         else
         {
@@ -784,8 +786,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         
         if (s2n == null)
         {
+            /*
             Log.debug("Terrain " + terrain +
                       " doesn't exist in this variant.");
+            */
         }
         else
         {
