@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.util.*;
 
 /**
  * Class BattleChit implements the GUI for a Titan chit representing
@@ -513,7 +512,7 @@ class BattleChit extends Chit
         if (carryPossible && carryDamage > 0)
         {
             System.out.println(carryDamage + " possible carries");
-            map.highlightCarries(this, carryDamage);
+            map.highlightCarries(carryDamage);
         }
 
         // Record that this attacker has struck.
