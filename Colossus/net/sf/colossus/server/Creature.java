@@ -520,7 +520,7 @@ implements
     /** @param name (exact) name of a creature.
      * @return true if this names represents a creature
      * TODO: make more efficient. maybe use getCreatureByName()
-     * TODO: mayebe param name will becomde case insensitive.
+     * TODO: maybe param name will become case insensitive.
      */
     public static boolean isCreature(final String name)
     {
