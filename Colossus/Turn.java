@@ -246,6 +246,9 @@ class Turn extends Dialog implements ActionListener, WindowListener
             if (player.legionsMoved() == 0 && 
                 player.countMobileLegions() > 0)
             {
+                // Highlight all unmoved legions, rather than the
+                // locations to which the forced-to-move legion can move. 
+                board.highlightUnmovedLegions();
                 return;
             }
 
