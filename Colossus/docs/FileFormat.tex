@@ -211,10 +211,13 @@ Four different lines can exist, in any number and order (only the last one of ea
 \texttt{\texttt{TER}:$\langle$ter\_filename$\rangle$}
 
 \texttt{\texttt{DEPEND}:$\langle$comma-separated list of dependecies$\rangle$}
+\texttt{\texttt{MAXPLAYERS}:$\langle$max number of players$\rangle$}
 
-NOTE: if one of the  first three type is missing, the Default file is implied. if \texttt{DEPEND} is missing, no dependencies are implied. In all case, the ``Default'' directory is looked-up last, so mentioning ``Default'' as a dependency is not required.
+\textit{Note:} if one of the  first three type is missing, the Default file is implied. if \texttt{DEPEND} is missing, no dependencies are implied. In all case, the ``Default'' directory is looked-up last, so mentioning ``Default'' as a dependency is not required.
 
-Exemple: A variant that use creatures from ExtTitan, Battlelands from Badlands and a local map could be described as:
+\textit{Note:} Do not use a \texttt{MAXPLAYERS} value higher than the number of Tower in the \texttt{MAP} file, this will crash Colossus. If \texttt{MAXPLAYERS} isn't specified, 6 is the default value used. If \texttt{MAXPLAYERS} is too big for Colossus, the default maximum will be used instead to avoid crashing.
+
+\textit{Exemple:} A variant that use creatures from ExtTitan, Battlelands from Badlands and a local map could be described as:
 
 \texttt{\texttt{CRE}:ExtTitan.cre}
 

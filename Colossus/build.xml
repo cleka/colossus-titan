@@ -181,9 +181,13 @@
                        Badlands-JDG/**,
                        Undead/**,
                        TG-SetII/**,
+                       TG-SetIII/**,
                        TG-ConceptI/**,
+                       TG-ConceptII/**,
                        TG-ConceptIII/**,
-                       Outlands/**"
+                       TG-Wild/**,
+                       Outlands/**,
+                       SmallTitan/**"
              excludes="net/sf/colossus/datatools/*.class,
                        **/*Test.class"
              />

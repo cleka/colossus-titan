@@ -176,7 +176,8 @@ public final class Constants
         "TG-ConceptI",
         "TG-ConceptII",
         "TG-ConceptIII",
-        "TG-Wild"
+        "TG-Wild",
+        "SmallTitan"
     };
 
     public static final int numVariants = variantArray.length;
