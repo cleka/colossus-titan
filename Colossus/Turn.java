@@ -273,6 +273,10 @@ class Turn extends Dialog implements ActionListener, WindowListener
                         }
                         else
                         {
+                            // Highlight all unmoved legions, rather than the
+                            // locations to which the forced-to-move legion 
+                            // can move. 
+                            board.highlightUnmovedLegions();
                             return;
                         }
                     }
