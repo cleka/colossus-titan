@@ -1,4 +1,29 @@
-Note first recruit of each creature type, and when each is exhausted.
+Log first recruit of each creature type, and when each is exhausted.
+
+Make Player option menu per-player instead of global, with results 
+   saved to playername.cfg
+
+Auto move should take mulligans if available.  Titans should teleport
+   to towers and grab warlocks more often.  Consider recruit scarcity
+   (last gargoyle more valuable than troll).  Don't leave non-moved
+   legion highlighted.  Force moving something, starting with least
+   valuable stack if none want to move.  Consider terrain when
+   deciding whether to fight.  Don't cheat and peek at the opposing 
+   stack unless all stacks are visible or some cheat option is set.
+   Have stacks figure moves in some priority order, not just legion order.
+   Randomize order in which moves are actually made to avoid giving away 
+   titan location.  Consider safety of moved-to hex.  Add some value to 
+   flying and rangestrike to creature recruiting scores, or just make up 
+   a good value for each creature type.  Don't give as much value for 
+   recruiting creatures less powerful than the ones already there, 
+   especially if already 6 high.  Give some value to sitting in native 
+   terrain.  Get scrub snacks out of nearby opponent's good recruiting 
+   terrain, and into blocking positions.
+
+Add redo.
+
+Add explicit auto move action, instead of just doing it at the beginning
+   of the movement phase if the option is set.
 
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.
@@ -33,7 +58,6 @@ Add an option to show information about MasterBoard hexes when a
 Add allow the ability to replace any creature in a legion with a
    different creature type or "unknown," for PBEM and debug.
 
-Add per-player option menu, with results saved to playername.cfg
 
 Change more modal dialogs to use a factory that returns a value,
    rather than a public constructor and a call to a mutator.
@@ -45,13 +69,8 @@ Change more modal dialogs to use a factory that returns a value,
 
 Add test main() to remaining dialogs.
 
-Test optimizations (strength reduction of divides, and substitution
-   of method calls for mod 6) to see if they actually make a
-   measurable difference.  Get rid of them if they don't.
-
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 
-Add auto-MasterBoard-move option.
 Add auto-BattleMap-move option.
 Add auto-strike option.
 Add auto-split option.

@@ -7,6 +7,7 @@ import javax.swing.*;
  * Class Game gets and holds high-level data about a Titan game.
  * @version $Id$
  * @author David Ripton
+ * @author Bruce Sherrod
  */
 
 
@@ -52,6 +53,7 @@ public final class Game
     public static final String autoPickMarker = "Autopick marker";
     public static final String autoPickEntrySide = "Autopick entry side";
     public static final String autoForcedStrike = "Auto forced strike";
+    public static final String autoMove = "Auto move";  // masterboard only
     public static final String showStatusScreen = "Show game status";
     public static final String showDice = "Show dice";
     public static final String antialias = "Antialias";
@@ -102,6 +104,8 @@ public final class Game
     public void newGame()
     {
         logEvent("\nStarting new game");
+
+        turnNumber = 1;
 
         Creature.resetAllCounts();
         if (board != null)
@@ -403,11 +407,7 @@ public final class Game
     public boolean getOption(String name)
     {
         String value = options.getProperty(name);
-        if (value == null)
-        {
-            return false;
-        }
-        else if (value.equals("true"))
+        if (value != null && value.equals("true"))
         {
             return true;
         }
@@ -565,6 +565,137 @@ public final class Game
 
         // Highlight hexes with legions that can move.
         highlightUnmovedLegions();
+
+        if (getOption(autoMove))
+        {
+            doAutoMove();
+        }
+    }
+
+
+    private void doAutoMove()
+    {
+        Player player = getActivePlayer();
+        List legions = player.getLegions();
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion) it.next();
+
+            // null hypothesis: sit still
+            int bestRecruitValue = getEvaluationOfMove(legion,
+                legion.getCurrentHex(), false);
+            MasterHex bestHex = legion.getCurrentHex();
+
+            // hard-coded 1-ply search
+            Set set = listMoves(legion, true);
+            for (Iterator moveIterator = set.iterator();
+                moveIterator.hasNext();)
+            {
+                String hexLabel = (String) moveIterator.next();
+                MasterHex hex = board.getHexFromLabel(hexLabel);
+                int value = getEvaluationOfMove(legion, hex, true);
+                if (value > bestRecruitValue)
+                {
+                    bestRecruitValue = value;
+                    bestHex = hex;
+                }
+            }
+
+            // move legion to hex
+            if (bestHex != null)
+            {
+                MasterHex hex = bestHex;
+                actOnLegion(legion);
+                actOnHex(hex);
+            }
+        }
+    }
+
+
+    private int getEvaluationOfMove(Legion legion, MasterHex hex,
+        boolean canRecruitHere)
+    {
+        int value = 0;
+
+        // consider making an attack
+        Legion enemyLegion = hex.getEnemyLegion(legion.getPlayer());
+        if (enemyLegion != null)
+        {
+            int discountedPointValue = (3 * legion.getPointValue()) / 4;
+            if (legion.numCreature(Creature.titan) > 0)
+            {
+                // be a bit cautious attacking w/titan
+                discountedPointValue -= 10; 
+            }
+            // todo: add our angel call
+            int enemyPointValue = enemyLegion.getPointValue();
+            // todo: add in enemy's turn 4 recruit
+            if (discountedPointValue > enemyPointValue)
+            {
+                // we can win
+                value += (40 * enemyPointValue) / 100;
+            }
+            else
+            {
+                // we'll lose
+                value = Integer.MIN_VALUE;
+            }
+        }
+
+        // consider what we can recruit
+        if (canRecruitHere)
+        {
+            List recruits = findEligibleRecruits(legion, hex);
+            if (recruits.size() > 0)
+            {
+                Creature recruit = (Creature)recruits.get(recruits.size() - 1);
+                value += recruit.getSkill() * recruit.getPower();
+            }
+        }
+
+        // consider what we might be able to recruit next turn, from here
+        for (int roll = 1; roll <= 6; roll++)
+        {
+            Set moves = listMoves(legion, true, hex, roll);
+            int bestRecruitVal = 0;
+            Creature bestRecruit = null;
+            for (Iterator nextMoveIt = moves.iterator(); nextMoveIt.hasNext();)
+            {
+                String nextLabel = (String) nextMoveIt.next();
+                MasterHex nextHex = board.getHexFromLabel(nextLabel);
+                List nextRecruits = findEligibleRecruits(legion, nextHex);
+                if (nextRecruits.size() == 0)
+                {
+                    continue;
+                }
+                Creature nextRecruit =
+                    (Creature)nextRecruits.get(nextRecruits.size() - 1);
+                int val = nextRecruit.getSkill() * nextRecruit.getPower();
+                if (val > bestRecruitVal)
+                {
+                    bestRecruitVal = val;
+                    bestRecruit = nextRecruit;
+                }
+            }
+            // 1/6 chance of rolling "roll" to get this
+            value += bestRecruitVal / 6; 
+            if (bestRecruit != null)
+            {
+                System.out.println("--- if " + legion
+                   + " moves to " + hex
+                   + " then it could recruit "
+                   +  bestRecruit.toString()
+                   + " on a " + roll +  " next turn..."
+                   + " (adding " + (bestRecruitVal / 6) + " to score)"
+                   );
+            }
+        }
+
+        // consider mobility?
+        // suckdown squares penalty
+        // next to tower bonus
+        return value;
     }
 
 
@@ -1342,8 +1473,8 @@ public final class Game
                 recruits.add(Creature.centaur);
                 recruits.add(Creature.gargoyle);
                 recruits.add(Creature.ogre);
-                recruits.add(Creature.warlock);
                 recruits.add(Creature.guardian);
+                recruits.add(Creature.warlock);
                 break;
 
             case 't':
@@ -1819,9 +1950,15 @@ public final class Game
     /** Return a list of eligible recruits, as Creatures. */
     public static ArrayList findEligibleRecruits(Legion legion)
     {
+        return findEligibleRecruits(legion, legion.getCurrentHex());
+    }
+
+
+    /** Return a list of eligible recruits, as Creatures. */
+    public static ArrayList findEligibleRecruits(Legion legion, MasterHex hex)
+    {
         ArrayList recruits;
 
-        MasterHex hex = legion.getCurrentHex();
         char terrain = hex.getTerrain();
 
         // Towers are a special case.
@@ -1832,11 +1969,6 @@ public final class Game
             recruits.add(Creature.centaur);
             recruits.add(Creature.gargoyle);
             recruits.add(Creature.ogre);
-            if (legion.numCreature(Creature.titan) >= 1 ||
-                legion.numCreature(Creature.warlock) >= 1)
-            {
-                recruits.add(Creature.warlock);
-            }
             if (legion.numCreature(Creature.behemoth) >= 3 ||
                 legion.numCreature(Creature.centaur) >= 3 ||
                 legion.numCreature(Creature.colossus) >= 3 ||
@@ -1859,6 +1991,11 @@ public final class Game
                 legion.numCreature(Creature.wyvern) >= 3)
             {
                 recruits.add(Creature.guardian);
+            }
+            if (legion.numCreature(Creature.titan) >= 1 ||
+                legion.numCreature(Creature.warlock) >= 1)
+            {
+                recruits.add(Creature.warlock);
             }
         }
         else
@@ -2421,16 +2558,24 @@ public final class Game
      *  Include teleport moves only if teleport is true. */
     private Set listMoves(Legion legion, boolean teleport)
     {
-        HashSet set = new HashSet();
+        return listMoves(legion, teleport, legion.getCurrentHex(),
+             legion.getPlayer().getMovementRoll());
+    }
 
+
+
+    /** Return set of hex labels where this legion can move.
+     *  Include teleport moves only if teleport is true. */
+    private Set listMoves(Legion legion, boolean teleport, MasterHex hex,
+        int movementRoll)
+    {
+        HashSet set = new HashSet();
         if (legion.hasMoved())
         {
             return set;
         }
 
         Player player = legion.getPlayer();
-        MasterHex hex = legion.getCurrentHex();
-
         board.clearAllNonFriendlyOccupiedEntrySides(player);
 
         // Conventional moves
@@ -2446,10 +2591,10 @@ public final class Game
             }
         }
 
-        set.addAll(findNormalMoves(hex, player, legion,
-            player.getMovementRoll(), block, NOWHERE));
+        set.addAll(findNormalMoves(hex, player, legion, movementRoll, block,
+            NOWHERE));
 
-        if (teleport && player.getMovementRoll() == 6)
+        if (teleport && movementRoll == 6)
         {
             // Tower teleport
             if (hex.getTerrain() == 'T' && legion.numLords() > 0 &&

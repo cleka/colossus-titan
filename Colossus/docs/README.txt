@@ -1,4 +1,4 @@
-Colossus alpha     January 16, 2001    Copyright 2001 David Ripton
+Colossus alpha     April 25, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
@@ -63,7 +63,8 @@ Running the game requires the following:
    with a two-button mouse.
 
    What is reasonably fast?  It depends.  I think Colossus runs acceptably
-   on a Pentium 133 with 64 MB and a JVM with a JIT.  Your opinion may vary.
+   (not great) on a Pentium 133 with 64 MB and a JVM with a JIT.  Your opinion
+   may vary.
 
    The game looks best in 1280x960 or higher, but I've added some scaling
    so you should be able to get by in 1024x768.  Less should work but will
@@ -160,7 +161,7 @@ places, and the character moves there.  Repeat until all characters are
 on-board, unless you'd like to leave some off-board to die for some reason.
 The "Undo Last Move" and "Undo All Moves" menu options are available.  When
 done moving, click "Done with Moves"  The attacker repeats the process,
-except that after he finishes moving, it's strike time.
+except that after he finishes moving, it's striking time.
 
 Any creatures adjacent to an enemy must strike; rangestrikers with an enemy in
 range and line of sight may strike.  (If you turn on the "Auto forced strike"
@@ -189,6 +190,7 @@ archangel as appropriate in the dialog.
 
 During turn 4 of the battle, the defender may be allowed to muster a recruit.
 If so, a dialog will pop up showing the legal recruits.  If desired, pick one.
+If no recruit is desired, dismiss the recruit dialog.
 
 When the battle finishes, the winner gets some points and maybe the option of
 acquiring one or more angels or archangels.  If the winner didn't summon
@@ -235,7 +237,8 @@ You'll want to manually delete all those save files from time to time.
 Credits:
 
 Programming:  David Ripton  dripton@wizard.net
-              David Barr
+              David Barr (applet conversion)
+              Bruce Sherrod (AI)
 Counter art:  Tchula Ripton, David Lum
 Bug reports:  Anthony Kam, Bruce Sherrod, Augustin Ku, David Barr,
               Sean McCulloch, Luca Ferraro, Jonathan Woodward

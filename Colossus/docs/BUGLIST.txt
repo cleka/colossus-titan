@@ -76,3 +76,21 @@ Cyclops entered battle map with 4 hits already.  Failed to heal after
 Win98, jdk1.3: Focus keeps moving to MovementDie and BattleDice, which 
    disrupts keyboard shortcuts.  Doesn't happen with StatusScreen.
    Doesn't happen in Unix.
+
+Linux, jdk1.3: Time loss, titan-on-titan battle with last 2 players
+   Battle phase advances to Fight
+Battle phase advances to Strikeback
+Time loss
+Legion Gr01 (Cauldron) [Titan] is eliminated
+Exception occurred during event dispatching:
+java.lang.NullPointerException
+        at Game.updateStatusScreen(Game.java:780)
+        at Player.addPoints(Player.java:655)
+        at Player.die(Player.java:696)
+        at Battle.advancePhase(Battle.java:228)
+        at Battle.setupFight(Battle.java:306)
+        at Battle.advancePhase(Battle.java:193)
+        at Battle.setupFight(Battle.java:306)
+        at Battle.advancePhase(Battle.java:177)
+        at Battle.doneWithMoves(Battle.java:703)
+        at BattleMap$3.actionPerformed(BattleMap.java:112)
