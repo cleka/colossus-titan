@@ -20,7 +20,9 @@ class Player
     Legion [] legions = new Legion[60];
     boolean alive;
     boolean myTurn;
-
+    int mulligansLeft = 1;
+    int movementRoll;
+    int legionsMoved;
 
     Player(String name)
     {
@@ -32,6 +34,7 @@ class Player
         numLegions = 0;
         alive = true;
         myTurn = false;
+        legionsMoved = 0;
     }
 
 
