@@ -47,7 +47,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
             return;
         }
 
-        setSize((21 * scale / 20) * (numEligible + 1), (21 * scale / 10));
+        setSize(scale * (numEligible + 1), (21 * scale / 10));
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, 
@@ -58,7 +58,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
 
         for (int i = 0; i < numEligible; i++)
         {
-            markers[i] = new Chit(cx + i * (scale + 3), cy, scale,
+            markers[i] = new Chit(cx + i * (21 * scale / 20), cy, scale,
                 "images/" + recruits[i].name + ".gif", this);
         }
 
@@ -404,7 +404,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     }
 
 
-    public void mouseClicked(MouseEvent e)
+    public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
         for (int i = 0; i < numEligible; i++)
@@ -433,7 +433,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     {
     }
     
-    public void mousePressed(MouseEvent e)
+    public void mouseClicked(MouseEvent e)
     {
     }
     
