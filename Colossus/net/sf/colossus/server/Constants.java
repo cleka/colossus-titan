@@ -117,6 +117,7 @@ public final class Constants
         "TitanPlus",
         "ExtTitan", 
         "Badlands",
+        "Badlands-JDG",
         "Outlands",
         "Undead",
         "TG-SetII",

@@ -1,0 +1,51 @@
+B green       Brush     true  1 Gargoyle 2 Cyclops  2 Gorgon
+
+D orange      Desert    true  1 Lion     3 Griffon  2 Hydra
+
+H saddleBrown Hills     true  1 Ogre     3 Minotaur 2 Unicorn
+
+J darkGreen   Jungle    true  1 Gargoyle 2 Cyclops  3 Behemoth 2 Serpent
+
+M sienna      Marsh     true  1 Ogre     2 Troll    2 Ranger
+
+m red         Mountains true  1 Lion     2 Minotaur 2 Dragon   2 Colossus
+
+P yellow      Plains    true  1 Centaur  2 Lion     2 Ranger
+
+S blue        Swamp     true  1 Troll    3 Wyvern   2 Hydra
+
+t skyBlue     Tundra    true  1 Troll    2 Warbear  2 Giant    2 Colossus
+
+W olive       Woods     true  1 Centaur  3 Warbear  2 Unicorn
+
+# Tower is a special case
+T grey        Tower     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock
+
+# Alternate (Badlands) Battlelands
+b green       BrushAlt  true  1 Gargoyle 2 Cyclops  2 Gorgon Brush
+
+d orange      DesertAlt true  1 Lion     3 Griffon  2 Hydra Desert
+
+j darkGreen   JungleAlt true  1 Gargoyle 2 Cyclops  3 Behemoth 2 Serpent Jungle
+
+N sienna      MarshAlt  true  1 Ogre     2 Troll    2 Ranger Marsh
+
+s blue        SwampAlt  true  1 Troll    3 Wyvern   2 Hydra Swamp
+
+U skyBlue     TundraAlt true  1 Troll    2 Warbear  2 Giant    2 Colossus Tundra
+
+w olive       WoodsAlt  true  1 Centaur  3 Warbear  2 Unicorn Woods
+
+# New (Badlands) Battlelands, same as Plains
+F yellow      Fort      true  1 Centaur  2 Lion     2 Ranger
+
+O yellow      Town      true  1 Centaur  2 Lion     2 Ranger
+
+o yellow      Waterhole true  1 Centaur  2 Lion     2 Ranger
+
+# New Galt Battlelands
+n red         MountainsAlt true  1 Lion     2 Minotaur 2 Dragon   2 Colossus
+h saddleBrown HillsAlt     true  1 Ogre     3 Minotaur 2 Unicorn
+u grey        TowerAlt     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock
+
+ACQUIRABLE 100 Angel 500 Archangel

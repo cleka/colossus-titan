@@ -19,7 +19,7 @@ import net.sf.colossus.util.Log;
 
 public class BattleHex extends Hex
 {
-    /** Valid elevations are 0, 1, and 2. */
+    /** Valid elevations are 0, 1, and 2.  Also 3 for JDG Badlands. */
     private int elevation;
 
     // Hex terrain types are:
@@ -147,20 +147,24 @@ public class BattleHex extends Hex
                 return HTMLColor.lightOlive;
             case 1:
                 return HTMLColor.darkYellow;
-            default:
             case 2:
                 return Color.yellow;
+            default:
+            case 3:
+                return HTMLColor.lightYellow;
             }
         case 'w':  // tower
             switch (elevation)
             {
             case 0:
-                return HTMLColor.lightGray;
+                return HTMLColor.dimGray;
             case 1:
+                return HTMLColor.darkGray;
+            case 2:
                 return Color.gray;
             default:
-            case 2:
-                return HTMLColor.darkGray;
+            case 3:
+                return HTMLColor.lightGray;
             }
         case 'r':  // bramble
             return Color.green;
@@ -171,7 +175,14 @@ public class BattleHex extends Hex
         case 'o':  // bog
             return Color.gray;
         case 'v':  // volcano
-            return Color.red;
+            switch (elevation)
+            {
+            case 3:
+                return Color.red;
+            default:
+            case 2:
+                return HTMLColor.darkRed;
+            }
         case 'd':  // drift
             return Color.blue;
         case 'l':  // lake

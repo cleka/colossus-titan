@@ -304,7 +304,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                                                         terrains[i]));
         }
         popupMenuTerrain.addSeparator();
-        for (int i = 0 ; i < 3 ; i++)
+        for (int i = 0 ; i < 4 ; i++)
         {
             mi = popupMenuTerrain.add(new ElevationAction(
                                       "Set Elevation to: " + i,

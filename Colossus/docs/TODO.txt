@@ -10,6 +10,9 @@ Add remaining command-line options.
 
 Save/load/test scale.
 
+Add code to recognize alt towers as towers, show overlays for alt
+   hills/mountains/towers for Badlands-JDG
+TundraAlt not used in standard Badlands?
 
 Bug: All stacks visible is broken.
 
@@ -23,6 +26,9 @@ Bug: Still getting excess Acquire dialog, for 6-high legion that earns two
 Bug: Non-overlay terrain layers shown a bit too far to the right.
 
 Bug: No T2T teleport on first turn only works for first player?
+
+Bug: Need to redo caretaker stack display when "Use black overlay on Chits"
+   is flipped.
 
 Change Quit button in GetPlayers dialog to Cancel.  Go back to existing 
    game if there is one from Cancel, or quit if just starting.  Eliminate
