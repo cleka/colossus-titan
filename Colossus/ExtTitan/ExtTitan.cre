@@ -23,7 +23,7 @@ Troll      8     2     false false false true  true  false false false false fal
 Unicorn    8     4     false false false false false false true  false true  false false false false false false false    12    Unicorns   hydraOrange
 Warbear    6     3     false false false true  false false false false true  false false false false false false false    21    Warbears   centaurGold
 Warlock    6     4     true  false false false false false false false false false false false true  false false true      6    Warlocks   hydraOrange
-Wyvern     7     3     false true  false false true  false false false false false false false false false false false    18    Wyverns    colossusPink
+Wyvern     7     3     false true  false false true  false true false false false false false false false false false    18    Wyverns    colossusPink
 
 Chimera    9     3     true  true  false false true  false false false true  false false false false false false false    12    Chimerae   hydraOrange
 Jabberwok 16     2     false false true  false false false false false false false false false false false false false    21    Jabberwok  behemothGreen
