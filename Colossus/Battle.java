@@ -298,7 +298,12 @@ public class Battle
         if (turnNumber == 4 && defender.canRecruit())
         {
             // Allow recruiting a reinforcement.
-            new PickRecruit(map.getFrame(), defender);
+            Creature recruit = PickRecruit.pickRecruit(
+                map.getFrame(), defender);
+            if (recruit != null)
+            {
+                Game.doRecruit(recruit, defender, map.getFrame());
+            }
 
             if (defender.hasRecruited())
             {
@@ -1769,7 +1774,12 @@ public class Battle
                 // Recruit reinforcement
                 if (legion.canRecruit())
                 {
-                    new PickRecruit(board.getFrame(), legion);
+                    Creature recruit = PickRecruit.pickRecruit(
+                        board.getFrame(), legion);
+                    if (recruit != null)
+                    {
+                        Game.doRecruit(recruit, legion, board.getFrame());
+                    }
                 }
             }
 

@@ -23,18 +23,19 @@ public class PickRecruit extends JDialog implements MouseListener,
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
-    private boolean dialogLock;
+    private static Creature recruit;
 
 
-    public PickRecruit(JFrame parentFrame, Legion legion)
+    private PickRecruit(JFrame parentFrame, Legion legion)
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruit in " + legion.getCurrentHex().getDescription(),
             true);
 
+        recruit = null;
+
         if (!legion.canRecruit())
         {
-            setVisible(false);
             dispose();
             return;
         }
@@ -122,22 +123,23 @@ public class PickRecruit extends JDialog implements MouseListener,
     }
 
 
+    /** Return the creature recruited, or null if none. */
+    public static Creature pickRecruit(JFrame parentFrame, Legion legion)
+    {
+        new PickRecruit(parentFrame, legion);
+        return recruit;
+    }
+
+
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
         int i = recruitChits.indexOf(source);
-        if (i != -1 && !dialogLock)
+        if (i != -1)
         {
-            // Prevent multiple clicks from yielding multiple recruits.
-            dialogLock = true;
-
             // Recruit the chosen creature.
-            Game.doRecruit((Creature)recruits.get(i), legion, parentFrame);
-
-            // Then exit.
-            setVisible(false);
+            recruit = (Creature)recruits.get(i);
             dispose();
-            return;
         }
     }
 
@@ -174,7 +176,6 @@ public class PickRecruit extends JDialog implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
-        setVisible(false);
         dispose();
     }
 
@@ -215,6 +216,7 @@ public class PickRecruit extends JDialog implements MouseListener,
             Creature.cyclops, Creature.cyclops, null, 
             null, null, player);
         
-        new PickRecruit(frame, legion);
+        Creature creature = PickRecruit.pickRecruit(frame, legion);
+        System.out.println("recruited " + creature);
     }
 }

@@ -21,13 +21,16 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
     private static final int [] colorMnemonics = 
         {KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O, KeyEvent.VK_G, 
             KeyEvent.VK_E, KeyEvent.VK_R};
+    private static String color;
         
 
-    public PickColor(JFrame parentFrame, Game game, Player player)
+    private PickColor(JFrame parentFrame, Game game, Player player)
     {
         super(parentFrame, player.getName() + ", Pick a Color", true);
         this.game = game;
         this.player = player;
+
+        color = null;
     
         setBackground(Color.lightGray);
         pack();
@@ -115,6 +118,14 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
         addWindowListener(this);
         setVisible(true);
     }
+    
+    
+    public static String pickColor(JFrame parentFrame, Game game,
+        Player player)
+    {
+        new PickColor(parentFrame, game, player);
+        return color;
+    }
 
 
     private int colorNumber(String colorName) 
@@ -161,11 +172,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
 
     public void actionPerformed(ActionEvent e)
     {
-        String color = e.getActionCommand();
-        // Send data back to game, and exit.
-        Game.logEvent(player.getName() + " chooses color " + color);
-        player.setColor(color);
-        setVisible(false);
+        color = e.getActionCommand();
         dispose();
     }
 
@@ -191,8 +198,13 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
         game.addPlayer(p0);
         game.addPlayer(p1);
 
-        new PickColor(frame, game, p0);
-        new PickColor(frame, game, p1);
+        String answer = pickColor(frame, game, p0);
+        Game.logEvent(p0.getName() + " chooses color " + answer);
+        p0.setColor(answer);
+
+        answer = pickColor(frame, game, p1);
+        Game.logEvent(p1.getName() + " chooses color " + answer);
+        p1.setColor(answer);
 
         System.exit(0);
     }

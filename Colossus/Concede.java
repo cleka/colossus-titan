@@ -31,6 +31,8 @@ public class Concede extends JDialog implements ActionListener
             "Flee" : "Concede") + " with Legion "  + ally.getMarkerId() +
             " in " + ally.getCurrentHex().getDescription() + "?", true);
 
+        answer = false;
+
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
 

@@ -17,11 +17,14 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
     private ArrayList chits = new ArrayList();
     private static final int scale = 60;
     private ArrayList lords = new ArrayList();
+    private static Creature lord;
 
 
-    public PickLord(JFrame parentFrame, Legion legion)
+    private PickLord(JFrame parentFrame, Legion legion)
     {
         super(parentFrame, "Reveal Which Lord?", true);
+
+        lord = null;
 
         this.legion = legion;
         player = legion.getPlayer();
@@ -75,16 +78,21 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
     }
 
 
+    public static Creature pickLord(JFrame parentFrame, Legion legion)
+    {
+        new PickLord(parentFrame, legion);
+        return lord;
+    }
+
+
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
         int i = chits.indexOf(source);
         if (i != -1)
         {
-            legion.setTeleportingLord((Creature)lords.get(i));
-            setVisible(false);
+            lord = (Creature)lords.get(i);
             dispose();
-            return;
         }
     }
 

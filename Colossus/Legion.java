@@ -233,18 +233,6 @@ public class Legion
     }
     
     
-    public Creature getTeleportingLord()
-    {
-        return teleportingLord; 
-    }
-
-
-    public void setTeleportingLord(Creature creature)
-    {
-        teleportingLord = creature;
-    }
-
-
     public boolean canFlee()
     {
         Iterator it = critters.iterator();
@@ -745,7 +733,7 @@ public class Legion
         }
         else
         {
-            new PickLord(parentFrame, this);
+            teleportingLord = PickLord.pickLord(parentFrame, this);
         }
 
         if (teleportingLord != null)

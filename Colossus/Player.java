@@ -43,8 +43,8 @@ public class Player implements Comparable
     {
         return dead;
     }
-    
-    
+
+
     public void setDead(boolean dead)
     {
         this.dead = dead;
@@ -125,11 +125,11 @@ public class Player implements Comparable
     }
 
 
-    /** Players are sorted in order of decreasing starting tower. 
+    /** Players are sorted in order of decreasing starting tower.
         This is inconsistent with equals(). */
     public int compareTo(Object object)
     {
-        if (object instanceof Player) 
+        if (object instanceof Player)
         {
             Player other = (Player)object;
             return (other.getTower() - this.getTower());
@@ -157,8 +157,8 @@ public class Player implements Comparable
     {
         return playersEliminated;
     }
-    
-    
+
+
     public void setPlayersElim(String playersEliminated)
     {
         this.playersEliminated = new String(playersEliminated);
@@ -173,7 +173,7 @@ public class Player implements Comparable
         }
         else
         {
-            playersEliminated = new String(playersEliminated + 
+            playersEliminated = new String(playersEliminated +
                 player.getShortColor());
         }
     }
@@ -281,7 +281,7 @@ public class Player implements Comparable
     }
 
 
-    /** Return the number of this player's legions that have legal 
+    /** Return the number of this player's legions that have legal
         non-teleport moves remaining. */
     public int countMobileLegions()
     {
@@ -364,14 +364,14 @@ public class Player implements Comparable
         if (game.getForcedMovementRoll() != 0)
         {
             movementRoll = game.getForcedMovementRoll();
-            Game.logEvent(getName() + " rolled a " + movementRoll + 
+            Game.logEvent(getName() + " rolled a " + movementRoll +
                 " for movement (forced!)");
             game.clearForcedMovementRoll();
         }
         else
         {
             movementRoll = Game.rollDie();
-            Game.logEvent(getName() + " rolled a " + movementRoll + 
+            Game.logEvent(getName() + " rolled a " + movementRoll +
                 " for movement");
         }
     }
@@ -392,8 +392,8 @@ public class Player implements Comparable
     {
         lastLegionMoved = legion;
     }
-    
-    
+
+
     public void markLastLegionSplitOff(Legion legion)
     {
         lastLegionSplitOff = legion;
@@ -421,7 +421,7 @@ public class Player implements Comparable
     }
 
 
-    /** Return true if two or more of this player's legions share 
+    /** Return true if two or more of this player's legions share
      *  a hex and they have a legal non-teleport move. */
     public boolean splitLegionHasForcedMove()
     {
@@ -430,7 +430,7 @@ public class Player implements Comparable
         {
             Legion legion = (Legion)it.next();
             MasterHex hex = legion.getCurrentHex();
-            if (hex.getNumFriendlyLegions(this) > 1 && 
+            if (hex.getNumFriendlyLegions(this) > 1 &&
                 game.countConventionalMoves(legion) > 0)
             {
                 return true;
@@ -448,7 +448,7 @@ public class Player implements Comparable
             lastLegionRecruited = null;
         }
 
-        // Update number of creatures in status window. 
+        // Update number of creatures in status window.
         game.updateStatusScreen();
     }
 
@@ -464,7 +464,7 @@ public class Player implements Comparable
         lastLegionRecruited = null;
     }
 
-    
+
     public void undoAllRecruits()
     {
         Iterator it = legions.iterator();
@@ -473,8 +473,8 @@ public class Player implements Comparable
             Legion legion = (Legion)it.next();
             legion.undoRecruit();
         }
-        
-        // Update number of creatures in status window. 
+
+        // Update number of creatures in status window.
         game.updateStatusScreen();
     }
 
@@ -496,8 +496,8 @@ public class Player implements Comparable
 
         game.getBoard().selectHexesByLabels(set);
     }
-    
-    
+
+
     public void undoLastSplit()
     {
         if (lastLegionSplitOff != null)
@@ -522,8 +522,8 @@ public class Player implements Comparable
         {
             Legion legion = (Legion)it.next();
             Legion parent = legion.getParent();
-            if (parent != null && parent.getCurrentHex() == 
-                legion.getCurrentHex()) 
+            if (parent != null && parent.getCurrentHex() ==
+                legion.getCurrentHex())
             {
                 legion.recombine(parent, false);
                 it.remove();
@@ -550,8 +550,8 @@ public class Player implements Comparable
 
         return height;
     }
-    
-    
+
+
     public int getNumCreatures()
     {
         int count = 0;
@@ -647,13 +647,16 @@ public class Player implements Comparable
      *  to reflect the addition. */
     public void addPoints(double points)
     {
-        score += points;
-        if (game != null)
+        if (points > 0)
         {
-            game.updateStatusScreen();
-        }
+            score += points;
+            if (game != null)
+            {
+                game.updateStatusScreen();
+            }
 
-        Game.logEvent(getName() + " earns " + points + " points");
+            Game.logEvent(getName() + " earns " + points + " points");
+        }
     }
 
 
@@ -692,9 +695,9 @@ public class Player implements Comparable
             {
                 scorer.addPoints(halfPoints);
             }
-            
-            // Call the iterator's remove() method rather than 
-            // removeLegion() to avoid concurrent modification problems. 
+
+            // Call the iterator's remove() method rather than
+            // removeLegion() to avoid concurrent modification problems.
             legion.prepareToRemove();
             it.remove();
         }

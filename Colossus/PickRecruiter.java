@@ -22,14 +22,17 @@ public class PickRecruiter extends JDialog implements MouseListener,
     private int height;
     private GridBagLayout gridbag = new GridBagLayout(); 
     private GridBagConstraints constraints = new GridBagConstraints();
+    private static Creature recruiter;
 
 
     /** recruiters is a list of Creatures */
-    public PickRecruiter(JFrame parentFrame, Legion legion,
+    private PickRecruiter(JFrame parentFrame, Legion legion,
         ArrayList recruiters)
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruiter", true);
+
+        recruiter = null;
 
         this.legion = legion;
         player = legion.getPlayer();
@@ -104,6 +107,14 @@ public class PickRecruiter extends JDialog implements MouseListener,
         setVisible(true);
         repaint();
     }
+    
+    
+    public static Creature pickRecruiter(JFrame parentFrame, Legion legion,
+        ArrayList recruiters)
+    {
+        new PickRecruiter(parentFrame, legion, recruiters);
+        return recruiter;
+    }
 
 
     public void mousePressed(MouseEvent e)
@@ -112,13 +123,10 @@ public class PickRecruiter extends JDialog implements MouseListener,
         int i = recruiterChits.indexOf(source);
         if (i != -1)
         {
-            // Place the selected recruiter first in the list.
-            recruiters.set(0, recruiters.get(i));
+            recruiter = (Creature)recruiters.get(i); 
 
             // Then exit.
-            setVisible(false);
             dispose();
-            return;
         }
     }
 
@@ -155,7 +163,6 @@ public class PickRecruiter extends JDialog implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
-        setVisible(false);
         dispose();
     }
 

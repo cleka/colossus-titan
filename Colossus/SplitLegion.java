@@ -49,7 +49,7 @@ public class SplitLegion extends JDialog implements MouseListener,
         {
             player.selectMarker(selectedMarker);
         }
-       
+
         pack();
 
         newLegion = new Legion(player.getSelectedMarker(), oldLegion,
@@ -84,7 +84,7 @@ public class SplitLegion extends JDialog implements MouseListener,
             contentPane.add(chit);
             chit.addMouseListener(this);
         }
-   
+
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 1;
         constraints.gridwidth = 1;
@@ -107,7 +107,7 @@ public class SplitLegion extends JDialog implements MouseListener,
         {
             constraints.gridwidth = 2;
         }
-        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2; 
+        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2;
         if (leadSpace < 0)
         {
             leadSpace = 0;
@@ -157,7 +157,7 @@ public class SplitLegion extends JDialog implements MouseListener,
         constraints.gridy = gridy;
         constraints.gridwidth = 1;
         gridbag.setConstraints(chit, constraints);
-        
+
         Container contentPane = getContentPane();
         contentPane.add(chit);
 
@@ -166,7 +166,7 @@ public class SplitLegion extends JDialog implements MouseListener,
         newMarker.repaint();
 
         pack();
-       
+
         repaint();
     }
 
@@ -177,16 +177,19 @@ public class SplitLegion extends JDialog implements MouseListener,
         int i = oldChits.indexOf(source);
         if (i != -1)
         {
-            moveCreatureToOtherLegion(oldLegion, newLegion, oldChits, 
+            moveCreatureToOtherLegion(oldLegion, newLegion, oldChits,
                 newChits, i, 1);
             return;
         }
-        i = newChits.indexOf(source);
-        if (i != -1)
+        else
         {
-            moveCreatureToOtherLegion(newLegion, oldLegion, newChits, 
-                oldChits, i, 0);
-            return;
+            i = newChits.indexOf(source);
+            if (i != -1)
+            {
+                moveCreatureToOtherLegion(newLegion, oldLegion, newChits,
+                    oldChits, i, 0);
+                return;
+            }
         }
     }
 
@@ -206,7 +209,6 @@ public class SplitLegion extends JDialog implements MouseListener,
     public void mouseReleased(MouseEvent e)
     {
     }
-
 
 
     public void windowActivated(WindowEvent e)
@@ -249,7 +251,7 @@ public class SplitLegion extends JDialog implements MouseListener,
             // must have height 4 and one lord.
             if (oldLegion.getHeight() < 2 || newLegion.getHeight() < 2)
             {
-                JOptionPane.showMessageDialog(parentFrame, 
+                JOptionPane.showMessageDialog(parentFrame,
                     "Legion too short.");
                 return;
             }
@@ -257,7 +259,7 @@ public class SplitLegion extends JDialog implements MouseListener,
             {
                 if (oldLegion.getHeight() != newLegion.getHeight())
                 {
-                    JOptionPane.showMessageDialog(parentFrame, 
+                    JOptionPane.showMessageDialog(parentFrame,
                         "Initial split must be 4-4.");
                     return;
                 }
@@ -303,8 +305,8 @@ public class SplitLegion extends JDialog implements MouseListener,
             // Exit.
             dispose();
 
-            Game.logEvent(newLegion.getHeight() + 
-                " creatures were split off from legion " + 
+            Game.logEvent(newLegion.getHeight() +
+                " creatures were split off from legion " +
                 oldLegion.getMarkerId() +
                 " into new legion " + newLegion.getMarkerId());
 
@@ -335,14 +337,14 @@ public class SplitLegion extends JDialog implements MouseListener,
         player.setColor("Red");
         player.initMarkersAvailable();
         player.selectMarker("Rd01");
-        Legion legion = new Legion(player.getSelectedMarker(), null, null, 
-            Creature.titan, Creature.angel, Creature.ogre, Creature.ogre, 
-            Creature.centaur, Creature.centaur, Creature.gargoyle, 
+        Legion legion = new Legion(player.getSelectedMarker(), null, null,
+            Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
+            Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);
-        Marker marker = new Marker(scale, player.getSelectedMarker(), 
+        Marker marker = new Marker(scale, player.getSelectedMarker(),
             frame, null);
         legion.setMarker(marker);
-        
+
         new SplitLegion(frame, legion, player);
     }
 }

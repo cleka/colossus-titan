@@ -15,14 +15,12 @@ public class GetPlayers extends JDialog implements WindowListener,
     ActionListener
 {
     private ArrayList textFields = new ArrayList();
-    private Game game;
+    private static TreeSet playerNames = new TreeSet();
 
 
-    public GetPlayers(JFrame parentFrame, Game game)
+    private GetPlayers(JFrame parentFrame)
     {
         super(parentFrame, "Player Setup", true);
-
-        this.game = game;
 
         setBackground(Color.lightGray);
         pack();
@@ -59,11 +57,18 @@ public class GetPlayers extends JDialog implements WindowListener,
         addWindowListener(this);
         setVisible(true);
     }
+
+
+    public static TreeSet getPlayers(JFrame parentFrame)
+    {
+        new GetPlayers(parentFrame);
+        return playerNames;
+    }
     
     
     private void validateInputs()
     {
-        Set playerNames = new TreeSet();
+        playerNames.clear(); 
         int numPlayers = 0;
 
         Iterator it = textFields.iterator();
@@ -91,18 +96,6 @@ public class GetPlayers extends JDialog implements WindowListener,
             return;
         }
 
-        // Data is good; send to game.
-        if (game != null)
-        {
-            it = playerNames.iterator();
-            while (it.hasNext())
-            {
-                String name = (String)it.next();
-                game.addPlayer(name);
-                Game.logEvent("Added player " + name);
-            }
-        }
-
         dispose();
     }
 
@@ -117,10 +110,6 @@ public class GetPlayers extends JDialog implements WindowListener,
 
     public void windowClosing(WindowEvent e)
     {
-        if (game != null)
-        {
-            game.dispose();
-        }
         dispose();
     }
 
@@ -144,27 +133,12 @@ public class GetPlayers extends JDialog implements WindowListener,
     {
         if (e.getActionCommand().equals("Quit"))
         {
-            if (game != null)
-            {
-                game.dispose();
-            }
             dispose();
         }
         else if (e.getActionCommand().equals("Done"))
         {
             validateInputs();
         }
-    }
-
-
-    public void dispose()
-    {
-        if (game == null)
-        {
-            System.exit(0);
-        }
-        setVisible(false);
-        super.dispose();
     }
 
 
@@ -181,6 +155,15 @@ public class GetPlayers extends JDialog implements WindowListener,
 
     public static void main(String [] args)
     {
-        new GetPlayers(new JFrame(), null);
+        Game game = new Game();
+        TreeSet names = getPlayers(new JFrame());
+
+        Iterator it = names.iterator();
+        while (it.hasNext())
+        {
+            String name = (String)it.next();
+            game.addPlayer(name);
+            Game.logEvent("Added player " + name);
+        }
     }
 }

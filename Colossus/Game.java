@@ -82,8 +82,14 @@ public class Game
 
         JFrame frame = new JFrame();
 
-        new GetPlayers(frame, this);
-        // GetPlayers will fill in the player objects
+        TreeSet playerNames = GetPlayers.getPlayers(frame);
+        Iterator it = playerNames.iterator();
+        while (it.hasNext())
+        {
+            String name = (String)it.next();
+            addPlayer(name);
+            logEvent("Added player " + name);
+        }
 
         // Since the inputs are validated, it's time to roll for towers.
         assignTowers();
@@ -95,7 +101,9 @@ public class Game
         while (lit.hasPrevious())
         {
             Player player = (Player)lit.previous();
-            new PickColor(frame, this, player);
+            String color = PickColor.pickColor(frame, this, player);
+            logEvent(player.getName() + " chooses color " + color);
+            player.setColor(color);
             player.initMarkersAvailable();
         }
 
@@ -104,7 +112,7 @@ public class Game
             statusScreen = new StatusScreen(this);
             board = new MasterBoard(this);
             masterFrame = board.getFrame();
-            Iterator it = players.iterator();
+            it = players.iterator();
             while (it.hasNext())
             {
                 Player player = (Player)it.next();
@@ -1905,8 +1913,8 @@ public class Game
         }
         else
         {
-            new PickRecruiter(parentFrame, legion, recruiters);
-            recruiter = (Creature)recruiters.get(0);
+            recruiter = PickRecruiter.pickRecruiter(parentFrame, legion,
+                recruiters);
         }
 
         legion.addCreature(recruit, true);
@@ -2540,18 +2548,19 @@ public class Game
             case Game.MUSTER:
                 if (legion.hasMoved() && legion.canRecruit())
                 {
-                    if (!dialogLock)
+                    Creature recruit = PickRecruit.pickRecruit(masterFrame,
+                        legion);
+                    if (recruit != null)
                     {
-                        dialogLock = true;
-                        new PickRecruit(masterFrame, legion);
-                        if (!legion.canRecruit())
-                        {
-                            board.unselectHexByLabel(
-                                legion.getCurrentHex().getLabel());
+                        doRecruit(recruit, legion, masterFrame);
+                    }
 
-                            updateStatusScreen();
-                        }
-                        dialogLock = false;
+                    if (!legion.canRecruit())
+                    {
+                        board.unselectHexByLabel(
+                            legion.getCurrentHex().getLabel());
+
+                        updateStatusScreen();
                     }
                 }
 
@@ -2658,14 +2667,17 @@ public class Game
         if (summoningAngel)
         {
             Legion donor = hex.getFriendlyLegion(player);
-            player.selectLegion(donor);
-            if (summonAngel == null)
+            if (donor != null)
             {
-                summonAngel = battle.getSummonAngel();
+                player.selectLegion(donor);
+                if (summonAngel == null)
+                {
+                    summonAngel = battle.getSummonAngel();
+                }
+                summonAngel.updateChits();
+                summonAngel.repaint();
+                donor.getMarker().repaint();
             }
-            summonAngel.updateChits();
-            summonAngel.repaint();
-            donor.getMarker().repaint();
         }
 
         // Do not allow clicking on engagements if one is
@@ -2714,11 +2726,11 @@ public class Game
                     {
                         // If the defender won the battle by agreement,
                         // he may recruit.
-                        if (!dialogLock2)
+                        Creature recruit = PickRecruit.pickRecruit(
+                            masterFrame, defender);
+                        if (recruit != null)
                         {
-                            dialogLock2 = true;
-                            new PickRecruit(masterFrame, defender);
-                            dialogLock2 = false;
+                            doRecruit(recruit, defender, masterFrame);
                         }
                     }
                     else if (hex.getLegion(0) == attacker &&

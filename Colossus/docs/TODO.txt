@@ -26,6 +26,8 @@ Change more modal dialogs to use a factory that returns a value,
    dialog replacements.  All parameters into the dialogs should
    be read-only or clones.
 
+Add test main() to remaining dialogs.
+
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 Add auto-recruit option.
 Add auto-forced-strike option.
