@@ -208,6 +208,11 @@ public final class Options
         return value;
     }
 
+    public void removeOption(String optname)
+    {
+        props.remove(optname);
+    }
+
     public Enumeration propertyNames()
     {
         return props.propertyNames();

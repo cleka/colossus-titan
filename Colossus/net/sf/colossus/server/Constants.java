@@ -185,6 +185,8 @@ public final class Constants
     public static final String [] variantArray =
     {
         "Default",
+        "Abyssal6",
+        "Abyssal9",
         "Badlands",
         "Badlands-JDG",
         "ExtTitan", 

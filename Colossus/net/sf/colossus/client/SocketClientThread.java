@@ -76,11 +76,13 @@ Log.debug("About to connect client socket to " + host + ":" + port);
             {
                 if (fromServer.length() > 0)
                 {
+                /*
                     if (!fromServer.startsWith(Constants.log))
                     {
-//                        System.out.println("From server to " + 
-//                            client.getPlayerName() + ": " + fromServer);
+                        System.out.println("From server to " + 
+                            client.getPlayerName() + ": " + fromServer);
                     }
+                */
                     parseLine(fromServer);
                 }
             }

@@ -65,11 +65,19 @@ public final class Start
         }
     }
 
+    private static void clearNonPersistentOptions(
+        net.sf.colossus.util.Options options)
+    {
+        options.setOption(Constants.runClient, false);
+        options.removeOption(Constants.loadGame);
+    }
+
     static void startupDialog(Game game, CommandLine cl)
     {
         net.sf.colossus.util.Options options = game.getOptions();
         options.loadOptions();
-        options.setOption(Constants.runClient, false);
+        clearNonPersistentOptions(options);
+
         String loadFilename = options.getStringOption(Constants.loadGame);
         new GetPlayers(new JFrame(), options);
 
