@@ -28,9 +28,9 @@ def convertToSVG(infile):
     print cmd
     os.system(cmd)
 
-def brightness(rgb):
+def brightness(rgba):
     """Return the sum of a (r,g,b) tuple"""
-    (r, g, b) = rgb
+    (r, g, b, a) = rgba
     return r + g + b
 
 def findBackgroundForeground(im):
@@ -86,7 +86,7 @@ def roundAllPixels(im, bg, fg):
                 im.putpixel(xy, newpixel)
 
 def processOneFile(filename):
-    im = Image.open(filename).convert('RGB')
+    im = Image.open(filename).convert('RGBA')
     print 'filename', filename, 'format', im.format, 'size', im.size
     (bg, fg) = findBackgroundForeground(im)
     shaveBorder(im, bg)
