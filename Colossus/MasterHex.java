@@ -224,15 +224,15 @@ class MasterHex
 
     void drawGate(Graphics g, int vx1, int vy1, int vx2, int vy2, int gateType)
     {
-        int x0;                // first focus point
+        int x0;                 // first focus point
         int y0;
-        int x1;                // second focus point
+        int x1;                 // second focus point
         int y1;
-        int x2;                // center point
+        int x2;                 // center point
         int y2;
-        double theta;          // gate angle
-        int x[] = new int[4];  // gate points
-        int y[] = new int[4];
+        double theta;           // gate angle
+        int [] x = new int[4];  // gate points
+        int [] y = new int[4];
 
         x0 = vx1 + (vx2 - vx1) / 6;
         y0 = vy1 + (vy2 - vy1) / 6;
@@ -345,7 +345,7 @@ class MasterHex
                     y[0] = (int) Math.round(y0 + l * Math.cos(theta));
                     x[1] = (int) Math.round((x0 + x1) / 2 + l * 
                            Math.sin(theta));
-                            y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                    y[1] = (int) Math.round((y0 + y1) / 2 - l * 
                            Math.cos(theta));
                     x[2] = (int) Math.round(x1 - l * Math.sin(theta));
                     y[2] = (int) Math.round(y1 + l * Math.cos(theta));
