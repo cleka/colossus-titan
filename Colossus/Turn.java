@@ -107,37 +107,37 @@ class Turn extends Dialog implements ActionListener
         // Place this window in the upper right corner.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width - getSize().width, 0));
+
+        // Highlight hexes with legions that can move.
+        board.highlightUnmovedLegions();
     }
 
     
     void setupFightDialog()
     {
-        removeAll();
-        setLayout(new GridLayout(0, 2));
-
-        add(new Label(game.getActivePlayer().getName() + 
-            " : Resolve Engagements"));
-        Button button1 = new Button("Muster Recruits");
-        add(button1);
-        button1.addActionListener(this);
-
-        pack();
-
-        // Place this window in the upper right corner.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width, 0));
-        
         // Highlight hexes with engagements.
-        Player player = game.getActivePlayer();
-        for (int i = 0; i < player.getNumLegions(); i++)
+        // If there are no engagements, move forward to the muster phase.
+        if (board.highlightEngagements() < 1)
         {
-            Legion legion = player.legions[i];
-            MasterHex hex = legion.getCurrentHex();
-            if (hex.getNumEnemyLegions(player) > 0)
-            {
-                hex.select();
-                hex.repaint();
-            }
+            game.advancePhase();
+            setupMusterDialog();
+        }
+        else
+        {
+            removeAll();
+            setLayout(new GridLayout(0, 2));
+
+            add(new Label(game.getActivePlayer().getName() + 
+                " : Resolve Engagements"));
+            Button button1 = new Button("Done with Engagements");
+            add(button1);
+            button1.addActionListener(this);
+
+            pack();
+
+            // Place this window in the upper right corner.
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            setLocation(new Point(d.width - getSize().width, 0));
         }
     }
 
@@ -206,18 +206,16 @@ class Turn extends Dialog implements ActionListener
         {
             player.undoLastMove();
 
-            // Remove all moves from MasterBoard.
-            board.unselectAllHexes();
-            board.repaint();
+            // Remove all moves from MasterBoard and show unmoved legions.
+            board.highlightUnmovedLegions();
         }
 
         else if (e.getActionCommand() == "Undo All Moves")
         {
             player.undoAllMoves();
 
-            // Remove all moves from MasterBoard.
-            board.unselectAllHexes();
-            board.repaint();
+            // Remove all moves from MasterBoard and show unmoved legions.
+            board.highlightUnmovedLegions();
         }
 
         else if (e.getActionCommand() == "Take Mulligan")
@@ -275,22 +273,15 @@ class Turn extends Dialog implements ActionListener
             }
         }
 
-        else if (e.getActionCommand() == "Muster Recruits")
+        else if (e.getActionCommand() == "Done with Engagements")
         {
             // Advance only if there are no unresolved engagements.
-            for (int i = 0; i < player.getNumLegions(); i++)
+            if (board.highlightEngagements() == 0)
             {
-                Legion legion = player.legions[i];
-                MasterHex hex = legion.getCurrentHex();
-                if (hex.getNumEnemyLegions(player) > 0)
-                {
-                    return;
-                }
+                game.advancePhase();
+
+                setupMusterDialog();
             }
-
-            game.advancePhase();
-
-            setupMusterDialog();
         }
         
         else if (e.getActionCommand() == "End Turn")
