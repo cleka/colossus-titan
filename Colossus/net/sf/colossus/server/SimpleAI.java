@@ -98,7 +98,7 @@ public class SimpleAI implements AI
                         recruiter = (Creature)recruiters.get(0);
                     }
                     game.doRecruit(legion, recruit, recruiter);
-                    game.getServer().didRecruit(legion);
+                    game.getServer().didRecruit(legion, recruit, recruiter);
                 }
             }
         }
@@ -371,17 +371,21 @@ public class SimpleAI implements AI
 
             String markerId = pickMarker(player.getMarkersAvailable(),
                 player.getShortColor());
+/* XXX
             // create the new legion
             Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion),
                 markerId);
-
-            // Hide all creatures in both legions.
-            // null if no markers left
-            if (newLegion != null)
+*/
+            StringBuffer results = new StringBuffer();
+            List creatures = chooseCreaturesToSplitOut(legion);
+            Iterator it = creatures.iterator();
+            while (it.hasNext())
             {
-                legion.hideAllCreatures();
-                newLegion.hideAllCreatures();
+                Creature creature = (Creature)it.next();
+                results.append(",");
+                results.append(creature.getName());
             }
+            game.doSplit(legion.getMarkerId(), markerId, results.toString());
         }
     }
 

@@ -1,3 +1,6 @@
+Test summons, acquires, reinforces, joins, unrecruits for possible bugs
+   in client side legion contents/height logic.
+
 Copy various new docs to web page from inst.  tex -> html first when possible.
 Put old, new web pages under CVS.
 ant inst all html stuff to web site.
@@ -8,7 +11,8 @@ Document test procedures.
 Add some JUnit tests.
 
 Add command-line options to start a game with N AIs, have the game exit
-   java when done, etc. to support automated testing.
+   java when done, etc. to support automated testing.  GetOpt package?
+Options to auto quit JVM when game over, auto stop when last human dies.
 
 Find a better Java dependency checker, and add a real depend target.  There 
 are a couple mentioned on the Ant page.
@@ -28,12 +32,6 @@ Change some dialogs to show info in a label instead of the title (so
 Change StatusScreen to use a JTable.  
 Pass smaller chunks of changed info to StatusScreen, from generalized
     info update messages. 
-
-Cache legion heights and then known legion contents in Client.  
-   Requires sending events to all clients when a legion is formed (game 
-   start or load), splits/joins, moves/unmoves, recruits/unrecruits, 
-   reinforces, acquires, summons, dies (flees/concedes/negotiates/battles), 
-   or gets reduced (by negotiation or battle).
 
 Remove remaining public Client methods that only directly control the GUI
    in favor of higher-level events.
@@ -60,6 +58,8 @@ Prompt player whether to continue game after last human player dies
 Include an .ico file for Windows.
 
 Remember window positions in .cfg file.
+
+Remember GetPlayers settings in .cfg file.
 
 Add UI for players to specify favorite colors.
 
@@ -93,4 +93,5 @@ Show StatusScreen and ShowLegion info in the masterboard window, rather
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
 
-   
+Special-case less fear of initial 8-high enemy legions, to make AI move
+   both legions out of tower in turn 1.

@@ -116,10 +116,6 @@ final class Legion implements Comparable
         markerNames.put("Rd12", "Torch");
     }
 
-    /**
-     * TMJF sez: these are but I think they are only for
-     * testing purposes
-     */
 
     Legion(String markerId, String parentId, String currentHexLabel,
         String startingHexLabel, Creature creature0, Creature creature1,
@@ -141,35 +137,35 @@ final class Legion implements Comparable
 
         if (creature0 != null)
         {
-            critters.add(new Critter(creature0, false, markerId, game));
+            critters.add(new Critter(creature0, markerId, game));
         }
         if (creature1 != null)
         {
-            critters.add(new Critter(creature1, false, markerId, game));
+            critters.add(new Critter(creature1, markerId, game));
         }
         if (creature2 != null)
         {
-            critters.add(new Critter(creature2, false, markerId, game));
+            critters.add(new Critter(creature2, markerId, game));
         }
         if (creature3 != null)
         {
-            critters.add(new Critter(creature3, false, markerId, game));
+            critters.add(new Critter(creature3, markerId, game));
         }
         if (creature4 != null)
         {
-            critters.add(new Critter(creature4, false, markerId, game));
+            critters.add(new Critter(creature4, markerId, game));
         }
         if (creature5 != null)
         {
-            critters.add(new Critter(creature5, false, markerId, game));
+            critters.add(new Critter(creature5, markerId, game));
         }
         if (creature6 != null)
         {
-            critters.add(new Critter(creature6, false, markerId, game));
+            critters.add(new Critter(creature6, markerId, game));
         }
         if (creature7 != null)
         {
-            critters.add(new Critter(creature7, false, markerId, game));
+            critters.add(new Critter(creature7, markerId, game));
         }
 
         initCreatureVisibility();
@@ -414,31 +410,16 @@ final class Legion implements Comparable
     }
 
 
-    /** Return a list of imageNames for all critters in this legion.
-     *  Unless showAll is true, return "Unknown" for critters that
-     *  are not visible.  Put all the Unknowns at the end of the
-     *  list to avoid giving out too much information. */
-    List getImageNames(boolean showAll)
+    /** Return a list of imageNames for all critters in this legion. */
+    List getImageNames()
     {
         sortCritters();
         List imageNames = new ArrayList();
         Iterator it = getCritters().iterator();
-        int unknowns = 0;
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (showAll || critter.isVisible())
-            {
-                imageNames.add(critter.getImageName());
-            }
-            else
-            {
-                unknowns++;
-            }
-        }
-        for (int i = 0; i < unknowns; i++)
-        {
-            imageNames.add("Unknown");
+            imageNames.add(critter.getImageName());
         }
         return imageNames;
     }
@@ -811,12 +792,6 @@ final class Legion implements Comparable
     }
 
 
-    /** convenience method for AI */
-    void addCreature(Creature creature)
-    {
-        addCreature(creature,false);
-    }
-
     /** Add a creature to this legion.  If takeFromStack is true,
         then do this only if such a creature remains in the stacks,
         and decrement the number of this creature type remaining. */
@@ -840,8 +815,7 @@ final class Legion implements Comparable
             }
         }
 
-        // Newly added critters are visible.
-        critters.add(new Critter(creature, true, markerId, game));
+        critters.add(new Critter(creature, markerId, game));
     }
 
     /** Remove the creature in position i in the legion.  Return the
@@ -1068,7 +1042,7 @@ final class Legion implements Comparable
                 newLegion.recombine(this, true);
                 return null;
             }
-            newLegion.addCreature(creature);
+            newLegion.addCreature(creature, false);
         }
 
         player.addLegion(newLegion);
@@ -1087,66 +1061,15 @@ final class Legion implements Comparable
     }
 
 
-
-    void hideAllCreatures()
-    {
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            critter.setVisible(false);
-        }
-    }
-
-
     void revealAllCreatures()
     {
-        Iterator it = critters.iterator();
-        while (it.hasNext())
+        Server server = game.getServer();
+        if (server != null)
         {
-            Critter critter = (Critter)it.next();
-            critter.setVisible(true);
+            server.allRevealLegion(this);
         }
     }
 
-    void revealCreatures(Creature creature, int numberToReveal)
-    {
-        int numberAlreadyRevealed = 0;
-
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (critter.getCreature().getName().equals(
-                creature.getName()) && critter.isVisible())
-            {
-                numberAlreadyRevealed++;
-            }
-        }
-
-        int excess = numberAlreadyRevealed + numberToReveal -
-            numCreature(creature);
-        if (excess > 0)
-        {
-            numberToReveal -= excess;
-        }
-
-        it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (critter.getCreature().getName().equals(
-                creature.getName()) && !critter.isVisible())
-            {
-                critter.setVisible(true);
-                numberToReveal--;
-                if (numberToReveal == 0)
-                {
-                    return;
-                }
-            }
-        }
-    }
 
     /** List the lords eligible to teleport this legion to hexLabel,
      *  as strings. */

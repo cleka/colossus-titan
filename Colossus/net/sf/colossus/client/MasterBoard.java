@@ -450,6 +450,11 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
+                if (client.isGameOver())
+                {
+                    System.exit(0);
+                }
+
                 String [] options = new String[2];
                 options[0] = "Yes";
                 options[1] = "No";
@@ -458,7 +463,6 @@ public final class MasterBoard extends JPanel
                     "Quit Game?",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, options, options[1]);
-
                 if (answer == JOptionPane.YES_OPTION)
                 {
                     System.exit(0);
@@ -587,6 +591,7 @@ public final class MasterBoard extends JPanel
         addCheckBox(gameMenu, Options.logDebug, KeyEvent.VK_L);
         mi = gameMenu.add(changeAIDelayAction);
         mi.setMnemonic(KeyEvent.VK_D);
+        addCheckBox(gameMenu, Options.autoQuit, KeyEvent.VK_Q);
 
         // Then per-player options
 

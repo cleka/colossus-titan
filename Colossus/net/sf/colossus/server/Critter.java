@@ -18,7 +18,6 @@ import net.sf.colossus.client.HexMap;
 
 final class Critter extends Creature implements Comparable
 {
-    private boolean visible;
     private Creature creature;
     private String markerId;
     private Battle battle;
@@ -36,12 +35,11 @@ final class Critter extends Creature implements Comparable
     private boolean carryPossible;
 
 
-    Critter(Creature creature, boolean visible, String markerId, Game game)
+    Critter(Creature creature, String markerId, Game game)
     {
         super(creature);
 
         this.creature = creature;
-        this.visible = visible;
         this.markerId = markerId;
         this.game = game;
         tag = ++tagCounter;
@@ -51,7 +49,7 @@ final class Critter extends Creature implements Comparable
     /** Deep copy for AI. */
     Critter AICopy(Game game)
     {
-        Critter newCritter = new Critter(creature, visible, markerId, game);
+        Critter newCritter = new Critter(creature, markerId, game);
 
         newCritter.battle = battle;
         newCritter.struck = struck;
@@ -75,16 +73,6 @@ final class Critter extends Creature implements Comparable
     void setGame(Game game)
     {
         this.game = game;
-    }
-
-    boolean isVisible()
-    {
-        return visible;
-    }
-
-    void setVisible(boolean visible)
-    {
-        this.visible = visible;
     }
 
     Creature getCreature()
@@ -133,7 +121,7 @@ final class Critter extends Creature implements Comparable
     {
         String basename = super.getImageName();
 
-        if (isTitan())
+        if (isTitan() && getPlayer() != null)
         {
             basename = "Titan-" + getPower() + "-" + getPlayer().getColor();
         }

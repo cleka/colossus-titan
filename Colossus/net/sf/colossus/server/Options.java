@@ -27,6 +27,7 @@ public final class Options
     public static final String logDebug = "Log debug messages";
     public static final String allStacksVisible = "All stacks visible";
     public static final String aiDelay = "AI delay";
+    public static final String autoQuit = "Auto quit when game over";
 
     // Display options (client)
     public static final String showCaretaker = "Show Caretaker's stacks";

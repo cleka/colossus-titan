@@ -547,15 +547,15 @@ public final class Game
         {
             case 0:
                 Log.event("Draw");
-                server.allShowMessageDialog("Draw");
-                gameOver = true;
+                setGameOver(true);
+                server.allTellGameOver("Draw");
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
                 Log.event(winnerName + " wins");
-                server.allShowMessageDialog(winnerName + " wins");
-                gameOver = true;
+                setGameOver(true);
+                server.allTellGameOver(winnerName + " wins");
                 break;
 
             default:
@@ -567,6 +567,15 @@ public final class Game
     boolean isOver()
     {
         return gameOver;
+    }
+
+    void setGameOver(boolean gameOver)
+    {
+        this.gameOver = gameOver;
+        if (gameOver && server.getClientOption(Options.autoQuit))
+        {
+            dispose();
+        }
     }
 
 
@@ -921,7 +930,6 @@ public final class Game
         {
             Critter critter = (Critter)it.next();
             out.println(critter.getName());
-            out.println(critter.isVisible());
             if (inBattle)
             {
                 out.println(critter.getHits());
@@ -1175,6 +1183,10 @@ public final class Game
 
             server.allUpdateStatusScreen();
             caretaker.fullySyncDisplays();
+
+            server.allFullyUpdateLegionHeights();
+            server.allFullyUpdateOwnLegionContents();
+            // TODO allStacksVisible
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -1218,11 +1230,7 @@ public final class Game
         {
             buf = in.readLine();
             Critter critter = new Critter(
-                Creature.getCreatureByName(buf), false, null, this);
-
-            buf = in.readLine();
-            boolean visible = Boolean.valueOf(buf).booleanValue();
-            critter.setVisible(visible);
+                Creature.getCreatureByName(buf), null, this);
 
             // Battle stuff
             if (inBattle)
@@ -1451,8 +1459,7 @@ public final class Game
             while (liter.hasNext())
             {
                 Creature lesser = (Creature)liter.next();
-                if ((numberOfRecruiterNeeded(
-                                             lesser, creature, terrain) <=
+                if ((numberOfRecruiterNeeded(lesser, creature, terrain) <=
                      legion.numCreature(lesser)) &&
                     (recruits.indexOf(creature) == -1))
                 {
@@ -1521,10 +1528,6 @@ public final class Game
             // Mark the recruiter(s) as visible.
             numRecruiters = numberOfRecruiterNeeded(recruiter,
                 recruit, hex.getTerrain());
-            if (numRecruiters >= 1 && numRecruiters < 99)
-            {
-                legion.revealCreatures(recruiter, numRecruiters);
-            }
         }
 
         Log.event("Legion " + legion.getLongMarkerName() + " in " +
@@ -1972,8 +1975,7 @@ public final class Game
             String typeColonDonor = player.aiSummonAngel(attacker);
             if (typeColonDonor == null)
             {
-                // XXX testing Peter's fix
-                player.setDonorId(null);
+                Log.error("null in Game.createSummonAngel() -- hang");
                 return;
             }
             int split = typeColonDonor.indexOf(':');
@@ -2168,10 +2170,6 @@ Log.debug("" + findEngagements().size() + " engagements left");
         }
         newLegion = legion.split(creatures, childId);
 
-        // Hide all creatures in both legions.
-        legion.hideAllCreatures();
-        newLegion.hideAllCreatures();
-
         if (newLegion == null)
         {
             return false;
@@ -2179,6 +2177,17 @@ Log.debug("" + findEngagements().size() + " engagements left");
 
         String hexLabel = legion.getCurrentHexLabel();
         server.didSplit(hexLabel, parentId, childId, newLegion.getHeight());
+
+        if (server.getClientOption(Options.allStacksVisible))
+        {
+            server.allRevealLegion(legion);
+            server.allRevealLegion(newLegion);
+        }
+        else
+        {
+            server.oneRevealLegion(legion, player.getName());
+            server.oneRevealLegion(newLegion, player.getName());
+        }
 
         return true;
     }
@@ -2234,8 +2243,8 @@ Log.debug("" + findEngagements().size() + " engagements left");
         if (teleport)
         {
             // TODO Make sure teleportingLord is legal
-            legion.revealCreatures(
-                Creature.getCreatureByName(teleportingLord), 1);
+
+            server.allRevealCreature(legion, teleportingLord);
         }
 
         legion.moveToHex(hex, entrySide, teleport, teleportingLord);

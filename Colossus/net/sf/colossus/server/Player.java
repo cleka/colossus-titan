@@ -595,11 +595,12 @@ public final class Player implements Comparable
     void undoRecruit(String markerId)
     {
         Legion legion = getLegionByMarkerId(markerId);
+        String recruitName = legion.getRecruitName();
         legion.undoRecruit();
+
         // Update number of creatures in status window.
-        // game.getServer().allUpdateStatusScreen();
-        // XXX Need to tell all clients that this recruit was undone.
-        game.getServer().undidRecruit(legion);
+        game.getServer().allUpdateStatusScreen();
+        game.getServer().undidRecruit(legion, recruitName);
     }
 
 
@@ -607,8 +608,11 @@ public final class Player implements Comparable
     {
         Legion splitoff = getLegionByMarkerId(splitoffId);
         String hexLabelToAlign = splitoff.getCurrentHexLabel();
-        splitoff.recombine(splitoff.getParent(), true);
+        Legion parent = splitoff.getParent();
+        splitoff.recombine(parent, true);
         game.getServer().allUpdateStatusScreen();
+        game.getServer().undidSplit(splitoffId);
+        game.getServer().oneRevealLegion(parent, getName());
     }
 
 

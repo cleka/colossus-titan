@@ -288,6 +288,16 @@ public final class Server
         }
     }
 
+    void allTellGameOver(String message)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.tellGameOver(message);
+        }
+    }
+
 
     void allSetupSplit()
     {
@@ -519,10 +529,12 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
             Constants.FIGHT) && legion.canRecruit())
         {
             legion.sortCritters();
+            Creature recruit = null;
+            Creature recruiter = null;
             if (recruitName != null)
             {
-                Creature recruit = Creature.getCreatureByName(recruitName);
-                Creature recruiter = Creature.getCreatureByName(recruiterName);
+                recruit = Creature.getCreatureByName(recruitName);
+                recruiter = Creature.getCreatureByName(recruiterName);
                 if (recruit != null)
                 {
                     game.doRecruit(legion, recruit, recruiter);
@@ -531,7 +543,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
             if (!legion.canRecruit())
             {
-                didRecruit(legion);
+                didRecruit(legion, recruit, recruiter);
             }
         }
         // Need to always call this to keep game from hanging.
@@ -544,25 +556,29 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         }
     }
 
-    void didRecruit(Legion legion)
+    void didRecruit(Legion legion, Creature recruit, Creature recruiter)
     {
         allUpdateStatusScreen();
+
+        int numRecruiters = Game.numberOfRecruiterNeeded(recruiter, recruit, 
+            legion.getCurrentHex().getTerrain());
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.didRecruit(legion.getMarkerId(), legion.getRecruitName());
+            client.didRecruit(legion.getMarkerId(), recruit.getName(),
+                recruiter.getName(), numRecruiters);
         }
     }
 
-    void undidRecruit(Legion legion)
+    void undidRecruit(Legion legion, String recruitName)
     {
         allUpdateStatusScreen();
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.undidRecruit(legion.getMarkerId());
+            client.undidRecruit(legion.getMarkerId(), recruitName);
         }
     }
 
@@ -592,8 +608,8 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
             Client client = getClient(ally.getPlayerName());
             client.askConcede(ally.getLongMarkerName(),
                 ally.getCurrentHex().getDescription(), ally.getMarkerId(),
-                ally.getImageNames(true), enemy.getMarkerId(), 
-                enemy.getImageNames(true));
+                ally.getImageNames(), enemy.getMarkerId(), 
+                enemy.getImageNames());
         }
     }
 
@@ -626,8 +642,8 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
             Client client = getClient(ally.getPlayerName());
             client.askFlee(ally.getLongMarkerName(),
                 ally.getCurrentHex().getDescription(), ally.getMarkerId(),
-                ally.getImageNames(true), enemy.getMarkerId(), 
-                enemy.getImageNames(true));
+                ally.getImageNames(), enemy.getMarkerId(), 
+                enemy.getImageNames());
         }
     }
 
@@ -653,14 +669,14 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         Client client1 = getClient(defender.getPlayerName());
         client1.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
-            defender.getMarkerId(), attacker.getImageNames(true),
-            defender.getImageNames(true), attacker.getCurrentHexLabel());
+            defender.getMarkerId(), attacker.getImageNames(),
+            defender.getImageNames(), attacker.getCurrentHexLabel());
 
         Client client2 = getClient(attacker.getPlayerName());
         client2.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
-            defender.getMarkerId(), attacker.getImageNames(true),
-            defender.getImageNames(true), attacker.getCurrentHexLabel());
+            defender.getMarkerId(), attacker.getImageNames(),
+            defender.getImageNames(), attacker.getCurrentHexLabel());
     }
 
     // XXX Stringify the proposal.
@@ -952,22 +968,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     }
 
 
-    public List getLegionImageNames(String markerId, String playerName)
-    {
-        Legion legion = game.getLegionByMarkerId(markerId);
-        if (legion == null)
-        {
-            return new ArrayList();
-        }
-        boolean showAll = false;
-        if (playerName.equals(legion.getPlayerName()) ||
-            getClientOption(Options.allStacksVisible))
-        {
-            showAll = true;
-        }
-        return legion.getImageNames(showAll);
-    }
-
     public void undoSplit(String playerName, String splitoffId)
     {
         if (playerName != game.getActivePlayerName())
@@ -975,7 +975,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
             return;
         }
         game.getPlayer(playerName).undoSplit(splitoffId);
-        undidSplit(splitoffId);
     }
 
     void undidSplit(String splitoffId)
@@ -1223,7 +1222,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.didSplit(childId, hexLabel);
+            client.didSplit(hexLabel, parentId, childId, height);
         }
     }
 
@@ -1251,6 +1250,85 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
             client.didMove(markerId, startingHexLabel, endingHexLabel);
         }
     }
+
+
+    void allTellAddCreature(String markerId, String creatureName)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.addCreature(markerId, creatureName);
+        }
+    }
+
+    void allRevealLegion(Legion legion)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setLegionContents(legion.getMarkerId(), 
+                legion.getImageNames());
+            client.setLegionHeight(legion.getMarkerId(),
+                legion.getHeight());
+        }
+    }
+
+    void oneRevealLegion(Legion legion, String playerName)
+    {
+        Client client = getClient(playerName);
+        client.setLegionContents(legion.getMarkerId(),
+            legion.getImageNames());
+        client.setLegionHeight(legion.getMarkerId(),
+            legion.getHeight());
+    }
+
+    void allFullyUpdateLegionHeights()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            Iterator it2 = game.getAllLegions().iterator();
+            while (it2.hasNext())
+            {
+                Legion legion = (Legion)it2.next();
+                client.setLegionHeight(legion.getMarkerId(),
+                    legion.getHeight());
+            }
+        }
+    }
+
+    void allFullyUpdateOwnLegionContents()
+    {
+        Iterator it = game.getPlayers().iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            Client client = getClient(player.getName());
+
+            Iterator it2 = player.getLegions().iterator();
+            while (it2.hasNext())
+            {
+                Legion legion = (Legion)it2.next();
+                oneRevealLegion(legion, player.getName()); 
+            }
+        }
+    }
+
+    void allRevealCreature(Legion legion, String creatureName)
+    {
+        java.util.List names = new ArrayList();
+        names.add(creatureName);
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.revealCreatures(legion.getMarkerId(), names);
+        }
+    }
+
 
 
     /** Return a list of Creatures. */

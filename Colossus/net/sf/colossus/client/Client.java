@@ -90,6 +90,13 @@ public final class Client
      *  is missing then we assume it is set to the maximum. */
     private Map creatureCounts = new HashMap();
 
+    /** Map of markerId to Integer height */
+    private Map legionToHeight = new HashMap();
+
+    /** Map of markerId to List of known creature names in legion. */
+    private Map legionContents = new HashMap();
+
+
     int turnNumber = -1;
     String activePlayerName = "none";
     int phase = -1;
@@ -97,9 +104,13 @@ public final class Client
     String battleActivePlayerName = "none";
     int battlePhase = -1;
 
+    /** If the game is over, then quitting does not require confirmation. */
+    private boolean gameOver;
+
     /** The primary client controls some game options.  If all players
      *  are AIs, then the primary client gets a board and map. */
     private boolean primary;
+
 
 
     public Client(Server server, String playerName, boolean primary)
@@ -620,12 +631,6 @@ public final class Client
         return null;
     }
 
-    // TODO Cache legion heights on client.
-    int getLegionHeight(String markerId)
-    {
-        return server.getLegionHeight(markerId);
-    }
-
     /** Add the marker to the end of the list.  If it's already
      *  in the list, remove the earlier entry. */
     void setMarker(String id, Marker marker)
@@ -658,6 +663,138 @@ public final class Client
             }
         }
     }
+
+
+    // TODO Extract legion info class.
+
+    int getLegionHeight(String markerId)
+    {
+        Integer integer = (Integer)legionToHeight.get(markerId);
+        if (integer != null)
+        {
+            return integer.intValue();
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    public void setLegionHeight(String markerId, int height)
+    {
+        legionToHeight.put(markerId, new Integer(height));
+    }
+
+    void incLegionHeight(String markerId)
+    {
+        int height = getLegionHeight(markerId);
+        height++;
+        setLegionHeight(markerId, height);
+    }
+
+    void decLegionHeight(String markerId)
+    {
+        int height = getLegionHeight(markerId);
+        height--;
+        setLegionHeight(markerId, height);
+    }
+
+    /** Return an immutable copy of the legion's contents. */
+    java.util.List getLegionContents(String markerId)
+    {
+        java.util.List contents = (java.util.List)legionContents.get(markerId);
+        if (contents == null)
+        {
+            contents = new ArrayList();
+        }
+        return Collections.unmodifiableList(contents);
+    }
+
+    // TODO Colorized, powered titans.  See Critter.getImageName()
+    /** Return a list of Strings.  Use the proper string for titans and
+     *  unknown creatures. */
+    java.util.List getLegionImageNames(String markerId)
+    {
+        java.util.List names = new ArrayList();
+        names.addAll(getLegionContents(markerId));
+        int numUnknowns = getLegionHeight(markerId) - names.size();
+        for (int i = 0; i < numUnknowns; i++)
+        {
+            names.add("Unknown");
+        }
+        return names;
+    }
+
+    /** Replace the existing contents for this legion with these. */
+    public void setLegionContents(String markerId, java.util.List names)
+    {
+        legionContents.put(markerId, names);
+    }
+
+    /** Remove all contents for this legion. */
+    public void clearLegionContents(String markerId)
+    {
+        legionContents.remove(markerId);
+    }
+
+    /** Add a new creature to this legion. */
+    public void addCreature(String markerId, String name)
+    {
+        incLegionHeight(markerId);
+        java.util.List names = new ArrayList();
+        names.addAll(getLegionContents(markerId));
+        names.add(name);
+        setLegionContents(markerId, names);
+    }
+
+    public void removeCreature(String markerId, String name)
+    {
+Log.debug("called Client.removeCreature for " + markerId + " " + name);
+        decLegionHeight(markerId);
+        java.util.List names = getLegionContents(markerId);
+        if (names == null)
+        {
+            return;   // Nothing to remove
+        }
+        java.util.List newNames = new ArrayList();
+        newNames.addAll(names);
+        newNames.remove(name);
+        setLegionContents(markerId, newNames);
+    }
+
+    /** Reveal creatures in this legion, some of which already may be known. */
+    public void revealCreatures(String markerId, final java.util.List names)
+    {
+        java.util.List newNames = new ArrayList();
+        java.util.List oldNames = getLegionContents(markerId);
+        if (oldNames == null || oldNames.isEmpty())
+        {
+            newNames.addAll(names);
+        }
+        else
+        {
+            newNames.addAll(oldNames);
+
+            java.util.List oldScratch = new ArrayList();  // Can't just clone
+            oldScratch.addAll(oldNames);
+
+            Iterator it = names.iterator();
+            while (it.hasNext())
+            {
+                String name = (String)it.next();
+                // If it's already there, don't add it, but remove it from
+                // the list in case we have multiples of this creature.
+                if (!oldScratch.remove(name))
+                {
+                    newNames.add(name);
+                }
+            }
+        }
+        setLegionContents(markerId, newNames);
+    }
+
+
+
 
 
     java.util.List getBattleChits()
@@ -755,8 +892,11 @@ public final class Client
     void clearRecruitChits()
     {
         recruitChits.clear();
-        // TODO Only repaint the hexes that had recruitChits.
-        board.repaint();
+        // TODO Only repaint needed hexes.
+        if (board != null)
+        {
+            board.repaint();
+        }
     }
 
 
@@ -963,6 +1103,19 @@ Log.debug("called Client.acquireAngelCallback()");
             JOptionPane.showMessageDialog(frame, message);
         }
     }
+
+
+    public void tellGameOver(String message)
+    {
+        gameOver = true;
+        showMessageDialog(message);
+    }
+
+    boolean isGameOver()
+    {
+        return gameOver;
+    }
+
 
 
     void doFight(String hexLabel)
@@ -1322,7 +1475,8 @@ Log.debug("called Client.acquireAngelCallback()");
         server.doRecruit(markerId, recruitName, recruiterName);
     }
 
-    public void didRecruit(String markerId, String recruitName)
+    public void didRecruit(String markerId, String recruitName,
+        String recruiterName, int numRecruiters)
     {
         String hexLabel = getHexForLegion(markerId);
         possibleRecruitHexes.remove(hexLabel);
@@ -1330,6 +1484,18 @@ Log.debug("called Client.acquireAngelCallback()");
         {
             pushUndoStack(markerId);
         }
+
+        if (numRecruiters >= 1 && recruiterName != null)
+        {
+            java.util.List recruiters = new ArrayList();
+            for (int i = 0; i < numRecruiters; i++)
+            {
+                recruiters.add(recruiterName);
+            }
+            revealCreatures(markerId, recruiters);
+        }
+        addCreature(markerId, recruitName);
+
         if (board != null)
         {
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
@@ -1339,10 +1505,11 @@ Log.debug("called Client.acquireAngelCallback()");
         }
     }
 
-    public void undidRecruit(String markerId)
+    public void undidRecruit(String markerId, String recruitName)
     {
         String hexLabel = getHexForLegion(markerId);
         possibleRecruitHexes.add(hexLabel);
+        removeCreature(markerId, recruitName);
         if (board != null)
         {
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
@@ -1897,13 +2064,6 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    // TODO Cache this on client. */
-    /** Return a list of Strings. */
-    java.util.List getLegionImageNames(String markerId)
-    {
-        return server.getLegionImageNames(markerId, playerName);
-    }
-
     void undoLastSplit()
     {
         if (!isUndoStackEmpty())
@@ -2109,17 +2269,32 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
     /** Callback from server after any successful split. */
-    public void didSplit(String childId, String hexLabel)
+    public void didSplit(String hexLabel, String parentId, String childId,
+        int childHeight)
     {
+        // If my legion, or allStacksVisible, separate calls will update
+        // contents of both legions soon.
+
         if (isMyLegion(childId))
         {
             clearRecruitChits();
             pushUndoStack(childId);
             markersAvailable.remove(childId);
         }
+        else
+        {
+            // TODO split prediction, saving somewhere in case split is undone
+            clearLegionContents(parentId);
+            clearLegionContents(childId);
+        }
+
         numSplitsThisTurn++;
 
         legionToHex.put(childId, hexLabel);
+
+        setLegionHeight(childId, childHeight);
+        setLegionHeight(parentId, getLegionHeight(parentId) - childHeight);
+
         if (board != null)
         {
             board.alignLegions(hexLabel);
