@@ -134,6 +134,18 @@ class Player
     }
 
 
+    boolean canSummonAngel()
+    {
+        return canSummonAngel;
+    }
+
+
+    void disallowSummoningAngel()
+    {
+        canSummonAngel = false;
+    }
+
+
     int titanPower()
     {
         return (int) (6 + (score / 100));
