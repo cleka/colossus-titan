@@ -102,7 +102,7 @@ public final class LogWindow extends JTextArea
     {
         int x = client.getIntOption(Options.logWindowLocX);
         int y = client.getIntOption(Options.logWindowLocY);
-        if (x > 0 && y > 0)
+        if (x >= 0 && y >= 0)
         {
             location = new Point(x, y);
         }

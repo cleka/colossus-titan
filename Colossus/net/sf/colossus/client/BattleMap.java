@@ -663,7 +663,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         int x = client.getIntOption(Options.battleMapLocX);
         int y = client.getIntOption(Options.battleMapLocY);
-        if (x > 0 && y > 0)
+        if (x >= 0 && y >= 0)
         {
             location = new Point(x, y);
         }

@@ -248,7 +248,7 @@ final class StatusScreen extends KDialog implements WindowListener
     {
         int x = client.getIntOption(Options.statusScreenLocX);
         int y = client.getIntOption(Options.statusScreenLocY);
-        if (x > 0 && y > 0)
+        if (x >= 0 && y >= 0)
         {
             location = new Point(x, y);
         }

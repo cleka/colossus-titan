@@ -137,7 +137,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
     {
         int x = client.getIntOption(Options.creatureCollectionViewLocX);
         int y = client.getIntOption(Options.creatureCollectionViewLocY);
-        if (x > 0 && y > 0)
+        if (x >= 0 && y >= 0)
         {
             location = new Point(x, y);
         }

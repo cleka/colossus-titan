@@ -173,7 +173,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     {
         int x = client.getIntOption(Options.concedeLocX);
         int y = client.getIntOption(Options.concedeLocY);
-        if (x > 0 && y > 0)
+        if (x >= 0 && y >= 0)
         {
             location = new Point(x, y);
         }
