@@ -2559,7 +2559,7 @@ Log.debug("Best target is null, aborting");
 
     static int getKillValue(Creature creature)
     {
-        return getKillValue(creature, "Plains");
+        return getKillValue(creature, null);
     }
 
     // XXX titan power
@@ -2591,7 +2591,8 @@ Log.debug("Best target is null, aborting");
         {
             val += 4;
         }
-        if (MasterHex.isNativeCombatBonus(creature, terrain))
+        if (terrain != null && 
+            MasterHex.isNativeCombatBonus(creature, terrain))
         {
             val += 3;
         }

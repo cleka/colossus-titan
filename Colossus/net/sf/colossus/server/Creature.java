@@ -458,7 +458,7 @@ public class Creature implements Comparable
     
     /**
      * Compare by name.
-     * overloaded in Critte w/ a different semantic
+     * overloaded in Critter w/ a different semantic
      */
     public int compareTo(Object object)
     {

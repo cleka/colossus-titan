@@ -95,6 +95,22 @@ public final class PredictSplits
         return leaves;
     }
 
+    /** Return all non-empty nodes in subtree starting from node. */
+    java.util.List getNodes(Node node)
+    {
+        java.util.List nodes = new ArrayList();
+        if (!node.getCreatures().isEmpty())
+        {
+            nodes.add(node);
+        }
+        if (node.getChild1() != null)
+        {
+            nodes.addAll(getNodes(node.getChild1()));
+            nodes.addAll(getNodes(node.getChild2()));
+        }
+        return nodes;
+    }
+
     class ReverseIntegerComparator implements Comparator
     {
         // Sort in reverse, so we don't disturb array 
@@ -110,13 +126,31 @@ public final class PredictSplits
     /** Print all childless nodes in tree. */
     void printLeaves()
     {
+        Log.debug("*** leaves ***");
         java.util.List leaves = getLeaves(root);
+        Collections.sort(leaves);
         Iterator it = leaves.iterator();
         while (it.hasNext())
         {
             Node leaf = (Node)it.next();
             Log.debug(leaf.toString());
         }
+        Log.debug("**************");
+    }
+
+    /** Print all nodes in tree. */
+    void printNodes()
+    {
+        Log.debug("*** nodes ***");
+        java.util.List nodes = getNodes(root);
+        Collections.sort(nodes);
+        Iterator it = nodes.iterator();
+        while (it.hasNext())
+        {
+            Node node = (Node)it.next();
+            Log.debug(node.toString());
+        }
+        Log.debug("*************");
     }
 
     /** Return the leaf node with matching markerId. */
@@ -161,20 +195,23 @@ final class CreatureInfoComparator implements Comparator
 }
 
 
-class Node
+class Node implements Comparable
 {
-    final String markerId;       // Not unique!
-    final int turnCreated;
-    CreatureInfoList creatures = new CreatureInfoList();
-    CreatureInfoList removed = new CreatureInfoList(); // only if atSplit
-    final Node parent;
-    int childSize1 = 0;          // At the time this node was split.
-    int childSize2 = 0;          // At the time this node was split.
-    Node child1;                 // At the time this node was split.
-    Node child2;                 // At the time this node was split.
-    boolean flipped;
-    int turnSplit = -1;
-    static CreatureInfoComparator cic = new CreatureInfoComparator();
+    private final String markerId;       // Not unique!
+    private final int turnCreated;
+    private CreatureInfoList creatures = new CreatureInfoList();
+
+    // only if atSplit
+    private CreatureInfoList removed = new CreatureInfoList(); 
+
+    private final Node parent;
+    private int childSize1 = 0;          // At the time this node was split.
+    private int childSize2 = 0;          // At the time this node was split.
+    private Node child1;                 // At the time this node was split.
+    private Node child2;                 // At the time this node was split.
+    private boolean flipped;
+    private int turnSplit = -1;
+    private static CreatureInfoComparator cic = new CreatureInfoComparator();
 
     Node(String markerId, int turnCreated, CreatureInfoList cil, Node parent)
     {
@@ -236,7 +273,9 @@ class Node
     /** Return list of CreatureInfo */
     CreatureInfoList getRemovedCreatures()
     {
-        return removed;
+        CreatureInfoList cil = new CreatureInfoList();
+        cil.addAll(removed);
+        return cil;
     }
 
     /** Return list of CreatureInfo where certain == true. */
@@ -471,6 +510,7 @@ Log.debug("revealSomeCreatures() " + this);
 
     void revealAllCreatures(CreatureNameList cnl)
     {
+Log.debug("revealAllCreatures() for " + this + " " + cnl);
         CreatureInfoList cil = new CreatureInfoList();
         Iterator it = cnl.iterator();
         while (it.hasNext())
@@ -529,6 +569,8 @@ Log.debug("revealSomeCreatures() " + this);
     CreatureInfoList chooseCreaturesToSplitOut(int childSize, 
         CreatureInfoList knownSplit, CreatureInfoList knownKeep)
     {
+Log.debug("chooseCreaturesToSplitOut() " + this + " " + childSize + " " +
+knownSplit + " " + knownKeep);
         // Sanity checks
         if (knownSplit.size() > childSize)
         {
@@ -597,7 +639,6 @@ Log.debug("revealSomeCreatures() " + this);
         if (getHeight() == 8)
         {
             CreatureInfo lord = null;
-            // Maintain flags.
             if (knownSplit.contains(Constants.titan) || 
                 knownKeep.contains(Constants.angel))
             {
@@ -628,6 +669,8 @@ Log.debug("revealSomeCreatures() " + this);
 
     void split(int childSize, String otherMarkerId, int turn)
     {
+Log.debug("split() for " + this + " " + childSize + " " + 
+otherMarkerId + " " + turn);        
         if (creatures.size() > 8)
         {
             throw new PredictSplitsException("> 8 creatures in legion");
@@ -654,6 +697,8 @@ Log.debug("revealSomeCreatures() " + this);
 
         CreatureInfoList splitoffCreatures = chooseCreaturesToSplitOut(
             childSize, knownSplit, knownKeep);
+Log.debug("splitoffCreatures is " + splitoffCreatures);
+
         CreatureNameList splitoffNames = new CreatureNameList();
         Iterator it = splitoffCreatures.iterator();
         while (it.hasNext())
@@ -781,7 +826,6 @@ Log.debug("child2: " + child2);
 Log.debug("tellChildContents for node " + this + " from node " + child);
 Log.debug("child atSplit is " + childAtSplit);
 
-
         if (!creatures.isSupersetOf(childAtSplit))
         {
             if (parent == null)
@@ -837,6 +881,7 @@ Log.debug("Re-predicting parent split");
 
     void addCreature(String creatureName)
     {
+        Log.debug("addCreature() " + this + " : " + creatureName);
         if (getHeight() >= 7 && child1 == null)
         {
             throw new PredictSplitsException("Tried adding to 7-high legion");
@@ -847,6 +892,7 @@ Log.debug("Re-predicting parent split");
 
     void removeCreature(String creatureName)
     {
+Log.debug("removeCreature() " + this + " : " + creatureName);
         if (getHeight() <= 0)
         {
             throw new PredictSplitsException(
@@ -862,6 +908,7 @@ Log.debug("Re-predicting parent split");
         // predictions if it was here at the time of the split.
         if (ci.isAtSplit())
         {
+Log.debug("appending " + ci + " to removed");
             removed.add(ci);
         }
         creatures.removeCreatureByName(creatureName);
@@ -874,6 +921,19 @@ Log.debug("Re-predicting parent split");
         {
             String name = (String)it.next();
             removeCreature(name);
+        }
+    }
+
+    public int compareTo(Object object)
+    {
+        if (object instanceof Node)
+        {
+            Node other = (Node)object;
+            return (toString().compareTo(other.toString()));
+        }
+        else
+        {
+            throw new ClassCastException();
         }
     }
 }
@@ -973,6 +1033,19 @@ class CreatureInfoList extends ArrayList
             list.add(ci.getName());
         }
         return list;
+    }
+
+    /** Deep copy */
+    public Object clone()
+    {
+        CreatureInfoList dupe = new CreatureInfoList();
+        Iterator it = iterator();
+        while (it.hasNext())
+        {
+            CreatureInfo ci = (CreatureInfo)it.next();
+            dupe.add(ci.clone());
+        }
+        return dupe;
     }
 }
 
