@@ -256,7 +256,8 @@ public class Chit extends JPanel
 
 
 /**
- * Adapts static methods of Chit so they can be used by the CreatureCollectionView
+ * Adapts static methods of Chit so they can be used by the 
+ * CreatureCollectionView
  */
 class ChitImageUtility implements IImageUtility
 {

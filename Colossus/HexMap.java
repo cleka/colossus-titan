@@ -649,6 +649,19 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     }
 
 
+    public Set getAllHexLabels()
+    {
+        HashSet set = new HashSet();
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            set.add(hex.getLabel());
+        }
+        return set;
+    }
+
+
     /** Return the hex that is defined as the center of the map,
      *  for defender tower entry purposes. */
     public static BattleHex getCenterTowerHex()

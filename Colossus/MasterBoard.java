@@ -134,6 +134,7 @@ public final class MasterBoard extends JPanel
         this.game = client.getGame();
 
         masterFrame = new JFrame("MasterBoard");
+        masterFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         contentPane = masterFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
         setOpaque(true);
@@ -523,7 +524,7 @@ public final class MasterBoard extends JPanel
                 options[0] = "Yes";
                 options[1] = "No";
                 int answer = JOptionPane.showOptionDialog(masterFrame,
-                    "Are you sure you with to quit?",
+                    "Are you sure you wish to quit?",
                     "Quit Game?",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, options, options[1]);
@@ -1236,6 +1237,10 @@ public final class MasterBoard extends JPanel
     public void alignLegions(String hexLabel)
     {
         GUIMasterHex hex = getGUIHexByLabel(hexLabel);
+        if (hex == null)
+        {
+            return;
+        }
         ArrayList markerIds = game.getLegionMarkerIds(hexLabel);
         Player player = game.getActivePlayer();
         if (player == null)
@@ -1844,10 +1849,24 @@ public final class MasterBoard extends JPanel
 
     class MasterBoardWindowHandler extends WindowAdapter
     {
-         public void windowClosing(WindowEvent e)
-         {
-             game.dispose();
-         }
+        public void windowClosing(WindowEvent e)
+        {
+            // XXX This code is a duplicate of quitGameAction.  Find out
+            // how to invoke that action correctly from here.
+            String [] options = new String[2];
+            options[0] = "Yes";
+            options[1] = "No";
+            int answer = JOptionPane.showOptionDialog(masterFrame,
+               "Are you sure you wish to quit?",
+               "Quit Game?",
+               JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+               null, options, options[1]);
+
+            if (answer == JOptionPane.YES_OPTION)
+            {
+                game.dispose();
+            }
+        }
     }
 
     public void paintComponent(Graphics g)
@@ -1920,7 +1939,8 @@ public final class MasterBoard extends JPanel
 
     public void rescale()
     {
-        setupHexesGUI();
+        // XXX setupHexesGUI() should be sufficient but fails.
+        setupHexes();
         loadInitialMarkerImages();
     }
 

@@ -41,6 +41,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         this.client = client;
 
         battleFrame = new JFrame();
+        battleFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         Legion attacker = battle.getAttacker();
         Legion defender = battle.getDefender();
 
@@ -415,7 +416,6 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    // XXX Just do chits, without going through critters.
     public void alignChits(String hexLabel)
     {
         GUIBattleHex hex = getGUIHexByLabel(hexLabel);
@@ -663,11 +663,26 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
-        if (battle.getGame() != null)
+        String [] options = new String[2];
+        options[0] = "Yes";
+        options[1] = "No";
+        int answer = JOptionPane.showOptionDialog(battleFrame,
+           "Are you sure you wish to quit?",
+           "Quit Game?",
+           JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+           null, options, options[1]);
+
+        if (answer == JOptionPane.YES_OPTION)
         {
-            battle.getGame().dispose();
+            if (battle.getGame() != null)
+            {
+                battle.getGame().dispose();
+            }
+            else
+            {
+                System.exit(0);
+            }
         }
-        battle.cleanup();
     }
 
 
@@ -711,7 +726,13 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         setupHexes();
         setupEntrances();
-        placeLegionChits(battle.getDefender(), true);
-        placeLegionChits(battle.getAttacker(), false);
+        int chitScale = 4 * Scale.get();
+        Iterator it = client.getBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            chit.rescale(chitScale);
+        }
+        alignChits(getAllHexLabels());
     }
 }

@@ -77,6 +77,12 @@ public final class BattleDice extends JPanel
     /** Initialize and layout the components, in response to new data. */
     public void showRoll()
     {
+        // Abort if called too early.
+        if (attackerName == null)
+        {
+            return;
+        }
+
         setVisible(false);
         removeAll();
 
