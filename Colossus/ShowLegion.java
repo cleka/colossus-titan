@@ -18,7 +18,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
 
     ShowLegion(JFrame parentFrame, Legion legion, Point point)
     {
-        super(parentFrame, "Contents of Legion " + legion.getMarkerId(), true);
+        super(parentFrame, "Contents of Legion " + legion.getMarkerId(), false);
 
         int scale = 60;
         pack();

@@ -23,7 +23,7 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
     ShowMasterHex(JFrame parentFrame, MasterHex hex, Point point)
     {
         super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(), 
-            true);
+            false);
 
         numChits = hex.getNumRecruitTypes();
         
