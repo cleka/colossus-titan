@@ -25,7 +25,7 @@ class Marker extends Chit
     {
         super.paint(g);
 
-        String sHeight = Integer.toString(legion.getHeight());
+        String height = Integer.toString(legion.getHeight());
         Rectangle rect = getBounds();
 
         // Construct a font 1.5 times the size of the current font.
@@ -38,12 +38,12 @@ class Marker extends Chit
 
         FontMetrics fontMetrics = g.getFontMetrics();
         int fontHeight = fontMetrics.getAscent();
-        int fontWidth = fontMetrics.stringWidth(sHeight);
+        int fontWidth = fontMetrics.stringWidth(height);
 
         // Show height in white.
         g.setColor(Color.white);
 
-        g.drawString(sHeight, rect.x + rect.width * 3 / 4  - fontWidth / 2,
+        g.drawString(height, rect.x + rect.width * 3 / 4  - fontWidth / 2,
             rect.y + rect.height * 2 / 3 + fontHeight / 2);
 
         // Restore the font.
