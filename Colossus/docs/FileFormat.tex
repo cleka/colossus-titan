@@ -200,13 +200,13 @@ Towers are denoted by the keyword \texttt{TOWER} by itself on a line. The terrai
 
 This file lists some hints to the Colossus AI on how to play the game.
 
-At the moment only one kind of hints exists: the \texttt{RECRUIT} hint.
-
-Each hint is a line of the form:
+Each hint is a line of one of the forms:
 
 \texttt{RECRUIT $\langle$terrain\_letter$\rangle$ $\langle$recruiter\_name$\rangle$ $\langle$recruiter\_number$\rangle$  $\langle$recruitee\_name$\rangle$ $\langle$optional\_condition$\rangle$}
 
-where:
+\texttt{INITIALSPLIT $\langle$hex\_label$\rangle$ $\langle$decimal\_value$\rangle$ "(" $\langle$split\_creature\_name$\rangle$ * ")" *}
+
+where for \texttt{RECRUIT}:
 
 \begin{itemize}
 \item $\langle$terrain\_letter$\rangle$ is the letter of the terrain
@@ -231,6 +231,18 @@ and $\langle$optional\_condition$\rangle$ is an optional condition builded with 
 \end{itemize}
 
 If the recruitee's name is ``nothing'' or ``Nothing'', then the hint suggest not recruiting there.
+
+where for \texttt{INITIALSPLIT}:
+
+\begin{itemize}
+\item $\langle$hex\_label$\rangle$ is the label of the Tower where the split occurs (should be quoted in double quote \", as most label are numbers).
+\item $\langle$decimal\_value$\rangle$ is the probability (between 0.0 and 1.0) of this split to occurs.
+\item $\langle$split\_creature\_name$\rangle$ is the name of one splitted creature.
+\end{itemize}
+
+At the moment, there should be exactly two lists of exactly four creatures in the hint. The 8 creatures should be exactly one Titan, one Angel (those two in different stacks), and 2 of each of the three starting creatures of the Tower.
+
+Each split for a given Tower is checked in order, and the first to pass the test is used, so the last one for each Tower should always use ``1.0'' as the probability.
 
 \section{\texttt{VAR} file format (default file used: ``Default/Default.var'')}
 \label{VAR}
