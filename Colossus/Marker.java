@@ -1,4 +1,5 @@
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * Class Marker implements the GUI for a legion marker.
@@ -11,19 +12,31 @@ public class Marker extends Chit
     private Legion legion;
 
 
-    public Marker(int scale, String imageFilename, Container container, 
+    public Marker(int scale, String imageFilename, Container container,
         Legion legion)
     {
         super(scale, imageFilename, container);
-
         this.legion = legion;
     }
 
 
-    // Show the height of the legion.
+    public void setLegion(Legion legion)
+    {
+        this.legion = legion;
+    }
+
+
+    /** Show the height of the legion. */
+    //public void paintComponent(Graphics g)
     public void paint(Graphics g)
     {
+        //super.paintComponent(g);
         super.paint(g);
+
+        if (legion == null)
+        {
+            return;
+        }
 
         String height = Integer.toString(legion.getHeight());
         Rectangle rect = getBounds();

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 
 /**
@@ -9,13 +10,14 @@ import java.awt.event.*;
  */
 
 
-public class GetPlayers extends Dialog implements WindowListener, ActionListener
+public class GetPlayers extends JDialog implements WindowListener,
+    ActionListener
 {
     private TextField [] tf = new TextField[6];
     private Game game;
 
 
-    public GetPlayers(Frame parentFrame, Game game)
+    public GetPlayers(JFrame parentFrame, Game game)
     {
         super(parentFrame, "Player Setup", true);
 
@@ -24,21 +26,23 @@ public class GetPlayers extends Dialog implements WindowListener, ActionListener
         setBackground(Color.lightGray);
         pack();
 
-        setLayout(new GridLayout(0, 2));
+        Container contentPane = getContentPane();
+
+        contentPane.setLayout(new GridLayout(0, 2));
 
         for (int i = 0; i < 6; i++)
         {
             String s = "Player " + (i + 1) + " Name";
-            add(new Label(s));
+            contentPane.add(new JLabel(s));
             tf[i] = new TextField(20);
-            add(tf[i]);
+            contentPane.add(tf[i]);
         }
 
-        Button button1 = new Button("OK");
-        add(button1);
+        JButton button1 = new JButton("OK");
+        contentPane.add(button1);
         button1.addActionListener(this);
-        Button button2 = new Button("Quit");
-        add(button2);
+        JButton button2 = new JButton("Quit");
+        contentPane.add(button2);
         button2.addActionListener(this);
 
         pack();
@@ -97,12 +101,11 @@ public class GetPlayers extends Dialog implements WindowListener, ActionListener
         // Data is good; send to game.
         if (game != null)
         {
-            game.setNumPlayers(numPlayers);
             for (int i = 0; i < numPlayers; i++)
             {
                 // Display player numbers as if they started at 1 not 0.
                 Game.logEvent("Player " + (i + 1) + " is " + playerNames[i]);
-                game.setPlayerName(i, playerNames[i]);
+                game.addPlayer(playerNames[i]);
             }
         }
 
@@ -202,6 +205,6 @@ public class GetPlayers extends Dialog implements WindowListener, ActionListener
 
     public static void main(String [] args)
     {
-        new GetPlayers(new Frame(), null);
+        new GetPlayers(new JFrame(), null);
     }
 }

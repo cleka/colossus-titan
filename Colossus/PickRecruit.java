@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class PickRecruit allows a player to pick a creature to recruit.
@@ -8,7 +9,7 @@ import java.awt.event.*;
  */
 
 
-public class PickRecruit extends Dialog implements MouseListener,
+public class PickRecruit extends JDialog implements MouseListener,
     WindowListener
 {
     private int numEligible;
@@ -21,16 +22,13 @@ public class PickRecruit extends Dialog implements MouseListener,
     private Marker legionMarker;
     private Chit [] legionChits;
     private int scale = 60;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
-    private Frame parentFrame;
+    private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private boolean dialogLock;
 
 
-    public PickRecruit(Frame parentFrame, Legion legion)
+    public PickRecruit(JFrame parentFrame, Legion legion)
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruit in " + legion.getCurrentHex().getDescription(),
@@ -54,7 +52,9 @@ public class PickRecruit extends Dialog implements MouseListener,
         addMouseListener(this);
         addWindowListener(this);
 
-        setLayout(gridbag);
+        Container contentPane = getContentPane();
+
+        contentPane.setLayout(gridbag);
 
         pack();
 
@@ -68,7 +68,7 @@ public class PickRecruit extends Dialog implements MouseListener,
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         gridbag.setConstraints(legionMarker, constraints);
-        add(legionMarker);
+        contentPane.add(legionMarker);
 
         legionChits = new Chit[height];
         for (int i = 0; i < height; i++)
@@ -77,7 +77,7 @@ public class PickRecruit extends Dialog implements MouseListener,
                 legion.getCritter(i).getImageName(), this);
             constraints.gridy = 0;
             gridbag.setConstraints(legionChits[i], constraints);
-            add(legionChits[i]);
+            contentPane.add(legionChits[i]);
         }
 
 
@@ -101,14 +101,14 @@ public class PickRecruit extends Dialog implements MouseListener,
             constraints.gridx = leadSpace + i;
             constraints.gridy = 1;
             gridbag.setConstraints(recruitChits[i], constraints);
-            add(recruitChits[i]);
+            contentPane.add(recruitChits[i]);
             recruitChits[i].addMouseListener(this);
             int count = recruits[i].getCount();
-            Label countLabel = new Label(Integer.toString(count), 
-                Label.CENTER);
+            JLabel countLabel = new JLabel(Integer.toString(count), 
+                JLabel.CENTER);
             constraints.gridy = 2;
             gridbag.setConstraints(countLabel, constraints);
-            add(countLabel);
+            contentPane.add(countLabel);
         }
 
         tracker = new MediaTracker(this);
@@ -129,7 +129,7 @@ public class PickRecruit extends Dialog implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, e.toString() + 
+            JOptionPane.showMessageDialog(parentFrame, e.toString() + 
                 " waitForAll was interrupted");
         }
         imagesLoaded = true;
@@ -142,35 +142,6 @@ public class PickRecruit extends Dialog implements MouseListener,
 
         setVisible(true);
         repaint();
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-        d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
     }
 
 

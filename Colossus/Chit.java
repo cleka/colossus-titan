@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.io.*;
+import javax.swing.*;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
@@ -8,11 +9,12 @@ import java.io.*;
  * @author David Ripton
  */
 
-public class Chit extends Canvas
+public class Chit extends Canvas // XXX JPanel
 {
+    // XXX Use an icon instead?
     private Image image;
     private Rectangle rect;
-    private static Container container;
+    private Container container;
 
     /** Flag to mark chit as dead and paint it with an "X" through it. */
     private boolean dead;
@@ -27,6 +29,7 @@ public class Chit extends Canvas
 
     public Chit(int scale, String imageFilename, Container container)
     {
+        super();
         Point point = getLocation();
         rect = new Rectangle(point.x, point.y, scale, scale);
         setBounds(rect);
@@ -91,8 +94,12 @@ public class Chit extends Canvas
     }
 
 
+    //public void paintComponent(Graphics g)
     public void paint(Graphics g)
     {
+	//super.paintComponent(g);
+	super.paint(g);
+
         g.drawImage(image, rect.x, rect.y, rect.width, rect.width, container);
         if (isDead())
         {
@@ -115,13 +122,6 @@ public class Chit extends Canvas
         }
     }
     
-    
-    public void repaint()
-    {
-        container.repaint(rect.x, rect.y, rect.width, rect.height);
-        super.repaint();
-    }
-
 
     public void setLocation(Point point)
     {

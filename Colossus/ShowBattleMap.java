@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
  * Class ShowBattleMap displays a battle map. 
@@ -8,7 +9,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class ShowBattleMap extends Dialog implements WindowListener,
+public class ShowBattleMap extends JDialog implements WindowListener,
     MouseListener
 {
     // Singleton class, so make everything static.
@@ -25,14 +26,14 @@ public class ShowBattleMap extends Dialog implements WindowListener,
     private MasterHex masterHex;
 
 
-    public ShowBattleMap(Frame parentFrame, MasterHex masterHex)
+    public ShowBattleMap(JFrame parentFrame, MasterHex masterHex)
     {
         super(parentFrame, "Battle Map for " + 
             masterHex.getTerrainName(), true);
 
         this.masterHex = masterHex;
 
-        setLayout(null);
+        getContentPane().setLayout(null);
 
         scale = BattleMap.getScale();
 
@@ -68,7 +69,7 @@ public class ShowBattleMap extends Dialog implements WindowListener,
             d.height != offDimension.height)
         {
             offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
+            offImage = createImage(d.width, d.height);
             offGraphics = offImage.getGraphics();
         }
 
@@ -88,7 +89,6 @@ public class ShowBattleMap extends Dialog implements WindowListener,
 
     public void paint(Graphics g)
     {
-        // Double-buffer everything.
         update(g);
     }
 
@@ -171,7 +171,7 @@ public class ShowBattleMap extends Dialog implements WindowListener,
 
     public static void main(String [] args)
     {
-        Frame frame = new Frame("testing ShowBattleMap");
+        JFrame frame = new JFrame("testing ShowBattleMap");
         frame.setSize(new Dimension(20 * scale, 20 * scale));
         frame.pack();
         frame.setVisible(true);

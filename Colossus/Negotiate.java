@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class Negotiate allows two players to settle an engagement.
@@ -7,7 +8,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-public class Negotiate extends Dialog implements MouseListener, ActionListener
+public class Negotiate extends JDialog implements MouseListener, ActionListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded;
@@ -18,20 +19,19 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
     private Marker attackerMarker;
     private Marker defenderMarker;
     private static final int scale = 60;
-    private Frame parentFrame;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
+    private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    public Negotiate(Frame parentFrame, Legion attacker, Legion defender)
+    public Negotiate(JFrame parentFrame, Legion attacker, Legion defender)
     {
         super(parentFrame, attacker.getMarkerId() + " Negotiates with " +
             defender.getMarkerId(), true);
 
-        setLayout(gridbag);
+        Container contentPane = getContentPane();
+
+        contentPane.setLayout(gridbag);
 
         this.attacker = attacker;
         this.defender = defender;
@@ -51,7 +51,7 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         gridbag.setConstraints(attackerMarker, constraints);
-        add(attackerMarker);
+        contentPane.add(attackerMarker);
 
         attackerChits = new Chit[attacker.getHeight()];
         for (int i = 0; i < attacker.getHeight(); i++)
@@ -62,7 +62,7 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
             constraints.gridy = 0;
             constraints.gridwidth = 1;
             gridbag.setConstraints(attackerChits[i], constraints);
-            add(attackerChits[i]);
+            contentPane.add(attackerChits[i]);
             attackerChits[i].addMouseListener(this);
         }
         
@@ -72,7 +72,7 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
         constraints.gridy = 1;
         constraints.gridwidth = 1;
         gridbag.setConstraints(defenderMarker, constraints);
-        add(defenderMarker);
+        contentPane.add(defenderMarker);
 
         defenderChits = new Chit[defender.getHeight()];
         for (int i = 0; i < defender.getHeight(); i++)
@@ -83,7 +83,7 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
             constraints.gridy = 1;
             constraints.gridwidth = 1;
             gridbag.setConstraints(defenderChits[i], constraints);
-            add(defenderChits[i]);
+            contentPane.add(defenderChits[i]);
             defenderChits[i].addMouseListener(this);
         }
 
@@ -107,13 +107,13 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, e.toString() +
+            JOptionPane.showMessageDialog(parentFrame, e.toString() +
                 " waitForAll was interrupted");
         }
         imagesLoaded = true;
 
-        Button button1 = new Button("Agree");
-        Button button2 = new Button("Fight");
+        JButton button1 = new JButton("Agree");
+        JButton button2 = new JButton("Fight");
 
         // Attempt to center the buttons.
         int chitWidth = Math.max(attacker.getHeight(), 
@@ -135,11 +135,11 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
         constraints.gridy = 2;
         constraints.gridx = leadSpace;
         gridbag.setConstraints(button1, constraints);
-        add(button1);
+        contentPane.add(button1);
         button1.addActionListener(this);
         constraints.gridx = leadSpace + constraints.gridwidth;
         gridbag.setConstraints(button2, constraints);
-        add(button2);
+        contentPane.add(button2);
         button2.addActionListener(this);
 
         pack();
@@ -162,35 +162,6 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
     {
         Concede.saveLocation(getLocation());
         dispose();
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
     }
 
 
@@ -265,7 +236,7 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
             // Ensure that at least one legion is completely eliminated.
             if (attackersLeft > 0 && defendersLeft > 0)
             {
-                new MessageBox(parentFrame, 
+                JOptionPane.showMessageDialog(parentFrame, 
                     "At least one legion must be eliminated.");
                 return;
             }
@@ -333,7 +304,7 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
                     if (winnerChits[i].isDead() && winner.getCreature(i) ==
                         Creature.titan)
                     {
-                        new MessageBox(parentFrame,
+                        JOptionPane.showMessageDialog(parentFrame,
                             "Titan cannot die unless his whole stack dies.");
                         return;
                     }

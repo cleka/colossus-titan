@@ -1,4 +1,5 @@
 import java.awt.*;
+import javax.swing.*;
 import java.util.*;
 
 /**
@@ -23,15 +24,13 @@ public class Legion
     private int battleTally;
 
 
-    public Legion(int scale, String markerId, Legion splitFrom,
-        Container container, MasterHex hex, Creature creature0, 
-        Creature creature1, Creature creature2, Creature creature3, 
-        Creature creature4, Creature creature5, Creature creature6, 
-        Creature creature7, Player player)
+    public Legion(String markerId, Legion splitFrom, MasterHex hex, 
+        Creature creature0, Creature creature1, Creature creature2, 
+        Creature creature3, Creature creature4, Creature creature5, 
+        Creature creature6, Creature creature7, Player player)
     {
         this.markerId = markerId;
         this.splitFrom = splitFrom;
-        this.marker = new Marker(scale, getImageName(), container, this);
         this.currentHex = hex;
         this.startingHex = hex;
         this.player = player;
@@ -181,6 +180,13 @@ public class Legion
     public Marker getMarker()
     {
         return marker;
+    }
+
+
+    public void setMarker(Marker marker)
+    {
+        this.marker = marker;
+        marker.setLegion(this);
     }
 
 
@@ -600,7 +606,7 @@ public class Legion
 
 
     // Reveal the lord who teleported the legion.  Pick one if necessary.
-    public void revealTeleportingLord(Frame parentFrame)
+    public void revealTeleportingLord(JFrame parentFrame)
     {
         // Count how many types of lords are in the stack.  If only one,
         // reveal it.

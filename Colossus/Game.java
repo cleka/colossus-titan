@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import javax.swing.*;
 
 
 /**
@@ -12,9 +13,7 @@ import java.util.*;
 
 public class Game
 {
-    private int numPlayers;
-    private String [] playerNames = new String[6];
-    private Player [] players;
+    private ArrayList players = new ArrayList(6);
     private MasterBoard board;
     private int activePlayerNum;
     private int turnNumber = 1;  // Advance when every player has a turn
@@ -61,16 +60,10 @@ public class Game
             this.applet = applet;
         }
 
-        Frame frame = new Frame();
+        JFrame frame = new JFrame();
 
         new GetPlayers(frame, this);
-
-        // Fill in the player objects
-        players = new Player[numPlayers];
-        for (int i = 0; i < numPlayers; i++)
-        {
-            players[i] = new Player(playerNames[i], this);
-        }
+        // GetPlayers will fill in the player objects
 
         // Since the inputs are validated, it's time to roll for towers.
         assignTowers();
@@ -78,10 +71,12 @@ public class Game
         // Renumber players in descending tower order.
         sortPlayers();
 
-        for (int i = numPlayers - 1; i >= 0; i--)
+        ListIterator lit = players.listIterator(players.size());
+        while (lit.hasPrevious())
         {
-            new PickColor(frame, this, i);
-            players[i].initMarkersAvailable();
+            Player player = (Player)lit.previous();
+            new PickColor(frame, this, player);
+            player.initMarkersAvailable();
         }
 
         if (!disposed)
@@ -137,7 +132,6 @@ public class Game
     // For testing only.
     public Game()
     {
-        players = new Player[6];
     }
 
 
@@ -162,6 +156,7 @@ public class Game
     // Randomize towers by rolling dice and rerolling ties.
     private void assignTowers()
     {
+        int numPlayers = getNumPlayers();
         int [] playerTower = new int[numPlayers];
         int [] rolls = new int[numPlayers];
 
@@ -206,8 +201,9 @@ public class Game
 
         for (int i = 0; i < numPlayers; i++)
         {
-            logEvent(players[i].getName() + " gets tower " + playerTower[i]);
-            players[i].setTower(playerTower[i]);
+            Player player = getPlayer(i);
+            logEvent(player.getName() + " gets tower " + playerTower[i]);
+            player.setTower(playerTower[i]);
         }
     }
 
@@ -216,6 +212,7 @@ public class Game
     // in which they'll move.
     private void sortPlayers()
     {
+        /* XXX
         for (int i = 0; i < numPlayers - 1; i++)
         {
             for (int j = i + 1; j < numPlayers; j++)
@@ -228,6 +225,8 @@ public class Game
                 }
             }
         }
+        */
+        Collections.sort(players);
     }
 
 
@@ -238,32 +237,30 @@ public class Game
 
     public int getNumPlayers()
     {
-        return numPlayers;
+        return players.size();
     }
 
 
-    public void setNumPlayers(int numPlayers)
+    public void addPlayer(String name)
     {
-        this.numPlayers = numPlayers;
+        players.add(new Player(name, this));
     }
 
 
-    public void setPlayerName(int playerNum, String name)
+    public void addPlayer(Player player)
     {
-        if (playerNum < 0 || playerNum > getNumPlayers() - 1)
-        {
-            return;
-        }
-        playerNames[playerNum] = name;
+        players.add(player);
     }
 
 
     private int getNumLivingPlayers()
     {
         int count = 0;
-        for (int i = 0; i < numPlayers; i++)
+        Iterator it = players.iterator();
+        while (it.hasNext())
         {
-            if (!players[i].isDead())
+            Player player = (Player)it.next();
+            if (!player.isDead())
             {
                 count++;
             }
@@ -274,7 +271,7 @@ public class Game
 
     public Player getActivePlayer()
     {
-        return players[activePlayerNum];
+        return (Player)players.get(activePlayerNum);
     }
 
 
@@ -286,30 +283,24 @@ public class Game
 
     public Player getPlayer(int i)
     {
-        return players[i];
-    }
-
-
-    public void setPlayer(int i, Player player)
-    {
-        if (i >= 0 && i < numPlayers)
-        {
-            players[i] = player;
-        }
+        return (Player)players.get(i);
     }
 
 
     public void checkForVictory()
     {
         int remaining = 0;
-        int winner = -1;
+        // Assign something to winner to avoid uninitialized var error.
+        Player winner = getPlayer(0);
 
-        for (int i = 0; i < numPlayers; i++)
+        Iterator it = players.iterator();
+        while (it.hasNext())
         {
-            if (!players[i].isDead())
+            Player player = (Player)it.next();
+            if (!player.isDead())
             {
                 remaining++;
-                winner = i;
+                winner = player;
             }
         }
 
@@ -317,13 +308,14 @@ public class Game
         {
             case 0:
                 logEvent("Draw");
-                new MessageBox(board, "Draw");
+                JOptionPane.showMessageDialog(board, "Draw");
                 dispose();
                 break;
 
             case 1:
-                logEvent(players[winner].getName() + " wins");
-                new MessageBox(board, players[winner].getName() + " wins");
+                logEvent(winner.getName() + " wins");
+                JOptionPane.showMessageDialog(board, 
+                    winner.getName() + " wins");
                 dispose();
                 break;
 
@@ -366,7 +358,7 @@ public class Game
     {
         board.unselectAllHexes();
         activePlayerNum++;
-        if (activePlayerNum == numPlayers)
+        if (activePlayerNum == getNumPlayers())
         {
             activePlayerNum = 0;
             turnNumber++;
@@ -574,7 +566,7 @@ public class Game
             String buf = new String();
 
             buf = in.readLine();
-            numPlayers = Integer.parseInt(buf);
+            int numPlayers = Integer.parseInt(buf);
 
             buf = in.readLine();
             turnNumber = Integer.parseInt(buf);
@@ -592,38 +584,38 @@ public class Game
                 Creature.creatures[i].setCount(count);
             }
 
-            players = new Player[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
                 String name = in.readLine();
-                players[i] = new Player(name, this);
+                Player player = new Player(name, this);
+                players.add(player);
 
                 String color = in.readLine();
-                players[i].setColor(color);
+                player.setColor(color);
 
                 buf = in.readLine();
                 int tower = Integer.parseInt(buf);
-                players[i].setTower(tower);
+                player.setTower(tower);
 
                 buf = in.readLine();
                 int score = Integer.parseInt(buf);
-                players[i].setScore(score);
+                player.setScore(score);
 
                 buf = in.readLine();
 
                 // Output whether the player is alive.
-                players[i].setDead(!Boolean.valueOf(buf).booleanValue());
+                player.setDead(!Boolean.valueOf(buf).booleanValue());
 
                 buf = in.readLine();
                 int mulligansLeft = Integer.parseInt(buf);
-                players[i].setMulligansLeft(mulligansLeft);
+                player.setMulligansLeft(mulligansLeft);
 
                 String playersElim = in.readLine();
                 if (playersElim.equals("null"))
                 {
                     playersElim = new String("");
                 }
-                players[i].setPlayersElim(playersElim);
+                player.setPlayersElim(playersElim);
 
                 buf = in.readLine();
                 int numMarkersAvailable = Integer.parseInt(buf);
@@ -631,7 +623,7 @@ public class Game
                 for (int j = 0; j < numMarkersAvailable; j++)
                 {
                     String markerId = in.readLine();
-                    players[i].addLegionMarker(markerId);
+                    player.addLegionMarker(markerId);
                 }
 
                 buf = in.readLine();
@@ -660,11 +652,10 @@ public class Game
                         visibles[k] = Boolean.valueOf(buf).booleanValue();
                     }
 
-                    Legion legion = new Legion(3 * board.getScale(),
-                        markerId, null, board,
+                    Legion legion = new Legion(markerId, null,
                         MasterBoard.getHexFromLabel(hexLabel), creatures[0],
                         creatures[1], creatures[2], creatures[3], creatures[4],
-                        creatures[5], creatures[6], creatures[7], players[i]);
+                        creatures[5], creatures[6], creatures[7], player);
 
                     for (int k = 0; k < height; k++)
                     {
@@ -674,10 +665,11 @@ public class Game
                         }
                     }
 
-                    players[i].addLegion(legion);
+                    player.addLegion(legion);
                 }
             }
 
+            // XXX iterators
             // Move all legions into their hexes.
             for (int i = 0; i < getNumPlayers(); i++)
             {
@@ -1440,7 +1432,7 @@ public class Game
 
 
     public static void doRecruit(Creature recruit, Legion legion,
-        Frame parentFrame)
+        JFrame parentFrame)
     {
         // Pick the recruiter(s) if necessary.
         Critter [] recruiters = new Critter[4];
@@ -1630,10 +1622,10 @@ public class Game
         Creature.gargoyle.takeOne();
         Creature.gargoyle.takeOne();
 
-        Legion legion = new Legion(3 * MasterBoard.getScale(),
-            player.getSelectedMarker(), null, board, hex, Creature.titan,
-            Creature.angel, Creature.ogre, Creature.ogre, Creature.centaur,
-            Creature.centaur, Creature.gargoyle, Creature.gargoyle, player);
+        Legion legion = new Legion(player.getSelectedMarker(), null, hex, 
+            Creature.titan, Creature.angel, Creature.ogre, Creature.ogre, 
+            Creature.centaur, Creature.centaur, Creature.gargoyle, 
+            Creature.gargoyle, player);
 
         player.addLegion(legion);
         hex.addLegion(legion);
@@ -1914,11 +1906,15 @@ public class Game
     /** Present a dialog allowing the player to enter via land or teleport. */
     private void chooseWhetherToTeleport(MasterHex hex)
     {
-        new OptionDialog(board, "Teleport?", "Teleport?", "Teleport",
-            "Move Normally");
+        String [] options = new String[2];
+        options[0] = "Teleport";
+        options[1] = "Move Normally";
+        int answer = JOptionPane.showOptionDialog(board, "Teleport?", 
+            "Teleport?", JOptionPane.YES_NO_OPTION, 
+            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
         // If Teleport, then leave teleported set.
-        if (OptionDialog.getLastAnswer() == OptionDialog.NO_OPTION)
+        if (answer == JOptionPane.NO_OPTION)
         {
             hex.setTeleported(false);
         }
@@ -2081,13 +2077,13 @@ public class Game
                 // Need a legion marker to split.
                 if (player.getNumMarkersAvailable() == 0)
                 {
-                    new MessageBox(board, "No markers are available.");
+                    JOptionPane.showMessageDialog(board, "No markers are available.");
                     return;
                 }
                 // Don't allow extra splits in turn 1.
                 if (getTurnNumber() == 1 && player.getNumLegions() > 1)
                 {
-                    new MessageBox(board, "Cannot split twice on Turn 1.");
+                    JOptionPane.showMessageDialog(board, "Cannot split twice on Turn 1.");
                     return;
                 }
 

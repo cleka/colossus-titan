@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
@@ -7,12 +8,12 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-public class Concede extends Dialog implements ActionListener
+public class Concede extends JDialog implements ActionListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private static final int scale = 60;
-    private Frame parentFrame;
+    private JFrame parentFrame;
     private boolean flee;
     private Legion ally;
     private Legion enemy;
@@ -20,21 +21,20 @@ public class Concede extends Dialog implements ActionListener
     private Chit [] enemyChits;
     private Chit allyMarker;
     private Chit enemyMarker;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
     private static Point location;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    public Concede(Frame parentFrame, Legion ally, Legion enemy, boolean flee)
+    public Concede(JFrame parentFrame, Legion ally, Legion enemy, boolean flee)
     {
         super(parentFrame, ally.getPlayer().getName() + ": " + (flee ?
             "Flee" : "Concede") + " with Legion "  + ally.getMarkerId() +
             " in " + ally.getCurrentHex().getDescription() + "?", true);
 
-        setLayout(gridbag);
+        Container contentPane = getContentPane();
+
+        contentPane.setLayout(gridbag);
 
         this.parentFrame = parentFrame;
         this.ally = ally;
@@ -52,7 +52,7 @@ public class Concede extends Dialog implements ActionListener
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         gridbag.setConstraints(allyMarker, constraints);
-        add(allyMarker);
+        contentPane.add(allyMarker);
 
         // Leave space for angels.
         allyChits = new Chit[7];
@@ -63,14 +63,14 @@ public class Concede extends Dialog implements ActionListener
             constraints.gridy = 0;
             constraints.gridwidth = 1;
             gridbag.setConstraints(allyChits[i], constraints);
-            add(allyChits[i]);
+            contentPane.add(allyChits[i]);
         }
 
         enemyMarker = new Marker(scale, enemy.getImageName(), this, enemy);
         constraints.gridy = 1;
         constraints.gridwidth = 1;
         gridbag.setConstraints(enemyMarker, constraints);
-        add(enemyMarker);
+        contentPane.add(enemyMarker);
 
         // Leave space for angels.
         enemyChits = new Chit[7];
@@ -81,7 +81,7 @@ public class Concede extends Dialog implements ActionListener
             constraints.gridy = 1;
             constraints.gridwidth = 1;
             gridbag.setConstraints(enemyChits[i], constraints);
-            add(enemyChits[i]);
+            contentPane.add(enemyChits[i]);
         }
 
         tracker = new MediaTracker(this);
@@ -103,13 +103,13 @@ public class Concede extends Dialog implements ActionListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, e.toString() +
+            JOptionPane.showMessageDialog(parentFrame, e.toString() +
                 " waitForAll was interrupted");
         }
         imagesLoaded = true;
 
-        Button button1 = new Button(flee ? "Flee" : "Concede");
-        Button button2 = new Button(flee ? "Don't Flee" : "Don't Concede");
+        JButton button1 = new JButton(flee ? "Flee" : "Concede");
+        JButton button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
 
         // Attempt to center the buttons.
         int chitWidth = Math.max(ally.getHeight(), enemy.getHeight()) + 1;
@@ -130,11 +130,11 @@ public class Concede extends Dialog implements ActionListener
         constraints.gridy = 2;
         constraints.gridx = leadSpace;
         gridbag.setConstraints(button1, constraints);
-        add(button1);
+        contentPane.add(button1);
         button1.addActionListener(this);
         constraints.gridx = leadSpace + constraints.gridwidth; 
         gridbag.setConstraints(button2, constraints);
-        add(button2);
+        contentPane.add(button2);
         button2.addActionListener(this);
 
         pack();
@@ -169,35 +169,6 @@ public class Concede extends Dialog implements ActionListener
     {
         location = getLocation();
         dispose();
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
     }
 
 

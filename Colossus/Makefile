@@ -8,8 +8,7 @@
 
 # Java compiler
 # jikes is really fast, good, and free.
-# javac is the standard; use it if you don't have jikes.  If you have 
-#    JDK 1.1 you'll need to use -depend instead of -Xdepend.
+# javac is the standard; use it if you don't have jikes.
 # kjc comes with kaffe.  I like its --warning option.
 
 JCC = jikes -g -depend +P

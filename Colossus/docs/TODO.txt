@@ -1,16 +1,16 @@
+Take GUI info for Marker out of Legion constructor.
+
+Use splitFrom instead of legions(0) to determine parent legion
+   in hex with a split.  
 Differently-highlight hexes where a legion could move if
    a friendly stack were not already there.
+Highlight selected legion better. 
 
 Color code StatusScreen better.
 
-Have methods in Game and Battle return lists of hex labels, 
-   rather than actually selecting and repainting hexes.  All
-   GUI method calls need to be moved out of non-GUI classes.
+Add some keyboard shortcuts.
 
-Add some keyboard shortcuts.  (Need Swing?)
-
-Highlight selected legion better. 
-
+All GUI method calls need to be moved out of non-GUI classes.
 Split GUI classes from model classes.
 
 Move GUI/client classes and model/server classes into separate

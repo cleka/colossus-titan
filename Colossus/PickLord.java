@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class PickLord allows a player to choose which lord tower teleports.
@@ -8,7 +9,7 @@ import java.awt.event.*;
  */
 
 
-public class PickLord extends Dialog implements MouseListener, WindowListener
+public class PickLord extends JDialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded;
@@ -16,13 +17,10 @@ public class PickLord extends Dialog implements MouseListener, WindowListener
     private Legion legion;
     private Chit [] chits;
     private static final int scale = 60;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
     private Creature [] lords;
 
 
-    public PickLord(Frame parentFrame, Legion legion)
+    public PickLord(JFrame parentFrame, Legion legion)
     {
         super(parentFrame, "Reveal Which Lord?", true);
 
@@ -32,7 +30,9 @@ public class PickLord extends Dialog implements MouseListener, WindowListener
         addMouseListener(this);
         addWindowListener(this);
 
-        setLayout(new FlowLayout());
+        Container contentPane = getContentPane();
+
+        contentPane.setLayout(new FlowLayout());
 
         pack();
 
@@ -64,7 +64,7 @@ public class PickLord extends Dialog implements MouseListener, WindowListener
         for (int i = 0; i < chits.length; i++)
         {
             chits[i] = new Chit(scale, lords[i].getImageName(), this);
-            add(chits[i]);
+            contentPane.add(chits[i]);
             chits[i].addMouseListener(this);
         }
         
@@ -81,7 +81,7 @@ public class PickLord extends Dialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, e.toString() +
+            JOptionPane.showMessageDialog(parentFrame, e.toString() +
                 " waitForAll was interrupted");
         }
 
@@ -94,35 +94,6 @@ public class PickLord extends Dialog implements MouseListener, WindowListener
 
         setVisible(true);
         repaint();
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
     }
 
 

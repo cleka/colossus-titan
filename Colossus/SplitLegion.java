@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
@@ -8,7 +9,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class SplitLegion extends Dialog implements MouseListener,
+public class SplitLegion extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
     private MediaTracker tracker;
@@ -21,20 +22,18 @@ public class SplitLegion extends Dialog implements MouseListener,
     private Marker newMarker;
     private Player player;
     private static final int scale = 60;
-    private Frame parentFrame;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
+    private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    public SplitLegion(Frame parentFrame, Legion oldLegion, Player player)
+    public SplitLegion(JFrame parentFrame, Legion oldLegion, Player player)
     {
         super(parentFrame, player.getName() + ": Split Legion " +
             oldLegion.getMarkerId(), true);
 
-        setLayout(gridbag);
+        Container contentPane = getContentPane();
+        contentPane.setLayout(gridbag);
 
         this.oldLegion = oldLegion;
         this.player = player;
@@ -50,9 +49,12 @@ public class SplitLegion extends Dialog implements MouseListener,
        
         pack();
 
-        newLegion = new Legion(scale, player.getSelectedMarker(), oldLegion,
-            this, oldLegion.getCurrentHex(), null, null, null, null, null,
+        newLegion = new Legion(player.getSelectedMarker(), oldLegion,
+            oldLegion.getCurrentHex(), null, null, null, null, null,
             null, null, null, player);
+        String imageName = "images/" + player.getSelectedMarker() + ".gif";
+        newMarker = new Marker(scale, imageName, this, null);
+        newLegion.setMarker(newMarker);
 
         setBackground(Color.lightGray);
         setResizable(false);
@@ -73,7 +75,7 @@ public class SplitLegion extends Dialog implements MouseListener,
             constraints.gridy = 0;
             constraints.gridwidth = 1;
             gridbag.setConstraints(oldMarker, constraints);
-            add(oldMarker);
+            contentPane.add(oldMarker);
 
             for (int i = 0; i < oldLegion.getHeight(); i++)
             {
@@ -81,16 +83,15 @@ public class SplitLegion extends Dialog implements MouseListener,
                     oldLegion.getCritter(i).getImageName(), this);
                 oldChits.add(chit);
                 gridbag.setConstraints(chit, constraints);
-                add(chit);
+                contentPane.add(chit);
                 chit.addMouseListener(this);
             }
        
-            newMarker = newLegion.getMarker();
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 1;
             constraints.gridwidth = 1;
             gridbag.setConstraints(newMarker, constraints);
-            add(newMarker);
+            contentPane.add(newMarker);
 
             tracker = new MediaTracker(this);
 
@@ -108,13 +109,13 @@ public class SplitLegion extends Dialog implements MouseListener,
             }
             catch (InterruptedException e)
             {
-                new MessageBox(parentFrame, e.toString() +
-                    "waitForAll was interrupted");
+                JOptionPane.showMessageDialog(parentFrame, e.toString() +
+                    " waitForAll was interrupted");
             }
             imagesLoaded = true;
 
-            Button button1 = new Button("Done");
-            Button button2 = new Button("Cancel");
+            JButton button1 = new JButton("Done");
+            JButton button2 = new JButton("Cancel");
 
              // Attempt to center the buttons.
             int chitWidth = Math.max(oldLegion.getHeight(),
@@ -136,11 +137,11 @@ public class SplitLegion extends Dialog implements MouseListener,
             constraints.gridx = leadSpace;
             constraints.gridy = 2;
             gridbag.setConstraints(button1, constraints);
-            add(button1);
+            contentPane.add(button1);
             button1.addActionListener(this);
             constraints.gridx = leadSpace + constraints.gridwidth;
             gridbag.setConstraints(button2, constraints);
-            add(button2);
+            contentPane.add(button2);
             button2.addActionListener(this);
 
             pack();
@@ -151,35 +152,6 @@ public class SplitLegion extends Dialog implements MouseListener,
 
             setVisible(true);
         }
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(d.width, d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    // Double-buffer everything.
-    public void paint(Graphics g)
-    {
-        update(g);
     }
 
 
@@ -213,7 +185,9 @@ public class SplitLegion extends Dialog implements MouseListener,
         constraints.gridy = gridy;
         constraints.gridwidth = 1;
         gridbag.setConstraints(chit, constraints);
-        add(chit);
+        
+        Container contentPane = getContentPane();
+        contentPane.add(chit);
 
         // Update the stack heights on both markers.
         oldMarker.repaint();
@@ -310,21 +284,21 @@ public class SplitLegion extends Dialog implements MouseListener,
             // must have height 4 and one lord.
             if (oldLegion.getHeight() < 2 || newLegion.getHeight() < 2)
             {
-                new MessageBox(parentFrame, "Legion too short.");
+                JOptionPane.showMessageDialog(parentFrame, "Legion too short.");
                 return;
             }
             if (oldLegion.getHeight() + newLegion.getHeight() == 8)
             {
                 if (oldLegion.getHeight() != newLegion.getHeight())
                 {
-                    new MessageBox(parentFrame, "Initial split must be 4-4.");
+                    JOptionPane.showMessageDialog(parentFrame, "Initial split must be 4-4.");
                     return;
                 }
                 else
                 {
                     if (oldLegion.numLords() != 1)
                     {
-                        new MessageBox(parentFrame,
+                        JOptionPane.showMessageDialog(parentFrame,
                             "Each stack must have one lord.");
                         return;
                     }
@@ -384,7 +358,7 @@ public class SplitLegion extends Dialog implements MouseListener,
 
     public static void main(String [] args)
     {
-        Frame frame = new Frame("testing SplitLegion");
+        JFrame frame = new JFrame("testing SplitLegion");
         frame.setSize(new Dimension(20 * scale, 20 * scale));
         frame.pack();
         frame.setVisible(true);
@@ -395,10 +369,12 @@ public class SplitLegion extends Dialog implements MouseListener,
         player.initMarkersAvailable();
         player.selectMarker("Rd01");
 
-        Legion legion = new Legion(scale, player.getSelectedMarker(), null, 
-            frame, null, Creature.titan, Creature.angel, Creature.ogre,
+        Legion legion = new Legion(player.getSelectedMarker(), null, 
+            null, Creature.titan, Creature.angel, Creature.ogre,
             Creature.ogre, Creature.centaur, Creature.centaur,
-            Creature.gargoyle, null, player);
+            Creature.gargoyle, Creature.gargoyle, player);
+        Marker marker = new Marker(scale, "images/Rd02.gif", frame, null);
+        legion.setMarker(marker);
 
         new SplitLegion(frame, legion, player);
     }

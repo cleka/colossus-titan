@@ -1,5 +1,6 @@
 import java.applet.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * Class GameApplet allows launching Colossus as an applet.
@@ -8,17 +9,19 @@ import java.awt.*;
  */
 
 
-public class GameApplet extends Applet 
+public class GameApplet extends JApplet
 {
     public void init() 
     {
-        setLayout(new BorderLayout());
-        add(new GameButton(this), BorderLayout.CENTER);
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add(new GameButton(this), BorderLayout.CENTER);
     }
 
     public void destroy() 
     {
         stop();
-        removeAll();
+        Container contentPane = getContentPane();
+        contentPane.removeAll();
     }
 }

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 
 /**
@@ -9,17 +10,17 @@ import java.awt.event.*;
  */
 
 
-public class StatusScreen extends Frame implements WindowListener
+public class StatusScreen extends JFrame implements WindowListener
 {
-    private Label [] nameLabel;
-    private Label [] towerLabel;
-    private Label [] colorLabel;
-    private Label [] elimLabel;
-    private Label [] legionsLabel;
-    private Label [] markersLabel;
-    private Label [] creaturesLabel;
-    private Label [] titanLabel;
-    private Label [] scoreLabel;
+    private JLabel [] nameLabel;
+    private JLabel [] towerLabel;
+    private JLabel [] colorLabel;
+    private JLabel [] elimLabel;
+    private JLabel [] legionsLabel;
+    private JLabel [] markersLabel;
+    private JLabel [] creaturesLabel;
+    private JLabel [] titanLabel;
+    private JLabel [] scoreLabel;
 
     private Game game;
     
@@ -36,82 +37,92 @@ public class StatusScreen extends Frame implements WindowListener
 
         addWindowListener(this);
 
-        setLayout(new GridLayout(9, 0));
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new GridLayout(9, 0));
 
         int numPlayers = game.getNumPlayers();
 
-        nameLabel = new Label[numPlayers];
-        towerLabel = new Label[numPlayers];
-        colorLabel = new Label[numPlayers];
-        elimLabel = new Label[numPlayers];
-        legionsLabel = new Label[numPlayers];
-        markersLabel = new Label[numPlayers];
-        creaturesLabel = new Label[numPlayers];
-        titanLabel = new Label[numPlayers];
-        scoreLabel = new Label[numPlayers];
+        nameLabel = new JLabel[numPlayers];
+        towerLabel = new JLabel[numPlayers];
+        colorLabel = new JLabel[numPlayers];
+        elimLabel = new JLabel[numPlayers];
+        legionsLabel = new JLabel[numPlayers];
+        markersLabel = new JLabel[numPlayers];
+        creaturesLabel = new JLabel[numPlayers];
+        titanLabel = new JLabel[numPlayers];
+        scoreLabel = new JLabel[numPlayers];
+        
 
-
-        add(new Label("Player"));
+        contentPane.add(new JLabel("Player"));
         for (int i = 0; i < numPlayers; i++)
         {
-            nameLabel[i] = new Label();
-            add(nameLabel[i]);
+            nameLabel[i] = new JLabel();
+            nameLabel[i].setOpaque(true);
+            contentPane.add(nameLabel[i]);
         }
 
-        add(new Label("Tower"));
+        contentPane.add(new JLabel("Tower"));
         for (int i = 0; i < numPlayers; i++)
         {
-            towerLabel[i] = new Label();
-            add(towerLabel[i]);
+            towerLabel[i] = new JLabel();
+            towerLabel[i].setOpaque(true);
+            contentPane.add(towerLabel[i]);
         }
 
-        add(new Label("Color"));
+        contentPane.add(new JLabel("Color"));
         for (int i = 0; i < numPlayers; i++)
         {
-            colorLabel[i] = new Label();
-            add(colorLabel[i]);
+            colorLabel[i] = new JLabel();
+            colorLabel[i].setOpaque(true);
+            contentPane.add(colorLabel[i]);
         }
 
-        add(new Label("Elim"));
+        contentPane.add(new JLabel("Elim"));
         for (int i = 0; i < numPlayers; i++)
         {
-            elimLabel[i] = new Label();
-            add(elimLabel[i]);
+            elimLabel[i] = new JLabel();
+            elimLabel[i].setOpaque(true);
+            contentPane.add(elimLabel[i]);
         }
 
-        add(new Label("Legions"));
+        contentPane.add(new JLabel("Legions"));
         for (int i = 0; i < numPlayers; i++)
         {
-            legionsLabel[i] = new Label();
-            add(legionsLabel[i]);
+            legionsLabel[i] = new JLabel();
+            legionsLabel[i].setOpaque(true);
+            contentPane.add(legionsLabel[i]);
         }
 
-        add(new Label("Markers"));
+        contentPane.add(new JLabel("Markers"));
         for (int i = 0; i < numPlayers; i++)
         {
-            markersLabel[i] = new Label();
-            add(markersLabel[i]);
+            markersLabel[i] = new JLabel();
+            markersLabel[i].setOpaque(true);
+            contentPane.add(markersLabel[i]);
         }
 
-        add(new Label("Creatures"));
+        contentPane.add(new JLabel("Creatures"));
         for (int i = 0; i < numPlayers; i++)
         {
-            creaturesLabel[i] = new Label();
-            add(creaturesLabel[i]);
+            creaturesLabel[i] = new JLabel();
+            creaturesLabel[i].setOpaque(true);
+            contentPane.add(creaturesLabel[i]);
         }
 
-        add(new Label("Titan Size"));
+        contentPane.add(new JLabel("Titan Size"));
         for (int i = 0; i < numPlayers; i++)
         {
-            titanLabel[i] = new Label();
-            add(titanLabel[i]);
+            titanLabel[i] = new JLabel();
+            titanLabel[i].setOpaque(true);
+            contentPane.add(titanLabel[i]);
         }
 
-        add(new Label("Score"));
+        contentPane.add(new JLabel("Score"));
         for (int i = 0; i < numPlayers; i++)
         {
-            scoreLabel[i] = new Label();
-            add(scoreLabel[i]);
+            scoreLabel[i] = new JLabel();
+            scoreLabel[i].setOpaque(true);
+            contentPane.add(scoreLabel[i]);
         }
 
         updateStatusScreen();
@@ -242,5 +253,4 @@ public class StatusScreen extends Frame implements WindowListener
     {
         return getMinimumSize();
     }
-
 }

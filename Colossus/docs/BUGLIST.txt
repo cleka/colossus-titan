@@ -1,28 +1,5 @@
 Suspected Java bugs:
 
-Win95, 1.1.7: BattleTurn: "Done with Mov..."; default button size is
-   too small for its label.
-
-Red Hat 6.1, kaffe 1.05
-   Background colors are different.  (e.g. white instead of black.)  They're 
-      being set rather than defaulted.
-   Some clicks are rejected as though not inside chits or hexes even though
-      they are.  Sometimes a second click works; sometimes it takes several
-      tries.
-   Problems with PickMarker at the start of the game.  The first player's
-      markers are not displayed, but clicking in the place where they
-      should be works.  Some clicks are repeatedly missed, which prevents
-      progressing to the game.
-
-jar files made in Linux ibmjdk118 won't execute directly on Solaris JDK 1.2.2.
-   They'll run on Windows (JDK 1.3beta), and with "java -jar" on Solaris. 
-   Bad magic numbers?  Problem with jexec?
-
-Red Hat 6.1, ibmjdk118: Occasional SIGSEGV javacore in SplitLegion, with 
-   native threads on.  Green threads seem okay.  Occasional SIGSEGV 
-   javacore in PickRecruit, even with green threads.  One SIGSEGV
-   javacore during battle, with green threads.  AWT thread race condition?
-
 Red Hat 6.1, Sun 1.2.2/1.3/1.3refresh, Blackdown 1.2.2RC4: 
    ShowDice dialog sometimes moves from upper right corner to upper 
    left corner.  ShowLegion dialog sometimes pops up in upper left 
@@ -37,17 +14,13 @@ Win98, JDK1.3: setLocation() to keep ShowLegion, ShowMasterHex
 
 Win98, jdk1.3: Bad repaint onto potential carry target with no carries.
 
-Solaris, jdk1.2.2, jdk1.3: Popup menu text is invisible 
-   black-on-black.  There is no way to set the background and 
-   foreground colors.
-
 Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle, 
    usually around turn 15 of a 4-player game or turn 11 of a 6-player
    game.  Looks like a HotSpot memory leak.
    Things that don't help: System.gc() calls after every battle, -Xint,
    -client, -server, -Xincgc options to Java.
    Things to try: Manually removing event listeners, manually removing
-   more GUI elements as dialogs are dismissed.
+   more GUI elements as dialogs are dismissed, Linux jdk 1.3
 
 
 Current programming bugs:
@@ -70,9 +43,6 @@ Linux, ibmjdk118: Legion with angel in tower did not immediately
    
 Linux, ibmjdk118: Got a NullPointerException in Concede.<init>
 
-Linux, ibmjdk13: Repainting of stacked chits in battlemap entry
-   hex is ugly.  Chits in front are not fully redrawn.
-
 Linux, ibmjdk118: Angel summoned into battle can move on top of
    any of its allies which has not moved yet, because their hexes 
    are highlighted.
@@ -86,3 +56,9 @@ Solaris, jdk1.3: Mutual elimination, with defender's titan killed.
    Got the message "Legion XXXX is eliminated" twice for the
    attacking legion, once for the defender.
 
+Square (red, black, or white) in NW corner of board and map.  
+   Partial marker?
+
+In the second battle of a game, creatures can't move into some
+   hexes that they should be able to enter.  Problem with the
+   runOnce setup logic?

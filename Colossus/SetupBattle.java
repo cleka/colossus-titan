@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /** 
  *  Class SetupBattle is a dialog to set up a standalone battle.
@@ -16,7 +17,7 @@ import java.awt.event.*;
 
 
 
-public class SetupBattle extends Frame 
+public class SetupBattle extends JFrame 
 {
     private int chitScale = 60;
 
@@ -26,7 +27,9 @@ public class SetupBattle extends Frame
     {
         super("Set Up Battle");
 
-        setLayout(null);
+        Container contentPane = getContentPane();
+
+        contentPane.setLayout(null);
     }
 
 

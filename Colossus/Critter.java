@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 /**
  * Class Critter represents an individual Titan Character.
  * @version $Id$
@@ -512,10 +514,13 @@ public class Critter extends Creature
         }
         prompt.append("?");
 
-        new OptionDialog(map, "Take Strike Penalty?", prompt.toString(), 
-            "Take Penalty", "Do Not Take Penalty");
-
-        return (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION);
+        String [] options = new String[2];
+        options[0] = "Take Penalty";
+        options[1] = "Do Not Take Penalty";
+        int answer = JOptionPane.showOptionDialog(map, prompt.toString(), 
+            "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        return (answer == JOptionPane.YES_OPTION);
     }
 
 

@@ -33,8 +33,10 @@ public class BattleChit extends Chit
     }
 
 
+    //public void paintComponent(Graphics g)
     public void paint(Graphics g)
     {
+        //super.paintComponent(g);
         super.paint(g);
 
         if (critter.getHits() > 0 && !isDead())

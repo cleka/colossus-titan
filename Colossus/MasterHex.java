@@ -868,7 +868,7 @@ public class MasterHex extends Hex
     }
 
 
-    private void alignLegions()
+    public void alignLegions()
     {
         int numLegions = getNumLegions();
         if (numLegions == 0)
@@ -877,7 +877,12 @@ public class MasterHex extends Hex
         }
 
         Legion legion0 = (Legion)legions.get(0);
-        int chitScale = legion0.getMarker().getBounds().width;
+        Marker marker = legion0.getMarker(); 
+        if (marker == null)
+        {
+            return;
+        }
+        int chitScale = marker.getBounds().width;
         Point startingPoint = getOffCenter();
         Point point = new Point(startingPoint);
 
@@ -886,39 +891,42 @@ public class MasterHex extends Hex
             // Place legion in the center of the hex.
             point.x -= chitScale / 2;
             point.y -= chitScale / 2;
-            legion0.getMarker().setLocation(point);
+            marker.setLocation(point);
         }
         else if (numLegions == 2)
         {
             // Place legions in NW and SE corners.
             point.x -= 3 * chitScale / 4;
             point.y -= 3 * chitScale / 4;
-            legion0.getMarker().setLocation(point);
+            marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale / 4;
             point.y -= chitScale / 4;
             Legion legion1 = (Legion)legions.get(1);
-            legion1.getMarker().setLocation(point);
+            marker = legion1.getMarker(); 
+            marker.setLocation(point);
         }
         else if (numLegions == 3)
         {
             // Place legions in NW, SE, NE corners.
             point.x -= 3 * chitScale / 4;
             point.y -= 3 * chitScale / 4;
-            legion0.getMarker().setLocation(point);
+            marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale / 4;
             point.y -= chitScale / 4;
             Legion legion1 = (Legion)legions.get(1);
-            legion1.getMarker().setLocation(point);
+            marker = legion1.getMarker(); 
+            marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale / 4;
             point.y -= chitScale;
             Legion legion2 = (Legion)legions.get(2);
-            legion2.getMarker().setLocation(point);
+            marker = legion2.getMarker(); 
+            marker.setLocation(point);
         }
 
         repaint();

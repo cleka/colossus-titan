@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class AcquireAngel allows a player to acquire an angel or archangel.
@@ -8,7 +9,7 @@ import java.awt.event.*;
  */
 
 
-public class AcquireAngel extends Dialog implements MouseListener,
+public class AcquireAngel extends JDialog implements MouseListener,
     WindowListener
 {
     private int numEligible;
@@ -18,12 +19,9 @@ public class AcquireAngel extends Dialog implements MouseListener,
     private Player player;
     private Legion legion;
     private Chit [] chits;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
 
 
-    public AcquireAngel(Frame parentFrame, Legion legion, boolean archangel)
+    public AcquireAngel(JFrame parentFrame, Legion legion, boolean archangel)
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Acquire Angel", true);
@@ -38,7 +36,9 @@ public class AcquireAngel extends Dialog implements MouseListener,
         addWindowListener(this);
 
         int scale = 60;
-        setLayout(new FlowLayout());
+
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new FlowLayout());
 
         numEligible = Game.findEligibleAngels(legion, recruits, archangel);
         if (numEligible == 0)
@@ -54,7 +54,7 @@ public class AcquireAngel extends Dialog implements MouseListener,
         for (int i = 0; i < numEligible; i++)
         {
             chits[i] = new Chit(scale, recruits[i].getImageName(), this);
-            add(chits[i]);
+            contentPane.add(chits[i]);
             chits[i].addMouseListener(this);
         }
 
@@ -71,7 +71,7 @@ public class AcquireAngel extends Dialog implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, e.toString() +
+            JOptionPane.showMessageDialog(parentFrame, e.toString() +
                 " waitForAll was interrupted");
         }
 
@@ -84,35 +84,6 @@ public class AcquireAngel extends Dialog implements MouseListener,
 
         setVisible(true);
         repaint();
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
     }
 
 

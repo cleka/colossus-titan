@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
  * Class BattleMap implements the GUI for a Titan battlemap.
@@ -8,7 +9,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class BattleMap extends Frame implements MouseListener,
+public class BattleMap extends JFrame implements MouseListener,
     WindowListener
 {
     private static BattleHex[][] h = new BattleHex[6][6];
@@ -20,6 +21,7 @@ public class BattleMap extends Frame implements MouseListener,
     private static Image offImage;
     private static Graphics offGraphics;
     private static Dimension offDimension;
+
     private static MediaTracker tracker;
     private static boolean imagesLoaded;
     private static boolean eraseFlag;
@@ -57,7 +59,7 @@ public class BattleMap extends Frame implements MouseListener,
         this.board = board;
         this.battle = battle;
 
-        setLayout(null);
+        getContentPane().setLayout(null);
 
         scale = getScale();
         chitScale = 2 * scale;
@@ -78,7 +80,8 @@ public class BattleMap extends Frame implements MouseListener,
 
         // Neighbors and entrances only need to be set up once, since
         // they're the same for all maps.
-        if (!runOnce)
+        // XXX This is broken
+        //if (!runOnce)
         {
             SetupBattleHexes.setupNeighbors(h);
             setupEntrances();
@@ -96,7 +99,8 @@ public class BattleMap extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, e.toString() + " waitForAll was interrupted");
+            JOptionPane.showMessageDialog(this, e.toString() + 
+                " waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -157,7 +161,8 @@ public class BattleMap extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, e.toString() + "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(this, e.toString() + 
+                " waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -518,7 +523,7 @@ public class BattleMap extends Frame implements MouseListener,
             d.height != offDimension.height)
         {
             offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
+            offImage = createImage(d.width, d.height);
             offGraphics = offImage.getGraphics();
         }
 
@@ -555,10 +560,9 @@ public class BattleMap extends Frame implements MouseListener,
         g.drawImage(offImage, 0, 0, this);
     }
 
-
+    /** Double-buffer everything. */
     public void paint(Graphics g)
     {
-        // Double-buffer everything.
         update(g);
     }
 

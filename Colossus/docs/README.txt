@@ -1,4 +1,4 @@
-Colossus alpha     October 9, 2000    Copyright 2000 David Ripton
+Colossus alpha     November 9, 2000    Copyright 2000 David Ripton
 
 This is Colossus.  It's an attempt at a Java clone of Avalon Hill's
 Titan(tm) boardgame.
@@ -24,8 +24,7 @@ Running the game requires the following:
    lets you compile Java programs, not just run them.
 
    (Colossus used to run under JDK 1.1, but I recently made some
-   changes that break backwards compatibility.  If this affects you,
-   let me know.)
+   changes that break backwards compatibility.  Sorry.)
 
    Colossus will now also run as an applet in a web browser, as long
    as your browser is new enough to support JDK 1.2 applets.  That
@@ -45,15 +44,13 @@ Running the game requires the following:
    but the AWT is usually a weak point.
 
    Windows: Sun's 1.3 is good, but there are memory leaks
-      in the HotSpot garbage collector.  Turning off client 
-      HotSpot will make it slower but fix the memory
-      leaks.  1.2.2 is okay.  1.2.0 and 1.2.1 have very serious 
-      memory leaks in the image handling code, so I don't 
-      recommend them.
+      in the HotSpot garbage collector.  1.2.2 is good.  1.2.0 
+      and 1.2.1 have very serious memory leaks in the image 
+      handling code, so I don't recommend them.
 
    Solaris Sparc: Recent Sun boxes come with a pre-installed 
       1.2.x JDK, which is okay.  1.3 is faster, but has 
-      memory leaks unless you turn off HotSpot.
+      more memory leaks. 
 
    Linux: The Sun and Blackdown 1.2.2 versions are okay.  Sun's
       1.3 beta refresh is buggier.  (I haven't tried 1.3 final 
@@ -70,17 +67,11 @@ Running the game requires the following:
    
    What is reasonably fast?  It depends.  I think Colossus runs acceptably
    on a Pentium 133 with 64 MB and a JVM with a JIT.  Your opinion may vary.
-   The client-side HotSpot JVM in JDK 1.3 seems to help, so if you have a 
-   slower machine, you might want to upgrade your JRE.
 
    The game looks best in 1280x960 or higher, but I've added some scaling
    so you should be able to get by in 1024x768.  Less should work but will
    be really ugly.  The Java AWT requires at least a 256-color display; it 
    might work with less, but colors will be off.
-
-   Colossus used to require Swing, but it doesn't anymore.  But it might
-   again someday.  (Swing is included in JDK 1.2+, so there's no longer
-   quite as much reason to avoid it.)
 
    Java handles mouse buttons beyond the first badly.  In a perfect world,
    option-click on a Macintosh and the second mouse button on a PC would

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class ShowDice displays dice rolls during a battle.
@@ -8,15 +9,12 @@ import java.awt.event.*;
  */
 
 
-public class ShowDice extends Dialog implements WindowListener
+public class ShowDice extends JDialog implements WindowListener
 {
-    private Frame parentFrame;
+    private JFrame parentFrame;
     private MediaTracker tracker;
     private static final int scale = 60;
     private boolean imagesLoaded;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private Insets insets = new Insets(5, 5, 5, 5);
@@ -28,13 +26,13 @@ public class ShowDice extends Dialog implements WindowListener
     private int [] rolls;
     private int hits;
     private int carries;
-    private Label label1 = new Label();
-    private Label label2 = new Label();
-    private Label label3 = new Label();
+    private JLabel label1 = new JLabel();
+    private JLabel label2 = new JLabel();
+    private JLabel label3 = new JLabel();
     private Chit [] dice;
 
 
-    public ShowDice(Frame parentFrame)
+    public ShowDice(JFrame parentFrame)
     {
         super(parentFrame, "Show Dice Rolls", false);
 
@@ -45,7 +43,8 @@ public class ShowDice extends Dialog implements WindowListener
 
         addWindowListener(this);
 
-        setLayout(gridbag);
+        Container contentPane = getContentPane();
+        contentPane.setLayout(gridbag);
 
         pack();
 
@@ -128,31 +127,32 @@ public class ShowDice extends Dialog implements WindowListener
 
         setVisible(false);
         setEnabled(false);
-        removeAll();
+        Container contentPane = getContentPane();
+        contentPane.removeAll();
 
         label1.setText(attacker.getName() + " in " + 
             attacker.getCurrentHex().getDescription() + " attacks " + 
             defender.getName() + " in " + 
             defender.getCurrentHex().getDescription()); 
-        label1.setAlignment(Label.LEFT);
+        label1.setAlignmentX(Label.LEFT_ALIGNMENT);
         constraints.gridy = 0;
         constraints.gridwidth = 6;
         constraints.ipadx = 0;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.insets = insets;
         gridbag.setConstraints(label1, constraints);
-        add(label1);
+        contentPane.add(label1);
 
         label2.setText("Rolling " + numDice + " dice with target number " +
             targetNumber);
-        label3.setAlignment(Label.LEFT);
+        label3.setAlignmentX(Label.LEFT_ALIGNMENT);
         constraints.gridy = 1;
         constraints.gridwidth = 6;
         constraints.ipadx = 0;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.insets = insets;
         gridbag.setConstraints(label2, constraints);
-        add(label2);
+        contentPane.add(label2);
 
         tracker = new MediaTracker(this);
         dice = new Chit[numDice];
@@ -165,7 +165,7 @@ public class ShowDice extends Dialog implements WindowListener
             constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = insets;
             gridbag.setConstraints(dice[i], constraints);
-            add(dice[i]);
+            contentPane.add(dice[i]);
             tracker.addImage(dice[i].getImage(), 0);
         }
         try
@@ -174,8 +174,8 @@ public class ShowDice extends Dialog implements WindowListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, e.toString() +
-                "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(parentFrame, e.toString() +
+                " waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -198,14 +198,14 @@ public class ShowDice extends Dialog implements WindowListener
             carryString = " possible carries";
         }
         label3.setText(hits + hitString + carries + carryString);
-        label3.setAlignment(Label.LEFT);
+        label3.setAlignmentX(Label.LEFT_ALIGNMENT);
         constraints.gridy = 3 + numDice / 6;
         constraints.gridwidth = 6;
         constraints.ipadx = 0;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.insets = insets;
         gridbag.setConstraints(label3, constraints);
-        add(label3);
+        contentPane.add(label3);
 
         pack();
 
@@ -223,35 +223,6 @@ public class ShowDice extends Dialog implements WindowListener
         setEnabled(true);
 
         repaint();
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
     }
 
 

@@ -6,7 +6,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class Player
+public class Player implements Comparable
 {
     private String name;
     private String color;              // Black, Blue, Brown, Gold, Green, Red
@@ -122,6 +122,22 @@ public class Player
     public int getTower()
     {
         return startingTower;
+    }
+
+
+    /** Players are sorted in order of decreasing starting tower. 
+        This is inconsistent with equals() */
+    public int compareTo(Object object) throws ClassCastException
+    {
+        if (object instanceof Player) 
+        {
+            Player other = (Player)object;
+            return (other.getTower() - this.getTower());
+        }
+        else
+        {
+            throw new ClassCastException();
+        }
     }
 
 

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class ShowLegion displays the chits of the Creatures in a Legion
@@ -7,18 +8,15 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-public class ShowLegion extends Dialog implements MouseListener, WindowListener
+public class ShowLegion extends JDialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private Legion legion;
     private Chit [] chits;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
 
 
-    public ShowLegion(Frame parentFrame, Legion legion, Point point, boolean
+    public ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean
         allVisible)
     {
         super(parentFrame, "Contents of Legion " + legion.getMarkerId(), false);
@@ -55,7 +53,9 @@ public class ShowLegion extends Dialog implements MouseListener, WindowListener
         }
         setLocation(origin);
 
-        setLayout(new FlowLayout());
+        Container contentPane = getContentPane();
+
+        contentPane.setLayout(new FlowLayout());
 
         this.legion = legion;
 
@@ -75,7 +75,7 @@ public class ShowLegion extends Dialog implements MouseListener, WindowListener
             }
 
             chits[i] = new Chit(scale, imageName, this);
-            add(chits[i]);
+            contentPane.add(chits[i]);
             chits[i].addMouseListener(this);
         }
 
@@ -92,8 +92,8 @@ public class ShowLegion extends Dialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, e.toString() +
-                "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(parentFrame, e.toString() +
+                " waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -103,35 +103,6 @@ public class ShowLegion extends Dialog implements MouseListener, WindowListener
 
         setVisible(true);
         repaint();
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
     }
 
 

@@ -1,5 +1,6 @@
-import java.awt.event.*;
 import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class GameButton launches Colossus as an applet.
@@ -7,7 +8,7 @@ import java.awt.*;
  * @author David Barr
  */
 
-public class GameButton extends Button implements ActionListener 
+public class GameButton extends JButton implements ActionListener 
 {
     private Game game;
     private GameApplet applet;

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class PickRecruiter allows a player to choose which creature(s) recruit.
@@ -8,7 +9,7 @@ import java.awt.event.*;
  */
 
 
-public class PickRecruiter extends Dialog implements MouseListener,
+public class PickRecruiter extends JDialog implements MouseListener,
     WindowListener
 {
     private int numEligible;
@@ -21,15 +22,12 @@ public class PickRecruiter extends Dialog implements MouseListener,
     private Marker legionMarker;
     private Chit [] legionChits;
     private int scale = 60;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
     private int height;
     private GridBagLayout gridbag = new GridBagLayout(); 
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    public PickRecruiter(Frame parentFrame, Legion legion, int numEligible,
+    public PickRecruiter(JFrame parentFrame, Legion legion, int numEligible,
         Critter [] recruiters)
     {
         super(parentFrame, legion.getPlayer().getName() +
@@ -44,7 +42,9 @@ public class PickRecruiter extends Dialog implements MouseListener,
         addMouseListener(this);
         addWindowListener(this);
 
-        setLayout(gridbag);
+        Container contentPane = getContentPane();
+
+        contentPane.setLayout(gridbag);
 
         pack();
 
@@ -58,7 +58,7 @@ public class PickRecruiter extends Dialog implements MouseListener,
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         gridbag.setConstraints(legionMarker, constraints);
-        add(legionMarker);
+        contentPane.add(legionMarker);
         
         legionChits = new Chit[height];
         for (int i = 0; i < height; i++)
@@ -68,7 +68,7 @@ public class PickRecruiter extends Dialog implements MouseListener,
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 0;
             gridbag.setConstraints(legionChits[i], constraints);
-            add(legionChits[i]);
+            contentPane.add(legionChits[i]);
         }
 
         recruiterChits = new Chit[numEligible];
@@ -90,7 +90,7 @@ public class PickRecruiter extends Dialog implements MouseListener,
             constraints.gridx = leadSpace + i;
             constraints.gridy = 1;
             gridbag.setConstraints(recruiterChits[i], constraints);
-            add(recruiterChits[i]);
+            contentPane.add(recruiterChits[i]);
             recruiterChits[i].addMouseListener(this);
         }
 
@@ -113,7 +113,7 @@ public class PickRecruiter extends Dialog implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, e.toString() + 
+            JOptionPane.showMessageDialog(parentFrame, e.toString() + 
                 " waitForAll was interrupted");
         }
         imagesLoaded = true;
@@ -126,35 +126,6 @@ public class PickRecruiter extends Dialog implements MouseListener,
 
         setVisible(true);
         repaint();
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-        d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
     }
 
 

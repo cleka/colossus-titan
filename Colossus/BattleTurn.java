@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class BattleTurn gets and holds chronological and sequence data for a battle.
@@ -7,12 +8,13 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-public class BattleTurn extends Dialog implements ActionListener,
+public class BattleTurn extends JDialog implements ActionListener,
     WindowListener
 {
     private static BattleMap map;
     private static Point location;
     private static Battle battle;
+    private static Container contentPane;
 
 
     public BattleTurn(BattleMap map, Battle battle)
@@ -42,11 +44,13 @@ public class BattleTurn extends Dialog implements ActionListener,
 
     public void setupRecruitDialog()
     {
-        removeAll();
+        contentPane = getContentPane();
+        contentPane.removeAll();
         setTitle(battle.getActivePlayer().getName() + " Turn " + 
             battle.getTurnNumber());
-        setLayout(new GridLayout(1, 0));
-        add(new Label(battle.getActivePlayer().getName() + " : Recruit"));
+        contentPane.setLayout(new GridLayout(1, 0));
+        contentPane.add(new JLabel(battle.getActivePlayer().getName() + 
+            " : Recruit"));
 
         battle.recruitReinforcement();
     }
@@ -54,11 +58,13 @@ public class BattleTurn extends Dialog implements ActionListener,
     
     public void setupSummonDialog()
     {
-        removeAll();
+        contentPane = getContentPane();
+        contentPane.removeAll();
         setTitle(battle.getActivePlayer().getName() + " Turn " +
             battle.getTurnNumber());
-        setLayout(new GridLayout(1, 0));
-        add(new Label(battle.getActivePlayer().getName() + " : Summon"));
+        contentPane.setLayout(new GridLayout(1, 0));
+        contentPane.add(new JLabel(battle.getActivePlayer().getName() + 
+            " : Summon"));
         pack();
     }
 
@@ -72,27 +78,29 @@ public class BattleTurn extends Dialog implements ActionListener,
         }
         else
         {
-            removeAll();
+            contentPane = getContentPane();
+            contentPane.removeAll();
             setTitle(battle.getActivePlayer().getName() + " Turn " + 
                 battle.getTurnNumber());
-            setLayout(new GridLayout(5, 0));
+            contentPane.setLayout(new GridLayout(5, 0));
 
-            add(new Label(battle.getActivePlayer().getName() + " : Move"));
+            contentPane.add(new JLabel(battle.getActivePlayer().getName() +
+                " : Move"));
 
-            Button button1 = new Button("Undo Last Move");
-            add(button1);
+            JButton button1 = new JButton("Undo Last Move");
+            contentPane.add(button1);
             button1.addActionListener(this);
 
-            Button button2 = new Button("Undo All Moves");
-            add(button2);
+            JButton button2 = new JButton("Undo All Moves");
+            contentPane.add(button2);
             button2.addActionListener(this);
 
-            Button button3 = new Button("Concede Battle");
-            add(button3);
+            JButton button3 = new JButton("Concede Battle");
+            contentPane.add(button3);
             button3.addActionListener(this);
 
-            Button button4 = new Button("Done with Moves");
-            add(button4);
+            JButton button4 = new JButton("Done with Moves");
+            contentPane.add(button4);
             button4.addActionListener(this);
 
             pack();
@@ -112,19 +120,20 @@ public class BattleTurn extends Dialog implements ActionListener,
         }
         else
         {
-            removeAll();
-            setLayout(new GridLayout(3, 0));
+            contentPane = getContentPane();
+            contentPane.removeAll();
+            contentPane.setLayout(new GridLayout(3, 0));
 
-            add(new Label(battle.getActivePlayer().getName() + 
+            contentPane.add(new JLabel(battle.getActivePlayer().getName() +
                 ((battle.getPhase() == Battle.FIGHT) ? 
                 " : Strike" : " : Strikeback")));
 
-            Button button1 = new Button("Concede Battle");
-            add(button1);
+            JButton button1 = new JButton("Concede Battle");
+            contentPane.add(button1);
             button1.addActionListener(this);
             
-            Button button2 = new Button("Done with Strikes");
-            add(button2);
+            JButton button2 = new JButton("Done with Strikes");
+            contentPane.add(button2);
             button2.addActionListener(this);
 
             pack();

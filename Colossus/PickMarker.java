@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
  * Class PickMarker allows a player to pick a legion marker.
@@ -9,18 +10,15 @@ import java.util.*;
  */
 
 
-public class PickMarker extends Dialog implements MouseListener, WindowListener
+public class PickMarker extends JDialog implements MouseListener, WindowListener
 {
     private ArrayList markers = new ArrayList();
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private Player player;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-    private Image offImage;
 
 
-    public PickMarker(Frame parentFrame, Player player)
+    public PickMarker(JFrame parentFrame, Player player)
     {
         super(parentFrame, player.getName() + ": Pick Legion Marker", true);
 
@@ -31,13 +29,16 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
 
         if (player.getNumMarkersAvailable() == 0)
         {
-            new MessageBox(parentFrame, "No markers available");
+            JOptionPane.showMessageDialog(parentFrame, "No markers available");
             dispose();
         }
         else
         {
             int scale = 60;
-            setLayout(new GridLayout(0, Math.min(
+
+            Container contentPane = getContentPane();
+
+            contentPane.setLayout(new GridLayout(0, Math.min(
                 player.getNumMarkersAvailable(), 12)));
 
             pack();
@@ -56,7 +57,7 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
                     this);
                 marker.setId(markerId);    
                 markers.add(marker);
-                add(marker);
+                contentPane.add(marker);
                 marker.addMouseListener(this);
                 tracker.addImage(marker.getImage(), 0);
             }
@@ -67,7 +68,7 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
             }
             catch (InterruptedException e)
             {
-                new MessageBox(parentFrame, e.toString() +
+                JOptionPane.showMessageDialog(parentFrame, e.toString() +
                     " waitForAll was interrupted");
             }
             imagesLoaded = true;
@@ -81,35 +82,6 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
             setVisible(true);
             repaint();
         }
-    }
-
-
-    public void update(Graphics g)
-    {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
-        Dimension d = getSize();
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(2 * d.width, 2 * d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
     }
 
 
@@ -200,7 +172,7 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
 
     public static void main(String [] args)
     {
-        Frame frame = new Frame("testing PickMarker");
+        JFrame frame = new JFrame("testing PickMarker");
         int scale = 60;
         frame.setSize(new Dimension(20 * scale, 20 * scale));
         frame.pack();

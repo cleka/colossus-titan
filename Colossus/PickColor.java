@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 
 /**
@@ -9,30 +10,31 @@ import java.awt.event.*;
  */
 
 
-public class PickColor extends Dialog implements WindowListener, ActionListener
+public class PickColor extends JDialog implements WindowListener, ActionListener
 {
-    private Label [] colorLabel = new Label[6];
+    private JLabel [] colorLabel = new JLabel[6];
     private Game game;
-    private int playerNum;
+    private Player player;
     private static final String [] colorNames = 
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
         
 
-    public PickColor(Frame parentFrame, Game game, int playerNum)
+    public PickColor(JFrame parentFrame, Game game, Player player)
     {
-        super(parentFrame, game.getPlayer(playerNum).getName() + 
-            ", Pick a Color", true);
+        super(parentFrame, player.getName() + ", Pick a Color", true);
         this.game = game;
-        this.playerNum = playerNum;
+        this.player = player;
     
         setBackground(Color.lightGray);
         pack();
 
-        setLayout(new GridLayout(0, 3));
+        Container contentPane = getContentPane();
 
-        add(new Label("Tower"));
-        add(new Label("Name"));
-        add(new Label("Color"));
+        contentPane.setLayout(new GridLayout(0, 3));
+
+        contentPane.add(new JLabel("Tower"));
+        contentPane.add(new JLabel("Name"));
+        contentPane.add(new JLabel("Color"));
         
         boolean [] colorTaken = new boolean[6];
         for (int i = 0; i < 6; i++)
@@ -40,34 +42,36 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
             colorTaken[i] = false;
         }
 
+        // XXX Use an iterator?
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            int tower = game.getPlayer(i).getTower();
-            add(new Label(String.valueOf(100 * tower)));
-            add(new Label(game.getPlayer(i).getName()));
-            String color = game.getPlayer(i).getColor(); 
+            Player currentPlayer = game.getPlayer(i);
+            int tower = currentPlayer.getTower();
+            contentPane.add(new JLabel(String.valueOf(100 * tower)));
+            contentPane.add(new JLabel(currentPlayer.getName()));
+            String color = currentPlayer.getColor(); 
 
             if (color == null)
             {
-                if (i == playerNum)
+                if (currentPlayer == player)
                 {
-                    colorLabel[i] = new Label("?");
+                    colorLabel[i] = new JLabel("?");
                 }
                 else
                 {
-                    colorLabel[i] = new Label("");
+                    colorLabel[i] = new JLabel("");
                 }
             }
             else
             {
-                colorLabel[i] = new Label(color);
+                colorLabel[i] = new JLabel(color);
                 if (colorNumber(color) != -1)
                 {
                     colorTaken[colorNumber(color)] = true;
                 }
             }
 
-            add(colorLabel[i]);
+            contentPane.add(colorLabel[i]);
         }
         
         Color [] background = { Color.black, Color.blue, new Color(180, 90, 0),
@@ -77,7 +81,7 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
 
         for (int i = 0; i < 6; i++)
         {
-            Button button = new Button();
+            JButton button = new JButton();
             if (colorTaken[i])
             {
                 button.setBackground(Color.lightGray);
@@ -90,7 +94,7 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
                 button.setForeground(foreground[i]);
                 button.addActionListener(this);
             }
-            add(button);
+            contentPane.add(button);
         }
 
         pack();
@@ -151,9 +155,8 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
     {
         String color = e.getActionCommand();
         // Send data back to game, and exit.
-        Game.logEvent(game.getPlayer(playerNum).getName() + 
-            " chooses color " + color);
-        game.getPlayer(playerNum).setColor(color);
+        Game.logEvent(player.getName() + " chooses color " + color);
+        player.setColor(color);
         dispose();
     }
 
@@ -172,17 +175,15 @@ public class PickColor extends Dialog implements WindowListener, ActionListener
     public static void main(String [] args)
     {
         Game game = new Game();
-        Frame frame = new Frame();
+        JFrame frame = new JFrame();
 
-        int numPlayers = 2;
-        game.setNumPlayers(numPlayers);
         Player p0 = new Player("Bo", game);
         Player p1 = new Player("Luke", game);
-        game.setPlayer(0, p0);
-        game.setPlayer(1, p1);
+        game.addPlayer(p0);
+        game.addPlayer(p1);
 
-        new PickColor(frame, game, 0);
-        new PickColor(frame, game, 1);
+        new PickColor(frame, game, p0);
+        new PickColor(frame, game, p1);
 
         System.exit(0);
     }

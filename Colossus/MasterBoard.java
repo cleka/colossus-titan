@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
@@ -8,7 +9,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class MasterBoard extends Frame implements MouseListener,
+public class MasterBoard extends JFrame implements MouseListener,
     WindowListener, ActionListener
 {
     // There are a total of 96 hexes
@@ -35,12 +36,13 @@ public class MasterBoard extends Frame implements MouseListener,
     /** Used to fix artifacts from legions hanging outside hexes. */
     private boolean eraseFlag;
 
-    private PopupMenu popupMenu;
-    private MenuItem menuItemHex; 
-    private MenuItem menuItemMap;
+    private JPopupMenu popupMenu;
+    private JMenuItem menuItemHex; 
+    private JMenuItem menuItemMap;
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
+    private Container contentPane;
 
 
     public MasterBoard(Game game)
@@ -49,7 +51,9 @@ public class MasterBoard extends Frame implements MouseListener,
 
         this.game = game;
 
-        setLayout(null);
+        contentPane = getContentPane();
+
+        contentPane.setLayout(null);
 
         scale = getScale();
 
@@ -72,12 +76,12 @@ public class MasterBoard extends Frame implements MouseListener,
 
     private void initializePopupMenu()
     {
-        popupMenu = new PopupMenu();
-        menuItemHex = new MenuItem("View Recruit Info");
-        menuItemMap = new MenuItem("View BattleMap");
+        popupMenu = new JPopupMenu();
+        menuItemHex = new JMenuItem("View Recruit Info");
+        menuItemMap = new JMenuItem("View BattleMap");
         popupMenu.add(menuItemHex);
         popupMenu.add(menuItemMap);
-        add(popupMenu);
+        contentPane.add(popupMenu);
         menuItemHex.addActionListener(this);
         menuItemMap.addActionListener(this);
     }
@@ -87,13 +91,19 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         tracker = new MediaTracker(this);
 
+        // XXX iterator
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             Player player = game.getPlayer(i);
             for (int j = 0; j < player.getNumLegions(); j++)
             {
-                tracker.addImage(player.getLegion(j).getMarker().getImage(),
-                    0);
+                Legion legion = player.getLegion(j);
+                Marker marker = new Marker(3 * scale, legion.getImageName(),
+                    this, null);
+                legion.setMarker(marker);
+                tracker.addImage(marker.getImage(), 0);
+                MasterHex hex = legion.getCurrentHex();
+                hex.alignLegions();
             }
         }
 
@@ -103,7 +113,8 @@ public class MasterBoard extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, e.toString() + " waitForAll was interrupted");
+            JOptionPane.showMessageDialog(this, e.toString() + 
+                " waitForAll was interrupted");
         }
 
         imagesLoaded = true;
@@ -112,7 +123,7 @@ public class MasterBoard extends Frame implements MouseListener,
     
     private void setupIcon()
     {
-        if (!game.isApplet())
+        if (game != null && !game.isApplet())
         {
             try
             {
@@ -197,7 +208,8 @@ public class MasterBoard extends Frame implements MouseListener,
             for (int j = 0; j < player.getNumLegions(); j++)
             {
                 Legion legion = player.getLegion(j);
-                if (legion.getMarker().contains(point))
+                Marker marker = legion.getMarker();
+                if (marker != null && marker.contains(point))
                 {
                     return legion;
                 }
@@ -315,24 +327,9 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    /** Present a dialog allowing the player to enter via land or teleport. */
-    private void chooseWhetherToTeleport(MasterHex hex)
-    {
-        new OptionDialog(this, "Teleport?", "Teleport?", "Teleport", 
-            "Move Normally");
-
-        // If Teleport, then leave teleported set.
-        if (OptionDialog.getLastAnswer() == OptionDialog.NO_OPTION)
-        {
-            hex.setTeleported(false);
-        }
-    }
-
-
     public void deiconify()
     {
-        // setState(Frame.NORMAL) does not work under 1.1
-        // removeNotify() then addNotify() causes problems with the Turn dialog
+        setState(JFrame.NORMAL);
     }
 
 
@@ -470,13 +467,6 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    /** Double-buffer everything. */
-    public void paint(Graphics g)
-    {
-        update(g);
-    }
-
-
     public void setEraseFlag()
     {
         eraseFlag = true;
@@ -500,7 +490,6 @@ public class MasterBoard extends Frame implements MouseListener,
             return;
         }
 
-
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
@@ -509,6 +498,7 @@ public class MasterBoard extends Frame implements MouseListener,
             offImage = createImage(d.width, d.height);
             offGraphics = offImage.getGraphics();
         }
+
 
         // If the erase flag is set, erase the background.
         if (eraseFlag)
@@ -533,7 +523,8 @@ public class MasterBoard extends Frame implements MouseListener,
             Player player = game.getPlayer(i);
             for (int j = player.getNumLegions() - 1; j >= 0; j--)
             {
-                if (rectClip.intersects(
+                Marker marker = player.getLegion(j).getMarker();
+                if (marker != null && rectClip.intersects(
                     player.getLegion(j).getMarker().getBounds()))
                 {
                     player.getLegion(j).getMarker().paint(offGraphics);
@@ -542,6 +533,13 @@ public class MasterBoard extends Frame implements MouseListener,
         }
 
         g.drawImage(offImage, 0, 0, this);
+    }
+    
+    
+    /** Double-buffer everything. */
+    public void paint(Graphics g)
+    {
+        update(g);
     }
 
 
@@ -554,5 +552,11 @@ public class MasterBoard extends Frame implements MouseListener,
     public Dimension getPreferredSize()
     {
         return getMinimumSize();
+    }
+
+
+    public static void main(String [] args)
+    {
+        new MasterBoard(null);
     }
 }

@@ -1,4 +1,5 @@
 import java.util.*;
+import javax.swing.*;
 
 /**
  * Class Battle holds data about a Titan battle.
@@ -162,7 +163,7 @@ public class Battle
             checkForElimination();
 
             // Make sure the battle isn't over before continuing.
-            if (masterHex.getNumLegions() == 2)
+            if (!attackerElim && !defenderElim)
             {
                 if (activeLegion == attacker)
                 {
@@ -297,7 +298,7 @@ public class Battle
 
     public void setCarryDamage(int carryDamage)
     {
-        this.carryDamage = carryDamage;;
+        this.carryDamage = carryDamage;
     }
 
 
@@ -508,10 +509,17 @@ public class Battle
     private void tryToConcede(Player player)
     {
         // XXX: Concession timing is tricky.
-        new OptionDialog(map, "Confirm Concession",
-            "Are you sure you want to concede the battle?",
-            "Yes", "No");
-        if (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION)
+
+        String [] options = new String[2];
+        options[0] = "Yes";
+        options[1] = "No";
+        int answer = JOptionPane.showOptionDialog(map, 
+            "Are you sure you with to concede the battle?",
+            "Confirm Concession?",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, 
+            null, options, options[1]);
+
+        if (answer == JOptionPane.YES_OPTION)
         {
             Game.logEvent(player.getName() + " concedes the battle");
             concede(player);
@@ -653,7 +661,8 @@ public class Battle
         {
             critters.remove(critter);
             critters.add(0, critter);
-            critter.getChit().repaint();
+            // Repainting just this chit doesn't cut it.
+            critter.getCurrentHex().repaint();
         }
     }
 
@@ -879,7 +888,7 @@ public class Battle
         if (isForcedStrikeRemaining())
         {
             highlightChitsWithTargets();
-            new MessageBox(map, "Engaged creatures must strike.");
+            JOptionPane.showMessageDialog(map, "Engaged creatures must strike.");
         }
         else
         {
@@ -1726,16 +1735,14 @@ public class Battle
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('J');
         hex.setEntrySide(3);
-        Legion attacker = new Legion(60, "Bk01", null, null, hex, 
+        Legion attacker = new Legion("Bk01", null, hex, 
             Creature.archangel, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
             Creature.warlock, null, player1);
-        Legion defender = new Legion(60, "Rd01", null, null, hex, 
+        Legion defender = new Legion("Rd01", null, hex, 
             Creature.serpent, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian,
             Creature.minotaur, null, player2);
-        hex.addLegion(attacker);
-        hex.addLegion(defender);
 
         new Battle(null, attacker, defender, hex);
     }
