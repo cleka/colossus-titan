@@ -7,26 +7,41 @@
 class Player
 {
     String name;
-    String color;       // black, blue, brown, gold, green, red
-    int startingTower;  // 1-6 
+    String color;       // Bk, Bl, Br, Gd, Gr, Rd 
+    int startingTower;  // 1-6
     int score;
-    int titanPower;
-    boolean canTitanTeleport;
     int angels;         // number of angels + archangels in legions
     boolean canSummonAngel; 
     String playersEliminated;    // BkBlRdGd
+    String [] markersAvailable = new String[12];
+    Legion [] legions;
 
-
-    Player(String inName, String inColor, int inStartingTower)
+    Player(String name, String color, int startingTower)
     {
-        name = inName;
-        color = inColor;
-        startingTower = inStartingTower;
+        this.name = name;
+        this.color = color;
+        this.startingTower = startingTower;
         score = 0;
-        titanPower = 6;
-        canTitanTeleport = false;
         angels = 1; 
         canSummonAngel = true;
+        for (int i = 1; i <= 9; i++)
+        {
+            markersAvailable[i] = color + '0' + Integer.toString(i);
+        }
+        for (int i = 10; i <= 12; i++)
+        {
+            markersAvailable[i] = color + Integer.toString(i);
+        }
     }
 
+    boolean canTitanTeleport()
+    {
+        return (score >= 400);
+    }
+
+
+    int titanPower()
+    {
+        return 6 + (score / 100);
+    }
 }
