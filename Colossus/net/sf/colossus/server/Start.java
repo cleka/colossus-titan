@@ -235,6 +235,7 @@ public final class Start
         com.werken.opt.Options opts = new com.werken.opt.Options();
         CommandLine cl = null;
 
+        // Catch-all block so we can log fatal exceptions.
         try
         {
             opts.addOption('h', "help", false, "Show options help");
@@ -255,49 +256,49 @@ public final class Start
             opts.addOption('x', "quiet", false, "turn off debug log");
 
             cl = opts.parse(args);
+
+            Game game = new Game();
+    
+            if (cl.optIsSet('h'))
+            {
+                usage(opts);
+            }
+    
+            else if (cl.optIsSet('c'))
+            {
+                startClient(cl);
+            }
+    
+            else if (cl.optIsSet('l') || cl.optIsSet('z'))
+            {
+                String filename = null;
+                if (cl.optIsSet('l'))
+                {
+                    filename = cl.getOptValue('l');
+                }
+                else if (cl.optIsSet('z'))
+                {
+                    filename = "--latest";
+                }
+                game.getOptions().loadOptions();
+                game.loadGame(filename);
+            }
+            else if (cl.optIsSet('g'))
+            {
+                game.getOptions().loadOptions();
+                setupOptionsFromCommandLine(cl, game);
+                game.newGame(); 
+            }
+            else
+            {
+                startupDialog(game, cl);
+            }
         }
         catch (Exception ex)
         {
-            // TODO Clean up the output.
+            Log.error(ex.toString());
             ex.printStackTrace();
-            return;
-        }
-
-        Game game = new Game();
-
-        if (cl.optIsSet('h'))
-        {
-            usage(opts);
-        }
-
-        else if (cl.optIsSet('c'))
-        {
-            startClient(cl);
-        }
-
-        else if (cl.optIsSet('l') || cl.optIsSet('z'))
-        {
-            String filename = null;
-            if (cl.optIsSet('l'))
-            {
-                filename = cl.getOptValue('l');
-            }
-            else if (cl.optIsSet('z'))
-            {
-                filename = "--latest";
-            }
-            game.getOptions().loadOptions();
-            game.loadGame(filename);
-        }
-        else if (cl.optIsSet('g'))
-        {
-            game.getOptions().loadOptions();
-            setupOptionsFromCommandLine(cl, game);
-            game.newGame(); 
-        }
-        else
-        {
-            startupDialog(game, cl);
+            System.exit(1);
         }
     }
 }
