@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class BattleMap implements the GUI for a Titan battlemap.
@@ -1966,13 +1966,6 @@ System.out.println("defender's titan eliminated");
     }
 
 
-    public void paint(Graphics g)
-    {
-        // Double-buffer everything.
-        update(g);
-    }
-
-
     public void update(Graphics g)
     {
         if (!imagesLoaded)
@@ -2020,6 +2013,13 @@ System.out.println("defender's titan eliminated");
         }
 
         g.drawImage(offImage, 0, 0, this);
+    }
+
+    
+    public void paint(Graphics g)
+    {
+        // Double-buffer everything.
+        update(g);
     }
 
 
