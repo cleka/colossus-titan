@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.*;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
@@ -91,6 +92,7 @@ class Character
     boolean nativeBog;
     boolean nativeSandDune;
     boolean nativeSlope;
+    boolean lord;
 
 
     // Add various character archetypes as class members
@@ -133,7 +135,7 @@ class Character
         new Character("Serpent", 18, 2, false, false, true, false, false,
             false, false, false),
         new Character("Titan", 6, 4, false, false, false, false, false,
-            false, false, true)
+            false, false, true),
         new Character("Troll", 8, 2, false, false, false, true, true,
             false, false, false),
         new Character("Unicorn", 6, 4, false, false, false, false, false,
@@ -185,8 +187,29 @@ class Character
 class Legion
 {
     Chit chit;
-    int size;
+    int height;
     String markerId;    // Bk03, Rd12, etc.
     Character [] chars = new Character[7];
-    int pointValue;
+
+    Legion(int cx, int cy, int scale, String markerId,
+        Container container, int height, Character [] chars)
+    {
+        String imageFilename = "images/" + markerId + ".gif";
+        this.chit = new Chit(cx, cy, scale, imageFilename, container);
+        this.height = height;
+        // XXX Is this the right way to do this?
+        this.chars = chars;
+    }
+
+
+    int getPointValue()
+    {
+        int pointValue = 0;
+        for (int i = 0; i < height; i++)
+        {
+            pointValue += chars[i].getPointValue();
+        }
+        return pointValue;
+    }
+
 }
