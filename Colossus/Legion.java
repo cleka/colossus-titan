@@ -78,7 +78,7 @@ class Legion
         }
         else
         {
-            // XXX Skip this when loading game
+            // XXX Need to skip this when loading game
             hideAllCreatures();
         }
     }
@@ -505,6 +505,62 @@ class Legion
                 {
                     return;
                 }
+            }
+        }
+    }
+
+
+    // Reveal the lord who teleported the legion.  Pick one if necessary.
+    public void revealTeleportingLord()
+    {
+        // Count how many types of lords are in the stack.  If only one,
+        // reveal it.
+
+        // "There can be only one."
+        int titans = (numCreature(Creature.titan)); 
+        int angels = (numCreature(Creature.angel)); 
+        if (angels > 1)
+        {
+            angels = 1;
+        }
+        int archangels = (numCreature(Creature.archangel));
+        if (archangels > 1)
+        {
+            archangels = 1;
+        }
+
+        int lordTypes = titans + angels + archangels;
+
+        if (lordTypes == 1)
+        {
+            if (titans == 1)
+            {
+                revealCreatures(Creature.titan, 1);
+            }
+            else if (angels == 1)
+            {
+                revealCreatures(Creature.angel, 1);
+            }
+            else if (archangels == 1)
+            {
+                revealCreatures( Creature.archangel, 1);
+            }
+        }
+        else
+        {
+            // XXX Need a dialog for this.  For now, reveal angels then
+            // archangels than titan.
+            if (angels == 1)
+            {
+                revealCreatures(Creature.angel, 1);
+            }
+            else if (archangels == 1)
+            {
+                revealCreatures(Creature.archangel, 1);
+            }
+            else
+            {
+                revealCreatures(Creature.titan, 1);
             }
         }
     }
