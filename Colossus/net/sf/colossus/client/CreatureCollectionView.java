@@ -32,15 +32,12 @@ class CreatureCollectionView extends KDialog implements WindowListener
         new JLabel(baseString, SwingConstants.CENTER);
     private final static JLabel legendLabel =
         new JLabel(htmlizeOnly(
-                               htmlColorizeOnly("Values are: ", "black") +
-                               htmlColorizeOnly("In Stack/", "black") +
-                               htmlColorizeOnly("Total", "blue") +
-                               htmlColorizeOnly("/", "black") +
-                               /*
-                                 htmlColorizeOnly("In Game", "green") +
-                                 htmlColorizeOnly("/", "black") +
-                               */
-                               htmlColorizeOnly("Dead", "red")));
+            htmlColorizeOnly("Bottom Values are: ", "black") +
+            htmlColorizeOnly("In Stack/", "black") +
+            htmlColorizeOnly("/", "black") +
+            htmlColorizeOnly("In Game", "green") +
+            htmlColorizeOnly("/", "black") +
+            htmlColorizeOnly("Dead", "red")));
     
     static
     {
@@ -86,7 +83,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
     /** the count for an individual creature */
     class CreatureCount extends JPanel
     {
-        JLabel label;
+        private JLabel label;
+        private JLabel topLabel;
 
         CreatureCount(String name)
         {
@@ -96,10 +94,19 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
             Chit chit = new Chit(4 * Scale.get(), name, this);
             label = new JLabel(baseString, SwingConstants.CENTER);
+            topLabel =
+                new JLabel(htmlizeOnly(
+                             htmlColorizeOnly(
+                               Integer.toString(
+                                 client.getCreatureMaxCount(name)),
+                               "blue")),
+                           SwingConstants.CENTER);
             label.setFont(countFont);
+            topLabel.setFont(countFont);
             countMap.put(name, label);
-
+            
             // jikes whines because add is defined in both JPanel and JDialog.
+            this.add(topLabel, BorderLayout.NORTH);
             this.add(chit, BorderLayout.CENTER);
             this.add(label, BorderLayout.SOUTH);
         }
@@ -108,7 +115,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
         {
             Dimension labelDim = label.getPreferredSize();
             int minX = 4 * Scale.get() + 1;
-            int minY = 4 * Scale.get() + (int)labelDim.getHeight() + 1;
+            int minY = 4 * Scale.get() + (2 * (int)labelDim.getHeight()) + 1;
             if (minX < (int)labelDim.getWidth() + 2)
                 minX = (int)labelDim.getWidth() + 2;
             return new Dimension(minX, minY);
@@ -176,8 +183,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
                                  "green");
             String htmlSlash = htmlColorizeOnly("/", "black");
             label.setText(htmlizeOnly(htmlCount + htmlSlash +
-                                      htmlTotalCount + htmlSlash +
-                                      /* htmlInGameCount + htmlSlash + */
+                                      htmlInGameCount + htmlSlash +
                                       htmlDeadCount));
         }
 
@@ -243,7 +249,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
         int minX = minSingleX * 5;
         int minY = (((4 * Scale.get()) + 8 +
-                     (int)baseLabel.getPreferredSize().getHeight()) *
+                     (2 * (int)baseLabel.getPreferredSize().getHeight())) *
                     ((creatures.size() + 4 ) / 5)) + 60;
         
         return new Dimension(minX, minY);
