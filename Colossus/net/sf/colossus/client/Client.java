@@ -80,10 +80,6 @@ public final class Client implements IClient
     /** the parent frame for secondary windows */
     private JFrame secondaryParent = null;
 
-    // XXX Should be per player
-    /** Sorted set of available legion markers for this player. */
-    private SortedSet markersAvailable = new TreeSet(new MarkerComparator());
-
     private String parentId;
     private int numSplitsThisTurn;
 
@@ -615,7 +611,6 @@ public final class Client implements IClient
     public void updatePlayerInfo(java.util.List infoStrings)
     {
         numPlayers = infoStrings.size();
-
         if (playerInfo == null)
         {
             playerInfo = new PlayerInfo[numPlayers];
@@ -624,12 +619,10 @@ public final class Client implements IClient
                 playerInfo[i] = new PlayerInfo(this);
             }
         }
-
         for (int i = 0; i < numPlayers; i++)
         {
             playerInfo[i].update((String)infoStrings.get(i));
         }
-
         updateStatusScreen();
     }
 
@@ -688,6 +681,11 @@ public final class Client implements IClient
             }
         }
         return null;
+    }
+
+    PlayerInfo getPlayerInfo()
+    {
+        return getPlayerInfo(playerName);
     }
 
     java.util.List getPlayerNames()
@@ -946,11 +944,6 @@ public final class Client implements IClient
         return Collections.unmodifiableList(markers);
     }
 
-    Set getMarkersAvailable()
-    {
-        return Collections.unmodifiableSortedSet(markersAvailable);
-    }
-
 
     /** Get this legion's info.  Create it first if necessary. */
     LegionInfo getLegionInfo(String markerId)
@@ -988,7 +981,7 @@ public final class Client implements IClient
 
         if (isMyLegion(id))
         {
-            markersAvailable.add(id);
+            getPlayerInfo().addMarkerAvailable(id);
         }
 
         LegionInfo info = getLegionInfo(id);
@@ -998,7 +991,6 @@ public final class Client implements IClient
         removeRecruitChit(hexLabel);
 
         legionInfo.remove(id);
-
         if (board != null)
         {
             board.alignLegions(hexLabel);
@@ -1988,7 +1980,7 @@ Log.debug(playerName + " Client.initBoard()");
 
     public void nakRecruit(String markerId)
     {
-Log.error("Got nak for recruit with " + markerId);
+        Log.error("Got nak for recruit with " + markerId);
     }
 
     public void undidRecruit(String markerId, String recruitName)
@@ -2067,9 +2059,8 @@ Log.error("Got nak for recruit with " + markerId);
     }
 
 
-    // XXX Update markersAvailable more often.
-    public synchronized void setupSplit(Set markersAvailable, 
-        String activePlayerName, int turnNumber)
+    public synchronized void setupSplit(String activePlayerName, 
+        int turnNumber)
     {
         clearUndoStack();
         cleanupNegotiationDialogs();
@@ -2077,12 +2068,6 @@ Log.error("Got nak for recruit with " + markerId);
         this.activePlayerName = activePlayerName;
         this.turnNumber = turnNumber;
         this.phase = Constants.SPLIT;
-
-        this.markersAvailable.clear();
-        if (markersAvailable != null)
-        {
-            this.markersAvailable.addAll(markersAvailable);
-        }
 
         numSplitsThisTurn = 0;
 
@@ -3346,7 +3331,7 @@ Log.error("Got nak for recruit with " + markerId);
         {
             String splitoffId = (String)popUndoStack();
             server.undoSplit(splitoffId);
-            markersAvailable.add(splitoffId);
+            getPlayerInfo().addMarkerAvailable(splitoffId);
             numSplitsThisTurn--;
         }
     }
@@ -3538,6 +3523,7 @@ Log.error("Got nak for recruit with " + markerId);
         {
             return;
         }
+        Set markersAvailable = getPlayerInfo().getMarkersAvailable();
         // Need a legion marker to split.
         if (markersAvailable.size() < 1)
         {
@@ -3583,16 +3569,13 @@ Log.error("Got nak for recruit with " + markerId);
         {
             return;
         }
-
         if (parentId == null)
         {
             // Picking first marker.
             server.assignFirstMarker(childId);
             return;
         }
-
         String results = SplitLegion.splitLegion(this, parentId, childId);
-
         if (results != null)
         {
             doSplit(parentId, childId, results);
@@ -3619,7 +3602,7 @@ Log.error("Got nak for recruit with " + markerId);
         {
             clearRecruitChits();
             pushUndoStack(childId);
-            markersAvailable.remove(childId);
+            getPlayerInfo().removeMarkerAvailable(childId);
         }
 
         numSplitsThisTurn++;
@@ -3633,7 +3616,7 @@ Log.error("Got nak for recruit with " + markerId);
 
     public void nakSplit(String parentId)
     {
-Log.error("Got nak for split of " + parentId);
+        Log.error("Got nak for split of " + parentId);
     }
 
 
@@ -3670,14 +3653,9 @@ Log.error("Got nak for split of " + parentId);
         server.assignColor(color);
     }
 
-    public void askPickFirstMarker(Set markersAvailable)
+    public void askPickFirstMarker()
     {
-        this.markersAvailable.clear();
-        if (markersAvailable != null)
-        {
-            this.markersAvailable.addAll(markersAvailable);
-        }
-
+        Set markersAvailable = getPlayerInfo().getMarkersAvailable();
         if (getOption(Options.autoPickMarker))
         {
             String markerId = ai.pickMarker(markersAvailable, getShortColor());

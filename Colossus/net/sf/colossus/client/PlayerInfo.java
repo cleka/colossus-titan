@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.*;
 
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.parser.TerrainRecruitLoader;
@@ -26,12 +27,15 @@ public final class PlayerInfo
     private String color;
     private String playersElim;
     private int numLegions;
-    private int numMarkers;
     private int numCreatures;
     private int creatureValue;
     private int titanPower;
     private int score;
     private int mulligansLeft;
+
+    /** Sorted set of available legion markers for this player. */
+    private SortedSet markersAvailable = null;
+
 
     /** Two-stage initialization. */
     PlayerInfo(Client client)
@@ -46,40 +50,51 @@ public final class PlayerInfo
      */
     void update(String infoString)
     {
-        java.util.List data = Split.split(':', infoString);
+        java.util.List data = Split.split(":", infoString);
         String buf;
 
-        buf = (String)data.get(0);
+        buf = (String)data.remove(0);
         dead = Boolean.valueOf(buf).booleanValue();
 
-        name = ((String)data.get(1));
+        name = ((String)data.remove(0));
 
-        tower = ((String)data.get(2));
+        tower = ((String)data.remove(0));
 
-        color = (String)data.get(3);
+        color = (String)data.remove(0);
 
-        playersElim = (String)data.get(4);
+        playersElim = (String)data.remove(0);
 
-        buf = (String)data.get(5);
+        buf = (String)data.remove(0);
         numLegions = Integer.parseInt(buf);
 
-        buf = (String)data.get(6);
-        numMarkers = Integer.parseInt(buf);
-
-        buf = (String)data.get(7);
+        buf = (String)data.remove(0);
         numCreatures = Integer.parseInt(buf);
 
-        buf = (String)data.get(8);
+        buf = (String)data.remove(0);
         titanPower = Integer.parseInt(buf);
 
-        buf = (String)data.get(9);
+        buf = (String)data.remove(0);
         score = Integer.parseInt(buf);
 
-        buf = (String)data.get(10);
+        buf = (String)data.remove(0);
         creatureValue = Integer.parseInt(buf);
 
-        buf = (String)data.get(11);
+        buf = (String)data.remove(0);
         mulligansLeft = Integer.parseInt(buf);
+
+        if (!data.isEmpty())
+        {
+            if (markersAvailable == null)
+            {
+                markersAvailable = new TreeSet(new MarkerComparator(
+                    getShortColor()));
+            }
+            else
+            {
+                markersAvailable.clear();
+            }
+            markersAvailable.addAll(data);
+        }
     }
 
 
@@ -125,7 +140,14 @@ public final class PlayerInfo
 
     int getNumMarkers()
     {
-        return numMarkers;
+        if (markersAvailable == null)
+        {
+            return 0;
+        }
+        else
+        {
+            return markersAvailable.size();
+        }
     }
 
     int getNumCreatures()
@@ -200,5 +222,20 @@ public final class PlayerInfo
     public List getLegionIds()
     {
         return client.getLegionsByPlayer(name);
+    }
+
+    Set getMarkersAvailable()
+    {
+        return Collections.unmodifiableSortedSet(markersAvailable);
+    }
+
+    void addMarkerAvailable(String markerId)
+    {
+        markersAvailable.add(markerId);
+    }
+
+    void removeMarkerAvailable(String markerId)
+    {
+        markersAvailable.remove(markerId);
     }
 }

@@ -535,11 +535,10 @@ final class SocketServerThread extends Thread implements IClient
             turnNumber);
     }
 
-    public void setupSplit(Set markersAvailable, String activePlayerName,
-        int turnNumber)
+    public void setupSplit(String activePlayerName, int turnNumber)
     {
-        out.println(Constants.setupSplit + sep + Glob.glob(markersAvailable) + 
-            sep + activePlayerName + sep + turnNumber);
+        out.println(Constants.setupSplit + sep + activePlayerName + sep + 
+            turnNumber);
     }
 
     public void setupMove()
@@ -632,10 +631,9 @@ final class SocketServerThread extends Thread implements IClient
         out.println(Constants.askPickColor + sep + Glob.glob(colorsLeft));
     }
 
-    public void askPickFirstMarker(Set markersAvailable)
+    public void askPickFirstMarker()
     {
-        out.println(Constants.askPickFirstMarker + sep + 
-            Glob.glob(markersAvailable));
+        out.println(Constants.askPickFirstMarker);
     }
 
     public void log(String message)

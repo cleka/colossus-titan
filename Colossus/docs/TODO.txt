@@ -50,8 +50,6 @@ EASY Indicate which players have titan teleport in StatusScreen.
 
 EASY Disable "AIs stop when humans dead" if no human players at start of game.
 
-EASY Make inverting defending units optional.
-
 Synchronize repaints in StatusScreen so yellow moves all at once
 
 Finish EngagementResults:

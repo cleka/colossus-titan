@@ -518,8 +518,8 @@ public final class Server implements IServer
             IClient client = getClient(player.getName());
             if (client != null)
             {
-                client.setupSplit(player.getMarkersAvailable(),
-                    game.getActivePlayerName(), game.getTurnNumber());
+                client.setupSplit(game.getActivePlayerName(), 
+                    game.getTurnNumber());
             }
         }
         allUpdatePlayerInfo();
@@ -1677,7 +1677,7 @@ public final class Server implements IServer
         IClient client = getClient(playerName);
         if (client != null)
         {
-            client.askPickFirstMarker(player.getMarkersAvailable());
+            client.askPickFirstMarker();
         }
     }
 

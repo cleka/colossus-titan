@@ -82,17 +82,14 @@ public class SimpleAI implements AI
         if (!(myMarkerIds.isEmpty()))
         {
             Collections.shuffle(myMarkerIds, random);
-            
             return (String)(myMarkerIds.get(0));
         }
         
         if (!(otherMarkerIds.isEmpty()))
         {
             Collections.shuffle(otherMarkerIds, random);
-            
             return (String)(otherMarkerIds.get(0));
         }
-        
         return null;
     }
 
@@ -116,7 +113,6 @@ public class SimpleAI implements AI
             {
                 //Log.debug("Calling chooseRecruit() in muster().");
                 Creature recruit = chooseRecruit(legion, legion.getHexLabel());
-
                 if (recruit != null)
                 {
                     List recruiters = client.findEligibleRecruiters(
@@ -160,10 +156,8 @@ public class SimpleAI implements AI
     Creature chooseRecruit(LegionInfo legion, String hexLabel)
     {
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-
         List recruits = client.findEligibleRecruits(legion.getMarkerId(), 
             hexLabel);
-
         if (recruits.size() == 0)
         {
             return null;
@@ -202,7 +196,7 @@ public class SimpleAI implements AI
 
     public void split()
     {
-        PlayerInfo player = client.getPlayerInfo(client.getPlayerName());
+        PlayerInfo player = client.getPlayerInfo();
 
         Iterator it = player.getLegionIds().iterator();
         while (it.hasNext())
@@ -215,7 +209,6 @@ public class SimpleAI implements AI
     private void splitOneLegion(PlayerInfo player, String markerId)
     {
         LegionInfo legion = client.getLegionInfo(markerId);
-
         if (legion.getHeight() < 7)
         {
             return;
@@ -235,7 +228,6 @@ public class SimpleAI implements AI
         {
             int forcedToAttack = 0;
             boolean goodRecruit = false;
-
             for (int roll = 1; roll <= 6; roll++)
             {
                 Set moves = client.getMovement().listAllMoves(legion, 
@@ -315,9 +307,8 @@ public class SimpleAI implements AI
             }
         }
 
-        String newMarkerId = pickMarker(client.getMarkersAvailable(),
+        String newMarkerId = pickMarker(player.getMarkersAvailable(),
             player.getShortColor());
-
         StringBuffer results = new StringBuffer();
         List creatures = chooseCreaturesToSplitOut(legion);
         Iterator it = creatures.iterator();
@@ -724,7 +715,7 @@ public class SimpleAI implements AI
     {
         boolean moved = false;
 
-        PlayerInfo player = client.getPlayerInfo(client.getPlayerName());
+        PlayerInfo player = client.getPlayerInfo();
 
         // consider mulligans
         if (handleMulligans(player))
@@ -1794,6 +1785,7 @@ public class SimpleAI implements AI
             //    " ( from hex " + hex.getLabel() + " to a " + terrain + ")");
             return (now > 0);
         }
+
         public int creatureAvailable(String name)
         {
             int count =
@@ -1801,6 +1793,7 @@ public class SimpleAI implements AI
             //Log.debug("ORACLE: count is " + count);
             return count;
         }
+
         public boolean otherFriendlyStackHasCreature(java.util.List allNames)
         {
             java.util.List all = client.getFriendlyLegions(
@@ -1832,12 +1825,14 @@ public class SimpleAI implements AI
             }
             return false;
         }
+
         public boolean hasCreature(String name)
         {
             int num = legion.numCreature(name);
             //Log.debug("ORACLE: num is " + num);
             return (num > 0);
         }
+
         public boolean canRecruit(String name)
         {
             boolean contains =
@@ -1845,21 +1840,22 @@ public class SimpleAI implements AI
             //Log.debug("ORACLE: contains is " + false);
             return contains;
         }
+
         public int stackHeight()
         {
             return legion.getHeight();
         }
+
         public String hexLabel()
         {
             return hex.getLabel();
         }
+
         public int biggestAttackerHeight()
         {
             if (enemyAttackMap == null)
             {
-                enemyAttackMap =
-                    buildEnemyAttackMap(
-                        client.getPlayerInfo(client.getPlayerName()));
+                enemyAttackMap = buildEnemyAttackMap(client.getPlayerInfo());
             }
             int worst = 0;
             for (int i = 1; i < 6; i++)
@@ -3514,7 +3510,7 @@ Log.debug("Called findBattleMoves()");
         {
             return creature.getHintedRecruitmentValue();
         }
-        PlayerInfo player = client.getPlayerInfo(legion.getPlayerName());
+        PlayerInfo player = legion.getPlayerInfo();
         int power = player.getTitanPower();
         int skill = creature.getSkill();
         return power * skill * VariantSupport.getHintedRecruitmentValueOffset(
@@ -3527,7 +3523,7 @@ Log.debug("Called findBattleMoves()");
         {
             return creature.getHintedRecruitmentValue(section);
         }
-        PlayerInfo player = client.getPlayerInfo(legion.getPlayerName());
+        PlayerInfo player = legion.getPlayerInfo();
         int power = player.getTitanPower();
         int skill = creature.getSkill();
         return power * skill * VariantSupport.getHintedRecruitmentValueOffset(

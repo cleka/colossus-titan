@@ -331,13 +331,9 @@ Log.debug("End of SocketClientThread while loop");
         }
         else if (method.equals(Constants.setupSplit))
         {
-            List maList = Split.split(Glob.sep, (String)args.remove(0));
-            Set markersAvailable = new HashSet();
-            markersAvailable.addAll(maList);
-
             String activePlayerName = (String)args.remove(0);
             int turnNumber = Integer.parseInt((String)args.remove(0));
-            client.setupSplit(markersAvailable, activePlayerName, turnNumber);
+            client.setupSplit(activePlayerName, turnNumber);
         }
         else if (method.equals(Constants.setupMove))
         {
@@ -442,10 +438,7 @@ Log.debug("End of SocketClientThread while loop");
         }
         else if (method.equals(Constants.askPickFirstMarker))
         {
-            List maList = Split.split(Glob.sep, (String)args.remove(0));
-            Set markersAvailable = new HashSet();
-            markersAvailable.addAll(maList);
-            client.askPickFirstMarker(markersAvailable);
+            client.askPickFirstMarker();
         }
         else if (method.equals(Constants.log))
         {

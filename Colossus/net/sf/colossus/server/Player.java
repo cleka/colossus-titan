@@ -6,6 +6,7 @@ import java.io.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.util.Glob;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
@@ -792,44 +793,32 @@ public final class Player implements Comparable
 
 
 
-    // XXX Prohibit colons in player names.
-    /** Return a colon:separated string with a bunch of info for
+    /** Return a colon-separated string with a bunch of info for
      *  the status screen. */
     String getStatusInfo(boolean treatDeadAsAlive)
     {
-        StringBuffer buf = new StringBuffer();
+        List li = new ArrayList();
         if (treatDeadAsAlive)
         {
-            buf.append(false);
+            li.add("" + false);
         }
         else
         {
-            buf.append(isDead());
+            li.add("" + isDead());
         }
-        buf.append(':');
-        buf.append(name);
-        buf.append(':');
-        buf.append(getTower());
-        buf.append(':');
-        buf.append(getColor());
-        buf.append(':');
-        buf.append(getPlayersElim());
-        buf.append(':');
-        buf.append(getNumLegions());
-        buf.append(':');
-        buf.append(getNumMarkersAvailable());
-        buf.append(':');
-        buf.append(getNumCreatures());
-        buf.append(':');
-        buf.append(getTitanPower());
-        buf.append(':');
-        buf.append(getScore());
-        buf.append(':');
-        buf.append(getTotalPointValue());
-        buf.append(':');
-        buf.append(getMulligansLeft());
+        li.add(name);
+        li.add(getTower());
+        li.add(getColor());
+        li.add(getPlayersElim());
+        li.add("" + getNumLegions());
+        li.add("" + getNumCreatures());
+        li.add("" + getTitanPower());
+        li.add("" + getScore());
+        li.add("" + getTotalPointValue());
+        li.add("" + getMulligansLeft());
+        li.add(Glob.glob(":", getMarkersAvailable()));
 
-        return buf.toString();
+        return Glob.glob(":", li);
     }
 
     /** Return the total value of all of this player's creatures. */

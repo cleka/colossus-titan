@@ -327,7 +327,7 @@ public final class Game
         }
         Log.event(player.getName() + " chooses color " + color);
         player.initMarkersAvailable();
-
+        server.allUpdatePlayerInfo();
         server.askPickFirstMarker(playerName);
     }
 

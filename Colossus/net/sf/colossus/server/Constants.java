@@ -233,7 +233,7 @@ public final class Constants
     // Protocol packet type constants
     /** XXX If any of the args in the protocol contain this string, then
      *  the protocol will break. */
-    public static final String protocolTermSeparator=" ~ ";
+    public static final String protocolTermSeparator = " ~ ";
 
     // From client to server
     public static final String signOn = "signOn";

@@ -96,8 +96,7 @@ public interface IClient
 
     public void setupTurnState(String activePlayerName, int turnNumber);
 
-    public void setupSplit(Set markersAvailable, String activePlayerName,
-        int turnNumber);
+    public void setupSplit(String activePlayerName, int turnNumber);
 
     public void setupMove();
 
@@ -135,7 +134,7 @@ public interface IClient
 
     public void askPickColor(java.util.List colorsLeft);
 
-    public void askPickFirstMarker(Set markersAvailable);
+    public void askPickFirstMarker();
 
     public void log(String message);
 
