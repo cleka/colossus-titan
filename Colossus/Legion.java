@@ -17,6 +17,7 @@ class Legion
     Creature [] creatures = new Creature[8];  // 8 before initial splits
     int currentHex;
     int startingHex;
+    boolean moved = false;
 
     Legion(int cx, int cy, int scale, String markerId, String splitFrom,
         Container container, int height, int currentHex, 
@@ -76,5 +77,22 @@ class Legion
             }
         }
         return count;
+    }
+
+
+    void moveToHex(MasterHex hex)
+    {
+        currentHex = hex.label;
+        chit.setLocationAbs(hex.getOffCenter());
+        moved = true;
+    }
+
+
+    void undoMove()
+    {
+        currentHex = startingHex;
+        MasterHex hex = MasterBoard.getHexFromLabel(startingHex);
+        chit.setLocationAbs(hex.getOffCenter());
+        moved = false;
     }
 }
