@@ -25,7 +25,7 @@ import java.util.*;
 
 import javax.swing.*;
 
-import net.sf.colossus.parser.StrategicMapLoader;
+import net.sf.colossus.xmlparser.StrategicMapLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
@@ -126,8 +126,6 @@ public final class MasterBoard extends JPanel
 
     private boolean playerLabelDone;
 
-    private static StrategicMapLoader sml = null;
-
     private JMenu lfMenu;
 
     private static interface MasterHexVisitor
@@ -191,14 +189,13 @@ public final class MasterBoard extends JPanel
      *  since readMapData() needs it. */
     public synchronized static void staticMasterboardInit()
     {
-        // variant can changes those
+        // variant can change these
         horizSize = 0;
         vertSize = 0;
         boardParity = 0;
         plainHexArray = null;
         show = null;
         towerSet = null;
-        sml = null;
 
         try
         {
@@ -207,15 +204,11 @@ public final class MasterBoard extends JPanel
         catch (Exception e)
         {
             Log.error("Reading map data for non-GUI failed : " + e);
+            e.printStackTrace();
             System.exit(1);
         }
 
-        Log.debug("Setting up static arrays in MasterBoard");
-
-        setupPlainHexes();
-
         Log.debug("Setting up static TowerSet in MasterBoard");
-
         setupTowerSet();
     }
 
@@ -805,7 +798,7 @@ public final class MasterBoard extends JPanel
         return null;
     }
 
-    private static void readMapData()
+    private static synchronized void readMapData()
         throws Exception
     {
         List directories = VariantSupport.getVarDirectoriesList();
@@ -815,36 +808,11 @@ public final class MasterBoard extends JPanel
         {
             throw new FileNotFoundException(VariantSupport.getMapName());
         }
-        sml = new StrategicMapLoader(mapIS);
-        int[] size = sml.getHexArraySize();
-        horizSize = size[0];
-        vertSize = size[1];
-        show = new boolean[horizSize][vertSize];
-    }
-
-    /** Add terrain types, id labels, label sides, and exits to hexes.
-     *  Side effects on passed list. */
-    private static synchronized void setupPlainHexes()
-    {
-        plainHexArray = new MasterHex[horizSize][vertSize];
-        for (int i = 0; i < show.length; i++)
-        {
-            for (int j = 0; j < show[i].length; j++)
-            {
-                show[i][j] = false;
-            }
-        }
-        try
-        {
-            while (sml.oneCase(plainHexArray, show) >= 0)
-            {
-            }
-        }
-        catch (Exception e)
-        {
-            Log.error("Strategic map loading failed : " + e);
-            System.exit(1);
-        }
+        StrategicMapLoader sml = new StrategicMapLoader(mapIS);
+        horizSize = sml.getHorizSize();
+        vertSize = sml.getVertSize();
+        show = sml.getShow();
+        plainHexArray = sml.getHexes();
 
         computeBoardParity();
         setupExits(plainHexArray);

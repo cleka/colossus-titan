@@ -47,7 +47,7 @@ def handle_line(line):
         if len(atoms) == 2:
             width = atoms[0]
             height = atoms[1]
-            print '<board width="%s" height="%s" >'
+            print '<board width="%s" height="%s" >' % (width, height)
         else:
             hex = Hex(atoms)
             print hex

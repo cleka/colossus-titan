@@ -1,4 +1,4 @@
 TER:BadlandsTer.xml
-MAP:Badlands.map
+MAP:BadlandsMap.xml
 CRE:DefaultCre.xml
 HINT:Badlands.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin

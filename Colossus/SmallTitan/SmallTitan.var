@@ -1,4 +1,4 @@
-MAP:SmallTitan.map
+MAP:SmallTitanMap.xml
 CRE:DefaultCre.xml
 TER:DefaultTer.xml
 MAXPLAYERS:3

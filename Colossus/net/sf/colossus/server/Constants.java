@@ -75,6 +75,16 @@ public final class Constants
     public static final int ARROWS_ONLY = -2;
     public static final int NOWHERE = -1;
 
+    public static final HashMap hexsideMap = new HashMap();
+    static
+    {
+        hexsideMap.put("NONE", new Integer(NONE));
+        hexsideMap.put("BLOCK", new Integer(BLOCK));
+        hexsideMap.put("ARCH", new Integer(ARCH));
+        hexsideMap.put("ARROW", new Integer(ARROW));
+        hexsideMap.put("ARROWS", new Integer(ARROWS));
+    }
+
     // MasterBoard size
     public static final int MIN_HORIZ_SIZE = 15;
     public static final int MIN_VERT_SIZE = 8;
@@ -98,7 +108,7 @@ public final class Constants
         KeyEvent.VK_A, KeyEvent.VK_P, KeyEvent.VK_S};
 
     public static final String noShortName = "XX";
-    private static final java.util.HashMap shortNamesMap = new HashMap();
+    private static final HashMap shortNamesMap = new HashMap();
 
     public static final int MIN_AI_DELAY = 0;      //in ms
     public static final int MAX_AI_DELAY = 3000;
@@ -126,7 +136,7 @@ public final class Constants
     public static final String defaultCREFile = "DefaultCre.xml";
 
     /** Default MAP file */
-    public static final String defaultMAPFile = "Default.map";
+    public static final String defaultMAPFile = "DefaultMap.xml";
 
     /** Default TER file */
     public static final String defaultTERFile = "DefaultTer.xml";

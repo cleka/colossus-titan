@@ -1,4 +1,4 @@
-MAP:Unified.map
+MAP:UnifiedMap.xml
 CRE:UnifiedCre.xml
 TER:UnifiedTer.xml
 HINT:Default.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin
