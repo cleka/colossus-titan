@@ -424,9 +424,9 @@ class Node implements Comparable
 
         if (count > getHeight())
         {
-            throw new PredictSplitsException(
-                "Certainty error in revealCreatures -- count is " + 
+            Log.error("Certainty error in revealCreatures -- count is " +
                 count + " height is " + getHeight());
+            return;
         }
 
         // Mark passed creatures as certain and then communicate this to

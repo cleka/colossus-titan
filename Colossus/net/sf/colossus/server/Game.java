@@ -891,10 +891,10 @@ public final class Game
         else
         {
             fn = new String(filename);
+            Log.event("Saving game to " + filename);
         }
 
         FileWriter fileWriter;
-
         try
         {
             fileWriter = new FileWriter(fn);

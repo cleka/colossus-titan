@@ -1887,6 +1887,7 @@ Log.debug(playerName + " Client.initBoard()");
         }
         battleChits.clear();
         battlePhase = -1;
+        battleTurnNumber = -1;
         battleActivePlayerName = null;
     }
 
@@ -2096,6 +2097,17 @@ Log.error("Got nak for recruit with " + markerId);
         }
     }
 
+    private void defaultCursor()
+    {
+        board.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    private void waitCursor()
+    {
+        board.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    }
+
+
     // XXX Update markersAvailable more often.
     public synchronized void setupSplit(Set markersAvailable, 
         String activePlayerName, int turnNumber)
@@ -2125,13 +2137,11 @@ Log.error("Got nak for recruit with " + markerId);
             if (isMyTurn())
             {
                 focusBoard();
-                board.setCursor(Cursor.getPredefinedCursor(
-                    Cursor.DEFAULT_CURSOR));
+                defaultCursor();
             }
             else
             {
-                board.setCursor(Cursor.getPredefinedCursor(
-                    Cursor.WAIT_CURSOR));
+                waitCursor();
             }
         }
         updateStatusScreen();
@@ -2205,13 +2215,11 @@ Log.error("Got nak for recruit with " + markerId);
             {
                 focusMap();
                 map.setupSummonMenu();
-                map.setCursor(Cursor.getPredefinedCursor(
-                    Cursor.DEFAULT_CURSOR));
+                defaultCursor();
             }
             else
             {
-                map.setCursor(Cursor.getPredefinedCursor(
-                    Cursor.WAIT_CURSOR));
+                waitCursor();
             }
         }
         updateStatusScreen();
@@ -2317,13 +2325,11 @@ Log.error("Got nak for recruit with " + markerId);
             if (isMyBattlePhase())
             {
                 focusMap();
-                map.setCursor(Cursor.getPredefinedCursor(
-                    Cursor.DEFAULT_CURSOR));
+                defaultCursor();
             }
             else
             {
-                map.setCursor(Cursor.getPredefinedCursor(
-                    Cursor.WAIT_CURSOR));
+                waitCursor();
             }
             map.setupFightMenu();
         }
