@@ -3,6 +3,7 @@ package net.sf.colossus.client;
 import java.util.*;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
 
 
@@ -96,6 +97,11 @@ public final class Movement
                     findEntrySide(hex, cameFrom)));
                 return set;
             }
+        }
+        else if (roll < 0)
+        {
+            Log.error("Movement.findNormalMoves() roll < 0");
+            return null;
         }
 
         if (block >= 0)

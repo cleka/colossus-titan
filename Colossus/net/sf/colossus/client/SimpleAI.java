@@ -22,7 +22,7 @@ import net.sf.colossus.server.Dice;
 public class SimpleAI implements AI
 {
     private Client client;
-    private int timeLimit;   // in s
+    private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
     private boolean timeIsUp;
 
 
@@ -563,6 +563,7 @@ public class SimpleAI implements AI
         final Creature nonsplitCreature = oddTower ? startCre[0]
                 : startCre[2];
 
+// XXX Hardcoded to default board.
         // don't split gargoyles in tower 3 or 6 (because of the extra jungles)
         if ("300".equals(label) || "600".equals(label))
         {
@@ -2484,6 +2485,10 @@ Log.debug("Called findBattleMoves()");
         Timer timer = new Timer();
         timeIsUp = false;
         final int MS_PER_S = 1000;
+        if (timeLimit <= 0)
+        {
+            timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;
+        }
         timer.schedule(new TriggerTimeIsUp(), MS_PER_S * timeLimit);
     }
 
@@ -2924,7 +2929,7 @@ Log.debug("Pruning a duplicate legion move");
             }
         }
 
-        // Encourage defending critters to hang back, and
+        // Encourage defending critters to hang back.
         else if (legion.getMarkerId().equals(client.getDefenderMarkerId()))
         {
             if (HexMap.terrainIsTower(terrain))
