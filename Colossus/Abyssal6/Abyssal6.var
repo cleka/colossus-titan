@@ -1,5 +1,5 @@
 MAP:Abyssal6.map
 CRE:Abyssal6.cre
 TER:Abyssal6.ter
-HINT:Abyssal6.hin
+HINT:Abyssal6.hin,Abyssal6TowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin
 DEPEND:ExtTitan

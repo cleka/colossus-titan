@@ -354,33 +354,46 @@ public final class VariantSupport
     {
         aihl = null;
         if (getHintName().endsWith(".hin"))
-        { // first if it's a .hin, use the AIHintLoader
+        { // first if it's a .hin, use the AIHintLoader on one or more .hin files.
             try
             {
-                java.util.List directories = 
-                    getVarDirectoriesList();
-                InputStream aihlIS = ResourceLoader.getInputStream(getHintName(),
-                                                                   directories);
-                if (aihlIS == null) 
+                java.util.List directories = getVarDirectoriesList();
+                java.util.List allHintsFiles = net.sf.colossus.util.Split.split(",", getHintName());
+                java.util.Iterator it = allHintsFiles.iterator();
+                while (it.hasNext())
                 {
-                    throw new FileNotFoundException(getHintName());
-                }
-                aihl = new AIHintLoader(aihlIS);
-                boolean done = false;
-                int totalHints = 0;
-                while (!done)
-                {
-                    int result = ((AIHintLoader)aihl).oneHint();
-                    if (result < 0)
+                    String currHintsFileName = (String)it.next();
+                    InputStream aihlIS = ResourceLoader.getInputStream(
+                                             currHintsFileName,
+                                             directories);
+                    if (aihlIS == null) 
                     {
-                        done = true;
+                        throw new FileNotFoundException(currHintsFileName);
+                    }
+                    if (aihl == null)
+                    {
+                        aihl = new AIHintLoader(aihlIS);
                     }
                     else
                     {
-                        totalHints += result;
+                        ((AIHintLoader)aihl).ReInit(aihlIS);
                     }
+                    boolean done = false;
+                    int totalHints = 0;
+                    while (!done)
+                    {
+                        int result = ((AIHintLoader)aihl).oneHint();
+                        if (result < 0)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            totalHints += result;
+                        }
+                    }
+                    Log.debug("Found " + totalHints + " hints in " + currHintsFileName);
                 }
-                Log.debug("Found " + totalHints + " hints in " + getHintName());
             }
             catch (Exception e) 
             {
