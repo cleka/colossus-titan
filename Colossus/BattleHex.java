@@ -2,22 +2,14 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * Class Hex describes one Battlemap hex.
+ * Class BattleHex describes one Battlemap hex.
  * @version $Id$
  * @author David Ripton
  */
 
-class Hex
+class BattleHex extends Hex
 {
-    public static final double SQRT3 = Math.sqrt(3.0);
-    public static final double RAD_TO_DEG = 180 / Math.PI;
-
-    private boolean selected;
-    private int[] xVertex = new int[6];
-    private int[] yVertex = new int[6];
-    private Polygon p;
-    private Rectangle rectBound;
-    private double l;
+    private double len;
 
     private BattleMap map;
 
@@ -28,29 +20,28 @@ class Hex
     // Valid elevations are 0, 1, and 2.
     private int elevation = 0;
 
+    // Terrain types are:
     // p, r, s, t, o, v, d
     // plain, bramble, sand, tree, bog, volcano, drift
-    private char terrain = 'p';
 
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
     // The hexside is marked only in the higher hex.
     private char [] hexsides = new char[6];
 
-    private Hex [] neighbors = new Hex[6];
+    private BattleHex [] neighbors = new BattleHex[6];
 
     private int xCoord;
     private int yCoord;
 
 
-    Hex(int cx, int cy, int scale, BattleMap map, int xCoord, int yCoord)
+    BattleHex(int cx, int cy, int scale, BattleMap map, int xCoord, int yCoord)
     {
         this.map = map;
         this.xCoord = xCoord;
         this.yCoord = yCoord;
-        l = scale / 3.0;
-
-        selected = false;
+        this.scale = scale;
+        len = scale / 3.0;
 
         xVertex[0] = cx;
         yVertex[0] = cy;
@@ -65,7 +56,7 @@ class Hex
         xVertex[5] = cx - 1 * scale;
         yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
 
-        p = new Polygon(xVertex, yVertex, 6);
+        hexagon = new Polygon(xVertex, yVertex, 6);
         // Add 1 to width and height because Java rectangles come up
         // one pixel short.
         rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] -
@@ -75,12 +66,15 @@ class Hex
         {
             hexsides[i] = ' ';
         }
+
+        setTerrain('p');
     }
 
 
     void rescale(int cx, int cy, int scale)
     {
-        l = scale / 3.0;
+        this.scale = scale;
+        len = scale / 3.0;
 
         xVertex[0] = cx;
         yVertex[0] = cy;
@@ -96,8 +90,8 @@ class Hex
         yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
 
         // The hit testing breaks if we just reassign the vertices
-        // of the old polygon.
-        p = new Polygon(xVertex, yVertex, 6);
+        // of the old hexagon.
+        hexagon = new Polygon(xVertex, yVertex, 6);
 
         // Add 1 to width and height because Java rectangles come up
         // one pixel short.
@@ -110,7 +104,7 @@ class Hex
 
     public void paint(Graphics g)
     {
-        if (selected)
+        if (isSelected())
         {
             g.setColor(java.awt.Color.white);
         }
@@ -119,9 +113,9 @@ class Hex
             g.setColor(getTerrainColor());
         }
 
-        g.fillPolygon(p);
+        g.fillPolygon(hexagon);
         g.setColor(java.awt.Color.black);
-        g.drawPolygon(p);
+        g.drawPolygon(hexagon);
 
         FontMetrics fontMetrics = g.getFontMetrics();
         String name = getTerrainName();
@@ -202,14 +196,14 @@ class Hex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                    x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                    x[0] = (int) Math.round(x0 - len * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + len * Math.cos(theta));
+                    x[1] = (int) Math.round((x0 + x1) / 2 + len * 
                         Math.sin(theta));
-                    y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                    y[1] = (int) Math.round((y0 + y1) / 2 - len * 
                         Math.cos(theta));
-                    x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+                    x[2] = (int) Math.round(x1 - len * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 + len * Math.cos(theta));
                     
                     g.setColor(java.awt.Color.white);
                     g.fillPolygon(x, y, 3);
@@ -226,22 +220,22 @@ class Hex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                    x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                    y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                    x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                    x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                    y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+                    x[0] = (int) Math.round(x0 - len * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + len * Math.cos(theta));
+                    x[1] = (int) Math.round(x0 + len * Math.sin(theta));
+                    y[1] = (int) Math.round(y0 - len * Math.cos(theta));
+                    x[2] = (int) Math.round(x1 + len * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 - len * Math.cos(theta));
+                    x[3] = (int) Math.round(x1 - len * Math.sin(theta));
+                    y[3] = (int) Math.round(y1 + len * Math.cos(theta));
 
                     x2 = (int) Math.round((x0 + x1) / 2);
                     y2 = (int) Math.round((y0 + y1) / 2);
                     Rectangle rect = new Rectangle();
-                    rect.x = x2 - (int) Math.round(l);
-                    rect.y = y2 - (int) Math.round(l);
-                    rect.width = (int) (2 * Math.round(l));
-                    rect.height = (int) (2 * Math.round(l));
+                    rect.x = x2 - (int) Math.round(len);
+                    rect.y = y2 - (int) Math.round(len);
+                    rect.width = (int) (2 * Math.round(len));
+                    rect.height = (int) (2 * Math.round(len));
 
                     g.setColor(java.awt.Color.white);
                     // Draw a bit more than a semicircle, to clean edge.
@@ -264,14 +258,14 @@ class Hex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - l / 3 * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + l / 3 * Math.cos(theta));
-                    x[1] = (int) Math.round(x0 + l / 3 * Math.sin(theta));
-                    y[1] = (int) Math.round(y0 - l / 3 * Math.cos(theta));
-                    x[2] = (int) Math.round(x1 + l / 3 * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 - l / 3 * Math.cos(theta));
-                    x[3] = (int) Math.round(x1 - l / 3 * Math.sin(theta));
-                    y[3] = (int) Math.round(y1 + l / 3 * Math.cos(theta));
+                    x[0] = (int) Math.round(x0 - len / 3 * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + len / 3 * Math.cos(theta));
+                    x[1] = (int) Math.round(x0 + len / 3 * Math.sin(theta));
+                    y[1] = (int) Math.round(y0 - len / 3 * Math.cos(theta));
+                    x[2] = (int) Math.round(x1 + len / 3 * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 - len / 3 * Math.cos(theta));
+                    x[3] = (int) Math.round(x1 - len / 3 * Math.sin(theta));
+                    y[3] = (int) Math.round(y1 + len / 3 * Math.cos(theta));
                     
                     g.setColor(java.awt.Color.black);
                     g.drawLine(x[0], y[0], x[1], y[1]);
@@ -287,14 +281,14 @@ class Hex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                    x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                    y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                    x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                    x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                    y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+                    x[0] = (int) Math.round(x0 - len * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + len * Math.cos(theta));
+                    x[1] = (int) Math.round(x0 + len * Math.sin(theta));
+                    y[1] = (int) Math.round(y0 - len * Math.cos(theta));
+                    x[2] = (int) Math.round(x1 + len * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 - len * Math.cos(theta));
+                    x[3] = (int) Math.round(x1 - len * Math.sin(theta));
+                    y[3] = (int) Math.round(y1 + len * Math.cos(theta));
                     
                     g.setColor(java.awt.Color.white);
                     g.fillPolygon(x, y, 4);
@@ -303,56 +297,6 @@ class Hex
                 }
                 break;
         }
-    }
-
-
-    boolean select(Point point)
-    {
-        if (p.contains(point))
-        {
-            selected = !selected;
-            return true;
-        }
-        return false;
-    }
-
-    void select()
-    {
-        selected = true;
-    }
-
-    void unselect()
-    {
-        selected = false;
-    }
-
-    boolean isSelected()
-    {
-        return selected;
-    }
-
-    boolean isSelected(Point point)
-    {
-        return (p.contains(point) && selected == true);
-    }
-
-
-    Point getCenter()
-    {
-        return new Point((xVertex[0] + xVertex[3]) / 2,
-            (yVertex[0] + yVertex[3]) / 2);
-    }
-
-
-    public Rectangle getBounds()
-    {
-        return rectBound;
-    }
-
-
-    public boolean contains(Point point)
-    {
-        return (p.contains(point));
     }
 
 
@@ -460,19 +404,9 @@ class Hex
     }
 
 
-    void setTerrain(char terrain)
-    {
-        this.terrain = terrain;
-    }
-
-    char getTerrain()
-    {
-        return terrain;
-    }
-
     String getTerrainName()
     {
-        switch (terrain)
+        switch (getTerrain())
         {
             case 'p':
                 switch (elevation)
@@ -504,7 +438,7 @@ class Hex
 
     Color getTerrainColor()
     {
-        switch (terrain)
+        switch (getTerrain())
         {
             case 'p':  // plain
                 switch (elevation)
@@ -556,7 +490,7 @@ class Hex
     {
         char hexside = ' ';
 
-        Hex neighbor = getNeighbor(i);
+        BattleHex neighbor = getNeighbor(i);
         if (neighbor != null)
         {
             hexside = neighbor.getHexside((i + 3) % 6);
@@ -577,7 +511,7 @@ class Hex
     }
 
 
-    void setNeighbor(int i, Hex hex)
+    void setNeighbor(int i, BattleHex hex)
     {
         if (i >= 0 && i < 6)
         {
@@ -589,7 +523,7 @@ class Hex
         }
     }
 
-    Hex getNeighbor(int i)
+    BattleHex getNeighbor(int i)
     {
         if (i < 0 || i > 6)
         {
@@ -620,6 +554,8 @@ class Hex
     // possible number of movement points.
     int getEntryCost(Creature creature, int cameFrom)
     {
+        char terrain = getTerrain();
+
         // Check to see if the hex is occupied or totally impassable.
         if (isOccupied() || terrain == 't' || (terrain == 'v' && creature !=
             Creature.dragon) || (terrain == 'o' && !creature.isNativeBog()))
