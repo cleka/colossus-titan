@@ -73,7 +73,8 @@ public class BattleMap extends JFrame implements MouseListener,
     {
         super(attacker.getMarkerId() + " (" + attacker.getPlayer().getName() +
             ") attacks " + defender.getMarkerId() + " (" +
-            defender.getPlayer().getName() + ")");
+            defender.getPlayer().getName() + ")" + " in " + 
+            masterHex.getTerrainName().toLowerCase());
 
         this.attacker = attacker;
         this.defender = defender;
@@ -534,6 +535,9 @@ public class BattleMap extends JFrame implements MouseListener,
                 }
             }
         }
+        // XXX- Make sure the repaints happen.
+        repaint();
+        Thread.yield();
 
         return count;
     }
