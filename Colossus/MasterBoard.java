@@ -78,7 +78,8 @@ class MasterBoard extends Frame implements MouseListener,
         }
         catch (NullPointerException e)
         {
-            System.out.println("Couldn't find " + Creature.colossus.getImageName());
+            System.out.println("Couldn't find " +
+                Creature.colossus.getImageName());
             System.exit(1);
         }
 
@@ -1234,8 +1235,9 @@ class MasterBoard extends Frame implements MouseListener,
 
     public void deiconify()
     {
-        // XXX - Need to find a way to call this only under 1.2+.
-        // setState(Frame.NORMAL);
+        // This works under 1.1, unlike setState(Frame.NORMAL) 
+        removeNotify();
+        addNotify();
     }
 
 
