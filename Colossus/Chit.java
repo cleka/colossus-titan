@@ -8,7 +8,7 @@ import java.io.*;
  * @author David Ripton
  */
 
-class Chit
+class Chit extends Canvas
 {
     private Image image;
     private boolean selected = false;
@@ -31,7 +31,18 @@ class Chit
     Chit(int cx, int cy, int scale, String imageFilename,
         Container container)
     {
+        // If cx or cy is set to -1, that means that the Chit
+        // should allow the layout manager to place it.
+        if (cx == -1 || cy == -1)
+        {
+            Point point = getLocation();
+            cx = point.x;
+            cy = point.y;
+        }
+
         rect = new Rectangle(cx, cy, scale, scale);
+        setBounds(rect);
+
         this.container = container;
 
         // The image-loading syntax that works correctly for applications
@@ -49,11 +60,13 @@ class Chit
                 int length = in.available();
                 thanksToNetscape = new byte[length];
                 in.read(thanksToNetscape);
-                image = Toolkit.getDefaultToolkit().createImage(thanksToNetscape);
+                image = Toolkit.getDefaultToolkit().createImage(
+                    thanksToNetscape);
             }
             catch (Exception e)
             {
-                System.out.println("couldn't load image " + imageFilename + "\n" + e);
+                System.out.println("Couldn't load image " + imageFilename + 
+                    "\n" + e);
             }
         }
         else
@@ -76,6 +89,7 @@ class Chit
         dy = 0;
         rect.width = scale;
         rect.height = scale;
+        setBounds(rect);
     }
 
 
@@ -102,11 +116,12 @@ class Chit
                 rect.y + rect.height);
         }
     }
-
-
-    void repaint()
+    
+    
+    public void repaint()
     {
         container.repaint(rect.x, rect.y, rect.width, rect.height);
+        super.repaint();
     }
 
 
@@ -126,17 +141,10 @@ class Chit
     }
 
 
-    void setLocation(Point point)
-    {
-        point.x -= dx;
-        point.y -= dy;
-        rect.setLocation(point);
-    }
-
-
     void setLocationAbs(Point point)
     {
         rect.setLocation(point);
+        setBounds(rect);
     }
 
 
@@ -146,15 +154,15 @@ class Chit
     }
 
 
-    public Point center()
+    public Dimension getPreferredSize()
     {
-        return new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
+        return new Dimension(rect.width, rect.height);
     }
-
-
-    public Point topLeft()
+    
+    
+    public Dimension getMinimumSize()
     {
-        return new Point(rect.x, rect.y);
+        return getPreferredSize();
     }
 
 
