@@ -703,23 +703,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
-    // XXX delete add logic to client
-    public int [] getCritterTags(String hexLabel)
-    {
-        Battle battle = game.getBattle();
-        List critters = battle.getCritters(hexLabel);
-        int [] tags = new int[critters.size()];
-        int i = 0;
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            tags[i++] = critter.getTag();
-        }
-        return tags;
-    }
-
-
     /** Return a set of hexLabels. */
     public Set findMobileCritters()
     {
@@ -746,24 +729,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
     {
         Battle battle = game.getBattle();
         return battle.findCrittersWithTargets();
-    }
-
-
-    /** Return the player name for the critter tag.  Only works in battle. */
-    public String getPlayerNameByTag(int tag)
-    {
-        Battle battle = game.getBattle();
-        Legion legion = battle.getActiveLegion();
-        if (legion.getCritterByTag(tag) != null)
-        {
-            return legion.getPlayerName();
-        }
-        legion = battle.getInactiveLegion();
-        if (legion.getCritterByTag(tag) != null)
-        {
-            return legion.getPlayerName();
-        }
-        return "";
     }
 
 
@@ -1245,13 +1210,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
             legion.getPlayer().getMovementRoll(), false);
     }
 
-    /** Return a list of creature name strings. */
-    public List listTeleportingLords(String markerId, String hexLabel)
-    {
-        Legion legion = game.getLegionByMarkerId(markerId);
-        return legion.listTeleportingLords(hexLabel);
-    }
-
 
     /** Return an int which is all possible entry sides (1, 3, 5)
      *  added together. */
@@ -1259,12 +1217,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
         boolean teleport)
     {
         return game.getPossibleEntrySides(markerId, hexLabel, teleport);
-    }
-
-
-    public Set findAllUnmovedLegionHexes()
-    {
-        return game.findAllUnmovedLegionHexes();
     }
 
 

@@ -770,6 +770,23 @@ public final class Client
         return battleChits;
     }
 
+    java.util.List getBattleChits(String hexLabel)
+    {
+        java.util.List chits = new ArrayList();
+
+        Iterator it = getBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (hexLabel.equals(chit.getHexLabel()))
+            {
+                chits.add(chit);
+            }
+        }
+        return chits;
+    }
+
+
     /** Get the BattleChit with this tag. */
     BattleChit getBattleChit(int tag)
     {
@@ -1563,6 +1580,16 @@ Log.debug("called Client.acquireAngelCallback()");
         this.turnNumber = turnNumber;
     }
 
+    private void resetAllMoves()
+    {
+        Iterator it = legionInfo.values().iterator();
+        while (it.hasNext())
+        {
+            LegionInfo info = (LegionInfo)it.next();
+            info.setMoved(false);
+        }
+    }
+
     // TODO Update markersAvailable more often.
     public void setupSplit(Set markersAvailable, String activePlayerName,
         int turnNumber)
@@ -1576,6 +1603,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
         numSplitsThisTurn = 0;
 
+        resetAllMoves();
 
         if (board != null)
         {
@@ -1828,12 +1856,6 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
     // TODO cache
-    int [] getCritterTags(String hexLabel)
-    {
-        return server.getCritterTags(hexLabel);
-    }
-
-    // TODO cache
     /** Return a set of hexLabels. */
     Set findMobileCritters()
     {
@@ -1858,10 +1880,21 @@ Log.debug("called Client.acquireAngelCallback()");
         return server.findCrittersWithTargets();
     }
 
-    // TODO Cache this
     String getPlayerNameByTag(int tag)
     {
-        return server.getPlayerNameByTag(tag);
+        BattleChit chit = getBattleChit(tag);
+        if (chit == null)
+        {
+            return "???";
+        }
+        if (chit.isInverted())
+        {
+            return getPlayerNameByMarkerId(defenderMarkerId);
+        }
+        else
+        {
+            return getPlayerNameByMarkerId(attackerMarkerId);
+        }
     }
 
     boolean isMyCritter(int tag)
@@ -1888,7 +1921,7 @@ Log.debug("called Client.acquireAngelCallback()");
     // TODO cache, after getting list of lords
     private String figureTeleportingLord(String hexLabel)
     {
-        java.util.List lords = server.listTeleportingLords(moverId, hexLabel);
+        java.util.List lords = listTeleportingLords(moverId, hexLabel);
         switch (lords.size()) 
         {
             case 0:
@@ -1899,6 +1932,51 @@ Log.debug("called Client.acquireAngelCallback()");
                 return PickLord.pickLord(board.getFrame(), lords);
         }
     }
+
+    /** List the lords eligible to teleport this legion to hexLabel,
+     *  as strings. */
+    private java.util.List listTeleportingLords(String moverId, 
+        String hexLabel)
+    {
+        // Needs to be a List not a Set so that it can be passed as
+        // an imageList.
+        java.util.List lords = new ArrayList();
+
+        LegionInfo info = getLegionInfo(moverId);
+
+        // Titan teleport
+        java.util.List legions = getLegionsByHex(hexLabel);
+        if (!legions.isEmpty())
+        {
+            LegionInfo other = getLegionInfo((String)legions.get(0));
+            if (other != null && !playerName.equals(other.getPlayerName()) &&
+                info.hasTitan())
+            {
+                lords.add("Titan");
+            }
+        }
+
+        // Tower teleport
+        else
+        {
+            Iterator it = info.getContents().iterator();
+            while (it.hasNext())
+            {
+                String name = (String)it.next();
+                Creature creature = Creature.getCreatureByName(name);
+                if (creature != null && creature.isLord())
+                {
+                    if (!lords.contains(name))
+                    {
+                        lords.add(name);
+                    }
+                }
+            }
+        }
+
+        return lords;
+    }
+
 
     void doMove(String hexLabel)
     {
@@ -2084,10 +2162,21 @@ Log.debug("found " + set.size() + " hexes");
         return markerIds;
     }
 
-    // TODO store moved status in LegionInfo
-    Set findAllUnmovedLegionHexes()
+    Set findUnmovedLegionHexes()
     {
-        return server.findAllUnmovedLegionHexes();
+        Set set = new HashSet();
+
+        Iterator it = legionInfo.values().iterator();
+        while (it.hasNext())
+        {
+            LegionInfo info = (LegionInfo)it.next();
+            if (!info.hasMoved() && playerName.equals(info.getPlayerName())) 
+            {
+                set.add(info.getHexLabel());
+            }
+        }
+        return set;
+
     }
 
     /** Return a set of hexLabels for the active player's legions with

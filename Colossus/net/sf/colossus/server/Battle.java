@@ -2084,21 +2084,6 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         return null;
     }
 
-    List getCritters(String hexLabel)
-    {
-        List critters = new ArrayList();
-        Iterator it = getAllCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (hexLabel.equals(critter.getCurrentHexLabel()))
-            {
-                critters.add(critter);
-            }
-        }
-        return critters;
-    }
-
     Critter getCritter(int tag)
     {
         Iterator it = getAllCritters().iterator();

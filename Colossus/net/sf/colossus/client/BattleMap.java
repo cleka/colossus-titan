@@ -431,40 +431,32 @@ public final class BattleMap extends HexMap implements MouseListener,
     void alignChits(String hexLabel)
     {
         GUIBattleHex hex = getGUIHexByLabel(hexLabel);
-        int [] tags = client.getCritterTags(hexLabel);
-        int numCritters = tags.length;
-        if (numCritters < 1)
+        java.util.List chits = client.getBattleChits(hexLabel);
+        int numChits = chits.size();
+        if (numChits < 1)
         {
             hex.repaint();
             return;
         }
-        BattleChit chit = client.getBattleChit(tags[0]);
-        if (chit == null)
-        {
-            hex.repaint();
-            return;
-        }
+        BattleChit chit = (BattleChit)chits.get(0);
         int chitscale = chit.getBounds().width;
         int chitscale4 = chitscale / 4;
 
         Point point = new Point(hex.findCenter());
 
         // Cascade chits diagonally.
-        int offset = ((chitscale * (1 + numCritters))) / 4;
+        int offset = ((chitscale * (1 + numChits))) / 4;
         point.x -= offset;
         point.y -= offset;
 
         chit.setLocation(point);
 
-        for (int i = 1; i < numCritters; i++)
+        for (int i = 1; i < numChits; i++)
         {
             point.x += chitscale4;
             point.y += chitscale4;
-            chit = client.getBattleChit(tags[i]);
-            if (chit != null)
-            {
-                chit.setLocation(point);
-            }
+            chit = (BattleChit)chits.get(i);
+            chit.setLocation(point);
         }
         hex.repaint();
     }

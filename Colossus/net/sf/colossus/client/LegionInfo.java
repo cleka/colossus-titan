@@ -331,7 +331,7 @@ Log.debug("LegionInfo.isEngaged() says there are " + numInHex);
         this.moved = moved;
     }
 
-    boolean moved()
+    boolean hasMoved()
     {
         return moved;
     }

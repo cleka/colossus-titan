@@ -1461,7 +1461,7 @@ public final class MasterBoard extends JPanel
     void highlightUnmovedLegions()
     {
         unselectAllHexes();
-        selectHexesByLabels(client.findAllUnmovedLegionHexes());
+        selectHexesByLabels(client.findUnmovedLegionHexes());
         repaint();
     }
 

@@ -3158,38 +3158,6 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
     }
 
 
-    Set findAllUnmovedLegionHexes()
-    {
-        Player player = getActivePlayer();
-        Set set = new HashSet();
-
-        for (int i = 0; i < player.getNumLegions(); i++)
-        {
-            Legion legion = player.getLegion(i);
-            if (!legion.hasMoved()) 
-            {
-                set.add(legion.getCurrentHexLabel());
-            }
-        }
-        return set;
-    }
-
-    Set findTallLegionHexes()
-    {
-        Player player = getActivePlayer();
-        Set set = new HashSet();
-
-        for (int i = 0; i < player.getNumLegions(); i++)
-        {
-            Legion legion = player.getLegion(i);
-            if (legion.getHeight() >= 7)
-            {
-                set.add(legion.getCurrentHexLabel());
-            }
-        }
-        return set;
-    }
-
     // XXX Need to eliminate calls to the methods below that
     // cross the future network interface.
 
@@ -3205,7 +3173,7 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
         return trl.getStartingCreatures(t);
     }
 
-   public static char[] getTerrains()
+    public static char[] getTerrains()
     {
         return trl.getTerrains();
     }

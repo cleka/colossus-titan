@@ -254,4 +254,9 @@ class Chit extends JPanel
     {
         this.border = border;
     }
+
+    boolean isInverted()
+    {
+        return inverted;
+    }
 }
