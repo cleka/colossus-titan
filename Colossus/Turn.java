@@ -33,33 +33,44 @@ class Turn extends Dialog implements ActionListener
     void setupSplitDialog()
     {
         Player player = game.getActivePlayer();
-        setTitle(player.getName() + " Turn " + game.getTurnNumber());
-        removeAll();
-        setLayout(new GridLayout(0, 3));
 
-        add(new Label(game.getActivePlayer().getName() + " : Split stacks"));
-        Button button1 = new Button("Undo All Splits");
-        add(button1);
-        button1.addActionListener(this);
-        Button button2 = new Button("Done with Splits");
-        add(button2);
-        button2.addActionListener(this);
-
-        pack();
-
-        // Place this window in the upper right corner.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width, 0));
-
-        // Highlight hexes with 7 high legions.
-        for (int i = 0; i < player.getNumLegions(); i++)
+        // If there are no markers available, skip forward to movement.
+        if (player.getNumMarkersAvailable() == 0)
         {
-            Legion legion = player.legions[i];
-            if (legion.getHeight() >= 7)
+            game.advancePhase();
+            setupMoveDialog();
+        }
+        else
+        {
+            setTitle(player.getName() + " Turn " + game.getTurnNumber());
+            removeAll();
+            setLayout(new GridLayout(0, 3));
+
+            add(new Label(game.getActivePlayer().getName() + 
+                " : Split stacks"));
+            Button button1 = new Button("Undo All Splits");
+            add(button1);
+            button1.addActionListener(this);
+            Button button2 = new Button("Done with Splits");
+            add(button2);
+            button2.addActionListener(this);
+
+            pack();
+
+            // Place this window in the upper right corner.
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            setLocation(new Point(d.width - getSize().width, 0));
+
+            // Highlight hexes with 7 high legions.
+            for (int i = 0; i < player.getNumLegions(); i++)
             {
-                MasterHex hex = legion.getCurrentHex();
-                hex.select();
-                hex.repaint();
+                Legion legion = player.legions[i];
+                if (legion.getHeight() >= 7)
+                {
+                    MasterHex hex = legion.getCurrentHex();
+                    hex.select();
+                    hex.repaint();
+                }
             }
         }
     }
