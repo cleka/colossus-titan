@@ -875,6 +875,7 @@ final class Battle
                 critter.setDead(true);
             }
         }
+        removeDeadCreatures();
     }
 
 
@@ -892,10 +893,7 @@ final class Battle
 
     void doneWithMoves()
     {
-        if (anyOffboardCreatures())
-        {
-            removeOffboardCreatures();
-        }
+        removeOffboardCreatures();
         commitMoves();
         advancePhase();
     }

@@ -13,6 +13,7 @@ import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.parser.StrategicMapLoader;
+import images.ResourceAnchor;
 
 
 /**
@@ -91,6 +92,8 @@ public final class MasterBoard extends JPanel
     public static final String viewBattleMap = "View Battle Map";
     public static final String changeScale = "Change Scale";
 
+    public static final String about = "About";
+
     private static String mapName = GetPlayers.getMapName();
 
     private AbstractAction newGameAction;
@@ -110,6 +113,8 @@ public final class MasterBoard extends JPanel
     private AbstractAction viewRecruitInfoAction;
     private AbstractAction viewBattleMapAction;
     private AbstractAction changeScaleAction;
+
+    private AbstractAction aboutAction;
 
 
     static
@@ -457,6 +462,28 @@ public final class MasterBoard extends JPanel
                 }
             }
         };
+
+        aboutAction = new AbstractAction(about)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                byte [] bytes = new byte[8];  // length of an ISO date
+                String version = "unknown";
+                try
+                {
+                    ClassLoader cl = ResourceAnchor.class.getClassLoader();
+                    InputStream is = cl.getResourceAsStream("version");
+                    is.read(bytes);
+                    version = new String(bytes, 0, bytes.length); 
+                }
+                catch (Exception ex)
+                {
+                    Log.debug("Problem reading version file " + ex);
+                }
+
+                client.showMessageDialog("Colossus build: " + version);
+            }
+        };
     }
 
 
@@ -512,9 +539,6 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_Q);
 
         fileMenu.addSeparator();
-        // XXX We need one save options action for each options menu,
-        // as well as a global one that saves them all.
-        // Ditto for load options.
         mi = fileMenu.add(saveOptionsAction);
         mi.setMnemonic(KeyEvent.VK_O);
 
@@ -566,6 +590,13 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
+
+        // Then help menu
+        JMenu helpMenu = new JMenu("Help");
+        playerMenu.setMnemonic(KeyEvent.VK_H);
+        menuBar.add(helpMenu);
+
+        mi = helpMenu.add(aboutAction);
     }
 
 

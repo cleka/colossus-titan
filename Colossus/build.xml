@@ -50,8 +50,7 @@
                  CreatureLoader,
                  StrategicMapLoader,
                  TerrainRecruitLoader,
-                 VariantLoader,
-                 fix"
+                 VariantLoader"
         description = "Create .java files from .jj files with javacc">
 </target>
 
@@ -93,7 +92,7 @@
 </target> 
 
 
-<target name="compile" depends="init,parsers,fix"
+<target name="compile" depends="init,parsers"
         description = "Compile .java files to .class files">
         <javac deprecation="yes" target="1.2" srcdir="."
                 includes="**/*.java"
@@ -101,7 +100,7 @@
 </target>
 
 
-<target name="javadoc" depends="fix,compile"
+<target name="javadoc" depends="compile"
         description = "Make javadoc files">
         <javadoc sourcepath="." destdir="./javadoc"
                  packagenames="net.sf.colossus.*"
@@ -109,6 +108,7 @@
 </target>
 
 
+<!-- TODO If the jar is newer than all its contents, don't build. -->
 <target name="jar" depends="compile,version"
         description = "Make jar file">
         <jar jarfile = "Colossus.jar" basedir="."
@@ -127,7 +127,7 @@
 </target>
 
 
-<!-- XXX Grab jarsigner password from ant.properties file instead? -->
+<!-- TODO If jar is already signed, don't resign. -->
 <target name="sign" depends="jar"
         description = "Sign jar file">
         <signjar jar="Colossus.jar"
@@ -152,7 +152,6 @@
 </target>
 
 
-<!-- XXX Is this working? -->
 <target name="inst" depends="init,sign,dist"
         description = "Copy files into htdocs tree on SF"> 
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
@@ -163,7 +162,7 @@
 
 
 <!-- Be very careful modifying this.  It whacks whole directories easily. -->
-<!-- XXX Files like .#Colossus.jar.1.203 are not being deleted. -->
+<!-- XXX Files like .#Colossus.jar.1.203 are not being deleted.  Ant bug? -->
 <target name="clean"
         description = "Delete derived files"> 
         <delete verbose="yes" includeemptydirs="yes"> 

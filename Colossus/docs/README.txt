@@ -1,4 +1,4 @@
-Colossus alpha     December 6, 2001    Copyright 2001 David Ripton
+Colossus alpha     December 19, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
@@ -13,34 +13,35 @@ so that others can do the same.  If you fix any bugs or add any features,
 please send me a copy so that I can fold them into the master code.
 
 
-Running the game requires the following:
+Running the game requires: 
 
-1. A 1.2 (aka "Java 2") or later version of a JRE (Java runtime environment) 
-   or JDK (Java development kit).
+A 1.2 (aka "Java 2") or later version of a JRE (Java runtime environment) 
+or JDK (Java development kit).  
 
-   (Colossus will not run under JRE 1.0.x or 1.1.x  Colossus does not
-   currently run as an applet in a web browser.  The obsolete 
-   Microsoft JVM that's bundled with IE won't work.  Sorry.)
+(Colossus will not run under JRE 1.0.x or 1.1.x  It won't currently run 
+as an applet in a web browser.  The obsolete Microsoft JVM that's bundled
+with IE and Windows won't work.  Sorry.)
 
-   Win32, Solaris, and x86 Linux versions of the JRE and JDK are
-   freely downloadable from http://java.sun.com.  
+Win32, Solaris, and x86 Linux versions of the JRE and JDK are freely 
+downloadable from http://java.sun.com.
 
-   Another Linux port is available from http://www.blackdown.org.  
+Another Linux port is available from http://www.blackdown.org.  
 
-   The Mac version is at http://devworld.apple.com/java/
+The Mac version is at http://devworld.apple.com/java/
 
-   Info on other ports (AIX, OS/2, etc.) is at 
-   http://java.sun.com/cgi-bin/java-ports.cgi
+Info on other ports (AIX, OS/2, etc.) is at 
+http://java.sun.com/cgi-bin/java-ports.cgi
 
-   The current recommended version is Sun JRE 1.3.1.
+The current recommended version is Sun JRE 1.3.1.
 
-   If in doubt, you probably want:
-   http://java.sun.com/j2se/1.3/jre/download-windows.html
+If in doubt, you probably want:
+http://java.sun.com/j2se/1.3/jre/download-windows.html
 
-2. The minimum computer spec is about a 133 MHz CPU, 64 MB RAM, 
-   mouse, 800x600 256-color display.  You'll get better results 
-   with about a 300 MHz CPU and 1024x768 display.
-
+You also need a computer with a mouse and a color display.  I'm not 
+sure exactly what the minimum system spec is anymore.  A Pentium
+133 with 64MB is slow but works.  If you try the game on something 
+slower or with less memory, please let me know your system specs
+and how well it worked.
 
 
 
@@ -202,8 +203,7 @@ If you find any bugs that you think we can fix, please let us know, in
 as much detail as possible.  (In particular, include the OS and JVM 
 version.)  The best way to report bugs is via the bug tracker at 
 SourceForge -- go to http://colossus.sf.net, click on the SourceForge 
-icon, click on Tracker, and click on Bugs.  (If that's too hard you can 
-just send email.)
+icon, and click on Bugs.  (If that's too hard you can just send email.)
 
 We've tried to get the rules right, though a few areas (concession timing,
 in particular) are still off.  Bruno Wolff's Titan Errata and Clarifications
@@ -250,6 +250,14 @@ A.  Probably about April 2002.  No guarantees -- real life sometimes
     little bit different, and where any fourth-grader can change the
     die-rolling function to get 6s in combat whenever he wants, are no fun.
 
+Q.  Why is the AI so dumb?
+
+A1. It's not.  You're just incredibly smart.
+
+A2. Nobody's doing much with the AI right now.  I'll start working
+    on it again after the network game is finished.  Feel free to
+    improve it in the meantime.
+
 Q.  What's the difference between SimpleAI and MinimaxAI and RandomAI?
 
 A1. SimpleAI is faster and smarter.  MinimaxAI is slower and dumber.
@@ -274,27 +282,26 @@ A.  The maps and recruit trees and stuff used to be hardcoded.  Romain
     include some variant data files in the package at some point.  Note that
     the AI has not been fully tested with variant maps.
 
-Q.  Why not use XML for all of those data files?
+Q.  How can I help?
 
-A.  Because an XML parser is about as big as the rest of Colossus put
-    together, and I don't want to double the download size for all the 
-    people still using slow modems, and I don't want to require people 
-    to download and install an XML parser separately because that's one 
-    more technical hurdle that most people don't want to deal with 
-    just to play a silly game.
+A.  Bug reports are great.  Detailed bug reports delivered via the 
+    SourceForge bug tracker are even better.  
     
-    JDK 1.4 includes an XML parser, so maybe eventually.  (Not anytime
-    soon -- 1.4 is still beta and there is no Mac version yet.)
-
+    If you want to contribute code, make sure that you're starting 
+    from the latest source (pull from CVS)  Please read and follow 
+    CodingStandards.txt so your code is easier to merge.  Join and
+    send mail to the dev mailing list at SF so we know what you're
+    up to.  Beyond that, just code whatever you want and send 
+    patches when it works.
 
 
 Credits:
 
 Programming:  David Ripton  dripton@wizard.net
               Bruce Sherrod (AI)  bruce@thematrix.com
+	      Romain Dolbeau (variant support)
               Tom Fruchterman (caretaker display)
               David Barr (applet conversion)
-	      Romain Dolbeau (variant support)
 
 Counter art:  Jerry Reiger, David Lum, Tchula Ripton
 

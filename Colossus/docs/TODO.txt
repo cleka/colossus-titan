@@ -1,5 +1,4 @@
-Make all possible public classes and methods package private.  Reduce 
-   cross-platform imports.  Document remaining public classes, which 
+Reduce cross-platform imports.  Document remaining public classes, which 
    are those that need to be included in the network protocol.
 
 Add test .jnlp files that points to a jar in the local filesystem,
@@ -15,8 +14,6 @@ Remember window positions in .cfg file.
 Show just-recruited enemy critters on top of their stacks.
 
 Add a window that shows the recruiting tree.
-
-Version stamping, showing up in an About menu.
 
 Allow dragging chits in addition to clicking source and destination.
 
