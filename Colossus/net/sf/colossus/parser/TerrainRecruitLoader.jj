@@ -720,13 +720,7 @@ TOKEN :
 TOKEN :
 {
     < BOOL: "true"|"false" >
-}
-
-TOKEN:
-{
-    < TERRAINLIST : (<TERCAR><COMMA>)*<TERCAR> >
-|   < #TERCAR : ["a"-"z","A"-"Z"] >
-|   < #COMMA : "," >
+|   < COMMA: "," >
 }
 
 TOKEN :
@@ -776,11 +770,14 @@ String r_chaine() :
 }
 
 String r_terrainList() :
-{}
 {
-    <TERRAINLIST>
+    String temp1;
+    String temp2 = null;
+}
+{
+    (temp1 = r_chaine()) (<COMMA> (temp2 = r_terrainList()))?
     {
-        return(new String(token.image));
+        return(temp1 + (temp2 == null ? "" : ("," + temp2)));
     }
 }
 
