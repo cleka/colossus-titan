@@ -1,3 +1,24 @@
+Bug: 20020405 Hang in AI split phase, playing Abyssal6 5 AIs on one machine,
+   one network player on another, both Win98.
+From client Gold: strike ~ 70 ~ C4
+Lion in D5 strikes Cyclops in Drift (1) hex C4 with strike number 3 : 23443: 4 hits
+Called ai.strike() for Gd01
+Best target is null, aborting
+From client Gold: doneWithStrikes
+Green earns 99.0 points
+Legion Gd01 (Caduceus) is eliminated
+From client Green: acquireAngel ~ Gr01 ~ Angel
+Legion Gr01 (Cauldron) acquires one Angel
+in kickEngagements() summoning=false reinforcing=false acquiring=false
+Called Game.findEngagements()
+0 engagements left
+Called Game.findEngagements()
+Phase advances to Muster
+Blue's turn, number 5
+Green earns 48.0 points
+Legion Gd02 (Claw) [Angel, Cyclops, Gargoyle, Gargoyle, Ogre, Cyclops] is eliminated
+From client Blue: doSplit ~ Bu02 ~ Bu01 ~ ,Gargoyle,Gargoyle
+
 Bug: Chat window went modal and started beeping.  Killing it from the
    Graphics menu worked.
 
