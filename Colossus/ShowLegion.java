@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class ShowLegion displays the chits of the Creatures in a Legion
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 class ShowLegion extends Dialog implements MouseListener, WindowListener

@@ -1,7 +1,7 @@
 /**
  * Class Player holds the data for one player in a Titan game.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 class Player

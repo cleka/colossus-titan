@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class SummonAngel allows a player to Summon an angel or archangel.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 

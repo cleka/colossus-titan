@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class Negotiate allows two players to settle an engagement.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 class Negotiate extends Dialog implements MouseListener, ActionListener

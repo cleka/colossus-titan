@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class PickMarker allows a player to pick a legion marker.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 

@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class AcquireAngel allows a player to acquire an angel or archangel.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 

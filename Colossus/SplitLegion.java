@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 class SplitLegion extends Dialog implements MouseListener, ActionListener,

@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 class Concede extends Dialog implements ActionListener

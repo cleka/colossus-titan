@@ -48,6 +48,7 @@ public class BattleMap extends Frame implements MouseListener,
     private BattleTurn turn;
     private MasterBoard board;
     private MasterHex masterHex;
+    private ShowDice showDice;
 
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
@@ -148,6 +149,7 @@ public class BattleMap extends Frame implements MouseListener,
         imagesLoaded = true;
 
         turn = new BattleTurn(this, this, attacker, defender);
+        showDice = new ShowDice(this);
 
         attacker.clearBattleTally();
         defender.clearBattleTally();
@@ -1456,6 +1458,12 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    public ShowDice getShowDice()
+    {
+        return showDice;
+    }
+
+
     private void setupHexes()
     {
         int cx = 6 * scale;
@@ -2104,11 +2112,11 @@ public class BattleMap extends Frame implements MouseListener,
         Player player1 = new Player("Attacker", null);
         Player player2 = new Player("Defender", null);
         Legion attacker = new Legion(chitScale, "Bk01", null, null, 7,
-            null, Creature.ogre, Creature.troll, Creature.ranger,
+            null, Creature.archangel, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
             Creature.warlock, null, player1);
         Legion defender = new Legion(chitScale, "Rd01", null, null, 7,
-            null, Creature.centaur, Creature.lion, Creature.gargoyle,
+            null, Creature.serpent, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian,
             Creature.minotaur, null, player2);
         MasterHex hex = new MasterHex(0, 0, 0, false, null);

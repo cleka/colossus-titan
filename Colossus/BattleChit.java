@@ -562,21 +562,16 @@ class BattleChit extends Chit
         // Roll the dice.
         int damage = 0;
 
-        System.out.print("Rolling " + dice + " dice needing " + strikeNumber
-            + " to hit:   ");
+        int [] rolls = new int[dice];
         for (int i = 0; i < dice; i++)
         {
-            int roll = (int) Math.ceil(6 * Math.random());
+            rolls[i] = (int) Math.ceil(6 * Math.random());
 
-            // XXX: Display the rolls somehow.
-            System.out.print(roll);
-
-            if (roll >= strikeNumber)
+            if (rolls[i] >= strikeNumber)
             {
                 damage++;
             }
         }
-        System.out.println("   : " + damage + " hits");
 
         int totalDamage = target.getHits();
         totalDamage += damage;
@@ -584,7 +579,10 @@ class BattleChit extends Chit
         int power = target.getPower();
         if (totalDamage > power)
         {
-            carryDamage = totalDamage - power;
+            if (carryPossible)
+            {
+                carryDamage = totalDamage - power;
+            }
             totalDamage = power;
         }
         target.setHits(totalDamage);
@@ -592,14 +590,23 @@ class BattleChit extends Chit
         target.repaint();
 
         // Let the attacker choose whether to carry, if applicable.
-        if (carryPossible && carryDamage > 0)
+        if (carryDamage > 0)
         {
-            System.out.println(carryDamage + " possible carries");
             map.highlightCarries(carryDamage);
         }
 
         // Record that this attacker has struck.
         struck = true;
+
+        // Display the rolls in the showDice dialog.
+        ShowDice showDice = map.getShowDice();
+        showDice.setAttacker(this);
+        showDice.setDefender(target);
+        showDice.setTargetNumber(strikeNumber);
+        showDice.setRolls(rolls);
+        showDice.setHits(damage);
+        showDice.setCarries(carryDamage);
+        showDice.setup();
     }
 
 

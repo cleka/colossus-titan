@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class BattleTurn gets and holds chronological and sequence data for a battle.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 class BattleTurn extends Dialog implements ActionListener, WindowListener

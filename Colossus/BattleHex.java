@@ -115,7 +115,7 @@ class BattleHex extends Hex
         g.drawPolygon(hexagon);
 
         FontMetrics fontMetrics = g.getFontMetrics();
-        String name = getTerrainName();
+        String name = getTerrainName().toUpperCase();
 
         g.drawString(name, rectBound.x + (rectBound.width -
             fontMetrics.stringWidth(name)) / 2,
@@ -412,24 +412,24 @@ class BattleHex extends Hex
                 switch (elevation)
                 {
                     case 0:
-                        return "PLAINS";
+                        return "Plains";
                     case 1:
-                        return "PLAINS (1)";
+                        return "Plains (1)";
                     case 2:
-                        return "PLAINS (2)";
+                        return "Plains (2)";
                 }
             case 'r':
-                return "BRAMBLE";
+                return "Bramble";
             case 's':
-                return "SAND";
+                return "Sand";
             case 't':
-                return "TREE";
+                return "Tree";
             case 'o':
-                return "BOG";
+                return "Bog";
             case 'v':
-                return "VOLCANO (2)";
+                return "Volcano (2)";
             case 'd':
-                return "DRIFT";
+                return "Drift";
             default:
                 return "?????";
         }

@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class MessageBox creates a message dialog with an OK button.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 class MessageBox extends Dialog implements ActionListener

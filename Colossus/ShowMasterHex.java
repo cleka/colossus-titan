@@ -4,7 +4,7 @@ import java.awt.event.*;
 /**
  * Class ShowMasterHex displays the terrain type and recruits for a MasterHex.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 class ShowMasterHex extends Dialog implements MouseListener, WindowListener
