@@ -31,7 +31,6 @@ public final class Options
     public static final String autoStop = "AIs stop when humans dead";
     public static final String autoQuit = "Auto quit when game over";
 
-
     // Rules options
     public static final String variant = "Variant";
 
@@ -39,19 +38,17 @@ public final class Options
     public static final String allStacksVisible = "All stacks visible";
     public static final String cumulativeSlow = "Slowing is cumulative";
     public static final String oneHexAllowed = "Always allows one hex";
-    public static final String nonRandomBattleDice = 
-        "Use non-random battle dice";
+    public static final String nonRandomBattleDice =
+            "Use non-random battle dice";
 
-    public static final String noFirstTurnT2TTeleport = 
-        "No tower-to-tower Teleport on first turn";
-    public static final String noFirstTurnTeleport = 
-        "No Teleport on first turn";
-    public static final String towerToTowerTeleportOnly = 
-        "Tower-to-Tower Teleport only";
+    public static final String noFirstTurnT2TTeleport =
+            "No tower-to-tower Teleport on first turn";
+    public static final String noFirstTurnTeleport =
+            "No Teleport on first turn";
+    public static final String towerToTowerTeleportOnly =
+            "Tower-to-Tower Teleport only";
     public static final String noTowerTeleport = "No Tower Teleport";
     public static final String noTitanTeleport = "No Titan Teleport";
-
-
 
     // Display options (client only)
     public static final String stealFocus = "Steal focus";
@@ -60,10 +57,10 @@ public final class Options
     public static final String showLogWindow = "Show log window";
     public static final String useOverlay = "Use Graphical Overlay";
     public static final String noBaseColor = "Use black overlay on Chits";
-    public static final String useColoredBorders = 
-        "Use colored borders on Battle Chits";
-    public static final String doNotInvertDefender = 
-        "Do not invert defender's Battle Chits";
+    public static final String useColoredBorders =
+            "Use colored borders on Battle Chits";
+    public static final String doNotInvertDefender =
+            "Do not invert defender's Battle Chits";
     public static final String showAllRecruitChits = "Show all recruit Chits";
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
@@ -104,29 +101,25 @@ public final class Options
     public static final String favoriteColors = "Favorite colors";
     public static final String favoriteLookFeel = "Favorite Look And Feel";
 
-
     private Properties props = new Properties();
     private String owner;      // playerName, or Constants.optionsServerName
-
 
     public Options(String owner)
     {
         this.owner = owner;
     }
 
-
     public String getOptionsFilename()
     {
-        return Constants.gameDataPath + Constants.optionsBase + owner + 
-            Constants.optionsExtension;
+        return Constants.gameDataPath + Constants.optionsBase + owner +
+                Constants.optionsExtension;
     }
-
 
     public void loadOptions()
     {
         // Don't load from temporary player names.
-        if (owner.startsWith(Constants.byColor) || 
-            owner.startsWith(Constants.byClient))
+        if (owner.startsWith(Constants.byColor) ||
+                owner.startsWith(Constants.byClient))
         {
             return;
         }
@@ -145,12 +138,11 @@ public final class Options
         }
     }
 
-    
     public void saveOptions()
     {
         // Don't save from temporary player names.
-        if (owner.startsWith(Constants.byColor) || 
-            owner.startsWith(Constants.byClient))
+        if (owner.startsWith(Constants.byColor) ||
+                owner.startsWith(Constants.byClient))
         {
             return;
         }
@@ -159,12 +151,12 @@ public final class Options
         File optionsDir = new File(Constants.gameDataPath);
         if (!optionsDir.exists() || !optionsDir.isDirectory())
         {
-             Log.event("Trying to make directory " + Constants.gameDataPath);
-             if (!optionsDir.mkdirs())
-             {
-                 Log.error("Could not create options directory");
-                 return;
-             }
+            Log.event("Trying to make directory " + Constants.gameDataPath);
+            if (!optionsDir.mkdirs())
+            {
+                Log.error("Could not create options directory");
+                return;
+            }
         }
 
         try
@@ -178,7 +170,6 @@ public final class Options
             Log.error("Couldn't write options to " + optionsFile);
         }
     }
-
 
     public void setOption(String optname, String value)
     {
@@ -194,7 +185,6 @@ public final class Options
     {
         setOption(optname, String.valueOf(value));
     }
-
 
     public String getStringOption(String optname)
     {
@@ -234,7 +224,6 @@ public final class Options
         return props.propertyNames();
     }
 
-
     /** Remove all playerName and playerType entries. */
     public void clearPlayerInfo()
     {
@@ -248,7 +237,6 @@ public final class Options
             }
         }
     }
-
 
     /** Wipe everything. */
     public void clear()
