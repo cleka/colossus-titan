@@ -1,11 +1,12 @@
 package net.sf.colossus.datatools;
 
+import net.sf.colossus.client.Hex;
+
 /**
  * Class BattlelandsBuilder
  * @version $Id$
  * @author Romain Dolbeau
  */
-
 public class BattlelandsBuilder
 {
     public static void main(String[] arg)
@@ -17,6 +18,8 @@ public class BattlelandsBuilder
             file = arg[0];
             System.out.println("Opening " + file);
         }
+
+        Hex.setOverlay(true);
 
         ShowBuilderHexMap bhm = new ShowBuilderHexMap(file);
     }

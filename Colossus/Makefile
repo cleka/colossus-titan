@@ -146,6 +146,8 @@ $(BBJAR): net/sf/colossus/parser/BattlelandLoader.java $(BBCLASS)
 	jar -cmf $(BBMANIFEST) $@ net/sf/colossus/datatools/*.class \
                                   net/sf/colossus/client/*.class \
                                   net/sf/colossus/parser/*.class \
-                                  net/sf/colossus/util/HTMLColor.class
+                                  net/sf/colossus/server/*.class \
+                                  net/sf/colossus/util/*.class \
+                                  images/*.gif
 	chmod +x $@
 

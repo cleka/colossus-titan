@@ -145,7 +145,7 @@ public abstract class Hex
         return useOverlay;
     }
 
-    static void setOverlay(boolean enabled)
+    public static void setOverlay(boolean enabled)
     {
         useOverlay = enabled;
     }
