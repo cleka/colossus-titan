@@ -60,7 +60,7 @@ of a succession of line of two different kind.
 
 # The first kind is:
 
-<terrain_letter> <terrain_color> <terrain_name> <regular_recruit> (<recruiter_needed> <recruit>)+
+<terrain_letter> <terrain_color> <terrain_name> <regular_recruit> (<recruiter_needed> <recruit>)+ <terrain_display_name>?
 
 <terrain_letter> is the letter internaly used to identify the terrain.
  they must all be different.
@@ -68,7 +68,9 @@ of a succession of line of two different kind.
 <terrain_color> is the color used to display this terrain type,
  see HTMLColor.java for the various available color.
 
-<terrain_name> is the descriptive name of the terrain (Brush, ...)
+<terrain_name> is the descriptive name of the terrain (Brush, ...) ;
+ it is used also as the Battlelands file name. If <terrain_display_name>
+ is not present, it is also used as the display name.
 
 <regular_recruit>> is a boolean (i.e. true or false) telling if
 a Creature can recruit below or above its rank (usually true
@@ -78,6 +80,11 @@ except for Tower).
  to recruit the next creature.
 
 <recruit> is the name of the recruit creature (Gargoyle, ...)
+
+<terrain_display_name> is an optional string, used to display
+ the name of the terrain on the MasterBoard, and as the name
+ of the overlay file (see "Images files" below). If absent,
+ <terrain_name> is used instead.
 
 The last two as a pair can be repeated any number of time.
 Any later creature can recruit a previous one or itself.
@@ -241,7 +248,9 @@ corner).
 Two version of the file should be supplied, one with and one without
 the '_i' postfix to the name (i.e 'MyTerrain.gif' and 'MyTerrain_i.gif').
 The first is used when the biggest part of the hexagon is down,
-the second when the biggest part is up.
+the second when the biggest part is up. The Display Name (see
+above, "TER file format") is used if present, and Name is used
+if not.
 
 # Graphical overlay for the Hexes on the Battlelands (aka
 Hazard) should be transparent GIF file, of size 216x188

@@ -64,6 +64,11 @@ public class MasterHex extends Hex
         return (Game.getTerrainName(getTerrain()));
     }
 
+    public String getTerrainDisplayName()
+    {
+        return (Game.getTerrainDisplayName(getTerrain()));
+    }
+
     public static String getTerrainName(char t)
     {
         return (Game.getTerrainName(t));

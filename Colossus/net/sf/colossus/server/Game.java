@@ -1807,8 +1807,9 @@ public final class Game
                 String hexLabel = (String)it.next();
                 if (MasterBoard.getHexByLabel(hexLabel) != null)
                 {
-                    if (!isOccupied(hexLabel) || (ignoreFriends && 
+                    if ((!isOccupied(hexLabel) || (ignoreFriends && 
                         getNumEnemyLegions(hexLabel, player) == 0))
+                        && (!(hexLabel.equals(hex.getLabel()))))
                     {
                         set.add(hexLabel);
                     }
@@ -2920,6 +2921,11 @@ reinforcing + " acquiring=" + acquiring);
     public static String getTerrainName(char t)
     {
         return trl.getTerrainName(t);
+    }
+
+    public static String getTerrainDisplayName(char t)
+    {
+        return trl.getTerrainDisplayName(t);
     }
 
     public static Color getTerrainColor(char t)

@@ -23,19 +23,19 @@ W olive       Woods     true  1 Centaur  3 Warbear  2 Unicorn
 
 
 # Alternate (Badlands) Battlelands
-b green       BrushAlt  true  1 Gargoyle 2 Cyclops  2 Gorgon
+b green       BrushAlt  true  1 Gargoyle 2 Cyclops  2 Gorgon Brush
 
-d orange      DesertAlt true  1 Lion     3 Griffon  2 Hydra
+d orange      DesertAlt true  1 Lion     3 Griffon  2 Hydra Desert
 
-j darkGreen   JungleAlt true  1 Gargoyle 2 Cyclops  3 Behemoth 2 Serpent
+j darkGreen   JungleAlt true  1 Gargoyle 2 Cyclops  3 Behemoth 2 Serpent Jungle
 
-N sienna      MarshAlt  true  1 Ogre     2 Troll    2 Ranger
+N sienna      MarshAlt  true  1 Ogre     2 Troll    2 Ranger Marsh
 
-s blue        SwampAlt  true  1 Troll    3 Wyvern   2 Hydra
+s blue        SwampAlt  true  1 Troll    3 Wyvern   2 Hydra Swamp
 
-U skyBlue     TundraAlt true  1 Troll    2 Warbear  2 Giant    2 Colossus
+U skyBlue     TundraAlt true  1 Troll    2 Warbear  2 Giant    2 Colossus Tundra
 
-w olive       WoodsAlt  true  1 Centaur  3 Warbear  2 Unicorn
+w olive       WoodsAlt  true  1 Centaur  3 Warbear  2 Unicorn Woods
 
 # New (Badlands) Battlelands, same as Plains
 

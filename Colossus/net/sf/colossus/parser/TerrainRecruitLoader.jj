@@ -31,6 +31,10 @@ public class TerrainRecruitLoader
      */
     Hashtable carToName = new Hashtable();
     /**
+     * Map a character (representing a terrain) to a terrain display name.
+     */
+    Hashtable carToDisplayName = new Hashtable();
+    /**
      * Map a character (representing a terrain) to a terrain color.
      */
     Hashtable carToColor = new Hashtable();
@@ -119,6 +123,15 @@ public class TerrainRecruitLoader
     public String getTerrainName(char tc)
     {
         return((String)carToName.get(new Character(tc)));
+    }
+    /**
+     * Give the display name of the terrain.
+     * @param tc Character representing a terrain.
+     * @return The display name of the terrain as a String.
+     */
+    public String getTerrainDisplayName(char tc)
+    {
+        return((String)carToDisplayName.get(new Character(tc)));
     }
     /**
      * Give the color of the terrain.
@@ -585,7 +598,7 @@ List r_acquirableDataList() :
  */
 int oneTerrain() :
 {
-    String t;
+    String t, dt = null;
     String col;
     char tc;
     ArrayList rl;
@@ -595,10 +608,11 @@ int oneTerrain() :
 }
 {
     (tc = r_char()) (col = r_chaine()) (t = r_chaine())
-        (rb = r_bool()) (rl = r_allRecruit())
+        (rb = r_bool()) (rl = r_allRecruit()) (dt = r_chaine())?
     {
         carToRecruits.put(new Character(tc), rl);
         carToName.put(new Character (tc), t);
+        carToDisplayName.put(new Character (tc), dt == null ? t : dt);
         carToColor.put(new Character (tc), HTMLColor.stringToColor(col));
         carToBelow.put(new Character (tc), new Boolean (rb));
         if (terrains == null)

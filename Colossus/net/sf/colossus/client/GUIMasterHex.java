@@ -28,7 +28,7 @@ public final class GUIMasterHex extends MasterHex
     private int halfFontHeight;
     private Point offCenter;
     private MasterBoard board;
-    /** Terrain name in upper case. */
+    /** Terrain display name in upper case. */
     private String name;
     private GeneralPath innerHexagon;
     private Color selectColor = Color.white;
@@ -217,7 +217,7 @@ public final class GUIMasterHex extends MasterHex
         fontMetrics = g2.getFontMetrics();
         halfFontHeight = (fontMetrics.getMaxAscent() +
             fontMetrics.getLeading()) / 2;
-        name = getTerrainName().toUpperCase();
+        name = getTerrainDisplayName().toUpperCase();
     }
 
     private void restoreFont(Graphics2D g2)
@@ -286,7 +286,7 @@ public final class GUIMasterHex extends MasterHex
             fontMetrics = g2.getFontMetrics();
             halfFontHeight = (fontMetrics.getMaxAscent() +
                               fontMetrics.getLeading()) / 2;
-            name = getTerrainName().toUpperCase();
+            name = getTerrainDisplayName().toUpperCase();
         }
 
         // Long names like "MOUNTAINS" need to be printed in the wide part of
@@ -490,7 +490,7 @@ public final class GUIMasterHex extends MasterHex
         if (overlay == null)
         {
             java.util.List directories = VariantSupport.getImagesDirectoriesList();
-            overlay = ResourceLoader.getImage(getTerrainName() +
+            overlay = ResourceLoader.getImage(getTerrainDisplayName() +
                                            (!inverted ? invertedPostfix : ""),
                                            directories);
             
