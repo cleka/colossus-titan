@@ -128,6 +128,33 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         }
     }
 
+    private void doFillSlope(BattleHex[][] h)
+    {
+        for (int i = 0; i < h.length ; i++)
+        {
+            for (int j = 0; j < h[i].length ; j++)
+            {
+                if (h[i][j] != null)
+                {
+                    for (int k = 0; k < 6; k++)
+                    {
+                        if ((h[i][j].getHexside(k) == ' ') &&
+                            (h[i][j].getOppositeHexside(k) == ' '))
+                        {
+                            BattleHex n = h[i][j].getNeighbor(k);
+                            if (n != null)
+                            {
+                                if (h[i][j].getElevation() >
+                                    n.getElevation())
+                                    h[i][j].setHexside(k, 's');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     class TerrainAction extends AbstractAction
     {
         char c;
@@ -179,6 +206,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private AbstractAction quitAction;
     private AbstractAction eraseAction;
     private AbstractAction randomizeAction;
+    private AbstractAction fillWithSlopeAction;
     private AbstractAction loadFileAction;
 
     JMenuBar menuBar;
@@ -225,6 +253,14 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 }
             };
 
+        fillWithSlopeAction = new AbstractAction("Fill Edge With Slope") {
+                public void actionPerformed(ActionEvent e) {
+                    doFillSlope(getBattleHexArray());
+                    repaint();
+                }
+            };
+
+
         loadFileAction = new AbstractAction("Load Map (from file)") {
                 public void actionPerformed(ActionEvent e) {
                     doLoadFile(getBattleHexArray());
@@ -239,6 +275,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         mi = fileMenu.add(showBattlelandAction);
         mi = fileMenu.add(eraseAction);
         mi = fileMenu.add(randomizeAction);
+        mi = fileMenu.add(fillWithSlopeAction);
         mi = fileMenu.add(quitAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 
