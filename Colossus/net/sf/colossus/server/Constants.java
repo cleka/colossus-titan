@@ -71,7 +71,7 @@ public final class Constants
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
 
     public static final int MIN_DELAY = 0;      //in ms
-    public static final int MAX_DELAY = 5000;
+    public static final int MAX_DELAY = 3000;
     public static final int DEFAULT_DELAY = 300;
 
     // Entry sides

@@ -365,9 +365,16 @@ public final class GetPlayers extends KDialog implements WindowListener,
         }
         else if (e.getActionCommand().equals(Options.aiDelay))
         {
-            final int oldDelay = options.getIntOption(Options.aiDelay);
+            int oldDelay = options.getIntOption(Options.aiDelay);
+            if (oldDelay < Constants.MIN_DELAY || 
+                oldDelay > Constants.MAX_DELAY)
+            {
+                oldDelay = Constants.DEFAULT_DELAY;
+            }
+
             final int newDelay = PickIntValue.pickIntValue(parentFrame,
-                oldDelay, "Pick AI Delay", 0, 3000);
+                oldDelay, "Pick AI Delay", Constants.MIN_DELAY, 
+                Constants.MAX_DELAY);
             if (newDelay != oldDelay)
             {
                 options.setOption(Options.aiDelay, newDelay);
