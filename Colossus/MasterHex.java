@@ -319,21 +319,7 @@ class MasterHex
                 break;
 
             case ARROWS:
-                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                x[1] = (int) Math.round((x0 + x1) / 2 + l * 
-                    Math.sin(theta));
-                y[1] = (int) Math.round((y0 + y1) / 2 - l * 
-                       Math.cos(theta));
-                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                g.setColor(java.awt.Color.white);
-                g.fillPolygon(x, y, 3);
-                g.setColor(java.awt.Color.black);
-                g.drawPolyline(x, y, 3);
-
-                for (int j = 1; j < 3; j++)
+                for (int j = 0; j < 3; j++)
                 {
                     x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
                     y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
