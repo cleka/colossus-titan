@@ -67,10 +67,12 @@ final class SocketClientThread extends Thread implements IServer
         {
             while ((fromServer = in.readLine()) != null)
             {
-                if (fromServer.length() > 0 && 
-                    !fromServer.startsWith(Constants.log))
+                if (fromServer.length() > 0)
                 {
-                    System.out.println("From server: " + fromServer);
+                    if (!fromServer.startsWith(Constants.log))
+                    {
+                        System.out.println("From server: " + fromServer);
+                    }
                     parseLine(fromServer);
                 }
             }

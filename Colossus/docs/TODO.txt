@@ -2,17 +2,20 @@ Bug: Non-warlock rangestrikers fail to attack legions of all lords.
      They move into rangestriking position even though they can't.
 Bug: Log window text sometimes appears over board, map.
 Bug: Load game is completely broken.
+Bug: Rangers and clopses mixed up because they have the same sort value.
+     Add fractional points for flying and rangestrike?
 
 Authenticate all remote calls to ensure that they come from the correct
    client.  (By socket, using the thread name, set to player name.)
-
-Add StartClient gui for setting playerName and hostname. 
 
 Chat window.
 
 Add Client.jnlp file.
 
-Refuse remote newGame/loadGame/saveGame calls?
+Sometimes refuse remote newGame/loadGame/saveGame calls?
+
+Cleanup network shutdown -- when game over or player eliminated, don't
+   whine if its client drops.
 
 
 Colorize StatusScreen.
