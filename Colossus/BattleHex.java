@@ -36,10 +36,15 @@ class Hex
 
     private Hex [] neighbors = new Hex[6];
 
+    private int xCoord;
+    private int yCoord;
 
-    Hex(int cx, int cy, int scale, BattleMap map)
+
+    Hex(int cx, int cy, int scale, BattleMap map, int xCoord, int yCoord)
     {
         this.map = map;
+        this.xCoord = xCoord;
+        this.yCoord = yCoord;
 
         selected = false;
 
@@ -341,6 +346,18 @@ class Hex
         {
             return neighbors[i];
         }
+    }
+
+
+    int getXCoord()
+    {
+        return xCoord;
+    }
+    
+    
+    int getYCoord()
+    {
+        return yCoord;
     }
 
 
