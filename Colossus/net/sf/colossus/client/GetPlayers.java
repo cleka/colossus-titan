@@ -105,21 +105,14 @@ public final class GetPlayers extends KDialog implements WindowListener,
         pack();
 
         Container contentPane = getContentPane();
-        GridLayout baseLayout = new GridLayout(0, 1);
+        BoxLayout baseLayout = new BoxLayout(contentPane, BoxLayout.Y_AXIS);
         contentPane.setLayout(baseLayout);
 
-        GridBagLayout baseBagLayout = new GridBagLayout();
-        GridBagConstraints baseConstraints = new GridBagConstraints();
-        baseConstraints.fill = baseConstraints.HORIZONTAL;
-        baseConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        //contentPane.setLayout(baseBagLayout);
-                
         for (int i = 0; i < 6; i++)
         {
             Container playerPane = new Container();
             playerPane.setLayout(new GridLayout(0, 3));
             contentPane.add(playerPane);
-            baseBagLayout.setConstraints(playerPane, baseConstraints);
             
             String s = "Player " + (i + 1);
             playerPane.add(new JLabel(s));
@@ -154,9 +147,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         variantPane.setLayout(new GridLayout(0, 2));
 
         contentPane.add(gamePane);
-        baseBagLayout.setConstraints(gamePane, baseConstraints);
         contentPane.add(variantPane);
-        baseBagLayout.setConstraints(variantPane, baseConstraints);
         
         JButton button1 = new JButton(newGame);
         button1.setMnemonic(KeyEvent.VK_N);
@@ -185,13 +176,13 @@ public final class GetPlayers extends KDialog implements WindowListener,
         variantPane.add(buttonVariant);
         buttonVariant.addActionListener(this);
 
-        Container readmePane = new Container();
+        JPanel readmePane = new JPanel();
         readmePane.setLayout(new GridLayout(0, 1));
+        readmePane.setMinimumSize(new Dimension(200, 100));
         readme = new TextArea("", 12, 60, TextArea.SCROLLBARS_VERTICAL_ONLY);
         readme.setEditable(false);
         readmePane.add(readme);
         contentPane.add(readmePane);
-        baseBagLayout.setConstraints(readmePane, baseConstraints);
 
         readme.setText(VariantSupport.loadVariant(variantArray[0] + ".var",
                                                   variantArray[0]));
