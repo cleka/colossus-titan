@@ -40,7 +40,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         int scale = 60;
         setLayout(null);
 
-        findEligibleRecruits();
+        numEligible = findEligibleRecruits(legion, recruits);
         if (numEligible == 0)
         {
             dispose();
@@ -86,8 +86,11 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     }
 
 
-    void findEligibleRecruits()
+    // Returns the number of eligible recruits.
+    static int findEligibleRecruits(Legion legion, Creature [] recruits)
     {
+        MasterHex hex = MasterBoard.getHexFromLabel(legion.getCurrentHex());
+
         switch(hex.getTerrain())
         {
             case 'B':
@@ -375,13 +378,15 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
             }
         }
 
+        int count = 0;
         for (int i = 0; i < 5; i++)
         {
             if (recruits[i] != null)
             {
-                numEligible++;
+                count++;
             }
         }
+        return count;
     }
 
 
