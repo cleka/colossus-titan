@@ -33,4 +33,7 @@ public interface AI
 
     /** make battle moves for the active legion */
     void battleMove(Game game);
+
+    /** pick an entry side */
+    int pickEntrySide(String hexLabel, Legion legion, Game game);
 }

@@ -77,7 +77,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public MasterHex getMasterHex()
     {
-        return MasterBoard.getHexFromLabel(masterHexLabel);
+        return MasterBoard.getHexByLabel(masterHexLabel);
     }
 
 
@@ -552,7 +552,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null. */
-    public BattleHex getHexFromLabel(String label)
+    public BattleHex getHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())

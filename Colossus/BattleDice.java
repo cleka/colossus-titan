@@ -276,10 +276,10 @@ public final class BattleDice extends JFrame implements WindowListener
         BattleMap map = new BattleMap(hex.getLabel());
 
         Critter serpent = attacker.getCritter(Creature.serpent);
-        serpent.addBattleInfo("C3", "C3", map, null, null);
+        serpent.addBattleInfo("C3", "C3", null, null);
 
         Critter angel = defender.getCritter(Creature.angel);
-        angel.addBattleInfo("C2", "C2", map, null, null);
+        angel.addBattleInfo("C2", "C2", null, null);
 
         int targetNumber = 6;
         int [] rolls = {1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6};

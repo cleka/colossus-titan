@@ -106,5 +106,16 @@ Solaris, 1.3: Dead titan, but player keeps going.  Need to check
 Solaris, 1.3: Player options are sometimes incorrect for both
    loaded and new games.
 
-Critters in legions now get resorted at random.  Need to sort
-   them before display.
+Solaris, 1.3.1: BattleMap title bar not updated from recruit to
+   move when AI is moving.
+
+Solaris, 1.3.1: AI moved a legion on top of a just-moved ally.
+   Looks like the detection of friendly legions is broken. 
+   Maybe trying to compare an AICopied player to a real player?
+   Try to compare player names rather than players.
+
+Solaris, 1.3.1: Performance really slows down after a battle.
+   See if System.gc() helps.
+
+Solaris, 1.3.1: Sometimes not unselecting hex after recruiting.
+   Also after splitting a 7-high legion.

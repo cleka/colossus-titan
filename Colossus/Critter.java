@@ -7,12 +7,11 @@ import java.util.*;
  * @author David Ripton
  */
 
-public final class Critter extends Creature
+public final class Critter extends Creature implements Comparable
 {
     private boolean visible;
     private Creature creature;
     private String markerId;
-    private BattleMap map;
     private Battle battle;
     private boolean struck;
     private String currentHexLabel;
@@ -42,7 +41,6 @@ public final class Critter extends Creature
     {
         Critter newCritter = new Critter(creature, visible, markerId, game);
 
-        newCritter.map = map;
         newCritter.battle = battle;
         newCritter.struck = struck;
         newCritter.currentHexLabel = currentHexLabel;
@@ -56,11 +54,10 @@ public final class Critter extends Creature
 
 
     public void addBattleInfo(String currentHexLabel, String startingHexLabel,
-        BattleMap map, BattleChit chit, Battle battle)
+        BattleChit chit, Battle battle)
     {
         this.currentHexLabel = currentHexLabel;
         this.startingHexLabel = startingHexLabel;
-        this.map = map;
         this.chit = chit;
         this.battle = battle;
     }
@@ -250,13 +247,13 @@ public final class Critter extends Creature
 
     public BattleHex getCurrentHex()
     {
-        return map.getHexFromLabel(currentHexLabel);
+        return battle.getBattleMap().getHexByLabel(currentHexLabel);
     }
 
 
     public BattleHex getStartingHex()
     {
-        return map.getHexFromLabel(startingHexLabel);
+        return battle.getBattleMap().getHexByLabel(startingHexLabel);
     }
 
 
@@ -368,7 +365,8 @@ public final class Critter extends Creature
                 if (neighbor != null)
                 {
                     Critter other = battle.getCritter(neighbor);
-                    if (other != null && other.getPlayer() != getPlayer() &&
+                    if (other != null && !other.getPlayer().getName().equals(
+                        getPlayer().getName()) &&
                         (countDead || !other.isDead()))
                     {
                         return true;
@@ -387,6 +385,7 @@ public final class Critter extends Creature
     {
         currentHexLabel = hex.getLabel();
         battle.setLastCritterMoved(this);
+        BattleMap map = battle.getBattleMap();
         map.alignChits(startingHexLabel);
         map.alignChits(currentHexLabel);
     }
@@ -398,6 +397,7 @@ public final class Critter extends Creature
         currentHexLabel = startingHexLabel;
         Game.logEvent(getName() + " undoes move and returns to " +
             startingHexLabel);
+        BattleMap map = battle.getBattleMap();
         map.alignChits(formerHexLabel);
         map.alignChits(currentHexLabel);
     }
@@ -614,9 +614,10 @@ public final class Critter extends Creature
         }
         else
         {
-            int answer = JOptionPane.showOptionDialog(map, prompt.toString(),
-                "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+            int answer = JOptionPane.showOptionDialog(battle.getBattleMap(),
+                prompt.toString(), "Take Strike Penalty?",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, options[1]);
             return (answer == JOptionPane.YES_OPTION);
         }
     }
@@ -744,7 +745,7 @@ public final class Critter extends Creature
                                 targetHex, hex, false)) != 'd')
                             {
                                 critter.setCarryFlag(false);
-                                Game.logDebug("DENIED CARRY UP DUNE HEXSIDE");
+                                Game.logWarn("DENIED CARRY UP DUNE HEXSIDE");
                             }
 
                             else if (tmpStrikeNumber > strikeNumber ||
@@ -851,8 +852,9 @@ public final class Critter extends Creature
         {
             do
             {
-                String answer = JOptionPane.showInputDialog(map,
-                    "Input number of hits (0-" + dice + ")");
+                String answer = JOptionPane.showInputDialog(
+                    battle.getBattleMap(), "Input number of hits (0-" +
+                    dice + ")");
                 try
                 {
                     damage = Integer.parseInt(answer);
@@ -951,5 +953,42 @@ public final class Critter extends Creature
             hits = getPower();
         }
         chit.setDead(dead);
+    }
+
+    /** Inconsistent with equals() */
+    public int compareTo(Object object)
+    {
+        Critter critter = (Critter)object;
+
+        if (isTitan())
+        {
+            return -1;
+        }
+        if (critter.isTitan())
+        {
+            return 1;
+        }
+        int diff = critter.getPointValue() - getPointValue();
+        if (diff != 0)
+        {
+            return diff;
+        }
+        if (isRangestriker() && !critter.isRangestriker())
+        {
+            return -1;
+        }
+        if (!isRangestriker() && critter.isRangestriker())
+        {
+            return 1;
+        }
+        if (isFlier() && !critter.isFlier())
+        {
+            return -1;
+        }
+        if (!isFlier() && critter.isFlier())
+        {
+            return 1;
+        }
+        return getName().compareTo(critter.getName());
     }
 }

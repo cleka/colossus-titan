@@ -285,7 +285,7 @@ public final class Negotiate extends JDialog implements MouseListener,
                         {
                             name = "Titan";
                         }
-                        winnerLosses.add(Creature.getCreatureFromName(name));
+                        winnerLosses.add(Creature.getCreatureByName(name));
                     }
                 }
                 results = new NegotiationResults(true, false, winner,

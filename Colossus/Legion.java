@@ -17,14 +17,14 @@ public final class Legion implements Comparable
     private String currentHexLabel;
     private String startingHexLabel;
     private boolean moved;
-    private boolean recruited;
+    private String recruitName;
     private String playerName;
     private int battleTally;
-    private int entrySide;
-    private boolean teleported;
-    private Creature teleportingLord;
+    private Creature teleportingLord; // XXX Move into HexInfo?
     private static HashMap markerNames = new HashMap();
     private Game game;
+    /** Maps hex labels to HexInfo classes. */
+    private HashMap hexInfoMap = new HashMap();
 
     static
     {
@@ -240,12 +240,20 @@ public final class Legion implements Comparable
             startingHexLabel, critters, playerName, game);
 
         newLegion.moved = moved;
-        newLegion.recruited = recruited;
+        newLegion.recruitName = recruitName;
         newLegion.battleTally = battleTally;
-        newLegion.entrySide = entrySide;
-        newLegion.teleported = teleported;
         newLegion.teleportingLord = teleportingLord;
         newLegion.marker = marker;
+
+        // Deep copy hexInfoMap
+        Iterator it = hexInfoMap.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Map.Entry entry = (Map.Entry)it.next();
+            String hexLabel = (String)entry.getKey();
+            HexInfo hexInfo = (HexInfo)entry.getValue();
+            newLegion.hexInfoMap.put(hexLabel, hexInfo.AICopy());
+        }
 
         return newLegion;
     }
@@ -304,7 +312,7 @@ public final class Legion implements Comparable
                 tmpScore -= 100;
                 if (type != null && recruits.contains(type))
                 {
-                    Creature angel = Creature.getCreatureFromName(type);
+                    Creature angel = Creature.getCreatureByName(type);
                     if (angel != null)
                     {
                         addCreature(angel, true);
@@ -348,7 +356,7 @@ public final class Legion implements Comparable
         {
             Critter critter = (Critter)it.next();
             critter.heal();
-            critter.addBattleInfo(null, null, null, null, null);
+            critter.addBattleInfo(null, null, null, null);
         }
     }
 
@@ -531,7 +539,16 @@ public final class Legion implements Comparable
     {
         String hexLabel = currentHexLabel;
         prepareToRemove();
-        getPlayer().getLegions().remove(this);
+
+        Player player = getPlayer();
+        // XXX The player can be null if the legion has not been fully
+        // created.  Fix SplitLegion.
+        if (player == null)
+        {
+            player = game.getActivePlayer();
+        }
+        player.getLegions().remove(this);
+
         game.getBoard().alignLegions(hexLabel);
     }
 
@@ -566,28 +583,28 @@ public final class Legion implements Comparable
         Game.logEvent(log.toString());
 
         // Free up the legion marker.
-        getPlayer().getMarkersAvailable().add(getMarkerId());
+        Player player = getPlayer();
+        // XXX The player can be null if the legion has not been fully
+        // created.  Fix SplitLegion.
+        if (player == null)
+        {
+            player = game.getActivePlayer();
+        }
+        player.getMarkersAvailable().add(getMarkerId());
     }
 
 
     public void moveToHex(MasterHex hex)
     {
-        teleported = hex.getTeleported();
-        entrySide = hex.getEntrySide();
         Player player = getPlayer();
         String hexLabel = hex.getLabel();
-
-        Game.logEvent("Legion " + getLongMarkerName() + " in " +
-            getCurrentHex().getDescription() +
-            (teleported ?
-                (game.isOccupied(hexLabel) ? " titan teleports " :
-                    " tower teleports (" + teleportingLord + ") " )
-                : " moves ") +
-            "to " + hex.getDescription());
 
         currentHexLabel = hexLabel;
         moved = true;
         player.setLastLegionMoved();
+
+        boolean teleported = getTeleported(hexLabel);
+
         // If we teleported, no more teleports are allowed this turn.
         if (teleported)
         {
@@ -597,6 +614,12 @@ public final class Legion implements Comparable
         MasterBoard board = game.getBoard();
         board.alignLegions(currentHexLabel);
         board.alignLegions(startingHexLabel);
+
+        Game.logEvent("Legion " + getLongMarkerName() + " in " +
+            getCurrentHex().getDescription() + (teleported ?
+            (game.isOccupied(hexLabel) ? " titan teleports " :
+            " tower teleports (" + teleportingLord + ") " ) : " moves ") +
+            "to " + hex.getDescription());
     }
 
 
@@ -604,19 +627,18 @@ public final class Legion implements Comparable
     {
         if (moved)
         {
+            // If this legion teleported, allow teleporting again.
+            if (getTeleported(currentHexLabel))
+            {
+                getPlayer().setTeleported(false);
+            }
+
             String formerHexLabel = currentHexLabel;
             currentHexLabel = startingHexLabel;
 
             moved = false;
             Game.logEvent("Legion " + getLongMarkerName() +
                 " undoes its move");
-
-            // If this legion teleported, allow teleporting again.
-            if (teleported)
-            {
-                teleported = false;
-                getPlayer().setTeleported(false);
-            }
 
             MasterBoard board = game.getBoard();
             board.alignLegions(currentHexLabel);
@@ -629,48 +651,47 @@ public final class Legion implements Comparable
     {
         startingHexLabel = currentHexLabel;
         moved = false;
-        recruited = false;
+        recruitName = null;
     }
 
 
     public boolean hasRecruited()
     {
-        return recruited;
+        return (recruitName != null);
     }
 
-
-    public void setRecruited(boolean recruited)
+    public String getRecruitName()
     {
-        this.recruited = recruited;
+        return recruitName;
+    }
+
+    public void setRecruitName(String recruitName)
+    {
+        this.recruitName = recruitName;
     }
 
 
-    // hasMoved() is a separate check, so that this function can be used in
-    // battle as well as during the muster phase.
+    /** hasMoved() is a separate check, so that this function can be used in
+     *  battle as well as during the muster phase. */
     public boolean canRecruit()
     {
-        if (recruited || getHeight() > 6 || getPlayer().isDead() ||
+        if (recruitName != null || getHeight() > 6 || getPlayer().isDead() ||
             game.findEligibleRecruits(this).isEmpty())
         {
             return false;
         }
-
         return true;
     }
 
 
     public void undoRecruit()
     {
-        if (hasRecruited())
+        if (recruitName != null)
         {
-            ListIterator lit = critters.listIterator(critters.size());
-            Critter critter = (Critter)lit.previous();
-
-            game.getCaretaker().putOneBack(critter);
-            removeCreature(critter, false, true);
-
-            recruited = false;
-
+            Creature creature = Creature.getCreatureByName(recruitName);
+            game.getCaretaker().putOneBack(creature);
+            removeCreature(creature, false, true);
+            recruitName = null;
             Game.logEvent("Legion " + getLongMarkerName() +
                 " undoes its recruit");
         }
@@ -711,7 +732,7 @@ public final class Legion implements Comparable
 
     public MasterHex getCurrentHex()
     {
-        return MasterBoard.getHexFromLabel(currentHexLabel);
+        return MasterBoard.getHexByLabel(currentHexLabel);
     }
 
     public String getStartingHexLabel()
@@ -721,21 +742,168 @@ public final class Legion implements Comparable
 
     public MasterHex getStartingHex()
     {
-        return MasterBoard.getHexFromLabel(startingHexLabel);
+        return MasterBoard.getHexByLabel(startingHexLabel);
     }
 
 
-    public int getEntrySide()
+    // Track entry side and teleport information for a MasterHex.
+    final class HexInfo
     {
-        return entrySide;
+        String hexLabel;
+        TreeSet entrySides = new TreeSet();  // Holds Integers.
+        boolean teleported;
+
+        HexInfo AICopy()
+        {
+            HexInfo newHexInfo = new HexInfo();
+            // Strings and Integers are immutable.
+            newHexInfo.hexLabel = hexLabel;
+            newHexInfo.entrySides = (TreeSet)entrySides.clone();
+            newHexInfo.teleported = teleported;
+            return newHexInfo;
+        }
+
+        void setEntrySide(int side)
+        {
+            if (side == 1 || side == 3 || side ==5)
+            {
+                entrySides.add(new Integer(side));
+            }
+        }
+
+        int getNumEntrySides()
+        {
+            return entrySides.size();
+        }
+
+        boolean canEnterViaSide(int side)
+        {
+            return entrySides.contains(new Integer(side));
+        }
+
+        boolean canEnterViaLand()
+        {
+            return !entrySides.isEmpty();
+        }
+
+        /** Return the entry side.  If there are none or more than one,
+         *  return -1. */
+        int getEntrySide()
+        {
+            if (entrySides.size() != 1)
+            {
+                return -1;
+            }
+            else
+            {
+                return ((Integer)entrySides.first()).intValue();
+            }
+        }
+
+        void clearAllEntrySides()
+        {
+            entrySides.clear();
+        }
+
+        boolean getTeleported()
+        {
+            return teleported;
+        }
+
+        void setTeleported(boolean teleported)
+        {
+            this.teleported = teleported;
+        }
     }
 
-
-    public void setEntrySide(int entrySide)
+    /** If the indicated hex has exactly one entry side, return it.
+     *  Otherwise return -1. */
+    public int getEntrySide(String hexLabel)
     {
-        this.entrySide = entrySide;
+        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
+        if (hexInfo == null)
+        {
+            return -1;
+        }
+        return hexInfo.getEntrySide();
     }
 
+    public void setEntrySide(String hexLabel, int entrySide)
+    {
+        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
+        if (hexInfo == null)
+        {
+            hexInfo = new HexInfo();
+        }
+        hexInfo.setEntrySide(entrySide);
+        hexInfoMap.put(hexLabel, hexInfo);
+    }
+
+    public int getNumEntrySides(String hexLabel)
+    {
+        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
+        if (hexInfo == null)
+        {
+            return 0;
+        }
+        return hexInfo.getNumEntrySides();
+    }
+
+    public boolean canEnterViaSide(String hexLabel, int side)
+    {
+        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
+        if (hexInfo == null)
+        {
+            return false;
+        }
+        return hexInfo.canEnterViaSide(side);
+    }
+
+    public boolean canEnterViaLand(String hexLabel)
+    {
+        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
+        if (hexInfo == null)
+        {
+            return false;
+        }
+        return hexInfo.canEnterViaLand();
+    }
+
+    public void clearAllEntrySides(String hexLabel)
+    {
+        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
+        if (hexInfo != null)
+        {
+            hexInfo.clearAllEntrySides();
+        }
+    }
+
+    public void clearAllHexInfo()
+    {
+        hexInfoMap.clear();
+    }
+
+
+    public boolean getTeleported(String hexLabel)
+    {
+        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
+        if (hexInfo == null)
+        {
+            return false;
+        }
+        return hexInfo.getTeleported();
+    }
+
+    public void setTeleported(String hexLabel, boolean teleported)
+    {
+        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
+        if (hexInfo == null)
+        {
+            hexInfo = new HexInfo();
+        }
+        hexInfo.setTeleported(teleported);
+        hexInfoMap.put(hexLabel, hexInfo);
+    }
 
     /** convenience method for AI */
     public void addCreature(Creature creature)
@@ -855,7 +1023,7 @@ public final class Legion implements Comparable
     }
 
     /** Return the first critter with a matching creatureClass:
-     *  name + startingHexLabel */
+     *  name + currentHexLabel */
     public Critter getCritterByCreatureClass(String creatureClass)
     {
         int len = creatureClass.length();
@@ -911,10 +1079,19 @@ public final class Legion implements Comparable
     }
 
 
+    /** Sort critters into descending order of importance. */
+    public void sortCritters()
+    {
+        Collections.sort(critters);
+    }
+
+
     /** Recombine this legion into another legion. Only remove this
         legion from the Player if remove is true.  If it's false, the
         caller is responsible for removing this legion, which can avoid
-        concurrent access problems. */
+        concurrent access problems. The caller needs to call
+        MasterBoard.alignLegions() on the remaining legion's hexLabel
+        after the recombined legion is actually removed. */
     public void recombine(Legion legion, boolean remove)
     {
         // Sanity check
@@ -947,6 +1124,8 @@ public final class Legion implements Comparable
 
         Game.logEvent("Legion " + getLongMarkerName() +
             " recombined into legion " + legion.getLongMarkerName());
+
+        sortCritters();
     }
 
 
@@ -1001,6 +1180,9 @@ public final class Legion implements Comparable
             " creatures are split off from legion " + getLongMarkerName() +
             " into new legion " + newLegion.getLongMarkerName());
 
+        sortCritters();
+        newLegion.sortCritters();
+
         return newLegion;
     }
 
@@ -1030,14 +1212,6 @@ public final class Legion implements Comparable
             critter.setVisible(true);
         }
     }
-
-
-    public void revealCreature(int index)
-    {
-        Critter critter = (Critter)critters.get(index);
-        critter.setVisible(true);
-    }
-
 
     public void revealCreatures(Creature creature, int numberToReveal)
     {
@@ -1077,7 +1251,6 @@ public final class Legion implements Comparable
             }
         }
     }
-
 
     /** Reveal the lord who tower teleported the legion.  Pick one if
      *  necessary. */

@@ -11,7 +11,6 @@ import java.awt.geom.*;
 public final class MasterHex extends Hex
 {
     private boolean inverted;
-    // private ArrayList legionMarkers = new ArrayList(3);
     private MasterBoard board;
     private FontMetrics fontMetrics;
     private int halfFontHeight;
@@ -35,12 +34,6 @@ public final class MasterHex extends Hex
     private int labelSide;
     private int[] exitType = new int[6];
     private int[] entranceType = new int[6];
-
-    // hexsides 0 - 5, though only 1, 3, and 5 are actually used.
-    // 1 is right, 3 is bottom, 5 is left
-    private TreeSet entrySides = new TreeSet();
-
-    private boolean teleported;
 
     public static final int NONE = 0;
     public static final int BLOCK = 1;
@@ -265,15 +258,8 @@ public final class MasterHex extends Hex
 
     public void repaint()
     {
-        try
-        {
-            board.repaint(rectBound.x, rectBound.y, rectBound.width,
-                rectBound.height);
-        }
-        catch (NullPointerException e)
-        {
-            // Don't crash if we're testing a battle and board is null.
-        }
+        board.repaint(rectBound.x, rectBound.y, rectBound.width,
+            rectBound.height);
     }
 
 
@@ -581,64 +567,5 @@ public final class MasterHex extends Hex
     public int getEntranceType(int i)
     {
         return entranceType[i];
-    }
-
-
-    public void setEntrySide(int side)
-    {
-        entrySides.add(new Integer(side));
-    }
-
-
-    /** Return the number of possible entry sides. */
-    public int getNumEntrySides()
-    {
-        return entrySides.size();
-    }
-
-
-    public boolean canEnterViaSide(int side)
-    {
-        return entrySides.contains(new Integer(side));
-    }
-
-
-    public boolean canEnterViaLand()
-    {
-        return !entrySides.isEmpty();
-    }
-
-
-    /** Return a possible entry side.  If there is more than one, only one
-     *  will be returned.  If there are none, -1 will be returned. */
-    public int getEntrySide()
-    {
-        if (entrySides.isEmpty())
-        {
-            return -1;
-        }
-        else
-        {
-            // TODO: Make this smarter.
-            return ((Integer)entrySides.first()).intValue();
-        }
-    }
-
-
-    public boolean getTeleported()
-    {
-        return teleported;
-    }
-
-
-    public void setTeleported(boolean teleported)
-    {
-        this.teleported = teleported;
-    }
-
-
-    public void clearAllEntrySides()
-    {
-        entrySides.clear();
     }
 }

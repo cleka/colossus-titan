@@ -46,7 +46,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             attacker.getPlayerName() + ") attacks " +
             defender.getLongMarkerName() + " (" +
             defender.getPlayerName() + ")" + " in " +
-            MasterBoard.getHexFromLabel(masterHexLabel).getDescription());
+            MasterBoard.getHexByLabel(masterHexLabel).getDescription());
 
         this.battle = battle;
 
@@ -89,19 +89,11 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public BattleMap AICopy()
+    public BattleMap AICopy(Battle battle)
     {
         BattleMap newMap = new BattleMap(masterHexLabel);
-
-        // XXX Need to copy hexes?
-
+        newMap.battle = battle;
         return newMap;
-    }
-
-
-    public void setBattle(Battle battle)
-    {
-        this.battle = battle;
     }
 
 
@@ -171,7 +163,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        battleFrame.setTitle(battle.getActivePlayer().getName() + 
+        battleFrame.setTitle(battle.getActivePlayer().getName() +
             " Turn " + battle.getTurnNumber() + " : Summon");
         phaseMenu.removeAll();
     }
@@ -183,8 +175,8 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             return;
         }
-        
-        battleFrame.setTitle(battle.getActivePlayer().getName() + 
+
+        battleFrame.setTitle(battle.getActivePlayer().getName() +
             " Turn " + battle.getTurnNumber() + " : Recruit");
         if (phaseMenu != null)
         {
@@ -290,7 +282,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             critter.getImageName(legion == battle.getDefender()), this,
             critter);
         critter.addBattleInfo(entrance.getLabel(), entrance.getLabel(),
-            this, chit, battle);
+            chit, battle);
         alignChits(entrance.getLabel());
     }
 
@@ -318,7 +310,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 startingHexLabel = entrance.getLabel();
             }
             critter.addBattleInfo(currentHexLabel, startingHexLabel,
-                this, chit, battle);
+                chit, battle);
             alignChits(currentHexLabel);
         }
     }
@@ -326,16 +318,20 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public BattleHex getEntrance(Legion legion)
     {
-        Legion attacker = battle.getAttacker();
-        int side = attacker.getEntrySide();
-        if (legion == attacker)
+        int side = battle.getAttacker().getEntrySide(
+            battle.getMasterHexLabel());
+        if (side == 1 || side == 3 || side ==5)
         {
-            return entrances[side];
+            if (legion.getMarkerId().equals(battle.getAttackerId()))
+            {
+                return entrances[side];
+            }
+            else
+            {
+                return entrances[(side + 3) % 6];
+            }
         }
-        else
-        {
-            return entrances[(side + 3) % 6];
-        }
+        return null;
     }
 
 
@@ -359,7 +355,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void alignChits(String hexLabel)
     {
-        BattleHex hex = getHexFromLabel(hexLabel);
+        BattleHex hex = getHexByLabel(hexLabel);
         ArrayList critters = battle.getCritters(hexLabel);
         if (critters.isEmpty())
         {

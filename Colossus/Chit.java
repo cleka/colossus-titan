@@ -97,6 +97,11 @@ public class Chit extends JPanel
         return id;
     }
 
+    public String toString()
+    {
+        return id;
+    }
+
 
     public void rescale(int scale)
     {

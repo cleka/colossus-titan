@@ -21,20 +21,16 @@ public final class PickEntrySide extends HexMap implements ActionListener,
     private static int entrySide;
 
 
-    private PickEntrySide(JFrame parentFrame, String masterHexLabel)
+    private PickEntrySide(JFrame parentFrame, String masterHexLabel, Legion
+        legion)
     {
         super(masterHexLabel);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
-
         laidOut = false;
-
         Container contentPane = dialog.getContentPane();
-
         contentPane.setLayout(null);
 
-        MasterHex hex = MasterBoard.getHexFromLabel(masterHexLabel);
-
-        if (hex.canEnterViaSide(5))
+        if (legion.canEnterViaSide(masterHexLabel, 5))
         {
             button5 = new JButton("Left");
             button5.setMnemonic(KeyEvent.VK_L);
@@ -42,7 +38,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
             button5.addActionListener(this);
         }
 
-        if (hex.canEnterViaSide(3))
+        if (legion.canEnterViaSide(masterHexLabel, 3))
         {
             button3 = new JButton("Bottom");
             button3.setMnemonic(KeyEvent.VK_B);
@@ -50,7 +46,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
             button3.addActionListener(this);
         }
 
-        if (hex.canEnterViaSide(1))
+        if (legion.canEnterViaSide(masterHexLabel, 1))
         {
             button1 = new JButton("Right");
             button1.setMnemonic(KeyEvent.VK_R);
@@ -71,10 +67,11 @@ public final class PickEntrySide extends HexMap implements ActionListener,
     }
 
 
-    public static int pickEntrySide(JFrame parentFrame, String masterHexLabel)
+    public static int pickEntrySide(JFrame parentFrame, String masterHexLabel,
+        Legion legion)
     {
         entrySide = -1;
-        new PickEntrySide(parentFrame, masterHexLabel);
+        new PickEntrySide(parentFrame, masterHexLabel, legion);
         return entrySide;
     }
 
@@ -174,10 +171,21 @@ public final class PickEntrySide extends HexMap implements ActionListener,
         frame.setVisible(true);
 
         MasterHex hex = MasterBoard.getAnyHexWithTerrain('D');
-        hex.setEntrySide(1);
-        hex.setEntrySide(3);
-        hex.setEntrySide(5);
-        int side = PickEntrySide.pickEntrySide(frame, hex.getLabel());
+        String hexLabel = hex.getLabel();
+        Game game = new Game();
+        game.addPlayer("Test");
+        Player player = game.getPlayer(0);
+        Legion legion = new Legion("Bk01", null, hex.getLabel(),
+            hex.getLabel(), Creature.titan, Creature.gargoyle,
+            Creature.gargoyle, Creature.cyclops, Creature.cyclops, null,
+            null, null, player.getName(), game);
+        player.addLegion(legion);
+
+        legion.setEntrySide(hexLabel, 1);
+        legion.setEntrySide(hexLabel, 3);
+        legion.setEntrySide(hexLabel, 5);
+
+        int side = PickEntrySide.pickEntrySide(frame, hex.getLabel(), legion);
         Game.logEvent("Chose side " + side);
     }
 }

@@ -159,12 +159,11 @@ public abstract class Hex
         for (int i = 1; i < sides; i++)
         {
             polygon.lineTo((float)x[i], (float)y[i]);
-        };
+        }
         if (closed)
         {
             polygon.closePath();
         }
-
         return polygon;
     }
 

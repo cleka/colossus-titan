@@ -7,14 +7,15 @@
 
 # Java compiler
 # jikes is really fast, good, and free.  It supports -depend so all
-#    dependent objects will be recompiled when you change one.
+#    dependent objects will be recompiled when you change one.  But
+#    the jswat debugger has problems running its class files.
 # javac is the standard; use it if you don't have jikes.  Sun has removed
 #    the -depend/-Xdepend option from javac in JDK 1.3, so be careful to
-#    manually recompile classes when necessary.
+#    manually recompile dependent classes when necessary.
 # kjc comes with kaffe.  I like its --warning option.
 
-JCC = jikes -g -depend -deprecation +P
-#JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.2
+#JCC = jikes -g -depend -deprecation +P
+JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.2
 #JCC = kjc -g --deprecation --warning
 
 
@@ -76,7 +77,7 @@ inst: $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST)
 
 # Clean up
 clean:
-	rm -f *~ core javacore.txt *.bak *.jar *.class
+	rm -f *~ core javacore.txt *.bak *.jar *.class .#*.jar
 
 # Make zip file.  Don't include saved games, CVS dirs, or other zip files.
 dist: $(JARFILE)

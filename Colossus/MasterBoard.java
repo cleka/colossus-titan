@@ -1438,7 +1438,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public void alignLegions(String hexLabel)
     {
-        MasterHex hex = getHexFromLabel(hexLabel);
+        MasterHex hex = getHexByLabel(hexLabel);
         ArrayList markerIds = game.getLegionMarkerIds(hexLabel);
         Player player = game.getActivePlayer();
         if (player == null)
@@ -1565,7 +1565,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
-    public static MasterHex getHexFromLabel(String label)
+    public static MasterHex getHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1626,11 +1626,17 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private Legion getLegionAtPoint(Point point)
     {
         Player player = game.getActivePlayer();
-        ArrayList legions = new ArrayList();
-        legions.addAll(player.getLegions());
-        legions.addAll(game.getAllEnemyLegions(player));
-
-        Iterator it = legions.iterator();
+        Iterator it = player.getLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            Marker marker = legion.getMarker();
+            if (marker != null && marker.contains(point))
+            {
+                return legion;
+            }
+        }
+        it = game.getAllEnemyLegions(player).iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -1721,37 +1727,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    /** Clear all entry side and teleport information from all hexes
-     *  not occupied by a friendly legion. */
-    public void clearAllNonFriendlyOccupiedEntrySides(Player player)
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            MasterHex hex = (MasterHex)it.next();
-            String hexLabel = hex.getLabel();
-            if (game.getNumFriendlyLegions(hexLabel, player) == 0)
-            {
-                hex.clearAllEntrySides();
-                hex.setTeleported(false);
-            }
-        }
-    }
-
-
-    /** Clear all entry side and teleport information from all hexes. */
-    public void clearAllEntrySides()
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            MasterHex hex = (MasterHex)it.next();
-            hex.clearAllEntrySides();
-            hex.setTeleported(false);
-        }
-    }
-
-
     /** Return true if the MouseEvent e came from button 2 or 3.
      *  In theory, isPopupTrigger() is the right way to check for
      *  this.  In practice, the poor design choice of only having
@@ -1784,6 +1759,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             // legion.
             if (isPopupButton(e))
             {
+                legion.sortCritters();
                 new ShowLegion(masterFrame, legion, point,
                     game.getOption(Options.allStacksVisible) ||
                     player == game.getActivePlayer());

@@ -1,3 +1,5 @@
+Teach the AI how to pick the next engagement to resolve.
+
 Rewrite SplitLegion to use Legion.split()
 
 Add a configurable AI move delay to make it easier to follow what the

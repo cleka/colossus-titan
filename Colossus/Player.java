@@ -343,7 +343,6 @@ public final class Player implements Comparable
                 count++;
             }
         }
-
         return count;
     }
 
@@ -383,10 +382,14 @@ public final class Player implements Comparable
         return name;
     }
 
-
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String toString()
+    {
+        return name;
     }
 
 
@@ -394,7 +397,6 @@ public final class Player implements Comparable
     {
         return movementRoll;
     }
-
 
     public void setMovementRoll(int movementRoll)
     {
@@ -406,7 +408,6 @@ public final class Player implements Comparable
     {
         return mulligansLeft;
     }
-
 
     public void setMulligansLeft(int number)
     {
@@ -425,22 +426,40 @@ public final class Player implements Comparable
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
 
-        // Clear old entry side and teleport information.
-        game.getBoard().clearAllEntrySides();
-
-        // Hide all stack contents from other players.
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
+
+            // Hide all stack contents from other players.
             legion.hideAllCreatures();
+
+            // Clear old entry side and teleport information.
+            legion.clearAllHexInfo();
+        }
+    }
+
+    /** Clear entry side and teleport information from all of this
+     *  player's legions. */
+    public void clearAllHexInfo()
+    {
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            legion.clearAllHexInfo();
         }
     }
 
 
     public void rollMovement()
     {
-        // It's a new turn, so once-per-turn things are allowed again.
+        // Only allow rolling if it hasn't already been done.
+        if (movementRoll != 0)
+        {
+            Game.logDebug("Called rollMovement() illegally");
+            return;
+        }
 
         if (game.getOption(Options.chooseMovement))
         {
@@ -467,6 +486,12 @@ public final class Player implements Comparable
             Game.logEvent(getName() + " takes a mulligan");
             mulligansLeft--;
             movementRoll = 0;
+
+            Iterator it = legions.iterator();
+            while (it.hasNext())
+            {
+                ((Legion)it.next()).clearAllHexInfo();
+            }
         }
     }
 
@@ -589,7 +614,9 @@ public final class Player implements Comparable
         if (!undoStack.isEmpty())
         {
             Legion splitoff = (Legion)undoStack.removeFirst();
+            String hexLabel = splitoff.getCurrentHexLabel();
             splitoff.recombine(splitoff.getParent(), true);
+            game.getBoard().alignLegions(hexLabel);
             highlightTallLegions();
         }
     }
@@ -607,6 +634,7 @@ public final class Player implements Comparable
             {
                 legion.recombine(parent, false);
                 it.remove();
+                game.getBoard().alignLegions(parent.getCurrentHexLabel());
             }
         }
 
@@ -956,10 +984,7 @@ public final class Player implements Comparable
         {
             return ai.flee(legion, enemy, game);
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     public boolean aiConcede(Legion legion, Legion enemy)
@@ -968,10 +993,7 @@ public final class Player implements Comparable
         {
             return ai.concede(legion, enemy, game);
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     public void aiStrike(Legion legion, Battle battle, boolean fakeDice,
@@ -1000,6 +1022,15 @@ public final class Player implements Comparable
         {
             ai.battleMove(game);
         }
+    }
+
+    public int aiPickEntrySide(String hexLabel, Legion legion)
+    {
+        if (getOption(Options.autoPickEntrySide))
+        {
+            return ai.pickEntrySide(hexLabel, legion, game);
+        }
+        return -1;
     }
 
 

@@ -101,8 +101,7 @@ public final class Battle
         newBattle.turnNumber = turnNumber;
         newBattle.phase = phase;
 
-        newBattle.map = map.AICopy();
-        newBattle.map.setBattle(newBattle);
+        newBattle.map = map.AICopy(newBattle);
 
         newBattle.summonState = summonState;
         newBattle.carryDamage = carryDamage;
@@ -148,12 +147,20 @@ public final class Battle
         return game.getPlayerByMarkerId(legions[activeLegionNum]);
     }
 
+    public String getAttackerId()
+    {
+        return attackerId;
+    }
 
     public Legion getAttacker()
     {
         return game.getLegionByMarkerId(attackerId);
     }
 
+    public String getDefenderId()
+    {
+        return defenderId;
+    }
 
     public Legion getDefender()
     {
@@ -204,23 +211,24 @@ public final class Battle
         {
             return attacker;
         }
-        else
+        Legion defender = getDefender();
+        if (defender != null && defender.getPlayerName().equals(
+            player.getName()))
         {
-            Legion defender = getDefender();
-            if (defender != null && defender.getPlayerName().equals(
-                player.getName()))
             return defender;
-            else
-            {
-                return null;
-            }
         }
+        return null;
     }
 
 
+    public String getMasterHexLabel()
+    {
+        return masterHexLabel;
+    }
+
     public MasterHex getMasterHex()
     {
-        return MasterBoard.getHexFromLabel(masterHexLabel);
+        return MasterBoard.getHexByLabel(masterHexLabel);
     }
 
 
@@ -553,9 +561,11 @@ public final class Battle
 
 
     /** Recursively find moves from this hex.  Return an array of hex IDs for
-     *  all legal destinations.  Do not double back. */
-    private Set findMoves(BattleHex hex, Creature creature, boolean flies,
-        int movesLeft, int cameFrom)
+     *  all legal destinations.  Do not double back.  If ignoreMobileAllies
+     *  is true, pretend that allied creatures that can move out of the
+     *  way are not there. */
+    private Set findMoves(BattleHex hex, Critter critter, boolean flies,
+        int movesLeft, int cameFrom, boolean ignoreMobileAllies)
     {
         HashSet set = new HashSet();
 
@@ -568,16 +578,18 @@ public final class Battle
                 if (neighbor != null)
                 {
                     int reverseDir = (i + 3) % 6;
-
                     int entryCost;
-                    if (isOccupied(neighbor))
+
+                    Critter bogey = getCritter(neighbor);
+                    if (bogey == null || (ignoreMobileAllies &&
+                        bogey.getMarkerId().equals(critter.getMarkerId())
+                        && !bogey.isInContact(false)))
                     {
-                        entryCost = BattleHex.IMPASSIBLE_COST;
+                        entryCost = neighbor.getEntryCost(critter, reverseDir);
                     }
                     else
                     {
-                        entryCost = neighbor.getEntryCost(creature,
-                            reverseDir);
+                        entryCost = BattleHex.IMPASSIBLE_COST;
                     }
 
                     if (entryCost <= movesLeft)
@@ -590,18 +602,19 @@ public final class Battle
                         // because flying is more efficient.
                         if (!flies && movesLeft > entryCost)
                         {
-                            set.addAll(findMoves(neighbor, creature, flies,
-                                movesLeft - entryCost, reverseDir));
+                            set.addAll(findMoves(neighbor, critter, flies,
+                                movesLeft - entryCost, reverseDir,
+                                ignoreMobileAllies));
                         }
                     }
 
                     // Fliers can fly over any non-volcano hex for 1 movement
                     // point.  Only dragons can fly over volcanos.
                     if (flies && movesLeft > 1 && (neighbor.getTerrain() != 'v'
-                        || creature.getName().equals("Dragon")))
+                        || critter.getName().equals("Dragon")))
                     {
-                        set.addAll(findMoves(neighbor, creature, flies,
-                            movesLeft - 1, reverseDir));
+                        set.addAll(findMoves(neighbor, critter, flies,
+                            movesLeft - 1, reverseDir, ignoreMobileAllies));
                     }
                 }
             }
@@ -636,10 +649,9 @@ public final class Battle
 
     /** Find all legal moves for this critter. The returned list
      *  contains hex IDs, not hexes. */
-    public Set showMoves(Critter critter)
+    public Set showMoves(Critter critter, boolean ignoreMobileAllies)
     {
         Set set = new HashSet();
-
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
             if (getTerrain() == 'T' && getTurnNumber() == 1 &&
@@ -650,17 +662,17 @@ public final class Battle
             else
             {
                 set = findMoves(critter.getCurrentHex(), critter,
-                    critter.isFlier(), critter.getSkill(), -1);
+                    critter.isFlier(), critter.getSkill(), -1,
+                    ignoreMobileAllies);
             }
         }
-
         return set;
     }
 
 
     public void highlightMoves(Critter critter)
     {
-        Set set = showMoves(critter);
+        Set set = showMoves(critter, false);
         map.unselectAllHexes();
         map.selectHexesByLabels(set);
     }
@@ -961,7 +973,7 @@ public final class Battle
                             // Reinforcement.
                             game.getCaretaker().putOneBack(critter);
                             // This recruit doesn't count.
-                            legion.setRecruited(false);
+                            legion.setRecruitName(null);
                         }
                     }
                     else if (legion == attacker)
@@ -1162,12 +1174,6 @@ Game.logDebug("defender eliminated");
     }
 
 
-    public Critter getCritterFromHexLabel(String hexLabel)
-    {
-        return getCritter(hexLabel);
-    }
-
-
     /** Perform strikes for any creature that is forced to strike
      *  and has only one legal target. Forced strikes will never
      *  generate carries, since there's only one target. If
@@ -1191,7 +1197,7 @@ Game.logDebug("defender eliminated");
                     if (set.size() == 1)
                     {
                         String hexLabel = (String)(set.iterator().next());
-                        Critter target = getCritterFromHexLabel(hexLabel);
+                        Critter target = getCritter(hexLabel);
                         critter.strike(target, false);
 
                         // If that strike killed the target, it's possible
@@ -1319,7 +1325,7 @@ Game.logDebug("defender eliminated");
             Critter target = (Critter)it.next();
             if (target.getCarryFlag())
             {
-                set.add(target.getCurrentHex().getLabel());
+                set.add(target.getCurrentHexLabel());
             }
         }
 
@@ -1352,7 +1358,7 @@ Game.logDebug("defender eliminated");
         }
         else
         {
-            String label = target.getCurrentHex().getLabel();
+            String label = target.getCurrentHexLabel();
             map.unselectHexByLabel(label);
             Game.logEvent(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
@@ -1374,7 +1380,7 @@ Game.logDebug("defender eliminated");
     {
         if (hex1 == null || hex2 == null)
         {
-            Game.logDebug("passed null hex to getRange()");
+            Game.logWarn("passed null hex to getRange()");
             return OUT_OF_RANGE;
         }
         if (hex1.isEntrance() || hex2.isEntrance())
@@ -1982,7 +1988,7 @@ Game.logDebug("defender eliminated");
             critterSelected = true;
 
             // Put selected chit at the top of the z-order.
-            if (getActiveLegion().moveToTop(critter));
+            if (getActiveLegion().moveToTop(critter))
             {
                 critter.getCurrentHex().repaint();
             }
@@ -2065,7 +2071,7 @@ Game.logDebug("defender eliminated");
             Game.logEvent(critter.getDescription() + " does not move");
             return true;
         }
-        else if (showMoves(critter).contains(hexLabel))
+        else if (showMoves(critter, false).contains(hexLabel))
         {
             Game.logEvent(critter.getName() + " moves from " +
                 critter.getCurrentHexLabel() + " to " + hexLabel);
@@ -2121,8 +2127,16 @@ Game.logDebug("defender eliminated");
     public ArrayList getAllCritters()
     {
         ArrayList critters = new ArrayList();
-        critters.addAll(getDefender().getCritters());
-        critters.addAll(getAttacker().getCritters());
+        Legion defender = getDefender();
+        if (defender != null)
+        {
+            critters.addAll(defender.getCritters());
+        }
+        Legion attacker = getAttacker();
+        if (attacker != null)
+        {
+            critters.addAll(attacker.getCritters());
+        }
         return critters;
     }
 
@@ -2188,7 +2202,7 @@ Game.logDebug("defender eliminated");
         Player player1 = game.getPlayer(0);
         game.addPlayer("Defender");
         Player player2 = game.getPlayer(1);
-        MasterHex hex = MasterBoard.getHexFromLabel("130");
+        MasterHex hex = MasterBoard.getHexByLabel("130");
         Legion attacker = new Legion("Bk01", null, hex.getLabel(),
             hex.getLabel(), Creature.archangel, Creature.troll,
             Creature.ranger, Creature.hydra, Creature.griffon,
@@ -2201,7 +2215,7 @@ Game.logDebug("defender eliminated");
             Creature.guardian, Creature.minotaur, null, player2.getName(),
             game);
         player2.addLegion(defender);
-        attacker.setEntrySide(5);
+        attacker.setEntrySide(hex.getLabel(), 5);
 
         Battle battle = new Battle(game, attacker.getMarkerId(),
             defender.getMarkerId(), DEFENDER, hex.getLabel(), 1, MOVE);

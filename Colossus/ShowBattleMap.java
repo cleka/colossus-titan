@@ -19,7 +19,7 @@ public final class ShowBattleMap extends HexMap implements WindowListener,
     {
         super(masterHexLabel);
 
-        MasterHex hex = MasterBoard.getHexFromLabel(masterHexLabel);
+        MasterHex hex = MasterBoard.getHexByLabel(masterHexLabel);
         dialog = new JDialog(parentFrame, "Battle Map for " +
             hex.getTerrainName(), true);
 

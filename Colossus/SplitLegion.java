@@ -313,6 +313,10 @@ public final class SplitLegion extends JDialog implements MouseListener,
         oldLegion.hideAllCreatures();
         newLegion.hideAllCreatures();
 
+        // Sort both legions.
+        oldLegion.sortCritters();
+        newLegion.sortCritters();
+
         Game.logEvent(newLegion.getHeight() +
             " creatures are split off from legion " +
             oldLegion.getLongMarkerName() +

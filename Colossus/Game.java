@@ -43,7 +43,7 @@ public final class Game
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
-        "Colossus savegame version 5";
+        "Colossus savegame version 6";
 
     public static final String configVersion =
         "Colossus config file version 2";
@@ -836,7 +836,7 @@ public final class Game
      *         Color
      *         Starting tower
      *         Score
-     *         Alive?
+     *         Dead?
      *         Mulligans left
      *         Players eliminated
      *         Number of markers left
@@ -853,7 +853,7 @@ public final class Game
      *             Moved?
      *             Entry side
      *             Parent
-     *             Recruited?
+     *             Recruit name
      *             Battle tally
      *             Height
      *             Creature 1:
@@ -959,7 +959,7 @@ public final class Game
         // Battle stuff
         if (engagementInProgress)
         {
-            out.println(battle.getMasterHex().getLabel());
+            out.println(battle.getMasterHexLabel());
             out.println(battle.getTurnNumber());
             out.println(battle.getActivePlayer().getName());
             out.println(battle.getPhase());
@@ -986,9 +986,9 @@ public final class Game
         out.println(legion.getCurrentHexLabel());
         out.println(legion.getStartingHexLabel());
         out.println(legion.hasMoved());
-        out.println(legion.getEntrySide());
+        out.println(legion.getEntrySide(legion.getCurrentHexLabel()));
         out.println(legion.getParentId());
-        out.println(legion.hasRecruited());
+        out.println(legion.getRecruitName());
         out.println(legion.getBattleTally());
         out.println(legion.getHeight());
         Collection critters = legion.getCritters();
@@ -1002,7 +1002,7 @@ public final class Game
             {
                 out.println(critter.getHits());
                 out.println(critter.getCurrentHexLabel());
-                out.println(critter.getStartingHex().getLabel());
+                out.println(critter.getStartingHexLabel());
                 out.println(critter.hasStruck());
                 out.println(critter.getCarryFlag());
             }
@@ -1277,8 +1277,7 @@ public final class Game
 
         String parentId = in.readLine();
 
-        buf = in.readLine();
-        boolean recruited = Boolean.valueOf(buf).booleanValue();
+        String recruitName = in.readLine();
 
         buf = in.readLine();
         int battleTally = Integer.parseInt(buf);
@@ -1292,7 +1291,7 @@ public final class Game
         {
             buf = in.readLine();
             Critter critter = new Critter(
-                Creature.getCreatureFromName(buf), false, null, this);
+                Creature.getCreatureByName(buf), false, null, this);
 
             buf = in.readLine();
             boolean visible = Boolean.valueOf(buf).booleanValue();
@@ -1341,8 +1340,8 @@ public final class Game
         }
 
         legion.setMoved(moved);
-        legion.setRecruited(recruited);
-        legion.setEntrySide(entrySide);
+        legion.setRecruitName(recruitName);
+        legion.setEntrySide(currentHexLabel, entrySide);
         legion.addToBattleTally(battleTally);
 
         return legion;
@@ -1380,22 +1379,19 @@ public final class Game
         (1000000000.sav comes after 999999999.sav) */
     private String latestSaveFilename(String [] filenames)
     {
-        final class StringNumComparator implements Comparator
-        {
-            public int compare(Object o1, Object o2)
-            {
-                if (!(o1 instanceof String) || !(o2 instanceof String))
-                {
-                    throw new ClassCastException();
-                }
-
-                return (int)(numberValue((String)o1) -
-                    numberValue((String)o2));
-            }
-        }
-
         return (String)Collections.max(Arrays.asList(filenames), new
-            StringNumComparator());
+            Comparator()
+            {
+                public int compare(Object o1, Object o2)
+                {
+                    if (!(o1 instanceof String) || !(o2 instanceof String))
+                    {
+                        throw new ClassCastException();
+                    }
+                    return (int)(numberValue((String)o1) -
+                        numberValue((String)o2));
+                }
+            });
     }
 
 
@@ -2158,12 +2154,34 @@ public final class Game
     }
 
 
+    private void doMuster(Legion legion)
+    {
+        if (legion.hasMoved() && legion.canRecruit())
+        {
+            Creature recruit = PickRecruit.pickRecruit(masterFrame, legion);
+            if (recruit != null)
+            {
+                doRecruit(recruit, legion, masterFrame);
+            }
+
+            if (!legion.canRecruit())
+            {
+                // XXX This is redundant, since doRecruit() also tries
+                // to unselect it.  Neither seems to be working, though.
+                updateStatusScreen();
+                board.unselectHexByLabel(legion.getCurrentHexLabel());
+
+                // XXX Even more redundancy.
+                board.getHexByLabel(legion.getCurrentHexLabel()).repaint();
+            }
+        }
+    }
+
     public void doRecruit(Creature recruit, Legion legion, JFrame parentFrame)
     {
         // Pick the recruiter(s) if necessary.
         ArrayList recruiters = findEligibleRecruiters(legion, recruit);
         Creature recruiter;
-
         Player player = legion.getPlayer();
 
         int numEligibleRecruiters = recruiters.size();
@@ -2190,12 +2208,14 @@ public final class Game
 
         legion.addCreature(recruit, true);
 
+        MasterHex hex = legion.getCurrentHex();
+
         int numRecruiters = 0;
         if (recruiter != null)
         {
             // Mark the recruiter(s) as visible.
             numRecruiters = numberOfRecruiterNeeded(recruiter,
-                recruit, legion.getCurrentHex().getTerrain());
+                recruit, hex.getTerrain());
             if (numRecruiters >= 1 && numRecruiters <= 3)
             {
                 legion.revealCreatures(recruiter, numRecruiters);
@@ -2203,16 +2223,17 @@ public final class Game
         }
 
         logEvent("Legion " + legion.getLongMarkerName() + " in " +
-            legion.getCurrentHex().getDescription() +
-            " recruits " + recruit.getName() + " with " +
-            (numRecruiters == 0 ? "nothing" :
+            hex.getDescription() + " recruits " + recruit.getName() +
+            " with " + (numRecruiters == 0 ? "nothing" :
             numRecruiters + " " + (numRecruiters > 1 ?
             recruiter.getPluralName() : recruiter.getName())));
 
         // Recruits are one to a customer.
-        legion.setRecruited(true);
-
+        legion.setRecruitName(recruit.getName());
         legion.getPlayer().setLastLegionRecruited(legion);
+
+        hex.unselect();
+        hex.repaint();
     }
 
     /** Return a list of names of angel types that can be acquired. */
@@ -2293,13 +2314,17 @@ public final class Game
         System.out.println(s);
     }
 
-
     /** Log an error. */
     public static void logError(String s)
     {
-        System.out.println(s);
+        System.out.println("Error: " + s);
     }
 
+    /** Log a warning. */
+    public static void logWarn(String s)
+    {
+        System.out.println("Warn:" + s);
+    }
 
     /** Log a debug message. */
     public static void logDebug(String s)
@@ -2392,8 +2417,8 @@ public final class Game
      *  block == -2, use only arrows.  Do not double back in
      *  the direction you just came from.
      */
-    public Set findNormalMoves(MasterHex hex, Player player, Legion legion,
-        int roll, int block, int cameFrom)
+    private Set findNormalMoves(MasterHex hex, Player player, Legion legion,
+        int roll, int block, int cameFrom, boolean affectEntrySides)
     {
         HashSet set = new HashSet();
         String hexLabel = hex.getLabel();
@@ -2405,9 +2430,13 @@ public final class Game
         {
             if (getNumFriendlyLegions(hexLabel, player) == 0)
             {
-                set.add(hex.getLabel());
+                set.add(hexLabel);
                 // Set the entry side relative to the hex label.
-                hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
+                if (affectEntrySides)
+                {
+                    legion.setEntrySide(hexLabel,
+                        (6 + cameFrom - hex.getLabelSide()) % 6);
+                }
             }
             return set;
         }
@@ -2416,30 +2445,33 @@ public final class Game
         {
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions.
-            for (int i = 0; i < player.getNumLegions(); i++)
+            Iterator it = player.getLegions().iterator();
+            while (it.hasNext())
             {
                 // Account for spin cycles.
-                if (player.getLegion(i).getCurrentHex() == hex &&
-                    player.getLegion(i) != legion)
+                Legion otherLegion = (Legion)it.next();
+                if (otherLegion != legion &&
+                    hexLabel.equals(otherLegion.getCurrentHexLabel()))
                 {
                     return set;
                 }
             }
-
-            set.add(hex.getLabel());
+            set.add(hexLabel);
 
             // Need to set entry sides even if no possible engagement,
             // for chooseWhetherToTeleport()
-            hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
-
+            if (affectEntrySides)
+            {
+                legion.setEntrySide(hexLabel,
+                    (6 + cameFrom - hex.getLabelSide()) % 6);
+            }
             return set;
         }
-
 
         if (block >= 0)
         {
             set.addAll(findNormalMoves(hex.getNeighbor(block), player, legion,
-                roll - 1, ARROWS_ONLY, (block + 3) % 6));
+                roll - 1, ARROWS_ONLY, (block + 3) % 6, affectEntrySides));
         }
         else if (block == ARCHES_AND_ARROWS)
         {
@@ -2449,7 +2481,7 @@ public final class Game
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), player,
                         legion, roll - 1, ARROWS_ONLY,
-                        (i + 3) % 6));
+                        (i + 3) % 6, affectEntrySides));
                 }
             }
         }
@@ -2460,7 +2492,8 @@ public final class Game
                 if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), player,
-                    legion, roll - 1, ARROWS_ONLY, (i + 3) % 6));
+                        legion, roll - 1, ARROWS_ONLY, (i + 3) % 6,
+                        affectEntrySides));
                 }
             }
         }
@@ -2485,7 +2518,7 @@ public final class Game
             set.add(hexLabel);
 
             // Mover can choose side of entry.
-            hex.setTeleported(true);
+            legion.setTeleported(hexLabel, true);
         }
 
         if (roll > 0)
@@ -2508,7 +2541,7 @@ public final class Game
     /** Return number of legal non-teleport moves. */
     public int countConventionalMoves(Legion legion)
     {
-        return listMoves(legion, false).size();
+        return listMoves(legion, false, false).size();
     }
 
 
@@ -2516,7 +2549,7 @@ public final class Game
      *  legal moves. */
     public int highlightMoves(Legion legion)
     {
-        Set set = listMoves(legion, true);
+        Set set = listMoves(legion, true, true);
         board.unselectAllHexes();
         board.selectHexesByLabels(set);
         return set.size();
@@ -2525,17 +2558,18 @@ public final class Game
 
     /** Return set of hex labels where this legion can move.
      *  Include teleport moves only if teleport is true. */
-    public Set listMoves(Legion legion, boolean teleport)
+    public Set listMoves(Legion legion, boolean teleport, boolean
+        affectEntrySides)
     {
         return listMoves(legion, teleport, legion.getCurrentHex(),
-             legion.getPlayer().getMovementRoll());
+             legion.getPlayer().getMovementRoll(), affectEntrySides);
     }
 
 
     /** Return set of hex labels where this legion can move.
      *  Include teleport moves only if teleport is true. */
     public Set listMoves(Legion legion, boolean teleport, MasterHex hex,
-        int movementRoll)
+        int movementRoll, boolean affectEntrySides)
     {
         HashSet set = new HashSet();
         if (legion.hasMoved())
@@ -2544,7 +2578,6 @@ public final class Game
         }
 
         Player player = legion.getPlayer();
-        board.clearAllNonFriendlyOccupiedEntrySides(player);
 
         // Conventional moves
 
@@ -2560,7 +2593,7 @@ public final class Game
         }
 
         set.addAll(findNormalMoves(hex, player, legion, movementRoll, block,
-            NOWHERE));
+            NOWHERE, affectEntrySides));
 
         if (teleport && movementRoll == 6)
         {
@@ -2581,8 +2614,8 @@ public final class Game
                         set.add(hexLabel);
 
                         // Mover can choose side of entry.
-                        hex = MasterBoard.getHexFromLabel(hexLabel);
-                        hex.setTeleported(true);
+                        hex = MasterBoard.getHexByLabel(hexLabel);
+                        legion.setTeleported(hexLabel, true);
                     }
                 }
             }
@@ -2605,7 +2638,7 @@ public final class Game
                             {
                                 set.add(hexLabel);
                                 // Mover can choose side of entry.
-                                hex.setTeleported(true);
+                                legion.setTeleported(hexLabel, true);
                             }
                         }
                     }
@@ -2768,6 +2801,10 @@ public final class Game
         engagementInProgress = false;
 
         updateStatusScreen();
+
+        // Performance is a bit slow after battles, so try to
+        // force the system to clean up.
+        System.gc();
     }
 
 
@@ -2912,23 +2949,7 @@ public final class Game
                 break;
 
             case Game.MUSTER:
-                if (legion.hasMoved() && legion.canRecruit())
-                {
-                    Creature recruit = PickRecruit.pickRecruit(masterFrame,
-                        legion);
-                    if (recruit != null)
-                    {
-                        doRecruit(recruit, legion, masterFrame);
-                    }
-
-                    if (!legion.canRecruit())
-                    {
-                        board.unselectHexByLabel(
-                            legion.getCurrentHex().getLabel());
-
-                        updateStatusScreen();
-                    }
-                }
+                doMuster(legion);
                 break;
         }
     }
@@ -2973,17 +2994,21 @@ public final class Game
     }
 
 
-    public void doMove(Legion legion, String hexLabel)
+    /** Move the legion to the hex if legal.  Return true if the
+     *  legion was moved. */
+    public boolean doMove(Legion legion, String hexLabel)
     {
-        // Verify that the move is legal, rather than trusting
-        // hex.isSelected().
-        if (legion != null && listMoves(legion, true).contains(hexLabel))
+        boolean moved = false;
+
+        // Verify that the move is legal.
+        if (legion != null && listMoves(legion, true, true).contains(hexLabel))
         {
             Player player = legion.getPlayer();
-            MasterHex hex = MasterBoard.getHexFromLabel(hexLabel);
+            MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
 
             // Pick teleport or normal move if necessary.
-            if (hex.getTeleported() && hex.canEnterViaLand())
+            if (legion.getTeleported(hexLabel) &&
+                legion.canEnterViaLand(hexLabel))
             {
                 boolean answer;
                 if (player.getOption(Options.autoPickEntrySide))
@@ -2996,51 +3021,53 @@ public final class Game
                 {
                     answer = chooseWhetherToTeleport(hex);
                 }
-                hex.setTeleported(answer);
+                legion.setTeleported(hexLabel, answer);
             }
 
             // If this is a tower hex, set the entry side
             // to '3', regardless.
             if (hex.getTerrain() == 'T')
             {
-                hex.clearAllEntrySides();
-                hex.setEntrySide(3);
+                legion.clearAllEntrySides(hexLabel);
+                legion.setEntrySide(hexLabel, 3);
             }
             // If this is a teleport to a non-tower hex,
             // then allow entry from all three sides.
-            else if (hex.getTeleported())
+            else if (legion.getTeleported(hexLabel))
             {
-                hex.setEntrySide(1);
-                hex.setEntrySide(3);
-                hex.setEntrySide(5);
+                legion.setEntrySide(hexLabel, 1);
+                legion.setEntrySide(hexLabel, 3);
+                legion.setEntrySide(hexLabel, 5);
             }
 
-            // Pick entry side if hex is enemy-occupied
-            // and there is more than one possibility.
-            if (isOccupied(hexLabel) && hex.getNumEntrySides() > 1)
+            // Pick entry side if hex is enemy-occupied and there is
+            // more than one possibility.
+            if (isOccupied(hexLabel) && legion.getNumEntrySides(hexLabel) > 1)
             {
                 int side;
                 if (player.getOption(Options.autoPickEntrySide))
                 {
-                    side = hex.getEntrySide();
+                    side = player.aiPickEntrySide(hexLabel, legion);
                 }
                 else
                 {
-                    side = PickEntrySide.pickEntrySide(masterFrame, hexLabel);
+                    side = PickEntrySide.pickEntrySide(masterFrame, hexLabel,
+                        legion);
                 }
-                hex.clearAllEntrySides();
+                legion.clearAllEntrySides(hexLabel);
                 if (side == 1 || side == 3 || side == 5)
                 {
-                    hex.setEntrySide(side);
+                    legion.setEntrySide(hexLabel, side);
                 }
             }
 
-            // Unless a PickEntrySide was cancelled or
-            // disallowed, execute the move.
-            if (!isOccupied(hexLabel) || hex.getNumEntrySides() == 1)
+            // Unless a PickEntrySide was cancelled or disallowed,
+            // execute the move.
+            if (!isOccupied(hexLabel) ||
+                legion.getNumEntrySides(hexLabel) == 1)
             {
                 // If the legion teleported, reveal a lord.
-                if (hex.getTeleported())
+                if (legion.getTeleported(hexLabel))
                 {
                     // If it was a Titan teleport, that
                     // lord must be the titan.
@@ -3054,18 +3081,19 @@ public final class Game
                             getOption(Options.allStacksVisible));
                     }
                 }
-
                 legion.moveToHex(hex);
+                moved = true;
                 legion.getStartingHex().repaint();
                 hex.repaint();
             }
-
             highlightUnmovedLegions();
         }
         else
         {
             actOnMisclick();
         }
+
+        return moved;
     }
 
 
@@ -3091,6 +3119,9 @@ public final class Game
             engagementInProgress = true;
             Legion attacker = getFirstFriendlyLegion(hexLabel, player);
             Legion defender = getFirstEnemyLegion(hexLabel, player);
+
+            attacker.sortCritters();
+            defender.sortCritters();
 
             if (defender.canFlee())
             {
@@ -3528,12 +3559,11 @@ public final class Game
     {
         String playerName = player.getName();
         int count = 0;
-        Iterator it = getAllLegions().iterator();
+        Iterator it = getAllEnemyLegions(player).iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            if (hexLabel.equals(legion.getCurrentHexLabel()) &&
-                !playerName.equals(legion.getPlayerName()))
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 count++;
             }
@@ -3544,12 +3574,11 @@ public final class Game
     public Legion getFirstEnemyLegion(String hexLabel, Player player)
     {
         String playerName = player.getName();
-        Iterator it = getAllLegions().iterator();
+        Iterator it = getAllEnemyLegions(player).iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            if (hexLabel.equals(legion.getCurrentHexLabel()) &&
-                !playerName.equals(legion.getPlayerName()))
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
                 return legion;
             }
@@ -3570,7 +3599,7 @@ public final class Game
         catch (Exception e)
         {
             logError(e + "Could not set look and feel.");
-        };
+        }
 
         if (args.length == 0)
         {

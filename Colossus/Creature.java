@@ -276,7 +276,7 @@ public class Creature implements Comparable
     }
 
 
-    public static Creature getCreatureFromName(String name)
+    public static Creature getCreatureByName(String name)
     {
         Iterator it = creatures.iterator();
         while (it.hasNext())

@@ -181,11 +181,11 @@ class SimpleAI implements AI
             if (legion.getHeight() < 7)
             {
                 continue;
-                // don't split if we're likely to be forced to attack and lose
-                // don't split if we're likely to want to fight and we need to
-                // be 7 high.
-                // only consider this if we're not doing initial game split
             }
+            // don't split if we're likely to be forced to attack and lose
+            // don't split if we're likely to want to fight and we need to
+            //     be 7 high.
+            // only consider this if we're not doing initial game split
 
             if (legion.getHeight() == 7)
             {
@@ -194,13 +194,13 @@ class SimpleAI implements AI
                 for (int roll = 1; roll <= 6; roll++)
                 {
                     Set moves = game.listMoves(legion, true,
-                            legion.getCurrentHex(), roll);
+                        legion.getCurrentHex(), roll, false);
                     int safeMoves = 0;
                     Iterator moveIt = moves.iterator();
                     while (moveIt.hasNext())
                     {
                         String hexLabel = (String)moveIt.next();
-                        MasterHex hex = game.getBoard().getHexFromLabel(
+                        MasterHex hex = game.getBoard().getHexByLabel(
                             hexLabel);
 
                         if (game.getNumEnemyLegions(hexLabel, player) == 0)
@@ -212,18 +212,18 @@ class SimpleAI implements AI
                             Legion enemy = game.getFirstEnemyLegion(hexLabel,
                                 player);
                             int result = estimateBattleResults(legion, true,
-                                    enemy, hex);
+                                enemy, hex);
 
                             if (result == WIN_WITH_MINIMAL_LOSSES)
                             {
                                 debugln("We can safely split AND attack with "
-                                        + legion);
+                                    + legion);
 
                                 safeMoves++;
                             }
 
                             int result2 = estimateBattleResults(legion, false,
-                                    enemy, hex);
+                                enemy, hex);
 
                             if (result2 == WIN_WITH_MINIMAL_LOSSES
                                 && result != WIN_WITH_MINIMAL_LOSSES
@@ -255,6 +255,7 @@ class SimpleAI implements AI
             // need the muscle
             // TODO: don't split if there's no upwards recruiting
             // potential from our current location
+
             // create the new legion
             Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion,
                 game.getNumPlayers()));
@@ -585,15 +586,13 @@ class SimpleAI implements AI
         // the important ones get the first chance to move to good hexes.
         player.sortLegions();
 
-        boolean movedALegion = handleVoluntaryMoves(game, player, moveMap,
-            enemyAttackMap);
+        handleVoluntaryMoves(game, player, moveMap, enemyAttackMap);
 
         // make sure we move splits (when forced)
-        movedALegion = handleForcedSplitMoves(game, player,
-            moveMap) || movedALegion;
+        handleForcedSplitMoves(game, player, moveMap);
 
         // make sure we move at least one legion
-        if (!movedALegion)
+        if (player.legionsMoved() == 0)
         {
             handleForcedSingleMove(game, player, moveMap);
 
@@ -616,12 +615,10 @@ class SimpleAI implements AI
         }
     }
 
-    /** Return true if something was moved. */
-    private boolean handleVoluntaryMoves(Game game, Player player,
+    private void handleVoluntaryMoves(Game game, Player player,
         HashMap moveMap, HashMap [] enemyAttackMap)
     {
-        boolean movedThisTime;
-        boolean movedALegion = false;
+        boolean moved;
         List legions = player.getLegions();
 
         // Each time we move a legion, that may open up a
@@ -630,11 +627,10 @@ class SimpleAI implements AI
         // break out of the move loop and start over.
         do
         {
-            movedThisTime = false;
+            moved = false;
             for (Iterator it = legions.iterator(); it.hasNext();)
             {
                 Legion legion = (Legion)it.next();
-
                 if (legion.hasMoved())
                 {
                     continue;
@@ -642,25 +638,23 @@ class SimpleAI implements AI
 
                 // compute the value of sitting still
                 ArrayList moveList = new ArrayList();
-
                 moveMap.put(legion, moveList);
 
                 MoveInfo sitStillMove = new MoveInfo(legion, null,
                     evaluateMove(game, legion, legion.getCurrentHex(), false,
                     enemyAttackMap), 0);
-
                 moveList.add(sitStillMove);
 
                 // find the best move (1-ply search)
                 MasterHex bestHex = null;
                 int bestValue = Integer.MIN_VALUE;
-                Set set = game.listMoves(legion, true);
+                Set set = game.listMoves(legion, true, false);
 
                 for (Iterator moveIterator = set.iterator();
                     moveIterator.hasNext();)
                 {
                     final String hexLabel = (String)moveIterator.next();
-                    final MasterHex hex = game.getBoard().getHexFromLabel(
+                    final MasterHex hex = game.getBoard().getHexByLabel(
                         hexLabel);
                     final int value = evaluateMove(game, legion, hex, true,
                         enemyAttackMap);
@@ -671,32 +665,33 @@ class SimpleAI implements AI
                         bestHex = hex;
                     }
                     MoveInfo move = new MoveInfo(legion, hex, value,
-                            value - sitStillMove.value);
+                        value - sitStillMove.value);
                     moveList.add(move);
                 }
 
                 // if we found a move that's better than sitting still, move
                 if (bestValue > sitStillMove.value)
                 {
-                    game.doMove(legion, bestHex.getLabel());
-                    movedALegion = true;
-                    movedThisTime = true;
-                    // Break out of the move loop and start over with
-                    // the highest-priority unmoved legion.
-                    break;
+                    if (game.doMove(legion, bestHex.getLabel()))
+                    {
+                        moved = true;
+                        // Break out of the move loop and start over with
+                        // the highest-priority unmoved legion.
+                        break;
+                    }
+                    else
+                    {
+                        debugln("game.doMove() failed!");
+                    }
                 }
             }
         }
-        while (movedThisTime);
-
-        return movedALegion;
+        while (moved);
     }
 
-    /** Return true if something was moved. */
-    private static boolean handleForcedSplitMoves(Game game, Player player,
+    private static void handleForcedSplitMoves(Game game, Player player,
         HashMap moveMap)
     {
-        boolean movedALegion = false;
         List legions = player.getLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -753,7 +748,6 @@ class SimpleAI implements AI
                             + " in order to handle illegal legion " + legion);
                     game.doMove(move.legion, move.hex.getLabel());
 
-                    movedALegion = true;
                     // check again if this legion is ok; if so, break
                     friendlyLegions = game.getFriendlyLegions(hexLabel,
                         player);
@@ -769,7 +763,6 @@ class SimpleAI implements AI
                 }
             }
         }
-        return movedALegion;
     }
 
     /** Return true if something was moved. */
@@ -827,7 +820,6 @@ class SimpleAI implements AI
         }
     }
 
-
     private static HashMap[] buildEnemyAttackMap(Game game, Player player)
     {
         HashMap[] enemyMap = new HashMap[7];
@@ -863,7 +855,7 @@ class SimpleAI implements AI
                 {
                     // count the moves he can get to
                     Set set = game.listMoves(legion, false,
-                            legion.getCurrentHex(), roll);
+                            legion.getCurrentHex(), roll, false);
                     Iterator moveIt = set.iterator();
                     while (moveIt.hasNext())
                     {
@@ -900,7 +892,6 @@ class SimpleAI implements AI
         return enemyMap;
     }
 
-
     //
     // cheap, inaccurate evaluation function.  Returns a value for
     // moving this legion to this hex.  The value defines a distance
@@ -909,7 +900,7 @@ class SimpleAI implements AI
     // TODO: should be parameterized with weights
     //
     private static int evaluateMove(Game game, Legion legion, MasterHex hex,
-            boolean canRecruitHere, HashMap[] enemyAttackMap)
+        boolean canRecruitHere, HashMap[] enemyAttackMap)
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
         final int WIN_GAME = Integer.MAX_VALUE / 2;
@@ -947,7 +938,7 @@ class SimpleAI implements AI
                 case WIN_WITH_HEAVY_LOSSES:
                     debugln("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and WIN_WITH_HEAVY_LOSSES");
-                // don't do this with our titan unless we can win the game
+                    // don't do this with our titan unless we can win the game
                     Player player = legion.getPlayer();
                     List legions = player.getLegions();
                     boolean haveOtherAngels = false;
@@ -1151,7 +1142,7 @@ class SimpleAI implements AI
 
         for (int roll = 1; roll <= 6; roll++)
         {
-            Set moves = game.listMoves(legion, true, hex, roll);
+            Set moves = game.listMoves(legion, true, hex, roll, false);
             int bestRecruitVal = 0;
             Creature bestRecruit = null;
 
@@ -1159,7 +1150,7 @@ class SimpleAI implements AI
                  nextMoveIt.hasNext(); )
             {
                 String nextLabel = (String)nextMoveIt.next();
-                MasterHex nextHex = game.getBoard().getHexFromLabel(nextLabel);
+                MasterHex nextHex = game.getBoard().getHexByLabel(nextLabel);
                 // if we have to fight in that hex and we can't
                 // WIN_WITH_MINIMAL_LOSSES, then assume we can't
                 // recruit there.  IDEA: instead of doing any of this
@@ -1370,7 +1361,6 @@ class SimpleAI implements AI
         }
     }
 
-
     private static int getNumberOfWaysToTerrain(Legion legion, MasterHex hex,
         char terrainType)
     {
@@ -1412,7 +1402,6 @@ class SimpleAI implements AI
         }
         return count;
     }
-
 
     private static void findNormalMovesToTerrain(Legion legion, Player player,
         MasterHex hex, int roll, int block, int cameFrom, char terrainType,
@@ -1493,6 +1482,18 @@ class SimpleAI implements AI
         return;
     }
 
+    public int pickEntrySide(String hexLabel, Legion legion, Game game)
+    {
+        // This is a really dumb placeholder.  TODO Make it smarter.
+        for (int i = 1; i <= 5; i += 2)
+        {
+            if (legion.canEnterViaSide(hexLabel, i))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     public boolean flee(Legion legion, Legion enemy, Game game)
     {
@@ -1548,7 +1549,7 @@ class SimpleAI implements AI
             while (it2.hasNext())
             {
                 String hexLabel = (String)it2.next();
-                Critter target = battle.getCritterFromHexLabel(hexLabel);
+                Critter target = battle.getCritter(hexLabel);
                 int dice = critter.getDice(target);
                 int strikeNumber = critter.getStrikeNumber(target);
                 double h = Probs.meanHits(dice, strikeNumber);
@@ -1664,7 +1665,7 @@ class SimpleAI implements AI
             while (it.hasNext())
             {
                 String hexLabel = (String)it.next();
-                Critter target = battle.getCritterFromHexLabel(hexLabel);
+                Critter target = battle.getCritter(hexLabel);
 
                 if (target.wouldDieFrom(battle.getCarryDamage()))
                 {
@@ -1950,11 +1951,11 @@ class SimpleAI implements AI
             ArrayList allmoves = new ArrayList();
             Legion legion = (Legion)game.getActivePlayer().getLegions().get(0);
 
-            Iterator it = game.listMoves(legion, true).iterator();
+            Iterator it = game.listMoves(legion, true, true).iterator();
             while (it.hasNext())
             {
                 String hexLabel = (String)it.next();
-                MasterHex hex = game.getBoard().getHexFromLabel(hexLabel);
+                MasterHex hex = game.getBoard().getHexByLabel(hexLabel);
                 HashMap moves = new HashMap();
                 moves.put(legion, hex);
                 PlayerMove move = new PlayerMove(moves, this);
@@ -2167,51 +2168,11 @@ class SimpleAI implements AI
      */
 
 
+    // XXX This method needs to be broken up.
     public void battleMove(Game game)
     {
         debugln("Called battleMove()");
-        ArrayList allCritterMoves = findBattleMoves(game);
 
-        // Now that critters are sorted into the order in which they
-        // should move, start moving them, using the real game data.
-        // If the preferred move fails, fall back to the critter's
-        // remaining moves.
-
-        Battle battle = game.getBattle();
-        BattleMap map = battle.getBattleMap();
-        final char terrain = battle.getTerrain();
-        Legion legion = battle.getActiveLegion();
-
-        Iterator it = allCritterMoves.iterator();
-        while (it.hasNext())
-        {
-            ArrayList moveList = (ArrayList)it.next();
-            Iterator it2 = moveList.iterator();
-            while (it2.hasNext())
-            {
-                CritterMove cm = (CritterMove)it2.next();
-                Critter critter = legion.getCritterByCreatureClass(
-                    cm.getCreatureName() + cm.getStartingHexLabel());
-                BattleHex hex = cm.getEndingHex(map);
-                debugln("applymove: try " + critter + " to " + hex.getLabel());
-                if (battle.doMove(critter, hex))
-                {
-                    // The move was okay, so continue to the next critter.
-                    break;
-                }
-            }
-        }
-
-        debugln("Done with battleMove");
-    }
-
-
-    /** Compute a set of CritterMoves for the game's active legion.
-     *  Return an ArrayList containing one ArrayList of CritterMoves
-     *  for each Critter.
-     */
-    public ArrayList findBattleMoves(Game realGame)
-    {
         // Consider one critter at a time, in order of importance.
         // Examine all possible moves for that critter not already
         // taken by a more important one.
@@ -2219,10 +2180,6 @@ class SimpleAI implements AI
         // TODO Handle summoned/recruited critters, in particular
         // getting stuff out of the way so that a reinforcement
         // has room to enter.
-
-        // Work on a copy of the game state.  The caller is responsible
-        // for actually making the moves.
-        final Game game = realGame.AICopy();
 
         final Battle battle = game.getBattle();
         final BattleMap map = battle.getBattleMap();
@@ -2241,8 +2198,6 @@ class SimpleAI implements AI
         final ArrayList allCritterMoves = new ArrayList();
         HashSet hexesTaken = new HashSet();
 
-        String lastCreatureClass = "";
-
         Iterator it = critters.iterator();
         while (it.hasNext())
         {
@@ -2252,15 +2207,27 @@ class SimpleAI implements AI
 
             // moves is a list of hex labels where one critter
             // can move.
-            // TODO Also consider hexes currently occupied by
-            // friendly critters that can get out of the way.
-            Set moves = battle.showMoves(critter);
+
+            // Sometimes friendly critters need to get out
+            // of the way to clear a path for a more important
+            // critter.  We consider moves that the critter
+            // could make, disregarding mobile allies.
+
+            // TODO Make less important creatures get out of the way.
+
+            // TODO Recompute possible moves when actually moving,
+            // in case some more important critter has failed to
+            // move to its desired hex and left it open.
+
+            Set moves = battle.showMoves(critter, true);
 
             // Not moving is also an option, unless the critter is offboard.
             if (!currentHexLabel.startsWith("X"))
             {
                 moves.add(currentHexLabel);
             }
+
+debugln("Found " + moves.size() + " moves for " + critter.getDescription());
 
             // Now that we've computed possible moves with them out
             // of the way, move previously considered critters into
@@ -2272,7 +2239,7 @@ class SimpleAI implements AI
                 ArrayList moveList = (ArrayList)it2.next();
                 CritterMove cm = (CritterMove)moveList.get(0);
                 Critter critter2 = legion.getCritterByCreatureClass(
-                    cm.getCreatureClass());
+                    cm.getCreatureName() + cm.getEndingHexLabel());
                 // Might already have been moved.
                 if (critter2 != null)
                 {
@@ -2297,7 +2264,7 @@ class SimpleAI implements AI
 
                 CritterMove cm = new CritterMove(critterName,
                    currentHexLabel, hexLabel);
-                BattleHex hex = map.getHexFromLabel(hexLabel);
+                BattleHex hex = map.getHexByLabel(hexLabel);
 
                 // Need to move the critter to evaluate.
                 critter.moveToHex(hex);
@@ -2306,7 +2273,7 @@ class SimpleAI implements AI
                 cm.setValue(evaluateCritterMove(battle, critter));
                 moveList.add(cm);
 
-                // Move the critter back.
+                // Move the critter back where it started.
                 critter.moveToHex(critter.getStartingHex());
             }
 
@@ -2341,83 +2308,36 @@ class SimpleAI implements AI
             allCritterMoves.add(moveList);
         }
 
+        // Figure the order in which creatures should move to get in
+        // each other's way as little as possible.
+        Collections.sort(allCritterMoves, new MoveOrderComparator(battle,
+            allCritterMoves));
 
-        // Now we need to figure the order in which creatures should move,
-        // to get in each other's way as little as possible.
-        // Fliers should move last, since they can fly over allies.
-        // Those moving far should move before those staying close to home.
-        // Non-natives should move before natives, since natives can often
-        //     move through hexes that non-natives can't.
-        // More important creatures should move before less important
-        //     creatures.
-        Collections.sort(critters, new Comparator()
+        // Now that critters are sorted into the order in which they
+        // should move, start moving them for real.  If the preferred
+        // move fails, fall back to the critter's remaining moves.
+
+        it = allCritterMoves.iterator();
+        while (it.hasNext())
         {
-            public int compare(Object o1, Object o2)
+            ArrayList moveList = (ArrayList)it.next();
+            Iterator it2 = moveList.iterator();
+            while (it2.hasNext())
             {
-                Critter critter1 = (Critter)o1;
-                Critter critter2 = (Critter)o2;
-                if (critter1.isFlier() && !critter2.isFlier())
+                CritterMove cm = (CritterMove)it2.next();
+                Critter critter = legion.getCritterByCreatureClass(
+                    cm.getCreatureName() + cm.getStartingHexLabel());
+                BattleHex hex = cm.getEndingHex(map);
+                debugln("applymove: try " + critter + " to " + hex.getLabel());
+                if (battle.doMove(critter, hex))
                 {
-                    return 1;
-                }
-                else if (critter2.isFlier() && !critter1.isFlier())
-                {
-                    return -1;
-                }
-
-                BattleHex desiredHex1 = null;
-                BattleHex desiredHex2 = null;
-
-                Iterator it3 = allCritterMoves.iterator();
-                while (it3.hasNext())
-                {
-                    ArrayList moveList = (ArrayList)it3.next();
-                    CritterMove cm = (CritterMove)moveList.get(0);
-                    if (desiredHex1 == null &&
-                        cm.getCritter(legion) == critter1)
-                    {
-                        desiredHex1 = cm.getEndingHex(map);
-                    }
-                    else if (desiredHex2 == null &&
-                        cm.getCritter(legion) == critter2)
-                    {
-                        desiredHex2 = cm.getEndingHex(map);
-                    }
-                }
-
-                int diff = battle.getRange(critter2.getStartingHex(),
-                    desiredHex2, true) - battle.getRange(
-                    critter1.getStartingHex(), desiredHex1, true);
-                if (diff != 0)
-                {
-                    return diff;
-                }
-
-                if (MasterHex.isNativeCombatBonus(critter1, terrain) &&
-                    !MasterHex.isNativeCombatBonus(critter2, terrain))
-                {
-                    return 1;
-                }
-                else if (MasterHex.isNativeCombatBonus(critter2, terrain) &&
-                    !MasterHex.isNativeCombatBonus(critter1, terrain))
-                {
-                    return -1;
-                }
-
-                diff = getKillValue(critter2, terrain) -
-                    getKillValue(critter1, terrain);
-                if (diff != 0)
-                {
-                    return diff;
-                }
-                else
-                {
-                    return critter1.getName().compareTo(critter2.getName());
+                    // The move was okay, so continue to the next critter.
+                    break;
                 }
             }
-        });
+        }
 
-        return allCritterMoves;
+        debugln("Done with battleMove");
     }
 
 
@@ -2426,13 +2346,10 @@ class SimpleAI implements AI
         char terrain = battle.getTerrain();
         Legion legion = critter.getLegion();
         Legion enemy = battle.getInactiveLegion();
-
-        int value = getCombatValue(critter, terrain);
-
-        // Subtract for wounds.
-        value -= critter.getPower() * critter.getHits() / 2;
-
+        int skill = critter.getSkill();
         BattleHex hex = critter.getCurrentHex();
+
+        int value = 0;
 
         // Add for sitting in favorable terrain.
         // Subtract for sitting in unfavorable terrain.
@@ -2445,7 +2362,7 @@ class SimpleAI implements AI
         {
             if (hex.isNativeBonusTerrain())
             {
-                value += 3;
+                value += 1;
             }
             // Hack: We want marsh natives to slightly prefer
             // moving to bog hexes, even though there's no
@@ -2460,65 +2377,136 @@ class SimpleAI implements AI
         {
             if (hex.isNonNativePenaltyTerrain())
             {
-                value -= 3;
+                value -= 2;
             }
         }
 
-        // Reward the ability to rangestrike.
-        // TODO Non-warlock skill 4 rangestrikers should slightly
-        // prefer range 3 to range 4.  Non-brush rangestrikers
-        // should prefer strikes not through bramble.  Having multiple
-        // rangestrike targets is good, in case someone else kills one.
-        if (critter.isRangestriker() && !critter.isInContact(true)
-            && battle.findStrikes(critter, true).size() >= 1)
-        {
-            value += 4;
-        }
+        Set targetHexLabels = battle.findStrikes(critter, true);
+        int numTargets = targetHexLabels.size();
 
-        // Reward being adjacent to an enemy if attacking.
-        // Penalize being adjacent to an enemy if defending.
-        if (critter.isInContact(false))
+        // TODO Reward ganging up on enemies.  Difficult because not
+        // all allies have yet moved.
+
+        if (numTargets >= 1)
         {
-            if (legion == battle.getAttacker())
+            if (!critter.isInContact(true))
             {
-                value += 1;
+                // Rangestrikes.
+                value += 3;
+
+                // Having multiple targets is good, in case someone else
+                // kills one.
+                if (numTargets >= 2)
+                {
+                    value += 1;
+                }
+
+                // Non-warlock skill 4 rangestrikers should slightly prefer
+                // range 3 to range 4.  Non-brush rangestrikers should
+                // prefer strikes not through bramble.  Warlocks should
+                // try to rangestrike titans.
+                boolean bonus = false;
+                Iterator it = targetHexLabels.iterator();
+                while (it.hasNext())
+                {
+                    String hexLabel = (String)it.next();
+                    Critter target = battle.getCritter(hexLabel);
+                    if (target.isTitan())
+                    {
+                        value += 1;
+                    }
+                    int strikeNum = critter.getStrikeNumber(target);
+                    if (strikeNum == 4 - skill + target.getSkill())
+                    {
+                        // No penality.
+                        bonus = true;
+                    }
+                }
+                if (bonus)
+                {
+                    value += 1;
+                }
             }
             else
             {
-                value -= 1;
+                // Normal strikes.  If we can strike them, they can
+                // strike us.
+
+                // Slightly reward being adjacent to an enemy if attacking.
+                // Slightly penalize being adjacent to an enemy if defending.
+                if (legion == battle.getAttacker())
+                {
+                    value += 1;
+                }
+                else
+                {
+                    value -= 1;
+                }
+
+                // Penalize being next to multiple enemies.
+                if (numTargets > 2)
+                {
+                    value -= 1;
+                }
+
+                Iterator it = targetHexLabels.iterator();
+                while (it.hasNext())
+                {
+                    String hexLabel = (String)it.next();
+                    Critter target = battle.getCritter(hexLabel);
+
+                    // Reward being next to enemy titans.  (Banzai!)
+                    if (target.isTitan())
+                    {
+                        value += 5;
+                    }
+
+                    // Reward being next to a wimpier critter.
+                    if (getKillValue(target, terrain) < getKillValue(critter,
+                        terrain))
+                    {
+                        value += 1;
+                    }
+
+                    // Reward being next to a rangestriker, so it can't hang
+                    // back and plink us.
+                    if (target.isRangestriker() && !critter.isRangestriker())
+                    {
+                        value += 5;
+                    }
+
+                    // Reward being next to an enemy that we can probably
+                    // kill this turn.  Penalize being next to an enemy
+                    // that can probably kill us this turn.
+                    int dice = critter.getDice(target);
+                    int strikeNum = critter.getStrikeNumber(target);
+                    double meanHits = Probs.meanHits(dice, strikeNum);
+                    if (meanHits + target.getHits() >= target.getPower())
+                    {
+                        value += 2;
+                    }
+
+                    dice = target.getDice(critter);
+                    strikeNum = target.getStrikeNumber(critter);
+                    meanHits = Probs.meanHits(dice, strikeNum);
+                    if (meanHits + critter.getHits() >= critter.getPower())
+                    {
+                        value -= 2;
+                    }
+                }
             }
-
-            // Penalize being next to multiple enemies.
-            int numEnemies = critter.numInContact(false);
-            if (numEnemies > 1)
-            {
-                value -= numEnemies - 1;
-            }
-
-            // Reward being next to enemy titans.  (Banzai!)
-
-            // Penalize being next to strong non-titan enemies.
-
-            // Reward being next to a wimpier critter.
-
-            // Reward ganging up on enemies.
-
-            // Reward being next to a rangestriker, so it can't hang
-            // back and plink us.
-
-            // Reward being next to an enemy that we can probably
-            // kill this turn.  Penalize being next to an enemy
-            // that can probably kill us this turn.
         }
 
         // Reward adjacent friendly creatures.
         int buddies = critter.numAdjacentAllies();
-        value += buddies;
+        value += 2 * buddies;
 
         BattleHex entrance = battle.getBattleMap().getEntrance(legion);
 
         // Reward titans sticking to the edges of the back row
-        // surrounded by allies.
+        // surrounded by allies.  We need to relax this in the
+        // last few turns of the battle, so that attacking titans
+        // don't just sit back and wait for a time loss.
         if (critter.isTitan())
         {
             value += 5 * buddies;
@@ -2530,13 +2518,16 @@ class SimpleAI implements AI
             }
             else
             {
-                value -= 10 * battle.getRange(hex, entrance, true);
-                for (int i = 0; i < 6; i++)
+                if (battle.getTurnNumber() <= 5)
                 {
-                    BattleHex neighbor = hex.getNeighbor(i);
-                    if (neighbor == null || neighbor.getTerrain() == 't')
+                    value -= 3 * battle.getRange(hex, entrance, true);
+                    for (int i = 0; i < 6; i++)
                     {
-                        value += 10;
+                        BattleHex neighbor = hex.getNeighbor(i);
+                        if (neighbor == null || neighbor.getTerrain() == 't')
+                        {
+                            value += 3;
+                        }
                     }
                 }
             }
@@ -2557,25 +2548,133 @@ class SimpleAI implements AI
 
                 // To ensure that defending legions completely enter
                 // the board, prefer the second row to the first while
-                // more than 3 critters remain.
+                // more than 3 critters remain.  Also on turn 4 when
+                // recruits show up.
                 // Remember that titan ranges are double-inclusive.
                 int preferredRange = 3;
-                if (legion.getHeight() <= 3)
+                if (legion.getHeight() <= 3 && battle.getTurnNumber() != 4)
                 {
                     preferredRange = 2;
                 }
                 if (range != preferredRange)
                 {
-                    value -= range;
+                    value -= Math.min(range, 2);
                 }
             }
         }
-        else
+        else  // attacker
         {
             value += battle.getRange(hex, entrance, true);
         }
 
+        debugln("EVAL " + critter.getName() +
+                (critter.hasMoved() ? " move to " : " stay in ") + hex +
+                " = " + value);
+
         return value;
+    }
+
+
+
+    /** Fliers should move last, since they can fly over allies.
+     *  Those moving far should move before those staying close to home.
+     *  Non-natives should move before natives, since natives can often
+     *     move through hexes that non-natives can't.
+     *  More important creatures should move before less important
+     *     creatures. */
+    final class MoveOrderComparator implements Comparator
+    {
+        private Battle battle;
+        private ArrayList allCritterMoves;
+
+        public MoveOrderComparator(Battle battle, ArrayList allCritterMoves)
+        {
+            this.battle = battle;
+            this.allCritterMoves = allCritterMoves;
+        }
+
+        public int compare(Object o1, Object o2)
+        {
+            final BattleMap map = battle.getBattleMap();
+            final char terrain = battle.getTerrain();
+            final Legion legion = battle.getActiveLegion();
+
+
+            ArrayList moveList1 = (ArrayList)o1;
+            ArrayList moveList2 = (ArrayList)o2;
+
+            CritterMove cm1 = (CritterMove)moveList1.get(0);
+            CritterMove cm2 = (CritterMove)moveList2.get(0);
+
+            Critter critter1 = legion.getCritterByCreatureClass(
+                cm1.getCreatureName() + cm1.getStartingHexLabel());
+            Critter critter2 = legion.getCritterByCreatureClass(
+                cm2.getCreatureName() + cm2.getStartingHexLabel());
+
+            if (critter1.isFlier() && !critter2.isFlier())
+            {
+                return 1;
+            }
+            else if (critter2.isFlier() && !critter1.isFlier())
+            {
+                return -1;
+            }
+
+            BattleHex desiredHex1 = null;
+            BattleHex desiredHex2 = null;
+
+            Iterator it = allCritterMoves.iterator();
+            while (it.hasNext())
+            {
+                ArrayList moveList = (ArrayList)it.next();
+                CritterMove cm = (CritterMove)moveList.get(0);
+                if (desiredHex1 == null &&
+                    cm.getCreatureName() == critter1.getName() &&
+                    cm.getStartingHexLabel() == critter1.getStartingHexLabel())
+                {
+                    desiredHex1 = cm.getEndingHex(map);
+                }
+                else if (desiredHex2 == null &&
+                    cm.getCreatureName() == critter2.getName() &&
+                    cm.getStartingHexLabel() ==
+                    critter2.getStartingHexLabel())
+                {
+                    desiredHex2 = cm.getEndingHex(map);
+                }
+            }
+
+            int range1 = battle.getRange(critter1.getStartingHex(),
+                desiredHex1, true);
+            int range2 = battle.getRange(critter2.getStartingHex(),
+                desiredHex2, true);
+            int diff = range2 - range1;
+            if (diff != 0)
+            {
+                return diff;
+            }
+
+            if (MasterHex.isNativeCombatBonus(critter1, terrain) &&
+                !MasterHex.isNativeCombatBonus(critter2, terrain))
+            {
+                return 1;
+            }
+            else if (MasterHex.isNativeCombatBonus(critter2, terrain) &&
+                !MasterHex.isNativeCombatBonus(critter1, terrain))
+            {
+                return -1;
+            }
+
+            diff = getKillValue(critter2, terrain) -
+                getKillValue(critter1, terrain);
+            if (diff != 0)
+            {
+                return diff;
+            }
+            else
+            {
+                return critter1.getName().compareTo(critter2.getName());
+            }
+        }
     }
 
 
@@ -2640,16 +2739,6 @@ class SimpleAI implements AI
             return creatureName;
         }
 
-        public String getCreatureClass()
-        {
-            return creatureName + endingHexLabel;
-        }
-
-        public Critter getCritter(Legion legion)
-        {
-            return legion.getCritterByCreatureClass(getCreatureClass());
-        }
-
         public String getStartingHexLabel()
         {
             return startingHexLabel;
@@ -2662,12 +2751,12 @@ class SimpleAI implements AI
 
         public BattleHex getStartingHex(BattleMap map)
         {
-            return map.getHexFromLabel(startingHexLabel);
+            return map.getHexByLabel(startingHexLabel);
         }
 
         public BattleHex getEndingHex(BattleMap map)
         {
-            return map.getHexFromLabel(endingHexLabel);
+            return map.getHexByLabel(endingHexLabel);
         }
     }
 }

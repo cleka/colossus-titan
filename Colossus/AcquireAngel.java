@@ -40,7 +40,7 @@ public final class AcquireAngel extends JDialog implements MouseListener,
         while (it.hasNext())
         {
             String creatureName = (String)it.next();
-            Creature recruit = Creature.getCreatureFromName(creatureName);
+            Creature recruit = Creature.getCreatureByName(creatureName);
             Chit chit = new Chit(scale, recruit.getImageName(), this);
             chits.add(chit);
             contentPane.add(chit);
