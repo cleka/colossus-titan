@@ -4,6 +4,8 @@ import java.util.*;
 public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
     Hashtable carToRecruits = new Hashtable();
     Hashtable carToName = new Hashtable();
+    Hashtable carToColor = new Hashtable();
+    public char[] terrains = null;
 
     class recruitNumber
     {
@@ -13,6 +15,27 @@ public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
         {
             name = n; number = i;
         }
+        public String toString()
+        {
+            return("(" + number + "," + name +")");
+        }
+    }
+    public Creature[] getStartingCreatures()
+    {
+        Creature[] bc = new Creature[3];
+        ArrayList to = getPossibleRecruits('T');
+        bc[0] = (Creature)to.get(0);
+        bc[1] = (Creature)to.get(1);
+        bc[2] = (Creature)to.get(2);
+        return(bc);
+    }
+    public String getTerrainName(char tc)
+    {
+        return((String)carToName.get(new Character(tc)));
+    }
+    public java.awt.Color getTerrainColor(char tc)
+    {
+        return((java.awt.Color)carToColor.get(new Character(tc)));
     }
     public ArrayList getPossibleRecruits(char terrain)
     {
@@ -21,7 +44,10 @@ public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
         for (int i = 0; i < al.size() ; i++)
         {
             recruitNumber tr = (recruitNumber)al.get(i);
-            re.add(Creature.getCreatureByName(tr.name));
+            if (tr.number > 0)
+            {
+                re.add(Creature.getCreatureByName(tr.name));
+            }
         }
         return(re);
     }
@@ -126,17 +152,31 @@ public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
 
   final public int oneTerrain() throws ParseException {
     String t;
+    String col;
     char tc;
     ArrayList rl;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TERCAR:
       tc = r_char();
+      col = r_chaine();
       t = r_chaine();
       rl = r_allRecruit();
       jj_consume_token(EOL);
         carToRecruits.put(new Character(tc), rl);
         carToName.put(new Character (tc), t);
-        Log.debug("Adding recruits for " + t);
+        carToColor.put(new Character (tc), HTMLColor.stringToColor(col));
+        if (terrains == null)
+        {
+            terrains = new char[1];
+            terrains[0] = tc;
+        } else {
+            char[] t2 = new char[terrains.length + 1];
+            for (int i = 0; i < terrains.length ; i++)
+                t2[i] = terrains[i];
+            t2[terrains.length] = tc;
+            terrains = t2;
+        }
+        Log.debug("Adding recruits for " + t + " " + rl);
         {if (true) return(1);}
       break;
     case EOL:

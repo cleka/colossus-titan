@@ -1,6 +1,6 @@
 options
 {
-  IGNORE_CASE = true;
+  IGNORE_CASE = false;
   STATIC = false;
 }
 
@@ -9,19 +9,10 @@ import java.util.*;
 
 public class StrategicMapLoader
 {
-    static Hashtable stringToTerrain;
     static Hashtable stringToWay;
-    static final String[] terrainString = { "BRUSH","DESERT","HILLS","JUNGLE",
-        "MOUNTAINS","MARSH","PLAINS","SWAMP","TOWER","TUNDRA","WOODS" };
         
     public void StrategicMapLoaderInit()
     {
-        stringToTerrain = new Hashtable(11);
-        for (int i = 0 ; i < terrainString.length ; i++)
-        {
-            stringToTerrain.put(terrainString[i], new Character(MasterHex.terrains[i]));
-        }
-                
         stringToWay = new Hashtable(4);
         stringToWay.put("ARROW", new Integer(MasterHex.ARROW));
         stringToWay.put("ARROWS",  new Integer(MasterHex.ARROWS));
@@ -46,18 +37,13 @@ TOKEN :
 
 TOKEN :
 {
-        < CASE : "CASE" >
-}
-
-TOKEN :
-{
         < NUMBER : (<DIGIT>)+ >
 |       < #DIGIT: ["0" - "9"] >
 }
 
 TOKEN :
 {
-        < TERRAIN : "TOWER"|"BRUSH"|"JUNGLE"|"PLAINS"|"WOODS"|"DESERT"|"MARSH"|"HILLS"|"SWAMP"|"MOUNTAINS"|"TUNDRA" >
+        < TERRAIN : ["a"-"z","A"-"Z"] >
 }
 
 TOKEN :
@@ -70,7 +56,7 @@ char c_terrain() :
 {
     <TERRAIN>
     {
-        return(((Character)stringToTerrain.get(token.image)).charValue());
+        return(token.image.charAt(0));
     }
 }
 
@@ -108,12 +94,12 @@ int oneCase(MasterHex [][] h) :
     int nPosY;
 }
 {
-    <CASE> (p = c_number()) (ter = c_terrain()) (s1 = c_number()) (ts1 = c_way()) (s2 = c_number()) (ts2 = c_way()) (s3 = c_number()) (ts3 = c_way()) (posX = c_number()) (posY = c_number()) <EOL>
+    (p = c_number()) (ter = c_terrain()) (s1 = c_number()) (ts1 = c_way()) (s2 = c_number()) (ts2 = c_way()) (s3 = c_number()) (ts3 = c_way()) (posX = c_number()) (posY = c_number()) <EOL>
     {
         nPosX = posX-1;
         nPosY = (posY-1)/2;
         Log.debug("Adding case #" + p + " @(" + nPosX + "," + nPosY +
-            "), type " + ter + " with exit : " + s1 + ", " + s2 + ", " + s3);
+            "), type " + Game.trl.getTerrainName(ter) + " with exit : " + s1 + ", " + s2 + ", " + s3);
         h[nPosX][nPosY].setTerrain(ter);
         h[nPosX][nPosY].setLabel(p);
         h[nPosX][nPosY].setXCoord(nPosX);

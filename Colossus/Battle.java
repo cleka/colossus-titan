@@ -2196,6 +2196,7 @@ public final class Battle
              Battle.MOVE);
     }
 
+    /*
     public static void main(String [] args)
     {
         Game game = new Game();
@@ -2224,5 +2225,5 @@ public final class Battle
         game.setBattle(battle);
         battle.init();
     }
+    */
 }
-

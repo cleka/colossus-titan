@@ -54,7 +54,10 @@ sources = $(wildcard *.java) $(wildcard net/sf/colossus/*.java) \
 	$(wildcard net/sf/colossus/masterboard/*.java) \
 	$(wildcard net/sf/colossus/battle/*.java) \
 	StrategicMapLoader.java \
-	TerrainRecruitLoader.java
+	TerrainRecruitLoader.java \
+	CreatureLoader.java \
+	BattlelandLoader.java \
+	VariantLoader.java
 
 CLASS_FILES = $(sources:%.java=%.class)
 
@@ -68,8 +71,9 @@ jar : $(JARFILE)
 
 # Create jar file
 $(JARFILE): StrategicMapLoader.java TerrainRecruitLoader.java \
+	CreatureLoader.java BattlelandLoader.java \
 	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF StrategicMap.map
-	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class net/sf/colossus/*.class net/sf/colossus/protocol/*.class images/*.gif StrategicMap.map Recruit.ter
+	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class net/sf/colossus/*.class net/sf/colossus/protocol/*.class images/*.gif StrategicMap.map Recruit.ter Creature.cre Default.var Battlelands
 	chmod +x Colossus.jar
 
 # Sign jar file.  This target uses dripton's key; other developers can

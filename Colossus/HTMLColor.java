@@ -153,4 +153,22 @@ public final class HTMLColor
     // My additions.
     public static final Color darkYellow = new Color(200, 200, 0);
     public static final Color lightOlive = new Color(150, 150, 0);
+
+    public static Color stringToColor(String colorName)
+    {
+	Color theColor;
+	try
+	{
+	    java.lang.Class htmlColor = Class.forName("HTMLColor");
+	    java.lang.reflect.Field fieldColor = htmlColor.getDeclaredField(colorName);
+	    theColor = (Color)fieldColor.get(null);
+	}
+	catch (Exception e)
+	{
+	    System.out.println("Warning : I know nothing about color \"" +
+			       colorName + "\", : " + e);
+	    theColor = Color.black;
+	}
+	return(theColor);
+    }
 }

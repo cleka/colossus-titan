@@ -64,13 +64,13 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
-        angelChit = new Chit(scale, Creature.angel.getImageName(), this);
+        angelChit = new Chit(scale, Creature.getCreatureByName("Angel").getImageName(), this);
         constraints.gridy = 0;
         gridbag.setConstraints(angelChit, constraints);
         contentPane.add(angelChit);
         angelChit.addMouseListener(this);
 
-        archangelChit = new Chit(scale, Creature.archangel.getImageName(),
+        archangelChit = new Chit(scale, Creature.getCreatureByName("Archangel").getImageName(),
             this);
         constraints.gridy = 0;
         gridbag.setConstraints(archangelChit, constraints);
@@ -137,11 +137,11 @@ public final class SummonAngel extends JDialog implements MouseListener,
         Object source = e.getSource();
         if (angelChit == source && !angelChit.isDead())
         {
-            cleanup(donor, Creature.angel);
+            cleanup(donor, Creature.getCreatureByName("Angel"));
         }
         else if (archangelChit == source && !archangelChit.isDead())
         {
-            cleanup(donor, Creature.archangel);
+            cleanup(donor, Creature.getCreatureByName("Archangel"));
         }
     }
 
@@ -200,8 +200,8 @@ public final class SummonAngel extends JDialog implements MouseListener,
             return;
         }
 
-        int angels = donor.numCreature(Creature.angel);
-        int archangels = donor.numCreature(Creature.archangel);
+        int angels = donor.numCreature(Creature.getCreatureByName("Angel"));
+        int archangels = donor.numCreature(Creature.getCreatureByName("Archangel"));
 
         angelChit.setDead(angels == 0);
         archangelChit.setDead(archangels == 0);
@@ -219,8 +219,8 @@ public final class SummonAngel extends JDialog implements MouseListener,
                 return;
             }
 
-            int angels = donor.numCreature(Creature.angel);
-            int archangels = donor.numCreature(Creature.archangel);
+            int angels = donor.numCreature(Creature.getCreatureByName("Angel"));
+            int archangels = donor.numCreature(Creature.getCreatureByName("Archangel"));
 
             if (angels == 0 && archangels == 0)
             {
@@ -231,12 +231,12 @@ public final class SummonAngel extends JDialog implements MouseListener,
             if (archangels == 0)
             {
                 // Must take an angel.
-                cleanup(donor, Creature.angel);
+                cleanup(donor, Creature.getCreatureByName("Angel"));
             }
             else if (angels == 0)
             {
                 // Must take an archangel.
-                cleanup(donor, Creature.archangel);
+                cleanup(donor, Creature.getCreatureByName("Archangel"));
             }
             else
             {

@@ -57,7 +57,7 @@ public final class ShowMasterHex extends JDialog implements MouseListener,
         ArrayList creatures = Game.getPossibleRecruits(terrain);
         Iterator it = creatures.iterator();
         boolean firstTime = true;
-        Creature prevCreature = Creature.titan;
+        Creature prevCreature = Creature.getCreatureByName("Titan");
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();

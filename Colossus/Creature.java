@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 /**
  *
@@ -32,6 +33,7 @@ public class Creature implements Comparable
     private final int maxCount;
 
     // Add various Creature archetypes as class members
+    /*
     public static final Creature angel = new Creature("Angel", 6, 4,
         false, true, false, false, false, false, false, true, false,
         18, "Angels");
@@ -104,22 +106,25 @@ public class Creature implements Comparable
     public static final Creature wyvern = new Creature("Wyvern", 7, 3,
         false, true, false, false, true, false, false, false, false,
         18, "Wyverns");
-
+    */
     /** For marking unknown enemy creatures when tracking PBEM games. */
     public static final Creature unknown = new Creature("Unknown", 1, 1,
         false, false, false, false, false, false, false, false, false,
         1, "Unknown");
 
     /** Sometimes we need to iterate through all creature types. */
+    /*
     private static final Creature [] creaturesArray = {angel, archangel,
         behemoth, centaur, colossus, cyclops, dragon, gargoyle, giant,
         gorgon, griffon, guardian, hydra, lion, minotaur, ogre, ranger,
         serpent, titan, troll, unicorn, warbear, warlock, wyvern};
 
     private static final List creatures = Arrays.asList(creaturesArray);
+    */
+    private static List creatures = new ArrayList();
 
 
-    private Creature(String name, int power, int skill, boolean rangestrikes,
+    public Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
         boolean lord, boolean demilord, int maxCount, String pluralName)
@@ -159,6 +164,34 @@ public class Creature implements Comparable
         this.pluralName = creature.pluralName;
     }
 
+    public static void loadCreatures()
+    {
+	try 
+	{
+	    creatures.clear();
+	    InputStream creIS = 
+		java.lang.ClassLoader.getSystemResourceAsStream(
+                    GetPlayers.getCreaturesName());
+		if (creIS == null)
+		{
+		    creIS = new FileInputStream(GetPlayers.getCreaturesName());
+		}
+		if (creIS == null) 
+	        {
+		    System.out.println(
+		        "Creatures def. loading failed for file " + 
+			GetPlayers.getCreaturesName());
+		    System.exit(1);
+		}
+		CreatureLoader cl = new CreatureLoader(creIS);
+		while (cl.oneCreature(creatures) >= 0) {}
+	} 
+        catch (Exception e) 
+	{
+            System.out.println("Creatures def. loading failed : " + e);
+            System.exit(1);
+        }
+    }
 
     public static List getCreatures()
     {

@@ -1,3 +1,4 @@
+import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -13,6 +14,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 {
     protected String masterHexLabel;
     protected char terrain;
+    private static final String pathSeparator = "/";
+    private static String battlelandsDirName = "Battlelands";
+
 
     // GUI hexes need to be recreated for each object, since scale varies.
     protected GUIBattleHex [][] h = new GUIBattleHex[6][6];
@@ -42,9 +46,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     /** Set up a static non-GUI hex map for each terrain type. */
     static
     {
-        for (int t = 0; t < MasterHex.terrains.length; t++)
+	char terrains[] = MasterHex.getTerrainsArray();
+        for (int t = 0; t < terrains.length; t++)
         {
-            char terrain = MasterHex.terrains[t];
+            char terrain = terrains[t];
 
             BattleHex [][] gameH = new BattleHex[6][6];
             ArrayList gameHexes = new ArrayList();
@@ -138,8 +143,35 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  Cliffs are bidirectional; other hexside obstacles are noted
      *  only on the high side, since they only interfere with
      *  uphill movement. */
-    protected static void setupHexesGameState(char terrain, BattleHex [][] h)
+    protected synchronized static void setupHexesGameState(char terrain, BattleHex [][] h)
     {
+	try
+        {
+            String terrainName =
+		battlelandsDirName +
+		pathSeparator +
+		MasterHex.getTerrainName(terrain);
+            ClassLoader cl = Game.class.getClassLoader();
+            InputStream terIS = 
+                cl.getResourceAsStream(terrainName);
+            if (terIS == null)
+            {
+                terIS = new FileInputStream(terrainName);
+            }
+            if (terIS == null) 
+            {
+                System.out.println(
+		    "Battlelands loading failed for file " + 
+		    terrainName);
+            }
+            BattlelandLoader bl = new BattlelandLoader(terIS);
+            while (bl.oneBattlelandCase(h) >= 0) {}
+        }
+        catch (Exception e) 
+	    {
+            System.out.println("Battlelands loading failed : " + e);
+        }
+	/*
         switch (terrain)
         {
             case 'P':
@@ -405,6 +437,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 h[4][3].setHexside(3, 'w');
                 break;
         }
+	*/
     }
 
 
@@ -753,7 +786,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return new Dimension(60 * scale, 60 * scale);
     }
 
-
+    /*
     public static void main(String [] args)
     {
         char terrain;
@@ -781,4 +814,5 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+    */
 }

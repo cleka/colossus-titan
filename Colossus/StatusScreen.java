@@ -149,7 +149,6 @@ public final class StatusScreen extends JDialog implements WindowListener
         setVisible(true);
     }
 
-
     private void setPlayerLabelBackground(int i, Color color)
     {
         if (nameLabel[i].getBackground() != color)

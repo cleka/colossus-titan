@@ -1,0 +1,96 @@
+options
+{
+  IGNORE_CASE = false;
+  STATIC = false;
+}
+
+PARSER_BEGIN(VariantLoader)
+import java.util.*;
+
+public class VariantLoader
+{
+	public static final int MAP_INDEX = 0;
+	public static final int CRE_INDEX = 1;
+	public static final int TER_INDEX = 2;
+}
+
+PARSER_END(VariantLoader)
+
+SKIP :
+{
+        " "
+  |     "\r"
+  |     "\t"
+}
+
+TOKEN :
+{
+        < EOL: "\n" >
+}
+
+TOKEN :
+{
+    < CHAINE : (<CAR>)+ >
+|   < #CAR : ["a"-"z","A"-"Z","0"-"9","_","-","."] >
+}
+
+String v_chaine() :
+{}
+{
+    <CHAINE>
+    {
+        return(new String(token.image));
+    }
+}
+
+void v_map(String[] ls) :
+{
+    String fn;
+}
+{
+    "MAP:" (fn = v_chaine())
+    { ls[MAP_INDEX] = fn; }
+}
+
+void v_cre(String[] ls) :
+{
+    String fn;
+}
+{
+    "CRE:" (fn = v_chaine())
+    { ls[CRE_INDEX] = fn; }
+}
+
+void v_ter(String[] ls) :
+{
+    String fn;
+}
+{
+    "TER:" (fn = v_chaine())
+    { ls[TER_INDEX] = fn; }
+}
+
+int oneLine(String[] ls) :
+{}
+{
+    v_map(ls)	   
+    {
+        return(1);
+    }
+|   v_cre(ls)	   
+    {
+        return(1);
+    }
+|   v_ter(ls)	   
+    {
+        return(1);
+    }
+|   <EOL>
+    {
+        return(0);
+    }
+|   <EOF>
+    {
+        return(-1);
+    }
+}

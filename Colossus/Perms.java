@@ -215,6 +215,7 @@ public final class Perms
 
 
     /** Unit test for Perms. */
+    /*
     public static void main(String [] args)
     {
         ArrayList critters = new ArrayList(7);
@@ -245,4 +246,5 @@ public final class Perms
             System.out.println();
         }
     }
+    */
 }

@@ -301,7 +301,7 @@ public final class Negotiate extends JDialog implements MouseListener,
         }
     }
 
-
+    /*
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing Negotiate");
@@ -346,4 +346,5 @@ public final class Negotiate extends JDialog implements MouseListener,
         Negotiate.negotiate(client, attacker, defender);
         System.exit(0);
     }
+    */
 }

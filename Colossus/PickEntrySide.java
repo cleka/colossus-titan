@@ -163,7 +163,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
         cleanup(-1);
     }
 
-
+    /*
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing PickEntrySide");
@@ -192,4 +192,5 @@ public final class PickEntrySide extends HexMap implements ActionListener,
         System.out.println("Chose side " + side);
         System.exit(0);
     }
+    */
 }

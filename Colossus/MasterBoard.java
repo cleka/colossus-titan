@@ -1467,12 +1467,12 @@ public final class MasterBoard extends JPanel
         {
             masterFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(
                 getClass().getResource(Chit.getImagePath(
-                Creature.colossus.getImageName()))));
+                Creature.getCreatureByName("Colossus").getImageName()))));
         }
         catch (NullPointerException e)
         {
             Log.error(e.toString() + " Couldn't find " +
-                Creature.colossus.getImageName());
+                Creature.getCreatureByName("Colossus").getImageName());
             game.dispose();
         }
     }
@@ -1971,6 +1971,7 @@ public final class MasterBoard extends JPanel
     public static void main(String [] args)
     {
         Game game = new Game();
+	game.initAndLoadData();
         game.initServerAndClients();
         new MasterBoard(game.getServer().getClient(0));
     }

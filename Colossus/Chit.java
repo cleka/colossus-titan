@@ -81,10 +81,29 @@ public class Chit extends JPanel
 
         // This syntax works with either images in a jar file or images
         // in the local filesystem.
-
-        java.net.URL url = getClass().getResource(imageFilename);
-        Image image = Toolkit.getDefaultToolkit().getImage(url);
-        icon = new ImageIcon(image);
+	
+	try {
+	    java.net.URL url = getClass().getResource(imageFilename);
+	    if (url != null)
+	    {
+		Image image = Toolkit.getDefaultToolkit().getImage(url);
+		if (image != null)
+		    icon = new ImageIcon(image);
+	    }
+	    if (icon == null)
+	    { /* try direct file access */
+		Image image = Toolkit.getDefaultToolkit().getImage(imageFilename);
+		if (image != null)
+		    icon = new ImageIcon(image);
+	    }
+	    if (icon == null)
+	    {
+		throw new FileNotFoundException(imageFilename);
+	    }
+	} catch (Exception e) {
+	    System.out.println("Couldn't get image :" + e);
+	    System.exit(1);
+	}
 
         return icon;
     }
@@ -211,7 +230,7 @@ public class Chit extends JPanel
         return buf.toString();
     }
 
-
+    /*
     public static void main(String [] args)
     {
         // Allow showing chits in a different directory.
@@ -249,6 +268,7 @@ public class Chit extends JPanel
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+    */
 }
 
 

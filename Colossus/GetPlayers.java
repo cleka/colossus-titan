@@ -16,10 +16,13 @@ public final class GetPlayers extends JDialog implements WindowListener,
     ActionListener
 {
     public static final int maxAIsupported = 16;
+
     public static final String newGame = "New Game";
     public static final String loadGame = "Load Game";
+    public static final String loadVariant = "Load Variant";
     public static final String loadMap = "Load Map";
     public static final String loadRec = "Load Recruiters";
+    public static String loadCre = "Load Creatures";
     public static final String quit = "Quit";
     public static final String none = "None";
     public static final String byColor = "<By color>";
@@ -38,6 +41,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     private static String mapName = "StrategicMap.map";
     private static String recruitName = "Recruit.ter";
+    private static String creaturesName = "Creature.cre";
     private static String anyAI = "A Random AI";
     private static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
@@ -79,13 +83,19 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
         Container contentPane = getContentPane();
 
-        contentPane.setLayout(new GridLayout(0, 3));
-
+	GridLayout baseLayout = new GridLayout(0, 1);
+	
+        contentPane.setLayout(baseLayout);
+		
         for (int i = 0; i < 6; i++)
         {
+	    Container playerPane = new Container();
+	    playerPane.setLayout(new GridLayout(0, 3));
+	    contentPane.add(playerPane);
+	    
             String s = "Player " + (i + 1);
-            contentPane.add(new JLabel(s));
-
+            playerPane.add(new JLabel(s));
+	    
             JComboBox playerType = new JComboBox(typeChoices);
             if (i == 0)
             {
@@ -95,7 +105,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
             {
                 playerType.setSelectedItem(aiList[0]);
             }
-            contentPane.add(playerType);
+            playerPane.add(playerType);
             playerType.addActionListener(this);
             playerTypes[i] = playerType;
 
@@ -105,30 +115,46 @@ public final class GetPlayers extends JDialog implements WindowListener,
             {
                 playerName.setSelectedItem(username);
             }
-            contentPane.add(playerName);
+            playerPane.add(playerName);
             playerName.addActionListener(this);
             playerNames[i] = playerName;
         }
 
+	Container gamePane = new Container();
+	gamePane.setLayout(new GridLayout(0, 3));
+	Container variantPane = new Container();
+	variantPane.setLayout(new GridLayout(0, 1));
+	Container optionPane = new Container();
+	optionPane.setLayout(new GridLayout(0, 3));
 
+	contentPane.add(gamePane);
+	contentPane.add(variantPane);
+	contentPane.add(optionPane);
+	
         JButton button1 = new JButton(newGame);
         button1.setMnemonic(KeyEvent.VK_N);
-        contentPane.add(button1);
+        gamePane.add(button1);
         button1.addActionListener(this);
         JButton button2 = new JButton(loadGame);
         button2.setMnemonic(KeyEvent.VK_L);
-        contentPane.add(button2);
+        gamePane.add(button2);
         button2.addActionListener(this);
         JButton button3 = new JButton(quit);
         button3.setMnemonic(KeyEvent.VK_Q);
-        contentPane.add(button3);
+        gamePane.add(button3);
         button3.addActionListener(this);
+	JButton buttonVariant = new JButton(loadVariant);
+	variantPane.add(buttonVariant);
+	buttonVariant.addActionListener(this);
         JButton button4 = new JButton(loadMap);
-        contentPane.add(button4);
+        optionPane.add(button4);
         button4.addActionListener(this);
         JButton button5 = new JButton(loadRec);
-        contentPane.add(button5);
+        optionPane.add(button5);
         button5.addActionListener(this);
+        JButton button6 = new JButton(loadCre);
+        optionPane.add(button6);
+        button6.addActionListener(this);
 
         pack();
 
@@ -282,9 +308,34 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
     }
 
+    static class creFileFilter extends javax.swing.filechooser.FileFilter 
+    {
+        public boolean accept(File f) 
+        {
+            if (f.isDirectory()) 
+            {
+                return(true);
+            }
+            if (f.getName().endsWith(".cre")) 
+            {
+                return(true);
+            }
+            return(false);
+        }
+        public String getDescription() 
+        {
+            return("Colossus CREatures file");
+        }
+    }
+
     public static String getRecruitName()
     {
         return recruitName;
+    }
+
+    public static String getCreaturesName()
+    {
+	return creaturesName;
     }
     
     private static String chooseMap() 
@@ -317,6 +368,100 @@ public final class GetPlayers extends JDialog implements WindowListener,
         return (recName);
     }
 
+    private static String chooseCre() 
+    {
+        javax.swing.JFileChooser creChooser = new JFileChooser();
+        creChooser.setFileFilter(new creFileFilter());
+        creChooser.setDialogTitle(
+            "Choose your creatures base (or cancel for default base)");
+        int returnVal = creChooser.showOpenDialog(creChooser);
+        String creName = "Creature.cre";
+        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) 
+        {
+            creName = creChooser.getSelectedFile().getAbsolutePath();
+        }
+        return (creName);
+    }
+
+    static class varFileFilter extends javax.swing.filechooser.FileFilter 
+    {
+        public boolean accept(File f) 
+        {
+            if (f.isDirectory()) 
+            {
+                return(true);
+            }
+            if (f.getName().endsWith(".var")) 
+            {
+                return(true);
+            }
+            return(false);
+        }
+        public String getDescription() 
+        {
+            return("Colossus VARiant file");
+        }
+    }
+
+    private static void doLoadVariant()
+    {
+	javax.swing.JFileChooser varChooser = new JFileChooser();
+        varChooser.setFileFilter(new varFileFilter());
+        varChooser.setDialogTitle(
+            "Choose your variant (or cancel for default game)");
+        int returnVal = varChooser.showOpenDialog(varChooser);
+        String varName = "Default.var";
+        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
+        {
+            varName = varChooser.getSelectedFile().getAbsolutePath();
+        }
+	Log.debug("Loading variant " + varName);
+        try
+        {
+            ClassLoader cl = Game.class.getClassLoader();
+            InputStream varIS = 
+                cl.getResourceAsStream(varName);
+            if (varIS == null)
+            {
+                varIS = new FileInputStream(varName);
+            }
+            if (varIS == null) 
+            {
+                System.out.println(
+                    "Variant loading failed for file " + 
+                     varName);
+            }
+	    else
+	    {
+		VariantLoader vl = new VariantLoader(varIS);
+		String[] data = new String[3];
+		data[0] = data[1] = data[2] = null;
+		while (vl.oneLine(data) >= 0) {}
+		if (data[VariantLoader.MAP_INDEX] != null)
+		{
+		    mapName = data[VariantLoader.MAP_INDEX];
+		    Log.debug("Variant using MAP " + mapName);
+		}
+		if (data[VariantLoader.CRE_INDEX] != null)
+		{
+		    creaturesName = data[VariantLoader.CRE_INDEX];
+		    Log.debug("Variant using CRE " + creaturesName);
+
+		}
+		if (data[VariantLoader.TER_INDEX] != null)
+		{
+		    recruitName = data[VariantLoader.TER_INDEX];
+		    Log.debug("Variant using TER " + recruitName);
+
+		}
+	    }
+        }
+        catch (Exception e) 
+        {
+            System.out.println("Variant loading failed : " + e);
+        }
+    }
+
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals(quit))
@@ -331,6 +476,10 @@ public final class GetPlayers extends JDialog implements WindowListener,
         {
             doLoadGame();
         }
+	else if (e.getActionCommand().equals(loadVariant))
+        {
+	    doLoadVariant();
+	}
         else if (e.getActionCommand().equals(loadMap))
         {
             mapName = chooseMap();
@@ -338,6 +487,10 @@ public final class GetPlayers extends JDialog implements WindowListener,
         else if (e.getActionCommand().equals(loadRec))
         {
             recruitName = chooseRec();
+        }
+        else if (e.getActionCommand().equals(loadCre))
+        {
+            creaturesName = chooseCre();
         }
         else
         {

@@ -182,7 +182,7 @@ public final class Concede extends JDialog implements ActionListener
         cleanup();
     }
 
-
+    /*
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing Concede");
@@ -230,4 +230,5 @@ public final class Concede extends JDialog implements ActionListener
         System.out.println("Concede? " + answer);
         System.exit(0);
     }
+    */
 }

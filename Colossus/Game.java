@@ -47,16 +47,16 @@ public final class Game extends GameSource
     public static final String configVersion =
         "Colossus config file version 2";
 
-    private static TerrainRecruitLoader trl;
+    public static TerrainRecruitLoader trl;
 
     public Game()
     {
     }
 
-
-    public void initServerAndClients()
+    public void initAndLoadData()
     {
-        try 
+	Creature.loadCreatures(); /* try to load creatures */
+        try /* try to load the Recruits database */
         {
             String recruitName = GetPlayers.getRecruitName();
             ClassLoader cl = Game.class.getClassLoader();
@@ -75,13 +75,16 @@ public final class Game extends GameSource
             }
             trl = new TerrainRecruitLoader(terIS);
             while (trl.oneTerrain() >= 0) {}
-        } 
+        }
         catch (Exception e) 
         {
             System.out.println("Recruit-per-terrain loading failed : " + e);
             System.exit(1);
         }
-
+    }
+    // XXX temp
+    public void initServerAndClients()
+    {
         if (server == null)
         {
             server = new Server(this);
@@ -102,6 +105,7 @@ public final class Game extends GameSource
     /** Temporary to avoid having to rename this everywhere.*/
     public void initBoard()
     {
+	initAndLoadData();
         initServerAndClients();
         server.allInitBoard();
     }
@@ -205,6 +209,7 @@ public final class Game extends GameSource
         }
 
         // XXX temp
+	initAndLoadData();
         initServerAndClients();
 
         server.loadOptions();
@@ -1005,6 +1010,7 @@ public final class Game extends GameSource
             summoningAngel = false;
             gameOver = false;
 
+	    initAndLoadData(); // _before_ Creatures get read
 
             buf = in.readLine();
             int numPlayers = Integer.parseInt(buf);
@@ -1380,8 +1386,8 @@ public final class Game extends GameSource
         // Towers are a special case.
         if (terrain == 'T')
         {
-            recruits = getPossibleRecruits(terrain);
-            if (legion.numCreature(Creature.titan) < 1 &&
+	    recruits = getPossibleRecruits(terrain);
+	    if (legion.numCreature(Creature.getCreatureByName("Titan")) < 1 &&
                 legion.numCreature((Creature)recruits.get(4)) < 1)
             { /* no Titan, no itself */ 
                 recruits.remove(4);
@@ -1499,10 +1505,10 @@ public final class Game extends GameSource
             Creature warlockOrNot = (Creature)possibleRecruiters.get(4);
             Creature guardianOrNot = (Creature)possibleRecruiters.get(3);
             if (recruit.getName().equals(warlockOrNot.getName()))
-            {
-                if (legion.numCreature(Creature.titan) >= 1)
+		{
+		    if (legion.numCreature(Creature.getCreatureByName("Titan")) >= 1)
                 {
-                    recruiters.add(legion.getCritter(Creature.titan));
+                    recruiters.add(legion.getCritter(Creature.getCreatureByName("Titan")));
                 }
                 if (legion.numCreature(warlockOrNot) >= 1)
                 {
@@ -1680,13 +1686,13 @@ public final class Game extends GameSource
             return null;
         }
         ArrayList recruits = new ArrayList(2);
-        if (caretaker.getCount(Creature.angel) >= 1)
+        if (caretaker.getCount(Creature.getCreatureByName("Angel")) >= 1)
         {
-            recruits.add(Creature.angel.toString());
+            recruits.add(Creature.getCreatureByName("Angel").toString());
         }
-        if (archangel && caretaker.getCount(Creature.archangel) >= 1)
+        if (archangel && caretaker.getCount(Creature.getCreatureByName("Archangel")) >= 1)
         {
-            recruits.add(Creature.archangel.toString());
+            recruits.add(Creature.getCreatureByName("Archangel").toString());
         }
         return recruits;
     }
@@ -1731,14 +1737,23 @@ public final class Game extends GameSource
         // Lookup coords for chit starting from player[i].getTower()
         String hexLabel = (String.valueOf(100 * player.getTower()));
 
-        caretaker.takeOne(Creature.titan);
-        caretaker.takeOne(Creature.angel);
-        caretaker.takeOne(Creature.ogre);
-        caretaker.takeOne(Creature.ogre);
-        caretaker.takeOne(Creature.centaur);
-        caretaker.takeOne(Creature.centaur);
-        caretaker.takeOne(Creature.gargoyle);
-        caretaker.takeOne(Creature.gargoyle);
+        caretaker.takeOne(Creature.getCreatureByName("Titan"));
+        caretaker.takeOne(Creature.getCreatureByName("Angel"));
+	Creature[] startCre = trl.getStartingCreatures();
+	caretaker.takeOne(startCre[2]);
+	caretaker.takeOne(startCre[2]);
+	caretaker.takeOne(startCre[0]);
+	caretaker.takeOne(startCre[0]);
+	caretaker.takeOne(startCre[1]);
+	caretaker.takeOne(startCre[1]);
+	/*
+        caretaker.takeOne(Creature.getCreatureByName("Ogre"));
+        caretaker.takeOne(Creature.getCreatureByName("Ogre"));
+        caretaker.takeOne(Creature.getCreatureByName("Centaur"));
+        caretaker.takeOne(Creature.getCreatureByName("Centaur"));
+        caretaker.takeOne(Creature.getCreatureByName("Gargoyle"));
+        caretaker.takeOne(Creature.getCreatureByName("Gargoyle"));
+	*/
 
         Legion legion = Legion.getStartingLegion(selectedMarkerId,
             hexLabel, player.getName(), this);
@@ -2165,8 +2180,8 @@ public final class Game extends GameSource
             if (candidate != legion)
             {
                 String hexLabel = candidate.getCurrentHexLabel();
-                if ((candidate.numCreature(Creature.angel) > 0 ||
-                    candidate.numCreature(Creature.archangel) > 0) &&
+                if ((candidate.numCreature(Creature.getCreatureByName("Angel")) > 0 ||
+                    candidate.numCreature(Creature.getCreatureByName("Archangel")) > 0) &&
                     !isEngagement(hexLabel))
                 {
                     set.add(hexLabel);
@@ -2324,7 +2339,7 @@ public final class Game extends GameSource
                     // lord must be the titan.
                     if (isOccupied(hexLabel))
                     {
-                        legion.revealCreatures(Creature.titan, 1);
+                        legion.revealCreatures(Creature.getCreatureByName("Titan"), 1);
                     }
                     else
                     {

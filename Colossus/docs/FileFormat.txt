@@ -9,7 +9,7 @@ This file define the Colossus Masterboard ; what terrain type to use
 for an hex and what sort of exit to which hex. It's composed
 of a succession of line:
 
-CASE <case_label> <case_type>
+<case_label> <case_type>
  <exit_1_label> <exit_1_type>
  <exit_2_label> <exit_2_type>
  <exit_3_label> <exit_3_type>
@@ -17,10 +17,9 @@ CASE <case_label> <case_type>
 
 All of those should be on one line.
 
-CASE is the literal word CASE.
-
 <case_label> is the numeric label of the Hex.
-<case_type> is the terrain type of the hex (PLAINS, HILLS, ...)
+<case_type> is the letter of the terrain type of the hex
+ (same as in the TER file)
 <exit_N_label> are numeric labels for exits 1-3,
  or 0 for no (second, third) exit
 <exit_N_type> is the type of exits (ARROW, ARROWS, ARCH, BLOCK) ;
@@ -40,10 +39,13 @@ This file define the Colossus Recruit Trees ; what
 can recruit and be recruited on what terrain. it's composed
 of a succession of line:
 
-<terrain_letter> <terrain_name> (<recruiter_needed> <recruit>)+
+<terrain_letter> <terrain_color> <terrain_name> (<recruiter_needed> <recruit>)+
 
 <terrain_letter> is the letter internaly used to identify the terrain.
  they must all be different.
+
+<terrain_color> is the color used to display this terrain type,
+ see HTMLColor.java for the various available color.
 
 <terrain_name> is the descriptive name of the terrain (Brush, ...)
 
@@ -52,18 +54,81 @@ of a succession of line:
 
 <recruit> is the name of the recruit creature (Gargoyle, ...)
 
-the last two as a pair can be repeated any number of time. The first pair
+The last two as a pair can be repeated any number of time. The first pair
 ignore the <recruiter_needed> number, so it should be '1'.
 Any later creature can recruit a previous one or itself.
 A creature can recruit the next one only if they are numerous
 enough, as indicated by the <recruiter_needed> _of the recruit_.
 
-the line that starts with 'T Tower' (mandatory) is different.
-It should contain 5 pairs, all with '1' as the <recruiter_needed>
-except for the next-to-last that should be '3'. First three
-are 'anything  can recruit' creature, 4the fourth is 'anything
-numerous enough can recruit', the fifth and last is 'Titan can
-recruit'.
+The line that starts with 'T' and of name 'Tower' (mandatory) is
+different. It should contain 5 pairs, all with '1' as the
+<recruiter_needed> except for the next-to-last that should be '3'.
+First three are 'anything  can recruit' creature, 4the fourth is
+'anything numerous enough can recruit', the fifth and last is 'Titan
+can recruit'. First three will also be used as the starting
+creatures (starting legion will get 2 of each).
 
 Note: for the guardian or the guardian replacement, any value
-othe than '3' will _not_ work.
+other than '3' will _not_ work.
+
+3) CRE file format (default file used: Creature.cre)
+
+This file define the Colossus Creatures ; it's composed
+of a succession of lines:
+
+<name> <power> <skill>
+<rangestrikes> <flies>
+<nativeBramble> <nativeDrift> <nativeBog> <nativeSandDune> <nativeSlope>
+<lord> <demilord>
+<maxCount>
+<pluralName>
+
+all on one line.
+
+<name> is the display name of the creature
+
+<power> and <skill> are the numeric value of power and skill respectively.
+<rangestrikes> <and flies> are boolean values ('true' or 'false'),
+ defining if the creature can rangestrike or fly respectively.
+<nativeXXX> are boolean values defining if the creature is
+ native for terrain type XXX
+<lord> and <demilord> are boolean values, defining if the creature
+ is a lord or a demilord (mutually exclusive).
+<maxCount> is the max number of creature in the caretaker stack.
+<pluralName> is the same as name, just plural.
+
+4) Battleland file format (files used: by terrain name under Battlelands)
+
+These files define the Colossus Battlelands. they're composed
+of a succession of lines:
+
+<X_pos> <Y_pos> <terrain_type> <terrain_elevation> (<border_number> <border_type>)*
+
+all on one line.
+
+Any cas not mentioned in this file is assumed to be of type 'p',
+at elevation '0', and no border.
+
+<X_pos> and <Y_pos> are the X and Y position of the modified case.
+
+<terrain_type> is the terrain type of the case ; it's currently
+one of: p, r, s, t, o, v, d, w (Plain, bRamble, Sand, Tree, bOg, Volcano, Drift, toWer)
+
+<terrain_elevation> is the altitude of the terrain (between 0 and 2)
+
+finally. between 0 and 6 pair of the form <border_number> <border_type>,
+where <border_number> is between 0 and 5 and <bordet_type> is currently
+one of: d, c, s, w (Dune, Cliff, Slope, Wall) ; space (' ') is allowed,
+but it is the default 'no obstacle' and so it is not needed.
+
+5) VAR file format (default file used: Default.var)
+
+This file contains a variant definition, i.e. which
+MAP, CRE and TER file should be used.
+
+Three different lines can exist, in any number and order
+(the last one of each type is used):
+
+CRE:<cre_filename>
+MAP:<map_filename>
+TER:<ter_filename>

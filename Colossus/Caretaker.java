@@ -62,7 +62,7 @@ public final class Caretaker implements Cloneable
         Integer count = (Integer) map.get(strCreatureName);
         if (count == null)
         {
-            return CharacterArchetype.getMaxCount(strCreatureName);
+            return (Creature.getCreatureByName(strCreatureName).getMaxCount());
         }
         return count.intValue();
     }

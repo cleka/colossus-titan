@@ -42,17 +42,17 @@ public final class PickLord extends JDialog implements MouseListener,
 
         // Need to use Critters instead of Creatures to display
         // titan power correctly.
-        if (legion.numCreature(Creature.titan) > 0)
+        if (legion.numCreature(Creature.getCreatureByName("Titan")) > 0)
         {
-            lords.add(legion.getCritter(Creature.titan));
+            lords.add(legion.getCritter(Creature.getCreatureByName("Titan")));
         }
-        if (legion.numCreature(Creature.archangel) > 0)
+        if (legion.numCreature(Creature.getCreatureByName("Archangel")) > 0)
         {
-            lords.add(legion.getCritter(Creature.archangel));
+            lords.add(legion.getCritter(Creature.getCreatureByName("Archangel")));
         }
-        if (legion.numCreature(Creature.angel) > 0)
+        if (legion.numCreature(Creature.getCreatureByName("Angel")) > 0)
         {
-            lords.add(legion.getCritter(Creature.angel));
+            lords.add(legion.getCritter(Creature.getCreatureByName("Angel")));
         }
 
         setResizable(false);
@@ -152,7 +152,7 @@ public final class PickLord extends JDialog implements MouseListener,
     {
     }
 
-
+    /*
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing PickLord");
@@ -177,4 +177,5 @@ public final class PickLord extends JDialog implements MouseListener,
         System.out.println("Chose " + creature);
         System.exit(0);
     }
+    */
 }

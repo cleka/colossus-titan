@@ -133,7 +133,7 @@ public final class ShowLegion extends JDialog implements MouseListener,
     {
     }
 
-
+    /*
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing ShowLegion");
@@ -156,4 +156,5 @@ public final class ShowLegion extends JDialog implements MouseListener,
 
         new ShowLegion(frame, legion, point, true);
     }
+    */
 }

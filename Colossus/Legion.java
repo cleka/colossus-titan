@@ -208,11 +208,26 @@ public final class Legion extends GameSource implements Comparable
     public static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-        Legion oLegion =
-            new Legion(markerId, null, hexLabel, hexLabel, Creature.titan,
-                       Creature.angel, Creature.ogre, Creature.ogre,
-                       Creature.centaur, Creature.centaur, Creature.gargoyle,
-                       Creature.gargoyle, playerName, game);
+	Creature[] startCre = Game.trl.getStartingCreatures();
+        Legion oLegion = 
+            new Legion(markerId, null, hexLabel, hexLabel,
+		       Creature.getCreatureByName("Titan"),
+                       Creature.getCreatureByName("Angel"),
+		       /*
+		       Creature.getCreatureByName("Ogre"),
+		       Creature.getCreatureByName("Ogre"),
+                       Creature.getCreatureByName("Centaur"),
+		       Creature.getCreatureByName("Centaur"),
+		       Creature.getCreatureByName("Gargoyle"),
+                       Creature.getCreatureByName("Gargoyle"),
+		       */
+		       startCre[2],
+		       startCre[2],
+		       startCre[0],
+		       startCre[0],
+		       startCre[1],
+		       startCre[1],
+		       playerName, game);
         // Probably not the right place to be adding this
         oLegion.addGameListener(game.getListener());
         return oLegion;
@@ -736,7 +751,7 @@ public final class Legion extends GameSource implements Comparable
         {
             Legion candidate = (Legion)it.next();
             if (candidate != this &&
-                (candidate.numCreature(Creature.angel) > 0) &&
+                (candidate.numCreature(Creature.getCreatureByName("Angel")) > 0) &&
                 !game.isEngagement(candidate.getCurrentHexLabel()))
             {
                 return true;
@@ -756,7 +771,7 @@ public final class Legion extends GameSource implements Comparable
         {
             Legion candidate = (Legion)it.next();
             if (candidate != this &&
-                (candidate.numCreature(Creature.archangel) > 0) &&
+                (candidate.numCreature(Creature.getCreatureByName("Archangel")) > 0) &&
                 !game.isEngagement(candidate.getCurrentHexLabel()))
             {
                 return true;

@@ -145,7 +145,7 @@ public final class AcquireAngel extends JDialog implements MouseListener,
     {
     }
 
-
+    /*
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing AcquireAngel");
@@ -174,4 +174,5 @@ public final class AcquireAngel extends JDialog implements MouseListener,
         System.out.println("Chose " + type);
         System.exit(0);
     }
+    */
 }

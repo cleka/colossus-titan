@@ -14,8 +14,10 @@ public class MasterHex extends Hex
     /** Terrain types are:
      *  Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
      *  Swamp, Tower, tundra, Woods */
+    /*
     public static final char [] terrains =
         {'B', 'D', 'H', 'J', 'm', 'M', 'P', 'S', 'T', 't', 'W'};
+    */
 
     // Hex labels are:
     // Middle ring: 1-42
@@ -36,7 +38,6 @@ public class MasterHex extends Hex
     public static final int ARCH = 2;
     public static final int ARROW = 3;
     public static final int ARROWS = 4;
-
 
     // The hex vertexes are numbered like this:
     //
@@ -61,9 +62,15 @@ public class MasterHex extends Hex
         super();
     }
 
+    public static char[] getTerrainsArray()
+    {
+	return Game.trl.terrains;
+    }
 
     public String getTerrainName()
     {
+	return(Game.trl.getTerrainName(getTerrain()));
+	/*
         switch (getTerrain())
         {
             case 'B':
@@ -91,10 +98,18 @@ public class MasterHex extends Hex
             default:
                 return "?????";
         }
+	*/
+    }
+
+    public static String getTerrainName(char t)
+    {
+	return(Game.trl.getTerrainName(t));
     }
 
     public Color getTerrainColor()
     {
+	return(Game.trl.getTerrainColor(getTerrain()));
+	/*
         switch (getTerrain())
         {
             case 'B':
@@ -122,6 +137,7 @@ public class MasterHex extends Hex
             default:
                 return Color.black;
         }
+	*/
     }
 
 

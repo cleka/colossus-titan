@@ -96,91 +96,93 @@ class SimpleAI implements AI
         Creature recruit = (Creature)recruits.get(recruits.size() - 1);
 
         // take third cyclops in brush
-        if (recruit == Creature.gorgon && recruits.contains(Creature.cyclops)
-            && legion.numCreature(Creature.behemoth) == 0
-            && legion.numCreature(Creature.cyclops) == 2)
+        if (recruit == Creature.getCreatureByName("Gorgon")
+	    && recruits.contains(Creature.getCreatureByName("Cyclops"))
+            && legion.numCreature(Creature.getCreatureByName("Behemoth")) == 0
+            && legion.numCreature(Creature.getCreatureByName("Cyclops")) == 2)
         {
-            recruit = Creature.cyclops;
+            recruit = Creature.getCreatureByName("Cyclops");
         }
         // take a fourth cyclops in brush
         // (so that we can split out a cyclops and still keep 3)
-        else if (recruit == Creature.gorgon
-            && recruits.contains(Creature.cyclops)
+        else if (recruit == Creature.getCreatureByName("Gorgon")
+            && recruits.contains(Creature.getCreatureByName("Cyclops"))
             && legion.getHeight() == 6
-            && legion.numCreature(Creature.behemoth) == 0
-            && legion.numCreature(Creature.gargoyle) == 0)
+            && legion.numCreature(Creature.getCreatureByName("Behemoth")) == 0
+            && legion.numCreature(Creature.getCreatureByName("Gargoyle")) == 0)
         {
-            recruit = Creature.cyclops;
+            recruit = Creature.getCreatureByName("Cyclops");
         }
         // prefer warlock over guardian (should be built in now)
-        else if (recruits.contains(Creature.guardian)
-            && recruits.contains(Creature.warlock))
+        else if (recruits.contains(Creature.getCreatureByName("Guardian"))
+            && recruits.contains(Creature.getCreatureByName("Warlock")))
         {
-            recruit = Creature.warlock;
+            recruit = Creature.getCreatureByName("Warlock");
         }
         // take a third lion/troll if we've got at least 1 way to desert/swamp
         // from here and we're not about to be attacked
-        else if (recruits.contains(Creature.lion)
-            && recruits.contains(Creature.ranger)
-            && legion.numCreature(Creature.lion) == 2
+        else if (recruits.contains(Creature.getCreatureByName("Lion"))
+            && recruits.contains(Creature.getCreatureByName("Ranger"))
+            && legion.numCreature(Creature.getCreatureByName("Lion")) == 2
             && getNumberOfWaysToTerrain(legion, hex, 'D') > 0)
         {
-            recruit = Creature.lion;
+            recruit = Creature.getCreatureByName("Lion");
         }
-        else if (recruits.contains(Creature.troll)
-            && recruits.contains(Creature.ranger)
-            && legion.numCreature(Creature.troll) == 2
+        else if (recruits.contains(Creature.getCreatureByName("Troll"))
+            && recruits.contains(Creature.getCreatureByName("Ranger"))
+            && legion.numCreature(Creature.getCreatureByName("Troll")) == 2
             && getNumberOfWaysToTerrain(legion, hex, 'S') > 0)
         {
-            recruit = Creature.troll;
+            recruit = Creature.getCreatureByName("Troll");
         }
         // tower creature selection:
-        else if (recruits.contains(Creature.ogre) &&
-            recruits.contains(Creature.centaur) &&
-            recruits.contains(Creature.gargoyle) && recruits.size() == 3)
+        else if (recruits.contains(Creature.getCreatureByName("Ogre")) &&
+		 recruits.contains(Creature.getCreatureByName("Centaur")) &&
+		 recruits.contains(Creature.getCreatureByName("Gargoyle")) &&
+		 recruits.size() == 3)
         {
             // if we have 2 centaurs or ogres, take a third
-            if (legion.numCreature(Creature.ogre) == 2)
+            if (legion.numCreature(Creature.getCreatureByName("Ogre")) == 2)
             {
-                recruit = Creature.ogre;
+                recruit = Creature.getCreatureByName("Ogre");
             }
-            else if (legion.numCreature(Creature.centaur) == 2)
+            else if (legion.numCreature(Creature.getCreatureByName("Centaur")) == 2)
             {
-                recruit = Creature.centaur;
+                recruit = Creature.getCreatureByName("Centaur");
                 // else if we have 1 of a tower creature, take a matching one
             }
-            else if (legion.numCreature(Creature.gargoyle) == 1)
+            else if (legion.numCreature(Creature.getCreatureByName("Gargoyle")) == 1)
             {
-                recruit = Creature.gargoyle;
+                recruit = Creature.getCreatureByName("Gargoyle");
             }
-            else if (legion.numCreature(Creature.ogre) == 1)
+            else if (legion.numCreature(Creature.getCreatureByName("Ogre")) == 1)
             {
-                recruit = Creature.ogre;
+                recruit = Creature.getCreatureByName("Ogre");
             }
-            else if (legion.numCreature(Creature.centaur) == 1)
+            else if (legion.numCreature(Creature.getCreatureByName("Centaur")) == 1)
             {
-                recruit = Creature.centaur;
+                recruit = Creature.getCreatureByName("Centaur");
                 // else if there's cyclops left and we don't have 2
                 // gargoyles, take a gargoyle
             }
-            else if (game.getCaretaker().getCount(Creature.cyclops) > 6
-                && legion.numCreature(Creature.gargoyle) < 2)
+            else if (game.getCaretaker().getCount(Creature.getCreatureByName("Cyclops")) > 6
+                && legion.numCreature(Creature.getCreatureByName("Gargoyle")) < 2)
             {
-                recruit = Creature.gargoyle;
+                recruit = Creature.getCreatureByName("Gargoyle");
                 // else if there's trolls left and we don't have 2 ogres,
                 // take an ogre
             }
-            else if (game.getCaretaker().getCount(Creature.troll) > 6
-                && legion.numCreature(Creature.ogre) < 2)
+            else if (game.getCaretaker().getCount(Creature.getCreatureByName("Troll")) > 6
+                && legion.numCreature(Creature.getCreatureByName("Ogre")) < 2)
             {
-                recruit = Creature.ogre;
+                recruit = Creature.getCreatureByName("Ogre");
                 // else if there's lions left and we don't have 2 lions,
                 // take a centaur
             }
-            else if (game.getCaretaker().getCount(Creature.lion) > 6
-                && legion.numCreature(Creature.centaur) < 2)
+            else if (game.getCaretaker().getCount(Creature.getCreatureByName("Lion")) > 6
+                && legion.numCreature(Creature.getCreatureByName("Centaur")) < 2)
             {
-                recruit = Creature.centaur;
+                recruit = Creature.getCreatureByName("Centaur");
                 // else we don't really care; take anything
             }
         }
@@ -346,14 +348,14 @@ class SimpleAI implements AI
             Creature bestRecruit = null;
             Caretaker caretaker = game.getCaretaker();
             if ((currentScore + pointValue) / 500 > currentScore / 500 &&
-                caretaker.getCount(Creature.archangel) >= 1)
+                caretaker.getCount(Creature.getCreatureByName("Archangel")) >= 1)
             {
-                bestRecruit = Creature.archangel;
+                bestRecruit = Creature.getCreatureByName("Archangel");
             }
             else if ((currentScore + pointValue) / 100 > currentScore / 100 &&
-                caretaker.getCount(Creature.angel) >= 1)
+                caretaker.getCount(Creature.getCreatureByName("Angel")) >= 1)
             {
-                bestRecruit = Creature.angel;
+                bestRecruit = Creature.getCreatureByName("Angel");
             }
             if (bestRecruit != null && bestRecruit.getPointValue() >
                 weakest.getPointValue())
@@ -474,14 +476,15 @@ class SimpleAI implements AI
      *  split out. */
     protected static List doInitialGameSplit(String label, int numPlayers)
     {
+	Creature[] startCre = Game.trl.getStartingCreatures();
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
         final boolean oddTower = "100".equals(label) || "300".equals(label)
                 || "500".equals(label);
-        final Creature splitCreature = oddTower ? Creature.ogre
-                : Creature.centaur;
-        final Creature nonsplitCreature = oddTower ? Creature.centaur
-                : Creature.ogre;
+        final Creature splitCreature = oddTower ? startCre[2]
+                : startCre[0];
+        final Creature nonsplitCreature = oddTower ? startCre[0]
+                : startCre[2];
 
         // don't split gargoyles in tower 3 or 6 (because of the extra jungles)
         if ("300".equals(label) || "600".equals(label))
@@ -519,20 +522,21 @@ class SimpleAI implements AI
     private static List CMUsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature)
     {
+	Creature[] startCre = Game.trl.getStartingCreatures();
         LinkedList splitoffs = new LinkedList();
 
         if (favorTitan)
         {
             if (Game.rollDie() <= 3)
             {
-                splitoffs.add(Creature.titan);
-                splitoffs.add(Creature.gargoyle);
-                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(Creature.getCreatureByName("Titan"));
+                splitoffs.add(startCre[1]);
+                splitoffs.add(startCre[1]);
                 splitoffs.add(splitCreature);
             }
             else
             {
-                splitoffs.add(Creature.angel);
+                splitoffs.add(Creature.getCreatureByName("Angel"));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(splitCreature);
@@ -542,17 +546,17 @@ class SimpleAI implements AI
         {
             if (Game.rollDie() <= 3)
             {
-                splitoffs.add(Creature.titan);
+                splitoffs.add(Creature.getCreatureByName("Titan"));
             }
             else
             {
-                splitoffs.add(Creature.angel);
+                splitoffs.add(Creature.getCreatureByName("Angel"));
             }
 
             if (Game.rollDie() <= 3)
             {
-                splitoffs.add(Creature.gargoyle);
-                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(startCre[1]);
+                splitoffs.add(startCre[1]);
                 splitoffs.add(splitCreature);
             }
             else
@@ -571,47 +575,48 @@ class SimpleAI implements AI
     private static List MITsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature)
     {
+	Creature[] startCre = Game.trl.getStartingCreatures();
         LinkedList splitoffs = new LinkedList();
 
         if (favorTitan)
         {
             if (Game.rollDie() <= 3)
             {
-                splitoffs.add(Creature.titan);
+                splitoffs.add(Creature.getCreatureByName("Titan"));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
-                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(startCre[1]);
             }
             else
             {
-                splitoffs.add(Creature.angel);
+                splitoffs.add(Creature.getCreatureByName("Angel"));
                 splitoffs.add(splitCreature);
                 splitoffs.add(splitCreature);
-                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(startCre[1]);
             }
         }
         else
         {
             if (Game.rollDie() <= 3)
             {
-                splitoffs.add(Creature.titan);
+                splitoffs.add(Creature.getCreatureByName("Titan"));
             }
             else
             {
-                splitoffs.add(Creature.angel);
+                splitoffs.add(Creature.getCreatureByName("Angel"));
             }
 
             if (Game.rollDie() <= 3)
             {
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
-                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(startCre[1]);
             }
             else
             {
                 splitoffs.add(splitCreature);
                 splitoffs.add(splitCreature);
-                splitoffs.add(Creature.gargoyle);
+                splitoffs.add(startCre[1]);
             }
         }
 
@@ -1023,7 +1028,7 @@ class SimpleAI implements AI
                             continue;
                         }
 
-                        if (l.numCreature(Creature.angel) == 0)
+                        if (l.numCreature(Creature.getCreatureByName("Angel")) == 0)
                         {
                             continue;
                         }
@@ -1050,7 +1055,7 @@ class SimpleAI implements AI
                     }
                     // don't do this if we'll lose our only angel group
                     // and won't score enough points to make up for it
-                    else if (legion.numCreature(Creature.angel) > 0
+                    else if (legion.numCreature(Creature.getCreatureByName("Angel")) > 0
                              &&!haveOtherAngels && enemyPointValue < 88)
                     {
                         value += LOSE_LEGION + 5;
@@ -1746,10 +1751,11 @@ class SimpleAI implements AI
             Legion legion = game.getFirstLegion(hexLabel);
             if (bestAngelType(legion).equals("Archangel"))
             {
-                if (bestAngel == null || bestAngel != Creature.archangel)
+                if (bestAngel == null ||
+		    bestAngel != Creature.getCreatureByName("Archangel"))
                 {
                     bestLegion = legion;
-                    bestAngel = Creature.archangel;
+                    bestAngel = Creature.getCreatureByName("Archangel");
                 }
                 else
                 {
@@ -1764,9 +1770,9 @@ class SimpleAI implements AI
                 if (bestAngel == null)
                 {
                     bestLegion = legion;
-                    bestAngel = Creature.angel;
+                    bestAngel = Creature.getCreatureByName("Angel");
                 }
-                else if (bestAngel == Creature.angel)
+                else if (bestAngel == Creature.getCreatureByName("Angel"))
                 {
                     if (legion.compareTo(bestLegion) > 0)
                     {
@@ -1784,11 +1790,11 @@ class SimpleAI implements AI
 
     public static String bestAngelType(Legion legion)
     {
-        if (legion.numCreature(Creature.archangel) >= 1)
+        if (legion.numCreature(Creature.getCreatureByName("Archangel")) >= 1)
         {
             return "Archangel";
         }
-        if (legion.numCreature(Creature.angel) >= 1)
+        if (legion.numCreature(Creature.getCreatureByName("Angel")) >= 1)
         {
             return "Angel";
         }

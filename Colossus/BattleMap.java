@@ -321,12 +321,12 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             battleFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(
                 getClass().getResource(Chit.getImagePath(
-                Creature.colossus.getImageName()))));
+                Creature.getCreatureByName("Colossus").getImageName()))));
         }
         catch (NullPointerException e)
         {
             Log.error(e.toString() + " Couldn't find " +
-                Creature.colossus.getImageName());
+                Creature.getCreatureByName("Colossus").getImageName());
             dispose();
         }
     }

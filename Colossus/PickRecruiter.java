@@ -186,7 +186,7 @@ public final class PickRecruiter extends JDialog implements MouseListener,
     {
     }
 
-
+    /*
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing PickRecruiter");
@@ -216,4 +216,5 @@ public final class PickRecruiter extends JDialog implements MouseListener,
         System.out.println("Picked " + creature);
         System.exit(0);
     }
+    */
 }
