@@ -23,9 +23,10 @@ class Turn extends Dialog implements ActionListener
         this.game = game;
         this.board = board;
 
-        setSize(300, 250);
-        
         setupSplitDialog();
+
+        // This is necessary to prevent a visible resize.
+        pack();
 
         setVisible(true);
     }
@@ -62,17 +63,8 @@ class Turn extends Dialog implements ActionListener
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
             setLocation(new Point(d.width - getSize().width, 0));
 
-            // Highlight hexes with 7 high legions.
-            for (int i = 0; i < player.getNumLegions(); i++)
-            {
-                Legion legion = player.getLegion(i);
-                if (legion.getHeight() >= 7)
-                {
-                    MasterHex hex = legion.getCurrentHex();
-                    hex.select();
-                    hex.repaint();
-                }
-            }
+            // Highlight hexes with legions that are 7 high.
+            player.highlightTallLegions();  
         }
     }
 
@@ -176,7 +168,7 @@ class Turn extends Dialog implements ActionListener
         for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion legion = player.getLegion(i);
-            if (legion.getHeight() < 7 && legion.hasMoved())
+            if (legion.canRecruit() && legion.hasMoved())
             {
                 Creature [] recruits = new Creature[5];
                 if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
@@ -254,9 +246,8 @@ class Turn extends Dialog implements ActionListener
 
             else
             {
-                // XXX: If two or more legions share the same hex, force a
+                // If two or more legions share the same hex, force a
                 // move if one is legal.  Otherwise, recombine them.
-
                 for (int i = 0; i < player.getNumLegions(); i++)
                 {
                     Legion legion = player.getLegion(i);
@@ -300,6 +291,9 @@ class Turn extends Dialog implements ActionListener
         {
             // Commit all moves.
             player.commitMoves();
+
+            // Mulligans are only allowed on turn 1.
+            player.setMulligansLeft(0);
 
             game.advanceTurn();
 
