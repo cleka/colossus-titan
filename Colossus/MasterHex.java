@@ -1022,7 +1022,7 @@ class MasterHex extends Hex
     {
         for (int i = 0; i < 6; i++)
         {
-            if (entrySide[i] == true)
+            if (entrySide[i])
             {
                 return i;
             }
