@@ -3,11 +3,15 @@ package net.sf.colossus.client;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.HashMap;
@@ -16,9 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import net.sf.colossus.server.Creature;
@@ -78,8 +84,13 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
         getContentPane().setLayout(new BorderLayout());
 
-        JPanel panel = makeCreaturePanel();
-        getContentPane().add(panel, BorderLayout.CENTER);
+        JScrollPane scrollPane =
+            new JScrollPane(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                            javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JPanel panel = makeCreaturePanel(scrollPane);
+        scrollPane.setViewportView(panel);
+        getContentPane().add(scrollPane,
+                             BorderLayout.CENTER);
 
         getContentPane().add(legendLabel, BorderLayout.SOUTH);
 
@@ -170,11 +181,11 @@ class CreatureCollectionView extends KDialog implements WindowListener
         }
     }
 
-    private JPanel makeCreaturePanel()
+    private JPanel makeCreaturePanel(JScrollPane scrollPane)
     {
         List creatures = Creature.getCreatures();
-        JPanel creaturePanel =
-                new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
+        JPanel creaturePanel = new JPanel();
+        creaturePanel.setLayout(new CCVFlowLayout(scrollPane, creaturePanel, FlowLayout.LEFT, 2, 2));
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
@@ -323,3 +334,81 @@ class CreatureCollectionView extends KDialog implements WindowListener
         return getMinimumSize();
     }
 }
+
+class CCVFlowLayout extends FlowLayout implements ComponentListener {
+    private JScrollPane parentScrollPane;
+    private JComponent parentComponent;
+    
+    public CCVFlowLayout(JScrollPane sp, JComponent me, int al, int sx, int sy)
+    {
+        super(al, sx, sy);
+        parentScrollPane = sp;
+        parentComponent = me;
+        parentScrollPane.addComponentListener(this);
+    }
+    
+    protected Dimension getOurSize()
+    {
+        javax.swing.JViewport viewport = parentScrollPane.getViewport();
+        Dimension extentSize = viewport.getExtentSize();
+        java.awt.Insets insets = parentComponent.getInsets();
+        int maxLegalWidth = extentSize.width - (insets.left + insets.right);
+        int x = 0, y = insets.top + getVgap();
+        int rowHeight = 0, maxWidth = 0;
+        Component[] allComponents = parentComponent.getComponents();
+        for (int i = 0; i < allComponents.length; i++)
+        {
+            if (allComponents[i].isVisible())
+            {
+                Dimension d = allComponents[i].getPreferredSize();
+                if ((x == 0) || ((x + getHgap() + d.width) <= maxLegalWidth))
+                {
+                    if (x > 0) {
+                        x += getHgap();
+                    }
+                    x += d.width;
+                    rowHeight = (rowHeight < d.height ? d.height : rowHeight);
+                } else
+                {
+                    if (x > maxWidth) {
+                        maxWidth = x;
+                    }
+                    x = d.width;
+                    y += getVgap() + rowHeight;
+                    rowHeight = d.height;
+                }
+            }
+        }
+        if (x > (maxWidth - getHgap())) {
+            maxWidth = x + getHgap();
+        }
+        y += getVgap() + rowHeight + insets.bottom;
+        return new Dimension(maxWidth, y);
+    }
+    
+    public void componentResized(ComponentEvent e) {
+        javax.swing.JViewport viewport = parentScrollPane.getViewport();
+        Dimension viewSize = viewport.getViewSize();
+        Dimension extentSize = viewport.getExtentSize();
+        Dimension ourSize = getOurSize();
+        if ((viewSize.width != extentSize.width) ||
+            (viewSize.height != ourSize.height)) {
+            int x = (ourSize.width > extentSize.width ?  ourSize.width : extentSize.width);
+            int y = (ourSize.height > extentSize.height ?  ourSize.height : extentSize.height);
+            parentComponent.setPreferredSize(new Dimension(x,y));
+            viewport.setViewSize(new Dimension(x,y));
+            parentComponent.doLayout();
+            parentScrollPane.doLayout();
+        }
+    }
+    
+    public void componentMoved(ComponentEvent e) {
+    }
+    
+    public void componentShown(ComponentEvent e) {
+    }
+    
+    public void componentHidden(ComponentEvent e) {
+    } 
+}
+
