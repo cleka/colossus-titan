@@ -44,6 +44,7 @@ public class Game extends Frame implements WindowListener, ActionListener
     {
         super("Player Setup");
         this.isApplet = isApplet;
+        Chit.setApplet(isApplet);
         setBackground(Color.lightGray);
         pack();
         setSize(300, 250);
@@ -82,6 +83,7 @@ public class Game extends Frame implements WindowListener, ActionListener
     {
         super("Player Setup");
         this.isApplet = isApplet;
+        Chit.setApplet(isApplet);
         setBackground(Color.lightGray);
         pack();
 
@@ -776,8 +778,7 @@ public class Game extends Frame implements WindowListener, ActionListener
                         markerId, null, board, height, 
                         board.getHexFromLabel(hexLabel), creatures[0], 
                         creatures[1], creatures[2], creatures[3], creatures[4],
-                        creatures[5], creatures[6], creatures[7], players[i],
-                        isApplet);
+                        creatures[5], creatures[6], creatures[7], players[i]);
 
                     for (int k = 0; k < height; k++)
                     {
