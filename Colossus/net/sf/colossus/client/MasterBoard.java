@@ -9,6 +9,7 @@ import java.io.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.ImageLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Creature;
@@ -20,6 +21,7 @@ import net.sf.colossus.parser.StrategicMapLoader;
  * Class MasterBoard implements the GUI for a Titan masterboard.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 public final class MasterBoard extends JPanel
@@ -1399,16 +1401,22 @@ public final class MasterBoard extends JPanel
 
     private void setupIcon()
     {
-        try
+        java.util.List directories = new java.util.ArrayList();
+        directories.add(GetPlayers.getVarDirectory() +
+                        ImageLoader.getPathSeparator() +
+                        Constants.imageDirName);
+        directories.add(Constants.imageDirName);
+        
+        Image image = ImageLoader.getImage("Colossus", directories);
+        
+        if (image == null)
         {
-            masterFrame.setIconImage(Chit.getImageIcon(
-                Chit.getImagePath("Colossus")).getImage());
-        }
-        catch (NullPointerException e)
-        {
-            Log.error(e.toString() + " Couldn't find "+ 
-                Chit.getImagePath("Colossus"));
+            Log.error("ERROR: Couldn't find Colossus icon");
             System.exit(1);
+        }
+        else
+        {
+            masterFrame.setIconImage(image);
         }
     }
 

@@ -7,6 +7,7 @@ import java.util.*;
 import javax.swing.*;
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.ImageLoader;
 import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
@@ -41,8 +42,6 @@ public final class BattleMap extends HexMap implements MouseListener,
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
     private AbstractAction concedeBattleAction;
-
-
 
     BattleMap(Client client, String masterHexLabel)
     {
@@ -324,19 +323,24 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     private void setupIcon()
     {
-        try
+        java.util.List directories = new java.util.ArrayList();
+        directories.add(GetPlayers.getVarDirectory() +
+                        ImageLoader.getPathSeparator() +
+                        Constants.imageDirName);
+        directories.add(Constants.imageDirName);
+        
+        Image image = ImageLoader.getImage("Colossus", directories);
+        
+        if (image == null)
         {
-            battleFrame.setIconImage(Chit.getImageIcon(
-                Chit.getImagePath("Colossus")).getImage());
-        }
-        catch (NullPointerException e)
-        {
-            Log.error(e.toString() + " Couldn't find " +
-                Creature.getCreatureByName("Colossus").getImageName());
+            Log.error("ERROR: Couldn't find Colossus icon");
             dispose();
         }
+        else
+        {
+            battleFrame.setIconImage(image);
+        }
     }
-
 
     /** Show which player owns this board. */
     void setupPlayerLabel()

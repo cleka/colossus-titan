@@ -8,7 +8,8 @@ import java.net.*;
 import javax.swing.*;
 import java.io.*;
 import net.sf.colossus.util.Log;
-
+import net.sf.colossus.util.ImageLoader;
+import net.sf.colossus.server.Constants;
 
 /**
  * Class GUIBattleHex holds GUI info for one battle hex.
@@ -313,56 +314,18 @@ public class GUIBattleHex extends BattleHex
     // overlays support
     static HashMap hexOverlay;
     static HashMap hexsideOverlay;
-    private static final String pathSeparator = "/";
-    private static String imageDirName = "images";
     private static String imagePostfix = "_Hazard";
-    private static final String imageExtension = ".gif";
+
     
     private static Image loadOneOverlay(String name)
     {
         Image overlay = null;
-        try
-        {
-            URL url;
-            String imageFilename = name +
-                imagePostfix +
-                imageExtension;
-            // try first with the var-specific directory
-            try {
-                url = new URL("file:" +
-                              GetPlayers.getVarDirectory() +
-                              imageDirName +
-                              pathSeparator +
-                              imageFilename);
-                // url will not be null even is the file doesn't exist,
-                // so we need to check if connection can be opened
-                if ((url != null) && (url.openStream() != null))
-                {
-                    overlay = Toolkit.getDefaultToolkit().getImage(url);
-                }
-            } catch (Exception e) {}
-            // try second with the default loader
-            if (overlay == null)
-            {
-                ClassLoader cl = Client.class.getClassLoader();
-                url = cl.getResource(imageDirName +
-                                     pathSeparator +
-                                     imageFilename);
-                if (url != null)
-                {
-                    overlay = (new ImageIcon(url)).getImage();
-                }
-            }
-            if (overlay == null)
-            {
-                throw new FileNotFoundException(imageFilename);
-            }
-        }
-        catch (Exception e) 
-        {
-            Log.debug("Couldn't get image :" + e);
-            return null;
-        }
+        java.util.List directories = new java.util.ArrayList();
+        directories.add(GetPlayers.getVarDirectory() +
+                        ImageLoader.getPathSeparator() +
+                        Constants.imageDirName);
+        directories.add(Constants.imageDirName);
+        overlay = ImageLoader.getImage(name + imagePostfix, directories);
         return overlay;
     }
 

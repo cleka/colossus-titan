@@ -77,4 +77,7 @@ public final class Constants
     public static final String bottom = "Bottom";
     public static final String right = "Right";
     public static final String left = "Left";
+
+    /** Images subdirectory name */
+    public static String imageDirName = "images";
 }

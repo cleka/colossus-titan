@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.util.*;
 import java.awt.geom.*;
 import java.net.*;
+import net.sf.colossus.util.ImageLoader;
+import net.sf.colossus.server.Constants;
 
 
 /**
@@ -14,6 +16,7 @@ import java.net.*;
  * either a character or a legion.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 class Chit extends JPanel
@@ -30,19 +33,7 @@ class Chit extends JPanel
 
     private String id;
 
-    // Constants describing where to find image files.
-
-    // File.separator does not work right in jar files.  A hardcoded
-    // forward-slash does, and works in *x and Windows.  So I'm ignoring
-    // JavaPureCheck's opinion and using a forward slash.
-    // XXX Is there a way to detect whether a program is running from a
-    // jar file?
-    private static final String pathSeparator = "/";
-    private static String imageDirName = "images";
-    private static final String imageExtension = ".gif";
-
     private static BasicStroke threeWide = new BasicStroke(3);
-
 
     Chit(int scale, String id, Container container)
     {
@@ -64,54 +55,28 @@ class Chit extends JPanel
 
         setBackground(Color.lightGray);
 
-        String imageFilename = getImagePath(id);
-
-        icon = getImageIcon(imageFilename);
+        icon = getImageIcon(id);
     }
 
     static ImageIcon getImageIcon(String imageFilename)
     {
         ImageIcon icon = null;
 
-        try 
+        // first, build list of candidate directories
+        java.util.List directories = new java.util.ArrayList();
+        directories.add(GetPlayers.getVarDirectory() +
+                        ImageLoader.getPathSeparator() +
+                        Constants.imageDirName);
+        directories.add(Constants.imageDirName);
+        icon = ImageLoader.getImageIcon(imageFilename,
+                                        directories);
+
+        if (icon == null)
         {
-            URL url;
-            // try first with the var-specific directory
-            try {
-                url = new URL("file:" + GetPlayers.getVarDirectory() +
-                              imageFilename);
-                // url will not be null even is the file doesn't exist,
-                // so we need to check if connection can be opened
-                if ((url != null) && (url.openStream() != null))
-                {
-                    Image image = Toolkit.getDefaultToolkit().getImage(url);
-                    if (image != null)
-                    {
-                        icon = new ImageIcon(image);
-                    }
-                }
-            } catch (Exception e) {}
-            // try second with the default loader
-            if (icon == null)
-            {
-                ClassLoader cl = Client.class.getClassLoader();
-                url = cl.getResource(imageFilename);
-                if (url != null)
-                {
-                    icon = new ImageIcon(url);
-                }
-            }
-            if (icon == null)
-            {
-                throw new FileNotFoundException(imageFilename);
-            }
-        }
-        catch (Exception e) 
-        {
-            System.out.println("Couldn't get image :" + e);
+            System.out.println("Couldn't get image :" + imageFilename);
             System.exit(1);
         }
-
+        
         return icon;
     }
 
@@ -214,16 +179,8 @@ class Chit extends JPanel
         dead = !dead;
     }
 
-
     void setBorder(boolean border)
     {
         this.border = border;
-    }
-
-
-    /** Return the full path to an image file, given its basename */
-    static String getImagePath(String basename)
-    {
-        return imageDirName + pathSeparator + basename + imageExtension;
     }
 }
