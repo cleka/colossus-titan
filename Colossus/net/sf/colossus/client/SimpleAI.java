@@ -2125,12 +2125,18 @@ public class SimpleAI implements AI
             // don't bother unless we can try to weaken the titan stack
             // and we aren't going to help him by removing cruft
             // also, 7-height stack never flee and wimpy stack always flee
-            if (legion.getHeight() < 4)
+            if (legion.getHeight() < 6)
             {
                 Log.debug("Legion " + legion.getMarkerId() + " flee " +
                           " as they are just " + legion.getHeight()  +
                           " wimps !");
                 return true;
+            }
+            if ((enemy.getPointValue() * 0.5) > legion.getPointValue())
+            {
+                Log.debug("Legion " + legion.getMarkerId() + " flee " +
+                          " as they are less than half as strong as " +
+                          enemy.getMarkerId());
             }
             if (enemy.getHeight() == 7)
             {
