@@ -11,12 +11,12 @@ class Player
     private int startingTower;  // 1-6
     private double score = 0;    // track half-points, then round
     private boolean canSummonAngel = true;
-    private String playersEliminated;  // e.g. 1356, based on starting tower
+    private String playersEliminated;  // RdBkGr
     private int numMarkersAvailable = 12;
-    private String [] markersAvailable = new String[60];
+    private String [] markersAvailable = new String[72];
     private String markerSelected;
     int numLegions = 0;
-    Legion [] legions = new Legion[60];
+    Legion [] legions = new Legion[72];
     private Legion selectedLegion = null;
     private boolean alive = true;
     private int mulligansLeft = 1;
@@ -112,6 +112,19 @@ class Player
     String getPlayersElim()
     {
         return playersEliminated;
+    }
+
+
+    void addPlayerElim(Player player)
+    {
+        if (playersEliminated == null)
+        {
+            playersEliminated = player.getShortColor();
+        }
+        else
+        {
+            playersEliminated += player.getShortColor();
+        }
     }
 
 
@@ -273,6 +286,9 @@ class Player
         {
             if (legion == legions[i])
             {
+                // Remove the legion from its current hex.
+                legion.getCurrentHex().removeLegion(legion);
+
                 // Return lords and demi-lords to the stacks.
                 for (int j = 0; j < legion.getHeight(); j++)
                 {
@@ -315,15 +331,24 @@ class Player
         return numMarkersAvailable;
     }
 
+
+    String [] getMarkersAvailable()
+    {
+        return markersAvailable;
+    }
+
+
     String getMarker(int i)
     {
         return markersAvailable[i];
     }
 
+
     String getSelectedMarker()
     {
         return markerSelected;
     }
+
 
     void addSelectedMarker()
     {
@@ -332,10 +357,12 @@ class Player
         markerSelected = null;
     }
 
+
     void clearSelectedMarker()
     {
         markerSelected = null;
     }
+
 
     void selectMarker(int i)
     {
@@ -356,6 +383,19 @@ class Player
             markersAvailable[numMarkersAvailable - 1] = new String("");
             numMarkersAvailable--;
         }
+    }
+
+
+    void addLegionMarkers(Player player)
+    {
+        String [] newMarkers = player.getMarkersAvailable();
+        int len;
+        for (len = 0; newMarkers[len] != null; len++);
+        for (int i = 0; i < len; i++)
+        {
+            markersAvailable[numMarkersAvailable + i] = newMarkers[i];
+        }
+        numMarkersAvailable += len;
     }
 
 
@@ -410,8 +450,18 @@ class Player
         // Mark this player as dead.
         alive = false;
 
+        // Mark who eliminated this player.
+        player.addPlayerElim(this);
+
+        // Give him this player's legion markers.
+        player.addLegionMarkers(this);
+        numMarkersAvailable = 0;
+
         game.updateStatusScreen();
 
         game.getBoard().repaint();
+
+        // If only one player remains, note the victory.
+        game.checkForVictory();
     }
 }
