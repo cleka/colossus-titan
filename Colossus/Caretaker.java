@@ -8,7 +8,9 @@ import java.util.*;
  * @author Bruce Sherrod
  */
 
-public final class Caretaker
+import net.sf.colossus.*;
+
+public final class Caretaker implements Cloneable
 {
     /**
      * mapping from String creature name to Integer count.  If the
@@ -17,20 +19,55 @@ public final class Caretaker
      */
     private HashMap map = new HashMap();
 
+	/**
+	 * This is an adapter so that we can use the CreatureCollectionView
+	 * in the main program
+	 */
+	class CaretakerCollection implements ICreatureCollection
+	{
+		public String getName()
+			{
+				return "Caretaker's Stacks";
+			}
+		public void setCount(String strCharacterName, int nCount)
+			{
+				Caretaker.this.setCount(strCharacterName, nCount);
+			}
+		public int getCount(String strCharacterName)
+			{
+				return Caretaker.this.getCount(strCharacterName);
+			}
+	}
+
+	public ICreatureCollection getCollectionInterface()
+		{
+			return new CaretakerCollection();
+		}
+
+	protected int getCount(String strCreatureName)
+	{
+		Integer count = (Integer) map.get(strCreatureName);
+		if (count == null)
+		{
+			return CharacterArchetype.getMaxCount(strCreatureName);
+		}
+		return count.intValue();
+	}
+
     public int getCount(Creature creature)
     {
-        Integer count = (Integer) map.get(creature.getName());
-        if (count == null)
-        {
-            return creature.getMaxCount();
-        }
-        return count.intValue();
+		return getCount(creature.getName());
     }
 
+	protected void setCount(String strCreatureName, int count)
+	{
+		map.put(strCreatureName, new Integer(count)); 
+	}
+
     public void setCount(Creature creature, int count)
-    {
-        map.put(creature.getName(), new Integer(count));
-    }
+	{
+		setCount(creature.getName(), count);
+	}
 
     public void resetAllCounts()
     {
@@ -77,10 +114,18 @@ public final class Caretaker
      */
     public Caretaker AICopy()
     {
-        Caretaker newCaretaker = new Caretaker();
-        // because String and Integer are both immutable, a shallow copy is
-        // the same as a deep copy
-        newCaretaker.map = (HashMap) map.clone();
-        return newCaretaker;
+		return (Caretaker) clone();
     }
+
+	// ---------------------------------
+	// Override from Object 
+
+	public Object clone()
+		{
+			Caretaker newCaretaker = new Caretaker();
+			// because String and Integer are both immutable, a shallow copy is
+			// the same as a deep copy
+			newCaretaker.map = (HashMap) map.clone();
+			return newCaretaker;
+		}
 }
