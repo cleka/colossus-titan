@@ -214,7 +214,9 @@ public final class Caretaker implements Cloneable
                 if (dead > 0)
                 {
                     int live = getCount(name);
-                    setCount(name, live + dead);
+                    // Don't use setCount, because we want to update displays
+                    // only after both updates are done.
+                    map.put(name, new Integer(live + dead)); 
                     setDeadCount(name, 0);
                 }
             }
