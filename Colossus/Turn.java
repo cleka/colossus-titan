@@ -15,7 +15,8 @@ class Turn extends Dialog implements ActionListener
 
     Turn(Frame parentFrame, Game game, MasterBoard board)
     {
-        super(parentFrame, game.getActivePlayer().getName() + " Turn 1");
+        super(parentFrame, game.getActivePlayer().getName() + " Turn " +
+            game.getTurnNumber());
 
         this.parentFrame = parentFrame;
         this.game = game;
@@ -31,6 +32,8 @@ class Turn extends Dialog implements ActionListener
     
     void setupSplitDialog()
     {
+        setTitle(game.getActivePlayer().getName() + " Turn " +
+            game.getTurnNumber());
         removeAll();
         setLayout(new GridLayout(0, 2));
 
@@ -51,7 +54,7 @@ class Turn extends Dialog implements ActionListener
     {
         removeAll();
         Player player = game.getActivePlayer();
-        if (player.mulligansLeft > 0)
+        if (player.getMulligansLeft() > 0)
         {
             setLayout(new GridLayout(0, 4));
         }
@@ -60,15 +63,15 @@ class Turn extends Dialog implements ActionListener
             setLayout(new GridLayout(0, 3));
         }
 
-        player.movementRoll = (int) Math.ceil(6 * Math.random());
+        player.rollMovementDie();
 
         add(new Label(player.getName() + " : Movement Roll: " + 
-            player.movementRoll));
+            player.getMovementRoll()));
         Button button1 = new Button("Reset Moves");
         add(button1);
         button1.addActionListener(this);
 
-        if (player.mulligansLeft > 0)
+        if (player.getMulligansLeft() > 0)
         {
             Button button2 = new Button("Take Mulligan");
             add(button2);
@@ -87,6 +90,43 @@ class Turn extends Dialog implements ActionListener
     }
 
     
+    void setupFightDialog()
+    {
+        removeAll();
+        setLayout(new GridLayout(0, 2));
+
+        add(new Label(game.getActivePlayer().getName() + 
+            " : Resolve Engagements"));
+        Button button1 = new Button("Muster Recruits");
+        add(button1);
+        button1.addActionListener(this);
+
+        pack();
+
+        // Place this window in the upper right corner.
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width - getSize().width, 0));
+    }
+
+
+    void setupMusterDialog()
+    {
+        removeAll();
+        setLayout(new GridLayout(0, 2));
+
+        add(new Label(game.getActivePlayer().getName() + " : Muster Recruits"));
+        Button button1 = new Button("End Turn");
+        add(button1);
+        button1.addActionListener(this);
+
+        pack();
+
+        // Place this window in the upper right corner.
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width - getSize().width, 0));
+    }
+    
+
     public void actionPerformed(ActionEvent e)
     {
         Player player = game.getActivePlayer();
@@ -114,19 +154,15 @@ class Turn extends Dialog implements ActionListener
 
         else if (e.getActionCommand() == "Take Mulligan")
         {
-            if (player.mulligansLeft > 0)
-            {
-                player.movementRoll = (int) Math.ceil(6 * Math.random());
+            player.takeMulligan();
 
-                player.mulligansLeft--;
-                if (player.mulligansLeft == 0)
-                {
-                    // Remove the Take Mulligan button.
-                    setupMoveDialog();
-                }
-                // Remove all moves from MasterBoard.
-                board.unselectAllHexes();
+            if (player.getMulligansLeft() == 0)
+            {
+                // Remove the Take Mulligan button.
+                setupMoveDialog();
             }
+            // Remove all moves from MasterBoard.
+            board.unselectAllHexes();
         }
 
         else if (e.getActionCommand() == "Done with Moves")
@@ -135,19 +171,36 @@ class Turn extends Dialog implements ActionListener
             {
                 // XXX: Check for the wacky case where there are
                 // no legal moves at all.
+                return;
             }
 
             else
             {
-                // If two or more legions share the same hex, force a
+                // XXX: If two or more legions share the same hex, force a
                 // move if one is legal.  Otherwise, recombine them.
-            }
 
+
+                game.advancePhase();
+
+                setupFightDialog();
+            }
         }
 
+        else if (e.getActionCommand() == "Muster Recruits")
+        {
+            game.advancePhase();
+
+            setupMusterDialog();
+        }
+        
         else if (e.getActionCommand() == "End Turn")
         {
+            // Commit all moves.
+            player.commitMoves();
+
             game.advanceTurn();
+
+            setupSplitDialog();
         }
     }
 }
