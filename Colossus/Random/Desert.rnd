@@ -29,7 +29,7 @@ AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS s,50. s,25.
 AREA (innermost) HAZARDS t,5.,1
 
 # hexside probability
-# 60% of the hexside will be Slope, and 50% of the remaining will be Cliff
+# 60% of the hexside will be dune, and 50% of the remaining will be Cliff
 # This for any elevation
-PAIR (s,*)(p,*) HEXSIDES s,60. c,50.
+PAIR (s,*)(p,*) HEXSIDES d,60. c,50.
 
