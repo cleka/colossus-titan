@@ -92,8 +92,7 @@ class BattleTurn extends JDialog implements ActionListener
 
         if (summonState == BattleMap.FIRST_BLOOD)
         {
-            if (attacker.getHeight() < 7 &&
-                attacker.getPlayer().canSummonAngel())
+            if (attacker.canSummonAngel())
             {
                 summoningAngel = true;
 
