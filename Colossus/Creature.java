@@ -2,13 +2,17 @@ import java.util.*;
 
 /**
  *
- * Class Creature represents the CONSTANT information about a Titan Creature.
+ * Class Creature represents the CONSTANT information about a Titan
+ * Creature.
  *
- * Game related info is in Critter.  Counts of recruited/available/dead are in Caretaker.
+ * Game related info is in Critter.  Counts of
+ * recruited/available/dead are in Caretaker.
+ *
+ * TMJF -- test that I can check inn
  *
  * @version $Id$
- * @author David Ripton, Bruce Sherrod
- */
+ * @author David Ripton, Bruce Sherrod 
+*/
 
 public class Creature implements Comparable
 {
