@@ -14,17 +14,8 @@ import java.awt.event.*;
 public abstract class PhaseAdvancer
 {
     private javax.swing.Timer timer;
-    private Server server;
     private boolean isHuman;
 
-
-    private class AdvancePhaseListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            advancePhaseInternal();
-        }
-    }
 
     void startTimer(int delay)
     {
@@ -38,7 +29,7 @@ public abstract class PhaseAdvancer
         int delay = Constants.MIN_DELAY;
         if (server != null)
         {
-            delay = server.getClientIntOption(Options.aiDelay);
+            delay = server.getIntOption(Options.aiDelay);
         }
         if (isHuman || delay < Constants.MIN_DELAY)
         {
@@ -57,4 +48,13 @@ public abstract class PhaseAdvancer
     abstract void advancePhaseInternal();
 
     abstract void advanceTurn();
+
+
+    private class AdvancePhaseListener implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            advancePhaseInternal();
+        }
+    }
 }

@@ -2,6 +2,9 @@ package net.sf.colossus.server;
 
 
 import java.util.*;
+import java.io.*;
+
+import net.sf.colossus.util.Log;
 
 
 /** Class Options lists game options for Colossus.
@@ -11,9 +14,13 @@ import java.util.*;
 
 public final class Options
 {
+    // Everything is public because we use this class in both the client
+    // and server packages.  (With separate data.)
+
     // Constants related to the options config files
     public static final String optionsPath = "Colossus";
     public static final String optionsSep = "-";
+    public static final String optionsServerName = "server";
     public static final String optionsExtension = ".cfg";
 
     public static final String configVersion =
@@ -29,6 +36,16 @@ public final class Options
     public static final String aiDelay = "AI delay";
     public static final String autoQuit = "Auto quit when game over";
 
+
+    private static final String [] serverOptions = 
+        { autosave, logDebug, allStacksVisible, aiDelay, autoQuit };
+
+    public static List getServerOptions()
+    {
+        return Collections.unmodifiableList(Arrays.asList(serverOptions));
+    }
+
+
     // Display options (client)
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";
@@ -38,26 +55,117 @@ public final class Options
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
 
-    // AI options (player - put on client)
+    // AI options (player - on client)
     public static final String autoPickColor = "Auto pick color";
     public static final String autoPickMarker = "Auto pick markers";
-    public static final String autoSplit = "Auto split";
-    public static final String autoMasterMove = "Auto masterboard move";
     public static final String autoPickEntrySide = "Auto pick entry sides";
-    public static final String autoFlee = "Auto flee";
     public static final String autoNegotiate = "Auto negotiate";
-    public static final String autoPickEngagement = "Auto pick engagements";
-    public static final String autoBattleMove = "Auto battle move";
     public static final String autoForcedStrike = "Auto forced strike";
     public static final String autoCarrySingle = "Auto carry single";
     public static final String autoRangeSingle = "Auto rangestrike single";
-    public static final String autoStrike = "Auto strike";
     public static final String autoSummonAngels = "Auto summon angels";
     public static final String autoAcquireAngels = "Auto acquire angels";
-    public static final String autoRecruit = "Auto recruit";
     public static final String autoPickRecruiter = "Auto pick recruiters";
     public static final String autoPlay = "Auto play";
 
     // General per-player options
     public static final String favoriteColors = "Favorite colors";
+
+
+    private Properties props = new Properties();
+    private String owner;      // playerName, or optionsServerName
+
+
+    public Options(String owner)
+    {
+        this.owner = owner;
+    }
+
+    public void loadOptions()
+    {
+        final String optionsFile = optionsPath + optionsSep +
+            owner + optionsExtension;
+        loadOptions(optionsFile);
+    }
+
+    public void loadOptions(String optionsFile)
+    {
+        try
+        {
+            FileInputStream in = new FileInputStream(optionsFile);
+            props.load(in);
+        }
+        catch (IOException e)
+        {
+            Log.debug("Couldn't read options from " + optionsFile);
+            return;
+        }
+    }
+
+    
+    public void saveOptions()
+    {
+        final String optionsFile = optionsPath + optionsSep +
+            owner + optionsExtension;
+        try
+        {
+            FileOutputStream out = new FileOutputStream(optionsFile);
+            props.store(out, configVersion);
+            out.close();
+        }
+        catch (IOException e)
+        {
+            Log.error("Couldn't write options to " + optionsFile);
+        }
+    }
+
+
+    public void setOption(String optname, String value)
+    {
+        props.setProperty(optname, value);
+    }
+
+    public void setOption(String optname, boolean value)
+    {
+        setOption(optname, String.valueOf(value));
+    }
+
+    public void setOption(String optname, int value)
+    {
+        setOption(optname, String.valueOf(value));
+    }
+
+
+    public String getStringOption(String optname)
+    {
+        String value = props.getProperty(optname);
+        return value;
+    }
+
+    public boolean getOption(String optname)
+    {
+        String value = getStringOption(optname);
+        return (value != null && value.equals("true"));
+    }
+
+    /** Return -1 if the option's value has not been set. */
+    public int getIntOption(String optname)
+    {
+        String buf = getStringOption(optname);
+        int value = -1;
+        try
+        {
+            value = Integer.parseInt(buf);
+        }
+        catch (Exception ex)
+        {
+            value = -1;
+        }
+        return value;
+    }
+
+    public Enumeration propertyNames()
+    {
+        return props.propertyNames();
+    }
 }

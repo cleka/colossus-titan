@@ -46,6 +46,8 @@ final class StatusScreen extends KDialog implements WindowListener
 
         setVisible(false);
         this.client = client;
+
+        // Needs to be set up before calling this.
         numPlayers = client.getNumPlayers();
 
         addWindowListener(this);

@@ -34,6 +34,8 @@ public final class Server
     /** Map of player name to client. */
     private Map clientMap = new HashMap();
 
+    private String primaryPlayerName = null;
+
     // Cached strike information.
     Critter striker; 
     Critter target;
@@ -55,6 +57,10 @@ public final class Server
         Client client = new Client(this, playerName, primary);
         clients.add(client);
         clientMap.put(playerName, client);
+        if (primary)
+        {
+            primaryPlayerName = playerName;
+        }
     }
 
 
@@ -139,6 +145,7 @@ public final class Server
 
     public void makeForcedStrikes(String playerName, boolean rangestrike)
     {
+Log.debug("called Server.makeForcedStrikes() " + playerName + " " + rangestrike);
         if (playerName.equals(game.getBattle().getActivePlayerName()))
         {
             game.getBattle().makeForcedStrikes(rangestrike);
@@ -160,16 +167,6 @@ public final class Server
     }
 
 
-    boolean getClientOption(String playerName, String optname)
-    {
-        Client client = getClient(playerName);
-        if (client != null)
-        {
-            return client.getOption(optname);
-        }
-        return false;
-    }
-
     /** Return the name of the first human-controlled client, or null if
      *  all clients are AI-controlled. */
     private String getFirstHumanClientName()
@@ -183,49 +180,6 @@ public final class Server
             }
         }
         return null;
-    }
-
-    /** Get the option from the first human-controlled client.  If there 
-     *  are none, get the option from the first AI-controlled client. */
-    boolean getClientOption(String optname)
-    {
-        String clientName = getFirstHumanClientName();
-        if (clientName == null)
-        {
-            clientName = game.getPlayer(0).getName();
-        }
-        return getClientOption(clientName, optname);
-    }
-
-    /** Get the option from the first human-controlled client.  If there 
-     *  are none, get the option from the first AI-controlled client. */
-    int getClientIntOption(String optname)
-    {
-        String clientName = getFirstHumanClientName();
-        if (clientName == null)
-        {
-            clientName = game.getPlayer(0).getName();
-        }
-        return getClientIntOption(clientName, optname);
-    }
-
-    int getClientIntOption(String playerName, String optname)
-    {
-        Client client = getClient(playerName);
-        if (client != null)
-        {
-            return client.getIntOption(optname);
-        }
-        return -1;
-    }
-
-    void setClientOption(String playerName, String optname, boolean value)
-    {
-        Client client = getClient(playerName);
-        if (client != null)
-        {
-            client.setOption(optname, value);
-        }
     }
 
 
@@ -478,6 +432,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     void createSummonAngel(Legion legion)
     {
+Log.debug("called Server.createSummonAngel for " + legion);
         Client client = getClient(legion.getPlayerName());
         client.createSummonAngel(legion.getMarkerId(), 
             legion.getLongMarkerName());
@@ -485,7 +440,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     void reinforce(Legion legion)
     {
-        if (getClientOption(legion.getPlayerName(), Options.autoRecruit))
+        if (legion.getPlayer().isAI())
         {
             legion.getPlayer().aiReinforce(legion);
         }
@@ -610,7 +565,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     /** Ask ally's player whether he wants to concede with ally. */
     void askConcede(Legion ally, Legion enemy)
     {
-        if (getClientOption(ally.getPlayerName(), Options.autoFlee))
+        if (ally.getPlayer().isAI())
         {
             if (ally.getPlayer().aiConcede(ally, enemy))
             {
@@ -643,7 +598,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     /** Ask ally's player whether he wants to flee with ally. */
     void askFlee(Legion ally, Legion enemy)
     {
-        if (getClientOption(ally.getPlayerName(), Options.autoFlee))
+        if (ally.getPlayer().isAI())
         {
             if (ally.getPlayer().aiFlee(ally, enemy))
             {
@@ -1434,5 +1389,56 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
             Client client = getClient(name);
             client.setColor(color);
         }
+    }
+
+
+    // XXX We use Server as a hook for PhaseAdvancer to get to options,
+    // but this is ugly.
+    int getIntOption(String optname)
+    {
+        return game.getIntOption(optname);
+    }
+
+
+    void oneSetOption(String playerName, String optname, String value)
+    {
+        Client client = getClient(playerName);
+        client.setOption(optname, value);
+    }
+
+    void oneSetOption(String playerName, String optname, boolean value)
+    {
+        oneSetOption(playerName, optname, String.valueOf(value));
+    }
+
+    void allSetOption(String optname, String value)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setOption(optname, value);
+        }
+    }
+
+    void allSetOption(String optname, boolean value)
+    {
+        allSetOption(optname, String.valueOf(value));
+    }
+
+    void allSetOption(String optname, int value)
+    {
+        allSetOption(optname, String.valueOf(value));
+    }
+
+    // Allow the primary client (only) to change game options.
+    public void setOption(String playerName, String optname, String value)
+    {
+        if (!playerName.equals(primaryPlayerName))
+        {
+            Log.error("non-primary client tried to set server option");
+            return;
+        }
+        game.setOption(optname, value);
     }
 }

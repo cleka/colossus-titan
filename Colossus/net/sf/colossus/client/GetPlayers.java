@@ -18,7 +18,7 @@ import net.sf.colossus.server.Game;
 import net.sf.colossus.client.VariantSupport;
 
 /**
- * Class GetPlayers is a dialog used to enter players' names.
+ * Class GetPlayers is a dialog used to enter players' names, types, variant, etc. 
  * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
@@ -28,8 +28,6 @@ import net.sf.colossus.client.VariantSupport;
 public final class GetPlayers extends KDialog implements WindowListener,
     ActionListener
 {
-    public static final int maxAIsupported = 16;
-
     public static final String newGame = "New Game";
     public static final String loadGame = "Load Game";
     public static final String loadVariant = "Load External Variant";
@@ -53,7 +51,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private static String anyAI = "A Random AI";
     private static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
-    // XXX MinimaxAI is currently very broken.
     private static String[] aiList = { "SimpleAI" };
 
     /** list of available Variant */
@@ -72,10 +69,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private GetPlayers(JFrame parentFrame)
     {
         super(parentFrame, "Player Setup", true);
-
-        /* get the list of the available AI */
-        /* not reliable yet */
-        // aiList = getAIList();
 
         int ainum = 0;
         for (int i = 0 ; i < aiList.length ; i++) 
@@ -189,7 +182,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         Document doc =
             VariantSupport.loadVariant(variantArray[0] + ".var",
                                        variantArray[0]);
-        readme.setContentType((String)doc.getProperty(ResourceLoader.keyContentType));
+        readme.setContentType((String)doc.getProperty(
+            ResourceLoader.keyContentType));
         readme.setDocument(doc);
 
         pack();
@@ -209,6 +203,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     }
 
 
+    /** Start new game if values are legal. */
     private void validateInputs()
     {
         playerInfo.clear();
@@ -249,6 +244,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             return;
         }
 
+        // Will eliminate modal dialog, allowing game to start.
         dispose();
     }
 
@@ -307,7 +303,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             File varFile = varChooser.getSelectedFile();
             Document doc = VariantSupport.loadVariant(varFile);
-            readme.setContentType((String)doc.getProperty(ResourceLoader.keyContentType));
+            readme.setContentType((String)doc.getProperty(
+                ResourceLoader.keyContentType));
             readme.setDocument(doc);
         }
     }
@@ -359,7 +356,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
                     Document doc =
                         VariantSupport.loadVariant(value + ".var",
                                                    value);
-                    readme.setContentType((String)doc.getProperty(ResourceLoader.keyContentType));
+                    readme.setContentType((String)doc.getProperty(
+                        ResourceLoader.keyContentType));
                     readme.setDocument(doc);
                 }
             }

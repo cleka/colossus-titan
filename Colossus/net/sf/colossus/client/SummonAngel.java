@@ -8,6 +8,7 @@ import java.util.*;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Log;
 
 /**
  * Allows a player to summon an angel or archangel.
@@ -90,9 +91,11 @@ final class SummonAngel extends KDialog implements MouseListener,
     static SummonAngel summonAngel(Client client, String markerId,
         String longMarkerName)
     {
+Log.debug("called summonAngel for " + markerId);
         if (!active)
         {
             active = true;
+Log.debug("returning new SummonAngel dialog for " + markerId);
             return new SummonAngel(client, markerId, longMarkerName);
         }
         return null;

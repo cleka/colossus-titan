@@ -586,8 +586,7 @@ final class Critter extends Creature implements Comparable
                 po.addCarryTargets(battle.getCarryTargets());
                 penaltyOptions.add(po);
 
-                if (game.getServer().getClientOption(getPlayerName(),
-                    Options.autoStrike))
+                if (getPlayer().isAI())
                 {
                     po = getPlayer().aiChooseStrikePenalty(
                         Collections.unmodifiableSortedSet(penaltyOptions));
@@ -806,7 +805,7 @@ Log.debug("new penalty option: " + po.toString());
         }
 
         // Record that this attacker has struck.
-        struck = true;
+        setStruck(true);
 
         if (game != null)
         {

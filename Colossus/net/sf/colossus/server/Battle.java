@@ -491,12 +491,15 @@ final class Battle
 
     private boolean setupSummon()
     {
+Log.debug("Battle.setupSummon()");
         server.allSetupBattleSummon();
         boolean advance = true;
         if (summonState == Constants.FIRST_BLOOD)
         {
+Log.debug("Battle.setupSummon() FIRST_BLOOD");
             if (getAttacker().canSummonAngel())
             {
+Log.debug("Battle.setupSummon() attacker can summon angel");
                 game.createSummonAngel(getAttacker());
                 advance = false;
             }
@@ -505,6 +508,7 @@ final class Battle
             // battle is over.
             summonState = Constants.TOO_LATE;
         }
+Log.debug("Battle.setupSummon() advance will be " + advance);
         return advance;
     }
 
@@ -526,8 +530,7 @@ final class Battle
         else
         {
             Player player = getActivePlayer();
-            if (server.getClientOption(player.getName(),
-                Options.autoBattleMove))
+            if (player.isAI())
             {
                 player.aiBattleMove();
             }
@@ -541,35 +544,20 @@ final class Battle
 
         applyDriftDamage();
 
-        // If there are no possible strikes, move on.
+        // Automatically perform forced strikes if applicable.
+        Player player = getActivePlayer();
+        if (player.isAI())
+        {
+            player.aiStrike(getActiveLegion(), this, false);
+        }
+
+        // If there are no possible strikes left, move on.
         if (findCrittersWithTargets().size() < 1)
         {
+            commitStrikes();
             return true;
         }
-        else
-        {
-            // Automatically perform forced strikes if applicable.
-            Player player = getActivePlayer();
-            if (server.getClientOption(player.getName(),
-                Options.autoStrike))
-            {
-                player.aiStrike(getActiveLegion(), this, false);
-            }
-            else if (server.getClientOption(player.getName(),
-                Options.autoForcedStrike))
-            {
-                boolean rangestrike = server.getClientOption(player.getName(),
-                    Options.autoRangeSingle);
-                makeForcedStrikes(rangestrike);
-            }
 
-            // If there are no possible strikes left, move on.
-            if (findCrittersWithTargets().size() < 1)
-            {
-                commitStrikes();
-                return true;
-            }
-        }
         return false;
     }
 
@@ -1166,6 +1154,7 @@ final class Battle
      *  technically forced. */
     void makeForcedStrikes(boolean rangestrike)
     {
+Log.debug("called Battle.makeForcedStrikes() " + rangestrike);
         Legion legion = getActiveLegion();
         boolean repeat;
         do

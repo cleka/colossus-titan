@@ -3,6 +3,8 @@ package net.sf.colossus.server;
 
 import java.util.*;
 
+import net.sf.colossus.client.Client;
+
 
 /**
  * interface to allow for multiple AI implementations
@@ -49,7 +51,7 @@ public interface AI
     String acquireAngel(String markerId, List recruits);
 
     /** choose whether to summon an angel or archangel */
-    String summonAngel(Legion legion, Game game);
+    String summonAngel(String summonerId, Client client);
 
     /** pick a color of legion markers */
     String pickColor(Set colors, List favoriteColors);

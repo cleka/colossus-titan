@@ -814,7 +814,7 @@ public final class Player implements Comparable
 
     void aiSplit()
     {
-        if (game.getServer().getClientOption(name, Options.autoSplit))
+        if (isAI())
         {
             ai.split(game);
             // Keep the AI from continuing to play after winning.
@@ -827,7 +827,7 @@ public final class Player implements Comparable
 
     void aiMasterMove()
     {
-        if (game.getServer().getClientOption(name, Options.autoMasterMove))
+        if (isAI())
         {
             ai.masterMove(game);
             recombineIllegalSplits();
@@ -841,7 +841,7 @@ public final class Player implements Comparable
 
     void aiRecruit()
     {
-        if (game.getServer().getClientOption(name, Options.autoRecruit))
+        if (isAI())
         {
             ai.muster(game);
             // Keep the AI from continuing to play after winning.
@@ -855,7 +855,7 @@ public final class Player implements Comparable
 
     void aiReinforce(Legion legion)
     {
-        if (game.getServer().getClientOption(name, Options.autoRecruit))
+        if (isAI())
         {
             ai.reinforce(legion, game);
         }
@@ -864,7 +864,7 @@ public final class Player implements Comparable
 
     boolean aiFlee(Legion legion, Legion enemy)
     {
-        if (game.getServer().getClientOption(name, Options.autoFlee))
+        if (isAI())
         {
             return ai.flee(legion, enemy, game);
         }
@@ -873,7 +873,7 @@ public final class Player implements Comparable
 
     boolean aiConcede(Legion legion, Legion enemy)
     {
-        if (game.getServer().getClientOption(name, Options.autoFlee))
+        if (isAI())
         {
             return ai.concede(legion, enemy, game);
         }
@@ -882,8 +882,7 @@ public final class Player implements Comparable
 
     void aiStrike(Legion legion, Battle battle, boolean forced)
     {
-        if (forced || game.getServer().getClientOption(name,
-            Options.autoStrike))
+        if (forced || isAI())
         {
             ai.strike(legion, battle, game);
         }
@@ -891,7 +890,7 @@ public final class Player implements Comparable
 
     PenaltyOption aiChooseStrikePenalty(SortedSet penaltyOptions)
     {
-        if (game.getServer().getClientOption(name, Options.autoStrike))
+        if (isAI())
         {
             return ai.chooseStrikePenalty(penaltyOptions);
         }
@@ -900,7 +899,7 @@ public final class Player implements Comparable
 
     void aiBattleMove()
     {
-        if (game.getServer().getClientOption(name, Options.autoBattleMove))
+        if (isAI())
         {
             ai.battleMove(game);
             game.getBattle().doneWithMoves();
@@ -910,7 +909,7 @@ public final class Player implements Comparable
     int aiPickEntrySide(String hexLabel, Legion legion, boolean left, 
         boolean bottom, boolean right)
     {
-        if (game.getServer().getClientOption(name, Options.autoPickEntrySide))
+        if (isAI())
         {
             return ai.pickEntrySide(hexLabel, legion, game, left, bottom,
                 right);
@@ -920,24 +919,13 @@ public final class Player implements Comparable
 
     String aiPickEngagement()
     {
-        if (game.getServer().getClientOption(name, Options.autoPickEngagement))
+        if (isAI())
         {
             return ai.pickEngagement(game);
         }
         return null;
     }
 
-
-    /** Return a String of form "Angeltype:donorId", or null if no
-      * angel is to be summoned. */
-    String aiSummonAngel(Legion legion)
-    {
-        if (game.getServer().getClientOption(name, Options.autoSummonAngels))
-        {
-            return ai.summonAngel(legion, game);
-        }
-        return null;
-    }
 
     // XXX Prohibit colons in player names.
     /** Return a colon:separated string with a bunch of info for

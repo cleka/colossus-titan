@@ -153,7 +153,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 {
                     case Constants.MOVE:
                         // TODO Check this locally rather than asking for help.
-                        if (!client.getOption(Options.autoBattleMove) &&
+                        if (!client.getOption(Options.autoPlay) &&
                             client.anyOffboardCreatures() && 
                             !confirmLeavingCreaturesOffboard())
                         {

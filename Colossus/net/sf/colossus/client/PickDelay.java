@@ -85,7 +85,7 @@ final class PickDelay extends KDialog implements WindowListener,
             dispose();
             if (client != null)
             {
-                client.setIntOption(Options.aiDelay, newDelay);
+                client.setOption(Options.aiDelay, newDelay);
             }
         }
         else if (e.getActionCommand().equals("Cancel"))
@@ -94,7 +94,7 @@ final class PickDelay extends KDialog implements WindowListener,
             dispose();
             if (client != null)
             {
-                client.setIntOption(Options.aiDelay, newDelay);
+                client.setOption(Options.aiDelay, newDelay);
             }
         }
     }

@@ -486,8 +486,7 @@ public final class MasterBoard extends JPanel
                     oldScale);
                 if (newScale != oldScale && newScale != -1)
                 {
-                    client.setStringOption(Options.scale, 
-                        new Integer(newScale).toString());
+                    client.setOption(Options.scale, newScale);
                     Scale.set(newScale);
                     client.rescaleAllWindows();
                 }
@@ -593,12 +592,17 @@ public final class MasterBoard extends JPanel
         gameMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(gameMenu);
 
-        addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
-        addCheckBox(gameMenu, Options.allStacksVisible, KeyEvent.VK_S);
-        addCheckBox(gameMenu, Options.logDebug, KeyEvent.VK_L);
-        mi = gameMenu.add(changeAIDelayAction);
-        mi.setMnemonic(KeyEvent.VK_D);
-        addCheckBox(gameMenu, Options.autoQuit, KeyEvent.VK_Q);
+        // TODO If not primary, still show the checkboxes, but don't
+        // allow changing them.
+        if (client.isPrimary())
+        {
+            addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
+            addCheckBox(gameMenu, Options.allStacksVisible, KeyEvent.VK_S);
+            addCheckBox(gameMenu, Options.logDebug, KeyEvent.VK_L);
+            mi = gameMenu.add(changeAIDelayAction);
+            mi.setMnemonic(KeyEvent.VK_D);
+            addCheckBox(gameMenu, Options.autoQuit, KeyEvent.VK_Q);
+        }
 
         // Then per-player options
 
@@ -608,19 +612,12 @@ public final class MasterBoard extends JPanel
 
         addCheckBox(playerMenu, Options.autoPickColor, KeyEvent.VK_C);
         addCheckBox(playerMenu, Options.autoPickMarker, KeyEvent.VK_I);
-        addCheckBox(playerMenu, Options.autoSplit, KeyEvent.VK_S);
-        addCheckBox(playerMenu, Options.autoMasterMove, KeyEvent.VK_M);
         addCheckBox(playerMenu, Options.autoPickEntrySide, KeyEvent.VK_E);
-        addCheckBox(playerMenu, Options.autoFlee, KeyEvent.VK_F);
-        addCheckBox(playerMenu, Options.autoPickEngagement, KeyEvent.VK_N);
-        addCheckBox(playerMenu, Options.autoBattleMove, KeyEvent.VK_B);
         addCheckBox(playerMenu, Options.autoForcedStrike, KeyEvent.VK_K);
         addCheckBox(playerMenu, Options.autoCarrySingle, KeyEvent.VK_Y);
         addCheckBox(playerMenu, Options.autoRangeSingle, KeyEvent.VK_G);
-        addCheckBox(playerMenu, Options.autoStrike, KeyEvent.VK_T);
         addCheckBox(playerMenu, Options.autoSummonAngels, KeyEvent.VK_O);
         addCheckBox(playerMenu, Options.autoAcquireAngels, KeyEvent.VK_A);
-        addCheckBox(playerMenu, Options.autoRecruit, KeyEvent.VK_R);
         addCheckBox(playerMenu, Options.autoPickRecruiter, KeyEvent.VK_U);
         playerMenu.addSeparator();
         addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_P);

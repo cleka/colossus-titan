@@ -50,7 +50,7 @@ public final class Game
     private LinkedList colorPickOrder = new LinkedList();
     private Set colorsLeft;
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
-    private Properties options = new Properties();
+    private Options options = new Options(Options.optionsServerName);
 
 
     Game()
@@ -129,6 +129,7 @@ public final class Game
         // XXX Make sure to clear player options so that we don't get into
         // an AI infinite loop.
         Game newGame = new Game();
+
         for (int i = 0; i < players.size(); i++)
         {
             Player player = ((Player)players.get(i)).AICopy(newGame);
@@ -163,6 +164,7 @@ public final class Game
         gameOver = false;
     }
 
+    /** Start a new game. */
     void newGame()
     {
         clearFlags();
@@ -178,7 +180,6 @@ public final class Game
         {
             // User selected Quit.
             dispose();
-            return;
         }
 
         // See if user hit the Load game button, and we should
@@ -214,8 +215,11 @@ public final class Game
 
         // We need to set the autoPlay option before loading the board,
         // so that we can avoid showing boards for non-primary AI players.
-
         syncAutoPlay();
+
+        options.loadOptions();
+        syncOptions();
+
         server.allInitBoard();
         assignTowers();
 
@@ -231,8 +235,20 @@ public final class Game
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            server.setClientOption(player.getName(), Options.autoPlay,
+            server.oneSetOption(player.getName(), Options.autoPlay,
                 player.isAI());
+        }
+    }
+
+    /** Send all current game option values to all clients. */
+    private void syncOptions()
+    {
+        Enumeration en = options.propertyNames();
+        while (en.hasMoreElements())
+        {
+            String name = (String)en.nextElement();
+            String value = options.getStringOption(name);
+            server.allSetOption(name, value);
         }
     }
 
@@ -270,15 +286,15 @@ public final class Game
 
     private void nextPickColor()
     {
-        if (colorPickOrder.isEmpty())
-        {
-            // All players are done picking colors; continue.
-            newGame2();
-        }
-        else
+        if (!colorPickOrder.isEmpty())
         {
             String playerName = (String)colorPickOrder.removeFirst();
             server.askPickColor(playerName, colorsLeft);
+        }
+        else
+        {
+            // All players are done picking colors; continue.
+            newGame2();
         }
     }
 
@@ -300,7 +316,7 @@ public final class Game
         nextPickColor();
     }
 
-
+    /** Done picking player colors; proceed to start game. */
     private void newGame2()
     {
         server.allUpdatePlayerInfo();
@@ -318,7 +334,6 @@ public final class Game
         autoSave();
         setupPhase();
         caretaker.fullySyncDisplays();
-        server.allUpdatePlayerInfo();
     }
 
 
@@ -568,7 +583,7 @@ public final class Game
     void setGameOver(boolean gameOver)
     {
         this.gameOver = gameOver;
-        if (gameOver && server.getClientOption(Options.autoQuit))
+        if (gameOver && getOption(Options.autoQuit))
         {
             dispose();
         }
@@ -959,7 +974,7 @@ public final class Game
 
     void autoSave()
     {            
-        if (server.getClientOption(Options.autosave))
+        if (getOption(Options.autosave))
         {
             saveGame();
         }
@@ -1111,6 +1126,9 @@ public final class Game
 
             syncAutoPlay();
 
+            options.loadOptions();
+            syncOptions();
+
             // Battle stuff
             buf = in.readLine();
             if (buf != null && buf.length() > 0)
@@ -1174,7 +1192,7 @@ public final class Game
 
             server.allUpdatePlayerInfo();
 
-            if (server.getClientOption(Options.allStacksVisible))
+            if (getOption(Options.allStacksVisible))
             {
                 server.allFullyUpdateAllLegionContents();
             }
@@ -1973,31 +1991,9 @@ public final class Game
 
     void createSummonAngel(Legion attacker)
     {
-        Player player = getActivePlayer();
-        if (server.getClientOption(player.getName(), Options.autoSummonAngels))
-        {
-            // TODO Move to client side
-            String typeColonDonor = player.aiSummonAngel(attacker);
-            if (typeColonDonor == null)
-            {
-                Log.error("null in Game.createSummonAngel() -- hang");
-                return;
-            }
-            int split = typeColonDonor.indexOf(':');
-            String angelType = typeColonDonor.substring(0, split);
-            String donorId = typeColonDonor.substring(split + 1);
-
-            // Set up the donor in case the summon gets cancelled.
-            Legion donor = player.getLegionByMarkerId(donorId);
-            player.setDonorId(donorId);
-            Creature angel = Creature.getCreatureByName(angelType);
-            doSummon(attacker, donor, angel);
-        }
-        else
-        {
-            summoning = true;
-            server.createSummonAngel(attacker);
-        }
+Log.debug("called Game.createSummonAngel() for " + attacker);
+        summoning = true;
+        server.createSummonAngel(attacker);
     }
 
     /** Called locally and from Battle. */
@@ -2188,7 +2184,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
         String hexLabel = legion.getCurrentHexLabel();
         server.didSplit(hexLabel, parentId, childId, newLegion.getHeight());
 
-        if (server.getClientOption(Options.allStacksVisible))
+        if (getOption(Options.allStacksVisible))
         {
             server.allRevealLegion(legion);
             server.allRevealLegion(newLegion);
@@ -2994,5 +2990,26 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
     public static Color getTerrainColor(char t)
     {
         return trl.getTerrainColor(t);
+    }
+
+
+    boolean getOption(String optname)
+    {
+        return options.getOption(optname);
+    }
+
+    int getIntOption(String optname)
+    {
+        return options.getIntOption(optname);
+    }
+
+    void setOption(String optname, String value)
+    {
+        String oldValue = options.getStringOption(optname);
+        if (!value.equals(oldValue))
+        {
+            options.setOption(optname, value);
+            syncOptions();
+        }
     }
 }

@@ -63,7 +63,8 @@ public final class Client
     private java.util.List recruitChits = new ArrayList();
 
     // Per-client and per-player options. 
-    private Properties options = new Properties();
+    private Options options; 
+    private boolean optionChanged = false;
 
     /** Player who owns this client. */
     private String playerName;
@@ -117,14 +118,13 @@ public final class Client
 
     private int numPlayers;
 
-    private String [] summonables = { "Angel", "Archangel"};
-
 
     public Client(Server server, String playerName, boolean primary)
     {
         this.server = server;
         this.playerName = playerName;
         this.primary = primary;
+        options = new Options(playerName);
     }
 
 
@@ -170,38 +170,19 @@ public final class Client
     /** Legion summoner summons unit from legion donor. */
     void doSummon(String summoner, String donor, String unit)
     {
+Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summoner);
+
         server.doSummon(summoner, donor, unit);
-        board.repaint();
-        summonAngel = null;
-        // TODO Make this consistent.
-        board.highlightEngagements();
-
-        repaintHexByMarkerId(summoner);
-        repaintHexByMarkerId(donor);
-    }
-
-
-    private void repaintHexByMarkerId(String markerId)
-    {
-        if (markerId == null)
+        if (board != null)
         {
-            Log.error("called Client.repaintHexByMarkerId(null)");
-        }
-        if (board == null)
-        {
-            return;
-        }
-        String hexLabel = getHexForLegion(markerId);
-        if (hexLabel != null)
-        {
-            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-            if (hex != null)
-            {
-                hex.repaint();
-            }
+            board.repaint();
+            summonAngel = null;
+
+            // TODO Make this consistent.
+            board.highlightEngagements();
+            board.repaint();
         }
     }
-
 
 
     /** This player quits the whole game. The server needs to always honor
@@ -299,51 +280,74 @@ public final class Client
         return movementDie;
     }
 
-    // XXX All the public option methods need to be non-public.
-    public boolean getOption(String optname)
+    boolean getOption(String optname)
     {
         // If autoplay is set, then return true for all other auto* options.
         if (optname.startsWith("Auto") && !optname.equals(Options.autoPlay))
         {
-            if (getOption(Options.autoPlay))
+            if (options.getOption(Options.autoPlay))
             {
                 return true;
             }
         }
-        String value = options.getProperty(optname);
-        return (value != null && value.equals("true"));
+        return options.getOption(optname);
     }
 
-    public String getStringOption(String optname)
+    String getStringOption(String optname)
     {
-        String value = options.getProperty(optname);
-        return value;
+        return options.getStringOption(optname);
     }
 
-    public void setOption(String optname, boolean value)
+    /** Return -1 if the option's value has not been set. */
+    int getIntOption(String optname)
     {
-        options.setProperty(optname, String.valueOf(value));
+        return options.getIntOption(optname);
+    }
 
-        // Side effects
+    public void setOption(String optname, String value)
+    {
+        if (!value.equals(getStringOption(optname)))
+        {
+            optionChanged = true;
+        }
+        options.setOption(optname, value);
+        optionTrigger(optname, value);
+    }
+
+    void setOption(String optname, boolean value)
+    {
+        setOption(optname, String.valueOf(value));
+    }
+
+    void setOption(String optname, int value)
+    {
+        setOption(optname, String.valueOf(value));
+    }
+
+    /** Trigger side effects after changing an option value. */
+    private void optionTrigger(String optname, String value)
+    {
+        boolean bval = Boolean.valueOf(value).booleanValue();
+
         if (optname.equals(Options.antialias))
         {
-            Hex.setAntialias(value);
+            Hex.setAntialias(bval);
             repaintAllWindows();
         }
         else if (optname.equals(Options.useOverlay))
         {
-            Hex.setOverlay(value);
+            Hex.setOverlay(bval);
             repaintAllWindows();
         }
         else if (optname.equals(Options.noBaseColor))
         {
-            Creature.setNoBaseColor(value);
+            Creature.setNoBaseColor(bval);
             net.sf.colossus.util.ResourceLoader.purgeCache();
             repaintAllWindows();
         }
         else if (optname.equals(Options.logDebug))
         {
-            Log.setShowDebug(value);
+            Log.setShowDebug(bval);
         }
         else if (optname.equals(Options.showCaretaker))
         {
@@ -351,8 +355,8 @@ public final class Client
         }
         else if (optname.equals(Options.showLogWindow))
         {
-            Log.setToWindow(value);
-            if (value)
+            Log.setToWindow(bval);
+            if (bval)
             {
                 // Force log window to appear.
                 Log.event("");
@@ -362,71 +366,26 @@ public final class Client
                 Log.disposeLogWindow();
             }
         }
-    }
-
-    void setStringOption(String optname, String value)
-    {
-        options.setProperty(optname, String.valueOf(value));
-        // TODO Add some triggers so that if autoPlay or autoSplit is set
-        // during this player's split phase, the appropriate action
-        // is called.
-    }
-
-    void setIntOption(String optname, int value)
-    {
-        options.setProperty(optname, String.valueOf(value));
-    }
-
-    /** Return -1 if the option's value has not been set. */
-    public int getIntOption(String optname)
-    {
-        String buf = options.getProperty(optname);
-        int value = -1;
-        try
+        else if (optname.equals(Options.showStatusScreen))
         {
-            value = Integer.parseInt(buf);
+            updateStatusScreen();
         }
-        catch (Exception ex)
-        {
-            value = -1;
-        }
-        return value;
+        syncOptions();
     }
-
 
     /** Save player options to a file.  The current format is standard
      *  java.util.Properties keyword=value. */
     void saveOptions()
     {
-        final String optionsFile = Options.optionsPath + Options.optionsSep +
-            playerName + Options.optionsExtension;
-        try
-        {
-            FileOutputStream out = new FileOutputStream(optionsFile);
-            options.store(out, Options.configVersion);
-            out.close();
-        }
-        catch (IOException e)
-        {
-            Log.error("Couldn't write options to " + optionsFile);
-        }
+        options.saveOptions();
     }
 
     /** Load player options from a file. The current format is standard
      *  java.util.Properties keyword=value */
     void loadOptions(String optionsFile)
     {
-        try
-        {
-            FileInputStream in = new FileInputStream(optionsFile);
-            options.load(in);
-        }
-        catch (IOException e)
-        {
-            Log.debug("Couldn't read player options from " + optionsFile);
-            return;
-        }
-        syncCheckboxes();
+        options.loadOptions(optionsFile);
+        syncOptions();
     }
 
 
@@ -434,11 +393,24 @@ public final class Client
      *  java.util.Properties keyword=value */
     private void loadOptions()
     {
-        final String optionsFile = Options.optionsPath + Options.optionsSep +
-            playerName + Options.optionsExtension;
-        loadOptions(optionsFile);
+        options.loadOptions();
+        optionChanged = true;
+        syncOptions();
     }
 
+
+    private void syncOptions()
+    {
+        if (optionChanged)
+        {
+            syncCheckboxes();
+            if (isPrimary()) 
+            {
+                syncServerOptions();
+            }
+            optionChanged = false;
+        }
+    }
 
     /** Ensure that Player menu checkboxes reflect the correct state. */
     private void syncCheckboxes()
@@ -453,6 +425,21 @@ public final class Client
             String name = (String)en.nextElement();
             boolean value = getOption(name);
             board.twiddleOption(name, value);
+        }
+    }
+
+    private void syncServerOptions()
+    {
+        Enumeration en = options.propertyNames();
+        while (en.hasMoreElements())
+        {
+            String name = (String)en.nextElement();
+            String value = getStringOption(name);
+            // XXX Look out for infinite loops.
+            if (Options.getServerOptions().contains(name))
+            {
+                server.setOption(playerName, name, value);
+            }
         }
     }
 
@@ -486,6 +473,11 @@ public final class Client
 
     private void updateStatusScreen()
     {
+        if (getNumPlayers() < 1)
+        {
+            // Called too early.
+            return;
+        }
         if (getOption(Options.showStatusScreen))
         {
             if (statusScreen != null)
@@ -647,6 +639,7 @@ public final class Client
         if (playerName.equals(getBattleActivePlayerName()) &&
             getOption(Options.autoForcedStrike))
         {
+Log.debug("Client.makeForcedStrikes() for " + playerName);
             server.makeForcedStrikes(playerName, getOption(
                 Options.autoRangeSingle));
         }
@@ -659,8 +652,9 @@ public final class Client
     }
 
 
+    // Public for client-side AI -- do not call from server side.
     /** Get this legion's info.  Create it first if necessary. */
-    LegionInfo getLegionInfo(String markerId)
+    public LegionInfo getLegionInfo(String markerId)
     {
         LegionInfo info = (LegionInfo)legionInfo.get(markerId);
         if (info == null)
@@ -971,17 +965,27 @@ public final class Client
         return summonAngel;
     }
 
-    // Only called for human players.
     public void createSummonAngel(String markerId, String longMarkerName)
     {
-        if (board == null)
+Log.debug("called Client.createSummonAngel for " + playerName + " " + markerId);
+        if (getOption(Options.autoSummonAngels))
         {
-            Log.error("Called createSummonAngel() with null board");
-            return;
+Log.debug("auto summon");
+            String typeColonDonor = ai.summonAngel(markerId, this);
+            java.util.List parts = Split.split(':', typeColonDonor);
+            String unit = (String)parts.get(0);
+            String donor = (String)parts.get(1);
+Log.debug("will call doSummon with donor " + donor + " and angel " + unit);
+            doSummon(markerId, donor, unit);
         }
-        board.deiconify();
-        board.getFrame().toFront();
-        summonAngel = SummonAngel.summonAngel(this, markerId, longMarkerName);
+        else
+        {
+            board.deiconify();
+            board.getFrame().toFront();
+Log.debug("will call summonAngel for " + markerId);
+            summonAngel = SummonAngel.summonAngel(this, markerId, 
+                longMarkerName);
+        }
     }
 
     String getDonorId()
@@ -1005,7 +1009,7 @@ public final class Client
 Log.debug("called Client.askAcquireAngel()");
         if (getOption(Options.autoAcquireAngels))
         {
-            acquireAngelCallback(markerId, ai.acquireAngel( markerId,
+            acquireAngelCallback(markerId, ai.acquireAngel(markerId,
                 recruits));
         }
         else
@@ -1243,7 +1247,6 @@ Log.debug("called Client.acquireAngelCallback()");
         }
         else
         {
-            // TODO Reduce round trips by doing this on the server?
             makeForcedStrikes();
 
             if (map != null)
@@ -1275,7 +1278,7 @@ Log.debug("called Client.acquireAngelCallback()");
         {
             return;
         }
-        if (getOption(Options.autoStrike))
+        if (getOption(Options.autoPlay))
         {
             // AI carries are handled on server side.
             return;
@@ -1652,11 +1655,13 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
     /** Used for both strike and strikeback. */
-    public void setupBattleFight(int battlePhase,  
+    public void setupBattleFight(int battlePhase, 
         String battleActivePlayerName)
     {
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
+
+        makeForcedStrikes();
 
         if (map != null)
         {
@@ -1978,24 +1983,12 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    /** Return true if the legion has a summonable. */
-    private boolean hasSummonable(String markerId)
-    {
-        LegionInfo info = getLegionInfo(markerId);
-        for (int i = 0; i < summonables.length; i++)
-        {
-            if (info.contains(summonables[i]))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    // public for client-side AI -- do not call from server side.
     /** Return a set of hexLabels for all other unengaged legions of 
      *  markerId's player that have summonables. */
-    Set findSummonableAngelHexes(String summonerId)
+    public Set findSummonableAngelHexes(String summonerId)
     {
+Log.debug("Called Client.findSummonableAngelHexes for " + summonerId);
         Set set = new HashSet();
         LegionInfo summonerInfo = getLegionInfo(summonerId);
         String playerName = summonerInfo.getPlayerName();
@@ -2003,12 +1996,18 @@ Log.debug("called Client.acquireAngelCallback()");
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-            if (!markerId.equals(summonerId) && hasSummonable(markerId))
+Log.debug("checking " + markerId);
+            if (!markerId.equals(summonerId)) 
             {
+Log.debug(markerId + " not the same as summoner");
                 LegionInfo info = getLegionInfo(markerId);
-                set.add(info.getHexLabel());
+                if (info.hasSummonable() && !(info.isEngaged()))
+                {
+                    set.add(info.getHexLabel());
+                }
             }
         }
+Log.debug("found " + set.size() + " hexes");
         return set;
     }
 
@@ -2036,7 +2035,8 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    java.util.List getLegionsByHex(String hexLabel)
+    // public for client-side AI -- do not call from server side
+    public java.util.List getLegionsByHex(String hexLabel)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
@@ -2432,4 +2432,3 @@ Log.debug("called Client.acquireAngelCallback()");
         return getLegionInfo(markerId).getHexLabel();
     }
 }
-

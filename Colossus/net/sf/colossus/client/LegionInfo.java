@@ -15,7 +15,7 @@ import net.sf.colossus.server.SimpleAI;
  */
 
 
-final class LegionInfo
+public final class LegionInfo
 {
     private Client client;
 
@@ -159,17 +159,17 @@ final class LegionInfo
      *  Default to "Titan" if the info is not there. */
     String getTitanBasename()
     {
-//        try
-//        {
+        try
+        {
             PlayerInfo info = client.getPlayerInfo(playerName);
             String color = info.getColor();
             int power = info.getTitanPower();
             return "Titan-" + power + "-" + color;
-//        }
-//        catch (Exception ex)
-//        {
-//            return "Titan";
-//        }
+        }
+        catch (Exception ex)
+        {
+            return "Titan";
+        }
     }
 
 
@@ -229,6 +229,89 @@ final class LegionInfo
             }
             contents = newNames;
         }
+    }
+
+
+    boolean hasTitan()
+    {
+        return getContents().contains("Titan");
+    }
+
+
+    // XXX Hardcoded to just archangels and angels for now.
+    public String bestSummonable()
+    {
+        if (getContents().contains("Archangel"))
+        {
+            return "Archangel";
+        }
+        if (getContents().contains("Angel"))
+        {
+            return "Angel";
+        }
+        return null;
+    }
+
+    boolean hasSummonable()
+    {
+        return (bestSummonable() != null);
+    }
+
+    /** Return the point value of *known* contents of this legion. */
+    private int getPointValue()
+    {
+        int sum = 0;
+        Iterator it = getContents().iterator();
+        while (it.hasNext())
+        {
+            String name = (String)it.next();
+            if (name.equals("Titan"))
+            {
+                PlayerInfo info = client.getPlayerInfo(playerName);
+                // Assumes titan skill is never changed by variants.
+                sum += info.getTitanPower() * 4;
+            }
+            else
+            {
+                sum += Creature.getCreatureByName(name).getPointValue();
+            }
+        }
+        return sum;
+    }
+
+    /** Legions are sorted in descending order of known total point value,
+        with the titan legion always coming first.  This is inconsistent
+        with equals().  Really only useful for comparing own legions. */
+    public int compareTo(Object object)
+    {
+        if (object instanceof LegionInfo)
+        {
+            LegionInfo other = (LegionInfo)object;
+            if (hasTitan())
+            {
+                return Integer.MIN_VALUE;
+            }
+            else if (other.hasTitan())
+            {
+                return Integer.MAX_VALUE;
+            }
+            else
+            {
+                return (other.getPointValue() - this.getPointValue());
+            }
+        }
+        else
+        {
+            throw new ClassCastException();
+        }
+    }
+
+    // Not exact -- does not verify that other legion is enemy.
+    boolean isEngaged()
+    {
+        int numInHex = client.getLegionsByHex(getHexLabel()).size();
+Log.debug("LegionInfo.isEngaged() says there are " + numInHex);
+        return (numInHex == 2);
     }
 }
 

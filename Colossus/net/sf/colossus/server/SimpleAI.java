@@ -14,6 +14,8 @@ import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.client.Client;
+import net.sf.colossus.client.LegionInfo;
 
 
 /**
@@ -1821,83 +1823,54 @@ public class SimpleAI implements AI
         return null;
     }
 
+
+    // Runs on client side.
     /** Return a string of form angeltype:donorId, or null. */
-    public String summonAngel(Legion summoner, Game game)
+    public String summonAngel(String summonerId, Client client)
     {
-Log.debug("SimpleAI.summonAngel: Finding summonable angels");
-        Set set = game.findSummonableAngels(summoner.getMarkerId());
-Log.debug("SimpleAI.summonAngel: angels found: " + set.toString());
-
         // Always summon the biggest possible angel, from the least
-        // important legion that has one.  TODO Make this smarter.
+        // important legion that has one.
 
-        // XXX This will not summon non-angel summonables!
+        Set hexLabels = client.findSummonableAngelHexes(summonerId);
 
-        Legion bestLegion = null;
-        Creature bestAngel = null;
+        String [] summonables = { "Archangel", "Angel" };
 
-        Iterator it = set.iterator();
+        String bestLegion = null;
+        String bestAngel = null;
+
+        Iterator it = hexLabels.iterator();
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            Legion legion = game.getFirstLegion(hexLabel);
-Log.debug("SimpleAI.summonAngel: checking summoning from " +
-           legion.getLongMarkerName() + " in " + hexLabel);
-            if (bestAngelType(legion).equals("Archangel"))
+            java.util.List legions = client.getLegionsByHex(hexLabel);
+            if (legions.size() != 1)
             {
-                if (bestAngel == null ||
-                    bestAngel != Creature.getCreatureByName("Archangel"))
-                {
-                    bestLegion = legion;
-                    bestAngel = Creature.getCreatureByName("Archangel");
-                }
-                else
-                {
-                    if (legion.compareTo(bestLegion) > 0)
-                    {
-                        bestLegion = legion;
-                    }
-                }
-Log.debug("SimpleAI.summonAngel: found archangel");
+                Log.error("SimpleAI.summonAngel(): Engagement in " + hexLabel); 
+                continue;
             }
-            else  // Angel
+            String markerId = (String)legions.get(0);
+            LegionInfo info = client.getLegionInfo(markerId);
+            String myAngel = info.bestSummonable();
+            if (myAngel == null)
             {
-                if (bestAngel == null)
-                {
-                    bestLegion = legion;
-                    bestAngel = Creature.getCreatureByName("Angel");
-                }
-                else if (bestAngel == Creature.getCreatureByName("Angel"))
-                {
-                    if (legion.compareTo(bestLegion) > 0)
-                    {
-                        bestLegion = legion;
-                    }
-                }
-Log.debug("SimpleAI.summonAngel: found angel");
+                Log.error("SimpleAI.summonAngel(): No angel in " + markerId); 
+                continue;
+            }
+
+            if (bestAngel == null ||
+                Creature.getCreatureByName(myAngel).getPointValue() > 
+                    Creature.getCreatureByName(bestAngel).getPointValue() ||
+                info.compareTo(bestLegion) > 0 &&
+                    (Creature.getCreatureByName(myAngel).getPointValue() ==
+                        Creature.getCreatureByName(bestAngel).getPointValue()))
+            {
+                bestLegion = markerId;
+                bestAngel = myAngel;
             }
         }
-Log.debug("SimpleAI.summonAngel: best legion is " + bestLegion);
-Log.debug("SimpleAI.summonAngel: best angel is " + bestAngel);
-        if (bestLegion == null || bestAngel == null)
-        {
-            Log.error("null in SimpleAI.summonAngel() -- hang coming");
-        }
-        return bestAngel.getName() + ":" + bestLegion.getMarkerId();
+        return bestAngel + ":" + bestLegion;
     }
 
-    static String bestAngelType(Legion legion)
-    {
-        if (legion.numCreature(Creature.getCreatureByName("Archangel")) >= 1)
-        {
-            return "Archangel";
-        }
-        if (legion.numCreature(Creature.getCreatureByName("Angel")) >= 1)
-        {
-            return "Angel";
-        }
-        return null;
-    }
 
     public void strike(Legion legion, Battle battle, Game game)
     {
