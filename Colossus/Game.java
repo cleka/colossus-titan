@@ -82,6 +82,7 @@ public final class Game
     public static final String autoForcedStrike = "Auto forced strike";
     public static final String autoSplit = "Auto split";
     public static final String autoMasterMove = "Auto masterboard move";
+    public static final String autoFlee = "Auto flee";
     public static final String autoPlay = "Auto play";
 
 
@@ -2693,6 +2694,8 @@ public final class Game
         }
         battle = null;
         engagementInProgress = false;
+
+        updateStatusScreen();
     }
 
 
@@ -3007,8 +3010,16 @@ public final class Game
             {
                 // Fleeing gives half points and denies the
                 // attacker the chance to summon an angel.
-                boolean flees = Concede.flee(masterFrame, defender,
-                    attacker);
+
+                boolean flees; 
+                if (defender.getPlayer().getOption(autoFlee))
+                {
+                    flees = defender.getPlayer().aiFlee(defender, attacker);
+                }
+                else
+                {
+                    flees = Concede.flee(masterFrame, defender, attacker);
+                }
                 if (flees)
                 {
                     handleConcession(defender, attacker, true);

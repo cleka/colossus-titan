@@ -14,6 +14,7 @@ public final class PickRoll extends JDialog implements MouseListener,
     WindowListener, KeyListener
 {
     private Chit [] dice = new Chit[6];
+    private Chit question; 
     private static int scale = 60;
     private static int roll;
 
@@ -38,9 +39,11 @@ public final class PickRoll extends JDialog implements MouseListener,
             contentPane.add(dice[i]);
             dice[i].addMouseListener(this);
         }
+        question = new Chit(scale, "Unknown", this);
+        contentPane.add(question);
+        question.addMouseListener(this);
 
         pack();
-
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2,
@@ -70,6 +73,11 @@ public final class PickRoll extends JDialog implements MouseListener,
                 roll = i + 1;
                 dispose();
             }
+        }
+        if (question == source)
+        {
+            roll = Game.rollDie();
+            dispose();
         }
     }
 
@@ -135,6 +143,11 @@ public final class PickRoll extends JDialog implements MouseListener,
         if (ch >= '1' && ch <= '6')
         {
             roll = ch - '0';
+            dispose();
+        }
+        else if (ch == '?')
+        {
+            roll = Game.rollDie();
             dispose();
         }
     }

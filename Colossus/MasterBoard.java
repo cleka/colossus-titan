@@ -538,9 +538,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         addCheckBox(playerMenu, Game.autoPickRecruiter, KeyEvent.VK_P);
         addCheckBox(playerMenu, Game.autoPickMarker, KeyEvent.VK_M);
         addCheckBox(playerMenu, Game.autoPickEntrySide, KeyEvent.VK_E);
-        addCheckBox(playerMenu, Game.autoForcedStrike, KeyEvent.VK_F);
+        addCheckBox(playerMenu, Game.autoForcedStrike, KeyEvent.VK_K);
         addCheckBox(playerMenu, Game.autoMasterMove, KeyEvent.VK_A);
         addCheckBox(playerMenu, Game.autoSplit, KeyEvent.VK_S);
+        addCheckBox(playerMenu, Game.autoFlee, KeyEvent.VK_F);
         playerMenu.addSeparator();
         addCheckBox(playerMenu, Game.autoPlay, KeyEvent.VK_U);
 

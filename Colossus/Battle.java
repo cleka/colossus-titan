@@ -910,6 +910,14 @@ public final class Battle
                 }
             }
         }
+        if (attacker.getPlayer().isTitanEliminated())
+        {
+            attackerElim = true;
+        }
+        if (defender.getPlayer().isTitanEliminated())
+        {
+            defenderElim = true;
+        }
     }
 
 
@@ -921,6 +929,7 @@ public final class Battle
         {
             // Nobody gets any points.
             // Make defender die first, to simplify turn advancing.
+Game.logDebug("mutual titan elimination");
             defender.getPlayer().die(null, false);
             attacker.getPlayer().die(null, true);
             cleanup();
@@ -929,6 +938,7 @@ public final class Battle
         // Check for single Titan elimination.
         else if (attacker.getPlayer().isTitanEliminated())
         {
+Game.logDebug("attacker titan elimination");
             if (defenderElim)
             {
                 defender.remove();
@@ -942,6 +952,7 @@ public final class Battle
         }
         else if (defender.getPlayer().isTitanEliminated())
         {
+Game.logDebug("defender titan elimination");
             if (attackerElim)
             {
                 attacker.remove();
@@ -957,6 +968,7 @@ public final class Battle
         // Check for mutual legion elimination.
         else if (attackerElim && defenderElim)
         {
+Game.logDebug("mutual");
             attacker.remove();
             defender.remove();
             cleanup();
@@ -965,12 +977,14 @@ public final class Battle
         // Check for single legion elimination.
         else if (attackerElim)
         {
+Game.logDebug("attacker eliminated");
             defender.addBattleTallyToPoints();
             attacker.remove();
             cleanup();
         }
         else if (defenderElim)
         {
+Game.logDebug("defender eliminated");
             attacker.addBattleTallyToPoints();
             defender.remove();
             cleanup();

@@ -107,10 +107,5 @@ java.lang.NullPointerException
         at MasterBoard.mousePressed(MasterBoard.java:1708)
 
 Solaris, 1.3: Dead titan, but player keeps going.  Need to check
-   for player death more often to work around this bug?
-
-All enemy creatures are invisible immediately after loading a
-   game.
-All creatures are visible after loading a game, until their turn
-   comes up.
-
+   for player death more often to work around this bug?  (Seen
+   three times.)

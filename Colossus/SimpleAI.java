@@ -1280,6 +1280,20 @@ class SimpleAI implements AI
     }
 
 
+    /** Return true if legion should flee from enemy */
+    public boolean flee(Legion legion, Legion enemy)
+    {
+        // XXX This is a really dumb placeholder.
+        if (legion.getPointValue() < 0.7 * enemy.getPointValue())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 
 
     ////////////////////////////////////////////////////////////////

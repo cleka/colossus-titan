@@ -115,6 +115,11 @@ public final class Legion
     {
         this.markerId = markerId;
         this.parentId = parentId;
+        // Sanity check
+        if (parentId != null && parentId.equals(markerId))
+        {
+            parentId = null;
+        }
         this.currentHex = currentHex;
         this.startingHex = startingHex;
         this.player = player;
@@ -171,13 +176,13 @@ public final class Legion
         Player player)
     {
         return new Legion(markerId, null, hex, hex, Creature.titan,
-            Creature.angel, Creature.ogre, Creature.ogre, 
+            Creature.angel, Creature.ogre, Creature.ogre,
             Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);
     }
 
 
-    public static Legion getEmptyLegion(String markerId, String parentId, 
+    public static Legion getEmptyLegion(String markerId, String parentId,
         MasterHex hex, Player player)
     {
         return new Legion(markerId, parentId, hex, hex, null, null, null,
@@ -188,24 +193,24 @@ public final class Legion
     /** deep copy for AI */
     public Legion AICopy()
     {
-	Legion newLegion = new Legion(markerId, parentId, currentHex, startingHex, 
-				      critters.size()>=1?(Creature)critters.get(0):null,
-				      critters.size()>=2?(Creature)critters.get(1):null,
-				      critters.size()>=3?(Creature)critters.get(2):null,
-				      critters.size()>=4?(Creature)critters.get(3):null,
-				      critters.size()>=5?(Creature)critters.get(4):null,
-				      critters.size()>=6?(Creature)critters.get(5):null,
-				      critters.size()>=7?(Creature)critters.get(6):null,
-				      critters.size()>=8?(Creature)critters.get(7):null, 
-				      player);
-	newLegion.moved = moved;
-	newLegion.recruited = recruited;
-	newLegion.battleTally = battleTally;
-	newLegion.entrySide = entrySide;
-	newLegion.teleported = teleported;
-	newLegion.teleportingLord = teleportingLord;
-	newLegion.marker = marker;
-	return newLegion;
+        Legion newLegion = new Legion(markerId, parentId, currentHex, startingHex,
+                                      critters.size()>=1?(Creature)critters.get(0):null,
+                                      critters.size()>=2?(Creature)critters.get(1):null,
+                                      critters.size()>=3?(Creature)critters.get(2):null,
+                                      critters.size()>=4?(Creature)critters.get(3):null,
+                                      critters.size()>=5?(Creature)critters.get(4):null,
+                                      critters.size()>=6?(Creature)critters.get(5):null,
+                                      critters.size()>=7?(Creature)critters.get(6):null,
+                                      critters.size()>=8?(Creature)critters.get(7):null,
+                                      player);
+        newLegion.moved = moved;
+        newLegion.recruited = recruited;
+        newLegion.battleTally = battleTally;
+        newLegion.entrySide = entrySide;
+        newLegion.teleported = teleported;
+        newLegion.teleportingLord = teleportingLord;
+        newLegion.marker = marker;
+        return newLegion;
     }
 
 
@@ -466,7 +471,7 @@ public final class Legion
                 }
                 if (critter.isImmortal())
                 {
-		    getPlayer().getGame().getCaretaker().putOneBack(critter);
+                    getPlayer().getGame().getCaretaker().putOneBack(critter);
                 }
             }
             log.append("] ");
@@ -567,7 +572,7 @@ public final class Legion
             ListIterator lit = critters.listIterator(critters.size());
             Critter critter = (Critter)lit.previous();
 
-	    getPlayer().getGame().getCaretaker().putOneBack(critter);
+            getPlayer().getGame().getCaretaker().putOneBack(critter);
             removeCreature(critter, false, true);
 
             recruited = false;
@@ -631,7 +636,7 @@ public final class Legion
     /** convenience method for AI */
     public void addCreature(Creature creature)
     {
-	addCreature(creature,false);
+        addCreature(creature,false);
     }
 
     /** Add a creature to this legion.  If takeFromStack is true,
@@ -641,10 +646,10 @@ public final class Legion
     {
         if (takeFromStack)
         {
-	    Caretaker caretaker = getPlayer().getGame().getCaretaker();
+            Caretaker caretaker = getPlayer().getGame().getCaretaker();
             if (caretaker.getCount(creature) > 0)
             {
-		caretaker.takeOne(creature);
+                caretaker.takeOne(creature);
             }
             else
             {
@@ -667,7 +672,7 @@ public final class Legion
         // If the creature is a lord or demi-lord, put it back in the stacks.
         if (returnImmortalToStack && critter.isImmortal())
         {
-	    getPlayer().getGame().getCaretaker().putOneBack(critter);
+            getPlayer().getGame().getCaretaker().putOneBack(critter);
         }
 
         // If there are no critters left, disband the legion.
@@ -749,6 +754,12 @@ public final class Legion
         concurrent access problems. */
     public void recombine(Legion legion, boolean remove)
     {
+        // Sanity check
+        if (legion == this)
+        {
+            Game.logDebug("Tried to recombine a legion with itself!");
+            return;
+        }
         Iterator it = critters.iterator();
         while (it.hasNext())
         {
@@ -759,7 +770,7 @@ public final class Legion
             // Keep removeLegion() from returning lords to stacks.
             if (critter.isLord())
             {
-		getPlayer().getGame().getCaretaker().takeOne(critter);
+                getPlayer().getGame().getCaretaker().takeOne(critter);
             }
         }
         if (remove)
@@ -779,7 +790,7 @@ public final class Legion
     /**
      * Split off creatures into a new legion using legion marker markerId.
      * (Or the first available marker, if markerId is null.)
-     * Return the new legion, or null if there's an error. 
+     * Return the new legion, or null if there's an error.
      */
     public Legion split(List creatures, String newMarkerId)
     {
@@ -821,9 +832,14 @@ public final class Legion
         player.setLastLegionSplitOff(newLegion);
         currentHex.addLegion(newLegion, false);
 
+        Game.logEvent(newLegion.getHeight() +
+            " creatures are split off from legion " + getLongMarkerName() +
+            " into new legion " + newLegion.getLongMarkerName());
+
         return newLegion;
     }
-    
+
+
     public Legion split(List creatures)
     {
         return split(creatures, null);

@@ -45,23 +45,23 @@ public final class Player implements Comparable
      */
     public Player AICopy()
     {
-	Player newPlayer = new Player(name, game);
-	newPlayer.color = color;              // Black, Blue, Brown, Gold, Green, Red
-	newPlayer.startingTower = startingTower;         // 1-6
-	newPlayer.score = score;              // track half-points, then round
-	newPlayer.summoned = summoned;
-	newPlayer.teleported = teleported;
-	newPlayer.playersEliminated = playersEliminated;  // RdBkGr
-	newPlayer.mulligansLeft = mulligansLeft;
-	newPlayer.movementRoll = movementRoll;
-	newPlayer.dead = dead;
-	newPlayer.ai = ai;
-	newPlayer.titanEliminated = titanEliminated;
-	for (int i = 0; i < legions.size(); i++)
-	    newPlayer.legions.add(i, ((Legion) legions.get(i)).AICopy());
-	// Strings are immutable, so a shallow copy == a deep copy
-	newPlayer.markersAvailable = (TreeSet) markersAvailable.clone();
-	return newPlayer;
+        Player newPlayer = new Player(name, game);
+        newPlayer.color = color;       // Black, Blue, Brown, Gold, Green, Red
+        newPlayer.startingTower = startingTower;         // 1-6
+        newPlayer.score = score;       // track half-points, then round
+        newPlayer.summoned = summoned;
+        newPlayer.teleported = teleported;
+        newPlayer.playersEliminated = playersEliminated;  // RdBkGr
+        newPlayer.mulligansLeft = mulligansLeft;
+        newPlayer.movementRoll = movementRoll;
+        newPlayer.dead = dead;
+        newPlayer.ai = ai;
+        newPlayer.titanEliminated = titanEliminated;
+        for (int i = 0; i < legions.size(); i++)
+            newPlayer.legions.add(i, ((Legion) legions.get(i)).AICopy());
+        // Strings are immutable, so a shallow copy == a deep copy
+        newPlayer.markersAvailable = (TreeSet) markersAvailable.clone();
+        return newPlayer;
     }
 
     public boolean isDead()
@@ -562,8 +562,8 @@ public final class Player implements Comparable
         {
             Legion legion = (Legion)it.next();
             Legion parent = legion.getParent();
-            if (parent != null && parent.getCurrentHex() ==
-                legion.getCurrentHex())
+            if (parent != null && parent != legion && 
+                parent.getCurrentHex() == legion.getCurrentHex())
             {
                 legion.recombine(parent, false);
                 it.remove();
@@ -769,6 +769,7 @@ public final class Player implements Comparable
 
     public void eliminateTitan()
     {
+Game.logDebug("Called eliminateTitan for " + name);
         titanEliminated = true;
     }
 
@@ -888,7 +889,20 @@ public final class Player implements Comparable
             ai.muster(game);
         }
     }
-
+    
+    
+    public boolean aiFlee(Legion legion, Legion enemy)
+    {
+        if (getOption(Game.autoFlee))
+        {
+            return ai.flee(legion, enemy);
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
 
     /** Comparator that forces this player's legion markers to come
      *  before captured markers in sort order. */

@@ -18,6 +18,7 @@ public class PerPlayerOptions
         set.add(Game.autoForcedStrike);
         set.add(Game.autoSplit);
         set.add(Game.autoMasterMove);
+        set.add(Game.autoFlee);
         set.add(Game.autoPlay);
     }
 
