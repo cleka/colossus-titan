@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class BattleMap implements the GUI for a Titan battlemap.
@@ -7,7 +8,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-public class BattleMap extends Frame implements MouseListener,
+public class BattleMap extends JFrame implements MouseListener,
     MouseMotionListener, WindowListener
 {
     private Hex[][] h = new Hex[6][6];
@@ -89,9 +90,10 @@ public class BattleMap extends Frame implements MouseListener,
             this.side = side;
         }
 
-        setLayout(null);
+        getContentPane().setLayout(null);
 
         preferredSize = new Dimension(30 * scale, 30 * scale);
+        pack();
         setSize(preferredSize);
 
         setResizable(false);
@@ -100,7 +102,6 @@ public class BattleMap extends Frame implements MouseListener,
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        pack();
         validate();
 
         // Initialize the hexmap.
@@ -142,7 +143,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(this, "waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -179,7 +180,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(this, "waitForAll was interrupted");
         }
         imagesLoaded = true;
     }
@@ -363,9 +364,8 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    // If any chits were left off-board, kill them.
-    // XXX: If they were newly summoned or recruited, unsummon or unrecruit
-    //   them instead.
+    // If any chits were left off-board, kill them.  If they were newly 
+    //   summoned or recruited, unsummon or unrecruit them instead.
     void removeOffboardChits()
     {
         Player player = turn.getActivePlayer();
@@ -2036,6 +2036,6 @@ System.out.println("defender's titan eliminated");
             Creature.minotaur, null, player2);
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('J');
-        new BattleMap(attacker, defender, hex, 'b', null);
+        new BattleMap(attacker, defender, hex, 3, null);
     }
 }
