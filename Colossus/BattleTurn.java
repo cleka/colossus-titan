@@ -98,7 +98,7 @@ System.out.println("SummonAngel");
                 summoningAngel = true;
 
                 // Make sure the MasterBoard is visible.
-                // XXX: map.getBoard().deiconify() when it becomes available
+                map.getBoard().deiconify();
                 map.getBoard().show();
 
                 summonAngel = new SummonAngel(map.getBoard(), attacker);
