@@ -56,12 +56,11 @@ public final class Game
     /** Server port number. */
     private int port = Constants.defaultPort;
 
-    History history;
+    private History history;
 
     /** Public only for JUnit test setup. */
     public Game()
     {
-
     }
 
     /** For Start */
@@ -998,9 +997,7 @@ public final class Game
                 root.addContent(bat);
             }
             root.addContent(history.getCopy());
-
             XMLOutputter putter = new XMLOutputter("    ", true);
-
             putter.output(doc, out);
         }
         catch (IOException ex)
@@ -3104,5 +3101,39 @@ public final class Game
             options.setOption(optname, value);
             syncOptions();
         }
+    }
+
+
+    // History wrappers.  Time to start obeying the Law of Demeter.
+    void addCreatureEvent(String markerId, String creatureName)
+    {
+        history.addCreatureEvent(markerId, creatureName, turnNumber);
+    }
+
+    void removeCreatureEvent(String markerId, String creatureName)
+    {
+        history.removeCreatureEvent(markerId, creatureName, turnNumber);
+    }
+
+    void splitEvent(String parentId, String childId, List splitoffs)
+    {
+        history.splitEvent(parentId, childId, splitoffs, turnNumber);
+    }
+
+    void mergeEvent(String splitoffId, String survivorId)
+    {
+        history.mergeEvent(splitoffId, survivorId, turnNumber);
+    }
+
+    void revealEvent(boolean allPlayers, List playerNames, String markerId,
+            List creatureNames, boolean whole)
+    {
+        history.revealEvent(allPlayers, playerNames, markerId, creatureNames,
+                whole, turnNumber);
+    }
+
+    void playerElimEvent(String playerName, String slayerName)
+    {
+        history.playerElimEvent(playerName, slayerName, turnNumber);
     }
 }

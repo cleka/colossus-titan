@@ -22,19 +22,21 @@ public class History
         return (Element)root.clone();
     }
 
-    void addCreatureEvent(String markerId, String creatureName)
+    void addCreatureEvent(String markerId, String creatureName, int turn)
     {
         Element event = new Element("AddCreature");
         event.setAttribute("markerId", markerId);
         event.setAttribute("creatureName", creatureName);
+        event.setAttribute("turn", "" + turn);
         root.addContent(event);
     }
 
-    void removeCreatureEvent(String markerId, String creatureName)
+    void removeCreatureEvent(String markerId, String creatureName, int turn)
     {
         Element event = new Element("RemoveCreature");
         event.setAttribute("markerId", markerId);
         event.setAttribute("creatureName", creatureName);
+        event.setAttribute("turn", "" + turn);
         root.addContent(event);
     }
 
@@ -67,7 +69,7 @@ public class History
     }
 
     void revealEvent(boolean allPlayers, List playerNames, String markerId,
-            List creatureNames, boolean whole)
+            List creatureNames, boolean whole, int turn)
     {
         if (creatureNames.isEmpty())
         {
@@ -78,6 +80,7 @@ public class History
         event.setAttribute("markerId", markerId);
         event.setAttribute("wholeLegion", "" + whole);
         event.setAttribute("allPlayers", "" + allPlayers);
+        event.setAttribute("turn", "" + turn);
         if (!allPlayers)
         {
             Element viewers = new Element("viewers");
@@ -104,7 +107,7 @@ public class History
         root.addContent(event);
     }
 
-    void playerElimEvent(String playerName, String slayerName)
+    void playerElimEvent(String playerName, String slayerName, int turn)
     {
         Element event = new Element("PlayerElim");
         event.setAttribute("name", playerName);
@@ -112,6 +115,7 @@ public class History
         {
             event.setAttribute("slayer", slayerName);
         }
+        event.setAttribute("turn", "" + turn);
         root.addContent(event);
     }
 

@@ -438,7 +438,7 @@ public final class Server implements IServer
         }
         if (updateHistory)
         {
-            game.history.playerElimEvent(playerName, slayerName);
+            game.playerElimEvent(playerName, slayerName);
         }
     }
 
@@ -745,9 +745,9 @@ public final class Server implements IServer
         {
             recruiterNames.add(recruiterName);
         }
-        game.history.revealEvent(true, null, legion.getMarkerId(),
+        game.revealEvent(true, null, legion.getMarkerId(),
                 recruiterNames, false);
-        game.history.addCreatureEvent(legion.getMarkerId(), recruit.getName());
+        game.addCreatureEvent(legion.getMarkerId(), recruit.getName());
     }
 
     void undidRecruit(Legion legion, String recruitName)
@@ -759,7 +759,7 @@ public final class Server implements IServer
             IClient client = (IClient)it.next();
             client.undidRecruit(legion.getMarkerId(), recruitName);
         }
-        game.history.removeCreatureEvent(legion.getMarkerId(), recruitName);
+        game.removeCreatureEvent(legion.getMarkerId(), recruitName);
     }
 
     public synchronized void engage(String hexLabel)
@@ -1132,8 +1132,7 @@ public final class Server implements IServer
         }
         if (updateHistory)
         {
-            game.history.mergeEvent(splitoffId, survivorId,
-                    game.getTurnNumber());
+            game.mergeEvent(splitoffId, survivorId);
         }
     }
 
@@ -1343,8 +1342,7 @@ public final class Server implements IServer
         activeClient.didSplit(hexLabel, parentId, childId, height, splitoffs,
                 game.getTurnNumber());
 
-        game.history.splitEvent(parentId, childId, splitoffs,
-                game.getTurnNumber());
+        game.splitEvent(parentId, childId, splitoffs);
 
         if (!game.getOption(Options.allStacksVisible))
         {
@@ -1443,7 +1441,7 @@ public final class Server implements IServer
         }
         if (updateHistory)
         {
-            game.history.addCreatureEvent(markerId, creatureName);
+            game.addCreatureEvent(markerId, creatureName);
         }
     }
 
@@ -1458,7 +1456,7 @@ public final class Server implements IServer
         }
         if (updateHistory)
         {
-            game.history.removeCreatureEvent(markerId, creatureName);
+            game.removeCreatureEvent(markerId, creatureName);
         }
     }
 
@@ -1471,7 +1469,7 @@ public final class Server implements IServer
             client.revealCreatures(legion.getMarkerId(),
                     legion.getImageNames());
         }
-        game.history.revealEvent(true, null, legion.getMarkerId(),
+        game.revealEvent(true, null, legion.getMarkerId(),
                 legion.getImageNames(), true);
     }
 
@@ -1491,7 +1489,7 @@ public final class Server implements IServer
             client.revealEngagedCreatures(
                 legion.getMarkerId(), legion.getImageNames(), isAttacker);
         }
-        game.history.revealEvent(true, null, legion.getMarkerId(),
+        game.revealEvent(true, null, legion.getMarkerId(),
                 legion.getImageNames(), true);
     }
 
@@ -1516,7 +1514,7 @@ public final class Server implements IServer
         }
         List li = new ArrayList();
         li.add(playerName);
-        game.history.revealEvent(false, li, legion.getMarkerId(),
+        game.revealEvent(false, li, legion.getMarkerId(),
                 legion.getImageNames(), true);
     }
 
@@ -1572,7 +1570,7 @@ public final class Server implements IServer
             IClient client = (IClient)it.next();
             client.revealCreatures(legion.getMarkerId(), creatureNames);
         }
-        game.history.revealEvent(true, null, legion.getMarkerId(),
+        game.revealEvent(true, null, legion.getMarkerId(),
                 creatureNames, false);
     }
 

@@ -725,7 +725,7 @@ public final class Legion implements Comparable
         }
         if (updateHistory)
         {
-            game.history.removeCreatureEvent(getMarkerId(), critter.getName());
+            game.removeCreatureEvent(getMarkerId(), critter.getName());
         }
     }
 
