@@ -232,14 +232,14 @@ public class BattlelandRandomizerLoader
         leftover = al;
     }
 
-    Hashtable hexsideRandomness = new Hashtable();
-    private class hazardPair
+    private Map hexsideRandomness = new TreeMap();
+    private class hazardPair implements Comparable
     {
         final char hs;
         final int  es;
         final char hd;
         final int  ed;
-        hazardPair(char hs, int es, char hd, int ed)
+        private hazardPair(char hs, int es, char hd, int ed)
         {
             this.hs = hs;
             this.es = es;
@@ -248,7 +248,6 @@ public class BattlelandRandomizerLoader
         }
         public boolean equals(Object o)
         {
-System.out.print("toto");
             if (o == null)
                 return false;
             if (!(o instanceof hazardPair))
@@ -259,14 +258,23 @@ System.out.print("toto");
                     (es == h.es) &&
                     (ed == h.ed));
         }
-        boolean match(hazardPair h)
+        public int compareTo(Object o)
         {
-            boolean eq = ((hs == h.hs) && (hd == h.hd));
-            if ((es != -1) && (h.es != -1))
-                eq = eq && (es == h.es);
-            if ((ed != -1) && (h.ed != -1))
-                eq = eq && (ed == h.ed);
-            return eq;
+            hazardPair h = (hazardPair)o;
+            if ((hs == h.hs) &&
+                (hd == h.hd) &&
+                (es == h.es) &&
+                (ed == h.ed))
+                return 0;
+            if (hs != h.hs)
+                return (hs < h.hs ? -1 : 1);
+            if (hd != h.hd)
+                return (hd < h.hd ? -1 : 1);
+            if (es != h.es)
+                return (es < h.es ? -1 : 1);
+            if (ed != h.ed)
+                return (ed < h.ed ? -1 : 1);
+            return 0;
         }
         public String toString()
         {
@@ -311,22 +319,18 @@ System.out.print("toto");
         hazardPair p2;
         List al;
         p2 = p;
-System.out.println("Matching (1): " + p2);
         al = (List)hexsideRandomness.get(p2);
         if (al != null) // exact match
             return al;
         p2 = new hazardPair(p.hs, p.es, p.hd, -1);
-System.out.println("Matching (2): " + p2);
         al = (List)hexsideRandomness.get(p2);
         if (al != null)
             return al;
         p2 = new hazardPair(p.hs, -1, p.hd, p.ed);
-System.out.println("Matching (3): " + p2);
         al = (List)hexsideRandomness.get(p2);
         if (al != null)
             return al;
         p2 = new hazardPair(p.hs, -1, p.hd, -1);
-System.out.println("Matching (4): " + p2);
         al = (List)hexsideRandomness.get(p2);
         if (al != null)
             return al;
@@ -351,8 +355,6 @@ System.out.println("Matching (4): " + p2);
                             int  ed = hd.getElevation();
                             hazardPair hp = new hazardPair(ts,es,td,ed);
                             List hsl = findHazardPairBestMatch(hp);
-System.out.println("Found " + hsl + " for h[" + i + "][" + j + "] / " + k);
-System.out.println(" this is " + hp);
                             if (hsl != null)
                             {
                                 boolean attributed = false;
@@ -730,6 +732,7 @@ int oneArea(BattleHex h[][]) :
     <AREA> (al = z_listAddress()) <HAZARDS> (tl = z_listHazard())
     {
         Collections.sort(al);
+        Collections.reverse(tl);
         //System.err.println("Using area: " + al + ", terrains: " + tl);
         resolveAll(h, al, tl);
         //System.err.println("Usedup: " + usedup);
@@ -743,9 +746,10 @@ int oneArea(BattleHex h[][]) :
     }
 |   <PAIR> (hp = z_hazardPair()) <HEXSIDES> (tl = z_listHexside())
     {
-System.out.println("For " + hp + " we'll use " + tl);
+        //System.out.println("For " + hp + " we'll use " + tl);
+        Collections.reverse(tl);
         hexsideRandomness.put(hp,tl);
-System.out.println("NOW: " + hexsideRandomness);
+        //System.out.println("NOW: " + hexsideRandomness);
         return(0);
     }
 |   <EOL>

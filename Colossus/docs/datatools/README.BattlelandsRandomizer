@@ -15,17 +15,19 @@ The Randomizer used can also be accessed from inside
 BattlelandsBuilder, in a much more user-friendly
 way. An input file (described below) is still needed.
 
-It's not finished yet, as no inter-hexagon hazard
-are generated yet (such as slope, ...).
+Examples of random input file can be found in the
+'Random' directory.
 
-Properties are line of one of the two forms:
+Properties are line of one of the three forms:
 
 AREA <list_of_hex> HAZARDS <list_of_hazards>
 LABEL <label> = <list_of_hex>
+PAIR <pair_of_hazard> HEXSIDES <list_of_hexsides>
 
 where
 
-* AREA, HAZARDS and LABEL are the strings literals ; = is the character literal '='.
+* AREA, HAZARDS, PAIR, HEXSIDES and LABEL are the strings literals ;
+  = is the character literal '='.
 
 * <list_of_hex> is a list of hex from the following available forms:
 
@@ -63,21 +65,33 @@ where
     all hexes present in the <list_of_hex> are excluded from the result.
 
 * <list_of_hazards> is a list of Hazard from the following available forms:
-    <hazard_letter>
-    <hazard_letter>,<probability>
-    <hazard_letter>,<elevation>
-    <hazard_letter>,<probability_elevation_0>,<probability_elevation_1>,<probability_elevation_2>
-    <hazard_letter>,<probability>,<probability_elevation_0>,<probability_elevation_1>,<probability_elevation_2>
-    where <hazard_letter> is a letter representing a Hazard ('r' for Brush, and so on, see BattleHex.java), <probability> is a float number representing the
-    percentile of chance of the hazard being present (a numerical point
-    _must_ be present for all probability), <elevation> is a hard-coded
-    elevation (integer between 0 and 2), and the three
+    <hazard_letter>(,<probability>)?(,<elevation>)?
+    <hazard_letter>(,<probability>)?(,<probability_elevation_0>,<probability_elevation_1>,<probability_elevation_2>)?
+    where <hazard_letter> is a letter representing a Hazard ('r' for Brush,
+    and so on, see BattleHex.java), <probability> is a float number
+    representing the  percentile of chance of the hazard being present
+    (a numerical point _must_ be present for all probability), <elevation>
+    is a hard-coded elevation (integer between 0 and 2), and the three
     <probability_elevation_X> are the odds of the hazard being at elevation
     0, 1 and 2 respectively (it's better is the sum is 100., but they will
     be normalized to percentile values).
+    Only the <hazard_letter> is mandatory, the other parts are optionals.
+    But if those other parts are present, they must respect the order
+    above (first probability if present, the either the elevation or
+    the elevation probabilities).
 
 * <label> is a lowercase-only string, that act afterwards as it was the list of
     Hex on the right side of the '=' character.
+
+* <list_of_hexsides> is alist of <hexside_letter>,<hexside_probability>
+
+* <pair_of_hazard> is a pair of (<hazard_letter>,<elevation>). Elevation
+  can be 0, 1, 2 or the character literal *, which means 'any elevation'.
+  For all hexside between such a pair of hazard, all hexside from the
+  <list_of_hexside> will be tried in order, until either one is
+  present, or all have been tried (in which case no hexside will be
+  used between the two hazards). Not that the default Hazard, the
+  plains (character 'p'), can be used.
 
 BattlelandsRandomizer will then, for each AREA, try to put the
 Hazard in any one of the Hex in the AREA. An Hex will not receive
@@ -88,5 +102,11 @@ case, only the last Hazard is used.
 AERAs are processed in order, so an Hex that appears in multiple
 AREAS may also receive multiple Hazards. In this case alsom
 only the last Hazard is used.
+
+Note that all hexsides use the same PAIR-defined probability. Only the
+last PAIR statement is used for a given pair. For this purpose, all
+elevation including * are different. The more specific statement will
+be used (i.e. (s,0)(p,0) will be used instead of (s,*)(p,*) for
+the hexside between a 0-height Sand and a O-height Plains).
 
 File Version: $Header$

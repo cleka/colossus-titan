@@ -1,0 +1,35 @@
+# $Id$
+
+LABEL innermost=C3 D3 D4
+
+# Three desert patch growing from the defense border lines
+# First a sand, followed by some more surroundings it,
+# followed by even more surroundings the entire patch.
+# repeat thrice. Note that in each patch, if the first
+# sand isn't  present, then none of the others will be present.
+AREA (leftdefenseentry)  HAZARDS s,95.
+LABEL leftdefsand=(usedup)
+AREA SURROUNDINGSOF((leftdefsand)) HAZARDS s,75. s,50. s,25.
+LABEL leftdefsand=(usedup)(leftdefsand)
+AREA SURROUNDINGSOF((leftdefsand)) HAZARDS s,50. s,25.
+
+AREA (upperdefenseentry) HAZARDS s,95.
+LABEL upperdefsand=(usedup)
+AREA SURROUNDINGSOF((upperdefsand)) HAZARDS s,75. s,50. s,25.
+LABEL upperdefsand=(usedup)(upperdefsand)
+AREA SURROUNDINGSOF((upperdefsand)) HAZARDS s,50. s,25.
+
+AREA (lowerdefenseentry) HAZARDS s,95.
+LABEL lowerdefsand=(usedup)
+AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS s,75. s,50. s,25.
+LABEL lowerdefsand=(usedup)(lowerdefsand)
+AREA SURROUNDINGSOF((lowerdefsand)) HAZARDS s,50. s,25.
+
+# once in a while, a tree get lost in the Desert
+AREA (innermost) HAZARDS t,5.,1
+
+# hexside probability
+# 60% of the hexside will be Slope, and 50% of the remaining will be Cliff
+# This for any elevation
+PAIR (s,*)(p,*) HEXSIDES s,60. c,50.
+
