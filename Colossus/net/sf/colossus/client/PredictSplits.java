@@ -421,6 +421,7 @@ class Node implements Comparable
                 count++;
             }
         }
+        Log.debug("count is " + count + " height is " + getHeight());
 
         if (count > getHeight())
         {
@@ -488,8 +489,11 @@ class Node implements Comparable
             creatures.removeLastUncertainCreature();
         }
 
-        Log.debug("revealSomeCreatures() " + this);
-        parent.tellChildContents(this);
+        Log.debug("end revealSomeCreatures() " + this);
+        if (parent != null)
+        {
+            parent.tellChildContents(this);
+        }
     }
 
     void revealAllCreatures(List cnl)
