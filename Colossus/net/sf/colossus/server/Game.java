@@ -630,18 +630,18 @@ public final class Game
         switch (remaining)
         {
             case 0:
+                setGameOver(true);
                 Log.event("Game over -- Draw at " + new Date().getTime());
                 server.allTellGameOver("Draw");
-                setGameOver(true);
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
 
+                setGameOver(true);
                 Log.event("Game over -- " + winnerName + " wins at " +
                     new Date().getTime());
                 server.allTellGameOver(winnerName + " wins");
-                setGameOver(true);
                 break;
 
             default:
