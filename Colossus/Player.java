@@ -23,6 +23,7 @@ class Player
     private int movementRoll;
     private Game game;
     private Legion lastLegionMoved = null;
+    private boolean titanEliminated = false;
 
 
     Player(String name, Game game)
@@ -427,7 +428,10 @@ class Player
     void addPoints(double points)
     {
         score += points;
-        game.updateStatusScreen();
+        if (game != null)
+        {
+            game.updateStatusScreen();
+        }
     }
 
 
@@ -454,7 +458,10 @@ class Player
             }
             else
             {
-                player.addPoints(legions[i].getPointValue() / 2.0);
+                if (player != null)
+                {
+                    player.addPoints(legions[i].getPointValue() / 2.0);
+                }
             }
         }
 
@@ -475,11 +482,14 @@ class Player
         // Mark this player as dead.
         alive = false;
 
-        // Mark who eliminated this player.
-        player.addPlayerElim(this);
-
-        // Give him this player's legion markers.
-        player.addLegionMarkers(this);
+        // Mark who eliminated this player and give him this player's 
+        // legion markers.
+        if (player != null)
+        {
+            player.addPlayerElim(this);
+            player.addLegionMarkers(this);
+        }
+        
         numMarkersAvailable = 0;
 
         game.updateStatusScreen();
@@ -494,5 +504,16 @@ class Player
         {
             game.advanceTurn();
         }
+    }
+
+
+    void eliminateTitan()
+    {
+        titanEliminated = true;
+    }
+
+    boolean isTitanEliminated()
+    {
+        return titanEliminated;
     }
 }
