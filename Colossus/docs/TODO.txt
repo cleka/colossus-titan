@@ -9,16 +9,12 @@ Big picture:
 
 Bug: Failing LOSTest -- problems with slopes and cliffs.
 
-Bug: Auto forced strike is taking strikes when there's > 1 target.
-
 Bug: run -i 6 -g sometimes spins forever on fixName.  Sometimes okay.  Race.
 Called SocketServerThread.setPlayerName() old:Gold new:<By color>5 thread: Gold
 From client <By color>5: fixName ~ Gold
 Got fixName new:Gold old:<By color>5
 
 Bug: Some strike updates do not reach client GUI.
-
-Bug: estimateBattleResults() broken -- missing titans?
 
 Bug: Double advance from split phase when autosplit has no legal splits?
 
@@ -28,12 +24,13 @@ Bug: Takes 2 undo battle moves to undo a move.
 
 Bug: Need to detect failed AI battle moves and fall back.
 
-Bug: Need to call AI type setting code on client side.
-
-Bug: Hang on AI player "done with moves"
+Bug: Hang on AI player "done with moves"  Looks like no legion was moved.
 
 Bug: Need to re-highlight after undo split, undo battle move, undo muster.
 
+Bug: Game advanced past human's battle move phase, leaving all offboard.
+
+Auto-advance from battle move, strike phases is disabled for humans.
 
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.

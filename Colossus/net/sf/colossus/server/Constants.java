@@ -141,6 +141,7 @@ public final class Constants
     public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI" };
     public static final int numAITypes = aiArray.length;
     public static final String all = "All";
+    public static final String aiPackage = "net.sf.colossus.client.";
 
     // Player names
     public static final String byColor = "<By color>";

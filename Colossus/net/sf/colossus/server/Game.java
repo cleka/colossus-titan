@@ -320,6 +320,8 @@ Log.debug("Called Game.newGame2()");
             Player player = (Player)it.next();
             server.oneSetOption(player.getName(), Options.autoPlay,
                 player.isAI());
+            server.oneSetOption(player.getName(), Options.playerType,
+                player.getType());
         }
     }
 

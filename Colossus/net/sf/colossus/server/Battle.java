@@ -183,6 +183,10 @@ public final class Battle
 
     String getActivePlayerName()
     {
+        if (getActivePlayer() == null)
+        {
+            return null;
+        }
         return getActivePlayer().getName();
     }
 
@@ -471,11 +475,6 @@ public final class Battle
     {
         server.allSetupBattleMove();
 
-        if (findMobileCritters().size() < 1)
-        {
-            return true;
-        }
-
         return false;
     }
 
@@ -483,12 +482,6 @@ public final class Battle
     {
         server.allSetupBattleFight();
         applyDriftDamage();
-
-        if (findCrittersWithTargets().size() < 1)
-        {
-            commitStrikes();
-            return true;
-        }
 
         return false;
     }
@@ -854,6 +847,10 @@ Log.debug("Called Battle.doneReinforcing()");
 
     private void removeDeadCreaturesFromLegion(Legion legion)
     {
+        if (legion == null)
+        {
+            return;
+        }
         List critters = legion.getCritters();
         if (critters != null)
         {

@@ -54,7 +54,6 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         JPanel attackerPane = new JPanel();
         contentPane.add(attackerPane);
 
-Log.debug("making attacker marker " + scale + " " + attackerId);
         attackerMarker = new Marker(scale, attackerId, this, client);
         attackerPane.add(attackerMarker);
 

@@ -1094,6 +1094,7 @@ Log.debug("Called Server.addClient() for " + playerName);
         if (player.legionsMoved() == 0 &&
             player.countMobileLegions() > 0)
         {
+Log.debug("At least one legion must move.");
             showMessageDialog("At least one legion must move.");
             return;
         }
@@ -1101,6 +1102,7 @@ Log.debug("Called Server.addClient() for " + playerName);
         // non-teleport move, force one of them to take it.
         else if (player.splitLegionHasForcedMove())
         {
+Log.debug("Split legions must be separated.");
             showMessageDialog("Split legions must be separated.");
             return;
         }

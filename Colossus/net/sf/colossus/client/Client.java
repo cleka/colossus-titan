@@ -79,8 +79,6 @@ public final class Client implements IClient
     private String parentId;
     private int numSplitsThisTurn;
 
-    // XXX Need to support changing AI type.
-    private String type;      // "Human" or ".*AI"
     private AI ai = new SimpleAI(this);
 
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
@@ -461,6 +459,10 @@ public final class Client implements IClient
                 Scale.set(scale);
                 rescaleAllWindows();
             }
+        }
+        else if (optname.equals(Options.playerType))
+        {
+            setType(value);
         }
     }
 
@@ -2275,12 +2277,11 @@ public final class Client implements IClient
     Set findMobileCritters()
     {
         Set set = new HashSet();
-        Iterator it = getBattleChits().iterator();
+        Iterator it = getActiveBattleChits().iterator();
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
-            if (isActive(chit) && !chit.hasMoved() &&
-                !isInContact(chit, false))
+            if (!chit.hasMoved() && !isInContact(chit, false))
             {
                 set.add(chit.getHexLabel());
             }
@@ -3032,7 +3033,7 @@ public final class Client implements IClient
 
     void doneWithSplits()
     {
-        if (!playerName.equals(getActivePlayerName()))
+        if (!isMyTurn())
         {
             return;
         }
@@ -3043,18 +3044,18 @@ public final class Client implements IClient
 
     public void doneWithMoves()
     {
-        if (!playerName.equals(getActivePlayerName()))
+        if (!isMyTurn())
         {
             return;
         }
         clearRecruitChits();
-        server.doneWithMoves();
         clearUndoStack();
+        server.doneWithMoves();
     }
 
     void doneWithEngagements()
     {
-        if (!playerName.equals(getActivePlayerName()))
+        if (!isMyTurn())
         {
             return;
         }
@@ -3064,7 +3065,7 @@ public final class Client implements IClient
 
     void doneWithRecruits()
     {
-        if (!playerName.equals(getActivePlayerName()))
+        if (!isMyTurn())
         {
             return;
         }
@@ -3384,9 +3385,9 @@ Log.debug("Called Client.setType() for " + playerName + " " + type);
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
             type = Constants.aiArray[whichAI];
         }
-        if (!type.startsWith("net.sf.colossus.server."))
+        if (!type.startsWith(Constants.aiPackage))
         {
-            type = "net.sf.colossus.server." + type;
+            type = Constants.aiPackage + type;
         }
         if (type.endsWith("AI"))
         {
@@ -3396,16 +3397,21 @@ Log.debug("Called Client.setType() for " + playerName + " " + type);
                     ai.getClass().getName() + " to " + type);
                 try 
                 {
+                    Class [] classArray = new Class[1];
+                    classArray[0] = Class.forName(
+                        "net.sf.colossus.client.Client");
+                    Object [] objArray = new Object[1];
+                    objArray[0] = this;
                     ai = (AI)Class.forName(type).getDeclaredConstructor(
-                        new Class[0]).newInstance(new Object[0]);
+                        classArray).newInstance(objArray);
                 } 
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     Log.error("Failed to change client " + playerName +
                         " from " + ai.getClass().getName() + " to " + type);
+                    ex.printStackTrace();
                 }
             }
         }
-        this.type = type;
     }
 }

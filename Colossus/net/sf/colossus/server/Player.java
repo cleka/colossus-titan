@@ -5,6 +5,7 @@ import java.util.*;
 import java.io.*;
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
@@ -77,13 +78,11 @@ Log.debug("Called Player.setType() for " + name + " " + type);
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
             type = Constants.aiArray[whichAI];
         }
-        if (!type.startsWith("net.sf.colossus.server."))
+        if (!type.startsWith(Constants.aiPackage))
         {
-            type = "net.sf.colossus.server." + type;
+            type = Constants.aiPackage + type;
         }
         this.type = type;
-
-        // XXX Push type to client
     }
 
 
