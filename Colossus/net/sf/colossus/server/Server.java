@@ -169,7 +169,7 @@ Log.debug("About to create server socket on port " + port);
         {
             InetAddress ia = InetAddress.getLocalHost();
 Log.debug("Called Server.createLocalClient() for " + playerName);
-            IClient client = new Client(ia.toString(), port, playerName, 
+            IClient client = new Client(ia.getHostAddress(), port, playerName,
                 false);
         }
         catch (UnknownHostException ex)

@@ -45,7 +45,7 @@ public final class Start
         try
         {
             InetAddress ia = InetAddress.getLocalHost();
-            hostname = ia.toString();
+            hostname = ia.getHostAddress();
         }
         catch (UnknownHostException ex)
         {
