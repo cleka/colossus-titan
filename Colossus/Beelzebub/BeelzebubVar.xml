@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<variant name="Beelzebub">
+<!--  Beelzebub - a variant by Chris Byler and Jay Delanoy -->
+<!--  -->
+    <creatures filename="BeelzebubCre.xml" />
+    <strategic_map filename="BeelzebubMap.xml" />
+    <terrain_recruits filename="BeelzebubTer.xml" />
+    <hint classname="Beelzebub.BeelzebubHint" />
+</variant>
