@@ -305,6 +305,10 @@ class SimpleAI implements AI
             // create the new legion
             Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion,
                 game.getNumPlayers()));
+
+            // Hide all creatures in both legions.
+            legion.hideAllCreatures();
+            newLegion.hideAllCreatures();
         }
     }
 
@@ -2178,8 +2182,8 @@ class SimpleAI implements AI
                     {
                         Legion legion = (Legion)it.next();
                         value += evaluateMove(game, legion,
-                                legion.getCurrentHex(), legion.hasMoved(),
-                                enemyAttackMap);
+                            legion.getCurrentHex(), legion.hasMoved(),
+                            enemyAttackMap);
                     }
                     // TODO: add additional value for player having
                     // stacks near each other
@@ -2838,6 +2842,7 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         final Legion enemy = battle.getInactiveLegion();
         final int skill = critter.getSkill();
         final BattleHex hex = critter.getCurrentHex();
+        final int turn = battle.getTurnNumber();
 
         int value = 0;
 
@@ -3012,7 +3017,7 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
             }
             else
             {
-                if (battle.getTurnNumber() <= 4)
+                if (turn <= 4)
                 {
                     value -= 30 * battle.getRange(hex, entrance, true);
                     for (int i = 0; i < 6; i++)
@@ -3057,7 +3062,12 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         }
         else  // attacker
         {
-            value += 3 * battle.getRange(hex, entrance, true);
+            // In the last couple of turns, just head for enemy creatures,
+            // not board edges.
+            if (turn <= 5)
+            {
+                value += 3 * battle.getRange(hex, entrance, true);
+            }
         }
 
         Log.debug("EVAL " + critter.getName() +

@@ -190,9 +190,10 @@ public final class Legion implements Comparable
         }
         else
         {
+            // XXX
             // When loading a game, we handle revealing visible creatures
             // after legion creation.
-            hideAllCreatures();
+            // hideAllCreatures();
         }
     }
 

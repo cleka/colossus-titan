@@ -467,7 +467,8 @@ private int mulligansLeft = 99;
             Legion legion = (Legion)it.next();
 
             // Hide all stack contents from other players.
-            legion.hideAllCreatures();
+            // XXX Testing doing this when we split instead.
+            // legion.hideAllCreatures();
 
             // Clear old entry side and teleport information.
             legion.clearAllHexInfo();
@@ -865,6 +866,10 @@ private int mulligansLeft = 99;
         if (game.getServer().getClientOption(name, Options.autoMasterMove))
         {
             ai.masterMove(game);
+            // XXX This should fix illegal legions, but it would be better
+            // to merge this logic and the logic in MasterBoard to create
+            // a server-side check.
+            undoAllSplits();
             game.advancePhase(Game.MOVE);
         }
     }

@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import java.awt.event.*;
 
 
 /**
@@ -18,6 +19,7 @@ public final class Game
     private boolean engagementInProgress;
     private boolean battleInProgress;
     private boolean summoningAngel;
+    private boolean pendingAdvancePhase;
     private Battle battle;
     private static Random random = new Random();
     private Caretaker caretaker = new Caretaker();
@@ -113,6 +115,7 @@ public final class Game
         engagementInProgress = false;
         battleInProgress = false;
         summoningAngel = false;
+        pendingAdvancePhase = false;
         caretaker.resetAllCounts();
         players.clear();
 
@@ -386,13 +389,16 @@ public final class Game
 
     public Player getPlayerByName(String name)
     {
-        Iterator it = players.iterator();
-        while (it.hasNext())
+        if (name != null)
         {
-            Player player = (Player)it.next();
-            if (name.equals(player.getName()))
+            Iterator it = players.iterator();
+            while (it.hasNext())
             {
-                return player;
+                Player player = (Player)it.next();
+                if (name.equals(player.getName()))
+                {
+                    return player;
+                }
             }
         }
         return null;
@@ -473,11 +479,38 @@ public final class Game
     /** Advance to the next phase, only if the passed oldPhase is current. */
     public void advancePhase(int oldPhase)
     {
-        if (oldPhase != phase)
+        if (oldPhase != phase || pendingAdvancePhase)
         {
             Log.error("Called advancePhase illegally");
             return;
         }
+
+        pendingAdvancePhase = true;
+
+        ActionListener phaseAdvancer = new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                advancePhaseInternal();
+            }
+        };
+
+        // This needs to be configurable.
+        int delay = 100;
+
+        // java.util.Timer is not present in JDK 1.2, so use the Swing
+        // timer for compatibility.
+        javax.swing.Timer timer = new javax.swing.Timer(delay, phaseAdvancer);
+        timer.setRepeats(false);
+        // XXX Trying to work around excess advancePhase() calls.
+        timer.restart();
+    }
+
+
+    /** Advance to the next phase, with no error checking.  Do not
+     *  call this directly -- it should only be called from advancePhase(). */
+    private void advancePhaseInternal()
+    {
         phase++;
 
         if (phase > MUSTER ||
@@ -489,6 +522,7 @@ public final class Game
         {
             Log.event("Phase advances to " + getPhaseName(phase));
         }
+        pendingAdvancePhase = false;
 
         setupPhase();
     }
@@ -550,7 +584,7 @@ public final class Game
     {
         // If there are no engagements, move forward to the muster phase.
         Client.clearUndoStack();
-        if (findEngagements().size() == 0)
+        if (!summoningAngel && findEngagements().size() == 0)
         {
             advancePhase(FIGHT);
         }
@@ -752,7 +786,7 @@ public final class Game
         }
 
         // Battle stuff
-        if (engagementInProgress)
+        if (engagementInProgress && battle != null)
         {
             out.println(battle.getMasterHexLabel());
             out.println(battle.getTurnNumber());
@@ -867,6 +901,11 @@ public final class Game
                 Log.error("Can't load this savegame version.");
                 dispose();
             }
+
+
+            // Reset flags that are not in the savegame file.
+            pendingAdvancePhase = false;
+
 
             buf = in.readLine();
             int numPlayers = Integer.parseInt(buf);
@@ -2519,7 +2558,12 @@ public final class Game
                 creatures.add(creature);
             }
             Legion newLegion = legion.split(creatures, newMarkerId);
+
+            // Hide all creatures in both legions.
+            legion.hideAllCreatures();
+            newLegion.hideAllCreatures();
         }
+
 
         int newHeight = legion.getHeight();
 

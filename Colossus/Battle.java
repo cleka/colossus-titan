@@ -1,5 +1,6 @@
 import java.util.*;
 import javax.swing.*;
+import java.awt.event.*;
 
 /**
  * Class Battle holds data about a Titan battle.
@@ -62,16 +63,56 @@ public final class Battle
         this.turnNumber = turnNumber;
         this.phase = phase;
 
+        terrain = getMasterHex().getTerrain();
+
         // Set defender's entry side opposite attacker's.
-        int side = getAttacker().getEntrySide(masterHexLabel);
+        Legion attacker = getAttacker();
+        int side = attacker.getEntrySide(masterHexLabel);
         Legion defender = getDefender();
         defender.clearAllEntrySides(masterHexLabel);
         defender.setEntrySide(masterHexLabel, (side + 3) % 6);
 
+        placeLegion(attacker);
+        placeLegion(defender);
+
         game.getServer().allInitBattleMap(masterHexLabel, this);
 
-        terrain = getMasterHex().getTerrain();
         Client.clearUndoStack();
+    }
+
+
+    private void placeLegion(Legion legion)
+    {
+        BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
+            legion);
+        String entranceLabel = entrance.getLabel();
+        Iterator it = legion.getCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+
+            String currentHexLabel = critter.getCurrentHexLabel();
+            if (currentHexLabel == null)
+            {
+                currentHexLabel = entranceLabel;
+            }
+            String startingHexLabel = critter.getStartingHexLabel();
+            if (startingHexLabel == null)
+            {
+                startingHexLabel = entranceLabel;
+            }
+
+            critter.addBattleInfo(currentHexLabel, startingHexLabel,
+                this);
+        }
+    }
+
+    private void placeCritter(Critter critter)
+    {
+        BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
+            critter.getLegion());
+        String entranceLabel = entrance.getLabel();
+        critter.addBattleInfo(entranceLabel, entranceLabel, this);
     }
 
 
@@ -292,7 +333,26 @@ public final class Battle
     }
 
 
-    public void advancePhase()
+    /** Advance to the next battle phase. */
+    private void advancePhase()
+    {
+        ActionListener phaseAdvancer = new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                advancePhaseInternal();
+            }
+        };
+        int delay = 100;
+        javax.swing.Timer timer = new javax.swing.Timer(delay, phaseAdvancer);
+        timer.setRepeats(false);
+        timer.start();
+    }
+
+
+    /** Advance to the next phase, with no error checking.  Do not call
+     *  this directly -- it should only be called from advancePhase(). */
+    private void advancePhaseInternal()
     {
         boolean again = false;
 
@@ -501,8 +561,9 @@ public final class Battle
         if (placeNewChit)
         {
             Legion attacker = getAttacker();
-            game.getServer().allPlaceNewChit(attacker.getCritter(
-                attacker.getHeight() - 1), false);
+            Critter critter = attacker.getCritter(attacker.getHeight() - 1);
+            placeCritter(critter);
+            game.getServer().allPlaceNewChit(critter, false);
         }
         if (phase == SUMMON)
         {
@@ -538,6 +599,7 @@ public final class Battle
             {
                 Critter newCritter = defender.getCritter(
                     defender.getHeight() - 1);
+                placeCritter(newCritter);
                 game.getServer().allPlaceNewChit(newCritter, true);
             }
         }

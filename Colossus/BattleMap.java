@@ -69,8 +69,8 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         setupEntrances();
 
-        placeLegion(attacker, false);
-        placeLegion(defender, true);
+        placeLegionChits(attacker, false);
+        placeLegionChits(defender, true);
 
         if (location == null)
         {
@@ -372,43 +372,21 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void placeNewChit(Critter critter, boolean inverted)
     {
-        BattleHex entrance = getEntrance(terrain, masterHexLabel,
-            critter.getLegion());
-        String entranceLabel = entrance.getLabel();
-
         // Add chit to client.
         client.addBattleChit(
             critter.getImageName(inverted), critter);
-        critter.addBattleInfo(entranceLabel, entranceLabel, battle);
-        alignChits(entranceLabel);
+        alignChits(critter.getCurrentHexLabel());
     }
 
 
-    private void placeLegion(Legion legion, boolean inverted)
+    private void placeLegionChits(Legion legion, boolean inverted)
     {
-        BattleHex entrance = getEntrance(terrain, masterHexLabel, legion);
-        String entranceLabel = entrance.getLabel();
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            // Add chit to client
             client.addBattleChit(critter.getImageName(inverted), critter);
-
-            String currentHexLabel = critter.getCurrentHexLabel();
-            if (currentHexLabel == null)
-            {
-                currentHexLabel = entranceLabel;
-            }
-            String startingHexLabel = critter.getStartingHexLabel();
-            if (startingHexLabel == null)
-            {
-                startingHexLabel = entranceLabel;
-            }
-
-            critter.addBattleInfo(currentHexLabel, startingHexLabel,
-                battle);
-            alignChits(currentHexLabel);
+            alignChits(critter.getCurrentHexLabel());
         }
     }
 
@@ -421,7 +399,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    /** Return the Critter whose chit contains the given point,
+    /** Return the BattleChit containing the given point,
      *  or null if none does. */
     private BattleChit getBattleChitAtPoint(Point point)
     {
@@ -438,6 +416,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
+    // XXX Just do chits, without going through critters.
     public void alignChits(String hexLabel)
     {
         GUIBattleHex hex = getGUIHexByLabel(hexLabel);
@@ -733,7 +712,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         setupHexes();
         setupEntrances();
-        placeLegion(battle.getDefender(), true);
-        placeLegion(battle.getAttacker(), false);
+        placeLegionChits(battle.getDefender(), true);
+        placeLegionChits(battle.getAttacker(), false);
     }
 }

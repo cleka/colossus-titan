@@ -1,18 +1,19 @@
+Attacking AI creatures need to chargest closest enemy in the last few
+   turns, rather than accepting a time loss.
+
 Support default names by color for AI players.
 
-Need to allow first human player to control game options, load game, etc.
+Allow first human player to control game options, load game, etc.
 
-All GUI method calls need to be moved out of non-GUI classes.
 Split GUI classes from model classes.
 
 Add UI for players to specify favorite colors.
 
 Get minimax masterboard moves working.
 
-Add a configurable AI move delay to make it easier to follow what the
-   AI is doing.
+Make advance phase delay configurable.
 Add AI time limits.
-Add AI progress indicator.
+Add AI progress indicator, hourglass cursor.
 
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
@@ -28,10 +29,9 @@ Write some design docs.
 
 Movement die should be displayed immediately when enabled, rather than
    waiting until the next turn, unless no movement die has been rolled
-   yet.  Same for battledice.
+   yet.  Same for battle dice, which means always keeping the information
+   up to date even if it's not being used.
 
-Separate the GUI parts of MasterBoard/MasterHex/BattleMap/BattleHex
-   from the game state parts.
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 
@@ -43,11 +43,6 @@ Add SetupBattle dialog, to allow setting up standalone battles.
    angel/archangel available to summon, recruits available for terrain
    type, player scores for titan power.)
 Add show caretaker stacks / show graveyard dialogs.  (From Prometheus.)
-
-Should be able to undo moves until an engagement is resolved.
-   If no engagements, should be able to undo recruits, then
-   undo moves.  "Done with Engagements" shouldn't be necessary.
-   Basically, phases should be less rigid.
 
 Add an option to show information about MasterBoard hexes when a
    mover is selected, such as whether that legion can recruit
@@ -66,17 +61,22 @@ All parameters passed into dialogs should be read-only or clones, with
    all changes to game state done by the caller.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
+Add optional additional handicap mulligans that can be used after turn 1.
 
 Add keyboard legion/critter selection?  (Previous, next, unselect keys)
 Add toolbars?
 Add tooltips?
 
 Highlight selected legion better.
-Highlight teleport and normal moves differently.
+Highlight teleport and normal moves differently, and show entry sides.
 Differently-highlight hexes where a legion could move if
    a friendly stack were not already there?
 
 Color code StatusScreen better.
+
+Show StatusScreen / MovementDie / ShowLegion info in the masterboard
+   window, rather than in separate windows.  Show BattleDice info in
+   the BattleMap window, rather than a separate window.
 
 Add the ability to change the creature type of a creature in a legion,
    and to specify "unknown" as a creature type, for tracking PBEM games.

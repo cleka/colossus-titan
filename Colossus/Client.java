@@ -810,12 +810,18 @@ public final class Client
     {
         server.getGame().doSummon(legion, donor, angel);
 
-        String hexLabel = legion.getCurrentHexLabel();
-        GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-        hex.repaint();
-        hexLabel = donor.getCurrentHexLabel();
-        hex = board.getGUIHexByLabel(hexLabel);
-        hex.repaint();
+        if (legion != null)
+        {
+            String hexLabel = legion.getCurrentHexLabel();
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            hex.repaint();
+        }
+        if (donor != null)
+        {
+            String hexLabel = donor.getCurrentHexLabel();
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            hex.repaint();
+        }
 
         summonAngel = null;
         board.highlightEngagements();
