@@ -9,7 +9,7 @@ import java.awt.*;
 
 class Legion
 {
-    private Chit marker;
+    private Marker marker;
     private int height;
     private String markerId;    // Bk03, Rd12, etc.
     private Legion splitFrom;
@@ -23,7 +23,7 @@ class Legion
     private int battleTally = 0;
 
 
-    Legion(int cx, int cy, int scale, String markerId, Legion splitFrom,
+    Legion(int scale, String markerId, Legion splitFrom,
         Container container, int height, MasterHex hex,
         Creature creature0, Creature creature1, Creature creature2,
         Creature creature3, Creature creature4, Creature creature5,
@@ -31,7 +31,8 @@ class Legion
     {
         this.markerId = markerId;
         this.splitFrom = splitFrom;
-        this.marker = new Marker(cx, cy, scale, getImageName(), container, this);
+        this.marker = new Marker(-1, -1, scale, getImageName(), container,
+            this);
         this.height = height;
         this.currentHex = hex;
         this.startingHex = hex;
@@ -157,7 +158,7 @@ class Legion
     }
 
 
-    public Chit getMarker()
+    public Marker getMarker()
     {
         return marker;
     }
