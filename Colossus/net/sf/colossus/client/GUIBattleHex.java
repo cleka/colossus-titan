@@ -7,6 +7,7 @@ import java.awt.geom.*;
 import java.net.*;
 import javax.swing.*;
 import java.io.*;
+import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
@@ -23,6 +24,7 @@ public class GUIBattleHex extends BattleHex
 {
     private GeneralPath innerHexagon;
     private Component map;
+    private static final Color highlightColor = Color.red;
 
     // Hex terrain types are:
     // p, r, s, t, o, v, d, w
@@ -98,7 +100,10 @@ public class GUIBattleHex extends BattleHex
 
         if (isSelected())
         {
-            g2.setColor(Color.red);
+            if (getTerrainColor().equals(highlightColor))
+                g2.setColor(HTMLColor.invertRGBColor(highlightColor));
+            else
+                g2.setColor(highlightColor);
             g2.fill(hexagon);
 
             g2.setColor(getTerrainColor());

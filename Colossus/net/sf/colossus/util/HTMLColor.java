@@ -177,4 +177,12 @@ public final class HTMLColor
         }
         return theColor;
     }
+
+    public static Color invertRGBColor(Color c)
+    {
+        Color c2 = new Color(255 - c.getRed(),
+                             255 - c.getGreen(),
+                             255 - c.getBlue());
+        return c2;
+    }
 }
