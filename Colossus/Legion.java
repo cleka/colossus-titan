@@ -13,7 +13,7 @@ import net.sf.colossus.battle.*;
 
 public final class Legion 
     extends GameSource
-	implements Comparable
+    implements Comparable
 {
     private String markerId;    // Bk03, Rd12, etc.
     private String parentId;
@@ -111,9 +111,10 @@ public final class Legion
         markerNames.put("Rd12", "Torch");
     }
 
-	/**
-	 * TMJF sez: these are public but I think they are only for testing purposes
-	 */
+    /**
+     * TMJF sez: these are public but I think they are only for 
+     * testing purposes
+     */
 
     public Legion(String markerId, String parentId, String currentHexLabel,
         String startingHexLabel, Creature creature0, Creature creature1,
@@ -209,13 +210,13 @@ public final class Legion
     public static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-		Legion oLegion = 
-			new Legion(markerId, null, hexLabel, hexLabel, Creature.titan,
-					   Creature.angel, Creature.ogre, Creature.ogre,
-					   Creature.centaur, Creature.centaur, Creature.gargoyle,
-					   Creature.gargoyle, playerName, game);
-		// Probably not the right place to be adding this
-		oLegion.addGameListener(game.getListener());
+	Legion oLegion = 
+            new Legion(markerId, null, hexLabel, hexLabel, Creature.titan,
+                       Creature.angel, Creature.ogre, Creature.ogre,
+                       Creature.centaur, Creature.centaur, Creature.gargoyle,
+                       Creature.gargoyle, playerName, game);
+        // Probably not the right place to be adding this
+        oLegion.addGameListener(game.getListener());
         return oLegion;
     }
 
@@ -223,12 +224,12 @@ public final class Legion
     public static Legion getEmptyLegion(String markerId, String parentId,
         String hexLabel, String playerName, Game game)
     {
-		Legion oLegion = 
-			new Legion(markerId, parentId, hexLabel, hexLabel, null,
-					   null, null, null, null, null, null, null, playerName, game);
-		// Probably not the right place to be adding this
-		oLegion.addGameListener(game.getListener());
-		return oLegion;
+        Legion oLegion = 
+            new Legion(markerId, parentId, hexLabel, hexLabel, null,
+                       null, null, null, null, null, null, null, playerName, game);
+        // Probably not the right place to be adding this
+        oLegion.addGameListener(game.getListener());
+        return oLegion;
     }
 
 
@@ -701,8 +702,8 @@ public final class Legion
                 " undoes its recruit");
             game.getServer().allRepaintHex(currentHexLabel);
 
-			// Because we are modifying the caretaker
-			fireEvent(new LegionEvent(this, LegionEvent.nLEGION_LOST_CHARACTER));
+            // Because we are modifying the caretaker
+            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_LOST_CHARACTER));
         }
     }
 
@@ -967,7 +968,7 @@ public final class Legion
                 return;
             }
 
-			fireEvent(new LegionEvent(this, LegionEvent.nLEGION_GAINED_CHARACTER));
+            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_GAINED_CHARACTER));
         }
 
         // Newly added critters are visible.
