@@ -127,29 +127,33 @@ final class BattleDice extends JPanel
                                          targetNumber + ")");
         }
 
-        dice = new Chit[numDice];
-
-        for (int i = 0; i < numDice; i++)
-        {
-            String imageName = getDieImageName((String)rolls.get(i));
-            if (imageName != null)
-            {
-                dice[i] = new Chit(2 * Scale.get(), imageName, this);
-                if (averageMiss > i)
-                    missBox.add(dice[i]);
-                else
-                    hitBox.add(dice[i]);
-            }
-        }
-
         if (numDice > 0)
         {
+            dice = new Chit[numDice];
+            
+            for (int i = 0; i < numDice; i++)
+            {
+                String imageName = getDieImageName((String)rolls.get(i));
+                if (imageName != null)
+                {
+                    dice[i] = new Chit(2 * Scale.get(), imageName, this);
+                    if (averageMiss > i)
+                        missBox.add(dice[i]);
+                    else
+                        hitBox.add(dice[i]);
+                }
+            }
+            
             if (averageMiss < numDice)
                 hitBox.setVisible(true);
             if (averageMiss > 0)
                 missBox.setVisible(true);
         }
-
+        else
+        {
+            dice = null;
+        }
+        
         invalidate();
         setVisible(true);
         repaint();
