@@ -99,7 +99,8 @@ class Concede extends Dialog implements ActionListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, "waitForAll was interrupted");
+            new MessageBox(parentFrame, e.toString() +
+                " waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -142,7 +143,6 @@ class Concede extends Dialog implements ActionListener
         }
 
         Dimension d = getSize();
-        Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
