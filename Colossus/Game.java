@@ -165,27 +165,27 @@ public class Game extends Frame implements WindowListener, ActionListener
     }
 
 
+    // Use a Fisher-Yates shuffle to randomize towers.
     private void assignTowers()
     {
         int [] playerTower = new int[6];
 
-        // A random card-shuffling algorithm is cleaner than repeated
-        //    die-rolling and checking for duplicates
-
-        for (int i = 0; i < 6 ; i++)
+        for (int i = 0; i < 6; i++)
         {
             playerTower[i] = i + 1;
         }
 
-        // 1000 shuffles should be more than enough.
-        for (int i = 0; i < 1000; i++)
+        for (int i = numPlayers - 1; i >= 0; i--)
         {
-            int m = (int) Math.floor(6 * Math.random());
-            int n = (int) Math.floor(6 * Math.random());
-            int t = playerTower[m];
-            playerTower[m] = playerTower[n];
-            playerTower[n] = t;
+            int j = (int) Math.floor((i + 1) * Math.random());
+            if (i != j)
+            {
+                int t = playerTower[i];
+                playerTower[i] = playerTower[j];
+                playerTower[j] = t;
+            }
         }
+
         for (int i = 0; i < numPlayers; i++)
         {
             players[i].setTower(playerTower[i]);
