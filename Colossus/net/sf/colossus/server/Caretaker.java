@@ -85,6 +85,11 @@ public final class Caretaker implements Cloneable
     {
         setCount(creature.getName(), count);
     }
+
+    void setDeadCount(Creature creature, int count)
+    {
+        setDeadCount(creature.getName(), count);
+    }
     
     void resetAllCounts()
     {

@@ -78,6 +78,7 @@ public final class Start
         net.sf.colossus.util.Options options = game.getOptions();
         options.loadOptions();
         clearNonPersistentOptions(options);
+        setupOptionsFromCommandLine(cl, game);
 
         new GetPlayers(new JFrame(), options);
         String loadFilename = options.getStringOption(Constants.loadGame);
@@ -112,7 +113,7 @@ public final class Start
 
     /** Modify options from command-line args if possible.  Clear
      *  options to abort if something is wrong. */
-    private void setupOptionsFromCommandLine(CommandLine cl, Game game)
+    private static void setupOptionsFromCommandLine(CommandLine cl, Game game)
     {
         if (cl == null)
         {
@@ -274,6 +275,7 @@ public final class Start
         else if (cl.optIsSet('g'))
         {
             game.getOptions().loadOptions();
+            setupOptionsFromCommandLine(cl, game);
             game.newGame(); 
         }
         else

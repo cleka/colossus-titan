@@ -13,7 +13,7 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.SaveGameFilter;
+import net.sf.colossus.server.XMLSnapshotFilter;
 import net.sf.colossus.server.ConfigFileFilter;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.parser.StrategicMapLoader;
@@ -380,7 +380,7 @@ public final class MasterBoard extends JPanel
                 // No need for confirmation because the user can cancel
                 // from the load game dialog.
                 JFileChooser chooser = new JFileChooser(Constants.saveDirname);
-                chooser.setFileFilter(new SaveGameFilter());
+                chooser.setFileFilter(new XMLSnapshotFilter());
                 int returnVal = chooser.showOpenDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
@@ -403,7 +403,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 JFileChooser chooser = new JFileChooser(Constants.saveDirname);
-                chooser.setFileFilter(new SaveGameFilter());
+                chooser.setFileFilter(new XMLSnapshotFilter());
                 int returnVal = chooser.showSaveDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {

@@ -110,15 +110,48 @@ public final class Player implements Comparable
 
     void initMarkersAvailable()
     {
+        initMarkersAvailable(getShortColor());
+    }
+
+    void initMarkersAvailable(String shortColor)
+    {
         for (int i = 1; i <= 9; i++)
         {
-            addLegionMarker(getShortColor() + '0' + Integer.toString(i));
+            addLegionMarker(shortColor + '0' + Integer.toString(i));
         }
         for (int i = 10; i <= 12; i++)
         {
-            addLegionMarker(getShortColor() + Integer.toString(i));
+            addLegionMarker(shortColor + Integer.toString(i));
         }
     }
+
+    /** Set markersAvailable based on other available information. */
+    void computeMarkersAvailable()
+    {
+        if (dead)
+        {
+            markersAvailable.clear();
+        }
+        else
+        {
+            initMarkersAvailable();
+            StringBuffer allVictims = new StringBuffer(playersEliminated);
+            for (int i = 0; i < allVictims.length(); i += 2)
+            {
+                String shortColor = allVictims.substring(i, i + 2);
+                initMarkersAvailable(shortColor);
+                Player victim = game.getPlayerByShortColor(shortColor);
+                allVictims.append(victim.getPlayersElim());
+            }
+            Iterator it = getLegionIds().iterator();
+            while (it.hasNext())
+            {
+                String markerId = (String)it.next();
+                markersAvailable.remove(markerId);
+            }
+        }
+    }
+
 
 
     String getShortColor()

@@ -7,6 +7,9 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 
+import org.jdom.*;
+import org.jdom.output.*;
+import org.jdom.input.*;
 import com.werken.opt.CommandLine;
 
 import net.sf.colossus.util.Log;
@@ -495,12 +498,6 @@ public final class Game
         return activePlayerNum;
     }
 
-    /** for AI only */
-    void setActivePlayerNum(int i)
-    {
-        activePlayerNum = i;
-    }
-
     Player getPlayer(int i)
     {
         return (Player)players.get(i);
@@ -520,6 +517,23 @@ public final class Game
             {
                 Player player = (Player)it.next();
                 if (name.equals(player.getName()))
+                {
+                    return player;
+                }
+            }
+        }
+        return null;
+    }
+
+    Player getPlayerByShortColor(String shortColor)
+    {
+        if (shortColor != null)
+        {
+            Iterator it = players.iterator();
+            while (it.hasNext())
+            {
+                Player player = (Player)it.next();
+                if (shortColor.equals(player.getShortColor()))
                 {
                     return player;
                 }
@@ -818,10 +832,25 @@ public final class Game
     }
 
 
+    void saveGame(final String filename)
+    {
+        if (filename == null)
+        {
+            saveGameXML(filename);
+        }
+        else if (filename.endsWith(Constants.saveExtension))
+        {
+            saveGameText(filename);
+        }
+        else
+        {
+            saveGameXML(filename);
+        }
+    }
+
+
     /** Create a text file describing this game's state, in
      *  file filename, or <saveDirName>/<time>.sav if null.
-     *  We don't use XML yet because we don't want to require 
-     *  JDK 1.3.x users to install a parser.
      *  Format:
      *     Savegame version string
      *     Variant filename
@@ -892,7 +921,7 @@ public final class Game
      *     Defending Legion:
      *         ...
      */
-    synchronized void saveGame(final String filename)
+    synchronized void saveGameText(final String filename)
     {
         String fn = null; 
         if (filename == null || filename.equals("null"))
@@ -980,7 +1009,7 @@ public final class Game
             while (it2.hasNext())
             {
                 Legion legion = (Legion)it2.next();
-                dumpLegion(out, legion, false);
+                dumpLegionText(out, legion, false);
             }
         }
 
@@ -1004,8 +1033,8 @@ public final class Game
                 out.println(carryTarget);
             }
 
-            dumpLegion(out, battle.getAttacker(), true);
-            dumpLegion(out, battle.getDefender(), true);
+            dumpLegionText(out, battle.getAttacker(), true);
+            dumpLegionText(out, battle.getDefender(), true);
         }
 
         if (out.checkError())
@@ -1015,7 +1044,9 @@ public final class Game
         }
     }
 
-    private void dumpLegion(PrintWriter out, Legion legion, boolean inBattle)
+
+    private void dumpLegionText(PrintWriter out, Legion legion, 
+        boolean inBattle)
     {
         out.println(legion.getMarkerId());
         out.println(legion.getCurrentHexLabel());
@@ -1042,6 +1073,196 @@ public final class Game
         }
     }
 
+
+
+    synchronized void saveGameXML(final String filename)
+    {
+        String fn = null; 
+        if (filename == null || filename.equals("null"))
+        {
+            Date date = new Date();
+            File savesDir = new File(Constants.saveDirname);
+            if (!savesDir.exists() || !savesDir.isDirectory())
+            {
+                Log.event("Trying to make directory " + Constants.saveDirname);
+                if (!savesDir.mkdirs())
+                {
+                    Log.error("Could not create saves directory");
+                    return;
+                }
+            }
+
+            fn = Constants.saveDirname + Constants.xmlSnapshotStart +
+                date.getTime() + Constants.xmlExtension;
+        }
+        else
+        {
+            fn = new String(filename);
+        }
+
+        FileWriter fileWriter;
+        try
+        {
+            fileWriter = new FileWriter(fn);
+        }
+        catch (IOException e)
+        {
+            Log.error(e.toString());
+            Log.error("Couldn't open " + fn);
+            return;
+        }
+        PrintWriter out = new PrintWriter(fileWriter);
+
+        try 
+        {
+            Element root = new Element("ColossusSnapshot");
+            root.setAttribute("version", Constants.xmlSnapshotVersion);
+
+            Document doc = new Document(root);
+            
+            Element el = new Element("Variant");
+            el.setAttribute("dir", VariantSupport.getVarDirectory());
+            el.setAttribute("file", VariantSupport.getVarName());
+            root.addContent(el);
+
+            el = new Element("TurnNumber");
+            el.addContent("" + getTurnNumber());
+            root.addContent(el);
+
+            el = new Element("CurrentPlayer");
+            el.addContent("" + getActivePlayerNum());
+            root.addContent(el);
+
+            el = new Element("CurrentPhase");
+            el.addContent("" + getPhase());
+            root.addContent(el);
+
+            Element car = new Element("Caretaker");
+            root.addContent(car);
+
+            // Caretaker stacks
+            java.util.List creatures = Creature.getCreatures();
+            Iterator it = creatures.iterator();
+            while (it.hasNext())
+            {
+                Creature creature = (Creature)it.next();
+
+                el = new Element("Creature");
+                el.setAttribute("name", creature.getName());
+                el.setAttribute("remaining", "" +
+                    caretaker.getCount(creature));
+                el.setAttribute("dead", "" + caretaker.getDeadCount(creature));
+                car.addContent(el);
+            }
+    
+            // Players
+            it = players.iterator();
+            while (it.hasNext())
+            {
+                Player player = (Player)it.next();
+
+                el = new Element("Player");
+                el.setAttribute("name", player.getName());
+                el.setAttribute("type", player.getType());
+                el.setAttribute("color", player.getColor());
+                el.setAttribute("startingTower", player.getTower());
+                el.setAttribute("score", "" + player.getScore());
+                el.setAttribute("dead", "" + player.isDead());
+                el.setAttribute("mulligansLeft", "" + 
+                    player.getMulligansLeft());
+                el.setAttribute("colorsElim", player.getPlayersElim());
+                el.setAttribute("movementRoll", "" + player.getMovementRoll());
+                el.setAttribute("teleported", "" + player.hasTeleported());
+                el.setAttribute("summoned", "" + player.hasSummoned());
+    
+                Collection legions = player.getLegions();
+                Iterator it2 = legions.iterator();
+                while (it2.hasNext())
+                {
+                    Legion legion = (Legion)it2.next();
+                    el.addContent(dumpLegionXML(doc, legion, battle != null 
+                        && (legion == battle.getAttacker() || 
+                            legion == battle.getDefender())));
+                }
+                root.addContent(el);
+            }
+    
+            // Battle stuff
+            if (engagementInProgress && battle != null)
+            {
+                Element bat = new Element("Battle");
+                bat.setAttribute("masterHexLabel", battle.getMasterHexLabel());
+                bat.setAttribute("turnNumber", "" + battle.getTurnNumber());
+                bat.setAttribute("activePlayer", "" + 
+                    battle.getActivePlayerName());
+                bat.setAttribute("phase", "" + battle.getPhase());
+                bat.setAttribute("summonState", "" + battle.getSummonState());
+                bat.setAttribute("carryDamage", "" + battle.getCarryDamage());
+                bat.setAttribute("driftDamageApplied", "" +  
+                    battle.isDriftDamageApplied());
+
+                it = battle.getCarryTargets().iterator();
+                while (it.hasNext())
+                {
+                    Element ct = new Element("CarryTarget");
+                    String carryTarget = (String)it.next();
+                    ct.addContent(carryTarget);
+                    bat.addContent(ct);
+                }
+                root.addContent(bat);
+            }
+            
+            XMLOutputter putter = new XMLOutputter("    ", true);
+            putter.output(doc, out);
+        }
+        catch (IOException ex)
+        {
+            Log.error("Error writing XML savegame: " + ex.toString());
+        }
+    }
+
+    private String notnull(String in)
+    {
+        if (in == null)
+        {
+            return "null";
+        }
+        return in;
+    }
+
+    private Element dumpLegionXML(Document doc, Legion legion, 
+        boolean inBattle)
+    {
+        Element leg = new Element("Legion");
+        leg.setAttribute("name", legion.getMarkerId());
+        leg.setAttribute("currentHex", legion.getCurrentHexLabel());
+        leg.setAttribute("startingHex", legion.getStartingHexLabel());
+        leg.setAttribute("moved", "" + legion.hasMoved());
+        leg.setAttribute("entrySide", "" + legion.getEntrySide());
+        leg.setAttribute("parent", notnull(legion.getParentId()));
+        leg.setAttribute("recruitName", notnull(legion.getRecruitName()));
+        leg.setAttribute("battleTally", "" + legion.getBattleTally());
+
+        Collection critters = legion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            Element cre = new Element("Creature");
+
+            cre.setAttribute("name", critter.getName());
+            if (inBattle)
+            {
+                cre.setAttribute("hits", "" + critter.getHits());
+                cre.setAttribute("currentHex", critter.getCurrentHexLabel());
+                cre.setAttribute("startingHex", critter.getStartingHexLabel());
+                cre.setAttribute("struck", "" + critter.hasStruck());
+            }
+            leg.addContent(cre);
+        }
+        return leg;
+    }
+
     void autoSave()
     {            
         if (getOption(Options.autosave))
@@ -1051,9 +1272,21 @@ public final class Game
     }
 
 
+    void loadGame(String filename)
+    {
+        if (filename.endsWith(Constants.saveExtension))
+        {
+            loadGameText(filename);
+        }
+        else
+        {
+            loadGameXML(filename);
+        }
+    }
+
     /** Try to load a game from saveDirName/filename.  If the filename is
      *  "--latest" then load the latest savegame found in saveDirName. */
-    void loadGame(String filename)
+    void loadGameText(String filename)
     {
         File file = null;
         if (filename.equals("--latest"))
@@ -1184,7 +1417,7 @@ public final class Game
                 // Legions
                 for (int j = 0; j < numLegions; j++)
                 {
-                    readLegion(in, player, false);
+                    readLegionText(in, player, false);
                 }
             }
 
@@ -1223,11 +1456,11 @@ public final class Game
                 }
 
                 Player attackingPlayer = getActivePlayer();
-                Legion attacker = readLegion(in, attackingPlayer, true);
+                Legion attacker = readLegionText(in, attackingPlayer, true);
 
                 Player defendingPlayer = getFirstEnemyLegion(
                     engagementHexLabel, attackingPlayer).getPlayer();
-                Legion defender = readLegion(in, defendingPlayer, true);
+                Legion defender = readLegionText(in, defendingPlayer, true);
 
                 int activeLegionNum;
                 if (battleActivePlayerName.equals(attackingPlayer.getName()))
@@ -1253,15 +1486,15 @@ public final class Game
             // Remaining stuff has been moved to loadGame2()
         }
         // FileNotFoundException, IOException, NumberFormatException
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.error(e + " Tried to load corrupt savegame.");
-            e.printStackTrace();
+            Log.error("Tried to load corrupt savegame.");
+            ex.printStackTrace();
             dispose();
         }
     }
 
-    Legion readLegion(BufferedReader in, Player player,
+    Legion readLegionText(BufferedReader in, Player player,
         boolean inBattle) throws IOException
     {
         String markerId = in.readLine();
@@ -1350,6 +1583,305 @@ public final class Game
         return legion;
     }
 
+
+
+    /** Try to load a game from saveDirName/filename.  If the filename is
+     *  "--latest" then load the latest savegame found in saveDirName. */
+    void loadGameXML(String filename)
+    {
+        File file = null;
+        if (filename.equals("--latest"))
+        {
+            File dir = new File(Constants.saveDirname);
+            if (!dir.exists() || !dir.isDirectory())
+            {
+                Log.error("No saves directory");
+                dispose();
+            }
+            String [] filenames = dir.list(new XMLSnapshotFilter());
+            if (filenames.length < 1)
+            {
+                Log.error("No XML savegames found in saves directory");
+                dispose();
+            }
+            file = new File(Constants.saveDirname + 
+                latestSaveFilename(filenames));
+        }
+        else
+        {
+            file = new File(Constants.saveDirname + filename);
+        }
+
+        try
+        {
+            Log.event("Loading game from " + file);
+            SAXBuilder builder = new SAXBuilder("com.bluecast.xml.Piccolo");
+            Document doc = builder.build(file);
+
+            Element root = doc.getRootElement();
+            Attribute ver = root.getAttribute("version");
+            if (!ver.getValue().equals(Constants.xmlSnapshotVersion))
+            {
+                Log.error("Can't load this savegame version.");
+                dispose();
+            }
+
+            // Reset flags that are not in the savegame file.
+            clearFlags();
+            loadingGame = true;
+            
+            Element el = root.getChild("Variant");
+            Attribute dir = el.getAttribute("dir");
+            Attribute fil = el.getAttribute("file");
+            VariantSupport.loadVariant(fil.getValue(), dir.getValue());
+
+            el = root.getChild("TurnNumber");
+            turnNumber = Integer.parseInt(el.getTextTrim());
+
+            el = root.getChild("CurrentPlayer");
+            activePlayerNum = Integer.parseInt(el.getTextTrim());
+
+            el = root.getChild("CurrentPhase");
+            phase = Integer.parseInt(el.getTextTrim());
+
+            Element ct = root.getChild("Caretaker");
+            java.util.List kids = ct.getChildren();
+            Iterator it = kids.iterator();
+            while (it.hasNext())
+            {
+                el = (Element)it.next();
+                String creatureName = el.getAttribute("name").getValue();
+                int remaining = el.getAttribute("remaining").getIntValue();
+                int dead = el.getAttribute("dead").getIntValue();
+                Creature creature = Creature.getCreatureByName(creatureName);
+                caretaker.setCount(creature, remaining);
+                caretaker.setDeadCount(creature, dead);
+            }
+
+            players.clear();
+            if (battle != null)
+            {
+                server.allCleanupBattle();
+            }
+
+            // Players
+            java.util.List playerElements = root.getChildren("Player");
+            it = playerElements.iterator();
+            while (it.hasNext())
+            {
+                Element pla = (Element)it.next();
+
+                String name = pla.getAttribute("name").getValue();
+                Player player = new Player(name, this);
+                players.add(player);
+
+                String type = pla.getAttribute("type").getValue();
+                player.setType(type);
+
+                String color = pla.getAttribute("color").getValue();
+                player.setColor(color);
+
+                String tower= pla.getAttribute("startingTower").getValue();
+                player.setTower(tower);
+
+                int score = pla.getAttribute("score").getIntValue();
+                player.setScore(score);
+
+                player.setDead(pla.getAttribute("dead").getBooleanValue());
+
+                int mulligansLeft = 
+                    pla.getAttribute("mulligansLeft").getIntValue(); 
+                player.setMulligansLeft(mulligansLeft);
+
+                player.setMovementRoll(
+                    pla.getAttribute("movementRoll").getIntValue());
+
+                player.setTeleported(
+                    pla.getAttribute("teleported").getBooleanValue());
+
+                player.setSummoned(
+                    pla.getAttribute("summoned").getBooleanValue());
+
+                String playersElim = 
+                    pla.getAttribute("colorsElim").getValue();
+                if (playersElim == "null")
+                {
+                    playersElim = "";
+                }
+                player.setPlayersElim(playersElim);
+
+                java.util.List legionElements = pla.getChildren("Legion");
+                Iterator it2 = legionElements.iterator();
+                while (it2.hasNext())
+                {
+                    Element leg = (Element)it2.next();
+                    readLegionXML(leg, player);
+                }
+            }
+            // Need all players' playersElim set up before we can do this.
+            it = players.iterator();
+            while (it.hasNext())
+            {
+                Player player = (Player)it.next();
+                player.computeMarkersAvailable();
+            }
+
+            // Battle stuff
+            Element bat = root.getChild("Battle");
+            if (bat != null)
+            {
+                String engagementHexLabel = 
+                    bat.getAttribute("masterHexLabel").getValue();
+
+                int battleTurnNum = 
+                    bat.getAttribute("turnNumber").getIntValue();
+
+                String battleActivePlayerName =
+                    bat.getAttribute("activePlayer").getValue();
+
+                int battlePhase = bat.getAttribute("phase").getIntValue();
+
+                int summonState = 
+                    bat.getAttribute("summonState").getIntValue();
+
+                int carryDamage = 
+                    bat.getAttribute("carryDamage").getIntValue();
+
+                boolean driftDamageApplied =
+                    bat.getAttribute("driftDamageApplied").getBooleanValue();
+
+                java.util.List cts = bat.getChildren("CarryTarget");
+                Iterator it2 = cts.iterator();
+                Set carryTargets = new HashSet();
+                while (it2.hasNext())
+                {
+                    Element cart = (Element)it2.next();
+                    carryTargets.add(cart.getTextTrim());
+                }
+
+                Player attackingPlayer = getActivePlayer();
+                Legion attacker = getFirstFriendlyLegion(engagementHexLabel,
+                    attackingPlayer);
+                Legion defender = getFirstEnemyLegion(engagementHexLabel, 
+                    attackingPlayer);
+                Player defendingPlayer = defender.getPlayer();
+
+                int activeLegionNum;
+                if (battleActivePlayerName.equals(attackingPlayer.getName()))
+                {
+                    activeLegionNum = Constants.ATTACKER;
+                }
+                else
+                {
+                    activeLegionNum = Constants.DEFENDER;
+                }
+
+                battle = new Battle(this, attacker.getMarkerId(),
+                    defender.getMarkerId(), activeLegionNum,
+                    engagementHexLabel, battleTurnNum, battlePhase);
+                battle.setSummonState(summonState);
+                battle.setCarryDamage(carryDamage);
+                battle.setDriftDamageApplied(driftDamageApplied);
+                battle.setCarryTargets(carryTargets);
+                battle.init();
+            }
+
+            initServer();
+            // Remaining stuff has been moved to loadGame2()
+        }
+        catch (Exception ex)
+        {
+            Log.error("Tried to load corrupt savegame");
+            ex.printStackTrace();
+            dispose();
+        }
+    }
+
+    private void readLegionXML(Element leg, Player player) 
+        throws DataConversionException
+    {
+        String markerId = leg.getAttribute("name").getValue();
+        String currentHexLabel = leg.getAttribute("currentHex").getValue();
+        String startingHexLabel = leg.getAttribute("startingHex").getValue();
+        boolean moved = leg.getAttribute("moved").getBooleanValue();
+        int entrySide = leg.getAttribute("entrySide").getIntValue();
+        String parentId = leg.getAttribute("parent").getValue();
+        String recruitName = leg.getAttribute("recruitName").getValue();
+        if (recruitName.equals("null"))
+        {
+            recruitName = null;
+        }
+        int battleTally = leg.getAttribute("battleTally").getIntValue();
+
+        // Critters
+        Critter [] critters = new Critter[8];
+        java.util.List creatureElements = leg.getChildren("Creature");
+        Iterator it = creatureElements.iterator();
+        int k = 0;
+        while (it.hasNext())
+        {
+            Element cre = (Element)it.next();
+            String name = cre.getAttribute("name").getValue();
+            Critter critter = new Critter(
+                Creature.getCreatureByName(name), null, this);
+
+            // Battle stuff
+            if (cre.getAttribute("hits") != null)
+            {
+                int hits = cre.getAttribute("hits").getIntValue();
+                critter.setHits(hits);
+
+                String currentBattleHexLabel =
+                    cre.getAttribute("currentHex").getValue();
+                critter.setCurrentHexLabel(currentBattleHexLabel);
+                String startingBattleHexLabel =
+                    cre.getAttribute("startingHex").getValue();
+                critter.setStartingHexLabel(startingBattleHexLabel);
+
+                boolean struck = cre.getAttribute("struck").getBooleanValue();
+                critter.setStruck(struck);
+            }
+
+            critters[k] = critter;
+            k++;
+        }
+
+        // If this legion already exists, modify it in place.
+        Legion legion = player.getLegionByMarkerId(markerId);
+        if (legion != null)
+        {
+            for (k = 0; k < legion.getHeight(); k++)
+            {
+                legion.setCritter(k, critters[k]);
+            }
+        }
+        else
+        {
+            legion = new Legion(
+                markerId, 
+                parentId, 
+                currentHexLabel, 
+                startingHexLabel,
+                critters[0] == null ? null : critters[0].getCreature(),
+                critters[1] == null ? null : critters[1].getCreature(),
+                critters[2] == null ? null : critters[2].getCreature(),
+                critters[3] == null ? null : critters[3].getCreature(),
+                critters[4] == null ? null : critters[4].getCreature(),
+                critters[5] == null ? null : critters[5].getCreature(),
+                critters[6] == null ? null : critters[6].getCreature(),
+                critters[7] == null ? null : critters[7].getCreature(),
+                player.getName(), 
+                this);
+            player.addLegion(legion);
+        }
+
+        legion.setMoved(moved);
+        legion.setRecruitName(recruitName);
+        legion.setEntrySide(entrySide);
+        legion.addToBattleTally(battleTally);
+    }
+
+
     void loadGame2()
     {
         server.allSetColor();
@@ -1390,10 +1922,6 @@ public final class Game
             if (Character.isDigit(ch))
             {
                 numberPart.append(ch);
-            }
-            else
-            {
-                break;
             }
         }
         try

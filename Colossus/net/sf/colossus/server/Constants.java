@@ -46,6 +46,9 @@ public final class Constants
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
         "Colossus savegame version 11";
+    public static final String xmlExtension = ".xml";
+    public static final String xmlSnapshotStart = "ColossusSnapshot_";
+    public static final String xmlSnapshotVersion = "12";
 
     // Phases of a battle turn
     public static final int SUMMON = 0;

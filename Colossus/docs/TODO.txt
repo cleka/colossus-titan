@@ -37,8 +37,6 @@ Green rolls a 4 for movement
 
 
 
-Bug: stresstest is broken by new options processing.  cfg file ends up
-   overriding command-line options and inserting a human player.
 Bug: The duplicate name detection code for network players is now
    failing with the new initialization timing -- oscillating fixNames
    between dripton and dripton4
@@ -162,14 +160,6 @@ Add confirm dialogs (for conceding with titan, skipping recruits, ...)
 Make BattleMap less tall.
 Highlight entrances somehow.  Maybe use fixed boxes with an arrow to
    show entry side, instead of cascading.
-
-XML snapshot, replacing flat-file savegames.  Bundle Crimson for JRE 1.3.
-Add player numbers, since order is no longer significant.  (Don't use
-   tower numbers -- some variant may want to change default player order.)
-Currently numbers start at 0 -- change to 1-based?
-Merge battle stuff into creatures, as optional entries.
-Define what fields are optional.
-Include things like time (already in filename) and IP address of server?
 
 XML game history log
 
