@@ -349,26 +349,29 @@ public final class ResourceLoader
                 {
                     if (filenames[i].startsWith("Power-"))
                     {
-                        int val = Integer.parseInt(filenames[i].substring(6));
+                        int val = numberFromFilename(filenames[i], "Power-");
                         String mapKey2 = getMapKey(filenames[i], directories);
                         tempImage[i] =
-                            createNumberImage(basew,baseh,val,false,mapKey2);
+                            createNumberImage(basew,baseh,val,false,mapKey2,
+                                              colorFromFilename(filenames[i], "Power-"));
                     }
                     if (filenames[i].startsWith("Skill-"))
                     {
-                        int val = Integer.parseInt(filenames[i].substring(6));
+                        int val = numberFromFilename(filenames[i], "Skill-");
                         String mapKey2 = getMapKey(filenames[i], directories);
                         tempImage[i] =
-                            createNumberImage(basew,baseh,val,true,mapKey2);
+                            createNumberImage(basew,baseh,val,true,mapKey2,
+                                              colorFromFilename(filenames[i], "Skill-"));
                     }
-                    if (filenames[i].endsWith("-Name"))
+                    if (filenames[i].indexOf("-Name") != -1)
                     {
                         String name =
                             filenames[i].substring(0,
                                                    filenames[i].indexOf("-Name"));
                         String mapKey2 = getMapKey(filenames[i], directories);
                         tempImage[i] =
-                            createNameImage(basew,baseh,name,mapKey2);
+                            createNameImage(basew,baseh,name,mapKey2,
+                                            colorFromFilename(filenames[i], name + "-Name"));
                     }
                     if (tempImage[i] == null)
                     {
@@ -400,14 +403,14 @@ public final class ResourceLoader
         return bi;
     }
 
-    private static Image createNumberImage(int width, int height, int value, boolean right, String mapKey)
+    private static Image createNumberImage(int width, int height, int value, boolean right, String mapKey, Color color)
     {
         BufferedImage bi = new BufferedImage(width, height,
                                              BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
         biContext.setColor(new Color((float)1.,(float)1.,(float)1.,(float)0.));
         biContext.fillRect(0,0,width,height);
-        biContext.setColor(Color.black);
+        biContext.setColor(color);
         int fontsize = (width+height)/10;
         biContext.setFont(defaultFont.deriveFont(fontsize));
         FontMetrics fm = biContext.getFontMetrics();
@@ -434,14 +437,14 @@ public final class ResourceLoader
         return bi;
     }
 
-    private static Image createNameImage(int width, int height, String name, String mapKey)
+    private static Image createNameImage(int width, int height, String name, String mapKey, Color color)
     {
         BufferedImage bi = new BufferedImage(width, height,
                                              BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
         biContext.setColor(new Color((float)1.,(float)1.,(float)1.,(float)0.));
         biContext.fillRect(0,0,width,height);
-        biContext.setColor(Color.black);
+        biContext.setColor(color);
         int fontsize = (width+height)/10;
         biContext.setFont(defaultFont.deriveFont(fontsize));
         Font font = biContext.getFont();
@@ -476,5 +479,90 @@ public final class ResourceLoader
         {
             Thread.yield();
         }
+    }
+
+    private static int numberFromFilename(String filename, String prefix)
+    {
+        if (!(filename.startsWith(prefix)))
+        {
+            System.err.println("Warning: " + prefix + " is not prefix of " + filename);
+            return 0;
+        }
+        int index = prefix.length();
+        int index2 = index;
+        if (index2 >= filename.length())
+        {
+            return 0;
+        }
+        char c = filename.charAt(index2);
+        if (c == '-')
+        {
+            index2++;
+            if (index2 < filename.length())
+                c = filename.charAt(index2);
+            else
+                c = '*';
+        }
+        while ((c >= '0') && (c <= '9'))
+        {
+            index2++;
+            if (index2 < filename.length())
+                c = filename.charAt(index2);
+            else
+                c = '*';
+        }
+        String sub = filename.substring(index,index2);
+        int val = 0;
+        try
+        {
+            val = Integer.parseInt(sub);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Error during number extraction: " + e);
+        }
+        return val;
+    }
+
+    private static Color colorFromFilename(String filename, String prefix)
+    {
+        if (!(filename.startsWith(prefix)))
+        {
+            System.err.println("Warning: " + prefix + " is not prefix of " + filename);
+            return Color.black;
+        }
+        int index = prefix.length();
+        int index2 = index;
+        if (index2 >= filename.length())
+        {
+            return Color.black;
+        }
+        char c = filename.charAt(index2);
+        if (c == '-')
+        {
+            index2++;
+            if (index2 < filename.length())
+                c = filename.charAt(index2);
+            else
+                c = '*';
+        }
+        while ((c >= '0') && (c <= '9'))
+        {
+            index2++;
+            if (index2 < filename.length())
+                c = filename.charAt(index2);
+            else
+                c = '*';
+        }
+        if (c == '-')
+        {
+            index2++;
+        }
+        if (index2 >= filename.length())
+        {
+            return Color.black;
+        }
+        String sub = filename.substring(index2);
+        return HTMLColor.stringToColor(sub);
     }
 }

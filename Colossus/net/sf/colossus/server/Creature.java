@@ -42,6 +42,7 @@ public class Creature implements Comparable
     private final boolean lord;
     private final boolean demilord;
     private final int maxCount;
+    private final String baseColor;
 
     public static final Creature unknown = new Creature("Unknown", 1, 1,
         false, false, false, false, false, false, false,
@@ -78,8 +79,37 @@ public class Creature implements Comparable
         this.demilord = demilord;
         this.maxCount = maxCount;
         this.pluralName = pluralName;
+        this.baseColor = null;
     }
 
+    public Creature(String name, int power, int skill, boolean rangestrikes,
+        boolean flies, boolean nativeBramble, boolean nativeDrift,
+        boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
+        boolean nativeVolcano, boolean waterDwelling, boolean magicMissile,
+        boolean summonable,
+        boolean lord, boolean demilord, int maxCount, String pluralName,
+        String baseColor)
+    {
+        this.name = name;
+        this.power = power;
+        this.skill = skill;
+        this.rangestrikes = rangestrikes;
+        this.flies = flies;
+        this.nativeBramble = nativeBramble;
+        this.nativeDrift = nativeDrift;
+        this.nativeBog = nativeBog;
+        this.nativeSandDune = nativeSandDune;
+        this.nativeSlope = nativeSlope;
+        this.nativeVolcano = nativeVolcano;
+        this.waterDwelling = waterDwelling;
+        this.magicMissile = magicMissile;
+        this.summonable = summonable;
+        this.lord = lord;
+        this.demilord = demilord;
+        this.maxCount = maxCount;
+        this.pluralName = pluralName;
+        this.baseColor = baseColor;
+    }
 
     public Creature(Creature creature)
     {
@@ -101,6 +131,7 @@ public class Creature implements Comparable
         this.demilord = creature.demilord;
         this.maxCount = creature.maxCount;
         this.pluralName = creature.pluralName;
+        this.baseColor = creature.baseColor;
     }
 
 
@@ -192,10 +223,12 @@ public class Creature implements Comparable
         String[] tempNames =
             new String[4 +
                        ((isFlier() || isRangestriker()) ? 1 : 0)];
+        String colorSuffix = (baseColor == null ? "" : "-" + baseColor);
         tempNames[0] = name;
-        tempNames[1] = "Power-" + getPower();
-        tempNames[2] = "Skill-" + getSkill();
-        tempNames[3] = name + "-Name";
+        tempNames[1] = "Power-" + getPower() + colorSuffix;
+            
+        tempNames[2] = "Skill-" + getSkill() + colorSuffix;
+        tempNames[3] = name + "-Name" + colorSuffix;
         if (isFlier() || isRangestriker())
         {
             tempNames[4] =

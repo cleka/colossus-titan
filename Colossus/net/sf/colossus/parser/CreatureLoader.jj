@@ -120,6 +120,7 @@ int oneCreature(List lc) :
     boolean lord;
     boolean demilord;
     int maxCount;
+    String baseColor = null;
     String s;
 }
 {
@@ -141,13 +142,15 @@ int oneCreature(List lc) :
     (demilord= c_bool())
     (maxCount= c_number())
     (pluralName = c_chaine())
+    (baseColor = c_chaine())?
     {
         lc.add(new Creature(name, power, skill, rangestrikes,
-                              flies, nativeBramble, nativeDrift,
-                              nativeBog, nativeSandDune, nativeSlope,
-                              nativeVolcano, waterDwelling, magicMissile,
-                              summonable,
-                              lord, demilord, maxCount, pluralName));
+                            flies, nativeBramble, nativeDrift,
+                            nativeBog, nativeSandDune, nativeSlope,
+                            nativeVolcano, waterDwelling, magicMissile,
+                            summonable,
+                            lord, demilord, maxCount, pluralName,
+                            baseColor));
         System.out.println(name + " is a " + power + " " + skill);
         return 1;
     }
