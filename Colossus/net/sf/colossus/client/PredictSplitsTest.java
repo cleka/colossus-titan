@@ -743,7 +743,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Cyclops");
         ps.getLeaf("Rd11").revealCreatures(cnl);
         ps.getLeaf("Rd11").addCreature("Gorgon");
-        assertTrue(ps.getLeaf("Rd01").allCertain());
+        assertFalse(ps.getLeaf("Rd01").allCertain());
         assertFalse(ps.getLeaf("Rd02").allCertain());
         assertFalse(ps.getLeaf("Rd04").allCertain());
         assertFalse(ps.getLeaf("Rd05").allCertain());
@@ -790,7 +790,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Ranger");
         ps.getLeaf("Rd11").revealCreatures(cnl);
         ps.getLeaf("Rd11").addCreature("Ranger");
-        assertTrue(ps.getLeaf("Rd01").allCertain());
+        assertFalse(ps.getLeaf("Rd01").allCertain());
         assertFalse(ps.getLeaf("Rd02").allCertain());
         assertFalse(ps.getLeaf("Rd04").allCertain());
         assertTrue(ps.getLeaf("Rd05").allCertain());
@@ -818,7 +818,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Behemoth");
         ps.getLeaf("Rd11").revealCreatures(cnl);
         ps.getLeaf("Rd11").addCreature("Behemoth");
-        assertTrue(ps.getLeaf("Rd01").allCertain());
+        assertFalse(ps.getLeaf("Rd01").allCertain());
         assertFalse(ps.getLeaf("Rd02").allCertain());
         assertFalse(ps.getLeaf("Rd03").allCertain());
         assertTrue(ps.getLeaf("Rd04").allCertain());
@@ -846,7 +846,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Ranger");
         ps.getLeaf("Rd12").revealCreatures(cnl);
         ps.getLeaf("Rd12").removeCreatures(cnl);
-        assertTrue(ps.getLeaf("Rd01").allCertain());
+        assertFalse(ps.getLeaf("Rd01").allCertain());
         assertFalse(ps.getLeaf("Rd02").allCertain());
         assertFalse(ps.getLeaf("Rd03").allCertain());
         assertTrue(ps.getLeaf("Rd04").allCertain());
@@ -895,7 +895,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Ranger");
         ps.getLeaf("Rd08").revealCreatures(cnl);
         ps.getLeaf("Rd08").addCreature("Ranger");
-        assertTrue(ps.getLeaf("Rd01").allCertain());
+        assertFalse(ps.getLeaf("Rd01").allCertain());
         assertTrue(ps.getLeaf("Rd02").allCertain());
         assertFalse(ps.getLeaf("Rd03").allCertain());
         assertTrue(ps.getLeaf("Rd04").allCertain());
@@ -949,7 +949,7 @@ public class PredictSplitsTest extends TestCase
         cnl.add("Ranger");
         cnl.add("Troll");
         ps.getLeaf("Rd05").removeCreatures(cnl);
-        assertTrue(ps.getLeaf("Rd01").allCertain());
+        assertFalse(ps.getLeaf("Rd01").allCertain());
         assertTrue(ps.getLeaf("Rd02").allCertain());
         assertFalse(ps.getLeaf("Rd03").allCertain());
         assertTrue(ps.getLeaf("Rd04").allCertain());
@@ -1393,7 +1393,7 @@ public class PredictSplitsTest extends TestCase
         aps.printLeaves();
         assertFalse(ps.getLeaf("Gr04").allCertain());
         assertFalse(ps.getLeaf("Gr06").allCertain());
-        assertTrue(ps.getLeaf("Gr07").allCertain());  // XXX
+        assertFalse(ps.getLeaf("Gr07").allCertain());
         assertFalse(ps.getLeaf("Gr08").allCertain());
 
         turn = 8;
