@@ -134,6 +134,8 @@ public final class Game
 	newGame.masterFrame = null;
 	newGame.engagementInProgress = engagementInProgress;
 
+        newGame.masterFrame = masterFrame;
+
 	return newGame;
     }
 

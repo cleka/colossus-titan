@@ -105,3 +105,11 @@ Solaris, 1.3: Dead titan, but player keeps going.  Need to check
 
 Solaris, 1.3: Player options are sometimes incorrect for both
    loaded and new games.
+
+Win98, 1.3.1: Legion.split() needs to update StatusScreen.
+
+Critters in legions now get resorted at random.  Need to sort
+   them before display.
+
+Win98, 1.3.1: Null ptrs in MasterBoard.paintComponent() from null
+   players and legion lists.

@@ -129,6 +129,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     {
         MasterBoard newBoard = new MasterBoard();
         newBoard.setGame(game);
+        newBoard.setupActions();
         return newBoard;
     }
 
@@ -1913,9 +1914,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         // Paint markers in reverse order.  The active player's
         // markers are painted last.
-        Player player = game.getActivePlayer();
         ArrayList legions = new ArrayList();
-        legions.addAll(player.getLegions());
+        Player player = game.getActivePlayer();
+        if (player != null)
+        {
+            legions.addAll(player.getLegions());
+        }
         legions.addAll(game.getAllEnemyLegions(player));
 
         ListIterator lit = legions.listIterator(legions.size());

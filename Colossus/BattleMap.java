@@ -166,22 +166,40 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void setupSummonMenu()
     {
-         battleFrame.setTitle(battle.getActivePlayer().getName() + " Turn " +
-            battle.getTurnNumber() + " : Summon");
-         phaseMenu.removeAll();
+        if (battleFrame == null)
+        {
+            return;
+        }
+
+        battleFrame.setTitle(battle.getActivePlayer().getName() + 
+            " Turn " + battle.getTurnNumber() + " : Summon");
+        phaseMenu.removeAll();
     }
 
 
     public void setupRecruitMenu()
     {
-         battleFrame.setTitle(battle.getActivePlayer().getName() + " Turn " +
-            battle.getTurnNumber() + " : Recruit");
-         phaseMenu.removeAll();
+        if (battleFrame == null)
+        {
+            return;
+        }
+        
+        battleFrame.setTitle(battle.getActivePlayer().getName() + 
+            " Turn " + battle.getTurnNumber() + " : Recruit");
+        if (phaseMenu != null)
+        {
+            phaseMenu.removeAll();
+        }
     }
 
 
     public void setupMoveMenu()
     {
+        if (battleFrame == null)
+        {
+            return;
+        }
+
         battleFrame.setTitle(battle.getActivePlayer().getName() +
             " Turn " + battle.getTurnNumber() + " : Move");
 
@@ -211,10 +229,14 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void setupFightMenu()
     {
-         battleFrame.setTitle(battle.getActivePlayer().getName() +
-                ((battle.getPhase() == Battle.FIGHT) ?
-                " : Strike" : " : Strikeback"));
+        if (battleFrame == null)
+        {
+            return;
+        }
 
+        battleFrame.setTitle(battle.getActivePlayer().getName() +
+            ((battle.getPhase() == Battle.FIGHT) ?
+            " : Strike" : " : Strikeback"));
         phaseMenu.removeAll();
 
         JMenuItem mi;
@@ -433,6 +455,9 @@ public final class BattleMap extends HexMap implements MouseListener,
         // Save location for next object.
         location = getLocation();
 
-        battleFrame.dispose();
+        if (battleFrame != null)
+        {
+            battleFrame.dispose();
+        }
     }
 }

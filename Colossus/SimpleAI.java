@@ -535,6 +535,9 @@ class SimpleAI implements AI
         }
         else
         {
+            // Need to handle mulligans somehow; just use the existing
+            // simple hack for now.
+            handleMulligans(game, game.getActivePlayer());
             PlayerMove playermove = (PlayerMove)minimax.search(
                 new MasterBoardPosition(game, game.getActivePlayerNum()), 1);
 
