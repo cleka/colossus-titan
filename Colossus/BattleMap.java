@@ -194,8 +194,8 @@ public class BattleMap extends Frame implements MouseListener,
 
     // Recursively find moves from this hex.  Select all legal destinations.
     //    Do not double back.  Return the number of moves found.
-    void findMoves(Hex hex, BattleChit chit, Creature creature, boolean flies,
-        int movesLeft, int cameFrom)
+    private void findMoves(Hex hex, BattleChit chit, Creature creature,
+        boolean flies, int movesLeft, int cameFrom)
     {
         for (int i = 0; i < 6; i++)
         {
@@ -247,8 +247,32 @@ public class BattleMap extends Frame implements MouseListener,
         {
             Creature creature = chit.getCreature();
 
-            findMoves(chit.getCurrentHex(), chit, creature, creature.flies(),
-                creature.getSkill(), -1);
+            if (terrain == 'T' && turn.getTurnNumber() == 1 &&
+                turn.getActivePlayer() == defender.getPlayer())
+            {
+                // Mark all unoccupied tower hexes.
+                if (!h[3][1].isOccupied())
+                {
+                    h[3][1].select();
+                    h[3][1].repaint();
+                }
+                for (int i = 2; i <= 4; i++)
+                {
+                    for (int j = 2; j <= 3; j++)
+                    {
+                        if (!h[i][j].isOccupied())
+                        {
+                            h[i][j].select();
+                            h[i][j].repaint();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                findMoves(chit.getCurrentHex(), chit, creature, 
+                    creature.flies(), creature.getSkill(), -1);
+            }
         }
     }
 
@@ -407,7 +431,7 @@ public class BattleMap extends Frame implements MouseListener,
                     // Can't rangestrike if it can be struck normally.
                     if (!hex.isSelected())
                     {
-                        if (getRangestrikePenalty(chit, bogie) < 10)
+                        if (rangestrikePossible(chit, bogie))
                         {
                             if (highlight)
                             {
@@ -504,7 +528,68 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
     
-    // XXX: If there are two possible paths, check both.
+    // Check LOS, going to the left of hexspines if argument left is true, or
+    // to the right if it is false.
+    private boolean LOSBlockedDir(Hex initialHex, Hex currentHex, Hex finalHex, 
+        boolean left)
+    {
+        if (currentHex == finalHex)
+        {
+            return false;
+        }
+        
+        int x1 = currentHex.getXCoord();
+        float y1 = currentHex.getYCoord();
+        int x2 = finalHex.getXCoord();
+        float y2 = finalHex.getYCoord();
+
+        // Offboard hexes are not allowed.
+        if (x1 == -1 || x2 == -1)
+        {
+            return true;
+        }
+        
+        int direction = getDirection(currentHex, finalHex, left);
+
+        Hex nextHex = currentHex.getNeighbor(direction);
+
+        if (nextHex == null)
+        {
+            return true;
+        }
+
+        if (nextHex == finalHex)
+        {
+            // Success!
+            return false;
+        }
+
+        // Trees block LOS.
+        if (nextHex.getTerrain() == 't')
+        {
+            return true;
+        }
+
+        // Characters block LOS.
+        // XXX: Cliff exception: If striker or target is atop cliff, characters
+        //     at base do not block LOS.
+        // XXX: Height exception: If striker or target are both at higher
+        //     elevation than this hex, characters do not block.
+
+        if (nextHex.isOccupied())
+        {
+            return true;
+        }
+
+        // XXX: Unconnected cliffs, slopes, dunes, walls block LOS.
+
+        return LOSBlockedDir(initialHex, nextHex, finalHex, left);
+    }
+
+
+    // Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
+    // lies along a hexspine, check both and return true only if both are
+    // blocked.
     boolean LOSBlocked(Hex hex1, Hex hex2)
     {
         if (hex1 == hex2)
@@ -523,93 +608,74 @@ public class BattleMap extends Frame implements MouseListener,
             return true;
         }
         
-        int direction = getDirection(hex1, hex2);
-
-        Hex nextHex = hex1.getNeighbor(direction);
-        if (nextHex == null)
+        // Hexes with odd X coordinates are pushed down half a hex.
+        if ((x1 & 1) == 1)
         {
-            System.out.println("oops");
-            return true;
+            y1 += 0.5;
         }
-
-        if (nextHex == hex2)
+        if ((x2 & 1) == 1)
         {
-            // Success!
-            return false;
+            y2 += 0.5;
         }
+        
+        float xDist = x2 - x1;
+        float yDist = y2 - y1;
 
-        // Trees block LOS.
-        if (nextHex.getTerrain() == 't')
+        if (yDist == 0 || yDist == 1.5 * xDist || yDist == -1.5 * xDist)
         {
-            return true;
+            // Hexspine; try both sides.
+            return (LOSBlockedDir(hex1, hex1, hex2, true) &&
+                LOSBlockedDir(hex1, hex1, hex2, false));
         }
-
-        // Characters block LOS.
-        // XXX: Add exceptions for cliffs, elevation differences.
-        if (nextHex.isOccupied())
+        else if ((xDist / yDist > 0 && yDist < 1.5 * xDist) ||
+            yDist < -1.5 * xDist)
         {
-            return true;
+            // LOS to left
+            return LOSBlockedDir(hex1, hex1, hex2, true);
         }
-
-        return LOSBlocked(nextHex, hex2);
+        else
+        {
+            // LOS to right
+            return LOSBlockedDir(hex1, hex1, hex2, false);
+        }
     }
 
 
-    // Return a large number if the strike is impossible.  Otherwise
-    // return the total skill penalty for range and terrain.
-    int getRangestrikePenalty(BattleChit chit, BattleChit target)
+    // Return true if the rangestrike is possible.
+    boolean rangestrikePossible(BattleChit chit, BattleChit target)
     {
         Hex currentHex = chit.getCurrentHex();
         Hex targetHex = target.getCurrentHex();
-        Creature creature = chit.getCreature();
-        Creature targetCreature = target.getCreature();
-        int skill = creature.getSkill();
-        int elevation = currentHex.getElevation();
-        int targetElevation = targetHex.getElevation();
+        Creature creature = chit.getCreature(); 
 
-        int penalty = 0;
+        boolean clear = true;
 
         int range = getRange(currentHex, targetHex);
+        int skill = creature.getSkill();
 
         if (range > skill)
         {
-            penalty += 10;
+            clear = false;
         }
 
-        // Only warlocks can rangestrike at range 2.  (Cliff top/bottom.)
-        else if (range < 3 && creature != Creature.warlock)
+        // Only warlocks can rangestrike at range 2, rangestrike Lords,
+        // or rangestrike without LOS.
+        else if (creature != Creature.warlock && (range < 3 ||
+            target.getCreature().isLord() || 
+            LOSBlocked(currentHex, targetHex)))
         {
-            penalty += 10;
+            clear = false;
         }
 
-        // Only warlocks can rangestrike Lords.
-        else if (target.getCreature().isLord() && creature != Creature.warlock)
-        {
-            penalty += 10;
-        }
-
-        // Don't bother with expensive LOS calculations for warlocks or
-        // out-of-range shots.
-        if (penalty < 10 && creature != Creature.warlock)
-        {
-            if (range == 4)
-            {
-                penalty += 1;
-            }
-
-            if (LOSBlocked(currentHex, targetHex))
-            {
-                penalty += 10;
-            }
-        }
-
-        return penalty;
+        return clear;
     }
 
 
     // Returns the hexside direction of the path from hex1 to hex2.
-    // XXX: Sometimes two directions are possible.
-    int getDirection(Hex hex1, Hex hex2)
+    // Sometimes two directions are possible.  If the left parameter
+    // is set, the direction further left will be given.  Otherwise,
+    // the direction further right will be given.
+    int getDirection(Hex hex1, Hex hex2, boolean left)
     {
         if (hex1 == hex2)
         {
@@ -644,54 +710,217 @@ public class BattleMap extends Frame implements MouseListener,
 
         if (xDist >= 0)
         {
-            if (yDist >= 1.5 * xDist)
-            {
-                return 0;
-            }
-            if (yDist <= -1.5 * xDist)
+            if (yDist > 1.5 * xDist)
             {
                 return 3;
             }
-            if (yDist >= 0)
+            if (yDist == 1.5 * xDist)
             {
-                return 1;
+                if (left)
+                {
+                    return 2;
+                }
+                else
+                {
+                    return 3;
+                }
             }
-            else // (yDist < 0)
+            if (yDist < -1.5 * xDist)
+            {
+                return 0;
+            }
+            if (yDist == -1.5 * xDist)
+            {
+                if (left)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            if (yDist > 0)
             {
                 return 2;
             }
-        }
-        else // (xDist < 0)
-        {
-            if (yDist <= 1.5 * xDist)
+            if (yDist < 0)
             {
-                return 3;
+                return 1;
             }
-            if (yDist >= -1.5 * xDist)
+            if (yDist == 0)
+            {
+                if (left)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 2;
+                }
+            }
+        }
+
+        if (xDist < 0)
+        {
+            if (yDist < 1.5 * xDist)
             {
                 return 0;
             }
-            if (yDist >= 0)
+            if (yDist == 1.5 * xDist)
             {
-                return 5;
+                if (left)
+                {
+                    return 5;
+                }
+                else
+                {
+                    return 0;
+                }
             }
-            else // (yDist < 0)
+            if (yDist > -1.5 * xDist)
+            {
+                return 3;
+            }
+            if (yDist == -1.5 * xDist)
+            {
+                if (left)
+                {
+                    return 3;
+                }
+                else
+                {
+                    return 4;
+                }
+            }
+            if (yDist > 0)
             {
                 return 4;
             }
+            if (yDist < 0)
+            {
+                return 5;
+            }
+            if (yDist == 0)
+            {
+                if (left)
+                {
+                    return 4;
+                }
+                else
+                {
+                    return 5;
+                }
+            }
         }
+
+        // Shouldn't be reached.
+        return -1;
     }
 
-
-    // If there are two possible unblocked paths, use the one with
-    // the lower number of bramble hexes.
-    int countInterveningBrambleHexes(Hex hex1, Hex hex2)
+    // Return the number of intervening bramble hexes.  If LOS is along a
+    // hexspine, go left if argument left is true, right otherwise.  If
+    // LOS is blocked, return a large number.
+    private int countBrambleHexesDir(Hex hex1, Hex hex2,
+        boolean left, int previousCount)
     {
-        int count = 0;
+        int count = previousCount;
 
-        // XXX: Count 'em.
+        int x1 = hex1.getXCoord();
+        float y1 = hex1.getYCoord();
+        int x2 = hex2.getXCoord();
+        float y2 = hex2.getYCoord();
 
-        return count;
+        // Offboard hexes are not allowed.
+        if (x1 == -1 || x2 == -1)
+        {
+            return 10;
+        }
+        
+        int direction = getDirection(hex1, hex2, left);
+
+        Hex nextHex = hex1.getNeighbor(direction);
+        if (nextHex == null)
+        {
+            return 10;
+        }
+
+        if (nextHex == hex2)
+        {
+            // Success!
+            return count;
+        }
+
+        // Trees block LOS.
+        if (nextHex.getTerrain() == 't')
+        {
+            return 10;
+        }
+
+        // Characters block LOS.  (There are no height differences on maps
+        //    with bramble.)
+        if (nextHex.isOccupied())
+        {
+            return 10;
+        }
+        
+        // Add one if it's bramble.
+        if (nextHex.getTerrain() == 'r')
+        {
+            count++;
+        }
+        
+        return countBrambleHexesDir(nextHex, hex2, left, count);
+    }
+
+    // Return the number of intervening bramble hexes.  If LOS is along a
+    // hexspine and there are two choices, pick the lower one.
+    int countBrambleHexes(Hex hex1, Hex hex2)
+    {
+        if (hex1 == hex2)
+        {
+            return 0;
+        }
+        
+        int x1 = hex1.getXCoord();
+        float y1 = hex1.getYCoord();
+        int x2 = hex2.getXCoord();
+        float y2 = hex2.getYCoord();
+
+        // Offboard hexes are not allowed.
+        if (x1 == -1 || x2 == -1)
+        {
+            return 10;
+        }
+        
+        // Hexes with odd X coordinates are pushed down half a hex.
+        if ((x1 & 1) == 1)
+        {
+            y1 += 0.5;
+        }
+        if ((x2 & 1) == 1)
+        {
+            y2 += 0.5;
+        }
+        
+        float xDist = x2 - x1;
+        float yDist = y2 - y1;
+
+        // Hexspine; try both sides.
+        if (yDist == 0 || yDist == 1.5 * xDist || yDist == -1.5 * xDist) 
+        {
+            return Math.min(countBrambleHexesDir(hex1, hex2, true, 0), 
+                countBrambleHexesDir(hex1, hex2, false, 0));
+        }
+        else if ((xDist / yDist > 0 && yDist < 1.5 * xDist) || 
+            yDist < -1.5 * xDist)
+        {
+            return countBrambleHexesDir(hex1, hex2, true, 0);
+        }
+        else
+        {
+            return countBrambleHexesDir(hex1, hex2, false, 0);
+        }
     }
 
 
@@ -833,7 +1062,7 @@ public class BattleMap extends Frame implements MouseListener,
                 {
                     h[i][j] = new Hex
                         ((int) Math.round(cx + 3 * i * scale),
-                        (int) Math.round(cy + (2 * j + i % 2) *
+                        (int) Math.round(cy + (2 * j + (i & 1)) *
                         Hex.SQRT3 * scale), scale, this, i, j);
                 }
             }
@@ -1468,6 +1697,6 @@ public class BattleMap extends Frame implements MouseListener,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian, null, null,
             player2);
-        new BattleMap(attacker, defender, 'H', 'b');
+        new BattleMap(attacker, defender, 'T', 'b');
     }
 }
