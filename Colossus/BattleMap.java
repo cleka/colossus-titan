@@ -45,7 +45,7 @@ public class BattleMap extends JFrame implements MouseListener,
     private Legion defender;
 
     // 5 is left, 1 is right, 3 is bottom
-    private int side;
+    private int entrySide;
 
     private BattleTurn turn;
     private MasterBoard board;
@@ -70,7 +70,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
 
     public BattleMap(Legion attacker, Legion defender, MasterHex masterHex, 
-        int side, MasterBoard board)
+        int entrySide, MasterBoard board)
     {
         super(attacker.getMarkerId() + " attacks " + defender.getMarkerId());
 
@@ -83,11 +83,11 @@ public class BattleMap extends JFrame implements MouseListener,
         // All tower attacks come from the bottom side (3)
         if (terrain == 'T')
         {
-            this.side = 3;
+            this.entrySide = 3;
         }
         else
         {
-            this.side = side;
+            this.entrySide = entrySide;
         }
 
         getContentPane().setLayout(null);
@@ -1292,7 +1292,10 @@ public class BattleMap extends JFrame implements MouseListener,
                 else
                 {
                     attackerPoints += creature.getPointValue();
-                    if (summonState == NO_KILLS)
+
+                    // Chits left offboard do not trigger angel summoning.
+                    if (summonState == NO_KILLS && 
+                        !chits[i].getCurrentHex().isEntrance())
                     {
                         summonState = FIRST_BLOOD;
                     }
@@ -1782,11 +1785,11 @@ System.out.println("defender's titan eliminated");
     {
         if (legion == attacker)
         {
-            return entrances[side];
+            return entrances[entrySide];
         }
         else
         {
-            return entrances[(side + 3) % 6];
+            return entrances[(entrySide + 3) % 6];
         }
     }
 
