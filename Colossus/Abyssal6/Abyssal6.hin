@@ -1,11 +1,40 @@
-RECRUIT B Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
-                                (2 Behemoth AVAILABLE))
-RECRUIT P Lion      2 Lion     (((CANREACH D) AND
-                                 (NOT (HASCREATURE Griffon))) AND
-                                (2 Griffon AVAILABLE))
-RECRUIT M Troll     2 Troll    (((CANREACH S) AND
-                                 (NOT (HASCREATURE Wyvern))) AND
-                                (2 Wyvern AVAILABLE))
+RECRUIT B Cyclops   2 Cyclops  ((CANREACH J) AND
+                                (NOT (HASCREATURE Behemoth)) AND
+                                (2 Behemoth AVAILABLE) AND
+                                (NOT (HEIGHTIS 6)))
+RECRUIT P Lion      2 Lion     ((CANREACH D) AND
+                                (NOT (HASCREATURE Griffon)) AND
+                                (2 Griffon AVAILABLE) AND
+                                (NOT (HEIGHTIS 6)))
+RECRUIT P Centaur   2 Centaur  ((CANREACH W) AND
+                                (NOT (HASCREATURE Warbear)) AND
+                                (2 Warbear AVAILABLE) AND
+                                (NOT (HEIGHTIS 6)))
+RECRUIT M Troll     2 Troll    ((CANREACH S) AND
+                                (NOT (HASCREATURE Wyvern)) AND
+                                (2 Wyvern AVAILABLE) AND
+                                (NOT (HEIGHTIS 6)))
+RECRUIT M Ogre      2 Ogre     ((CANREACH H) AND
+                                (NOT (HASCREATURE Minotaur)) AND
+                                (2 Minotaur AVAILABLE) AND
+                                (NOT (HEIGHTIS 6)))
+RECRUIT M Ranger    2 Ranger   ((CANREACH P) AND
+                                (NOT (HASCREATURE AirElemental)) AND
+                                (3 AirElemental AVAILABLE) AND
+                                (NOT (HEIGHTIS 6)))
+RECRUIT W Unicorn   2 Unicorn  ((CANREACH H) AND
+                                (NOT (HASCREATURE EarthElemental)) AND
+                                (3 EarthElemental AVAILABLE) AND
+                                (NOT (HEIGHTIS 6)))
+RECRUIT D Hydra     2 Hydra    ((CANREACH S) AND
+                                (NOT (HASCREATURE WaterElemental)) AND
+                                (3 WaterElemental AVAILABLE) AND
+                                (NOT (HEIGHTIS 6)))
+RECRUIT t Colossus  2 Colossus ((CANREACH m) AND
+                                (NOT (HASCREATURE FireElemental)) AND
+                                (3 FireElemental AVAILABLE) AND
+                                (NOT (HEIGHTIS 6)))
+
 RECRUIT T Ogre      2 Ogre     (NOT ((CANRECRUIT Warlock) OR
                                      (CANRECRUIT Guardian) OR
                                      (CANRECRUIT Knight)))
