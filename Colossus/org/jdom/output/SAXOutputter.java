@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <pm AT jdom DOT org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <pm AT jdom DOT org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter AT jdom DOT org> and
+ Brett McLaughlin <brett AT jdom DOT org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
@@ -72,10 +72,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import org.jdom.*;
 
 /**
- * <p>
  * <code>SAXOutputter</code> takes a JDOM tree and fires SAX2 events.
- * </p>
  *
+ * <p>
  * Most <code>ContentHandler</code> callbacks are supported. Both
  * <code>ignorableWhitespace</code> and <code>skippedEntity</code> have
  * not been implemented. The <code>setDocumentLocator</code> callback has
@@ -83,15 +82,18 @@ import org.jdom.*;
  * <code>getColumnNumber</code> and <code>getLineNumber</code>.
  * </p>
  *
+ * <p>
  * The <code>EntityResolver</code> callback <code>resolveEntity</code> has
  * been implemented for DTDs.
  * </p>
  *
+ * <p>
  * At this time, it is not possible to access notations and unparsed entity
  * references in a DTD from a JDOM tree. Therefore, <code>DTDHandler</code>
  * callbacks have not been implemented yet.
  * </p>
  *
+ * <p>
  * The <code>ErrorHandler</code> callbacks have not been implemented, since
  * these are supposed to be invoked when the document is parsed. However, the
  * document has already been parsed in order to create the JDOM tree.
@@ -115,6 +117,10 @@ public class SAXOutputter {
     /** Shortcut for SAX namespace-prefixes core feature */
     private static final String NS_PREFIXES_SAX_FEATURE =
                         "http://xml.org/sax/features/namespace-prefixes";
+
+    /** Shortcut for SAX validation core feature */
+    private static final String VALIDATION_SAX_FEATURE =
+                        "http://xml.org/sax/features/validation";
 
     /** Shortcut for SAX-ext. lexical handler property */
     private static final String LEXICAL_HANDLER_SAX_PROPERTY =
@@ -182,20 +188,22 @@ public class SAXOutputter {
     private boolean declareNamespaces = false;
 
     /**
-     * <p>
+     * Whether to report DTD events to DeclHandlers and LexicalHandlers.
+     * Defaults to <code>true</code>.
+     */
+    private boolean reportDtdEvents = true;
+
+    /**
      * This will create a <code>SAXOutputter</code> without any
      * registered handler.  The application is then responsible for
      * registering them using the <code>setXxxHandler()</code> methods.
-     * </p>
      */
     public SAXOutputter() {
     }
 
     /**
-     * <p>
      * This will create a <code>SAXOutputter</code> with the
      * specified <code>ContentHandler</code>.
-     * </p>
      *
      * @param contentHandler contains <code>ContentHandler</code> 
      * callback methods
@@ -205,11 +213,9 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * This will create a <code>SAXOutputter</code> with the
      * specified SAX2 handlers. At this time, only <code>ContentHandler</code>
      * and <code>EntityResolver</code> are supported.
-     * </p>
      *
      * @param contentHandler contains <code>ContentHandler</code> 
      * callback methods
@@ -226,11 +232,9 @@ public class SAXOutputter {
     }
    
     /**
-     * <p>
      * This will create a <code>SAXOutputter</code> with the
      * specified SAX2 handlers. At this time, only <code>ContentHandler</code>
      * and <code>EntityResolver</code> are supported.
-     * </p>
      *
      * @param contentHandler contains <code>ContentHandler</code> 
      * callback methods
@@ -253,9 +257,7 @@ public class SAXOutputter {
     }
    
     /**
-     * <p>
      * This will set the <code>ContentHandler</code>.
-     * </p>
      *
      * @param contentHandler contains <code>ContentHandler</code> 
      * callback methods.
@@ -265,9 +267,7 @@ public class SAXOutputter {
     }
    
     /**
-     * <p>
      * Returns the registered <code>ContentHandler</code>.
-     * </p>
      *
      * @return the current <code>ContentHandler</code> or
      * <code>null</code> if none was registered.
@@ -277,9 +277,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * This will set the <code>ErrorHandler</code>.
-     * </p>
      *
      * @param errorHandler contains <code>ErrorHandler</code> callback methods.
      */
@@ -288,9 +286,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * Return the registered <code>ErrorHandler</code>.
-     * </p>
      *
      * @return the current <code>ErrorHandler</code> or
      * <code>null</code> if none was registered.
@@ -300,9 +296,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * This will set the <code>DTDHandler</code>.
-     * </p>
      *
      * @param dtdHandler contains <code>DTDHandler</code> callback methods.
      */
@@ -311,9 +305,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * Return the registered <code>DTDHandler</code>.
-     * </p>
      *
      * @return the current <code>DTDHandler</code> or
      * <code>null</code> if none was registered.
@@ -323,9 +315,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * This will set the <code>EntityResolver</code>.
-     * </p>
      *
      * @param entityResolver contains EntityResolver callback methods.
      */
@@ -334,9 +324,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * Return the registered <code>EntityResolver</code>.
-     * </p>
      *
      * @return the current <code>EntityResolver</code> or
      * <code>null</code> if none was registered.
@@ -346,9 +334,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
-     *  This will set the <code>LexicalHandler</code>.
-     * </p>
+     * This will set the <code>LexicalHandler</code>.
      *
      * @param lexicalHandler contains lexical callback methods.
      */
@@ -357,9 +343,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * Return the registered <code>LexicalHandler</code>.
-     * </p>
      *
      * @return the current <code>LexicalHandler</code> or
      * <code>null</code> if none was registered.
@@ -369,9 +353,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
-     *  This will set the <code>DeclHandler</code>.
-     * </p>
+     * This will set the <code>DeclHandler</code>.
      *
      * @param declHandler contains declaration callback methods.
      */
@@ -380,9 +362,7 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * Return the registered <code>DeclHandler</code>.
-     * </p>
      *
      * @return the current <code>DeclHandler</code> or
      * <code>null</code> if none was registered.
@@ -392,11 +372,9 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * This will define whether attribute namespace declarations shall be
      * reported as "xmlns" attributes.  This flag defaults to <code>false</code>
      * and behaves as the "namespace-prefixes" SAX core feature.
-     * </p>
      *
      * @param reportDecl whether attribute namespace declarations shall be
      * reported as "xmlns" attributes.
@@ -406,25 +384,41 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
+     * This will define whether to report DTD events to SAX DeclHandlers
+     * and LexicalHandlers if these handlers are registered and the
+     * document to output includes a DocType declaration.
+     *
+     * @param reportDtdEvents whether to notify DTD events.
+     */
+    public void setReportDTDEvents(boolean reportDtdEvents) {
+        this.reportDtdEvents = reportDtdEvents;
+    }
+
+    /**
      * This will set the state of a SAX feature.
-     * </p>
      * <p>
-     * All XMLReaders are required to support setting  to true and  to false.
+     * All XMLReaders are required to support setting to true and to false.
      * </p>
      * <p>
      * SAXOutputter currently supports the following SAX core features:
      * <dl>
      *  <dt><code>http://xml.org/sax/features/namespaces</code></dt>
-     *   <dd><strong>description:</strong> An optional extension handler for
-     *       lexical events like comments.</dd>
+     *   <dd><strong>description:</strong> <code>true</code> indicates
+     *       namespace URIs and unprefixed local names for element and
+     *       attribute names will be available</dd>
      *   <dd><strong>access:</strong> read/write, but always
      *       <code>true</code>!</dd>
      *  <dt><code>http://xml.org/sax/features/namespace-prefixes</code></dt>
-     *   <dd><strong>description:</strong> An optional extension handler
-     *       for DTD-related events other than notations and unparsed
-     *       entities.</dd>
+     *   <dd><strong>description:</strong> <code>true</code> indicates
+     *       XML 1.0 names (with prefixes) and attributes (including xmlns*
+     *       attributes) will be available</dd>
      *   <dd><strong>access:</strong> read/write</dd>
+     *  <dt><code>http://xml.org/sax/features/validation</code></dt>
+     *   <dd><strong>description:</strong> controls whether SAXOutputter
+     *       is reporting DTD-related events; if <code>true</code>, the
+     *       DocType internal subset will be parsed to fire DTD events</dd>
+     *   <dd><strong>access:</strong> read/write, defaults to
+     *       <code>true</code></dd>
      * </dl>
      * </p>
      *
@@ -433,9 +427,9 @@ public class SAXOutputter {
      * @param value <code>boolean</code> the requested state of the
      *              feature (true or false).
      *
-     * @throws SAXNotRecognizedException When SAXOutputter does not
+     * @throws SAXNotRecognizedException when SAXOutputter does not
      *         recognize the feature name.
-     * @throws SAXNotSupportedException  When SAXOutputter recognizes
+     * @throws SAXNotSupportedException  when SAXOutputter recognizes
      *         the feature name but cannot set the requested value.
      */
     public void setFeature(String name, boolean value)
@@ -453,25 +447,29 @@ public class SAXOutputter {
                 // Else: true is OK!
             }
             else {
-                // Not a supported feature.
-                throw new SAXNotRecognizedException(name);
+                if (VALIDATION_SAX_FEATURE.equals(name)) {
+                    // Report DTD events.
+                    this.setReportDTDEvents(value);
+                }
+                else {
+                    // Not a supported feature.
+                    throw new SAXNotRecognizedException(name);
+                }
             }
         }
     }
 
     /**
-     * <p>
      * This will look up the value of a SAX feature.
-     * </p>
      *
      * @param name <code>String</code> the feature name, which is a
      *             fully-qualified URI.
      * @return <code>boolean</code> the current state of the feature
      *         (true or false).
      *
-     * @throws SAXNotRecognizedException When SAXOutputter does not
+     * @throws SAXNotRecognizedException when SAXOutputter does not
      *         recognize the feature name.
-     * @throws SAXNotSupportedException  When SAXOutputter recognizes
+     * @throws SAXNotSupportedException  when SAXOutputter recognizes
      *         the feature name but determine its value at this time.
      */
     public boolean getFeature(String name)
@@ -486,18 +484,22 @@ public class SAXOutputter {
                 return (true);
             }
             else {
-                // Not a supported feature.
-                throw new SAXNotRecognizedException(name);
+                if (VALIDATION_SAX_FEATURE.equals(name)) {
+                    // Report DTD events.
+                    return (this.reportDtdEvents);
+                }
+                else {
+                    // Not a supported feature.
+                    throw new SAXNotRecognizedException(name);
+                }
             }
         }
     }
 
     /**
-     * <p>
      * This will set the value of a SAX property.
      * This method is also the standard mechanism for setting extended
      * handlers.
-     * </p>
      * <p>
      * SAXOutputter currently supports the following SAX properties:
      * <dl>
@@ -520,9 +522,9 @@ public class SAXOutputter {
      *              fully-qualified URI.
      * @param value <code>Object</code> the requested value for the property.
      *
-     * @throws SAXNotRecognizedException When SAXOutputter does not recognize
+     * @throws SAXNotRecognizedException when SAXOutputter does not recognize
      *         the property name.
-     * @throws SAXNotSupportedException  When SAXOutputter recognizes the
+     * @throws SAXNotSupportedException  when SAXOutputter recognizes the
      *         property name but cannot set the requested value.
      */
     public void setProperty(String name, Object value)
@@ -543,17 +545,15 @@ public class SAXOutputter {
     }
 
     /**
-     * <p>
      * This will look up the value of a SAX property.
-     * </p>
      *
      * @param name <code>String</code> the property name, which is a
      *             fully-qualified URI.
      * @return <code>Object</code> the current value of the property.
      *
-     * @throws SAXNotRecognizedException When SAXOutputter does not recognize
+     * @throws SAXNotRecognizedException when SAXOutputter does not recognize
      *         the property name.
-     * @throws SAXNotSupportedException  When SAXOutputter recognizes the
+     * @throws SAXNotSupportedException  when SAXOutputter recognizes the
      *         property name but cannot determine its value at this time.
      */
     public Object getProperty(String name)
@@ -575,12 +575,12 @@ public class SAXOutputter {
 
 
     /**
-     * <p>
      * This will output the <code>JDOM Document</code>, firing off the
      * SAX events that have been registered.
-     * </p>
      *
      * @param document <code>JDOM Document</code> to output.
+     *
+     * @throws JDOMException if any error occurred.
      */
     public void output(Document document) throws JDOMException {
         if (document == null) {
@@ -594,10 +594,12 @@ public class SAXOutputter {
         startDocument();
 
         // Fire DTD events
-        dtdEvents(document);
+        if (this.reportDtdEvents) {
+           dtdEvents(document);
+        }
 
         // Handle root element, as well as any root level
-        // processing instructions and CDATA sections
+        // processing instructions and comments
         Iterator i = document.getContent().iterator();
         while (i.hasNext()) {
             Object obj = i.next();
@@ -609,25 +611,50 @@ public class SAXOutputter {
                 // contentHandler.processingInstruction()
                 processingInstruction((ProcessingInstruction) obj);
             }
-            else if (obj instanceof CDATA) {
-                // contentHandler.characters()
-                characters(((CDATA) obj).getText());
-            }
             else if (obj instanceof Comment) {
                 // lexicalHandler.comment()
-                comment(((Comment)obj).getText()); 
+                comment(((Comment) obj).getText()); 
             }
         }
-       
+
+        // contentHandler.endDocument()
+        endDocument();
+    }
+
+    /**
+     * This will output a list of JDOM nodes, firing off the
+     * SAX events that have been registered.
+     * <p>
+     * <strong>Warning</strong>: This method outputs ill-formed XML
+     * documents and should only be used to output document portions
+     * towards processors (such as XSLT processors) capable of
+     * accepting such ill-formed documents.</p>
+     *
+     * @param nodes <code>List</code> of JDOM nodes to output.
+     *
+     * @throws JDOMException if any error occurred.
+     */
+    public void output(List nodes) throws JDOMException {
+        if ((nodes == null) || (nodes.size() == 0)) {
+            return;
+        }
+
+        // contentHandler.setDocumentLocator()
+        documentLocator(null);
+
+        // contentHandler.startDocument()
+        startDocument();
+
+        // Process node list.
+        elementContent(nodes, new NamespaceStack());
+
         // contentHandler.endDocument()
         endDocument();
     }
    
     /**
-     * <p>
      * This parses a DTD declaration to fire the related events towards
      * the registered handlers.
-     * </p>
      *
      * @param document <code>JDOM Document</code> the DocType is to
      *                 process.
@@ -710,20 +737,22 @@ public class SAXOutputter {
         LocatorImpl locator = new LocatorImpl();
         String publicID = null;
         String systemID = null;
-        DocType docType = document.getDocType();
-        if (docType != null) {
-            publicID = docType.getPublicID();
-            systemID = docType.getSystemID();
+
+        if (document != null) {
+            DocType docType = document.getDocType();
+            if (docType != null) {
+                publicID = docType.getPublicID();
+                systemID = docType.getSystemID();
+            }
         }
-      
         locator.setPublicId(publicID);
         locator.setSystemId(systemID);
         locator.setLineNumber(-1);
         locator.setColumnNumber(-1);
-      
+
         contentHandler.setDocumentLocator((Locator) locator);
     }
-   
+
     /**
      * <p>
      * This method is always the second method of all callbacks in
@@ -798,7 +827,7 @@ public class SAXOutputter {
         startElement(element, nsAtts);
 
         // handle content in the element
-        elementContent(element, namespaces);
+        elementContent(element.getContent(), namespaces);
 
         // contentHandler.endElement()
         endElement(element);
@@ -956,46 +985,70 @@ public class SAXOutputter {
      * This will invoke the callbacks for the content of an element.
      * </p>
      *
-     * @param element <code>Element</code> used in callbacks.
+     * @param content element content as a <code>List</code> of nodes.
      * @param namespaces <code>List</code> stack of Namespaces in scope.
      */
-    private void elementContent(Element element, NamespaceStack namespaces) 
+    private void elementContent(List content, NamespaceStack namespaces) 
                       throws JDOMException {
-        List eltContent = element.getContent();
-      
-        boolean empty = eltContent.size() == 0;
-        boolean stringOnly =
-            !empty &&
-            eltContent.size() == 1 &&
-            eltContent.get(0) instanceof Text;
-          
-        if (stringOnly) {
-            // contentHandler.characters()
-            characters(element.getText());
-        }
-        else {
-            Object content = null;
-            for (int i = 0, size = eltContent.size(); i < size; i++) {
-                content = eltContent.get(i);
-                if (content instanceof Element) {
-                    element((Element) content, namespaces);
-                }
-                else if (content instanceof Text) {
-                    // contentHandler.characters()
-                    characters(((Text) content).getText());
-                }
-                else if (content instanceof CDATA) {
-                    // contentHandler.characters()
-                    characters(((CDATA) content).getText());
-                }
-                else if (content instanceof ProcessingInstruction) {
-                    // contentHandler.processingInstruction()
-                    processingInstruction((ProcessingInstruction) content);
-                }
+        Iterator i = content.iterator();
+        while (i.hasNext()) {
+            Object obj = i.next();
+
+            if (obj instanceof Element) {
+                element((Element) obj, namespaces);
+            }
+            else if (obj instanceof CDATA) {
+                cdata(((CDATA) obj).getText());
+            }
+            else if (obj instanceof Text) {
+                // contentHandler.characters()
+                characters(((Text) obj).getText());
+            }
+            else if (obj instanceof ProcessingInstruction) {
+                // contentHandler.processingInstruction()
+                processingInstruction((ProcessingInstruction) obj);
+            }
+            else if (obj instanceof Comment) {
+                // lexicalHandler.comment()
+                comment(((Comment) obj).getText()); 
+            }
+            else if (obj instanceof EntityRef) {
+                // contentHandler.skippedEntity()
+                entityRef((EntityRef) obj);
+            }
+            else {
+                // Not a valid element child. This could happen with
+                // application-provided lists which may contain non
+                // JDOM objects.
+                handleError(new JDOMException(
+                                        "Invalid element content: " + obj));
             }
         }
     }
-    
+
+    /**
+     * <p>
+     * This will be called for each chunk of CDATA section encountered.
+     * </p>
+     *
+     * @param cdataText all text in the CDATA section, including whitespace.
+     */
+    private void cdata(String cdataText) throws JDOMException {
+        try {
+            if (lexicalHandler != null) {
+                lexicalHandler.startCDATA();
+                characters(cdataText);
+                lexicalHandler.endCDATA();
+            }
+            else {
+                characters(cdataText);
+            }
+        }
+        catch (SAXException se) {
+            throw new JDOMException("Exception in CDATA", se);
+        }
+    }
+
     /**
      * <p>
      * This will be called for each chunk of character data encountered.
@@ -1030,6 +1083,28 @@ public class SAXOutputter {
             }
         }
     }
+
+    /**
+     * <p>
+     * This will invoke the <code>ContentHandler.skippedEntity</code>
+     * callback when an entity reference is encountered.
+     * </p>
+     *
+     * @param entity <code>EntityRef</code>.
+     */
+    private void entityRef(EntityRef entity) throws JDOMException {
+        if (entity != null) {
+            try {
+                // No need to worry about appending a '%' character as
+                // we do not support parameter entities
+                contentHandler.skippedEntity(entity.getName());
+            }
+            catch (SAXException se) {
+                throw new JDOMException("Exception in entityRef", se);
+            }
+        }
+    }
+   
 
     /**
      * <p>
@@ -1074,6 +1149,42 @@ public class SAXOutputter {
             type = Attribute.UNDECLARED_ATTRIBUTE;
         }
         return attrTypeToNameMap[type];
+    }
+
+    /**
+     * <p>
+     * Notifies the registered {@link ErrorHandler SAX error handler}
+     * (if any) of an input processing error. The error handler can
+     * choose to absorb the error and let the processing continue.
+     * </p>
+     *
+     * @param exception <code>JDOMException</code> containing the
+     *                  error information; will be wrapped in a
+     *                  {@link SAXParseException} when reported to
+     *                  the SAX error handler.
+     *
+     * @throws JDOMException if no error handler has been registered
+     *                       or if the error handler fired a
+     *                       {@link SAXException}.
+     */
+    protected void handleError(JDOMException exception) throws JDOMException {
+        if (errorHandler != null) {
+            try {
+                errorHandler.error(new SAXParseException(
+                                exception.getMessage(), null, exception));
+            }
+            catch (SAXException se) {
+               if (se.getException() instanceof JDOMException) {
+                   throw (JDOMException)(se.getException());
+               }
+               else {
+                   throw new JDOMException(se.getMessage(), se);
+               }
+            }
+        }
+        else {
+            throw exception;
+        }
     }
 
     /**

@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
 
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org>.
 
  In addition, we request (but do not require) that you include in the
  end-user documentation provided with the redistribution and/or in the
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many
  individuals on behalf of the JDOM Project and was originally
- created by Brett McLaughlin <brett@jdom.org> and
- Jason Hunter <jhunter@jdom.org>.  For more information on the
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
 
  */
 
@@ -61,11 +61,9 @@ import java.util.*;
 import org.jdom.filter.Filter;
 
 /**
- * <p>
  * <code>AttributeList</code> represents legal JDOM <code>Attribute</code>
  * content.  This class is NOT PUBLIC; users should see it as a simple List
  * implementation.
- * </p>
  *
  * @author Alex Rosen
  * @author Philippe Riand
@@ -87,7 +85,8 @@ class AttributeList extends AbstractList
     private static final int INITIAL_ARRAY_SIZE = 3;
 
     /** The backing list */
-    protected ArrayList list;
+    private Attribute elementData[];
+    private int size;
 
     /** The parent Element */
     protected Element parent;
@@ -96,20 +95,16 @@ class AttributeList extends AbstractList
     private AttributeList() {}
 
     /**
-     * <p>
      * Create a new instance of the AttributeList representing
      * Element content
-     * </p>
      */
     public AttributeList(Element parent) {
         this.parent = parent;
     }
 
     /**
-     * <p>
      * Add a attribute to the end of the list or replace a existing
      * attribute with the same name and <code>Namespace</code>.
-     * </p>
      *
      * @param index The location to set the value to.
      * @param obj The object to insert into the list.
@@ -138,11 +133,9 @@ class AttributeList extends AbstractList
     }
 
     /**
-     * <p>
      * Inserts the specified attribute at the specified position in this list.
      * Shifts the attribute currently at that position (if any) and any
      * subsequent attributes to the right (adds one to their indices).
-     * </p>
      *
      * @param index The location to set the value to.
      * @param obj The object to insert into the list.
@@ -169,11 +162,9 @@ class AttributeList extends AbstractList
     }
 
     /**
-     * <p>
      * Check and add the <code>Attribute</code> to this list at
      * the given index. Note: does not check for duplicate
      * attributes.
-     * </p>
      *
      * @param index index where to add <code>Attribute</code>
      * @param attribute <code>Attribute</code> to add
@@ -190,24 +181,26 @@ class AttributeList extends AbstractList
             throw new IllegalAddException(parent, attribute, reason);
         }
 
-        if (list == null) {
-            if (index == 0) {
-                ensureCapacity(INITIAL_ARRAY_SIZE);
-            }
-            else {
-                throw new IndexOutOfBoundsException("Index: " + index +
-                                                    " Size: " + size());
-            }
+        if (index<0 || index>size) {
+            throw new IndexOutOfBoundsException("Index: " + index +
+                                                " Size: " + size());
         }
 
-        list.add(index, attribute);
         attribute.setParent(parent);
+
+        ensureCapacity(size+1);
+        if( index==size ) {
+            elementData[size++] = attribute;
+        } else {
+            System.arraycopy(elementData, index, elementData, index + 1, size - index);
+            elementData[index] = attribute;
+            size++;
+        }
+        modCount++;
     }
 
     /**
-     * <p>
      * Add all the objects in the specified collection.
-     * </p>
      *
      * @param collection The collection containing all the objects to add.
      * @return <code>true</code> if the list was modified as a result of
@@ -218,11 +211,9 @@ class AttributeList extends AbstractList
     }
 
     /**
-     * <p>
      * Inserts the specified collecton at the specified position in this list.
      * Shifts the attribute currently at that position (if any) and any
      * subsequent attributes to the right (adds one to their indices).
-     * </p>
      *
      * @param index The offset to start adding the data in the collection
      * @param collection The collection to insert into the list.
@@ -231,7 +222,7 @@ class AttributeList extends AbstractList
      * throws IndexOutOfBoundsException if index < 0 || index > size()
      */
     public boolean addAll(int index, Collection collection) {
-        if ((list == null) && (index != 0)) {
+        if (index<0 || index>size) {
             throw new IndexOutOfBoundsException("Index: " + index +
                                                 " Size: " + size());
         }
@@ -261,33 +252,32 @@ class AttributeList extends AbstractList
     }
 
     /**
-     * <p>
      * Clear the current list.
-     * </p>
      */
     public void clear() {
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                Attribute attribute = (Attribute) list.get(i);
+        if (elementData != null) {
+            for (int i = 0; i < size; i++) {
+                Attribute attribute = elementData[i];
                 attribute.setParent(null);
             }
-            list = null;
+            elementData = null;
         }
         modCount++;
     }
 
     /**
-     * <p>
      * Clear the current list and set it to the contents
      * of the <code>Collection</code>.
      * object.
-     * </p>
      *
      * @param collection The collection to use.
      */
     public void clearAndSet(Collection collection) {
-        ArrayList old = list;
-        list = null;
+        Attribute[] old = elementData;
+        int oldSize = size;
+
+        elementData = null;
+        size = 0;
 
         if ((collection != null) && (collection.size() != 0)) {
             ensureCapacity(collection.size());
@@ -295,59 +285,63 @@ class AttributeList extends AbstractList
                 addAll(0, collection);
             }
             catch (RuntimeException exception) {
-                list = old;
+                elementData = old;
+                size = oldSize;
                 throw exception;
             }
         }
 
         if (old != null) {
-            for (int i = 0; i < old.size(); i++) {
-                Attribute attribute = (Attribute) old.get(i);
+            for (int i = 0; i < oldSize; i++) {
+                Attribute attribute = old[i];
                 attribute.setParent(null);
+            }
+        }
+        modCount++;
+    }
+
+    /**
+     * Increases the capacity of this <code>AttributeList</code> instance,
+     * if necessary, to ensure that it can hold at least the number of
+     * items specified by the minimum capacity argument.
+     *
+     * @param minCapacity the desired minimum capacity.
+     */
+    protected void ensureCapacity(int minCapacity) {
+        if (elementData == null) {
+            elementData = new Attribute[minCapacity];
+        }
+        else {
+            int oldCapacity = elementData.length;
+            if (minCapacity > oldCapacity) {
+                Attribute oldData[] = elementData;
+                int newCapacity = (oldCapacity * 3)/2 + 1;
+                if (newCapacity < minCapacity)
+                    newCapacity = minCapacity;
+                elementData = new Attribute[newCapacity];
+                System.arraycopy(oldData, 0, elementData, 0, size);
             }
         }
     }
 
     /**
-     * <p>
-     * Increases the capacity of this <code>AttributeList</code> instance,
-     * if necessary, to ensure that it can hold at least the number of
-     * items specified by the minimum capacity argument.
-     * </p>
-     *
-     * @param minCapacity the desired minimum capacity.
-     */
-    protected void ensureCapacity(int minCapacity) {
-        if (list == null) {
-            list = new ArrayList(minCapacity);
-        }
-        else {
-            list.ensureCapacity(minCapacity);
-        }
-    }
-
-    /**
-     * <p>
      * Return the object at the specified offset.
-     * </p>
      *
      * @param index The offset of the object.
      * @return The Object which was returned.
      */
     public Object get(int index) {
-        if (list == null) {
+        if (index<0 || index>=size) {
             throw new IndexOutOfBoundsException("Index: " + index +
                                                 " Size: " + size());
         }
 
-        return list.get(index);
+        return elementData[index];
     }
 
     /**
-     * <p>
      * Return the <code>Attribute</code> with the
      * given <code>Namespace</code>.
-     * </p>
      *
      * @param namespace <code>Namespace</code> to match
      * @return the <code>Attribute</code>, or null if one doesn't exist.
@@ -357,7 +351,7 @@ class AttributeList extends AbstractList
         if (index < 0) {
             return null;
         }
-        return list.get(index);
+        return elementData[index];
     }
 
     /**
@@ -366,9 +360,9 @@ class AttributeList extends AbstractList
      */
     protected int indexOf(String name, Namespace namespace) {
         String uri = namespace.getURI();
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                Attribute old = (Attribute) list.get(i);
+        if (elementData != null) {
+            for (int i = 0; i < size; i++) {
+                Attribute old = elementData[i];
                 String oldURI = old.getNamespaceURI();
                 String oldName = old.getName();
                 if (oldURI.equals(uri) && oldName.equals(name)) {
@@ -380,30 +374,29 @@ class AttributeList extends AbstractList
     }
 
     /**
-     * <p>
      * Remove the object at the specified offset.
-     * </p>
      *
      * @param index The offset of the object.
      * @return The Object which was removed.
      */
     public Object remove(int index) {
-        if (list == null)
+        if (index<0 || index>=size)
             throw new IndexOutOfBoundsException("Index: " + index +
                                                 " Size: " + size());
 
-        Attribute old = (Attribute) list.get(index);
+        Attribute old = elementData[index];
         old.setParent(null);
+        int numMoved = size - index - 1;
+        if (numMoved > 0)
+            System.arraycopy(elementData, index+1, elementData, index,numMoved);
+        elementData[--size] = null; // Let gc do its work
         modCount++;
-        list.remove(index);
         return old;
     }
 
     /**
-     * <p>
      * Remove the <code>Attribute</code> with the
      * given name and <code>Namespace</code>.
-     * </p>
      *
      * @param namespace <code>Namespace</code> to match
      * @return the <code>true</code> if attribute was removed,
@@ -419,10 +412,8 @@ class AttributeList extends AbstractList
     }
 
     /**
-     * <p>
      * Set the object at the specified location to the supplied
      * object.
-     * </p>
      *
      * @param index The location to set the value to.
      * @param obj The location to set the value to.
@@ -449,10 +440,8 @@ class AttributeList extends AbstractList
     }
 
     /**
-     * <p>
      * Set the object at the specified location to the supplied
      * object. Note: does not check for duplicate attributes.
-     * </p>
      *
      * @param index The location to set the value to.
      * @param obj The location to set the value to.
@@ -460,7 +449,7 @@ class AttributeList extends AbstractList
      * throws IndexOutOfBoundsException if index < 0 || index >= size()
      */
     protected Object set(int index, Attribute attribute) {
-        if (list == null)
+        if (index<0 || index>=size)
             throw new IndexOutOfBoundsException("Index: " + index +
                                                  " Size: " + size());
 
@@ -475,10 +464,11 @@ class AttributeList extends AbstractList
             throw new IllegalAddException(parent, attribute, reason);
         }
 
-        Attribute old = (Attribute) list.get(index);
+        Attribute old = (Attribute) elementData[index];
         old.setParent(null);
 
-        list.set(index, attribute);
+        elementData[index] = attribute;
+        attribute.setParent(parent);
         return old;
     }
 
@@ -495,28 +485,18 @@ class AttributeList extends AbstractList
     }
 
     /**
-     * <p>
      * Return the number of items in this list
-     * </p>
      *
      * @return The number of items in this list.
      */
     public int size() {
-        if (list == null) {
-            return 0;
-        }
-        return list.size();
+        return size;
     }
  
     /**
-     * <p>
      * Return this list as a <code>String</code>
-     * </p>
      */
     public String toString() {
-        if ((list != null) && (list.size() > 0)) {
-            return list.toString();
-        }
-        else return "[]";
+        return super.toString();
     }
 }

@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
@@ -73,12 +73,11 @@ import org.w3c.dom.*;
 import org.xml.sax.*;
 
 /**
- * <p><code>DOMBuilder</code> builds a JDOM tree using DOM.
+ * <code>DOMBuilder</code> builds a JDOM tree using DOM.
  * Note that this class should only be used for building from a pre-existing
  * DOM tree.  The class can be used to build from files, streams, etc but
  * other builders like SAXBuilder can perform the task faster because
  * they don't create a DOM tree first.
- * </p>
  *
  * @author Brett McLaughlin
  * @author Jason Hunter
@@ -110,37 +109,34 @@ public class DOMBuilder {
     private JDOMFactory factory = new DefaultJDOMFactory();
 
     /**
-     * <p>
      * This creates a new DOMBuilder which will attempt to first locate
      * a parser via JAXP, then will try to use a set of default parsers.
      * The underlying parser will not validate.
-     * </p>
      */
     public DOMBuilder() {
         this(false);
     }
 
     /**
-     * <p>
      * This creates a new DOMBuilder which will attempt to first locate
      * a parser via JAXP, then will try to use a set of default parsers.
      * The underlying parser will validate or not according to the given
      * parameter.
-     * </p>
      *
      * @param validate <code>boolean</code> indicating if
      *                 validation should occur.
+     * @deprecated Deprecated in Beta 9, DOMBuilder shouldn't be used for
+     *             building from files and that's the only time validation
+     *             matters
      */
     public DOMBuilder(boolean validate) {
         setValidation(validate);
     }
 
     /**
-     * <p>
      * This creates a new DOMBuilder using the specified DOMAdapter
      * implementation as a way to choose the underlying parser.
      * The underlying parser will not validate.
-     * </p>
      *
      * @param adapterClass <code>String</code> name of class
      *                     to use for DOM building.
@@ -150,17 +146,18 @@ public class DOMBuilder {
     }
 
     /**
-     * <p>
      * This creates a new DOMBuilder using the specified DOMAdapter
      * implementation as a way to choose the underlying parser.
      * The underlying parser will validate or not according to the given
      * parameter.
-     * </p>
      *
      * @param adapterClass <code>String</code> name of class
      *                     to use for DOM building.
      * @param validate <code>boolean</code> indicating if
      *                 validation should occur.
+     * @deprecated Deprecated in Beta 9, DOMBuilder shouldn't be used for
+     *             building from files and that's the only time validation
+     *             matters
      */
     public DOMBuilder(String adapterClass, boolean validate) {
         this.adapterClass = adapterClass;
@@ -168,10 +165,8 @@ public class DOMBuilder {
     }
 
     /*
-     * <p>
      * This sets a custom JDOMFactory for the builder.  Use this to build 
      * the tree with your own subclasses of the JDOM classes.
-     * </p>
      *
      * @param factory <code>JDOMFactory</code> to use
      */
@@ -180,9 +175,7 @@ public class DOMBuilder {
     }
 
     /**
-     * <p>
      * This sets validation for the builder.
-     * </p>
      *
      * @param validate <code>boolean</code> indicating whether validation
      * should occur.
@@ -192,12 +185,10 @@ public class DOMBuilder {
     }
 
     /**
-     * <p>
      * This builds a document from the supplied
-     *   input stream by constructing a DOM tree and reading information from
-     *   the DOM to create a JDOM document, a slower approach than SAXBuilder 
-     *   but useful for debugging.
-     * </p>
+     * input stream by constructing a DOM tree and reading information from
+     * the DOM to create a JDOM document, a slower approach than SAXBuilder 
+     * but useful for debugging.
      *
      * @param in <code>InputStream</code> to read from.
      * @return <code>Document</code> - resultant Document object.
@@ -236,14 +227,8 @@ public class DOMBuilder {
                 catch (ClassNotFoundException e) {
                     // e.printStackTrace();
                 }
-                catch (NoSuchMethodException e) {
-                    // e.printStackTrace();
-                }
                 catch (IllegalAccessException e) {
                     // e.printStackTrace();
-                }
-                catch (InvocationTargetException ite) {
-                    throw ite.getTargetException(); // throw the root cause
                 }
             }
 
@@ -287,12 +272,10 @@ public class DOMBuilder {
     }
 
     /**
-     * <p>
      * This builds a document from the supplied
-     *   filename by constructing a DOM tree and reading information from the
-     *   DOM to create a JDOM document, a slower approach than SAXBuilder but 
-     *   useful for debugging.
-     * </p>
+     * filename by constructing a DOM tree and reading information from the
+     * DOM to create a JDOM document, a slower approach than SAXBuilder but 
+     * useful for debugging.
      *
      * @param file <code>File</code> to read from.
      * @return <code>Document</code> - resultant Document object.
@@ -312,12 +295,10 @@ public class DOMBuilder {
     }
 
     /**
-     * <p>
      * This builds a document from the supplied
-     *   URL by constructing a DOM tree and reading information from the
-     *   DOM to create a JDOM document, a slower approach than SAXBuilder but 
-     *   useful for debugging.
-     * </p>
+     * URL by constructing a DOM tree and reading information from the
+     * DOM to create a JDOM document, a slower approach than SAXBuilder but 
+     * useful for debugging.
      *
      * @param url <code>URL</code> to read from.
      * @return <code>Document</code> - resultant Document object.
@@ -336,9 +317,7 @@ public class DOMBuilder {
     }
 
     /**
-     * <p>
      * This will build a JDOM tree from an existing DOM tree.
-     * </p>
      *
      * @param domDocument <code>org.w3c.dom.Document</code> object
      * @return <code>Document</code> - JDOM document object.
@@ -350,9 +329,7 @@ public class DOMBuilder {
     }
 
     /**
-     * <p>
      * This will build a JDOM Element from an existing DOM Element
-     * </p>
      *
      * @param domElement <code> org.w3c.dom.Element</code> object
      * @return <code>Element</code> - JDOM Element object
@@ -364,11 +341,9 @@ public class DOMBuilder {
     }
 
     /**
-     * <p>
      * This takes a DOM <code>Node</code> and builds up
-     *   a JDOM tree, recursing until the DOM tree is exhausted
-     *   and the JDOM tree results.
-     * </p>
+     * a JDOM tree, recursing until the DOM tree is exhausted
+     * and the JDOM tree results.
      *
      * @param node <code>Code</node> to examine.
      * @param doc JDOM <code>Document</code> being built.
@@ -411,6 +386,14 @@ public class DOMBuilder {
 
                 Element element = factory.element(localName, ns);
 
+                if (atRoot) {
+                    // If at root, set as document root
+                    doc.setRootElement(element);
+                } else {
+                    // else add to parent element
+                    current.addContent(element);
+                }
+
                 // Add namespaces
                 NamedNodeMap attributeList = node.getAttributes();
                 int attsize = attributeList.getLength();
@@ -419,7 +402,6 @@ public class DOMBuilder {
                     Attr att = (Attr) attributeList.item(i);
 
                     String attname = att.getName();
-
                     if (attname.startsWith("xmlns")) {
                         String attPrefix = "";
                         colon = attname.indexOf(':');
@@ -476,14 +458,6 @@ public class DOMBuilder {
                             factory.attribute(attLocalName, attvalue, attns);
                         element.setAttribute(attribute);
                     }
-                }
-
-                if (atRoot) {
-                    // If at root, set as document root
-                    doc.setRootElement(element);
-                } else {
-                    // else add to parent element
-                    current.addContent(element);
                 }
 
                 // Recurse on child nodes

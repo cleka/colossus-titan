@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
@@ -59,12 +59,10 @@ package org.jdom.filter;
 import org.jdom.*;
 
 /**
- * <p>
  * Classes which wish to modify the behaviour of the FilterList
  * can implement the list filter interface in order to reduce
  * the visibility of certain items in the list, or to restrict
  * the mutability of the list.
- * </p>
  *
  * @author Jools Enticknap
  * @author Bradley S. Huffman
@@ -72,9 +70,7 @@ import org.jdom.*;
  */
 public interface Filter {
     /**
-     * <p>
      * Check to see if the object can be added to the list.
-     * </p>
      *
      * @param obj The object to verify.
      * @return <code>true</code> if the object can be added.
@@ -82,9 +78,7 @@ public interface Filter {
     public boolean canAdd(Object obj);
 
     /**
-     * <p>
      * Check to see if the object can be removed from the list.
-     * </p>
      *
      * @param obj The object to verify.
      * @return <code>true</code> if the object can be removed.
@@ -92,9 +86,7 @@ public interface Filter {
     public boolean canRemove(Object obj);
 
     /**
-     * <p>
      * Check to see if the object matches a predefined set of rules.
-     * </p>
      *
      * @param obj The object to verify.
      * @return <code>true</code> if the object matches a predfined 

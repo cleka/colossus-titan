@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
@@ -60,12 +60,11 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * <p>
  * <code>ProcessingInstruction</code> defines behavior for an
- *   XML processing instruction, modeled in Java.  Methods
- *   allow the user to obtain the target of the PI as well as its data.
- *   The data can always be accessed as a String, and where appropriate
- *   can be retrieved as name/value pairs.
+ * XML processing instruction, modeled in Java.  Methods
+ * allow the user to obtain the target of the PI as well as its data.
+ * The data can always be accessed as a String, and where appropriate
+ * can be retrieved as name/value pairs.
  * </p>
  *
  * @author Brett McLaughlin
@@ -92,18 +91,14 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     protected Object parent;
 
     /**
-     * <p>
      * Default, no-args constructor for implementations
-     *   to use if needed.
-     * </p>
+     * to use if needed.
      */
     protected ProcessingInstruction() { }
 
     /**
-     * <p>
      * This will create a new <code>ProcessingInstruction</code>
-     *   with the specified target and data.
-     * </p>
+     * with the specified target and data.
      *
      * @param target <code>String</code> target of PI.
      * @param data <code>Map</code> data for PI, in
@@ -112,21 +107,13 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *         as a processing instruction name.
      */
     public ProcessingInstruction(String target, Map data) {
-        String reason;
-        if ((reason = Verifier.checkProcessingInstructionTarget(target))
-                                    != null) {
-            throw new IllegalTargetException(target, reason);
-        }
-
-        this.target = target;
+        setTarget(target);
         setData(data);
     }
 
     /**
-     * <p>
      * This will create a new <code>ProcessingInstruction</code>
-     *   with the specified target and data.
-     * </p>
+     * with the specified target and data.
      *
      * @param target <code>String</code> target of PI.
      * @param rawData <code>String</code> data for PI.
@@ -134,21 +121,30 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *         as a processing instruction name.
      */
     public ProcessingInstruction(String target, String data) {
-        String reason;
-        if ((reason = Verifier.checkProcessingInstructionTarget(target))
-                                    != null) {
-            throw new IllegalTargetException(target, reason);
-        }
-
-        this.target = target;
+        setTarget(target);
         setData(data);
     }
 
     /**
-     * <p>
+     * This will set the target for the PI.
+     *
+     * @param target <code>String</code> new target of PI.
+     * @return <code>ProcessingInstruction</code> - this PI modified.
+     */
+    public ProcessingInstruction setTarget(String newTarget) {
+        String reason;
+        if ((reason = Verifier.checkProcessingInstructionTarget(newTarget))
+                                    != null) {
+            throw new IllegalTargetException(newTarget, reason);
+        }
+
+        target = newTarget;
+        return this;
+    }
+
+    /**
      * This will return the parent of this <code>ProcessingInstruction</code>.
-     *   If there is no parent, then this returns <code>null</code>.
-     * </p>
+     * If there is no parent, then this returns <code>null</code>.
      *
      * @return parent of this <code>ProcessingInstruction</code>
      */
@@ -173,10 +169,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This detaches the PI from its parent, or does nothing if the
      * PI has no parent.
-     * </p>
      *
      * @return <code>ProcessingInstruction</code> - this 
      * <code>ProcessingInstruction</code> modified.
@@ -192,11 +186,9 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This retrieves the owning <code>{@link Document}</code> for
-     *   this PI, or null if not a currently a member of a
-     *   <code>{@link Document}</code>.
-     * </p>
+     * this PI, or null if not a currently a member of a
+     * <code>{@link Document}</code>.
      *
      * @return <code>Document</code> owning this PI, or null.
      */
@@ -211,9 +203,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This sets the <code>{@link Document}</code> parent of this PI.
-     * </p>
      *
      * @param document <code>Document</code> parent
      * @return this <code>PI</code> modified
@@ -224,9 +214,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will retrieve the target of the PI.
-     * </p>
      *
      * @return <code>String</code> - target of PI.
      */
@@ -235,9 +223,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will return the raw data from all instructions.
-     * </p>
      *
      * @return <code>String</code> - data of PI.
      */
@@ -246,10 +232,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     *  This will return a <code>List</code> containing the names of the
-     *    "attribute" style pieces of name/value pairs in this PI's data.
-     * </p>
+     * This will return a <code>List</code> containing the names of the
+     * "attribute" style pieces of name/value pairs in this PI's data.
      *
      * @return <code>List</code> - the <code>List</code> containing the
      *         "attribute" names.
@@ -266,9 +250,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will set the raw data for the PI.
-     * </p>
      *
      * @param rawData <code>String</code> data of PI.
      * @return <code>ProcessingInstruction</code> - this PI modified.
@@ -282,12 +264,10 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will set the name/value pairs within the passed
-     *   <code>Map</code> as the pairs for the data of
-     *   this PI.  The keys should be the pair name
-     *   and the values should be the pair values.
-     * </p>
+     * <code>Map</code> as the pairs for the data of
+     * this PI.  The keys should be the pair name
+     * and the values should be the pair values.
      *
      * @return <code>ProcessingInstruction</code> - modified PI.
      */
@@ -299,11 +279,9 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will return the value for a specific
-     *   name/value pair on the PI.  If no such pair is
-     *   found for this PI, null is returned.
-     * </p>
+     * name/value pair on the PI.  If no such pair is
+     * found for this PI, null is returned.
      *
      * @param name <code>String</code> name of name/value pair
      *             to lookup value for.
@@ -314,11 +292,9 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will set the value for the specified name/value
-     *   pair.  If no matching pair is found, the supplied
-     *   pair is added to the PI data.
-     * </p>
+     * pair.  If no matching pair is found, the supplied
+     * pair is added to the PI data.
      *
      * @param name <code>String</code> name of pair.
      * @param value <code>String</code> value for pair.
@@ -333,10 +309,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     * This will remove the name/value pair with the specified
-     *   name.
-     * </p>
+     * This will remove the name/value pair with the specified name.
      *
      * @return <code>boolean</code> - whether the requested
      *         instruction was removed.
@@ -351,9 +324,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will convert the Map to a string representation.
-     * </p>
      *
      * @param mapData <code>Map</code> PI data to convert
      */
@@ -369,17 +340,17 @@ public class ProcessingInstruction implements Serializable, Cloneable {
                    .append(value)
                    .append("\" ");
         }
-        // Remove last space
-        rawData.setLength(rawData.length() - 1);
+        // Remove last space, if we did any appending
+        if (rawData.length() > 0) {
+            rawData.setLength(rawData.length() - 1);
+        }
 
         return rawData.toString();
     }
 
     /**
-     * <p>
      * This will parse and load the instructions for the PI.
-     *   This is separated to allow it to occur once and then be reused.
-     * </p>
+     * This is separated to allow it to occur once and then be reused.
      *
      * @param rawData <code>String</code> PI data to parse
      */
@@ -389,7 +360,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
         // now be handled correctly:
         //   <?pi href="http://hi/a=b"?>        Reads OK
         //   <?pi href = 'http://hi/a=b' ?>     Reads OK
-        //   <?pi href\t = \t'http://hi/a-b'?>  Reads OK
+        //   <?pi href\t = \t'http://hi/a=b'?>  Reads OK
+        //   <?pi href  =  "http://hi/a=b"?>    Reads OK
         //   <?pi?>                             Empty Map
         //   <?pi id=22?>                       Empty Map
         //   <?pi id='22?>                      Empty Map
@@ -415,13 +387,17 @@ public class ProcessingInstruction implements Serializable, Cloneable {
                 char currentChar = inputData.charAt(pos);
                 if (currentChar == '=') {
                     name = inputData.substring(startName, pos).trim();
-                    value = extractQuotedString(
-                                     inputData.substring(pos+1).trim());
+                    // Get the boundaries on the quoted string
+                    // We use boundaries so we know where to start next
+                    int[] bounds = extractQuotedString(
+                                     inputData.substring(pos+1));
                     // A null value means a parse error and we return empty!
-                    if (value == null) {
+                    if (bounds == null) {
                         return new HashMap();
                     }
-                    pos += value.length() + 1;  // skip over equals and value
+                    value = inputData.substring(bounds[0]+pos+1,
+                                                bounds[1]+pos+1);
+                    pos += bounds[1] + 1;  // skip past value
                     break;
                 }
                 else if (Character.isWhitespace(previousChar)
@@ -469,7 +445,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
      *         returned.
      * @see parseData
      */
-    private String extractQuotedString(String rawData) {
+    private int[] extractQuotedString(String rawData) {
         // Remembers whether we're actually in a quoted string yet
         boolean inQuotes = false;
 
@@ -494,26 +470,22 @@ public class ProcessingInstruction implements Serializable, Cloneable {
                 else if (quoteChar == currentChar) {
                     // We're leaving a quoted string
                     inQuotes = false;
-                    return rawData.substring(start, pos);
+                    return new int[] { start, pos };
                 }
                 // Otherwise we've encountered a quote
                 // inside a quote, so just continue
             }
         }
 
-        // Should we throw an exception if no quoted string was found,
-        // or simply return an empty string???
         return null;
     }
     
     /**
-     * <p>
-     *  This returns a <code>String</code> representation of the
-     *    <code>ProcessingInstruction</code>, suitable for debugging. If the XML
-     *    representation of the <code>ProcessingInstruction</code> is desired,
-     *    {@link org.jdom.output.XMLOutputter#outputString(ProcessingInstruction)}
-     *    should be used.
-     * </p>
+     * This returns a <code>String</code> representation of the
+     * <code>ProcessingInstruction</code>, suitable for debugging. If the XML
+     * representation of the <code>ProcessingInstruction</code> is desired,
+     * {@link org.jdom.output.XMLOutputter#outputString(ProcessingInstruction)}
+     * should be used.
      *
      * @return <code>String</code> - information about the
      *         <code>ProcessingInstruction</code>
@@ -527,10 +499,8 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     *  This tests for equality of this <code>ProcessingInstruction</code>
-     *    to the supplied <code>Object</code>.
-     * </p>
+     * This tests for equality of this <code>ProcessingInstruction</code>
+     * to the supplied <code>Object</code>.
      *
      * @param ob <code>Object</code> to compare to.
      * @return <code>boolean</code> - whether the
@@ -542,9 +512,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     *  This returns the hash code for this <code>ProcessingInstruction</code>.
-     * </p>
+     * This returns the hash code for this <code>ProcessingInstruction</code>.
      *
      * @return <code>int</code> - hash code.
      */
@@ -553,9 +521,7 @@ public class ProcessingInstruction implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     *  This will return a clone of this <code>ProcessingInstruction</code>.
-     * </p>
+     * This will return a clone of this <code>ProcessingInstruction</code>.
      *
      * @return <code>Object</code> - clone of this 
      * <code>ProcessingInstruction</code>.
@@ -583,5 +549,4 @@ public class ProcessingInstruction implements Serializable, Cloneable {
 
         return pi;
     }
-
 }

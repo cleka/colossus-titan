@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,19 +48,17 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
 package org.jdom;
 
 /**
- * <p>
  * <code>IllegalAddException</code> is thrown when trying to add a
  * illegal object to a JDOM construct.
- * </p>
  *
  * @author Brett McLaughlin
  * @version $Revision$, $Date$
@@ -71,11 +69,9 @@ public class IllegalAddException extends IllegalArgumentException {
       "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link Attribute}</code>
-     *   to the <code>{@link Element}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link Attribute}</code>
+     * to the <code>{@link Element}</code> is illegal.
      *
      * @param base <code>Element</code> that <code>Attribute</code>
      *        couldn't be added to
@@ -94,11 +90,9 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link Element}</code>
-     *   to parent is illegal.
-     * </p>
+     * that the addition of the <code>{@link Element}</code>
+     * to parent is illegal.
      *
      * @param base <code>Element</code> that the child
      *        couldn't be added to
@@ -117,11 +111,9 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link Element}</code>
-     *   to the <code>{@link Document}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link Element}</code>
+     * to the <code>{@link Document}</code> is illegal.
      *
      * @param base <code>Document</code> that the <code>Element</code>
      *        couldn't be added to
@@ -138,11 +130,9 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link ProcessingInstruction}</code>
-     *   to the <code>{@link Element}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link ProcessingInstruction}</code>
+     * to the <code>{@link Element}</code> is illegal.
      *
      * @param base <code>Element</code> that the
      *              <code>ProcessingInstruction</code> couldn't be added to
@@ -162,11 +152,9 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link ProcessingInstruction}</code>
-     *   to the <code>{@link Document}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link ProcessingInstruction}</code>
+     * to the <code>{@link Document}</code> is illegal.
      *
      * @param base <code>Document</code> that the
      *        <code>ProcessingInstruction</code> couldn't be added to
@@ -184,11 +172,9 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link Comment}</code>
-     *   to the <code>{@link Element}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link Comment}</code>
+     * to the <code>{@link Element}</code> is illegal.
      *
      * @param base <code>Element</code> that the <code>Comment</code>
      *             couldn't be added to
@@ -208,10 +194,8 @@ public class IllegalAddException extends IllegalArgumentException {
 
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link CDATA}</code>
-     * </p>
+     * that the addition of the <code>{@link CDATA}</code>
      *
      * @param base <code>Element</code> that the <code>CDATA</code>
      *             couldn't be added to
@@ -231,11 +215,9 @@ public class IllegalAddException extends IllegalArgumentException {
 
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link Text}</code>
-     *   to the <code>{@link Element}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link Text}</code>
+     * to the <code>{@link Element}</code> is illegal.
      *
      * @param base <code>Element</code> that the <code>Comment</code>
      *             couldn't be added to
@@ -254,11 +236,9 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link Comment}</code>
-     *   to the <code>{@link Document}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link Comment}</code>
+     * to the <code>{@link Document}</code> is illegal.
      *
      * @param base <code>Document</code> that the <code>Comment</code>
      *             couldn't be added to
@@ -275,11 +255,9 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link EntityRef}</code>
-     *   to the <code>{@link Element}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link EntityRef}</code>
+     * to the <code>{@link Element}</code> is illegal.
      *
      * @param base <code>Element</code> that the <code>EntityRef</code>
      *             couldn't be added to
@@ -298,11 +276,9 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link Namespace}</code>
-     *   to the <code>{@link Element}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link Namespace}</code>
+     * to the <code>{@link Element}</code> is illegal.
      *
      * @param base <code>Element</code> that the <code>Namespace</code>
      *             couldn't be added to
@@ -317,7 +293,7 @@ public class IllegalAddException extends IllegalArgumentException {
                                    : ":" + added.getPrefix() + "=")
               .append("\"")
               .append(added.getURI())
-              .append("\" could not be added as content to \"")
+              .append("\" could not be added as a namespace to \"")
               .append(base.getQualifiedName())
               .append("\": ")
               .append(reason)
@@ -325,11 +301,9 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the addition of the <code>{@link DocType}</code>
-     *   to the <code>{@link Document}</code> is illegal.
-     * </p>
+     * that the addition of the <code>{@link DocType}</code>
+     * to the <code>{@link Document}</code> is illegal.
      *
      * @param base <code>Document</code> that the <code>DocType</code>
      *             couldn't be added to
@@ -346,10 +320,8 @@ public class IllegalAddException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> with the specified
-     *   error message.
-     * </p>
+     * error message.
      *
      * @param reason cause of the problem
      */

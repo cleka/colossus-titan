@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
@@ -69,12 +69,14 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
- * <p><code>SAXBuilder</code> builds a JDOM tree using SAX.
+ * <code>SAXBuilder</code> builds a JDOM tree using SAX.
  * Information about SAX can be found at 
- * <a href="http://www.megginson.com/SAX">http://www.megginson.com/SAX</a>.</p>
+ * <a href="http://www.saxproject.org">http://www.saxproject.org</a>.
  *
- * <p>Known issues: Relative paths for a DocType or EntityRef may be
- * converted by the SAX parser into absolute paths</p>
+ * <p>
+ * Known issues: Relative paths for a DocType or EntityRef may be
+ * converted by the SAX parser into absolute paths.
+ * </p>
  *
  * @author Jason Hunter
  * @author Brett McLaughlin
@@ -129,23 +131,28 @@ public class SAXBuilder {
     private HashMap properties = new HashMap(5);
 
     /**
-     * <p>
+     * Whether parser reuse is allowed.
+     * <p>Default: <code>false</code></p>
+     */
+    private boolean reuseParser = false;
+
+    /** The current SAX parser, if parser reuse has been activated. */
+    private XMLReader saxParser = null;
+
+    /**
      * Creates a new SAXBuilder which will attempt to first locate
      * a parser via JAXP, then will try to use a set of default 
      * SAX Drivers. The underlying parser will not validate.
-     * </p>
      */
     public SAXBuilder() {
         this(false);
     }
 
     /**
-     * <p>
      * Creates a new SAXBuilder which will attempt to first locate
      * a parser via JAXP, then will try to use a set of default 
      * SAX Drivers. The underlying parser will validate or not
      * according to the given parameter.
-     * </p>
      *
      * @param validate <code>boolean</code> indicating if
      *                 validation should occur.
@@ -155,10 +162,8 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * Creates a new SAXBuilder using the specified SAX parser.
      * The underlying parser will not validate.
-     * </p>
      *
      * @param saxDriverClass <code>String</code> name of SAX Driver
      *                       to use for parsing.
@@ -168,11 +173,9 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * Creates a new SAXBuilder using the specified SAX parser.
      * The underlying parser will validate or not
      * according to the given parameter.
-     * </p>
      *
      * @param saxDriverClass <code>String</code> name of SAX Driver
      *                       to use for parsing.
@@ -185,10 +188,8 @@ public class SAXBuilder {
     }
 
     /*
-     * <p>
      * This sets a custom JDOMFactory for the builder.  Use this to build
      * the tree with your own subclasses of the JDOM classes.
-     * </p>
      *
      * @param factory <code>JDOMFactory</code> to use
      */
@@ -197,9 +198,7 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * This sets validation for the builder.
-     * </p>
      *
      * @param validate <code>boolean</code> indicating whether validation 
      * should occur.
@@ -209,9 +208,7 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * This sets custom ErrorHandler for the <code>Builder</code>.
-     * </p>
      *
      * @param errorHandler <code>ErrorHandler</code>
      */
@@ -220,9 +217,7 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * This sets custom EntityResolver for the <code>Builder</code>.
-     * </p>
      *
      * @param entityResolver <code>EntityResolver</code>
      */
@@ -231,9 +226,7 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * This sets custom DTDHandler for the <code>Builder</code>.
-     * </p>
      *
      * @param dtdHandler <code>DTDHandler</code>
      */
@@ -242,9 +235,7 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * This sets custom XMLFilter for the <code>Builder</code>.
-     * </p>
      *
      * @param xmlFilter <code>XMLFilter</code>
      */
@@ -253,7 +244,6 @@ public class SAXBuilder {
     }
  
     /**
-     * <p>
      * Specifies whether or not the parser should elminate whitespace in 
      * element content (sometimes known as "ignorable whitespace") when
      * building the document.  Only whitespace which is contained within
@@ -261,7 +251,6 @@ public class SAXBuilder {
      * eliminated (see XML Rec 3.2.1).  For this setting to take effect 
      * requires that validation be turned on.  The default value of this
      * setting is <code>false</code>.
-     * </p>
      *
      * @param ignoringWhite Whether to ignore ignorable whitespace
      */
@@ -270,9 +259,25 @@ public class SAXBuilder {
     }
 
     /**
+     * Specifies whether this builder shall reuse the same SAX parser
+     * when performing subsequent parses or allocate a new parser for
+     * each parse.  The default value of this setting is
+     * <code>false</code> (i.e. no parser reuse).
      * <p>
+     * <strong>Note</strong>: As SAX parser instances may not be used
+     * in multiple threads running concurrently, the parser reuse
+     * feature shall not be used with SAXBuilder instances shared
+     * among threads.</p>
+     *
+     * @param reuseParser Whether to reuse the SAX parser.
+     */
+    public void setReuseParser(boolean reuseParser) {
+        this.reuseParser = reuseParser;
+        this.saxParser   = null;
+    }
+
+    /**
      * This sets a feature on the SAX parser. See the SAX documentation for
-     * more information.
      * </p>
      * <p>
      * NOTE: SAXBuilder requires that some particular features of the SAX parser be
@@ -292,10 +297,8 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * This sets a property on the SAX parser. See the SAX documentation for
      * more information.
-     * </p>
      * <p>
      * NOTE: SAXBuilder requires that some particular properties of the SAX parser be
      * set up in certain ways for it to work properly. The list of such properties
@@ -314,16 +317,17 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * This builds a document from the supplied
-     *   input source.
-     * </p>
+     * input source.
      *
      * @param in <code>InputSource</code> to read from.
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
+     * @throws IOException when an I/O error prevents a document
+     *         from being fully parsed.
      */
-    public Document build(InputSource in) throws JDOMException {
+    public Document build(InputSource in) 
+     throws JDOMException, IOException {
         SAXHandler contentHandler = null;
 
         try {
@@ -331,47 +335,57 @@ public class SAXBuilder {
             contentHandler = createContentHandler();
             configureContentHandler(contentHandler);
 
-            // Create and configure the parser.
-            XMLReader parser = createParser();
+            XMLReader parser = this.saxParser;
+            if (parser == null) {
+                // Create and configure the parser.
+                parser = createParser();
 
-            // Install optional filter
-            if (saxXMLFilter != null) {
-                // Connect filter chain to parser
-                XMLFilter root = saxXMLFilter;
-                while (root.getParent() instanceof XMLFilter) {
-                    root = (XMLFilter)root.getParent();
+                // Install optional filter
+                if (saxXMLFilter != null) {
+                    // Connect filter chain to parser
+                    XMLFilter root = saxXMLFilter;
+                    while (root.getParent() instanceof XMLFilter) {
+                        root = (XMLFilter)root.getParent();
+                    }
+                    root.setParent(parser);
+
+                    // Read from filter
+                    parser = saxXMLFilter;
                 }
-                root.setParent(parser);
 
-                // Read from filter
-                parser = saxXMLFilter;
+                // Configure parser
+                configureParser(parser, contentHandler);
+
+                if (reuseParser == true) {
+                    this.saxParser = parser;
+                }
             }
-
-            // Configure parser
-            configureParser(parser, contentHandler);
+            else {
+                // Reset content handler as SAXHandler instances can not
+                // be reused
+                parser.setContentHandler(contentHandler);
+            }
 
             // Parse the document.
             parser.parse(in);
 
             return contentHandler.getDocument();
         }
-        catch (Exception e) {
-            if (e instanceof SAXParseException) {
-                SAXParseException p = (SAXParseException)e;
-                String systemId = p.getSystemId();
-                if (systemId != null) {
-                    throw new JDOMException("Error on line " + 
-                              p.getLineNumber() + " of document "
-                              + systemId, e);
-                } else {
-                    throw new JDOMException("Error on line " +
-                              p.getLineNumber(), e);
-                }
-            } else if (e instanceof JDOMException) {
-                throw (JDOMException)e;
+        catch (SAXParseException e) {
+            String systemId = e.getSystemId();
+            if (systemId != null) {
+                throw new JDOMParseException("Error on line " + 
+                    e.getLineNumber() + " of document " + systemId,
+                    contentHandler.getDocument(), e);
             } else {
-                throw new JDOMException("Error in building", e);
+                throw new JDOMParseException("Error on line " +
+                    e.getLineNumber(),
+                    contentHandler.getDocument(), e);
             }
+        }
+        catch (SAXException e) {
+            throw new JDOMParseException("Error in building: " + 
+                e.getMessage(), contentHandler.getDocument(), e);
         }
         finally {
             // Explicitly nullify the handler to encourage GC
@@ -382,36 +396,31 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * This creates the SAXHandler that will be used to build the Document.
-     * </p>
+     *
+     * @return <code>SAXHandler</code> - resultant SAXHandler object.
      */
-    protected SAXHandler createContentHandler() throws Exception {
+    protected SAXHandler createContentHandler() {
         SAXHandler contentHandler = new SAXHandler(factory);
         return contentHandler;
     }
 
     /**
-     * <p>
      * This configures the SAXHandler that will be used to build the Document.
-     * </p>
      * <p>
      * The default implementation simply passes through some configuration
      * settings that were set on the SAXBuilder: setExpandEntities() and
      * setIgnoringElementContentWhitespace().
      * </p>
      */
-    protected void configureContentHandler(SAXHandler contentHandler) 
-                    throws Exception {
+    protected void configureContentHandler(SAXHandler contentHandler) {
         // Setup pass through behavior
         contentHandler.setExpandEntities(expand);
         contentHandler.setIgnoringElementContentWhitespace(ignoringWhite);
     }
 
     /**
-     * <p>
      * This creates the XMLReader to be used for reading the XML document.
-     * </p>
      * <p>
      * The default behavior is to (1) use the saxDriverClass, if it has been
      * set, (2) try to obtain a parser from JAXP, if it is available, and 
@@ -419,13 +428,20 @@ public class SAXBuilder {
      * the Xerces parser). Subclasses may override this method to determine
      * the parser to use in a different way.
      * </p>
+     *
+     * @return <code>XMLReader</code> - resultant XMLReader object.
      */
-    protected XMLReader createParser() throws Exception {
+    protected XMLReader createParser() throws JDOMException {
         XMLReader parser = null;
         if (saxDriverClass != null) {
             // The user knows that they want to use a particular class
-            parser = XMLReaderFactory.createXMLReader(saxDriverClass);
-            // System.out.println("using specific " + saxDriverClass);
+            try {
+              parser = XMLReaderFactory.createXMLReader(saxDriverClass);
+              // System.out.println("using specific " + saxDriverClass);
+            }
+            catch (SAXException e) {
+              throw new JDOMException("Could not load " + saxDriverClass, e); 
+            }
         } else {
             // Try using JAXP...
             // Note we need JAXP 1.1, and if JAXP 1.0 is all that's
@@ -474,18 +490,22 @@ public class SAXBuilder {
         // Check to see if we got a parser yet, if not, try to use a
         // hard coded default
         if (parser == null) {
-            parser = XMLReaderFactory.createXMLReader(DEFAULT_SAX_DRIVER);
-            // System.out.println("using default " + DEFAULT_SAX_DRIVER);
-            saxDriverClass = parser.getClass().getName();
+            try {
+                parser = XMLReaderFactory.createXMLReader(DEFAULT_SAX_DRIVER);
+                // System.out.println("using default " + DEFAULT_SAX_DRIVER);
+                saxDriverClass = parser.getClass().getName();
+            }
+            catch (SAXException e) {
+                throw new JDOMException("Could not load default SAX parser: "
+                  + DEFAULT_SAX_DRIVER, e); 
+            }
         }
 
         return parser;
     }
 
     /**
-     * <p>
      * This configures the XMLReader to be used for reading the XML document.
-     * </p>
      * <p>
      * The default implementation sets various options on the given XMLReader,
      *  such as validation, DTD resolution, entity handlers, etc., according
@@ -496,7 +516,7 @@ public class SAXBuilder {
      * </p>
      */
     protected void configureParser(XMLReader parser, SAXHandler contentHandler)
-                    throws Exception {
+        throws JDOMException {
 
         // Setup SAX handlers.
 
@@ -622,10 +642,8 @@ public class SAXBuilder {
     }
 
     /**
-     * <p>
      * Tries to set a feature on the parser. If the feature cannot be set,
      * throws a JDOMException describing the problem.
-     * </p>
      */
     private void internalSetFeature(XMLReader parser, String feature, 
                     boolean value, String displayName) throws JDOMException {
@@ -668,8 +686,11 @@ public class SAXBuilder {
      * @param in <code>InputStream</code> to read from.
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
+     * @throws IOException when an I/O error prevents a document
+     *         from being fully parsed.
      */
-    public Document build(InputStream in) throws JDOMException {
+    public Document build(InputStream in) 
+     throws JDOMException, IOException {
         return build(new InputSource(in));
     }
 
@@ -682,8 +703,11 @@ public class SAXBuilder {
      * @param file <code>File</code> to read from.
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
+     * @throws IOException when an I/O error prevents a document
+     *         from being fully parsed.
      */
-    public Document build(File file) throws JDOMException {
+    public Document build(File file) 
+        throws JDOMException, IOException {
         try {
             URL url = fileToURL(file);
             return build(url);
@@ -701,8 +725,11 @@ public class SAXBuilder {
      * @param url <code>URL</code> to read from.
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
+     * @throws IOException when an I/O error prevents a document
+     *         from being fully parsed.
      */
-    public Document build(URL url) throws JDOMException {
+    public Document build(URL url) 
+        throws JDOMException, IOException {
         String systemID = url.toExternalForm();
         return build(new InputSource(systemID));
     }
@@ -717,9 +744,11 @@ public class SAXBuilder {
      * @param systemId base for resolving relative URIs
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
+     * @throws IOException when an I/O error prevents a document
+     *         from being fully parsed.
      */
     public Document build(InputStream in, String systemId)
-        throws JDOMException {
+        throws JDOMException, IOException {
 
         InputSource src = new InputSource(in);
         src.setSystemId(systemId);
@@ -729,30 +758,39 @@ public class SAXBuilder {
     /**
      * <p>
      * This builds a document from the supplied
-     *   Reader.
+     *   Reader.  It's the programmer's responsibility to make sure
+     *   the reader matches the encoding of the file.  It's always safer
+     *   to use an InputStream rather than a Reader, if it's available.
      * </p>
      *
      * @param in <code>Reader</code> to read from.
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
+     * @throws IOException when an I/O error prevents a document
+     *         from being fully parsed.
      */
-    public Document build(Reader characterStream) throws JDOMException {
+    public Document build(Reader characterStream) 
+        throws JDOMException, IOException {
         return build(new InputSource(characterStream));
     }
 
     /**
      * <p>
      * This builds a document from the supplied
-     *   Reader.
+     *   Reader.  It's the programmer's responsibility to make sure
+     *   the reader matches the encoding of the file.  It's always safer
+     *   to use an InputStream rather than a Reader, if it's available.
      * </p>
      *
      * @param in <code>Reader</code> to read from.
      * @param systemId base for resolving relative URIs
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
+     * @throws IOException when an I/O error prevents a document
+     *         from being fully parsed.
      */
     public Document build(Reader characterStream, String SystemId)
-        throws JDOMException {
+        throws JDOMException, IOException {
 
         InputSource src = new InputSource(characterStream);
         src.setSystemId(SystemId);
@@ -767,8 +805,11 @@ public class SAXBuilder {
      * @param systemId URI for the input
      * @return <code>Document</code> - resultant Document object.
      * @throws JDOMException when errors occur in parsing.
+     * @throws IOException when an I/O error prevents a document
+     *         from being fully parsed.
      */
-    public Document build(String systemId) throws JDOMException {
+    public Document build(String systemId) 
+        throws JDOMException, IOException {
         return build(new InputSource(systemId));
     }
 

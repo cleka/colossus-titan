@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <pm AT jdom DOT org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <pm AT jdom DOT org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter AT jdom DOT org> and
+ Brett McLaughlin <brett AT jdom DOT org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
@@ -92,21 +92,17 @@ public class DOMOutputter {
     private String adapterClass;
 
     /**
-     * <p>
      * This creates a new DOMOutputter which will attempt to first locate
      * a DOM implementation to use via JAXP, and if JAXP does not exist or
      * there's a problem, will fall back to the default parser.
-     * </p>
      */
     public DOMOutputter() {
         // nothing
     }
 
     /**
-     * <p>
      * This creates a new DOMOutputter using the specified DOMAdapter
      * implementation as a way to choose the underlying parser.
-     * </p>
      *
      * @param adapterClass <code>String</code> name of class
      *                     to use for DOM output
@@ -117,11 +113,9 @@ public class DOMOutputter {
 
 
     /**
-     * <p>
      * This converts the JDOM <code>Document</code> parameter to a 
      * DOM Document, returning the DOM version.  The DOM implementation
      * is the one chosen in the constructor.
-     * </p>
      *
      * @param document <code>Document</code> to output.
      * @return an <code>org.w3c.dom.Document</code> version
@@ -186,13 +180,13 @@ public class DOMOutputter {
     }
 
     /** 
-     * <p>
      * This converts the JDOM <code>Element</code> parameter to a 
      * DOM Element, returning the DOM version.
-     * </p>
      *
      * @param element <code>Element</code> to output.
      * @return an <code>org.w3c.dom.Element</code> version
+     * @deprecated Deprecated in Beta 9, since a DOM Element should not be
+     *             isolated from its Document; use output(Document) instead
      */
     public org.w3c.dom.Element output(Element element) throws JDOMException {
         try {
@@ -206,12 +200,12 @@ public class DOMOutputter {
     }
 
     private org.w3c.dom.Document createDOMDocument()
-                                       throws Throwable {
+                                       throws JDOMException {
         return createDOMDocument(null);
     }
 
     private org.w3c.dom.Document createDOMDocument(DocType dt)
-                                       throws Throwable {
+                                       throws JDOMException {
         if (adapterClass != null) {
             // The user knows that they want to use a particular impl
             try {
@@ -221,6 +215,12 @@ public class DOMOutputter {
                 return adapter.createDocument(dt);
             }
             catch (ClassNotFoundException e) {
+                // e.printStackTrace();
+            }
+            catch (IllegalAccessException e) {
+                // e.printStackTrace();
+            }
+            catch (InstantiationException e) {
                 // e.printStackTrace();
             }
         }
@@ -236,14 +236,11 @@ public class DOMOutputter {
             catch (ClassNotFoundException e) {
                 // e.printStackTrace();
             }
-            catch (NoSuchMethodException e) {
-                // e.printStackTrace();
-            }
             catch (IllegalAccessException e) {
                 // e.printStackTrace();
             }
-            catch (InvocationTargetException ite) {
-                throw ite.getTargetException(); // throw the root cause
+            catch (InstantiationException e) {
+                // e.printStackTrace();
             }
         }
 
@@ -258,8 +255,15 @@ public class DOMOutputter {
         catch (ClassNotFoundException e) {
             // e.printStackTrace();
         }
+        catch (IllegalAccessException e) {
+            // e.printStackTrace();
+        }
+        catch (InstantiationException e) {
+            // e.printStackTrace();
+        }
 
-        throw new Exception("No JAXP or default parser available");
+        throw new JDOMException("No JAXP or default parser available");
+        
     }
 
     protected org.w3c.dom.Element output(Element element,
@@ -408,12 +412,13 @@ public class DOMOutputter {
     }
 
     /**
-     * <p>
      * This converts the JDOM <code>Attribute</code> parameter to a
      * DOM <code>Attr</code>, returning the DOM version.
-     * </p>
+     *
      * @param attribute <code>Attribute</code> to output.
      * @return an <code>org.w3c.dom.Attr</code> version
+     * @deprecated Deprecated in Beta 9, since a DOM Attr should not be
+     *             isolated from its Document; use output(Document) instead
      */
     public org.w3c.dom.Attr output(Attribute attribute) throws JDOMException {
         try {
@@ -448,10 +453,8 @@ public class DOMOutputter {
     }
 
     /**
-     * <p>
-     *  This will handle adding any <code>{@link Namespace}</code>
-     *    attributes to the DOM tree.
-     * </p>
+     * This will handle adding any <code>{@link Namespace}</code>
+     * attributes to the DOM tree.
      *
      * @param ns <code>Namespace</code> to add definition of
      */

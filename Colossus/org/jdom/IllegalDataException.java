@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,19 +48,18 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
 package org.jdom;
 
 /**
- * <p><code>IllegalDataException</code>
- *   is thrown when illegal text is supplied to a
- *   JDOM construct.
- * </p>
+ * <code>IllegalDataException</code>
+ * is thrown when illegal text is supplied to a
+ * JDOM construct.
  *
  * @author Brett McLaughlin
  * @author Elliotte Rusty Harold
@@ -72,11 +71,9 @@ public class IllegalDataException extends IllegalArgumentException {
       "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the specified data is illegal for the construct
-     *   it was supplied to.
-     * </p>
+     * that the specified data is illegal for the construct
+     * it was supplied to.
      *
      * @param data <code>String</code> data that breaks rules.
      * @param construct <code>String</code> construct that data is illegal for.
@@ -95,11 +92,9 @@ public class IllegalDataException extends IllegalArgumentException {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> indicating
-     *   that the specified data is illegal for the construct
-     *   it was supplied to.
-     * </p>
+     * that the specified data is illegal for the construct
+     * it was supplied to.
      *
      * @param data <code>String</code> data that breaks rules.
      * @param construct <code>String</code> construct that data is illegal for.
@@ -113,5 +108,4 @@ public class IllegalDataException extends IllegalArgumentException {
               .append(".")
               .toString());
     }
-
 }

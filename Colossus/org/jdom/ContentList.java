@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
 
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org).
 
  In addition, we request (but do not require) that you include in the
  end-user documentation provided with the redistribution and/or in the
@@ -48,25 +48,24 @@
 
  This software consists of voluntary contributions made by many
  individuals on behalf of the JDOM Project and was originally
- created by Brett McLaughlin <brett@jdom.org> and
- Jason Hunter <jhunter@jdom.org>.  For more information on the
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
 
  */
 
 package org.jdom;
 
 import java.util.*;
+import java.util.NoSuchElementException; // mysteriously helps JDK 1.1.x builds
 
 import org.jdom.filter.Filter;
 
 /**
- * <p>
  * <code>ContentList</code> represents legal JDOM content, including content
  * for <code>Document</code>s or <code>Element</code>s.
  * This class is NOT PUBLIC; users should see it as a simple List
  * implementation.
- * </p>
  *
  * @author Alex Rosen
  * @author Philippe Riand
@@ -79,8 +78,7 @@ import org.jdom.filter.Filter;
  * @see ProcessingInstruction
  * @see Text
  */
-class ContentList extends AbstractList
-                         implements List, Cloneable, java.io.Serializable {
+class ContentList extends AbstractList implements java.io.Serializable {
 
     private static final String CVS_ID =
       "@(#) $RCSfile$ $Revision$ $Date$ $Name$";
@@ -99,10 +97,11 @@ class ContentList extends AbstractList
     private static final int NEXT    = 4;
     private static final int ADD     = 5;
     private static final int REMOVE  = 6;
-    private static final int SET     = 7;
 
     /** Our backing list */
-    protected ArrayList list;
+//    protected ArrayList list;
+    private Object elementData[];
+    private int size;
 
     /** Document or Element this list belongs to */
     protected Object parent;
@@ -111,33 +110,25 @@ class ContentList extends AbstractList
     private ContentList() { }
 
     /**
-     * <p>
      * Create a new instance of the ContentList representing
      * Document content
-     * </p>
      */
     protected ContentList(Document document) {
         this.parent = document;
-        ensureCapacity(INITIAL_ARRAY_SIZE);
     }
 
     /**
-     * <p>
      * Create a new instance of the ContentList representing
      * Element content
-     * </p>
      */
     protected ContentList(Element parent) {
         this.parent = parent;
-        ensureCapacity(INITIAL_ARRAY_SIZE);
     }
 
     /**
-     * <p>
      * Inserts the specified object at the specified position in this list.
      * Shifts the object currently at that position (if any) and any
      * subsequent objects to the right (adds one to their indices).
-     * </p>
      *
      * @param index The location to set the value to.
      * @param obj The object to insert into the list.
@@ -156,9 +147,6 @@ class ContentList extends AbstractList
         else if (obj instanceof ProcessingInstruction) {
             add(index, (ProcessingInstruction) obj);
         }
-        else if (obj instanceof CDATA) {
-            add(index, (CDATA) obj);
-        }
         else if (obj instanceof EntityRef) {
             add(index, (EntityRef) obj);
         }
@@ -175,10 +163,8 @@ class ContentList extends AbstractList
     }
 
     /**
-     * <p>
      * Check and add the <code>Element</code> to this list at
      * the given index.
-     * </p>
      *
      * @param index index where to add <code>Element</code>
      * @param element <code>Element</code> to add
@@ -194,6 +180,11 @@ class ContentList extends AbstractList
                           element.getParent().getQualifiedName() + "\"");
         }
 
+        if (element.getDocument() != null) {
+            throw new IllegalAddException(element.getDocument(), element,
+                          "The element already has an existing parent");
+        }
+
         if (element == parent) {
             throw new IllegalAddException(
                 "The element cannot be added to itself");
@@ -205,14 +196,9 @@ class ContentList extends AbstractList
                 "The element cannot be added as a descendent of itself");
         }
 
-        if (list == null) {
-            if (index == 0) {
-                ensureCapacity(INITIAL_ARRAY_SIZE);
-            }
-            else {
-                throw new IndexOutOfBoundsException("Index: " + index +
-                                                    " Size: " + size());
-            }
+        if (index<0 || index>size) {
+            throw new IndexOutOfBoundsException("Index: " + index +
+                                                " Size: " + size());
         }
 
         if (parent instanceof Document) {
@@ -226,15 +212,20 @@ class ContentList extends AbstractList
             element.setParent((Element) parent);
         }
 
-        list.add(index, element);
+        ensureCapacity(size+1);
+        if( index==size ) {
+            elementData[size++] = element;
+        } else {
+            System.arraycopy(elementData, index, elementData, index + 1, size - index);
+            elementData[index] = element;
+            size++;
+        }
         modCount++;
     }
 
     /**
-     * <p>
      * Check and add the <code>Comment</code> to this list at
      * the given index.
-     * </p>
      *
      * @param index index where to add <code>Comment</code>
      * @param comment <code>Comment</code> to add
@@ -250,14 +241,14 @@ class ContentList extends AbstractList
                           comment.getParent().getQualifiedName() + "\"");
         }
 
-        if (list == null) {
-            if (index == 0) {
-                ensureCapacity(INITIAL_ARRAY_SIZE);
-            }
-            else {
-                throw new IndexOutOfBoundsException("Index: " + index +
-                                                    " Size: " + size());
-            }
+        if (comment.getDocument() != null) {
+            throw new IllegalAddException(comment.getDocument(), comment,
+                          "The comment already has an existing parent");
+        }
+
+        if (index<0 || index>size) {
+            throw new IndexOutOfBoundsException("Index: " + index +
+                                                " Size: " + size());
         }
 
         if (parent instanceof Document) {
@@ -267,15 +258,20 @@ class ContentList extends AbstractList
             comment.setParent((Element) parent);
         }
 
-        list.add(index, comment);
+        ensureCapacity(size+1);
+        if( index==size ) {
+            elementData[size++] = comment;
+        } else {
+            System.arraycopy(elementData, index, elementData, index + 1, size - index);
+            elementData[index] = comment;
+            size++;
+        }
         modCount++;
     }
 
     /**
-     * <p>
      * Check and add the <code>ProcessingInstruction</code> to this list at
      * the given index.
-     * </p>
      *
      * @param index index where to add <code>ProcessingInstruction</code>
      * @param pi <code>ProcessingInstruction</code> to add
@@ -291,14 +287,14 @@ class ContentList extends AbstractList
                           pi.getParent().getQualifiedName() + "\"");
         }
 
-        if (list == null) {
-            if (index == 0) {
-                ensureCapacity(INITIAL_ARRAY_SIZE);
-            }
-            else {
-                throw new IndexOutOfBoundsException("Index: " + index +
-                                                    " Size: " + size());
-            }
+        if (pi.getDocument() != null) {
+            throw new IllegalAddException(pi.getDocument(), pi,
+                          "The processing instruction already has an existing parent");
+        }
+
+        if (index<0 || index>size) {
+            throw new IndexOutOfBoundsException("Index: " + index +
+                                                " Size: " + size());
         }
 
         if (parent instanceof Document) {
@@ -308,15 +304,20 @@ class ContentList extends AbstractList
             pi.setParent((Element) parent);
         }
 
-        list.add(index, pi);
+        ensureCapacity(size+1);
+        if( index==size ) {
+            elementData[size++] = pi;
+        } else {
+            System.arraycopy(elementData, index, elementData, index + 1, size - index);
+            elementData[index] = pi;
+            size++;
+        }
         modCount++;
     }
 
     /**
-     * <p>
      * Check and add the <code>CDATA</code> to this list at
      * the given index.
-     * </p>
      *
      * @param index index where to add <code>CDATA</code>
      * @param cdata <code>CDATA</code> to add
@@ -337,25 +338,27 @@ class ContentList extends AbstractList
                           cdata.getParent().getQualifiedName() + "\"");
         }
 
-        if (list == null) {
-            if (index == 0) {
-                ensureCapacity(INITIAL_ARRAY_SIZE);
-            }
-            else {
-                throw new IndexOutOfBoundsException("Index: " + index +
-                                                    " Size: " + size());
-            }
+        if (index<0 || index>size) {
+            throw new IndexOutOfBoundsException("Index: " + index +
+                                                " Size: " + size());
         }
-        list.add(index, cdata);
+
         cdata.setParent((Element) parent);
+
+        ensureCapacity(size+1);
+        if( index==size ) {
+            elementData[size++] = cdata;
+        } else {
+            System.arraycopy(elementData, index, elementData, index + 1, size - index);
+            elementData[index] = cdata;
+            size++;
+        }
         modCount++;
     }
 
     /**
-     * <p>
      * Check and add the <code>Text</code> to this list at
      * the given index.
-     * </p>
      *
      * @param index index where to add <code>Text</code>
      * @param text <code>Text</code> to add
@@ -376,26 +379,27 @@ class ContentList extends AbstractList
                           text.getParent().getQualifiedName() + "\"");
         }
 
-        if (list == null) {
-            if (index == 0) {
-                ensureCapacity(INITIAL_ARRAY_SIZE);
-            }
-            else {
-                throw new IndexOutOfBoundsException("Index: " + index +
-                                                    " Size: " + size());
-            }
+        if (index<0 || index>size) {
+            throw new IndexOutOfBoundsException("Index: " + index +
+                                                " Size: " + size());
         }
 
-        list.add(index, text);
         text.setParent((Element) parent);
+
+        ensureCapacity(size+1);
+        if( index==size ) {
+            elementData[size++] = text;
+        } else {
+            System.arraycopy(elementData, index, elementData, index + 1, size - index);
+            elementData[index] = text;
+            size++;
+        }
         modCount++;
     }
 
     /**
-     * <p>
      * Check and add the <code>EntityRef</code> to this list at
      * the given index.
-     * </p>
      *
      * @param index index where to add <code>Entity</code>
      * @param entity <code>Entity</code> to add
@@ -416,25 +420,26 @@ class ContentList extends AbstractList
                           entity.getParent().getQualifiedName() + "\"");
         }
 
-        if (list == null) {
-            if (index == 0) {
-                ensureCapacity(INITIAL_ARRAY_SIZE);
-            }
-            else {
-                throw new IndexOutOfBoundsException("Index: " + index +
-                                                    " Size: " + size());
-            }
+        if (index<0 || index>size) {
+            throw new IndexOutOfBoundsException("Index: " + index +
+                                                " Size: " + size());
         }
 
-        list.add(index, entity);
         entity.setParent((Element) parent);
+
+        ensureCapacity(size+1);
+        if( index==size ) {
+            elementData[size++] = entity;
+        } else {
+            System.arraycopy(elementData, index, elementData, index + 1, size - index);
+            elementData[index] = entity;
+            size++;
+        }
         modCount++;
     }
 
     /**
-     * <p>
      * Add the specified collecton to the end of this list.
-     * </p>
      *
      * @param collection The collection to add to the list.
      * @return <code>true</code> if the list was modified as a result of
@@ -445,11 +450,9 @@ class ContentList extends AbstractList
     }
 
     /**
-     * <p>
      * Inserts the specified collecton at the specified position in this list.
      * Shifts the object currently at that position (if any) and any
      * subsequent objects to the right (adds one to their indices).
-     * </p>
      *
      * @param index The offset to start adding the data in the collection
      * @param collection The collection to insert into the list.
@@ -458,7 +461,7 @@ class ContentList extends AbstractList
      * throws IndexOutOfBoundsException if index < 0 || index > size()
      */
     public boolean addAll(int index, Collection collection) {
-        if ((list == null) && (index != 0)) {
+        if (index<0 || index>size) {
             throw new IndexOutOfBoundsException("Index: " + index +
                                                 " Size: " + size());
         }
@@ -487,17 +490,33 @@ class ContentList extends AbstractList
     }
 
     /**
-     * <p>
+     * Clear the current list.
+     */
+    public void clear() {
+        if (elementData != null) {
+            for (int i = 0; i < size; i++) {
+                Object obj = elementData[i];
+                removeParent(obj);
+            }
+            elementData = null;
+            size = 0;
+        }
+        modCount++;
+    }
+
+    /**
      * Clear the current list and set it to the contents
      * of the <code>Collection</code>.
      * object.
-     * </p>
      *
      * @param collection The collection to use.
      */
     protected void clearAndSet(Collection collection) {
-        ArrayList old = list;
-        list = null;
+        Object[] old = elementData;
+        int oldSize = size;
+
+        elementData = null;
+        size = 0;
 
         if ((collection != null) && (collection.size() != 0)) {
             ensureCapacity(collection.size());
@@ -505,57 +524,59 @@ class ContentList extends AbstractList
                 addAll(0, collection);
             }
             catch (RuntimeException exception) {
-                list = old;
+                elementData = old;
+                size = oldSize;
                 throw exception;
             }
         }
 
         if (old != null) {
-            for (int i = 0; i < old.size(); i++) {
-                removeParent(old.get(i));
+            for (int i = 0; i < oldSize; i++) {
+                removeParent(old[i]);
+            }
+        }
+        modCount++;
+    }
+
+    /**
+     * Increases the capacity of this <code>ContentList</code> instance,
+     * if necessary, to ensure that it can hold at least the number of
+     * items specified by the minimum capacity argument.
+     *
+     * @param minCapacity the desired minimum capacity.
+     */
+    protected void ensureCapacity(int minCapacity) {
+        if( elementData==null ) {
+            elementData = new Object[INITIAL_ARRAY_SIZE];
+        } else {
+            int oldCapacity = elementData.length;
+            if (minCapacity > oldCapacity) {
+                Object oldData[] = elementData;
+                int newCapacity = (oldCapacity * 3)/2 + 1;
+                if (newCapacity < minCapacity)
+                    newCapacity = minCapacity;
+                elementData = new Object[newCapacity];
+                System.arraycopy(oldData, 0, elementData, 0, size);
             }
         }
     }
 
     /**
-     * <p>
-     * Increases the capacity of this <code>ContentList</code> instance,
-     * if necessary, to ensure that it can hold at least the number of
-     * items specified by the minimum capacity argument.
-     * </p>
-     *
-     * @param minCapacity the desired minimum capacity.
-     */
-    protected void ensureCapacity(int minCapacity) {
-        if (list == null) {
-            list = new ArrayList(minCapacity);
-        }
-        else {
-            list.ensureCapacity(minCapacity);
-        }
-    }
-
-    /**
-     * <p>
      * Return the object at the specified offset.
-     * </p>
      *
      * @param index The offset of the object.
      * @return The Object which was returned.
      */
     public Object get(int index) {
-        if (list == null) {
+        if (index<0 || index>=size) {
             throw new IndexOutOfBoundsException("Index: " + index +
                                                 " Size: " + size());
         }
-
-        return list.get(index);
+        return elementData[index];
     }
 
     /**
-     * <p>
      * Return a view of this list based on the given filter.
-     * </p>
      *
      * @param filter <code>Filter</code> for this view.
      * @return a list representing the rules of the <code>Filter</code>.
@@ -565,18 +586,16 @@ class ContentList extends AbstractList
     }
 
     /**
-     * <p>
      * Return the index of the first Element in the list.  If the parent
      * is a <code>Document</code> then the element is the root element.
      * If the list contains no Elements, it returns -1.
-     * </p>
      *
      * @return index of first element, or -1 if one doesn't exist
      */
     protected int indexOfFirstElement() {
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                if (list.get(i) instanceof Element) {
+        if( elementData!=null ) {
+            for (int i = 0; i < size; i++) {
+                if (elementData[i] instanceof Element) {
                     return i;
                 }
             }
@@ -585,24 +604,26 @@ class ContentList extends AbstractList
     }
 
     /**
-     * <p>
      * Remove the object at the specified offset.
-     * </p>
      *
      * @param index The offset of the object.
      * @return The Object which was removed.
      */
     public Object remove(int index) {
-        if (list == null)
+        if (index<0 || index>=size)
             throw new IndexOutOfBoundsException("Index: " + index +
                                                  " Size: " + size());
 
-        Object old = list.get(index);
+        Object old = elementData[index];
         removeParent(old);
-        list.remove(index);
+        int numMoved = size - index - 1;
+        if (numMoved > 0)
+            System.arraycopy(elementData, index+1, elementData, index,numMoved);
+        elementData[--size] = null; // Let gc do its work
         modCount++;
         return old;
     }
+
 
     /** Remove the parent of a Object */
     private void removeParent(Object obj) {
@@ -622,10 +643,6 @@ class ContentList extends AbstractList
             ProcessingInstruction pi = (ProcessingInstruction) obj;
             pi.setParent(null);
         }
-        else if (obj instanceof CDATA) {
-            CDATA cdata = (CDATA) obj;
-            cdata.setParent(null);
-        }
         else if (obj instanceof EntityRef) {
             EntityRef entity = (EntityRef) obj;
             entity.setParent(null);
@@ -637,10 +654,8 @@ class ContentList extends AbstractList
     }
 
     /**
-     * <p>
      * Set the object at the specified location to the supplied
      * object.
-     * </p>
      *
      * @param index The location to set the value to.
      * @param obj The location to set the value to.
@@ -648,7 +663,7 @@ class ContentList extends AbstractList
      * throws IndexOutOfBoundsException if index < 0 || index >= size()
      */
     public Object set(int index, Object obj) {
-        if (list == null)
+        if (index<0 || index>=size)
             throw new IndexOutOfBoundsException("Index: " + index +
                                                  " Size: " + size());
 
@@ -672,29 +687,21 @@ class ContentList extends AbstractList
     }
 
     /**
-     * <p>
      * Return the number of items in this list
-     * </p>
      *
      * @return The number of items in this list.
      */
     public int size() {
-        if (list == null)
-            return 0;
-        return list.size();
+        return size;
     }
 
     /**
-     * <p>
      * Return this list as a <code>String</code>
-     * </p>
      *
      * @return The number of items in this list.
      */
     public String toString() {
-        if ((list != null) && (list.size() > 0))
-             return list.toString();
-        else return "[]";
+        return super.toString();
     }
 
     /** Give access of ContentList.modCount to FilterList */
@@ -706,10 +713,8 @@ class ContentList extends AbstractList
     /* * * * * * * * * * * * * FilterList * * * * * * * * * * * * * * * */
 
     /**
-     * <p>
      * <code>FilterList</code> represents legal JDOM content, including content
      * for <code>Document</code>s or <code>Element</code>s.
-     * </p>
      */
 
     class FilterList extends AbstractList {
@@ -721,7 +726,7 @@ class ContentList extends AbstractList
         int count = 0;
 
         /** Expected modCount in our backing list */
-        int expected = 0;
+        int expected = -1;
 
         // Implementation Note: Directly after size() is called, expected
         //       is sync'd with ContentList.modCount and count provides
@@ -731,20 +736,16 @@ class ContentList extends AbstractList
         //       not be used without first calling size();
 
         /**
-         * <p>
          * Create a new instance of the FilterList with the specified Filter.
-         * </p>
          */
         FilterList(Filter filter) {
             this.filter = filter;
         }
 
         /**
-         * <p>
          * Inserts the specified object at the specified position in this list.
          * Shifts the object currently at that position (if any) and any
          * subsequent objects to the right (adds one to their indices).
-         * </p>
          *
          * @param index The location to set the value to.
          * @param obj The object to insert into the list.
@@ -763,9 +764,7 @@ class ContentList extends AbstractList
         }
 
         /**
-         * <p>
          * Return the object at the specified offset.
-         * </p>
          *
          * @param index The offset of the object.
          * @return The Object which was returned.
@@ -788,9 +787,7 @@ class ContentList extends AbstractList
         }
 
         /**
-         * <p>
          * Remove the object at the specified offset.
-         * </p>
          *
          * @param index The offset of the object.
          * @return The Object which was removed.
@@ -813,10 +810,8 @@ class ContentList extends AbstractList
         }
 
         /**
-         * <p>
          * Set the object at the specified location to the supplied
          * object.
-         * </p>
          *
          * @param index The location to set the value to.
          * @param obj The location to set the value to.
@@ -846,9 +841,7 @@ class ContentList extends AbstractList
         }
 
         /**
-         * <p>
          * Return the number of items in this list
-         * </p>
          *
          * @return The number of items in this list.
          */
@@ -866,7 +859,7 @@ class ContentList extends AbstractList
 
             count = 0;
             for (int i = 0; i < ContentList.this.size(); i++) {
-                Object obj = ContentList.this.list.get(i);
+                Object obj = ContentList.this.elementData[i];
                 if (filter.matches(obj)) {
                     count++;
                 }
@@ -876,17 +869,15 @@ class ContentList extends AbstractList
         }
 
         /**
-         * <p>
          * Return the adjusted index
-         * </p>
          *
          * @param index Index of in this view.
          * @return True index in backing list
          */
         final private int getAdjustedIndex(int index) {
             int adjusted = 0;
-            for (int i = 0; i < ContentList.this.list.size(); i++) {
-                Object obj = ContentList.this.list.get(i);
+            for (int i = 0; i < ContentList.this.size; i++) {
+                Object obj = ContentList.this.elementData[i];
                 if (filter.matches(obj)) {
                     if (index == adjusted) {
                         return i;
@@ -896,10 +887,10 @@ class ContentList extends AbstractList
             }
 
             if (index == adjusted) {
-                return list.size();
+                return ContentList.this.size;
             }
 
-            return list.size() + 1;
+            return ContentList.this.size + 1;
         }
     }
 
@@ -948,14 +939,15 @@ class ContentList extends AbstractList
                           break;
             case PREV:    cursor = last;
                           break;
+            case ADD:     
             case NEXT:    cursor = moveForward(last + 1);
                           break;
-            case ADD:
             case REMOVE:  cursor = moveForward(last);
                           break;
             case HASPREV: cursor = moveForward(cursor + 1);
                           break;
-            default:      break;
+            case HASNEXT: break;
+            default:      throw new IllegalStateException("Unknown operation");
             }
 
             if (lastOperation != CREATE) {
@@ -975,7 +967,8 @@ class ContentList extends AbstractList
                 last = cursor;
             }
             else {
-                throw new IllegalStateException("no next item");
+                last = ContentList.this.size();
+                throw new NoSuchElementException();
             }
 
             lastOperation = NEXT;
@@ -1003,7 +996,8 @@ class ContentList extends AbstractList
             case ADD:
             case NEXT:    cursor = last;
                           break;
-            default:      break;
+            case HASPREV: break;
+            default:      throw new IllegalStateException("Unknown operation");
             }
 
             if (lastOperation != CREATE) {
@@ -1023,7 +1017,8 @@ class ContentList extends AbstractList
                 last = cursor;
             }
             else {
-                throw new IllegalStateException("no previous item");
+                last = -1;
+                throw new NoSuchElementException();
             }
 
             lastOperation = PREV;
@@ -1079,12 +1074,8 @@ class ContentList extends AbstractList
         public void add(Object obj) {
             checkConcurrentModification();
 
-            if ((lastOperation != PREV) && (lastOperation != NEXT)) {
-                throw new IllegalStateException("no preceeding call to " +
-                                                 "prev() or next()");
-            }
-
             if (filter.canAdd(obj)) {
+                last++;
                 ContentList.this.add(last, obj);
             }
             else {
@@ -1103,9 +1094,14 @@ class ContentList extends AbstractList
         public void remove() {
             checkConcurrentModification();
 
-            if ((lastOperation != PREV) && (lastOperation != NEXT)) {
+            if ((last < 0) || (lastOperation == REMOVE)) {
                 throw new IllegalStateException("no preceeding call to " +
-                                                 "prev() or next()");
+                                                "prev() or next()");
+            }
+
+            if (lastOperation == ADD) {
+                throw new IllegalStateException("cannot call remove() " +
+                                                "after add()");
             }
 
             Object old = ContentList.this.get(last);
@@ -1127,9 +1123,14 @@ class ContentList extends AbstractList
         public void set(Object obj) {
             checkConcurrentModification();
 
-            if ((lastOperation != PREV) && (lastOperation != NEXT)) {
+            if ((lastOperation == ADD) || (lastOperation == REMOVE)) {
+                throw new IllegalStateException("cannot call set() after " +
+                                                "add() or remove()");
+            }
+
+            if (last < 0) {
                 throw new IllegalStateException("no preceeding call to " +
-                                                 "prev() or next()");
+                                                "prev() or next()");
             }
 
             if (filter.canAdd(obj)) {
@@ -1148,7 +1149,7 @@ class ContentList extends AbstractList
             }
 
             expected = ContentList.this.getModCount();
-            lastOperation = REMOVE;
+            // Don't set lastOperation
         }
 
         /**

@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
@@ -66,14 +66,14 @@ import java.rmi.RemoteException;
 import org.xml.sax.SAXException;
 
 /**
- * <b><code>JDOMException</code></b>
+ * <b><code>JDOMException</code></b>.
  * <p>
  * This <code>Exception</code> subclass is the top level
- *   <code>Exception</code> that JDOM classes
- *   can throw.  It's subclasses add specificity to the 
- *   problems that can occur using JDOM, but this single
- *   <code>Exception</code> can be caught to handle all
- *   JDOM specific problems.
+ * <code>Exception</code> that JDOM classes
+ * can throw.  Its subclasses add specificity to the 
+ * problems that can occur using JDOM, but this single
+ * <code>Exception</code> can be caught to handle all
+ * JDOM specific problems.
  * </p>
  * 
  * @author Brett McLaughlin
@@ -89,18 +89,14 @@ public class JDOMException extends Exception {
     protected Throwable cause;
 
     /**
-     * <p>
      * This will create an <code>Exception</code>.
-     * </p>
      */
     public JDOMException() {
         super("Error occurred in JDOM application.");
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> with the given message.
-     * </p>
      *
      * @param message <code>String</code> message indicating
      *                the problem that occurred.
@@ -110,11 +106,9 @@ public class JDOMException extends Exception {
     }
 
     /**
-     * <p>
      * This will create an <code>Exception</code> with the given message
-     *   and wrap another <code>Exception</code>.  This is useful when
-     *   the originating <code>Exception</code> should be held on to.
-     * </p>
+     * and wrap another <code>Exception</code>.  This is useful when
+     * the originating <code>Exception</code> should be held on to.
      *
      * @param message <code>String</code> message indicating
      *                the problem that occurred.
@@ -127,9 +121,8 @@ public class JDOMException extends Exception {
     }    
 
     /** 
-     * <p>
      * Intializes the cause of this exception to be the specified value.
-     * </p>
+     *
      * @param cause <code>Throwable</code> that caused this
      *                  to be thrown.
      */
@@ -140,11 +133,9 @@ public class JDOMException extends Exception {
     }    
 
     /**
-     * <p>
      * This returns the message for the <code>Exception</code>. If
-     *   there are one or more nested exceptions, their messages
-     *   are appended.
-     * </p>
+     * there are one or more nested exceptions, their messages
+     * are appended.
      *
      * @return <code>String</code> - message for <code>Exception</code>.
      */
@@ -195,11 +186,9 @@ public class JDOMException extends Exception {
     }
 
     /**
-     * <p>
      * This prints the stack trace of the <code>Exception</code>. If
-     *   there is a root cause, the stack trace of the root
-     *   <code>Exception</code> is printed right after.
-     * </p>
+     * there is a root cause, the stack trace of the root
+     * <code>Exception</code> is printed right after.
      */
     public void printStackTrace() {
         // Print the stack trace for this exception.
@@ -224,11 +213,9 @@ public class JDOMException extends Exception {
     }
 
     /**
-     * <p>
      * This prints the stack trace of the <code>Exception</code> to the given
-     *   PrintStream. If there is a root cause, the stack trace of the root
-     *   <code>Exception</code> is printed right after.
-     * </p>
+     * PrintStream. If there is a root cause, the stack trace of the root
+     * <code>Exception</code> is printed right after.
      */
     public void printStackTrace(PrintStream s) {
         // Print the stack trace for this exception.
@@ -240,7 +227,7 @@ public class JDOMException extends Exception {
         // Print the stack trace for each nested exception.
         while((child = getNestedException(parent)) != null) {
             if (child != null) {
-                System.err.print("Caused by: ");
+                s.print("Caused by: ");
                 child.printStackTrace(s);
                 // Any nested JDOMException will print its own children,
                 // so we need to break out of here.
@@ -253,11 +240,9 @@ public class JDOMException extends Exception {
     }
 
     /**
-     * <p>
      * This prints the stack trace of the <code>Exception</code> to the given
-     *   PrintWriter. If there is a root cause, the stack trace of the root
-     *   <code>Exception</code> is printed right after.
-     * </p>
+     * PrintWriter. If there is a root cause, the stack trace of the root
+     * <code>Exception</code> is printed right after.
      */
     public void printStackTrace(PrintWriter w) {
         // Print the stack trace for this exception.
@@ -269,7 +254,7 @@ public class JDOMException extends Exception {
         // Print the stack trace for each nested exception.
         while((child = getNestedException(parent)) != null) {
             if (child != null) {
-                System.err.print("Caused by: ");
+                w.print("Caused by: ");
                 child.printStackTrace(w);
                 // Any nested JDOMException will print its own children,
                 // so we need to break out of here.
@@ -282,10 +267,8 @@ public class JDOMException extends Exception {
     }
 
     /**
-     * <p>
      * This will return the root cause <code>Throwable</code>, or null
-     *   if one does not exist.
-     * </p>
+     * if one does not exist.
      * 
      * @return <code>Throwable</code> - the wrapped <code>Throwable</code>.
      */

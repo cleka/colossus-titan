@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <pm AT jdom DOT org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <pm AT jdom DOT org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter AT jdom DOT org> and
+ Brett McLaughlin <brett AT jdom DOT org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 package org.jdom.output;
@@ -60,11 +60,10 @@ import java.util.*;
 import org.jdom.Namespace;
 
 /**
- * <p><code>NamespaceStack</code> is a helper class used by both
- *   <code>{@link XMLOutputter}</code> and 
- *   <code>{@link SAXOutputter}</code> to manage namespaces
- *   in a JDOM Document during output.
- * </p>
+ * <code>NamespaceStack</code> is a helper class used by both
+ * <code>{@link XMLOutputter}</code> and 
+ * <code>{@link SAXOutputter}</code> to manage namespaces
+ * in a JDOM Document during output.
  *
  * @author Elliotte Rusty Harolde
  * @author Fred Trimble
@@ -83,7 +82,7 @@ class NamespaceStack {
     private Stack uris;        
 
     /**
-     * <p> This creates the needed storage. </p>
+     * This creates the needed storage.
      */
     public NamespaceStack() {
         prefixes = new Stack();
@@ -91,10 +90,8 @@ class NamespaceStack {
     }
   
     /**
-     * <p>
-     *  This will add a new <code>{@link Namespace}</code>
-     *    to those currently available.
-     * </p>
+     * This will add a new <code>{@link Namespace}</code>
+     * to those currently available.
      * 
      * @param ns <code>Namespace</code> to add.
      */
@@ -104,10 +101,8 @@ class NamespaceStack {
     }      
     
     /**
-     * <p>
-     *  This will remove the topmost (most recently added)
-     *    <code>{@link Namespace}</code>, and return its prefix.
-     * </p>
+     * This will remove the topmost (most recently added)
+     * <code>{@link Namespace}</code>, and return its prefix.
      *
      * @return <code>String</code> - the popped namespace prefix.
      */
@@ -119,7 +114,7 @@ class NamespaceStack {
     }
     
     /**
-     * <p> This returns the number of available namespaces. </p>
+     * This returns the number of available namespaces.
      *
      * @return <code>int</code> - size of the namespace stack.
      */
@@ -128,10 +123,8 @@ class NamespaceStack {
     }    
   
     /**
-     * <p>
-     *  Given a prefix, this will return the namespace URI most 
-     *    rencently (topmost) associated with that prefix.
-     * </p>
+     * Given a prefix, this will return the namespace URI most 
+     * rencently (topmost) associated with that prefix.
      *
      * @param prefix <code>String</code> namespace prefix.
      * @return <code>String</code> - the namespace URI for that prefix.
@@ -146,11 +139,9 @@ class NamespaceStack {
     }
     
     /**
-     * <p>
-     *  This will print out the size and current stack, from the
-     *    most recently added <code>{@link Namespace}</code> to
-     *    the "oldest," all to <code>System.out</code>.
-     * </p>
+     * This will print out the size and current stack, from the
+     * most recently added <code>{@link Namespace}</code> to
+     * the "oldest," all to <code>System.out</code>.
      */
     public String toString() {
         StringBuffer buf = new StringBuffer();

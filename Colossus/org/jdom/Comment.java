@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <request_AT_jdom_DOT_org>.
  
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <request_AT_jdom_DOT_org>.
  
  In addition, we request (but do not require) that you include in the 
  end-user documentation provided with the redistribution and/or in the 
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many 
  individuals on behalf of the JDOM Project and was originally 
- created by Brett McLaughlin <brett@jdom.org> and 
- Jason Hunter <jhunter@jdom.org>.  For more information on the 
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter_AT_jdom_DOT_org> and
+ Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
  
  */
 
@@ -59,11 +59,9 @@ package org.jdom;
 import java.io.Serializable;
 
 /**
- * <p>
  * <code>Comment</code> defines behavior for an XML
- *   comment, modeled in Java.  Methods
- *   allow the user to obtain the text of the comment.
- * </p>
+ * comment, modeled in Java.  Methods
+ * allow the user to obtain the text of the comment.
  *
  * @author Brett McLaughlin
  * @author Jason Hunter
@@ -81,18 +79,12 @@ public class Comment implements Serializable, Cloneable {
     protected Object parent;
 
     /**
-     * <p>
-     * Default, no-args constructor for implementations
-     *   to use if needed.
-     * </p>
+     * Default, no-args constructor for implementations to use if needed.
      */
     protected Comment() {}
 
     /**
-     * <p>
-     * This creates the comment with the supplied
-     *   text.
-     * </p>
+     * This creates the comment with the supplied text.
      *
      * @param text <code>String</code> content of comment.
      */
@@ -101,10 +93,8 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will return the parent of this <code>Comment</code>.
-     *   If there is no parent, then this returns <code>null</code>.
-     * </p>
+     * If there is no parent, then this returns <code>null</code>.
      *
      * @return parent of this <code>Comment</code>
      */
@@ -116,9 +106,7 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will set the parent of this <code>Comment</code>.
-     * </p>
      *
      * @param parent <code>Element</code> to be new parent.
      * @return this <code>Comment</code> modified.
@@ -129,10 +117,8 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This detaches the <code>Comment</code> from its parent, or does 
      * nothing if the <code>Comment</code> has no parent.
-     * </p>
      *
      * @return <code>Comment</code> - this 
      * <code>Comment</code> modified.
@@ -148,11 +134,9 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This retrieves the owning <code>{@link Document}</code> for
-     *   this Comment, or null if not a currently a member of a
-     *   <code>{@link Document}</code>.
-     * </p>
+     * this Comment, or null if not a currently a member of a
+     * <code>{@link Document}</code>.
      *
      * @return <code>Document</code> owning this Element, or null.
      */
@@ -167,9 +151,7 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This sets the <code>{@link Document}</code> parent of this comment.
-     * </p>
      *
      * @param document <code>Document</code> parent
      * @return this <code>Comment</code> modified
@@ -180,10 +162,7 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     * This returns the textual data within the
-     *   <code>Comment</code>.
-     * </p>
+     * This returns the textual data within the <code>Comment</code>.
      *
      * @return <code>String</code> - text of comment.
      */
@@ -192,9 +171,7 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
      * This will set the value of the <code>Comment</code>.
-     * </p>
      *
      * @param text <code>String</code> text for comment.
      * @return <code>Comment</code> - this Comment modified.
@@ -212,13 +189,11 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     *  This returns a <code>String</code> representation of the
-     *    <code>Comment</code>, suitable for debugging. If the XML
-     *    representation of the <code>Comment</code> is desired,
-     *    {@link org.jdom.output.XMLOutputter#outputString(Comment)} 
-     *    should be used.
-     * </p>
+     * This returns a <code>String</code> representation of the
+     * <code>Comment</code>, suitable for debugging. If the XML
+     * representation of the <code>Comment</code> is desired,
+     * {@link org.jdom.output.XMLOutputter#outputString(Comment)} 
+     * should be used.
      *
      * @return <code>String</code> - information about the
      *         <code>Attribute</code>
@@ -232,10 +207,8 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     *  This tests for equality of this <code>Comment</code> to the supplied
-     *    <code>Object</code>.
-     * </p>
+     * This tests for equality of this <code>Comment</code> to the supplied
+     * <code>Object</code>.
      *
      * @param ob <code>Object</code> to compare to.
      * @return <code>boolean</code> - whether the <code>Comment</code> is
@@ -246,9 +219,7 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     *  This returns the hash code for this <code>Comment</code>.
-     * </p>
+     * This returns the hash code for this <code>Comment</code>.
      *
      * @return <code>int</code> - hash code.
      */
@@ -257,9 +228,7 @@ public class Comment implements Serializable, Cloneable {
     }
 
     /**
-     * <p>
-     *  This will return a clone of this <code>Comment</code>.
-     * </p>
+     * This will return a clone of this <code>Comment</code>.
      *
      * @return <code>Object</code> - clone of this <code>Comment</code>.
      */

@@ -2,7 +2,7 @@
 
  $Id$
 
- Copyright (C) 2000 Brett McLaughlin & Jason Hunter.
+ Copyright (C) 2000 Jason Hunter & Brett McLaughlin.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -19,11 +19,11 @@
 
  3. The name "JDOM" must not be used to endorse or promote products
     derived from this software without prior written permission.  For
-    written permission, please contact license@jdom.org.
+    written permission, please contact <pm AT jdom DOT org>.
 
  4. Products derived from this software may not be called "JDOM", nor
     may "JDOM" appear in their name, without prior written permission
-    from the JDOM Project Management (pm@jdom.org).
+    from the JDOM Project Management <pm AT jdom DOT org>.
 
  In addition, we request (but do not require) that you include in the
  end-user documentation provided with the redistribution and/or in the
@@ -48,9 +48,9 @@
 
  This software consists of voluntary contributions made by many
  individuals on behalf of the JDOM Project and was originally
- created by Brett McLaughlin <brett@jdom.org> and
- Jason Hunter <jhunter@jdom.org>.  For more information on the
- JDOM Project, please see <http://www.jdom.org/>.
+ created by Jason Hunter <jhunter AT jdom DOT org> and
+ Brett McLaughlin <brett AT jdom DOT org>.  For more information
+ on the JDOM Project, please see <http://www.jdom.org/>.
 
  */
 
@@ -63,16 +63,14 @@ import org.jdom.*;
 import org.jdom.output.*;
 
 /**
- * <p>
  * <code>XMLOutputter</code> takes a JDOM tree and formats it to a
  * stream as XML.  The outputter can manage many styles of document
  * formatting, from untouched to pretty printed.  The default is to
  * output the document content exactly as created, but this can be
  * changed with the various <code>set*()</code> methods.
- * </p>
  *
  * <p>
- * There are <code>output(...)</code> methods to print any of the
+ * There are <code>output(&#133;)<code> methods to print any of the
  * standard JDOM classes, including <code>Document</code> and
  * <code>Element</code>, to either a <code>Writer</code> or an
  * <code>OutputStream</code>. <b>Warning</b>: When outputting to a
@@ -87,9 +85,9 @@ import org.jdom.output.*;
  * </p>
  *
  * <p>
- * The methods <code>outputString(...)</code> are for convenience
+ * The methods <code>outputString(&#133;)</code> are for convenience
  * only; for top performance you should call one of the
- * <code>output(...)</code> and pass in your own <code>Writer</code> or
+ * <code>output(&#133;)</code> and pass in your own <code>Writer</code> or
  * <code>OutputStream</code> if possible.
  * </p>
  *
@@ -103,9 +101,9 @@ import org.jdom.output.*;
  * </p>
  *
  * <p>
- * Empty elements are by default printed as &lt;empty/&gt, but this can
+ * Empty elements are by default printed as &lt;empty/&gt;, but this can
  * be configured with <code>setExpandEmptyElements</code> to cause them to
- * be expanded to &lt;empty&gt&lt;/empty&gt;.
+ * be expanded to &lt;empty&gt;&lt;/empty&gt;.
  * </p>
  *
  * <p>
@@ -180,7 +178,7 @@ import org.jdom.output.*;
  * <p>
  * When a element has a xml:space attribute with the value of "preserve",
  * all formating is turned off and reverts back to the default until the
- * element and it's contents have been printed.  If a nested element
+ * element and its contents have been printed.  If a nested element
  * contains another xml:space with the value "default" formatting is turned
  * back on for the child element and then off for the remainder of the
  * parent element.
@@ -266,21 +264,17 @@ public class XMLOutputter implements Cloneable {
     // * * * * * * * * * * Constructors * * * * * * * * * *
 
     /**
-     * <p>
      * This will create an <code>XMLOutputter</code> with no additional
      * whitespace (indent or newlines) added; the whitespace from the
      * element text content is fully preserved.
-     * </p>
      */
     public XMLOutputter() {
     }
 
     /**
-     * <p>
      * This will create an <code>XMLOutputter</code> with the given indent
      * added but no new lines added; all whitespace from the element text
      * content is included as well.
-     * </p>
      *
      * @param indent  the indent string, usually some number of spaces
      */
@@ -289,12 +283,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will create an <code>XMLOutputter</code> with the given indent
      * that prints newlines only if <code>newlines</code> is
      * <code>true</code>; all whitespace from the element text content is
      * included as well.
-     * </p>
      *
      * @param indent the indent <code>String</code>, usually some number
      *        of spaces
@@ -307,12 +299,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will create an <code>XMLOutputter</code> with
      * the given indent and new lines printing only if
      * <code>newlines</code> is <code>true</code>, and encoding format
      * <code>encoding</code>.
-     * </p>
      *
      * @param indent the indent <code>String</code>, usually some number
      *        of spaces
@@ -328,12 +318,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will create an <code>XMLOutputter</code> with all the
      * options as set in the given <code>XMLOutputter</code>.  Note
      * that <code>XMLOutputter two = (XMLOutputter)one.clone();</code>
      * would work equally well.
-     * </p>
      *
      * @param that the XMLOutputter to clone
      */
@@ -348,13 +336,11 @@ public class XMLOutputter implements Cloneable {
     // * * * * * * * * * * Set parameters methods * * * * * * * * * *
 
     /**
-     * <p>
      * This will set the newline separator (<code>lineSeparator</code>).
      * The default is <code>\r\n</code>. Note that if the "newlines"
      * property is false, this value is irrelevant.  To make it output
      * the system default line ending string, call
      * <code>setLineSeparator(System.getProperty("line.separator"))</code>
-     * </p>
      *
      * <p>
      * To output "UNIX-style" documents, call
@@ -381,10 +367,8 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Sets whether newlines (<code>lineSeparator</code>) should
      * be printed.
-     * </p>
      *
      * @see #setLineSeparator(String)
      * @param newlines <code>true</code> indicates new lines should be
@@ -395,10 +379,8 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Sets the output encoding.  The name should be an accepted XML
      * encoding.
-     * </p>
      *
      * @param encoding the encoding format.  Use XML-style names like
      *                 "UTF-8" or "ISO-8859-1" or "US-ASCII"
@@ -408,12 +390,11 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will set whether the XML declaration
-     * (<code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;</code>)
+     * (<code>&lt;&#063;xml version="1&#046;0"
+     * encoding="UTF-8"&#063;&gt;</code>)
      * includes the encoding of the document. It is common to omit
      * this in uses such as WML and other wireless device protocols.
-     * </p>
      *
      * @param omitEncoding <code>boolean</code> indicating whether or not
      *        the XML declaration should indicate the document encoding.
@@ -423,12 +404,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will set whether the XML declaration
-     * (<code>&lt;?xml version="1.0"?&gt;</code>)
+     * (<code>&lt;&#063;xml version="1&#046;0"&#063;gt;</code>)
      * will be omitted or not. It is common to omit this in uses such
      * as SOAP and XML-RPC calls.
-     * </p>
      *
      * @param omitDeclaration <code>boolean</code> indicating whether or not
      *        the XML declaration should be omitted.
@@ -438,11 +417,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will set whether empty elements are expanded from
      * <code>&lt;tagName/&gt;</code> to
      * <code>&lt;tagName&gt;&lt;/tagName&gt;</code>.
-     * </p>
      *
      * @param expandEmptyElements <code>boolean</code> indicating whether or not
      *        empty elements should be expanded.
@@ -452,10 +429,8 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will set whether content between tags consisting of all
      * whitespace is printed or trimmed.
-     * </p>
      *
      * <p>Default: false </p>
      *
@@ -467,10 +442,8 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will set whether the text has leading/trailing whitespace
      * trimmed.
-     * </p>
      *
      * <p>Default: false </p>
      *
@@ -482,11 +455,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will set whether the text is output verbatim (false)
      * or with whitespace normalized as per <code>{@link
      * org.jdom.Element#getTextNormalize()}</code>.
-     * </p>
      *
      * <p>Default: false </p>
      *
@@ -498,12 +469,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will set the indent <code>String</code> to use; this
      * is usually a <code>String</code> of empty spaces. If you pass
      * null, or the empty string (""), then no indentation will
      * happen.  Default: none (null)
-     * </p>
      *
      * @param indent <code>String</code> to use for indentation.
      */
@@ -517,63 +486,13 @@ public class XMLOutputter implements Cloneable {
         defaultFormat.indent = indent;
     }
 
-    /**
-     * <p>
-     * Set the indent on or off, newlines must be set to <code>true</code>
-     * for indentation to actually occur.  If setting on, will use the
-     * value of STANDARD_INDENT, which is usually two spaces.
-     * </p>
-     *
-     * @param doIndent if true, set indenting on; if false, set indenting off
-     */
-    public void setIndent(boolean doIndent) {
-        if (doIndent) {
-            defaultFormat.indent = STANDARD_INDENT;
-        }
-        else {
-            defaultFormat.indent = null;
-        }
-    }
-
-    /**
-     * <p>
-     * This will set the indent <code>String</code>'s size; a size
-     * of 4 would result in the indentation being equivalent to the
-     * <code>String</code> "&nbsp;&nbsp;&nbsp;&nbsp;" (four spaces).
-     * </p>
-     *
-     * @param size <code>int</code> number of spaces in indentation.
-     */
-    public void setIndent(int size) {
-        setIndentSize(size);
-    }
-
-    /**
-     * <p>
-     * This will set the indent <code>String</code>'s size; an indentSize
-     * of 4 would result in the indentation being equivalent to the
-     * <code>String</code> "&nbsp;&nbsp;&nbsp;&nbsp;" (four spaces).
-     * </p>
-     *
-     * @param indentSize <code>int</code> number of spaces in indentation.
-     */
-    public void setIndentSize(int indentSize) {
-        StringBuffer indentBuffer = new StringBuffer();
-        for (int i=0; i<indentSize; i++) {
-            indentBuffer.append(" ");
-        }
-        defaultFormat.indent = indentBuffer.toString();
-    }
-
     // * * * * * * * * * * Output to a OutputStream * * * * * * * * * *
     // * * * * * * * * * * Output to a OutputStream * * * * * * * * * *
 
     /**
-     * <p>
      * This will print the <code>Document</code> to the given output stream.
      * The characters are printed using the encoding specified in the
      * constructor, or a default of UTF-8.
-     * </p>
      *
      * @param doc <code>Document</code> to format.
      * @param out <code>OutputStream</code> to use.
@@ -586,9 +505,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out the <code>{@link DocType}</code>.
-     * </p>
      *
      * @param doctype <code>DocType</code> to output.
      * @param out <code>OutputStream</code> to use.
@@ -599,11 +516,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out an <code>{@link Element}</code>, including
-     * it's <code>{@link Attribute}</code>s, and all
+     * its <code>{@link Attribute}</code>s, and all
      * contained (child) elements, etc.
-     * </p>
      *
      * @param element <code>Element</code> to output.
      * @param out <code>Writer</code> to use.
@@ -619,7 +534,6 @@ public class XMLOutputter implements Cloneable {
      * attributes.  This can be useful for printing the content of an
      * element that contains HTML, like "&lt;description&gt;JDOM is
      * &lt;b&gt;fun&gt;!&lt;/description&gt;".
-     * </p>
      *
      * @param element <code>Element</code> to output.
      * @param out <code>OutputStream</code> to use.
@@ -631,12 +545,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will handle printing out a list of nodes.
      * This can be useful for printing the content of an element that
      * contains HTML, like "&lt;description&gt;JDOM is
      * &lt;b&gt;fun&gt;!&lt;/description&gt;".
-     * </p>
      *
      * @param list <code>List</code> of nodes.
      * @param out <code>OutputStream</code> to use.
@@ -648,9 +560,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out a <code>{@link CDATA}</code> node.
-     * </p>
      *
      * @param cdata <code>CDATA</code> to output.
      * @param out <code>OutputStream</code> to use.
@@ -661,10 +571,8 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out a <code>{@link Text}</code> node.  Perfoms
      * the necessary entity escaping and whitespace stripping.
-     * </p>
      *
      * @param text <code>Text</code> to output.
      * @param out <code>OutputStream</code> to use.
@@ -675,24 +583,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
-     * Print out a <code>{@link java.lang.String}</code>.  Perfoms
-     * the necessary entity escaping and whitespace stripping.  </p>
-     * </p>
-     *
-     * @param string <code>String</code> to output.
-     * @param out <code>OutputStream</code> to use.
-     * @deprecated see output(<code>Text</code>,<code>OutputStream</code>)
-     */
-    public void output(String string, OutputStream out) throws IOException {
-        Writer writer = makeWriter(out);
-        output(string, writer);  // output() flushes
-    }
-
-    /**
-     * <p>
      * Print out a <code>{@link Comment}</code>.
-     * </p>
      *
      * @param comment <code>Comment</code> to output.
      * @param out <code>OutputStream</code> to use.
@@ -703,9 +594,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out a <code>{@link ProcessingInstruction}</code>.
-     * </p>
      *
      * @param processingInstruction <code>ProcessingInstruction</code>
      *                              to output.
@@ -718,9 +607,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out a <code>{@link EntityRef}</code>.
-     * </p>
      *
      * @param entity <code>EntityRef</code> to output.
      * @param out <code>OutputStream</code> to use.
@@ -731,10 +618,8 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Get an OutputStreamWriter, using prefered encoding
      * (see {@link #setEncoding}).
-     * </p>
      */
     protected Writer makeWriter(OutputStream out)
                          throws java.io.UnsupportedEncodingException {
@@ -742,9 +627,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Get an OutputStreamWriter, use specified encoding.
-     * </p>
      */
     protected Writer makeWriter(OutputStream out, String enc)
                          throws java.io.UnsupportedEncodingException {
@@ -765,9 +648,7 @@ public class XMLOutputter implements Cloneable {
     // * * * * * * * * * * Output to a Writer * * * * * * * * * *
 
     /**
-     * <p>
      * This will print the <code>Document</code> to the given Writer.
-     * </p>
      *
      * <p>
      * Warning: using your own Writer may cause the outputter's
@@ -786,13 +667,18 @@ public class XMLOutputter implements Cloneable {
 
         if (doc.getDocType() != null) {
             printDocType(doc.getDocType(), out);
+
+            // Always print line separator after declaration, helps the
+            // output look better and is semantically inconsequential
+            out.write(currentFormat.lineSeparator);
         }
 
         // Print out root element, as well as any root level
         // comments and processing instructions,
         // starting with no indentation
         List content = doc.getContent();
-        for( int i = 0; i < content.size(); i++) {
+        int size = content.size();
+        for( int i = 0; i < size; i++) {
             Object obj = content.get( i);
             if (obj instanceof Element) {
                 printElement(doc.getRootElement(), out, 0,
@@ -821,9 +707,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out the <code>{@link DocType}</code>.
-     * </p>
      *
      * @param doctype <code>DocType</code> to output.
      * @param out <code>Writer</code> to use.
@@ -834,11 +718,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out an <code>{@link Element}</code>, including
-     * it's <code>{@link Attribute}</code>s, and all
+     * its <code>{@link Attribute}</code>s, and all
      * contained (child) elements, etc.
-     * </p>
      *
      * @param element <code>Element</code> to output.
      * @param out <code>Writer</code> to use.
@@ -851,44 +733,41 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will handle printing out an <code>{@link
      * Element}</code>'s content only, not including its tag, and
      * attributes.  This can be useful for printing the content of an
      * element that contains HTML, like "&lt;description&gt;JDOM is
      * &lt;b&gt;fun&gt;!&lt;/description&gt;".
-     * </p>
      *
      * @param element <code>Element</code> to output.
      * @param out <code>Writer</code> to use.
      */
     public void outputElementContent(Element element, Writer out)
                     throws IOException {
-        printContent(element.getContent(), out, 0, createNamespaceStack());
+        List content = element.getContent();
+        printContentRange(content, 0, content.size(), out,
+                          0, createNamespaceStack());
         out.flush();
     }
 
     /**
-     * <p>
      * This will handle printing out a list of nodes.
      * This can be useful for printing the content of an element that
      * contains HTML, like "&lt;description&gt;JDOM is
      * &lt;b&gt;fun&gt;!&lt;/description&gt;".
-     * </p>
      *
      * @param list <code>List</code> of nodes.
      * @param out <code>Writer</code> to use.
      */
     public void output(List list, Writer out)
                     throws IOException {
-        printContent(list, out, 0, createNamespaceStack());
+        printContentRange(list, 0, list.size(), out,
+                          0, createNamespaceStack());
         out.flush();
     }
 
     /**
-     * <p>
      * Print out a <code>{@link CDATA}</code> node.
-     * </p>
      *
      * @param cdata <code>CDATA</code> to output.
      * @param out <code>Writer</code> to use.
@@ -899,10 +778,8 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out a <code>{@link Text}</code> node.  Perfoms
      * the necessary entity escaping and whitespace stripping.
-     * </p>
      *
      * @param text <code>Text</code> to output.
      * @param out <code>Writer</code> to use.
@@ -913,24 +790,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
-     * Print out a <code>{@link java.lang.String}</code>.  Perfoms
-     * the necessary entity escaping and whitespace stripping.
-     * </p>
-     *
-     * @param string <code>String</code> to output.
-     * @param out <code>Writer</code> to use.
-     * @deprecated see output(<code>Text</code>,<code>Writer</code>)
-     */
-    public void output(String string, Writer out) throws IOException {
-        printString(string, out);
-        out.flush();
-    }
-
-    /**
-     * <p>
      * Print out a <code>{@link Comment}</code>.
-     * </p>
      *
      * @param comment <code>Comment</code> to output.
      * @param out <code>Writer</code> to use.
@@ -941,9 +801,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out a <code>{@link ProcessingInstruction}</code>.
-     * </p>
      *
      * @param element <code>ProcessingInstruction</code> to output.
      * @param out <code>Writer</code> to use.
@@ -955,9 +813,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Print out a <code>{@link EntityRef}</code>.
-     * </p>
      *
      * @param entity <code>EntityRef</code> to output.
      * @param out <code>Writer</code> to use.
@@ -971,11 +827,9 @@ public class XMLOutputter implements Cloneable {
     // * * * * * * * * * * Output to a String * * * * * * * * * *
 
     /**
-     * <p>
      * Return a string representing a document.  Uses an internal
      * StringWriter. Warning: a String is Unicode, which may not match
      * the outputter's specified encoding.
-     * </p>
      *
      * @param doc <code>Document</code> to format.
      */
@@ -988,11 +842,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Return a string representing a DocType. Warning: a String is
      * Unicode, which may not match the outputter's specified
      * encoding.
-     * </p>
      *
      * @param doctype <code>DocType</code> to format.
      */
@@ -1005,11 +857,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Return a string representing an element. Warning: a String is
      * Unicode, which may not match the outputter's specified
      * encoding.
-     * </p>
      *
      * @param element <code>Element</code> to format.
      */
@@ -1022,10 +872,8 @@ public class XMLOutputter implements Cloneable {
     }
 
    /**
-     * <p>
      * Return a string representing a list of nodes.  The list is
      * assumed to contain legal JDOM nodes.
-     * </p>
      *
      * @param list <code>List</code> to format.
      */
@@ -1038,11 +886,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Return a string representing a CDATA node. Warning: a String is
      * Unicode, which may not match the outputter's specified
      * encoding.
-     * </p>
      *
      * @param cdata <code>CDATA</code> to format.
      */
@@ -1055,11 +901,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Return a string representing a Text node. Warning: a String is
      * Unicode, which may not match the outputter's specified
      * encoding.
-     * </p>
      *
      * @param text <code>Text</code> to format.
      */
@@ -1072,12 +916,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
-     * Return a string representing (with trimming, normalizatio, and
+     * Return a string representing (with trimming, normalization, and
      * escaping possibly applied) a <code>String</code>. Warning: a
      * String is Unicode, which may not match the outputter's specified
      * encoding.
-     * </p>
      *
      * @param str <code>String</code> to format.
      */
@@ -1090,11 +932,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Return a string representing a comment. Warning: a String is
      * Unicode, which may not match the outputter's specified
      * encoding.
-     * </p>
      *
      * @param comment <code>Comment</code> to format.
      */
@@ -1107,11 +947,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Return a string representing a PI. Warning: a String is
      * Unicode, which may not match the outputter's specified
      * encoding.
-     * </p>
      *
      * @param pi <code>ProcessingInstruction</code> to format.
      */
@@ -1124,11 +962,9 @@ public class XMLOutputter implements Cloneable {
     }
 
    /**
-     * <p>
      * Return a string representing an entity. Warning: a String is
      * Unicode, which may not match the outputter's specified
      * encoding.
-     * </p>
      *
      * @param entity <code>EntityRef</code> to format.
      */
@@ -1144,10 +980,8 @@ public class XMLOutputter implements Cloneable {
     // * * * * * * * * * * Internal printing methods * * * * * * * * * *
 
     /**
-     * <p>
      * This will handle printing of the declaration.
      * Assumes XML version 1.0 since we don't directly know.
-     * </p>
      *
      * @param doc <code>Document</code> whose declaration to write.
      * @param out <code>Writer</code> to use.
@@ -1168,14 +1002,12 @@ public class XMLOutputter implements Cloneable {
             // Print new line after decl always, even if no other new lines
             // Helps the output look better and is semantically
             // inconsequential
-            out.write( currentFormat.lineSeparator);
+            out.write(currentFormat.lineSeparator);
         }
     }
 
     /**
-     * <p>
      * This handle printing the DOCTYPE declaration if one exists.
-     * </p>
      *
      * @param doc <code>Document</code> whose declaration to write.
      * @param out <code>Writer</code> to use.
@@ -1205,21 +1037,16 @@ public class XMLOutputter implements Cloneable {
             out.write("\"");
         }
         if ((internalSubset != null) && (!internalSubset.equals(""))) {
-            out.write(" [\n");
+            out.write(" [");
+            out.write(currentFormat.lineSeparator);
             out.write(docType.getInternalSubset());
             out.write("]");
         }
         out.write(">");
-
-        // Always print line separator after declaration, helps the
-        // output look better and is semantically inconsequential
-        out.write( currentFormat.lineSeparator);
     }
 
     /**
-     * <p>
      * This will handle printing of comments.
-     * </p>
      *
      * @param comment <code>Comment</code> to write.
      * @param out <code>Writer</code> to use.
@@ -1232,9 +1059,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will handle printing of processing instructions.
-     * </p>
      *
      * @param comment <code>ProcessingInstruction</code> to write.
      * @param out <code>Writer</code> to use.
@@ -1260,12 +1085,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will handle printing a <code>{@link EntityRef}</code>.
      * Only the entity reference such as <code>&amp;entity;</code>
      * will be printed. However, subclasses are free to override
      * this method to print the contents of the entity instead.
-     * </p>
      *
      * @param entity <code>EntityRef</code> to output.
      * @param out <code>Writer</code> to use.  */
@@ -1277,9 +1100,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will handle printing of <code>{@link CDATA}</code> text.
-     * </p>
      *
      * @param cdata <code>CDATA</code> to output.
      * @param out <code>Writer</code> to use.
@@ -1295,9 +1116,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will handle printing of <code>{@link Text}</code> strings.
-     * </p>
      *
      * @param text <code>Text</code> to write.
      * @param out <code>Writer</code> to use.
@@ -1315,19 +1134,19 @@ public class XMLOutputter implements Cloneable {
      * trims interior whitespace, etc. if necessary.
      */
     protected void printString(String str, Writer out) throws IOException {
-        if (currentFormat.textNormalize)
-             str = Text.normalizeString( str);
-        else if (currentFormat.textTrim)
-                 str = str.trim();
+        if (currentFormat.textNormalize) {
+            str = Text.normalizeString( str);
+        }
+        else if (currentFormat.textTrim) {
+            str = str.trim();
+        }
         out.write( escapeElementEntities( str));
     }
 
     /**
-     * <p>
      * This will handle printing of a <code>{@link Element}</code>,
-     * it's <code>{@link Attribute}</code>s, and all contained (child)
+     * its <code>{@link Attribute}</code>s, and all contained (child)
      * elements, etc.
-     * </p>
      *
      * @param element <code>Element</code> to output.
      * @param out <code>Writer</code> to use.
@@ -1350,10 +1169,12 @@ public class XMLOutputter implements Cloneable {
 
         Format previousFormat = currentFormat;
 
-        if ("default".equals( space))
+        if ("default".equals( space)) {
             currentFormat = defaultFormat;
-        else if ("preserve".equals( space))
-                 currentFormat = noFormatting;
+        }
+        else if ("preserve".equals( space)) {
+            currentFormat = noFormatting;
+        }
 
         // Print the beginning of the tag plus attributes and any
         // necessary namespace declarations
@@ -1379,7 +1200,8 @@ public class XMLOutputter implements Cloneable {
         // in based on the current settings.
 
         int start = skipLeadingWhite( content, 0);
-        if (start >= content.size()) {
+        int size = content.size();
+        if (start >= size) {
             // Case content is empty or all insignificant whitespace
             if (currentFormat.expandEmptyElements) {
                 out.write("></");
@@ -1397,17 +1219,17 @@ public class XMLOutputter implements Cloneable {
             // or Text we don't want to indent after the start or
             // before the end tag.
 
-            if (nextNonText( content, start) < content.size()) {
+            if (nextNonText( content, start) < size) {
                 // Case Mixed Content - normal indentation
                 newline(out);
-                printContentRange(content, start, content.size(), out,
+                printContentRange(content, start, size, out,
                                   level + 1, namespaces);
                 newline(out);
                 indent(out, level);
             }
             else {
                 // Case all CDATA or Text - no indentation
-                printTextRange(content, start, content.size(), out);
+                printTextRange(content, start, size, out);
             }
             out.write("</");
             out.write(element.getQualifiedName());
@@ -1424,50 +1246,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
-     * This will handle printing of a <code>{@link
-     * Element}</code>'s content only, not including it's tag,
-     * attributes, or namespace info.
-     * </p>
-     *
-     * @param element <code>Element</code> to output.
-     * @param out <code>Writer</code> to use.
-     * @param level <code>int</code> level of indentation.
-     * @param namespaces <code>List</code> stack of Namespaces in scope.
-     */
-    protected void printElementContent(Element element, Writer out,
-                                       int level,
-                                       NamespaceStack namespaces)
-                       throws IOException {
-        printContent( element.getContent(), out, level, namespaces);
-    }
-
-    /**
-     * <p>
-     * This will handle printing of a <code>{@link
-     * Element}</code>'s content only, not including it's tag,
-     * attributes, or namespace info.
-     * </p>
-     *
-     * @param content <code>List</code> of content to output.
-     * @param out <code>Writer</code> to use.
-     * @param level <code>int</code> level of indentation.
-     * @param namespaces <code>List</code> stack of Namespaces in scope.
-     */
-    protected void printContent(List content, Writer out,
-                                int level, NamespaceStack namespaces)
-                       throws IOException {
-        printContentRange(content, 0, content.size(), out,
-                          level, namespaces);
-    }
-
-    /**
-     * <p>
      * This will handle printing of content within a given range.
      * The range to print is specified in typical Java fashion; the
      * starting index is inclusive, while the ending index is
      * exclusive.
-     * </p>
      *
      * @param content <code>List</code> of content to output
      * @param starting index of first content node (inclusive.
@@ -1492,8 +1274,7 @@ public class XMLOutputter implements Cloneable {
             //
             // Handle consecutive CDATA and Text nodes all at once
             //
-            if ((next instanceof CDATA) ||
-                (next instanceof Text)) {
+            if (next instanceof Text) {
                 first = skipLeadingWhite( content, index);
                 // Set index to next node for loop
                 index = nextNonText( content, first);
@@ -1511,8 +1292,10 @@ public class XMLOutputter implements Cloneable {
             //
             // Handle other nodes
             //
-            if (!firstNode)
+            if (!firstNode) {
                 newline(out);
+            }
+
             indent(out, level);
 
             if (next instanceof Comment) {
@@ -1538,11 +1321,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will handle printing of a sequence of <code>{@link CDATA}</code>
      * or <code>{@link Text}</code> nodes.  It is a error to have any other
      * pass this method any other type of node.
-     * </p>
      *
      * @param content <code>List</code> of content to output
      * @param starting index of first content node (inclusive).
@@ -1560,7 +1341,8 @@ public class XMLOutputter implements Cloneable {
         // Remove leading whitespace-only nodes
         start = skipLeadingWhite( content, start);
 
-        if (start < content.size()) {
+        int size = content.size();
+        if (start < size) {
             // And remove trialing whitespace-only nodes
             end = skipTrialingWhite( content, end);
 
@@ -1569,13 +1351,12 @@ public class XMLOutputter implements Cloneable {
 
                 // Get the unmangled version of the text
                 // we are about to print
-                if (node instanceof CDATA)
-                     next = ((CDATA) node).getText();
-                else next = ((Text) node).getText();
+                next = ((Text) node).getText();
 
                 // This may save a little time
-                if (next == null || "".equals( next))
+                if (next == null || "".equals( next)) {
                     continue;
+                }
 
                 // Determine if we need to pad the output (padding is
                 // only need in trim or normalizing mode)
@@ -1590,9 +1371,12 @@ public class XMLOutputter implements Cloneable {
                 }
 
                 // Print the node
-                if (node instanceof CDATA)
-                     printCDATA( (CDATA) node, out);
-                else printString( next, out);
+                if (node instanceof CDATA) {
+                    printCDATA( (CDATA) node, out);
+                }
+                else {
+                    printString( next, out);
+                }
 
                 previous = next;
             }
@@ -1600,10 +1384,8 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
-     *  This will handle printing of any needed <code>{@link Namespace}</code>
-     *  declarations.
-     * </p>
+     * This will handle printing of any needed <code>{@link Namespace}</code>
+     * declarations.
      *
      * @param ns <code>Namespace</code> to print definition of
      * @param out <code>Writer</code> to use.
@@ -1615,8 +1397,9 @@ public class XMLOutputter implements Cloneable {
         String uri = ns.getURI();
 
         // Already printed namespace decl?
-        if (uri.equals( namespaces.getURI(prefix)))
+        if (uri.equals( namespaces.getURI(prefix))) {
             return;
+        }
 
         out.write(" xmlns");
         if (!prefix.equals("")) {
@@ -1630,9 +1413,7 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will handle printing of a <code>{@link Attribute}</code> list.
-     * </p>
      *
      * @param attributes <code>List</code> of Attribute objcts
      * @param out <code>Writer</code> to use
@@ -1672,8 +1453,9 @@ public class XMLOutputter implements Cloneable {
         // (we do output xmlns="" if the "" prefix was already used and we
         // need to reclaim it for the NO_NAMESPACE)
         Namespace ns = element.getNamespace();
-        if (ns == Namespace.XML_NAMESPACE)
+        if (ns == Namespace.XML_NAMESPACE) {
             return;
+        }
         if ( !((ns == Namespace.NO_NAMESPACE) &&
                (namespaces.getURI("") == null))) {
             printNamespace(ns, out, namespaces);
@@ -1696,38 +1478,20 @@ public class XMLOutputter implements Cloneable {
     // * * * * * * * * * * Support methods * * * * * * * * * *
 
     /**
-     * <p>
      * This will print a new line only if the newlines flag was set to
      * true.
-     * </p>
      *
      * @param out <code>Writer</code> to use
      */
     protected void newline(Writer out) throws IOException {
-        if (currentFormat.newlines)
+        if (currentFormat.newlines) {
             out.write(currentFormat.lineSeparator);
+        }
     }
 
     /**
-     * <p>
      * This will print indents (only if the newlines flag was
      * set to <code>true</code>, and indent is non-null).
-     * </p>
-     *
-     * @param out <code>Writer</code> to use
-     * @param level current indent level (number of tabs)
-     * @deprecated since it's never used in XMLOutputter, used
-     * in XMLOutputter indent( out, 0) instead
-     */
-    protected void indent(Writer out) throws IOException  {
-        indent(out, 0);
-    }
-
-    /**
-     * <p>
-     * This will print indents (only if the newlines flag was
-     * set to <code>true</code>, and indent is non-null).
-     * </p>
      *
      * @param out <code>Writer</code> to use
      * @param level current indent level (number of tabs)
@@ -1735,8 +1499,9 @@ public class XMLOutputter implements Cloneable {
     protected void indent(Writer out, int level) throws IOException {
         if (currentFormat.newlines) {
             if (currentFormat.indent == null ||
-                currentFormat.indent.equals(""))
+                currentFormat.indent.equals("")) {
                     return;
+            }
 
             for (int i = 0; i < level; i++) {
                 out.write(currentFormat.indent);
@@ -1749,17 +1514,19 @@ public class XMLOutputter implements Cloneable {
     // all whitespace.
     // @param start index to begin search (inclusive)
     private int skipLeadingWhite( List content, int start) {
-        if (start < 0)
-             start = 0;
+        if (start < 0) {
+            start = 0;
+        }
 
         int index = start;
+        int size = content.size();
         if (currentFormat.trimAllWhite
                 || currentFormat.textNormalize
-                || currentFormat.textTrim
-                || currentFormat.newlines) {
-            while( index < content.size()) {
-                if ( !isAllWhitespace( content.get(index)))
-                    break;
+                || currentFormat.textTrim) {
+            while( index < size) {
+                if ( !isAllWhitespace( content.get(index))) {
+                    return index;
+                }
                 index++;
             }
         }
@@ -1771,14 +1538,15 @@ public class XMLOutputter implements Cloneable {
     // if content contains all whitespace.
     // @param start index to begin search (exclusive)
     private int skipTrialingWhite( List content, int start) {
-        if (start > content.size())
-            start = content.size();
+        int size = content.size();
+        if (start > size) {
+            start = size;
+        }
 
         int index = start;
         if (currentFormat.trimAllWhite
                 || currentFormat.textNormalize
-                || currentFormat.textTrim
-                || currentFormat.newlines) {
+                || currentFormat.textTrim) {
             while( index >= 0) {
                 if ( !isAllWhitespace( content.get(index - 1)))
                     break;
@@ -1792,17 +1560,19 @@ public class XMLOutputter implements Cloneable {
     // is returned if there is no more non-CDATA or non-Text nodes
     // @param start index to begin search (inclusive)
     private int nextNonText( List content, int start) {
-        if (start < 0)
+        if (start < 0) {
             start = 0;
+        }
 
         int index = start;
-        while( index < content.size()) {
-            if ( !((content.get( index) instanceof CDATA) ||
-                   (content.get( index) instanceof Text)))
-                break;
+        int size = content.size();
+        while( index < size) {
+            if ( !(content.get( index) instanceof Text)) {
+                return index;
+            }
             index++;
         }
-        return index;
+        return size;
     }
 
     // Determine if a Object is all whitespace
@@ -1811,9 +1581,6 @@ public class XMLOutputter implements Cloneable {
 
         if (obj instanceof String) {
             str = (String) obj;
-        }
-        else if (obj instanceof CDATA) {
-            str = ((CDATA) obj).getText();
         }
         else if (obj instanceof Text) {
             str = ((Text) obj).getText();
@@ -1859,13 +1626,11 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * This will take the pre-defined entities in XML 1.0 and
      * convert their character representation to the appropriate
      * entity reference, suitable for XML attributes.  It does
      * no converstion for ' because it's not necessary as the outputter
      * writes attributes surrounded by double-quotes.
-     * </p>
      *
      * @param str <code>String</code> input to escape.
      * @return <code>String</code> with escaped content.
@@ -1929,12 +1694,10 @@ public class XMLOutputter implements Cloneable {
 
 
     /**
-     * <p>
      * This will take the three pre-defined entities in XML 1.0
      * (used specifically in XML elements) and convert their character
      * representation to the appropriate entity reference, suitable for
      * XML element content.
-     * </p>
      *
      * @param st <code>String</code> input to escape.
      * @return <code>String</code> with escaped content.
@@ -1989,10 +1752,9 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Parse command-line arguments of the form <code>-omitEncoding
-     * -indentSize 3 ...</code>
-     * </p>
+     * -indentSize 3 &#133;</code>.
+     *
      * @return int index of first parameter that we didn't understand
      */
     public int parseArgs(String[] args, int i) {
@@ -2005,9 +1767,6 @@ public class XMLOutputter implements Cloneable {
             }
             else if (args[i].equals("-indent")) {
                 setIndent(args[++i]);
-            }
-            else if (args[i].equals("-indentSize")) {
-                setIndentSize(Integer.parseInt(args[++i]));
             }
             else if (args[i].startsWith("-expandEmpty")) {
                 setExpandEmptyElements(true);
@@ -2059,10 +1818,8 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Return a string listing of the settings for this
      * XMLOutputter instance.
-     * </p>
      *
      * @return a string listing the settings for this XMLOutputter instance
      */
@@ -2097,12 +1854,10 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Factory for making new NamespaceStack objects.  The NamespaceStack
      * created is actually an inner class extending the package protected
      * NamespaceStack, as a way to make NamespaceStack "friendly" toward
      * subclassers.
-     * </p>
      */
     protected NamespaceStack createNamespaceStack() {
        // actually returns a XMLOutputter.NamespaceStack (see below)
@@ -2110,13 +1865,11 @@ public class XMLOutputter implements Cloneable {
     }
 
     /**
-     * <p>
      * Our own null subclass of NamespaceStack.  This plays a little
      * trick with Java access protection.  We want subclasses of
      * XMLOutputter to be able to override protected methods that
      * declare a NamespaceStack parameter, but we don't want to
      * declare the parent NamespaceStack class as public.
-     * </p>
      */
     protected class NamespaceStack
         extends org.jdom.output.NamespaceStack
@@ -2127,38 +1880,75 @@ public class XMLOutputter implements Cloneable {
     // * * * * * * * * * * Deprecated methods * * * * * * * * * *
 
     /**
-     * <p>
-     * Ensure that text immediately preceded by or followed by an
-     * element will be "padded" with a single space.
-     * </p>
+     * Print out a <code>{@link java.lang.String}</code>.  Perfoms
+     * the necessary entity escaping and whitespace stripping.  </p>
      *
-     * @deprecated Deprecated in beta7, because this is no longer necessary
+     * @param string <code>String</code> to output.
+     * @param out <code>OutputStream</code> to use.
+     * @deprecated Deprecated in beta8, see {@link #output(Text,OutputStream)}
      */
-    public void setPadText(boolean padText) { }
-
-    /**
-     * <p>
-     * Set the initial indentation level.
-     * </p>
-     *
-     * @deprecated Deprecated in beta7, because this is better done with a
-     *             stacked FilterOutputStream
-     */
-    public void setIndentLevel(int level) { }
-
-    /**
-     * <p>
-     * This will set whether the XML declaration
-     * (<code>&lt;?xml version="1.0"?&gt;</code>)
-     * will be suppressed or not. It is common to suppress this in uses such
-     * as SOAP and XML-RPC calls.
-     * </p>
-     *
-     * @param suppressDeclaration <code>boolean</code> indicating whether or not
-     *        the XML declaration should be suppressed.
-     * @deprecated Deprecated in beta7, use setOmitDeclaration() instead
-     */
-    public void setSuppressDeclaration(boolean suppressDeclaration) {
-        this.omitDeclaration = suppressDeclaration;
+    public void output(String string, OutputStream out) throws IOException {
+        Writer writer = makeWriter(out);
+        output(string, writer);  // output() flushes
     }
+
+    /**
+     * Print out a <code>{@link java.lang.String}</code>.  Perfoms
+     * the necessary entity escaping and whitespace stripping.
+     *
+     * @param string <code>String</code> to output.
+     * @param out <code>Writer</code> to use.
+     * @deprecated Deprecated in beta8, see {@link #output(Text,Writer)}
+     */
+    public void output(String string, Writer out) throws IOException {
+        printString(string, out);
+        out.flush();
+    }
+
+    /**
+     * Set the indent on or off, newlines must be set to <code>true</code>
+     * for indentation to actually occur.  If setting on, will use the
+     * value of STANDARD_INDENT, which is usually two spaces.
+     * @deprecated Deprecated in beta9, use setIndent(String) instead
+     *
+     * @param doIndent if true, set indenting on; if false, set indenting off
+     */
+    public void setIndent(boolean doIndent) {
+        if (doIndent) {
+            defaultFormat.indent = STANDARD_INDENT;
+        }
+        else {
+            defaultFormat.indent = null;
+        }
+    }
+
+    /**
+     * This will set the indent <code>String</code>'s size; a size
+     * of 4 would result in the indentation being equivalent to the
+     * <code>String</code> "&nbsp;&nbsp;&nbsp;&nbsp;" (four spaces).
+     * @deprecated Deprecated in beta9, use setIndent(String) instead
+     *
+     * @param size <code>int</code> number of spaces in indentation.
+     */
+    public void setIndent(int size) {
+        setIndentSize(size);
+    }
+
+    /**
+     * This will set the indent <code>String</code>'s size; an indentSize
+     * of 4 would result in the indentation being equivalent to the
+     * <code>String</code> "&nbsp;&nbsp;&nbsp;&nbsp;" (four spaces).
+     *
+     * @deprecated Deprecated in beta9, use setIndent(String) instead
+     *
+     * @param indentSize <code>int</code> number of spaces in indentation.
+     */
+    public void setIndentSize(int indentSize) {
+        StringBuffer indentBuffer = new StringBuffer();
+        for (int i=0; i<indentSize; i++) {
+            indentBuffer.append(" ");
+        }
+        defaultFormat.indent = indentBuffer.toString();
+    }
+
 }
