@@ -1999,6 +1999,9 @@ public final class MasterBoard extends JPanel
     {
         setupHexes();
         client.recreateMarkers();
+        setSize(getPreferredSize());
+        masterFrame.pack();
+        repaint();
     }
 
 

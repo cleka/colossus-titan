@@ -723,6 +723,9 @@ public final class BattleMap extends HexMap implements MouseListener,
             chit.rescale(chitScale);
         }
         alignChits(getAllHexLabels());
+        setSize(getPreferredSize());
+        battleFrame.pack();
+        repaint();
     }
 
     public static String entrySideName(int side)

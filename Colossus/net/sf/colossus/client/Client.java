@@ -414,6 +414,13 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
             {
                 setLookAndFeel(lfName);
             }
+
+            int scale = getIntOption(Options.scale);
+            if (scale > 0)
+            {
+                Scale.set(scale);
+                rescaleAllWindows();
+            }
         }
     }
 
