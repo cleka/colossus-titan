@@ -29,7 +29,8 @@ public class RationalAI extends SimpleAI implements AI
     private List legionsToSplit = new ArrayList();
     private Map[] enemyAttackMap;
     private Map evaluateMoveMap = new HashMap();
-
+    private List bestMoveList;
+    private Iterator bestMoveListIter;
 
     public RationalAI(Client client)
     {
@@ -211,7 +212,7 @@ public class RationalAI extends SimpleAI implements AI
     }
 
     /** Return true if done, false if waiting for callback. */
-    private boolean splitOneLegion(PlayerInfo player, String markerId)
+    boolean splitOneLegion(PlayerInfo player, String markerId)
     {
         Log.setShowDebug(true);
         Log.debug("splitOneLegion()");
@@ -686,8 +687,29 @@ public class RationalAI extends SimpleAI implements AI
             return true;
         }
 
-        /** cache all places enemies can move to, for use in risk analysis. */
-        return handleVoluntaryMoves(player);
+        boolean telePort = false;
+        if (bestMoveList == null)
+        {
+            bestMoveList = new ArrayList();
+            telePort = handleVoluntaryMoves(player);
+            bestMoveListIter = bestMoveList.iterator();
+        }
+
+        if (!bestMoveListIter.hasNext())
+        {
+            bestMoveList = null;
+            return false;
+        }
+
+        LegionBoardMove lm = (LegionBoardMove)bestMoveListIter.next();
+        client.doMove(lm.markerId, lm.toHex);
+
+        if (telePort)
+        {
+            bestMoveList = null;
+        }
+        return true;
+
     }
 
     private class LegionIndex
@@ -912,7 +934,7 @@ public class RationalAI extends SimpleAI implements AI
             while (legit.hasNext())
             {
                 List legionMoves = (List)legit.next();
-                if (legionMoves.size() < 6)
+                if (legionMoves.isEmpty())
                 {
                     continue;  // not a teleporting legion
                 }
@@ -932,15 +954,340 @@ public class RationalAI extends SimpleAI implements AI
                 {
                     Log.debug("found teleport:  " + best_move.markerId +
                         " to " + best_move.toHex + " value " + best_move.val);
-                    client.doMove(best_move.markerId, best_move.toHex);
+                    bestMoveList.add(best_move);
                     return true;
                 }
             }
         }
 
-        // find initial optimum, assuming optimum will move a legion
-        return handleConflictedMoves(all_legionMoves, !moved,
-            occupiedHexes);
+        MoveFinder opt = new MoveFinder();
+        bestMoveList = opt.findOptimalMove(all_legionMoves, !moved);
+
+        return false;
+    }
+
+    private class MoveFinder    
+    {
+        private List bestMove = null;
+        private double bestScore;
+        private boolean mustMove;
+        private long nodesExplored = 0;
+
+        // initial score is some value that should be smaller that the 
+        // worst move
+        private final static double INITIAL_SCORE = -1000000;
+        private final static double NO_MOVE_EXISTS = 2 * INITIAL_SCORE;
+
+        public List findOptimalMove(List all_legionMoves, boolean mustMove)
+        {
+            bestMove = new ArrayList(); // just in case there is no legal move
+            bestScore = INITIAL_SCORE;
+            this.mustMove = mustMove;
+            nodesExplored = 0;
+
+            Log.debug("Starting computing the best move");
+
+            setupTimer();
+
+            branchAndBound(new ArrayList(), all_legionMoves, 0);
+
+            Log.debug("Total nodes explored = " + nodesExplored);
+
+            for (Iterator it = bestMove.iterator(); it.hasNext();)
+            {
+                if (((LegionBoardMove)it.next()).noMove)
+                {
+                    it.remove();
+                }
+            }
+
+            return bestMove;
+        }
+
+        private double moveValueBound(List availableMoves)
+        {
+            double ret = 0;
+            for (Iterator it = availableMoves.iterator(); it.hasNext();)
+            {
+                List moves = ((List)it.next());
+                if (moves.isEmpty())
+                {
+                    // at least one peice has no legal moves
+                    return NO_MOVE_EXISTS;
+                }
+                // each move list is assmed t be sorted, so just use the first
+                ret += ((LegionBoardMove)moves.get(0)).val;
+            }
+            return ret;
+        }
+
+        /**
+         * checks if a move is valid, and if so returns the moves in
+         * an executeable sequence. The legios not moving are not part
+         * of bestMove. Returns null if the move is not valid.
+         * @param performedMoves
+         * @return
+         */
+        private List getValidMove(List performedMoves)
+        {
+            if (mustMove)
+            {
+                boolean moved = false;
+                for (Iterator it = performedMoves.iterator(); it.hasNext();)
+                {
+                    LegionBoardMove lm = (LegionBoardMove)it.next();
+                    if (!lm.noMove)
+                    {
+                        moved = true;
+                        break;
+                    }
+                }
+                if (!moved)
+                    return null;
+            }
+
+            Map occupiedHexes = new Hashtable();
+            Set newOccupiedHexes = new HashSet();
+            List newBestMove = new ArrayList();
+            for (Iterator it = performedMoves.iterator(); it.hasNext();)
+            {
+                LegionBoardMove lm = (LegionBoardMove)it.next();
+                List markers = (List)occupiedHexes.get(lm.fromHex);
+                if (markers == null)
+                {
+                    markers = new ArrayList();
+                    occupiedHexes.put(lm.fromHex, markers);
+                }
+                markers.add(lm.markerId);
+            }
+
+            boolean moved = true;
+            while (moved)
+            {
+                moved = false;
+                // move all pieces that has an open move
+                for (Iterator it = performedMoves.iterator(); it.hasNext();)
+                {
+                    LegionBoardMove lm = (LegionBoardMove)it.next();
+                    List destConflicts = (List)occupiedHexes.get(lm.toHex);
+                    if (destConflicts == null
+                        || destConflicts.size() == 0
+                        || (destConflicts.size() == 1
+                            && lm.markerId.equals(destConflicts.get(0))))
+                    { // this piece has an open move
+                        List markers = (List)occupiedHexes.get(lm.fromHex);
+                        markers.remove(lm.markerId);
+                        if (!newOccupiedHexes.add(lm.toHex))
+                        { // two or more pieces are moving to the same spot.
+                            return null;
+                        }
+                        newBestMove.add(lm);
+                        it.remove();
+                        moved = true;
+                    }
+                }
+            }
+
+            // if there are moves left in perfornmedMoves
+            // check if there is a cycle or a split didnt seperate
+            for (Iterator it = performedMoves.iterator(); it.hasNext();)
+            {
+                LegionBoardMove lm = (LegionBoardMove)it.next();
+                if (!lm.noMove)
+                {
+                    // A marker that cant move at this point
+                    // means a cycle exists 
+                    return null;
+                }
+                // now we know we have a split legion not moving since
+                // that is the only way to have a noMove conflict 
+                LegionInfo legion = client.getLegionInfo(lm.markerId);
+                Set moves =
+                    client.getMovement().listNormalMoves(
+                        legion,
+                        legion.getCurrentHex(),
+                        client.getMovementRoll());
+                for (Iterator it2 = moves.iterator(); it2.hasNext();)
+                {
+                    // make sure move is blocked
+                    String dest = (String)it2.next();
+                    if (!(newOccupiedHexes.contains(dest)
+                        || occupiedHexes.containsKey(dest)))
+                    {
+                        // this legion has an open move it should have taken                  
+                        return null;
+                    }
+                }
+
+            }
+
+            return newBestMove;
+        }
+
+        private void branchAndBound(
+            List performedMoves,
+            List availableMoves,
+            double currentValue)
+        {
+            nodesExplored++;
+            if (timeIsUp)
+            {
+                if (bestMove == null)
+                {
+                    // Log.debug("no legal move found yet, not able to time out");
+                }
+                else
+                {
+                    Log.debug(
+                        "handleVoluntaryMoves() time up after "
+                            + nodesExplored
+                            + " Nodes Explored");
+                    return;
+                }
+            }
+
+            // bounding step
+            if (currentValue + moveValueBound(availableMoves) <= bestScore)
+            {
+                return;
+            }
+
+            if (availableMoves.isEmpty())
+            { // this is a leaf check valdity of move
+                // could be moved to a function
+                List newBestMove = getValidMove(performedMoves);
+                if (newBestMove != null)
+                {
+                    bestMove = newBestMove;
+                    bestScore = currentValue;
+                    Log.debug(
+                        "New best move found: ("
+                            + currentValue
+                            + ") "
+                            + bestMove);
+                }
+                else
+                {
+                    /*                Log.debug(
+                                        "Illigal move: ("
+                                            + currentValue
+                                            + " : "
+                                            + bestScore
+                                            + ") "
+                                            + performedMoves);*/
+                }
+                return;
+            }
+
+            List nextMoves = (List)availableMoves.get(0);
+            for (Iterator it = nextMoves.iterator(); it.hasNext();)
+            {
+                LegionBoardMove lm = (LegionBoardMove)it.next();
+                if (!lm.noMove
+                    && checkNewCycle(lm.fromHex, lm.toHex, performedMoves))
+                {
+                    continue;
+                }
+                List newPerformedMoves = new ArrayList(performedMoves);
+                newPerformedMoves.add(lm);
+                branchAndBound(
+                    newPerformedMoves,
+                    removeHeadAndConflicts(availableMoves, lm),
+                    currentValue + lm.val);
+            }
+
+        }
+
+        /**
+         * checkes if there is a path from 'from' to target, using
+         * the moves in the list. This is used to see if there are cycles
+         * in the moves, when you ad a move from 'target' to 'from'
+         * @param target
+         * @param from
+         * @param moves
+         * @return
+         */
+        private boolean checkNewCycle(String target, String from, List moves)
+        {
+            for (Iterator it = moves.iterator(); it.hasNext();)
+            {
+                // note the when we hit a split there can be several
+                // paths to explore.
+                LegionBoardMove lm = (LegionBoardMove)it.next();
+                if (lm.fromHex.equals(from))
+                {
+                    if (lm.toHex.equals(target))
+                    {
+                        return true;
+                    }
+                    if (checkNewCycle(target, lm.toHex, moves))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private List removeHeadAndConflicts(
+            List availableMoves,
+            LegionBoardMove lm)
+        {
+            List newAvailableMoves = new ArrayList();
+
+            for (Iterator it = availableMoves.listIterator(1); it.hasNext();)
+            {
+                List moves = (List)it.next();
+                List newMoves = new ArrayList();
+                if (lm.noMove
+                    && !moves.isEmpty()
+                    && lm.fromHex.equals(((LegionBoardMove)moves.get(0)).fromHex))
+                {
+                    // special case, these two legions are split, make
+                    // sure to try the move off moves first
+                    LegionBoardMove stayMove = null;
+                    for (Iterator it2 = moves.iterator(); it2.hasNext();)
+                    {
+                        LegionBoardMove move = (LegionBoardMove)it2.next();
+                        if (move.noMove)
+                        {
+                            stayMove = move;
+                        }
+                        else
+                        {
+                            newMoves.add(move);
+                        }
+                    }
+                    if (stayMove != null)
+                    { // there should be one, but just checking
+                        newMoves.add(stayMove);
+                        // make shure staymove is explored last  
+                    }
+                }
+                else
+                {
+                    for (Iterator it2 = moves.iterator(); it2.hasNext();)
+                    {
+                        LegionBoardMove move = (LegionBoardMove)it2.next();
+                        if (!lm.toHex.equals(move.toHex))
+                        {
+                            newMoves.add(move);
+                        }
+                    }
+                }
+                if (newMoves.size() == 1)
+                {
+                    // if it only has one possible then consider it first
+                    newAvailableMoves.add(0, newMoves);
+                }
+                else
+                {
+                    newAvailableMoves.add(newMoves);
+                }
+            }
+
+            return newAvailableMoves;
+        }
     }
 
     /** find optimimum move for a set of legion moves given by all_legionMoves.
@@ -1465,9 +1812,9 @@ public class RationalAI extends SimpleAI implements AI
         nextTurnValue /= 6.0;     // 1/6 chance of each happening
         value += 0.9 * nextTurnValue; // discount future moves some
 
-        Log.debug("depth " + depth + " EVAL " + legion +
-            (canRecruitHere != RECRUIT_FALSE ? " move to " : " stay in ") +
-            hex + " = " + r3(value));
+        //Log.debug("depth " + depth + " EVAL " + legion +
+        //    (canRecruitHere != RECRUIT_FALSE ? " move to " : " stay in ") +
+        //    hex + " = " + r3(value));
 
         return (int)value;
     }
@@ -1492,7 +1839,7 @@ public class RationalAI extends SimpleAI implements AI
         return true;
     }
 
-    private class BattleResults
+    static class BattleResults
     {
         private double ev; // expected value of attack
         private int att_dead;
@@ -1522,7 +1869,7 @@ public class RationalAI extends SimpleAI implements AI
 
     }
 
-    private BattleResults estimateBattleResults(LegionInfo attacker,
+    BattleResults estimateBattleResults(LegionInfo attacker,
         LegionInfo defender, MasterHex hex)
     {
         return estimateBattleResults(attacker, defender, hex, null);
