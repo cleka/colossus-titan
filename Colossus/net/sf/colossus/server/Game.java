@@ -844,6 +844,9 @@ public final class Game
 
     private void setupMuster()
     {
+        // XXX Redundant call to try to work around a bug.
+        caretaker.resurrectImmortals();
+
         Player player = getActivePlayer();
 
         player.removeEmptyLegions();
@@ -979,8 +982,7 @@ public final class Game
                 {
                     Legion legion = (Legion)it2.next();
 
-                    el.addContent(dumpLegion(doc, legion, battleInProgress
-                            && (legion == battle.getAttacker() ||
+                    el.addContent(dumpLegion(doc, legion, battleInProgress && (legion == battle.getAttacker() ||
                             legion == battle.getDefender())));
                 }
                 root.addContent(el);
@@ -1334,7 +1336,7 @@ public final class Game
     }
 
     private void readLegion(Element leg, Player player)
-            throws DataConversionException
+        throws DataConversionException
     {
         String markerId = leg.getAttribute("name").getValue();
         String currentHexLabel = leg.getAttribute("currentHex").getValue();
@@ -1662,7 +1664,8 @@ public final class Game
         java.util.List recruits = new ArrayList();
         String terrain = legion.getCurrentHex().getTerrain();
         java.util.List allRecruits =
-                TerrainRecruitLoader.getRecruitableAcquirableList(terrain, score);
+                TerrainRecruitLoader.getRecruitableAcquirableList(terrain,
+                score);
         java.util.Iterator it = allRecruits.iterator();
         while (it.hasNext())
         {
@@ -1975,8 +1978,8 @@ public final class Game
                     if (MasterBoard.getHexByLabel(hexLabel) != null)
                     {
                         if ((!isOccupied(hexLabel) || (ignoreFriends &&
-                                getNumEnemyLegions(hexLabel, player) == 0))
-                                && (!(hexLabel.equals(hex.getLabel()))))
+                                getNumEnemyLegions(hexLabel, player) == 0)) &&
+                                (!(hexLabel.equals(hex.getLabel()))))
                         {
                             set.add(hexLabel);
                         }
