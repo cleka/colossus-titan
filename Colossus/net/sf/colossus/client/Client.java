@@ -1622,8 +1622,8 @@ Log.debug("called Client.acquireAngelCallback()");
             if (playerName.equals(getBattleActivePlayerName()))
             {
                 map.getFrame().toFront();
+                map.setupSummonMenu();
             }
-            map.setupSummonMenu();
         }
     }
 
@@ -1639,8 +1639,8 @@ Log.debug("called Client.acquireAngelCallback()");
             if (playerName.equals(getBattleActivePlayerName()))
             {
                 map.getFrame().toFront();
+                map.setupRecruitMenu();
             }
-            map.setupRecruitMenu();
         }
     }
 
@@ -1652,7 +1652,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
         this.battlePhase = Constants.MOVE;
 
-        if (map != null)
+        if (map != null && playerName.equals(getBattleActivePlayerName()))
         {
             map.setupMoveMenu();
         }
@@ -1672,8 +1672,8 @@ Log.debug("called Client.acquireAngelCallback()");
             if (playerName.equals(getBattleActivePlayerName()))
             {
                 map.getFrame().toFront();
+                map.setupFightMenu();
             }
-            map.setupFightMenu();
         }
     }
 

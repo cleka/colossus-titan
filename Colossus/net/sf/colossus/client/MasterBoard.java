@@ -642,6 +642,7 @@ public final class MasterBoard extends JPanel
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
         mi = graphicsMenu.add(viewFullRecruitTreeAction);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
 
         // Then help menu
