@@ -27,6 +27,9 @@ class Turn extends JDialog implements ActionListener
 
         setBackground(java.awt.Color.lightGray);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            
+        // Place this window in the upper left corner.
+        setLocation(new Point(0, 0));
 
         setupSplitDialog();
 
@@ -66,9 +69,6 @@ System.out.println("setupSplitDialog");
 
             pack();
 
-            // Place this window in the upper right corner.
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width - getSize().width, 0));
 
             // Highlight hexes with legions that are 7 high.
             player.highlightTallLegions();  
@@ -121,10 +121,6 @@ System.out.println("setupMoveDialog");
            
         pack();
 
-        // Place this window in the upper right corner.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width, 0));
-
         // Highlight hexes with legions that can move.
         board.highlightUnmovedLegions();
     }
@@ -153,10 +149,6 @@ System.out.println("setupFightDialog");
             button1.addActionListener(this);
 
             pack();
-
-            // Place this window in the upper right corner.
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width - getSize().width, 0));
         }
     }
 
@@ -191,10 +183,6 @@ System.out.println("setupMusterDialog");
             button4.addActionListener(this);
 
             pack();
-
-            // Place this window in the upper right corner.
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width - getSize().width, 0));
         
             // Highlight hexes with legions eligible to muster.
             board.highlightPossibleRecruits();
