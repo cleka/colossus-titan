@@ -43,7 +43,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
     private static String varDirectory = "";
     private static String mapName = "StrategicMap.map";
     private static String recruitName = "Recruit.ter";
-    private static String creaturesName = "Creature.cre";
+    private static String creaturesName = "creature.cre";
     private static String anyAI = "A Random AI";
     private static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
@@ -442,6 +442,11 @@ public final class GetPlayers extends JDialog implements WindowListener,
             if (varIS == null)
             {
                 varIS = new FileInputStream(varName);
+            }
+            if (varIS == null)
+            {
+                varIS = 
+                    Class.forName("GetPlayers").getResourceAsStream(varName);
             }
             if (varIS == null) 
             {
