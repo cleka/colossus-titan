@@ -172,6 +172,10 @@ class Concede extends JDialog implements ActionListener
         }
 
         g.drawImage(offImage, 0, 0, this);
+
+        // XXX: Handle via super.paint() instead?
+        button1.repaint();
+        button2.repaint();
     }
 
 
