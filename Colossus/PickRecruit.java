@@ -86,8 +86,7 @@ public final class PickRecruit extends JDialog implements MouseListener,
             contentPane.add(chit);
             chit.addMouseListener(this);
 
-            // XXX Remove direct caretaker reference.
-            int count = client.getCaretaker().getCount(recruit);
+            int count = client.getCreatureCount(recruit.getName());
             JLabel countLabel = new JLabel(Integer.toString(count),
                 JLabel.CENTER);
             constraints.gridy = 2;

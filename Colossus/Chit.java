@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.util.*;
 import java.awt.geom.*;
 
-import net.sf.colossus.*;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
@@ -67,7 +66,7 @@ public class Chit extends JPanel
         icon = getImageIcon(imageFilename);
     }
 
-    public ImageIcon getImageIcon(String imageFilename)
+    public static ImageIcon getImageIcon(String imageFilename)
     {
         // The image-loading syntax that works correctly for applications
         // packaged in executable jar files does not work correctly for
@@ -80,7 +79,8 @@ public class Chit extends JPanel
         
         try 
         {
-            java.net.URL url = getClass().getResource(imageFilename);
+            java.net.URL url = 
+                Class.forName("Chit").getResource(imageFilename);
             if (url != null)
             {
                 Image image = Toolkit.getDefaultToolkit().getImage(url);
@@ -126,12 +126,6 @@ public class Chit extends JPanel
         }
 
         return icon;
-    }
-
-    private static Chit s_oChit = new Chit(1, "Angel", null);
-    public static ImageIcon getImageIconUtility(String imageFilename)
-    {
-        return s_oChit.getImageIcon(imageFilename);
     }
 
 
@@ -248,23 +242,5 @@ public class Chit extends JPanel
         buf.append(basename);
         buf.append(imageExtension);
         return buf.toString();
-    }
-}
-
-
-/**
- * Adapts static methods of Chit so they can be used by the 
- * CreatureCollectionView
- */
-class ChitImageUtility implements IImageUtility
-{
-    public ImageIcon getImageIcon(String strPath)
-    {
-        return Chit.getImageIconUtility(strPath);
-    }
-
-    public String getImagePath(String strName)
-    {
-        return Chit.getImagePath(strName);
     }
 }

@@ -12,7 +12,7 @@ import java.util.*;
 public final class ShowMasterHex extends JDialog implements MouseListener,
     WindowListener
 {
-    public ShowMasterHex(JFrame parentFrame, Caretaker caretaker, 
+    public ShowMasterHex(JFrame parentFrame, Client client, 
         MasterHex hex, Point point)
     {
         super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(),
@@ -87,7 +87,7 @@ public final class ShowMasterHex extends JDialog implements MouseListener,
             contentPane.add(numToRecruitLabel);
             numToRecruitLabel.addMouseListener(this);
 
-            int count = caretaker.getCount(creature);
+            int count = client.getCreatureCount(creature.getName());
             JLabel countLabel = new JLabel(Integer.toString(count),
                 JLabel.CENTER);
             contentPane.add(countLabel);

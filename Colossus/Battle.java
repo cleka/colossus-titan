@@ -2,7 +2,6 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
 
-import net.sf.colossus.battle.*;
 
 /**
  * Class Battle holds data about a Titan battle. It has utility functions
@@ -2130,100 +2129,5 @@ public final class Battle
         }
         return null;
     }
-
-    BattleMemo saveToMemo()
-    {
-        BattleMemo oMemo = null;
-        Legion oDefenderLegion = getActiveLegion();
-        Legion oAttackerLegion = getInactiveLegion();
-        LegionMemo oAttackerMemo = oAttackerLegion.saveToMemo();
-        LegionMemo oDefenderMemo = oDefenderLegion.saveToMemo();
-
-        int nEntrySide = -1;
-        nEntrySide = oAttackerLegion.getEntrySide(masterHexLabel);
-        boolean bHasSummoned = oAttackerLegion.getPlayer().hasSummoned(); 
-        boolean bAngelAvailable = oAttackerLegion.angelAvailable();
-        boolean bArchangelAvailable = oAttackerLegion.archangelAvailable();
-
-        oMemo = new BattleMemo(
-            oAttackerMemo,
-            oDefenderMemo,
-            bAngelAvailable,
-            bArchangelAvailable,
-            terrain,
-            masterHexLabel,
-            nEntrySide);
-
-        return oMemo;
-    }
-
-    private static Game makeLegionsAndReturnGame(BattleMemo oMemo)
-    {
-        Game game = new Game();
-        game.addPlayer("Attacker");
-        Player player1 = game.getPlayer(0);
-        player1.setColor(oMemo.getAttacker().getColor());
-        game.addPlayer("Defender");
-        Player player2 = game.getPlayer(1);
-        player2.setColor(oMemo.getDefender().getColor());
-        game.initBoard();
-        Legion attacker = new Legion(game, oMemo.getAttacker());
-        Legion defender = new Legion(game, oMemo.getDefender());
-        player1.addLegion(attacker);
-        player2.addLegion(defender);
-        String strMasterHex = oMemo.getMasterHex();
-        attacker.setEntrySide(strMasterHex, oMemo.getEntrySide());
-
-        return game;
-    }
-
-    public static Battle makeBattleFromMemo(BattleMemo oMemo)
-    {
-        LegionMemo oAttacker = oMemo.getAttacker();
-        LegionMemo oDefender = oMemo.getDefender();
-        String strAttackerId = oAttacker.getMarkerId();
-        String strDefenderId = oDefender.getMarkerId();
-
-        Game oGame = makeLegionsAndReturnGame(oMemo);
-
-        return new Battle
-            (oGame, 
-             strAttackerId,
-             strDefenderId,
-             Battle.DEFENDER,
-             oMemo.getMasterHex(),
-             1,
-             Battle.MOVE);
-    }
-
-    /*
-    public static void main(String [] args)
-    {
-        Game game = new Game();
-        game.addPlayer("Attacker");
-        Player player1 = game.getPlayer(0);
-        game.addPlayer("Defender");
-        Player player2 = game.getPlayer(1);
-        game.initBoard();
-        MasterHex hex = MasterBoard.getHexByLabel("5");
-        Legion attacker = new Legion("Bk01", null, hex.getLabel(),
-            hex.getLabel(), Creature.archangel, Creature.troll,
-            Creature.ranger, Creature.hydra, Creature.minotaur,
-            Creature.angel, Creature.warlock, null, player1.getName(),
-            game);
-        player1.addLegion(attacker);
-        Legion defender = new Legion("Rd01", null, hex.getLabel(),
-            hex.getLabel(), Creature.serpent, Creature.hydra,
-            Creature.ranger, Creature.warlock, Creature.gorgon,
-            Creature.guardian, Creature.minotaur, null, player2.getName(),
-            game);
-        player2.addLegion(defender);
-        attacker.setEntrySide(hex.getLabel(), 5);
-
-        Battle battle = new Battle(game, attacker.getMarkerId(),
-            defender.getMarkerId(), DEFENDER, hex.getLabel(), 1, MOVE);
-        game.setBattle(battle);
-        battle.init();
-    }
-    */
 }
+

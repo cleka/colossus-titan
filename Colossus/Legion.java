@@ -1,9 +1,6 @@
 import javax.swing.*;
 import java.util.*;
 
-import net.sf.colossus.protocol.*;
-import net.sf.colossus.battle.*;
-
 /**
  * Class Legion represents a Titan stack of Creatures and its
  * stack marker.
@@ -11,7 +8,7 @@ import net.sf.colossus.battle.*;
  * @author David Ripton
  */
 
-public final class Legion extends GameSource implements Comparable
+public final class Legion implements Comparable
 {
     private String markerId;    // Bk03, Rd12, etc.
     private String parentId;
@@ -220,8 +217,6 @@ public final class Legion extends GameSource implements Comparable
                        startCre[1],
                        startCre[1],
                        playerName, game);
-        // Probably not the right place to be adding this
-        oLegion.addGameListener(game.getListener());
         return oLegion;
     }
 
@@ -233,8 +228,6 @@ public final class Legion extends GameSource implements Comparable
             new Legion(markerId, parentId, hexLabel, hexLabel, null,
                        null, null, null, null, null, null, null, 
                        playerName, game);
-        // Probably not the right place to be adding this
-        oLegion.addGameListener(game.getListener());
         return oLegion;
     }
 
@@ -617,8 +610,6 @@ public final class Legion extends GameSource implements Comparable
                 }
             }
             log.append("] ");
-
-            fireEvent(new LegionEvent(this, LegionEvent.nLEGION_DIED));
         }
         log.append("is eliminated");
         Log.event(log.toString());
@@ -739,10 +730,6 @@ public final class Legion extends GameSource implements Comparable
             Log.event("Legion " + getLongMarkerName() +
                 " undoes its recruit");
             game.getServer().allRepaintHex(currentHexLabel);
-
-            // Because we are modifying the caretaker
-            fireEvent(new LegionEvent(this,
-                LegionEvent.nLEGION_LOST_CHARACTER));
         }
     }
 
@@ -1007,9 +994,6 @@ public final class Legion extends GameSource implements Comparable
             {
                 return;
             }
-
-            fireEvent(new LegionEvent(this,
-                LegionEvent.nLEGION_GAINED_CHARACTER));
         }
 
         // Newly added critters are visible.
@@ -1031,8 +1015,6 @@ public final class Legion extends GameSource implements Comparable
             {
                 game.getCaretaker().putOneBack(critter);
             }
-            fireEvent(new LegionEvent(this,
-                LegionEvent.nLEGION_LOST_CHARACTER));
         }
 
         // If there are no critters left, disband the legion.
@@ -1083,8 +1065,6 @@ public final class Legion extends GameSource implements Comparable
             {
                 game.getCaretaker().putOneBack(critter);
             }
-            fireEvent(new LegionEvent(this,
-                LegionEvent.nLEGION_LOST_CHARACTER));
         }
         return critter;
     }
@@ -1396,39 +1376,9 @@ public final class Legion extends GameSource implements Comparable
         return strArray;
     }
 
-    public LegionMemo saveToMemo()
-    {
-        ArrayList oList = this.getCritters();
-        String[] strCritters = convertCritterListToStringArray(oList);
-        return new LegionMemo(getMarkerId(),
-                              parentId,
-                              currentHexLabel,
-                              startingHexLabel,
-                              strCritters,
-                              getPlayer().getName()
-                              );
-    }
-   
     private static Creature getCreatureByName(String strName)
     {
         return strName != null ? Creature.getCreatureByName(strName) : null;
-    }
-    public Legion(Game oGame, LegionMemo oMemo)
-    {
-        this(oMemo.getMarkerId(),
-             oMemo.getParentMarkerId(),
-             oMemo.getCurrentHexLabel(),
-             oMemo.getStartingHexLabel(),
-             getCreatureByName(oMemo.getCritter(0)),
-             getCreatureByName(oMemo.getCritter(1)),
-             getCreatureByName(oMemo.getCritter(2)),
-             getCreatureByName(oMemo.getCritter(3)),
-             getCreatureByName(oMemo.getCritter(4)),
-             getCreatureByName(oMemo.getCritter(5)),
-             getCreatureByName(oMemo.getCritter(6)),
-             getCreatureByName(oMemo.getCritter(7)),
-             oMemo.getPlayerName(),
-             oGame);
     }
 
 // --------------------------------------------

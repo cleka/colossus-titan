@@ -12,7 +12,6 @@ import java.util.*;
  * @author Bruce Sherrod
  */
 
-import net.sf.colossus.*;
 
 public final class Caretaker implements Cloneable
 {
@@ -32,32 +31,7 @@ public final class Caretaker implements Cloneable
     }
 
 
-    /**
-     * This is an adapter so that we can use the CreatureCollectionView
-     * in the main program
-     */
-    class CaretakerCollection implements ICreatureCollection
-    {
-        public String getName()
-        {
-            return "Caretaker's Stacks";
-        }
-        public void setCount(String strCharacterName, int nCount)
-        {
-            Caretaker.this.setCount(strCharacterName, nCount);
-        }
-        public int getCount(String strCharacterName)
-        {
-            return Caretaker.this.getCount(strCharacterName);
-        }
-    }
-
-    public ICreatureCollection getCollectionInterface()
-    {
-        return new CaretakerCollection();
-    }
-
-    protected int getCount(String strCreatureName)
+    public int getCount(String strCreatureName)
     {
         Integer count = (Integer) map.get(strCreatureName);
         if (count == null)
@@ -154,7 +128,7 @@ public final class Caretaker implements Cloneable
         Caretaker newCaretaker = new Caretaker(game);
         // because String and Integer are both immutable, a shallow copy is
         // the same as a deep copy
-        newCaretaker.map = (HashMap) map.clone();
+        newCaretaker.map = (HashMap)map.clone();
         return newCaretaker;
     }
 }

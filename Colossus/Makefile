@@ -49,10 +49,7 @@ all: jar
 
 # Find target files
 
-sources = $(wildcard *.java) $(wildcard net/sf/colossus/*.java) \
-	$(wildcard net/sf/colossus/protocol/*.java) \
-	$(wildcard net/sf/colossus/masterboard/*.java) \
-	$(wildcard net/sf/colossus/battle/*.java) \
+sources = $(wildcard *.java) \
 	StrategicMapLoader.java \
 	TerrainRecruitLoader.java \
 	CreatureLoader.java \
@@ -69,7 +66,9 @@ JARFILE = Colossus.jar
 
 jar : $(JARFILE)
 
-version : 
+# TODO Update this whenever anything else changes, and bundle
+# it into the jar.
+version :
 	echo `date +%Y%m%d` > version
 
 
@@ -77,7 +76,7 @@ version :
 $(JARFILE): StrategicMapLoader.java TerrainRecruitLoader.java \
 	CreatureLoader.java BattlelandLoader.java \
 	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF StrategicMap.map
-	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class net/sf/colossus/*.class net/sf/colossus/protocol/*.class images/*.gif StrategicMap.map Recruit.ter Creature.cre Default.var Battlelands
+	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif StrategicMap.map Recruit.ter Creature.cre Default.var Battlelands
 	chmod +x Colossus.jar
 
 # Sign jar file.  This target uses dripton's key; other developers can
@@ -101,7 +100,7 @@ inst: signjar $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST) $(INST_JN
 
 # Clean up
 clean:
-	rm -f *~ core javacore.txt *.bak *.jar *.class .#*.jar net/sf/colossus/*.class net/sf/colossus/protocol/*.class
+	rm -f *~ core javacore.txt *.bak *.jar *.class .#*.jar 
 
 # Make zip file.  Don't include saved games, CVS dirs, or other zip files.
 dist: $(JARFILE)
@@ -110,5 +109,5 @@ dist: $(JARFILE)
 
 # Make javadoc docs
 javadoc:
-	javadoc -d javadoc/ -version -author -private *.java net/sf/colossus/*.java net/sf/colossus/protocol/*.java
+	javadoc -d javadoc/ -version -author -private *.java
 

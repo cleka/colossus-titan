@@ -86,13 +86,13 @@ Need to better stop phase advancing on draw, not just win.  Human player
 
 Zero-height legion's (caused by angel being summoned out) marker
    doesn't go away.
+Lost a legion marker somewhere?  Try to reproduce.  (Maybe with 1-high 
+   angels stacks?)
 
 CreatureCollectionView does not respect scale.
 
 Carry cursor sometimes fails without an error message.  Race condition?
 
-Lost a legion marker somewhere?  Try to reproduce.  (Maybe with 1-high angels 
-   stacks?)
 
 Teleport bug not fixed?  Try to reproduce.
 
@@ -100,6 +100,7 @@ Negotiation is broken and disabled.
 
 Red battle hex highlighting clashes with volcano.
 
+Report that JNLP is broken but zip works.  Need to confirm.
 
 
 AI bugs:

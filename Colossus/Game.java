@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 
-import net.sf.colossus.protocol.*;
-
 
 /**
  * Class Game gets and holds high-level data about a Titan game.
@@ -14,7 +12,7 @@ import net.sf.colossus.protocol.*;
  * @author Bruce Sherrod <bruce@thematrix.com>
  */
 
-public final class Game extends GameSource
+public final class Game
 {
     private ArrayList players = new ArrayList(6);
     private int activePlayerNum;
@@ -2032,32 +2030,30 @@ public final class Game extends GameSource
         }
     }
 
-    public boolean doSummon(Legion legion, Legion donor, Creature angel)
+    public void doSummon(Legion legion, Legion donor, Creature angel)
     {
         Player player = getActivePlayer();
 
-        if (angel == null || donor == null || !legion.canSummonAngel())
+        if (angel != null && donor != null && legion.canSummonAngel())
         {
-            return false;
+            // Only one angel can be summoned per turn.
+            player.setSummoned(true);
+
+            // Move the angel or archangel.
+            donor.removeCreature(angel, false, false);
+            legion.addCreature(angel, false);
+
+            Log.event("An " + angel.getName() +
+                " is summoned from legion " + donor.getLongMarkerName() +
+                " into legion " + legion.getLongMarkerName());
         }
 
-        // Only one angel can be summoned per turn.
-        player.setSummoned(true);
-
-        // Move the angel or archangel.
-        donor.removeCreature(angel, false, false);
-        legion.addCreature(angel, false);
-
-        Log.event("An " + angel.getName() +
-            " is summoned from legion " + donor.getLongMarkerName() +
-            " into legion " + legion.getLongMarkerName());
-
+        // Need to call this regardless to advance past the summon phase.
         if (battle != null)
         {
             battle.finishSummoningAngel(player.hasSummoned());
         }
         summoningAngel = false;
-        return true;
     }
 
 
@@ -2903,19 +2899,6 @@ public final class Game extends GameSource
         this.battle = battle;
     }
 
-    private GameListener m_oListener = new GameAdapter()
-    {
-        public void legionChange(LegionEvent evt)
-        {
-            //Log.debug("Game.GameListener.legionChange: " + evt);
-            fireEvent(evt);
-        }
-    };
-
-    public GameListener getListener()
-    {
-        return m_oListener;
-    }
 
     public int mulligan()
     {

@@ -679,6 +679,13 @@ public final class Critter extends Creature implements Comparable
 
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
+        // Bug 488753 says AI creatures occasionally struck from
+        // offboard.  So let's add an extra check.
+        if (hex.isEntrance() || targetHex.isEntrance())
+        {
+            Log.error("Attempted offboard strike disallowed!");
+            return;
+        }
 
         battle.leaveCarryMode();
         boolean carryPossible = true;

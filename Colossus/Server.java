@@ -616,12 +616,16 @@ public final class Server
         client.createSummonAngel(legion);
     }
 
-    public boolean doSummon(String markerId, String donorId, String angel)
+    public void doSummon(String markerId, String donorId, String angel)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
         Legion donor = game.getLegionByMarkerId(donorId);
-        Creature creature = Creature.getCreatureByName(angel);
-        return game.doSummon(legion, donor, creature);
+        Creature creature = null;
+        if (angel != null)
+        {
+            Creature.getCreatureByName(angel);
+        }
+        game.doSummon(legion, donor, creature);
     }
 
 
@@ -735,12 +739,20 @@ public final class Server
     }
 
 
+    // XXX This needs to be multithreaded to work properly when
+    // both clients are running in the same JVM.
     public void twoNegotiate(Legion attacker, Legion defender)
     {
         Client client1 = getClient(attacker.getPlayerName());
-        client1.askNegotiate(attacker, defender);
+        client1.askNegotiate(attacker.getLongMarkerName(), 
+            defender.getLongMarkerName(), attacker.getMarkerId(), 
+            defender.getMarkerId(), attacker.getImageNames(true),
+            defender.getImageNames(true), attacker.getCurrentHexLabel());
         Client client2 = getClient(defender.getPlayerName());
-        client2.askNegotiate(attacker, defender);
+        client2.askNegotiate(attacker.getLongMarkerName(), 
+            defender.getLongMarkerName(), attacker.getMarkerId(), 
+            defender.getMarkerId(), attacker.getImageNames(true),
+            defender.getImageNames(true), attacker.getCurrentHexLabel());
     }
 
 
@@ -1250,5 +1262,10 @@ public final class Server
             return legion.getHeight();
         }
         return 0;
+    }
+
+    public int getCreatureCount(String creatureName)
+    {
+        return game.getCaretaker().getCount(creatureName);
     }
 }

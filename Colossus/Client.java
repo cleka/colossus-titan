@@ -13,7 +13,6 @@ import java.awt.*;
  *  @author David Ripton
  */
 
-import net.sf.colossus.*;
 
 public final class Client
 {
@@ -257,14 +256,12 @@ public final class Client
     }
 
     /** Legion summoner summons unit from legion donor. */
-    boolean summon(String summoner, String donor, String unit)
+    void summon(String summoner, String donor, String unit)
     {
-        boolean status = server.doSummon(summoner, donor, unit);
+        server.doSummon(summoner, donor, unit);
         board.repaint();
         summonAngel = null;
         board.highlightEngagements();
-
-        return status;
     }
 
 
@@ -536,11 +533,8 @@ public final class Client
         {
             if (caretakerDisplay == null)
             {
-                IImageUtility oImageUtility = new ChitImageUtility();
-                ICreatureCollection oCaretakerCollection =
-                    server.getGame().getCaretaker().getCollectionInterface();
                 caretakerDisplay = new CreatureCollectionView(
-                    board.getFrame(), oCaretakerCollection, oImageUtility);
+                    board.getFrame(), this);
                 caretakerDisplay.addWindowListener(new WindowAdapter()
                 {
                     public void windowClosing(WindowEvent e)
@@ -1107,7 +1101,11 @@ public final class Client
     }
 
 
-    public void askNegotiate(Legion attacker, Legion defender)
+    // XXX Remove direct legion refs.
+    public void askNegotiate(String attackerLongMarkerName, 
+        String defenderLongMarkerName, String attackerMarkerId, 
+        String defenderMarkerId, java.util.List attackerImageNames, 
+        java.util.List defenderImageNames, String hexLabel)
     {
         NegotiationResults results = null;
         // AI players just fight for now anyway, and the AI reference is
@@ -1119,12 +1117,14 @@ public final class Client
         }
         else
         {
-            results = Negotiate.negotiate(this, attacker, defender);
+            results = Negotiate.negotiate(this, attackerLongMarkerName, 
+            defenderLongMarkerName, attackerMarkerId, defenderMarkerId, 
+            attackerImageNames, defenderImageNames);
         }
 
         if (results.isFight())
         {
-            fight(attacker.getCurrentHexLabel());
+            fight(hexLabel);
         }
         else
         {
@@ -1559,10 +1559,9 @@ public final class Client
         return server.getGame().getActivePlayerNum();
     }
 
-    /** XXX temp */
-    public Caretaker getCaretaker()
+    public int getCreatureCount(String creatureName)
     {
-        return server.getGame().getCaretaker();
+        return server.getCreatureCount(creatureName);
     }
 
 
@@ -1666,11 +1665,11 @@ public final class Client
         {
             return;
         }
+        clearRecruitChits();
         String error = server.doneWithMoves(playerName);
         if (!error.equals(""))
         {
             showMessageDialog(error);
-            clearRecruitChits();
             board.highlightUnmovedLegions();
         }
     }

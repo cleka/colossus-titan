@@ -1,5 +1,3 @@
-package net.sf.colossus;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -13,20 +11,16 @@ import java.util.*;
  */
 public class CreatureCollectionView extends JDialog
 {
-    private ICreatureCollection m_oCollection;
-
-    protected IImageUtility m_oImageUtility;
-
+    private Client client;
     private static Point location;
 
 
-    public CreatureCollectionView(JFrame frame, ICreatureCollection oCollection,
-        IImageUtility oImageUtility)
+    public CreatureCollectionView(JFrame frame, Client client)
     {
-        super(frame, oCollection.getName());
+        super(frame);
+        setTitle("Caretaker's Stacks");
 
-        m_oCollection = oCollection;
-        m_oImageUtility = oImageUtility;
+        this.client = client;
 
         JPanel oPanel = makeCreaturePanel();
         getContentPane().add(oPanel, BorderLayout.CENTER);
@@ -69,15 +63,18 @@ public class CreatureCollectionView extends JDialog
             m_strName = strName;
             JLabel lblCreatureName = 
                 new JLabel(strName, SwingConstants.CENTER);
-            String strPath = m_oImageUtility.getImagePath(strName);
-            ImageIcon oIcon = m_oImageUtility.getImageIcon(strPath);
+            String strPath = Chit.getImagePath(strName);
+            ImageIcon oIcon = Chit.getImageIcon(strPath);
             JLabel lblCreatureIcon = new JLabel(oIcon);
             JLabel lblCreatureCount = new JLabel(Integer.toString(
-                m_oCollection.getCount(strName)), SwingConstants.CENTER);
+                client.getCreatureCount(strName)), SwingConstants.CENTER);
             m_oCountHash.put(strName, lblCreatureCount);
-            add(lblCreatureName, BorderLayout.NORTH);
-            add(lblCreatureIcon, BorderLayout.CENTER);
-            add(lblCreatureCount, BorderLayout.SOUTH);
+
+            // jikes whines because add is defined in both JPanel
+            // and JDialog.
+            this.add(lblCreatureName, BorderLayout.NORTH);
+            this.add(lblCreatureIcon, BorderLayout.CENTER);
+            this.add(lblCreatureCount, BorderLayout.SOUTH);
         }
 
         void update()
@@ -87,15 +84,15 @@ public class CreatureCollectionView extends JDialog
 
     private JPanel makeCreaturePanel()
     {
-        java.util.List oCharacterList = CharacterArchetype.getCharacters();
+        java.util.List oCharacterList = Creature.getCreatures();
         int nNumCharacters = oCharacterList.size();
         JPanel oCreaturePanel = 
-                new JPanel(new GridLayout(5, nNumCharacters / 5));
-        Iterator i = oCharacterList.iterator();
-        for(; i.hasNext();)
+            new JPanel(new GridLayout(5, nNumCharacters / 5));
+        Iterator it = oCharacterList.iterator();
+        while (it.hasNext())
         {
-            String strName = (String)i.next();
-            oCreaturePanel.add(new CreatureCount(strName));
+            Creature creature = (Creature)it.next();
+            oCreaturePanel.add(new CreatureCount(creature.getName()));
         }
                         
         return oCreaturePanel;
@@ -109,13 +106,13 @@ public class CreatureCollectionView extends JDialog
             Map.Entry entry = (Map.Entry)it.next();
             String strName = (String)entry.getKey();
             JLabel lbl = (JLabel)entry.getValue();
-            int count = m_oCollection.getCount(strName);
+            int count = client.getCreatureCount(strName);
             String color;
             if (count == 0)
             {
                 color = "red";
             }
-            else if (count == CharacterArchetype.getMaxCount(strName))
+            else if (count == Creature.getCreatureByName(strName).getMaxCount())
             {
                 color = "green";
             }

@@ -12,8 +12,8 @@ import java.util.*;
 public final class Negotiate extends JDialog implements MouseListener,
     ActionListener
 {
-    private Legion attacker;
-    private Legion defender;
+    private String attackerMarkerId;
+    private String defenderMarkerId;
     private ArrayList attackerChits = new ArrayList();
     private ArrayList defenderChits = new ArrayList();
     private Marker attackerMarker;
@@ -24,30 +24,29 @@ public final class Negotiate extends JDialog implements MouseListener,
     private static NegotiationResults results;
 
 
-    private Negotiate(Client client, Legion attacker, Legion defender)
+    private Negotiate(Client client, String attackerLongMarkerName,
+        String defenderLongMarkerName, String attackerMarkerId,
+        String defenderMarkerId, java.util.List attackerImageNames,
+        java.util.List defenderImageNames)
     {
-        super(client.getBoard().getFrame(), attacker.getLongMarkerName() +
-            " Negotiates with " + defender.getLongMarkerName(), true);
-
-        Container contentPane = getContentPane();
-
-        contentPane.setLayout(gridbag);
+        super(client.getBoard().getFrame(), attackerLongMarkerName +
+            " Negotiates with " + defenderLongMarkerName, true);
 
         this.client = client;
-        this.attacker = attacker;
-        this.defender = defender;
+        this.attackerMarkerId = attackerMarkerId;
+        this.defenderMarkerId = defenderMarkerId;
 
+        Container contentPane = getContentPane();
+        contentPane.setLayout(gridbag);
         pack();
         setBackground(Color.lightGray);
         setResizable(false);
-
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-
         addMouseListener(this);
 
         int scale = 4 * Scale.get();
 
-        attackerMarker = new Marker(scale, attacker.getImageName(),
+        attackerMarker = new Marker(scale, attackerMarkerId,
             this, client);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
@@ -55,12 +54,11 @@ public final class Negotiate extends JDialog implements MouseListener,
         gridbag.setConstraints(attackerMarker, constraints);
         contentPane.add(attackerMarker);
 
-        Collection critters = attacker.getCritters();
-        Iterator it = critters.iterator();
+        Iterator it = attackerImageNames.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = new Chit(scale, critter.getImageName(), this);
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
             attackerChits.add(chit);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 0;
@@ -70,7 +68,7 @@ public final class Negotiate extends JDialog implements MouseListener,
             chit.addMouseListener(this);
         }
 
-        defenderMarker = new Marker(scale, defender.getImageName(),
+        defenderMarker = new Marker(scale, defenderMarkerId,
             this, client);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 1;
@@ -78,12 +76,11 @@ public final class Negotiate extends JDialog implements MouseListener,
         gridbag.setConstraints(defenderMarker, constraints);
         contentPane.add(defenderMarker);
 
-        critters = defender.getCritters();
-        it = critters.iterator();
+        it = defenderImageNames.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = new Chit(scale, critter.getImageName(), this);
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
             defenderChits.add(chit);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 1;
@@ -99,8 +96,8 @@ public final class Negotiate extends JDialog implements MouseListener,
         button2.setMnemonic(KeyEvent.VK_F);
 
         // Attempt to center the buttons.
-        int chitWidth = Math.max(attacker.getHeight(),
-            defender.getHeight()) + 1;
+        int chitWidth = 1 + Math.max(attackerImageNames.size(),
+            defenderImageNames.size());
         if (chitWidth < 4)
         {
             constraints.gridwidth = 1;
@@ -144,10 +141,14 @@ public final class Negotiate extends JDialog implements MouseListener,
     /** Display a dialog allowing one player to offer a settlement to
      *  an engagement.  Return a NegotiationResults.
      */
-    public static NegotiationResults negotiate(Client client, Legion attacker,
-        Legion defender)
+    public static NegotiationResults negotiate(Client client, 
+        String attackerLongMarkerName, String defenderLongMarkerName, 
+        String attackerMarkerId, String defenderMarkerId,
+        java.util.List attackerImageNames, java.util.List defenderImageNames)
     {
-        new Negotiate(client, attacker, defender);
+        new Negotiate(client, attackerLongMarkerName, defenderLongMarkerName,
+            attackerMarkerId, defenderMarkerId, attackerImageNames,
+            defenderImageNames);
         return results;
     }
 
@@ -226,28 +227,28 @@ public final class Negotiate extends JDialog implements MouseListener,
             if (!attackersLeft && !defendersLeft)
             {
                 // Mutual destruction.
-                results = new NegotiationResults(attacker.getMarkerId(),
-                    defender.getMarkerId(), false, true, null, null);
+                results = new NegotiationResults(attackerMarkerId,
+                    defenderMarkerId, false, true, null, null);
             }
 
             // If this is not a mutual elimination, figure out how many
             // points the victor receives.
             else
             {
-                Legion winner;
-                Legion loser;
+                String winnerMarkerId;
+                String loserMarkerId;
                 ArrayList winnerChits;
 
                 if (!defendersLeft)
                 {
-                    winner = attacker;
-                    loser = defender;
+                    winnerMarkerId = attackerMarkerId;
+                    loserMarkerId = defenderMarkerId;
                     winnerChits = attackerChits;
                 }
                 else
                 {
-                    winner = defender;
-                    loser = attacker;
+                    winnerMarkerId = defenderMarkerId;
+                    loserMarkerId = attackerMarkerId;
                     winnerChits = defenderChits;
                 }
 
@@ -281,9 +282,9 @@ public final class Negotiate extends JDialog implements MouseListener,
                         winnerLosses.add(Creature.getCreatureByName(name));
                     }
                 }
-                results = new NegotiationResults(attacker.getMarkerId(),
-                    defender.getMarkerId(), false, false,
-                    winner.getMarkerId(), winnerLosses);
+                results = new NegotiationResults(attackerMarkerId,
+                    defenderMarkerId, false, false,
+                    winnerMarkerId, winnerLosses);
             }
 
             // Exit this dialog.
@@ -292,8 +293,8 @@ public final class Negotiate extends JDialog implements MouseListener,
 
         else if (e.getActionCommand().equals("Fight"))
         {
-            results = new NegotiationResults(attacker.getMarkerId(),
-                defender.getMarkerId(), true, false, null, null);
+            results = new NegotiationResults(attackerMarkerId,
+                defenderMarkerId, true, false, null, null);
 
             // Exit this dialog.
             cleanup();

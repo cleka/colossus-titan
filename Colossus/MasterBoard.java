@@ -298,9 +298,7 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    // XXX Remove direct caretaker reference.
-                    new ShowMasterHex(masterFrame, client.getCaretaker(), 
-                        hex, lastPoint);
+                    new ShowMasterHex(masterFrame, client, hex, lastPoint);
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }
@@ -472,8 +470,6 @@ public final class MasterBoard extends JPanel
 
         // Its a little wasteful to create a separate object
         // but a little cleaner to have a separate inner class
-        // ditto for mouse and window listeners, where we saved
-        // LOC by extending adapter
         cbmi.addItemListener(m_oItemListener);
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
