@@ -281,7 +281,7 @@ public final class Movement
         return true;
     }
 
-    private boolean titanTeleportAllowed()
+    boolean titanTeleportAllowed()
     {
         if (client.getOption(Options.noTitanTeleport))
         {

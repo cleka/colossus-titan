@@ -101,13 +101,13 @@ public class RationalAI extends SimpleAI implements AI
 
         // Compute value of staying for each split stack
         double stay_here_value1 = hexRisk(legion, legion.getCurrentHex(),
-            null);
+            null, false);
         double stay_here_value2;
 
         if (child_legion != null)
         {
             stay_here_value2 = hexRisk(child_legion, legion.getCurrentHex(),
-                null);
+                null, false);
             Log.debug("expectedValueSplitLegion(), value of " +
                 "staying here for split legion1 " + stay_here_value1);
             Log.debug("expectedValueSplitLegion(), value of " +
@@ -222,7 +222,7 @@ public class RationalAI extends SimpleAI implements AI
             return true;
         }
 
-        double stay_here_risk = hexRisk(legion, legion.getCurrentHex(), null);
+        double stay_here_risk = hexRisk(legion, legion.getCurrentHex(), null, false);
 
         boolean at_risk = false;
         if (stay_here_risk > 0 || legion.hasTitan())
@@ -809,6 +809,15 @@ public class RationalAI extends SimpleAI implements AI
         moved = findMoveList(markerIds, all_legionMoves, occupiedHexes, false);
 
         Log.debug("done computing move values for legions");
+        
+        Log.debug("raw best moves:");
+        for (Iterator it = all_legionMoves.iterator(); it.hasNext();)
+        {
+                List moves = ((List)it.next());
+                LegionBoardMove lbm = (LegionBoardMove) moves.get(0);
+                Log.debug(lbm.markerId + " to " + lbm.toHex + " value " + lbm.val);
+        }
+        
 
         // handle teleports
         // XXX
@@ -1185,11 +1194,12 @@ public class RationalAI extends SimpleAI implements AI
         }
     }
 
-    final int TITAN_SURVIVAL = 30; // safety margin for Titan
+    final int TITAN_SURVIVAL = 20; // safety margin for Titan
 
     // Compute risk of being attacked
     // Value returned is expected point value cost
-    double hexRisk(LegionInfo legion, MasterHex hex, Creature recruit)
+    double hexRisk(LegionInfo legion, MasterHex hex, Creature recruit,
+    boolean invert)
     {
         double risk = 0.0;
 
@@ -1220,6 +1230,11 @@ public class RationalAI extends SimpleAI implements AI
             {
                 LegionInfo enemy = (LegionInfo)it.next();
                 result = evaluateCombat(enemy, legion, hex);
+                
+                if (invert)
+                {
+                    result = - result;
+                }
 
                 if (result > worst_result_this_roll)
                 {
@@ -1229,6 +1244,12 @@ public class RationalAI extends SimpleAI implements AI
             risk -= worst_result_this_roll;
         }
         risk /= 6.0;
+        
+        if (invert)
+        {
+            risk = - risk;
+        }
+        
         Log.debug("compute final attack risk as " + r3(risk));
         return risk;
     }
@@ -1278,7 +1299,7 @@ public class RationalAI extends SimpleAI implements AI
                         value = 1000 + (int)result.getExpectedValue() * 1000;
                     }
                     else if (result.getAttackerDead() <
-                        attackerPointValue / 2 &&
+                        attackerPointValue / 2  &&
                         (attackerPointValue - result.getAttackerDead()) >
                         TITAN_SURVIVAL)
                     {
@@ -1324,7 +1345,7 @@ public class RationalAI extends SimpleAI implements AI
             {
                 // gun for the titan stack if we can knock out
                 // more than 80% of the value
-                if (result.getDefenderDead() > defenderPointValue * .8)
+                if (result.getDefenderDead() > defenderPointValue * .5)
                 {
                     // value should be proportional to amount of Titan stack
                     // killed since we may be able to attack with more
@@ -1338,6 +1359,7 @@ public class RationalAI extends SimpleAI implements AI
                 // ack! we'll kill our titan group
                 // use metric below so that if we have no choice but to attack
                 // we pick the least losing battle
+                       
                 value = (-1000 + (int)result.getExpectedValue() * 1000) /
                     client.getNumLivingPlayers();
             }
@@ -1347,7 +1369,7 @@ public class RationalAI extends SimpleAI implements AI
         // apply penalty to attacks if we have few legions
         // Don't reward titan attacks with few stacks
         int attackerLegions = attacker.getPlayerInfo().getNumLegions();
-        if (attackerLegions < 5)
+        if (attackerLegions < 5 && !I_HATE_HUMANS)
         {
             return value - (result.getAttackerDead() / 
                     attackerPointValue) * 1000;
@@ -1384,19 +1406,19 @@ public class RationalAI extends SimpleAI implements AI
                     !isHumanLegion(attacker))
             {
                 // try not to attack other AIs                
-                if (value > -5000)
+                if (value > -50)
                 {
-                    value = -5000;
+                    value = -50;
                 }
 
                 if (attacker.hasTitan())
                 {
-                    value -= 1000;
+                    value -= 100;
                 }
 
                 if (defender.hasTitan())
                 {
-                    value -= 1000;
+                    value -= 100;
                 }
             }
 
@@ -1451,7 +1473,7 @@ public class RationalAI extends SimpleAI implements AI
     // moving this legion to this hex.  The value defines a distance
     // metric over the set of all possible moves.
     private int evaluateMoveInner(LegionInfo legion, MasterHex hex,
-        int canRecruitHere, int depth, boolean addHexRisk)
+        int canRecruitHere, int depth, boolean normalHexRisk)
     {
         // evaluateHexAttack includes recruit value
         double value = evaluateHexAttack(legion, hex, canRecruitHere);
@@ -1462,33 +1484,39 @@ public class RationalAI extends SimpleAI implements AI
             return (int)value;
         }
 
-        // for speed, at last depth ignore hex risk
-        if (depth == 0)
-        {
-            return (int)value;
-        }
-
         // consider what we might be able to recruit next turn, from here
         double nextTurnValue = 0.0;
         double stay_at_hex = 0.0;
 
-        if (addHexRisk)
+        boolean invert = false;
+        
+        if (!normalHexRisk)
         {
-            // value of staying at hex we move to
-            // i.e. what is risk we will be attacked if we stay at this hex
-            stay_at_hex = hexRisk(legion, hex, null);
-
-            // when we move to this hex we may get attacked and not have
-            // a next turn
-            value += stay_at_hex;
-
-            // if we are very likely to be attacked and die here 
-            // then just return value
-            if (value < -10)
-            {
-                return (int)value;
-            }
+            invert = true;
         }
+        
+        // value of staying at hex we move to
+        // i.e. what is risk we will be attacked if we stay at this hex
+        // (if invert = true, this becomes value of potentially
+        // attacking something at this hex)
+        stay_at_hex = hexRisk(legion, hex, null, invert);
+
+        // when we move to this hex we may get attacked and not have
+        // a next turn
+        value += stay_at_hex;
+
+        // if we are very likely to be attacked and die here 
+        // then just return value
+        if (value < -10)
+        {
+            return (int)value;
+        }
+
+        if (depth == 0)
+        {
+            return (int)value;
+        }
+  
 
         // squares that are further away are more likely to be blocked
         double DISC_FACTOR = 1.0;
@@ -1497,27 +1525,43 @@ public class RationalAI extends SimpleAI implements AI
         // value of next turn
         for (int roll = 1; roll <= 6; roll++)
         {
-            Set moves = client.getMovement().listAllMoves(legion, hex, roll);
+            Set normal_moves = client.getMovement().listNormalMoves(legion, hex, roll);
+            Set tele_moves = client.getMovement().listTeleportMoves(legion, hex, roll);
             double bestMoveVal = stay_at_hex; // can always stay here
-            Iterator nextMoveIt = moves.iterator();
-
-            while (nextMoveIt.hasNext())
+            boolean no_attack = false;
+            
+            for (int i = 0; i < 2; i++)
             {
-                String nextLabel = (String)nextMoveIt.next();
-                MasterHex nextHex = MasterBoard.getHexByLabel(nextLabel);
-
-                double nextMoveVal = evaluateMove(legion, nextHex,
-                    RECRUIT_AT_7, depth - 1, false);
-
-                if (nextMoveVal > bestMoveVal)
+                Iterator nextMoveIt;
+                if (i == 0)
                 {
-                    bestMoveVal = nextMoveVal;
+                    nextMoveIt = normal_moves.iterator();
+                    no_attack = false;
+                }
+                else
+                {
+                    nextMoveIt = tele_moves.iterator();
+                    no_attack = true;
+                }
+
+                while (nextMoveIt.hasNext())
+                {
+                    String nextLabel = (String)nextMoveIt.next();
+                    MasterHex nextHex = MasterBoard.getHexByLabel(nextLabel);
+
+                    double nextMoveVal = evaluateMove(legion, nextHex,
+                        RECRUIT_AT_7, depth - 1, no_attack);
+
+                    if (nextMoveVal > bestMoveVal)
+                    {
+                        bestMoveVal = nextMoveVal;
+                    }
                 }
             }
             bestMoveVal *= discount;
             nextTurnValue += bestMoveVal;
             // squares that are further away are more likely to be blocked
-            discount *= DISC_FACTOR;
+           discount *= DISC_FACTOR;
         }
 
         nextTurnValue /= 6.0;     // 1/6 chance of each happening
@@ -1603,6 +1647,7 @@ public class RationalAI extends SimpleAI implements AI
         round_loop:
         for (round = 0; round < 7; round++)
         {
+            /*
             // DO NOT ADD ANGEL!
             // If attacker cannot win without angel then this
             // will often leave a weak group with an angel in it
@@ -1611,14 +1656,15 @@ public class RationalAI extends SimpleAI implements AI
             // about moving and mustering
             if (I_HATE_HUMANS)
             {
+             **/
                 // angel call
                 if (!summonedAngel && defenderKilled > 0)
                 {
                     PowerSkill angel = new PowerSkill("Angel", 6, 4);
-                    defenderCreatures.add(angel);
+                    attackerCreatures.add(angel);
                     summonedAngel = true;
                 }
-            }
+            //}
 
             // 4th round muster
             if (round == 4 && defenderCreatures.size() > 1)
@@ -2008,170 +2054,6 @@ public class RationalAI extends SimpleAI implements AI
         return false;
     }
 
-
-    class PowerSkill
-    {
-        private String name;
-        private int power_attack;
-        private int power_defend; // how many dice attackers lose
-        private int skill_attack;
-        private int skill_defend;
-        private double hp;  // how many hit points or power left
-        private double value;
-
-        public PowerSkill(String nm, int p, int pa, int pd, int sa, int sd)
-        {
-            name = nm;
-            power_attack = pa;
-            power_defend = pd;
-            skill_attack = sa;
-            skill_defend = sd;
-            hp = p; // may not be the same as power_attack!
-            value = p * Math.min(sa, sd);
-        }
-
-        public PowerSkill(String nm, int pa, int sa)
-        {
-            name = nm;
-            power_attack = pa;
-            power_defend = 0;
-            skill_attack = sa;
-            skill_defend = sa;
-            hp = pa;
-            value = pa * sa;
-        }
-
-        public int getPowerAttack()
-        {
-            return power_attack;
-        }
-
-        public int getPowerDefend()
-        {
-            return power_defend;
-        }
-
-        public int getSkillAttack()
-        {
-            return skill_attack;
-        }
-
-        public int getSkillDefend()
-        {
-            return skill_defend;
-        }
-
-        public double getHP()
-        {
-            return hp;
-        }
-
-        public void setHP(double h)
-        {
-            hp = h;
-        }
-
-        public void addDamage(double d)
-        {
-            hp -= d;
-        }
-
-        public double getPointValue()
-        {
-            return value;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-    }
-
-    // return power and skill of a given creature given the terrain
-    private PowerSkill getNativeValue(Creature creature, String terrain,
-        boolean defender)
-    {
-        int power = creature.getPower();
-        int skill = creature.getSkill();
-
-        if (MasterHex.isNativeCombatBonus(creature, terrain) ||
-            (terrain.equals("Tower") && defender == true))
-        {
-            // list of terrain bonuses
-            // format is
-            // "Terrain", "power_attack_bonus",  "power_defend_bonus",
-            // "skill_attack_bonus", "skill_defend_bonus"
-            // where the bonuses are versus a non-native creature
-
-            int terrains = 7;
-
-            String[][] allTerrains = { {"Plains", "0", "0", "0", "0"},
-                // strike down wall, defender strike up
-                {"Tower", "0", "0", "1", "1"},
-                // native in bramble has skill to hit increased by 1
-                {"Brush", "0", "0", "0", "1"}, {"Jungle", "0", "0", "0", "1"},
-                // native gets an extra die when attack down slope
-                // non-native loses 1 skill when attacking up slope
-                {"Hills", "1", "0", "0", "1"},
-                // native gets an extra 2 dice when attack down dune
-                // non-native loses 1 die when attacking up dune
-                {"Desert", "2", "1", "0", "0"},
-                // Native gets extra 1 die when attack down slope
-                // non-native loses 1 skill when attacking up slope
-                {"Mountains", "1", "0", "0", "1"}
-                // the other types have only movement bonuses
-            };
-
-            int POWER_ATT = 1;
-            int POWER_DEF = 2;
-            int SKILL_ATT = 3;
-            int SKILL_DEF = 4;
-
-            for (int i = 0; i < terrains; i++)
-            {
-                if (terrain.equals(allTerrains[i][0]))
-                {
-                    if (terrain.equals("Tower") && defender == false)
-                    {
-                        // no attacker bonus for tower
-                        return new PowerSkill(creature.getName(), power,
-                            skill);
-                    }
-                    else if (terrain.equals("Mountains") && defender == true &&
-                        creature.getName().equals("Dragon"))
-                    {
-                        // Dragon gets an extra 3 die when attack down slope
-                        // non-native loses 1 skill  when attacking up slope
-                        return new PowerSkill(
-                            creature.getName(),
-                            power,
-                            power + 3,
-                            Integer.parseInt(allTerrains[i][POWER_DEF]),
-                            skill +
-                            Integer.parseInt(allTerrains[i][SKILL_ATT]),
-                            skill +
-                            Integer.parseInt(allTerrains[i][SKILL_DEF]));
-                    }
-                    else
-                    {
-                        return new PowerSkill(
-                            creature.getName(),
-                            power,
-                            power +
-                            Integer.parseInt(allTerrains[i][POWER_ATT]),
-                            Integer.parseInt(allTerrains[i][POWER_DEF]),
-                            skill +
-                            Integer.parseInt(allTerrains[i][SKILL_ATT]),
-                            skill +
-                            Integer.parseInt(allTerrains[i][SKILL_DEF]));
-                    }
-                }
-            }
-        }
-
-        // no special bonus found
-        return new PowerSkill(creature.getName(), power, skill);
-    }
 
     public List getCombatList(LegionInfo legion, String terrain,
         boolean defender)

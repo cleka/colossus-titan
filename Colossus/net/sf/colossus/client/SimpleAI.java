@@ -1028,8 +1028,23 @@ public class SimpleAI implements AI
                 for (int roll = 1; roll <= 6; roll++)
                 {
                     // count the moves he can get to
-                    Set set = client.getMovement().listAllMoves(legion,
+                    Set set;
+                    
+                    // Only allow Titan teleport
+                    // Remember, tower teleports cannot attack
+                    if (legion.hasTitan() && 
+                    legion.getPlayerInfo().canTitanTeleport() && 
+                    client.getMovement().titanTeleportAllowed())
+                    {
+                        set = client.getMovement().listAllMoves(legion,
                             legion.getCurrentHex(), roll);
+                    }
+                    else
+                    {
+                        set = client.getMovement().listNormalMoves(legion,
+                            legion.getCurrentHex(), roll);
+                    }
+                    
                     Iterator moveIt = set.iterator();
                     while (moveIt.hasNext())
                     {
@@ -2156,7 +2171,6 @@ public class SimpleAI implements AI
 
     private BattleChit findBestTarget()
     {
-        boolean canKillSomething = false;
         BattleChit bestTarget = null;
         String terrain = client.getBattleTerrain();
 
@@ -2173,20 +2187,19 @@ public class SimpleAI implements AI
             if (h + target.getHits() >= target.getPower())
             {
                 // We can probably kill this target.
-                if (bestTarget == null || !canKillSomething ||
+                if (bestTarget == null || 
                         getKillValue(target, terrain) >
                         getKillValue(bestTarget, terrain))
                 {
                     bestTarget = target;
-                    canKillSomething = true;
                 }
             }
             else
             {
                 // We probably can't kill this target.
+                // But if it is a Titan it may be more valuable to do fractional damage
                 if (bestTarget == null ||
-                        (!canKillSomething &&
-                        getKillValue(target, terrain) >
+                        (0.5 * ((double) (h + target.getHits()) / (double) target.getPower()) * getKillValue(target, terrain) >
                         getKillValue(bestTarget, terrain)))
                 {
                     bestTarget = target;
@@ -2436,6 +2449,199 @@ public class SimpleAI implements AI
         return val;
     }
     
+    
+    class PowerSkill
+    {
+        private String name;
+        private int power_attack;
+        private int power_defend; // how many dice attackers lose
+        private int skill_attack;
+        private int skill_defend;
+        private double hp;  // how many hit points or power left
+        private double value;
+
+        public PowerSkill(String nm, int p, int pa, int pd, int sa, int sd)
+        {
+            name = nm;
+            power_attack = pa;
+            power_defend = pd;
+            skill_attack = sa;
+            skill_defend = sd;
+            hp = p; // may not be the same as power_attack!
+            value = p * Math.min(sa, sd);
+        }
+
+        public PowerSkill(String nm, int pa, int sa)
+        {
+            name = nm;
+            power_attack = pa;
+            power_defend = 0; 
+            skill_attack = sa;
+            skill_defend = sa;
+            hp = pa;
+            value = pa * sa;
+        }
+
+        public int getPowerAttack()
+        {
+            return power_attack;
+        }
+
+        public int getPowerDefend()
+        {
+            return power_defend;
+        }
+
+        public int getSkillAttack()
+        {
+            return skill_attack;
+        }
+
+        public int getSkillDefend()
+        {
+            return skill_defend;
+        }
+
+        public double getHP()
+        {
+            return hp;
+        }
+
+        public void setHP(double h)
+        {
+            hp = h;
+        }
+
+        public void addDamage(double d)
+        {
+            hp -= d;
+        }
+
+        public double getPointValue()
+        {
+            return value;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+    }
+
+    
+    // return power and skill of a given creature given the terrain
+    // terrain here is either a board hex label OR
+    // a Hex terrain label (see the util.Terrains class)
+    private PowerSkill calc_bonus(Creature creature, String terrain,
+        boolean defender)
+    {
+        int power = creature.getPower();
+        int skill = creature.getSkill();
+
+       
+        // list of terrain bonuses
+        // format is
+        // "Terrain", "power_attack_bonus",  "power_defend_bonus",
+        // "skill_attack_bonus", "skill_defend_bonus"
+        // where the bonuses are versus a non-native creature
+
+        int terrains = 10;
+
+        String[][] allTerrains = { {"Plains", "0", "0", "0", "0"},
+            // strike down wall, defender strike up
+            {"Tower", "0", "0", "1", "1"},
+            // native in bramble has skill to hit increased by 1
+            {"Brush", "0", "0", "0", "1"}, {"Jungle", "0", "0", "0", "1"}, 
+            {"Brambles", "0", "0", "0", "1"},
+            // native gets an extra die when attack down slope
+            // non-native loses 1 skill when attacking up slope
+            {"Hills", "1", "0", "0", "1"},
+            // native gets an extra 2 dice when attack down dune
+            // non-native loses 1 die when attacking up dune
+            {"Desert", "2", "1", "0", "0"},{"Sand", "2", "1", "0", "0"},
+            // Native gets extra 1 die when attack down slope
+            // non-native loses 1 skill when attacking up slope
+            {"Mountains", "1", "0", "0", "1"}, {"Volcano", "1", "0", "0", "1"}
+            // the other types have only movement bonuses
+        };
+
+        int POWER_ATT = 1;
+        int POWER_DEF = 2;
+        int SKILL_ATT = 3;
+        int SKILL_DEF = 4;
+
+        for (int i = 0; i < terrains; i++)
+        {
+            if (terrain.equals(allTerrains[i][0]))
+            {
+                if (terrain.equals("Tower") && defender == false)
+                {
+                    // no attacker bonus for tower
+                    return new PowerSkill(creature.getName(), power,
+                        skill);
+                }
+                else if ((terrain.equals("Mountains") || terrain.equals("Volcano"))
+                    && defender == true &&
+                    creature.getName().equals("Dragon"))
+                {
+                    // Dragon gets an extra 3 die when attack down slope
+                    // non-native loses 1 skill  when attacking up slope
+                    return new PowerSkill(
+                        creature.getName(),
+                        power,
+                        power + 3,
+                        Integer.parseInt(allTerrains[i][POWER_DEF]),
+                        skill +
+                        Integer.parseInt(allTerrains[i][SKILL_ATT]),
+                        skill +
+                        Integer.parseInt(allTerrains[i][SKILL_DEF]));
+                }
+                else
+                {
+                    return new PowerSkill(
+                        creature.getName(),
+                        power,
+                        power +
+                        Integer.parseInt(allTerrains[i][POWER_ATT]),
+                        Integer.parseInt(allTerrains[i][POWER_DEF]),
+                        skill +
+                        Integer.parseInt(allTerrains[i][SKILL_ATT]),
+                        skill +
+                        Integer.parseInt(allTerrains[i][SKILL_DEF]));
+                }
+            }
+        }
+        
+       // terrain not found
+       return new PowerSkill(creature.getName(), power, skill);
+    }
+
+    // return power and skill of a given creature given the terrain
+    // board hex label 
+    protected PowerSkill getNativeValue(Creature creature, String terrain,
+        boolean defender)
+    {
+        
+        if (! (MasterHex.isNativeCombatBonus(creature, terrain) ||
+               (terrain.equals("Tower") && defender == true)))
+        {
+            return new PowerSkill(creature.getName(), creature.getPower(), 
+                        creature.getSkill());
+        }
+        
+        return calc_bonus(creature, terrain, defender);
+        
+    }
+    
+    // return power and skill of a given creature given 
+    // a Hex terrain label (see the util.Terrains class)
+    protected PowerSkill getNativeTerrainValue(Creature creature, String terrain,
+        boolean defender)
+    {
+         return calc_bonus(creature, terrain, defender);  
+    }
+        
+
 
     ////////////////////////////////////////////////////////////////
     // Battle move stuff
@@ -2955,21 +3161,23 @@ public class SimpleAI implements AI
 
     class BattleEvalConstants
     {
+     
         int OFFBOARD_DEATH_SCALE_FACTOR = -150;
-        int NATIVE_BONUS_TERRAIN = 50;
+        int NATIVE_BONUS_TERRAIN = 40; // 50 -- old value
         int NATIVE_BOG = 20;
-        int NON_NATIVE_PENALTY_TERRAIN = -100;
+        int NON_NATIVE_PENALTY_TERRAIN = -100; 
         int PENALTY_DAMAGE_TERRAIN = -200;
         int FIRST_RANGESTRIKE_TARGET = 300;
         int EXTRA_RANGESTRIKE_TARGET = 100;
         int RANGESTRIKE_TITAN = 500;
         int RANGESTRIKE_WITHOUT_PENALTY = 100;
         int ATTACKER_ADJACENT_TO_ENEMY = 400;
-        int DEFENDER_ADJACENT_TO_ENEMY = -20;
+        int DEFENDER_ADJACENT_TO_ENEMY = -20; 
         int ADJACENT_TO_ENEMY_TITAN = 1300;
         int ADJACENT_TO_RANGESTRIKER = 500;
-        int KILL_SCALE_FACTOR = 100;
-        int KILLABLE_TARGETS_SCALE_FACTOR = 10;
+        int ATTACKER_KILL_SCALE_FACTOR = 25; // 100
+        int DEFENDER_KILL_SCALE_FACTOR = 1; // 100
+        int KILLABLE_TARGETS_SCALE_FACTOR = 0; // 10
         int ATTACKER_GET_KILLED_SCALE_FACTOR = -20;
         int DEFENDER_GET_KILLED_SCALE_FACTOR = -40;
         int ATTACKER_GET_HIT_SCALE_FACTOR = -1;
@@ -2981,7 +3189,7 @@ public class SimpleAI implements AI
         int DEFENDER_FORWARD_EARLY_PENALTY = -60;
         int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -300;
         int ADJACENT_TO_BUDDY = 100;
-        int ADJACENT_TO_BUDDY_TITAN = 200;
+        int ADJACENT_TO_BUDDY_TITAN = 600; // 200
         int GANG_UP_ON_CREATURE = 50;
     }
 
@@ -3022,8 +3230,14 @@ public class SimpleAI implements AI
         final LegionInfo legion = client.getLegionInfo(
                 client.getMyEngagedMarkerId());
         final int skill = critter.getSkill();
+        final int power = critter.getPower();
         final BattleHex hex = client.getBattleHex(critter);
         final int turn = client.getBattleTurnNumber();
+        PowerSkill ps = getNativeTerrainValue(critter.getCreature(), 
+                                 hex.getTerrain(), true);
+
+        int native_power = ps.getPowerAttack() + (ps.getPowerDefend() + power);
+        int native_skill = ps.getSkillAttack() + ps.getSkillDefend();        
 
         int value = 0;
 
@@ -3039,6 +3253,20 @@ public class SimpleAI implements AI
                 critter.getCreature().isNativeTerrain(hex.getTerrain()))
         {
             value += bec.NATIVE_BONUS_TERRAIN;
+            
+            // Above gives a small base value.
+            // Scale remaining bonus to size of benefit
+        
+            if (hex. getElevation() > 0)
+            {
+                native_skill += 1; // guess at bonus
+            }
+                
+            int bonus = (native_power - 2 * power) * skill +
+                        (native_skill - 2 * skill) * power;
+            
+            value += 3 * bonus;
+            
             // We want marsh natives to slightly prefer moving to bog hexes,
             // even though there's no real bonus there, to leave other hexes
             // clear for non-native allies.
@@ -3046,6 +3274,17 @@ public class SimpleAI implements AI
             {
                 value += bec.NATIVE_BOG;
             }
+            
+            /* 
+            Log.debug("Native " + critter.getCreature().getName() + " in " + 
+             hex.getTerrain() +  " bonus " + bonus);
+            Log.debug("Native SKA " + ps.getSkillAttack() + " SKD " + 
+             ps.getSkillDefend());
+            Log.debug("Native PA " + ps.getPowerAttack() + " PD " + 
+             ps.getPowerDefend() + power);
+            Log.debug("Native skill " + native_skill + " skill " + 2*skill);
+            Log.debug("Native power " + native_power + " power " + 2*power);
+             **/
         }
         else  // Critter is not native or the terrain is not beneficial
         {
@@ -3053,6 +3292,13 @@ public class SimpleAI implements AI
                     (!critter.getCreature().isNativeTerrain(hex.getTerrain())))
             {
                 value += bec.NON_NATIVE_PENALTY_TERRAIN;
+                
+                // Above gives a small base value.
+                // Scale remaining bonus to size of benefit
+                int bonus = (native_power - 2 * power) * skill +
+                        (native_skill - 2 * skill) * power;
+
+                value += 3 * bonus; // bonus should be negative here
             }
         }
 
@@ -3151,6 +3397,12 @@ public class SimpleAI implements AI
                     {
                         value += bec.ADJACENT_TO_RANGESTRIKER;
                     }
+                    
+                    // Attack Warlocks so they don't get Titan
+                    if (target.getName().equals("Warlock"))
+                    {
+                        value += bec.ADJACENT_TO_BUDDY_TITAN;
+                    }
 
                     // Reward being next to an enemy that we can probably
                     // kill this turn.
@@ -3163,6 +3415,12 @@ public class SimpleAI implements AI
                         numKillableTargets++;
                         int targetValue = getKillValue(target, terrain);
                         killValue = Math.max(targetValue, killValue);
+                    }
+                    else
+                    {
+                        // reward doing damage to target - esp. titan.
+                        int targetValue = getKillValue(target, terrain);
+                        killValue = (int) (0.5 * ((double) meanHits / (double)target.getPower()) * Math.max(targetValue, killValue));
                     }
 
                     // Reward ganging up on enemies.
@@ -3185,10 +3443,18 @@ public class SimpleAI implements AI
                     }
                 }
 
-                value += bec.KILL_SCALE_FACTOR * killValue +
+                if (legion.getMarkerId().equals(
+                                client.getAttackerMarkerId()))
+                {
+                    value += bec.ATTACKER_KILL_SCALE_FACTOR * killValue +
                         bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets;
+                }
+                else
+                {
+                    value += bec.DEFENDER_KILL_SCALE_FACTOR * killValue +
+                        bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets; 
+                }
 
-                int power = critter.getPower();
                 int hits = critter.getHits();
 
                 // XXX Attacking legions late in battle ignore damage.
@@ -3314,6 +3580,8 @@ public class SimpleAI implements AI
                         if (other.isTitan())
                         {
                             value += bec.ADJACENT_TO_BUDDY_TITAN;
+                            value += native_skill * 
+                                     (native_power - critter.getHits());
                         }
                         else
                         {
