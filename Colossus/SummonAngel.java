@@ -95,6 +95,12 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     }
 
 
+    Legion getLegion()
+    {
+        return legion;
+    }
+
+
     void cleanup(boolean summoned)
     {
         if (summoned)
