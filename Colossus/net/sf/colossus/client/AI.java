@@ -34,8 +34,11 @@ public interface AI
     /** make battle strikes for legion */
     boolean strike(LegionInfo legion);
 
-    /** make battle moves for the active legion */
-    void battleMove();
+    /** return a list of battle moves for the active legion */
+    java.util.List battleMove();
+
+    /** Try another move for creatures whose moves failed. */
+    void retryFailedBattleMoves(java.util.List bestMoveOrder);
 
     /** pick an entry side */
     String pickEntrySide(String hexLabel, String markerId, Set entrySides);

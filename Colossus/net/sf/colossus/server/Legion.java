@@ -334,7 +334,7 @@ public final class Legion implements Comparable
             if (getHeight() >= 7)
             {
                 Log.event("Legion " + getLongMarkerName() +
-                          " if full and cannot acquire: " + angelType);
+                          " is full and cannot acquire: " + angelType);
             }
             else
             {

@@ -879,7 +879,7 @@ Log.debug("Called Game.newGame2()");
      *     Defending Legion:
      *         ...
      */
-    void saveGame(final String filename)
+    synchronized void saveGame(final String filename)
     {
         String fn = null; 
         if (filename == null || filename.equals("null"))
@@ -963,14 +963,11 @@ Log.debug("Called Game.newGame2()");
             out.println(player.getNumLegions());
 
             Collection legions = player.getLegions();
-            synchronized (legions)
+            it2 = legions.iterator();
+            while (it2.hasNext())
             {
-                it2 = legions.iterator();
-                while (it2.hasNext())
-                {
-                    Legion legion = (Legion)it2.next();
-                    dumpLegion(out, legion, false);
-                }
+                Legion legion = (Legion)it2.next();
+                dumpLegion(out, legion, false);
             }
         }
 
@@ -1642,8 +1639,8 @@ Log.debug("Called Game.newGame2()");
      *  arrows.  If block == -2, use only arrows.  Do not double back in
      *  the direction you just came from.  Return a set of 
      *  hexLabel:entrySide tuples. */
-    private Set findNormalMoves(MasterHex hex, Legion legion, int roll, 
-        int block, int cameFrom, boolean ignoreFriends)
+    private synchronized Set findNormalMoves(MasterHex hex, Legion legion, 
+        int roll, int block, int cameFrom, boolean ignoreFriends)
     {
         Set set = new HashSet();
         String hexLabel = hex.getLabel();
@@ -1672,18 +1669,15 @@ Log.debug("Called Game.newGame2()");
             // This hex is the final destination.  Mark it as legal if
             // it is unoccupied by friendly legions.
             java.util.List legions = player.getLegions();
-            synchronized (legions)
+            Iterator it = legions.iterator();
+            while (it.hasNext())
             {
-                Iterator it = legions.iterator();
-                while (it.hasNext())
+                // Account for spin cycles.
+                Legion otherLegion = (Legion)it.next();
+                if (!ignoreFriends && otherLegion != legion &&
+                    hexLabel.equals(otherLegion.getCurrentHexLabel()))
                 {
-                    // Account for spin cycles.
-                    Legion otherLegion = (Legion)it.next();
-                    if (!ignoreFriends && otherLegion != legion &&
-                        hexLabel.equals(otherLegion.getCurrentHexLabel()))
-                    {
-                        return set;
-                    }
+                    return set;
                 }
             }
 
@@ -2040,21 +2034,19 @@ Log.debug("Called Game.newGame2()");
     /** Return set of hexLabels for engagements found. */
     Set findEngagements()
     {
+Log.debug("Called Game.findEngagements()");
         Set set = new HashSet();
         Player player = getActivePlayer();
 
         java.util.List legions = player.getLegions();
-        synchronized (legions)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Iterator it = legions.iterator();
-            while (it.hasNext())
+            Legion legion = (Legion)it.next();
+            String hexLabel = legion.getCurrentHexLabel();
+            if (getNumEnemyLegions(hexLabel, player) > 0)
             {
-                Legion legion = (Legion)it.next();
-                String hexLabel = legion.getCurrentHexLabel();
-                if (getNumEnemyLegions(hexLabel, player) > 0)
-                {
-                    set.add(hexLabel);
-                }
+                set.add(hexLabel);
             }
         }
         return set;
@@ -2185,34 +2177,31 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     }
 
     /** Return a set of hexLabels. */
-    Set findSummonableAngels(String markerId)
+    synchronized Set findSummonableAngels(String markerId)
     {
         Legion legion = getLegionByMarkerId(markerId);
         Set set = new HashSet();
         java.util.List legions = legion.getPlayer().getLegions();
-        synchronized (legions)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Iterator it = legions.iterator();
-            while (it.hasNext())
+            Legion candidate = (Legion)it.next();
+            if (candidate != legion)
             {
-                Legion candidate = (Legion)it.next();
-                if (candidate != legion)
+                String hexLabel = candidate.getCurrentHexLabel();
+                boolean hasSummonable = false;
+                java.util.List summonableList =
+                    Creature.getSummonableCreatures();
+                Iterator sumIt = summonableList.iterator();
+                while (sumIt.hasNext() && !hasSummonable)
                 {
-                    String hexLabel = candidate.getCurrentHexLabel();
-                    boolean hasSummonable = false;
-                    java.util.List summonableList =
-                        Creature.getSummonableCreatures();
-                    Iterator sumIt = summonableList.iterator();
-                    while (sumIt.hasNext() && !hasSummonable)
-                    {
-                        Creature c = (Creature)sumIt.next();
-                        hasSummonable = hasSummonable ||
-                            (candidate.numCreature(c) > 0);
-                    }
-                    if (hasSummonable && !isEngagement(hexLabel))
-                    {
-                        set.add(hexLabel);
-                    }
+                    Creature c = (Creature)sumIt.next();
+                    hasSummonable = hasSummonable ||
+                        (candidate.numCreature(c) > 0);
+                }
+                if (hasSummonable && !isEngagement(hexLabel))
+                {
+                    set.add(hexLabel);
                 }
             }
         }
@@ -2722,17 +2711,14 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
 
 
     /** Return a list of all players' legions. */
-    java.util.List getAllLegions()
+    synchronized java.util.List getAllLegions()
     {
         java.util.List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
             java.util.List legions = player.getLegions();
-            synchronized (legions)
-            {
-                list.addAll(legions);
-            }
+            list.addAll(legions);
         }
         return list;
     }
@@ -2750,7 +2736,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     }
 
     /** Return a list of all legions not belonging to player. */
-    java.util.List getAllEnemyLegions(Player player)
+    synchronized java.util.List getAllEnemyLegions(Player player)
     {
         java.util.List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
@@ -2759,10 +2745,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             if (nextPlayer != player)
             {
                 java.util.List legions = nextPlayer.getLegions();
-                synchronized (legions)
-                {
-                    list.addAll(legions);
-                }
+                list.addAll(legions);
             }
         }
         return list;
@@ -2888,58 +2871,49 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         return markerIds;
     }
 
-    int getNumFriendlyLegions(String hexLabel, Player player)
+    synchronized int getNumFriendlyLegions(String hexLabel, Player player)
     {
         int count = 0;
         java.util.List legions = player.getLegions();
-        synchronized (legions)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Iterator it = legions.iterator();
-            while (it.hasNext())
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
-                Legion legion = (Legion)it.next();
-                if (hexLabel.equals(legion.getCurrentHexLabel()))
-                {
-                    count++;
-                }
+                count++;
             }
         }
         return count;
     }
 
-    Legion getFirstFriendlyLegion(String hexLabel, Player player)
+    synchronized Legion getFirstFriendlyLegion(String hexLabel, Player player)
     {
         java.util.List legions = player.getLegions();
-        synchronized (legions)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Iterator it = legions.iterator();
-            while (it.hasNext())
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
-                Legion legion = (Legion)it.next();
-                if (hexLabel.equals(legion.getCurrentHexLabel()))
-                {
-                    return legion;
-                }
+                return legion;
             }
         }
         return null;
     }
 
-    java.util.List getFriendlyLegions(String hexLabel, Player player)
+    synchronized java.util.List getFriendlyLegions(String hexLabel, 
+        Player player)
     {
         java.util.List newLegions = new ArrayList();
         java.util.List legions = player.getLegions();
-        synchronized (legions)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Iterator it = legions.iterator();
-            
-            while (it.hasNext())
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
             {
-                Legion legion = (Legion)it.next();
-                if (hexLabel.equals(legion.getCurrentHexLabel()))
-                {
-                    newLegions.add(legion);
-                }
+                newLegions.add(legion);
             }
         }
         return newLegions;

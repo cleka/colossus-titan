@@ -30,7 +30,6 @@ final class Strike
     }
 
 
-
     /** Return the set of hex labels for hexes with critters that have
      *  valid strike targets. */
     public Set findCrittersWithTargets()
@@ -53,17 +52,14 @@ final class Strike
     boolean isForcedStrikeRemaining()
     {
         java.util.List battleChits = client.getBattleChits();
-        synchronized (battleChits)
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
         {
-            Iterator it = battleChits.iterator();
-            while (it.hasNext())
+            BattleChit chit = (BattleChit)it.next();
+            if (client.isActive(chit) && !chit.hasStruck() && 
+                client.isInContact(chit, false))
             {
-                BattleChit chit = (BattleChit)it.next();
-                if (client.isActive(chit) && !chit.hasStruck() && 
-                    client.isInContact(chit, false))
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return false;
@@ -79,7 +75,7 @@ final class Strike
      *  XXX This method does stuff, rather than just returning 
      *  information, unlike the rest of the Strike class.
      *  Returns true if a strike was made. */
-    synchronized boolean makeForcedStrikes(boolean rangestrike)
+    boolean makeForcedStrikes(boolean rangestrike)
     {
         boolean struck = false;
 
@@ -304,25 +300,22 @@ final class Strike
         int min = Constants.OUT_OF_RANGE;
 
         java.util.List battleChits = client.getBattleChits();
-        synchronized (battleChits)
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
         {
-            Iterator it = battleChits.iterator();
-            while (it.hasNext())
+            BattleChit target = (BattleChit)it.next();
+            if (chit.isInverted() != target.isInverted())
             {
-                BattleChit target = (BattleChit)it.next();
-                if (chit.isInverted() != target.isInverted())
+                BattleHex targetHex = client.getBattleHex(target);
+                int range = getRange(hex, targetHex, false);
+                // Exit early if adjacent.
+                if (range == 2)
                 {
-                    BattleHex targetHex = client.getBattleHex(target);
-                    int range = getRange(hex, targetHex, false);
-                    // Exit early if adjacent.
-                    if (range == 2)
-                    {
-                        return range;
-                    }
-                    else if (range < min)
-                    {
-                        min = range;
-                    }
+                    return range;
+                }
+                else if (range < min)
+                {
+                    min = range;
                 }
             }
         }

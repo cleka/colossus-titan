@@ -61,7 +61,7 @@ class DevRandom extends Random
         }
         else
         {
-            Log.error("Random source unavailable ! Falling back on a PRNG");
+            Log.debug("Random source unavailable ! Falling back on a PRNG");
         }
     }
     

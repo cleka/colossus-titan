@@ -1118,7 +1118,8 @@ Log.debug("Called Battle.doneReinforcing()");
         // Advance only if there are no unresolved strikes.
         if (isForcedStrikeRemaining())
         {
-            Log.error("client called battle.doneWithStrikes() illegally");
+            Log.error(server.getPlayerName() + 
+                " called battle.doneWithStrikes() illegally");
             return false;
         }
         else

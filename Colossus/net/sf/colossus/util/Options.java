@@ -117,6 +117,7 @@ public final class Options
         }
 
         String optionsFile = getOptionsFilename();
+        Log.event("Loading options from " + optionsFile);
         try
         {
             FileInputStream in = new FileInputStream(optionsFile);

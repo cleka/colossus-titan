@@ -136,6 +136,9 @@ public final class Client implements IClient
 
     private int delay = -1;
 
+    /** For battle AI. */
+    private java.util.List bestMoveOrder = null;
+
 
 
     public Client(String host, int port, String playerName, boolean remote)
@@ -759,7 +762,6 @@ public final class Client implements IClient
 
     public void dispose()
     {
-Log.debug(playerName + " Client.dispose()");
         cleanupBattle();
         disposeMovementDie();
         disposeStatusScreen();
@@ -803,17 +805,14 @@ Log.debug(playerName + " Client.dispose()");
     java.util.List getActiveBattleChits()
     {
         java.util.List chits = new ArrayList();
-        synchronized (battleChits)
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
         {
-            Iterator it = battleChits.iterator();
-            while (it.hasNext())
+            BattleChit chit = (BattleChit)it.next();
+            if (getBattleActivePlayerName().equals(getPlayerNameByTag(
+                chit.getTag())))
             {
-                BattleChit chit = (BattleChit)it.next();
-                if (getBattleActivePlayerName().equals(getPlayerNameByTag(
-                    chit.getTag())))
-                {
-                    chits.add(chit);
-                }
+                chits.add(chit);
             }
         }
         return chits;
@@ -822,17 +821,14 @@ Log.debug(playerName + " Client.dispose()");
     java.util.List getInactiveBattleChits()
     {
         java.util.List chits = new ArrayList();
-        synchronized (battleChits)
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
         {
-            Iterator it = battleChits.iterator();
-            while (it.hasNext())
+            BattleChit chit = (BattleChit)it.next();
+            if (!getBattleActivePlayerName().equals(getPlayerNameByTag(
+                                                    chit.getTag())))
             {
-                BattleChit chit = (BattleChit)it.next();
-                if (!getBattleActivePlayerName().equals(getPlayerNameByTag(
-                                                        chit.getTag())))
-                {
-                    chits.add(chit);
-                }
+                chits.add(chit);
             }
         }
         return chits;
@@ -1047,16 +1043,13 @@ Log.debug(playerName + " Client.dispose()");
     {
         java.util.List chits = new ArrayList();
 
-        synchronized (battleChits)
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
         {
-            Iterator it = battleChits.iterator();
-            while (it.hasNext())
+            BattleChit chit = (BattleChit)it.next();
+            if (hexLabel.equals(chit.getCurrentHexLabel()))
             {
-                BattleChit chit = (BattleChit)it.next();
-                if (hexLabel.equals(chit.getCurrentHexLabel()))
-                {
-                    chits.add(chit);
-                }
+                chits.add(chit);
             }
         }
         return chits;
@@ -1076,16 +1069,13 @@ Log.debug(playerName + " Client.dispose()");
     /** Get the BattleChit with this tag. */
     BattleChit getBattleChit(int tag)
     {
-        synchronized (battleChits)
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
         {
-            Iterator it = battleChits.iterator();
-            while (it.hasNext())
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getTag() == tag)
             {
-                BattleChit chit = (BattleChit)it.next();
-                if (chit.getTag() == tag)
-                {
-                    return chit;
-                }
+                return chit;
             }
         }
         return null;
@@ -1093,28 +1083,25 @@ Log.debug(playerName + " Client.dispose()");
 
 
     // XXX Does this need to be public?
-    public void removeDeadBattleChits()
+    public synchronized void removeDeadBattleChits()
     {
-        synchronized (battleChits)
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
         {
-            Iterator it = battleChits.iterator();
-            while (it.hasNext())
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.isDead())
             {
-                BattleChit chit = (BattleChit)it.next();
-                if (chit.isDead())
+                it.remove();
+                
+                // Also remove it from LegionInfo.
+                String name = chit.getId();
+                if (chit.isInverted())
                 {
-                    it.remove();
-                    
-                    // Also remove it from LegionInfo.
-                    String name = chit.getId();
-                    if (chit.isInverted())
-                    {
-                        getLegionInfo(defenderMarkerId).removeCreature(name);
-                    }
-                    else
-                    {
-                        getLegionInfo(attackerMarkerId).removeCreature(name);
-                    }
+                    getLegionInfo(defenderMarkerId).removeCreature(name);
+                }
+                else
+                {
+                    getLegionInfo(attackerMarkerId).removeCreature(name);
                 }
             }
         }
@@ -1137,7 +1124,7 @@ Log.debug(playerName + " Client.dispose()");
     }
 
     /** Create a new BattleChit and add it to the end of the list. */
-    private synchronized void addBattleChit(final String bareImageName, 
+    private void addBattleChit(final String bareImageName, 
         boolean inverted, int tag, String hexLabel)
     {
         String imageName = bareImageName;
@@ -1154,10 +1141,7 @@ Log.debug(playerName + " Client.dispose()");
         }
         BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
             map, inverted, tag, hexLabel);
-        synchronized (battleChits)
-        {
-            battleChits.add(chit);
-        }
+        battleChits.add(chit);
     }
 
 
@@ -1726,10 +1710,7 @@ Log.debug(playerName + " Client.cleanupBattle()");
             map.dispose();
             map = null;
         }
-        synchronized (battleChits)
-        {
-            battleChits.clear();
-        }
+        battleChits.clear();
         battleTurnNumber = -1;
         battlePhase = -1;
         battleActivePlayerName = null;
@@ -1941,7 +1922,6 @@ Log.debug(playerName + " Client.cleanupBattle()");
     public void setupSplit(Set markersAvailable, String activePlayerName,
         int turnNumber)
     {
-Log.debug(playerName + " called setupSplit");
         cleanupNegotiationDialogs();
 
         this.activePlayerName = activePlayerName;
@@ -2027,7 +2007,6 @@ Log.debug(playerName + " called setupSplit");
     public synchronized void setupBattleSummon(String battleActivePlayerName,
         int battleTurnNumber)
     {
-Log.debug(playerName + " Client.setupBattleSummon()");
         this.battlePhase = Constants.SUMMON;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
@@ -2046,7 +2025,6 @@ Log.debug(playerName + " Client.setupBattleSummon()");
     public synchronized void setupBattleRecruit(String battleActivePlayerName,
         int battleTurnNumber)
     {
-Log.debug(playerName + " Client.setupBattleRecruit()");
         this.battlePhase = Constants.RECRUIT;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
@@ -2062,24 +2040,20 @@ Log.debug(playerName + " Client.setupBattleRecruit()");
         updateStatusScreen();
     }
 
-    private void resetAllBattleMoves()
+    private synchronized void resetAllBattleMoves()
     {
-        synchronized (battleChits)
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
         {
-            Iterator it = battleChits.iterator();
-            while (it.hasNext())
-            {
-                BattleChit chit = (BattleChit)it.next();
-                chit.setMoved(false);
-                chit.setStruck(false);
-            }
+            BattleChit chit = (BattleChit)it.next();
+            chit.setMoved(false);
+            chit.setStruck(false);
         }
     }
 
     public synchronized void setupBattleMove(String battleActivePlayerName,
         int battleTurnNumber)
     {
-Log.debug(playerName + " Client.setupBattleMove()");
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
@@ -2100,16 +2074,42 @@ Log.debug(playerName + " Client.setupBattleMove()");
 
         if (isMyBattlePhase() && getOption(Options.autoPlay))
         {
-            ai.battleMove();
-            doneWithBattleMoves();
+            bestMoveOrder = ai.battleMove();
+            if (bestMoveOrder != null)
+            {
+                Iterator it = bestMoveOrder.iterator();
+                while (it.hasNext())
+                {
+                    CritterMove cm = (CritterMove)it.next();
+                    tryBattleMove(cm);
+                }
+            }
+
+            // Wait for information from the server before proceding.
+            java.util.Timer timer = new java.util.Timer();
+            timer.schedule(new FinishAIBattleMove(), 200);
         }
     }
+
+    private void tryBattleMove(CritterMove cm)
+    {
+        BattleChit critter = cm.getCritter();
+        String hexLabel = cm.getEndingHexLabel();
+        Log.debug("Try " + critter + " to " + hexLabel);
+        doBattleMove(critter.getTag(), hexLabel);
+        aiPause();
+    }
+
+    private void retryFailedBattleMoves()
+    {
+        ai.retryFailedBattleMoves(bestMoveOrder);
+    }
+
 
     /** Used for both strike and strikeback. */
     public synchronized void setupBattleFight(int battlePhase,
         String battleActivePlayerName)
     {
-Log.debug(playerName + " Client.setupBattleFight()");
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
         if (battlePhase == Constants.FIGHT)
@@ -2271,12 +2271,38 @@ Log.debug(playerName + " Client.setupBattleFight()");
         server.doBattleMove(tag, hexLabel);
     }
 
+
+    private void markBattleMoveSuccessful(int tag, String endingHexLabel)
+    {
+        if (bestMoveOrder != null)
+        {
+            Iterator it = bestMoveOrder.iterator();
+            while (it.hasNext())
+            {
+                CritterMove cm = (CritterMove)it.next();
+                if (tag == cm.getTag() && 
+                    endingHexLabel.equals(cm.getEndingHexLabel()))
+                {
+                    // Remove this CritterMove from the list to show
+                    // that it doesn't need to be retried.
+                    Log.debug("markBattleMoveSuccessful() " + tag + " " + 
+                        endingHexLabel);
+                    it.remove();
+                }
+            }
+        }
+    }
+
     public void tellBattleMove(int tag, String startingHexLabel,
         String endingHexLabel, boolean undo)
     {
         if (isMyCritter(tag) && !undo)
         {
             pushUndoStack(endingHexLabel);
+            if (getOption(Options.autoPlay))
+            {
+                markBattleMoveSuccessful(tag, endingHexLabel);
+            }
         }
         BattleChit chit = getBattleChit(tag);
         if (chit != null)
@@ -2822,7 +2848,7 @@ Log.debug(playerName + " Client.setupBattleFight()");
         return movement;
     }
 
-    synchronized Strike getStrike()
+    Strike getStrike()
     {
         return strike;
     }
@@ -3654,4 +3680,13 @@ Log.debug(playerName + " Client.setupBattleFight()");
         }
     }
 
+    /** Timer-based callback for battle moves. */
+    class FinishAIBattleMove extends TimerTask
+    {
+        public void run()
+        {
+            retryFailedBattleMoves();
+            doneWithBattleMoves();
+        }
+    }
 }

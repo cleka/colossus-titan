@@ -48,7 +48,8 @@ public final class Server implements IServer
 
     // Network stuff
     private ServerSocket serverSocket;
-    private Socket [] clientSockets = new Socket[VariantSupport.getMaxPlayers()];
+    private Socket [] clientSockets = new Socket[
+        VariantSupport.getMaxPlayers()];
     private int numClients;
     private int maxClients;
 
@@ -114,7 +115,7 @@ Log.debug("About to create server socket on port " + port);
 
 
     /** Each server thread's name is set to its player's name. */
-    private String getPlayerName()
+    String getPlayerName()
     {
         return Thread.currentThread().getName();
     }
@@ -823,7 +824,7 @@ Log.debug("Called Server.addClient() for " + playerName);
     {
         if (!isBattleActivePlayer())
         {
-            Log.error(getPlayerName() + " illegally called strike()");
+            Log.error(getPlayerName() + " illegally called doBattleMove()");
             return;
         }
         boolean moved = game.getBattle().doMove(tag, hexLabel);
@@ -849,11 +850,31 @@ Log.debug("Called Server.addClient() for " + playerName);
             return;
         }
         Battle battle = game.getBattle();
-        if (battle != null)
+        if (battle == null)
         {
-            battle.getActiveLegion().getCritterByTag(tag).strike(
-                battle.getCritter(hexLabel));
+            Log.error("null battle in Server.strike()");
+            return;
         }
+        Legion legion = battle.getActiveLegion();
+        if (legion == null)
+        {
+            Log.error("null active legion in Server.strike()");
+            return;
+        }
+        Critter critter = legion.getCritterByTag(tag);
+        if (critter == null)
+        {
+            Log.error("No critter with tag " + tag + " in Server.strike()");
+            // XXX Hang here.
+            return;
+        }
+        Critter target = battle.getCritter(hexLabel);
+        if (target == null)
+        {
+            Log.error("No target in hex " + hexLabel + " in Server.strike()");
+            return;
+        }
+        critter.strike(target);
     }
 
     public synchronized void applyCarries(String hexLabel)

@@ -2016,7 +2016,7 @@ public class SimpleAI implements AI
 
     /** Simple one-ply group strike algorithm.  Return false if there were
      *  no strike targets. */
-    public synchronized boolean strike(LegionInfo legion)
+    public boolean strike(LegionInfo legion)
     {
 Log.debug("Called ai.strike() for " + legion.getMarkerId());
         // PRE: Caller handles forced strikes before calling this.
@@ -2227,7 +2227,8 @@ Log.debug("Best target is null, aborting");
      */
 
 
-    public void battleMove()
+    /** Return a list of critter moves, in best move order. */
+    public java.util.List battleMove()
     {
         Log.debug("Called battleMove()");
 
@@ -2247,53 +2248,29 @@ Log.debug("Best target is null, aborting");
         LegionMove bestLegionMove = findBestLegionMove(legionMoves);
         List bestMoveOrder = findMoveOrder(bestLegionMove);
 
-        // Now that critters are sorted into the order in which they
-        // should move, start moving them for real.  
-        // XXX If the preferred move fails, fall back to the critter's 
-        // remaining moves.
-
-        if (bestMoveOrder != null)
-        {
-            makeBattleMoves(bestMoveOrder);
-            retryFailedBattleMoves(bestMoveOrder);
-        }
-
-        Log.debug("Done with battleMove()");
+        return bestMoveOrder;
     }
 
 
-    private void makeBattleMoves(List bestMoveOrder)
+    /** Try another move for creatures whose moves failed. */
+    public void retryFailedBattleMoves(List bestMoveOrder)
     {
+        if (bestMoveOrder == null)
+        {
+            return;
+        }
         Iterator it = bestMoveOrder.iterator();
         while (it.hasNext())
         {
             CritterMove cm = (CritterMove)it.next();
             BattleChit critter = cm.getCritter();
+            String startingHexLabel = cm.getStartingHexLabel();
+            String endingHexLabel = cm.getEndingHexLabel();
 
-            String hexLabel = cm.getEndingHexLabel();
-            Log.debug("try " + critter + " to " + hexLabel);
-            client.doBattleMove(critter.getTag(), hexLabel);
-        }
-    }
-
-    private void retryFailedBattleMoves(List bestMoveOrder)
-    {
-        List retries = new ArrayList();
-
-        // Try another move for creatures whose moves failed.
-        Iterator it = bestMoveOrder.iterator();
-        while (it.hasNext())
-        {
-            CritterMove cm = (CritterMove)it.next();
-            BattleChit critter = cm.getCritter();
-            String startingHexLabel = cm.getEndingHexLabel();
-            String endingHexLabel = cm.getStartingHexLabel();
-
-            BattleChit squatter = client.getBattleChit(endingHexLabel);
-            if (squatter == null || squatter.getTag() != critter.getTag())
+            Log.debug(critter.getDescription() + " failed to move");
+            List moveList = findBattleMovesOneCritter(critter);
+            if (!moveList.isEmpty())
             {
-                Log.debug(critter.getDescription() + " failed to move");
-                List moveList = findBattleMovesOneCritter(critter);
                 CritterMove cm2 = (CritterMove)moveList.get(0);
                 Log.debug("Moving " + critter.getDescription() + " to " +
                     cm2.getEndingHexLabel());
@@ -3129,63 +3106,6 @@ Log.debug("Called findBattleMoves()");
         return sum;
     }
 
-
-    class CritterMove
-    {
-        private int value;
-        private BattleChit critter;
-        private String startingHexLabel;
-        private String endingHexLabel;
-
-        CritterMove(BattleChit critter, String startingHexLabel,
-            String endingHexLabel)
-        {
-            super();
-            this.critter = critter;
-            this.startingHexLabel = startingHexLabel;
-            this.endingHexLabel = endingHexLabel;
-        }
-
-        public void setValue(int value)
-        {
-            this.value = value;
-        }
-
-        public int getValue()
-        {
-            return value;
-        }
-
-        BattleChit getCritter()
-        {
-            return critter;
-        }
-
-        String getStartingHexLabel()
-        {
-            return startingHexLabel;
-        }
-
-        String getEndingHexLabel()
-        {
-            return endingHexLabel;
-        }
-
-        BattleHex getStartingHex(char terrain)
-        {
-            return HexMap.getHexByLabel(terrain, startingHexLabel);
-        }
-
-        BattleHex getEndingHex(char terrain)
-        {
-            return HexMap.getHexByLabel(terrain, endingHexLabel);
-        }
-
-        public String toString()
-        {
-            return critter.getDescription() + " to " + getEndingHexLabel();
-        }
-    }
 
     /** MoveList is an ArrayList of CritterMoves */
     class MoveList extends ArrayList

@@ -44,12 +44,9 @@ public final class ResourceLoader
     }
 
     /** empty the cache so that all Chits have to be redrawn */
-    public static void purgeCache()
+    public synchronized static void purgeCache()
     {
-        synchronized (imageCache)
-        {
-            imageCache.clear();
-        }
+        imageCache.clear();
     }
 
     /**
@@ -58,56 +55,54 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The Image, or null if it was not found.
      */
-    public static Image getImage(String filename, java.util.List directories)
+    public synchronized static Image getImage(String filename, 
+        java.util.List directories)
     {
         Image image = null;
         String mapKey = getMapKey(filename, directories);
-        synchronized (imageCache)
+        Object cached = imageCache.get(mapKey);
+        if ((cached != null) && (cached instanceof Image))
         {
-            Object cached = imageCache.get(mapKey);
-            if ((cached != null) && (cached instanceof Image))
+            image = (Image)cached;
+        }
+        if ((cached != null) && (cached instanceof ImageIcon))
+        {
+            image = ((ImageIcon)cached).getImage();
+        }
+        java.util.Iterator it = directories.iterator();
+        while (it.hasNext() && (image == null))
+        {
+            Object o = it.next();
+            if (o instanceof String)
             {
-                image = (Image)cached;
-            }
-            if ((cached != null) && (cached instanceof ImageIcon))
-            {
-                image = ((ImageIcon)cached).getImage();
-            }
-            java.util.Iterator it = directories.iterator();
-            while (it.hasNext() && (image == null))
-            {
-                Object o = it.next();
-                if (o instanceof String)
+                String path = (String)o;
+                for (int i = 0 ;
+                     ((i < imageExtension.length) &&
+                      (image == null)) ;
+                     i++)
                 {
-                    String path = (String)o;
-                    for (int i = 0 ;
-                         ((i < imageExtension.length) &&
-                          (image == null)) ;
-                         i++)
+                    image = tryLoadImageFromFile(filename +
+                                                 imageExtension[i], path);
+                    if (image == null)
                     {
-                        image = tryLoadImageFromFile(filename +
-                                                     imageExtension[i], path);
-                        if (image == null)
+                        ImageIcon
+                            temp = tryLoadImageIconFromResource(
+                                       filename + imageExtension[i], path);
+                        if (temp != null)
                         {
-                            ImageIcon
-                                temp = tryLoadImageIconFromResource(
-                                           filename + imageExtension[i], path);
-                            if (temp != null)
-                            {
-                                image = temp.getImage();
-                            }
+                            image = temp.getImage();
                         }
-                        if (image != null)
-                        {
-                            imageCache.put(mapKey, image);
-                        }
+                    }
+                    if (image != null)
+                    {
+                        imageCache.put(mapKey, image);
                     }
                 }
             }
-            if (image != null)
-            {
-                waitOnImage(image);
-            }
+        }
+        if (image != null)
+        {
+            waitOnImage(image);
         }
         return(image);
     }
@@ -118,60 +113,57 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The ImageIcon, or null if it was not found.
      */
-    public static ImageIcon getImageIcon(String filename, 
+    public synchronized static ImageIcon getImageIcon(String filename, 
         java.util.List directories)
     {
         ImageIcon icon = null;
         String mapKey = getMapKey(filename, directories);
-        synchronized (imageCache)
-        {        
-            Object cached = imageCache.get(mapKey);
-            if ((cached != null) && (cached instanceof Image))
+        Object cached = imageCache.get(mapKey);
+        if ((cached != null) && (cached instanceof Image))
+        {
+            icon = new ImageIcon((Image)cached);
+        }
+        if ((cached != null) && (cached instanceof ImageIcon))
+        {
+            icon = (ImageIcon)cached;
+        }
+        java.util.Iterator it = directories.iterator();
+        while (it.hasNext() && (icon == null))
+        {
+            Object o = it.next();
+            if (o instanceof String)
             {
-                icon = new ImageIcon((Image)cached);
-            }
-            if ((cached != null) && (cached instanceof ImageIcon))
-            {
-                icon = (ImageIcon)cached;
-            }
-            java.util.Iterator it = directories.iterator();
-            while (it.hasNext() && (icon == null))
-            {
-                Object o = it.next();
-                if (o instanceof String)
+                String path = (String)o;
+                for (int i = 0 ;
+                     ((i < imageExtension.length) &&
+                      (icon == null)) ;
+                     i++)
                 {
-                    String path = (String)o;
-                    for (int i = 0 ;
-                         ((i < imageExtension.length) &&
-                          (icon == null)) ;
-                         i++)
+                    Image temp =
+                        tryLoadImageFromFile(
+                            filename + imageExtension[i], path);
+                    if (temp == null)
                     {
-                        Image temp =
-                            tryLoadImageFromFile(
-                                filename + imageExtension[i], path);
-                        if (temp == null)
-                        {
-                            icon =
-                                tryLoadImageIconFromResource(filename +
-                                                             imageExtension[i],
-                                                             path);
-                        }
-                        else
-                        {
-                            icon = new ImageIcon(temp);
-                        }
-                        if (icon != null)
-                        {
-                            imageCache.put(mapKey, icon);
-                        }
+                        icon =
+                            tryLoadImageIconFromResource(filename +
+                                                         imageExtension[i],
+                                                         path);
+                    }
+                    else
+                    {
+                        icon = new ImageIcon(temp);
+                    }
+                    if (icon != null)
+                    {
+                        imageCache.put(mapKey, icon);
                     }
                 }
             }
-            while (icon != null && 
-                   icon.getImageLoadStatus() == MediaTracker.LOADING)
-            { // no need for CPU time
-                Thread.yield();
-            }
+        }
+        while (icon != null && 
+               icon.getImageLoadStatus() == MediaTracker.LOADING)
+        { // no need for CPU time
+            Thread.yield();
         }
         return(icon);
     }
@@ -395,67 +387,66 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The compisite Image, or null if any part was not found.
      */
-    public static Image getCompositeImage(String[] filenames, java.util.List directories)
+    public synchronized static Image getCompositeImage(String[] filenames, 
+        java.util.List directories)
     {
         BufferedImage bi;
-        synchronized (imageCache)
+        String mapKey = getMapKey(filenames, directories);
+        Object cached = imageCache.get(mapKey);
+        
+        if ((cached != null) && (cached instanceof Image))
         {
-            String mapKey = getMapKey(filenames, directories);
-            Object cached = imageCache.get(mapKey);
-            
-            if ((cached != null) && (cached instanceof Image))
+            return (Image)cached;
+        }
+        if ((cached != null) && (cached instanceof ImageIcon))
+        {
+            return((ImageIcon)cached).getImage();
+        }
+        Image tempImage[] = new Image[filenames.length];
+        int basew = 60, baseh = 60;
+        for (int i = 0; i < filenames.length ; i++)
+        {
+            tempImage[i] =
+                getImage(filenames[i], directories);
+            if ((i == 0) && (tempImage[i] != null))
             {
-                return (Image)cached;
+                ImageIcon tempicon = new ImageIcon(tempImage[i]);
+                basew = tempicon.getIconWidth();
+                baseh = tempicon.getIconHeight();
             }
-            if ((cached != null) && (cached instanceof ImageIcon))
+            if (tempImage[i] == null)
             {
-                return((ImageIcon)cached).getImage();
+                tempImage[i] = tryBuildingInexistantImage(filenames[i],
+                                                          basew, baseh,
+                                                          directories);
             }
-            Image tempImage[] = new Image[filenames.length];
-            int basew = 60, baseh = 60;
-            for (int i = 0; i < filenames.length ; i++)
+            if (tempImage[i] == null)
             {
-                tempImage[i] =
-                    getImage(filenames[i], directories);
-                if ((i == 0) && (tempImage[i] != null))
-                {
-                    ImageIcon tempicon = new ImageIcon(tempImage[i]);
-                    basew = tempicon.getIconWidth();
-                    baseh = tempicon.getIconHeight();
-                }
-                if (tempImage[i] == null)
-                {
-                    tempImage[i] = tryBuildingInexistantImage(filenames[i],
-                                                              basew, baseh,
-                                                              directories);
-                }
-                if (tempImage[i] == null)
-                {
-                    Log.error("during creation of [" + mapKey + 
-                        "], loading failed for " + filenames[i]);
-                    return null;
-                }
+                Log.error("during creation of [" + mapKey + 
+                    "], loading failed for " + filenames[i]);
+                return null;
             }
-            bi = new BufferedImage(basew, baseh,
-                                   BufferedImage.TYPE_INT_ARGB);
-            Graphics2D biContext = bi.createGraphics();
-            for (int i = 0; (biContext!=null) && (i < filenames.length) ; i++)
-            {
-                biContext.drawImage(tempImage[i],
-                                    0, 0,
-                                    basew, baseh,
-                                    null);
-                waitOnImage(bi);
-            }
-            if (bi != null)
-            {
-                imageCache.put(mapKey, bi);
-            }
+        }
+        bi = new BufferedImage(basew, baseh,
+                               BufferedImage.TYPE_INT_ARGB);
+        Graphics2D biContext = bi.createGraphics();
+        for (int i = 0; (biContext!=null) && (i < filenames.length) ; i++)
+        {
+            biContext.drawImage(tempImage[i],
+                                0, 0,
+                                basew, baseh,
+                                null);
+            waitOnImage(bi);
+        }
+        if (bi != null)
+        {
+            imageCache.put(mapKey, bi);
         }
         return bi;
     }
 
-    private static Image tryBuildingInexistantImage(String filename, int basew, int baseh, java.util.List directories)
+    private synchronized static Image tryBuildingInexistantImage(
+        String filename, int basew, int baseh, java.util.List directories)
     {
         Image tempImage = null;
         
@@ -524,10 +515,7 @@ public final class ResourceLoader
         }
         waitOnImage(tempImage);
         String mapKey = getMapKey(filename, directories);
-        synchronized (imageCache)
-        {
-            imageCache.put(mapKey, tempImage);
-        }
+        imageCache.put(mapKey, tempImage);
         return(tempImage);
     }
 
