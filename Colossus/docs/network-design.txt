@@ -1,0 +1,37 @@
+All players play through the network protocol, over sockets.  (Except that most
+of the AI still runs on the server side.)  The main difference between local 
+and network players is initialization.  Local players have their clients 
+initialized by the server in the server's JVM, while remote players initialize 
+their own clients using StartClient.  Both types of clients then connect to 
+the server.  (Using "localhost" for local clients.)
+
+There is one ServerSocket, attached to Server.  It waits for maxClients (equal 
+to the total number of players in the game, of all types) to connect.  Each 
+time a client connects, it spawns a SocketServerThread which is associated with
+that client.  The SocketServerThread has an infinite while() loop that listens 
+for traffic on the socket, parses it, and calls appropriate methods on Server.
+
+SocketServerThread also implements IClient, so the Server can call Client 
+methods on the appropriate SocketServerThread, which then stringifies them and 
+sends them over the socket to the client.
+
+The way this is managed is that each SocketServerThread has its thread name set 
+to that client's player name.  (They must be unique -- we add numbers to the 
+end of non-unique names to force this.)  Server keeps a list and map of 
+clients, and so when the server asks for a client by name it actually gets the 
+appropriate SocketServerThread.  And any code inside Server is running in a 
+thread, so Thread.currentThread().getName() says which client called this 
+method. (Useful for authenticating that the correct player is acting.)
+
+Each Client has a SocketClientThread, which opens a socket to the server at the 
+passed host and port.  (The default is localhost:1969)  SocketClientThread 
+implements IServer and handles sending outbound traffic to the server.
+
+The protocol is a straight stringification of the remote methods in Client and 
+Server.  We join the method name and all its arguments into a String, and then 
+split them back apart on the other side.  Compound arguments (Set, List, etc.) 
+are themselves joined and split, using a different joining sequence.  The 
+grunt work is done in the Glob and Split classes in util.  The parsing is just 
+a giant case statement. Yes, this is ugly and hard to maintain.  But it 
+shouldn't need to change much.
+

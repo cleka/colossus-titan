@@ -22,15 +22,15 @@ It has the same requirements as Colossus itself, see
 and
 \htmladdnormallink{Colossus build-HOWTO}{../../build/index.html}.
 
-To create the program, just type ``make tools'' or ``and tools''.
+To create the program, just type ``make tools'' or ``ant tools''.
 See the
 \htmladdnormallink{Colossus build-HOWTO}{../../build/index.html}
 for more details.
 This should create all the tools for Colossus, including
 BattlelandsRandomizer.
 
-BattlelandsRandomizer use an input file that describe
-the properties of the future Battleland, and generate
+BattlelandsRandomizer uses an input file that describes
+the properties of the future Battleland, and generates
 one random Battleland. At the moment, it's a purely
 static, text-based process.
 
@@ -39,10 +39,10 @@ The Randomizer used can also be accessed from inside
 in a much more user-friendly way. An input file (described below) is
 still needed.
 
-Examples of random input file can be found in the
+Examples of random input files can be found in the
 ``Random'' subdirectory.
 
-Properties are line of one of the three forms:
+Properties are lines of one of the three forms:
 
 \begin{enumerate}
 
@@ -135,19 +135,19 @@ where
 \end{itemize}
 
 BattlelandsRandomizer will then, for each \texttt{AREA}, try to put the
-Hazard in any one of the Hex in the \texttt{AREA}. An Hex will not receive
-two hazards, but if an Hex is present multiple times in the same
+Hazard in any one of the Hexes in the \texttt{AREA}. A Hex will not receive
+two hazards, but if a Hex is present multiple times in the same
 \texttt{AREA}, it may receive one Hazard per occurence of the Hex. In this
 case, only the last Hazard is used.
 
 \texttt{AERA}s are processed in order, so an Hex that appears in multiple
-\texttt{AREAS} may also receive multiple Hazards. In this case alsom
+\texttt{AREAS} may also receive multiple Hazards. In this case
 only the last Hazard is used.
 
 Note that all hexsides use the same \texttt{PAIR}-defined probability. Only the
 last \texttt{PAIR} statement is used for a given pair. For this purpose, all
-elevation including * are different. The more specific statement will
+elevations including * are different. The more specific statement will
 be used (i.e. (s,0)(p,0) will be used instead of (s,*)(p,*) for
-the hexside between a 0-height Sand and a O-height Plains).
+the hexside between a 0-height Sand and a 0-height Plains).
 
 \end{document}

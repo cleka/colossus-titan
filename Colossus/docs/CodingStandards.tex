@@ -37,10 +37,10 @@ designers follow Python's lead and just ditch the braces), but
 consistency within a project is more important than personal
 preference.
 
-\item Colossus currently compiles and runs under JDK 1.2. Try to
-keep it that way. At some point we might decide to bump the JDK
-version requirement for a truly great feature (e.g. templated
-container classes), but don't do it trivially. 
+\item Colossus currently compiles and runs under JDK 1.3. Try to
+keep it that way. We might decide to bump the JDK version requirement 
+for a truly great feature (e.g. templated container classes), but 
+that requires consensus of all developers.
 
 \item Keep all member variables private, except for constants.
 Use get/set methods to share. (But don't automatically add 
@@ -57,8 +57,7 @@ instead of regular comments where applicable.
 either private (if possible) or package private (if needed
 by other classes in the package), unless it needs to be public.
 And just because a method is public doesn't mean it should be
-called from outside the package. Remember, there will only
-be a network interface between Client and Server.
+called from outside the package.
 \label{permission}
 
 \item Some methods are private because they're not used outside of
@@ -68,7 +67,7 @@ not currently subclassed, not because they should never be
 subclassed. These are optimizations for both programmers (who
 don't need to check to see if other classes call / override
 something before changing it if it's tagged private / final) and
-for the JVM, not necessarily design statements. So feel free
+for the JVM, not necessarily final design statements. So feel free
 to change such things as necessary, until the interfaces are
 finalized and polished and other people depend upon them. But
 see \#\ref{permission}.

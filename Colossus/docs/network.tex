@@ -22,38 +22,34 @@ add the ability to reconnect or have an AI take over later.)  So I
 recommend starting with 2-player games rather than 6-player games.
 
 One person needs to run the server.  For now, Colossus servers are 
-short-lived, staying up only for the length of one game.  The server
-needs a local copy of the Colossus code, and a Java Development Kit 
-or Java Runtime Environment.  The JDK/JRE bin directory needs to be 
-in the PATH.  And the server computer needs to have a well-known 
-hostname or IP address accessible to the other players' computers, 
-without draconian firewalling.
+short-lived, staying up only for the length of one game.
 
-The server operator simply runs the normal "run" script used to run 
-hotseat games.  The startup dialog should appear as normal, allowing 
-you to set the variant, optional rules, and how many players of which 
-types you want.  Human players are local to the server machine.  
-Network players are remote.  The game will wait for *exactly* the 
-number of network players you specify, then start the game.  If you 
-prefer, you can use command-line options instead.  ``\texttt{run -h}'' 
-to see them.
+The server operator simply starts the game as usual, using Java Web
+Start or the ``run'' script for a local copy.  The startup dialog 
+should appear, allowing you to set the variant, optional rules, and 
+how many players of which types you want.  Human players are local 
+to the server machine.  Network players are remote.  The game will 
+wait for *exactly* the number of network players you specify, then 
+start the game.  If you have a local copy of the game you can use 
+command-line options instead.  ``\texttt{run -h}'' to see them.
 
 Each client needs to wait for the server to be started, then run
-the runclient script.  It will pop up a dialog that lets you enter
-a player name, hostname, and port.  The player name will default to 
-your OS user name.  The server host will default to the local machine, 
-which probably isn't what you want unless you're doing loopback testing.  
-You can use the IP address instead of the hostname if you prefer.  Most
-servers will use the default port.  Again, you can use command-line 
-options instead.  ``\texttt{runclient -h}'' to see them.
+the runclient script or click on the client Java Web Start icon.  
+It will pop up a dialog that lets you enter a player name, hostname, 
+and port.  The player name will default to your OS user name.  The 
+server host will default to the local machine, which probably isn't 
+what you want unless you're doing loopback testing.  You can use the 
+IP address instead of the hostname if you prefer.  Most servers will 
+use the default port.  Again, you can use command-line options 
+instead.  ``\texttt{runclient -h}'' to see them.
 
 Once all the clients have connected, then the game should start up like
 a normal Colossus game.  When the game ends, kill all the clients and
 the server and restart from scratch next time.
 
-We don't have a built-in chat client yet, so you might want to run
-your favorite IRC or instant messenger client in the background. 
-
+There is a simple chat client built in, but it doesn't persist across
+multiple games, so you might want to run your favorite IM or IRC client
+alongside the game.
 
 \section{FAQ}
 

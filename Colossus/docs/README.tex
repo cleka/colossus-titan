@@ -16,24 +16,29 @@
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
-It's not done yet. Right now it allows hotseat play, and play against a
-mostly working but not-quite-ready-for-prime-time AI. Client/server 
-networking is in development. (Really, we're getting closer.)
+It's not finished yet. Right now it allows hotseat play, and play against a 
+mostly working but not-quite-ready-for-prime-time AI. Client/server
+networking is done but still a bit rough. You can play with the standard Titan
+rules, or choose from several variants.
 
-This program is freeware, distributed under the GNU public license, which
-is included in the file COPYING.GPL. This means that you have the right to
-make and distribute changes, as long as you always include the source code
-so that others can do the same. If you fix any bugs or add any features,
-please send me a copy so that I can fold them into the master code.
+This program is freeware, distributed under the GNU public license, which is 
+included in the file COPYING.GPL. This means that you have the right to make 
+and distribute changes, as long as you always include the source code so that 
+others can do the same. If you fix any bugs or add any features, please send 
+us a copy so that we can fold them into the master code.
 
 \section{Game requirements}
 
-A 1.3 or later version of a JRE (Java runtime environment) or JDK (Java development kit). 
+A 1.3 or later version of a JRE (Java runtime environment) or JDK (Java 
+development kit). 
 
-(Colossus will not run under JRE 1.0.x or 1.1.x or 1.2.x  [We just broke 1.2
-support when we started using PNG files.]  It won't currently run as an applet 
-in a web browser. The obsolete Microsoft JVM that's bundled with IE and Windows 
-won't work. Sorry.)
+Unless you're an advanced Java user, then you should probably use Java Web 
+Start, which will automatically download and install the correct JRE for you.
+\htmladdnormallink{http://java.sun.com/products/javawebstart/}{http://java.sun.com/products/javawebstart/}
+
+(Colossus will not run under JRE 1.0.x or 1.1.x or 1.2.x  It won't run as an 
+applet in a web browser. The obsolete Microsoft JVM that's bundled with IE and 
+Windows won't work.)
 
 Windows, Solaris, and x86 Linux versions of the JRE and JDK are freely 
 downloadable from \htmladdnormallink{http://java.sun.com}{http://java.sun.com}.
@@ -42,79 +47,78 @@ Another Linux port is available from
 \htmladdnormallink{http://www.blackdown.org}{http://www.blackdown.org}.
 
 The Mac version is at
-\htmladdnormallink{http://devworld.apple.com/java/}{http://devworld.apple.com/java/}
+\htmladdnormallink{http://devworld.apple.com/java/}{http://devworld.apple.com/java/}.
 
 Info on other ports (AIX, OS/2, etc.) is at 
-\htmladdnormallink{http://java.sun.com/cgi-bin/java-ports.cgi}{http://java.sun.com/cgi-bin/java-ports.cgi}
+\htmladdnormallink{http://java.sun.com/cgi-bin/java-ports.cgi}{http://java.sun.com/cgi-bin/java-ports.cgi}.
 
-The current recommended version is Sun JRE 1.4.0 on platforms that have it, 
-(Windows, x86 Linux, Solaris) and 1.3.1 on platforms that don't.  (We know 
-of some GUI bugs in 1.3.1 for Linux that are fixed in 1.4.0.)
+The current recommended version is Sun JRE 1.4.0 on platforms that have it,
+(Windows, x86 Linux, Solaris) and 1.3.1 on platforms that don't.  (We know of 
+some GUI bugs in 1.3.1 that are fixed in 1.4.0.)
 
-If in doubt, you probably want to visit:
-\htmladdnormallink{http://java.sun.com/j2se/1.4/download.html}{http://java.sun.com/j2se/1.4/download.html}
-
-You also need a computer with a mouse and a color display.  The minimum
-system spec is about a Pentium 133 with 64MB.  The recommended system
-is about a 300 MHz CPU and 128MB.  It's free, so if you don't know if
-your system is fast enough, just try it.
+You also need a computer with a mouse and a color display.  The minimum system
+spec is about a Pentium 133 with 64MB.  The recommended system is about a 300 
+MHz CPU and 128MB.  It's free, so if you don't know if your system is fast 
+enough, just try it.
 
 \section{Getting the program to run}
 
-The easiest way to run the game, if you already have Java Web Start (or
-an equivalent JNLP launcher) installed on your computer, is to click on 
-the Java Web Start link on the web page. This will download the game, 
-upgrade your JRE if necessary, make a shortcut icon if you want, etc.
-Really slick, when it works. If it doesn't work, you have other options.
+The easiest way to run the game, if you already have Java Web Start (or an 
+equivalent JNLP launcher) installed on your computer, is to click on the Java 
+Web Start link on the web page 
+(\htmladdnormallink{http://colossus.sf.net}{http://colossus.sf.net}).  
+This will download the latest version of the game, upgrade your JRE if 
+necessary, make a shortcut icon if you want, etc.  Really slick, when it works.
+If it doesn't work, you have other choices.
 
 Another option is to run the executable jar file. If you downloaded 
-Colossus.jar by itself, you're set. If you downloaded a zip file, you'll 
-need to unzip it using your favorite unzip tool and find the jar file 
-inside. Try double-clicking on Colossus.jar in your GUI file manager. 
-If that doesn't work, pop up a command prompt, cd to the directory where 
-you unzipped the zip file, and try typing ``java -jar Colossus.jar''
+Colossus.jar by itself, you're set. If you downloaded a zip file, you will need
+to unzip it using your favorite unzip tool and find the jar file inside. Try 
+double-clicking on Colossus.jar in your GUI file manager.  If that fails,
+pop up a command prompt, cd to the directory where you unzipped the zip file, 
+and try typing ``java -jar Colossus.jar''
 
-Yet another option, in case the jar file is temporarily broken for some
-reason, is to expand the whole game tree and run the Start class manually. 
-Unzip the zip file and try ``java net.sf.colossus.server.Start''
+Yet another option, in case the jar file is temporarily broken for some reason, 
+is to expand the whole game tree and run the Start class manually.  Unzip the 
+zip file and try ``java net.sf.colossus.server.Start''  (Or use ``run'' or
+``run.bat''.)
 
 \section{Game play instruction}
 
-I assume you already know how to play Titan. The full rules are copyrighted 
-by Avalon Hill, so I can't provide them. Titan is an excellent boardgame, 
-and I recommend that everyone buy a copy while you still can. (Avalon Hill 
-was bought by Hasbro, which may or may not decide to reprint Titan in 
-something like its original form.)
+I assume you already know how to play Titan. The full rules are copyrighted by 
+Avalon Hill, so I can't provide them. Titan is an excellent boardgame, and I 
+recommend that everyone buy a copy while you still can. (Avalon Hill was bought 
+by Hasbro, which may or may not decide to reprint Titan in something like its 
+original form.)
 
-Once you get things running, a dialog should pop up, allowing you to
-choose up to six player types (human, AI, or not present) and their names.
-You can also choose a variant.  When you're done, click ``OK'' 
+Once you get things running, a dialog should pop up, allowing you to choose up 
+to six player types (human, AI, or not present) and their names.  You can also 
+choose a variant.  When you're done, click ``OK'' 
 
 Another dialog will pop up, telling you which tower each player gets and 
 letting players pick colors in increasing order of tower number. Pick colors 
-for each human player. If you misclick, click ``Restart'' When every player 
-has a color, click ``Done''
+for each human player.
 
 Now a window will pop up for each player, letting him pick his initial legion
 marker. Pick one. (If you really don't care, use the ``Auto pick markers''
-option on the Player menu.)  (NOTE: This is currently broken -- each player
+option on the Player menu.)\footnote{This is currently broken -- each player
 is automatically assigned a first legion marker even if ``Auto pick markers''
-is off.)
+is off.}
 
 After each player has picked his initial legion marker, the MasterBoard window
-will pop up. You'll see each player's initial legion marker sitting in a
-tower hex. You'll also see a small window in the lower right corner of the
-screen. This is the Game Status window, which tracks each player's score,
-number of legion markers remaining, etc. And there's a Caretaker window which 
-tracks how many of each creature remain in the stacks. (These are both optional: 
-turn them on or off from the Graphics menu.)
+will pop up. You'll see each player's initial legion marker sitting in a tower 
+hex. You'll also see a small window in the lower right corner of the screen. 
+This is the Game Status window, which tracks each player's score, number of 
+legion markers remaining, etc. And there's a Caretaker window which tracks how 
+many of each creature remain in the stacks. (These are both optional: turn them
+on or off from the Graphics menu.)
 
 You can right-click (or control-click if you have a one-button mouse) on a 
-legion to see its contents. (Unless you've selected ``All stacks visible'' on 
+legion to see its contents. (Unless you've selected ``All stacks visible'' on
 the Game menu, the contents of other players' legions are hidden, except for 
-those creatures which have recently been revealed via fighting, recruiting, 
-or teleporting). You can right-click on a hex to call up a menu, which lets 
-you either see what you can recruit in that hex, or its battle map.
+those creatures which have recently been revealed via fighting, recruiting, or
+teleporting). You can right-click on a hex to call up a menu, which lets you 
+either see what you can recruit in that hex, or its battle map.
 
 The active player first needs to split his initial 8-high legion. You'll
 notice that the hex containing the active player's legion is lit up as a
@@ -128,15 +132,16 @@ legions contains three Creatures and one Lord. When you're ready, select
 Done from the Phase menu.
 
 Next comes the movement phase. The game will tell you your movement roll.
-Click on a legion, and the places it can move will light up. Little pictures
-of the creatures the legion can recruit in hex will also appear. Click on 
-one of those places, and the legion will move there. (In some cases, you 
-will need to choose whether to teleport or move normally, or which lord 
-teleports if there is more than once choice.) The ``Undo Last Move'' and
-``Undo All Moves'' actions are there in case you change your mind. During the
-first turn only, and once only, there will be a ``Take Mulligan'' action which
-you can use to re-roll your movement. When you're done moving everything you
-want to move, select Done.
+Click on a legion, and the places it can move will light up. Little pictures of
+the creatures the legion can recruit in hex will also appear. Click on one of 
+those places, and the legion will move there. (In some cases, you will need to 
+choose whether to teleport or move normally, or which lord teleports if there 
+is more than once choice.) The ``Undo Last Move'' and ``Undo All Moves'' 
+actions are there in case you change your mind. During the first turn only, 
+and once only, there will be a ``Take Mulligan'' action which you can use to 
+re-roll your movement. When you're done moving everything you want to move, 
+select Done.\footnote{If you look closely at the menus you'll see that many of 
+the frequently used options have hotkeys, like 'd' for "Done."}
 
 If you moved any legions onto enemy legions, then next comes the engagement
 phase. Each hex with an engagement will light up. Click on the one you want
@@ -219,8 +224,7 @@ click on the SourceForge icon, and click on Bugs. (If that's too hard
 you can just send email.)
 
 We've tried to get the rules right, though a few areas (concession timing,
-in particular) are still off. Bruno Wolff's Titan Errata and Clarifications
-at
+in particular) are still off. Bruno Wolff's Titan Errata and Clarifications at
 \htmladdnormallink{http://wolff.to/titan/errata.shtml}{http://wolff.to/titan/errata.shtml}
 is a good place to check for rules issues.
 

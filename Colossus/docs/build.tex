@@ -73,9 +73,8 @@ the things that point to it.
 
 \subsection{Other compilers}
 
-\hypercite{Jikes}{Jikes}{}{JIKES} is Open Source very fast Java compiler
-written in C++, originally
-written by \texttt{IBM}. Its speed is very nice, and it has some other neat 
+\hypercite{Jikes}{Jikes}{}{JIKES} is a very fast Open Source Java compiler
+written in C++, originally by \texttt{IBM}. Its speed is very nice, and it has some other neat 
 features like incremental compilation, more warnings, etc. However, 
 jikes produces slightly different class files than javac, which 
 sometimes causes problems. So I recommend using Jikes most of the time,
@@ -146,13 +145,24 @@ as a transport mechanism, which complicates cvs setup a bit. There are a
 lot of \texttt{CVS} + ssh setup directions on \texttt{SF}. If you can't
 get it to work, ask for help.
 
-If you're under Win32 (that's MS Windows 95+ or NT and later), see
-\hypercite{PuTTY}{}{}{PUTTY} for a SSH/Telnet client. General SourceForge
-documentation is at \htmladdnormallink{http://sourceforge.net/docman/?group\_id=1}{http://sourceforge.net/docman/?group\_id=1}.
+If you're using Windows see \hypercite{PuTTY}{}{}{PUTTY} for a good free 
+SSH/Telnet client. General SourceForge documentation is at 
+\htmladdnormallink{http://sourceforge.net/docman/?group\_id=1}{http://sourceforge.net/docman/?group\_id=1}.
 
-\begin{itemize}
-\item[TODO:] Insert \texttt{SF} \texttt{CVS} setup instructions, etc.
-\end{itemize}
+
+If you're using Unix (bash syntax, I assume you can convert to csh or whatever):
+
+export CVSROOT=username@cvs1.sourceforge.net:/cvsroot/colossus
+
+export CVS\_RSH=ssh
+
+If you're using Windows:
+
+set CVSROOT=username@cvs1.sourceforge.net:/cvsroot/colossus
+
+set CVS\_RSH=c:/putty/plink.exe
+
+set PLINK\_PROTOCOL=ssh
 
 \subsection{Java Web Start}
 
@@ -208,7 +218,8 @@ creating whole-file false diffs or files that look awful if someone has
 different tab stop settings than yours. (Yes, cross-platform development
 adds a few wrinkles.)
 
-Among the nice editors for Unix, there's \hypercite{XEmacs}{XEmacs}{}{XEMACS}. XEmacs can use the
+Two popular free portable editors are \hypercite{Vim}{Vim}{}{Vim} and 
+\hypercite{XEmacs}{XEmacs}{}{XEMACS}. XEmacs can use the
 \hypercite{Java Development Environment for Emacs}{Java Development Environment for Emacs}{}{JDE}.
 
 \section{Optional tools}
@@ -217,6 +228,9 @@ Among the nice editors for Unix, there's \hypercite{XEmacs}{XEmacs}{}{XEMACS}. X
 
 \texttt{JS}wat is free and pretty good.
 \htmladdnormallink{http://www.bluemarsh.com/java/jswat/}{http://www.bluemarsh.com/java/jswat/}
+
+(The problem with debuggers in general is that they work great with simple 
+code but tend to fall over with complex multithreaded, distributed code.)
 
 \subsection{Profilers}
 
@@ -280,14 +294,9 @@ use. Basically, skim through ``build.xml''.
 
 \section{Testing}
 
-Testing is currently manual.  You play the game a lot and look for problems.
-This misses a lot of problems, so we need to start adding JUnit tests.
-
-\section{Gotchas}
-
-\begin{itemize}
-\item[TODO:] Find out what confuses people and fix or document it.
-\end{itemize}
+Most testing is currently manual.  You play the game a lot and look for 
+problems.  This misses a lot of bugs, so we've started adding JUnit tests.
+``ant test'' will run the ones we have.  Feel free to add more.
 
 \addcontentsline{toc}{section}{References}
 \bibliographystyle{plain}
