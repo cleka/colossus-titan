@@ -637,6 +637,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
 
     void twoNegotiate(Legion attacker, Legion defender)
     {
+    /* TODO Put negotiation back in.
         Client client1 = getClient(defender.getPlayerName());
         client1.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
@@ -646,6 +647,9 @@ Log.debug("called Server.createSummonAngel for " + legion);
         client2.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
             defender.getMarkerId(), attacker.getCurrentHexLabel());
+    */
+
+        fight(attacker.getCurrentHexLabel());
     }
 
     // XXX Stringify the proposal.
