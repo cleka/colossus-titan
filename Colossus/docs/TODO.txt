@@ -18,7 +18,6 @@ Add test main() to remaining dialogs.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 Add auto-forced-strike option.
-Add auto-pick-legion-markers option.
 Add auto-pick-entry-side option.
 Add auto-MasterBoard-move option.
 Add auto-BattleMap-move option.
