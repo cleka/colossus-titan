@@ -2123,18 +2123,19 @@ public class SimpleAI implements AI
         
         int result = estimateBattleResults(enemy, legion,
                                            legion.getCurrentHex());
-
         switch (result)
         {
-        case WIN_WITH_MINIMAL_LOSSES:
         case WIN_WITH_HEAVY_LOSSES:
         case DRAW:
         case LOSE_BUT_INFLICT_HEAVY_LOSSES:
+        case LOSE:
             Log.debug("Legion " + legion.getMarkerId() + " doesn't flee " +
                       " before " + enemy.getMarkerId() + " with result " + 
-                      result);
+                      result + " (" + legion.getPointValue() + " vs. " + 
+                      enemy.getPointValue() + " in " +
+                      legion.getCurrentHex().getTerrainName() + ")");
             return false;
-        case LOSE:
+        case WIN_WITH_MINIMAL_LOSSES:
             // don't bother unless we can try to weaken the titan stack
             // and we aren't going to help him by removing cruft
             // also, 7-height stack never flee and wimpy stack always flee
