@@ -135,31 +135,3 @@ Bug: Angel acquiring is broken.  Default variant.
      Legion Rd01 (Cross) in Tower hex 300 recruits Warlock with 1 Titan
      Legion Rd03 (Fist) in Marsh hex 112 recruits Troll with 2 Ogres
      Legion Rd02 (Eagle) in Tower hex 200 recruits Centaur with 1 Angel
-
-Bug: dripton rolls a 2 for movement
-     Legion Rd02 (Eagle) in 5 moves to Plains hex 105 entering on Right
-     Legion Br01 (Antlers) in 108 moves to Plains hex 6 entering on Left
-     Legion Br02 (Bell) in 7 moves to Brush hex 3 entering on Bottom
-     Legion Br03 (Chest) in 139 moves to Brush hex 137 entering on Right
-     Legion Br04 (Figurehead) [Gargoyle, Gargoyle] is eliminated
-     called Client.removeMarker() for Br04
-     called Client.removeMarker() for Br04
-     removed marker from iterator and legionToHex
-     Error: Could not find hex null
-     called board.alignLegions() for null
-     called Client.removeMarker() for Br04
-     called Client.removeMarker() for Br04
-     called Client.removeMarker() for Br04
-     called Client.removeMarker() for Br04
-     Legion Br04 (Figurehead) recombined into legion Rd01 (Cross)
-
-Bug: Cancelled a post-battle SummonAngel (either way)
-     Error: Could not find hex null
-     java.lang.NullPointerException
-        at net.sf.colossus.client.Client.repaintHexByMarkerId(Client.java:148)
-        at net.sf.colossus.client.Client.doSummon(Client.java:136)
-        at net.sf.colossus.client.SummonAngel.cleanup(SummonAngel.java:106)
-        at net.sf.colossus.client.SummonAngel.actionPerformed(SummonAngel.java:199)
-     SummonAngel Dialog stayed around.  Next fight, same phase, tried to
-        summon but could not.
-

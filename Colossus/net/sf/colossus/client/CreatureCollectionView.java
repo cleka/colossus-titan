@@ -13,6 +13,7 @@ import net.sf.colossus.server.Creature;
  *  Viewer for a collection, say the graveyard or the creature keeper
  *  @version $Id$
  *  @author Tom Fruchterman
+ *  @author David Ripton
  */
 class CreatureCollectionView extends JDialog
 {

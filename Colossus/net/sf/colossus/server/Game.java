@@ -23,7 +23,7 @@ import net.sf.colossus.client.VariantSupport;
  * Class Game gets and holds high-level data about a Titan game.
  * @version $Id$
  * @author David Ripton
- * @author Bruce Sherrod <bruce@thematrix.com>
+ * @author Bruce Sherrod
  * @author Romain Dolbeau
  */
 
@@ -51,6 +51,7 @@ public final class Game
     private Set colorsLeft;
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Properties options = new Properties();
+
 
     Game()
     {
@@ -307,7 +308,8 @@ public final class Game
         setupPhase();
 
         server.allUpdateStatusScreen();
-        server.allUpdateCaretakerDisplay();
+        // XXX Needed?
+        server.allUpdateCreatureCounts();
     }
 
 
@@ -1159,7 +1161,9 @@ public final class Game
             setupPhase();
 
             server.allUpdateStatusScreen();
-            server.allUpdateCaretakerDisplay();
+
+            // XXX Needed?
+            server.allUpdateCreatureCounts();
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -2215,6 +2219,7 @@ reinforcing + " acquiring=" + acquiring);
             return false;
         }
         Player player = legion.getPlayer();
+        String startingHexLabel = legion.getCurrentHexLabel();
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
 
         // Teleport only if it's the only option.
@@ -2237,8 +2242,16 @@ reinforcing + " acquiring=" + acquiring);
             entrySide = (String)(sides.iterator().next());
         }
 
-        return doMove(markerId, hexLabel, entrySide, teleport, 
+Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord + 
+" entrySide=" + entrySide); 
+
+        boolean moved = doMove(markerId, hexLabel, entrySide, teleport, 
             teleportingLord);
+        if (moved)
+        {
+            server.allTellDidMove(markerId, startingHexLabel, hexLabel);
+        }
+        return moved;
     }
 
 

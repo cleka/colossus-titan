@@ -813,12 +813,13 @@ public class SimpleAI implements AI
                     if (game.doMove(legion.getMarkerId(), bestHex.getLabel()))
                     {
                         moved = true;
-                        game.getServer().allTellDidMove(legion.getMarkerId(),
-                            legion.getStartingHexLabel(), 
-                            legion.getCurrentHexLabel());
                         // Break out of the move loop and start over with
                         // the highest-priority unmoved legion.
                         break;
+                    }
+                    else
+                    {
+                        Log.debug("Move failed 1");
                     }
                 }
             }
@@ -887,7 +888,7 @@ public class SimpleAI implements AI
                     if (!game.doMove(move.legion.getMarkerId(), 
                         move.hex.getLabel()))
                     {
-                        Log.debug("Move failed");
+                        Log.debug("Move failed 2");
                     }
 
                     // check again if this legion is ok; if so, break
@@ -956,7 +957,10 @@ public class SimpleAI implements AI
                     + " taking penalty " + move.difference
                     + " in order to handle illegal legion " + move.legion);
 
-            game.doMove(move.legion.getMarkerId(), move.hex.getLabel());
+            if (!game.doMove(move.legion.getMarkerId(), move.hex.getLabel()))
+            {
+                Log.debug("Move failed 3");
+            }
         }
     }
 

@@ -86,6 +86,10 @@ public final class Client
     /** Map of markerId to hexLabel */
     private Map legionToHex = new HashMap();
 
+    /** Map of creature name to Integer count.  As in Caretaker, if an entry
+     *  is missing then we assume it is set to the maximum. */
+    private Map creatureCounts = new HashMap();
+
 
     public Client(Server server, String playerName)
     {
@@ -144,8 +148,14 @@ public final class Client
             return;
         }
         String hexLabel = getHexForLegion(markerId);
-        GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-        hex.repaint();
+        if (hexLabel != null)
+        {
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            if (hex != null)
+            {
+                hex.repaint();
+            }
+        }
     }
 
 
@@ -296,7 +306,7 @@ public final class Client
         }
         else if (name.equals(Options.showCaretaker))
         {
-            updateCaretakerDisplay();
+            updateCreatureCounts();
         }
         else if (name.equals(Options.showLogWindow))
         {
@@ -450,10 +460,26 @@ public final class Client
     }
 
 
-    // TODO Rename.  Should take all caretaker counts as a parameter
-    // rather than having the display call back to server.
-    public void updateCaretakerDisplay()
+    private void updateCreatureCounts()
     {
+        updateCreatureCounts(null);
+    }
+
+    // TODO Stringify
+    public void updateCreatureCounts(Map counts)
+    {
+        if (counts != null)
+        {
+            Iterator it = creatureCounts.entrySet().iterator();
+            while (it.hasNext())
+            {
+                Map.Entry entry = (Map.Entry)it.next();
+                String creatureName = (String)entry.getKey();
+                Integer num = (Integer)entry.getValue();
+                creatureCounts.put(creatureName, num);
+            }
+        }
+
         if (getOption(Options.showCaretaker))
         {
             if (caretakerDisplay == null)
@@ -771,9 +797,33 @@ Log.debug("called board.alignLegions() for " + hexLabel);
             board.requestFocus();
         }
 
-        // Waiting until the board is loaded to load options makes
-        // it easier to sync the option checkboxes.
+        // Now that the board is ready we can load options and
+        // sync the option checkboxes.
         loadOptions();
+
+        sleepWhileImagesLoad();
+    }
+
+
+    // XXX Trying to give the image loading background thread a
+    // fair shot at the CPU.  Need to find the right calling point.
+    void sleepWhileImagesLoad()
+    {
+        if (board == null)
+        {
+            return;
+        }
+
+Log.debug("Sleeping to let images load");
+        try
+        {
+            Thread.sleep(2000);
+        }
+        catch (InterruptedException ex)
+        {
+            Log.debug("Interrupted");
+        }
+Log.debug("Done sleeping");
     }
 
 
@@ -824,6 +874,7 @@ Log.debug("called board.alignLegions() for " + hexLabel);
 
     public void askAcquireAngel(String markerId, java.util.List recruits)
     {
+Log.debug("called Client.askAcquireAngel()");
         if (getOption(Options.autoAcquireAngels))
         {
             acquireAngelCallback(markerId, ai.acquireAngel( markerId,
@@ -838,11 +889,13 @@ Log.debug("called board.alignLegions() for " + hexLabel);
 
     void acquireAngelCallback(String markerId, String angelType)
     {
+Log.debug("called Client.acquireAngelCallback()");
         server.acquireAngel(markerId, angelType);
-        // XXX repaint just the one hex.
         if (board != null)
         {
-            board.repaint();
+            String hexLabel = getHexForLegion(markerId);
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            hex.repaint();
         }
     }
 
@@ -1730,10 +1783,17 @@ Log.debug("Client.getCarryTargets()");
         return server.getActivePlayerNum();
     }
 
+
     int getCreatureCount(String creatureName)
     {
-        return server.getCreatureCount(creatureName);
+        Integer count = (Integer)creatureCounts.get(creatureName);
+        if (count == null)
+        {
+            return Creature.getCreatureByName(creatureName).getMaxCount();
+        }
+        return count.intValue();
     }
+
 
     java.util.List getLegionsByHex(String hexLabel)
     {

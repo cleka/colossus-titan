@@ -328,7 +328,7 @@ final class Legion implements Comparable
             }
         }
         angelsToAcquire--;
-        if (angelsToAcquire == 0)
+        if (angelsToAcquire <= 0)
         {
             game.doneAcquiringAngels();
         }

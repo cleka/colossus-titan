@@ -16,6 +16,8 @@ import net.sf.colossus.util.Log;
  *
  * @version $Id$
  * @author Bruce Sherrod
+ * @author David Ripton
+ * @author Tom Fruchterman
  */
 
 
@@ -25,7 +27,6 @@ final class Caretaker implements Cloneable
      *  creature is not found, assume that we have a full count (equal
      *  to Creature.getMaxCount()) */
     private HashMap map = new HashMap();
-
     private Game game;
 
 
@@ -37,7 +38,7 @@ final class Caretaker implements Cloneable
 
     int getCount(String strCreatureName)
     {
-        Integer count = (Integer) map.get(strCreatureName);
+        Integer count = (Integer)map.get(strCreatureName);
         if (count == null)
         {
             return (Creature.getCreatureByName(strCreatureName).getMaxCount());
@@ -63,13 +64,13 @@ final class Caretaker implements Cloneable
 
     void resetAllCounts()
     {
-        map = new HashMap();
+        map.clear(); 
         updateDisplays();
     }
 
     void takeOne(Creature creature)
     {
-        Integer count = (Integer) map.get(creature.getName());
+        Integer count = (Integer)map.get(creature.getName());
         if (count == null)
         {
             Log.event("First " + creature.getName() + " recruited");
@@ -87,7 +88,7 @@ final class Caretaker implements Cloneable
             {
                 Log.event("Last " + creature.getName() + " recruited");
             }
-            map.put(creature.getName(), new Integer(count.intValue()-1));
+            map.put(creature.getName(), new Integer(count.intValue() - 1));
         }
         updateDisplays();
     }
@@ -111,7 +112,7 @@ final class Caretaker implements Cloneable
             Server server = game.getServer();
             if (server != null)
             {
-                server.allUpdateCaretakerDisplay();
+                server.allUpdateCreatureCounts();
             }
         }
     }
@@ -122,7 +123,6 @@ final class Caretaker implements Cloneable
         return (Caretaker)clone();
     }
 
-
     public Object clone()
     {
         Caretaker newCaretaker = new Caretaker(game);
@@ -130,5 +130,10 @@ final class Caretaker implements Cloneable
         // the same as a deep copy
         newCaretaker.map = (HashMap)map.clone();
         return newCaretaker;
+    }
+
+    Map getCreatureCountMap()
+    {
+        return Collections.unmodifiableMap((Map)map.clone());
     }
 }

@@ -77,13 +77,15 @@ public final class Server
         }
     }
 
-    void allUpdateCaretakerDisplay()
+    // TODO Only update the ones that have changed.
+    void allUpdateCreatureCounts()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.updateCaretakerDisplay();
+            Map creatureCountMap = game.getCaretaker().getCreatureCountMap();
+            client.updateCreatureCounts(creatureCountMap);
         }
     }
 
@@ -423,6 +425,7 @@ public final class Server
     /** Find out if the player wants to acquire an angel or archangel. */
     void askAcquireAngel(String playerName, String markerId, List recruits)
     {
+Log.debug("Called Server.askAcquireAngel()");
         Client client = getClient(playerName);
         if (client != null)
         {
@@ -432,6 +435,7 @@ public final class Server
 
     public void acquireAngel(String markerId, String angelType)
     {
+Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion != null)
         {
@@ -1155,11 +1159,6 @@ public final class Server
             return legion.getHeight();
         }
         return 0;
-    }
-
-    public int getCreatureCount(String creatureName)
-    {
-        return game.getCaretaker().getCount(creatureName);
     }
 
 
