@@ -230,6 +230,18 @@ public final class Client implements IClient
         this.battleSite = hexLabel;
         this.attackerMarkerId = attackerId;
         this.defenderMarkerId = defenderId;
+
+        highlightBattleSite();
+    }
+
+
+    void highlightBattleSite()
+    {
+        if (board != null && battleSite != null && battleSite.length() > 0)
+        {
+            board.unselectAllHexes();
+            board.selectHexByLabel(battleSite);
+        }
     }
 
 

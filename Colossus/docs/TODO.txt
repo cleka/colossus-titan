@@ -28,9 +28,6 @@ EVAL Gd01 move to Plains hex 105 = 0
 
 Bug: Hang in battle, with two players.  Dev code vs. out-of-sync old code.
 
-Bug: 1_LATEST_IS_date is broken in remote_inst.  Can't delete previous
-   1_LATEST_IS file  Works from RH 7.3 box.
-
 Bug: Titan teleport onto chaff stack in tower, 1 warlock left, recruitChit
    shows ogre instead of warlock.
 
@@ -39,13 +36,13 @@ Bug: Loaded a game with 2 human players and 4 AIs.  Only got one board.
 Bug: Eliminate warnings for calling methods on Titan Creature instead of
    Critter in SimpleAI.
 
+Indicate which players have titan teleport in StatusScreen.
+
 Save random seed in savegame?
 
 Do not scale chits in CreatureCollectionView
 
 Recompile JDK without beeps.  Send patch to Sun.
-
-View hex recruit tree does not always paint.
 
 Allow clearing recruit chits, displaying stuff during other players' turns.
 
@@ -122,10 +119,6 @@ Use SF project releases.
 
 ShowLegion on mouseover, not click, with permanent dialog.
 Show zoomed area around mouse cursor in a small window, for Abyssal9.
-
-Highlight appropriate engagement hex while engagement is being resolved.
-   (Except during angel summoning.)  Also just after battle, while showing:
-Optional post-engagement status dialog.
 
 Add confirm dialogs (for conceding with titan, skipping recruits, ...)
 
