@@ -2533,6 +2533,11 @@ public class SimpleAI implements AI
         {
             return name;
         }
+        
+        public String toString()
+        {
+        	return name + "(" + hp + ")";
+        }
     }
 
     
