@@ -3,6 +3,10 @@
  * Simple implementation of a Titan AI
  *
  * @author Bruce Sherrod
+ *
+ *
+ * TODO: force AI to move at least one legion
+ * TODO: force AI to move legions which split 
  */
 
 import java.io.*;
@@ -195,10 +199,14 @@ class SimpleAI implements AI
 		// out. if there are more than 2 weakest creatures,
 		// prefer a pair of matching ones.  if none match,
 		// kick out the left-most ones (the oldest ones)
-		//
 		// 
 		// TODO: keep 3 cyclops if we don't have a behemoth
 		// (split out a gorgon instead)
+		//
+		// TODO: prefer to split out creatures that have no
+		// recruiting value (e.g. if we have 1 angel, 2
+		// centaurs, 2 gargoyles, and 2 cyclops, split out the
+		// gargoyles)
 		//
 		Critter weakest1 = null;
 		Critter weakest2 = null;
@@ -301,7 +309,7 @@ class SimpleAI implements AI
 	    legion2.addCreature(nonsplitCreature1);
 	    legion2.addCreature(nonsplitCreature2);
 	}
-	// don't split gargoyles in tower 3 or 6 (cause of the extra jungles)
+	// don't split gargoyles in tower 3 or 6 (because of the extra jungles)
 	else if ("300".equals(label) || "600".equals(label))
 	{
 	    if (game.random.nextInt(10) % 2 ==0)
@@ -321,10 +329,30 @@ class SimpleAI implements AI
 	    legion2.addCreature(nonsplitCreature1);
 	    legion2.addCreature(nonsplitCreature2);
 	}
+	//
+	// new idea due to David Ripton: split gargoyles in tower 2 or
+	// 5, because on a 5 we can get to brush and jungle and get 2
+	// gargoyles.  I'm not sure if this is really better than recruiting
+	// a cyclops and leaving the other group in the tower, but it's
+	// interesting so we'll try it.
+	//
+	else if ("200".equals(label) || "500".equals(label))
+	{
+	    // MIT split
+	    legion1.addCreature(titan);
+	    legion1.addCreature(nonsplitCreature1);
+	    legion1.addCreature(nonsplitCreature2);
+	    legion1.addCreature(gargoyle1); 
+	    legion2.addCreature(angel);
+	    legion2.addCreature(splitCreature1);
+	    legion2.addCreature(splitCreature2);
+	    legion2.addCreature(gargoyle2);
+	}
+	//
 	// otherwise, mix it up for fun
 	else
 	{
-	    if (game.random.nextInt(100) < 33)
+	    if (game.random.nextInt(100) <= 33)
 	    {
 		// MIT split
 		legion1.addCreature(titan);
@@ -442,25 +470,63 @@ class SimpleAI implements AI
 	// TODO: if we're 7 high, we can't recruit (unless exploring further turns?)
 
 	// consider making an attack
-	Legion enemyLegion = hex.getEnemyLegion(legion.getPlayer());
+	final Legion enemyLegion = hex.getEnemyLegion(legion.getPlayer());
 	if (enemyLegion != null)
 	{
-	    // very conservative attack here
-	    int discountedPointValue = (3 * legion.getPointValue()) / 4;
-	    if (legion.numCreature(Creature.titan) > 0)
-		discountedPointValue -= 10; // be a bit cautious attacking w/titan
-	    // TODO: add our angel call 
-	    int enemyPointValue = enemyLegion.getPointValue();
-	    // TODO: add in enemy's turn 4 recruit
-	    if (discountedPointValue > enemyPointValue)
+	    final int enemyPointValue = enemyLegion.getPointValue();
+	    final int result = estimateBattleResults(legion, enemyLegion, hex);
+	    switch (result)
 	    {
-		// we can win
-		value += (40 * enemyPointValue) / 100; 
-	    }
-	    else
-	    {
-		// we'll lose
-		value = Integer.MIN_VALUE; 
+		case WIN_WITH_MINIMAL_LOSSES:
+		    // we score a fraction of an angel
+		    value += (24 * enemyPointValue) / 100; 
+		    // plus a fraction of a titan
+		    value += (6 * enemyPointValue) / 100; 
+		    // plus some more for killing a group (this is arbitrary)
+		    value += (10 * enemyPointValue) / 100; 
+		    // TODO: if enemy titan, we also score half points
+		    // (this may make the AI unfairly gun for your titan)
+		    break;
+		case WIN_WITH_HEAVY_LOSSES:
+		    // don't do this with our titan unless we can win the game
+		    {
+			if (legion.numCreature(Creature.titan) > 0
+			    && game.getNumLivingPlayers() > 2)
+			    value = Integer.MIN_VALUE;
+			else
+			{
+			    // we score a fraction of an angel & titan strength
+			    value += (30 * enemyPointValue) / 100; 
+			    // but we lose this group
+			    value -= (10 * legion.getPointValue()) / 100; 
+			    // TODO: if we have no other angels, more penalty here
+			    // TODO: if enemy titan, we also score half points
+			    // (this may make the AI unfairly gun for your titan)
+			} 
+		    }
+		    break;
+		case DRAW:
+		    {
+			// if not our titan, but is enemy titan, do it
+			// note: this might be an unfair use of
+			// information for the AI
+			if (legion.numCreature(Creature.titan) == 0
+			    && enemyLegion.numCreature(Creature.titan) == 0)
+			{
+			    // arbitrary value for killing a player: it's worth a little
+			    value += enemyPointValue / 6;
+			}
+		    }
+		    break;
+		case LOSE_BUT_INFLICT_HEAVY_LOSSES:
+		    {
+			// TODO: how important is it that we damage his group?
+			value = Integer.MIN_VALUE; 
+		    }
+		    break;
+		case LOSE:
+		    value = Integer.MIN_VALUE; 
+		    break;
 	    }
 	}
 
@@ -572,6 +638,8 @@ class SimpleAI implements AI
 	// TODO: consider mobility.  e.g., penalty for suckdown
 	// squares, bonus if next to tower or under the top
 
+	// TODO: consider what we can attack next turn from here
+
 	// TODO: consider risk of being attacked
 
 	// TODO: consider nearness to our other legions
@@ -585,6 +653,47 @@ class SimpleAI implements AI
 	// recruit on 1,3,5, and we have a behemoth with choice of 3/5
 	// to jungle or 4/6 to jungle, prefer the 4/6 location).
 	return value;
+    }
+
+
+    private static final int WIN_WITH_MINIMAL_LOSSES = 0;
+    private static final int WIN_WITH_HEAVY_LOSSES = 1;
+    private static final int DRAW = 2;
+    private static final int LOSE_BUT_INFLICT_HEAVY_LOSSES = 3;
+    private static final int LOSE = 4;
+    
+    /**
+     * estimate the outcome of a battle
+     * @param attacker the attacking legion
+     * @param defender the defending legion
+     * @param hex the hex where the battle takes place (the hex should
+     * contain info about which side the attacker enters from )
+     * @return a constant int indicating the attack result.
+     */
+    private int estimateBattleResults(Legion attacker, Legion defender, MasterHex hex)
+    {
+	int attackerPointValue = attacker.getPointValue();
+	// TODO: reduce PV slightly if titan is present and weak (and thus cant fight)
+	// TODO: add angel call 
+	int defenderPointValue = defender.getPointValue();
+	// TODO: reduce PV slightly if titan is present and weak (and thus cant fight)
+	// TODO: add in enemy's turn 4 recruit
+
+	// TODO: adjust for natives
+	// TODO: adjust for entry side 
+
+	// really dumb estimator
+	double ratio = (double) attackerPointValue / (double) defenderPointValue; 
+	if (ratio >= 1.25)
+	    return WIN_WITH_MINIMAL_LOSSES;
+	else if (ratio >= 1.10)
+	    return WIN_WITH_HEAVY_LOSSES;
+	else if (ratio >= 0.9)
+	    return DRAW;
+	else if (ratio >= 0.75)
+	    return LOSE_BUT_INFLICT_HEAVY_LOSSES;
+	else  // ratio less than 0.75
+	    return LOSE;
     }
 
 
