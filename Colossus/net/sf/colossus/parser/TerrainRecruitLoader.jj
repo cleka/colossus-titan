@@ -52,6 +52,15 @@ public class TerrainRecruitLoader
      */
     private static List acquirableList = null;
 
+    /* make sure that the acquirableList is null when creating a new TerrainRecruitLoader */
+    {
+        if (acquirableList != null)
+        {
+            Log.debug("Destroying previous acquirableList ; this should never happen during a game...");
+            acquirableList = null;
+        }
+    }
+
     /**
      * Return an array of all the char representing a valid terrain.
      * @return An array of char, each representing a valid terrain.
