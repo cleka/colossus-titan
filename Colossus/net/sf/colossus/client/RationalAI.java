@@ -347,7 +347,7 @@ public class RationalAI extends SimpleAI implements AI
 
     /** Find value of recruiting, including possibly attacking an enemy
      set enemy = null to indicate no enemy */
-    private double recruitValue(LegionInfo legion, String hexLabel,
+    double recruitValue(LegionInfo legion, String hexLabel,
         LegionInfo enemy, String terrain)
     {
         int value = 0;
@@ -666,6 +666,11 @@ public class RationalAI extends SimpleAI implements AI
             this.val = val;
             this.noMove = noMove;
         }
+        
+        public String toString()
+        {
+        	return markerId + " to " + toHex;
+        }
     }
 
     /** Return true if we need to run this method again after the server
@@ -892,6 +897,8 @@ public class RationalAI extends SimpleAI implements AI
             Log.debug("Starting computing the best move");
 
             setupTimer();
+            
+            Collections.shuffle(all_legionMoves,random);
 
             branchAndBound(new ArrayList(), all_legionMoves, 0);
 
@@ -1209,7 +1216,7 @@ public class RationalAI extends SimpleAI implements AI
             return 0.0;
         }
 
-        Log.debug("considering risk of " + legion + " in " + hex);
+        // Log.debug("considering risk of " + legion + " in " + hex);
         int roll;
         int result = 0;
 
@@ -1250,7 +1257,7 @@ public class RationalAI extends SimpleAI implements AI
             risk = - risk;
         }
         
-        Log.debug("compute final attack risk as " + r3(risk));
+        // Log.debug("compute final attack risk as " + r3(risk));
         return risk;
     }
 
@@ -1382,9 +1389,9 @@ public class RationalAI extends SimpleAI implements AI
     // This will typically be negative to indicate that we might lose,
     // zero if the hex is empty, or positive if the hex is occupied
     // by a weak legion
-    private final int RECRUIT_FALSE = 0; // don't allow recruiting by attacker
-    private final int RECRUIT_TRUE = 1; // allow recruiting by attacker
-    private final int RECRUIT_AT_7 = 2; // allow recruiting by attacker 7 high
+    static final int RECRUIT_FALSE = 0; // don't allow recruiting by attacker
+    static final int RECRUIT_TRUE = 1; // allow recruiting by attacker
+    static final int RECRUIT_AT_7 = 2; // allow recruiting by attacker 7 high
 
     int evaluateHexAttack(LegionInfo attacker, MasterHex hex,
         int canRecruitHere)
@@ -1475,7 +1482,8 @@ public class RationalAI extends SimpleAI implements AI
     private int evaluateMoveInner(LegionInfo legion, MasterHex hex,
         int canRecruitHere, int depth, boolean normalHexRisk)
     {
-        // evaluateHexAttack includes recruit value
+
+    	// evaluateHexAttack includes recruit value
         double value = evaluateHexAttack(legion, hex, canRecruitHere);
 
         // if we get killed at this hex there can be no further musters
@@ -1492,7 +1500,7 @@ public class RationalAI extends SimpleAI implements AI
         
         if (!normalHexRisk)
         {
-            invert = true;
+            // invert = true;
         }
         
         // value of staying at hex we move to
@@ -1574,7 +1582,7 @@ public class RationalAI extends SimpleAI implements AI
         return (int)value;
     }
 
-    private boolean isHumanLegion(LegionInfo legion)
+    boolean isHumanLegion(LegionInfo legion)
     {
         return !legion.getPlayerInfo().isAI();
     }
@@ -1584,15 +1592,37 @@ public class RationalAI extends SimpleAI implements AI
         private double ev; // expected value of attack
         private int att_dead;
         private int def_dead;
-
+        private List log = new ArrayList();
+        
         public BattleResults(double e, int a, int d)
         {
             ev = e;
             att_dead = a;
             def_dead = d;
         }
+        
+		/**
+		 * @param ev
+		 * @param att_dead
+		 * @param def_dead
+		 * @param log
+		 */
+		public BattleResults(double ev, int att_dead, int def_dead, List log) {
+			super();
+			this.ev = ev;
+			this.att_dead = att_dead;
+			this.def_dead = def_dead;
+			this.log = log;
+		}
 
-        public double getExpectedValue()
+		/**
+		 * @return Returns the log.
+		 */
+		public List getLog() {
+			return log;
+		}
+
+		public double getExpectedValue()
         {
             return ev;
         }
@@ -1607,12 +1637,19 @@ public class RationalAI extends SimpleAI implements AI
             return def_dead;
         }
 
+        void log() {
+			Log.debug("Expected battle log");
+			for (Iterator it = log.iterator(); it.hasNext();) {
+				Log.debug((String) it.next());
+			}
+		}
+        
     }
 
     BattleResults estimateBattleResults(LegionInfo attacker,
         LegionInfo defender, MasterHex hex)
     {
-        return estimateBattleResults(attacker, defender, hex, null);
+        return estimateBattleResults(attacker, defender, hex, null, null);
     }
 
     // add in value of points received for killing group / 100
@@ -1622,7 +1659,7 @@ public class RationalAI extends SimpleAI implements AI
 
     private BattleResults estimateBattleResults(LegionInfo attacker,
         LegionInfo defender,
-        MasterHex hex, Creature recruit)
+        MasterHex hex, Creature recruit, Creature callable)
     {
         if (I_HATE_HUMANS &&
             !isHumanLegion(attacker) && !isHumanLegion(defender))
@@ -1643,11 +1680,15 @@ public class RationalAI extends SimpleAI implements AI
         int defenderMuster = 0;
         int round;
         boolean summonedAngel = false;
-
+        List log = new ArrayList(14);
+        
         round_loop:
-        for (round = 0; round < 7; round++)
+        for (round = 2; round <= 7; round++)
         {
-            /*
+        	// note start on turn 2, because often there wil be no contact in turn 1
+        	log.add("Round "+round+" attacker" + attackerCreatures);
+        	log.add("Round "+round+" defender" + defenderCreatures);
+        	/*
             // DO NOT ADD ANGEL!
             // If attacker cannot win without angel then this
             // will often leave a weak group with an angel in it
@@ -1658,9 +1699,9 @@ public class RationalAI extends SimpleAI implements AI
             {
              **/
                 // angel call
-                if (!summonedAngel && defenderKilled > 0)
+                if (callable != null && defenderKilled > 0)
                 {
-                    PowerSkill angel = new PowerSkill("Angel", 6, 4);
+                    PowerSkill angel = getNativeValue(callable, terrain, false);
                     attackerCreatures.add(angel);
                     summonedAngel = true;
                 }
@@ -1805,7 +1846,7 @@ public class RationalAI extends SimpleAI implements AI
                 while (a.hasNext())
                 {
                     PowerSkill psa = (PowerSkill)a.next();
-                    if (psa.getHP() <= 0)
+                    if (psa.getHP() <= 0.2) // we remove both dead and likely dead critters
                     {
                         attackerKilled += psa.getPointValue();
                         a.remove();
@@ -1884,7 +1925,7 @@ public class RationalAI extends SimpleAI implements AI
         }
 
         return new BattleResults(expectedValue, attackerKilled,
-            defenderKilled - defenderMuster);
+            defenderKilled - defenderMuster, log);
     }
 
     public boolean flee(LegionInfo legion, LegionInfo enemy)
@@ -1903,11 +1944,12 @@ public class RationalAI extends SimpleAI implements AI
         I_HATE_HUMANS = save_hate;
         int result = (int)br.getExpectedValue();
         
-        Log.debug("flee: attacking legion = " + enemy);
-        Log.debug("flee: defending legion = " + legion);
+        Log.debug("flee: attacking legion = " + enemy + ":" + enemy.getContents());
+        Log.debug("flee: defending legion = " + legion + ":" + legion.getContents());
         Log.debug("flee called. battle results value: " + result);
         Log.debug("expected value of attacker dead = " + br.getAttackerDead());
         Log.debug("expected value of defender dead = " + br.getDefenderDead());
+        br.log();
 
         // For the first four turns never flee
         // Make attacker pay to minimize their future mustering
@@ -2021,12 +2063,13 @@ public class RationalAI extends SimpleAI implements AI
             legion.getCurrentHex());
         I_HATE_HUMANS = save_hate;
         
-        Log.debug("concede: attacking legion = " + legion);
-        Log.debug("concede: defending legion = " + enemy);
+        Log.debug("concede: attacking legion = " + legion + ":" + legion.getContents());
+        Log.debug("concede: defending legion = " + enemy + ":" + enemy.getContents());
         Log.debug("concede called. battle results value: " + 
                 br.getExpectedValue());
         Log.debug("expected value of attacker dead = " + br.getAttackerDead());
         Log.debug("expected value of defender dead = " + br.getDefenderDead());
+        br.log();
 
         if (br.getDefenderDead() < enemy.getPointValue() * 2 / 7 &&
             height >= 6)
