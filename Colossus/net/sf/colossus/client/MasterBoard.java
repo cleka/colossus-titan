@@ -571,7 +571,8 @@ public final class MasterBoard extends JPanel
         mi = graphicsMenu.add(viewFullRecruitTreeAction);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
-        mi = graphicsMenu.add(chooseScreenAction);
+        if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length > 1)
+            mi = graphicsMenu.add(chooseScreenAction);
 
         // Then Look & Feel
         lfMenu = new JMenu("Look & Feel");
