@@ -28,7 +28,7 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
         pack();
 
         setBackground(Color.lightGray);
-        setSize(2 * scale / 5 + scale * legion.getHeight(), 8 * scale / 5);
+        setResizable(false);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
         Point parentOrigin = parentFrame.getLocation();
@@ -55,7 +55,7 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
         }
         setLocation(origin);
 
-        setLayout(null);
+        setLayout(new FlowLayout());
 
         this.legion = legion;
 
@@ -67,15 +67,16 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
             String imageName;
             if (!allVisible && !critter.isVisible())
             {
-                imageName = "images/" + "Question.gif"; 
+                imageName = "images/Question.gif"; 
             }
             else
             {
                 imageName = critter.getImageName();
             }
 
-            chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale,
-                imageName, this);
+            chits[i] = new Chit(-1, -1, scale, imageName, this);
+            add(chits[i]);
+            chits[i].addMouseListener(this);
         }
 
         tracker = new MediaTracker(this);
@@ -95,6 +96,8 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
                 "waitForAll was interrupted");
         }
         imagesLoaded = true;
+
+        pack();
 
         addMouseListener(this);
 
@@ -121,11 +124,6 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
             offGraphics = offImage.getGraphics();
         }
 
-        for (int i = 0; i < legion.getHeight(); i++)
-        {
-            chits[i].paint(offGraphics);
-        }
-
         g.drawImage(offImage, 0, 0, this);
     }
 
@@ -148,9 +146,14 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
     }
 
 
+    // Dispose if mouse exits the dialog, but not if it exits a
+    // chit within the dialog.
     public void mouseExited(MouseEvent e)
     {
-        dispose();
+        if (e.getSource() == this) 
+        {
+            dispose();
+        }
     }
 
 
