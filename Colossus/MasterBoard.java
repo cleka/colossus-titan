@@ -1247,9 +1247,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
                     // Right-click or alt-click means to show the contents
                     // of the legion.
-                    if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
-                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
-                        InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
+                    if (e.isPopupTrigger())
                     {
                         new ShowLegion(this, legion, point, 
                             i == game.getActivePlayerNum());
@@ -1344,9 +1342,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
                     // Right-click or alt-click means to show the contents
                     // of the hex.
-                    if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
-                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
-                        InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
+                    if (e.isPopupTrigger())
                     {
                         new ShowMasterHex(this, hex, point);
                         return;
