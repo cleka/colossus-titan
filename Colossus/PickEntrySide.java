@@ -471,19 +471,6 @@ class PickEntrySide extends Dialog implements ActionListener,
         }
 
         g.drawImage(offImage, 0, 0, this);
-
-        if (button1 != null)
-        {
-            button1.repaint();
-        }
-        if (button2 != null)
-        {
-            button2.repaint();
-        }
-        if (button3 != null)
-        {
-            button3.repaint();
-        }
     }
 
 

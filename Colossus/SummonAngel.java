@@ -168,10 +168,6 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         }
 
         g.drawImage(offImage, 0, 0, this);
-
-        // These are necessary because Buttons are lightweight.
-        button1.repaint();
-        button2.repaint();
     }
 
 
