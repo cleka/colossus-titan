@@ -40,7 +40,7 @@ all: jar
 
 # Find target files
 
-sources = $(wildcard *.java)
+sources = $(wildcard *.java) $(wildcard net/sf/colossus/*.java)
 
 CLASS_FILES = $(sources:%.java=%.class)
 
@@ -54,7 +54,7 @@ jar : $(JARFILE)
 
 # Create jar file
 $(JARFILE): $(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
-	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif
+	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class net/sf/colossus/*.class images/*.gif
 	chmod +x Colossus.jar
 
 INST_JARFILE = $(HTMLDIR)/$(JARFILE)
