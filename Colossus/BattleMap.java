@@ -1,6 +1,5 @@
 /** Attempted port of hexmap from MFC to Java dripton  12/10/97 */
 
-// TODO: Make the chits show up ASAP when their images load.
 // TODO: Make the drawing of stacked chits less painful.
 // TODO: Double-buffer.
 // TODO: Add the dragon and hydra.
@@ -10,7 +9,7 @@ import java.awt.*;
 
 class Hex implements Shape
 {
-    protected boolean selected;
+    private boolean selected;
     private int[] x_vertex = new int[6];
     private int[] y_vertex = new int[6];
     private Polygon p;
@@ -43,6 +42,7 @@ class Hex implements Shape
     }
 
 
+    // Overridden to avoid clearing entire background
     public void update(Graphics g)
     {
         paint(g);
@@ -51,7 +51,6 @@ class Hex implements Shape
 
     public void paint(Graphics g)
     {
-        System.out.println("painting a Hex");
         if (selected)
         {
             g.setColor(java.awt.Color.red);
@@ -96,9 +95,10 @@ class Hex implements Shape
 
 class Chit implements Shape
 {
-    protected boolean selected;
+    private boolean selected;
     private Rectangle rect;
-    private Image image;
+    // Need to let the container's MediaTracker access the image.
+    Image image;
     private Container container;
 
     Chit(int cx, int cy, int scale, String image_filename, 
@@ -107,9 +107,10 @@ class Chit implements Shape
         selected = false;
         rect = new Rectangle(cx, cy, scale, scale);
         image = Toolkit.getDefaultToolkit().getImage(image_filename);
-        container = my_container;
+	container = my_container;
     }
 
+    // Overridden to avoid clearing entire background
     public void update(Graphics g)
     {
         paint(g);
@@ -117,11 +118,7 @@ class Chit implements Shape
 
     public void paint(Graphics g)
     {
-        System.out.println("painting a Chit");
-        if (g.drawImage(image, rect.x, rect.y, container) == false)
-        {
-            System.out.println("image started drawing but isn't done");
-        }
+        g.drawImage(image, rect.x, rect.y, container);
     }
 
 
@@ -173,7 +170,8 @@ public class BattleMap extends Frame
     // Hack: Do we need to clear the background of the current
     //       clip on the next redraw?
     private boolean needToClear;
-    private boolean imagesLoading;
+    private MediaTracker tracker;
+    private boolean imagesLoaded;
 
     public BattleMap()
     {
@@ -192,7 +190,23 @@ public class BattleMap extends Frame
         
         tracking = -1;
 	needToClear = false;
-	imagesLoading = true;
+	imagesLoaded = false;
+
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                if (show[i][j])
+                {
+                    h[i][j] = new Hex
+                        ((int)java.lang.Math.round(cx + 3 * i * scale),
+                        (int)java.lang.Math.round(cy + (2 * j + i % 2) *
+                        java.lang.Math.sqrt(3.0) * scale), scale);
+                }
+            }
+        }
+
+        tracker = new MediaTracker(this);
 
         chits[0] = new Chit(100, 100, 60, "Angel.gif", this);
         chits[1] = new Chit(120, 120, 60, "Archange.gif", this);
@@ -217,20 +231,23 @@ public class BattleMap extends Frame
         chits[20] = new Chit(520, 520, 60, "Warbear.gif", this);
         chits[21] = new Chit(540, 540, 60, "Warlock.gif", this);
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 22; i++)
         {
-            for (int j = 0; j < 6; j++)
-            {
-                if (show[i][j])
-                {
-                    h[i][j] = new Hex
-                        ((int)java.lang.Math.round(cx + 3 * i * scale),
-                        (int)java.lang.Math.round(cy + (2 * j + i % 2) *
-                        java.lang.Math.sqrt(3.0) * scale), scale);
-                }
-            }
-        }
+	    tracker.addImage(chits[i].image, 0);
+	}
 
+	try
+	{
+            // Wait until images are loaded.
+            tracker.waitForAll();
+        }
+	catch (InterruptedException e)
+	{
+	    System.out.println("waitForAll was interrupted");
+	}
+	imagesLoaded = true;
+
+        // Paint the whole BattleMap
         repaint();
     }
 
@@ -313,6 +330,12 @@ public class BattleMap extends Frame
     public void paint(Graphics g)
     {
         System.out.println("Called BattleMap.paint()");
+	if (!imagesLoaded)
+	{
+	    System.out.println("Images are not loaded yet");
+	    return;
+        }
+
         rectClip = g.getClipBounds();
         System.out.println("rectClip: " + rectClip.x + " " + rectClip.y 
 	    + " " + rectClip.width + " " + rectClip.height);
@@ -352,7 +375,6 @@ public class BattleMap extends Frame
 	    needToClear = false;
         }
 
-	// TODO: Wait if imagesLoading
         paint(g);
     }
     
