@@ -7,12 +7,14 @@
 
 
 # Java compiler
-# jikes is really fast, good, and free.
-# javac is the standard; use it if you don't have jikes.
+# jikes is really fast, good, and free.  It supports -depend so all
+#    dependent objects will be recompiled when you change one.
+# javac is the standard; use it if you don't have jikes.  Sun has removed
+#    the -depend/-Xdepend option from javac in JDK 1.3, so be careful.
 # kjc comes with kaffe.  I like its --warning option.
 
 JCC = jikes -g -depend +P
-#JCC = javac -J-Djavac.pipe.output=true -g -deprecation -Xdepend
+#JCC = javac -J-Djavac.pipe.output=true -g -deprecation
 #JCC = kjc -g --deprecation --warning
 
 

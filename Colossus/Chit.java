@@ -73,7 +73,11 @@ public class Chit extends Canvas // XXX JPanel
         }
         else
         {
-            icon = new ImageIcon(imageFilename);
+            // This syntax works with either images in a jar file or images 
+            // in the local filesystem.
+            Image image = Toolkit.getDefaultToolkit().getImage(
+                getClass().getResource(imageFilename));
+            icon = new ImageIcon(image);
         }
     }
 

@@ -49,11 +49,14 @@ public class Game
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
 
-
-    // XXX These should be added to the options menu.
+    // Per-player client options
+    private static boolean autoPickRecruiter; 
+    private static boolean showDice = true;
+    private static boolean showGameStatus = true;
+    
+    // Server options
     private static boolean autosaveEveryTurn = true;
     private static boolean allVisible;
-    private static boolean pickRecruiter = true;
 
 
     public Game(boolean isApplet, GameApplet applet)
@@ -1436,9 +1439,9 @@ public class Game
         }
         else
         {
-            // Only use the PickRecruiter dialog if the pickRecruiter
-            // option is true.  If it's false, just use the first one.
-            if (pickRecruiter)
+            // Only use the PickRecruiter dialog if the autoPickRecruiter
+            // option is false.  If it's true, just use the first one.
+            if (!autoPickRecruiter)
             {
                 new PickRecruiter(parentFrame, legion, numEligibleRecruiters,
                     recruiters);

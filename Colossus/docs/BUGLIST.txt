@@ -4,7 +4,8 @@ Linux, Sun 1.2.2/1.3beta/1.3betarefresh, Blackdown 1.2.2RC4:
    ShowDice dialog sometimes moves from upper right corner to upper 
    left corner.  ShowLegion dialog sometimes pops up in upper left 
    corner instead of over mouse position.  These problems don't happen 
-   with ibmjdk118.  Try Linux JDK 1.3 final.
+   with ibmjdk118.  Seems to be fixed in Solaris 1.3 final.  Try Linux 
+   JDK 1.3 final.
 
 Win98, JDK1.3: setLocation() to keep ShowLegion, ShowMasterHex
    dialogs from displaying past the bottom or right edge of the
@@ -42,7 +43,8 @@ Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
 
 Solaris, jdk1.3: Mutual elimination, with defender's titan killed.
    Got the message "Legion XXXX is eliminated" twice for the
-   attacking legion, once for the defender.
+   attacking legion, once for the defender.  OK when just attacking
+   titan is killed.
 
 Solaris, jdk1.3: Square (red, black, or white) in NW corner of board 
    and map.  Partial marker?  Doesn't appear on board when 
@@ -58,5 +60,5 @@ Solaris, jdk1.3: Removed dead creature was half painted.  Went away
 
 Solaris, jdk1.3: Ranger in bramble rangestrikes behemoth in bramble,
    titan range 3.  Target number is 4.  Shouldn't it be 5?  (1 penalty
-   for each bramble)
+   for each bramble)  Check rules.
 

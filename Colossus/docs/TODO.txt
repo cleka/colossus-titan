@@ -1,4 +1,4 @@
-Change Turn and BattleTurn into JToolbars.
+Change Turn and BattleTurn into JToolBars?
 
 Use splitFrom instead of legions(0) to determine parent legion
    in hex with a split.  
@@ -15,6 +15,9 @@ Have Chit extend JPanel instead of Canvas.
 Color code StatusScreen better.
 
 Add some keyboard shortcuts.
+Add menus. They should duplicate the functionality of 
+   Turn/BattleTurn and add additional functions like
+   save/load/new game, options, etc.
 
 All GUI method calls need to be moved out of non-GUI classes.
 Split GUI classes from model classes.

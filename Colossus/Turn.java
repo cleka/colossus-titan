@@ -11,9 +11,38 @@ import javax.swing.*;
 public class Turn extends JDialog implements ActionListener, WindowListener,
     KeyListener
 {
-    private static Game game;
-    private static MasterBoard board;
+    private Game game;
+    private MasterBoard board;
     private static Point location;
+    private JButton button;
+
+    private static final String undoLastSplit =
+        "<html>Undo <b>L</b>ast Split";
+    private static final String undoAllSplits =
+        "<html>Undo <b>A</b>ll Splits";
+    private static final String withdrawFromGame =
+        "<html><b>W</b>ithdraw from Game";
+    private static final String doneWithSplits =
+        "<html><b>D</b>one with Splits";
+
+    private static final String undoLastMove = 
+        "<html>Undo <b>L</b>ast Move";
+    private static final String undoAllMoves = 
+        "<html>Undo <b>A</b>ll Moves";
+    private static final String takeMulligan = 
+        "<html>Take <b>M</b>ulligan";
+    private static final String doneWithMoves =
+        "<html><b>D</b>one with Moves";
+
+    private static final String doneWithEngagements = 
+        "<html><b>D</b>one with Engagements";
+
+    private static final String undoLastRecruit =
+        "<html>Undo <b>L</b>ast Recruit";
+    private static final String undoAllRecruits =
+        "<html>Undo <b>A</b>ll Recruits";
+    private static final String doneWithTurn =
+        "<html><b>D</b>one with Turn";
 
 
     public Turn(Game game, MasterBoard board)
@@ -42,6 +71,8 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
         // Since we repeatedly call removeAll() and pack(), which reset
         // the window size, don't let the user resize the window. 
         setResizable(false);
+
+        requestFocus();
 
         setVisible(true);
     }
@@ -75,18 +106,25 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             contentPane.setLayout(new GridLayout(5, 0));
 
             contentPane.add(new JLabel(player.getName() + " : Split stacks "));
-            JButton button1 = new JButton("Undo Last Split");
-            contentPane.add(button1);
-            button1.addActionListener(this);
-            JButton button2 = new JButton("Undo All Splits");
-            contentPane.add(button2);
-            button2.addActionListener(this);
-            JButton button3 = new JButton("Withdraw from Game");
-            contentPane.add(button3);
-            button3.addActionListener(this);
-            JButton button4 = new JButton("Done with Splits");
-            contentPane.add(button4);
-            button4.addActionListener(this);
+            button = new JButton(undoLastSplit);
+            button.setMnemonic(KeyEvent.VK_L);
+            contentPane.add(button);
+            button.addActionListener(this);
+
+            button = new JButton(undoAllSplits);
+            button.setMnemonic(KeyEvent.VK_A);
+            contentPane.add(button);
+            button.addActionListener(this);
+
+            button = new JButton(withdrawFromGame);
+            button.setMnemonic(KeyEvent.VK_W);
+            contentPane.add(button);
+            button.addActionListener(this);
+
+            button = new JButton(doneWithSplits);
+            button.setMnemonic(KeyEvent.VK_D);
+            contentPane.add(button);
+            button.addActionListener(this);
 
             pack();
 
@@ -115,28 +153,33 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
         contentPane.add(new JLabel(player.getName() + " : Movement Roll: " + 
             player.getMovementRoll() + " "));
 
-        JButton button1 = new JButton("Undo Last Move");
-        contentPane.add(button1);
-        button1.addActionListener(this);
+        button = new JButton(undoLastMove);
+        button.setMnemonic(KeyEvent.VK_L);
+        contentPane.add(button);
+        button.addActionListener(this);
 
-        JButton button2 = new JButton("Undo All Moves");
-        contentPane.add(button2);
-        button2.addActionListener(this);
+        button = new JButton(undoAllMoves);
+        button.setMnemonic(KeyEvent.VK_A);
+        contentPane.add(button);
+        button.addActionListener(this);
 
         if (player.getMulligansLeft() > 0)
         {
-            JButton button3 = new JButton("Take Mulligan");
-            contentPane.add(button3);
-            button3.addActionListener(this);
+            button = new JButton(takeMulligan);
+            button.setMnemonic(KeyEvent.VK_M);
+            contentPane.add(button);
+            button.addActionListener(this);
         }
 
-        JButton button4 = new JButton("Withdraw from Game");
-        contentPane.add(button4);
-        button4.addActionListener(this);
+        button = new JButton(withdrawFromGame);
+        button.setMnemonic(KeyEvent.VK_W);
+        contentPane.add(button);
+        button.addActionListener(this);
 
-        JButton button5 = new JButton("Done with Moves");
-        contentPane.add(button5);
-        button5.addActionListener(this);
+        button = new JButton(doneWithMoves);
+        button.setMnemonic(KeyEvent.VK_D);
+        contentPane.add(button);
+        button.addActionListener(this);
            
         pack();
 
@@ -161,9 +204,10 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
 
             contentPane.add(new JLabel(game.getActivePlayer().getName() + 
                 " : Resolve Engagements "));
-            JButton button1 = new JButton("Done with Engagements");
-            contentPane.add(button1);
-            button1.addActionListener(this);
+            button = new JButton(doneWithEngagements);
+            button.setMnemonic(KeyEvent.VK_D);
+            contentPane.add(button);
+            button.addActionListener(this);
 
             pack();
         }
@@ -184,18 +228,25 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
 
             contentPane.add(new JLabel(game.getActivePlayer().getName() + 
                 " : Muster Recruits "));
-            JButton button1 = new JButton("Undo Last Recruit");
-            contentPane.add(button1);
-            button1.addActionListener(this);
-            JButton button2 = new JButton("Undo All Recruits");
-            contentPane.add(button2);
-            button2.addActionListener(this);
-            JButton button3 = new JButton("Withdraw from Game");
-            contentPane.add(button3);
-            button3.addActionListener(this);
-            JButton button4 = new JButton("End Turn");
-            contentPane.add(button4);
-            button4.addActionListener(this);
+            button = new JButton(undoLastRecruit);
+            button.setMnemonic(KeyEvent.VK_L);
+            contentPane.add(button);
+            button.addActionListener(this);
+
+            button = new JButton(undoAllRecruits);
+            button.setMnemonic(KeyEvent.VK_A);
+            contentPane.add(button);
+            button.addActionListener(this);
+
+            button = new JButton(withdrawFromGame);
+            button.setMnemonic(KeyEvent.VK_W);
+            contentPane.add(button);
+            button.addActionListener(this);
+
+            button = new JButton(doneWithTurn);
+            button.setMnemonic(KeyEvent.VK_D);
+            contentPane.add(button);
+            button.addActionListener(this);
 
             pack();
         
@@ -231,29 +282,27 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
     {
         game.advancePhase();
         setupPhaseDialog();
+        requestFocus();
     }
     
 
     public void actionPerformed(ActionEvent e)
     {
-        // Focus is needed for keyboard input.
-        requestFocus();
-
         Player player = game.getActivePlayer();
 
-        if (e.getActionCommand().equals("Undo Last Split"))
+        if (e.getActionCommand().equals(undoLastSplit))
         {
             player.undoLastSplit();
             board.repaint();
         }
         
-        else if (e.getActionCommand().equals("Undo All Splits"))
+        else if (e.getActionCommand().equals(undoAllSplits))
         {
             player.undoAllSplits();
             board.repaint();
         }
 
-        else if (e.getActionCommand().equals("Done with Splits"))
+        else if (e.getActionCommand().equals(doneWithSplits))
         {
             if (player.getMaxLegionHeight() > 7)
             {
@@ -263,7 +312,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             advancePhase();
         }
 
-        else if (e.getActionCommand().equals("Undo Last Move"))
+        else if (e.getActionCommand().equals(undoLastMove))
         {
             player.undoLastMove();
 
@@ -271,7 +320,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             game.highlightUnmovedLegions();
         }
 
-        else if (e.getActionCommand().equals("Undo All Moves"))
+        else if (e.getActionCommand().equals(undoAllMoves))
         {
             player.undoAllMoves();
 
@@ -279,7 +328,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             game.highlightUnmovedLegions();
         }
 
-        else if (e.getActionCommand().equals("Take Mulligan"))
+        else if (e.getActionCommand().equals(takeMulligan))
         {
             player.takeMulligan();
 
@@ -292,7 +341,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             board.unselectAllHexes();
         }
 
-        else if (e.getActionCommand().equals("Done with Moves"))
+        else if (e.getActionCommand().equals(doneWithMoves))
         {
             // XXX Save location before moving on to engagement phase,
             // so that BattleTurns will end up in the right place.
@@ -346,7 +395,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             }
         }
 
-        else if (e.getActionCommand().equals("Done with Engagements"))
+        else if (e.getActionCommand().equals(doneWithEngagements))
         {
             // Advance only if there are no unresolved engagements.
             if (game.highlightEngagements() == 0)
@@ -360,21 +409,21 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             }
         }
         
-        else if (e.getActionCommand().equals("Undo Last Recruit"))
+        else if (e.getActionCommand().equals(undoLastRecruit))
         {
             player.undoLastRecruit();
 
             game.highlightPossibleRecruits();
         }
 
-        else if (e.getActionCommand().equals("Undo All Recruits"))
+        else if (e.getActionCommand().equals(undoAllRecruits))
         {
             player.undoAllRecruits();
 
             game.highlightPossibleRecruits();
         }
         
-        else if (e.getActionCommand().equals("End Turn"))
+        else if (e.getActionCommand().equals(doneWithTurn))
         {
             // Commit all moves.
             player.commitMoves();
@@ -385,7 +434,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             advancePhase();
         }
 
-        else if (e.getActionCommand().equals("Withdraw from Game"))
+        else if (e.getActionCommand().equals(withdrawFromGame))
         {
             String [] options = new String[2];
             options[0] = "Yes";
@@ -404,7 +453,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             }
         }
     }
-    
+
 
     /** Allow keyboard shortcuts for most button actions. */ 
     public void keyTyped(KeyEvent e)
@@ -420,9 +469,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
     public void keyReleased(KeyEvent e)
     {
     }
-
-
-
+    
 
     public void windowActivated(WindowEvent e)
     {
@@ -469,7 +516,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
     }
 
 
-    /** Required for keyboard input. */
+    /** Focus is required for keyboard shortcuts */
     public boolean isFocusTraversable()
     {
         return true;

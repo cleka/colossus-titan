@@ -42,6 +42,28 @@ public class MasterBoard extends JFrame implements MouseListener,
     private Point lastPoint;
     private Container contentPane;
 
+    private JMenuBar menuBar;
+    private JMenu fileMenu;
+    private JMenu actionMenu;
+    private JMenu optionsMenu;
+
+    private static final String newGame = "<html><b>N</b>ew game";
+    private static final String openGame = "<html><b>O</b>pen game";
+    private static final String saveGame = "<html><b>S</b>ave game";
+    private static final String saveGameAs = "<html>Save game as";
+    private static final String undoLast = "<html>Undo <b>l</b>ast";
+    private static final String undoAll = "<html>Undo <b>a</b>ll";
+    private static final String endPhase = "<html><b>E</b>nd phase";
+    private static final String takeMulligan = "<html>Take <b>m</b>ulligan";
+    private static final String concedeBattle = "<html><b>C</b>oncede battle";
+    private static final String withdrawFromGame = 
+        "<html>Withdraw from game";
+    private static final String autosave = "<html>Autosave";
+    private static final String allStacksVisible = "<html>All stacks visible";
+    private static final String autopickRecruiter = "<html>Autopick recruiter";
+    private static final String showGameStatus = "<html>Show game status";
+    private static final String showDice = "<html>Show dice";
+
 
     public MasterBoard(Game game)
     {
@@ -65,6 +87,7 @@ public class MasterBoard extends JFrame implements MouseListener,
         addMouseListener(this);
 
         initializePopupMenu();
+        initializeTopMenu();
 
         SetupMasterHexes.setupHexes(h, this, hexes);
     }
@@ -80,6 +103,55 @@ public class MasterBoard extends JFrame implements MouseListener,
         contentPane.add(popupMenu);
         menuItemHex.addActionListener(this);
         menuItemMap.addActionListener(this);
+    }
+
+
+    private void initializeTopMenu()
+    {
+        JMenuItem mi;
+
+        menuBar = new JMenuBar();
+
+        fileMenu = new JMenu("File");
+        mi = new JMenuItem(newGame);
+        fileMenu.add(mi);
+        mi = new JMenuItem(openGame);
+        fileMenu.add(mi);
+        mi = new JMenuItem(saveGame);
+        fileMenu.add(mi);
+        mi = new JMenuItem(saveGameAs);
+        fileMenu.add(mi);
+        menuBar.add(fileMenu);
+
+        actionMenu = new JMenu("Action");
+        mi = new JMenuItem(undoLast);
+        actionMenu.add(mi);
+        mi = new JMenuItem(undoAll);
+        actionMenu.add(mi);
+        mi = new JMenuItem(endPhase);
+        actionMenu.add(mi);
+        mi = new JMenuItem(takeMulligan);
+        actionMenu.add(mi);
+        mi = new JMenuItem(concedeBattle);
+        actionMenu.add(mi);
+        mi = new JMenuItem(withdrawFromGame);
+        actionMenu.add(mi);
+        menuBar.add(actionMenu);
+
+        optionsMenu = new JMenu("Options");
+        mi = new JCheckBoxMenuItem(autosave);
+        optionsMenu.add(mi);
+        mi = new JCheckBoxMenuItem(allStacksVisible);
+        optionsMenu.add(mi);
+        mi = new JCheckBoxMenuItem(autopickRecruiter);
+        optionsMenu.add(mi);
+        mi = new JCheckBoxMenuItem(showGameStatus);
+        optionsMenu.add(mi);
+        mi = new JCheckBoxMenuItem(showDice);
+        optionsMenu.add(mi);
+        menuBar.add(optionsMenu);
+
+        setJMenuBar(menuBar);
     }
                 
                 
