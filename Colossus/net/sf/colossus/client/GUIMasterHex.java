@@ -535,6 +535,12 @@ public final class GUIMasterHex extends MasterHex
                 return;
             }
             
+            /* DISABLED
+            // code to use if we want rotate the overlay,
+            // to look more like the 'regular' Titan Masterboard
+            // need to give theta the proper value,
+            // depending where on the masterboard we are.
+
             int width = overlay.getWidth(board);
             int height = overlay.getHeight(board);
             BufferedImage bi = new BufferedImage(width, height,
@@ -542,11 +548,6 @@ public final class GUIMasterHex extends MasterHex
             Graphics2D biContext = bi.createGraphics();
             biContext.drawImage(overlay, 0, 0, null);
             
-            /* DISABLED
-            // code to use if we want rotate the overlay,
-            // to look more like the 'regular' Titan Masterboard
-            // need to give theta the proper value,
-            // depending where on the masterboard we are.
             double theta = 0;;
             AffineTransform at = AffineTransform.getRotateInstance(theta);
             AffineTransformOp ato = new AffineTransformOp(at,
