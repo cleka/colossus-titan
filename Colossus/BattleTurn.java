@@ -23,6 +23,7 @@ class BattleTurn extends Dialog implements ActionListener
     private Legion activeLegion;
     private int turnNumber = 1;
     private int phase = MOVE;
+    private SummonAngel summonAngel;
 
 
     BattleTurn(Frame parentFrame, BattleMap map, Legion attacker, Legion
@@ -47,23 +48,42 @@ class BattleTurn extends Dialog implements ActionListener
 
     void setupRecruitDialog()
     {
-        if (turnNumber != 4 || defender.getHeight() > 6)
-        {
-            advancePhase();
-        }
-        else
+        setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+
+        if (turnNumber == 4 && defender.canRecruit())
         {
             // Allow recruiting a reinforcement.
-            // new PickRecruit(map, defender);
-            
-            advancePhase();
+            new PickRecruit(map, defender);
+
+            if (defender.recruited())
+            {
+                map.placeNewChit(defender);
+            }
         }
+            
+        advancePhase();
     }
     
     
-    // XXX: Write this.
     void setupSummonDialog()
     {
+        setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+
+        if (map.getSummonState() == BattleMap.FIRST_BLOOD)
+        {
+            if (attacker.getHeight() < 7 &&
+                attacker.getPlayer().canSummonAngel())
+            {
+                summonAngel = new SummonAngel(map.getBoard(), attacker);
+            }
+            else
+            {
+System.out.println("Couldn't summon angel  height is " + attacker.getHeight());
+            }
+        }
+        // XXX: Need a way to placeNewChit() that triggers when the summon
+        // finishes.
+
         advancePhase();
     }
 
@@ -199,8 +219,13 @@ class BattleTurn extends Dialog implements ActionListener
 
         else if (phase == STRIKEBACK)
         {
-            // Remove dead chits.
             map.removeDeadChits();
+
+            // Make sure the battle isn't over before continuing.
+            if (attacker.getHeight() < 1 || defender.getHeight() < 1)
+            {
+                return;
+            }
 
             if (activeLegion == attacker)
             {
@@ -214,9 +239,20 @@ class BattleTurn extends Dialog implements ActionListener
                 {
                     // Time loss.  Attacker is eliminated but defender
                     //    gets no points.
-                    attacker.removeLegion();
-                    dispose();
-                    map.dispose();
+                    if (attacker.numCreature(Creature.titan) != 0)
+                    {
+                        // This is the attacker's titan stack, so the defender 
+                        // gets his markers plus half points for his unengaged 
+                        // legions.
+                        Player player = attacker.getPlayer();
+                        attacker.removeLegion();
+                        player.die(defender.getPlayer());
+                    }
+                    else
+                    {
+                        attacker.removeLegion();
+                    }
+                    map.cleanup();
                 }
                 else
                 {
@@ -225,6 +261,12 @@ class BattleTurn extends Dialog implements ActionListener
                 }
             }
         }
+    }
+
+
+    SummonAngel getSummonAngel()
+    {
+        return summonAngel;
     }
 
 
