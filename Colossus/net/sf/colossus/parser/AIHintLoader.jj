@@ -906,11 +906,11 @@ int oneHint() :
 
         temp.add(recruitHint);
 
-        Log.debug("HINT: Recruit hint in " + recruitHint.getTerrain() +
+        /* Log.debug("HINT: Recruit hint in " + recruitHint.getTerrain() +
                   " with " + recruitHint.getNumber() + " " + 
                   recruitHint.getRecruiter() + " get a " + 
                   recruitHint.getRecruitee() +
-                  (ctn == null ? "" : " if " + ctn));
+                  (ctn == null ? "" : " if " + ctn)); */
         return(1);
     }
 |   <INITIALSPLIT> (label = h_chaine()) (ishd = h_initialsplit_hint())
@@ -924,7 +924,7 @@ int oneHint() :
             isl = new ArrayList();
             sectionLabelToInitialSplitList.put(label, isl);
         }
-        Log.debug("HINT: Initial Split hint for hex " + label + " is " + ishd);
+        //Log.debug("HINT: Initial Split hint for hex " + label + " is " + ishd);
         
         isl.add(ishd);
         

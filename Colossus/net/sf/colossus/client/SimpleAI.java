@@ -297,11 +297,13 @@ public class SimpleAI implements AI
             }
         }
 
+        /*
         if (recruit != temprecruit4)
         {
             Log.debug("HINT: Variant Hint disagree with built-in heuristic: " +
                       temprecruit4 + " vs. " + recruit);
         }
+        */
         
         /* use the hinted value as the actual recruit */
         return temprecruit4;
@@ -1954,12 +1956,14 @@ public class SimpleAI implements AI
                      recruitName +")");
             return ((Creature)recruits.get(recruits.size() - 1));
         }
+        /*
         if (!(basic.equals(recruit.getName())))
         {
             Log.debug("HINT: (" + hex.getLabel() +
                       ") variant hint suggest recruiting " +
                       recruitName + " instead of " + basic);
         }
+        */
         return recruit;
     }
 
