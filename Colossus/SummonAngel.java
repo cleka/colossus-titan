@@ -62,9 +62,9 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
 
         angelChit = new Chit(2 * scale, scale, scale, 
             Creature.angel.getImageName(),
-            this);
+            this, false);
         archangelChit = new Chit(5 * scale, scale, scale, 
-            Creature.archangel.getImageName(), this);
+            Creature.archangel.getImageName(), this, false);
         // X out chits since no legion is selected.
         angelChit.setDead(true);
         archangelChit.setDead(true);
