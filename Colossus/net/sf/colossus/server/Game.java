@@ -1368,59 +1368,25 @@ public final class Game
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
 
-        // Towers are a special case.
-        if (terrain == 'T')
-        {
-            recruits = getPossibleRecruits(terrain);
-            if (legion.numCreature(Creature.getCreatureByName("Titan")) < 1 &&
-                legion.numCreature((Creature)recruits.get(4)) < 1)
-            { /* no Titan, no itself */ 
-                recruits.remove(4);
-            }
-            java.util.List creatures = Creature.getCreatures();
-            Iterator it = creatures.iterator();
-            boolean keepGuardian = false; /* guardian or something else... */
-            Creature guardian = (Creature)recruits.get(3);
-            if (legion.numCreature(guardian) >= 1)
-            {
-                keepGuardian = true;
-            }
-            while (it.hasNext() && !keepGuardian)
-            {
-                Creature creature = (Creature)it.next();
-                if ((legion.numCreature(creature) >= 3) && 
-                    !creature.isImmortal())
-                {
-                    keepGuardian = true;
-                }
-            }
-            if (!keepGuardian)
-            { /* no non-lord creature is 3 or more in number */
-                recruits.remove(3);
-            }
-        }
-        else
-        {
-            recruits = new ArrayList();
-            java.util.List temprecruits = getPossibleRecruits(terrain);
-            java.util.List recruiters = getPossibleRecruiters(terrain);
+        recruits = new ArrayList();
+        java.util.List temprecruits = getPossibleRecruits(terrain);
+        java.util.List recruiters = getPossibleRecruiters(terrain);
 
-            ListIterator lit = temprecruits.listIterator();
+        ListIterator lit = temprecruits.listIterator();
             
-            while (lit.hasNext())
+        while (lit.hasNext())
+        {
+            Creature creature = (Creature)lit.next();
+            ListIterator liter = recruiters.listIterator();
+            while (liter.hasNext())
             {
-                Creature creature = (Creature)lit.next();
-                ListIterator liter = recruiters.listIterator();
-                while (liter.hasNext())
+                Creature lesser = (Creature)liter.next();
+                if ((numberOfRecruiterNeeded(
+                                             lesser, creature, terrain) <=
+                     legion.numCreature(lesser)) &&
+                    (recruits.indexOf(creature) == -1))
                 {
-                    Creature lesser = (Creature)liter.next();
-                    if ((numberOfRecruiterNeeded(
-                            lesser, creature, terrain) <=
-                         legion.numCreature(lesser)) &&
-                        (recruits.indexOf(creature) == -1))
-                    {
-                        recruits.add(creature);
-                    }
+                    recruits.add(creature);
                 }
             }
         }
@@ -1454,60 +1420,18 @@ public final class Game
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
 
-        if (terrain == 'T')
+        recruiters = getPossibleRecruiters(terrain);
+        Iterator it = recruiters.iterator();
+        while (it.hasNext())
         {
-            // Towers are a special case.  The recruiter of tower creatures
-            // remains anonymous, so we only deal with guardians and warlocks.
-            java.util.List possibleRecruiters = getPossibleRecruits(terrain);
-            Creature warlockOrNot = (Creature)possibleRecruiters.get(4);
-            Creature guardianOrNot = (Creature)possibleRecruiters.get(3);
-            if (recruit.getName().equals(warlockOrNot.getName()))
+            Creature possibleRecruiter = (Creature)it.next();
+            int needed = numberOfRecruiterNeeded(possibleRecruiter,
+                                                 recruit, terrain);
+            if (needed < 1 || needed > legion.numCreature(
+                                                          possibleRecruiter))
             {
-                if (legion.numCreature(Creature.getCreatureByName("Titan")) 
-                    >= 1)
-                {
-                    recruiters.add(Creature.getCreatureByName("Titan"));
-                }
-                if (legion.numCreature(warlockOrNot) >= 1)
-                {
-                    recruiters.add(warlockOrNot);
-                }
-            }
-            else if (recruit.getName().equals(guardianOrNot.getName()))
-            {
-                java.util.List creatures = Creature.getCreatures();
-                Iterator it = creatures.iterator();
-                while (it.hasNext())
-                {
-                    Creature creature = (Creature)it.next();
-                    if (creature.getName().equals(guardianOrNot.getName()) &&
-                        (legion.numCreature(creature) >= 1))
-                    {
-                        recruiters.add(creature);
-                    }
-                    else if (!creature.isImmortal() &&
-                             legion.numCreature(creature) >= 3)
-                    {
-                        recruiters.add(creature);
-                    }
-                }
-            }
-        }
-        else
-        {
-            recruiters = getPossibleRecruiters(terrain);
-            Iterator it = recruiters.iterator();
-            while (it.hasNext())
-            {
-                Creature possibleRecruiter = (Creature)it.next();
-                int needed = numberOfRecruiterNeeded(possibleRecruiter,
-                    recruit, terrain);
-                if (needed < 1 || needed > legion.numCreature(
-                    possibleRecruiter))
-                {
-                    // Zap this possible recruiter.
-                    it.remove();
-                }
+                // Zap this possible recruiter.
+                it.remove();
             }
         }
 

@@ -219,92 +219,52 @@ public class TerrainRecruitLoader
      */
     public int numberOfRecruiterNeeded(Creature recruiter, Creature recruit, char terrain)
     {
-        if (terrain != 'T') /* handle Tower with care */
-        {
-            ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
-            java.util.List pc = getPossibleRecruits(terrain);
-            java.util.List pr = getPossibleFakeRecruiters(terrain);
-            boolean recruitBelow = ((Boolean)carToBelow.get(new Character(terrain))).booleanValue();
-
-            int iReer = pc.indexOf(recruiter);
-            int iRe = pc.indexOf(recruit);
-            int iReerFake = pr.indexOf(recruiter);
-            int iReFake = pr.indexOf(recruit);
-            if (iRe == -1)
-            { // can't be recruited here
-                return 99;
-            }
-            if ((iReer >= iRe) && recruitBelow)
-            { // only one to recruit same or below if possible
-                return 1;
-            }
-            if ((iReer != -1) && ((iReer+1) < iRe))
-            { // can't recruit 2 or more above
-                return 99;
-            }
-            if (iReer != -1)
-            { // regular recruitments
-                return (((recruitNumber)al.get(iReFake)).number);
-            }
-            if (iReFake == 0)
-            { // first in stack, itself only (taken care of above)
-                return 99;
-            }
-
-            // OK, now iReer == -1, but it still can recruit
-            // it's something that can recruit, but cannot be recruited
-
-            // find out what's below the recruit in the recruiters stack
-            String below = ((recruitNumber)al.get(iReFake - 1)).name;
-
-            // First, "Anything" ; the number is needed no matter what
-            // the recruiter is
-            if (below.equals("Anything"))
-                return (((recruitNumber)al.get(iReFake)).number);
-            // Second, "Lord" ; only one Lord can recruit
-            if (below.equals("Lord") && (recruiter.isLord()))
-                return 1;
-            // Third, "Titan" ; only the Titan can recruit
-            if (below.equals("Titan") && (recruiter.isTitan()))
-                return 1;
-            // not possible to recruit, after all
+        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
+        java.util.List pc = getPossibleRecruits(terrain);
+        java.util.List pr = getPossibleFakeRecruiters(terrain);
+        boolean regularRecruit = ((Boolean)carToBelow.get(
+                       new Character(terrain))).booleanValue();
+        int iReer = pc.indexOf(recruiter);
+        int iRe = pc.indexOf(recruit);
+        int iReerFake = pr.indexOf(recruiter);
+        int iReFake = pr.indexOf(recruit);
+        
+        if (iRe == -1)
+        { // can't be recruited here
             return 99;
         }
-        /* Tower, special */
-        java.util.List to = getPossibleRecruits(terrain); /* this is 'T' */
-        if (recruit.getName().equals(((Creature)to.get(0)).getName()) ||
-            recruit.getName().equals(((Creature)to.get(1)).getName()) ||
-            recruit.getName().equals(((Creature)to.get(2)).getName()))
-        { // first three can be recruited by anything
-            return 0;
+        if (iReer == iRe)
+        { // only one to recruit same
+            return 1;
         }
-        else if (recruit.getName().equals(((Creature)to.get(4)).getName()))
-        {
-            if (recruiter.getName().equals("Titan") ||
-                recruiter.getName().equals(((Creature)to.get(4)).getName()))
-            { // fifth recruited by Titan or itself
-                return 1;
-            } 
-            else
-            {
-                return 99;
-            }
-        } 
-        else if (recruit.getName().equals(((Creature)to.get(3)).getName()))
-        { // fourth recruited by any 3 or itself
-            if (recruiter.getName().equals(((Creature)to.get(3)).getName()))
-            {
-                return 1;
-            }
-            else 
-            {
-                return 3;
-            }
-        } 
-        else 
-        {
+        if ((iReer > iRe) && regularRecruit)
+        { // only one to recruit below if possible
+            return 1;
+        }
+        if ((iReer != -1) && ((iReer+1) == iRe) && regularRecruit)
+        { // regular recruitments if possible
+            return (((recruitNumber)al.get(iReFake)).number);
+        }
+        if (iReFake == 0)
+        { // first in stack, itself only (taken care of above)
             return 99;
         }
+
+        // find out what's below the recruit in the recruiters stack
+        String below = ((recruitNumber)al.get(iReFake - 1)).name;
+
+        // First, "Anything" ; the number is needed no matter what
+        // the recruiter is
+        if (below.equals("Anything"))
+            return (((recruitNumber)al.get(iReFake)).number);
+        // Second, "Lord" ; only one Lord can recruit
+        if (below.equals("Lord") && (recruiter.isLord()))
+            return 1;
+        // Third, "Titan" ; only the Titan can recruit
+        if (below.equals("Titan") && (recruiter.isTitan()))
+            return 1;
+        // not possible to recruit, after all
+        return 99;
     }
 }
 
