@@ -392,6 +392,13 @@ class BattleChit extends Chit
     // damage.  Highlight legal carry targets.
     public void strike(BattleChit target)
     {
+        // sanity check
+        if (target.getLegion().getPlayer() == legion.getPlayer())
+        {
+            System.out.println("tried to strike own creature!");
+            return;
+        }
+
         BattleHex targetHex = target.getCurrentHex();
 
         boolean carryPossible = true;
