@@ -45,6 +45,7 @@ public final class Client
     private String battleSite;
     private BattleMap map;
     private BattleDice battleDice;
+
     // XXX Will need more than one of each.
     private Negotiate negotiate;
     private ReplyToProposal replyToProposal;
@@ -123,6 +124,7 @@ public final class Client
     private Strike strike = new Strike(this);
 
 
+    // XXX replace with socket
     public Client(Server server, String playerName, boolean primary)
     {
         this.server = server;
@@ -141,11 +143,9 @@ public final class Client
     /** Take a mulligan. */
     void mulligan()
     {
-        // TODO This should be enforced on the server side.
+        // XXX This should be enforced on the server side.
         undoAllMoves();
 
-        // XXX These are redundant, but will be needed again when we 
-        // move the undo.
         clearUndoStack();
         clearRecruitChits();
 
@@ -833,7 +833,6 @@ public final class Client
                 it.remove();
 
                 // Also remove it from LegionInfo.
-                // XXX test this for Titans
                 String name = chit.getId();
                 if (chit.isInverted())
                 {
@@ -1020,22 +1019,18 @@ public final class Client
 
     public void createSummonAngel(String markerId, String longMarkerName)
     {
-Log.debug("called Client.createSummonAngel for " + playerName + " " + markerId);
         if (getOption(Options.autoSummonAngels))
         {
-Log.debug("auto summon");
             String typeColonDonor = ai.summonAngel(markerId, this);
             java.util.List parts = Split.split(':', typeColonDonor);
             String unit = (String)parts.get(0);
             String donor = (String)parts.get(1);
-Log.debug("will call doSummon with donor " + donor + " and angel " + unit);
             doSummon(markerId, donor, unit);
         }
         else
         {
             board.deiconify();
             board.getFrame().toFront();
-Log.debug("will call summonAngel for " + markerId);
             summonAngel = SummonAngel.summonAngel(this, markerId, 
                 longMarkerName);
         }
@@ -1185,7 +1180,7 @@ Log.debug("called Client.acquireAngelCallback()");
         }
     }
 
-
+    // XXX too many arguments
     public void askConcede(String longMarkerName, String hexDescription,
         String allyMarkerId, String enemyMarkerId)
     {
@@ -1193,6 +1188,7 @@ Log.debug("called Client.acquireAngelCallback()");
             hexDescription, allyMarkerId, enemyMarkerId);
     }
 
+    // XXX too many arguments
     public void askFlee(String longMarkerName, String hexDescription,
         String allyMarkerId, String enemyMarkerId)
     {
@@ -1225,6 +1221,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
+    // XXX too many arguments
     public void askNegotiate(String attackerLongMarkerName, 
         String defenderLongMarkerName, String attackerId, String defenderId, 
         String hexLabel)
@@ -1266,7 +1263,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
     private void makeProposal(Proposal proposal)
     {
-        // TODO Stringify the proposal.
+        // XXX Stringify the proposal.
         server.makeProposal(playerName, proposal);
     }
 
@@ -1277,7 +1274,7 @@ Log.debug("called Client.acquireAngelCallback()");
         new ReplyToProposal(this, proposal);
     }
 
-
+    // XXX too many arguments
     public void tellStrikeResults(String strikerDesc, int strikerTag,
         String targetDesc, int targetTag, int strikeNumber, int [] rolls, 
         int damage, boolean killed, boolean wasCarry, int carryDamageLeft,
@@ -1359,34 +1356,6 @@ Log.debug("called Client.acquireAngelCallback()");
         {
             new PickCarry(map.getFrame(), this, carryDamage, 
                 carryTargetDescriptions);
-        }
-    }
-
-    private void setBattleChitDead(int tag)
-    {
-        Iterator it = battleChits.iterator();
-        while (it.hasNext())
-        {
-            BattleChit chit = (BattleChit)it.next();
-            if (chit.getTag() == tag)
-            {
-                chit.setDead(true);
-                return;
-            }
-        }
-    }
-
-    private void setBattleChitHits(int tag, int hits)
-    {
-        Iterator it = battleChits.iterator();
-        while (it.hasNext())
-        {
-            BattleChit chit = (BattleChit)it.next();
-            if (chit.getTag() == tag)
-            {
-                chit.setHits(hits);
-                return;
-            }
         }
     }
 
@@ -1635,7 +1604,6 @@ Log.debug("called Client.acquireAngelCallback()");
             if (playerName.equals(getActivePlayerName()))
             {
                 board.getFrame().toFront();
-                // XXX Fully paint once per turn to fix corrupt menus.
                 board.fullRepaint();
             }
         }
@@ -1924,7 +1892,6 @@ Log.debug("called Client.acquireAngelCallback()");
      *  Dead critters count as being in contact only if countDead is true. */
     boolean isInContact(BattleChit chit, boolean countDead)
     {
-        MasterHex mHex = MasterBoard.getHexByLabel(battleSite);
         BattleHex hex = HexMap.getHexByLabel(getBattleTerrain(),
             chit.getHexLabel());
 
@@ -2381,8 +2348,7 @@ Log.debug("found " + set.size() + " hexes");
         return markerIds;
     }
 
-    /** Returns a list of markerIds.
-     *  public for client-side AI -- do not call from server side */
+    /** Returns a list of markerIds. */
     java.util.List getLegionsByPlayer(String name)
     {
         java.util.List markerIds = new ArrayList();
@@ -2863,12 +2829,15 @@ Log.debug("found " + set.size() + " hexes");
             }
             color = ai.pickColor(colorsLeft, favoriteColors);
         }
-        else do
+        else 
         {
-            color = PickColor.pickColor(board.getFrame(), playerName, 
-                colorsLeft);
+            do
+            {
+                color = PickColor.pickColor(board.getFrame(), playerName, 
+                    colorsLeft);
+            }
+            while (color == null);
         }
-        while (color == null);
 
         this.color = color;
 

@@ -4,9 +4,8 @@ package net.sf.colossus.server;
 import java.util.*;
 import java.io.*;
 
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.client.GetPlayers;
+import net.sf.colossus.util.Log;
 import net.sf.colossus.parser.CreatureLoader;
 import net.sf.colossus.client.VariantSupport;
 
@@ -137,7 +136,7 @@ public class Creature implements Comparable
         }
         catch (Exception e) 
         {
-            System.out.println("Creatures def. loading failed : " + e);
+            Log.error("Creatures def. loading failed : " + e);
             System.exit(1);
         }
         summonableCreatures.clear();
@@ -367,7 +366,7 @@ public class Creature implements Comparable
 
 
     /** Compare by name. */
-    public boolean equals(Object object)
+    public final boolean equals(Object object)
     {
         if (!(object instanceof Creature))
         {

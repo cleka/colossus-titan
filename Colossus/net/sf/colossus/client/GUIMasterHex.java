@@ -8,10 +8,9 @@ import java.awt.geom.*;
 import java.net.*;
 import javax.swing.*;
 import java.io.*;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class GUIMasterHex holds GUI information for a MasterHex.
@@ -246,8 +245,8 @@ public final class GUIMasterHex extends MasterHex
 
         case 1:
             g2.drawString(label, rectBound.x + ((rectBound.width -
-                stringWidth(label, g2)) * 5 / 6), rectBound.y + halfFontHeight +
-                rectBound.height / 8);
+                stringWidth(label, g2)) * 5 / 6), rectBound.y + 
+                halfFontHeight + rectBound.height / 8);
             break;
 
         case 2:
@@ -437,6 +436,9 @@ public final class GUIMasterHex extends MasterHex
                     g2.draw(polygon);
                 }
                 break;
+
+            default:
+                Log.error("Bogus gate type");
         }
     }
 

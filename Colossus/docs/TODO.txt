@@ -1,6 +1,11 @@
+Remove all excess public methods from Client/Server.
+Change all arguments to public Client/Server methods to String.  (Use a 
+   proxy layer for this.)
+Change direct client/server references to sockets.
+
 Bug: AcquireAngel showed 3 angels.  (Both times, on a double-acquire.)
 
-Need to set Client movementRoll when loading during movement phase.
+Set Client movementRoll when loading during movement phase after roll.
 
 Add JUnit section to build docs.
 Document test procedures.

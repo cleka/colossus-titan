@@ -4,7 +4,6 @@ package net.sf.colossus.util;
 import java.util.*;
 import java.io.*;
 
-import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
 
 
@@ -177,7 +176,7 @@ public final class Options
         {
             value = Integer.parseInt(buf);
         }
-        catch (Exception ex)
+        catch (NumberFormatException ex)
         {
             value = -1;
         }

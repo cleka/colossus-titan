@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Probs;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 
@@ -576,9 +575,6 @@ final class Critter extends Creature implements Comparable
             return;
         }
 
-        BattleHex hex = getCurrentHex();
-        BattleHex targetHex = target.getCurrentHex();
-
         battle.leaveCarryMode();
         carryPossible = true;
         if (numInContact(false) < 2)
@@ -685,8 +681,6 @@ Log.debug("calling Critter.assignStrikePenalty() with " + prompt);
     /** Side effects on penaltyOptions, Battle.carryTargets */
     void findCarries(Critter target)
     {
-Log.debug("findCarries " + this.getDescription() + " striking " + target.getDescription()); 
-
         battle.clearCarryTargets();
         penaltyOptions.clear();
 
@@ -708,7 +702,7 @@ Log.debug("findCarries " + this.getDescription() + " striking " + target.getDesc
         if (!penaltyOptions.isEmpty())
         {
             // Add the non-penalty option as a choice.
-            PenaltyOption po = new PenaltyOption(this, target, getDice(target), 
+            PenaltyOption po = new PenaltyOption(this, target, getDice(target),
                 getStrikeNumber(target));
             penaltyOptions.add(po);
 
@@ -752,9 +746,6 @@ Log.debug("findCarries " + this.getDescription() + " striking " + target.getDesc
      *  Side effects on penaltyOptions, Battle.carryTargets */
     private void findCarry(Critter target, BattleHex neighbor)
     {
-        BattleHex hex = getCurrentHex();
-        BattleHex targetHex = target.getCurrentHex();
-
         final int dice = getDice(target);
         final int strikeNumber = getStrikeNumber(target);
 

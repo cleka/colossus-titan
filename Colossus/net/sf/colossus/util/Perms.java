@@ -190,6 +190,7 @@ public final class Perms
             return m_p;
         }
 
+        // TODO JUnit
         /** Unit test for PermGen. */
         public void main(String [] args)
         {

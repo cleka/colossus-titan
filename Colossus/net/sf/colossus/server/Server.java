@@ -65,7 +65,6 @@ public final class Server
     }
 
 
-    /** temp */
     void disposeAllClients()
     {
         Iterator it = clients.iterator();
@@ -141,7 +140,6 @@ public final class Server
 
     public void makeForcedStrikes(String playerName, boolean rangestrike)
     {
-Log.debug("called Server.makeForcedStrikes() " + playerName + " " + rangestrike);
         if (playerName.equals(game.getBattle().getActivePlayerName()))
         {
             game.getBattle().makeForcedStrikes(rangestrike);
@@ -676,22 +674,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
         game.getBattle().undoMove(hexLabel);
     }
 
-
-    // XXX delete add logic to client
-    /** Return a set of hexLabels. */
-    public Set findCrittersWithTargets()
-    {
-        Battle battle = game.getBattle();
-        return battle.findCrittersWithTargets();
-    }
-
-    // XXX delete add logic to client
-    /** Return a set of hexLabels. */
-    public Set findStrikes(int tag)
-    {
-        Battle battle = game.getBattle();
-        return battle.findStrikes(tag);
-    }
 
     void allTellStrikeResults(Critter striker, Critter target,
         int strikeNumber, int [] rolls, int damage, int carryDamageLeft, 

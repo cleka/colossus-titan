@@ -100,6 +100,7 @@ public final class Probs
                     break;
             case 6: lastFakeDie = 1;
                     break;
+            default: Log.error("Bogus fake die roll");
         }
         return lastFakeDie;
     }

@@ -77,10 +77,10 @@ public final class Constants
     public static final int NOWHERE = -1;
 
     // MasterBoard size
-    public final static int MIN_HORIZ_SIZE=15;
-    public final static int MIN_VERT_SIZE=8;
-    public final static int MAX_HORIZ_SIZE=60;
-    public final static int MAX_VERT_SIZE=32;
+    public static final int MIN_HORIZ_SIZE=15;
+    public static final int MIN_VERT_SIZE=8;
+    public static final int MAX_HORIZ_SIZE=60;
+    public static final int MAX_VERT_SIZE=32;
 
     public static final String [] colorNames =
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};

@@ -9,14 +9,11 @@ import javax.swing.text.*;
 import javax.swing.border.*;
 import java.util.*;
 
-import net.sf.colossus.util.Split;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.SaveGameFilter;
-import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class GetPlayers is a dialog used to enter players' names, types, variant, etc. 

@@ -5,11 +5,13 @@ import junit.framework.*;
 
 import net.sf.colossus.client.VariantSupport;
 import net.sf.colossus.client.MasterBoard;
-import net.sf.colossus.client.HexMap;
 
 
-/** JUnit test for line of sight. */
-
+/** 
+ *  JUnit test for line of sight. 
+ *  @version $Id$
+ *  @author David Ripton
+ */
 public class LOSTest extends TestCase
 {
     Game game;

@@ -9,8 +9,7 @@ import java.awt.geom.*;
 import java.awt.image.*;
 import java.net.*;
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.client.VariantSupport;
+import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Creature;
 
 /**
@@ -109,7 +108,7 @@ class Chit extends JPanel
         tempIcon = ResourceLoader.getImageIcon(imageFilename, directories);
         if (tempIcon == null)
         {
-            System.out.println("Couldn't get image :" + imageFilename);
+            Log.error("Couldn't get image :" + imageFilename);
             System.exit(1);
         }
         

@@ -47,7 +47,6 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         setBackground(Color.lightGray);
 
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         int scale = 4 * Scale.get();
 
         allyMarker = new Marker(scale, allyMarkerId, this, client);

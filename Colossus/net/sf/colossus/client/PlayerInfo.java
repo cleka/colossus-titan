@@ -4,7 +4,6 @@ package net.sf.colossus.client;
 import java.util.*;
 
 import net.sf.colossus.util.Split;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 

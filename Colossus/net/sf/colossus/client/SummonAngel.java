@@ -151,7 +151,6 @@ Log.debug("returning new SummonAngel dialog for " + markerId);
             return;
         }
         java.util.Iterator it = sumChitList.iterator();
-        boolean done = false;
         while (it.hasNext())
         {
             Chit c = (Chit)it.next();

@@ -11,8 +11,6 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.parser.BattlelandLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class HexMap displays a basic battle map.
@@ -151,7 +149,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  Cliffs are bidirectional; other hexside obstacles are noted
      *  only on the high side, since they only interfere with
      *  uphill movement. */
-    private synchronized static void setupHexesGameState(char terrain, 
+    private static synchronized void setupHexesGameState(char terrain, 
         BattleHex [][] h)
     {
         java.util.List directories = 
@@ -173,7 +171,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
         catch (Exception e) 
         {
-            System.out.println("Battlelands loading failed : " + e);
+            Log.error("Battlelands loading failed : " + e);
         }
     }
 

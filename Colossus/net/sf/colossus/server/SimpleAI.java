@@ -1,7 +1,6 @@
 package net.sf.colossus.server;
 
 
-import java.io.*;
 import java.util.*;
 
 import net.sf.colossus.util.Log;
@@ -13,7 +12,6 @@ import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.BattleMap;
-import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.parser.TerrainRecruitLoader;
@@ -1081,7 +1079,6 @@ public class SimpleAI implements AI
 
             switch (result)
             {
-
                 case WIN_WITH_MINIMAL_LOSSES:
                     Log.debug("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and WIN_WITH_MINIMAL_LOSSES");
@@ -1203,6 +1200,9 @@ public class SimpleAI implements AI
 
                     value += LOSE_LEGION;
                     break;
+
+                default:
+                    Log.error("Bogus battle result case");
             }
         }
 
@@ -1554,7 +1554,7 @@ public class SimpleAI implements AI
 
         // consider tower teleport
         if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0
-            && moves[6] == false)
+            && !moves[6])
         {
             // hack: assume that we can always tower teleport to the terrain we
             // want to go to.
@@ -1860,7 +1860,7 @@ public class SimpleAI implements AI
             java.util.List legions = client.getLegionsByHex(hexLabel);
             if (legions.size() != 1)
             {
-                Log.error("SimpleAI.summonAngel(): Engagement in " + hexLabel); 
+                Log.error("SimpleAI.summonAngel(): Engagement in " + hexLabel);
                 continue;
             }
             String markerId = (String)legions.get(0);
@@ -1868,7 +1868,7 @@ public class SimpleAI implements AI
             String myAngel = info.bestSummonable();
             if (myAngel == null)
             {
-                Log.error("SimpleAI.summonAngel(): No angel in " + markerId); 
+                Log.error("SimpleAI.summonAngel(): No angel in " + markerId);
                 continue;
             }
 
@@ -2255,7 +2255,6 @@ public class SimpleAI implements AI
 
         Battle battle = game.getBattle();
         final char terrain = battle.getTerrain();
-        Legion legion = battle.getActiveLegion();
 
         if (bestOrder != null)
         {
@@ -2270,7 +2269,8 @@ public class SimpleAI implements AI
                     Critter fakeCritter = cm.getCritter();
 
                     String hexLabel = cm.getEndingHexLabel();
-                    Log.debug("applymove: try " + fakeCritter + " to " + hexLabel);
+                    Log.debug("applymove: try " + fakeCritter + " to " + 
+                        hexLabel);
                     if (battle.doMove(fakeCritter.getTag(), hexLabel))
                     {
                         // The move was okay, so continue to the next critter.
@@ -2854,7 +2854,6 @@ public class SimpleAI implements AI
         public int compare(Object o1, Object o2)
         {
             final char terrain = battle.getTerrain();
-            final Legion legion = battle.getActiveLegion();
 
             List moveList1 = (List)o1;
             List moveList2 = (List)o2;

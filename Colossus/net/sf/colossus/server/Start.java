@@ -20,12 +20,12 @@ public final class Start
 {
     private static void usage(Options opts)
     {
-        System.out.println("Usage: java -jar Colossus.jar [options]");
+        Log.event("Usage: java -jar Colossus.jar [options]");
         Iterator it = opts.getOptions().iterator();
         while (it.hasNext())
         {
             Option opt = (Option)it.next();
-            System.out.println(opt.toString());
+            Log.event(opt.toString());
         }
     }
 

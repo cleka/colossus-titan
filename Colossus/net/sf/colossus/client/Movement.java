@@ -3,7 +3,6 @@ package net.sf.colossus.client;
 import java.util.*;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Options;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
 
 
@@ -355,7 +354,6 @@ public final class Movement
     {
         Set entrySides = new HashSet();
         LegionInfo legion = client.getLegionInfo(markerId);
-        PlayerInfo player = legion.getPlayerInfo();
         int movementRoll = client.getMovementRoll();
         MasterHex currentHex = MasterBoard.getHexByLabel(legion.getHexLabel());
         MasterHex targetHex = MasterBoard.getHexByLabel(targetHexLabel);

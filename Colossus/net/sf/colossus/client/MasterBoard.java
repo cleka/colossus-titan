@@ -17,7 +17,6 @@ import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.server.ConfigFileFilter;
 import net.sf.colossus.parser.StrategicMapLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
-import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
@@ -208,6 +207,9 @@ public final class MasterBoard extends JPanel
                         client.undoLastRecruit();
                         highlightPossibleRecruits();
                         break;
+
+                    default:
+                        Log.error("Bogus phase");
                 }
             }
         };
@@ -239,6 +241,9 @@ public final class MasterBoard extends JPanel
                         client.undoAllRecruits();
                         highlightPossibleRecruits();
                         break;
+
+                    default:
+                        Log.error("Bogus phase");
                 }
             }
         };
@@ -266,6 +271,9 @@ public final class MasterBoard extends JPanel
                     case Constants.MUSTER:
                         client.doneWithRecruits();
                         break;
+
+                    default:
+                        Log.error("Bogus phase");
                 }
             }
         };
@@ -774,7 +782,8 @@ public final class MasterBoard extends JPanel
         MasterHex[][] localH = null;
         try
         {
-            java.util.List directories = VariantSupport.getVarDirectoriesList();
+            java.util.List directories = 
+                VariantSupport.getVarDirectoriesList();
             InputStream mapIS = ResourceLoader.getInputStream(
                                                VariantSupport.getMapName(),
                                                directories);
@@ -968,7 +977,9 @@ public final class MasterBoard extends JPanel
                                     break;
                                 case 5:
                                     h[i - 1][j].setEntranceType(2, gateType);
-                                break;
+                                    break;
+                                default:
+                                    Log.error("Bogus hexside");
                             }
                         }
                     }

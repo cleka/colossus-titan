@@ -5,7 +5,6 @@ import java.util.*;
 import java.io.*;
 
 import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Split;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
@@ -114,16 +113,16 @@ Log.debug("Called Player.setType() for " + name + " " + type);
         {
             if (!(ai.getClass().getName().equals(type)))
             {
-                System.out.println("Changing player " + name + " from " +
+                Log.event("Changing player " + name + " from " +
                     ai.getClass().getName() + " to " + type);
                 try 
                 {
                     ai = (AI)Class.forName(type).getDeclaredConstructor(
                         new Class[0]).newInstance(new Object[0]);
                 } 
-                catch (Exception e) 
+                catch (Exception e)
                 {
-                    System.out.println("Failed to change player " + name +
+                    Log.error("Failed to change player " + name +
                         " from " + ai.getClass().getName() + " to " + type);
                 }
             }
@@ -622,7 +621,6 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     void undoSplit(String splitoffId)
     {
         Legion splitoff = getLegionByMarkerId(splitoffId);
-        String hexLabelToAlign = splitoff.getCurrentHexLabel();
         Legion parent = splitoff.getParent();
         splitoff.recombine(parent, true);
         game.getServer().allUpdatePlayerInfo();

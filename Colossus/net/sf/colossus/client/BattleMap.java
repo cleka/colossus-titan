@@ -10,7 +10,6 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
 
 
 /**
@@ -166,6 +165,8 @@ public final class BattleMap extends HexMap implements MouseListener,
                     case Constants.STRIKEBACK:
                         client.doneWithStrikes();
                         break;
+                    default:
+                        Log.error("Bogus phase");
                 }
             }
         };

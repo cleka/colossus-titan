@@ -52,7 +52,8 @@ public final class VariantSupport
      * @param tempVarDirectory The path to the directory holding the Variant.
      * @return A Document describing the variant.
      */
-    public static Document loadVariant(String tempVarName, String tempVarDirectory)
+    public static Document loadVariant(String tempVarName, 
+        String tempVarDirectory)
     {
         if (variantName.equals(tempVarName) &&
             varDirectory.equals(tempVarDirectory))
@@ -113,7 +114,8 @@ public final class VariantSupport
                 Log.debug("Variant using TER " + recruitName);
                 if (data[VariantLoader.DEPEND_INDEX] != null)
                 {
-                    dependUpon = Split.split(',', data[VariantLoader.DEPEND_INDEX]);
+                    dependUpon = Split.split(',', 
+                        data[VariantLoader.DEPEND_INDEX]);
                     Log.debug("Variant dependng upon " + dependUpon);
                 }
                 else
@@ -127,7 +129,7 @@ public final class VariantSupport
         }
         catch (Exception e)
         {
-            System.out.println("Variant loading failed : " + e);
+            Log.error("Variant loading failed : " + e);
             varDirectory = Constants.defaultDirName;
             variantName = Constants.defaultVARFile;
             mapName = Constants.defaultMAPFile;

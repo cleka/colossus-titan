@@ -87,7 +87,6 @@ final class BattleDice extends JPanel
         diceBox.setLayout(new FlowLayout());
         add(diceBox);
         dice = new Chit[numDice];
-        Dimension d = new Dimension(3, 0);
         for (int i = 0; i < numDice; i++)
         {
             dice[i] = new Chit(2 * Scale.get(), getDieImageName(rolls[i]),

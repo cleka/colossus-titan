@@ -44,7 +44,6 @@ final class ReplyToProposal extends KDialog implements ActionListener
         contentPane.setLayout(gridbag);
         pack();
         setBackground(Color.lightGray);
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 
         int scale = 4 * Scale.get();
 
@@ -113,9 +112,9 @@ final class ReplyToProposal extends KDialog implements ActionListener
         JButton button1 = new JButton("Accept");
         button1.setMnemonic(KeyEvent.VK_A);
         JButton button2 = new JButton("Decline");
-        button1.setMnemonic(KeyEvent.VK_D);
+        button2.setMnemonic(KeyEvent.VK_D);
         JButton button3 = new JButton("Fight");
-        button2.setMnemonic(KeyEvent.VK_F);
+        button3.setMnemonic(KeyEvent.VK_F);
 
         // Attempt to center the buttons.
         int chitWidth = 1 + Math.max(attackerImageNames.size(),

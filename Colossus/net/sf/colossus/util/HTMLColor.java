@@ -187,8 +187,8 @@ public final class HTMLColor
         }
         catch (Exception e)
         {
-            System.out.println("Warning : I know nothing about color \"" +
-                               colorName + "\", : " + e);
+            Log.warn("I know nothing about color \"" + colorName + 
+                "\", : " + e);
             theColor = Color.black;
         }
         return theColor;

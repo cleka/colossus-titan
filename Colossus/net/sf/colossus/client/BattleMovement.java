@@ -3,8 +3,6 @@ package net.sf.colossus.client;
 
 import java.util.*;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 
 

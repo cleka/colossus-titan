@@ -9,6 +9,8 @@ import net.sf.colossus.client.Client;
 /**
  * interface to allow for multiple AI implementations
  *
+ * @author Bruce Sherrod
+ * @author David Ripton
  * @version $Id$
  */
 public interface AI

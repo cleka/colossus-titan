@@ -4,8 +4,11 @@ import java.util.*;
 import junit.framework.*;
 
 
-/** JUnit test for balanced towers. */
-
+/** 
+ *  JUnit test for balanced towers. 
+ *  @version $Id$
+ *  @author David Ripton
+ */
 public class BalancedTowersTest extends TestCase
 {
     public BalancedTowersTest(String name)

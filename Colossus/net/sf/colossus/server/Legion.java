@@ -330,8 +330,9 @@ final class Legion implements Comparable
                 {
                     addCreature(angel, true);
                     Log.event("Legion " + getLongMarkerName() +
-                              " acquires an " + angelType);
-                    game.getServer().allTellAddCreature(getMarkerId(), angelType);
+                        " acquires an " + angelType);
+                    game.getServer().allTellAddCreature(getMarkerId(), 
+                        angelType);
                 }
             }
         }
@@ -432,25 +433,6 @@ final class Legion implements Comparable
         {
             Critter critter = (Critter)it.next();
             imageNames.add(critter.getImageName());
-        }
-        return imageNames;
-    }
-
-
-    /** Return a list of unique imageNames for all lords in this legion. */
-    List getUniqueLordImageNames()
-    {
-        sortCritters();
-        List imageNames = new ArrayList();
-        Iterator it = getCritters().iterator();
-        int unknowns = 0;
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (critter.isLord()) 
-            {
-                String imageName = critter.getImageName();
-            }
         }
         return imageNames;
     }

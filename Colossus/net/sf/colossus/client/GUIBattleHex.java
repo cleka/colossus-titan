@@ -8,10 +8,8 @@ import java.net.*;
 import javax.swing.*;
 import java.io.*;
 import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.client.VariantSupport;
+import net.sf.colossus.util.Log;
 
 /**
  * Class GUIBattleHex holds GUI info for one battle hex.
@@ -43,7 +41,8 @@ public class GUIBattleHex extends BattleHex
     // Letters increase left to right; numbers increase bottom to top.
 
 
-    public GUIBattleHex(int cx, int cy, int scale, Component map, int xCoord, int yCoord)
+    public GUIBattleHex(int cx, int cy, int scale, Component map, 
+        int xCoord, int yCoord)
     {
         super(xCoord, yCoord);
         this.map = map;
@@ -316,15 +315,19 @@ public class GUIBattleHex extends BattleHex
                     g2.setColor(Color.black);
                     g2.draw(polygon);
                 }
+                break;
 
             case 'r':     // river -- single blue line
-                    g2.setColor(HTMLColor.skyBlue);
-                    Stroke oldStroke = g2.getStroke();
-                    g2.setStroke(new BasicStroke((float)5.));
-                    g2.draw((Shape)new Line2D.Double(vx1, vy1, vx2, vy2));
-                    g2.setColor(Color.black);
-                    g2.setStroke(oldStroke);
+                g2.setColor(HTMLColor.skyBlue);
+                Stroke oldStroke = g2.getStroke();
+                g2.setStroke(new BasicStroke((float)5.));
+                g2.draw((Shape)new Line2D.Double(vx1, vy1, vx2, vy2));
+                g2.setColor(Color.black);
+                g2.setStroke(oldStroke);
                 break;
+
+            default:
+                Log.error("Bogus hexside type");
         }
     }
 

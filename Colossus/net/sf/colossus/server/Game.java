@@ -16,7 +16,6 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.GetPlayers;
-import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.parser.TerrainRecruitLoader;
@@ -90,7 +89,7 @@ public final class Game
         }
         catch (Exception e) 
         {
-            System.out.println("Recruit-per-terrain loading failed : " + e);
+            Log.error("Recruit-per-terrain loading failed : " + e);
             System.exit(1);
         }
     }
@@ -1271,7 +1270,7 @@ public final class Game
                 // Legions
                 for (int j = 0; j < numLegions; j++)
                 {
-                    Legion legion = readLegion(in, player, false);
+                    readLegion(in, player, false);
                 }
             }
 
@@ -2292,7 +2291,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
         Legion newLegion = null;
 
         java.util.List strings = Split.split(',', results);
-        String newMarkerId = (String)strings.remove(0);
+        strings.remove(0);
 
         // Need to replace strings with creatures.
         java.util.List creatures = new ArrayList();
@@ -3014,7 +3013,6 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
 
     Legion getFirstEnemyLegion(String hexLabel, Player player)
     {
-        String playerName = player.getName();
         Iterator it = getAllEnemyLegions(player).iterator();
         while (it.hasNext())
         {
