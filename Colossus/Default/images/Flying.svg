@@ -9,8 +9,7 @@
    preserveAspectRatio="xMidYMid"
    id="svg122"
    sodipodi:version="0.31.1"
-   sodipodi:docname="/home/dripton/src/Colossus/Default/images/Flying.svg"
-   sodipodi:docbase="/home/dripton/src/Colossus/Default/images/"
+   sodipodi:docname="Flying.svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -32,5 +31,5 @@
      sodipodi:arg1="0.943167"
      sodipodi:arg2="1.571486"
      points="35.5486,58.6834 32.0669,56.8499 28.5827,58.6786 29.2506,54.8007 26.4347,52.0522 30.3292,51.489 32.0731,47.9616 33.8121,51.4914 37.7057,52.0599 34.8861,54.8046 35.5486,58.6834 "
-     transform="matrix(0.669598,0,0,0.429394,11.261,34.0172)" />
+     transform="matrix(0.786413,0,0,0.79779,4.97554,12.2104)" />
 </svg>
