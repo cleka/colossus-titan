@@ -598,11 +598,9 @@ final class Critter extends Creature implements Comparable
     /** Side effects. */ 
     void assignStrikePenalty(String prompt)
     {
-Log.debug("calling Critter.assignStrikePenalty() with " + prompt);
         PenaltyOption po = matchingPenaltyOption(prompt); 
         if (po != null)
         {
-            Log.debug("Valid penalty option " + po.toString());
             Critter target = po.getTarget();
             int dice = po.getDice();
             int strikeNumber = po.getStrikeNumber();
@@ -749,7 +747,6 @@ Log.debug("calling Critter.assignStrikePenalty() with " + prompt);
         {
             // Can carry with no need for a penalty.
             battle.addCarryTarget(neighbor.getLabel());
-Log.debug("added carry target " + victim.getDescription());
         }
 
         else
@@ -764,7 +761,6 @@ Log.debug("added carry target " + victim.getDescription());
                     po.getStrikeNumber() == tmpStrikeNumber)
                 {
                     po.addCarryTarget(neighbor.getLabel());
-Log.debug("existing penalty option: " + po.toString());
                     return;
                 }
             }
@@ -773,7 +769,6 @@ Log.debug("existing penalty option: " + po.toString());
                 tmpDice, tmpStrikeNumber);
             po.addCarryTarget(neighbor.getLabel());
             penaltyOptions.add(po);
-Log.debug("new penalty option: " + po.toString());
         }
     }
 
@@ -784,7 +779,7 @@ Log.debug("new penalty option: " + po.toString());
     {
         if (hasStruck())
         {
-            Log.debug("Removed extra strike2() call for " + getDescription());
+            Log.warn("Removed extra strike2() call for " + getDescription());
             return;
         }
 

@@ -4,14 +4,10 @@ Big picture:
 3. Refactor to eliminate duplicate code.
 4. Improve networking.  (Persistent servers, reporting game openings to web
    page.)
-5. Improve AI.
+5. Improve AI.  (Group battle moves.)
 
 
 Bug: Failing LOSTest -- problems with slopes and cliffs.
-
-Bug: Some strike updates do not reach client GUI.
-
-Bug: Double advance from split phase when autosplit has no legal splits?
 
 Bug: AI needs to set donor, enter angel when summoning into battle.
 
@@ -22,20 +18,30 @@ Bug?: Attacking, conceded to AI after map up but before entering, and
 
 Bug: Concede dialog has top legion skewed slightly to right of bottom legion.
 
-Bug: Overlay sometimes not loading at start, even though checked on menu.  
-   Need to turn off then on.
-
-Bug: AIs still kamikaze into superior stacks with All stacks visible off.
-
-Auto-advance from battle move, strike phases is disabled for humans.
-
-Attacking titans are now way too aggressive early in battles.
+Bug: Hang after illegal carry attempt.
+Battle phase advances to Fight
+Angel takes Hex damage
+Called ai.strike() for Bu02
+Best target is Warbear in E4
+Best attacker is Troll in E3
+From client Blue: strike ~ 72 ~ A1
+Titan in B1 strikes Angel in Drift hex A1 with strike number 4 : 225351: 2 hits
+Called ai.strike() for Bu02
+Best target is Warbear in E4
+Best attacker is Troll in E3
+From client Blue: strike ~ 99 ~ E4
+added carry target Ogre in Plains hex D4
+Troll in E3 strikes Warbear in Drift hex E4 with strike number 5 : 41266524: 3 hits
+1 carry available
+From client Blue: strike ~ 99 ~ E4
+Removed extra strike2() call for Troll in Plains hex E3
+From client Blue: applyCarries ~ D4
+Warn: Tried illegal carry to Ogre in Plains hex D4
 
 
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
    Or make PickRecruit non-modal.
-
 
 Colorize chat window.
 Colorize StatusScreen.

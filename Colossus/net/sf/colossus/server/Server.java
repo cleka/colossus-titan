@@ -822,12 +822,6 @@ Log.debug("Called Server.addClient() for " + playerName);
             return;
         }
         boolean moved = game.getBattle().doMove(tag, hexLabel);
-        if (moved)
-        {
-            Critter critter = game.getBattle().getCritter(tag);
-            String startingHexLabel = critter.getStartingHexLabel();
-            allTellBattleMove(tag, startingHexLabel, hexLabel, false);
-        }
     }
 
     void allTellBattleMove(int tag, String startingHex, String endingHex, 

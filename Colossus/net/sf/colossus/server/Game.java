@@ -2363,6 +2363,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         else
         {
             server.aiRevealLegion(legion);
+            server.aiRevealLegion(newLegion);
             server.oneRevealLegion(legion, player.getName());
             server.oneRevealLegion(newLegion, player.getName());
         }

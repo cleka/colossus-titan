@@ -862,10 +862,14 @@ public final class Client implements IClient
             }
             else
             {
-                makeForcedStrikes();
+                boolean struck = makeForcedStrikes();
                 if (map != null)
                 {
                     map.highlightCrittersWithTargets();
+                }
+                if (!struck && findCrittersWithTargets().isEmpty())
+                {
+                    doneWithStrikes();
                 }
             }
         }
@@ -1169,8 +1173,8 @@ public final class Client implements IClient
 
     private Object popUndoStack()
     {
-        Object ob = undoStack.removeFirst();
-        return ob;
+        Object object = undoStack.removeFirst();
+        return object;
     }
 
     private void pushUndoStack(Object object)
@@ -1524,6 +1528,10 @@ public final class Client implements IClient
         int strikeNumber, java.util.List rolls, int damage, boolean killed, 
         boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
+if (isMyBattlePhase())
+{
+Log.debug("Client.tellStrikeResults() " + strikerTag + " " + targetTag + " " + strikeNumber + " " + damage + " " + killed + " " + wasCarry + " " + carryDamageLeft + " " + carryTargetDescriptions.size());
+}
         BattleChit chit = getBattleChit(strikerTag);
         if (chit != null)
         {

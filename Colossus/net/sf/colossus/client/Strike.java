@@ -36,11 +36,11 @@ final class Strike
     public Set findCrittersWithTargets()
     {
         Set set = new HashSet();
-        Iterator it = client.getBattleChits().iterator();
+        Iterator it = client.getActiveBattleChits().iterator();
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
-            if (client.isActive(chit) && countStrikes(chit, true) > 0)
+            if (countStrikes(chit, true) > 0)
             {
                 set.add(chit.getHexLabel());
             }
