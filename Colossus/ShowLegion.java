@@ -61,34 +61,23 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
         this.legion = legion;
 
         chits = new Chit[legion.getHeight()];
-        if (allVisible)
-        {
-            for (int i = 0; i < legion.getHeight(); i++)
-            {
-                chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale,
-                    legion.getCreature(i).getImageName(), this);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < legion.getHeight(); i++)
-            {
-                Critter critter = legion.getCritter(i);
-                String imageName;
-                if (!critter.isVisible())
-                {
-                    imageName = "images/" + "Question.gif"; 
-                }
-                else
-                {
-                    imageName = critter.getImageName();
-                }
 
-                chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale,
-                    imageName, this);
+        for (int i = 0; i < legion.getHeight(); i++)
+        {
+            Critter critter = legion.getCritter(i);
+            String imageName;
+            if (!allVisible && !critter.isVisible())
+            {
+                imageName = "images/" + "Question.gif"; 
             }
-        }
+            else
+            {
+                imageName = critter.getImageName();
+            }
 
+            chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale,
+                imageName, this);
+        }
 
         tracker = new MediaTracker(this);
 
