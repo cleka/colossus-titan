@@ -64,6 +64,8 @@ public class BattleMap extends Frame implements MouseListener,
     Legion donor = null;
     private static Point location;
 
+    private boolean isApplet = false;
+
 
     public BattleMap(MasterBoard board, Legion attacker, Legion defender,
         MasterHex masterHex, int entrySide)
@@ -79,6 +81,11 @@ public class BattleMap extends Frame implements MouseListener,
         this.terrain = masterHex.getTerrain();
         this.board = board;
         this.entrySide = entrySide;
+
+        if (board != null)
+        {
+            isApplet = board.getGame().isApplet();
+        }
 
         setLayout(null);
 
@@ -103,17 +110,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         setLocation(location);
 
-        try
-        {
-            setIconImage(Toolkit.getDefaultToolkit().getImage(
-                getClass().getResource(Creature.colossus.getImageName())));
-        }
-        catch (NullPointerException e)
-        {
-            System.out.println(e.toString() + " Couldn't find " +
-                Creature.colossus.getImageName());
-            System.exit(1);
-        }
+        setupIcon();
 
         setBackground(Color.white);
         addWindowListener(this);
@@ -136,7 +133,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale,
                 attacker.getCritter(i).getImageName(false), this,
                 attacker.getCritter(i), entrance,
-                attacker, this);
+                attacker, this, isApplet);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -148,7 +145,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale,
                 defender.getCritter(i - attackerHeight).getImageName(true),
                 this, defender.getCritter(i - attackerHeight), entrance,
-                defender, this);
+                defender, this, isApplet);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -165,13 +162,32 @@ public class BattleMap extends Frame implements MouseListener,
         }
         imagesLoaded = true;
 
-        turn = new BattleTurn(this, this, attacker, defender);
+        turn = new BattleTurn(this, this, attacker, defender, isApplet);
 
         attacker.clearBattleTally();
         defender.clearBattleTally();
 
         setVisible(true);
         repaint();
+    }
+
+
+    private void setupIcon()
+    {
+        if (!isApplet)
+        {
+            try
+            {
+                setIconImage(Toolkit.getDefaultToolkit().getImage(
+                    getClass().getResource(Creature.colossus.getImageName())));
+            }
+            catch (NullPointerException e)
+            {
+                System.out.println(e.toString() + " Couldn't find " + 
+                    Creature.colossus.getImageName());
+                dispose();
+            }
+        }
     }
 
 
@@ -186,7 +202,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         chits[numChits] = new BattleChit(0, 0, chitScale,
             critter.getImageName(legion == defender), this, critter,
-            entrance, legion, this);
+            entrance, legion, this, isApplet);
 
         tracker.addImage(chits[numChits].getImage(), 0);
         entrance.addChit(chits[numChits]);
@@ -1253,13 +1269,16 @@ public class BattleMap extends Frame implements MouseListener,
                 // Summon angel
                 if (legion.canSummonAngel())
                 {
-                    // Make sure the MasterBoard is visible.
-                    board.deiconify();
-                    // And bring it to the front.
-                    board.show();
-
-                    SummonAngel summonAngel = new SummonAngel(board, attacker);
-                    board.setSummonAngel(summonAngel);
+                    if (board != null)
+                    {
+                        // Make sure the MasterBoard is visible.
+                        board.deiconify();
+                        // And bring it to the front.
+                        board.show();
+    
+                        SummonAngel summonAngel = new SummonAngel(board, attacker);
+                        board.setSummonAngel(summonAngel);
+                    }
                 }
             }
             else
@@ -1267,7 +1286,7 @@ public class BattleMap extends Frame implements MouseListener,
                 // Recruit reinforcement
                 if (legion.canRecruit())
                 {
-                    new PickRecruit(this, legion);
+                    new PickRecruit(this, legion, isApplet);
                 }
             }
 
@@ -1982,7 +2001,11 @@ public class BattleMap extends Frame implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
-        System.exit(0);
+        if (board != null)
+        {
+            board.disposeGame();
+        }
+        dispose();
     }
 
 
@@ -2097,11 +2120,11 @@ public class BattleMap extends Frame implements MouseListener,
         Legion attacker = new Legion(0, 0, chitScale, null, null, null, 7,
             null, Creature.ogre, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
-            Creature.warlock, null, player1);
+            Creature.warlock, null, player1, false);
         Legion defender = new Legion(0, 0, chitScale, null, null, null, 7,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian,
-            Creature.minotaur, null, player2);
+            Creature.minotaur, null, player2, false);
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('J');
         new BattleMap(null, attacker, defender, hex, 3);
