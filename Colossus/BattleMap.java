@@ -46,28 +46,37 @@ public class BattleMap extends Frame implements MouseListener,
     // l = left (5), r = right (1), b = bottom (3)
     private char side;
 
+    private BattleTurn turn;
+    private MasterBoard board;
+    private MasterHex masterHex;
+
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
     // Swamp, Tower, tundra, Woods
     private char terrain;
-    private BattleTurn turn;
 
     private int attackerPoints = 0;
     private int defenderPoints = 0;
 
-    private boolean summonedAngel = false;
-    private boolean recruitedReinforcement = false;
     private boolean chitSelected = false;
     private int numCarries = 0;
 
+    public static final int NO_KILLS = 0;
+    public static final int FIRST_BLOOD = 1;
+    public static final int TOO_LATE = 2;
+    private int summonState = NO_KILLS;
 
-    public BattleMap(Legion attacker, Legion defender, char terrain, char side)
+
+    public BattleMap(Legion attacker, Legion defender, MasterHex masterHex, 
+        char side, MasterBoard board)
     {
         super(attacker.getMarkerId() + " attacks " + defender.getMarkerId());
 
         this.attacker = attacker;
         this.defender = defender;
-        this.terrain = terrain;
+        this.masterHex = masterHex;
+        this.terrain = masterHex.getTerrain();
+        this.board = board;
 
         // All tower attacks come from the bottom side.
         if (terrain == 'T')
@@ -99,7 +108,7 @@ public class BattleMap extends Frame implements MouseListener,
         int attackerHeight = attacker.getHeight();
         numChits = attackerHeight + defender.getHeight();
 
-        Hex entrance = getAttackerEntrance();
+        Hex entrance = getEntrance(attacker);
         for (int i = 0; i < attackerHeight; i++)
         {
             chits[i] = new BattleChit(0, 0, chitScale,
@@ -111,7 +120,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         entrance.alignChits();
 
-        entrance = getDefenderEntrance();
+        entrance = getEntrance(defender);
         for (int i = attackerHeight; i < numChits; i++)
         {
             chits[i] = new BattleChit(0, 0, chitScale,
@@ -138,6 +147,38 @@ public class BattleMap extends Frame implements MouseListener,
 
         setVisible(true);
         repaint();
+    }
+
+
+    void placeNewChit(Legion legion)
+    {
+        imagesLoaded = false;
+        tracker = new MediaTracker(this);
+
+        Hex entrance = getEntrance(legion);
+        int height = legion.getHeight();
+        Creature creature = legion.getCreature(height - 1);
+
+        chits[numChits] = new BattleChit(0, 0, chitScale, 
+            creature.getImageName(), this, creature, entrance, legion, 
+            (legion == defender), this);
+
+        tracker.addImage(chits[numChits].getImage(), 0);
+        entrance.addChit(chits[numChits]);
+
+        numChits++;
+
+        entrance.alignChits();
+
+        try
+        {
+            tracker.waitForAll();
+        }
+        catch (InterruptedException e)
+        {
+            new MessageBox(this, "waitForAll was interrupted");
+        }
+        imagesLoaded = true;
     }
 
 
@@ -614,7 +655,23 @@ public class BattleMap extends Frame implements MouseListener,
         }
     }
 
-    
+
+    // Know that yDist != 0
+    boolean toLeft(float xDist, float yDist)
+    {
+        float ratio = xDist / yDist;
+        if (ratio >= 1.5 || (ratio >= 0 && ratio <= .75) || 
+            (ratio >= -1.5 && ratio <= -.75))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
     // Check LOS, going to the left of hexspines if argument left is true, or
     // to the right if it is false.
     private boolean LOSBlockedDir(Hex initialHex, Hex currentHex, Hex finalHex, 
@@ -819,17 +876,10 @@ public class BattleMap extends Frame implements MouseListener,
                 LOSBlockedDir(hex1, hex1, hex2, false, strikeElevation, 
                 false, false, false, false, false, 0));
         }
-        else if (xDist / yDist > 0)
-        {
-            // LOS to left
-            return LOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, 0);
-        }
         else
         {
-            // LOS to right
-            return LOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                false, false, false, false, false, 0);
+            return LOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
+                strikeElevation, false, false, false, false, false, 0);
         }
     }
 
@@ -1129,16 +1179,67 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    MasterBoard getBoard()
+    {
+        return board;
+    }
+
+
+    int getSummonState()
+    {
+        return summonState;
+    }
+
+
+    void setSummonState(int state)
+    {
+        summonState = state;
+    }
+
+
+    void cleanup()
+    {
+        // Handle any after-battle angel summoning or recruiting.
+        if (masterHex.getNumLegions() == 1)
+        {
+            Legion legion = masterHex.getLegion(0);
+            if (legion == attacker)
+            {
+                // Summon angel
+                if (legion.getPlayer().canSummonAngel())
+                {
+                    new SummonAngel(board, attacker);
+                }
+            }
+            else
+            {
+                // Recruit reinforcement
+                if (legion.canRecruit())
+                {
+                    new PickRecruit(this, legion); 
+                }
+            }
+        }
+
+        turn.dispose();
+        dispose();
+        masterHex.unselect();
+        masterHex.repaint();
+    }
+
+
     void removeDeadChits()
     {
+        // Initialize these to true, and then set them to false when a 
+        // non-dead chit is found.
         boolean attackerElim = true;
         boolean defenderElim = true;
 
         for (int i = numChits - 1; i >= 0; i--)
         {
+            Legion legion = chits[i].getLegion();
             if (chits[i].isDead())
             {
-                Legion legion = chits[i].getLegion();
                 Creature creature = chits[i].getCreature();
                 if (legion == attacker)
                 {
@@ -1147,9 +1248,12 @@ public class BattleMap extends Frame implements MouseListener,
                 else
                 {
                     attackerPoints += creature.getPointValue();
+                    if (summonState == NO_KILLS)
+                    {
+                        summonState = FIRST_BLOOD;
+                    }
                 }
 
-                // XXX: Need to remove the exact chit?
                 legion.removeCreature(creature);
 
                 if (creature == Creature.titan)
@@ -1170,7 +1274,7 @@ public class BattleMap extends Frame implements MouseListener,
             }
             else
             {
-                if (chits[i].getLegion() == attacker)
+                if (legion == attacker)
                 {
                     attackerElim = false;
                 }
@@ -1186,24 +1290,22 @@ public class BattleMap extends Frame implements MouseListener,
             defender.getPlayer().isTitanEliminated())
         {
             // Nobody gets any points.
+System.out.println("mutual Titan kill");
             attacker.getPlayer().die(null);
             defender.getPlayer().die(null);
-            turn.dispose();
-            dispose();
+            cleanup();
         }
 
-        // Check for single Titan elimination.  Victor gets full points
-        // for eliminated chits, and half points for what's left, except for 
-        // legions engaged with other players, who then get the half points.
+        // Check for single Titan elimination.
         else if (attacker.getPlayer().isTitanEliminated())
         {
             if (!defenderElim)
             {
                 defender.addPoints(defenderPoints);
             }
+System.out.println("attacker's titan eliminated");
             attacker.getPlayer().die(defender.getPlayer());
-            turn.dispose();
-            dispose();
+            cleanup();
         }
         else if (defender.getPlayer().isTitanEliminated())
         {
@@ -1211,9 +1313,9 @@ public class BattleMap extends Frame implements MouseListener,
             {
                 attacker.addPoints(defenderPoints);
             }
+System.out.println("defender's titan eliminated");
             defender.getPlayer().die(attacker.getPlayer());
-            turn.dispose();
-            dispose();
+            cleanup();
         }
 
         // Check for mutual legion elimination.
@@ -1221,8 +1323,7 @@ public class BattleMap extends Frame implements MouseListener,
         {
             attacker.removeLegion();
             defender.removeLegion();
-            turn.dispose();
-            dispose();
+            cleanup();
         }
 
         // Check for single legion elimination.
@@ -1230,16 +1331,20 @@ public class BattleMap extends Frame implements MouseListener,
         {
             defender.addPoints(defenderPoints);
             attacker.removeLegion();
-            turn.dispose();
-            dispose();
+            cleanup();
         }
         else if (defenderElim)
         {
             attacker.addPoints(attackerPoints);
             defender.removeLegion();
-            turn.dispose();
-            dispose();
+            cleanup();
         }
+    }
+
+
+    BattleTurn getTurn()
+    {
+        return turn;
     }
 
 
@@ -1610,40 +1715,41 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    Hex getAttackerEntrance()
+    Hex getEntrance(Legion legion)
     {
-        switch(side)
+        if (legion == attacker)
         {
-            case 'l':
-                return entrances[5];
+            switch(side)
+            {
+                case 'l':
+                    return entrances[5];
 
-            case 'r':
-                return entrances[1];
+                case 'r':
+                    return entrances[1];
 
-            case 'b':
-                return entrances[3];
+                case 'b':
+                    return entrances[3];
 
-            default:
-                return null;
+                default:
+                    return null;
+            }
         }
-    }
-
-
-    Hex getDefenderEntrance()
-    {
-        switch(side)
+        else
         {
-            case 'l':
-                return entrances[2];
+            switch(side)
+            {
+                case 'l':
+                    return entrances[2];
 
-            case 'r':
-                return entrances[4];
+                case 'r':
+                    return entrances[4];
 
-            case 'b':
-                return entrances[0];
-
-            default:
-                return null;
+                case 'b':
+                    return entrances[0];
+                
+                default:
+                    return null;
+            }
         }
     }
 
@@ -1905,6 +2011,8 @@ public class BattleMap extends Frame implements MouseListener,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian, 
             Creature.minotaur, null, player2);
-        new BattleMap(attacker, defender, 'D', 'b');
+        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setTerrain('J');
+        new BattleMap(attacker, defender, hex, 'b', null);
     }
 }
