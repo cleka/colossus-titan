@@ -64,8 +64,6 @@ public class BattleMap extends Frame implements MouseListener,
     Legion donor = null;
     private static Point location;
 
-    private boolean isApplet = false;
-
 
     public BattleMap(MasterBoard board, Legion attacker, Legion defender,
         MasterHex masterHex, int entrySide)
@@ -81,11 +79,6 @@ public class BattleMap extends Frame implements MouseListener,
         this.terrain = masterHex.getTerrain();
         this.board = board;
         this.entrySide = entrySide;
-
-        if (board != null)
-        {
-            isApplet = board.getGame().isApplet();
-        }
 
         setLayout(null);
 
@@ -133,7 +126,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale,
                 attacker.getCritter(i).getImageName(false), this,
                 attacker.getCritter(i), entrance,
-                attacker, this, isApplet);
+                attacker, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -145,7 +138,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale,
                 defender.getCritter(i - attackerHeight).getImageName(true),
                 this, defender.getCritter(i - attackerHeight), entrance,
-                defender, this, isApplet);
+                defender, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -162,7 +155,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         imagesLoaded = true;
 
-        turn = new BattleTurn(this, this, attacker, defender, isApplet);
+        turn = new BattleTurn(this, this, attacker, defender);
 
         attacker.clearBattleTally();
         defender.clearBattleTally();
@@ -174,7 +167,7 @@ public class BattleMap extends Frame implements MouseListener,
 
     private void setupIcon()
     {
-        if (!isApplet)
+        if (board.getGame().isApplet())
         {
             try
             {
@@ -202,7 +195,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         chits[numChits] = new BattleChit(0, 0, chitScale,
             critter.getImageName(legion == defender), this, critter,
-            entrance, legion, this, isApplet);
+            entrance, legion, this);
 
         tracker.addImage(chits[numChits].getImage(), 0);
         entrance.addChit(chits[numChits]);
@@ -1286,7 +1279,7 @@ public class BattleMap extends Frame implements MouseListener,
                 // Recruit reinforcement
                 if (legion.canRecruit())
                 {
-                    new PickRecruit(this, legion, isApplet);
+                    new PickRecruit(this, legion);
                 }
             }
 
@@ -2120,11 +2113,11 @@ public class BattleMap extends Frame implements MouseListener,
         Legion attacker = new Legion(0, 0, chitScale, null, null, null, 7,
             null, Creature.ogre, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
-            Creature.warlock, null, player1, false);
+            Creature.warlock, null, player1);
         Legion defender = new Legion(0, 0, chitScale, null, null, null, 7,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian,
-            Creature.minotaur, null, player2, false);
+            Creature.minotaur, null, player2);
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('J');
         new BattleMap(null, attacker, defender, hex, 3);
