@@ -49,11 +49,9 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
     JMenuBar menuBar;
 
-    ShowBuilderHexMap(String masterHexLabel,
-                  char t,
-                  String f)
+    ShowBuilderHexMap(String f)
     {
-        super(masterHexLabel, t, f);
+        super(f);
 
         menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");

@@ -20,8 +20,6 @@ import net.sf.colossus.client.BasicGUIBattleHex;
 
 public class BuilderHexMap extends JPanel implements MouseListener, WindowListener
 {
-    private String masterHexLabel;
-    private char terrain;
     String filename = null;
     
     // GUI hexes need to be recreated for each object, since scale varies.
@@ -45,10 +43,8 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
     int cx = 6 * scale;
     int cy = 2 * scale;
 
-    BuilderHexMap(String masterHexLabel, char terrain, String f)
+    BuilderHexMap(String f)
     {
-        this.masterHexLabel = masterHexLabel;
-        this.terrain = terrain;
         filename = f;
 
         setOpaque(true);
@@ -59,7 +55,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
     void setupHexes()
     {
         setupHexesGUI();
-        setupHexesGameState(terrain, h);
+        setupHexesGameState(h);
         setupNeighbors(h);
     }
 
@@ -91,8 +87,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
      *  Cliffs are bidirectional; other hexside obstacles are noted
      *  only on the high side, since they only interfere with
      *  uphill movement. */
-    private synchronized void setupHexesGameState(char terrain, 
-        BattleHex [][] h)
+    private synchronized void setupHexesGameState(BattleHex [][] h)
     {
         if (filename != null)
         {
