@@ -499,56 +499,59 @@ public class AIHintLoader
         {
             HashMap sectionTerrainToRecruitHintList =
                 (HashMap)terrainToRecruitHintList.get(section[i]);
-            List temp = (List)sectionTerrainToRecruitHintList.get(index);
-        
-            if (temp == null)
-            { // no hint for this terrain
-                //Log.debug("HINT: none found for terrain type " + terrain);
-            }
-            else
+            if (sectionTerrainToRecruitHintList != null)
             {
-        
-                Iterator hintIt = temp.iterator();
-                while (hintIt.hasNext() && (hint == null))
+                List temp = (List)sectionTerrainToRecruitHintList.get(index);
+                
+                if (temp == null)
+                { // no hint for this terrain
+                    //Log.debug("HINT: none found for terrain type " + terrain);
+                }
+                else
                 {
-                    recruitHintData th = (recruitHintData)hintIt.next();
-                    //Log.debug("HINT: checking " + th);
-                    synchronized (th)
-                    {
-                        th.setOracle(oracle);
                     
-                        // first, try with all the creatures in the Legion
-                        Iterator legionIt = legion.getContents().iterator();
-                        while (legionIt.hasNext() && (hint == null))
-                        { // this will try creatures as many times as they exist. yuck !
-                            String creature = (String)legionIt.next();
-                            int num = legion.numCreature(creature);
-                            /* Log.debug("HINT: trying to match [1] " + terrain +
-                               " / " + creature +
-                               " / " + num); */
-                            if (th.match(terrain, creature, num))
-                            {
-                                hint = th.getRecruitee();
+                    Iterator hintIt = temp.iterator();
+                    while (hintIt.hasNext() && (hint == null))
+                    {
+                        recruitHintData th = (recruitHintData)hintIt.next();
+                        //Log.debug("HINT: checking " + th);
+                        synchronized (th)
+                        {
+                            th.setOracle(oracle);
+                            
+                            // first, try with all the creatures in the Legion
+                            Iterator legionIt = legion.getContents().iterator();
+                            while (legionIt.hasNext() && (hint == null))
+                            { // this will try creatures as many times as they exist. yuck !
+                                String creature = (String)legionIt.next();
+                                int num = legion.numCreature(creature);
+                                /* Log.debug("HINT: trying to match [1] " + terrain +
+                                   " / " + creature +
+                                   " / " + num); */
+                                if (th.match(terrain, creature, num))
+                                {
+                                    hint = th.getRecruitee();
+                                }
                             }
-                        }
-                        // second, try with all recruitable creature (so that
-                        // hint with (number == 0) are tried)
-                        Iterator recruitsIt = recruits.iterator();
-                        while (recruitsIt.hasNext() && (hint == null))
-                        { // this will try creatures as many times as they exist. yuck !
-                            String creature = ((Creature)recruitsIt.next()).getName();
-                            int num = legion.numCreature(creature);
-                            /* Log.debug("HINT: trying to match [2] " + terrain +
-                               " / " + creature +
-                               " / " + num); */
-                            if (th.match(terrain, creature, num))
-                            {
-                                hint = th.getRecruitee();
+                            // second, try with all recruitable creature (so that
+                            // hint with (number == 0) are tried)
+                            Iterator recruitsIt = recruits.iterator();
+                            while (recruitsIt.hasNext() && (hint == null))
+                            { // this will try creatures as many times as they exist. yuck !
+                                String creature = ((Creature)recruitsIt.next()).getName();
+                                int num = legion.numCreature(creature);
+                                /* Log.debug("HINT: trying to match [2] " + terrain +
+                                   " / " + creature +
+                                   " / " + num); */
+                                if (th.match(terrain, creature, num))
+                                {
+                                    hint = th.getRecruitee();
+                                }
                             }
-                        }
 
-                        // remove the Oracle, just in case
-                        th.setOracle(null);
+                            // remove the Oracle, just in case
+                            th.setOracle(null);
+                        }
                     }
                 }
             }
@@ -565,33 +568,31 @@ public class AIHintLoader
         {
             HashMap sectionLabelToInitialSplitList = 
                 (HashMap)labelToInitialSplitList.get(section[i]);
-            List allHints = (List)sectionLabelToInitialSplitList.get(label);
+            if (sectionLabelToInitialSplitList != null)
+            {
+                List allHints = (List)sectionLabelToInitialSplitList.get(label);
 
-            if (allHints == null)
-            {
-                
-            }
-            else
-            {
-                Iterator it = allHints.iterator();
-                boolean done = false;
-                
-                while (it.hasNext() && !done)
+                if (allHints != null)
                 {
-                    initialSplitHintData ishd = (initialSplitHintData)it.next();
-                    
-                    if (rnd.nextDouble() < ishd.getProbability())
+                    Iterator it = allHints.iterator();
+                    boolean done = false;
+                
+                    while (it.hasNext() && !done)
                     {
-                        List legions = ishd.getLegions();
+                        initialSplitHintData ishd = (initialSplitHintData)it.next();
+                    
+                        if (rnd.nextDouble() < ishd.getProbability())
+                        {
+                            List legions = ishd.getLegions();
                         
-                        legion = (List)legions.get(rnd.nextInt(legions.size()));
+                            legion = (List)legions.get(rnd.nextInt(legions.size()));
                         
-                        done = true;
+                            done = true;
+                        }
                     }
                 }
             }
         }
-
         return legion;
     }
 
@@ -602,10 +603,13 @@ public class AIHintLoader
         {
             HashMap sectionNameToRecruitmentValueOffset =
                 (HashMap)nameToRecruitmentValueOffset.get(section[i]);
-            Integer offset = (Integer)sectionNameToRecruitmentValueOffset.get(name);
-            if (offset != null)
+            if (sectionNameToRecruitmentValueOffset != null)
             {
-                return offset.intValue();
+                Integer offset = (Integer)sectionNameToRecruitmentValueOffset.get(name);
+                if (offset != null)
+                {
+                    return offset.intValue();
+                }
             }
         }
         return 0;
