@@ -81,6 +81,7 @@ def maxCount(lili, name):
        name appears in any of the lists contained in lili."""
     return max([li.count(name) for li in lili])
 
+
 class Perms(object):
     """Based on Gagan Saksena's code in online Python cookbook
        Not reentrant or thread-safe."""
@@ -399,58 +400,49 @@ class Node(object):
             self.turnSplit = turn   # New split
 
         if self.hasSplit():
-            knownKeep = getCreatureNames(
+            knownKeep1 = getCreatureNames(
               self.child1.getCertainAtSplitOrRemovedCreatures())
-            knownSplit = getCreatureNames(
+            knownSplit1 = getCreatureNames(
               self.child2.getCertainAtSplitOrRemovedCreatures())
         else:
-            knownKeep = []
-            knownSplit = []
-        knownCombo = knownKeep + knownSplit
-        all = getCreatureNames(self.creatures)
+            knownKeep1 = []
+            knownSplit1 = []
+        knownCombo = knownKeep1 + knownSplit1
         certain = getCreatureNames(self.getCertainCreatures())
-        uncertain = subtractLists(all, certain)
         if not superset(certain, knownCombo):
             # We need to abort this split and trust that it will be redone
             # after the certainty information percolates up to the parent.
             return
+        all = getCreatureNames(self.creatures)
+        uncertain = subtractLists(all, certain)
 
-        possibleSplits = self._findAllPossibleSplits(childSize, knownKeep,
-          knownSplit)
+        possibleSplits = self._findAllPossibleSplits(childSize, knownKeep1,
+          knownSplit1)
         splitoffNames = self._chooseCreaturesToSplitOut(possibleSplits)
 
-        possibleKeeps = []
-        for names in possibleSplits:
-            possibleKeeps.append(subtractLists(all, names))
+        possibleKeeps = [subtractLists(all, names) for names in possibleSplits]
 
-        knownKeep2 = []
-        knownSplit2 = []
-        for name in certain:
-            if not name in knownKeep2:
-                minKeep = minCount(possibleKeeps, name) - uncertain.count(name)
-                for unused in range(minKeep):
-                    knownKeep2.append(name)
-            if not name in knownSplit2:
-                minSplit = minCount(possibleSplits, name) - uncertain.count(
-                  name)
-                for unused in range(minSplit):
-                    knownSplit2.append(name)
+        def find_certain_child(certain, uncertain, possibles):
+            li = []
+            for name in Set(certain):
+                min_ = minCount(possibles, name)  - uncertain.count(name)
+                li.extend(min_ * [name])
+            return li
 
-        knownKeep3 = []
-        knownSplit3 = []
-        for name in all:
-            if not name in knownKeep3:
-                minKeep = maxCount([knownKeep, knownKeep2], name)
-                for unused in range(minKeep):
-                    knownKeep3.append(name)
-            if not name in knownSplit3:
-                minSplit = maxCount([knownSplit, knownSplit2], name)
-                for unused in range(minSplit):
-                    knownSplit3.append(name)
+        knownKeep2 = find_certain_child(certain, uncertain, possibleKeeps)
+        knownSplit2 = find_certain_child(certain, uncertain, possibleSplits)
 
-        knownKeep = knownKeep3
-        knownSplit = knownSplit3
 
+        def merge_knowns(known1, known2):
+            all = Set(known1 + known2)
+            li = []
+            for name in all:
+                max_ = maxCount([known1, known2], name)
+                li.extend(max_ * [name])
+            return li
+
+        knownKeep = merge_knowns(knownKeep1, knownKeep2)
+        knownSplit = merge_knowns(knownSplit1, knownSplit2)
 
         def _inherit_parent_certainty(certain, known, other):
             """If one of the child legions is fully known, assign the 
