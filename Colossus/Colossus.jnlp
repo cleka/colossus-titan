@@ -3,7 +3,7 @@
      <jnlp
        codebase="http://colossus.sf.net/"
        href="Colossus.jnlp">
-       <application-desc main-class="Start"/>
+       <application-desc main-class="net.sf.colossus.server.Start"/>
        <information>
          <title>Colossus</title>
          <vendor>David Ripton</vendor>
