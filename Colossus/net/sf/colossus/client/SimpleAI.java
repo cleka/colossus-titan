@@ -613,8 +613,8 @@ public class SimpleAI implements AI
     List doInitialGameSplit(String label)
     {
         java.util.List hintSuggestedSplit = getInitialSplitHint(label);
-        Log.debug("Hint: suggest splitting " + hintSuggestedSplit + 
-                  " in " + label);
+        /* Log.debug("HINT: suggest splitting " + hintSuggestedSplit + 
+           " in " + label); */
 
         if (!((hintSuggestedSplit == null) ||
               (hintSuggestedSplit.size() != 4)))
