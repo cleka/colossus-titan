@@ -599,7 +599,7 @@ public final class Player implements Comparable
         legion.undoRecruit();
 
         // Update number of creatures in status window.
-        game.getServer().allUpdateStatusScreen();
+        game.getServer().allUpdatePlayerInfo();
         game.getServer().undidRecruit(legion, recruitName);
     }
 
@@ -610,7 +610,7 @@ public final class Player implements Comparable
         String hexLabelToAlign = splitoff.getCurrentHexLabel();
         Legion parent = splitoff.getParent();
         splitoff.recombine(parent, true);
-        game.getServer().allUpdateStatusScreen();
+        game.getServer().allUpdatePlayerInfo();
         game.getServer().undidSplit(splitoffId);
         game.getServer().oneRevealLegion(parent, getName());
     }
@@ -632,7 +632,7 @@ public final class Player implements Comparable
                 it.remove();
             }
         }
-        game.getServer().allUpdateStatusScreen();
+        game.getServer().allUpdatePlayerInfo();
     }
 
 
@@ -716,7 +716,7 @@ public final class Player implements Comparable
             score += points;
             if (game != null)
             {
-                game.getServer().allUpdateStatusScreen();
+                game.getServer().allUpdatePlayerInfo();
             }
 
             Log.event(getName() + " earns " + points + " points");
@@ -787,7 +787,7 @@ public final class Player implements Comparable
             slayer.takeLegionMarkers(this);
         }
 
-        game.getServer().allUpdateStatusScreen();
+        game.getServer().allUpdatePlayerInfo();
 
         Log.event(getName() + " dies");
 

@@ -116,21 +116,6 @@ final class Critter extends Creature implements Comparable
         return battle;
     }
 
-    /** Return only the base part of the image name for this critter. */
-    public String getImageName()
-    {
-        String basename = super.getImageName();
-
-/* XXX Temporarily disabled while moving logic to client side
-        if (isTitan() && getPlayer() != null)
-        {
-            basename = "Titan-" + getPower() + "-" + getPlayer().getColor();
-        }
-*/
-
-        return basename;
-    }
-
 
     String getDescription()
     {

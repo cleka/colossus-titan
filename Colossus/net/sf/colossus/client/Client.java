@@ -17,6 +17,7 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.AI;
 import net.sf.colossus.server.SimpleAI;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Game;
 
 
 /**
@@ -67,7 +68,7 @@ public final class Client
     /** Player who owns this client. */
     private String playerName;
 
-    /** Marker color of player who owns this client. */
+    /** Starting marker color of player who owns this client. */
     private String color;
 
     /** Last movement roll for any player. */
@@ -111,6 +112,10 @@ public final class Client
      *  are AIs, then the primary client gets a board and map. */
     private boolean primary;
 
+    /** One per player. */
+    private PlayerInfo [] playerInfo;
+
+    private int numPlayers;
 
 
     public Client(Server server, String playerName, boolean primary)
@@ -463,22 +468,46 @@ public final class Client
     }
 
 
-    // TODO Update the status screen model regardless of whether the
-    // dialog is visible.  Rename to something less GUI-centric.
-    public void updateStatusScreen(String [] playerInfo)
+    int getNumPlayers()
+    {
+        return numPlayers;
+    }
+
+
+    public void updatePlayerInfo(String [] infoStrings)
+    {
+        numPlayers = infoStrings.length;
+
+        if (playerInfo == null)
+        {
+            playerInfo = new PlayerInfo[numPlayers];
+            for (int i = 0; i < numPlayers; i++)
+            {
+                playerInfo[i] = new PlayerInfo();
+            }
+        }
+
+        for (int i = 0; i < numPlayers; i++)
+        {
+            playerInfo[i].update(infoStrings[i]);
+        }
+
+        updateStatusScreen();
+    }
+
+    private void updateStatusScreen()
     {
         if (getOption(Options.showStatusScreen))
         {
             if (statusScreen != null)
             {
-                statusScreen.updateStatusScreen(playerInfo);
+                statusScreen.updateStatusScreen();
             }
             else
             {
                 if (board != null)
                 {
-                    statusScreen = new StatusScreen(board.getFrame(), this,
-                        playerInfo);
+                    statusScreen = new StatusScreen(board.getFrame(), this);
                 }
             }
         }
@@ -497,6 +526,23 @@ public final class Client
 
         // Side effects
         setupPlayerLabel();
+    }
+
+    PlayerInfo getPlayerInfo(int playerNum)
+    {
+        return playerInfo[playerNum];
+    }
+
+    PlayerInfo getPlayerInfo(String name)
+    {
+        for (int i = 0; i < playerInfo.length; i++)
+        {
+            if (name.equals(playerInfo[i].getName()))
+            {
+                return playerInfo[i];
+            }
+        }
+        return null;
     }
 
 
@@ -622,6 +668,9 @@ public final class Client
         return Collections.unmodifiableList(markers);
     }
 
+
+    // TODO Extract legion info class.
+
     /** Get the first marker with this id. */
     Marker getMarker(String id)
     {
@@ -671,8 +720,6 @@ public final class Client
     }
 
 
-    // TODO Extract legion info class.
-
     int getLegionHeight(String markerId)
     {
         Integer integer = (Integer)legionToHeight.get(markerId);
@@ -721,18 +768,45 @@ public final class Client
         return Collections.unmodifiableList(contents);
     }
 
-    // TODO Colorized, powered titans.  See Critter.getImageName()
+
+    /** Return the full basename for a titan in legion markerId,
+     *  first finding that legion's player, player color, and titan size.
+     *  Default to "Titan" if the info is not there. */
+    String getTitanBasename(String markerId)
+    {
+        try
+        {
+            String playerName = getPlayerNameByMarkerId(markerId);
+            PlayerInfo info = getPlayerInfo(playerName);
+            String color = info.getColor();
+            int power = info.getTitanPower();
+            return "Titan-" + power + "-" + color;
+        }
+        catch (Exception ex)
+        {
+            return "Titan";
+        }
+    }
+
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
     java.util.List getLegionImageNames(String markerId)
     {
         java.util.List names = new ArrayList();
         names.addAll(getLegionContents(markerId));
+
         int numUnknowns = getLegionHeight(markerId) - names.size();
         for (int i = 0; i < numUnknowns; i++)
         {
             names.add("Unknown");
         }
+
+        int j = names.indexOf("Titan");
+        if (j != -1)
+        {
+            names.set(j, getTitanBasename(markerId));
+        }
+
         return names;
     }
 
@@ -804,7 +878,11 @@ public final class Client
     }
 
 
-
+    // TODO Remove cross-network static call.
+    static int getTitanPower(int score)
+    {
+        return (int)(6 + score / Game.getTitanImprovementValue());
+    }
 
 
     java.util.List getBattleChits()
@@ -1859,6 +1937,7 @@ Log.debug("called Client.acquireAngelCallback()");
         return server.getPlayerNameByTag(tag);
     }
 
+
     boolean isMyCritter(int tag)
     {
         return (playerName.equals(getPlayerNameByTag(tag)));
@@ -2195,10 +2274,20 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    // TODO cache this
     private String getPlayerNameByMarkerId(String markerId)
     {
-        return (server.getPlayerNameByMarkerId(markerId));
+        String shortColor = markerId.substring(0, 2);
+        for (int i = 0; i < playerInfo.length; i++)
+        {
+            PlayerInfo info = playerInfo[i];
+            if (!info.isDead() && 
+                (info.getPlayersElim().indexOf(shortColor) != -1 ||
+                shortColor.equals(Player.getShortColor(info.getColor()))))
+            {
+                return info.getName();
+            }
+        }
+        return null;
     }
 
     boolean isMyLegion(String markerId)

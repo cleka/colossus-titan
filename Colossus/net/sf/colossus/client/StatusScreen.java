@@ -21,6 +21,8 @@ import net.sf.colossus.server.Options;
 
 final class StatusScreen extends KDialog implements WindowListener
 {
+    private int numPlayers; 
+
     private JLabel [] nameLabel;
     private JLabel [] towerLabel;
     private JLabel [] colorLabel;
@@ -38,13 +40,13 @@ final class StatusScreen extends KDialog implements WindowListener
     private static Dimension size;
 
 
-    StatusScreen(JFrame frame, Client client, String [] playerInfo)
+    StatusScreen(JFrame frame, Client client)
     {
         super(frame, "Game Status", false);
 
         setVisible(false);
         this.client = client;
-        int numPlayers = playerInfo.length;
+        numPlayers = client.getNumPlayers();
 
         addWindowListener(this);
 
@@ -142,10 +144,7 @@ final class StatusScreen extends KDialog implements WindowListener
             contentPane.add(scoreLabel[i]);
         }
 
-        if (playerInfo != null)
-        {
-            updateStatusScreen(playerInfo);
-        }
+        updateStatusScreen();
 
         pack();
 
@@ -185,17 +184,17 @@ final class StatusScreen extends KDialog implements WindowListener
     }
 
 
-    void updateStatusScreen(String [] playerInfo)
+    void updateStatusScreen()
     {
-        for (int i = 0; i < playerInfo.length; i++)
+        for (int i = 0; i < numPlayers; i++)
         {
-            java.util.List data = Split.split(':', playerInfo[i]);
+            PlayerInfo info = client.getPlayerInfo(i);
             Color color;
-            if ("true".equals((String)data.get(0)))
+            if (info.isDead())
             {
                 color = Color.red;
             }
-            else if (client.getActivePlayerName().equals((String)data.get(1)))
+            else if (client.getActivePlayerName().equals(info.getName()))
             {
                 color = Color.yellow;
             }
@@ -205,16 +204,16 @@ final class StatusScreen extends KDialog implements WindowListener
             }
             setPlayerLabelBackground(i, color);
 
-            nameLabel[i].setText((String)data.get(1));
-            towerLabel[i].setText((String)data.get(2));
-            colorLabel[i].setText((String)data.get(3));
-            elimLabel[i].setText((String)data.get(4));
-            legionsLabel[i].setText((String)data.get(5));
-            markersLabel[i].setText((String)data.get(6));
-            creaturesLabel[i].setText((String)data.get(7));
-            valueLabel[i].setText((String)data.get(10));
-            titanLabel[i].setText((String)data.get(8));
-            scoreLabel[i].setText((String)data.get(9));
+            nameLabel[i].setText(info.getName());
+            towerLabel[i].setText("" + info.getTower());
+            colorLabel[i].setText(info.getColor());
+            elimLabel[i].setText(info.getPlayersElim());
+            legionsLabel[i].setText("" + info.getNumLegions());
+            markersLabel[i].setText("" + info.getNumMarkers());
+            creaturesLabel[i].setText("" + info.getNumCreatures());
+            valueLabel[i].setText("" + info.getCreatureValue());
+            titanLabel[i].setText("" + info.getTitanPower());
+            scoreLabel[i].setText("" + info.getScore());
         }
 
         repaint();

@@ -65,13 +65,13 @@ public final class Server
     }
 
 
-    void allUpdateStatusScreen()
+    void allUpdatePlayerInfo()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.updateStatusScreen(getPlayerInfo());
+            client.updatePlayerInfo(getPlayerInfo());
         }
     }
 
@@ -307,7 +307,7 @@ public final class Server
             Client client = (Client)it.next();
             setupSplit(client);
         }
-        allUpdateStatusScreen();
+        allUpdatePlayerInfo();
     }
 
     private void setupSplit(Client client)
@@ -558,7 +558,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     void didRecruit(Legion legion, Creature recruit, Creature recruiter)
     {
-        allUpdateStatusScreen();
+        allUpdatePlayerInfo();
 
         int numRecruiters = Game.numberOfRecruiterNeeded(recruiter, recruit, 
             legion.getCurrentHex().getTerrain());
@@ -579,7 +579,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     void undidRecruit(Legion legion, String recruitName)
     {
-        allUpdateStatusScreen();
+        allUpdatePlayerInfo();
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
@@ -1222,7 +1222,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     /** Callback from game after this legion was split off. */
     void didSplit(String hexLabel, String parentId, String childId, int height)
     {
-        allUpdateStatusScreen();
+        allUpdatePlayerInfo();
 
         Iterator it = clients.iterator();
         while (it.hasNext())

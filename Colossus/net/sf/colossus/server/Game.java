@@ -313,7 +313,7 @@ public final class Game
             Player player = (Player)it.next();
             // XXX Need to let player pick first marker along with color.
             placeInitialLegion(player, player.getFirstAvailableMarker());
-            server.allUpdateStatusScreen();
+            server.allUpdatePlayerInfo();
         }
         server.allAddMarkers();
 
@@ -321,7 +321,7 @@ public final class Game
 
         setupPhase();
 
-        server.allUpdateStatusScreen();
+        server.allUpdatePlayerInfo();
         caretaker.fullySyncDisplays();
     }
 
@@ -1192,7 +1192,7 @@ public final class Game
 
             setupPhase();
 
-            server.allUpdateStatusScreen();
+            server.allUpdatePlayerInfo();
             caretaker.fullySyncDisplays();
         }
         // FileNotFoundException, IOException, NumberFormatException
@@ -2101,7 +2101,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
         }
         engagementInProgress = false;
         battleInProgress = false;
-        server.allUpdateStatusScreen();
+        server.allUpdatePlayerInfo();
         if (!summoning && !reinforcing && !acquiring)
         {
             server.allHighlightEngagements();
@@ -2523,7 +2523,7 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
         // defender flees or the attacker concedes before entering
         // the battle.
         engagementInProgress = false;
-        server.allUpdateStatusScreen();
+        server.allUpdatePlayerInfo();
         server.allHighlightEngagements();
         if (!acquiring)
         {
@@ -2640,7 +2640,7 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
             }
         }
         engagementInProgress = false;
-        server.allUpdateStatusScreen();
+        server.allUpdatePlayerInfo();
         if (!summoning && !reinforcing && !acquiring)
         {
             server.allHighlightEngagements();

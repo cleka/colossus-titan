@@ -1048,7 +1048,7 @@ final class Legion implements Comparable
 
         player.addLegion(newLegion);
 
-        game.getServer().allUpdateStatusScreen();
+        game.getServer().allUpdatePlayerInfo();
         Log.event(newLegion.getHeight() +
             " creatures are split off from legion " + getLongMarkerName() +
             " into new legion " + newLegion.getLongMarkerName());

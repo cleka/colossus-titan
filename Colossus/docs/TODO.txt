@@ -1,5 +1,7 @@
+Change booleanValue() logic to cleaner getBoolean() 
+
 Bug: Need another full repaint after loading game to show updated heights.
-Bug: Make colorized / powered titans work again.
+Bug: Make colorized / powered titans work everywhere.
 
 Bug: Non-displayed carry hits.  Only when strike penalty?
 2 carries available
@@ -36,9 +38,8 @@ Optional post-engagement status dialog.
 Change some dialogs to show info in a label instead of the title (so
    the dialog is wide enough) and add explicit cancel buttons.
 
-Change StatusScreen to use a JTable.  
 Pass smaller chunks of changed info to StatusScreen, from generalized
-    info update messages. 
+   info update messages. 
 
 Remove remaining public Client methods that only directly control the GUI
    in favor of higher-level events.
