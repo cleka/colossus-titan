@@ -26,7 +26,18 @@
 
 <property environment="env"/>
 
+<property name="libs.dir" value="libs"/>
 
+<path id="project.class.path">
+    <pathelement path="${classpath}"/>
+    <pathelement path="${build.dev.dir}"/>
+    <fileset dir="${libs.dir}">
+        <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="${libs.dir}">
+        <include name="**/*.zip"/>
+    </fileset>
+</path>
 
 <target name="init"
         description="Initialization">
@@ -71,13 +82,7 @@
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
                 includes="**/*.java"
                 excludes="**/datatools/*.java">
-            <classpath>
-                <pathelement location="libs/junit.jar"/>
-                <pathelement location="libs/werken.opt.jar"/>
-                <pathelement location="libs/jdom.jar"/>
-                <pathelement location="libs/batik-transcoder.jar"/>
-                <pathelement location="libs/batik-util.jar"/>
-            </classpath>
+			<classpath refid="project.class.path"/>
         </javamake>
 </target>
 
@@ -85,13 +90,7 @@
         description = "Compile all .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
                 includes="**/*.java">
-            <classpath>
-                <pathelement location="libs/junit.jar"/>
-                <pathelement location="libs/werken.opt.jar"/>
-                <pathelement location="libs/jdom.jar"/>
-                <pathelement location="libs/batik-transcoder.jar"/>
-                <pathelement location="libs/batik-util.jar"/>
-            </classpath>
+			<classpath refid="project.class.path"/>
         </javamake>
 </target>
 
@@ -100,13 +99,7 @@
 <target name="test" depends="compile,jar"
         description = "Run all unit tests using JUnit">
         <junit printsummary="yes" fork="no" haltonfailure="no">
-                <classpath>
-                    <pathelement location="libs/junit.jar"/>
-                    <pathelement location="libs/werken.opt.jar"/>
-                    <pathelement location="libs/jdom.jar"/>
-                    <pathelement location="libs/batik-transcoder.jar"/>
-                    <pathelement location="libs/batik-util.jar"/>
-                </classpath>
+				<classpath refid="project.class.path"/>
                 <formatter type="plain"/>
                 <test name="net.sf.colossus.server.DiceTest"/>
                 <test name="net.sf.colossus.util.CombosTest"/>
