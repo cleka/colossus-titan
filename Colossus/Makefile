@@ -109,8 +109,9 @@ inst: signjar $(INST_JARFILE) $(INST_README) $(INST_DIST) $(INST_JNLP)
 
 # Clean up
 clean:
-	rm -f version core javacore.txt *~ *.bak *.class *.jar .#*.jar javadoc/ \
-            net.sf.colossus/parser/*.java
+	rm -f version core javacore.txt *~ *.bak *.class *.jar .#*.jar \
+	javadoc/ net/sf/colossus/*/*.class \
+        net/sf/colossus/parser/*.java
 
 # Make zip file.  Don't include saved games, CVS dirs, or other zip files.
 dist: $(JARFILE)
