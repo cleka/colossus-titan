@@ -146,6 +146,9 @@ all on one line.
 <maxCount> is the max number of creature in the caretaker stack.
 <pluralName> is the same as name, just plural.
 
+Warning: You _must_ have an Angel and an Archangel in the file,
+as for the moments they're recruited by name.
+
 4) Battleland file format (files used: by terrain name under Battlelands)
 
 These files define the Colossus Battlelands. they're composed
