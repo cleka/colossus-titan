@@ -191,3 +191,11 @@ Two version of the file should be supplied, one with and one without
 the '_i' postfix to the name (i.e 'MyTerrain.gif' and 'MyTerrain_i.gif').
 The first is used when the biggest part of the hexagon is down,
 the second when the biggest part is up.
+
+# Graphical overlay for the Hexes on the Battlelands (aka
+Hazard) should be transparent GIF file, of size 216x188
+for the interior of the hexes (Bog, Sand...), and size 248x220
+for the hexsides (Cliff, Slope...). The filename should the name
+of the hazard followed by '_Hazard', followed by the extension
+'.gif' (for instance "MySea_Hazard.gif"). Omly one version
+is needed.

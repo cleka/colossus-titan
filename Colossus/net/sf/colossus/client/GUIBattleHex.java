@@ -4,6 +4,10 @@ package net.sf.colossus.client;
 import java.awt.*;
 import java.util.*;
 import java.awt.geom.*;
+import java.net.*;
+import javax.swing.*;
+import java.io.*;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -106,6 +110,9 @@ public class GUIBattleHex extends BattleHex
             g2.setColor(getTerrainColor());
             g2.fill(hexagon);
         }
+
+        if (useOverlay)
+            paintOverlay(g2);
 
         g2.setColor(Color.black);
         g2.draw(hexagon);
@@ -300,5 +307,202 @@ public class GUIBattleHex extends BattleHex
     public boolean innerContains(Point point)
     {
         return (innerHexagon.contains(point));
+    }
+
+    // overlays support
+    static HashMap hexOverlay;
+    static HashMap hexsideOverlay;
+    private static final String pathSeparator = "/";
+    private static String imageDirName = "images";
+    private static String imagePostfix = "_Hazard";
+    private static final String imageExtension = ".gif";
+    
+    private static Image loadOneOverlay(String name)
+    {
+        Image overlay = null;
+        try
+        {
+            URL url;
+            String imageFilename = name +
+                imagePostfix +
+                imageExtension;
+            // try first with the var-specific directory
+            try {
+                url = new URL("file:" +
+                              GetPlayers.getVarDirectory() +
+                              imageDirName +
+                              pathSeparator +
+                              imageFilename);
+                // url will not be null even is the file doesn't exist,
+                // so we need to check if connection can be opened
+                if ((url != null) && (url.openStream() != null))
+                {
+                    overlay = Toolkit.getDefaultToolkit().getImage(url);
+                }
+            } catch (Exception e) {}
+            // try second with the default loader
+            if (overlay == null)
+            {
+                ClassLoader cl = Client.class.getClassLoader();
+                url = cl.getResource(imageDirName +
+                                     pathSeparator +
+                                     imageFilename);
+                if (url != null)
+                {
+                    overlay = (new ImageIcon(url)).getImage();
+                }
+            }
+            if (overlay == null)
+            {
+                throw new FileNotFoundException(imageFilename);
+            }
+        }
+        catch (Exception e) 
+        {
+            Log.debug("Couldn't get image :" + e);
+            return null;
+        }
+        return overlay;
+    }
+
+    public static void loadOverlay()
+    {
+        hexOverlay = new HashMap();
+        hexsideOverlay = new HashMap();
+        BattleHex tempHex = new BattleHex(0,0);
+        for (int i = 0; i < getTerrains().length ; i++)
+        {
+            tempHex.setTerrain(getTerrains()[i]);
+            Image temp = loadOneOverlay(tempHex.getTerrainName());
+            if (temp != null)
+            {
+                hexOverlay.put(new Character(getTerrains()[i]), temp);
+            }
+        }
+        for (int i = 0; i < getHexsides().length ; i++)
+        {
+            tempHex.setHexside(0, getHexsides()[i]);
+            Image temp = loadOneOverlay(tempHex.getHexsideName(0));
+            if (temp != null)
+            {
+                hexsideOverlay.put(new Character(getHexsides()[i]), temp);
+            }
+        }
+    }
+
+    public void paintOverlay(Graphics2D g)
+    {
+        if (hexOverlay == null)
+            loadOverlay();
+        Image overlay = (Image)hexOverlay.get(new Character(getTerrain()));
+        if (overlay != null)
+        { // first, draw the Hex itself
+            g.drawImage(overlay,
+                        rectBound.x,
+                        rectBound.y,
+                        rectBound.width,
+                        rectBound.height,
+                    map);
+        }
+        // second, draw the opposite Hex HexSide
+        /* DISABLED
+        for (int i = 0; i < 6; i++)
+        {
+            char op = getOppositeHexside(i);
+            if (op != ' ')
+            {
+                BattleHex neighbor = getNeighbor(i);
+                Image sideOverlay = (Image)hexsideOverlay.get(
+                                            new Character(op));
+                if (sideOverlay != null)
+                {
+                    int firstVertex = (i + 3) % 6;
+                    int secondVertex = (firstVertex + 1) % 6;
+                    int sx1 = 0, sx2 = 0, sy1 = 0, sy2 = 0;
+                    Rectangle neighborBound = neighbor.getBounds();
+                    int dx1 = 0, dx2 = 0, dy1 = 0, dy2 = 0;
+                    int sourceWidth, sourceHeight;
+                    sourceWidth = sideOverlay.getWidth(map);
+                    sourceHeight = sideOverlay.getHeight(map);
+                    switch (firstVertex)
+                    {
+                    case 0:
+                        sx1 = sourceWidth / 4;
+                        sx2 = (3 * sourceWidth) / 4;
+                        sy1 = 0;
+                        sy2 = sourceHeight / 2;
+                        dx1 = (neighborBound.width / 4);
+                        dx2 = ((3 * neighborBound.width) / 4);
+                        dy1 = 0;
+                        dy2 = (neighborBound.height / 2);
+                        break;
+                    case 1:
+                        sx1 = (3 * sourceWidth) / 4;
+                        sx2 = sourceWidth;
+                        sy1 = 0;
+                        sy2 = sourceHeight / 2;
+                        dx1 = ((3 * neighborBound.width) / 4);
+                        dx2 = neighborBound.width;
+                        dy1 = 0;
+                        dy2 = (neighborBound.height / 2);
+                        break;
+                    case 2:
+                        sx1 = (3 * sourceWidth) / 4;
+                        sx2 = sourceWidth;
+                        sy1 = sourceHeight / 2;
+                        sy2 = sourceHeight;
+                        dx1 = ((3 * neighborBound.width) / 4);
+                        dx2 = neighborBound.width;
+                        dy1 = (neighborBound.height / 2);
+                        dy2 = neighborBound.height;
+                        break;
+                    case 3:
+                        sx1 = sourceWidth / 4;
+                        sx2 = (3 * sourceWidth) / 4;
+                        sy1 = sourceHeight / 2;
+                        sy2 = sourceHeight;
+                        dx1 = (neighborBound.width / 4);
+                        dx2 = ((3 * neighborBound.width) / 4);
+                        dy1 = (neighborBound.height / 2);
+                        dy2 = neighborBound.height;
+                        break;
+                    case 4:
+                        sx1 = 0;
+                        sx2 = sourceWidth / 4;
+                        sy1 = sourceHeight / 2;
+                        sy2 = sourceHeight;
+                        dx1 = 0;
+                        dx2 = (neighborBound.width / 4);
+                        dy1 = (neighborBound.height / 2);
+                        dy2 = neighborBound.height;
+                        break;
+                    case 5:
+                        sx1 = 0;
+                        sx2 = sourceWidth / 4;
+                        sy1 = 0;
+                        sy2 = sourceHeight / 2;
+                        dx1 = 0;
+                        dx2 = (neighborBound.width / 4);
+                        dy1 = 0;
+                        dy2 = (neighborBound.height / 2);
+                        break;
+                    }
+                    // make it bigger
+                    // dx1 = (int)((double)dx1 * 1.14814814814814814814);
+                    // dx2 = (int)((double)dx2 * 1.14814814814814814814);
+                    // dy1 = (int)((double)dy1 * 1.17021276595744680851);
+                    // dy2 = (int)((double)dy2 * 1.17021276595744680851);
+                    // dx1 += neighborBound.x;
+                    dx2 += neighborBound.x;
+                    dy1 += neighborBound.y;
+                    dy2 += neighborBound.y;
+                    g.drawImage(sideOverlay,
+                                dx1, dy1, dx2, dy2,
+                                sx1, sy1, sx2, sy2,
+                                map);
+                }
+            }
+        }
+        */
     }
 }

@@ -99,7 +99,7 @@ public class BattleHex extends Hex
             terrainName = "Tower";
             break;
         case 'r':
-            terrainName = "Bramble";
+            terrainName = "Brambles";
             break;
         case 's':
             terrainName = "Sand";

@@ -287,11 +287,13 @@ Credits:
 
 Programming:  David Ripton  dripton@wizard.net
               Bruce Sherrod (AI)  bruce@thematrix.com
-	      Romain Dolbeau (variant support)
+	      Romain Dolbeau (variant support, overlay display)
               Tom Fruchterman (caretaker display)
               David Barr (applet conversion)
 
 Counter art:  Jerry Reiger, David Lum, Tchula Ripton
+
+Overlay art:  ??? (Masterboard), D. U. Thibault (Battlelands)
 
 Network protocol: Falk Hueffner
 
@@ -302,4 +304,3 @@ Bug reports:  Anthony Kam, Augustin Ku, Sean McCulloch, Luca Ferraro,
               Magnus Berglund, Don Woods, Dean Gaudet
 
 Web and CVS space, bug tracker, mailing lists, etc.: SourceForge
-
