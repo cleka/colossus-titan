@@ -9,7 +9,7 @@ class Player
     private String name;
     private String color;       // Black, Blue, Brown, Gold, Green, Red 
     private int startingTower;  // 1-6
-    private int score = 0;
+    private double score = 0;    // track half-points, then round
     private boolean canSummonAngel = true;
     private String playersEliminated;  // e.g. 1356, based on starting tower
     private int numMarkersAvailable = 12;
@@ -22,6 +22,7 @@ class Player
     private int mulligansLeft = 1;
     private int movementRoll;
     private Game game;
+    private Legion lastLegionMoved = null;
 
     Player(String name, Game game)
     {
@@ -104,7 +105,7 @@ class Player
 
     int getScore()
     {
-        return score;
+        return (int) score;
     }
 
 
@@ -122,7 +123,7 @@ class Player
 
     int titanPower()
     {
-        return 6 + (score / 100);
+        return (int) (6 + (score / 100));
     }
 
 
@@ -193,11 +194,45 @@ class Player
     }
 
 
+    void markLastLegionMoved(Legion legion)
+    {
+        lastLegionMoved = legion;
+    }
+
+
+    void undoLastMove()
+    {
+        if (lastLegionMoved != null)
+        {
+            lastLegionMoved.undoMove();
+            lastLegionMoved = null;
+        }
+    }
+
+
     void undoAllMoves()
     {
         for (int i = 0; i < numLegions; i++)
         {
             legions[i].undoMove();
+        }
+    }
+
+
+    void undoAllSplits()
+    {
+        for (int i = numLegions - 1; i >= 0; i--)
+        {
+            Legion legion = legions[i];
+            MasterHex hex = legion.getCurrentHex();
+            if (hex.getNumLegions() > 1)
+            {
+                Legion parent = hex.getLegion(0);
+                if (parent != legion) 
+                {
+                    legion.recombine(parent);
+                }
+            }
         }
     }
 
@@ -315,10 +350,17 @@ class Player
     }
 
 
-    void addPoints(int points)
+    void addPoints(double points)
     {
         score += points;
         game.updateStatusScreen();
+    }
+
+
+    // Remove half-points.
+    void truncScore()
+    {
+        score = Math.floor(score);
     }
 
 
@@ -327,8 +369,6 @@ class Player
         // Engaged legions give half points to the player they're
         // engaged with.  All others give half points to player,
         // if non-null.
-
-        // XXX Roundoff errors?
         for (int i = 0; i < numLegions; i++)
         {
             MasterHex hex = legions[i].getCurrentHex();
@@ -336,13 +376,20 @@ class Player
             if (legion != null)
             {
                 Player enemy = legion.getPlayer();
-                enemy.addPoints(legions[i].getPointValue() / 2);
+                enemy.addPoints(legions[i].getPointValue() / 2.0);
             }
             else
             {
-                player.addPoints(legions[i].getPointValue() / 2);
+                player.addPoints(legions[i].getPointValue() / 2.0);
             }
         }
+
+        // Truncate every player's score to an integer value.
+        for (int i = 0; i < game.getNumPlayers(); i++)
+        {
+            game.player[i].truncScore();
+        }
+
 
         // Removing all legions is icky because the array shrinks as
         // each is removed.
