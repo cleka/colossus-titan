@@ -33,9 +33,9 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
     SummonAngel(MasterBoard board, Legion legion)
     {
-        super(board, legion.getPlayer().getName() + 
+        super(board, legion.getPlayer().getName() +
             ": Summon Angel into Legion " + legion.getMarkerId(), false);
-        
+
         this.legion = legion;
         player = legion.getPlayer();
         this.board = board;
@@ -65,16 +65,15 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         setBackground(java.awt.Color.lightGray);
         setSize(getPreferredSize());
         setResizable(false);
-            
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, 
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
 
-        angelChit = new Chit(2 * scale, scale, scale, 
-            Creature.angel.getImageName(),
-            this, false);
-        archangelChit = new Chit(5 * scale, scale, scale, 
-            Creature.archangel.getImageName(), this, false);
+        angelChit = new Chit(2 * scale, scale, scale,
+            Creature.angel.getImageName(), this);
+        archangelChit = new Chit(5 * scale, scale, scale,
+            Creature.archangel.getImageName(), this);
         // X out chits since no legion is selected.
         angelChit.setDead(true);
         archangelChit.setDead(true);
@@ -127,7 +126,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             offImage.flush();
             offGraphics.dispose();
         }
-        
+
         if (imagesLoaded)
         {
             tracker.removeImage(angelChit.getImage());
@@ -179,15 +178,15 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         if (!laidOut)
         {
             Insets insets = getInsets();
-            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
+            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 -
                 insets.bottom, d.width / 3, d.height / 8);
-            button2.setBounds(5 * d.width / 9 - insets.right, 
+            button2.setBounds(5 * d.width / 9 - insets.right,
                 3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
             laidOut = true;
         }
 
         g.drawImage(offImage, 0, 0, this);
-        
+
         // These are necessary because JButtons are lightweight.
         button1.repaint();
         button2.repaint();
@@ -217,7 +216,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             legion.addCreature(Creature.angel);
             cleanup(true);
         }
-        
+
         else if (archangelChit.select(point) && !archangelChit.isDead())
         {
             donor.removeCreature(Creature.archangel);
@@ -236,16 +235,16 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
     {
     }
 
-                            
+
     public void mouseClicked(MouseEvent e)
     {
     }
 
-                                            
+
     public void mouseReleased(MouseEvent e)
     {
     }
-    
+
 
     public void windowActivated(WindowEvent event)
     {
@@ -267,7 +266,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
     {
     }
 
-                                                         
+
     public void windowDeiconified(WindowEvent event)
     {
     }
@@ -288,7 +287,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         if (e.getActionCommand() == "Summon")
         {
             donor = player.getSelectedLegion();
-            if (donor == null) 
+            if (donor == null)
             {
                 JOptionPane.showMessageDialog(board, "Must select a legion.");
                 return;
@@ -299,7 +298,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
             if (angels == 0 && archangels == 0)
             {
-                JOptionPane.showMessageDialog(board, 
+                JOptionPane.showMessageDialog(board,
                     "No angels are available.");
                 return;
             }
@@ -319,7 +318,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             else
             {
                 // If both are available, make the player click on one.
-                JOptionPane.showMessageDialog(board, 
+                JOptionPane.showMessageDialog(board,
                     "Select angel or archangel.");
                 return;
             }

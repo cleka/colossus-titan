@@ -31,8 +31,8 @@ class Concede extends JDialog implements ActionListener
 
     Concede(JFrame parentFrame, Legion friend, Legion enemy, boolean flee)
     {
-        super(parentFrame, friend.getPlayer().getName() + ": " + (flee ? 
-            "Flee" : "Concede") + " with Legion "  + friend.getMarkerId() 
+        super(parentFrame, friend.getPlayer().getName() + ": " + (flee ?
+            "Flee" : "Concede") + " with Legion "  + friend.getMarkerId()
             + "?", true);
 
         Container contentPane = getContentPane();
@@ -58,23 +58,22 @@ class Concede extends JDialog implements ActionListener
         for (int i = 0; i < friend.getHeight(); i++)
         {
             friendChits[i] = new Chit((i + 1) * scale + (scale / 5), scale / 2,
-                scale, friend.getCreature(i).getImageName(), this, false);
+                scale, friend.getCreature(i).getImageName(), this);
         }
 
         // Leave space for angels.
         enemyChits = new Chit[7];
         for (int i = 0; i < enemy.getHeight(); i++)
         {
-            enemyChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                2 * scale, scale, enemy.getCreature(i).getImageName(), this,
-                false);
+            enemyChits[i] = new Chit((i + 1) * scale + (scale / 5),
+                2 * scale, scale, enemy.getCreature(i).getImageName(), this);
         }
 
-        friendMarker = new Chit(scale / 5, scale / 2, scale, 
-            friend.getImageName(), this, false);
-        
-        enemyMarker = new Chit(scale / 5, 2 * scale, scale, 
-            enemy.getImageName(), this, false);
+        friendMarker = new Chit(scale / 5, scale / 2, scale,
+            friend.getImageName(), this);
+
+        enemyMarker = new Chit(scale / 5, 2 * scale, scale,
+            enemy.getImageName(), this);
 
         tracker = new MediaTracker(this);
 
@@ -95,7 +94,7 @@ class Concede extends JDialog implements ActionListener
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(parentFrame, 
+            JOptionPane.showMessageDialog(parentFrame,
                 "waitForAll was interrupted");
         }
         imagesLoaded = true;
@@ -155,9 +154,9 @@ class Concede extends JDialog implements ActionListener
         if (!laidOut)
         {
             Insets insets = getInsets();
-            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
+            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 -
                 insets.bottom, d.width / 3, d.height / 8);
-            button2.setBounds(5 * d.width / 9 - insets.right, 
+            button2.setBounds(5 * d.width / 9 - insets.right,
                 3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
             laidOut = true;
         }
@@ -218,7 +217,7 @@ class Concede extends JDialog implements ActionListener
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand() == "Flee" || e.getActionCommand() == 
+        if (e.getActionCommand() == "Flee" || e.getActionCommand() ==
             "Concede")
         {
             // Figure how many points the victor receives.
@@ -228,7 +227,7 @@ class Concede extends JDialog implements ActionListener
                 points /= 2;
             }
 
-            // Remove the dead legion. 
+            // Remove the dead legion.
             friend.removeLegion();
 
             // Add points, and angels if necessary.
@@ -236,7 +235,7 @@ class Concede extends JDialog implements ActionListener
 
             // If this was the titan stack, its owner dies and gives half
             // points to the victor.
-            if (friend.numCreature(Creature.titan) == 1) 
+            if (friend.numCreature(Creature.titan) == 1)
             {
                 friend.getPlayer().die(enemy.getPlayer());
             }

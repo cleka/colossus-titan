@@ -27,9 +27,9 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
     PickRecruit(JFrame parentFrame, Legion legion)
     {
-        super(parentFrame, legion.getPlayer().getName() + 
+        super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruit", true);
-        
+
         if (!legion.canRecruit())
         {
             dispose();
@@ -58,17 +58,17 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         setBackground(java.awt.Color.lightGray);
         setSize(scale * (numEligible + 1), (23 * scale / 10));
         setResizable(false);
-            
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, 
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
 
         markers = new Chit[numEligible];
-        counts = new int[numEligible]; 
+        counts = new int[numEligible];
         for (int i = 0; i < numEligible; i++)
         {
             markers[i] = new Chit(scale * (21 * i + 10) / 20,
-                scale * 2 / 3, scale, recruits[i].getImageName(), this, false);
+                scale * 2 / 3, scale, recruits[i].getImageName(), this);
             counts[i] = recruits[i].getCount();
         }
 
@@ -86,7 +86,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(parentFrame, 
+            JOptionPane.showMessageDialog(parentFrame,
                 "waitForAll was interrupted");
         }
         imagesLoaded = true;
@@ -105,18 +105,18 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         {
             case 'B':
                 if (legion.numCreature(Creature.gargoyle) >= 1 ||
-                    legion.numCreature(Creature.cyclops) >= 1 || 
+                    legion.numCreature(Creature.cyclops) >= 1 ||
                     legion.numCreature(Creature.gorgon) >= 1)
                 {
                     recruits[0] = Creature.gargoyle;
                 }
                 if (legion.numCreature(Creature.gargoyle) >= 2 ||
-                    legion.numCreature(Creature.cyclops) >= 1 || 
+                    legion.numCreature(Creature.cyclops) >= 1 ||
                     legion.numCreature(Creature.gorgon) >= 1)
                 {
                     recruits[1] = Creature.cyclops;
                 }
-                if (legion.numCreature(Creature.cyclops) >= 2 || 
+                if (legion.numCreature(Creature.cyclops) >= 2 ||
                     legion.numCreature(Creature.gorgon) >= 1)
                 {
                     recruits[2] = Creature.gorgon;
@@ -125,18 +125,18 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
             case 'D':
                 if (legion.numCreature(Creature.lion) >= 1 ||
-                    legion.numCreature(Creature.griffon) >= 1 || 
+                    legion.numCreature(Creature.griffon) >= 1 ||
                     legion.numCreature(Creature.hydra) >= 1)
                 {
                     recruits[0] = Creature.lion;
                 }
                 if (legion.numCreature(Creature.lion) >= 3 ||
-                    legion.numCreature(Creature.griffon) >= 1 || 
+                    legion.numCreature(Creature.griffon) >= 1 ||
                     legion.numCreature(Creature.hydra) >= 1)
                 {
                     recruits[1] = Creature.griffon;
                 }
-                if (legion.numCreature(Creature.griffon) >= 2 || 
+                if (legion.numCreature(Creature.griffon) >= 2 ||
                     legion.numCreature(Creature.hydra) >= 1)
                 {
                     recruits[2] = Creature.hydra;
@@ -145,18 +145,18 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
             case 'H':
                 if (legion.numCreature(Creature.ogre) >= 1 ||
-                    legion.numCreature(Creature.minotaur) >= 1 || 
+                    legion.numCreature(Creature.minotaur) >= 1 ||
                     legion.numCreature(Creature.unicorn) >= 1)
                 {
                     recruits[0] = Creature.ogre;
                 }
                 if (legion.numCreature(Creature.ogre) >= 3 ||
-                    legion.numCreature(Creature.minotaur) >= 1 || 
+                    legion.numCreature(Creature.minotaur) >= 1 ||
                     legion.numCreature(Creature.unicorn) >= 1)
                 {
                     recruits[1] = Creature.minotaur;
                 }
-                if (legion.numCreature(Creature.minotaur) >= 2 || 
+                if (legion.numCreature(Creature.minotaur) >= 2 ||
                     legion.numCreature(Creature.unicorn) >= 1)
                 {
                     recruits[2] = Creature.unicorn;
@@ -165,20 +165,20 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
             case 'J':
                 if (legion.numCreature(Creature.gargoyle) >= 1 ||
-                    legion.numCreature(Creature.cyclops) >= 1 || 
+                    legion.numCreature(Creature.cyclops) >= 1 ||
                     legion.numCreature(Creature.behemoth) >= 1 ||
                     legion.numCreature(Creature.serpent) >= 1)
                 {
                     recruits[0] = Creature.gargoyle;
                 }
                 if (legion.numCreature(Creature.gargoyle) >= 2 ||
-                    legion.numCreature(Creature.cyclops) >= 1 || 
+                    legion.numCreature(Creature.cyclops) >= 1 ||
                     legion.numCreature(Creature.behemoth) >= 1 ||
                     legion.numCreature(Creature.serpent) >= 1)
                 {
                     recruits[1] = Creature.cyclops;
                 }
-                if (legion.numCreature(Creature.cyclops) >= 3 || 
+                if (legion.numCreature(Creature.cyclops) >= 3 ||
                     legion.numCreature(Creature.behemoth) >= 1 ||
                     legion.numCreature(Creature.serpent) >= 1)
                 {
@@ -193,20 +193,20 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
             case 'm':
                 if (legion.numCreature(Creature.lion) >= 1 ||
-                    legion.numCreature(Creature.minotaur) >= 1 || 
+                    legion.numCreature(Creature.minotaur) >= 1 ||
                     legion.numCreature(Creature.dragon) >= 1 ||
                     legion.numCreature(Creature.colossus) >= 1)
                 {
                     recruits[0] = Creature.lion;
                 }
                 if (legion.numCreature(Creature.lion) >= 2 ||
-                    legion.numCreature(Creature.minotaur) >= 1 || 
+                    legion.numCreature(Creature.minotaur) >= 1 ||
                     legion.numCreature(Creature.dragon) >= 1 ||
                     legion.numCreature(Creature.colossus) >= 1)
                 {
                     recruits[1] = Creature.minotaur;
                 }
-                if (legion.numCreature(Creature.minotaur) >= 2 || 
+                if (legion.numCreature(Creature.minotaur) >= 2 ||
                     legion.numCreature(Creature.dragon) >= 1 ||
                     legion.numCreature(Creature.colossus) >= 1)
                 {
@@ -221,18 +221,18 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
             case 'M':
                 if (legion.numCreature(Creature.ogre) >= 1 ||
-                    legion.numCreature(Creature.troll) >= 1 || 
+                    legion.numCreature(Creature.troll) >= 1 ||
                     legion.numCreature(Creature.ranger) >= 1)
                 {
                     recruits[0] = Creature.ogre;
                 }
                 if (legion.numCreature(Creature.ogre) >= 2 ||
-                    legion.numCreature(Creature.troll) >= 1 || 
+                    legion.numCreature(Creature.troll) >= 1 ||
                     legion.numCreature(Creature.ranger) >= 1)
                 {
                     recruits[1] = Creature.troll;
                 }
-                if (legion.numCreature(Creature.troll) >= 2 || 
+                if (legion.numCreature(Creature.troll) >= 2 ||
                     legion.numCreature(Creature.ranger) >= 1)
                 {
                     recruits[2] = Creature.ranger;
@@ -241,18 +241,18 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
             case 'P':
                 if (legion.numCreature(Creature.centaur) >= 1 ||
-                    legion.numCreature(Creature.lion) >= 1 || 
+                    legion.numCreature(Creature.lion) >= 1 ||
                     legion.numCreature(Creature.ranger) >= 1)
                 {
                     recruits[0] = Creature.centaur;
                 }
                 if (legion.numCreature(Creature.centaur) >= 2 ||
-                    legion.numCreature(Creature.lion) >= 1 || 
+                    legion.numCreature(Creature.lion) >= 1 ||
                     legion.numCreature(Creature.ranger) >= 1)
                 {
                     recruits[1] = Creature.lion;
                 }
-                if (legion.numCreature(Creature.lion) >= 2 || 
+                if (legion.numCreature(Creature.lion) >= 2 ||
                     legion.numCreature(Creature.ranger) >= 1)
                 {
                     recruits[2] = Creature.ranger;
@@ -261,18 +261,18 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
             case 'S':
                 if (legion.numCreature(Creature.troll) >= 1 ||
-                    legion.numCreature(Creature.wyvern) >= 1 || 
+                    legion.numCreature(Creature.wyvern) >= 1 ||
                     legion.numCreature(Creature.hydra) >= 1)
                 {
                     recruits[0] = Creature.troll;
                 }
                 if (legion.numCreature(Creature.troll) >= 3 ||
-                    legion.numCreature(Creature.wyvern) >= 1 || 
+                    legion.numCreature(Creature.wyvern) >= 1 ||
                     legion.numCreature(Creature.hydra) >= 1)
                 {
                     recruits[1] = Creature.wyvern;
                 }
-                if (legion.numCreature(Creature.wyvern) >= 2 || 
+                if (legion.numCreature(Creature.wyvern) >= 2 ||
                     legion.numCreature(Creature.hydra) >= 1)
                 {
                     recruits[2] = Creature.hydra;
@@ -281,20 +281,20 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
             case 't':
                 if (legion.numCreature(Creature.troll) >= 1 ||
-                    legion.numCreature(Creature.warbear) >= 1 || 
+                    legion.numCreature(Creature.warbear) >= 1 ||
                     legion.numCreature(Creature.giant) >= 1 ||
                     legion.numCreature(Creature.colossus) >= 1)
                 {
                     recruits[0] = Creature.troll;
                 }
                 if (legion.numCreature(Creature.troll) >= 2 ||
-                    legion.numCreature(Creature.warbear) >= 1 || 
+                    legion.numCreature(Creature.warbear) >= 1 ||
                     legion.numCreature(Creature.giant) >= 1 ||
                     legion.numCreature(Creature.colossus) >= 1)
                 {
                     recruits[1] = Creature.warbear;
                 }
-                if (legion.numCreature(Creature.warbear) >= 2 || 
+                if (legion.numCreature(Creature.warbear) >= 2 ||
                     legion.numCreature(Creature.giant) >= 1 ||
                     legion.numCreature(Creature.colossus) >= 1)
                 {
@@ -311,30 +311,30 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
                 recruits[0] = Creature.centaur;
                 recruits[1] = Creature.gargoyle;
                 recruits[2] = Creature.ogre;
-                if (legion.numCreature(Creature.behemoth) >= 3 || 
-                    legion.numCreature(Creature.centaur) >= 3 || 
-                    legion.numCreature(Creature.colossus) >= 3 || 
-                    legion.numCreature(Creature.cyclops) >= 3 || 
-                    legion.numCreature(Creature.dragon) >= 3 || 
-                    legion.numCreature(Creature.gargoyle) >= 3 || 
-                    legion.numCreature(Creature.giant) >= 3 || 
-                    legion.numCreature(Creature.gorgon) >= 3 || 
-                    legion.numCreature(Creature.griffon) >= 3 || 
-                    legion.numCreature(Creature.guardian) >= 1 || 
-                    legion.numCreature(Creature.hydra) >= 3 || 
-                    legion.numCreature(Creature.lion) >= 3 || 
-                    legion.numCreature(Creature.minotaur) >= 3 || 
-                    legion.numCreature(Creature.ogre) >= 3 || 
-                    legion.numCreature(Creature.ranger) >= 3 || 
-                    legion.numCreature(Creature.serpent) >= 3 || 
-                    legion.numCreature(Creature.troll) >= 3 || 
-                    legion.numCreature(Creature.unicorn) >= 3 || 
-                    legion.numCreature(Creature.warbear) >= 3 || 
+                if (legion.numCreature(Creature.behemoth) >= 3 ||
+                    legion.numCreature(Creature.centaur) >= 3 ||
+                    legion.numCreature(Creature.colossus) >= 3 ||
+                    legion.numCreature(Creature.cyclops) >= 3 ||
+                    legion.numCreature(Creature.dragon) >= 3 ||
+                    legion.numCreature(Creature.gargoyle) >= 3 ||
+                    legion.numCreature(Creature.giant) >= 3 ||
+                    legion.numCreature(Creature.gorgon) >= 3 ||
+                    legion.numCreature(Creature.griffon) >= 3 ||
+                    legion.numCreature(Creature.guardian) >= 1 ||
+                    legion.numCreature(Creature.hydra) >= 3 ||
+                    legion.numCreature(Creature.lion) >= 3 ||
+                    legion.numCreature(Creature.minotaur) >= 3 ||
+                    legion.numCreature(Creature.ogre) >= 3 ||
+                    legion.numCreature(Creature.ranger) >= 3 ||
+                    legion.numCreature(Creature.serpent) >= 3 ||
+                    legion.numCreature(Creature.troll) >= 3 ||
+                    legion.numCreature(Creature.unicorn) >= 3 ||
+                    legion.numCreature(Creature.warbear) >= 3 ||
                     legion.numCreature(Creature.wyvern) >= 3)
                 {
                     recruits[3] = Creature.guardian;
                 }
-                if (legion.numCreature(Creature.titan) >= 1 || 
+                if (legion.numCreature(Creature.titan) >= 1 ||
                     legion.numCreature(Creature.warlock) >= 1)
                 {
                     recruits[4] = Creature.warlock;
@@ -343,18 +343,18 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
             case 'W':
                 if (legion.numCreature(Creature.centaur) >= 1 ||
-                    legion.numCreature(Creature.warbear) >= 1 || 
+                    legion.numCreature(Creature.warbear) >= 1 ||
                     legion.numCreature(Creature.unicorn) >= 1)
                 {
                     recruits[0] = Creature.centaur;
                 }
                 if (legion.numCreature(Creature.centaur) >= 3 ||
-                    legion.numCreature(Creature.warbear) >= 1 || 
+                    legion.numCreature(Creature.warbear) >= 1 ||
                     legion.numCreature(Creature.unicorn) >= 1)
                 {
                     recruits[1] = Creature.warbear;
                 }
-                if (legion.numCreature(Creature.warbear) >= 2 || 
+                if (legion.numCreature(Creature.warbear) >= 2 ||
                     legion.numCreature(Creature.unicorn) >= 1)
                 {
                     recruits[2] = Creature.unicorn;
@@ -428,7 +428,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         g.drawImage(offImage, 0, 0, this);
     }
 
-    
+
     public void paint(Graphics g)
     {
         // Double-buffer everything.
@@ -446,7 +446,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
             offImage.flush();
             offGraphics.dispose();
         }
-        
+
         if (imagesLoaded)
         {
             for (int i = 0; i < numEligible; i++)
@@ -458,7 +458,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
         dispose();
         System.gc();
-    }  
+    }
 
 
     public void mousePressed(MouseEvent e)
@@ -482,8 +482,8 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
             }
         }
     }
-    
-    
+
+
     public void mouseEntered(MouseEvent e)
     {
     }
@@ -493,12 +493,12 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     {
     }
 
-    
+
     public void mouseClicked(MouseEvent e)
     {
     }
 
-    
+
     public void mouseReleased(MouseEvent e)
     {
     }
@@ -524,7 +524,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     {
     }
 
-                                                         
+
     public void windowDeiconified(WindowEvent event)
     {
     }

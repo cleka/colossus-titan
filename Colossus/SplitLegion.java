@@ -32,7 +32,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
 
     SplitLegion(JFrame parentFrame, Legion oldLegion, Player player)
     {
-        super(parentFrame, player.getName() + ": Split Legion " + 
+        super(parentFrame, player.getName() + ": Split Legion " +
             oldLegion.getMarkerId(), true);
 
         getContentPane().setLayout(null);
@@ -50,8 +50,8 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
         }
 
         newLegion = new Legion(scale / 5, 2 * scale, scale,
-            player.getSelectedMarker(), oldLegion, this, 0, 
-            oldLegion.getCurrentHex(), null, null, null, null, null, null, 
+            player.getSelectedMarker(), oldLegion, this, 0,
+            oldLegion.getCurrentHex(), null, null, null, null, null, null,
             null, null, player);
 
         pack();
@@ -77,14 +77,14 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             oldChits = new Chit[oldLegion.getHeight()];
             for (int i = 0; i < oldLegion.getHeight(); i++)
             {
-                oldChits[i] = new Chit((i + 1) * scale + (scale / 5), 
+                oldChits[i] = new Chit((i + 1) * scale + (scale / 5),
                     scale / 2, scale, oldLegion.getCreature(i).getImageName(),
-                    this, false);
+                    this);
             }
             newChits = new Chit[oldLegion.getHeight()];
-            
-            oldMarker = new Chit(scale / 5, scale / 2, scale, 
-                oldLegion.getImageName(), this, false);
+
+            oldMarker = new Chit(scale / 5, scale / 2, scale,
+                oldLegion.getImageName(), this);
 
             tracker = new MediaTracker(this);
 
@@ -101,7 +101,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             }
             catch (InterruptedException e)
             {
-                JOptionPane.showMessageDialog(parentFrame, 
+                JOptionPane.showMessageDialog(parentFrame,
                     "waitForAll was interrupted");
             }
             imagesLoaded = true;
@@ -161,10 +161,10 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
 
         if (!laidOut)
         {
-            Insets insets = getInsets(); 
-            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
+            Insets insets = getInsets();
+            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 -
                 insets.bottom, d.width / 3, d.height / 8);
-            button2.setBounds(5 * d.width / 9 - insets.right, 
+            button2.setBounds(5 * d.width / 9 - insets.right,
                 3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
             laidOut = true;
         }
@@ -174,8 +174,8 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
         button1.repaint();
         button2.repaint();
     }
-    
-    
+
+
     // Double-buffer everything.
     public void paint(Graphics g)
     {
@@ -193,7 +193,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             offImage.flush();
             offGraphics.dispose();
         }
-        
+
         if (imagesLoaded)
         {
             for (int i = 0; i < oldLegion.getHeight(); i++)
@@ -238,21 +238,21 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             if (oldChits[i].select(point))
             {
                 // Got a hit.
-                // Move this Creature over to the other Legion and adjust 
+                // Move this Creature over to the other Legion and adjust
                 // appropriate chit screen coordinates.
                 newLegion.setHeight(newLegion.getHeight() + 1);
                 newLegion.setCreature(newLegion.getHeight() - 1,
                     oldLegion.getCreature(i));
                 newChits[newLegion.getHeight() - 1] = oldChits[i];
-                newChits[newLegion.getHeight() - 1].setLocationAbs(new 
-                    Point(newLegion.getHeight() * scale + scale / 5, 
+                newChits[newLegion.getHeight() - 1].setLocationAbs(new
+                    Point(newLegion.getHeight() * scale + scale / 5,
                     2 * scale));
 
                 for (int j = i; j < oldLegion.getHeight() - 1; j++)
                 {
                     oldLegion.setCreature(j, oldLegion.getCreature(j + 1));
                     oldChits[j] = oldChits[j + 1];
-                    oldChits[j].setLocationAbs(new Point((j + 1) * scale + 
+                    oldChits[j].setLocationAbs(new Point((j + 1) * scale +
                         scale / 5, scale / 2));
                 }
                 oldLegion.setCreature(oldLegion.getHeight() - 1, null);
@@ -269,21 +269,21 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             if (newChits[i].select(point))
             {
                 // Got a hit.
-                // Move this Creature over to the other Legion and adjust 
+                // Move this Creature over to the other Legion and adjust
                 // appropriate chit screen coordinates.
                 oldLegion.setHeight(oldLegion.getHeight() + 1);
-                oldLegion.setCreature(oldLegion.getHeight() - 1, 
+                oldLegion.setCreature(oldLegion.getHeight() - 1,
                     newLegion.getCreature(i));
                 oldChits[oldLegion.getHeight() - 1] = newChits[i];
-                oldChits[oldLegion.getHeight() - 1].setLocationAbs(new 
-                    Point(oldLegion.getHeight() * scale + scale / 5, 
+                oldChits[oldLegion.getHeight() - 1].setLocationAbs(new
+                    Point(oldLegion.getHeight() * scale + scale / 5,
                     scale / 2));
 
                 for (int j = i; j < newLegion.getHeight() - 1; j++)
                 {
                     newLegion.setCreature(j, newLegion.getCreature(j + 1));
                     newChits[j] = newChits[j + 1];
-                    newChits[j].setLocationAbs(new Point((j + 1) * scale + 
+                    newChits[j].setLocationAbs(new Point((j + 1) * scale +
                         scale / 5, 2 * scale));
                 }
                 newLegion.setCreature(newLegion.getHeight() - 1, null);
@@ -332,7 +332,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
     public void windowDeactivated(WindowEvent event)
     {
     }
-                                                                                                                     
+
     public void windowDeiconified(WindowEvent event)
     {
     }
@@ -356,7 +356,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             // must have height 4 and one lord.
             if (oldLegion.getHeight() < 2 || newLegion.getHeight() < 2)
             {
-                JOptionPane.showMessageDialog(parentFrame, 
+                JOptionPane.showMessageDialog(parentFrame,
                     "Legion too short.");
                 return;
             }
@@ -364,7 +364,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             {
                 if (oldLegion.getHeight() != newLegion.getHeight())
                 {
-                    JOptionPane.showMessageDialog(parentFrame, 
+                    JOptionPane.showMessageDialog(parentFrame,
                         "Initial split not 4-4.");
                     return;
                 }
@@ -372,7 +372,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
                 {
                     if (oldLegion.numLords() != 1)
                     {
-                        JOptionPane.showMessageDialog(parentFrame, 
+                        JOptionPane.showMessageDialog(parentFrame,
                             "Each stack must have one lord.");
                         return;
                     }
@@ -387,7 +387,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
 
             // Add the new legion to the player.
             player.addLegion(newLegion);
-            
+
             // Set the new chit next to the old chit on the masterboard.
             newLegion.getCurrentHex().addLegion(newLegion);
 
@@ -409,7 +409,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(scale * (oldLegion.getHeight() + 
+        return new Dimension(scale * (oldLegion.getHeight() +
             newLegion.getHeight() + 2), 4 * scale);
     }
 }

@@ -24,15 +24,14 @@ class Legion
 
 
     Legion(int cx, int cy, int scale, String markerId, Legion splitFrom,
-        Container container, int height, MasterHex hex, 
-        Creature creature0, Creature creature1, Creature creature2, 
-        Creature creature3, Creature creature4, Creature creature5, 
+        Container container, int height, MasterHex hex,
+        Creature creature0, Creature creature1, Creature creature2,
+        Creature creature3, Creature creature4, Creature creature5,
         Creature creature6, Creature creature7, Player player)
     {
         this.markerId = markerId;
         this.splitFrom = splitFrom;
-        this.marker = new Chit(cx, cy, scale, getImageName(), container, 
-            false);
+        this.marker = new Chit(cx, cy, scale, getImageName(), container);
         this.height = height;
         this.currentHex = hex;
         this.startingHex = hex;
@@ -63,7 +62,7 @@ class Legion
     {
         if (player != null)
         {
-            player.addPoints(points);        
+            player.addPoints(points);
 
             int score = player.getScore();
             int tmpScore = score;
@@ -253,7 +252,7 @@ class Legion
 
             // removeCreature() will automatically put immortal creatures back
             // on the stack, but mortal ones must be handled manually.
-            if (!creature.isImmortal()) 
+            if (!creature.isImmortal())
             {
                 creature.putOneBack();
             }
@@ -269,7 +268,7 @@ class Legion
         return summoned;
     }
 
-    
+
     public void markSummoned()
     {
         summoned = true;
@@ -325,8 +324,8 @@ class Legion
             removeLegion();
         }
     }
-    
-    
+
+
     public void removeCreature(Creature creature)
     {
         for (int i = 0; i < height; i++)
@@ -365,7 +364,7 @@ class Legion
         for (int i = 0; i < height; i++)
         {
             creatures[i].putOneBack();
-            legion.addCreature(creatures[i]); 
+            legion.addCreature(creatures[i]);
         }
         // Prevent double-returning lords to stacks.
         height = 0;

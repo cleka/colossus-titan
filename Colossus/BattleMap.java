@@ -68,7 +68,7 @@ public class BattleMap extends JFrame implements MouseListener,
     Legion donor = null;
 
 
-    public BattleMap(MasterBoard board, Legion attacker, Legion defender, 
+    public BattleMap(MasterBoard board, Legion attacker, Legion defender,
         MasterHex masterHex, int entrySide)
     {
         super(attacker.getMarkerId() + " attacks " + defender.getMarkerId());
@@ -106,9 +106,9 @@ public class BattleMap extends JFrame implements MouseListener,
         for (int i = 0; i < attackerHeight; i++)
         {
             chits[i] = new BattleChit(0, 0, chitScale,
-                attacker.getCreature(i).getImageName(), this,
+                attacker.getCreature(i).getImageName(false), this,
                 attacker.getCreature(i), entrance,
-                attacker, false, this);
+                attacker, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -118,9 +118,9 @@ public class BattleMap extends JFrame implements MouseListener,
         for (int i = attackerHeight; i < numChits; i++)
         {
             chits[i] = new BattleChit(0, 0, chitScale,
-                defender.getCreature(i - attackerHeight).getImageName(), 
+                defender.getCreature(i - attackerHeight).getImageName(true),
                 this, defender.getCreature(i - attackerHeight), entrance,
-                defender, true, this);
+                defender, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -152,9 +152,9 @@ public class BattleMap extends JFrame implements MouseListener,
         int height = legion.getHeight();
         Creature creature = legion.getCreature(height - 1);
 
-        chits[numChits] = new BattleChit(0, 0, chitScale, 
-            creature.getImageName(), this, creature, entrance, legion, 
-            (legion == defender), this);
+        chits[numChits] = new BattleChit(0, 0, chitScale,
+            creature.getImageName(legion == defender), this, creature,
+            entrance, legion, this);
 
         tracker.addImage(chits[numChits].getImage(), 0);
         entrance.addChit(chits[numChits]);
@@ -306,7 +306,7 @@ public class BattleMap extends JFrame implements MouseListener,
             }
             else
             {
-                findMoves(chit.getCurrentHex(), chit, creature, 
+                findMoves(chit.getCurrentHex(), chit, creature,
                     creature.flies(), creature.getSkill(), -1);
             }
         }
@@ -353,7 +353,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    // If any chits were left off-board, kill them.  If they were newly 
+    // If any chits were left off-board, kill them.  If they were newly
     //   summoned or recruited, unsummon or unrecruit them instead.
     public void removeOffboardChits()
     {
@@ -367,8 +367,8 @@ public class BattleMap extends JFrame implements MouseListener,
             }
         }
     }
-    
-    
+
+
     // Mark all of the conceding player's chits as dead.
     public void concede(Player player)
     {
@@ -401,7 +401,7 @@ public class BattleMap extends JFrame implements MouseListener,
             for (int i = 0; i < numChits; i++)
             {
                 BattleChit chit = chits[i];
-                if (chit.getCurrentHex().getTerrain() == 'd' && 
+                if (chit.getCurrentHex().getTerrain() == 'd' &&
                     !chit.getCreature().isNativeDrift())
                 {
                     int totalDamage = chit.getHits();
@@ -466,7 +466,7 @@ public class BattleMap extends JFrame implements MouseListener,
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not engaged.
-            if (currentHex.getHexside(i) != 'c' && 
+            if (currentHex.getHexside(i) != 'c' &&
                 currentHex.getOppositeHexside(i) != 'c')
             {
                 BattleHex hex = currentHex.getNeighbor(i);
@@ -492,7 +492,7 @@ public class BattleMap extends JFrame implements MouseListener,
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally.
         Creature creature = chit.getCreature();
-        if (!chit.inContact(true) && creature.rangeStrikes() && 
+        if (!chit.inContact(true) && creature.rangeStrikes() &&
             turn.getPhase() != turn.STRIKEBACK)
         {
             int skill = creature.getSkill();
@@ -574,8 +574,8 @@ public class BattleMap extends JFrame implements MouseListener,
 
         return count;
     }
-    
-    
+
+
     public void applyCarries(BattleChit target)
     {
         int totalDamage = target.getHits();
@@ -602,7 +602,7 @@ public class BattleMap extends JFrame implements MouseListener,
     {
         for (int i = 0; i < numChits; i++)
         {
-            if (chits[i].getCarryFlag()) 
+            if (chits[i].getCarryFlag())
             {
                 chits[i].setCarryFlag(false);
                 chits[i].getCurrentHex().unselect();
@@ -651,10 +651,10 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             y2 += 0.5;
         }
-        
+
         float xDist = Math.abs(x2 - x1);
         float yDist = Math.abs(y2 - y1);
-        
+
         // Offboard chits are out of range.
         if (x1 == -1 || x2 == -1)
         {
@@ -684,7 +684,7 @@ public class BattleMap extends JFrame implements MouseListener,
     private boolean toLeft(float xDist, float yDist)
     {
         float ratio = xDist / yDist;
-        if (ratio >= 1.5 || (ratio >= 0 && ratio <= .75) || 
+        if (ratio >= 1.5 || (ratio >= 0 && ratio <= .75) ||
             (ratio >= -1.5 && ratio <= -.75))
         {
             return true;
@@ -698,9 +698,9 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // Check LOS, going to the left of hexspines if argument left is true, or
     // to the right if it is false.
-    private boolean LOSBlockedDir(BattleHex initialHex, BattleHex currentHex, 
-        BattleHex finalHex, boolean left, int strikeElevation, 
-        boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle, 
+    private boolean LOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
+        BattleHex finalHex, boolean left, int strikeElevation,
+        boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle,
         boolean midCliff, boolean midChit, int totalObstacles)
     {
         boolean targetAtop = false;
@@ -710,7 +710,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return false;
         }
-        
+
         int x1 = currentHex.getXCoord();
         float y1 = currentHex.getYCoord();
         int x2 = finalHex.getXCoord();
@@ -721,7 +721,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return true;
         }
-        
+
         int direction = getDirection(currentHex, finalHex, left);
 
         BattleHex nextHex = currentHex.getNeighbor(direction);
@@ -738,7 +738,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             if (hexside != ' ')
             {
-                strikerAtop = true; 
+                strikerAtop = true;
                 totalObstacles++;
                 if (hexside == 'c')
                 {
@@ -803,7 +803,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
             // If there are two walls, striker or target must be at elevation
             //     2 and range must not be 3.
-            if (terrain == 'T' && totalObstacles >= 2 && 
+            if (terrain == 'T' && totalObstacles >= 2 &&
                 getRange(initialHex, finalHex) == 3)
             {
                 return true;
@@ -817,7 +817,7 @@ public class BattleMap extends JFrame implements MouseListener,
             if (midChit)
             {
                 // We're not in the initial or final hex, and we have already
-                // marked an mid chit, so it's not adjacent to the base of a 
+                // marked an mid chit, so it's not adjacent to the base of a
                 // cliff that the target is atop.
                 return true;
             }
@@ -840,7 +840,7 @@ public class BattleMap extends JFrame implements MouseListener,
         }
 
         // Chits block LOS, unless both striker and target are at higher
-        //     elevation than the chit, or unless the chit is at the base of 
+        //     elevation than the chit, or unless the chit is at the base of
         //     a cliff and the striker or target is atop it.
         if (nextHex.isOccupied() && nextHex.getElevation() >= strikeElevation
             && (!strikerAtopCliff || currentHex != initialHex))
@@ -848,8 +848,8 @@ public class BattleMap extends JFrame implements MouseListener,
             midChit = true;
         }
 
-        return LOSBlockedDir(initialHex, nextHex, finalHex, left, 
-            strikeElevation, strikerAtop, strikerAtopCliff, 
+        return LOSBlockedDir(initialHex, nextHex, finalHex, left,
+            strikeElevation, strikerAtop, strikerAtopCliff,
             midObstacle, midCliff, midChit, totalObstacles);
     }
 
@@ -863,7 +863,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return false;
         }
-        
+
         int x1 = hex1.getXCoord();
         float y1 = hex1.getYCoord();
         int x2 = hex2.getXCoord();
@@ -874,7 +874,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return true;
         }
-        
+
         // Hexes with odd X coordinates are pushed down half a hex.
         if ((x1 & 1) == 1)
         {
@@ -884,12 +884,12 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             y2 += 0.5;
         }
-        
+
         float xDist = x2 - x1;
         float yDist = y2 - y1;
 
         // Chits below the level of the strike do not block LOS.
-        int strikeElevation = Math.min(hex1.getElevation(), 
+        int strikeElevation = Math.min(hex1.getElevation(),
             hex2.getElevation());
 
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
@@ -897,7 +897,7 @@ public class BattleMap extends JFrame implements MouseListener,
             // Hexspine; try both sides.
             return (LOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
                 false, false, false, false, false, 0) &&
-                LOSBlockedDir(hex1, hex1, hex2, false, strikeElevation, 
+                LOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
                 false, false, false, false, false, 0));
         }
         else
@@ -913,7 +913,7 @@ public class BattleMap extends JFrame implements MouseListener,
     {
         BattleHex currentHex = chit.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
-        Creature creature = chit.getCreature(); 
+        Creature creature = chit.getCreature();
 
         boolean clear = true;
 
@@ -928,7 +928,7 @@ public class BattleMap extends JFrame implements MouseListener,
         // Only warlocks can rangestrike at range 2, rangestrike Lords,
         // or rangestrike without LOS.
         else if (creature != Creature.warlock && (range < 3 ||
-            target.getCreature().isLord() || 
+            target.getCreature().isLord() ||
             LOSBlocked(currentHex, targetHex)))
         {
             clear = false;
@@ -948,7 +948,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return -1;
         }
-        
+
         int x1 = hex1.getXCoord();
         float y1 = hex1.getYCoord();
         int x2 = hex2.getXCoord();
@@ -959,7 +959,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return -1;
         }
-        
+
 
         // Hexes with odd X coordinates are pushed down half a hex.
         if ((x1 & 1) == 1)
@@ -970,10 +970,10 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             y2 += 0.5;
         }
-        
+
         float xDist = x2 - x1;
         float yDist = y2 - y1;
-        
+
 
         if (xDist >= 0)
         {
@@ -1103,7 +1103,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return 10;
         }
-        
+
         int direction = getDirection(hex1, hex2, left);
 
         BattleHex nextHex = hex1.getNeighbor(direction);
@@ -1130,13 +1130,13 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return 10;
         }
-        
+
         // Add one if it's bramble.
         if (nextHex.getTerrain() == 'r')
         {
             count++;
         }
-        
+
         return countBrambleHexesDir(nextHex, hex2, left, count);
     }
 
@@ -1148,7 +1148,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return 0;
         }
-        
+
         int x1 = hex1.getXCoord();
         float y1 = hex1.getYCoord();
         int x2 = hex2.getXCoord();
@@ -1159,7 +1159,7 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             return 10;
         }
-        
+
         // Hexes with odd X coordinates are pushed down half a hex.
         if ((x1 & 1) == 1)
         {
@@ -1169,23 +1169,23 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             y2 += 0.5;
         }
-        
+
         float xDist = x2 - x1;
         float yDist = y2 - y1;
 
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
             // Hexspine; try both sides.
-            return Math.min(countBrambleHexesDir(hex1, hex2, true, 0), 
+            return Math.min(countBrambleHexesDir(hex1, hex2, true, 0),
                 countBrambleHexesDir(hex1, hex2, false, 0));
         }
-        
+
         else if (xDist / yDist > 0)
         {
             // LOS to left
             return countBrambleHexesDir(hex1, hex2, true, 0);
         }
-        
+
         else
         {
             // LOS to right
@@ -1246,7 +1246,7 @@ public class BattleMap extends JFrame implements MouseListener,
                 // Recruit reinforcement
                 if (legion.canRecruit())
                 {
-                    new PickRecruit(this, legion); 
+                    new PickRecruit(this, legion);
                 }
             }
         }
@@ -1284,7 +1284,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
     public void removeDeadChits()
     {
-        // Initialize these to true, and then set them to false when a 
+        // Initialize these to true, and then set them to false when a
         // non-dead chit is found.
         boolean attackerElim = true;
         boolean defenderElim = true;
@@ -1295,19 +1295,19 @@ public class BattleMap extends JFrame implements MouseListener,
             if (chits[i].isDead())
             {
                 Creature creature = chits[i].getCreature();
-                
+
                 // After turn 1, offboard chits are returned to the stacks or
                 //   the stack they were summoned from, with no points awarded.
-                if (chits[i].getCurrentHex().isEntrance() && 
+                if (chits[i].getCurrentHex().isEntrance() &&
                     turn.getTurnNumber() > 1)
                 {
-                    if (creature == Creature.angel || creature == 
+                    if (creature == Creature.angel || creature ==
                         Creature.archangel)
                     {
                         donor = legion.getPlayer().getLastLegionSummonedFrom();
                         // Because addCreature grabs one from the stack, it
                         //     must be returned there.
-                        creature.putOneBack();                         
+                        creature.putOneBack();
                         donor.addCreature(creature);
                     }
                     else
@@ -1325,7 +1325,7 @@ public class BattleMap extends JFrame implements MouseListener,
                     attackerPoints += creature.getPointValue();
 
                     // Chits left offboard do not trigger angel summoning.
-                    if (summonState == NO_KILLS && 
+                    if (summonState == NO_KILLS &&
                         !chits[i].getCurrentHex().isEntrance())
                     {
                         summonState = FIRST_BLOOD;
@@ -1334,7 +1334,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
                 legion.removeCreature(creature);
                 // If an angel or archangel was returned to its donor instead
-                // of the stack, then the count must be adjusted. 
+                // of the stack, then the count must be adjusted.
                 if (donor != null)
                 {
                     creature.takeOne();
@@ -2057,7 +2057,7 @@ public class BattleMap extends JFrame implements MouseListener,
         g.drawImage(offImage, 0, 0, this);
     }
 
-    
+
     public void paint(Graphics g)
     {
         // Double-buffer everything.
@@ -2095,7 +2095,7 @@ public class BattleMap extends JFrame implements MouseListener,
             Creature.warlock, null, player1);
         Legion defender = new Legion(0, 0, chitScale, null, null, null, 7,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
-            Creature.cyclops, Creature.gorgon, Creature.guardian, 
+            Creature.cyclops, Creature.gorgon, Creature.guardian,
             Creature.minotaur, null, player2);
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('J');

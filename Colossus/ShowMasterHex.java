@@ -25,11 +25,11 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 
     ShowMasterHex(JFrame parentFrame, MasterHex hex, Point point)
     {
-        super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(), 
+        super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(),
             false);
 
         numChits = hex.getNumRecruitTypes();
-        
+
         pack();
 
         setBackground(java.awt.Color.lightGray);
@@ -59,7 +59,7 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
             origin.y -= adj;
         }
         setLocation(origin);
-        
+
         getContentPane().setLayout(null);
 
         this.hex = hex;
@@ -73,8 +73,8 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 
             numToRecruit[i] = hex.getNumToRecruit(i);
             count[i] = creature.getCount();
-            chits[i] = new Chit(scale, scale / 2 + i * scale, scale, 
-                creature.getImageName(), this, false);
+            chits[i] = new Chit(scale, scale / 2 + i * scale, scale,
+                creature.getImageName(), this);
         }
 
         tracker = new MediaTracker(this);
@@ -90,7 +90,7 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(parentFrame, 
+            JOptionPane.showMessageDialog(parentFrame,
                 "waitForAll was interrupted");
         }
         imagesLoaded = true;
@@ -130,12 +130,12 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
             if (numToRecruit[i] > 0)
             {
                 String numToRecruitLabel = Integer.toString(numToRecruit[i]);
-                offGraphics.drawString(numToRecruitLabel, scale / 3, (i + 1) * scale 
-                    + fontHeight / 2);
+                offGraphics.drawString(numToRecruitLabel, scale / 3, (i + 1) *
+                scale + fontHeight / 2);
             }
 
             String countLabel = Integer.toString(count[i]);
-            offGraphics.drawString(countLabel, 7 * scale / 3, (i + 1) * scale + 
+            offGraphics.drawString(countLabel, 7 * scale / 3, (i + 1) * scale +
                 fontHeight / 2);
         }
 
@@ -160,7 +160,7 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
             offImage.flush();
             offGraphics.dispose();
         }
-        
+
         if (imagesLoaded)
         {
             for (int i = 0; i < numChits; i++)
@@ -172,15 +172,15 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 
         dispose();
         System.gc();
-    }  
+    }
 
 
     public void mouseClicked(MouseEvent e)
     {
         cleanup();
     }
-    
-    
+
+
     public void mouseEntered(MouseEvent e)
     {
     }
@@ -190,14 +190,14 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
     {
         cleanup();
     }
-    
+
 
     public void mousePressed(MouseEvent e)
     {
         cleanup();
     }
 
-    
+
     public void mouseReleased(MouseEvent e)
     {
         cleanup();

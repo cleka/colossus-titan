@@ -54,7 +54,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
             origin.y -= adj;
         }
         setLocation(origin);
-        
+
         getContentPane().setLayout(null);
 
         this.legion = legion;
@@ -62,8 +62,8 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         chits = new Chit[legion.getHeight()];
         for (int i = 0; i < legion.getHeight(); i++)
         {
-            chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale, 
-                legion.getCreature(i).getImageName(), this, false);
+            chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale,
+                legion.getCreature(i).getImageName(), this);
         }
 
         tracker = new MediaTracker(this);
@@ -79,7 +79,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(parentFrame, 
+            JOptionPane.showMessageDialog(parentFrame,
                 "waitForAll was interrupted");
         }
         imagesLoaded = true;
@@ -135,7 +135,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
             offImage.flush();
             offGraphics.dispose();
         }
-        
+
         if (imagesLoaded)
         {
             for (int i = 0; i < legion.getHeight(); i++)
@@ -147,15 +147,15 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
 
         dispose();
         System.gc();
-    }  
-    
+    }
+
 
     public void mouseClicked(MouseEvent e)
     {
         cleanup();
     }
-    
-    
+
+
     public void mouseEntered(MouseEvent e)
     {
     }
@@ -165,14 +165,14 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
     {
         cleanup();
     }
-    
+
 
     public void mousePressed(MouseEvent e)
     {
         cleanup();
     }
 
-    
+
     public void mouseReleased(MouseEvent e)
     {
         cleanup();

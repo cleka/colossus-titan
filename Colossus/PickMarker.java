@@ -24,7 +24,7 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     PickMarker(JFrame parentFrame, Player player)
     {
         super(parentFrame, player.getName() + ": Pick Legion Marker", true);
-        
+
         this.player = player;
         markers = new Chit[player.getNumMarkersAvailable()];
 
@@ -44,13 +44,13 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
             pack();
 
             setBackground(java.awt.Color.lightGray);
-            setSize((21 * scale / 20) * (Math.min(12, 
-                player.getNumMarkersAvailable()) + 1), (21 * scale / 20) * 
+            setSize((21 * scale / 20) * (Math.min(12,
+                player.getNumMarkersAvailable()) + 1), (21 * scale / 20) *
                 ((player.getNumMarkersAvailable() - 1) / 12 + 2));
             setResizable(false);
-            
+
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width / 2 - getSize().width / 2, 
+            setLocation(new Point(d.width / 2 - getSize().width / 2,
                 d.height / 2 - getSize().height / 2));
 
             int cx = scale / 2;
@@ -60,8 +60,8 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
             {
                 markers[i] = new Chit(cx + (i % 12) * (21 * scale / 20),
                     cy + (i / 12) * (21 * scale / 20), scale,
-                    "images" + File.separator + player.getMarker(i) + 
-                    ".gif", this, false);
+                    "images" + File.separator + player.getMarker(i) +
+                    ".gif", this);
             }
 
             tracker = new MediaTracker(this);
@@ -77,7 +77,7 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
             }
             catch (InterruptedException e)
             {
-                JOptionPane.showMessageDialog(parentFrame, 
+                JOptionPane.showMessageDialog(parentFrame,
                     "waitForAll was interrupted");
             }
             imagesLoaded = true;
@@ -116,8 +116,8 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
 
         g.drawImage(offImage, 0, 0, this);
     }
-    
-    
+
+
     public void paint(Graphics g)
     {
         // Double-buffer everything.
@@ -135,7 +135,7 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
             offImage.flush();
             offGraphics.dispose();
         }
-        
+
         if (imagesLoaded)
         {
             for (int i = 0; i < player.getNumMarkersAvailable(); i++)
@@ -173,8 +173,8 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
             }
         }
     }
-    
-    
+
+
     public void mouseEntered(MouseEvent e)
     {
     }
@@ -184,12 +184,12 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     {
     }
 
-    
+
     public void mouseClicked(MouseEvent e)
     {
     }
 
-    
+
     public void mouseReleased(MouseEvent e)
     {
     }
@@ -217,7 +217,7 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     {
     }
 
-                                                         
+
     public void windowDeiconified(WindowEvent event)
     {
     }
