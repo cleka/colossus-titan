@@ -162,13 +162,19 @@ System.out.println("setupMusterDialog");
         else
         {
             removeAll();
-            setLayout(new GridLayout(0, 2));
+            setLayout(new GridLayout(0, 4));
 
             add(new Label(game.getActivePlayer().getName() + 
                 " : Muster Recruits"));
-            Button button1 = new Button("End Turn");
+            Button button1 = new Button("Undo Last Recruit");
             add(button1);
             button1.addActionListener(this);
+            Button button2 = new Button("Undo All Recruits");
+            add(button2);
+            button2.addActionListener(this);
+            Button button3 = new Button("End Turn");
+            add(button3);
+            button3.addActionListener(this);
 
             pack();
 
@@ -177,22 +183,7 @@ System.out.println("setupMusterDialog");
             setLocation(new Point(d.width - getSize().width, 0));
         
             // Highlight hexes with legions eligible to muster.
-
-            Player player = game.getActivePlayer();
-            for (int i = 0; i < player.getNumLegions(); i++)
-            {
-                Legion legion = player.getLegion(i);
-                if (legion.canRecruit() && legion.hasMoved())
-                {
-                    Creature [] recruits = new Creature[5];
-                    if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
-                    {
-                        MasterHex hex = legion.getCurrentHex();
-                        hex.select();
-                        hex.repaint();
-                    }
-                }
-            }
+            board.highlightPossibleRecruits();
         }
     }
     
@@ -300,6 +291,20 @@ System.out.println("setupMusterDialog");
 
                 setupMusterDialog();
             }
+        }
+        
+        else if (e.getActionCommand() == "Undo Last Recruit")
+        {
+            player.undoLastRecruit();
+
+            board.highlightPossibleRecruits();
+        }
+
+        else if (e.getActionCommand() == "Undo All Recruits")
+        {
+            player.undoAllRecruits();
+
+            board.highlightPossibleRecruits();
         }
         
         else if (e.getActionCommand() == "End Turn")
