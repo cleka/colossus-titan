@@ -15,6 +15,8 @@ class Legion
     private String markerId;    // Bk03, Rd12, etc.
     private Legion splitFrom;
     private Creature [] creatures = new Creature[8];  // 8 before initial splits
+    int numVisibleCreatures;
+    private Creature [] visibleCreatures = new Creature[8];
     private MasterHex currentHex;
     private MasterHex startingHex;
     private boolean moved = false;
@@ -44,6 +46,16 @@ class Legion
         creatures[5] = creature5;
         creatures[6] = creature6;
         creatures[7] = creature7;
+        // Initial legion contents are public; contents of legions created 
+        // by splits are private.
+        if (height == 8)
+        {
+            revealAllCreatures();
+        }
+        else
+        {
+            hideAllCreatures();
+        }
     }
 
 
@@ -223,8 +235,8 @@ class Legion
 
     public boolean canRecruit()
     {
-        if (recruited || height > 6 || 
-            PickRecruit.findEligibleRecruits(this, new Creature[6]) == 0)
+        if (recruited || height > 6 || !moved ||
+            PickRecruit.findEligibleRecruits(this, new Creature[5]) == 0)
         {
             return false;
         }
@@ -394,5 +406,73 @@ class Legion
         // Prevent double-returning lords to stacks.
         height = 0;
         removeLegion();
+    }
+
+
+    public void hideAllCreatures()
+    {
+        for (int i = 0; i < visibleCreatures.length; i++)
+        {
+            visibleCreatures[i] = null;
+        }
+        numVisibleCreatures = 0;
+    }
+    
+    
+    public void revealAllCreatures()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            visibleCreatures[i] = creatures[i];
+        }
+        numVisibleCreatures = height;
+    }
+
+
+    public void revealCreatures(Creature creature, int numberToReveal)
+    {
+        int numberAlreadyRevealed = 0;
+        for (int i = 0; i < numVisibleCreatures; i++)
+        {
+            if (visibleCreatures[i] == creature)
+            {
+                numberAlreadyRevealed++;
+            }
+        }
+        int excess = numberAlreadyRevealed + numberToReveal -
+            numCreature(creature);
+        if (excess > 0)
+        {
+            numberToReveal -= excess;
+        }
+
+        for (int i = numVisibleCreatures; i < numVisibleCreatures + 
+            numberToReveal; i++)
+        {
+            visibleCreatures[i] = creature;
+        }
+        if (numberToReveal > 0)
+        {
+            numVisibleCreatures += numberToReveal;
+        }
+    }
+
+
+    public int getNumVisibleCreatures()
+    {
+        return numVisibleCreatures;
+    }
+    
+    
+    public String getVisibleCreatureImageName(int i)
+    {
+        if (i > numVisibleCreatures - 1)
+        {
+            return "images" + File.separator + "Question.gif";
+        }
+        else
+        {
+            return visibleCreatures[i].getImageName();
+        }
     }
 }
