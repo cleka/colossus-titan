@@ -22,7 +22,7 @@ class MasterHex
     private Legion [] legions = new Legion[3];
 
     MasterHex [] neighbor = new MasterHex[6];
-    boolean selected;
+    private boolean selected;
     
 
     // B,D,H,J,m,M,P,S,T,t,W
@@ -360,6 +360,24 @@ class MasterHex
             return true;
         }
         return false;
+    }
+
+
+    void select()
+    {
+        selected = true;
+    }
+
+
+    void unselect()
+    {
+        selected = false;
+    }
+
+
+    boolean isSelected()
+    {
+        return selected;
     }
 
 
