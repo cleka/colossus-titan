@@ -67,11 +67,11 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
                 this);
         }
 
-        attackerMarker = new Chit(scale / 5, scale / 2, scale,
-            attacker.getImageName(), this);
+        attackerMarker = new Marker(scale / 5, scale / 2, scale,
+            attacker.getImageName(), this, attacker);
 
-        defenderMarker = new Chit(scale / 5, 2 * scale, scale,
-            defender.getImageName(), this);
+        defenderMarker = new Marker(scale / 5, 2 * scale, scale,
+            defender.getImageName(), this, defender);
 
         tracker = new MediaTracker(this);
 
