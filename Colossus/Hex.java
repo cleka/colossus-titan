@@ -32,7 +32,6 @@ public abstract class Hex
     protected double len;
     protected GeneralPath hexagon;
     protected Rectangle rectBound;
-    protected Point center;
     /** Globally turns antialiasing on or off for all hexes. */
     protected static boolean antialias;
 
@@ -161,7 +160,14 @@ public abstract class Hex
     /** Return the Point closest to the center of the polygon. */
     public Point findCenter()
     {
-        return new Point((int)Math.round((xVertex[0] + xVertex[3]) / 2),
+        return new Point((int)Math.round((xVertex[2] + xVertex[5]) / 2),
             (int)Math.round((yVertex[0] + yVertex[3]) / 2));
+    }
+
+    /** Return the Point2D.Double at the center of the polygon. */
+    public Point2D.Double findCenter2D()
+    {
+        return new Point2D.Double((xVertex[2] + xVertex[5]) / 2.0,
+            (yVertex[0] + yVertex[3]) / 2.0);
     }
 }

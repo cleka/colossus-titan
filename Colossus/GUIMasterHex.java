@@ -17,6 +17,8 @@ public final class GUIMasterHex extends MasterHex
     private MasterBoard board;
     /** Terrain name in upper case. */
     private String name;
+    private GeneralPath innerHexagon;
+
 
     // The hex vertexes are numbered like this:
     //
@@ -83,10 +85,25 @@ public final class GUIMasterHex extends MasterHex
 
         hexagon = makePolygon(6, xVertex, yVertex, true);
         rectBound = hexagon.getBounds();
-        center = findCenter();
         offCenter = new Point((int)Math.round((xVertex[0] + xVertex[1]) / 2),
             (int)Math.round(((yVertex[0] + yVertex[3]) / 2) +
             (inverted ? -(scale / 6.0) : (scale / 6.0))));
+
+        Point2D.Double center = findCenter2D();
+
+        final double innerScale = 0.8;
+        AffineTransform at = AffineTransform.getScaleInstance(innerScale,
+            innerScale);
+        innerHexagon = (GeneralPath)hexagon.createTransformedShape(at);
+
+        // Translate innerHexagon to make it concentric.
+        Rectangle2D innerBounds = innerHexagon.getBounds2D(); 
+        Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX() +
+            innerBounds.getWidth() / 2.0, innerBounds.getY() + 
+            innerBounds.getHeight() / 2.0);
+        at = AffineTransform.getTranslateInstance(center.getX() - 
+            innerCenter.getX(), center.getY() - innerCenter.getY());
+        innerHexagon.transform(at);
     }
 
 
@@ -112,13 +129,22 @@ public final class GUIMasterHex extends MasterHex
         if (isSelected())
         {
             g2.setColor(Color.white);
+            g2.fill(hexagon);
+
+            // Fill inscribed hexagon with the terrain color.
+            g2.setColor(getTerrainColor());
+            g2.fill(innerHexagon);
+
+            // And give it a border.
+            g2.setColor(Color.black);
+            g2.draw(innerHexagon);
         }
         else
         {
             g2.setColor(getTerrainColor());
+            g2.fill(hexagon);
         }
 
-        g2.fill(hexagon);
         g2.setColor(Color.black);
         g2.draw(hexagon);
 

@@ -12,6 +12,7 @@ public final class GUIBattleHex extends BattleHex
 {
     private HexMap map;
     private String name;
+    private GeneralPath innerHexagon;
 
     // Hex terrain types are:
     // p, r, s, t, o, v, d
@@ -50,7 +51,22 @@ public final class GUIBattleHex extends BattleHex
 
         hexagon = makePolygon(6, xVertex, yVertex, true);
         rectBound = hexagon.getBounds();
-        center = findCenter();
+
+        Point2D.Double center = findCenter2D();
+
+        final double innerScale = 0.8;
+        AffineTransform at = AffineTransform.getScaleInstance(innerScale,
+            innerScale);
+        innerHexagon = (GeneralPath)hexagon.createTransformedShape(at);
+
+        // Translate innerHexagon to make it concentric.
+        Rectangle2D innerBounds = innerHexagon.getBounds2D(); 
+        Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX() +
+            innerBounds.getWidth() / 2.0, innerBounds.getY() + 
+            innerBounds.getHeight() / 2.0);
+        at = AffineTransform.getTranslateInstance(center.getX() - 
+            innerCenter.getX(), center.getY() - innerCenter.getY());
+        innerHexagon.transform(at);
     }
 
 
@@ -68,19 +84,26 @@ public final class GUIBattleHex extends BattleHex
                 RenderingHints.VALUE_ANTIALIAS_OFF);
         }
 
+
         if (isSelected())
         {
             g2.setColor(Color.white);
+            g2.fill(hexagon);
+
+            g2.setColor(getTerrainColor());
+            g2.fill(innerHexagon);
+
+            g2.setColor(Color.black);
+            g2.draw(innerHexagon);
         }
         else
         {
             g2.setColor(getTerrainColor());
+            g2.fill(hexagon);
         }
 
-        g2.fill(hexagon);
         g2.setColor(Color.black);
         g2.draw(hexagon);
-
 
         // Draw hexside features.
         for (int i = 0; i < 6; i++)

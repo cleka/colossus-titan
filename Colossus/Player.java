@@ -662,6 +662,7 @@ public final class Player implements Comparable
             }
         }
         game.getServer().allAlignLegions(hexLabelsToAlign);
+        game.getServer().allUpdateStatusScreen();
     }
 
 

@@ -37,16 +37,6 @@ Loading in the middle of a battle resets turn
    map, keeps the map around after the battle is over, etc.  It's
    a mess.
 
-AI Legions sometimes miss the risk of staying in their current hex.  
-   For example, 2-high titan legion in H4 saw no risk from enemy 
-   6-high legion in D7, when it could have easily moved to safety.
-
-AI attacking ranger is way too aggressive on the first turn, moving 
-   adjacent to two enemy trolls rather than sitting back and rangestriking.
-
-AI tit/3*ser/ang stack in 115 rolled a 1 and moved into tower to take 
-   warlock, instead of moving to jungle for another serpent.
-
 Solaris, 1.3.1: Popup windows (e.g. ShowMasterHex) pop up in the wrong
    place if the window has been scrolled.  Scrollbars do not immediately
    appear / disappear after a rescale().
@@ -54,9 +44,6 @@ Solaris, 1.3.1: Popup windows (e.g. ShowMasterHex) pop up in the wrong
 Currently have to pick recruiter even with "all stacks visible" set.
 
 All enemy creatures are invisible after loading a game.
-
-Attacking AI is way too happy to take a time loss.  Need to crank up
-   aggression in the last few turns of battle.
 
 Did File/New while winning AI was playing against itself:
 Maybe we need to sleep for a second to let the timer events clear out?
@@ -76,14 +63,65 @@ java.lang.NullPointerException
         at java.awt.Component.setVisible(Component.java:903)
         at GetPlayers.<init>(GetPlayers.java:96)
 
-A doomed lion with no allies left struck back against an unwounded 
-   cyclops (which it can't kill) instead of a gargoyle (which it can).
+At end of game, with MultimaxAI player:
+Gold rolls a 6 for movement
+Exception occurred during event dispatching:
+java.lang.NullPointerException
+        at MinimaxAI.masterMove(MinimaxAI.java:32)
+        at Player.aiMasterMove(Player.java:893)
+        at Game.setupMove(Game.java:666)
+        at Game.setupPhase(Game.java:625)
+        at Game.advancePhaseInternal(Game.java:613)
+        at Game.access$000(Game.java:16)
+        at Game$1.actionPerformed(Game.java:580)
+        at javax.swing.Timer.fireActionPerformed(Timer.java:150)
+        at javax.swing.Timer$DoPostEvent.run(Timer.java:108)
+        at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:154)
+        at java.awt.EventQueue.dispatchEvent(EventQueue.java:337)
+        at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:131)
+        at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:98)
+        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+        at java.awt.EventDispatchThread.run(EventDispatchThread.java:85)
+
 
 Zero-height legion's (caused by angel being summoned out) marker
    doesn't go away.
 
 Need to better stop phase advancing on draw, not just win.  Human player
    ended up AI-controlled after draw.
+
+Scale is not saved to (and maybe not loaded from) cfg file.
+
+CreatureCollectionView does not respect scale.
+
+Carry cursor sometimes fails without an error message.
+
+Lost a legion marker somewhere?  Try to reproduce.  (Maybe with 1-high angels 
+   stacks?)
+
+Teleport bug not fixed?  Try to reproduce.
+
+
+
+
+AI bugs:
+
+AI Legions sometimes miss the risk of staying in their current hex.  
+   For example, 2-high titan legion in H4 saw no risk from enemy 
+   6-high legion in D7, when it could have easily moved to safety.
+
+AI attacking ranger is way too aggressive on the first turn, moving 
+   adjacent to two enemy trolls rather than sitting back and rangestriking.
+
+AI tit/3*ser/ang stack in 115 rolled a 1 and moved into tower to take 
+   warlock, instead of moving to jungle for another serpent.
+
+Attacking AI is way too happy to take a time loss.  Need to crank up
+   aggression in the last few turns of battle.
+
+A doomed lion with no allies left struck back against an unwounded 
+   cyclops (which it can't kill) instead of a gargoyle (which it can).
+   AI needs to understand when it's in its last phase.
 
 AI does not recruit post-battle reinforcements.
 
@@ -129,12 +167,14 @@ Considered 18 moves for Guardian in D4: D4 B2 E3 C3 F2 D5 B3 E4 C4 F3 B4 E5 C5 F
 
 AI sometimes concedes with its titan stack.  Check.
 
-When it works, scale is not saved to (and maybe not loaded from) cfg file.
+AI needs to be more careful about protecting Titan. 
 
-autosave is happening even with autosave option off.
+Legions full of trolls/ogres/clopses should try harder to
+   avoid the desert.
 
-CreatureCollectionView does not respect scale.
-
-Carry cursor sometimes fails.  Seems OS dependant -- it mostly works on Unix and 
-   always fails on Windows.
+Consider recruit scarcity (last gargoyle possibly more valuable than 
+   troll).  Don't cheat and peek at opposing stacks unless all stacks 
+   are visible or some cheat option is set.  Give some value to sitting in 
+   native terrain.  Get scrub snacks out of nearby opponents' good 
+   recruiting terrain and into blocking positions.
 

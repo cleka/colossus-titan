@@ -1,13 +1,10 @@
+Add a window that shows the recruiting tree.
+
 Allow dragging chits in addition to clicking source and destination.
 
 Eliminate persistent legion.hexInfo and instead return a temporary
    object containing all the entry sides and teleport possibilities
    along with the possible hexes that the legion can move to.
-
-AI needs to be more careful about protecting Titan. 
-
-Legions full of trolls/ogres/clopses should try harder to
-   avoid the desert.
 
 Consider switching from make to Ant to better handle packages.
 
@@ -32,12 +29,6 @@ Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
    account.
 
-AI: Consider recruit scarcity (last gargoyle possibly more valuable than 
-   troll).  Don't cheat and peek at opposing stacks unless all stacks 
-   are visible or some cheat option is set.  Give some value to sitting in 
-   native terrain.  Get scrub snacks out of nearby opponents' good 
-   recruiting terrain and into blocking positions.
-
 Write some design docs.
 
 Movement die should be displayed immediately when enabled, rather than
@@ -54,11 +45,6 @@ Add SetupBattle dialog, to allow setting up standalone battles.
    (terrain, entry side, creatures in attacking and defending legions,
    angel/archangel available to summon, recruits available for terrain
    type, player scores for titan power.)
-
-Add an option to show information about MasterBoard hexes when a
-   mover is selected, such as whether that legion can recruit
-   there, and how many die rolls from that hex would let the
-   legion recruit next turn.
 
 Add the ability to replace any creature in a legion with a different 
    creature type or "unknown," for PBEM and debug.
@@ -88,17 +74,12 @@ Color code StatusScreen better.
 Show StatusScreen and ShowLegion info in the masterboard window, rather 
    than in separate windows.
 
-Add the ability to change the creature type of a creature in a legion,
-   and to specify "unknown" as a creature type, for tracking PBEM games.
-
 Move GUI/client classes and model/server classes into separate
    packages.  Make all possible public classes package private.
    Document remaining public classes, which are those that
    need to be included in the network protocol.
 
-Fix concession timing.
-
 Client-server networking.
 
-Chat window.  (From Prometheus.)
+Chat window.
 
