@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Options;
 
 
 /**
@@ -55,7 +56,7 @@ final class EngagementResults
         super(frame, "Engagement Status", false);
         setFocusable(false);
         this.client = aClient;
-        pack(); // TODO: needed here? dunno.
+        // pack(); // TODO: needed here? dunno.
         setBackground(Color.lightGray);
         addWindowListener(this);
     }
@@ -65,7 +66,7 @@ final class EngagementResults
     private ArrayList engagementLog = new ArrayList();
     /** adds a log record to the list of logged engagements.
      *
-     * TODO: see if xxxStartingCerrainities can somehow get values
+     * TODO: see if xxxStartingCertainities can somehow get values
      *   of better quality.
      *
      * @param attackerStartingContents - imagew names,
@@ -374,8 +375,7 @@ final class EngagementResults
             final boolean inverse = false && isDefender;
             // add chits
             int idx = 0;
-            Iterator it = imageNames.iterator();
-            while (it.hasNext())
+            for (Iterator it = imageNames.iterator(); it.hasNext(); )
             {
                 final String imageName = (String) it.next();
                 final Boolean chitCertain = (Boolean) certainList.get(idx);
@@ -419,13 +419,28 @@ final class EngagementResults
             this.setTitle("Engagement " + (current + 1)
                 + " of " + engagementLog.size());
         }
-        // pop up the window
-        if (!isVisible())
+        maybeShow();
+    }
+
+    void maybeShow()
+    {
+        if (client.getOption(Options.showStatusScreen))
         {
             pack();
+            if (!isVisible())
+            {
+                setVisible(true);
+            }
         }
-        setVisible(true);
+        else
+        {
+            if (isVisible())
+            {
+                setVisible(false);
+            }
+        }
     }
+
 
     // button actions and labels
     private final static String NEXT = "Next";
@@ -468,6 +483,6 @@ final class EngagementResults
     /** just close it */
     public void windowClosing(WindowEvent e)
     {
-        dispose();
+        client.setOption(Options.showEngagementResults, false);
     }
 }

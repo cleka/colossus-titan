@@ -93,8 +93,6 @@ public final class MasterBoard extends JPanel
     public static final String viewHexRecruitTree = "View Hex Recruit Tree";
     public static final String viewBattleMap = "View Battle Map";
     public static final String 
-        viewEngagementResults = "View Engagement Results";
-    public static final String 
         viewCreatureDetails = "View Creature:Ranger Details";
     public static final String changeScale = "Change Scale";
 
@@ -120,7 +118,6 @@ public final class MasterBoard extends JPanel
     private AbstractAction viewFullRecruitTreeAction;
     private AbstractAction viewHexRecruitTreeAction;
     private AbstractAction viewBattleMapAction;
-    private AbstractAction viewEngagementResultsAction;
     private AbstractAction changeScaleAction;
     private AbstractAction viewCreatureDetailsAction;
 
@@ -384,14 +381,6 @@ public final class MasterBoard extends JPanel
                 {
                     client.withdrawFromGame();
                 }
-            }
-        };
-
-        viewEngagementResultsAction = new AbstractAction(viewEngagementResults)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                client.showEngagementResults();
             }
         };
 
@@ -662,6 +651,8 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.stealFocus, KeyEvent.VK_F);
         addCheckBox(graphicsMenu, Options.showCaretaker, KeyEvent.VK_C);
         addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
+        addCheckBox(graphicsMenu, Options.showEngagementResults, 
+                KeyEvent.VK_E);
         addCheckBox(graphicsMenu, Options.showLogWindow, KeyEvent.VK_L);
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
@@ -676,9 +667,6 @@ public final class MasterBoard extends JPanel
         mi = graphicsMenu.add(viewFullRecruitTreeAction);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
-        // engagement results
-        mi = graphicsMenu.add(viewEngagementResultsAction);
-        mi.setMnemonic(KeyEvent.VK_E);
         // creature details
         mi = graphicsMenu.add(viewCreatureDetailsAction);
         mi.setMnemonic(KeyEvent.VK_E);

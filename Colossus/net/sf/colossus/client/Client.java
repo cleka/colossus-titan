@@ -51,20 +51,6 @@ public final class Client implements IClient
     private SummonAngel summonAngel;
     private MovementDie movementDie;
     private EngagementResults engagementResults;
-    
-    /** show if any... */
-    public void showEngagementResults() 
-    {
-        if(engagementResults != null) 
-        {
-            engagementResults.pack();
-            engagementResults.setVisible(true);     
-        }
-        else 
-        {
-            Log.warn("no EngagementResults yet...");
-        }
-    }
 
     /** hexLabel of MasterHex for current or last engagement. */
     private String battleSite;
@@ -253,8 +239,8 @@ public final class Client implements IClient
         server.fight(land);
     }
 
-    private List _tellEngagementResults_attackerStartingContents = null; 
-    private List _tellEngagementResults_defenderStartingContents = null; 
+    private List _tellEngagementResults_attackerStartingContents = null;
+    private List _tellEngagementResults_defenderStartingContents = null;
     private List _tellEngagementResults_attackerLegionCertainities = null;
     private List _tellEngagementResults_defenderLegionCertainities = null;
     public void tellEngagement(String hexLabel, String attackerId,
@@ -265,19 +251,27 @@ public final class Client implements IClient
         this.defenderMarkerId = defenderId;
 
         // remember for end of battle.
-        _tellEngagementResults_attackerStartingContents = 
+        _tellEngagementResults_attackerStartingContents =
             getLegionImageNames(attackerId);
-        _tellEngagementResults_defenderStartingContents = 
-            getLegionImageNames(defenderId);    
-        // TODO: I have the feeling that getLegionCertainities() 
+        _tellEngagementResults_defenderStartingContents =
+            getLegionImageNames(defenderId);
+        // TODO: I have the feeling that getLegionCertainties()
         //   does not work here.
-        //   I always seem to get either ALL true or ALL false. 
-        _tellEngagementResults_attackerLegionCertainities = 
+        //   I always seem to get either ALL true or ALL false.
+        _tellEngagementResults_attackerLegionCertainities =
             getLegionCreatureCertainties(attackerId);
-        _tellEngagementResults_defenderLegionCertainities = 
+        _tellEngagementResults_defenderLegionCertainities =
             getLegionCreatureCertainties(defenderId);
 
         highlightBattleSite();
+    }
+
+    private void showEngagementResults(boolean show)
+    {
+        if (engagementResults != null)
+        {
+            engagementResults.maybeShow();
+        }
     }
 
     void highlightBattleSite()
@@ -298,17 +292,22 @@ public final class Client implements IClient
             return;
         }
 
-        if (engagementResults == null)
+        if (getOption(Options.showEngagementResults))
         {
-               engagementResults = new EngagementResults(frame, this);
+            if (engagementResults == null)
+            {
+                engagementResults = new EngagementResults(frame, this);
+            }
+            engagementResults.addData(winnerId, method, points,
+                _tellEngagementResults_attackerStartingContents,
+                _tellEngagementResults_defenderStartingContents,
+                _tellEngagementResults_attackerLegionCertainities,
+                _tellEngagementResults_defenderLegionCertainities);
         }
-        engagementResults.addData(
-               winnerId, method, points,
-            _tellEngagementResults_attackerStartingContents,
-            _tellEngagementResults_defenderStartingContents,
-            _tellEngagementResults_attackerLegionCertainities,
-            _tellEngagementResults_defenderLegionCertainities                
-            );
+        else
+        {
+            engagementResults = null;
+        }
     }
 
     /** Legion summoner summons unit from legion donor. */
@@ -454,7 +453,7 @@ public final class Client implements IClient
         return options.getStringOption(optname);
     }
 
-    /** Return -1 if the option's value has not been set.  
+    /** Return -1 if the option's value has not been set.
      public for LogWindow */
     public int getIntOption(String optname)
     {
@@ -557,6 +556,10 @@ public final class Client implements IClient
         else if (optname.equals(Options.showStatusScreen))
         {
             updateStatusScreen();
+        }
+        else if (optname.equals(Options.showEngagementResults))
+        {
+            showEngagementResults(bval);
         }
         else if (optname.equals(Options.favoriteLookFeel))
         {
@@ -1055,14 +1058,14 @@ public final class Client implements IClient
     /** Return a list of Booleans */
     List getLegionCreatureCertainties(String markerId)
     {
-        try 
+        try
         {
             return getLegionInfo(markerId).getCertainties();
         }
-        catch(NullPointerException exc) 
+        catch(NullPointerException exc)
         {  // TODO: is this the right thing?
             List l = new ArrayList(42/4);  // just longer then max
-            for(int idx=0; idx<(42/4); idx++) 
+            for(int idx=0; idx<(42/4); idx++)
             {
                 l.add(new Boolean(true));  // all true
             }
@@ -1117,23 +1120,23 @@ public final class Client implements IClient
     {
         revealCreatures(markerId, names);
         // in engagment we need to update the remembered list, too.
-        if(isAttacker) 
+        if (isAttacker)
         {
-            _tellEngagementResults_attackerStartingContents = 
+            _tellEngagementResults_attackerStartingContents =
                 getLegionImageNames(markerId);
             // towi: should return a list of trues, right?
-            _tellEngagementResults_attackerLegionCertainities = 
+            _tellEngagementResults_attackerLegionCertainities =
                 getLegionCreatureCertainties(markerId);
         }
-        else 
+        else
         {
-            _tellEngagementResults_defenderStartingContents = 
+            _tellEngagementResults_defenderStartingContents =
                 getLegionImageNames(markerId);
             // towi: should return a list of trues, right?
-            _tellEngagementResults_defenderLegionCertainities = 
+            _tellEngagementResults_defenderLegionCertainities =
                 getLegionCreatureCertainties(markerId);
         }
-        
+
     }
 
 
@@ -2028,7 +2031,7 @@ public final class Client implements IClient
         server.doRecruit(markerId, recruitName, recruiterName);
     }
 
-    /** Always needs to call server.doRecruit(), even if no recruit is 
+    /** Always needs to call server.doRecruit(), even if no recruit is
      *  wanted, to get past the reinforcing phase. */
     public void doReinforce(String markerId)
     {
@@ -2280,7 +2283,7 @@ public final class Client implements IClient
             {
                 focusBoard();
                 defaultCursor();
-                if (!getOption(Options.autoRecruit) && 
+                if (!getOption(Options.autoRecruit) &&
                     getPossibleRecruitHexes().isEmpty())
                 {
                     doneWithRecruits();
@@ -3761,13 +3764,13 @@ public final class Client implements IClient
     /** Called by AI, and by pickMarkerCallback() */
     void doSplit(String parentId, String childId, String results)
     {
-        Log.debug("Client.doSplit " + parentId + " " + childId + " " + 
+        Log.debug("Client.doSplit " + parentId + " " + childId + " " +
             results);
         server.doSplit(parentId, childId, results);
     }
 
     /** Callback from server after any successful split. */
-    public void didSplit(String hexLabel, String parentId, String childId, 
+    public void didSplit(String hexLabel, String parentId, String childId,
             int childHeight, List splitoffs, int turn)
     {
         Log.debug("Client.didSplit " + hexLabel + " " + parentId + " " +
