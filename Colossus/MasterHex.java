@@ -429,4 +429,12 @@ class MasterHex
                 return java.awt.Color.black;
         }
     }
+
+    // Return a point near the center of the hex, vertically offset
+    // a bit toward the fat side.
+    Point getOffCenter()
+    {
+        return new Point((xVertex[0] + xVertex[1]) / 2, (yVertex[0] + 
+            yVertex[3]) / 2 + (inverted ? -(scale / 6) : (scale / 6))); 
+    }
 }
