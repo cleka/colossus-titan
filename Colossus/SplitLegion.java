@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
@@ -8,7 +7,7 @@ import javax.swing.*;
  * author David Ripton
  */
 
-class SplitLegion extends JDialog implements MouseListener, ActionListener,
+class SplitLegion extends Dialog implements MouseListener, ActionListener,
     WindowListener
 {
     private MediaTracker tracker;
@@ -20,9 +19,9 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
     private Chit oldMarker;
     private Player player;
     private static final int scale = 60;
-    private JFrame parentFrame;
-    private JButton button1;
-    private JButton button2;
+    private Frame parentFrame;
+    private Button button1;
+    private Button button2;
     private boolean laidOut = false;
     private boolean eraseFlag = false;
     private Graphics offGraphics;
@@ -30,12 +29,12 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
     private Image offImage;
 
 
-    SplitLegion(JFrame parentFrame, Legion oldLegion, Player player)
+    SplitLegion(Frame parentFrame, Legion oldLegion, Player player)
     {
         super(parentFrame, player.getName() + ": Split Legion " +
             oldLegion.getMarkerId(), true);
 
-        getContentPane().setLayout(null);
+        setLayout(null);
 
         this.oldLegion = oldLegion;
         this.player = player;
@@ -101,15 +100,15 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             }
             catch (InterruptedException e)
             {
-                JOptionPane.showMessageDialog(parentFrame,
+                new MessageBox(parentFrame,
                     "waitForAll was interrupted");
             }
             imagesLoaded = true;
 
-            button1 = new JButton("Done");
-            button2 = new JButton("Cancel");
-            getContentPane().add(button1);
-            getContentPane().add(button2);
+            button1 = new Button("Done");
+            button2 = new Button("Cancel");
+            add(button1);
+            add(button2);
             button1.addActionListener(this);
             button2.addActionListener(this);
 
@@ -162,17 +161,14 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
         if (!laidOut)
         {
             Insets insets = getInsets();
-            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 -
+            button1.setBounds(insets.left + d.width / 9, 13 * d.height / 16 -
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right,
-                3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
+                13 * d.height / 16 - insets.bottom, d.width / 3, d.height / 8);
             laidOut = true;
         }
 
         g.drawImage(offImage, 0, 0, this);
-
-        button1.repaint();
-        button2.repaint();
     }
 
 
@@ -316,7 +312,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand() == "Done")
+        if (e.getActionCommand().equals("Done"))
         {
             // Check to make sure that each Legion is legal.
             // Each legion must have 2 <= height <= 7.
@@ -324,23 +320,21 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             // must have height 4 and one lord.
             if (oldLegion.getHeight() < 2 || newLegion.getHeight() < 2)
             {
-                JOptionPane.showMessageDialog(parentFrame,
-                    "Legion too short.");
+                new MessageBox(parentFrame, "Legion too short.");
                 return;
             }
             if (oldLegion.getHeight() + newLegion.getHeight() == 8)
             {
                 if (oldLegion.getHeight() != newLegion.getHeight())
                 {
-                    JOptionPane.showMessageDialog(parentFrame,
-                        "Initial split not 4-4.");
+                    new MessageBox(parentFrame, "Initial split not 4-4.");
                     return;
                 }
                 else
                 {
                     if (oldLegion.numLords() != 1)
                     {
-                        JOptionPane.showMessageDialog(parentFrame,
+                        new MessageBox(parentFrame,
                             "Each stack must have one lord.");
                         return;
                     }
@@ -367,7 +361,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             dispose();
         }
 
-        else if (e.getActionCommand() == "Cancel")
+        else if (e.getActionCommand().equals("Cancel"))
         {
             cancel();
         }
