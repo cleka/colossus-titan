@@ -16,7 +16,7 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
     private boolean imagesLoaded = false;
     private Player player;
     private Legion legion;
-    private Chit [] markers;
+    private Chit [] chits;
     private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
@@ -31,13 +31,13 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
         player = legion.getPlayer();
 
         recruits = new Creature[2];
-        markers = new Chit[2];
+        chits = new Chit[2];
 
         addMouseListener(this);
         addWindowListener(this);
 
         int scale = 60;
-        setLayout(null);
+        setLayout(new FlowLayout());
 
         numEligible = findEligibleRecruits(legion, recruits, archangel);
         if (numEligible == 0)
@@ -48,27 +48,21 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
 
         pack();
         setBackground(Color.lightGray);
-        setSize(scale * (numEligible + 1), (21 * scale / 10));
         setResizable(false);
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
-
-        int cx = scale / 2;
-        int cy = scale * 2 / 3;
 
         for (int i = 0; i < numEligible; i++)
         {
-            markers[i] = new Chit(cx + i * (21 * scale / 20), cy, scale,
-                recruits[i].getImageName(), this);
+            chits[i] = new Chit(-1, -1, scale, recruits[i].getImageName(), 
+                this);
+            add(chits[i]);
+            chits[i].addMouseListener(this);
         }
 
         tracker = new MediaTracker(this);
 
         for (int i = 0; i < numEligible; i++)
         {
-            tracker.addImage(markers[i].getImage(), 0);
+            tracker.addImage(chits[i].getImage(), 0);
         }
 
         try
@@ -82,6 +76,12 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
         }
 
         imagesLoaded = true;
+        pack();
+        
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
+            d.height / 2 - getSize().height / 2));
+
         setVisible(true);
         repaint();
     }
@@ -144,7 +144,6 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
         }
 
         Dimension d = getSize();
-        Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
@@ -153,14 +152,6 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
             offGraphics = offImage.getGraphics();
-        }
-
-        for (int i = 0; i < numEligible; i++)
-        {
-            if (rectClip.intersects(markers[i].getBounds()))
-            {
-                markers[i].paint(offGraphics);
-            }
         }
 
         g.drawImage(offImage, 0, 0, this);
@@ -179,7 +170,7 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
         Point point = e.getPoint();
         for (int i = 0; i < numEligible; i++)
         {
-            if (markers[i].select(point))
+            if (chits[i].select(point))
             {
                 // Select that marker.
                 legion.addCreature(recruits[i]);
