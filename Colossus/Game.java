@@ -3,6 +3,8 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
 
+import net.sf.colossus.protocol.*;
+
 
 /**
  * Class Game gets and holds high-level data about a Titan game.
@@ -11,7 +13,8 @@ import java.awt.event.*;
  * @author Bruce Sherrod <bruce@thematrix.com>
  */
 
-public final class Game
+public final class Game 
+    extends GameSource
 {
     private ArrayList players = new ArrayList(6);
     private int activePlayerNum;
@@ -3299,4 +3302,18 @@ public final class Game
         }
         return null;
     }
+
+	private GameListener m_oListener = new GameAdapter()
+	{
+		public void legionChange(LegionEvent evt)
+			{
+				System.out.println("Game.GameListener.legionChange: " + evt);
+				fireEvent(evt);
+			}
+		};
+
+	public GameListener getListener()
+		{
+			return m_oListener;
+		}
 }
