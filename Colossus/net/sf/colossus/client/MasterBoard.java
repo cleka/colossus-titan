@@ -1948,8 +1948,8 @@ public final class MasterBoard extends JPanel
         }
 
         if (offScreenBuffer == null ||
-                (!(offScreenBuffer.getWidth(this) == this.size().width &&
-                offScreenBuffer.getHeight(this) == this.size().height)))
+                (!(offScreenBuffer.getWidth(this) == this.getSize().width &&
+                offScreenBuffer.getHeight(this) == this.getSize().height)))
         {
             offScreenBuffer = this.createImage(this.getWidth(),
                     this.getHeight());
