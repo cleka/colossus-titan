@@ -87,7 +87,7 @@ public final class Constants
     /* the three arrays below must match ; see also
      net.sf.colossus.server.Legion, it uses the
      shortened name directly */
-    
+
     /* all should be MAX_MAX_PLAYERS long */
     public static final String[] colorNames = {"Black", "Blue", "Brown", "Gold",
         "Green", "Red",
@@ -204,6 +204,7 @@ public final class Constants
         "ExtTitan",
         "Infinite",
         "Outlands",
+        "Pantheon",
         "SmallTitan",
         "TG-ConceptI",
         "TG-ConceptII",

@@ -1,0 +1,29 @@
+green       Brush      true 	1 Gargoyle 2 Cyclops    2 Gorgon    
+       	
+darkGreen   Jungle     true	1 Gargoyle 2 Cyclops    2 Behemoth     2 Serpent 
+
+sienna      Marsh      true	1 Ogre     2 Troll      2 Ranger 
+
+yellow      Plains     true 	1 Centaur  2 Lion       2 Ranger 
+
+saddleBrown Hills      true	1 Ogre     3 Minotaur   2 Unicorn 
+
+olive       Woods      true	1 Centaur  3 Warbear    2 Unicorn   
+            
+orange      Desert     true	1 Lion     3 Griffon    2 Hydra 
+
+blue        Swamp      true	1 Troll    3 Wyvern     2 Hydra      
+    
+red         Mountains  true	1 Lion     2 Minotaur   2 Dragon       2 Colossus 
+
+skyBlue     Tundra     true	1 Troll    2 Warbear    2 Giant        2 Colossus      
+
+# Tower is a special case
+grey        Tower      false  0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock 
+
+pink      Mantio      false	-1 Titan 1 Druid  1 Knight 1 Priest 2 Estia -1 Ranger 3 Aphrodite  -1 Ranger 4 Apolo -1 Gorgon 3 Hermes -1 Gorgon 4 Dionysous -1 Serpent 2 Artemis -1 Unicorn 3 Ares -1 Unicorn 2 Dimitra -1 Hydra 3 Poseidon -1 Hydra 2 Hepfaestus -1 Colossus 3 Zeus -1 Colossus 2 Hera -1 Guardian 4 Athena -1 Warlock 4 Athena -1 Lord 4 Hades
+
+ACQUIRABLE 100 Angel 500 Archangel
+TITANTELEPORT 1000
+TITANIMPROVE 100
+
