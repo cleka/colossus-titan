@@ -353,6 +353,49 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
+    void highlightUnmovedLegions()
+    {
+        unselectAllHexes();
+
+        Player player = game.getActivePlayer();
+        player.unselectLegion();
+
+        for (int i = 0; i < player.getNumLegions(); i++) 
+        {
+            Legion legion = player.legions[i];
+            if (legion.hasMoved() == false)
+            {
+                MasterHex hex = legion.getCurrentHex();
+                hex.select();
+            }
+        }
+
+        repaint();
+    }
+
+
+    // Returns number of engagements found.
+    int highlightEngagements()
+    {
+        int count = 0;
+        Player player = game.getActivePlayer();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.legions[i];
+            MasterHex hex = legion.getCurrentHex();
+            if (hex.getNumEnemyLegions(player) > 0)
+            {
+                count++; 
+                hex.select();
+                hex.repaint();
+            }
+        }
+
+        return count;
+    }
+
+
     void setupHexes()
     {
         int cx = 3 * scale;
@@ -1025,8 +1068,8 @@ public class MasterBoard extends Frame implements MouseListener,
                                     // Mark this legion as active.
                                     player.selectLegion(legion);
 
-                                    // Find all legal destinations for this 
-                                    // legion and highlight them.
+                                    // Highlight all legal destinations 
+                                    // for this legion.
                                     showMoves(legion, player);
                                     return;
 
@@ -1078,9 +1121,13 @@ public class MasterBoard extends Frame implements MouseListener,
                             if (legion != null && hex.isSelected())
                             {
                                 legion.moveToHex(hex);
-                                unselectAllHexes();
-                                // XXX Repaint only affected hexes and chits?
-                                repaint();
+                                legion.getStartingHex().repaint();
+                                hex.repaint();
+                                highlightUnmovedLegions();
+                            }
+                            else
+                            {
+                                highlightUnmovedLegions();
                             }
                             break;
 
@@ -1118,7 +1165,7 @@ public class MasterBoard extends Frame implements MouseListener,
                                         }
                                     }
 
-                                        // XXX: Add negotiation and battle
+                                    // XXX: Add negotiation and battle
                                 }
                             }
                             break;
