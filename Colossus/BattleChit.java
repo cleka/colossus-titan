@@ -621,7 +621,7 @@ class BattleChit extends Chit
 
         if (hits > 0 && !isDead())
         {
-            String sHits = Integer.toString(hits);
+            String hitString = Integer.toString(hits);
             Rectangle rect = getBounds();
 
             // Construct a font 3 times the size of the current font.
@@ -634,7 +634,7 @@ class BattleChit extends Chit
 
             FontMetrics fontMetrics = g.getFontMetrics();
             int fontHeight = fontMetrics.getAscent();
-            int fontWidth = fontMetrics.stringWidth(sHits);
+            int fontWidth = fontMetrics.stringWidth(hitString);
 
             // Provide a high-contrast background for the number.
             g.setColor(Color.white);
@@ -645,7 +645,7 @@ class BattleChit extends Chit
             // Show number of hits taken in red.
             g.setColor(Color.red);
 
-            g.drawString(sHits, rect.x + (rect.width - fontWidth) / 2,
+            g.drawString(hitString, rect.x + (rect.width - fontWidth) / 2,
                 rect.y + (rect.height + fontHeight) / 2);
 
             // Restore the font.
