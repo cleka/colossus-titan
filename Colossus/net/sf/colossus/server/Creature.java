@@ -187,6 +187,24 @@ public class Creature implements Comparable
         return name;
     }
 
+    public String[] getImagesNames()
+    {
+        String[] tempNames =
+            new String[4 +
+                       ((isFlier() || isRangestriker()) ? 1 : 0)];
+        tempNames[0] = name;
+        tempNames[1] = "Power-" + getPower();
+        tempNames[2] = "Skill-" + getSkill();
+        tempNames[3] = name + "-Name";
+        if (isFlier() || isRangestriker())
+        {
+            tempNames[4] =
+                (isFlier() ? "Flying" : "") +
+                (isRangestriker() ? "Rangestrike" : "");
+        }
+        return tempNames;
+    }
+
     public int getPower()
     {
         return power;
@@ -274,6 +292,19 @@ public class Creature implements Comparable
         return null;
     }
 
+    public static boolean isCreature(String name)
+    {
+        Iterator it = creatures.iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            if (name.equals(creature.getName()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public String toString()
     {

@@ -119,6 +119,8 @@ public final class MasterBoard extends JPanel
 
     boolean playerLabelDone;
 
+    MediaTracker boardTracker = new MediaTracker(this);
+
 
     MasterBoard(Client client)
     {
@@ -1952,5 +1954,10 @@ public final class MasterBoard extends JPanel
             if (bh.getTerrain() == 'T')
                 towerSet.add(bh.getLabel());
         }
+    }
+
+    MediaTracker getBoardTracker()
+    {
+        return boardTracker;
     }
 }

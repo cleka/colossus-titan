@@ -2,7 +2,10 @@ package net.sf.colossus.util;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.*;
 import java.io.*;
+import java.util.*;
 
 /**
  * Class ResourceLoader is an utility class to load a resource from a filename and a list of directory.
@@ -13,14 +16,21 @@ import java.io.*;
 
 public final class ResourceLoader
 {
+
+    public static final String defaultFontName = "Lucida Sans Bold";
+    public static final int defaultFontStyle = Font.PLAIN;
+    public static final int defaultFontSize = 12;
+    public static final Font defaultFont = new Font(defaultFontName, defaultFontStyle, defaultFontSize);
     // File.separator does not work in jar files, except in Unix.
     // A hardcoded '/' works in Unix, Windows, MacOS X, and jar files.
     private static final String pathSeparator = "/";
     private static final String[] imageExtension = { ".png", ".gif" };
-    private static ClassLoader cl =
+    private static final int trackedId = 1;
+    private static final ClassLoader cl =
         net.sf.colossus.util.ResourceLoader.class.getClassLoader();
+    private static final Map imageCache = Collections.synchronizedMap(new HashMap());
 
-    /*
+    /**
      * Give the String to mark directories.
      * @return The String to mark directories.
      */
@@ -38,27 +48,55 @@ public final class ResourceLoader
     public static Image getImage(String filename, java.util.List directories)
     {
         Image image = null;
-        java.util.Iterator it = directories.iterator();
-        while (it.hasNext() && (image == null))
+        synchronized (imageCache)
         {
-            Object o = it.next();
-            if (o instanceof String)
+            String mapKey = getMapKey(filename, directories);
+            Object cached = imageCache.get(mapKey);
+            if ((cached != null) && (cached instanceof Image))
             {
-                String path = (String)o;
-                for (int i = 0 ; i < imageExtension.length ; i++)
+                image = (Image)cached;
+            }
+            if ((cached != null) && (cached instanceof ImageIcon))
+            {
+                image = ((ImageIcon)cached).getImage();
+            }
+            java.util.Iterator it = directories.iterator();
+            while (it.hasNext() && (image == null))
+            {
+                Object o = it.next();
+                if (o instanceof String)
                 {
-                    image = tryLoadImageFromFile(filename +
-                                                 imageExtension[i], path);
-                    if (image == null)
+                    String path = (String)o;
+                    for (int i = 0 ;
+                         ((i < imageExtension.length) &&
+                          (image == null)) ;
+                         i++)
                     {
-                        ImageIcon temp = tryLoadImageIconFromResource(
-                                         filename + imageExtension[i], path);
-                        if (temp != null)
+                        image = tryLoadImageFromFile(filename +
+                                                     imageExtension[i], path);
+                        if (image == null)
                         {
-                            image = temp.getImage();
+                            ImageIcon
+                                temp = tryLoadImageIconFromResource(
+                                           filename + imageExtension[i], path);
+                            if (temp != null)
+                            {
+                                image = temp.getImage();
+                            }
+                        }
+                        if (image != null)
+                        {
+                            imageCache.put(mapKey, image);
+                            System.err.println("Loaded " + path +
+                                               pathSeparator + filename +
+                                               imageExtension[i]);
                         }
                     }
                 }
+            }
+            if (image != null)
+            {
+                waitOnImage(image);
             }
         }
         return(image);
@@ -73,27 +111,57 @@ public final class ResourceLoader
     public static ImageIcon getImageIcon(String filename, java.util.List directories)
     {
         ImageIcon icon = null;
-        java.util.Iterator it = directories.iterator();
-        while (it.hasNext() && (icon == null))
+        synchronized (imageCache)
         {
-            Object o = it.next();
-            if (o instanceof String)
+            String mapKey = getMapKey(filename, directories);
+            Object cached = imageCache.get(mapKey);
+            if ((cached != null) && (cached instanceof Image))
             {
-                String path = (String)o;
-                for (int i = 0 ; i < imageExtension.length ; i++)
+                icon = new ImageIcon((Image)cached);
+            }
+            if ((cached != null) && (cached instanceof ImageIcon))
+            {
+                icon = (ImageIcon)cached;
+            }
+            java.util.Iterator it = directories.iterator();
+            while (it.hasNext() && (icon == null))
+            {
+                Object o = it.next();
+                if (o instanceof String)
                 {
-                    Image temp  = tryLoadImageFromFile(
-                                  filename + imageExtension[i], path);
-                    if (temp == null)
+                    String path = (String)o;
+                    for (int i = 0 ;
+                         ((i < imageExtension.length) &&
+                          (icon == null)) ;
+                         i++)
                     {
-                        icon = tryLoadImageIconFromResource(
-                               filename + imageExtension[i], path);
-                    }
-                    else
-                    {
-                        icon = new ImageIcon(temp);
+                        Image temp =
+                            tryLoadImageFromFile(
+                                filename + imageExtension[i], path);
+                        if (temp == null)
+                        {
+                            icon =
+                                tryLoadImageIconFromResource(filename +
+                                                             imageExtension[i],
+                                                             path);
+                        }
+                        else
+                        {
+                            icon = new ImageIcon(temp);
+                        }
+                        if (icon != null)
+                        {
+                            imageCache.put(mapKey, icon);
+                            System.err.println("Loaded " + path +
+                                               pathSeparator + filename +
+                                               imageExtension[i]);
+                        }
                     }
                 }
+            }
+            while (icon.getImageLoadStatus() == MediaTracker.LOADING)
+            { // no need for CPU time
+                Thread.yield();
             }
         }
         return(icon);
@@ -204,5 +272,209 @@ public final class ResourceLoader
             }
         }
         return(stream);
+    }
+
+    private static String getMapKey(String filename, java.util.List directories)
+    {
+        StringBuffer buf = new StringBuffer(filename);
+        Iterator it = directories.iterator();
+        while (it.hasNext())
+        {
+            Object o = it.next();
+            if (o instanceof String)
+            {
+                buf.append(",");
+                buf.append(o);
+            }
+        }
+        return buf.toString();
+    }
+
+    private static String getMapKey(String filenames[], java.util.List directories)
+    {
+        StringBuffer buf = new StringBuffer(filenames[0]);
+        for (int i = 1; i < filenames.length ; i++)
+        {
+            buf.append(",");
+            buf.append(filenames[i]);
+        }
+        Iterator it = directories.iterator();
+        while (it.hasNext())
+        {
+            Object o = it.next();
+            if (o instanceof String)
+            {
+                buf.append(",");
+                buf.append(o);
+            }
+        }
+        return buf.toString();
+    }
+
+    /**
+     * Return the composite image made from blending the given filenames from the given directories.
+     * @param filenames Names of the Images files to load (without extension).
+     * @param directories List of directories to search (in order).
+     * @return The compisite Image, or null if any part was not found.
+     */
+    public static Image getCompositeImage(String[] filenames, java.util.List directories)
+    {
+        BufferedImage bi;
+        synchronized (imageCache)
+        {
+            String mapKey = getMapKey(filenames, directories);
+            Object cached = imageCache.get(mapKey);
+            
+            if ((cached != null) && (cached instanceof Image))
+            {
+                return (Image)cached;
+            }
+            if ((cached != null) && (cached instanceof ImageIcon))
+            {
+                return((ImageIcon)cached).getImage();
+            }
+            Image tempImage[] = new Image[filenames.length];
+            int basew = -1, baseh = -1;
+            for (int i = 0; i < filenames.length ; i++)
+            {
+                tempImage[i] =
+                    getImage(filenames[i], directories);
+                if (i == 0)
+                {
+                    ImageIcon tempicon = new ImageIcon(tempImage[i]);
+                    basew = tempicon.getIconWidth();
+                    baseh = tempicon.getIconHeight();
+                }
+                if (tempImage[i] == null)
+                {
+                    if (filenames[i].startsWith("Power-"))
+                    {
+                        int val = Integer.parseInt(filenames[i].substring(6));
+                        String mapKey2 = getMapKey(filenames[i], directories);
+                        tempImage[i] =
+                            createNumberImage(basew,baseh,val,false,mapKey2);
+                    }
+                    if (filenames[i].startsWith("Skill-"))
+                    {
+                        int val = Integer.parseInt(filenames[i].substring(6));
+                        String mapKey2 = getMapKey(filenames[i], directories);
+                        tempImage[i] =
+                            createNumberImage(basew,baseh,val,true,mapKey2);
+                    }
+                    if (filenames[i].endsWith("-Name"))
+                    {
+                        String name =
+                            filenames[i].substring(0,
+                                                   filenames[i].indexOf("-Name"));
+                        String mapKey2 = getMapKey(filenames[i], directories);
+                        tempImage[i] =
+                            createNameImage(basew,baseh,name,mapKey2);
+                    }
+                    if (tempImage[i] == null)
+                    {
+                        System.err.println("During creation of \"" +
+                                           mapKey + "\", loading failed for " +
+                                           filenames[i]);
+                        return null;
+                    }
+                    waitOnImage(tempImage[i]);
+                }
+            }
+
+            ImageIcon tempIcon = new ImageIcon(tempImage[0]);
+            int width = tempIcon.getIconWidth();
+            int height = tempIcon.getIconHeight();
+            bi = new BufferedImage(width, height,
+                                   BufferedImage.TYPE_INT_ARGB);
+            Graphics2D biContext = bi.createGraphics();
+            for (int i = 0; i < filenames.length ; i++)
+            {
+                biContext.drawImage(tempImage[i],
+                                    0, 0,
+                                    width, height,
+                                    null);
+            }
+            waitOnImage(bi);
+            imageCache.put(mapKey, bi);
+        }
+        return bi;
+    }
+
+    private static Image createNumberImage(int width, int height, int value, boolean right, String mapKey)
+    {
+        BufferedImage bi = new BufferedImage(width, height,
+                                             BufferedImage.TYPE_INT_ARGB);
+        Graphics2D biContext = bi.createGraphics();
+        biContext.setColor(new Color((float)1.,(float)1.,(float)1.,(float)0.));
+        biContext.fillRect(0,0,width,height);
+        biContext.setColor(Color.black);
+        int fontsize = (width+height)/10;
+        biContext.setFont(defaultFont.deriveFont(fontsize));
+        FontMetrics fm = biContext.getFontMetrics();
+        Rectangle2D sb = fm.getStringBounds("" + value, biContext);
+        int sw = (int)sb.getWidth();
+        int sh = (int)sb.getHeight();
+
+        if (right)
+        {
+            biContext.drawString("" + value,
+                                 (width - (sw + 2)),
+                                 height - 2);
+        }
+        else
+        {
+            biContext.drawString("" + value,
+                                 2,
+                                 height - 2);
+        }
+        synchronized (imageCache)
+        {
+            imageCache.put(mapKey, bi);
+        }
+        return bi;
+    }
+
+    private static Image createNameImage(int width, int height, String name, String mapKey)
+    {
+        BufferedImage bi = new BufferedImage(width, height,
+                                             BufferedImage.TYPE_INT_ARGB);
+        Graphics2D biContext = bi.createGraphics();
+        biContext.setColor(new Color((float)1.,(float)1.,(float)1.,(float)0.));
+        biContext.fillRect(0,0,width,height);
+        biContext.setColor(Color.black);
+        int fontsize = (width+height)/10;
+        biContext.setFont(defaultFont.deriveFont(fontsize));
+        Font font = biContext.getFont();
+        int size = font.getSize();
+        FontMetrics fm = biContext.getFontMetrics();
+        Rectangle2D sb = fm.getStringBounds(name, biContext);
+        int sw = (int)sb.getWidth();
+        int sh = (int)sb.getHeight();
+        while ((sw >= width) && (size > 1))
+        {
+            size--;
+            biContext.setFont(font.deriveFont((float)size));
+            fm = biContext.getFontMetrics();
+            sb = fm.getStringBounds(name, biContext);
+            sw = (int)sb.getWidth();
+            sh = (int)sb.getHeight();
+        }
+        int offset = (width - sw) / 2;
+        biContext.drawString(name, offset, 1 + fm.getMaxAscent());
+
+        synchronized (imageCache)
+        {
+            imageCache.put(mapKey, bi);
+        }
+        return bi;
+    }
+
+    private static void waitOnImage(Image image)
+    {
+        ImageIcon icon = new ImageIcon(image);
+        while (icon.getImageLoadStatus() == MediaTracker.LOADING)
+        {
+            Thread.yield();
+        }
     }
 }

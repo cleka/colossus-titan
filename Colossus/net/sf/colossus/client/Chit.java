@@ -11,6 +11,7 @@ import java.net.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.client.VariantSupport;
+import net.sf.colossus.server.Creature;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
@@ -60,7 +61,16 @@ class Chit extends JPanel
 
         setBackground(Color.lightGray);
 
-        icon = getImageIcon(id);
+        
+        if (!Creature.isCreature(id))
+        {
+            icon = getImageIcon(id);
+        }
+        else
+        {
+            Creature cre = Creature.getCreatureByName(id);
+            icon = getImageIcon(cre.getImagesNames());
+        }
     }
 
     Chit(int scale, String id, Container container, boolean inverted)
@@ -68,7 +78,6 @@ class Chit extends JPanel
         this(scale, id, container);
         this.inverted = inverted;
     }
-
 
     static ImageIcon getImageIcon(String imageFilename)
     {
@@ -84,6 +93,13 @@ class Chit extends JPanel
         return tempIcon;
     }
 
+    static ImageIcon getImageIcon(String imageFilenames[])
+    {
+        java.util.List directories = VariantSupport.getImagesDirectoriesList();
+        Image composite = ResourceLoader.getCompositeImage(imageFilenames,
+                                                           directories);
+        return new ImageIcon(composite);
+    }
 
     String getId()
     {

@@ -189,7 +189,7 @@ Exemple: A variant that use creatures from ExtTitan, Battlelands from Badlands a
 \label{images}
 
 \begin{itemize}
-\item Chit (i.e. images representing a Creature) should be non-transparent \texttt{GIF} file, size 60 * 60 (other size may work but won't look as nice). They should be named after the Creature they represent, with a ``.gif'' extension. If the file doesn't exist, troubles may occur.
+\item Chit (i.e. images representing a Creature) should be non-transparent \texttt{GIF} file, size 60 * 60 (other size may work but won't look as nice). They should be named after the Creature they represent, with a ``.gif'' extension. If the file doesn't exist, troubles may occur. Also, see below for name/power/skill overlay.
 
 \item Graphical Overlay for the Hexes on the Masterboard should be transparent \texttt{GIF} file, of size whatever-you-want (they are resized to the same size as the Hex the represent). Default supplied files are 255x255. Use them as examples of what is possible to do. If the file doesn't exist, the non-overlayed display is used instead (i.e. name of the terrain and the label in the proper corner).
 
@@ -198,6 +198,9 @@ Two version of the file should be supplied, one with and one without the ``\_i''
 \item Graphical overlay for the Hexes on the Battlelands (aka Hazard) should be transparent GIF file, of size 216x188 for the interior of the hexes (Bog, Sand\ldots), and size 248x220 for the hexsides (Cliff, Slope\ldots). The filename should the name of the hazard followed by ``\_Hazard'', followed by the extension ``.gif'' (for instance ``MySea\_Hazard.gif''). Only one version is needed.
 
 Other sizes \emph{may} work (they are resized on-the-fly), and odds are better if the aspect ratio is the same.
+
+\item Skill, Power, and the name of creature are overlay added to the main Chit. If they are not available, they are created on the fly. You may supply any or all of them. Name should be respectively ``Skill-$\langle$skill_factor$\rangle$.gif'', ``Power-$\langle$power_factor$\rangle$.gif'', and ``$\langle$creature_name$\rangle$-Name.gif''. At some future date, color-dependant version may become availble.
+
 \end{itemize}
 
 \end{document}
