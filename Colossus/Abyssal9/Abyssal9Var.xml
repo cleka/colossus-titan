@@ -8,5 +8,5 @@
         <depend variant="ExtTitan" />
     </depends>
     <max_players num="9" />
-    <hint classname="Abyssal6.Abyssal6Hint" />
+    <hint classname="Abyssal9.Abyssal9Hint" />
 </variant>
