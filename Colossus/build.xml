@@ -41,6 +41,7 @@
 
         <property name="HTMLDIR" value="/home/groups/c/co/colossus/htdocs"/>
         <property name="DOWNLOAD_DIR" value="${HTMLDIR}/download"/>
+        <property name="DOCS_DIR" value="${HTMLDIR}/docs"/>
         <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip"/>
 
 </target>
@@ -165,6 +166,7 @@
                          **/javacore.txt,
                          **/*~,
                          **/*.bak,
+                         **/*.old,
                          **/*.class,
                          **/Colossus.jar,
                          **/.#Colossus.jar*,
@@ -301,18 +303,28 @@
                  BattlelandsBuilder.jar,
                  BattlelandsRandomizer.jar,
                  .*,
-                 test/*.jar"
+                 test/*.jar,
+                 **/*.ps,
+                 **/*.aux,
+                 **/*.bbl,
+                 **/*.bib,
+                 **/*.blg,
+                 **/*.log,
+                 **/*.old"
         />
 </target>
 
 
-<!-- TODO Need to copy docs. -->
 <target name="inst" depends="init,sign,dist,changelog,docs"
         description = "Copy files into htdocs tree on SF"> 
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
         <copy file="ChangeLog" todir="${HTMLDIR}"/>
+        <copy todir="${DOCS_DIR}"> <fileset dir="docs"/>
+</copy>
+
+
 </target>
 
 
