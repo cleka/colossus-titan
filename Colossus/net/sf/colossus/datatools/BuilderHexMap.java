@@ -465,6 +465,8 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
                             buf.append("# WARNING: wall on less-than-1 elevation Hex\n");
                         if ((t == 'l') && doDumpSides)
                             buf.append("# WARNING: non-default sides on Lake\n");
+                        if ((t == 't') && doDumpSides)
+                            buf.append("# WARNING: non-default sides on Tree\n");
                         buf.append(i);
                         buf.append(" ");
                         buf.append(j);

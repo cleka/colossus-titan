@@ -196,32 +196,34 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         GUIBuilderHex h = getHexContainingPoint(lastPoint);
         if (h != null)
         {
-            if (h.innerContains(lastPoint))
+            Point c = h.findCenter();
+            if (c.y >= lastPoint.y)
+            { // uppper half
+                if (lastPoint.x >=
+                    ((c.x) + (h.getBounds().x + h.getBounds().width))/2)
+                    lastSide = 1;
+                else if (lastPoint.x <= ((c.x) + (h.getBounds().x))/2)
+                    lastSide = 5;
+                else
+                    lastSide = 0;
+            }
+            else
+            { // lower half
+                if (lastPoint.x >=
+                    ((c.x) + (h.getBounds().x + h.getBounds().width))/2)
+                    lastSide = 2;
+                else if (lastPoint.x <= ((c.x) + (h.getBounds().x))/2)
+                    lastSide = 4;
+                else
+                    lastSide = 3;
+            }
+            if (h.innerContains(lastPoint) ||
+                (h.getNeighbor(lastSide) == null))
             { // change content
                 popupMenuTerrain.show(e.getComponent(), lastPoint.x, lastPoint.y);
             }
             else
             { // change border
-                Point c = h.findCenter();
-                if (c.y >= lastPoint.y)
-                { // uppper half
-                    if (lastPoint.x >=((c.x) + (h.getBounds().x + h.getBounds().width))/2)
-                        lastSide = 1;
-                    else if (lastPoint.x <= ((c.x) + (h.getBounds().x))/2)
-                        lastSide = 5;
-                    else
-                        lastSide = 0;
-                }
-                else
-                { // lower half
-                    if (lastPoint.x >=((c.x) + (h.getBounds().x + h.getBounds().width))/2)
-                        lastSide = 2;
-                    else if (lastPoint.x <= ((c.x) + (h.getBounds().x))/2)
-                        lastSide = 4;
-                    else
-                        lastSide = 3;
-                }
-
                 popupMenuBorder.show(e.getComponent(), lastPoint.x, lastPoint.y); 
             }
         }

@@ -23,12 +23,37 @@ of an hex to get a popup-menu to change the type
 and elevation of the hex ; click near the border of
 an hex to get a popup-menu to change this border of
 this hex (warning: beware slope or wall who can
-easily be put on the wrong hex, as their not much
+easily be put on the wrong hex, as there's not much
 visual clue of their orientation).
 
 ATM, the 'Save' and 'Save As' menu aren't working,
 they both dump the Battleland on the standard output.
 Copy/Paste them (or use a redirection) to the proper
 file.
+
+FAQ:
+
+1) I can't get the Hex Side popup-menu !
+2) My Hex Side is on the wrong hex !
+
+To get the Hex Side menu, you must be quite close
+to the Side itself. You must also not be on one
+of the outer side, without a neighbor Hex, as you
+can't put an Hex Side there. Finally, if the Hex
+Side is put `backward', that means you clicked on
+the wrong Hex ; for instance, you must click behind
+the straight border, on the Sand, to get a proper
+Dune. Clicking where you intend to get the round
+part will put the Dune backward.
+
+3) BattlelandsBuilder let me do dumb thing !
+
+Well, yes. It's designed that way : you can do
+whatever you please with it, including surrounding
+a Tree with dune or filling the map with Volcanoes.
+It will try to flag some obviously `dangerous'
+or `wrong' combinations with warnings, but you
+can use the output anyway (the warnings are
+comments that will be ignored by Colossus).
 
 File Version: $Header$
