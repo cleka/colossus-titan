@@ -203,6 +203,12 @@ class Legion
     }
 
 
+    boolean recruited()
+    {
+        return recruited;
+    }
+
+
     boolean canRecruit()
     {
         if (recruited || height > 6)
