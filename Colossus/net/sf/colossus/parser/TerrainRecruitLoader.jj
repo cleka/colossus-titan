@@ -157,7 +157,8 @@ public class TerrainRecruitLoader
         {
             recruitNumber tr = (recruitNumber)it.next();
             if ((tr.getNumber() > 0) && !(tr.getName().equals("Anything"))
-                                && !(tr.getName().equals("Lord")))
+                                     && !(tr.getName().equals("AnyNonLord"))
+                                     && !(tr.getName().equals("Lord")))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
             }
@@ -179,6 +180,7 @@ public class TerrainRecruitLoader
         {
             recruitNumber tr = (recruitNumber)it.next();
             if (!(tr.getName().equals("Anything")) &&
+                !(tr.getName().equals("AnyNonLord")) &&
                 !(tr.getName().equals("Lord")))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
@@ -186,6 +188,11 @@ public class TerrainRecruitLoader
             else
             {
                 if (tr.getName().equals("Anything"))
+                { // anyone can recruit here...
+                    java.util.List creatures = Creature.getCreatures();
+                    return(new ArrayList(creatures));
+                }
+                if (tr.getName().equals("AnyNonLord"))
                 { // anyone can recruit here...
                     java.util.List creatures = Creature.getCreatures();
                     return(new ArrayList(creatures));
@@ -223,6 +230,7 @@ public class TerrainRecruitLoader
         {
             recruitNumber tr = (recruitNumber)it.next();
             if (!(tr.getName().equals("Anything")) &&
+                !(tr.getName().equals("AnyNonLord")) &&
                 !(tr.getName().equals("Lord")))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
@@ -283,7 +291,11 @@ public class TerrainRecruitLoader
         // the recruiter is
         if (below.equals("Anything"))
             return (((recruitNumber)al.get(iReFake)).getNumber());
-        // Second, "Lord" ; only one Lord can recruit
+        // second, "AnyNonLord" ; the number is needed no matter what
+        // the recruiter is
+        if (below.equals("AnyNonLord") && !recruiter.isImmortal())
+            return (((recruitNumber)al.get(iReFake)).getNumber());
+        // Third, "Lord" ; only one Lord can recruit
         if (below.equals("Lord") && (recruiter.isLord()))
             return 1;
         // Third, "Titan" ; only the Titan can recruit

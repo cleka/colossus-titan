@@ -15,7 +15,7 @@ P yellow      Plains    true  1 Lion     2 Ranger
 S blue        Swamp     true  1 Troll    3 Wyvern   2 Hydra
 
 # Tower is a special case
-T grey        Tower     false 0 Anything 1 Lion 0 Anything 1 Cyclops 0 Anything 1  Troll 0 Anything 3 Guardian 0 Titan 1 Warlock
+T grey        Tower     false 0 Anything 1 Lion 0 Anything 1 Cyclops 0 Anything 1  Troll 0 AnyNonLord 3 Guardian 0 Titan 1 Warlock
 
 t skyBlue     Tundra    true  1 Troll    2 Warbear  2 Giant    2 Colossus
 

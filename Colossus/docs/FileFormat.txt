@@ -91,10 +91,13 @@ Any later creature can recruit a previous one or itself.
 A creature can recruit the next one only if they are numerous
 enough, as indicated by the <recruiter_needed> _of the recruit_.
 
-Too special name exist (pseudo-creature) : "Anything", which
+Three specials names exist (pseudo-creature) : "Anything", which
 means any creature can recruit the following creature provided
-thay are numerous enough, and "Lord"  which means a Lord (Angel,
-Titan, Archangel...) can recruit the following creature.
+thay are numerous enough, "AnyNonLord" which is the same but
+excludes Immortal (Lord or DemiLord) from the possible recruiters
+and "Lord"  which means a Lord (Angel, Titan, Archangel, etc., but
+not a DemiLord) can recruit the following creature.
+
 Note that for "Lord" and "Titan", only one recruiter
 is needed, and the number before the recruits indicate
 how many of the creatures _before_ Lord or Titan are
