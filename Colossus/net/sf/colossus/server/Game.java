@@ -1942,6 +1942,10 @@ public final class Game
         {
             // TODO Move to client side
             String typeColonDonor = player.aiSummonAngel(attacker);
+            if (typeColonDonor == null)
+            {
+                return;
+            }
             int split = typeColonDonor.indexOf(':');
             String angelType = typeColonDonor.substring(0, split);
             String donorId = typeColonDonor.substring(split + 1);
