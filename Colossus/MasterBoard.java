@@ -91,9 +91,9 @@ public class MasterBoard extends Frame implements MouseListener,
             game.player[i].legions[0] = new Legion(point.x - (3 * scale / 2), 
                 point.y - (3 * scale / 2), 3 * scale, 
                 game.player[i].markerSelected, null,
-                this, 8, Creature.titan, Creature.angel, Creature.ogre, 
-                Creature.ogre, Creature.centaur, Creature.centaur, 
-                Creature.gargoyle, Creature.gargoyle);
+                this, 8, 100 * game.player[i].startingTower, Creature.titan, 
+                Creature.angel, Creature.ogre, Creature.ogre, Creature.centaur, 
+                Creature.centaur, Creature.gargoyle, Creature.gargoyle);
 
             game.player[i].numLegions = 1;
         }
@@ -126,6 +126,26 @@ public class MasterBoard extends Frame implements MouseListener,
 
 
     // Do a brute-force search through the hex array, looking for
+    //    a match.  Return the hex.
+    MasterHex getHexFromLabel(int label)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j] && h[i][j].label == label)
+                {
+                    return h[i][j];
+                }
+            }
+        }
+
+        // Error, so return a bogus hex.
+        return new MasterHex(-1, -1, -1, false);
+    }
+
+
+    // Do a brute-force search through the hex array, looking for
     //    a match.  Return a point near the center of that hex,
     //    vertically offset a bit toward the fat side.
     Point getOffCenterFromLabel(int label)
@@ -145,6 +165,33 @@ public class MasterBoard extends Frame implements MouseListener,
         }
         // No match
         return new Point(-1, -1);
+    }
+
+
+    void showMoves(Legion legion, Player player)
+    {
+        MasterHex hex = getHexFromLabel(legion.currentHex); 
+
+
+        // Conventional moves
+
+
+        if (player.movementRoll == 6)
+        {
+            // Tower teleport
+            if (hex.terrain == 'T')
+            {
+
+            }
+
+            // Titan teleport
+            if (player.canTitanTeleport() && 
+                legion.numCreature(Creature.titan) > 0)
+            {
+                
+                // Mark every hex containing an enemy unit. 
+            }
+        }
     }
 
 
@@ -734,10 +781,10 @@ public class MasterBoard extends Frame implements MouseListener,
                     }
                     else
                     {
-                        // Only the current player can mess with his legions.
+                        // Only the current player can manipulate his legions.
                         if (i == game.activePlayer)
                         {
-                            if (game.phase == 1)  // split
+                            if (game.phase == game.SPLIT)
                             {
                                 SplitLegion splitlegion = new SplitLegion(this, 
                                     game.player[i].legions[j], game.player[i]);
@@ -747,17 +794,24 @@ public class MasterBoard extends Frame implements MouseListener,
                                 return;
                             }
 
-                            else if (game.phase == 2)  // move
+                            else if (game.phase == game.MOVE)
+                            {
+                                // Mark this legion as active.
+                                game.player[i].selectedLegion = j; 
+
+                                // Find all legal destinations for this legion 
+                                // and highlight them.
+                                showMoves(game.player[i].legions[j], 
+                                    game.player[i]);
+                                return;
+                            }
+
+                            else if (game.phase == game.FIGHT)
                             {
                                 return;
                             }
 
-                            else if (game.phase == 3)  // fight
-                            {
-                                return;
-                            }
-
-                            else if (game.phase == 4)  // muster
+                            else if (game.phase == game.MUSTER)
                             {
                                 return;
                             }
@@ -775,6 +829,25 @@ public class MasterBoard extends Frame implements MouseListener,
                 if (show[i][j] && h[i][j].contains(point))
                 {
                     h[i][j].select(point);
+
+                    // If we're moving and have selected a legion and this
+                    // hex is a legal destination, move the legion here.
+                    if (game.phase == game.SPLIT)
+                    {
+                    }
+
+                    // If we're fighting and there's an engagement here,
+                    // resolve it.
+                    else if (game.phase == game.FIGHT)
+                    {
+                    }
+
+                    // If we're mustering and there's a legion here that's
+                    // eligible to muster a recruit, do so. 
+                    else if (game.phase == game.MUSTER)
+                    {
+                    }
+
                     Rectangle clip = new Rectangle(h[i][j].getBounds());
                     repaint(clip.x, clip.y, clip.width, clip.height);
                     return;
