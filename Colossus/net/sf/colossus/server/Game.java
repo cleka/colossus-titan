@@ -372,8 +372,11 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
             towerList.add(it.next());
         }
 
-        // Make sure towers are ordered for balanced setup.
-        Collections.sort(towerList);
+        if (balanced)
+        {
+            towerList = getBalancedTowers(numPlayers, towerList);
+            Log.debug("Got balanced towers: " + towerList); 
+        }
 
         int playersLeft = numPlayers - 1;
 
@@ -390,6 +393,63 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
             Log.event(player.getName() + " gets tower " + playerTower[i]);
             player.setTower(playerTower[i]);
         }
+    }
+
+    /** Return a list with a balanced order of numPlayer towers chosen
+        from towerList, which must hold numeric strings. */
+    private static ArrayList getBalancedTowers(int numPlayers, 
+        final ArrayList towerList)
+    {
+        int numTowers = towerList.size();
+        if (numPlayers > numTowers)
+        {
+            Log.error("More players than towers!");
+            return towerList;
+        }
+
+        // Make a sorted copy, converting String to Integer.
+        ArrayList numericList = new ArrayList();
+        Iterator it = towerList.iterator();
+        while (it.hasNext())
+        {
+            String s = (String)it.next();
+            Integer i = new Integer(s);
+            numericList.add(i);
+        }
+        Collections.sort(numericList);
+
+        double towersPerPlayer = (double)numTowers / numPlayers;
+
+        // First just find a balanced sequence starting at zero.
+        double counter = 0.0;
+        int numDone = 0;
+        ArrayList sequence = new ArrayList();
+        // Prevent floating-point roundoff error.
+        double epsilon = 0.0000001;
+        while (numDone < numPlayers)
+        {
+            sequence.add(new Integer((int)Math.floor(counter + epsilon)));
+            numDone++;
+            counter += towersPerPlayer;
+        }
+
+        // Pick a random starting point.  (Zero-based)
+        int startingTower = rollDie(numTowers) - 1;
+
+        // Offset the sequence by the starting point, and get only
+        // the number of starting towers we need.
+        ArrayList returnList = new ArrayList();
+        it = sequence.iterator();
+        numDone = 0;
+        while (it.hasNext() && numDone < numPlayers)
+        {
+            Integer raw = (Integer)it.next();
+            int cooked = (raw.intValue() + startingTower) % numTowers;
+            Integer numericLabel = (Integer)numericList.get(cooked);
+            returnList.add(numericLabel.toString());
+            numDone++;
+        }
+        return returnList;
     }
 
     Caretaker getCaretaker()
@@ -3014,4 +3074,26 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
             syncOptions();
         }
     }
+
+
+    // test for getBalancedTowers()   TODO JUnit 
+    public static void main(String [] args)
+    {
+        int numPlayers = 4;
+        int numTowers = 6;
+        if (args.length == 2)
+        {
+            numTowers = Integer.valueOf(args[0]).intValue();
+            numPlayers = Integer.valueOf(args[1]).intValue();
+        }
+
+        ArrayList towerList = new ArrayList();
+        for (int i = 0; i < numTowers; i++)
+        {
+            towerList.add("" + 100 * (i + 1));
+        }
+
+        System.out.println(getBalancedTowers(numPlayers, towerList));
+    }
 }
+

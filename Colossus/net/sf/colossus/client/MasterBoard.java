@@ -348,19 +348,24 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                String [] options = new String[2];
-                options[0] = "Yes";
-                options[1] = "No";
-                int answer = JOptionPane.showOptionDialog(masterFrame,
-                    "Are you sure you with to start a new game?",
-                    "New Game?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[1]);
-
-                if (answer == JOptionPane.YES_OPTION)
+                if (!client.isGameOver())
                 {
-                    client.newGame();
+                    String [] options = new String[2];
+                    options[0] = "Yes";
+                    options[1] = "No";
+                    int answer = JOptionPane.showOptionDialog(masterFrame,
+                        "Are you sure you with to start a new game?",
+                        "New Game?",
+                        JOptionPane.YES_NO_OPTION, 
+                        JOptionPane.QUESTION_MESSAGE, null, options, 
+                        options[1]);
+
+                    if (answer != JOptionPane.YES_OPTION)
+                    {
+                        return;
+                    }
                 }
+                client.newGame();
             }
         };
 
@@ -597,7 +602,7 @@ public final class MasterBoard extends JPanel
         if (client.isPrimary())
         {
             addCheckBox(gameMenu, Options.allStacksVisible, KeyEvent.VK_S);
-// TODO addCheckBox(gameMenu, Options.balancedTowers, KeyEvent.VK_B);
+            addCheckBox(gameMenu, Options.balancedTowers, KeyEvent.VK_B);
             addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
             addCheckBox(gameMenu, Options.autoQuit, KeyEvent.VK_Q);
             addCheckBox(gameMenu, Options.logDebug, KeyEvent.VK_L);

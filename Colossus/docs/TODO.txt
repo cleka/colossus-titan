@@ -1,7 +1,11 @@
-Add balanced tower setup option.
+Bug: 6-AI game, one AI (dripton) showed a SummonAngel dialog rather than
+   picking itself.  Loaded autoplay=false from cfg file and overrode isAI()?
 
 Add "no 2s or 5s" mulligan option.
 Add optional additional handicap mulligans that can be used after turn 1.
+
+Add UI for setting server options before starting game.
+Add UI for players to specify favorite colors.
 
 Remember GetPlayers settings in server.cfg
 
@@ -51,7 +55,6 @@ Add display of dead creatures / total creatures / creatures in play to
 
 Reveal all stacks at game end.
 
-Add UI for players to specify favorite colors.
 
 Write more design docs.
 
