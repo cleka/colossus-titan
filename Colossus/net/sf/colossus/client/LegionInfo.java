@@ -74,7 +74,8 @@ public final class LegionInfo
         }
         catch (NullPointerException ex)
         {
-            Log.error("null pointer in LegionInfo.getHeight()");
+            Log.error("null pointer in LegionInfo.getHeight() for " + 
+                    toString());
             return 8;
         }
     }
