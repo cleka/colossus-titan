@@ -29,18 +29,32 @@ public class BattleHex extends Hex
     // l
     // lake
 
-    private static char[] allTerrains =
+    /**
+     * The array of all the valid terrain type for a BattleHex.
+     */
+    private static final char[] allTerrains =
     { 'p', 'w', 'r', 's', 't', 'o', 'v', 'd', 'l' };
 
     // Hexside terrain types are:
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
-    private static char[] allHexsides =
-    { ' ', 'd', 'c', 's', 'w'};
+    /**
+     * The array of all the valid terrain type for a BattleHex Side.
+     */
+    private static final char[] allHexsides =
+    { ' ', 'd', 'c', 's', 'w' };
 
-    // The hexside is marked only in the higher hex.
+    /**
+     * Hold the type of the six side of the BattleHex.
+     * The hexside is marked only in the higher hex.
+     */
     private char [] hexsides = new char[6];
 
+    /**
+     * Links to the neighbors of the BattleHex.
+     * Neighbors have one hex side in common.
+     * Non-existant neighbor are marked with <b>null</b>.
+     */
     private BattleHex [] neighbors = new BattleHex[6];
 
     private int xCoord;
