@@ -10,7 +10,7 @@ import java.io.*;
  * @author David Ripton
  */
 
-public final class MasterBoard extends JPanel 
+public final class MasterBoard extends JPanel
 {
     /** For easy of mapping to the GUI, hexes will be stored
      *  in a 15x8 array, with some empty elements. */
@@ -1788,6 +1788,24 @@ public final class MasterBoard extends JPanel
         Set set = game.listMoves(legion, true, true, false);
         unselectAllHexes();
         selectHexesByLabels(set);
+        showBestRecruit(legion, set);
+    }
+
+
+    private void showBestRecruit(Legion legion, Set set)
+    {
+        client.clearRecruitChits();
+        Iterator it = set.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            ArrayList recruits = game.findEligibleRecruits(legion, hexLabel);
+            if (recruits != null && recruits.size() > 0)
+            {
+                Creature recruit = (Creature)recruits.get(recruits.size() - 1);
+                client.addRecruitChit(recruit.getImageName(), hexLabel);
+            }
+        }
     }
 
 
@@ -2043,6 +2061,7 @@ public final class MasterBoard extends JPanel
         switch (game.getPhase())
         {
             case Game.MOVE:
+                client.clearRecruitChits();
                 client.setMoverId(null);
                 highlightUnmovedLegions();
                 break;
@@ -2107,8 +2126,8 @@ public final class MasterBoard extends JPanel
                     // TODO We need a client-side legion class that doesn't
                     // know the full contents of every enemy legion.
                     legion.sortCritters();
-                    new ShowLegion(masterFrame, legion, point, 
-                        client.getOption(Options.allStacksVisible) || 
+                    new ShowLegion(masterFrame, legion, point,
+                        client.getOption(Options.allStacksVisible) ||
                         playerName == client.getPlayerName());
                     return;
                 }
@@ -2189,6 +2208,7 @@ public final class MasterBoard extends JPanel
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
             case Game.MOVE:
+                client.clearRecruitChits();
                 String moverId = client.getMoverId();
                 if (game.doMove(moverId, hexLabel))
                 {
@@ -2232,7 +2252,7 @@ public final class MasterBoard extends JPanel
          {
              game.dispose();
          }
-    }   
+    }
 
     public void paintComponent(Graphics g)
     {
@@ -2264,6 +2284,17 @@ public final class MasterBoard extends JPanel
             if (marker != null && rectClip.intersects(marker.getBounds()))
             {
                 marker.paintComponent(g);
+            }
+        }
+
+        // Paint recruitChits
+        it = client.getRecruitChits().iterator();
+        while (it.hasNext())
+        {
+            Chit chit = (Chit)it.next();
+            if (chit != null && rectClip.intersects(chit.getBounds()))
+            {
+                chit.paintComponent(g);
             }
         }
     }

@@ -3,6 +3,7 @@ import java.net.*;
 import javax.swing.*;
 import java.io.*;
 import java.awt.event.*;
+import java.awt.*;
 
 /**
  *  Class Client lives on the client side and handles all communication
@@ -40,6 +41,8 @@ public final class Client
 
     /** The end of the list is on top in the z-order. */
     private ArrayList markers = new ArrayList();
+
+    private ArrayList recruitChits = new ArrayList();
 
     // Per-client and per-player options should be kept here instead
     // of in Game.  (For now we can move all options from Game/Player
@@ -102,7 +105,7 @@ public final class Client
 
     /** Split some creatures off oldLegion into newLegion. */
     boolean split(String parentLegionId, String childLegionId,
-        List splitCreatureNames)
+        java.util.List splitCreatureNames)
     {
         return false;
     }
@@ -189,7 +192,7 @@ public final class Client
     /** Offer to negotiate engagement in land.  If legion or unitsLeft
      *  is null or empty then propose a mutual. If this matches one
      *  of the opponent's proposals, then accept it. */
-    boolean negotiate(String land, String legion, List unitsLeft)
+    boolean negotiate(String land, String legion, java.util.List unitsLeft)
     {
         return false;
     }
@@ -538,7 +541,7 @@ public final class Client
             if (caretakerDisplay == null)
             {
                 IImageUtility oImageUtility = new ChitImageUtility();
-                ICreatureCollection oCaretakerCollection = 
+                ICreatureCollection oCaretakerCollection =
                     server.getGame().getCaretaker().getCollectionInterface();
                 caretakerDisplay = new CreatureCollectionView(
                     oCaretakerCollection, oImageUtility);
@@ -621,7 +624,7 @@ public final class Client
     }
 
 
-    public List getMarkers()
+    public java.util.List getMarkers()
     {
         return markers;
     }
@@ -755,6 +758,33 @@ public final class Client
         }
     }
 
+
+    public ArrayList getRecruitChits()
+    {
+        return recruitChits;
+    }
+
+    public void addRecruitChit(String imageName, String hexLabel)
+    {
+        int scale = 2 * Scale.get();
+        GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+        Chit chit = new Chit(scale, imageName, board);
+        chit.setVisible(false);
+        Point startingPoint = hex.getOffCenter();
+        Point point = new Point(startingPoint);
+        point.x -= scale / 2;
+        point.y -= scale / 2;
+        chit.setLocation(point);
+        chit.setVisible(true);
+        recruitChits.add(chit);
+    }
+
+    public void clearRecruitChits()
+    {
+        recruitChits.clear();
+        // XXX optimize
+        board.repaint();
+    }
 
 
     public static void clearUndoStack()
