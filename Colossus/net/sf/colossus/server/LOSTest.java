@@ -4,7 +4,6 @@ import java.util.*;
 import junit.framework.*;
 
 import net.sf.colossus.client.VariantSupport;
-import net.sf.colossus.client.MasterBoard;
 
 
 /** 
@@ -45,9 +44,6 @@ public class LOSTest extends TestCase
 
         game.addPlayer("Black", "SimpleAI");
         game.addPlayer("Green", "SimpleAI");
-
-        // Need a non-GUI board so we can look up hexes.
-        MasterBoard board = new MasterBoard();
 
         cyclops = Creature.getCreatureByName("Cyclops");
         troll = Creature.getCreatureByName("Troll");
