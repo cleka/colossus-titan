@@ -448,8 +448,14 @@ class BattleChit extends Chit
                                 // order to possibly carry.
                                 if (chooseStrikePenalty(chit))
                                 {
-                                    strikeNumber = tmpStrikeNumber;
-                                    dice = tmpDice;
+                                    if (tmpStrikeNumber > strikeNumber)
+                                    {
+                                        strikeNumber = tmpStrikeNumber;
+                                    }
+                                    if (tmpDice < dice)
+                                    {
+                                        dice = tmpDice;
+                                    }
                                     chit.setCarryFlag(true);
                                     numCarryTargets++;
                                 }
