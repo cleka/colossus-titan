@@ -6,9 +6,11 @@ import javax.swing.text.html.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
+import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.lang.reflect.*;
+import net.sf.colossus.server.Constants;
 
 /**
  * Class ResourceLoader is an utility class to load a resource from a filename and a list of directory.
@@ -19,6 +21,12 @@ import java.lang.reflect.*;
 
 public final class ResourceLoader
 {
+    /**
+     * Class ColossusClassLoader allows for class loading outside the
+     * CLASSPATH, i.e. from the various variant directories.
+     * @version $Id$
+     * @author Romain Dolbeau
+     */
     private static class ColossusClassLoader extends ClassLoader
     {
         java.util.List directories = null;
@@ -89,6 +97,16 @@ public final class ResourceLoader
         new ColossusClassLoader(baseCL);
     private static final Map imageCache = 
         Collections.synchronizedMap(new HashMap());
+    private static final Map fileCache =
+        Collections.synchronizedMap(new HashMap());
+    
+    private final static String sep = Constants.protocolTermSeparator;
+
+    private static String server = null;
+    public static void setDataServer(String server)
+    {
+        ResourceLoader.server = server;
+    }
 
     /**
      * Give the String to mark directories.
@@ -100,11 +118,28 @@ public final class ResourceLoader
     }
 
     /** empty the cache so that all Chits have to be redrawn */
-    public synchronized static void purgeCache()
+    public synchronized static void purgeImageCache()
     {
+        Log.debug("Purging Image Cache.");
         imageCache.clear();
     }
-
+    
+    /** empty the cache so that all files have to be reloaded */
+    public synchronized static void purgeFileCache()
+    {
+        //Log.debug("Purging File Cache.");
+        try
+        {
+            throw new Exception("Purging File Cache.");
+        }
+        catch (Exception e)
+        {
+            Log.debug("" + e);
+            e.printStackTrace();
+        }
+        fileCache.clear();
+    }
+    
     /**
      * Return the first Image of name filename in the list of directories.
      * @param filename Name of the Image file to load (without extension).
@@ -224,6 +259,13 @@ public final class ResourceLoader
         return(icon);
     }
 
+    /**
+     * Try loading the file file with the given filename in the given path
+     * as an Image.
+     * @param filename Name of the file to load.
+     * @param path Path to search for the file
+     * @return Resulting Image, or null if it fails.
+     */
     private static Image tryLoadImageFromFile(String filename, String path)
     {
         Image image = null;
@@ -248,6 +290,13 @@ public final class ResourceLoader
         return image;
     }
 
+    /**
+     * Try loading the file file with the given filename in the given path
+     * as an ImageIcon, through a Class loader.
+     * @param filename Name of the file to load.
+     * @param path Path to search for the file
+     * @return Resulting ImageIcon, or null if it fails.
+     */
     private static ImageIcon tryLoadImageIconFromResource(String filename, String path)
     {
         ImageIcon icon = null;
@@ -273,7 +322,7 @@ public final class ResourceLoader
     }
 
 
-    /**
+ /**
      * Return the first InputStream from file of name filename in the list of directories.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
@@ -281,27 +330,214 @@ public final class ResourceLoader
      */
     public static InputStream getInputStream(String filename, java.util.List directories)
     {
-        InputStream stream = null;
-        java.util.Iterator it = directories.iterator();
-        while (it.hasNext() && (stream == null))
+        return getInputStream(filename, directories, server != null, false);
+    }
+
+    /**
+     * Return the first InputStream from file of name filename in the list of directories.
+     * @param filename Name of the file to load.
+     * @param directories List of directories to search (in order).
+     * @param remote Ask the server for the stream.
+     * @return The InputStream, or null if it was not found.
+     */
+    public static InputStream getInputStream(String filename, java.util.List directories, boolean remote, boolean cachedOnly)
+    {
+        String mapKey = getMapKey(filename, directories);
+        Object cached = fileCache.get(mapKey);
+        byte[] data = null;
+
+        if ((cached == null) && cachedOnly)
         {
-            Object o = it.next();
-            if (o instanceof String)
+            Log.warn("Requested file " + filename + " is requested cached-only but is not is cache.");
+            return null;
+        }
+
+        if ((cached == null) && ((!remote) || (server == null)))
+        {
+            synchronized (fileCache)
             {
-                String path = (String)o;
-                String fullPath = path + pathSeparator + fixFilename(filename);
-                try
+                InputStream stream = null;
+                java.util.Iterator it = directories.iterator();
+                while (it.hasNext() && (stream == null))
                 {
-                    stream = new FileInputStream(fullPath);
-                } 
-                catch (Exception e) { stream = null; }
+                    Object o = it.next();
+                    if (o instanceof String)
+                    {
+                        String path = (String)o;
+                        String fullPath = path + pathSeparator +
+                            fixFilename(filename);
+                        try
+                        {
+                            File tempFile = new File(fullPath);
+                            stream = new FileInputStream(tempFile);
+                        }
+                        catch (Exception e) { stream = null; }
+                        if (stream == null)
+                        {
+                            stream = cl.getResourceAsStream(fullPath);
+                        }
+                    }
+                }
                 if (stream == null)
                 {
-                    stream = cl.getResourceAsStream(fullPath);
+                    Log.error("getInputStream:: " +
+                              " Couldn't get InputStream for file " +
+                              filename + " in " + directories +
+                              (cachedOnly ? " (cached only)" : ""));
+                    data = null;
+                }
+                else
+                {
+                    data = getBytesFromInputStream(stream);
+                    fileCache.put(mapKey, data);
                 }
             }
         }
-        return(stream);
+        else
+        {
+            synchronized (fileCache)
+            {
+                
+                if (cached != null)
+                {
+                    data = (byte[])cached;
+                }
+                else
+                {
+                    try
+                    {  
+                        Socket fileSocket =
+                            new Socket(server,
+                                       Constants.defaultFileServerPort);
+                        InputStream is = fileSocket.getInputStream();
+
+                        if (is == null)
+                        {
+                            Log.error("getInputStream:: " +
+                                      " Couldn't get InputStream from socket" +
+                                      " for file " +
+                                      filename + " in " + directories +
+                                      (cachedOnly ? " (cached only)" : ""));
+                            data = null;
+                        }
+                        else
+                        {
+                            PrintWriter out =
+                                new PrintWriter(fileSocket.getOutputStream(),
+                                                true);
+                            out.print(filename);
+                            java.util.Iterator it = directories.iterator();
+                            while (it.hasNext())
+                            {
+                                out.print(sep + (String)it.next());
+                            }
+                            out.println();
+                            data = getBytesFromInputStream(is);
+                            fileSocket.close();
+                            fileCache.put(mapKey, data);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.error("ResourceLoader::getInputStream() : " + e);
+                    }
+                }
+                
+            }
+        }
+        return(getInputStreamFromBytes(data));
+    }
+
+    /**
+     * Return the content of the specified file as an array of byte.
+     * @param filename Name of the file to load.
+     * @param directories List of directories to search (in order).
+     * @param cachedOnly Only look in the cache file, do not try to load the file from permanent storage.
+     * @return An array of byte representing the content of the file, or null if it fails.
+     */
+    public static byte[] getBytesFromFile(String filename,
+                                          java.util.List directories,
+                                          boolean cachedOnly)
+    {
+        InputStream is = getInputStream(filename, directories,
+                                        server != null, cachedOnly);
+        if (is == null)
+        {
+            Log.error("getBytesFromFile:: " +
+                      " Couldn't get InputStream for file " +
+                      filename + " in " + directories +
+                      (cachedOnly ? " (cached only)" : ""));
+                      return null;
+        }
+        return getBytesFromInputStream(is);
+    }
+    
+    /**
+     * Return the content of the specified InputStream as an array of byte.
+     * @param InputStream The InputStream to use.
+     * @return An array of byte representing the content of the InputStream, or null if it fails.
+     */
+    private static byte[] getBytesFromInputStream(InputStream is)
+    {
+        StringBuffer sb = new StringBuffer();
+
+        byte[] all = new byte[0];
+        
+        try {
+            byte[] data = new byte[1024 * 64];
+            int r = is.read(data);
+            while (r > 0)
+            {
+                byte[] temp = new byte[all.length + r];
+                for (int i = 0; i < all.length ; i++)
+                {
+                    temp[i] = all[i];
+                }
+                for (int i = 0; i < r ; i++)
+                {
+                    temp[i + all.length] = data[i];
+                }
+                all = temp;
+                r = is.read(data);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.error("Can't Stringify stream " + is + " (" + e + ")");
+        }
+        return all;
+    }
+
+    /**
+     * Return the content of the specified String as an InputStream.
+     * @param data The String to convert.
+     * @return An InputStream whose content is the data String.
+     */
+    private static InputStream getInputStreamFromString(String data)
+    {
+        if (data == null)
+        {
+            Log.error("getInputStreamFromString:: " +
+                      " Cant't create InputStream from null String");
+            return null;
+        }
+        return new ByteArrayInputStream(data.getBytes());
+    }
+
+    /**
+     * Return the content of the specified byte array as an InputStream.
+     * @param data The byte array to convert.
+     * @return An InputStream whose content is the data byte array.
+     */
+    private static InputStream getInputStreamFromBytes(byte[] data)
+    {
+        if (data == null)
+        {
+            Log.error("getInputStreamFromBytes:: " +
+                      " Cant't create InputStream from null byte array");
+            return null;
+        }
+        return new ByteArrayInputStream(data);
     }
 
     /**
@@ -310,7 +546,8 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The OutputStream, or null if it was not found.
      */
-    public static OutputStream getOutputStream(String filename, java.util.List directories)
+    public static OutputStream getOutputStream(String filename,
+                                               java.util.List directories)
     {
         OutputStream stream = null;
         java.util.Iterator it = directories.iterator();
@@ -400,6 +637,12 @@ public final class ResourceLoader
         return null;
     }
 
+    /**
+     * Return the key to use in the image and file caches.
+     * @param filename Name of the file.
+     * @param directories List of directories.
+     * @return A String to use as a key when storing/loading in a cache the specified file from the specified list of directories.
+     */
     private static String getMapKey(String filename, java.util.List directories)
     {
         StringBuffer buf = new StringBuffer(filename);
@@ -416,6 +659,12 @@ public final class ResourceLoader
         return buf.toString();
     }
 
+    /**
+     * Return the key to use in the image cache.
+     * @param filenames Array of name of files.
+     * @param directories List of directories.
+     * @return A String to use as a key when storing/loading in a cache the specified array of name of files from the specified list of directories.
+     */
     private static String getMapKey(String filenames[], java.util.List directories)
     {
         StringBuffer buf = new StringBuffer(filenames[0]);
@@ -501,6 +750,15 @@ public final class ResourceLoader
         return bi;
     }
 
+    /**
+     * Try to build an image when there is no source file to create it. Includes generation of some dynamic layers of images for composite image building.
+     * @see #getCompositeImage(String[], java.util.List)
+     * @param filename The name of the missing file.
+     * @param basew Width of the image to create.
+     * @param baseh Height of the image to create.
+     * @param directories List of searched directories.
+     * @return The generated Image.
+     */
     private synchronized static Image tryBuildingInexistantImage(
         String filename, int basew, int baseh, java.util.List directories)
     {
@@ -575,6 +833,15 @@ public final class ResourceLoader
         return(tempImage);
     }
 
+    /**
+     * Create an Image with only the given number on it.
+     * @param width Width of the image to create.
+     * @param height Height of the image to create.
+     * @param value The number to draw on the image.
+     * @param right The number is on the right side (default is left side).
+     * @param color The color to use to draw the number.
+     * @return The generated Image.
+     */
     private static Image createNumberImage(int width, int height, int value, 
         boolean right, Color color)
     {
@@ -609,7 +876,15 @@ public final class ResourceLoader
         return bi;
     }
 
-
+    /**
+     * Create an Image with only the given String on it.
+     * @param width Width of the image to create.
+     * @param height Height of the image to create.
+     * @param name The String to draw on the image.
+     * @param down The name is on the bottom (default is top).
+     * @param color The color to use to draw the String.
+     * @return The generated Image.
+     */
     private static Image createNameImage(int width, int height, 
         String name, boolean down, Color color)
     {
@@ -644,6 +919,13 @@ public final class ResourceLoader
         return bi;
     }
 
+    /**
+     * Create an Image that is only a plain rectangle.
+     * @param width Width of the image to create.
+     * @param height Height of the image to create.
+     * @param color The color to use to fill the rectangle.
+     * @return The generated Image.
+     */
     private static Image createPlainImage(int width, int height, Color color)
     {
         return createPlainImage(width, height, color,
@@ -651,6 +933,14 @@ public final class ResourceLoader
                                 false);
     }
 
+    /**
+     * Create an Image that is only a plain rectangle, with an optional border.
+     * @param width Width of the image to create.
+     * @param height Height of the image to create.
+     * @param color The color to use to fill the rectangle.
+     * @param border Whether to add a black border.
+     * @return The generated Image.
+     */
     private static Image createPlainImage(int width, int height, Color color,
                                           boolean border)
     {
@@ -659,6 +949,18 @@ public final class ResourceLoader
                                 border);
     }
 
+    /**
+     * Create an Image that only contains a colored rectangle, with an optional border.
+     * @param width Width of the image to create.
+     * @param height Height of the image to create
+     * @param color The color to use to fill the rectangle.
+     * @param t_x Left border of the rectangle.
+     * @param t_y Top border of the rectangle.
+     * @param t_w Width of the rectangle.
+     * @param t_h Height of the rectangle.
+     * @param border Whether to add a black border.
+     * @return The generated Image.
+     */
     private static Image createPlainImage(int width, int height, Color color,
                                           int t_x, int t_y, int t_w, int t_h,
                                           boolean border)
@@ -679,6 +981,13 @@ public final class ResourceLoader
         return bi;
     }
 
+    /**
+     * Create a colorized version of the image contained in the given file.
+     * @param filename Name of the Image file to load.
+     * @param directories List of directories to search (in order).
+     * @param color Color to use.
+     * @return An Image composed of the content of the file, with the transparent part filled the the given color.
+     */
     private static Image createColorizedImage(String filename, Color color, 
         java.util.List directories)
     {
@@ -739,6 +1048,10 @@ public final class ResourceLoader
         return bi;
     }
 
+    /**
+     * Wait until the Image in parameter is fully drawn.
+     * @param image Image to wait upon.
+     */
     private static void waitOnImage(Image image)
     {
         ImageIcon icon = new ImageIcon(image);
@@ -753,6 +1066,12 @@ public final class ResourceLoader
         }
     }
 
+    /**
+     * Extract a number from a filename, ignoring a prefix.
+     * @param filename File name to extract from.
+     * @param prefix Prefix to ignore.
+     * @return The extracted number.
+     */
     private static int numberFromFilename(String filename, String prefix)
     {
         if (!(filename.startsWith(prefix)))
@@ -796,6 +1115,12 @@ public final class ResourceLoader
         return val;
     }
 
+    /**
+     * Extract a color name from a filename, ignoring a prefix
+     * @param filename File name to extract from.
+     * @param prefix Prefix to ignore.
+     * @return The extracted color name.
+     */
     private static String colorNameFromFilename(String filename, String prefix)
     {
         if (!(filename.startsWith(prefix)))
@@ -838,26 +1163,47 @@ public final class ResourceLoader
         return sub;
     }
 
+    /**
+     * Extract a color from a filename, ignoring a prefix.
+     * @param filename File name to extract from.
+     * @param prefix Prefix to ignore.
+     * @return The extracted Color.
+     */
     private static Color colorFromFilename(String filename, String prefix)
     {
         return HTMLColor.stringToColor(colorNameFromFilename(filename, 
             prefix));
     }
 
+    /**
+     * Fix a filename by replacing space with underscore.
+     * @param filename Filename to fix.
+     * @return The fixed filename.
+     */
     private static String fixFilename(String filename)
     {
         return filename.replace(' ', '_');
     }
 
-    /** create an instance of the class whose name is in parameter. */
+    /**
+     * Create an instance of the class whose name is in parameter.
+     * @param className The name of the class to use.
+     * @param directories List of directories to search (in order).
+     * @return A new object, instance from the given class.
+     */
     public static Object getNewObject(String className,
                                       java.util.List directories)
     {
         return getNewObject(className, directories, null);
     } 
     
-    /** create an instance of the class whose name is in parameter. Parameters
-        to the constructor are in an array. */
+    /**
+     * Create an instance of the class whose name is in parameter, using parameters.
+     * @param className The name of the class to use.
+     * @param directories List of directories to search (in order).
+     * @param paramter Array of parameters to pass to the constructor.
+     * @return A new object, instance from the given class.
+     */
     public static Object getNewObject(String className,
                                       java.util.List directories,
                                       Object[] parameter)
@@ -908,5 +1254,55 @@ public final class ResourceLoader
             return null;
         }
         return o;
+    }
+
+    /**
+     * Force adding the given data as belonging to the given filename
+     * in the file cache.
+     * @param filename Name of the Image file to add.
+     * @param directories List of directories to search (in order).
+     * @param data File content to add.
+     */
+    public static void putIntoFileCache(String filename,
+                                        java.util.List directories,
+                                        byte[] data)
+    {
+        String mapKey = getMapKey(filename, directories);
+        fileCache.put(mapKey, data);
+    }
+
+    /**
+     * Force adding the given data as belonging to the given key
+     * in the file cache.
+     * @see #getMapKey(String, java.util.List)
+     * @see #getMapKey(String[], java.util.List)
+     * @param mapKey Key to use in the cache.
+     * @param data File content to add.
+     */
+    public static void putIntoFileCache(String mapKey,
+                                        byte[] data)
+    {
+        fileCache.put(mapKey, data);
+    }
+
+    /**
+     * Dump the filecache as a List of XML "DataFile" Element, with the file key as attribute "DataFileKey", and the file data as a CDATA content.
+     * @return A list of XML Element.
+     */
+    public static java.util.List getFileCacheDump()
+    {
+        java.util.List allElement = new ArrayList();
+        Set allKeys = fileCache.keySet();
+        Iterator it = allKeys.iterator();
+        while (it.hasNext())
+        {
+            String mapKey = (String)it.next();
+            byte[] data = (byte[])fileCache.get(mapKey);
+            org.jdom.Element el = new org.jdom.Element("DataFile");
+            el.setAttribute("DataFileKey", mapKey);
+            el.addContent(new org.jdom.CDATA(new String(data)));
+            allElement.add(el);
+        }
+        return allElement;
     }
 }

@@ -26,18 +26,20 @@ final class SocketServerThread extends Thread implements IClient
     private BufferedReader in;
     private PrintWriter out;
     private String playerName;
+    private java.util.List activeSocketList;
 
-    private final String sep = Constants.protocolTermSeparator;
+    private static final String sep = Constants.protocolTermSeparator;
 
 
-    SocketServerThread(Server server, Socket socket)
+    SocketServerThread(Server server, Socket socket,
+                       java.util.List activeSocketList)
     {
         super("SocketServerThread");
         this.server = server;
         this.socket = socket;
+        this.activeSocketList = activeSocketList;
     }
-
-
+    
     public void run()
     {
         try
@@ -77,6 +79,10 @@ final class SocketServerThread extends Thread implements IClient
         try
         {
             socket.close();
+            synchronized (activeSocketList)
+            {
+                activeSocketList.remove(activeSocketList.indexOf(socket));
+            }
         }
         catch (IOException ex)
         {

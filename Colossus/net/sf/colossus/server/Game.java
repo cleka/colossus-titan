@@ -88,6 +88,7 @@ public final class Game
         }
         server = new Server(this, port);
         server.initSocketServer();
+        server.initFileServer();
     }
 
     private void clearFlags()
@@ -131,8 +132,9 @@ public final class Game
         players.clear();
 
         options.saveOptions();
-
-        VariantSupport.loadVariant(options.getStringOption(Options.variant));
+        
+        VariantSupport.loadVariant(options.getStringOption(Options.variant),
+                                   true);
         Log.event("Starting new game");
         addPlayersFromOptions();
         initServer();
@@ -982,6 +984,13 @@ public final class Game
                 root.addContent(el);
             }
 
+            // Dump the file cache, so that generated files are preserved
+            it = ResourceLoader.getFileCacheDump().iterator();
+            while (it.hasNext())
+            {
+                root.addContent((Element)it.next());
+            }
+
             // Battle stuff
             if (engagementInProgress && battle != null)
             {
@@ -1128,8 +1137,34 @@ public final class Game
             Element el = root.getChild("Variant");
             Attribute dir = el.getAttribute("dir");
             Attribute fil = el.getAttribute("file");
+        
+            VariantSupport.freshenVariant(fil.getValue(), dir.getValue());
 
-            VariantSupport.loadVariant(fil.getValue(), dir.getValue());
+            // then load data files
+            java.util.List datafilesElements = root.getChildren("DataFile");
+            Iterator it = datafilesElements.iterator();
+            while (it.hasNext())
+            {
+                Element dea = (Element)it.next();
+                String mapKey = dea.getAttributeValue("DataFileKey");
+                java.util.List contentList = dea.getContent();
+                if (contentList.size() > 0)
+                {
+                    String content = ((CDATA)contentList.get(0)).getText();
+Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
+                    ResourceLoader.putIntoFileCache(mapKey,
+                                                    content.getBytes());
+                }
+                else
+                {
+                    ResourceLoader.putIntoFileCache(mapKey,
+                                                    new byte[0]);
+                }
+            }
+
+            // we're server, but the file generation process has been done
+            // by loading the savefile.
+            VariantSupport.loadVariant(fil.getValue(), dir.getValue(), false);
 
             el = root.getChild("TurnNumber");
             turnNumber = Integer.parseInt(el.getTextTrim());
@@ -1142,7 +1177,7 @@ public final class Game
 
             Element ct = root.getChild("Caretaker");
             java.util.List kids = ct.getChildren();
-            Iterator it = kids.iterator();
+            it = kids.iterator();
 
             while (it.hasNext())
             {
@@ -1234,7 +1269,7 @@ public final class Game
 
                 player.computeMarkersAvailable();
             }
-
+            
             // Battle stuff
             Element bat = root.getChild("Battle");
 

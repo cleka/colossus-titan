@@ -177,6 +177,7 @@ public final class Constants
 
     // Network stuff
     public static final int defaultPort = 26567;
+    public static final int defaultFileServerPort = 26568;
     public static final int numSavedServerNames = 10;
 
     // Game actions used in several places.
@@ -207,8 +208,8 @@ public final class Constants
         "TG-Wild",
         "TitanPlus",
         "Undead",
-        "Balrog"/*,
-        "Random"*/
+        "Balrog",
+        "Random"
     };
 
     public static final int numVariants = variantArray.length;
@@ -337,7 +338,6 @@ public final class Constants
     public static final String nakRecruit = "nakRecruit";
     public static final String nakBattleMove = "nakBattleMove";
     public static final String nakStrike = "nakStrike";
-
     static
     {
         if (colorNames.length != shortColorNames.length)

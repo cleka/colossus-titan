@@ -48,11 +48,11 @@ public final class Server implements IServer
 
     // Network stuff
     private ServerSocket serverSocket;
-    private Socket [] clientSockets = new Socket[
-        VariantSupport.getMaxPlayers()];
+    // list of Socket that are currently active
+    private java.util.List activeSocketList =
+        Collections.synchronizedList(new ArrayList());
     private int numClients;
     private int maxClients;
-
 
     Server(Game game, int port)
     {
@@ -103,7 +103,22 @@ Log.debug("About to create server socket on port " + port);
         }
     }
 
-
+    void initFileServer()
+    {
+        // must be called *after* initSocketServer()
+        // this may induce a race condition
+        // if the client ask for a file *before*
+        // the file server is up.
+        if (!activeSocketList.isEmpty())
+        {
+            new FileServerThread(activeSocketList).start();
+        }
+        else
+        {
+            Log.debug("No active remote client, not lauching the file server.");
+        }
+    }
+    
     private void waitForConnection()
     {
         Socket clientSocket = null;
@@ -112,7 +127,10 @@ Log.debug("About to create server socket on port " + port);
             clientSocket = serverSocket.accept();
             Log.event("Got client connection from " +
                 clientSocket.getInetAddress().toString());
-            clientSockets[numClients] = clientSocket;
+            synchronized (activeSocketList)
+            {
+                activeSocketList.add(clientSocket);
+            }
             numClients++;
         }
         catch (IOException ex)
@@ -122,7 +140,7 @@ Log.debug("About to create server socket on port " + port);
             return;
         }
 
-        new SocketServerThread(this, clientSocket).start();
+        new SocketServerThread(this, clientSocket, activeSocketList).start();
     }
 
 

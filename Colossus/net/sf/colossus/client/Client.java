@@ -17,6 +17,7 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
@@ -149,7 +150,17 @@ public final class Client implements IClient
         loadOptions();
 
         sct = new SocketClientThread(this, host, port);
-        this.server = (IServer)sct;
+        this.server = sct;
+
+        if (remote)
+        {
+            net.sf.colossus.util.ResourceLoader.setDataServer(host);
+        }
+        else
+        {
+            net.sf.colossus.util.ResourceLoader.setDataServer(null);
+        }
+        
         sct.start();
 
         TerrainRecruitLoader.setCaretakerInfo(caretakerInfo);
@@ -488,7 +499,7 @@ public final class Client implements IClient
         else if (optname.equals(Options.noBaseColor))
         {
             Creature.setNoBaseColor(bval);
-            net.sf.colossus.util.ResourceLoader.purgeCache();
+            net.sf.colossus.util.ResourceLoader.purgeImageCache();
             repaintAllWindows();
         }
         else if (optname.equals(Options.logDebug))
@@ -1333,8 +1344,7 @@ Log.debug("Called Client.removeLegion() for " + id);
     {
         if (isRemote())
         {
-            VariantSupport.loadVariant(options.getStringOption(
-                Options.variant));
+            VariantSupport.loadVariant(options.getStringOption(Options.variant), false);
         }
 
         if (!getOption(Options.autoPlay))

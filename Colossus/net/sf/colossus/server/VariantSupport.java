@@ -32,36 +32,80 @@ public final class VariantSupport
     private static HintInterface aihl = null;
     private static java.util.Properties markerNames;
 
+
+    /**
+     * Clean-up the ResourceLoader caches to make room for a variant.
+     * @param variantName Name of the soon-to-be-loaded variant.
+     */
+    public static void freshenVariant(String variantName)
+    {
+        freshenVariant(variantName + ".var", variantName);
+    }
+    
+    /**
+     * Clean-up the ResourceLoader caches to make room for a variant.
+     * @param varFile Soon-to-be-loaded variant File.
+     */
+    public static void freshenVariant(java.io.File varFile)
+    {
+        String tempVarName = varFile.getName();
+        String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
+        freshenVariant(tempVarName, tempVarDirectory);
+    }
+    
+    /**
+     * Clean-up the ResourceLoader caches to make room for a variant.
+     * @param tempVarName The name of the file holding the soon-to-be-loaded Variant definition.
+     * @param tempVarDirectory The path to the directory holding the soon-to-be-loaded Variant.
+     */
+    public static void freshenVariant(String tempVarName, 
+                                  String tempVarDirectory)
+    {
+        if (!(loadedVariant && variantName.equals(tempVarName) &&
+              varDirectory.equals(tempVarDirectory)))
+        {
+            ResourceLoader.purgeImageCache();
+            ResourceLoader.purgeFileCache();
+        }
+    }
+    
     /**
      * Load a Colossus Variant by name.
      * @param variantName The name of the variant.
+     * @param serverSide We're loading on a server.
      * @return A Document describing the variant.
      */
-    public static Document loadVariant(String variantName)
+    public static Document loadVariant(String variantName,
+                                       boolean serverSide)
     {
-        return loadVariant(variantName + ".var", variantName);
+        return loadVariant(variantName + ".var", variantName,
+                           serverSide);
     }
 
     /**
      * Load a Colossus Variant from the specified File
      * @param varFile The File to load as a Variant.
+     * @param serverSide We're loading on a server.
      * @return A Document describing the variant.
      */
-    public static Document loadVariant(java.io.File varFile)
+    public static Document loadVariant(java.io.File varFile,
+                                       boolean serverSide)
     {
         String tempVarName = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
-        return loadVariant(tempVarName, tempVarDirectory);
+        return loadVariant(tempVarName, tempVarDirectory, serverSide);
     }
 
     /**
      * Load a Colossus Variant from the specified filename in the specified path.
      * @param tempVarName The name of the file holding the Variant definition.
      * @param tempVarDirectory The path to the directory holding the Variant.
+     * @param serverSide We're loading on a server.
      * @return A Document describing the variant.
      */
     public static Document loadVariant(String tempVarName, 
-        String tempVarDirectory)
+                                       String tempVarDirectory,
+                                       boolean serverSide)
     {
         if (loadedVariant && variantName.equals(tempVarName) &&
             varDirectory.equals(tempVarDirectory))
@@ -69,6 +113,12 @@ public final class VariantSupport
             return varREADME;
         }
 
+        if (serverSide)
+        {
+            ResourceLoader.purgeImageCache();
+            ResourceLoader.purgeFileCache();
+        }
+        
         loadedVariant = false;
 
         Log.debug("Loading variant " + tempVarName +
@@ -177,7 +227,7 @@ public final class VariantSupport
         {
             loadedVariant = true;
             Creature.loadCreatures();
-            loadTerrainsAndRecruits();
+            loadTerrainsAndRecruits(serverSide);
             loadHints();
             markerNames = loadMarkerNamesProperties();
         }
@@ -192,7 +242,8 @@ public final class VariantSupport
             {
                 Log.debug("Trying to load Default instead...");
                 varREADME = loadVariant(Constants.defaultVARFile,
-                                        Constants.defaultDirName);
+                                        Constants.defaultDirName,
+                                        serverSide);
             }
         }
 
@@ -275,7 +326,7 @@ public final class VariantSupport
 
     /** TerrainRecruitLoader is needed by many classes, so load it
      *  immediately after loading the variant. */ 
-    public synchronized static void loadTerrainsAndRecruits()
+    public synchronized static void loadTerrainsAndRecruits(boolean serverSide)
     {
         // remove all old stuff in the custom recruitments system
         CustomRecruitBase.reset();
@@ -294,7 +345,7 @@ public final class VariantSupport
             TerrainRecruitLoader trl = new TerrainRecruitLoader(terIS);
             while (trl.oneTerrain() >= 0) {}
             /* now initialize the static bits of the Battlelands */
-            HexMap.staticBattlelandsInit();
+            HexMap.staticBattlelandsInit(serverSide);
         }
         catch (Exception e) 
         {

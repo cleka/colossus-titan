@@ -27,7 +27,7 @@ final class SocketClientThread extends Thread implements IServer
     private BufferedReader in;
     private PrintWriter out;
 
-    private final String sep = Constants.protocolTermSeparator;
+    private final static String sep = Constants.protocolTermSeparator;
 
 
     SocketClientThread(Client client, String host, int port)
