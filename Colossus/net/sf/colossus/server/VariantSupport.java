@@ -333,18 +333,18 @@ public final class VariantSupport
         }
     }
 
-    public static String getRecruitHint(char terrain,
-                                        net.sf.colossus.client.LegionInfo legion,
-                                        net.sf.colossus.server.CanReachTerrainInterface crti,
-                                        net.sf.colossus.server.HasCreatureInterface hci)
+    public static String getRecruitHint(
+        char terrain,
+        net.sf.colossus.client.LegionInfo legion,
+        net.sf.colossus.server.HintOracleInterface oracle)
     {
         if (aihl != null)
         {
-            return aihl.getRecruitHint(terrain,legion,crti,hci);
+            return aihl.getRecruitHint(terrain,legion,oracle);
         }
         return null;
     }
-
+    
     /** get maximum number of players in that variant */
     public static int getMaxPlayers()
     {

@@ -1789,36 +1789,36 @@ public class SimpleAI implements AI
         return best;
     }
 
-    private class SimpleAICanReachTerrain implements
-        net.sf.colossus.server.CanReachTerrainInterface
+    private class SimpleAIOracle implements
+        net.sf.colossus.server.HintOracleInterface
     {
         LegionInfo legion;
         MasterHex hex;
-        SimpleAICanReachTerrain(LegionInfo legion,
-                                MasterHex hex)
+        List recruits;
+        SimpleAIOracle(LegionInfo legion,
+                       MasterHex hex,
+                       List recruits)
         {
             this.legion = legion;
             this.hex = hex;
+            this.recruits = recruits;
         }
 
         public boolean canReach(char t)
         {
             return (getNumberOfWaysToTerrain(legion,hex,t) > 0);
         }
-    }
-
-    private class SimpleAIHasCreature implements
-        net.sf.colossus.server.HasCreatureInterface
-    {
-        LegionInfo legion;
-        SimpleAIHasCreature(LegionInfo legion)
+        public int creatureAvailable(String name)
         {
-            this.legion = legion;
+            return client.getCreatureCount(Creature.getCreatureByName(name));
         }
-
         public boolean hasCreature(String name)
         {
             return (legion.numCreature(name) > 0);
+        }
+        public boolean canRecruit(String name)
+        {
+            return recruits.contains(Creature.getCreatureByName(name));
         }
     }
 
@@ -1829,11 +1829,9 @@ public class SimpleAI implements AI
         String recruitName =
             VariantSupport.getRecruitHint(hex.getTerrain(),
                                           legion,
-                                          new SimpleAICanReachTerrain(legion,hex),
-                                          new SimpleAIHasCreature(legion));
+                                          new SimpleAIOracle(legion,hex,recruits));
         if (recruitName == null)
         {
-            Log.debug("No hint available");
             return (Creature)recruits.get(recruits.size() - 1);
         }
         Creature recruit = Creature.getCreatureByName(recruitName);

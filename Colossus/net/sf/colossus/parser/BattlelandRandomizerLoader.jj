@@ -2,7 +2,7 @@ options
 {
   IGNORE_CASE = false;
   STATIC = false;
-  LOOKAHEAD = 8;
+  LOOKAHEAD = 20;
   FORCE_LA_CHECK = true;
 }
 
