@@ -93,6 +93,10 @@ System.out.println("summonState = " + summonState);
             {
 System.out.println("SummonAngel");
                 summoningAngel = true;
+
+                // Make sure the MasterBoard is visible.
+                map.getBoard().show();
+
                 summonAngel = new SummonAngel(map.getBoard(), attacker);
                 // This is the last chance to summon an angel until the
                 // battle is over.
