@@ -2533,7 +2533,7 @@ Log.debug("Called findBattleMoves()");
         timer.schedule(new TriggerTimeIsUp(), MS_PER_S * timeLimit);
     }
 
-
+    private final static int MIN_ITERATIONS = 50;
     /** Evaluate all legion moves in the list, and return the best one.
      *  Break out early if the time limit is exceeded. */
     LegionMove findBestLegionMove(List legionMoves)
@@ -2561,9 +2561,18 @@ Log.debug("Called findBattleMoves()");
 
             if (timeIsUp)
             {
-                Log.debug("findBestLegionMove() time up after " + count + 
-                    " iterations");
-                break;
+                if (count >= MIN_ITERATIONS)
+                {
+                    Log.debug("findBestLegionMove() time up after " + count + 
+                              " iterations");
+                    break;
+                }
+                else
+                {
+                    Log.debug("findBestLegionMove() time up after " + count + 
+                              " iterations, but we keep searching until " +
+                              MIN_ITERATIONS);
+                }
             }
         }
         Log.debug("Best legion move: " + ((best == null) ? "none " : 

@@ -25,6 +25,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
     /** hash by creature name to the label that displays the count */
     Map countMap = new HashMap();
+    /** hash by creature name to the Chit (so we can cross away the dead) */
+    Map chitMap = new HashMap();
     private SaveWindow saveWindow;
     private final static Font countFont =
         new Font("Monospaced", Font.PLAIN, 12);
@@ -110,6 +112,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
                 chit = new Chit(4 * Scale.get(), name, this);
             else
                 chit = new Chit(4 * Scale.get(), "Titan-0-Black", this);
+            chitMap.put(name, chit);
             label = new JLabel(baseString, SwingConstants.CENTER);
             topLabel =
                 new JLabel(htmlizeOnly(
@@ -170,10 +173,17 @@ class CreatureCollectionView extends KDialog implements WindowListener
                 int maxcount = client.getCreatureMaxCount(name);
                 int deadCount = client.getCreatureDeadCount(name);
                 int inGameCount = maxcount - (deadCount + count);
+                boolean immortal =
+                    Creature.getCreatureByName(name).isImmortal();
                 String color;
                 if (count == 0)
                 {
                     color = "yellow";
+                    if (!immortal)
+                    {
+                        Chit chit = (Chit)chitMap.get(name);
+                        chit.setDead(true);
+                    }
                 }
                 else if (count == maxcount)
                 {
@@ -192,10 +202,10 @@ class CreatureCollectionView extends KDialog implements WindowListener
                                      "blue");
                 String htmlDeadCount =
                     htmlColorizeOnly(
-                        Creature.getCreatureByName(name).isImmortal() ?
-                            "--" :
-                            (deadCount < 10 ? "0" : "") + 
-                                 Integer.toString(deadCount), "red");
+                                     immortal ?
+                                     "--" :
+                                     (deadCount < 10 ? "0" : "") + 
+                                     Integer.toString(deadCount), "red");
                 String htmlInGameCount =
                     htmlColorizeOnly((inGameCount < 10 ? "0" : "") + 
                                      Integer.toString(inGameCount),
