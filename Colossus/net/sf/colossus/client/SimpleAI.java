@@ -2765,6 +2765,7 @@ Log.debug("Called findBattleMoves()");
         int NATIVE_BONUS_TERRAIN = 50;
         int NATIVE_BOG = 20;
         int NON_NATIVE_PENALTY_TERRAIN = -100;
+        int PENALTY_DAMAGE_TERRAIN = -200;
         int FIRST_RANGESTRIKE_TARGET = 300;
         int EXTRA_RANGESTRIKE_TARGET = 100;
         int RANGESTRIKE_TITAN = 500;
@@ -2813,27 +2814,29 @@ Log.debug("Called findBattleMoves()");
             value += bec.OFFBOARD_DEATH_SCALE_FACTOR *
                 getCombatValue(critter, terrain);
         }
-        else if (MasterHex.isNativeCombatBonus(critter.getCreature(), terrain))
+        else if (hex.isNativeBonusTerrain() &&
+                 critter.getCreature().isNativeTerrain(hex.getTerrain()))
         {
-            if (hex.isNativeBonusTerrain())
-            {
-                value += bec.NATIVE_BONUS_TERRAIN;
-            }
+            value += bec.NATIVE_BONUS_TERRAIN;
             // We want marsh natives to slightly prefer moving to bog hexes,
             // even though there's no real bonus there, to leave other hexes
             // clear for non-native allies.
-            else if (hex.getTerrain() == 'o')
+            if (hex.getTerrain() == 'o')
             {
                 value += bec.NATIVE_BOG;
             }
         }
-        else  // Critter is not native.
+        else  // Critter is not native or the terrain is not beneficial
         {
-            if (hex.isNonNativePenaltyTerrain())
+            if (hex.isNonNativePenaltyTerrain() &&
+                (!critter.getCreature().isNativeTerrain(hex.getTerrain())))
             {
                 value += bec.NON_NATIVE_PENALTY_TERRAIN;
             }
         }
+        /* damage is positive, healing is negative, so we can always add */
+        value += bec.PENALTY_DAMAGE_TERRAIN *
+            hex.damageToCreature(critter.getCreature()) ;
 
         Set targetHexLabels = client.findStrikes(critter.getTag());
         int numTargets = targetHexLabels.size();

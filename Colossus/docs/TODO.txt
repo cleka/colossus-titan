@@ -41,8 +41,6 @@ Disable "AIs stop when humans dead" if no human players at start of game.
 
 Should be able to move recruit chart behind board, map.
 
-AI needs to better avoid drift hexes.
-
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 
 
