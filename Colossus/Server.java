@@ -109,6 +109,40 @@ public final class Server
         }
     }
 
+
+    public void leaveCarryMode()
+    {
+        Battle battle = game.getBattle();
+        battle.leaveCarryMode();
+    }
+
+
+    public void doneWithBattleMoves()
+    {
+        Battle battle = game.getBattle();
+        battle.doneWithMoves();
+    }
+
+    public boolean anyOffboardCreatures()
+    {
+        Battle battle = game.getBattle();
+        return battle.anyOffboardCreatures();
+    }
+
+    public boolean doneWithStrikes()
+    {
+        Battle battle = game.getBattle();
+        return battle.doneWithStrikes();
+    }
+
+
+    public void makeForcedStrikes(boolean rangestrike)
+    {
+        Battle battle = game.getBattle();
+        battle.makeForcedStrikes(rangestrike);
+    }
+
+
     // XXX temp
     public void loadOptions()
     {
@@ -516,7 +550,8 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.placeNewChit(critter, inverted);
+            client.placeNewChit(critter.getImageName(inverted), 
+                critter.getTag(), critter.getCurrentHexLabel());
         }
     }
 
@@ -527,6 +562,16 @@ public final class Server
         {
             Client client = (Client)it.next();
             client.setBattleChitDead(tag);
+        }
+    }
+
+    public void allSetBattleChitHits(int tag, int hits)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setBattleChitHits(tag, hits);
         }
     }
 
@@ -636,6 +681,7 @@ public final class Server
 
     public boolean tryToConcede(String markerId)
     {
+        Battle battle = game.getBattle();
         return game.getBattle().tryToConcede(markerId);
     }
 
@@ -659,6 +705,115 @@ public final class Server
     public void fight(String hexLabel)
     {
         game.fight(hexLabel);
+    }
+
+
+    public boolean doBattleMove(int tag, String hexLabel)
+    {
+        return game.getBattle().doMove(tag, hexLabel);
+    }
+
+
+    public void strike(int tag, String hexLabel)
+    {
+        Battle battle = game.getBattle();
+        battle.getActiveLegion().getCritterByTag(tag).strike(
+            battle.getCritter(hexLabel), false);
+    }
+
+
+    public void applyCarries(String hexLabel)
+    {
+        Battle battle = game.getBattle();
+        battle.applyCarries(hexLabel);
+    }
+
+    public int getCarryDamage()
+    {
+        Battle battle = game.getBattle();
+        return battle.getCarryDamage();
+    }
+
+    public Set getCarryTargets()
+    {
+        Battle battle = game.getBattle();
+        return battle.getCarryTargets();
+    }
+
+
+    public void undoLastBattleMove()
+    {
+        Battle battle = game.getBattle();
+        battle.undoLastMove();
+    }
+
+    public void undoAllBattleMoves()
+    {
+        Battle battle = game.getBattle();
+        battle.undoAllMoves();
+    }
+
+
+    public int [] getCritterTags(String hexLabel)
+    {
+        Battle battle = game.getBattle();
+        ArrayList critters = battle.getCritters(hexLabel);
+        int [] tags = new int[critters.size()];
+        int i = 0;
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            tags[i++] = critter.getTag();
+        }
+        return tags;
+    }
+
+
+    /** Return a set of hexLabels. */
+    public Set findMobileCritters()
+    {
+        Battle battle = game.getBattle();
+        return battle.findMobileCritters();
+    }
+
+    /** Return a set of hexLabels. */
+    public Set showBattleMoves(int tag)
+    {
+        Battle battle = game.getBattle();
+        return battle.showMoves(tag);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findStrikes(int tag)
+    {
+        Battle battle = game.getBattle();
+        return battle.findStrikes(tag);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findCrittersWithTargets()
+    {
+        Battle battle = game.getBattle();
+        return battle.findCrittersWithTargets();
+    }
+
+
+    /** Return the player name for the critter tag.  Only works in battle. */
+    public String getPlayerNameByTag(int tag)
+    {
+        Battle battle = game.getBattle();
+        Legion legion = battle.getActiveLegion();
+        if (legion.getCritterByTag(tag) != null)
+        {
+            return legion.getPlayerName();
+        }
+        legion = battle.getInactiveLegion();
+        if (legion.getCritterByTag(tag) != null)
+        {
+            return legion.getPlayerName();
+        }
+        return "";
     }
 
 
@@ -714,13 +869,13 @@ public final class Server
     }
 
 
-    public void allInitBattleMap(String masterHexLabel, Battle battle)
+    public void allInitBattleMap(String masterHexLabel)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.initBattleMap(masterHexLabel, battle);
+            client.initBattleMap(masterHexLabel);
         }
     }
 

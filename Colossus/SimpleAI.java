@@ -2128,14 +2128,10 @@ class SimpleAI implements AI
                 {
                     CritterMove cm = (CritterMove)it2.next();
                     Critter fakeCritter = cm.getCritter();
-                    // Get the critter in this legion with the same tag.
-                    Critter critter = legion.getCritterByTag(
-                        fakeCritter.getTag());
 
-                    BattleHex hex = cm.getEndingHex(terrain);
-                    Log.debug("applymove: try " + critter + " to " +
-                        hex.getLabel());
-                    if (battle.doMove(critter, hex))
+                    String hexLabel = cm.getEndingHexLabel();
+                    Log.debug("applymove: try " + fakeCritter + " to " + hexLabel);
+                    if (battle.doMove(fakeCritter.getTag(), hexLabel))
                     {
                         // The move was okay, so continue to the next critter.
                         break;
@@ -2213,7 +2209,7 @@ class SimpleAI implements AI
                 Critter critter2 = cm.getCritter();
                 Log.debug("Simulating moving " + critter2.getName() + " to " + 
                     cm.getEndingHexLabel());
-                critter2.moveToHex(cm.getEndingHex(terrain));
+                critter2.moveToHex(cm.getEndingHexLabel());
             }
 
             // moveList is a list of CritterMoves for one critter.
@@ -2233,17 +2229,17 @@ class SimpleAI implements AI
 
                 CritterMove cm = new CritterMove(critter,
                    currentHexLabel, hexLabel);
-                BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
+                // XXX BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
 
                 // Need to move the critter to evaluate.
-                critter.moveToHex(hex);
+                critter.moveToHex(hexLabel);
 
                 // Compute and save the value for each CritterMove.
                 cm.setValue(evaluateCritterMove(battle, critter));
                 moveList.add(cm);
             }
             // Move the critter back where it started.
-            critter.moveToHex(critter.getStartingHex());
+            critter.moveToHex(critter.getStartingHexLabel());
 
             // Sort critter moves in descending order of score.
             Collections.sort(moveList, new Comparator()
@@ -2402,8 +2398,8 @@ class SimpleAI implements AI
             ArrayList moveList = (ArrayList)it.next();
             CritterMove cm = (CritterMove)moveList.get(0);
             Critter critter = cm.getCritter();
-            BattleHex hex = cm.getEndingHex(battle.getTerrain());
-            if (battle.testMove(critter, hex))
+            String hexLabel = cm.getEndingHexLabel();
+            if (battle.testMove(critter, hexLabel))
             {
                 val += critter.getPointValue();
             }
@@ -2631,7 +2627,7 @@ class SimpleAI implements AI
         }
 
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
-            legion);
+            legion.getEntrySide(masterHexLabel));
 
         // Reward titans sticking to the edges of the back row
         // surrounded by allies.  We need to relax this in the

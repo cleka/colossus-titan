@@ -86,10 +86,14 @@ public final class Battle
         defender.clearAllEntrySides(masterHexLabel);
         defender.setEntrySide(masterHexLabel, (side + 3) % 6);
 
+        Log.event(attacker.getLongMarkerName() + " (" +
+            attacker.getPlayerName() + ") attacks " +
+            defender.getLongMarkerName() + " (" +
+            defender.getPlayerName() + ")" + " in " +
+            MasterBoard.getHexByLabel(masterHexLabel).getDescription());
+
         placeLegion(attacker);
         placeLegion(defender);
-
-        game.getServer().allInitBattleMap(masterHexLabel, this);
 
         Client.clearUndoStack();
     }
@@ -98,7 +102,7 @@ public final class Battle
     private void placeLegion(Legion legion)
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
-            legion);
+            legion.getEntrySide(masterHexLabel));
         String entranceLabel = entrance.getLabel();
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
@@ -124,9 +128,20 @@ public final class Battle
     private void placeCritter(Critter critter)
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
-            critter.getLegion());
+            critter.getLegion().getEntrySide(masterHexLabel));
         String entranceLabel = entrance.getLabel();
         critter.addBattleInfo(entranceLabel, entranceLabel, this);
+    }
+
+
+    private void initBattleChits(Legion legion, boolean inverted)
+    {
+        Iterator it = legion.getCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            game.getServer().allPlaceNewChit(critter, inverted);
+        }
     }
 
 
@@ -134,6 +149,10 @@ public final class Battle
      *  is non-null earlier. */
     public void init()
     {
+        game.getServer().allInitBattleMap(masterHexLabel);
+        initBattleChits(getAttacker(), false);
+        initBattleChits(getDefender(), true);
+
         boolean advance = false;
         switch (getPhase())
         {
@@ -723,6 +742,13 @@ public final class Battle
         return set;
     }
 
+
+    public Set showMoves(int tag)
+    {
+        Critter critter = getActiveLegion().getCritterByTag(tag);
+        return showMoves(critter, false);
+    }
+
     /** Find all legal moves for this critter. The returned list
      *  contains hex IDs, not hexes. */
     public Set showMoves(Critter critter, boolean ignoreMobileAllies)
@@ -792,8 +818,10 @@ public final class Battle
     }
 
     /** Here for when we eventually do correct concession timing. */
-    public boolean tryToConcede(String markerId)
+    public boolean tryToConcede(String playerName)
     {
+        Legion legion = getLegionByPlayerName(playerName);
+        String markerId = legion.getMarkerId();
         Log.event(markerId + " concedes the battle");
         concede(markerId);
         return true;
@@ -913,7 +941,7 @@ public final class Battle
     }
 
 
-    public void clearCarries()
+    public void leaveCarryMode()
     {
         carryDamage = 0;
         carryTargets.clear();
@@ -1198,21 +1226,29 @@ public final class Battle
         while (repeat);
     }
 
-    public void doneWithStrikes()
+    /* Return true if okay, or false if forced strikes remain. */
+    public boolean doneWithStrikes()
     {
         // Advance only if there are no unresolved strikes.
         if (isForcedStrikeRemaining())
         {
             Log.error("client called battle.doneWithStrikes() illegally");
-            // XXX Send some error message to the client.
+            return false;
         }
         else
         {
             commitStrikes();
             advancePhase();
+            return true;
         }
     }
 
+
+    public Set findStrikes(int tag)
+    {
+        Critter critter = getActiveLegion().getCritterByTag(tag);
+        return findStrikes(critter, true);
+    }
 
     /** Return a set of hex labels for hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
@@ -1308,6 +1344,12 @@ public final class Battle
     }
 
 
+    public void applyCarries(String hexLabel)
+    {
+        Critter target = getCritter(hexLabel);
+        applyCarries(target);
+    }
+
     public void applyCarries(Critter target)
     {
         if (!carryTargets.contains(target.getCurrentHexLabel()))
@@ -1325,7 +1367,7 @@ public final class Battle
 
         if (carryDamage <= 0 || getCarryTargets().isEmpty())
         {
-            clearCarries();
+            leaveCarryMode();
         }
         else
         {
@@ -1944,10 +1986,23 @@ public final class Battle
 
 
     /** If legal, move critter to hex and return true. Else return false. */
-    public boolean doMove(Critter critter, BattleHex hex)
+    public boolean doMove(int tag, String hexLabel)
     {
-        String hexLabel = hex.getLabel();
+        Critter critter = getActiveLegion().getCritterByTag(tag);
+        if (critter != null)
+        {
+            return doMove(critter, hexLabel);
+        }
+        else
+        {
+            return false;
+        }
+    }
 
+
+    /** If legal, move critter to hex and return true. Else return false. */
+    private boolean doMove(Critter critter, String hexLabel)
+    {
         // Allow null moves.
         if (hexLabel.equals(critter.getCurrentHexLabel()))
         {
@@ -1958,7 +2013,7 @@ public final class Battle
         {
             Log.event(critter.getName() + " moves from " +
                 critter.getCurrentHexLabel() + " to " + hexLabel);
-            critter.moveToHex(hex);
+            critter.moveToHex(hexLabel);
             return true;
         }
         else
@@ -1973,13 +2028,11 @@ public final class Battle
     /** A streamlined version of doMove for the AI. If legal, move critter
      *  to hex and return true. Else return false.  Do not allow null moves.
      */
-    public boolean testMove(Critter critter, BattleHex hex)
+    public boolean testMove(Critter critter, String hexLabel)
     {
-        String hexLabel = hex.getLabel();
-
         if (showMoves(critter, false).contains(hexLabel))
         {
-            critter.moveToHex(hex);
+            critter.moveToHex(hexLabel);
             return true;
         }
         return false;
@@ -2168,6 +2221,7 @@ public final class Battle
 
         Battle battle = new Battle(game, attacker.getMarkerId(),
             defender.getMarkerId(), DEFENDER, hex.getLabel(), 1, MOVE);
+        game.setBattle(battle);
         battle.init();
     }
 }

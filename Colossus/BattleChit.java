@@ -9,20 +9,17 @@ import java.awt.*;
 
 public final class BattleChit extends Chit
 {
-    // XXX Remove direct critter reference.
-    private Critter critter;
     private int tag;
     private static Font font;
     private static Font oldFont;
     private static int fontHeight;
+    private int hits = 0;
 
 
-    public BattleChit(int scale, String id, Container container,
-        Critter critter)
+    public BattleChit(int scale, String id, Container container, int tag)
     {
         super(scale, id, container);
-        this.critter = critter;
-        tag = critter.getTag();
+        this.tag = tag;
         setBackground(Color.white);
     }
 
@@ -33,13 +30,20 @@ public final class BattleChit extends Chit
     }
 
 
+    public void setHits(int hits)
+    {
+        this.hits = hits;
+        repaint();
+    }
+
+
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
 
-        if (critter.getHits() > 0 && !isDead())
+        if (hits > 0 && !isDead())
         {
-            String hitString = Integer.toString(critter.getHits());
+            String hitString = Integer.toString(hits);
             Rectangle rect = getBounds();
             FontMetrics fontMetrics;
 

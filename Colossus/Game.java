@@ -2892,6 +2892,13 @@ public final class Game extends GameSource
         return null;
     }
 
+
+    /** For test code only. */
+    public void setBattle(Battle battle)
+    {
+        this.battle = battle;
+    }
+
     private GameListener m_oListener = new GameAdapter()
     {
         public void legionChange(LegionEvent evt)

@@ -49,7 +49,7 @@ public final class Client
     // Server later, and have their GUI manipulators removed or restricted.)
     private Properties options = new Properties();
 
-    /** Help keep straight whose client this is. */
+    /** Player who owns this client. */
     String playerName;
 
 
@@ -177,9 +177,9 @@ public final class Client
     }
 
     /** Legion concedes. */
-    boolean concede(String markerId)
+    boolean concede()
     {
-        return server.tryToConcede(markerId);
+        return server.tryToConcede(playerName);
     }
 
     /** Legion does not concede. */
@@ -592,12 +592,43 @@ public final class Client
     }
 
 
+    /** Called from server to clear carry cursor on client. */
     public void clearCarries()
     {
         if (map != null)
         {
             map.clearCarries();
         }
+    }
+
+
+    /** Called from BattleMap to leave carry mode. */
+    public void leaveCarryMode()
+    {
+        server.leaveCarryMode();
+    }
+
+
+    public void doneWithBattleMoves()
+    {
+        server.doneWithBattleMoves();
+    }
+
+    public boolean anyOffboardCreatures()
+    {
+        return server.anyOffboardCreatures();
+    }
+
+    /** Returns true if okay, or false if forced strikes remain. */
+    public boolean doneWithStrikes()
+    {
+        return server.doneWithStrikes();
+    }
+
+
+    public void makeForcedStrikes(boolean rangestrike)
+    {
+        server.makeForcedStrikes(rangestrike);
     }
 
 
@@ -691,10 +722,10 @@ public final class Client
     }
 
     /** Create a new BattleChit and add it to the end of the list. */
-    public void addBattleChit(String imageName, Critter critter)
+    public void addBattleChit(String imageName, int tag)
     {
         BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
-            map, critter);
+            map, tag);
         battleChits.add(chit);
     }
 
@@ -713,11 +744,11 @@ public final class Client
         }
     }
 
-    public void placeNewChit(Critter critter, boolean inverted)
+    public void placeNewChit(String imageName, int tag, String hexLabel)
     {
         if (map != null)
         {
-            map.placeNewChit(critter, inverted);
+            map.placeNewChit(imageName, tag, hexLabel);
         }
     }
 
@@ -730,6 +761,20 @@ public final class Client
             if (chit.getTag() == tag)
             {
                 chit.setDead(true);
+                return;
+            }
+        }
+    }
+
+    public void setBattleChitHits(int tag, int hits)
+    {
+        Iterator it = battleChits.iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getTag() == tag)
+            {
+                chit.setHits(hits);
                 return;
             }
         }
@@ -1093,12 +1138,12 @@ public final class Client
     }
 
 
-    public void initBattleMap(String masterHexLabel, Battle battle)
+    public void initBattleMap(String masterHexLabel)
     {
         // Do not show map for AI players.
         if (!getOption(Options.autoPlay))
         {
-            map = new BattleMap(this, masterHexLabel, battle);
+            map = new BattleMap(this, masterHexLabel);
             showBattleMap();
             initBattleDice();
         }
@@ -1334,6 +1379,109 @@ public final class Client
         {
             board.setupPlayerLabel();
         }
+    }
+
+    public String getColor()
+    {
+        Player player = server.getGame().getPlayer(playerName);
+        return player.getColor();
+    }
+
+
+    public String getBattleActivePlayerName()
+    {
+        return server.getGame().getBattle().getActivePlayerName();
+    }
+
+
+    public int getBattlePhase()
+    {
+        return server.getGame().getBattle().getPhase();
+    }
+
+    public int getBattleTurnNumber()
+    {
+        return server.getGame().getBattle().getTurnNumber();
+    }
+
+
+    /** Returns true if the move was legal, or false if it
+     *  was not allowed. */
+    public boolean doBattleMove(int tag, String hexLabel)
+    {
+        return server.doBattleMove(tag, hexLabel);
+    }
+
+
+    /** Attempt to have critter tag strike the critter in hexLabel. */
+    public void strike(int tag, String hexLabel)
+    {
+        server.strike(tag, hexLabel);
+    }
+
+
+    /** Attempt to apply carries to the critter in hexLabel. */
+    public void applyCarries(String hexLabel)
+    {
+        server.applyCarries(hexLabel);
+    }
+
+
+    public int getCarryDamage()
+    {
+        return server.getCarryDamage();
+    }
+
+    public Set getCarryTargets()
+    {
+        return server.getCarryTargets();
+    }
+
+
+    public void undoLastBattleMove()
+    {
+        server.undoLastBattleMove();
+    }
+
+    public void undoAllBattleMoves()
+    {
+        server.undoAllBattleMoves();
+    }
+
+
+    public int [] getCritterTags(String hexLabel)
+    {
+        return server.getCritterTags(hexLabel);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findMobileCritters()
+    {
+        return server.findMobileCritters();
+    }
+
+    /** Return a set of hexLabels. */
+    public Set showBattleMoves(int tag)
+    {
+        return server.showBattleMoves(tag);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findStrikes(int tag)
+    {
+        return server.findStrikes(tag);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findCrittersWithTargets()
+    {
+        return server.findCrittersWithTargets();
+    }
+
+
+    public String getPlayerNameByTag(int tag)
+    {
+        return server.getPlayerNameByTag(tag);
     }
 
 

@@ -163,6 +163,7 @@ public final class Critter extends Creature implements Comparable
     public void setHits(int hits)
     {
         this.hits = hits;
+        battle.getGame().getServer().allSetBattleChitHits(tag, hits);
     }
 
 
@@ -186,7 +187,7 @@ public final class Critter extends Creature implements Comparable
 
         if (damage > 0)
         {
-            hits += damage;
+            setHits(hits + damage);
             if (hits > getPower())
             {
                 excess = hits - getPower();
@@ -366,9 +367,9 @@ public final class Critter extends Creature implements Comparable
 
     /** Most code should use Battle.doMove() instead, since it checks
      *  for legality and logs the move. */
-    public void moveToHex(BattleHex hex)
+    public void moveToHex(String hexLabel)
     {
-        currentHexLabel = hex.getLabel();
+        currentHexLabel = hexLabel;
         Client.pushUndoStack(currentHexLabel);
         Set set = new HashSet();
         set.add(startingHexLabel);
@@ -679,7 +680,7 @@ public final class Critter extends Creature implements Comparable
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
-        battle.clearCarries();
+        battle.leaveCarryMode();
         boolean carryPossible = true;
         if (numInContact(false) < 2)
         {
