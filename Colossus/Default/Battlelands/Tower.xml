@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!DOCTYPE battlemap SYSTEM "file:./Default/Battlelands/battlemap.dtd">
 <battlemap terrain="Tower" tower="True">
     <battlehex x="2" y="2" terrain="Tower" elevation="1">
         <border number="0" type="w" />
@@ -39,12 +40,12 @@
         <border number="3" type="w" />
     </battlehex>
     <startlist>
-        <battlehex label="D4" />
-        <battlehex label="C4" />
-        <battlehex label="E4" />
-        <battlehex label="D3" />
-        <battlehex label="C3" />
-        <battlehex label="E3" />
-        <battlehex label="D5" />
+        <battlehexref label="D4" />
+        <battlehexref label="C4" />
+        <battlehexref label="E4" />
+        <battlehexref label="D3" />
+        <battlehexref label="C3" />
+        <battlehexref label="E3" />
+        <battlehexref label="D5" />
     </startlist>
 </battlemap>
