@@ -101,6 +101,12 @@ class Player
     }
 
 
+    int getNumLegions()
+    {
+        return numLegions;
+    }
+
+
     int legionsMoved()
     {
         int total = 0;
@@ -114,6 +120,7 @@ class Player
 
         return total;
     }
+
 
     String getName()
     {
