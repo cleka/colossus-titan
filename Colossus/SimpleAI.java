@@ -53,6 +53,12 @@ class SimpleAI implements AI
         game.board.unselectAllHexes();
         game.updateStatusScreen();
     }
+    
+
+    public Creature reinforce(Legion legion, Game game)
+    {
+        return chooseRecruit(game, legion, legion.getCurrentHex());
+    }
 
 
     /**
@@ -1064,7 +1070,9 @@ class SimpleAI implements AI
                                              MasterHex hex,
                                              Creature recruit)
     {
-        double attackerPointValue = attacker.getPointValue();
+        char terrain = hex.getTerrain();
+
+        double attackerPointValue = getCombatValue(attacker, terrain);
         if (attackerSplitsBeforeBattle)
         {
             // remove PV of the split
@@ -1073,75 +1081,23 @@ class SimpleAI implements AI
             while (creatureIt.hasNext())
             {
                 Creature creature = (Creature) creatureIt.next();
-                attackerPointValue -= creature.getPointValue();
+                attackerPointValue -= getCombatValue(creature, terrain);
             }
         }
         if (recruit != null)
         {
             // debugln("adding in recruited " + recruit + " when evaluating battle");
-            attackerPointValue += recruit.getPointValue();
-        }
-        // reduce PV slightly if titan is present and weak (and thus can't fight)
-        Critter attackerTitan  = attacker.getCritter(Creature.titan);
-        if (attackerTitan != null)
-        {
-            switch (attackerTitan.getPower())
-            {
-                case 6:
-                    attackerPointValue -= 12;
-                    break;
-                case 7:
-                    attackerPointValue -= 10;
-                    break;
-                case 8:
-                    attackerPointValue -= 8;
-                    break;
-                    // 9 or above is worth full strength
-            }
+            attackerPointValue += getCombatValue(recruit, terrain);
         }
         // TODO: add angel call
-        double defenderPointValue = defender.getPointValue();
-        // reduce PV slightly if titan is present and weak (and thus cant' fight)
-        Critter defenderTitan  = defender.getCritter(Creature.titan);
-        if (defenderTitan != null)
-        {
-            switch (defenderTitan.getPower())
-            {
-                case 6:
-                    defenderPointValue -= 12;
-                    break;
-                case 7:
-                    defenderPointValue -= 10;
-                    break;
-                case 8:
-                    defenderPointValue -= 8;
-                    break;
-                    // 9 or above is worth full strength
-            }
-        }
+
+        double defenderPointValue = getCombatValue(defender, terrain);
         // TODO: add in enemy's most likely turn 4 recruit
 
-        // TODO: adjust for natives / terrain type
-        switch (hex.getTerrain())
+        if (hex.getTerrain() == 'T')
         {
-            case 'T':  // defender in the tower!  ouch!
-                defenderPointValue *= 1.2;
-                break;
-            case 'B':
-                // in brush, having a native advantage is worth points
-                // TODO: implement this
-                break;
-            case 'M':
-                // in marsh, lack of any natives is a penalty.
-                // if >=2 natives, then not much effect
-                // TODO: implement this
-                break;
-            case 'S':
-                // in swamp, same as marsh plus a minor benefit to the defender
-                // from the trees (unless attacker has more rangestrikers)
-                // TODO: implement this
-                break;
-                // TODO: implement other terrain
+            // defender in the tower!  ouch!
+            defenderPointValue *= 1.2;
         }
         // TODO: adjust for entry side
 
@@ -1284,7 +1240,9 @@ class SimpleAI implements AI
     public boolean flee(Legion legion, Legion enemy, Game game)
     {
         // XXX This is a really dumb placeholder.
-        if (legion.getPointValue() < 0.7 * enemy.getPointValue())
+        char terrain = legion.getCurrentHex().getTerrain();
+        if (getCombatValue(legion, terrain) < 0.7 * getCombatValue(
+            enemy, terrain))
         {
             return true;
         }
@@ -1302,6 +1260,47 @@ class SimpleAI implements AI
         return false;
     }
 
+
+    public static int getCombatValue(Creature creature, char terrain)
+    {
+        int val = creature.getPointValue();
+        if (creature.isFlier())
+        {
+            val++;
+        }
+        if (creature.isRangestriker())
+        {
+            val++;
+        }
+        if (MasterHex.isNativeCombatBonus(creature, terrain))
+        {
+            val++;
+        }
+        // Weak titans can't risk fighting effectively.
+        if (creature.isTitan())
+        {
+            int power = creature.getPower();
+            if (power < 9)
+            {
+                val -= (6 + 2 * (9 - power));
+            }
+        }
+        return val;
+    }
+
+
+    public static int getCombatValue(Legion legion, char terrain)
+    {
+        int val = 0;
+        Collection critters = legion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            val += getCombatValue(critter, terrain);
+        }
+        return val;
+    }
 
 
     ////////////////////////////////////////////////////////////////

@@ -14,6 +14,9 @@ public interface AI
 
     /** make recruits for current player */
     public void muster(Game game);
+
+    /** pick one reinforcement */
+    public Creature reinforce(Legion legion, Game game);
     
     /** choose whether legion should flee from enemy */
     public boolean flee(Legion legion, Legion enemy, Game game);

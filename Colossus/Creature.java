@@ -178,6 +178,12 @@ public class Creature implements Comparable
     }
 
 
+    public boolean isTitan()
+    {
+        return name.equals("Titan");
+    }
+
+
     public String getName()
     {
         return name;

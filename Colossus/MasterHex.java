@@ -467,6 +467,37 @@ public final class MasterHex extends Hex
                 return Color.black;
         }
     }
+    
+    
+    public static boolean isNativeCombatBonus(Creature creature, char terrain)
+    {
+        switch (terrain)
+        {
+            case 'B':
+            case 'J':
+                return creature.isNativeBramble();
+
+            case 'D':
+                return creature.isNativeSandDune();
+
+            case 'H':
+            case 'm':
+                return creature.isNativeSlope();
+
+            case 't':
+                return creature.isNativeDrift();
+
+            case 'M':
+            case 'S':
+                return creature.isNativeBog();
+
+            case 'P':
+            case 'T':
+            case 'W':
+            default:
+                return false;
+        }
+    }
 
 
     /** Return a point near the center of the hex, vertically offset

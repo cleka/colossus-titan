@@ -390,8 +390,16 @@ public final class Battle
         if (turnNumber == 4 && defender.canRecruit())
         {
             // Allow recruiting a reinforcement.
-            Creature recruit = PickRecruit.pickRecruit(
-                map.getFrame(), defender);
+            Creature recruit;
+            Player player = defender.getPlayer();
+            if (player.getOption(Game.autoRecruit))
+            {
+                recruit = player.aiReinforce(defender);
+            }
+            else
+            {
+                recruit = PickRecruit.pickRecruit(map.getFrame(), defender);
+            }
             if (recruit != null && game != null)
             {
                 game.doRecruit(recruit, defender, map.getFrame());
@@ -885,7 +893,7 @@ public final class Battle
                     donor = null;
                 }
 
-                if (critter.getName().equals("Titan"))
+                if (critter.isTitan())
                 {
                     legion.getPlayer().eliminateTitan();
                 }
@@ -1942,8 +1950,17 @@ Game.logDebug("defender eliminated");
                 // Recruit reinforcement
                 if (legion.canRecruit() && attackerEntered)
                 {
-                    Creature recruit = PickRecruit.pickRecruit(
-                        board.getFrame(), legion);
+                    Creature recruit;
+                    Player player = legion.getPlayer();
+                    if (player.getOption(Game.autoRecruit))
+                    {
+                        recruit = player.aiReinforce(legion);
+                    }
+                    else
+                    {
+                        recruit = PickRecruit.pickRecruit(board.getFrame(),
+                            legion);
+                    }
                     if (recruit != null && game != null)
                     {
                         game.doRecruit(recruit, legion, board.getFrame());

@@ -769,7 +769,6 @@ public final class Player implements Comparable
 
     public void eliminateTitan()
     {
-Game.logDebug("Called eliminateTitan for " + name);
         titanEliminated = true;
     }
 
@@ -888,6 +887,16 @@ Game.logDebug("Called eliminateTitan for " + name);
         {
             ai.muster(game);
         }
+    }
+
+
+    public Creature aiReinforce(Legion legion)
+    {
+        if (getOption(Game.autoRecruit))
+        {
+            return ai.reinforce(legion, game);
+        }
+        return null;
     }
     
     

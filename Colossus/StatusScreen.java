@@ -191,13 +191,13 @@ public final class StatusScreen extends JFrame implements WindowListener
         {
             Player player = game.getPlayer(i);
             Color color;
-            if (game.getActivePlayerNum() == i)
-            {
-                color = Color.yellow;
-            }
-            else if (player.isDead())
+            if (player.isDead())
             {
                 color = Color.red;
+            }
+            else if (game.getActivePlayerNum() == i)
+            {
+                color = Color.yellow;
             }
             else
             {

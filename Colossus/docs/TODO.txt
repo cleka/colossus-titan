@@ -1,5 +1,9 @@
 Enable autoPickRecruit for reinforcements.
 
+Improve mapping of terrain types, creature nativity, and creature
+   recruiting potential so that the AI can easily take these into
+   account.
+
 AI: Consider recruit scarcity (last gargoyle more valuable than troll).  
    Don't leave non-moved legion highlighted. Consider terrain when
    deciding whether to fight.  Don't cheat and peek at the opposing 
@@ -8,8 +12,6 @@ AI: Consider recruit scarcity (last gargoyle more valuable than troll).
    or just make up a good value for each creature type.  Give some value 
    to sitting in native terrain.  Get scrub snacks out of nearby 
    opponents' good recruiting terrain, and into blocking positions.
-
-Add redo.
 
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.

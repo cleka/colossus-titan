@@ -94,7 +94,7 @@ public final class Critter extends Creature
     {
         String basename = super.getImageName(inverted);
 
-        if (getName().equals("Titan") && getPower() >= 6 && getPower() <= 20)
+        if (isTitan() && getPower() >= 6 && getPower() <= 20)
         {
             // Use Titan14.gif for a 14-power titan, etc.  Use the generic
             // Titan.gif (with X-4) for ridiculously big titans, to avoid
@@ -108,8 +108,10 @@ public final class Critter extends Creature
 
     public int getPower()
     {
-        if (getName().equals("Titan"))
+        if (isTitan())
+        {
             return getPlayer().getTitanPower();
+        }
         return super.getPower();
     }
 
