@@ -198,34 +198,14 @@ public final class Game
             colorsLeft.add(PickColor.colorNames[i]);
         }
 
-        int playerNum = players.size();
-        ListIterator lit = players.listIterator(playerNum);
-        while (lit.hasPrevious())
+        // Let human players pick colors first, followed by AI players.
+        for (i = getNumPlayers() - 1; i >= 0; i--)
         {
-            playerNum--;
-            Player player = (Player)lit.previous();
-            String color;
-            do
-            {
-                if (server.getClientOption(playerNum, Options.autoPickColor))
-                {
-                    color = player.aiPickColor(colorsLeft);
-                }
-                else
-                {
-                    color = PickColor.pickColor(frame, this, player);
-                }
-            }
-            while (color == null);
-            colorsLeft.remove(color);
-            player.setColor(color);
-            if (GetPlayers.byColor.equals(player.getName()))
-            {
-                player.setName(color);
-                server.getClient(playerNum).setPlayerName(color);
-            }
-            Log.event(player.getName() + " chooses color " + color);
-            player.initMarkersAvailable();
+            pickPlayerColor(i, GetPlayers.human, colorsLeft, frame);
+        }
+        for (i = getNumPlayers() - 1; i >= 0; i--)
+        {
+            pickPlayerColor(i, GetPlayers.ai, colorsLeft, frame);
         }
 
         it = players.iterator();
@@ -247,6 +227,41 @@ public final class Game
 
         server.allUpdateStatusScreen();
     }
+
+
+    /** Let player i pick a color, only if type matches the player's type. */
+    private void pickPlayerColor(int i, String type, HashSet colorsLeft,
+        JFrame frame)
+    {
+        Player player = (Player)players.get(i);
+        if (!type.equals(player.getType()))
+        {
+            return;
+        }
+        String color;
+        do
+        {
+            if (server.getClientOption(i, Options.autoPickColor))
+            {
+                color = player.aiPickColor(colorsLeft);
+            }
+            else
+            {
+                color = PickColor.pickColor(frame, this, player);
+            }
+        }
+        while (color == null);
+        colorsLeft.remove(color);
+        player.setColor(color);
+        if (GetPlayers.byColor.equals(player.getName()))
+        {
+            player.setName(color);
+            server.getClient(i).setPlayerName(color);
+        }
+        Log.event(player.getName() + " chooses color " + color);
+        player.initMarkersAvailable();
+    }
+
 
     private static String getPhaseName(int phase)
     {
@@ -2517,7 +2532,7 @@ public final class Game
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && legion.canRecruit())
                 {
-                    Creature recruit;
+                    Creature recruit = null;
                     Player player = legion.getPlayer();
                     if (server.getClientOption(player.getName(),
                         Options.autoRecruit))
@@ -2527,7 +2542,10 @@ public final class Game
                     else
                     {
                         String recruitName = server.pickRecruit(legion);
-                        recruit = Creature.getCreatureByName(recruitName);
+                        if (recruitName != null)
+                        {
+                            recruit = Creature.getCreatureByName(recruitName);
+                        }
                     }
                     if (recruit != null)
                     {

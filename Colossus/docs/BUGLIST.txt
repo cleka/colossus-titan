@@ -68,20 +68,10 @@ Win98, 1.4b: Currently have to pick recruiter even with "all stacks visible"
 
 Solaris, 1.3.1: All enemy creatures are invisible after loading a game.
 
-Prompt to avoid skipping recruits?
-
-Need prettier question.gif
-
 Attacking AI is way too happy to take a time loss.  Need to crank up
    aggression in the last few turns of battle.
-
-File/New Game is broken.  The board is disposed but not recreated.
-
-Loading a game is broken.  AI players end up human-controlled unless
-   they have a .cfg file saved.  Need to put player type in savegame.
 
 Client status line is colored after loading a game, but always black
    for a new game.  Need to reset color once it's known.
 
-In evalutateCritterMove(), buddies is always 0.  Distance from the
-   defender's preferred row seems to be broken as well.
+In evalutateCritterMove(), buddies is always 0.

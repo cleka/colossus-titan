@@ -1,5 +1,11 @@
 Advance phases on space instead of 'D'?
 
+Need a prettier question.gif
+
+Confirmation prompt to avoid skipping recruits?
+
+AI needs to stop moving when the game ends.
+
 Make AI advance phase delay configurable.
 
 Attacking AI creatures need to chargest closest enemy in the last few
@@ -44,7 +50,6 @@ Add SetupBattle dialog, to allow setting up standalone battles.
    (terrain, entry side, creatures in attacking and defending legions,
    angel/archangel available to summon, recruits available for terrain
    type, player scores for titan power.)
-Add show caretaker stacks / show graveyard dialogs.  (From Prometheus.)
 
 Add an option to show information about MasterBoard hexes when a
    mover is selected, such as whether that legion can recruit
