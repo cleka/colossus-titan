@@ -135,39 +135,28 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
         {
             if (oldChits[i].select(point))
             {
-System.out.println("hit on old chit " + i); 
                 // Got a hit.
-                //Rectangle clip = new Rectangle(oldChits[i].getBounds());
-
                 // Move this Creature over to the other Legion and adjust 
                 // appropriate chit screen coordinates.
                 newLegion.height++;
-System.out.println("new legion height is now " + newLegion.height);
                 newLegion.creatures[newLegion.height - 1] = 
                     oldLegion.creatures[i];
-System.out.println("new legion creature " + (newLegion.height - 1) +
-" set to old legion creature " + i);
                 newChits[newLegion.height - 1] = oldChits[i];
-                newChits[newLegion.height - 1].setLocation(new 
+                newChits[newLegion.height - 1].setLocationAbs(new 
                     Point(newLegion.height * scale + scale / 5, 2 * scale));
-System.out.println("chit now at (" + newChits[newLegion.height - 1].topLeft().x 
-+ ", " + newChits[newLegion.height - 1].topLeft().y + ")");
 
                 for (int j = i; j < oldLegion.height - 1; j++)
                 {
                     oldLegion.creatures[j] = oldLegion.creatures[j + 1];
-System.out.println("old legion creature " + j + " set to old legion creature "
-+ (j + 1));
                     oldChits[j] = oldChits[j + 1];
-                    oldChits[j].setLocation(new Point((j + 1) * scale + scale / 5,
-                        scale));
+                    oldChits[j].setLocationAbs(new Point((j + 1) * scale + 
+                        scale / 5, scale / 2));
                 }
                 oldLegion.creatures[oldLegion.height - 1] = null;
                 oldChits[oldLegion.height - 1] = null;
                 oldLegion.height--;
 
-                //clip.add(newChits[].getBounds());
-                repaint(/*clip.x, clip.y, clip.width, clip.height*/);
+                repaint();
                 return;
             }
         }
@@ -175,16 +164,28 @@ System.out.println("old legion creature " + j + " set to old legion creature "
         {
             if (newChits[i].select(point))
             {
-System.out.println("hit on new chit " + i); 
                 // Got a hit.
-                //Rectangle clip = new Rectangle(newChits[i].getBounds());
+                // Move this Creature over to the other Legion and adjust 
+                // appropriate chit screen coordinates.
+                oldLegion.height++;
+                oldLegion.creatures[oldLegion.height - 1] = 
+                    newLegion.creatures[i];
+                oldChits[oldLegion.height - 1] = newChits[i];
+                oldChits[oldLegion.height - 1].setLocationAbs(new 
+                    Point(oldLegion.height * scale + scale / 5, scale / 2));
 
-                // Move this Creature over to the other Legion.
+                for (int j = i; j < newLegion.height - 1; j++)
+                {
+                    newLegion.creatures[j] = newLegion.creatures[j + 1];
+                    newChits[j] = newChits[j + 1];
+                    newChits[j].setLocationAbs(new Point((j + 1) * scale + 
+                        scale / 5, 2 * scale));
+                }
+                newLegion.creatures[newLegion.height - 1] = null;
+                newChits[newLegion.height - 1] = null;
+                newLegion.height--;
 
-                // And adjust its screen coordinates.
-
-                //clip.add(oldChits[i].getBounds());
-                repaint(/*clip.x, clip.y, clip.width, clip.height*/);
+                repaint();
                 return;
             }
         }
@@ -248,7 +249,7 @@ System.out.println("hit on new chit " + i);
 
             // The split is legal.
             // Set the new chit next to the old chit on the masterboard.
-            newLegion.chit.setLocation(oldLegion.chit.center());
+            newLegion.chit.setLocationAbs(oldLegion.chit.center());
 
             // Add the new legion to the player.
             player.numLegions++;
