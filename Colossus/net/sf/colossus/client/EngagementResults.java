@@ -40,28 +40,27 @@ import net.sf.colossus.util.Options;
  * @author David Ripton
  */
 
-final class EngagementResults
-    extends KDialog
+final class EngagementResults extends KDialog
 {
     private IOracle oracle;
     private IOptions options;
-    
+
     private int current = -1;
     private int lastSeen = -1;
-    
+
     private ArrayList engagementLog = new ArrayList();
-	private SaveWindow saveWindow;
+    private SaveWindow saveWindow;
 
     private JButton firstButton;
     private JButton prevButton;
     private JButton nextButton;
     private JButton lastButton;
-	private JLabel summaryLabel;
-	private JLabel resultLabel;
-	private JLabel attackerIdLabel;
-	private JLabel defenderIdLabel;
-	private JPanel panelCenter;
-	private boolean moveNext;
+    private JLabel summaryLabel;
+    private JLabel resultLabel;
+    private JLabel attackerIdLabel;
+    private JLabel defenderIdLabel;
+    private JPanel panelCenter;
+    private boolean moveNext;
     private boolean advanceToLast=false;
 
     /** 
@@ -69,8 +68,8 @@ final class EngagementResults
      * @param frame is the parent window
      * @param oracle gives us information
      */
-    EngagementResults(final JFrame frame, final IOracle oracle, 
-            final IOptions options)
+    EngagementResults(final JFrame frame, final IOracle oracle,
+        final IOptions options)
     {
         super(frame, "Engagement Status", false);
         setFocusable(false);
@@ -78,15 +77,16 @@ final class EngagementResults
         this.options = options;
         setBackground(Color.lightGray);
         setupGUI();
-        
+
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
-        	public void windowClosing(WindowEvent e) {
-				super.windowClosing(e);
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
                 options.setOption(Options.showEngagementResults, false);
-			}
-        });
-        
+            }
+        }
+        );
+
         this.saveWindow = new SaveWindow(options, "EngagementResultView");
         saveWindow.restore(this, new Point(0,0));
     }
@@ -130,28 +130,28 @@ final class EngagementResults
         )
     {
         Engagement result = new Engagement(winnerId,
-                method,
-                points,
-                turns,
-                attackerStartingContents,
-                defenderStartingContents,
-                attackerStartingCertainities,
-                defenderStartingCertainities,
-                oracle
-        );       
+            method,
+            points,
+            turns,
+            attackerStartingContents,
+            defenderStartingContents,
+            attackerStartingCertainities,
+            defenderStartingCertainities,
+            oracle
+            );
         this.engagementLog.add(result);
-        
-        if(this.current == -1)
+
+        if (this.current == -1)
         {
-        	this.current = 0;
+            this.current = 0;
         }
-        
-        if(attackersTurn || this.moveNext || advanceToLast) {
-        	this.current = this.engagementLog.size() - 1;
+
+        if (attackersTurn || this.moveNext || advanceToLast) {
+            this.current = this.engagementLog.size() - 1;
         }
         // iff we are in the attackers turn, the next engagement
         // should be placed automatically, too
-        this.moveNext = attackersTurn; 
+        this.moveNext = attackersTurn;
 
         showCurrent();
         maybeShow();
@@ -183,7 +183,7 @@ final class EngagementResults
      */
     private void setupGUI()
     {
-        Container contentPane = this.getContentPane();        
+        Container contentPane = this.getContentPane();
         contentPane.setLayout(new BorderLayout());
 
         //    space for Labels
@@ -231,26 +231,28 @@ final class EngagementResults
         panelWest.add(new JLabel("Winner"));
 
         //  center gets only prepared for the chits
-        
+
         //  south
         this.firstButton = new JButton("First");
-        firstButton.addActionListener(new ActionListener(){
-        	public void actionPerformed(ActionEvent e){
+        firstButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 current = 0;
                 advanceToLast=false;
                 showCurrent();
-        	}    
-        });
+            }
+        }
+        );
         panelSouth.add(firstButton);
 
         this.prevButton = new JButton("Previous");
         prevButton.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 current--;
                 advanceToLast=false;
                 showCurrent();
-        	}   
-        });
+            }
+        }
+        );
         panelSouth.add(prevButton);
 
         this.nextButton = new JButton("Next");
@@ -259,18 +261,20 @@ final class EngagementResults
                 current++;
                 advanceToLast=false;
                 showCurrent();
-			}   
-        });
+            }
+        }
+        );
         panelSouth.add(nextButton);
 
         this.lastButton = new JButton("Last");
         lastButton.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 current = engagementLog.size() - 1;
                 advanceToLast=true;
                 showCurrent();
-			}
-        });
+            }
+        }
+        );
         panelSouth.add(lastButton);
 
         JButton hideButton = new JButton("Hide");
@@ -278,15 +282,16 @@ final class EngagementResults
             public void actionPerformed(ActionEvent e) {
                 hide();
             }
-        });
+        }
+        );
         panelSouth.add(hideButton);
     }
-    
+
     private Component createLegionComponent(String markerId,
-            List imageNames,
-            List certainList,
-            boolean isStarting,
-            boolean isDefender)
+        List imageNames,
+        List certainList,
+        boolean isStarting,
+        boolean isDefender)
     {
         // prepare my box
         Box panel = Box.createHorizontalBox();
@@ -305,8 +310,8 @@ final class EngagementResults
         int idx = 0;
         for (Iterator it = imageNames.iterator(); it.hasNext(); )
         {
-            final String imageName = (String) it.next();
-            final Boolean chitCertain = (Boolean) certainList.get(idx);
+            final String imageName = (String)it.next();
+            final Boolean chitCertain = (Boolean)certainList.get(idx);
             final boolean showDubious = !chitCertain.booleanValue();
             Chit chit = new Chit(scale, imageName, panel,
                 inverse, showDubious);
@@ -323,7 +328,7 @@ final class EngagementResults
         return panel;
     }
 
-    private void showCurrent() 
+    private void showCurrent()
     {
         if (engagementLog.size() == 0)
         {
@@ -336,36 +341,40 @@ final class EngagementResults
         }
         else
         {
-            Engagement result = (Engagement) engagementLog.get(current);
-            this.setTitle("Engagement " + (current + 1)
-                + " of " + engagementLog.size());
+            Engagement result = (Engagement)engagementLog.get(current);
+            this.setTitle("Engagement " + (current + 1) + " of " +
+                engagementLog.size());
             this.summaryLabel.setText(result.getSummary());
-            this.resultLabel.setText(result.getResultText());                          
+            this.resultLabel.setText(result.getResultText());
             this.attackerIdLabel.setText(result.attackerId);
             this.defenderIdLabel.setText(result.defenderId);
-            
+
             this.firstButton.setEnabled(current != 0);
             this.prevButton.setEnabled(current != 0);
             this.nextButton.setEnabled(current != engagementLog.size()-1);
             this.lastButton.setEnabled(current != engagementLog.size()-1);
 
-            this.panelCenter.removeAll();            
+            this.panelCenter.removeAll();
             this.panelCenter.add(createLegionComponent(result.attackerId,
-                    result.attackerStartingContents, result.attackerStartingCertainities,
-                    true, false));
+                result.attackerStartingContents,
+                result.attackerStartingCertainities,
+                true, false));
             this.panelCenter.add(createLegionComponent(result.defenderId,
-                    result.defenderStartingContents, result.defenderStartingCertainities,
-                    true, true));
+                result.defenderStartingContents,
+                result.defenderStartingCertainities,
+                true, true));
             if (result.attackerId.equals(result.winnerId))
             {
                 this.panelCenter.add(createLegionComponent(result.attackerId,
-                    result.attackerEndingContents, result.attackerEndingCertainties,
+                    result.attackerEndingContents,
+                    result.attackerEndingCertainties,
                     false, false));
             }
             else if (result.defenderId.equals(result.winnerId))
             {
                 this.panelCenter.add(createLegionComponent(result.defenderId,
-                    result.defenderEndingContents, result.defenderEndingCertainties,
+                    result.defenderEndingContents,
+                    result.defenderEndingCertainties,
                     false, true));
             }
             else
@@ -377,10 +386,10 @@ final class EngagementResults
         }
     }
 
-	void maybeShow()
+    void maybeShow()
     {
         if (options.getOption(Options.showEngagementResults) &&
-                engagementLog.size() != 0)
+            engagementLog.size() != 0)
         {
             pack();
             if (!isVisible())
@@ -418,7 +427,7 @@ final class EngagementResults
     {
         String winnerId; // null on mutual elim, flee, concede, negotiate
         String loserId;
-		String attackerId;
+        String attackerId;
         String defenderId;
         String method;
         int points;
@@ -427,33 +436,33 @@ final class EngagementResults
         List defenderStartingContents;
         List attackerStartingCertainities;
         List defenderStartingCertainities;
-		String hexLabel;
-		int gameTurn;
-		List attackerEndingContents;
-		List defenderEndingContents;
-		List attackerEndingCertainties;
-		List defenderEndingCertainties;
-        
-		public Engagement(
-		    String winnerId, 
-            String method, 
+        String hexLabel;
+        int gameTurn;
+        List attackerEndingContents;
+        List defenderEndingContents;
+        List attackerEndingCertainties;
+        List defenderEndingCertainties;
+
+        public Engagement(
+            String winnerId,
+            String method,
             int points,
-			int turns, 
+            int turns,
             List attackerStartingContents,
-			List defenderStartingContents,
-			List attackerStartingCertainities,
-			List defenderStartingCertainities,
+            List defenderStartingContents,
+            List attackerStartingCertainities,
+            List defenderStartingCertainities,
             IOracle oracle
             )
         {
-			this.winnerId = winnerId;
-			this.method = method;
-			this.points = points;
-			this.turns = turns;
-			this.attackerStartingContents = attackerStartingContents;
-			this.defenderStartingContents = defenderStartingContents;
-			this.attackerStartingCertainities = attackerStartingCertainities;
-			this.defenderStartingCertainities = defenderStartingCertainities;
+            this.winnerId = winnerId;
+            this.method = method;
+            this.points = points;
+            this.turns = turns;
+            this.attackerStartingContents = attackerStartingContents;
+            this.defenderStartingContents = defenderStartingContents;
+            this.attackerStartingCertainities = attackerStartingCertainities;
+            this.defenderStartingCertainities = defenderStartingCertainities;
             this.hexLabel = oracle.getBattleSite();
             this.attackerId = oracle.getAttackerMarkerId();
             this.defenderId = oracle.getDefenderMarkerId();
@@ -469,16 +478,15 @@ final class EngagementResults
                 oracle.getLegionCreatureCertainties(this.defenderId);
 
             this.setWinnerAndLoserId();
-		}
+        }
 
         public String getSummary() {
-            return "In turn " + this.gameTurn + ", " 
-                    + this.attackerId + " attacked " + this.defenderId
-					+ " in "
-					+ MasterBoard.getHexByLabel(this.hexLabel).getDescription();
-		}
+            return "In turn " + this.gameTurn + ", " + this.attackerId +
+                " attacked " + this.defenderId + " in " +
+                MasterBoard.getHexByLabel(this.hexLabel).getDescription();
+        }
 
-		private void setWinnerAndLoserId()
+        private void setWinnerAndLoserId()
         {
             this.loserId = null;
             if (this.winnerId != null)
@@ -503,20 +511,21 @@ final class EngagementResults
             String result = "bogus method";
             if (method.equals("flee"))
             {
-                result = winnerId + " won when " + loserId + " fled and earned "
-                         + this.points + " points";
+                result = winnerId + " won when " + loserId +
+                    " fled and earned " + this.points + " points";
             }
             else if (method.equals("concede"))
             {
-                result = winnerId + " won when " + loserId + " conceded and earned "
-                         + this.points + " points";
+                result = winnerId + " won when " + loserId +
+                    " conceded and earned " + this.points + " points";
             }
             else if (method.equals("negotiate"))
             {
                 if (winnerId != null)
                 {
-                    result = winnerId + " won a negotiated settlement and earned "
-                         + this.points + " points";
+                    result = winnerId +
+                        " won a negotiated settlement and earned " +
+                        this.points + " points";
                 }
                 else
                 {
@@ -527,14 +536,12 @@ final class EngagementResults
             {
                 if (winnerId != null)
                 {
-                    result = winnerId + " won the battle in "
-                         + this.turns +  " turns and earned "
-                         + this.points + " points";
+                    result = winnerId + " won the battle in " + this.turns +
+                        " turns and earned " + this.points + " points";
                 }
                 else
                 {
-                    result = "Mutual elimination in "
-                        + this.turns + " turns";
+                    result = "Mutual elimination in " + this.turns + " turns";
                 }
             }
             return result;
