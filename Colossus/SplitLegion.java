@@ -12,7 +12,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
     WindowListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded;
+    private boolean imagesLoaded = false;
     private Legion oldLegion;
     private Legion newLegion;
     private Chit [] oldChits;
@@ -25,7 +25,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
     private JButton button2;
     private boolean laidOut = false;
     private boolean eraseFlag = false;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
 
@@ -41,8 +41,6 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
         this.oldLegion = oldLegion;
         this.player = player;
         this.parentFrame = parentFrame;
-
-        imagesLoaded = false;
 
         PickMarker pickmarker = new PickMarker(parentFrame, player);
 
@@ -106,6 +104,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
                 JOptionPane.showMessageDialog(parentFrame, 
                     "waitForAll was interrupted");
             }
+            imagesLoaded = true;
 
             button1 = new JButton("Done");
             button2 = new JButton("Cancel");
@@ -114,16 +113,8 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             button1.addActionListener(this);
             button2.addActionListener(this);
 
-            imagesLoaded = true;
             setVisible(true);
         }
-    }
-
-
-    // Double-buffer everything.
-    public void paint(Graphics g)
-    {
-        update(g);
     }
 
 
@@ -137,35 +128,35 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
         Dimension d = getSize();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(d.width, d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
             eraseFlag = true;
         }
 
         // Clear the chit area to clean up behind chits that have been moved.
         if (eraseFlag)
         {
-            gBack.setColor(getBackground());
-            gBack.fillRect(0, 0, d.width, d.height);
-            gBack.setColor(getForeground());
+            offGraphics.setColor(getBackground());
+            offGraphics.fillRect(0, 0, d.width, d.height);
+            offGraphics.setColor(getForeground());
             eraseFlag = false;
         }
 
-        oldMarker.paint(gBack);
+        oldMarker.paint(offGraphics);
 
-        newLegion.getMarker().paint(gBack);
+        newLegion.getMarker().paint(offGraphics);
 
         for (int i = oldLegion.getHeight() - 1; i >= 0; i--)
         {
-            oldChits[i].paint(gBack);
+            oldChits[i].paint(offGraphics);
         }
         for (int i = newLegion.getHeight() - 1; i >= 0; i--)
         {
-            newChits[i].paint(gBack);
+            newChits[i].paint(offGraphics);
         }
 
         if (!laidOut)
@@ -183,6 +174,45 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
         button1.repaint();
         button2.repaint();
     }
+    
+    
+    // Double-buffer everything.
+    public void paint(Graphics g)
+    {
+        update(g);
+    }
+
+
+    // Attempt to free resources to work around Java memory leaks.
+    private void cleanup()
+    {
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+        
+        if (imagesLoaded)
+        {
+            for (int i = 0; i < oldLegion.getHeight(); i++)
+            {
+                tracker.removeImage(oldChits[i].getImage());
+                oldChits[i].getImage().flush();
+            }
+            for (int i = 0; i < newLegion.getHeight(); i++)
+            {
+                tracker.removeImage(newChits[i].getImage());
+                newChits[i].getImage().flush();
+            }
+            tracker.removeImage(oldMarker.getImage());
+            oldMarker.getImage().flush();
+        }
+
+        dispose();
+        System.gc();
+    }
 
 
     void cancel()
@@ -196,7 +226,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
                 newLegion.getCreature(i));
         }
 
-        dispose();
+        cleanup();
     }
 
 
@@ -362,7 +392,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             newLegion.getCurrentHex().addLegion(newLegion);
 
             // Exit.
-            dispose();
+            cleanup();
         }
 
         else if (e.getActionCommand() == "Cancel")

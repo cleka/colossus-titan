@@ -11,7 +11,7 @@ import javax.swing.*;
 class Negotiate extends JDialog implements MouseListener, ActionListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded;
+    private boolean imagesLoaded = false;
     private Legion attacker;
     private Legion defender;
     private Chit [] attackerChits;
@@ -23,7 +23,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
     private JButton button1;
     private JButton button2;
     private boolean laidOut = false;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
 
@@ -41,8 +41,6 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         this.attacker = attacker;
         this.defender = defender;
         this.parentFrame = parentFrame;
-
-        imagesLoaded = false;
 
         pack();
         setBackground(java.awt.Color.lightGray);
@@ -98,6 +96,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
             JOptionPane.showMessageDialog(parentFrame, 
                 "waitForAll was interrupted");
         }
+        imagesLoaded = true;
 
         button1 = new JButton("Agree");
         button2 = new JButton("Fight");
@@ -106,7 +105,6 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         button1.addActionListener(this);
         button2.addActionListener(this);
 
-        imagesLoaded = true;
         setVisible(true);
         repaint();
     }
@@ -123,24 +121,24 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
-        attackerMarker.paint(gBack);
-        defenderMarker.paint(gBack);
+        attackerMarker.paint(offGraphics);
+        defenderMarker.paint(offGraphics);
 
         for (int i = 0; i < attacker.getHeight(); i++)
         {
-            attackerChits[i].paint(gBack);
+            attackerChits[i].paint(offGraphics);
         }
         for (int i = 0; i < defender.getHeight(); i++)
         {
-            defenderChits[i].paint(gBack);
+            defenderChits[i].paint(offGraphics);
         }
 
         if (!laidOut)
@@ -165,6 +163,40 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
     {
         // Double-buffer everything.
         update(g);
+    }
+
+
+    // Attempt to free resources to work around Java memory leaks.
+    private void cleanup()
+    {
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+        
+        if (imagesLoaded)
+        {
+            for (int i = 0; i < attacker.getHeight(); i++)
+            {
+                tracker.removeImage(attackerChits[i].getImage());
+                attackerChits[i].getImage().flush();
+            }
+            for (int i = 0; i < defender.getHeight(); i++)
+            {
+                tracker.removeImage(defenderChits[i].getImage());
+                defenderChits[i].getImage().flush();
+            }
+            tracker.removeImage(attackerMarker.getImage());
+            attackerMarker.getImage().flush();
+            tracker.removeImage(defenderMarker.getImage());
+            defenderMarker.getImage().flush();
+        }
+
+        dispose();
+        System.gc();
     }
 
 
@@ -200,13 +232,16 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
     {
     }
 
+
     public void mouseExited(MouseEvent e)
     {
     }
 
+
     public void mouseClicked(MouseEvent e)
     {
     }
+
 
     public void mouseReleased(MouseEvent e)
     {

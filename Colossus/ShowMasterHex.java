@@ -11,14 +11,14 @@ import javax.swing.*;
 class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded;
+    private boolean imagesLoaded = false;
     private MasterHex hex;
     private Chit [] chits;
     private int numChits;
     private int [] numToRecruit;
     private int [] count;
     private int scale = 60;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
 
@@ -62,11 +62,7 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
         
         getContentPane().setLayout(null);
 
-        addMouseListener(this);
-
         this.hex = hex;
-
-        imagesLoaded = false;
 
         chits = new Chit[numChits];
         numToRecruit = new int[numChits];
@@ -97,8 +93,10 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
             JOptionPane.showMessageDialog(parentFrame, 
                 "waitForAll was interrupted");
         }
-
         imagesLoaded = true;
+
+        addMouseListener(this);
+
         setVisible(true);
         repaint();
     }
@@ -114,30 +112,30 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
         Dimension d = getSize();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
-        FontMetrics fontMetrics = gBack.getFontMetrics();
+        FontMetrics fontMetrics = offGraphics.getFontMetrics();
         int fontHeight = fontMetrics.getMaxAscent() + fontMetrics.getLeading();
 
         for (int i = 0; i < numChits; i++)
         {
-            chits[i].paint(gBack);
+            chits[i].paint(offGraphics);
 
             if (numToRecruit[i] > 0)
             {
                 String numToRecruitLabel = Integer.toString(numToRecruit[i]);
-                gBack.drawString(numToRecruitLabel, scale / 3, (i + 1) * scale 
+                offGraphics.drawString(numToRecruitLabel, scale / 3, (i + 1) * scale 
                     + fontHeight / 2);
             }
 
             String countLabel = Integer.toString(count[i]);
-            gBack.drawString(countLabel, 7 * scale / 3, (i + 1) * scale + 
+            offGraphics.drawString(countLabel, 7 * scale / 3, (i + 1) * scale + 
                 fontHeight / 2);
         }
 
@@ -152,9 +150,34 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
     }
 
 
+    // Attempt to free resources to work around Java memory leaks.
+    private void cleanup()
+    {
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+        
+        if (imagesLoaded)
+        {
+            for (int i = 0; i < numChits; i++)
+            {
+                tracker.removeImage(chits[i].getImage());
+                chits[i].getImage().flush();
+            }
+        }
+
+        dispose();
+        System.gc();
+    }  
+
+
     public void mouseClicked(MouseEvent e)
     {
-        dispose();
+        cleanup();
     }
     
     
@@ -165,19 +188,19 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 
     public void mouseExited(MouseEvent e)
     {
-        dispose();
+        cleanup();
     }
     
 
     public void mousePressed(MouseEvent e)
     {
-        dispose();
+        cleanup();
     }
 
     
     public void mouseReleased(MouseEvent e)
     {
-        dispose();
+        cleanup();
     }
 
 
@@ -193,7 +216,7 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        dispose();
+        cleanup();
     }
 
 

@@ -24,7 +24,7 @@ class Concede extends JDialog implements ActionListener
     private Chit [] enemyChits;
     private Chit friendMarker;
     private Chit enemyMarker;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
 
@@ -99,7 +99,7 @@ class Concede extends JDialog implements ActionListener
             JOptionPane.showMessageDialog(parentFrame, 
                 "waitForAll was interrupted");
         }
-
+        imagesLoaded = true;
 
         button1 = new JButton(flee ? "Flee" : "Concede");
         button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
@@ -108,7 +108,6 @@ class Concede extends JDialog implements ActionListener
         button1.addActionListener(this);
         button2.addActionListener(this);
 
-        imagesLoaded = true;
         setVisible(true);
         repaint();
     }
@@ -125,17 +124,17 @@ class Concede extends JDialog implements ActionListener
         Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
-        friendMarker.paint(gBack);
+        friendMarker.paint(offGraphics);
 
-        enemyMarker.paint(gBack);
+        enemyMarker.paint(offGraphics);
 
         // ArrayIndexOutOfBoundsException when an angel is acquired?
         for (int i = friend.getHeight() - 1; i >= 0; i--)
@@ -147,7 +146,7 @@ class Concede extends JDialog implements ActionListener
                     scale / 2, scale, friend.getCreature(i).getImageName(),
                     this, false);
             }
-            friendChits[i].paint(gBack);
+            friendChits[i].paint(offGraphics);
         }
         for (int i = enemy.getHeight() - 1; i >= 0; i--)
         {
@@ -158,7 +157,7 @@ class Concede extends JDialog implements ActionListener
                     this, false);
             }
 
-            enemyChits[i].paint(gBack);
+            enemyChits[i].paint(offGraphics);
         }
 
         if (!laidOut)
@@ -183,6 +182,40 @@ class Concede extends JDialog implements ActionListener
     {
         // Double-buffer everything.
         update(g);
+    }
+
+
+    // Attempt to free resources to work around Java memory leaks.
+    private void cleanup()
+    {
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+
+        if (imagesLoaded)
+        {
+            for (int i = 0; i < friend.getHeight(); i++)
+            {
+                tracker.removeImage(friendChits[i].getImage());
+                friendChits[i].getImage().flush();
+            }
+            for (int i = 0; i < enemy.getHeight(); i++)
+            {
+                tracker.removeImage(enemyChits[i].getImage());
+                enemyChits[i].getImage().flush();
+            }
+            tracker.removeImage(friendMarker.getImage());
+            friendMarker.getImage().flush();
+            tracker.removeImage(enemyMarker.getImage());
+            enemyMarker.getImage().flush();
+        }
+
+        dispose();
+        System.gc();
     }
 
 
@@ -212,7 +245,7 @@ class Concede extends JDialog implements ActionListener
             }
 
             // Exit this dialog.
-            dispose();
+            cleanup();
 
             // Unselect and repaint the hex.
             MasterHex hex = enemy.getCurrentHex();
@@ -222,7 +255,7 @@ class Concede extends JDialog implements ActionListener
 
         else
         {
-            dispose();
+            cleanup();
         }
     }
 

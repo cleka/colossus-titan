@@ -11,10 +11,10 @@ import javax.swing.*;
 class ShowLegion extends JDialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded;
+    private boolean imagesLoaded = false;
     private Legion legion;
     private Chit [] chits;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
 
@@ -57,11 +57,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         
         getContentPane().setLayout(null);
 
-        addMouseListener(this);
-
         this.legion = legion;
-
-        imagesLoaded = false;
 
         chits = new Chit[legion.getHeight()];
         for (int i = 0; i < legion.getHeight(); i++)
@@ -86,8 +82,10 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
             JOptionPane.showMessageDialog(parentFrame, 
                 "waitForAll was interrupted");
         }
-
         imagesLoaded = true;
+
+        addMouseListener(this);
+
         setVisible(true);
         repaint();
     }
@@ -103,17 +101,17 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         Dimension d = getSize();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
         for (int i = 0; i < legion.getHeight(); i++)
         {
-            chits[i].paint(gBack);
+            chits[i].paint(offGraphics);
         }
 
         g.drawImage(offImage, 0, 0, this);
@@ -127,9 +125,34 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
     }
 
 
+    // Attempt to free resources to work around Java memory leaks.
+    private void cleanup()
+    {
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+        
+        if (imagesLoaded)
+        {
+            for (int i = 0; i < legion.getHeight(); i++)
+            {
+                tracker.removeImage(chits[i].getImage());
+                chits[i].getImage().flush();
+            }
+        }
+
+        dispose();
+        System.gc();
+    }  
+    
+
     public void mouseClicked(MouseEvent e)
     {
-        dispose();
+        cleanup();
     }
     
     
@@ -140,19 +163,19 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
 
     public void mouseExited(MouseEvent e)
     {
-        dispose();
+        cleanup();
     }
     
 
     public void mousePressed(MouseEvent e)
     {
-        dispose();
+        cleanup();
     }
 
     
     public void mouseReleased(MouseEvent e)
     {
-        dispose();
+        cleanup();
     }
 
 
@@ -168,7 +191,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        dispose();
+        cleanup();
     }
 
 

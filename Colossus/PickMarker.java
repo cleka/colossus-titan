@@ -14,9 +14,9 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
 {
     private Chit [] markers;
     private MediaTracker tracker;
-    private boolean imagesLoaded;
+    private boolean imagesLoaded = false;
     private Player player;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
 
@@ -65,7 +65,6 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
                     ".gif", this, false);
             }
 
-            imagesLoaded = false;
             tracker = new MediaTracker(this);
 
             for (int i = 0; i < markers.length; i++)
@@ -82,11 +81,10 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
                 JOptionPane.showMessageDialog(parentFrame, 
                     "waitForAll was interrupted");
             }
+            imagesLoaded = true;
+            setVisible(true);
+            repaint();
         }
-
-        imagesLoaded = true;
-        setVisible(true);
-        repaint();
     }
 
 
@@ -101,19 +99,19 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
         Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
         for (int i = 0; i < markers.length; i++)
         {
             if (rectClip.intersects(markers[i].getBounds()))
             {
-                markers[i].paint(gBack);
+                markers[i].paint(offGraphics);
             }
         }
 
@@ -128,12 +126,37 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     }
 
 
+    // Attempt to free resources to work around Java memory leaks.
+    private void cleanup()
+    {
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+        
+        if (imagesLoaded)
+        {
+            for (int i = 0; i < player.getNumMarkersAvailable(); i++)
+            {
+                tracker.removeImage(markers[i].getImage());
+                markers[i].getImage().flush();
+            }
+        }
+
+        dispose();
+        System.gc();
+    }
+
+
     public void mousePressed(MouseEvent e)
     {
         if (player.getNumMarkersAvailable() == 0)
         {
             player.clearSelectedMarker();
-            dispose();
+            cleanup();
             return;
         }
 
@@ -146,7 +169,7 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
                 player.selectMarker(i);
 
                 // Then exit.
-                dispose();
+                cleanup();
                 return;
             }
         }

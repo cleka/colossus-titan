@@ -14,13 +14,13 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     private int numEligible;
     private Creature [] recruits;
     private MediaTracker tracker;
-    private boolean imagesLoaded;
+    private boolean imagesLoaded = false;
     private Player player;
     private Legion legion;
     private Chit [] markers;
     private int [] counts;
     private int scale = 60;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
 
@@ -74,7 +74,6 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         }
 
 
-        imagesLoaded = false;
         tracker = new MediaTracker(this);
 
         for (int i = 0; i < numEligible; i++)
@@ -91,8 +90,8 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
             JOptionPane.showMessageDialog(parentFrame, 
                 "waitForAll was interrupted");
         }
-
         imagesLoaded = true;
+
         setVisible(true);
         repaint();
     }
@@ -407,24 +406,24 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
         d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
         for (int i = 0; i < numEligible;  i++)
         {
             if (rectClip.intersects(markers[i].getBounds()))
             {
-                markers[i].paint(gBack);
+                markers[i].paint(offGraphics);
             }
 
             String countLabel = Integer.toString(counts[i]);
-            gBack.drawString(countLabel, scale * (21 * i + 20) / 20 -
-                gBack.getFontMetrics().stringWidth(countLabel) / 2, 2 * scale);
+            offGraphics.drawString(countLabel, scale * (21 * i + 20) / 20 -
+                offGraphics.getFontMetrics().stringWidth(countLabel) / 2, 2 * scale);
         }
 
         g.drawImage(offImage, 0, 0, this);
@@ -436,6 +435,31 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         // Double-buffer everything.
         update(g);
     }
+
+
+    // Attempt to free resources to work around Java memory leaks.
+    private void cleanup()
+    {
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+        
+        if (imagesLoaded)
+        {
+            for (int i = 0; i < numEligible; i++)
+            {
+                tracker.removeImage(markers[i].getImage());
+                markers[i].getImage().flush();
+            }
+        }
+
+        dispose();
+        System.gc();
+    }  
 
 
     public void mousePressed(MouseEvent e)
@@ -454,7 +478,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
                 player.markLastLegionRecruited(legion);
 
                 // Then exit.
-                dispose();
+                cleanup();
                 return;
             }
         }
@@ -493,7 +517,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent event)
     {
-        dispose();
+        cleanup();
     }
 
 
