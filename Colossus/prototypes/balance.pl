@@ -40,7 +40,12 @@ print "$ntowers towers and $nplayers players\n";
 
 if ($nplayers > $ntowers)
 {
-    die "More players than towers -- can't work.  Aborting.\n"
+    die "More players than towers -- can't work.  Aborting.\n";
+}
+
+if ($nplayers < 1)
+{
+    die "No players.  Aborting.\n";
 }
 
 my $towers_per_player = $ntowers / $nplayers;
