@@ -1,16 +1,15 @@
-Sort legion markers with one's own color first, then captured colors.
-
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.
 
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 
-Add an optional JScrollPane.
+Add a way to show each player's remaining legion markers outside PickMarker.
 
 Centralize scale handling.  Add a global rescale option.
 
 Need to be able to undo an auto recruit of a reinforcement in battle.
+   Or else turn off auto recruit for reinforcements.
 
 Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
@@ -64,9 +63,6 @@ Differently-highlight hexes where a legion could move if
    a friendly stack were not already there?
 
 Color code StatusScreen better.
-Add the ability to choose towers, movement die rolls, and number of
-   hits in combat, rather than rolling, for debug and tracking
-   PBEM games.
 
 Add the ability to change the creature type of a creature in a legion,
    and to specify "unknown" as a creature type, for tracking PBEM

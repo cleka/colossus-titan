@@ -18,7 +18,7 @@ public final class Player implements Comparable
     private String playersEliminated;  // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll;          // 0 if movement has not been rolled.
-    private TreeSet markersAvailable = new TreeSet();
+    private TreeSet markersAvailable = new TreeSet(new markerComparator());
     private ArrayList legions = new ArrayList();
     private boolean dead;
     private boolean titanEliminated;
@@ -29,6 +29,7 @@ public final class Player implements Comparable
     /** Stack of legions, to allow multiple levels of undo for splits,
      *  moves, and recruits. */
     private LinkedList undoStack = new LinkedList();
+
 
 
     public Player(String name, Game game)
@@ -758,6 +759,36 @@ public final class Player implements Comparable
         else
         {
             return false;
+        }
+    }
+    
+    /** Comparator that forces this player's legion markers to come
+     *  before captured markers in sort order. */
+    final class markerComparator implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            if (!(o1 instanceof String) || !(o2 instanceof String))
+            {
+                throw new ClassCastException();
+            }
+            String s1 = (String)o1;
+            String s2 = (String)o2;
+            String myPrefix = getShortColor();
+            boolean mine1 = s1.startsWith(myPrefix);
+            boolean mine2 = s2.startsWith(myPrefix);
+            if (mine1 && !mine2)
+            {
+                return -1;
+            }
+            else if (mine2 && !mine1)
+            {
+                return 1;
+            }
+            else
+            {
+                return s1.compareTo(s2);
+            }
         }
     }
 }

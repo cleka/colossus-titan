@@ -529,6 +529,36 @@ public final class Game
     }
 
 
+    private void repaintAllWindows()
+    {
+        if (board != null)
+        {
+            masterFrame.repaint();
+        }
+        if (battle != null)
+        {
+            BattleMap map = battle.getBattleMap();
+            if (map != null)
+            {
+                map.repaint();
+            }
+            BattleDice dice = battle.getBattleDice();
+            if (dice != null)
+            {
+                dice.repaint();
+            }
+        }
+        if (statusScreen != null)
+        {
+            statusScreen.repaint();
+        }
+        if (movementDie != null)
+        {
+            movementDie.repaint();
+        }
+    }
+
+
     private void initMovementDie()
     {
         movementDie = new MovementDie(this);
