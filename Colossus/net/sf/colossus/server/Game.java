@@ -1494,9 +1494,13 @@ Log.debug("Called Game.newGame2()");
         return recruiters;
     }
 
-    /** Return true if every single creature in legion is eligible
+    /**
+     * Return true if every single creature in legion is eligible
      *  to recruit this recruit in this terrain.  XXX We really should
-     *  explicitly check for "Anything" instead. */
+     *  explicitly check for "Anything" instead.
+     * And this will return false for AnyNonLord if there's a Lord
+     * in t he Legion. is that deliberate ?
+     */
     private boolean allCanRecruit(Legion legion, Creature recruit)
     {
         java.util.List recruiters = findEligibleRecruiters(

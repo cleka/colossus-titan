@@ -80,16 +80,46 @@ public class TerrainRecruitLoader
     {
         Iterator it = rl.iterator();
         String v1 = null;
-
+        boolean regularRecruit =
+            ((Boolean)carToBelow.get(new Character(t))).booleanValue();
         try 
         {
             while (it.hasNext())
             {
                 recruitNumber tr = (recruitNumber)it.next();
                 String v2 = tr.getName();
-                if ((v2 != null) && (v1 != null))
+                if (v2 != null)
                 {
-                    graph.addEdge(v1, v2, tr.getNumber(), t);
+                    if (v1 != null)
+                    {
+                        graph.addEdge(v1, v2, tr.getNumber(), t);
+                    }
+                    // add the self-recruit & below-recruit loop
+                    Iterator it2 = rl.iterator();
+                    boolean done = false;
+                    while (it2.hasNext() && !done)
+                    {
+                        recruitNumber tr2 = (recruitNumber)it2.next();
+                        if ((tr == tr2) || // same List, same objects
+                            regularRecruit)
+                        {
+                            // one can always recruit itself at one/zero level,
+                            // and also below if regularRecruit is on.
+                            if ((tr2.getNumber() > 0))
+                            {
+                                graph.addEdge(v2, tr2.getName(), 1, t);
+                            }
+                            else if ((tr2.getNumber() == 0))
+                            {
+                                graph.addEdge(v2, tr2.getName(), 0, t);
+                            }
+                        }
+                        if (tr == tr2)
+                        {
+                            done = true;
+                        }
+                    }
+                    
                 }
                 v1 = v2;
             }
@@ -334,11 +364,22 @@ public class TerrainRecruitLoader
         return re;
     }
 
-    public static int numberOfRecruiterNeeded_G(Creature recruiter, 
+    public static int numberOfRecruiterNeeded(Creature recruiter, 
                                                 Creature recruit,
                                                 char terrain)
     {
-        return 0;
+        int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
+                                                    recruit.getName(),
+                                                    terrain);
+        int old_value = numberOfRecruiterNeeded_OLD(recruiter,
+                                                    recruit,
+                                                    terrain);
+        if (g_value != old_value)
+        {
+            Log.error("GRAPH: Oups, problem in the graph code: it claims that in " + terrain + ", you need " + g_value + " instead of " + old_value + " " + recruiter.getName() + " to recruit " + recruit.getName());
+        }
+        
+        return g_value;
     }
 
     /**
@@ -351,7 +392,7 @@ public class TerrainRecruitLoader
      * @return Number of recruiter needed.
      * @see net.sf.colossus.server.Creature
      */
-    public static int numberOfRecruiterNeeded(Creature recruiter, 
+    public static int numberOfRecruiterNeeded_OLD(Creature recruiter, 
         Creature recruit, char terrain)
     {
         ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));

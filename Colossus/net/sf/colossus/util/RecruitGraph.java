@@ -328,6 +328,37 @@ public class RecruitGraph
                 number, terrain);
     }
 
+    public int numberOfRecruiterNeeded(String recruiter, 
+                                       String recruit,
+                                       char terrain)
+    {
+        List allEdge = getIncomingEdges(recruit);
+        RecruitVertex source = (RecruitVertex)creatureToVertex.get(recruiter);
+        boolean isLord = Creature.getCreatureByName(recruiter).isImmortal();
+        int minValue = 99;
+        
+        Iterator it = allEdge.iterator();
+        while (it.hasNext())
+        {
+            RecruitEdge theEdge = (RecruitEdge)it.next();
+            if (theEdge.getTerrain() == terrain)
+            {
+                RecruitVertex tempSrc = theEdge.getSource();
+                if ((source == tempSrc) ||
+                    (tempSrc.getCreatureName().equals("Anything")) ||
+                    ((!isLord) && (tempSrc.getCreatureName().equals("AnyNonLord"))) ||
+                    ((isLord) && (tempSrc.getCreatureName().equals("Lord"))))
+                {
+                    if (minValue > theEdge.getNumber())
+                    {
+                        minValue = theEdge.getNumber();
+                    }
+                }
+            }
+        }
+        return minValue;
+    }
+
     /**
      * Set the CaretakerInfo to use for availability of creatures.
      * @param The caretakerInfo to use subsequently.

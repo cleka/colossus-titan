@@ -691,8 +691,9 @@ Log.debug("Called Server.addClient() for " + playerName);
     {
         allUpdatePlayerInfo();
 
-        int numRecruiters = TerrainRecruitLoader.numberOfRecruiterNeeded(
-            recruiter, recruit, legion.getCurrentHex().getTerrain());
+        int numRecruiters = (recruiter == null ? 0 :
+             TerrainRecruitLoader.numberOfRecruiterNeeded(
+             recruiter, recruit, legion.getCurrentHex().getTerrain()));
         String recruiterName = null;
         if (recruiter != null)
         {
