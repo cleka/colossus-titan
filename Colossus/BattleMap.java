@@ -1242,7 +1242,7 @@ public class BattleMap extends JFrame implements MouseListener,
             if (legion == attacker)
             {
                 // Summon angel
-                if (legion.getPlayer().canSummonAngel())
+                if (legion.canSummonAngel())
                 {
                     // Make sure the MasterBoard is visible.
                     board.deiconify();
