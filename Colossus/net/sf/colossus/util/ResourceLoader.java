@@ -19,6 +19,59 @@ import java.lang.reflect.*;
 
 public final class ResourceLoader
 {
+    private static class ColossusClassLoader extends ClassLoader
+    {
+        java.util.List directories = null;
+        
+        ColossusClassLoader(ClassLoader parent)
+        {
+            super(parent);
+        }
+
+        ColossusClassLoader()
+        {
+            super();
+        }
+             
+        public Class findClass(String className) throws ClassNotFoundException
+        {
+            try
+            {
+                int index = className.lastIndexOf(".");
+                String shortClassName = className.substring(index + 1);
+                if (index == -1)
+                {
+                    Log.error("Loading of class \"" + className + "\" failed ("
+                              + "no dot in class name" + ")");
+                    return null;
+                }
+                InputStream classDataIS =
+                    getInputStream(shortClassName + ".class",
+                                   directories);
+                if (classDataIS == null)
+                {
+                    Log.error("Couldn't find the class file anywhere ! (" +
+                              shortClassName + ".class)");
+                    throw new FileNotFoundException("missing " +
+                                                    shortClassName + ".class");
+                }
+                byte[] classDataBytes = new byte[classDataIS.available()];
+                classDataIS.read(classDataBytes);
+                return defineClass(className, classDataBytes,
+                                   0, classDataBytes.length);
+            }
+            catch (Exception e)
+            {
+                return super.findClass(className);
+            }
+        }
+
+        void setDirectories(java.util.List d)
+        {
+            directories = d;
+        }
+    }
+
     public static final String keyContentType = "ResourceLoaderContentType";
     public static final String defaultFontName = "Lucida Sans Bold";
     public static final int defaultFontStyle = Font.PLAIN;
@@ -30,8 +83,10 @@ public final class ResourceLoader
     private static final String pathSeparator = "/";
     private static final String[] imageExtension = { ".png", ".gif" };
     private static final int trackedId = 1;
-    private static final ClassLoader cl =
+    private static final ClassLoader baseCL =
         net.sf.colossus.util.ResourceLoader.class.getClassLoader();
+    private static final ColossusClassLoader cl =
+        new ColossusClassLoader(baseCL);
     private static final Map imageCache = 
         Collections.synchronizedMap(new HashMap());
 
@@ -807,77 +862,15 @@ public final class ResourceLoader
                                       java.util.List directories,
                                       Object[] parameter)
     {
+        
         Class theClass = null;
         try
         {
+            cl.setDirectories(directories);
             theClass = cl.loadClass(className);
         }
         catch (Exception e)
         {
-            // OK, the easy way failed. Try again, without requiring the
-            // class to be in $CLASSPATH or the JAR file.
-            /*
-             * of course all that is useless because ClassLoader::defineClass
-             * is a protected method. why didn't I notice that _before_ 
-             * writing the code ?
-             */
-            /*
-            int index = className.lastIndexOf(".");
-            if (index == -1)
-            {
-                Log.error("Loading of class \"" + className + "\" failed ("
-                          + "no dot in class name" + ")");
-                return null;
-            }
-            String shortClassName = className.substring(index);
-            InputStream classDataIS = getInputStream(shortClassName + ".class",
-                                                     directories);
-            if (classDataIS == null)
-            {
-                Log.error("Loading of class \"" + className + "\" failed ("
-                          + "couldn't create InputStream" + ")");
-                return null;
-            }
-            int l = 4096, read = 0, total = 0;
-            byte b[] = new byte[l];
-            try 
-            {
-                while (read != -1)
-                {
-                    read = classDataIS.read(b,total,l);
-                    if (read != -1)
-                    {
-                        total += read;
-                        l -= read;
-                        if (l == 0)
-                        {
-                            l = 4096;
-                            byte b2[] = new byte[total + l];
-                            for (int i = 0; i < total; i ++)
-                            {
-                                b2[i] = b[i];
-                            }
-                            b = b2;
-                        }
-                    }
-                }
-            }
-            catch (Exception e1)
-            {
-                Log.error("Loading of class \"" + className + "\" failed ("
-                          + e1 + ")");
-                return null;
-            }
-            try
-            {
-                //theClass = cl.defineClass(className, b, 0, total);
-            }
-            catch (Exception e2)
-            {
-                Log.error("Loading of class \"" + className + "\" failed ("
-                          + e2 + ")");
-            }
-            */
             Log.error("Loading of class \"" + className + "\" failed ("
                       + e + ")");
         }
