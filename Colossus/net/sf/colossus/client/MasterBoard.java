@@ -163,6 +163,10 @@ public final class MasterBoard extends JPanel
 		                List certainties = legion.getCertainties();
 		                
 		                final JPanel panel = new JPanel(null);
+                        Color playerColor = 
+                            HTMLColor.stringToColor(legion.getPlayerInfo().getColor() +  
+                                                    "Colossus");
+                        panel.setBackground(playerColor);
 		                int scale = 2 * Scale.get();
 
 		                Iterator it = imageNames.iterator();
