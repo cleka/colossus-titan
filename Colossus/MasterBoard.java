@@ -630,7 +630,6 @@ class MasterBoard extends Frame implements MouseListener,
         }
         map = null;
 
-        // Make turn visible again.
         turn.setVisible(true);
         turn.setEnabled(true);
     }
@@ -1235,9 +1234,8 @@ class MasterBoard extends Frame implements MouseListener,
 
     public void deiconify()
     {
-        // This works under 1.1, unlike setState(Frame.NORMAL) 
-        removeNotify();
-        addNotify();
+        // setState(Frame.NORMAL) does not work under 1.1
+        // removeNotify() then addNotify() causes problems with the Turn dialog 
     }
 
 
