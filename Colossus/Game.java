@@ -410,12 +410,14 @@ class Game extends Frame implements WindowListener, ActionListener
 
     void advancePhase()
     {
+        board.unselectAllHexes();
         phase++;
     }
 
 
     void advanceTurn()
     {
+        board.unselectAllHexes();
         activePlayerNum++;
         activePlayerNum %= numPlayers;
         if (activePlayerNum == 0)
