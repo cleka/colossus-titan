@@ -34,6 +34,7 @@ class Turn extends Dialog implements ActionListener
     void setupSplitDialog()
     {
         Player player = game.getActivePlayer();
+        setTitle(player.getName() + " Turn " + game.getTurnNumber());
 
         // If there are no markers available, skip forward to movement.
         if (player.getNumMarkersAvailable() == 0)
@@ -43,7 +44,6 @@ class Turn extends Dialog implements ActionListener
         }
         else
         {
-            setTitle(player.getName() + " Turn " + game.getTurnNumber());
             removeAll();
             setLayout(new GridLayout(0, 3));
 
