@@ -196,6 +196,14 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
 
         dispose();
         System.gc();
+        try
+        {
+            finalize();
+        }
+        catch (Throwable e)
+        {
+            System.out.println("caught " + e.toString());
+        }
     }
 
 

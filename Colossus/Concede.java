@@ -212,6 +212,14 @@ class Concede extends JDialog implements ActionListener
 
         dispose();
         System.gc();
+        try
+        {
+            finalize();
+        }
+        catch (Throwable e)
+        {
+            System.out.println("caught " + e.toString());
+        }
     }
 
 
