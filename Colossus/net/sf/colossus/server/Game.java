@@ -821,8 +821,18 @@ public final class Game
 
     private void setupMuster()
     {
-        getActivePlayer().removeEmptyLegions();
-        server.allSetupMuster();
+        Player player = getActivePlayer();
+        player.removeEmptyLegions();
+        // If a player has been eliminated we can't count on his client
+        // still being around to advance the turn.
+        if (player.isDead())
+        {
+            advancePhase(Constants.MUSTER, player.getName());
+        }
+        else
+        {
+            server.allSetupMuster();
+        }
     }
 
     int getTurnNumber()
