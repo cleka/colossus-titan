@@ -1134,8 +1134,7 @@ public class MasterBoard extends Frame implements MouseListener,
                         // If we're fighting and there is an engagement here,
                         // resolve it.
                         case Game.FIGHT:
-                            if (hex.getNumFriendlyLegions(player) > 0 &&
-                                hex.getNumEnemyLegions(player) > 0)
+                            if (hex.isEngagement())
                             {
                                 Legion attacker = 
                                     hex.getFriendlyLegion(player);
@@ -1156,7 +1155,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
                                     new Concede(this, attacker, defender, 
                                         false);
-                                    if (hex.getNumFriendlyLegions(player) > 0) 
+                                    if (hex.isEngagement())
                                     {
                                         if (defender.canFlee() == false)
                                         {
@@ -1165,7 +1164,15 @@ public class MasterBoard extends Frame implements MouseListener,
                                         }
                                     }
 
-                                    // XXX: Add negotiation and battle
+                                    // The players may agree to a negotiated
+                                    // settlement.
+                                    if (hex.isEngagement())
+                                    {
+                                        new Negotiate(this, attacker, 
+                                            defender);
+                                    }
+
+                                    // XXX: Add battle
                                 }
                             }
                             break;
