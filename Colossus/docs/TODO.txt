@@ -99,8 +99,6 @@ Should be able to move recruit chart behind board, map.
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 
 
-Wait cursor / progress indicator / waiting for X text
-
 Should be able to clear recruitChits in any phase.  Move to Graphics menu?
 
 Real whole-legion battle eval function, including gang hits.

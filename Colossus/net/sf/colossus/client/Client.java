@@ -1962,6 +1962,13 @@ Log.error("Got nak for recruit with " + markerId);
             {
                 board.getFrame().toFront();
                 board.fullRepaint();
+                board.setCursor(Cursor.getPredefinedCursor(
+                    Cursor.DEFAULT_CURSOR));
+            }
+            else
+            {
+                board.setCursor(Cursor.getPredefinedCursor(
+                    Cursor.WAIT_CURSOR));
             }
         }
         updateStatusScreen();
@@ -2033,6 +2040,13 @@ Log.error("Got nak for recruit with " + markerId);
             {
                 map.getFrame().toFront();
                 map.setupSummonMenu();
+                map.setCursor(Cursor.getPredefinedCursor(
+                    Cursor.DEFAULT_CURSOR));
+            }
+            else
+            {
+                map.setCursor(Cursor.getPredefinedCursor(
+                    Cursor.WAIT_CURSOR));
             }
         }
         updateStatusScreen();
@@ -2139,6 +2153,13 @@ Log.error("Got nak for recruit with " + markerId);
             if (isMyBattlePhase())
             {
                 map.getFrame().toFront();
+                map.setCursor(Cursor.getPredefinedCursor(
+                    Cursor.DEFAULT_CURSOR));
+            }
+            else
+            {
+                map.setCursor(Cursor.getPredefinedCursor(
+                    Cursor.WAIT_CURSOR));
             }
             map.setupFightMenu();
         }
