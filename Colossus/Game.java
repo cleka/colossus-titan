@@ -8,7 +8,7 @@ import java.awt.event.*;
  */
 
 
-class Game extends Frame implements WindowListener, ActionListener
+public class Game extends Frame implements WindowListener, ActionListener
 {
     private int numPlayers;
     private Player [] players;
@@ -342,7 +342,7 @@ class Game extends Frame implements WindowListener, ActionListener
                 players[i].getNumLegions()));
             markersLabel[i].setText(String.valueOf(
                 players[i].getNumMarkersAvailable()));
-            titanLabel[i].setText(String.valueOf(players[i].titanPower()));
+            titanLabel[i].setText(String.valueOf(players[i].getTitanPower()));
             scoreLabel[i].setText(String.valueOf(players[i].getScore()));
         }
 
