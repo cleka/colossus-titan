@@ -21,6 +21,7 @@ class Legion
         Creature creature4, Creature creature5, 
         Creature creature6, Creature creature7)
     {
+        this.markerId = markerId;
         String imageFilename = "images/" + markerId + ".gif";
         this.chit = new Chit(cx, cy, scale, imageFilename, container);
         this.height = height;
