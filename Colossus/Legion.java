@@ -458,6 +458,26 @@ class Legion
     }
 
 
+    // Remove one creature from the visible list.  This is needed to
+    // remove summoned-out angels.
+    public void hideCreature(Creature creature)
+    {
+        for (int i = 0; i < numVisibleCreatures; i++)
+        {
+            if (visibleCreatures[i] == creature)
+            {
+                for (int j = i; j < numVisibleCreatures - 1; j++)
+                {
+                    visibleCreatures[j] = visibleCreatures[j + 1];
+                }
+                visibleCreatures[numVisibleCreatures - 1] = null;
+                numVisibleCreatures--;
+                return;
+            }
+        }
+    }
+
+
     public int getNumVisibleCreatures()
     {
         return numVisibleCreatures;
