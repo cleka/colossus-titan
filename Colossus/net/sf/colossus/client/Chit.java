@@ -75,24 +75,30 @@ class Chit extends JPanel
 
         try 
         {
-            ClassLoader cl = Client.class.getClassLoader();
-            URL url = cl.getResource(imageFilename);
-            if (url != null)
-            {
-                icon = new ImageIcon(url);
-            }
-            if (icon == null)
-            { 
-                // try with the var-specific directory
+            URL url;
+            // try first with the var-specific directory
+            try {
                 url = new URL("file:" + GetPlayers.getVarDirectory() +
-                    imageFilename);
-                if (url != null)
+                              imageFilename);
+                // url will not be null even is the file doesn't exist,
+                // so we need to check if connection can be opened
+                if ((url != null) && (url.openStream() != null))
                 {
                     Image image = Toolkit.getDefaultToolkit().getImage(url);
                     if (image != null)
                     {
                         icon = new ImageIcon(image);
                     }
+                }
+            } catch (Exception e) {}
+            // try second with the default loader
+            if (icon == null)
+            {
+                ClassLoader cl = Client.class.getClassLoader();
+                url = cl.getResource(imageFilename);
+                if (url != null)
+                {
+                    icon = new ImageIcon(url);
                 }
             }
             if (icon == null)

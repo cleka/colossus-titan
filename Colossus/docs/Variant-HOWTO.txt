@@ -30,7 +30,31 @@ particurly in Battlelands (slope next to a tree, or
 cliff between two bogs...). Also, ensuring consistency
 between the files is up to the Variant author.
 
-There may be an easier (read: graphical) way later, but
-don't hold your breath, nobody is working on it (yet).
+Battlelands can also be created using the graphical
+tool 'BattlelandsBuilder'. See inside the 'docs/datatools'
+directory for additional informations.
+
+There may be an easier (read: graphical) way later for
+CRE, TER and MAP files, but don't hold your breath, nobody
+is working on it (yet).
+
+FAQ:
+
+1) My creature won't load !
+2) My creature is displayed as a dull grey square !
+
+Creature's name (the first column of a CRE file) should not
+contain space or other non-alphabetical character (you
+can't use digits yet). So, don't create "Killer Rabbit 2"
+but create "KillerRabbitTwo" instead.
+
+The creature's name is also used as the base name
+of the pictures. So a "KillerRabbitTwo" will use
+the file "KillerRabbitTwo.gif" in the subdirectory
+"images".
+
+You should be able to re-use an existing name, as
+the 'images' directory is accessed before the default
+GIF files.
 
 File Version: $Header$
