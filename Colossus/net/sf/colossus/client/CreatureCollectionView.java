@@ -72,6 +72,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
     CreatureCollectionView(JFrame frame, Client client)
     {
         super(frame, "Caretaker's Stacks", false);
+        setFocusable(false);
 
         this.client = client;
 

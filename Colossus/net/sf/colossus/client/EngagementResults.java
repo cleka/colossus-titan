@@ -53,6 +53,7 @@ final class EngagementResults
     EngagementResults(final JFrame frame, final Client aClient)
     {
         super(frame, "Engagement Status", false);
+        setFocusable(false);
         this.client = aClient;
         pack(); // TODO: needed here? dunno.
         setBackground(Color.lightGray);

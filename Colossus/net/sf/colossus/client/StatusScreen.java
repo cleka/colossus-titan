@@ -58,6 +58,8 @@ final class StatusScreen extends KDialog implements WindowListener
         super(frame, "Game Status", false);
 
         setVisible(false);
+        setFocusable(false);
+
         this.client = client;
 
         // Needs to be set up before calling this.
