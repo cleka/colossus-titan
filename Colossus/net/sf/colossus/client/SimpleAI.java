@@ -2485,7 +2485,8 @@ Log.debug("Called findBattleMoves()");
         Timer timer = new Timer();
         timeIsUp = false;
         final int MS_PER_S = 1000;
-        if (timeLimit <= 0)
+        if (timeLimit < Constants.MIN_AI_TIME_LIMIT || 
+            timeLimit > Constants.MAX_AI_TIME_LIMIT)
         {
             timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;
         }
