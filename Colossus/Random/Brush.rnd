@@ -1,3 +1,4 @@
+# $Id$
 # some brush in the inside, and maybe even a tree
 AREA (inside) TERRAINS r r r r,75. r,5. r,5. r,5. t,5.,1
 # one brush on each entry side
