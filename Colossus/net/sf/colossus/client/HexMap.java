@@ -116,6 +116,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     void setupHexes()
     {
+        Log.debug("Setup all hexes for Battlelands.");
         setupHexesGUI();
         setupHexesGameState(terrain, h);
         setupNeighbors(h);
@@ -152,6 +153,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static synchronized void setupHexesGameState(char terrain, 
         BattleHex [][] h)
     {
+        Log.debug("Loading battleland " + MasterHex.getTerrainName(terrain));
         java.util.List directories = 
             VariantSupport.getBattlelandsDirectoriesList();
         InputStream batIS = ResourceLoader.getInputStream(

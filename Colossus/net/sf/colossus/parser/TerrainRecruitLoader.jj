@@ -52,13 +52,24 @@ public class TerrainRecruitLoader
      */
     private static List acquirableList = null;
 
-    /* make sure that the acquirableList is null when creating a new TerrainRecruitLoader */
+    /* make sure that all static elements are null or empty when creating a new TerrainRecruitLoader object... */
     {
         if (acquirableList != null)
         {
-            Log.debug("Destroying previous acquirableList ; this should never happen during a game...");
+            Log.debug("TerrainRecruitLoader: Destroying previous ``acquirableList'' ; this should never happen during a game...");
             acquirableList = null;
         }
+        if (terrains != null)
+        {
+            Log.debug("TerrainRecruitLoader: Destroying previous ``terrains'' ; this should never happen during a game...");
+            terrains = null;
+        }
+        Log.debug("TerrainRecruitLoader: clearing all Hashtables ; this should never happen during a game...");
+        carToRecruits.clear();
+        carToName.clear();
+        carToDisplayName.clear();
+        carToColor.clear();
+        carToBelow.clear();
     }
 
     /**
