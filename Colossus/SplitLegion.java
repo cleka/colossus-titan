@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
@@ -37,7 +37,6 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
 
         setResizable(false);
         getContentPane().setLayout(null);
-        setBackground(java.awt.Color.lightGray);
 
         this.oldLegion = oldLegion;
         this.player = player;
@@ -59,6 +58,8 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             null, null, player);
 
         pack();
+
+        setBackground(java.awt.Color.lightGray);
         setSize(getPreferredSize());
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
