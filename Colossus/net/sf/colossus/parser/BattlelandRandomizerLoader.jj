@@ -68,7 +68,15 @@ public class BattlelandRandomizerLoader
         al.add(new address(5,4));
         for (i = 3; i <= 4 ; i++)
             al.add(new address(i,5));
-        labels.put("lowerdefenseentry", al);   
+        labels.put("lowerdefenseentry", al);
+
+        al = new ArrayList();
+
+        for (i = 1; i < 6 ; i++)
+            for (j = 1; j < 6 ; j++)
+                if (show[i][j])
+                    al.add(new address(i,j));
+        labels.put("anywhere", al);
     }
 
     private class randomTerrain implements Comparable

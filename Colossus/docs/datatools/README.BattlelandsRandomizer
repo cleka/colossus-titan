@@ -40,10 +40,11 @@ where
     <label> is a label defined previously with a LABEL statement (see below)
 
     There are some predefined labels available, including :
-    "inside" representing everything but the most outside Hex
-    "leftdefenseentry", "upperdefenseentry" and "lowerdefenseentry",
-    the 3 lines of 3 hexagons representing the defense entry lines
-    (left, upper-right, and lower-right respectively).
+    # "inside" representing everything but the most outside Hex.
+    # "leftdefenseentry", "upperdefenseentry" and "lowerdefenseentry",
+       the 3 lines of 3 hexagons representing the defense entry lines
+       (left, upper-right, and lower-right respectively).
+    # "anywhere" representing the whole Battlelands.
     
     SOMEOF is a literal string ; result is a list of <number> hexes taken
     randomly from the <list_of_hex> in parameter.
