@@ -40,6 +40,7 @@ public final class Options
     public static final String noTitanTeleport = "No Titan Teleport";
     // more rules options
     public static final String cumulativeSlow = "Slowing is cumulative";
+    public static final String oneHexAllowed = "Always allows one hex";
     
 
     // Will add player numbers 0-5 to the end of these.

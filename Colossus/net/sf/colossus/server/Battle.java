@@ -555,7 +555,7 @@ Log.debug("Called Battle.doneReinforcing()");
      *  is true, pretend that allied creatures that can move out of the
      *  way are not there. */
     private Set findMoves(BattleHex hex, Critter critter, boolean flies,
-        int movesLeft, int cameFrom, boolean ignoreMobileAllies)
+        int movesLeft, int cameFrom, boolean ignoreMobileAllies, boolean first)
     {
         Set set = new HashSet();
         for (int i = 0; i < 6; i++)
@@ -585,7 +585,9 @@ Log.debug("Called Battle.doneReinforcing()");
                         entryCost = BattleHex.IMPASSIBLE_COST;
                     }
 
-                    if (entryCost <= movesLeft)
+                    if ((entryCost != BattleHex.IMPASSIBLE_COST) &&
+                        ((entryCost <= movesLeft) ||
+                         (first && game.getOption(Options.oneHexAllowed))))
                     {
                         // Mark that hex as a legal move.
                         set.add(neighbor.getLabel());
@@ -597,7 +599,7 @@ Log.debug("Called Battle.doneReinforcing()");
                         {
                             set.addAll(findMoves(neighbor, critter, flies,
                                 movesLeft - entryCost, reverseDir,
-                                ignoreMobileAllies));
+                                ignoreMobileAllies, false));
                         }
                     }
 
@@ -608,7 +610,8 @@ Log.debug("Called Battle.doneReinforcing()");
                         neighbor.canBeFlownOverBy(critter))
                     {
                         set.addAll(findMoves(neighbor, critter, flies,
-                            movesLeft - 1, reverseDir, ignoreMobileAllies));
+                                             movesLeft - 1, reverseDir,
+                                             ignoreMobileAllies, false));
                     }
                 }
             }
@@ -660,7 +663,7 @@ Log.debug("Called Battle.doneReinforcing()");
             {
                 set = findMoves(critter.getCurrentHex(), critter,
                     critter.isFlier(), critter.getSkill(), -1,
-                    ignoreMobileAllies);
+                    ignoreMobileAllies, true);
             }
         }
         return set;

@@ -31,7 +31,7 @@ final class BattleMovement
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back.  */
     private Set findMoves(BattleHex hex, Creature creature, boolean flies,
-        int movesLeft, int cameFrom)
+        int movesLeft, int cameFrom, boolean first)
     {
         Set set = new HashSet();
         for (int i = 0; i < 6; i++)
@@ -60,18 +60,20 @@ final class BattleMovement
                         entryCost = BattleHex.IMPASSIBLE_COST;
                     }
 
-                    if (entryCost <= movesLeft)
+                    if ((entryCost != BattleHex.IMPASSIBLE_COST) &&
+                        ((entryCost <= movesLeft) ||
+                         (first && client.getOption(Options.oneHexAllowed))))
                     {
                         // Mark that hex as a legal move.
                         set.add(neighbor.getLabel());
-
+                        
                         // If there are movement points remaining, continue
                         // checking moves from there.  Fliers skip this
                         // because flying is more efficient.
                         if (!flies && movesLeft > entryCost)
                         {
                             set.addAll(findMoves(neighbor, creature, flies,
-                                movesLeft - entryCost, reverseDir));
+                                movesLeft - entryCost, reverseDir, false));
                         }
                     }
 
@@ -82,7 +84,7 @@ final class BattleMovement
                         neighbor.canBeFlownOverBy(creature))
                     {
                         set.addAll(findMoves(neighbor, creature, flies,
-                            movesLeft - 1, reverseDir));
+                            movesLeft - 1, reverseDir, false));
                     }
                 }
             }
@@ -144,7 +146,7 @@ final class BattleMovement
                     chit.getCreatureName());
                 BattleHex hex = client.getBattleHex(chit);
                 set = findMoves(hex, creature, creature.isFlier(), 
-                    creature.getSkill(), -1);
+                                creature.getSkill(), -1, true);
             }
         }
         return set;
