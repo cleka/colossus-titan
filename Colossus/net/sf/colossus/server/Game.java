@@ -1933,20 +1933,21 @@ public final class Game
 
     /** Return the sum of all possible entry sides for this legion and hex,
      *  or -1 if there are none. */
-    int getPossibleEntrySides(String markerId, String hexLabel, 
+    int getPossibleEntrySides(String markerId, String targetHexLabel, 
         boolean teleport)
     {
         Legion legion = getLegionByMarkerId(markerId);
         Player player = legion.getPlayer();
         int movementRoll = player.getMovementRoll();
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+        MasterHex currentHex = legion.getCurrentHex();
+        MasterHex targetHex = MasterBoard.getHexByLabel(targetHexLabel);
 
         if (teleport)
         {
-            if (listTeleportMoves(legion, hex, movementRoll, false).contains(
-                hexLabel))
+            if (listTeleportMoves(legion, currentHex, movementRoll, 
+                false).contains(targetHexLabel))
             {
-                if (hex.getTerrain() == 'T')
+                if (targetHex.getTerrain() == 'T')
                 {
                     return 3;  // Towers only have bottom entry side.
                 }
@@ -1963,15 +1964,15 @@ public final class Game
 
         // Normal moves.
         int entrySides = 0;
-        Set tuples = findNormalMoves(hex, player, legion, movementRoll, 
-            findBlock(hex), Constants.NOWHERE, false);
+        Set tuples = findNormalMoves(currentHex, player, legion, movementRoll, 
+            findBlock(currentHex), Constants.NOWHERE, false);
         Iterator it = tuples.iterator();
         while (it.hasNext())
         {
             String tuple = (String)it.next();
             java.util.List parts = Split.split(':', tuple);
             String hl = (String)parts.get(0);
-            if (hl.equals(hexLabel))
+            if (hl.equals(targetHexLabel))
             {
                 String buf = (String)parts.get(1);
                 entrySides += Integer.parseInt(buf);

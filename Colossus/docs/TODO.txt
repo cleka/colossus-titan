@@ -2,6 +2,9 @@ Reduce imports between client and server packages.  Document remaining
    public classes, which are those that need to be included in the 
    network protocol.
 
+Make all modal dialogs non-modal.  (Can't enforce GUI modality across a
+   network.)
+
 Include an .ico file for Windows.
 
 Remember window positions in .cfg file.

@@ -1,4 +1,4 @@
-Colossus alpha     December 19, 2001    Copyright 2001 David Ripton
+Colossus alpha     December 25, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
@@ -311,7 +311,7 @@ GUI ideas: Kris Giesing, David Lum
 
 Bug reports:  Anthony Kam, Augustin Ku, Sean McCulloch, Luca Ferraro, 
               Jonathan Woodward, Aneel Nazareth, Paul Macgowan,
-              Magnus Berglund
+              Magnus Berglund, Don Woods
 
 Web and CVS space, bug tracker, mailing lists, etc.: SourceForge
 

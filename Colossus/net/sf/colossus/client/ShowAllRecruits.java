@@ -38,6 +38,7 @@ final class ShowAllRecruits extends JDialog implements MouseListener,
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             panel.setAlignmentY(0);
             panel.setBorder(BorderFactory.createLineBorder(Color.black));
+            panel.setBackground(Game.getTerrainColor(terrain));
 
             JLabel terrainLabel = new JLabel(MasterHex.getTerrainName(
                 terrain));
@@ -68,6 +69,7 @@ final class ShowAllRecruits extends JDialog implements MouseListener,
                 if (numToRecruit > 0 && numToRecruit <= 3)
                 {
                     numToRecruitLabel.setText(Integer.toString(numToRecruit));
+                    numToRecruitLabel.setAlignmentX(Label.CENTER_ALIGNMENT);
                 }
     
                 panel.add(numToRecruitLabel);

@@ -70,11 +70,11 @@ final class PickEntrySide extends HexMap implements ActionListener,
     }
 
 
-    /** entrySides is all the possible entry sides added together. */
+    /** sides is all the possible entry sides added together. */
     static int pickEntrySide(JFrame parentFrame, String masterHexLabel,
         int sides)
     {
-        entrySide = -1;
+        entrySide = sides;
 
         boolean left = false;
         boolean bottom = false;
@@ -100,10 +100,6 @@ final class PickEntrySide extends HexMap implements ActionListener,
         {
             new PickEntrySide(parentFrame, masterHexLabel, left, bottom, 
                 right);
-        }
-        else
-        {
-            entrySide = sides;
         }
 
         return entrySide;

@@ -41,9 +41,9 @@ Loading in the middle of a battle resets turn
    map, keeps the map around after the battle is over, etc.  It's
    a mess.
 
-Solaris, 1.3.1: Popup windows (e.g. ShowMasterHex) pop up in the wrong
-   place if the window has been scrolled.  Scrollbars do not immediately
-   appear / disappear after a rescale().
+Solaris, 1.3.1: Popup windows pop up in the wrong place if the window 
+   has been scrolled.  
+Scrollbars do not immediately appear / disappear after a rescale().
 
 All enemy creatures are invisible after loading a game.
 
@@ -104,6 +104,8 @@ Red battle hex highlighting clashes with volcano.
 Save game in first turn's move phase, after rolling 6.  Load game, 
    movement roll shows up as -1 in title, no die shown, but works 
    as 6.
+
+"All stacks visible" is completely broken.
 
 
 AI bugs:
