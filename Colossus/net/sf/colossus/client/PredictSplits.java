@@ -627,8 +627,10 @@ class Node implements Comparable
      *  remove.  Return null on error. */
     CreatureInfoList chooseCreaturesToSplitOut(List pos)
     {
-        Log.debug("chooseCreaturesToSplitOut() " + this + " " + pos);
-        int minKillValue = 99999;
+        Log.debug("chooseCreaturesToSplitOut() " + this);
+        List firstElement = (List)pos.get(0);
+        boolean maximize = (2 * firstElement.size() > getHeight());
+        int bestKillValue = -1;
         CreatureInfoList creaturesToRemove = new CreatureInfoList();
         Iterator it = pos.iterator();
         while (it.hasNext())
@@ -642,9 +644,11 @@ class Node implements Comparable
                 Creature creature = Creature.getCreatureByName(ci.getName());
                 totalKillValue += SimpleAI.getKillValue(creature);
             }
-            if (totalKillValue < minKillValue)
+            if ((bestKillValue == -1) ||
+                (!maximize && totalKillValue < bestKillValue) ||
+                (maximize && totalKillValue > bestKillValue))
             {
-                minKillValue = totalKillValue;
+                bestKillValue = totalKillValue;
                 creaturesToRemove = li;
             }
         }
@@ -783,20 +787,8 @@ class Node implements Comparable
             removed2.addAll(child2.getRemovedCreatures());
         }
 
-        String marker1 = null;
-        String marker2 = null;
-
-        // Assume that the bigger stack got the better creatures.
-        if (2 * childSize > getHeight())
-        {
-            marker1 = otherMarkerId;
-            marker2 = markerId;
-        }
-        else
-        {
-            marker1 = markerId;
-            marker2 = otherMarkerId;
-        }
+        String marker1 = markerId;
+        String marker2 = otherMarkerId;
 
         CreatureInfoList li1 = new CreatureInfoList();
         li1.addAll(strongList);

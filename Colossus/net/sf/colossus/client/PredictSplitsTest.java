@@ -6089,10 +6089,11 @@ public class PredictSplitsTest extends TestCase
         aps.getLeaf("Gd11").revealCreatures(cnl);
         aps.getLeaf("Gd11").addCreature("Troll");
         aps.printLeaves();
+
         turn = 11;
         Log.debug("Turn " + turn);
-        aps.getLeaf("Gr01").split(2, "Gr04", 11);
-        aps.getLeaf("Gr11").split(2, "Gr08", 11);
+        aps.getLeaf("Gr01").split(5, "Gr04", 11);
+        aps.getLeaf("Gr11").split(5, "Gr08", 11);
         cnl.clear();
         cnl.add("Troll"); 
         cnl.add("Troll"); 

@@ -403,10 +403,7 @@ class Node:
         """Decide how to split this legion, and return a list of Creatures to
         remove.  Return null on error."""
         print "chooseCreaturesToSplitOut() for", self, pos
-        maximize = False
-        if 2 * len(pos[0]) > self.getHeight():
-            # The splitoff is the bigger legion, so split off the best creatures. 
-            maximize = True
+        maximize = (2 * len(pos[0]) > self.getHeight())
 
         bestKillValue = None
         creaturesToRemove = []
