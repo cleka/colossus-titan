@@ -10,11 +10,11 @@ import java.awt.event.*;
 
 class Game extends Frame implements WindowListener, ActionListener
 {
-    int numPlayers;
+    private int numPlayers;
     Player [] player;
     private MasterBoard board;
-    int activePlayer = 0;
-    int turnNumber = 1;
+    private int activePlayerNum = 0;
+    private int turnNumber = 1;
 
     static final int SPLIT = 1;
     static final int MOVE = 2;
@@ -328,7 +328,7 @@ class Game extends Frame implements WindowListener, ActionListener
     {
         for (int i = 0; i < numPlayers; i++)
         {
-            if (activePlayer == i)
+            if (activePlayerNum == i)
             {
                 activeLabel[i].setText("*");
             }
@@ -384,9 +384,21 @@ class Game extends Frame implements WindowListener, ActionListener
     }
 
 
-    public Player getActivePlayer()
+    int getNumPlayers()
     {
-        return player[activePlayer];
+        return numPlayers;
+    }
+
+
+    Player getActivePlayer()
+    {
+        return player[activePlayerNum];
+    }
+
+
+    int getActivePlayerNum()
+    {
+        return activePlayerNum;
     }
 
 
@@ -398,8 +410,8 @@ class Game extends Frame implements WindowListener, ActionListener
 
     void advanceTurn()
     {
-        activePlayer++;
-        activePlayer %= numPlayers;
+        activePlayerNum++;
+        activePlayerNum %= numPlayers;
         turnNumber++;
         phase = SPLIT;
     }
