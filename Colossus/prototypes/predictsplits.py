@@ -380,6 +380,7 @@ class Node:
             if child.hasSplit():
                 child.split(child.childSize2, child.getOtherChildMarkerId())
 
+
     def split(self, childSize, otherMarkerId, turn=-1):
         assert self.getHeight() <= 8
 
@@ -409,46 +410,41 @@ class Node:
 
         posSplitNames = []
         posKeepNames = []
-        for pos_split_names in possibleSplits:
-            if superset(certain, pos_split_names):
-                pos_keep_names = subtractLists(certain, pos_split_names)
-                posKeepNames.append(pos_keep_names)
-                posSplitNames.append(pos_split_names)
-        knownKeepNames = []
-        knownSplitNames = []
+        for names in possibleSplits:
+            if superset(certain, names):
+                posKeepNames.append(subtractLists(certain, names))
+                posSplitNames.append(names)
+
+        knownKeep = []
+        knownSplit = []
         for name in certain:
-            if not name in knownKeepNames:
+            if not name in knownKeep:
                 minKeep = minCount(posKeepNames, name)
                 for unused in range(minKeep):
-                    knownKeepNames.append(name)
-            if not name in knownSplitNames:
+                    knownKeep.append(name)
+            if not name in knownSplit:
                 minSplit = minCount(posSplitNames, name)
                 for unused in range(minSplit):
-                    knownSplitNames.append(name)
+                    knownSplit.append(name)
 
-        # If either knownKeep or knownSplit is the full size of that
-        # child legion, then the certainty of creatures in the other
-        # child legion is the same as in the parent.
+        def _inherit_parent_certainty(certain, known, other):
+            """If one of the child legions is fully known, assign the 
+               creatures in the other child legion the same certainty they 
+               have in the parent.
+            """
+            all = certain[:]
+            assert superset(all, known)
+            for name in known:
+                all.remove(name)
+            assert superset(all, other)
+            for name in all:
+                if (all.count(name) > other.count(name)):
+                    other.append(name)
+
         if len(knownSplit) == childSize:
-            assert superset(certain, knownSplit)
-            for name in knownSplit:
-                certain.remove(name)
-            assert superset(certain, knownKeep)
-            moreKnownKeepNames = certain
-            for name in moreKnownKeepNames:
-                if moreKnownKeepNames.count(name) > knownKeepNames.count(name):
-                    knownKeepNames.append(name)
-
+            _inherit_parent_certainty(certain, knownSplit, knownKeep)
         elif len(knownKeep) == self.getHeight() - childSize:
-            assert superset(certain, knownKeep)
-            for name in knownKeep:
-                certain.remove(name)
-            assert superset(certain, knownSplit)
-            moreKnownSplitNames = certain
-            for name in moreKnownSplitNames:
-                if (moreKnownSplitNames.count(name) >
-                  knownSplitNames.count(name)):
-                    knownSplitNames.append(name)
+            _inherit_parent_certainty(certain, knownKeep, knownSplit)
 
         # lists of CreatureInfo
         strongList = []
@@ -459,42 +455,30 @@ class Node:
             if name in splitoffNames:
                 weakList.append(newinfo)
                 splitoffNames.remove(name)
-                # If in knownSplitNames, set certain
-                if name in knownSplitNames:
-                    knownSplitNames.remove(name)
+                # If in knownSplit, set certain
+                if name in knownSplit:
+                    knownSplit.remove(name)
                     newinfo.certain = True
             else:
                 strongList.append(newinfo)
                 # If in knownKeepNames, set certain
-                if name in knownKeepNames:
-                    knownKeepNames.remove(name)
+                if name in knownKeep:
+                    knownKeep.remove(name)
                     newinfo.certain = True
 
-        if not self.hasSplit():
-            afterSplit1 = []
-            afterSplit2 = []
-            removed1 = []
-            removed2 = []
+        if self.hasSplit():
+            strongList += self.child1.getAfterSplitCreatures()
+            for ci in self.child1.removed:
+                strongList.remove(ci)
+            weakList += self.child2.getAfterSplitCreatures()
+            for ci in self.child2.removed:
+                weakList.remove(ci)
+            self.child1.creatures = strongList
+            self.child2.creatures = weakList
         else:
-            afterSplit1 = self.child1.getAfterSplitCreatures()
-            afterSplit2 = self.child2.getAfterSplitCreatures()
-            removed1 = self.child1.removed
-            removed2 = self.child2.removed
-
-        strongFinal = strongList + afterSplit1
-        for ci in removed1:
-            strongFinal.remove(ci)
-        weakFinal = weakList + afterSplit2
-        for ci in removed2:
-            weakFinal.remove(ci)
-
-        if not self.hasSplit():
-            self.child1 = Node(self.markerId, turn, strongFinal, self)
-            self.child2 = Node(otherMarkerId, turn, weakFinal, self)
+            self.child1 = Node(self.markerId, turn, strongList, self)
+            self.child2 = Node(otherMarkerId, turn, weakList, self)
             self.childSize2 = self.child2.getHeight()
-        else:
-            self.child1.creatures = strongFinal
-            self.child2.creatures = weakFinal
 
         self._splitChildren()
 
