@@ -153,9 +153,9 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j] && h[i][j].selected == true)
+                if (show[i][j] && h[i][j].isSelected())
                 {
-                    h[i][j].selected = false;
+                    h[i][j].unselect();
                     Rectangle clip = new Rectangle(h[i][j].getBounds());
                     repaint(clip.x, clip.y, clip.width, clip.height);
                 }
@@ -178,7 +178,9 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             // XXX Mark an engagement.
 
-            hex.selected = true;
+            hex.select();
+            Rectangle clip = new Rectangle(hex.getBounds());
+            repaint(clip.x, clip.y, clip.width, clip.height);
             return;
         }
 
@@ -195,7 +197,9 @@ public class MasterBoard extends Frame implements MouseListener,
                     return;
                 }
             }
-            hex.selected = true;
+            hex.select();
+            Rectangle clip = new Rectangle(hex.getBounds());
+            repaint(clip.x, clip.y, clip.width, clip.height);
             return;
         }
 
@@ -241,7 +245,9 @@ public class MasterBoard extends Frame implements MouseListener,
 
         if (hex.getNumLegions() == 0)
         {
-            hex.selected = true;
+            hex.select();
+            Rectangle clip = new Rectangle(hex.getBounds());
+            repaint(clip.x, clip.y, clip.width, clip.height);
         }
 
         if (roll > 0)
@@ -298,26 +304,14 @@ public class MasterBoard extends Frame implements MouseListener,
                 // Mark every unoccupied tower.
                 for (int tower = 100; tower <= 600; tower += 100)
                 {
-                    hex = getHexFromLabel(tower); 
-                    boolean occupied = false;
-                    for (int i = 0; i < game.getNumPlayers(); i++)
+                    hex = getHexFromLabel(tower);
+                    if (hex.getNumLegions() == 0)
                     {
-                        for (int j = 0; j < game.player[i].getNumLegions(); 
-                            j++)
-                        {
-                            if (game.player[i].legions[j].getCurrentHex() == 
-                                hex.label)
-                            {
-                                occupied = true;
-                            }
-                        }
-                    }
-                    if (occupied == false)
-                    {
-                        hex.selected = true;
+                        hex.select();
+                        Rectangle clip = new Rectangle(hex.getBounds());
+                        repaint(clip.x, clip.y, clip.width, clip.height);
                     }
                 }
-                repaint();
             }
 
             // Titan teleport
@@ -325,7 +319,21 @@ public class MasterBoard extends Frame implements MouseListener,
                 legion.numCreature(Creature.titan) > 0)
             {
                 // Mark every hex containing an enemy unit. 
-
+                for (int i = 0; i < game.getNumPlayers(); i++)
+                {
+                    if (game.player[i] != player)
+                    {
+                        for (int j = 0; j < game.player[i].getNumLegions(); 
+                            j++)
+                        {
+                            getHexFromLabel(game.player[i].legions[j].
+                                getCurrentHex()).select();
+                            Rectangle clip = new Rectangle(h[i][j].
+                                getBounds());
+                            repaint(clip.x, clip.y, clip.width, clip.height);
+                        }
+                    }
+                }
             }
         }
     }
@@ -979,6 +987,7 @@ public class MasterBoard extends Frame implements MouseListener,
                                         SplitLegion(this, legion, player);
                                     // Update status window.
                                     game.updateStatusScreen();
+                                    // XXX Repaint only affected areas?
                                     repaint();
                                     return;
 
@@ -1025,7 +1034,7 @@ public class MasterBoard extends Frame implements MouseListener,
                         // destination, move the legion here.
                         case Game.MOVE:
                             Legion legion = player.getSelectedLegion();
-                            if (legion != null && h[i][j].selected == true)
+                            if (legion != null && h[i][j].isSelected())
                             {
                                 legion.moveToHex(h[i][j]);
                                 unselectAllHexes();
