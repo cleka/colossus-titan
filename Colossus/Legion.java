@@ -189,6 +189,12 @@ class Legion
     }
 
 
+    MasterHex getStartingHex()
+    {
+        return startingHex;
+    }
+
+
     void addCreature(Creature creature)
     {
         if (creature.getCount() > 0)
