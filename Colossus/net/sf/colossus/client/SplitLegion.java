@@ -208,11 +208,10 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     private void returnSplitResults()
     {
-        StringBuffer buf = new StringBuffer(newMarker.getId());
+        StringBuffer buf = new StringBuffer();
         Iterator it = newChits.iterator();
         while (it.hasNext())
         {
-            buf.append(",");
             Chit chit = (Chit)it.next();
             String creatureName = chit.getId();
             if (creatureName.startsWith(Constants.titan))
@@ -220,6 +219,10 @@ final class SplitLegion extends KDialog implements MouseListener,
                 creatureName = Constants.titan;
             }
             buf.append(creatureName);
+            if (it.hasNext())
+            {
+                buf.append(",");
+            }
         }
         results = buf.toString();
         dispose();

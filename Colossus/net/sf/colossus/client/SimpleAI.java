@@ -436,8 +436,11 @@ public class SimpleAI implements AI
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
-            results.append(",");
             results.append(creature.getName());
+            if (it.hasNext())
+            {
+                results.append(",");
+            }
         }
         client.doSplit(legion.getMarkerId(), newMarkerId, results.toString());
     }

@@ -22,7 +22,8 @@ public interface IClient
 
     public void setColor(String color);
 
-    public void updateCreatureCount(String creatureName, int count, int deadCount);
+    public void updateCreatureCount(String creatureName, int count, 
+        int deadCount);
 
     public void dispose();
 

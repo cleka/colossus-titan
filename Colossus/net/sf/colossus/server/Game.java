@@ -2206,8 +2206,13 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         return set;
     }
 
-    /** Return true if the split succeeded. */
-    boolean doSplit(String parentId, String childId, String results)
+
+    // TODO Finish error checks.
+    /** Return true if the split is legal.  Each legion must have
+     *  height >= 2.  If this was an initial split, each legion
+     *  must have height == 4 and one lord. */
+    private boolean isSplitLegal(String parentId, String childId, 
+        String results)
     {
         Legion legion = getLegionByMarkerId(parentId);
         Player player = legion.getPlayer();
@@ -2219,24 +2224,55 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
                 "Marker " + childId + " is not available.");
             return false;
         }
-        // Don't allow extra splits in turn 1.
-        if (getTurnNumber() == 1 && player.getNumLegions() > 1)
+
+        // Pre-split legion must have 4+ creatures.
+        if (legion.getHeight() < 4)
         {
             server.showMessageDialog(player.getName(),
-                "Cannot split twice on Turn 1.");
+                "Legion " + parentId + " is too short to split.");
             return false;
+        }
+
+        // Each legion must have 2+ creatures after the split.
+
+        // All creatures in results must be in the legion.
+
+        if (getTurnNumber() == 1) 
+        {
+            // Only allow a single split on turn 1.
+            if (player.getNumLegions() > 1)
+            {
+                server.showMessageDialog(player.getName(),
+                    "Cannot split twice on Turn 1.");
+                return false;
+            }
+            // Each stack must contain exactly 4 characters.
+            // Each stack must contain exactly 1 lord.
         }
         if (results == null)
         {
             return false;
         }
 
+        return true;
+    }
+
+
+    /** Return true if the split succeeded. */
+    boolean doSplit(String parentId, String childId, String results)
+    {
+        if (!isSplitLegal(parentId, childId, results))
+        {
+            return false;
+        }
+
+        Legion legion = getLegionByMarkerId(parentId);
+        Player player = legion.getPlayer();
         Legion newLegion = null;
 
         java.util.List strings = Split.split(',', results);
-        strings.remove(0);
 
-        // Need to replace strings with creatures.
+        // Replace strings with creatures.
         java.util.List creatures = new ArrayList();
         Iterator it = strings.iterator();
         while (it.hasNext())
