@@ -33,7 +33,8 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     PickRecruit(JFrame parentFrame, Legion legion)
     {
         super(parentFrame, legion.getPlayer().getName() +
-            ": Pick Recruit", true);
+            ": Pick Recruit in " + 
+            legion.getCurrentHex().getTerrainName().toLowerCase(), true);
 
         if (!legion.canRecruit())
         {
