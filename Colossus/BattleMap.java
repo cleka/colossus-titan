@@ -1208,7 +1208,8 @@ public class BattleMap extends Frame implements MouseListener,
                 // Summon angel
                 if (legion.getPlayer().canSummonAngel())
                 {
-                    new SummonAngel(board, attacker);
+                    SummonAngel summonAngel = new SummonAngel(board, attacker);
+                    board.setSummonAngel(summonAngel);
                 }
             }
             else
