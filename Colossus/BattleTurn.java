@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class BattleTurn gets and holds chronological and sequence data for a battle.
@@ -7,7 +8,7 @@ import java.awt.event.*;
  * author David Ripton
  */
 
-class BattleTurn extends Dialog implements ActionListener
+class BattleTurn extends JDialog implements ActionListener
 {
     // phases of a turn
     public static final int SUMMON = 0;
@@ -16,7 +17,7 @@ class BattleTurn extends Dialog implements ActionListener
     public static final int FIGHT = 3;
     public static final int STRIKEBACK = 4;
 
-    private Frame parentFrame;
+    private JFrame parentFrame;
     private BattleMap map;
     private Legion attacker;
     private Legion defender;
@@ -25,9 +26,10 @@ class BattleTurn extends Dialog implements ActionListener
     private int phase = MOVE;
     private SummonAngel summonAngel;
     private boolean summoningAngel = false;
+    private Container contentPane;
 
 
-    BattleTurn(Frame parentFrame, BattleMap map, Legion attacker, Legion
+    BattleTurn(JFrame parentFrame, BattleMap map, Legion attacker, Legion
         defender)
     {
         super(parentFrame, defender.getPlayer().getName() + " Turn 1");
@@ -39,14 +41,12 @@ class BattleTurn extends Dialog implements ActionListener
         activeLegion = defender;
         
         setBackground(java.awt.Color.lightGray);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         setupMoveDialog();
 
-        // This is necessary to prevent a visible resize.
         pack();
-
         setVisible(true);
-
         // Make sure that this window is in front of the Turn window.
         toFront();
     }
@@ -55,10 +55,11 @@ class BattleTurn extends Dialog implements ActionListener
     void setupRecruitDialog()
     {
 System.out.println("setupRecruitDialog");
-        removeAll();
+        contentPane = getContentPane();
+        contentPane.removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
-        setLayout(new GridLayout(0, 1));
-        add(new Label(getActivePlayer().getName() + " : Recruit"));
+        contentPane.setLayout(new GridLayout(0, 1));
+        contentPane.add(new JLabel(getActivePlayer().getName() + " : Recruit"));
 
         if (turnNumber == 4 && defender.canRecruit())
         {
@@ -79,10 +80,11 @@ System.out.println("recruiting time");
     void setupSummonDialog()
     {
 System.out.println("setupSummonDialog");
-        removeAll();
+        contentPane = getContentPane();
+        contentPane.removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
-        setLayout(new GridLayout(0, 1));
-        add(new Label(getActivePlayer().getName() + " : Summon"));
+        contentPane.setLayout(new GridLayout(0, 1));
+        contentPane.add(new JLabel(getActivePlayer().getName() + " : Summon"));
 
         int summonState = map.getSummonState();
 System.out.println("summonState = " + summonState);
@@ -155,22 +157,24 @@ System.out.println("No legal moves; advancing to strike phase");
         }
         else
         {
-            removeAll();
+            contentPane = getContentPane();
+            contentPane.removeAll();
             setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
-            setLayout(new GridLayout(0, 4));
+            contentPane.setLayout(new GridLayout(0, 4));
 
-            add(new Label(getActivePlayer().getName() + " : Move"));
+            contentPane.add(new JLabel(getActivePlayer().getName() + 
+                " : Move"));
 
-            Button button1 = new Button("Undo Last Move");
-            add(button1);
+            JButton button1 = new JButton("Undo Last Move");
+            contentPane.add(button1);
             button1.addActionListener(this);
 
-            Button button2 = new Button("Undo All Moves");
-            add(button2);
+            JButton button2 = new JButton("Undo All Moves");
+            contentPane.add(button2);
             button2.addActionListener(this);
 
-            Button button3 = new Button("Done with Moves");
-            add(button3);
+            JButton button3 = new JButton("Done with Moves");
+            contentPane.add(button3);
             button3.addActionListener(this);
 
             pack();
@@ -198,13 +202,14 @@ System.out.println("setupFightDialog");
         }
         else
         {
-            removeAll();
-            setLayout(new GridLayout(0, 2));
+            contentPane = getContentPane();
+            contentPane.removeAll();
+            contentPane.setLayout(new GridLayout(0, 2));
 
-            add(new Label(getActivePlayer().getName() +
+            contentPane.add(new JLabel(getActivePlayer().getName() +
                 ((phase == FIGHT) ? " : Strike" : " : Strikeback")));
-            Button button1 = new Button("Done with Strikes");
-            add(button1);
+            JButton button1 = new JButton("Done with Strikes");
+            contentPane.add(button1);
             button1.addActionListener(this);
 
             pack();
