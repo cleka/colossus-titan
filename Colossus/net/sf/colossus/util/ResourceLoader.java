@@ -380,8 +380,6 @@ public final class ResourceLoader
                         String prefix = 
                             (fly_ix != -1 ? "Flying" : "") +
                             (rgs_ix != -1 ? "Rangestrike" : "");
-                        String color = colorNameFromFilename(filenames[i],
-                                                             prefix);
                         String mapKey2 = getMapKey(filenames[i], directories);
                         tempImage[i] =
                             createColorizedImage(prefix + "Base",
@@ -411,12 +409,13 @@ public final class ResourceLoader
             bi = new BufferedImage(basew, baseh,
                                    BufferedImage.TYPE_INT_ARGB);
             Graphics2D biContext = bi.createGraphics();
-            for (int i = 0; i < filenames.length ; i++)
+            for (int i = 0; (biContext!=null) && (i < filenames.length) ; i++)
             {
                 biContext.drawImage(tempImage[i],
                                     0, 0,
                                     basew, baseh,
                                     null);
+                waitOnImage(bi);
             }
             if (bi != null)
             {
