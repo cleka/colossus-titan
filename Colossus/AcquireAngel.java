@@ -167,10 +167,10 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
 
     public void mousePressed(MouseEvent e)
     {
-        Point point = e.getPoint();
+        Object source = e.getSource();
         for (int i = 0; i < numEligible; i++)
         {
-            if (chits[i].select(point))
+            if (chits[i] == source)
             {
                 // Select that marker.
                 legion.addCreature(recruits[i]);

@@ -196,11 +196,11 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
 
     public void mousePressed(MouseEvent e)
     {
-        Point point = e.getPoint();
+        Object source = e.getSource();
         for (int i = 0; i < attacker.getHeight(); i++)
         {
             Chit chit = attackerChits[i];
-            if (chit.select(point))
+            if (chit == source)
             {
                 chit.toggleDead();
                 chit.repaint();
@@ -210,7 +210,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         for (int i = 0; i < defender.getHeight(); i++)
         {
             Chit chit = defenderChits[i];
-            if (chit.select(point))
+            if (chit == source)
             {
                 chit.toggleDead();
                 chit.repaint();
