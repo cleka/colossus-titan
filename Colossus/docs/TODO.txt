@@ -1,12 +1,20 @@
+Bug: SplitLegion still resizes slightly in Solaris/CDE/1.4.0
+
+Bug: Winning legion's marker not aligned after winning engagement (by
+   battle or flee).
+
+
 Put old, new web pages under CVS.
 Switch to new web page.
 
-Do some (optional?) sorting of chits within legions on client side.
+Do some sorting of chits within legions on client side.
 
 Document Javadepend in build.tex
 
 Fix pic used for minimized icon.
 Include an .ico file for Windows.  (ImageMagick can autogenerate one.)
+Maybe have a separate icons directory rather than reusing the ones
+   in Default/images?
 
 Add command-line options to start a game with N AIs, have the game exit
    java when done, etc. to support automated testing.  GetOpt package?

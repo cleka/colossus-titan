@@ -35,7 +35,7 @@ final class SplitLegion extends KDialog implements MouseListener,
     // in 1.4.0.  JPanels with BoxLayouts work.
     private JPanel oldBox;
     private JPanel newBox;
-    private Box buttonBox;
+    private JPanel buttonBox;
 
     private int totalChits;
     private int scale;
@@ -65,20 +65,24 @@ final class SplitLegion extends KDialog implements MouseListener,
 
         scale = 4 * Scale.get();
 
+
         oldBox = new JPanel();
         oldBox.setLayout(new BoxLayout(oldBox, BoxLayout.X_AXIS));
+        contentPane.add(oldBox);
+
         newBox = new JPanel();
         newBox.setLayout(new BoxLayout(newBox, BoxLayout.X_AXIS));
-
-        buttonBox = Box.createHorizontalBox();
-
-        contentPane.add(oldBox);
         contentPane.add(newBox);
+
+        buttonBox = new JPanel();
+        buttonBox.setLayout(new BoxLayout(buttonBox, BoxLayout.X_AXIS));
         contentPane.add(buttonBox);
+
 
         oldMarker = new Marker(scale, parentId, this, null);
         oldBox.add(oldMarker);
         oldBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
+        oldBox.add(Box.createHorizontalGlue());
 
         java.util.List imageNames = client.getLegionImageNames(parentId);
         totalChits = imageNames.size();
@@ -97,11 +101,12 @@ final class SplitLegion extends KDialog implements MouseListener,
         newMarker = new Marker(scale, selectedMarkerId, this, null);
         newBox.add(newMarker);
         newBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
+        newBox.add(Box.createHorizontalGlue());
 
         // Add chit-sized invisible spacers.
         for (int i = 0; i < totalChits; i++)
         {
-            newBox.add(Box.createRigidArea(new Dimension(scale, 0)));
+            newBox.add(Box.createRigidArea(new Dimension(scale, scale)));
         }
 
         JButton button1 = new JButton("Done");

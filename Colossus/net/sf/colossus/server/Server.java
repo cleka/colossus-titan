@@ -264,13 +264,13 @@ public final class Server
         }
     }
 
-    void allRemoveMarker(String markerId)
+    void allRemoveLegion(String markerId)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.removeMarker(markerId);
+            client.removeLegion(markerId);
         }
     }
 
@@ -1290,8 +1290,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
             Client client = (Client)it.next();
             client.setLegionContents(legion.getMarkerId(), 
                 legion.getImageNames());
-            client.setLegionHeight(legion.getMarkerId(),
-                legion.getHeight());
         }
     }
 
@@ -1300,8 +1298,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         Client client = getClient(playerName);
         client.setLegionContents(legion.getMarkerId(),
             legion.getImageNames());
-        client.setLegionHeight(legion.getMarkerId(),
-            legion.getHeight());
     }
 
     void allFullyUpdateLegionHeights()

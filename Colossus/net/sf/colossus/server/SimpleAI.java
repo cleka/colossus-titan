@@ -2183,6 +2183,11 @@ Log.debug("SimpleAI.summonAngel: best angel is " + bestAngel);
     }
 
 
+    public static int getKillValue(Creature creature)
+    {
+        return getKillValue(creature, 'P');
+    }
+
     static int getKillValue(Creature creature, char terrain)
     {
         int val = creature.getPointValue();

@@ -584,16 +584,15 @@ final class Legion implements Comparable
     /** Eliminate this legion. */
     void remove()
     {
-        String hexLabel = currentHexLabel;
         prepareToRemove();
         getPlayer().getLegions().remove(this);
-        game.getServer().allRemoveMarker(markerId);
     }
 
 
     /** Do the cleanup required before this legion can be removed. */
     void prepareToRemove()
     {
+        // TODO Use critters.toString() rather than doing it manually.
         StringBuffer log = new StringBuffer("Legion ");
         log.append(getLongMarkerName());
         log.append(" ");
@@ -620,8 +619,9 @@ final class Legion implements Comparable
         log.append("is eliminated");
         Log.event(log.toString());
 
-        // Free up the legion marker.
-        game.getServer().allRemoveMarker(markerId);
+        // Let the clients clean up the legion marker, etc.
+        game.getServer().allRemoveLegion(markerId);
+
         getPlayer().addLegionMarker(getMarkerId());
     }
 

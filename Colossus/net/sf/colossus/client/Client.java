@@ -57,6 +57,10 @@ public final class Client
     private int entrySide;
     private boolean teleport;
 
+    // XXX Somewhat redundant since we also track the marker in LegionInfo.
+    // But we need to resort this list to reflect z-order, and we want to
+    // keep LegionInfo sorted alphabetically by markerId, so I think we
+    // can live with the double maintenance.
     /** The end of the list is on top in the z-order. */
     private java.util.List markers = new ArrayList();
 
@@ -84,18 +88,9 @@ public final class Client
 
     private Set possibleRecruitHexes;
 
-    /** Map of markerId to hexLabel */
-    private Map legionToHex = new HashMap();
-
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
      *  is missing then we assume it is set to the maximum. */
     private Map creatureCounts = new HashMap();
-
-    /** Map of markerId to Integer height */
-    private Map legionToHeight = new HashMap();
-
-    /** Map of markerId to List of known creature names in legion. */
-    private Map legionContents = new HashMap();
 
 
     private int turnNumber = -1;
@@ -117,6 +112,9 @@ public final class Client
 
     /** One per player. */
     private PlayerInfo [] playerInfo;
+
+    /** One LegionInfo per legion, keyed by markerId.  Never null. */
+    private SortedMap legionInfo = new TreeMap();
 
     private int numPlayers;
 
@@ -672,103 +670,67 @@ public final class Client
     }
 
 
-    // TODO Extract legion info class.
 
-    /** Get the first marker with this id. */
-    Marker getMarker(String id)
+    /** Get this legion's info.  Create it first if necessary. */
+    LegionInfo getLegionInfo(String markerId)
     {
-        Iterator it = markers.iterator();
-        while (it.hasNext())
+        LegionInfo info = (LegionInfo)legionInfo.get(markerId);
+        if (info == null)
         {
-            Marker marker = (Marker)it.next();
-            if (marker.getId() == id)
-            {
-                return marker;
-            }
+            info = new LegionInfo(markerId, this);
+            legionInfo.put(markerId, info);
         }
-        return null;
+        return info;
     }
 
-    /** Add the marker to the end of the list.  If it's already
-     *  in the list, remove the earlier entry. */
+    /** Get the marker with this id. */
+    Marker getMarker(String id)
+    {
+        return getLegionInfo(id).getMarker();
+    }
+
+    /** Add the marker to the end of the list and to the LegionInfo.  
+        If it's already in the list, remove the earlier entry. */
     void setMarker(String id, Marker marker)
     {
         markers.remove(marker);
         markers.add(marker);
+        getLegionInfo(id).setMarker(marker);
     }
 
-    /** Remove the first marker with this id from the list.
-     *  Also remove any recruitChits for this marker's hex. */
-    public void removeMarker(String id)
+
+    /** Remove this eliminated legion, and clean up related stuff. */
+    public void removeLegion(String id)
     {
-        Iterator it = markers.iterator();
-        while (it.hasNext())
+        Marker marker = getMarker(id);
+        markers.remove(marker);
+
+        if (isMyLegion(id))
         {
-            Marker marker = (Marker)it.next();
-            if (marker.getId().equals(id))
-            {
-                String hexLabel = getHexForLegion(id);
-                it.remove();
-                legionToHex.remove(id);
-                if (board != null)
-                {
-                    board.alignLegions(hexLabel);
-                }
-                // XXX Not perfect, but since we don't track recruitChits
-                // by legion this is as good as we can do for now.
-                removeRecruitChit(hexLabel);
-                return;
-            }
+            markersAvailable.add(id);
         }
+
+        LegionInfo info = getLegionInfo(id);
+        String hexLabel = info.getHexLabel();
+        if (board != null)
+        {
+            board.alignLegions(hexLabel);
+        }
+        // XXX Not perfect -- Need to track recruitChits by legion.
+        removeRecruitChit(hexLabel);
+
+        legionInfo.remove(id);
     }
 
 
     int getLegionHeight(String markerId)
     {
-        Integer integer = (Integer)legionToHeight.get(markerId);
-        if (integer != null)
-        {
-            return integer.intValue();
-        }
-        else
-        {
-            return 0;
-        }
+        return getLegionInfo(markerId).getHeight();
     }
 
     public void setLegionHeight(String markerId, int height)
     {
-        legionToHeight.put(markerId, new Integer(height));
-        Marker marker = getMarker(markerId);
-        if (marker != null)
-        {
-            marker.repaint();
-        }
-    }
-
-    void incLegionHeight(String markerId)
-    {
-        int height = getLegionHeight(markerId);
-        height++;
-        setLegionHeight(markerId, height);
-    }
-
-    void decLegionHeight(String markerId)
-    {
-        int height = getLegionHeight(markerId);
-        height--;
-        setLegionHeight(markerId, height);
-    }
-
-    /** Return an immutable copy of the legion's contents. */
-    java.util.List getLegionContents(String markerId)
-    {
-        java.util.List contents = (java.util.List)legionContents.get(markerId);
-        if (contents == null)
-        {
-            contents = new ArrayList();
-        }
-        return Collections.unmodifiableList(contents);
+        getLegionInfo(markerId).setHeight(height);
     }
 
 
@@ -777,107 +739,43 @@ public final class Client
      *  Default to "Titan" if the info is not there. */
     String getTitanBasename(String markerId)
     {
-        try
-        {
-            String playerName = getPlayerNameByMarkerId(markerId);
-            PlayerInfo info = getPlayerInfo(playerName);
-            String color = info.getColor();
-            int power = info.getTitanPower();
-            return "Titan-" + power + "-" + color;
-        }
-        catch (Exception ex)
-        {
-            return "Titan";
-        }
+        return getLegionInfo(markerId).getTitanBasename();
     }
 
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
     java.util.List getLegionImageNames(String markerId)
     {
-        java.util.List names = new ArrayList();
-        names.addAll(getLegionContents(markerId));
-
-        int numUnknowns = getLegionHeight(markerId) - names.size();
-        for (int i = 0; i < numUnknowns; i++)
-        {
-            names.add("Unknown");
-        }
-
-        int j = names.indexOf("Titan");
-        if (j != -1)
-        {
-            names.set(j, getTitanBasename(markerId));
-        }
-
-        return names;
+        return getLegionInfo(markerId).getImageNames();
     }
 
     /** Replace the existing contents for this legion with these. */
     public void setLegionContents(String markerId, java.util.List names)
     {
-        legionContents.put(markerId, names);
+        getLegionInfo(markerId).setContents(names);
     }
 
     /** Remove all contents for this legion. */
-    public void clearLegionContents(String markerId)
+    private void clearLegionContents(String markerId)
     {
-        legionContents.remove(markerId);
+        getLegionInfo(markerId).clearContents();
     }
 
     /** Add a new creature to this legion. */
     public void addCreature(String markerId, String name)
     {
-        incLegionHeight(markerId);
-        java.util.List names = new ArrayList();
-        names.addAll(getLegionContents(markerId));
-        names.add(name);
-        setLegionContents(markerId, names);
+        getLegionInfo(markerId).addCreature(name);
     }
 
     public void removeCreature(String markerId, String name)
     {
-        decLegionHeight(markerId);
-        java.util.List names = getLegionContents(markerId);
-        if (names == null)
-        {
-            return;   // Nothing to remove
-        }
-        java.util.List newNames = new ArrayList();
-        newNames.addAll(names);
-        newNames.remove(name);
-        setLegionContents(markerId, newNames);
+        getLegionInfo(markerId).removeCreature(name);
     }
 
     /** Reveal creatures in this legion, some of which already may be known. */
     public void revealCreatures(String markerId, final java.util.List names)
     {
-        java.util.List newNames = new ArrayList();
-        java.util.List oldNames = getLegionContents(markerId);
-        if (oldNames == null || oldNames.isEmpty())
-        {
-            newNames.addAll(names);
-        }
-        else
-        {
-            newNames.addAll(oldNames);
-
-            java.util.List oldScratch = new ArrayList();  // Can't just clone
-            oldScratch.addAll(oldNames);
-
-            Iterator it = names.iterator();
-            while (it.hasNext())
-            {
-                String name = (String)it.next();
-                // If it's already there, don't add it, but remove it from
-                // the list in case we have multiples of this creature.
-                if (!oldScratch.remove(name))
-                {
-                    newNames.add(name);
-                }
-            }
-        }
-        setLegionContents(markerId, newNames);
+        getLegionInfo(markerId).revealCreatures(names);
     }
 
 
@@ -1790,16 +1688,19 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
+    // XXX Rename?
     /** Create a new marker and add it to the end of the list. */
     public void addMarker(String markerId, String hexLabel)
     {
+        LegionInfo info = getLegionInfo(markerId);
+        info.setHexLabel(hexLabel);
+
         if (board != null)
         {
             Marker marker = new Marker(3 * Scale.get(), markerId,
                 board.getFrame(), this);
             setMarker(markerId, marker);
-
-            legionToHex.put(markerId, hexLabel);
+            info.setMarker(marker);
             board.alignLegions(hexLabel);
         }
     }
@@ -1807,19 +1708,23 @@ Log.debug("called Client.acquireAngelCallback()");
     /** Create new markers in response to a rescale. */
     void recreateMarkers()
     {
-        ListIterator it = markers.listIterator();
+        markers.clear();
+
+        Iterator it = legionInfo.entrySet().iterator();
         while (it.hasNext())
         {
-            Marker marker = (Marker)it.next();
-            String markerId = marker.getId();
-            String hexLabel = (String)legionToHex.get(markerId);
-            marker = new Marker(3 * Scale.get(), markerId,
-                                board.getFrame(), this);
-            it.set(marker);
-            legionToHex.put(markerId, hexLabel);
+            Map.Entry entry = (Map.Entry)it.next();
+            LegionInfo info = (LegionInfo)entry.getValue();
+            String markerId = info.getMarkerId();
+            String hexLabel = info.getHexLabel();
+            Marker marker = new Marker(3 * Scale.get(), markerId, 
+                board.getFrame(), this);
+            info.setMarker(marker);
+            markers.add(marker);
             board.alignLegions(hexLabel);
         }
     }
+            
 
     private void setupPlayerLabel()
     {
@@ -2046,7 +1951,7 @@ Log.debug("called Client.acquireAngelCallback()");
         {
             pushUndoStack(markerId);
         }
-        legionToHex.put(markerId, currentHexLabel);
+        getLegionInfo(markerId).setHexLabel(currentHexLabel);
         if (board != null)
         {
             board.alignLegions(startingHexLabel);
@@ -2059,7 +1964,7 @@ Log.debug("called Client.acquireAngelCallback()");
     {
         removeRecruitChit(formerHexLabel);
         removeRecruitChit(currentHexLabel);
-        legionToHex.put(markerId, currentHexLabel);
+        getLegionInfo(markerId).setHexLabel(currentHexLabel);
         if (board != null)
         {
             board.alignLegions(formerHexLabel);
@@ -2112,13 +2017,14 @@ Log.debug("called Client.acquireAngelCallback()");
     java.util.List getLegionsByHex(String hexLabel)
     {
         java.util.List markerIds = new ArrayList();
-        Iterator it = legionToHex.entrySet().iterator();
+        Iterator it = legionInfo.entrySet().iterator();
         while (it.hasNext())
         {
             Map.Entry entry = (Map.Entry)it.next();
-            if (hexLabel.equals((String)entry.getValue()))
+            LegionInfo info = (LegionInfo)entry.getValue();
+            if (hexLabel.equals(info.getHexLabel()))
             {
-                markerIds.add((String)entry.getKey());
+                markerIds.add(info.getMarkerId());
             }
         }
         return markerIds;
@@ -2185,8 +2091,9 @@ Log.debug("called Client.acquireAngelCallback()");
 
     public void undidSplit(String splitoffId)
     {
-        String hexLabel = getHexForLegion(splitoffId);
-        legionToHex.remove(splitoffId);
+        LegionInfo info = getLegionInfo(splitoffId);
+        String hexLabel = info.getHexLabel();
+        removeLegion(splitoffId);
         if (board != null)
         {
             board.alignLegions(hexLabel);
@@ -2284,7 +2191,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    private String getPlayerNameByMarkerId(String markerId)
+    String getPlayerNameByMarkerId(String markerId)
     {
         String shortColor = markerId.substring(0, 2);
         for (int i = 0; i < playerInfo.length; i++)
@@ -2383,6 +2290,13 @@ Log.debug("called Client.acquireAngelCallback()");
         // If my legion, or allStacksVisible, separate calls will update
         // contents of both legions soon.
 
+        LegionInfo childInfo = getLegionInfo(childId);
+        childInfo.setHexLabel(hexLabel);
+        childInfo.setHeight(childHeight);
+
+        LegionInfo parentInfo = getLegionInfo(parentId);
+        parentInfo.setHeight(parentInfo.getHeight() - childHeight);
+
         if (isMyLegion(childId))
         {
             clearRecruitChits();
@@ -2397,11 +2311,6 @@ Log.debug("called Client.acquireAngelCallback()");
         }
 
         numSplitsThisTurn++;
-
-        legionToHex.put(childId, hexLabel);
-
-        setLegionHeight(childId, childHeight);
-        setLegionHeight(parentId, getLegionHeight(parentId) - childHeight);
 
         if (board != null)
         {
@@ -2443,7 +2352,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
     private String getHexForLegion(String markerId)
     {
-        return (String)legionToHex.get(markerId);
+        return getLegionInfo(markerId).getHexLabel();
     }
 }
 
