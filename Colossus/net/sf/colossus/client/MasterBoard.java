@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
@@ -66,6 +67,7 @@ public final class MasterBoard extends JPanel
     private JMenu phaseMenu;
     private JPopupMenu popupMenu;
     private Map checkboxes = new HashMap();
+    private JPanel[] legionFlyouts;
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
@@ -75,7 +77,7 @@ public final class MasterBoard extends JPanel
 
     private Container contentPane;
     /** our own little bar implementation */
-       private BottomBar bottomBar;
+    private BottomBar bottomBar;
 
     public static final String saveGameAs = "Save game as";
 
@@ -132,7 +134,114 @@ public final class MasterBoard extends JPanel
 
     private JMenu lfMenu;
 
-    private static interface MasterHexVisitor
+    private final class InfoPopupHandler extends KeyAdapter {
+    	private static final int POPUP_KEY = KeyEvent.VK_SHIFT;
+		private static final int PANEL_MARGIN = 4;
+        
+		private final Client client;
+        private Point lastMousePos;
+        
+		private InfoPopupHandler(Client client)
+        {
+			super();
+			this.client = client;
+		}
+		public void keyPressed(KeyEvent e)
+		{
+		    if(e.getKeyCode() == POPUP_KEY)
+		    {
+		        if(legionFlyouts == null)
+		        {
+		        	List markers = client.getMarkers();
+		            legionFlyouts = new JPanel[markers.size()];
+		            int i = 0;
+		            for (Iterator iter = markers.iterator(); iter.hasNext();)
+                    {
+						Marker marker = (Marker) iter.next();
+						LegionInfo legion = client.getLegionInfo(marker.getId());
+		                List imageNames = legion.getImageNames();
+		                List certainties = legion.getCertainties();
+		                
+		                final JPanel panel = new JPanel(null);
+		                int scale = 2 * Scale.get();
+
+		                Iterator it = imageNames.iterator();
+		                Iterator it2 = certainties.iterator();
+		                int j = 0;
+		                while (it.hasNext())
+		                {
+		                    String imageName = (String)it.next();
+		                    boolean sure = ((Boolean)it2.next()).booleanValue();
+		                    Chit chit = new Chit(scale, imageName, panel, false, !sure);
+		                    panel.add(chit);
+		                    chit.setLocation(scale * j + PANEL_MARGIN, PANEL_MARGIN);
+		                    j++;
+		                }
+
+		                add(panel);
+		                legionFlyouts[i] = panel;
+		                i++;
+
+		                panel.setSize(imageNames.size() * scale + 2 * PANEL_MARGIN, scale + 2 * PANEL_MARGIN);
+		                panel.setLocation(marker.getLocation());
+		                panel.setVisible(true);
+		                panel.addMouseMotionListener(new MouseMotionAdapter(){
+		                	public void mouseDragged(MouseEvent e)
+                            {
+                                if(lastMousePos != null)
+                                {
+    		                        Point loc = panel.getLocation();
+    		                        int diffX = e.getPoint().x - lastMousePos.x;
+    		                        int diffY = e.getPoint().y - lastMousePos.y;
+									loc.x += diffX;
+									loc.y += diffY;
+    		                        panel.setLocation(loc);
+                                    lastMousePos = e.getPoint();
+                                    // lastMousePos is read relative to panel, so adjust
+                                    // for movement
+                                    lastMousePos.x -= diffX;
+                                    lastMousePos.x -= diffY;
+                                }
+                                else
+                                {
+                                	lastMousePos = e.getPoint();
+                                }
+    							super.mouseMoved(e);
+							}
+		                });
+		                
+		                repaint();
+					}
+		        }
+		    }
+		    else 
+		    {
+		    	super.keyPressed(e);
+		    }
+		}
+		public void keyReleased(KeyEvent e)
+        {
+		    if(e.getKeyCode() == POPUP_KEY)
+		    {
+		        if(legionFlyouts != null)
+                {
+		            for (int i = 0; i < legionFlyouts.length; i++)
+                    {
+						remove(legionFlyouts[i]);
+					}
+		            repaint();
+		        	legionFlyouts = null; 
+		        }
+		    }
+		    else 
+		    {
+				super.keyReleased(e);
+		    }
+		}
+	}
+
+
+	private static interface MasterHexVisitor
     {
 
         /** Returns true iff the Hex matches **/
@@ -216,7 +325,7 @@ public final class MasterBoard extends JPanel
         setupTowerSet();
     }
 
-    MasterBoard(Client client)
+    MasterBoard(final Client client)
     {
         this.client = client;
 
@@ -229,6 +338,7 @@ public final class MasterBoard extends JPanel
         setBackground(Color.black);
         masterFrame.addWindowListener(new MasterBoardWindowHandler());
         addMouseListener(new MasterBoardMouseHandler());
+        addKeyListener(new InfoPopupHandler(client));
 
         setupGUIHexes();
 
