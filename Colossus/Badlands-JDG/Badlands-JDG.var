@@ -1,5 +1,5 @@
 TER:Badlands-JDG.ter
 MAP:Badlands-JDG.map
 CRE:Default.cre
-HINT:Badlands-JDG.hin
+HINT:Badlands.hin,Badlands-JDGTowerRecruit.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin
 DEPEND:Badlands
