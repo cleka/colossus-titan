@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+<!-- $Id$ -->
+    <title>Colossus Variant HOWTO</title>
+  </head>
+  <body>
+  <h2>The Variant Pack</h2>
+  <h4>How do I use a Variant Pack ?</h4>
+  Just use the 
+  <b>Load External Variant</b>
+   button and open the 
+  <b>VAR</b>
+   file inside the variant directory, then start a new game. That should be
+  enough. Alternatively, some variants are now supplied in the standard
+  distribution ; simply use the pop-up menu to select which variant to play ( 
+  <b>Default</b>
+   is the Classic Titan ruleset). 
+  <h4>What&#39;s in a Variant Pack ?</h4>
+  A Variant Pack should be a directory (folder) containing: 
+  <ul>
+    <li>A 
+    <b>.var</b>
+     file, that describes the other files</li>
+    <li>
+    <b>.cre</b>
+     , 
+    <b>.ter</b>
+     and 
+    <b>.map</b>
+     files that describe the variant</li>
+    <li>A 
+    <b>Battlelands</b>
+     subdirectory that contains the new and/or changed Battlelands</li>
+    <li>An 
+    <b>images</b>
+     subidirectory that contains the new and/or changed pictures.</li>
+  </ul>
+  The various files are described in details inside the FileFormat (TODO)
+  document. 
+  <h4>How do I create a Variant Pack ?</h4>
+  There&#39;s no user-friendly way yet. The easiest way is to build the
+  directory and copy the default files in it, then you can change them with any
+  text editor. The contents of the files are described in FileFormat (TODO).
+  You can also use other variants as examples. Warning: almost no sanity checks
+  are performed, and some combinations might give strange and/or unexpected
+  results, particurly in Battlelands (slope next to a tree, or cliff between
+  two bogs...). Also, ensuring consistency between the files is up to the
+  variant author. Battlelands can also be created using the graphical tool 
+  <b>BattlelandsBuilder</b>
+   . There may be an easier (read: graphical) way later for 
+  <b>.cre</b>
+   , 
+  <b>.ter</b>
+   and 
+  <b>.map</b>
+   files, but don&#39;t hold your breath, as nobody is working on it yet. 
+  <h2>Frequently Asked Questions</h2>
+  <ul>
+    <li>My creature won&#39;t load, or my creature is displayed as a dull grey
+    square
+    <br />
+    <br />
+     
+    <p>The creature&#39;s name (the first column of a 
+    <b>.cre</b>
+     file) should not contain spaces or other non-alphabetical characters (you
+    can&#39;t use digits yet), unless put between doublequotes (&quot;). i.e.
+    proper names are 
+    <b>&quot;KillerRabbitTwo&quot;</b>
+     or 
+    <b>&quot;Killer Rabbit 2&quot;</b>
+     . The same name must be used in the 
+    <b>.cre</b>
+     and 
+    <b>.ter</b>
+     files. The creature&#39;s name is also used as the base name of the
+    pictures. So a 
+    <b>KillerRabbitTwo</b>
+     will use the file 
+    <b>KillerRabbitTwo.gif</b>
+     in the subdirectory 
+    <b>images</b>
+     . Spaces will be replaced by underscores (_), and double quotes will be
+    ignored. So 
+    <b>&quot;Killer Rabbit 2&quot;</b>
+     will use 
+    <b>Killer_Rabbit_2.gif</b>
+     . You should be able to re-use an existing name, as the 
+    <b>images</b>
+     subdirectory is accessed before the default GIF files.</p>
+    </li>
+  </ul>
+  </body>
+</html>
+
