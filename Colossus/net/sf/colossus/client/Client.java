@@ -2100,7 +2100,8 @@ Log.debug(playerName + " Client.cleanupBattle()");
         aiPause();
     }
 
-    private void retryFailedBattleMoves()
+    /** synchronized to prevent concurrent mod on bestMoveOrder */
+    private synchronized void retryFailedBattleMoves()
     {
         ai.retryFailedBattleMoves(bestMoveOrder);
     }
@@ -2272,7 +2273,9 @@ Log.debug(playerName + " Client.cleanupBattle()");
     }
 
 
-    private void markBattleMoveSuccessful(int tag, String endingHexLabel)
+    /** synchronized to prevent concurrent mod on bestMoveOrder */
+    private synchronized void markBattleMoveSuccessful(int tag, 
+        String endingHexLabel)
     {
         if (bestMoveOrder != null)
         {

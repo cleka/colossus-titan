@@ -45,9 +45,6 @@ Gold's turn, number 17
 From client Brown: doneWithEngagements
 Error: Brown illegally called doneWithEngagements()
 
-Bug: Hang after AI calls Server.strike() with a bogus critter tag, and
-     no strike results are returned to kick the AI.
-
 Bug: 2-high titan stack did not run away even though it could be caught
    on 4-6 by a 6-high stack:
 Gold rolls a 4 for movement
