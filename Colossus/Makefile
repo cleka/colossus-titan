@@ -1,5 +1,5 @@
 # Makefile for Colossus
-# dripton  June 26, 1998
+# $Id$
 # Make sure to save this file in Unix rather than DOS endline format, so that
 #    it will continue to work portably.
 
@@ -12,6 +12,7 @@ JCC = jikes -g -depend +P
 # Targets
 
 all: classes
+
 
 # New rule for Java
 .SUFFIXES:
@@ -28,6 +29,9 @@ all: classes
 FILES = $(wildcard *.java)
 classes: $(FILES:.java=.class)
 
+# Create jar file
+jar: classes
+	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif
 
 # Clean up
 
