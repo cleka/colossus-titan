@@ -175,7 +175,6 @@ public final class Constants
 
     // Network stuff
     public static final int defaultPort = 26567;
-    public static final String localhost = "localhost";
     public static final int numSavedServerNames = 10;
 
     // Game actions used in several places.

@@ -2,6 +2,7 @@ package net.sf.colossus.server;
 
 
 import java.util.*;
+import java.net.*;
 import javax.swing.*;
 
 import com.werken.opt.Option;
@@ -40,7 +41,17 @@ public final class Start
     private static void startClient(CommandLine cl)
     {
         String playerName = Constants.username;
-        String hostname = Constants.localhost;
+        String hostname = null;
+        try
+        {
+            InetAddress ia = InetAddress.getLocalHost();
+            hostname = ia.toString();
+        }
+        catch (UnknownHostException ex)
+        {
+            Log.error(ex.toString());
+        }
+
         int port = Constants.defaultPort;
 
         if (cl.optIsSet('m'))

@@ -2,6 +2,7 @@ package net.sf.colossus.client;
 
 
 import java.util.*;
+import java.net.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -55,7 +56,15 @@ public class StartClient extends KDialog implements WindowListener,
         getContentPane().add(new JLabel("Server hostname"));
         Set hostChoices = new TreeSet();
         hostChoices.add(hostname);
-        hostChoices.add(Constants.localhost);
+        try
+        {
+            InetAddress ia = InetAddress.getLocalHost();
+            hostChoices.add(ia.getHostName());
+        }
+        catch (UnknownHostException ex)
+        {
+            Log.error(ex.toString());
+        }
         loadClientOptions();
         for (int i = 0; i < Constants.numSavedServerNames; i++)
         {

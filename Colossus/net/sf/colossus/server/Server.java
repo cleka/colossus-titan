@@ -165,9 +165,18 @@ Log.debug("About to create server socket on port " + port);
 
     private void createLocalClient(String playerName)
     {
+        try
+        {
+            InetAddress ia = InetAddress.getLocalHost();
 Log.debug("Called Server.createLocalClient() for " + playerName);
-        IClient client = new Client(Constants.localhost, port, playerName, 
-            false);
+            IClient client = new Client(ia.toString(), port, playerName, 
+                false);
+        }
+        catch (UnknownHostException ex)
+        {
+            Log.error(ex.toString());
+            System.exit(1);
+        }
     }
 
 
