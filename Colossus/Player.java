@@ -7,32 +7,77 @@
 class Player
 {
     String name;
-    String color;       // Bk, Bl, Br, Gd, Gr, Rd 
+    String color;       // Black, Blue, Brown, Gold, Green, Red 
     int startingTower;  // 1-6
     int score;
     int angels;         // number of angels + archangels in legions
     boolean canSummonAngel; 
-    String playersEliminated;    // BkBlRdGd
+    String playersEliminated;  // e.g. 1356, based on starting tower
     String [] markersAvailable = new String[12];
     Legion [] legions;
 
-    Player(String name, String color, int startingTower)
+
+    Player(String name)
     {
         this.name = name;
-        this.color = color;
-        this.startingTower = startingTower;
         score = 0;
         angels = 1; 
         canSummonAngel = true;
-        for (int i = 1; i <= 9; i++)
+    }
+
+
+    void setColor(String color)
+    {
+        this.color = color;
+        for (int i = 0; i <= 8; i++)
         {
-            markersAvailable[i] = color + '0' + Integer.toString(i);
+            markersAvailable[i] = shortColor() + '0' + Integer.toString(i + 1);
         }
-        for (int i = 10; i <= 12; i++)
+        for (int i = 9; i <= 11; i++)
         {
-            markersAvailable[i] = color + Integer.toString(i);
+            markersAvailable[i] = shortColor() + Integer.toString(i + 1);
         }
     }
+
+
+    String shortColor()
+    {
+        if (color == "Black") 
+        {
+            return new String("Bk");
+        }
+        else if (color == "Blue") 
+        {
+            return new String("Bl");
+        }
+        else if (color == "Brown") 
+        {
+            return new String("Br");
+        }
+        else if (color == "Gold") 
+        {
+            return new String("Gd");
+        }
+        else if (color == "Green") 
+        {
+            return new String("Gr");
+        }
+        else if (color == "Red") 
+        {
+            return new String("Rd");
+        }
+        else
+        {
+            return new String("XX");
+        }
+    }
+
+
+    void setTower(int startingTower)
+    {
+        this.startingTower = startingTower;
+    }
+
 
     boolean canTitanTeleport()
     {
