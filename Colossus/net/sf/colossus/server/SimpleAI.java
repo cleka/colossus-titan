@@ -1771,6 +1771,12 @@ legion.hasMoved() + " canRecruit=" + legion.canRecruit());
 
     public boolean concede(Legion legion, Legion enemy, Game game)
     {
+        // Never concede titan legion.
+        if (legion.hasTitan())
+        {
+            return false;
+        }
+
         // Wimpy legions should concede if it costs the enemy an
         // angel or good recruit.
         char terrain = legion.getCurrentHex().getTerrain();
