@@ -30,17 +30,18 @@ public class BattleMap extends Frame implements MouseListener,
     private boolean needToClear;
     private MediaTracker tracker;
     private boolean imagesLoaded;
+    private int scale;
 
     public BattleMap()
     {
         super("BattleMap");
 
-        int cx=80;
-        int cy=80;
-        int scale=25;
+        scale = 25;
+        int cx = 3 * scale;
+        int cy = 3 * scale;
         
         pack();
-        setSize(700, 700);
+        setSize(28 * scale, 28 * scale);
         setBackground(java.awt.Color.white);
         setVisible(true);
         addWindowListener(new InnerWindowAdapter());
@@ -109,6 +110,29 @@ public class BattleMap extends Frame implements MouseListener,
 
         repaint();
     }
+
+
+    void rescale(int scale)
+    {
+        this.scale = scale;
+        int cx = 3 * scale;
+        int cy = 2 * scale; 
+        setSize(28 * scale, 28 * scale);
+        
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    h[i][j].rescale(cx, cy, scale);
+                }
+            }
+        }
+        
+        repaint();
+    }
+
 
 
     public void mouseDragged(MouseEvent e)
@@ -335,6 +359,33 @@ class Hex
         // one pixel short.
         rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] - 
                         xVertex[5] + 1, yVertex[3] - yVertex[0] + 1);
+    }
+
+    
+    void rescale(int cx, int cy, int scale)
+    {
+        xVertex[0] = cx;
+        yVertex[0] = cy;
+        xVertex[1] = cx + 2 * scale;
+        yVertex[1] = cy;
+        xVertex[2] = cx + 3 * scale;
+        yVertex[2] = cy + (int) Math.round(SQRT3 * scale);
+        xVertex[3] = cx + 2 * scale;
+        yVertex[3] = cy + (int) Math.round(2 * SQRT3 * scale);
+        xVertex[4] = cx;
+        yVertex[4] = cy + (int) Math.round(2 * SQRT3 * scale);
+        xVertex[5] = cx - 1 * scale;
+        yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
+
+        p.xpoints = xVertex;
+        p.ypoints = yVertex;
+
+        // Add 1 to width and height because Java rectangles come up
+        // one pixel short.
+        rectBound.x =  xVertex[5];
+        rectBound.y =  yVertex[0];
+        rectBound.width = xVertex[2] - xVertex[5] + 1;
+        rectBound.height = yVertex[3] - yVertex[0] + 1;
     }
 
 
