@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class BattleMap implements the GUI for a Titan battlemap.
@@ -8,7 +7,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class BattleMap extends JFrame implements MouseListener,
+public class BattleMap extends Frame implements MouseListener,
     MouseMotionListener, WindowListener
 {
     private BattleHex[][] h = new BattleHex[6][6];
@@ -84,7 +83,7 @@ public class BattleMap extends JFrame implements MouseListener,
         this.board = board;
         this.entrySide = entrySide;
 
-        getContentPane().setLayout(null);
+        setLayout(null);
 
         // Make sure the board fits on the screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -163,7 +162,7 @@ public class BattleMap extends JFrame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(this, "waitForAll was interrupted");
+            new MessageBox(this, "waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -200,7 +199,7 @@ public class BattleMap extends JFrame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(this, "waitForAll was interrupted");
+            new MessageBox(this, "waitForAll was interrupted");
         }
         imagesLoaded = true;
     }
@@ -551,9 +550,7 @@ public class BattleMap extends JFrame implements MouseListener,
                 }
             }
         }
-        // XXX- Make sure the repaints happen.
         repaint();
-        Thread.yield();
 
         return count;
     }
