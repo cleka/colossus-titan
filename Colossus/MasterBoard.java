@@ -2328,6 +2328,17 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+    public void dispose()
+    {
+Log.debug("called MasterBoard.dispose()");
+        setVisible(false);
+        setEnabled(false);
+        masterFrame.setVisible(false);
+        masterFrame.setEnabled(false);
+        masterFrame.dispose();
+    }
+
+
     public static void main(String [] args)
     {
         Game game = new Game();

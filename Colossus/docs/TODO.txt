@@ -1,5 +1,4 @@
-Automatically advance past strike phases after everything has struck
-   and all carries are done.
+Support default names by color for AI players.
 
 Need to allow first human player to control game options, load game, etc.
 

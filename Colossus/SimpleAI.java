@@ -2984,7 +2984,7 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
                 }
                 else
                 {
-                    value -= 7 * getKillValue(critter, terrain) *
+                    value -= 6 * getKillValue(critter, terrain) *
                         hitsExpected / power;
                 }
             }
@@ -3057,7 +3057,7 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         }
         else  // attacker
         {
-            value += 10 * battle.getRange(hex, entrance, true);
+            value += 3 * battle.getRange(hex, entrance, true);
         }
 
         Log.debug("EVAL " + critter.getName() +

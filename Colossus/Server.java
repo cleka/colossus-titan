@@ -38,6 +38,19 @@ public final class Server
         clients.add(client);
     }
 
+
+    /** temp */
+    public void disposeAllClients()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.dispose();
+        }
+        clients.clear();
+    }
+
     // TODO Set up one thread per client?
 
     // TODO Need a scheme to broadcast a message to all clients, versus

@@ -529,12 +529,33 @@ public final class Client
         }
     }
 
+    public void disposeMasterBoard()
+    {
+        if (board != null)
+        {
+            board.dispose();
+            board = null;
+        }
+    }
+
+    public void disposeStatusScreen()
+    {
+        if (statusScreen != null)
+        {
+            statusScreen.dispose();
+            statusScreen = null;
+        }
+    }
 
 
     public void dispose()
     {
-        // TODO Call dispose() on every window
+        disposeBattleMap();
+        disposeMovementDie();
+        disposeStatusScreen();
+        disposeMasterBoard();
     }
+
 
     public void clearAllCarries()
     {
@@ -737,6 +758,9 @@ public final class Client
         // Do not show boards for AI players.
         if (!getOption(Options.autoPlay))
         {
+            disposeMasterBoard();
+            // XXX Do we also need to handle StatusScreen here?
+
             board = new MasterBoard(this);
             board.requestFocus();
 
@@ -890,6 +914,7 @@ public final class Client
     }
 
 
+    /** Assumes this is not an AI client and board is not null. */
     public String pickLord(Legion legion)
     {
         Creature lord = PickLord.pickLord(board.getFrame(), legion);

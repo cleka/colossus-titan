@@ -52,7 +52,14 @@ public final class Game
     // XXX temp
     public void initServerAndClients()
     {
-        server = new Server(this);
+        if (server == null)
+        {
+            server = new Server(this);
+        }
+        else
+        {
+            server.disposeAllClients();
+        }
         Iterator it = players.iterator();
         while (it.hasNext())
         {
@@ -155,7 +162,6 @@ public final class Game
 
         // XXX temp
         initServerAndClients();
-
 
         server.loadOptions();
 
@@ -800,7 +806,7 @@ public final class Game
 
 
     /** Create a text file describing this game's state, in
-     *  file saves/<time>.sav */
+     *  file <saveDirName>/<time>.sav */
     public void saveGame()
     {
         Date date = new Date();
@@ -821,9 +827,8 @@ public final class Game
     }
 
 
-    /** Try to load a game from ./filename first, then from
-     *  saveDirName/filename.  If the filename is "--latest" then load
-     *  the latest savegame found in saveDirName. */
+    /** Try to load a game from saveDirName/filename.  If the filename is
+     *  "--latest" then load the latest savegame found in saveDirName. */
     public void loadGame(String filename)
     {
         File file;
@@ -847,11 +852,7 @@ public final class Game
         }
         else
         {
-            file = new File(filename);
-            if (!file.exists())
-            {
-                file = new File(saveDirname + File.separator + filename);
-            }
+            file = new File(saveDirname + File.separator + filename);
         }
 
         try
@@ -2391,6 +2392,7 @@ public final class Game
             server.engage(engagementHexLabel);
         }
 
+        // XXX Still advancing when SummonAngel is visible.
         if (findEngagements().size() == 0 && !summoningAngel)
         {
             advancePhase(FIGHT);
@@ -2622,6 +2624,7 @@ public final class Game
                     else
                     {
                         legion.revealTeleportingLord(
+                            server.getClientOption(Options.autoPlay) ||
                             server.getClientOption(Options.allStacksVisible));
                     }
                 }
