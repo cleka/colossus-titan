@@ -276,6 +276,7 @@ class Player
     {
         if (mulligansLeft > 0)
         {
+            undoAllMoves();
             rollMovement();
             mulligansLeft--;
         }
