@@ -88,6 +88,8 @@ public class BattleMap extends Frame implements MouseListener,
             this.side = side;
         }
 
+        setLayout(null);
+
         preferredSize = new Dimension(30 * scale, 30 * scale);
         setSize(preferredSize);
         setResizable(false);
