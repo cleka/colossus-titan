@@ -25,6 +25,7 @@ public final class Options
     public static final String antialias = "Antialias";
 
     // AI options (player)
+    public static final String autoPickColor = "Auto pick color";
     public static final String autoPickMarker = "Auto pick markers";
     public static final String autoSplit = "Auto split";
     public static final String autoMasterMove = "Auto masterboard move";
@@ -45,6 +46,7 @@ public final class Options
 
     static
     {
+        perPlayerSet.add(autoPickColor);
         perPlayerSet.add(autoPickMarker);
         perPlayerSet.add(autoSplit);
         perPlayerSet.add(autoMasterMove);

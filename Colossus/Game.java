@@ -136,8 +136,6 @@ public final class Game
 
     public void newGame()
     {
-        logEvent("Starting new game");
-
         turnNumber = 1;
 
         caretaker.resetAllCounts();
@@ -146,21 +144,41 @@ public final class Game
 
         JFrame frame = new JFrame();
 
-        TreeSet playerNames = GetPlayers.getPlayers(frame);
-        if (playerNames.isEmpty())
+        TreeMap playerInfo = GetPlayers.getPlayers(frame);
+
+        if (playerInfo.isEmpty())
         {
+            // User selected Quit.
             dispose();
             return;
         }
-        Iterator it = playerNames.iterator();
-        while (it.hasNext())
-        {
-            String name = (String)it.next();
-            addPlayer(name);
-            logEvent("Add player " + name);
-        }
 
         initBoard();
+
+        // See if user hit the Load game button, and we should
+        // load a game instead of starting a new one.
+        if (playerInfo.size() == 1)
+        {
+            String key = (String)playerInfo.firstKey();
+            if (key.equals(GetPlayers.loadGame))
+            {
+                String filename = (String)playerInfo.get(key);
+                loadGame(filename);
+                return;
+            }
+        }
+
+        logEvent("Starting new game");
+
+        Iterator it = playerInfo.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Map.Entry entry = (Map.Entry)it.next();
+            String name = (String)entry.getKey();
+            String autoPlay = (String)entry.getValue();
+            addPlayer(name);
+            logEvent("Add " + autoPlay + " player " + name);
+        }
 
         assignTowers();
 
@@ -170,6 +188,22 @@ public final class Game
 
         loadOptions();
 
+        // Override autoPlay option with checkbox selection.
+        it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            String autoPlay = (String)playerInfo.get(player.getName());
+            if (autoPlay.equals(GetPlayers.ai))
+            {
+                player.setOption(Options.autoPlay, true);
+            }
+            else if (autoPlay.equals(GetPlayers.human))
+            {
+                player.setOption(Options.autoPlay, false);
+            }
+        }
+
         ListIterator lit = players.listIterator(players.size());
         while (lit.hasPrevious())
         {
@@ -177,6 +211,7 @@ public final class Game
             String color;
             do
             {
+                // TODO Add AI pickColor call here.
                 color = PickColor.pickColor(frame, this, player);
             }
             while (color == null);
@@ -304,7 +339,6 @@ public final class Game
     {
         players.add(new Player(name, this));
     }
-
 
     public void addPlayer(Player player)
     {
@@ -563,7 +597,10 @@ public final class Game
         {
             String name = (String)en.nextElement();
             boolean value = getOption(name);
-            board.twiddleOption(name, value);
+            if (board != null)
+            {
+                board.twiddleOption(name, value);
+            }
         }
     }
 
@@ -2747,11 +2784,10 @@ public final class Game
 
     public void doSummon(Legion legion, Legion donor, Creature angel)
     {
-        // Sanity check.
+        Player player = getActivePlayer();
+
         if (angel != null && donor != null && legion.canSummonAngel())
         {
-            Player player = getActivePlayer();
-
             // Only one angel can be summoned per turn.
             player.setSummoned(true);
 
@@ -2766,14 +2802,14 @@ public final class Game
             Game.logEvent("An " + angel.getName() +
                 " is summoned from legion " + donor.getLongMarkerName() +
                 " into legion " + legion.getLongMarkerName());
-
-            if (battle != null)
-            {
-                battle.finishSummoningAngel(player.hasSummoned());
-            }
-            summonAngel = null;
-            highlightEngagements();
         }
+
+        if (battle != null)
+        {
+            battle.finishSummoningAngel(player.hasSummoned());
+        }
+        summonAngel = null;
+        highlightEngagements();
     }
 
 

@@ -1069,6 +1069,15 @@ public final class Player implements Comparable
         return null;
     }
 
+    public String aiPickColor(Set colors)
+    {
+        if (getOption(Options.autoPickColor))
+        {
+            return ai.pickColor(colors);
+        }
+        return null;
+    }
+
 
     /** Comparator that forces this player's legion markers to come
      *  before captured markers in sort order. */

@@ -23,6 +23,19 @@ class SimpleAI implements AI
     }
 
 
+    // TODO Save favorite colors for each player in options.
+    public String pickColor(Set colors)
+    {
+        Iterator it = colors.iterator();
+        if (it.hasNext())
+        {
+            String color = (String)it.next();
+            return color;
+        }
+        return null;
+    }
+
+
     public void muster(Game game)
     {
         // Do not recruit if this legion is a scooby snack.
@@ -2708,7 +2721,12 @@ debugln("no moves");
             // On turn 1, all moving critters of the same creature type are
             // identical (since all come from the same entrance and none
             // are wounded), so we should be able to skip testing any
-            // permutations that just swapped like creatures.
+            // permutations that are effectively identical.
+
+            // TODO Generate and save all permutations, then sort, so that
+            // we can eliminate all duplicates, not just consecutive ones.
+
+
             if (turn == 1 && creatureNames(order).equals(creatureNames(
                 lastOrder)))
             {
@@ -2716,10 +2734,14 @@ debugln("no moves");
             }
 
             count++;
+
+            // TODO Change cursor to hourglass after N iterations.
+            // Maybe pop up a progress bar or progress monitor.
 if (count % 100 == 0)
 {
 debugln(count + " tries");
 }
+
             int score = testMoveOrder(order, battle);
             if (score > bestScore)
             {

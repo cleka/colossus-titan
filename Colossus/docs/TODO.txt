@@ -1,5 +1,6 @@
-Add a load game option to the GetPlayers dialog.  Also add AI/human
-   checkboxes next to each player name.
+Handle non-boolean player options.
+
+Make GetPlayers dialog less hideous.
 
 Eliminate Legion.hexInfoMap and just recompute and store the info for
    one hex when the legion moves?  Or have listMoves return a set of

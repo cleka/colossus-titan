@@ -47,4 +47,7 @@ public interface AI
 
     /** choose whether to summon an angel or archangel */
     String summonAngel(Legion legion, Game game);
+
+    /** pick a color of legion markers */
+    String pickColor(Set colors);
 }
