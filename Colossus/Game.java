@@ -121,7 +121,7 @@ public final class Game
 
         // XXX Temporary hotseat startup code
         JFrame frame = new JFrame();
-        TreeMap playerInfo = GetPlayers.getPlayers(frame);
+        List playerInfo = GetPlayers.getPlayers(frame);
         if (playerInfo.isEmpty())
         {
             // User selected Quit.
@@ -133,10 +133,12 @@ public final class Game
         // load a game instead of starting a new one.
         if (playerInfo.size() == 1)
         {
-            String key = (String)playerInfo.firstKey();
+            String entry = (String)playerInfo.get(0);
+            java.util.List values = Utils.split('~', entry);
+            String key = (String)values.get(0);
             if (key.equals(GetPlayers.loadGame))
             {
-                String filename = (String)playerInfo.get(key);
+                String filename = (String)values.get(1);
                 loadGame(filename);
                 return;
             }
@@ -144,14 +146,18 @@ public final class Game
 
         Log.event("Starting new game");
 
-        Iterator it = playerInfo.entrySet().iterator();
+        ArrayList playerTypes = new ArrayList();
+
+        Iterator it = playerInfo.iterator();
         while (it.hasNext())
         {
-            Map.Entry entry = (Map.Entry)it.next();
-            String name = (String)entry.getKey();
-            String autoPlay = (String)entry.getValue();
+            String entry = (String)it.next();
+            java.util.List values = Utils.split('~', entry);
+            String name = (String)values.get(0);
+            String type = (String)values.get(1);
             addPlayer(name);
-            Log.event("Add " + autoPlay + " player " + name);
+            playerTypes.add(type);
+            Log.event("Add " + type + " player " + name);
         }
 
         assignTowers();
@@ -168,28 +174,29 @@ public final class Game
 
         server.loadOptions();
 
-        // Override autoPlay option with checkbox selection, if not default.
+        // Override autoPlay option with selection.
+        int i = 0;
         it = players.iterator();
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            String autoPlay = (String)playerInfo.get(player.getName());
-            if (autoPlay.equals(GetPlayers.ai))
+            String type = (String)playerTypes.get(i);
+            if (type.equals(GetPlayers.ai))
             {
-                server.setClientOption(player.getName(), Options.autoPlay,
-                    true);
+                server.setClientOption(i, Options.autoPlay, true);
             }
-            else if (autoPlay.equals(GetPlayers.human))
+            else if (type.equals(GetPlayers.human))
             {
-                server.setClientOption(player.getName(), Options.autoPlay,
-                    false);
+                server.setClientOption(i, Options.autoPlay, true);
+                server.setClientOption(i, Options.autoPlay, false);
             }
+            i++;
         }
 
         server.allInitBoard();
 
         HashSet colorsLeft = new HashSet();
-        for (int i = 0; i < PickColor.colorNames.length; i++)
+        for (i = 0; i < PickColor.colorNames.length; i++)
         {
             colorsLeft.add(PickColor.colorNames[i]);
         }
@@ -203,8 +210,7 @@ public final class Game
             String color;
             do
             {
-                if (server.getClientOption(player.getName(),
-                    Options.autoPickColor))
+                if (server.getClientOption(playerNum, Options.autoPickColor))
                 {
                     color = player.aiPickColor(colorsLeft);
                 }
@@ -394,7 +400,7 @@ public final class Game
         return players;
     }
 
-    public Player getPlayerByName(String name)
+    public Player getPlayer(String name)
     {
         if (name != null)
         {

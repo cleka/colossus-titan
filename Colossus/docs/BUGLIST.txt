@@ -17,7 +17,7 @@ Solaris 1.3; Linux 1.3: JPopupMenu mnemonics don't work.  They work okay
 Linux 1.4b: Problems running to a remote X display.  Some of the
    startup dialogs never show up.  Behind the MasterBoard?
 
-Linux, Solaris, 1.3: Dialogs sometimes beep for no good reason.
+Linux, Solaris, 1.3 - 1.3.1: Dialogs sometimes beep for no good reason.
    Doesn't happen in Win98.
 
 Win98, 1.3.1: Windows don't always pop to the front when show() is
@@ -74,3 +74,5 @@ Need prettier question.gif
 
 Attacking AI is way too happy to take a time loss.  Need to crank up
    aggression in the last few turns of battle.
+
+File/New Game is broken.  The board is disposed but not recreated.

@@ -142,14 +142,19 @@ public final class Server
         return false;
     }
 
-    public boolean getClientOption(String optname)
+    public boolean getClientOption(int playerNum, String optname)
     {
-        Client client = getClient(0);
+        Client client = getClient(playerNum);
         if (client != null)
         {
             return client.getOption(optname);
         }
         return false;
+    }
+
+    public boolean getClientOption(String optname)
+    {
+        return getClientOption(0, optname);
     }
 
     public String getClientStringOption(String playerName, String optname)
@@ -167,6 +172,16 @@ public final class Server
         boolean value)
     {
         Client client = getClient(playerName);
+        if (client != null)
+        {
+            client.setOption(optname, value);
+        }
+    }
+
+    public void setClientOption(int playerNum, String optname,
+        boolean value)
+    {
+        Client client = getClient(playerNum);
         if (client != null)
         {
             client.setOption(optname, value);

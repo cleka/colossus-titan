@@ -716,7 +716,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         String playerName = client.getPlayerName();
         playerLabel = new JLabel(playerName);
 
-        Player player = game.getPlayerByName(playerName);
+        Player player = game.getPlayer(playerName);
         String colorName = player.getColor();
         // If we call this before player colors are chosen, just use
         // the defaults.

@@ -14,21 +14,24 @@ import java.util.*;
 public final class GetPlayers extends JDialog implements WindowListener,
     ActionListener
 {
-    public static String loadGame = "Load Game";
     public static String newGame = "New Game";
+    public static String loadGame = "Load Game";
     public static String quit = "Quit";
     public static String human = "Human";
     public static String ai = "AI";
-    public static String def = "Default";
-    public static String byColor = "<By color>";
     public static String none = "None";
+    public static String byColor = "<By color>";
+    public static String username = System.getProperty("user.name", byColor);
+    public static String [] typeChoices = { ai, human, none };
+    public static String [] nameChoices = { byColor, username, none };
 
     private JFrame parentFrame;
-    private ArrayList textFields = new ArrayList();
-    private ArrayList radioButtons = new ArrayList();
-    /** Maps player name to one of "Human" "AI" or "Default" */
-    private static TreeMap playerInfo = new TreeMap();
-    private String [] autoPlay = new String[6];
+
+    private JComboBox [] playerTypes = new JComboBox[6];
+    private JComboBox [] playerNames = new JComboBox[6];
+
+    /** List of Map.Entry objects that map player names to player types */
+    private static ArrayList playerInfo = new ArrayList();
 
 
     private GetPlayers(JFrame parentFrame)
@@ -41,54 +44,43 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
         Container contentPane = getContentPane();
 
-        contentPane.setLayout(new GridLayout(0, 5));
+        contentPane.setLayout(new GridLayout(0, 3));
 
         for (int i = 0; i < 6; i++)
         {
-            String s = "Player " + (i + 1) + " Name";
+            String s = "Player " + (i + 1);
             contentPane.add(new JLabel(s));
-            JTextField tf = new JTextField(20);
-            contentPane.add(tf);
-            textFields.add(tf);
 
-            ButtonGroup bg = new ButtonGroup();
+            JComboBox playerType = new JComboBox(typeChoices);
+            if (i == 0)
+            {
+                playerType.setSelectedItem(human);
+            }
+            contentPane.add(playerType);
+            playerType.addActionListener(this);
+            playerTypes[i] = playerType;
 
-            JRadioButton button = new JRadioButton(def, true);
-            bg.add(button);
-            contentPane.add(button);
-            radioButtons.add(button);
-            button.addActionListener(this);
-
-            button = new JRadioButton(human, false);
-            bg.add(button);
-            contentPane.add(button);
-            radioButtons.add(button);
-            button.addActionListener(this);
-
-            button = new JRadioButton(ai, false);
-            bg.add(button);
-            contentPane.add(button);
-            radioButtons.add(button);
-            button.addActionListener(this);
+            JComboBox playerName = new JComboBox(nameChoices);
+            playerName.setEditable(true);
+            if (i == 0)
+            {
+                playerName.setSelectedItem(username);
+            }
+            contentPane.add(playerName);
+            playerName.addActionListener(this);
+            playerNames[i] = playerName;
         }
 
-        // Fix tab order.
-        for (int i = 0; i < 6; i++)
-        {
-            JTextField tf = (JTextField)textFields.get(i);
-            JTextField next = (JTextField)textFields.get((i + 1) % 6);
-            tf.setNextFocusableComponent(next);
-        }
 
-        JButton button1 = new JButton("New Game");
+        JButton button1 = new JButton(newGame);
         button1.setMnemonic(KeyEvent.VK_N);
         contentPane.add(button1);
         button1.addActionListener(this);
-        JButton button2 = new JButton("Load Game");
+        JButton button2 = new JButton(loadGame);
         button2.setMnemonic(KeyEvent.VK_L);
         contentPane.add(button2);
         button2.addActionListener(this);
-        JButton button3 = new JButton("Quit");
+        JButton button3 = new JButton(quit);
         button3.setMnemonic(KeyEvent.VK_Q);
         contentPane.add(button3);
         button3.addActionListener(this);
@@ -105,7 +97,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
     }
 
 
-    public static TreeMap getPlayers(JFrame parentFrame)
+    /** Return a List of Strings containing tilde-separated name/type. */
+    public static java.util.List getPlayers(JFrame parentFrame)
     {
         new GetPlayers(parentFrame);
         return playerInfo;
@@ -115,37 +108,33 @@ public final class GetPlayers extends JDialog implements WindowListener,
     private void validateInputs()
     {
         playerInfo.clear();
+        HashSet namesTaken = new HashSet();
         int numPlayers = 0;
-        int i = 0;
 
-        Iterator it = textFields.iterator();
-        while (it.hasNext())
+        for (int i = 0; i < 6; i++)
         {
-            JTextField tf = (JTextField)it.next();
-            String text = tf.getText();
-            if (text.length() > 0)
+            String name = (String)(playerNames[i].getSelectedItem());
+            String type = (String)(playerTypes[i].getSelectedItem());
+            if (name.length() > 0 && !name.equals(none) && !type.equals(none))
             {
-                numPlayers++;
-                String ap = autoPlay[i];
-                if (ap == null)
+                // Duplicate names are not allowed.
+                if (namesTaken.contains(name))
                 {
-                    ap = def;
+                    return;
                 }
-                playerInfo.put(text, ap);
+                numPlayers++;
+                String entry = name + "~" + type;
+                playerInfo.add(entry);
+                if (!name.equals(byColor))
+                {
+                    namesTaken.add(name);
+                }
             }
-            i++;
         }
 
-        // Make sure that there is at least one player, and
-        // that each player has a unique name.
+        // Exit if there aren't enough unique player names.
         if (numPlayers < 1 || playerInfo.size() != numPlayers)
         {
-            it = textFields.iterator();
-            while (it.hasNext())
-            {
-                JTextField tf = (JTextField)it.next();
-                tf.setText("");
-            }
             return;
         }
 
@@ -162,7 +151,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
         {
             playerInfo.clear();
             // Set key to "load game" and value to savegame filename.
-            playerInfo.put(loadGame, chooser.getSelectedFile().getName());
+            playerInfo.add(loadGame + "~" +
+                chooser.getSelectedFile().getName());
             dispose();
         }
     }
@@ -213,10 +203,35 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
         else
         {
-            // Radio button.  Set the corresponding player's autoPlay value.
-            int buttonNum = radioButtons.indexOf(e.getSource());
-            int playerNum = buttonNum / 3;
-            autoPlay[playerNum] = e.getActionCommand();
+            // A combo box was changed.
+            Object source = e.getSource();
+
+            for (int i = 0; i < 6; i++)
+            {
+                JComboBox box = playerTypes[i];
+                if (box == source)
+                {
+                    // If player type was changed to none, also change player
+                    // name to none.
+                    String value = (String)box.getSelectedItem();
+                    if (value.equals(none))
+                    {
+                        playerNames[i].setSelectedItem(none);
+                    }
+                }
+
+                box = playerNames[i];
+                if (box == source)
+                {
+                    // If player name was changed to none, also change player
+                    // type to none.
+                    String value = (String)box.getSelectedItem();
+                    if (value.equals(none))
+                    {
+                        playerTypes[i].setSelectedItem(none);
+                    }
+                }
+            }
         }
     }
 
@@ -235,28 +250,31 @@ public final class GetPlayers extends JDialog implements WindowListener,
     public static void main(String [] args)
     {
         Game game = new Game();
-        TreeMap info = getPlayers(new JFrame());
+        java.util.List info = getPlayers(new JFrame());
 
         // See if user hit the Load game button, and we should
         // load a game instead.
-        if (playerInfo.size() == 1)
+        if (info.size() == 1)
         {
-            String key = (String)playerInfo.firstKey();
+            String entry = (String)info.get(0);
+            java.util.List values = Utils.split('~', entry);
+            String key = (String)values.get(0);
             if (key.equals(loadGame))
             {
-                String filename = (String)playerInfo.get(key);
+                String filename = (String)values.get(1);
                 System.out.println("Would load game from " + filename);
                 System.exit(0);
             }
         }
 
-        Iterator it = info.entrySet().iterator();
+        Iterator it = info.iterator();
         while (it.hasNext())
         {
-            Map.Entry entry = (Map.Entry)it.next();
-            String name = (String)entry.getKey();
-            String ap = (String)entry.getValue();
-            System.out.println("Add " + ap + " player " + name);
+            String entry = (String)it.next();
+            java.util.List values = Utils.split('~', entry);
+            String name = (String)values.get(0);
+            String type = (String)values.get(1);
+            System.out.println("Add " + type + " player " + name);
         }
         System.exit(0);
     }

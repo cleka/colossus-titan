@@ -1,4 +1,4 @@
-Colossus alpha     June 28, 2001    Copyright 2001 David Ripton
+Colossus alpha     July 26, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
@@ -19,8 +19,8 @@ Running the game requires the following:
    (Java development kit).  A JRE is a smaller download; a JDK also
    lets you compile Java programs, not just run them.
 
-   (Colossus will not run under JDK 1.0.x or 1.1.x  Colossus no longer
-   runs as an applet in a web browser.  Sorry.)
+   (Colossus will not run under JDK 1.0.x or 1.1.x  Colossus does not
+   currently run as an applet in a web browser.  Sorry.)
 
    Win32, Solaris, and x86 Linux versions of the JDK and JRE are
    freely downloadable from java.sun.com.  Another Linux port is
@@ -87,10 +87,10 @@ doesn't work, pop up a command prompt, cd to the directory where
 you unzipped the zip file, and try typing "java -jar Colossus.jar"
 
 Once you get things running, a dialog should pop up, allowing you to
-type in up to six player names.  Put names in some of the boxes, then
-click "OK"  Another dialog will pop up, telling you which tower each
-player gets and letting players pick colors in increasing order of
-tower number.  Pick colors for each player.  If you misclick, click
+choose up to six player types (human, AI, or not present) and their names.
+When you're done, click "OK"  Another dialog will pop up, telling you which 
+tower each player gets and letting players pick colors in increasing order 
+of tower number.  Pick colors for each player.  If you misclick, click
 "Restart"  When every player has a color, click "Done"
 
 Now a window will pop up for each player, letting him pick his initial legion
@@ -119,7 +119,7 @@ you pick the new legion marker to use.  Then another dialog will come up,
 allowing you to move characters between the two legions.  The game will
 not let you leave the split phase on the first turn until each of your
 legions contains three Creatures and one Lord.  When you're ready, select
-"Done with Splits" from the Phase menu.
+Done from the Phase menu.
 
 Next comes the movement phase.  The game will tell you your movement roll.
 Click on a legion, and the places it can move will light up.  Click on one of
@@ -128,7 +128,7 @@ to choose whether to teleport or move normally.)  The "Undo Last Move" and
 "Undo All Moves" actions are there in case you change your mind.  During the
 first turn only, and once only, there will be a "Take Mulligan" action which
 you can use to re-roll your movement.  When you're done moving everything you
-want to move, select "Done with Moves"
+want to move, select Done.
 
 If you moved any legions onto enemy legions, then next comes the engagement
 phase.  Each hex with an engagement will light up.  Click on the one you want
@@ -147,8 +147,8 @@ character, and the places it can move light up.  Click on one of those
 places, and the character moves there.  Repeat until all characters are
 on-board, unless you'd like to leave some off-board to die for some reason.
 The "Undo Last Move" and "Undo All Moves" menu options are available.  When
-done moving, click "Done with Moves"  The attacker repeats the process,
-except that after he finishes moving, it's striking time.
+done moving, click Done.  The attacker repeats the process, except that 
+after he finishes moving, it's striking time.
 
 Any creatures adjacent to an enemy must strike; rangestrikers with an enemy in
 range and line of sight may strike.  (If you turn on the "Auto forced strike"
@@ -163,7 +163,7 @@ legally carry over, then the legal carry target(s) will light up, and the
 striking player needs to pick which one to carry to, or click somewhere else 
 to decline the carry.  This carry process can repeat if the strike blows 
 through more than one creature.  There's no way to undo strikes.  (That
-would be cheating.)  When done striking, choose "Done with Strikes"
+would be cheating.)  When done striking, choose Done. 
 
 After the strike phase, the other player gets a strikeback phase.  It's
 identical to the strike phase, except that rangestrikes are not allowed.
@@ -188,22 +188,32 @@ acquiring one or more angels or archangels.  If the winner didn't summon
 an angel or recruit a reinforcement earlier, he will get another choice if
 eligible.
 
-After all engagements are resolved, choose "Done with Engagements" to
-proceed to the mustering phase.  Legions that moved and can recruit will
-light up.  Click on each one and choose a recruit.  If more than one type of
-creature is capable of summoning that recruit, you'll have to choose the
-recruiter(s) to be revealed, unless the "Autopick recruiter" option has 
-been selected.  When done, click "Done with Turn" and pass the mouse to 
-the next player.
+After all engagements are resolved, choose Done to proceed to the mustering 
+phase.  Legions that moved and can recruit will light up.  Click on each one 
+and choose a recruit.  If more than one type of creature is capable of 
+summoning that recruit, you'll have to choose the recruiter(s) to be 
+revealed, unless the "Autopick recruiter" option has been selected.  When 
+done, click Done and pass the mouse to the next player.
 
 The game ends when zero or one Titans remain.  The last player standing is
 the winner; if the game ends with a mutual elimination, it's a draw.
 
-To use the AI, select the Auto Play option from the Player menu for the
-players you want the computer to control.  If you select Save Options from
-the File menu, then all the current players' options will be saved by 
-player name, so next time you play you won't have to do this again if you
-use the same player names.
+
+Miscellaneous stuff:
+
+Unless you turn off the Autosave option, the game produces a numbered .sav 
+file in the saves/ subdirectory every turn.  If you start a new game with
+"java -jar Colossus.jar filename.sav" instead of just "java -jar Colossus"
+then the save file will be loaded.  "java -jar Colossus.jar --latest" will
+load the most recent save game in the saves/ subdirectory -- this is useful
+if the game crashes.  Or you can just use the Load option on the File menu.
+You'll want to manually delete all those save files from time to time.
+
+The antialias option makes the board look a little bit nicer, but slows
+down the game a bit.
+
+If you select Save Options from the File menu, then all the current players' 
+options will be saved in files called <player name>.cfg 
 
 
 Improvements:
@@ -211,7 +221,7 @@ Improvements:
 If you find any bugs that you think I can fix, please let me know, in
 as much detail as possible.  (In particular, include the OS and JVM version.)
 The best way to report bugs is via the bug tracker at SourceForge --
-go to http://colossus.sf.net, click on the SourceForge icon, click on 
+go to http://colossus.sourceforge.net, click on the SourceForge icon, click on
 tracker, and click on bugs.
 
 Java is still evolving, and the JDK itself still has plenty of bugs,
@@ -223,13 +233,8 @@ in particular) are still off.  Bruno Wolff's Titan Errata and Clarifications
 at http://www.uwm.edu/~bruno/titan/errata.shtml is a good place to check for
 rules issues.
 
-Unless you turn off the Autosave option, the game produces a numbered .sav 
-file in the saves/ subdirectory every turn.  If you start a new game with
-"java -jar Colossus.jar filename.sav" instead of just "java -jar Colossus"
-then the save file will be loaded.  "java -jar Colossus.jar --latest" will
-load the most recent save game in the saves/ subdirectory -- this is useful
-if the game crashes.  Or you can just use the Load option on the File menu.  
-You'll want to manually delete all those save files from time to time.
+
+
 
 
 Credits:
@@ -242,8 +247,10 @@ Counter art:  Jerry Reiger, David Lum, Tchula Ripton
 
 Network protocol: Falk Hueffner
 
+GUI ideas: Kris Giesing
+
 Bug reports:  Anthony Kam, Augustin Ku, Sean McCulloch, Luca Ferraro, 
               Jonathan Woodward, Aneel Nazareth
 
-Web and CVS space, bug tracker, etc.: SourceForge
+Web and CVS space, bug tracker, mailing lists, etc.: SourceForge
 

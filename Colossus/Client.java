@@ -963,7 +963,7 @@ public final class Client
     {
         if (summonAngel != null)
         {
-            Player player = server.getGame().getPlayerByName(playerName);
+            Player player = server.getGame().getPlayer(playerName);
             Legion donor = server.getGame().getFirstFriendlyLegion(
                 hexLabel, player);
             if (donor != null)

@@ -597,8 +597,9 @@ public final class Legion implements Comparable
 
         Log.event("Legion " + getLongMarkerName() + " in " +
             getCurrentHexLabel() + (teleported ?
-            (game.isOccupied(hexLabel) ? " titan teleports " :
-            " tower teleports (" + teleportingLord + ") " ) : " moves ") +
+            (game.getNumEnemyLegions(hexLabel, game.getPlayer(playerName)) > 0
+            ? " titan teleports "
+            : " tower teleports (" + teleportingLord + ") " ) : " moves ") +
             "to " + hex.getDescription());
     }
 

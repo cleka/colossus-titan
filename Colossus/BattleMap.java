@@ -356,7 +356,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         String playerName = client.getPlayerName();
         playerLabel = new JLabel(playerName);
 
-        Player player = battle.getGame().getPlayerByName(playerName);
+        Player player = battle.getGame().getPlayer(playerName);
         String colorName = player.getColor();
         // If we call this before player colors are chosen, just use
         // the defaults.

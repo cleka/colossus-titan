@@ -750,7 +750,7 @@ private int mulligansLeft = 99;
         // engaged with.  All others give half points to slayer,
         // if non-null.
 
-        Player slayer = game.getPlayerByName(slayerName);
+        Player slayer = game.getPlayer(slayerName);
 
         HashSet hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();

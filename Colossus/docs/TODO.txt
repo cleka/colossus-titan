@@ -1,8 +1,6 @@
 Attacking AI creatures need to chargest closest enemy in the last few
    turns, rather than accepting a time loss.
 
-Support default names by color for AI players.
-
 Allow first human player to control game options, load game, etc.
 
 Split GUI classes from model classes.
