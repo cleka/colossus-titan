@@ -1,18 +1,3 @@
-Bug: Non-warlock rangestrikers fail to attack legions of all lords.
-     They move into rangestriking position even though they can't.
-
-Bug: Log window text sometimes appears over board, map.
-
-Bug: Occasional "Error: java.net.SocketException: Connection reset by peer:
-     Connection reset by peer" for no known reason, which drops the client
-     and kills the game.  Happens with local clients.  Also remote?
-
-Bug: Human (local) player named byColor never has SocketServerThread name reset:
-    From client <By color>1: doneWithSplits
-    Error: <By color>1 illegally called doneWithSplits()
-
-Bug: Socket problems on Win2K.  "localhost" not portable?  Changed to 127.0.0.1
-
 Show battle hex id, legion ids in BattleMap title.
 
 Authenticate all remote calls to ensure that they come from the correct

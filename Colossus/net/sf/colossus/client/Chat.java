@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import net.sf.colossus.util.Options;
+import net.sf.colossus.server.Constants;
 
 /** 
  *  Simple chat window
@@ -21,9 +22,8 @@ final class Chat extends JFrame implements ActionListener
     private SaveWindow saveWindow;
 
     private JScrollPane receiveScrollPane;
-    private JScrollPane sendScrollPane;
     private JTextArea receive;
-    private JTextArea send;
+    private JTextField send;
 
     private ButtonGroup buttonGroup;
     /** List of RadioButtons */
@@ -35,6 +35,8 @@ final class Chat extends JFrame implements ActionListener
         super("Chat");
         this.client = client;
 
+        getContentPane().setLayout(new BoxLayout(getContentPane(), 
+            BoxLayout.Y_AXIS));
         setBackground(Color.white);
 
         addWindowListener(new WindowAdapter()
@@ -45,35 +47,33 @@ final class Chat extends JFrame implements ActionListener
             }
         });
 
-        receive = new JTextArea();
+        receive = new JTextArea(20, 80);
         receive.setEditable(false);
         receive.setLineWrap(true);
         receiveScrollPane = new JScrollPane(receive);
         getContentPane().add(receiveScrollPane);
 
-        send = new JTextArea();
-        receive.setEditable(true);
-        receive.setLineWrap(true);
-        sendScrollPane = new JScrollPane(send);
-        getContentPane().add(sendScrollPane);
-
         // All players except self, plus "all"
         buttons = new ArrayList();
         java.util.List names = client.getPlayerNames();
-        names.add(0, "All");
+        names.add(0, Constants.all);
         names.remove(client.getPlayerName());
-        Iterator it = names.iterator();
         buttonGroup = new ButtonGroup();
         Container buttonPane = new Container();
         getContentPane().add(buttonPane);
+        Iterator it = names.iterator();
         while (it.hasNext())
         {
             String name = (String)it.next();
             JRadioButton button = new JRadioButton(name);
+            button.setMinimumSize(new Dimension(30, 20)); 
             buttonPane.add(button);
             buttonGroup.add(button);
             button.addActionListener(this);
         }
+
+        send = new JTextField();
+        getContentPane().add(send);
 
         pack();
 
@@ -108,7 +108,7 @@ final class Chat extends JFrame implements ActionListener
         vert.setValue(vert.getMaximum());
     }
 
-    void send()
+    void sendMessage()
     {
         String target = buttonGroup.getSelection().getActionCommand();
     }

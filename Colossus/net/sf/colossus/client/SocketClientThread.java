@@ -33,6 +33,7 @@ final class SocketClientThread extends Thread implements IServer
         super("Client " + client.getPlayerName());
         this.client = client;
 
+Log.debug("About to connect client socket to " + host + ":" + port);       
         try
         {
             socket = new Socket(host, port);
@@ -436,6 +437,14 @@ Log.debug("End of SocketClientThread while loop");
     {
         out.println(Constants.signOn + sep + client.getPlayerName() + sep +
             client.isRemote());
+    }
+
+    /** Set the thread name to playerName, and tell the server so we
+     *  can set this playerName in the right SocketServerThread. */
+    void fixName(String playerName)
+    {
+        setName("Client " + playerName);
+        out.println(Constants.fixName + sep + playerName);
     }
 
 

@@ -114,13 +114,11 @@ final class SocketServerThread extends Thread implements IClient
         }
         else if (method.equals(Constants.fixName))
         {
-            if (playerName.equals(Constants.byColor) || 
-                playerName.equals(Constants.byClient))
+            String newName = (String)args.remove(0);
+Log.debug("Got fixName new:" + newName + " old:" + playerName);
+            if (!newName.equals(playerName))
             {
-                String playerName = (String)args.remove(0);
-                // Do not use setPlayerName() and feedback to client.
-                this.playerName = playerName;
-                setName(playerName);
+                setPlayerName(newName);
             }
         }
         else if (method.equals(Constants.leaveCarryMode))
@@ -401,6 +399,7 @@ final class SocketServerThread extends Thread implements IClient
 
     public void setPlayerName(String playerName)
     {
+Log.debug("Called SocketServerThread.setPlayerName() old:" + this.playerName + " new:" + playerName + " thread: " + getName());
         this.playerName = playerName;
         setName(playerName);
 

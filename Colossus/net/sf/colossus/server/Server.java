@@ -70,6 +70,7 @@ public final class Server implements IServer
         maxClients = game.getNumLivingPlayers();
 Log.debug("initSocketServer maxClients = " + maxClients);
 
+Log.debug("About to create server socket on port " + port);
         try
         {
             if (serverSocket != null)

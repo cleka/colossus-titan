@@ -40,6 +40,7 @@ public final class Client implements IClient
     private CreatureCollectionView caretakerDisplay;
     private SummonAngel summonAngel;
     private MovementDie movementDie;
+    private Chat chat;
 
     /** hexLabel of MasterHex for current or last battle. */
     private String battleSite;
@@ -423,6 +424,10 @@ public final class Client implements IClient
                 Log.disposeLogWindow();
             }
         }
+        else if (optname.equals(Options.showChat))
+        {
+            updateChat();
+        }
         else if (optname.equals(Options.showStatusScreen))
         {
             updateStatusScreen();
@@ -549,6 +554,35 @@ public final class Client implements IClient
         // Side effects
         setupPlayerLabel();
     }
+
+    private void updateChat()
+    {
+        if (getNumPlayers() < 1)
+        {
+            // Called too early.
+            return;
+        }
+        if (getOption(Options.showChat))
+        {
+            if (chat == null)
+            {
+                chat = new Chat(this);
+            }
+        }
+        else
+        {
+            if (board != null)
+            {
+                board.twiddleOption(Options.showChat, false);
+            }
+            if (chat != null)
+            {
+                chat.dispose();
+            }
+            chat = null;
+        }
+    }
+
 
     PlayerInfo getPlayerInfo(int playerNum)
     {
@@ -1048,7 +1082,7 @@ public final class Client implements IClient
     {
 Log.debug("Client.setPlayerName() from " + this.playerName + " to " + playerName);
         this.playerName = playerName;
-        sct.setName("Client " + playerName);
+        sct.fixName(playerName);
     }
 
 

@@ -131,6 +131,7 @@ public final class Constants
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI" };
     public static final int numAITypes = aiArray.length;
+    public static final String all = "All";
 
     // Player names
     public static final String byColor = "<By color>";
