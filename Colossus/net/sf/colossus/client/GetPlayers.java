@@ -486,7 +486,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     public Dimension getPreferredSize()
     {
-        return getMinimumSize();
+        return new Dimension(640, 640);
     }
 
 
