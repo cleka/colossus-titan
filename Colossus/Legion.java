@@ -22,7 +22,7 @@ class Legion
 
 
     Legion(int cx, int cy, int scale, String markerId, Legion splitFrom,
-        Container container, int height, MasterHex currentHex, 
+        Container container, int height, MasterHex hex, 
         Creature creature0, Creature creature1, Creature creature2, 
         Creature creature3, Creature creature4, Creature creature5, 
         Creature creature6, Creature creature7, Player player)
@@ -31,8 +31,8 @@ class Legion
         this.splitFrom = splitFrom;
         this.chit = new Chit(cx, cy, scale, getImageName(), container);
         this.height = height;
-        this.currentHex = currentHex;
-        this.startingHex = currentHex;
+        this.currentHex = hex;
+        this.startingHex = hex;
         this.player = player;
         creatures[0] = creature0;
         creatures[1] = creature1;
