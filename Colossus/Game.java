@@ -584,6 +584,15 @@ System.out.println("phase = SPLIT  activePlayerNum = " + activePlayerNum);
 
     public static void main(String args[])
     {
+        // Use the system look and feel rather than the cross-platform one.
+        try 
+        {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());        } 
+        catch (Exception ex_ignored) 
+        {
+            System.out.println("Default l&f left in place");
+        }
+
         Game game = new Game();
     }
 }
