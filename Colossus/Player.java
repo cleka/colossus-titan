@@ -533,6 +533,8 @@ class Player
                 numLegions--;
             }
         }
+
+        sortLegionMarkers();
     }
 
 
@@ -582,6 +584,7 @@ class Player
     {
         markersAvailable[numMarkersAvailable] = new String(markerSelected);
         numMarkersAvailable++;
+        sortLegionMarkers();
         markerSelected = null;
     }
 
@@ -618,6 +621,7 @@ class Player
     {
         markersAvailable[numMarkersAvailable] = markerId;
         numMarkersAvailable++;
+        sortLegionMarkers();
     }
 
 
@@ -631,6 +635,22 @@ class Player
             markersAvailable[numMarkersAvailable + i] = newMarkers[i];
         }
         numMarkersAvailable += len;
+        sortLegionMarkers();
+    }
+
+
+    public void sortLegionMarkers()
+    {
+        for (int i = 0; i < numMarkersAvailable; i++)
+        {
+            for (int j = i; j > 0 && markersAvailable[j - 1].compareTo(
+                markersAvailable[j]) > 0; j--)
+            {
+                String temp = markersAvailable[j - 1];
+                markersAvailable[j - 1] = markersAvailable[j];
+                markersAvailable[j] = temp;
+            }
+        }
     }
 
 
