@@ -32,6 +32,7 @@ public final class Player implements Comparable
     private LinkedList undoStack = new LinkedList();
     private Properties options = new Properties();
 
+    private AI ai = new SimpleAI();  // TODO Allow pluggable AIs.
 
     public Player(String name, Game game)
     {
@@ -751,9 +752,9 @@ public final class Player implements Comparable
 
     /** Return the value of the boolean option given by name. Default
      *  to false if there is no such option. */
-    public boolean getOption(String name)
+    public boolean getOption(String optname)
     {
-        String value = options.getProperty(name);
+        String value = options.getProperty(optname);
         if (value != null && value.equals("true"))
         {
             return true;
@@ -766,26 +767,13 @@ public final class Player implements Comparable
 
 
     /** Set option name to (a string version of) the given boolean value. */
-    public void setOption(String name, boolean value)
+    public void setOption(String optname, boolean value)
     {
-        options.setProperty(name, String.valueOf(value));
-        
-        // Side effects.
-        if (name.equals(Game.autoPlay))
-        {
-            // Set all other player options to the same value.
-            HashSet perPlayerOptions = Game.getPerPlayerOptions();
-            Iterator it = perPlayerOptions.iterator();
-            while (it.hasNext())
-            {
-                String optname = (String)it.next();
-                if (!optname.equals(Game.autoPlay))
-                {
-                    setOption(optname, value);
-                }
-            }
-            syncCheckboxes();
-        }
+        options.setProperty(optname, String.valueOf(value));
+
+        // TODO Add some triggers so that if autoPlay or autoSplit is set
+        // during this player's split phase, the appropriate action
+        // is called.
     }
 
 
@@ -793,7 +781,7 @@ public final class Player implements Comparable
      *  java.util.Properties keyword=value. */
     public void saveOptions()
     {
-        final String optionsFile = Game.optionsPath + Game.optionsSep + 
+        final String optionsFile = Game.optionsPath + Game.optionsSep +
             name + Game.optionsExtension;
         try
         {
@@ -823,21 +811,46 @@ public final class Player implements Comparable
         {
             System.out.println("Couldn't read player options from " +
                 optionsFile);
-            return;
         }
     }
 
 
-    // XXX This method doesn't work right.
     /** Ensure that Player menu checkboxes reflect the correct state. */
     public void syncCheckboxes()
     {
-        Enumeration en = options.propertyNames();
-        while (en.hasMoreElements())
+        Iterator it = PerPlayerOptions.iterator();
+        while (it.hasNext())
         {
-            String name = (String)en.nextElement();
-            boolean value = getOption(name);
-            game.getBoard().twiddleOption(name, value);
+            String optname = (String)it.next();
+            boolean value = getOption(optname);
+            game.getBoard().twiddleOption(optname, value);
+        }
+    }
+
+
+    public void aiSplit()
+    {
+        if (getOption(Game.autoPlay) || getOption(Game.autoSplit))
+        {
+            ai.split(game);
+        }
+    }
+
+
+    public void aiMasterMove()
+    {
+        if (getOption(Game.autoPlay) || getOption(Game.autoMasterMove))
+        {
+            ai.move(game);
+        }
+    }
+
+
+    public void aiRecruit()
+    {
+        if (getOption(Game.autoPlay) || getOption(Game.autoRecruit))
+        {
+            ai.muster(game);
         }
     }
 

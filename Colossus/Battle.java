@@ -310,7 +310,9 @@ public final class Battle
             map.setupFightMenu();
 
             // Automatically perform forced strikes if applicable.
-            if (getActivePlayer().getOption(Game.autoForcedStrike))
+            Player player = game.getActivePlayer();
+            if (player.getOption(Game.autoPlay) ||
+                player.getOption(Game.autoForcedStrike))
             {
                 makeForcedStrikes();
                 // If there are no possible strikes left, move on.
@@ -810,7 +812,7 @@ public final class Battle
                     else
                     {
                         // Reinforcement.
-			legion.getPlayer().getGame().getCaretaker().putOneBack(critter);
+                        game.getCaretaker().putOneBack(critter);
                         // This recruit doesn't count.
                         legion.setRecruited(false);
                     }
@@ -837,7 +839,7 @@ public final class Battle
                 // of the stack, then the count must be adjusted.
                 if (donor != null)
                 {
-		    legion.getPlayer().getGame().getCaretaker().takeOne(critter);
+                    game.getCaretaker().takeOne(critter);
                     donor = null;
                 }
 
@@ -1820,9 +1822,14 @@ public final class Battle
 
                 if (getCarryDamage() == 0)
                 {
-                    if (game != null && game.getOption(Game.autoForcedStrike))
+                    if (game != null)
                     {
-                        makeForcedStrikes();
+                        Player player = game.getActivePlayer();
+                        if (player.getOption(Game.autoPlay) ||
+                            player.getOption(Game.autoForcedStrike))
+                        {
+                            makeForcedStrikes();
+                        }
                     }
                     highlightChitsWithTargets();
                 }

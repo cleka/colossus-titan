@@ -4,10 +4,6 @@ Add different debug logging levels.  Maybe use JLog or some other
    free logging package instead of reinventing the wheel, if the 
    footprint is small enough.
 
-Make Player option menu per-player instead of global, with results 
-   saved to Colossus_playername.cfg  Add save player options to
-   menu.
-
 Auto move should take mulligans if available.  Titans should teleport
    to towers and grab warlocks more often.  Consider recruit scarcity
    (last gargoyle more valuable than troll).  Don't leave non-moved
@@ -25,10 +21,9 @@ Auto move should take mulligans if available.  Titans should teleport
    terrain.  Get scrub snacks out of nearby opponent's good recruiting 
    terrain, and into blocking positions.
 
-Add redo.
+Auto split should not split when it's dangerous to do so.
 
-Add explicit auto move action, instead of just doing it at the beginning
-   of the movement phase if the option is set.
+Add redo.
 
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.
@@ -78,8 +73,8 @@ Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 
 Add auto-BattleMap-move option.
 Add auto-strike option.
-Add auto-flee option.
-Add auto-play option.  (aka Really Dumb Computer Opponent.)
+Add auto-flee / auto-concede option.
+Add auto-play option.
 
 Add ability to specify computer opponents in GetPlayers.  Also a
    way to pick which AI subclass each uses.

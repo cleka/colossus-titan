@@ -23,7 +23,6 @@ public final class Game
     public static Random random = new Random();
     private MovementDie movementDie;
     private SummonAngel summonAngel;
-    private AI ai = new SimpleAI();  // TODO move to player
     private Caretaker caretaker = new Caretaker();
 
     public static final int SPLIT = 1;
@@ -59,7 +58,7 @@ public final class Game
     // Server options
     public static final String autosave = "Autosave";
     public static final String allStacksVisible = "All stacks visible";
-    
+
     // Debug options (server)
     public static final String chooseMovement = "Choose movement roll";
     public static final String chooseHits= "Choose number of hits";
@@ -81,20 +80,6 @@ public final class Game
     public static final String autoMasterMove = "Auto masterboard move";
     public static final String autoPlay = "Auto play";
 
-    private static HashSet perPlayerOptions = new HashSet();
-
-
-    static
-    {
-        perPlayerOptions.add(autoRecruit);
-        perPlayerOptions.add(autoPickRecruiter);
-        perPlayerOptions.add(autoPickMarker);
-        perPlayerOptions.add(autoPickEntrySide);
-        perPlayerOptions.add(autoForcedStrike);
-        perPlayerOptions.add(autoSplit);
-        perPlayerOptions.add(autoMasterMove);
-        perPlayerOptions.add(autoPlay);
-    }
 
 
     /** Start a new game. */
@@ -118,8 +103,6 @@ public final class Game
         board = new MasterBoard(this);
         masterFrame = board.getFrame();
         loadGame(filename);
-
-        loadOptions();
         updateStatusScreen();
     }
 
@@ -176,6 +159,8 @@ public final class Game
         Collections.sort(players);
         activePlayerNum = 0;
 
+        loadOptions();
+
         ListIterator lit = players.listIterator(players.size());
         while (lit.hasPrevious())
         {
@@ -191,8 +176,6 @@ public final class Game
             player.initMarkersAvailable();
         }
 
-        loadOptions();
-
         it = players.iterator();
         while (it.hasNext())
         {
@@ -201,6 +184,12 @@ public final class Game
             updateStatusScreen();
         }
         board.loadInitialMarkerImages();
+
+        if (!isApplet && getOption(autosave))
+        {
+            saveGame();
+        }
+
         setupPhase();
 
         board.setVisible(true);
@@ -293,7 +282,7 @@ public final class Game
 
     public Caretaker getCaretaker()
     {
-	return caretaker;
+        return caretaker;
     }
 
     public int getNumPlayers()
@@ -434,17 +423,11 @@ public final class Game
     }
 
 
-    public static HashSet getPerPlayerOptions()
-    {
-        return perPlayerOptions;
-    }
-
-
     /** Return the value of the boolean option given by name. Default
      *  to false if there is no such option. */
     public boolean getOption(String name)
     {
-        if (perPlayerOptions.contains(name))
+        if (PerPlayerOptions.contains(name))
         {
             try
             {
@@ -470,7 +453,7 @@ public final class Game
     /** Set option name to (a string version of) the given boolean value. */
     public void setOption(String name, boolean value)
     {
-        if (perPlayerOptions.contains(name))
+        if (PerPlayerOptions.contains(name))
         {
             getActivePlayer().setOption(name, value);
             return;
@@ -571,7 +554,6 @@ public final class Game
 
     public void setupPhase()
     {
-
         switch (getPhase())
         {
             case Game.SPLIT:
@@ -609,11 +591,7 @@ public final class Game
             // Highlight hexes with legions that are 7 high.
             player.highlightTallLegions();
         }
-
-	if (player.getOption(autoSplit))
-	{
-	    ai.split(this);
-	}
+        player.aiSplit();
     }
 
 
@@ -627,10 +605,7 @@ public final class Game
         // Highlight hexes with legions that can move.
         highlightUnmovedLegions();
 
-        if (player.getOption(autoMasterMove))
-        {
-            ai.move(this);
-        }
+        player.aiMasterMove();
     }
 
     private void setupFight()
@@ -645,7 +620,7 @@ public final class Game
         {
             board.setupFightMenu();
         }
-    } 
+    }
 
     private void setupMuster()
     {
@@ -662,10 +637,7 @@ public final class Game
             // Highlight hexes with legions eligible to muster.
             highlightPossibleRecruits();
 
-            if (player.getOption(autoRecruit))
-            {
-                ai.muster(this);
-            }
+            player.aiRecruit();
         }
     }
 
@@ -687,7 +659,7 @@ public final class Game
         else
         {
             Player player = getActivePlayer();
-            logEvent("\n" + player.getName() + "'s turn, number " + 
+            logEvent("\n" + player.getName() + "'s turn, number " +
                 turnNumber);
 
             player.syncCheckboxes();
@@ -1083,14 +1055,6 @@ public final class Game
                 }
             }
 
-
-            // Setup MasterBoard
-            board.loadInitialMarkerImages();
-            setupPhase();
-            board.setVisible(true);
-            board.repaint();
-
-
             // Battle stuff
             MasterHex engagementHex = null;
             buf = in.readLine();
@@ -1150,6 +1114,12 @@ public final class Game
                     showMovementRoll(roll);
                 }
             }
+
+            // Setup MasterBoard
+            board.loadInitialMarkerImages();
+            setupPhase();
+            board.setVisible(true);
+            board.repaint();
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -1307,7 +1277,7 @@ public final class Game
      *  java.util.Properties keyword=value. */
     public void saveOptions()
     {
-	final String optionsFile = optionsPath + optionsExtension;
+        final String optionsFile = optionsPath + optionsExtension;
         try
         {
             FileOutputStream out = new FileOutputStream(optionsFile);
@@ -1333,7 +1303,7 @@ public final class Game
      *  java.util.Properties keyword=value */
     public void loadOptions()
     {
-	final String optionsFile = optionsPath + optionsExtension;
+        final String optionsFile = optionsPath + optionsExtension;
         try
         {
             FileInputStream in = new FileInputStream(optionsFile);
@@ -1341,26 +1311,32 @@ public final class Game
         }
         catch (IOException e)
         {
-            System.out.println("Couldn't read game options from " + 
+            System.out.println("Couldn't read game options from " +
                 optionsFile);
             return;
         }
-        
-        // Ensure that menu checkboxes reflect the correct state.
-        Enumeration en = options.propertyNames();
-        while (en.hasMoreElements())
-        {
-            String name = (String)en.nextElement();
-            boolean value = getOption(name);
-            board.twiddleOption(name, value);
-        }
-        
+
+        syncCheckboxes();
+
         // Load options for each player
         Iterator it = players.iterator();
         while (it.hasNext())
         {
             Player player = (Player)it.next();
             player.loadOptions();
+        }
+        getActivePlayer().syncCheckboxes();
+    }
+
+
+    public void syncCheckboxes()
+    {
+        Enumeration en = options.propertyNames();
+        while (en.hasMoreElements())
+        {
+            String name = (String)en.nextElement();
+            boolean value = getOption(name);
+            board.twiddleOption(name, value);
         }
     }
 
@@ -2139,7 +2115,7 @@ public final class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (player.getOption(autoPickRecruiter) || 
+        else if (player.getOption(autoPickRecruiter) ||
             numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
@@ -2266,7 +2242,7 @@ public final class Game
     {
         String name = player.getName();
         String selectedMarkerId;
-        if (player.getOption(autoPickMarker))
+        if (player.getOption(autoPlay) || player.getOption(autoPickMarker))
         {
             selectedMarkerId = player.getFirstAvailableMarker();
         }
@@ -2330,7 +2306,7 @@ public final class Game
 
 
     public static final int ARCHES_AND_ARROWS = -1;
-    public static final int ARROWS_ONLY = -2; 
+    public static final int ARROWS_ONLY = -2;
     public static final int NOWHERE = -1;
 
 
@@ -2764,6 +2740,7 @@ public final class Game
                 }
 
                 SplitLegion.splitLegion(masterFrame, legion,
+                    player.getOption(autoPlay) ||
                     player.getOption(autoPickMarker));
 
                 updateStatusScreen();
