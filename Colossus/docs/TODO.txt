@@ -51,8 +51,6 @@ EASY Compute numLegions, numMarkers, numCreatures, titan power, total point valu
 
 EASY Indicate which players have titan teleport in StatusScreen.
 
-EASY Do not scale chits in CreatureCollectionView
-
 EASY Disable "AIs stop when humans dead" if no human players at start of game.
 
 EASY Colorize chat window.

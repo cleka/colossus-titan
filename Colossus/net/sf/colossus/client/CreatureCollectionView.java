@@ -23,6 +23,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
     private Client client;
     private Point location;
     private Dimension size;
+    private static final int fixedChitSize = 60;
 
     /** hash by creature name to the label that displays the bottom counts */
     Map countMap = new HashMap();
@@ -112,9 +113,13 @@ class CreatureCollectionView extends KDialog implements WindowListener
                                 
             setBorder(BorderFactory.createLineBorder(Color.black));
             if (!(name.equals("Titan")))
-                chit = new Chit(4 * Scale.get(), name, this);
+            {
+                chit = new Chit(fixedChitSize, name, this);
+            }
             else
-                chit = new Chit(4 * Scale.get(), "Titan-0-Black", this);
+            {
+                chit = new Chit(fixedChitSize, "Titan-0-Black", this);
+            }
             chitMap.put(name, chit);
             label = new JLabel(baseString, SwingConstants.CENTER);
             topLabel =
@@ -282,18 +287,6 @@ class CreatureCollectionView extends KDialog implements WindowListener
         saveWindow.saveSize(size);
     }
 
-    void rescale()
-    {
-        getContentPane().removeAll();
-        JPanel panel = makeCreaturePanel();
-        getContentPane().add(panel, BorderLayout.CENTER);
-        getContentPane().add(legendLabel, BorderLayout.SOUTH);
-        pack();
-        upperRightCorner();
-        location = getLocation();
-        update();
-    }
-
     public void windowClosing(WindowEvent e)
     {
         dispose();
@@ -304,16 +297,16 @@ class CreatureCollectionView extends KDialog implements WindowListener
         java.util.List creatures = Creature.getCreatures();
         // default : 5 creatures wide 
         
-        int minSingleX = (4 * Scale.get()) + 8;
+        int minSingleX = fixedChitSize + 8;
         if (minSingleX < (int)baseLabel.getPreferredSize().getWidth() + 8)
         {
             minSingleX = (int)baseLabel.getPreferredSize().getWidth() + 8;
         }
 
         int minX = minSingleX * 5;
-        int minY = (((4 * Scale.get()) + 8 +
+        int minY = ((fixedChitSize + 8 +
                      (2 * (int)baseLabel.getPreferredSize().getHeight())) *
-                    ((creatures.size() + 4 ) / 5)) + 60;
+                    ((creatures.size() + 4 ) / 5)) + fixedChitSize;
         
         return new Dimension(minX, minY);
     }

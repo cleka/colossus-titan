@@ -320,10 +320,7 @@ public final class Client implements IClient
         }
         if (caretakerDisplay != null)
         {
-            /* CreatureCollectionView doesn't repaint the Chit
-               unless rescale()ed... so we call rescale instead
-               of repaint. */
-            caretakerDisplay.rescale();
+            caretakerDisplay.repaint();
         }
         if (board != null)
         {
@@ -358,10 +355,6 @@ public final class Client implements IClient
         if (map != null)
         {
             map.rescale();
-        }
-        if (caretakerDisplay != null)
-        {
-            caretakerDisplay.rescale();
         }
         repaintAllWindows();
     }
