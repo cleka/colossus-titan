@@ -11,6 +11,7 @@ class MasterHex
 {
     public static final double SQRT3 = Math.sqrt(3.0);
     public static final double RAD_TO_DEG = 180 / Math.PI;
+
     private int[] xVertex = new int[6];
     private int[] yVertex = new int[6];
     private Polygon p;
@@ -20,11 +21,11 @@ class MasterHex
     private double l;              // hexside length
     private int numLegions = 0;
     private Legion [] legions = new Legion[3];
+    private boolean selected;
+    private MasterBoard board;
 
     MasterHex [] neighbor = new MasterHex[6];
-    private boolean selected;
     
-
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
     // Swamp, Tower, tundra, Woods
@@ -48,11 +49,12 @@ class MasterHex
     static final int ARROWS = 4;
 
 
-    MasterHex(int cx, int cy, int scale, boolean inverted)
+    MasterHex(int cx, int cy, int scale, boolean inverted, MasterBoard board)
     {
         selected = false;
         this.inverted = inverted;
         this.scale = scale;
+        this.board = board;
         l = scale / 3.0;
         if (inverted)
         {
@@ -211,6 +213,13 @@ class MasterHex
                                 entranceType[i]);
             }
         }
+    }
+
+
+    void repaint()
+    {
+        board.repaint(rectBound.x, rectBound.y, rectBound.width, 
+            rectBound.height);
     }
 
 
@@ -476,6 +485,19 @@ class MasterHex
     }
 
 
+    Legion getLegion(int i)
+    {
+        if (i < 0 || i > numLegions - 1)
+        {
+            return null;
+        }
+        else
+        {
+            return legions[i];
+        }
+    }
+
+
     int getNumFriendlyLegions(Player player)
     {
         int count = 0;
@@ -601,6 +623,14 @@ class MasterHex
                 }
                 legions[numLegions - 1] = null;
                 numLegions--;
+
+                // Write over the bounding area of the hex with
+                // the background color, to prevent artifacts from
+                // chits that used to hang outside the hex boundary.
+                if (numLegions >= 1)
+                {
+                    board.setEraseFlag();
+                }
 
                 // Reposition all legions within the hex.
                 alignLegions();
