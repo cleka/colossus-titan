@@ -58,8 +58,8 @@ public final class ResourceLoader
                 String shortClassName = className.substring(index + 1);
                 if (index == -1)
                 {
-                    Log.error("Loading of class \"" + className + "\" failed ("
-                            + "no dot in class name" + ")");
+                    Log.error("Loading of class \"" + className + "\" failed (" +
+                            "no dot in class name" + ")");
                     return null;
                 }
                 InputStream classDataIS =
@@ -1302,8 +1302,8 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            Log.error("Loading of class \"" + className + "\" failed ("
-                    + e + ")");
+            Log.error("Loading of class \"" + className + "\" failed (" + e +
+                    ")");
         }
         Constructor c = null;
         Object o = null;
@@ -1416,6 +1416,12 @@ public final class ResourceLoader
         }
     }
 
+    static boolean useSVG = false;
+    public static void setUseSVG(boolean useSVG)
+    {
+        ResourceLoader.useSVG = useSVG;
+    }
+
     /**
      * Try loading the SVG file with the given filename in the given path
      * as an Image.
@@ -1426,7 +1432,7 @@ public final class ResourceLoader
     private static Image tryLoadSVGImageFromFile(String filename, String path,
             int width, int height)
     {
-        if (!hasBatik)
+        if (!hasBatik || !useSVG)
         {
             return null;
         }

@@ -51,6 +51,7 @@ public final class Options
     public static final String noTitanTeleport = "No Titan Teleport";
 
     // Display options (client only)
+    public static final String useSVG = "Use SVG chits";
     public static final String stealFocus = "Steal focus";
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";
@@ -64,7 +65,6 @@ public final class Options
     public static final String showAllRecruitChits = "Show all recruit Chits";
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
-    public static final String serverName = "Server name";
 
     // Window locations and sizes (client only)
     public static final String locX = "Location X";
@@ -100,6 +100,7 @@ public final class Options
     // General per-player options (client only)
     public static final String favoriteColors = "Favorite colors";
     public static final String favoriteLookFeel = "Favorite Look And Feel";
+    public static final String serverName = "Server name";
 
     private Properties props = new Properties();
     private String owner;      // playerName, or Constants.optionsServerName

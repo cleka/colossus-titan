@@ -563,6 +563,7 @@ public final class MasterBoard extends JPanel
         graphicsMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(graphicsMenu);
 
+        addCheckBox(graphicsMenu, Options.useSVG, KeyEvent.VK_S);
         addCheckBox(graphicsMenu, Options.stealFocus, KeyEvent.VK_F);
         addCheckBox(graphicsMenu, Options.showCaretaker, KeyEvent.VK_C);
         addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
@@ -693,9 +694,13 @@ public final class MasterBoard extends JPanel
                     GUIMasterHex hex = new GUIMasterHex(plainHexArray[i][j]);
                     hex.init(
                             cx + 4 * i * scale,
-                            (int)Math.round(cy + (3 * j + ((i + boardParity) & 1)
-                            * (1 + 2 * (j / 2)) + ((i + 1 + boardParity) & 1)
-                            * 2 * ((j + 1) / 2)) * Hex.SQRT3 * scale),
+                            (int)Math.round(cy +
+                                    (3 * j +
+                                    ((i + boardParity) & 1) * (1 + 2 * (j / 2)) +
+                                    ((i + 1 + boardParity) & 1) * 2 *
+                                    ((j + 1) / 2)) *
+                            Hex.SQRT3 *
+                            scale),
                             scale,
                             isHexInverted(i, j),
                             this);

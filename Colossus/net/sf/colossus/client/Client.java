@@ -533,6 +533,10 @@ public final class Client implements IClient
         {
             setType(value);
         }
+        else if (optname.equals(Options.useSVG))
+        {
+            ResourceLoader.setUseSVG(bval);
+        }
     }
 
     /** Save player options to a file. */
