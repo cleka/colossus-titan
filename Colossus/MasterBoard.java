@@ -56,9 +56,9 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         super("MasterBoard");
 
-        scale = 15;
-        int cx = 6 * scale;
-        int cy = 6 * scale;
+        scale = 17;
+        int cx = 3 * scale;
+        int cy = 2 * scale;
 
         pack();
         setSize(69 * scale, 69 * scale);
@@ -623,6 +623,28 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
+    void rescale(int scale)
+    {
+        this.scale = scale;
+        int cx = 3 * scale;
+        int cy = 2 * scale;
+
+        setSize(69 * scale, 69 * scale);
+
+        // Initialize hexes
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    h[i][j].rescale(cx, cy, scale);
+                }
+            }
+        }
+    }
+
+
     public void mouseDragged(MouseEvent e)
     {
         if (tracking != -1)
@@ -845,15 +867,6 @@ class MasterHex
     int[] exitType = new int[6];
     int[] entranceType = new int[6];
 
-    private int x0;                // first focus point
-    private int y0;
-    private int x1;                // second focus point
-    private int y1;
-    private int x2;                // center point
-    private int y2;
-    private double theta;          // gate angle
-    private int x[] = new int[4];  // gate points
-    private int y[] = new int[4];
 
 
     MasterHex(int cx, int cy, int scale, boolean inverted)
@@ -898,6 +911,53 @@ class MasterHex
         // one pixel short of the area actually painted.
         rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] -
                         xVertex[5] + 1, yVertex[3] - yVertex[0] + 1);
+    }
+
+
+    void rescale(int cx, int cy, int scale)
+    {
+        this.scale = scale;
+        l = scale / 3.0;
+        if (inverted)
+        {
+            xVertex[0] = cx - scale;
+            yVertex[0] = cy;
+            xVertex[1] = cx + 3 * scale;
+            yVertex[1] = cy;
+            xVertex[2] = cx + 4 * scale;
+            yVertex[2] = cy + (int) Math.round(SQRT3 * scale);
+            xVertex[3] = cx + 2 * scale;
+            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
+            xVertex[4] = cx;
+            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
+            xVertex[5] = cx - 2 * scale;
+            yVertex[5] = cy + (int) Math.round(SQRT3 * scale);
+        }
+        else
+        {
+            xVertex[0] = cx;
+            yVertex[0] = cy;
+            xVertex[1] = cx + 2 * scale;
+            yVertex[1] = cy;
+            xVertex[2] = cx + 4 * scale;
+            yVertex[2] = cy + (int) Math.round(2 * SQRT3 * scale);
+            xVertex[3] = cx + 3 * scale;
+            yVertex[3] = cy + (int) Math.round(3 * SQRT3 * scale);
+            xVertex[4] = cx - scale;
+            yVertex[4] = cy + (int) Math.round(3 * SQRT3 * scale);
+            xVertex[5] = cx - 2 * scale;
+            yVertex[5] = cy + (int) Math.round(2 * SQRT3 * scale);
+        }
+
+        p.xpoints = xVertex;
+        p.ypoints = yVertex;
+
+        // Add 1 to width and height because Java rectangles come up
+        // one pixel short.
+        rectBound.x =  xVertex[5];
+        rectBound.y =  yVertex[0];
+        rectBound.width = xVertex[2] - xVertex[5] + 1;
+        rectBound.height = yVertex[3] - yVertex[0] + 1;
     }
 
 
@@ -957,127 +1017,8 @@ class MasterHex
 
             if (exitType[i] != 0)
             {
-                x0 = xVertex[i] + ((xVertex[n] - xVertex[i]) / 6);
-                y0 = yVertex[i] + ((yVertex[n] - yVertex[i]) / 6);
-                x1 = xVertex[i] + ((xVertex[n] - xVertex[i]) / 3);
-                y1 = yVertex[i] + ((yVertex[n] - yVertex[i]) / 3);
-
-                theta = Math.atan2(yVertex[n] - yVertex[i],
-                              xVertex[n] - xVertex[i]);
-
-                switch(exitType[i])
-                {
-                    case 1:   // block
-                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                        x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                        y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                        x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                        y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                        x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                        y[3] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                        g.setColor(java.awt.Color.white);
-                        g.fillPolygon(x, y, 4);
-                        g.setColor(java.awt.Color.black);
-                        g.drawPolyline(x, y, 4);
-                        break;
-
-                    case 2:   // arch
-                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                        x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                        y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                        x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                        y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                        x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                        y[3] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                        x2 = (int) Math.round((x0 + x1) / 2);
-                        y2 = (int) Math.round((y0 + y1) / 2);
-                        Rectangle rect = new Rectangle();
-                        rect.x = x2 - (int) Math.round(l);
-                        rect.y = y2 - (int) Math.round(l);
-                        rect.width = (int) (2 * Math.round(l));
-                        rect.height = (int) (2 * Math.round(l));
-                        
-                        g.setColor(java.awt.Color.white);
-                        g.fillOval(rect.x, rect.y, rect.width, rect.height);
-                        g.setColor(java.awt.Color.black);
-                        g.drawOval(rect.x, rect.y, rect.width, rect.height);
-                        
-                        x[2] = x[0];
-                        y[2] = y[0];
-                        x[0] = x1;
-                        y[0] = y1;
-                        x[1] = x[3];
-                        y[1] = y[3];
-                        x[3] = x0;
-                        y[3] = y0;
-                        g.setColor(java.awt.Color.white);
-                        g.fillPolygon(x, y, 4);
-                        g.setColor(java.awt.Color.black);
-                        g.drawLine(x1, y1, x[1], y[1]);
-                        g.drawLine(x[2], y[2], x0, y0);
-                        break;
-
-                    case 3:   // 1 arrow
-                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                        x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
-                        y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
-                        x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                        y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                        g.setColor(java.awt.Color.white);
-                        g.fillPolygon(x, y, 3);
-                        g.setColor(java.awt.Color.black);
-                        g.drawPolyline(x, y, 3);
-                        break;
-
-                    case 4:   // 3 arrows
-                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                        x[1] = (int) Math.round((x0 + x1) / 2 + l * 
-                               Math.sin(theta));
-                        y[1] = (int) Math.round((y0 + y1) / 2 - l * 
-                               Math.cos(theta));
-                        x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                        y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                        g.setColor(java.awt.Color.white);
-                        g.fillPolygon(x, y, 3);
-                        g.setColor(java.awt.Color.black);
-                        g.drawPolyline(x, y, 3);
-
-                        for (int j = 1; j < 3; j++)
-                        {
-                            x0 = xVertex[i] + ((xVertex[n] - xVertex[i]) *
-                                 (2 + 3 * j) / 12);
-                            y0 = yVertex[i] + ((yVertex[n] - yVertex[i]) *
-                                 (2 + 3 * j) / 12);
-
-                            x1 = xVertex[i] + ((xVertex[n] - xVertex[i]) *
-                                 (4 + 3 * j) / 12);
-                            y1 = yVertex[i] + ((yVertex[n] - yVertex[i]) *
-                                 (4 + 3 * j) / 12);
-
-                            x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                            y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                            x[1] = (int) Math.round((x0 + x1) / 2 + l * 
-                                   Math.sin(theta));
-                            y[1] = (int) Math.round((y0 + y1) / 2 - l * 
-                                   Math.cos(theta));
-                            x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                            y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-    
-                            g.setColor(java.awt.Color.white);
-                            g.fillPolygon(x, y, 3);
-                            g.setColor(java.awt.Color.black);
-                            g.drawPolyline(x, y, 3);
-                        }
-                        break;
-                }
+                drawGate(g, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
+                                exitType[i]);
             }
 
             // Draw entrances
@@ -1087,130 +1028,150 @@ class MasterHex
 
             if (entranceType[i] != 0)
             {
-                x0 = xVertex[n] + ((xVertex[i] - xVertex[n]) / 6);
-                y0 = yVertex[n] + ((yVertex[i] - yVertex[n]) / 6);
-                x1 = xVertex[n] + ((xVertex[i] - xVertex[n]) / 3);
-                y1 = yVertex[n] + ((yVertex[i] - yVertex[n]) / 3);
-
-                theta = Math.atan2(yVertex[i] - yVertex[n], xVertex[i] - 
-                        xVertex[n]);
-
-                switch(entranceType[i])
-                {
-                    case 1:   // block
-                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                        x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                        y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                        x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                        y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                        x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                        y[3] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                        g.setColor(java.awt.Color.white);
-                        g.fillPolygon(x, y, 4);
-                        g.setColor(java.awt.Color.black);
-                        g.drawPolyline(x, y, 4);
-                        break;
-
-                    case 2:   // arch
-                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                        x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                        y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                        x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                        y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                        x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                        y[3] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                        x2 = (int) Math.round((x0 + x1) / 2);
-                        y2 = (int) Math.round((y0 + y1) / 2);
-                        Rectangle rect = new Rectangle();
-                        rect.x = x2 - (int) Math.round(l);
-                        rect.y = y2 - (int) Math.round(l);
-                        rect.width = (int) (2 * Math.round(l));
-                        rect.height = (int) (2 * Math.round(l));
-
-                        g.setColor(java.awt.Color.white);
-                        g.fillOval(rect.x, rect.y, rect.width, rect.height);
-                        g.setColor(java.awt.Color.black);
-                        g.drawOval(rect.x, rect.y, rect.width, rect.height);
-
-                        x[2] = x[0];
-                        y[2] = y[0];
-                        x[0] = x1;
-                        y[0] = y1;
-                        x[1] = x[3];
-                        y[1] = y[3];
-                        x[3] = x0;
-                        y[3] = y0;
-                        g.setColor(java.awt.Color.white);
-                        g.fillPolygon(x, y, 4);
-                        g.setColor(java.awt.Color.black);
-                        g.drawLine(x1, y1, x[1], y[1]);
-                        g.drawLine(x[2], y[2], x0, y0);
-                        break;
-
-                    case 3:   // 1 arrow
-                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                        x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
-                        y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
-                        x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                        y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                        g.setColor(java.awt.Color.white);
-                        g.fillPolygon(x, y, 3);
-                        g.setColor(java.awt.Color.black);
-                        g.drawPolyline(x, y, 3);
-                        break;
-
-                    case 4:   // 3 arrows
-                        x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                        y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                        x[1] = (int) Math.round((x0 + x1) / 2 + l * 
-                               Math.sin(theta));
-                        y[1] = (int) Math.round((y0 + y1) / 2 - l *
-                               Math.cos(theta));
-                        x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                        y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                        g.setColor(java.awt.Color.white);
-                        g.fillPolygon(x, y, 3);
-                        g.setColor(java.awt.Color.black);
-                        g.drawPolyline(x, y, 3);
-                    
-                        for (int j = 1; j < 3; j++)
-                        {
-                            x0 = xVertex[n] + ((xVertex[i] -
-                                 xVertex[n]) * (2 + 3 * j) / 12);
-                            y0 = yVertex[n] + ((yVertex[i] -
-                                 yVertex[n]) * (2 + 3 * j) / 12);
-
-                            x1 = xVertex[n] + ((xVertex[i] -
-                                 xVertex[n]) * (4 + 3 * j) / 12);
-                            y1 = yVertex[n] + ((yVertex[i] -
-                                 yVertex[n]) * (4 + 3 * j) / 12);
-
-                            x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                            y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                            x[1] = (int) Math.round((x0 + x1) / 2 + l * 
-                                   Math.sin(theta));
-                            y[1] = (int) Math.round((y0 + y1) / 2 - l *
-                                   Math.cos(theta));
-                            x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                            y[2] = (int) Math.round(y1 + l * Math.cos(theta));
-
-                            g.setColor(java.awt.Color.white);
-                            g.fillPolygon(x, y, 3);
-                            g.setColor(java.awt.Color.black);
-                            g.drawPolyline(x, y, 3);
-                        }
-                        break;
-                }
+                drawGate(g, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
+                                entranceType[i]);
             }
         }
     }
+
+
+    void drawGate(Graphics g, int vx1, int vy1, int vx2, int vy2, int gateType)
+    {
+        int x0;                // first focus point
+        int y0;
+        int x1;                // second focus point
+        int y1;
+        int x2;                // center point
+        int y2;
+        double theta;          // gate angle
+        int x[] = new int[4];  // gate points
+        int y[] = new int[4];
+
+        x0 = vx1 + (vx2 - vx1) / 6;
+        y0 = vy1 + (vy2 - vy1) / 6;
+        x1 = vx1 + (vx2 - vx1) / 3;
+        y1 = vy1 + (vy2 - vy1) / 3;
+
+        theta = Math.atan2(vy2 - vy1, vx2 - vx1);
+
+        switch(gateType)
+        {
+            case 1:   // block
+                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                x[1] = (int) Math.round(x0 + l * Math.sin(theta));
+                y[1] = (int) Math.round(y0 - l * Math.cos(theta));
+                x[2] = (int) Math.round(x1 + l * Math.sin(theta));
+                y[2] = (int) Math.round(y1 - l * Math.cos(theta));
+                x[3] = (int) Math.round(x1 - l * Math.sin(theta));
+                y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                g.setColor(java.awt.Color.white);
+                g.fillPolygon(x, y, 4);
+                g.setColor(java.awt.Color.black);
+                g.drawPolyline(x, y, 4);
+                break;
+
+            case 2:   // arch
+                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                x[1] = (int) Math.round(x0 + l * Math.sin(theta));
+                y[1] = (int) Math.round(y0 - l * Math.cos(theta));
+                x[2] = (int) Math.round(x1 + l * Math.sin(theta));
+                y[2] = (int) Math.round(y1 - l * Math.cos(theta));
+                x[3] = (int) Math.round(x1 - l * Math.sin(theta));
+                y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                x2 = (int) Math.round((x0 + x1) / 2);
+                y2 = (int) Math.round((y0 + y1) / 2);
+                Rectangle rect = new Rectangle();
+                rect.x = x2 - (int) Math.round(l);
+                rect.y = y2 - (int) Math.round(l);
+                rect.width = (int) (2 * Math.round(l));
+                rect.height = (int) (2 * Math.round(l));
+                
+                g.setColor(java.awt.Color.white);
+                // Draw a bit more than a semicircle, to clean edge.
+                g.fillArc(rect.x, rect.y, rect.width, rect.height,
+                    (int) Math.round((2 * Math.PI - theta) * 
+                    RAD_TO_DEG - 10), 200);
+                g.setColor(java.awt.Color.black);
+                g.drawArc(rect.x, rect.y, rect.width, rect.height,
+                    (int) Math.round((2 * Math.PI - theta) * RAD_TO_DEG), 
+                    180);
+                        
+                x[2] = x[0];
+                y[2] = y[0];
+                x[0] = x1;
+                y[0] = y1;
+                x[1] = x[3];
+                y[1] = y[3];
+                x[3] = x0;
+                y[3] = y0;
+                g.setColor(java.awt.Color.white);
+                g.fillPolygon(x, y, 4);
+                g.setColor(java.awt.Color.black);
+                g.drawLine(x1, y1, x[1], y[1]);
+                g.drawLine(x[2], y[2], x0, y0);
+                break;
+
+            case 3:   // 1 arrow
+                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                    Math.sin(theta));
+                y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                    Math.cos(theta));
+                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                g.setColor(java.awt.Color.white);
+                g.fillPolygon(x, y, 3);
+                g.setColor(java.awt.Color.black);
+                g.drawPolyline(x, y, 3);
+                break;
+
+            case 4:   // 3 arrows
+                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                    Math.sin(theta));
+                y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                       Math.cos(theta));
+                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                g.setColor(java.awt.Color.white);
+                g.fillPolygon(x, y, 3);
+                g.setColor(java.awt.Color.black);
+                g.drawPolyline(x, y, 3);
+
+                for (int j = 1; j < 3; j++)
+                {
+                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
+                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
+
+                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
+                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
+
+                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                    x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                           Math.sin(theta));
+                            y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                           Math.cos(theta));
+                    x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+    
+                    g.setColor(java.awt.Color.white);
+                    g.fillPolygon(x, y, 3);
+                    g.setColor(java.awt.Color.black);
+                    g.drawPolyline(x, y, 3);
+                }
+                break;
+        }
+    }
+
 
 
     boolean select(Point point)
