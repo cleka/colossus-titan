@@ -52,12 +52,19 @@ all: jar
 
 # Find target files
 
-sources = $(wildcard *.java) \
+allsources = $(wildcard *.java) \
 	$(wildcard net/sf/colossus/client/*.java) \
 	$(wildcard net/sf/colossus/server/*.java) \
 	$(wildcard net/sf/colossus/util/*.java) \
 	$(wildcard net/sf/colossus/parser/*.java) \
 	$(wildcard com/werken/opt/*.java)
+testsources= $(wildcard *Test.java) \
+	$(wildcard net/sf/colossus/client/*Test.java) \
+	$(wildcard net/sf/colossus/server/*Test.java) \
+	$(wildcard net/sf/colossus/util/*Test.java) \
+	$(wildcard net/sf/colossus/parser/*Test.java) \
+	$(wildcard com/werken/opt/*Test.java)
+sources=$(filter-out $(testsources), $(allsources))
 
 CLASS_FILES = $(sources:%.java=%.class)
 
@@ -157,7 +164,7 @@ BBMANIFEST=META-INF/datatools/BattlelandsBuilder/MANIFEST.MF
 
 BRMANIFEST=META-INF/datatools/BattlelandsRandomizer/MANIFEST.MF
 
-datatools: $(BBJAR) $(BRJAR)
+tools: $(BBJAR) $(BRJAR)
 
 
 $(BBJAR): net/sf/colossus/parser/BattlelandLoader.java \
