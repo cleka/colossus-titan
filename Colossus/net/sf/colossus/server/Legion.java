@@ -245,8 +245,8 @@ final class Legion implements Comparable
         newLegion.recruitName = recruitName;
         newLegion.battleTally = battleTally;
         newLegion.teleportingLord = teleportingLord;
-
-        // XXX Make sure to copy entry side and teleport info
+        newLegion.entrySide = entrySide;
+        newLegion.teleported = teleported;
 
         return newLegion;
     }

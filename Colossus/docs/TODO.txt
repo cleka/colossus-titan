@@ -17,11 +17,6 @@ Add a window that shows the recruiting tree.
 
 Allow dragging chits in addition to clicking source and destination.
 
-Eliminate persistent legion.hexInfo and instead return a temporary
-   object containing all the entry sides and teleport possibilities
-   along with the possible hexes that the legion can move to.
-Highlight teleport and normal moves differently, and show entry sides.
-
 Confirmation prompt to avoid skipping recruits?
 
 Add UI for players to specify favorite colors.
