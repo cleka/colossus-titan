@@ -54,7 +54,8 @@
                  CreatureLoader,
                  StrategicMapLoader,
                  TerrainRecruitLoader,
-                 VariantLoader"
+                 VariantLoader,
+                 BattlelandRandomizerLoader"
         description = "Create .java files from .jj files with javacc">
 </target>
 
@@ -84,6 +85,12 @@
 
 <target name="VariantLoader">
         <javacc target="net/sf/colossus/parser/VariantLoader.jj"
+                javacchome="${env.JAVACC_HOME}"
+        />
+</target>
+
+<target name="BattlelandRandomizerLoader">
+        <javacc target="net/sf/colossus/parser/BattlelandRandomizerLoader.jj"
                 javacchome="${env.JAVACC_HOME}"
         />
 </target>
