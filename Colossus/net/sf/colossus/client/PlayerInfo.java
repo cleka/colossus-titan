@@ -86,10 +86,7 @@ public final class PlayerInfo
         buf = (String)data.remove(0);
         setMulligansLeft(Integer.parseInt(buf));
 
-        if (!data.isEmpty())
-        {
-            setMarkersAvailable(data);
-        }
+        setMarkersAvailable(data);
         
         /*
         Log.debug("Player info " + infoString);
@@ -183,7 +180,10 @@ public final class PlayerInfo
     void setMarkersAvailable(Collection markersAvailable)
     {
         this.markersAvailable.clear();
-        this.markersAvailable.addAll(markersAvailable);
+        if (!markersAvailable.isEmpty())
+        {
+            this.markersAvailable.addAll(markersAvailable);
+        }
     }
 
     void addMarkerAvailable(String markerId)

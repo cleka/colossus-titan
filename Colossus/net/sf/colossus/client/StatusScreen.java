@@ -32,7 +32,6 @@ final class StatusScreen extends KDialog implements WindowListener
 
     private JLabel[] nameLabel;
     private JLabel[] towerLabel;
-    private JLabel[] colorLabel;
     private JLabel[] elimLabel;
     private JLabel[] legionsLabel;
     private JLabel[] markersLabel;
@@ -103,12 +102,11 @@ final class StatusScreen extends KDialog implements WindowListener
 
         JPanel gridPane = new JPanel();
         contentPane.add(gridPane);
-        gridPane.setLayout(new GridLayout(9, 0));
+        gridPane.setLayout(new GridLayout(8, 0));
         gridPane.setBorder(BorderFactory.createEtchedBorder());
 
         nameLabel = new JLabel[numPlayers];
         towerLabel = new JLabel[numPlayers];
-        colorLabel = new JLabel[numPlayers];
         elimLabel = new JLabel[numPlayers];
         legionsLabel = new JLabel[numPlayers];
         markersLabel = new JLabel[numPlayers];
@@ -130,14 +128,6 @@ final class StatusScreen extends KDialog implements WindowListener
             towerLabel[i] = new JLabel();
             towerLabel[i].setOpaque(true);
             gridPane.add(towerLabel[i]);
-        }
-
-        gridPane.add(new JLabel("Color"));
-        for (int i = 0; i < numPlayers; i++)
-        {
-            colorLabel[i] = new JLabel();
-            colorLabel[i].setOpaque(true);
-            gridPane.add(colorLabel[i]);
         }
 
         gridPane.add(new JLabel("Elim"));
@@ -220,13 +210,28 @@ final class StatusScreen extends KDialog implements WindowListener
         setVisible(true);
     }
 
-    private void setPlayerLabelBackground(int i, Color color)
+    private void setPlayerLabelColors(JLabel label,
+                                      Color  bgColor,
+                                      Color  fgColor)
     {
-        if (nameLabel[i].getBackground() != color)
+        if (label.getBackground() != bgColor)
+        {
+            label.setBackground(bgColor);
+        }
+        if (label.getForeground() != fgColor)
+        {
+            label.setForeground(fgColor);
+        }
+    }
+
+
+    private void setPlayerLabelBackground(int   i,
+                                          Color color)
+    {
+        if (towerLabel[i].getBackground() != color)
         {
             nameLabel[i].setBackground(color);
             towerLabel[i].setBackground(color);
-            colorLabel[i].setBackground(color);
             elimLabel[i].setBackground(color);
             legionsLabel[i].setBackground(color);
             markersLabel[i].setBackground(color);
@@ -260,20 +265,42 @@ final class StatusScreen extends KDialog implements WindowListener
         for (int i = 0; i < numPlayers; i++)
         {
             PlayerInfo info = client.getPlayerInfo(i);
-            Color color;
+            Color color,
+                  bgcolor,
+                  fgcolor;
+
             if (info.isDead())
             {
-                color = Color.red;
+                color   = Color.red;
+                bgcolor = Color.red;
+                fgcolor = Color.black;
             }
-            else if (oracle.getActivePlayerName().equals(info.getName()))
+            else 
             {
-                color = Color.yellow;
+                if (oracle.getActivePlayerName().equals(info.getName()))
+                {
+                    color = Color.yellow;
+                }
+                else
+                {
+                    color = Color.lightGray;
+                }
+
+                if (!info.getColor().equals("null"))
+                {
+                    bgcolor = PickColor.getBackgroundColor(info.getColor());
+                    fgcolor = PickColor.getForegroundColor(info.getColor());
+                }
+                else
+                {
+                    bgcolor = Color.lightGray;
+                    fgcolor = Color.black;
+                }
             }
-            else
-            {
-                color = Color.lightGray;
-            }
-            setPlayerLabelBackground(i, color);
+
+            setPlayerLabelBackground(i, color); 
+            setPlayerLabelColors(nameLabel[i],  bgcolor, fgcolor);
+
 
             nameLabel[i].setText(info.getName());
             if (info.canTitanTeleport())
@@ -285,7 +312,6 @@ final class StatusScreen extends KDialog implements WindowListener
                 nameLabel[i].setText(info.getName());
             }
             towerLabel[i].setText("" + info.getTower());
-            colorLabel[i].setText(info.getColor());
             elimLabel[i].setText(info.getPlayersElim());
             legionsLabel[i].setText("" + info.getNumLegions());
             markersLabel[i].setText("" + info.getNumMarkers());

@@ -301,6 +301,13 @@ public class SimpleAI implements AI
 
         String newMarkerId = pickMarker(player.getMarkersAvailable(),
                 player.getShortColor());
+
+        if (newMarkerId == null)
+        {
+            Log.debug("Not splitting " + legion + 
+                      " because no markers available");
+            return;
+        }
         StringBuffer results = new StringBuffer();
         List creatures = chooseCreaturesToSplitOut(legion);
         Iterator it = creatures.iterator();

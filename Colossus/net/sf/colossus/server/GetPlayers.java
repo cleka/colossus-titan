@@ -218,7 +218,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         button2.addActionListener(this);
 
         JButton button3 = new JButton(Constants.runClient);
-        button2.setMnemonic(KeyEvent.VK_C);
+        button3.setMnemonic(KeyEvent.VK_C);
         gamePane.add(button3);
         button3.addActionListener(this);
 
@@ -424,7 +424,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private void doRunClient()
     {
-        setVisible(false);
         options.setOption(Constants.runClient, true);
         dispose();
     }
