@@ -32,7 +32,7 @@ Griffon    	5     4     false true  false false false true  false false false fa
 Wyvern     	7     3     false true  false false true  false false false false false false false false false false false    18    Wyverns colossusPink
 Unicorn    	6     4     false false false false false false true  false false false false false false false false false    12    Unicorns hydraOrange
 Ent        	12    3     false false false false false false false false false false false false false false false false    8     Ents ogreRed
-Dragon     	9     3     true  true  false false false false true  false false false true  false false false false false    18    Dragons red
+Dragon     	9     3     true  true  false false false false true  true false false false  false false false false false    18    Dragons red
 Giant      	7     4     true  false false true  false false false false false false false false false false false false    18    Giants giantBlue
 Hydra      	10    3     true  false false false true  true  false false false false false false false false false false    10    Hydrae hydraOrange
 Chimera    	16    3     false false false false true  true  false false false false false false false false false false    6     Chimerae hydraOrange

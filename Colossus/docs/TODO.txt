@@ -32,14 +32,10 @@ Bug: Got two "All humans eliminated" dialogs -- one for human and one
    for last AI.  (With stop when all humans eliminated option set.)
    Eliminated the dialog.  Put back?
 
-Remember IP addresses from past games.
-
 Disable "AIs stop when humans dead" if no human players at start of game.
 
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 
-
-More AI delays within phases (between moves, strikes, etc.). 
 
 Should be able to clear recruitChits in any phase.  Move to Graphics menu?
 
@@ -60,8 +56,6 @@ When getting both a PickRecruit and an AcquireAngel after a battle,
    Or make PickRecruit non-modal.
 
 Colorize chat window.
-
-Colorize StatusScreen.
 
 Observer clients.
 
@@ -97,8 +91,7 @@ ShowLegion on mouseover, not click, with permanent dialog.
 Show zoomed area around mouse cursor in a small window, for Abyssal9.
 
 Highlight appropriate engagement hex while engagement is being resolved.
-   (Except during angel summoning.)
-
+   (Except during angel summoning.)  Also just after battle, while showing:
 Optional post-engagement status dialog.
 
 Add confirm dialogs (for conceding with titan, skipping recruits, ...)
@@ -112,17 +105,13 @@ XML game log, replacing flat-file savegames.  Need to find a small XML
 
 Write more design docs.
 
-Add SetupBattle dialog, to allow setting up standalone battles.  
+Add SetupBattle dialog, to allow setting up standalone battles.
    (terrain, entry side, creatures in attacking and defending legions,
    angel/archangel available to summon, recruits available for terrain
    type, player scores for titan power.)
 
 Add a ShowLegionMarkers window that shows each player's remaining 
    legion markers.
-
-Improve mapping of terrain types, creature nativity, and creature
-   recruiting potential so that the AI can easily take these into
-   account.
 
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.

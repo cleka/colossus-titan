@@ -40,7 +40,7 @@ public final class Options
     public static final String noTitanTeleport = "No Titan Teleport";
     
 
-    // Will add player numbers 0-5 to the the of these.
+    // Will add player numbers 0-5 to the end of these.
     public static final String playerName = "Player name ";
     public static final String playerType = "Player type ";
 
@@ -55,6 +55,7 @@ public final class Options
     public static final String noBaseColor = "Use black overlay on Chits";
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
+    public static final String serverName = "Server name";
 
     // Window locations and sizes
     public static final String locX = "Location X";

@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import com.werken.opt.Options;
 import com.werken.opt.Option;
 import com.werken.opt.CommandLine;
 
@@ -25,9 +24,10 @@ import net.sf.colossus.util.KDialog;
 public class StartClient extends KDialog implements WindowListener,
     ActionListener
 {
-    String playerName;
-    String hostname;
+    static String playerName;
+    static String hostname;
     int port;
+    static net.sf.colossus.util.Options clientOptions;
 
     JComboBox nameBox; 
     JComboBox hostBox; 
@@ -56,6 +56,16 @@ public class StartClient extends KDialog implements WindowListener,
         Set hostChoices = new TreeSet();
         hostChoices.add(hostname);
         hostChoices.add(Constants.localhost);
+        loadClientOptions();
+        for (int i = 0; i < Constants.numSavedServerNames; i++)
+        {
+            String serverName = clientOptions.getStringOption(
+                net.sf.colossus.util.Options.serverName + i);
+            if (serverName != null)
+            {
+                hostChoices.add(serverName);
+            }
+        }
         hostBox = new JComboBox(new Vector(hostChoices));
         hostBox.setEditable(true);
         hostBox.addActionListener(this);
@@ -113,6 +123,7 @@ public class StartClient extends KDialog implements WindowListener,
             if (source == nameBox)
             {
                 playerName = (String)nameBox.getSelectedItem();
+                loadClientOptions();
             }
             else if (source == hostBox)
             {
@@ -134,18 +145,41 @@ public class StartClient extends KDialog implements WindowListener,
 
     public static void connect(String playerName, String hostname, int port)
     {
+        saveHostname();
         new Client(hostname, port, playerName, true);
     }
 
-
-    private static void usage(Options opts)
+    private void loadClientOptions()
     {
-        Log.event("Usage: java net.sf.colossus.client.StartClient [options]");
-        Iterator it = opts.getOptions().iterator();
-        while (it.hasNext())
+        clientOptions = new net.sf.colossus.util.Options(playerName);
+        clientOptions.loadOptions();
+    }
+
+    /** Save the chosen hostname as an option.  LRU sort saved hostnames. */
+    private static void saveHostname()
+    {
+        int highestNum = -1;
+        java.util.List names = new ArrayList();
+        names.add(hostname);
+        for (int i = 0; i < Constants.numSavedServerNames; i++)
         {
-            Option opt = (Option)it.next();
-            Log.event(opt.toString());
+            String serverName = clientOptions.getStringOption(
+                net.sf.colossus.util.Options.serverName + i);
+            if (serverName != null)
+            {
+                if (!serverName.equals(hostname))
+                {
+                    // Don't add it twice.
+                    highestNum = i + 1;
+                    names.add(serverName);
+                }
+            }
         }
+        for (int i = 0; i <= highestNum; i++)
+        {
+            clientOptions.setOption(net.sf.colossus.util.Options.serverName + 
+                i, (String)names.get(i));
+        }
+        clientOptions.saveOptions();
     }
 }
