@@ -438,16 +438,17 @@ public final class ResourceLoader
         Rectangle2D sb = fm.getStringBounds("" + value, biContext);
         int sw = (int)sb.getWidth();
         int sh = (int)sb.getHeight();
+        String valueTxt = (value > 0 ? ""+value : "X");
 
         if (right)
         {
-            biContext.drawString("" + value,
+            biContext.drawString(valueTxt,
                                  (width - (sw + 2)),
                                  height - 2);
         }
         else
         {
-            biContext.drawString("" + value,
+            biContext.drawString(valueTxt,
                                  2,
                                  height - 2);
         }
