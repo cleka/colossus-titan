@@ -83,8 +83,8 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             }
             newChits = new Chit[oldLegion.getHeight()];
 
-            oldMarker = new Chit(scale / 5, scale / 2, scale,
-                oldLegion.getImageName(), this);
+            oldMarker = new Marker(scale / 5, scale / 2, scale,
+                oldLegion.getImageName(), this, oldLegion);
 
             tracker = new MediaTracker(this);
 
