@@ -11,7 +11,7 @@ import java.awt.event.*;
 class PickRecruiter extends Dialog implements MouseListener, WindowListener
 {
     private int numEligible;
-    private Creature [] recruiters;
+    private Critter [] recruiters;
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
     private Player player;
@@ -28,7 +28,7 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
 
 
     PickRecruiter(Frame parentFrame, Legion legion, int numEligible, 
-        Creature [] recruiters)
+        Critter [] recruiters)
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruiter", true);
