@@ -43,7 +43,7 @@ class MasterBoard extends JFrame implements MouseListener,
     };
     private Rectangle rectClip;
     private Image offImage;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private MediaTracker tracker;
     private boolean imagesLoaded;
@@ -355,7 +355,6 @@ class MasterBoard extends JFrame implements MouseListener,
             return 0;
         }
 
-System.out.println("clearAllUnoccupiedEntrySides()");
         clearAllUnoccupiedEntrySides();
         
         int count = 0;
@@ -559,7 +558,6 @@ System.out.println("clearAllUnoccupiedEntrySides()");
 
     public void finishBattle()
     {
-System.out.println("MasterBoard.show()");
         show();
 
         if (summoningAngel && summonAngel != null)
@@ -1559,18 +1557,18 @@ System.out.println("MasterBoard.show()");
         rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(d.width, d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
         // If the erase flag is set, erase the background.
         if (eraseFlag)
         {
-            gBack.clearRect(0, 0, d.width, d.height);
+            offGraphics.clearRect(0, 0, d.width, d.height);
             eraseFlag = false;
         }
 
@@ -1580,7 +1578,7 @@ System.out.println("MasterBoard.show()");
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
-                    h[i][j].paint(gBack);
+                    h[i][j].paint(offGraphics);
                 }
             }
         }
@@ -1594,7 +1592,7 @@ System.out.println("MasterBoard.show()");
                 if (rectClip.intersects(
                     player.getLegion(j).getMarker().getBounds()))
                 {
-                    player.getLegion(j).getMarker().paint(gBack);
+                    player.getLegion(j).getMarker().paint(offGraphics);
                 }
             }
         }
