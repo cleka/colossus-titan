@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
@@ -8,14 +7,14 @@ import javax.swing.*;
  * author David Ripton
  */
 
-class Concede extends JDialog implements ActionListener
+class Concede extends Dialog implements ActionListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
     private static final int scale = 60;
-    private JFrame parentFrame;
-    private JButton button1;
-    private JButton button2;
+    private Frame parentFrame;
+    private Button button1;
+    private Button button2;
     private boolean laidOut = false;
     private boolean flee;
     private Legion friend;
@@ -30,15 +29,14 @@ class Concede extends JDialog implements ActionListener
     private static Point location;
 
 
-    Concede(JFrame parentFrame, Legion friend, Legion enemy, boolean flee)
+    Concede(Frame parentFrame, Legion friend, Legion enemy, boolean flee)
     {
         super(parentFrame, friend.getPlayer().getName() + ": " + (flee ?
             "Flee" : "Concede") + " with Legion "  + friend.getMarkerId() +
             " in " + friend.getCurrentHex().getTerrainName().toLowerCase() +
             "?", true);
 
-        Container contentPane = getContentPane();
-        contentPane.setLayout(null);
+        setLayout(null);
 
         this.parentFrame = parentFrame;
         this.friend = friend;
@@ -101,15 +99,14 @@ class Concede extends JDialog implements ActionListener
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(parentFrame,
-                "waitForAll was interrupted");
+            new MessageBox(parentFrame, "waitForAll was interrupted");
         }
         imagesLoaded = true;
 
-        button1 = new JButton(flee ? "Flee" : "Concede");
-        button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
-        contentPane.add(button1);
-        contentPane.add(button2);
+        button1 = new Button(flee ? "Flee" : "Concede");
+        button2 = new Button(flee ? "Don't Flee" : "Don't Concede");
+        add(button1);
+        add(button2);
         button1.addActionListener(this);
         button2.addActionListener(this);
 
@@ -180,18 +177,14 @@ class Concede extends JDialog implements ActionListener
         if (!laidOut)
         {
             Insets insets = getInsets();
-            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 -
+            button1.setBounds(insets.left + d.width / 9, 13 * d.height / 16 -
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right,
-                3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
+                13 * d.height / 16 - insets.bottom, d.width / 3, d.height / 8);
             laidOut = true;
         }
 
         g.drawImage(offImage, 0, 0, this);
-
-        // These are necessary because JButtons are lightweight.
-        button1.repaint();
-        button2.repaint();
     }
 
 
@@ -204,8 +197,8 @@ class Concede extends JDialog implements ActionListener
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand() == "Flee" || e.getActionCommand() ==
-            "Concede")
+        if (e.getActionCommand().equals("Flee") || 
+            e.getActionCommand().equals("Concede"))
         {
             // Figure how many points the victor receives.
             int points = friend.getPointValue();
