@@ -190,7 +190,6 @@ int oneCase(MasterHex [][] h, java.util.List list, boolean show[][], boolean isG
     }
 |   (s = c_comment())
     {
-        Log.debug("Found comment : " + s);
         return(0);
     }
 |   <EOF>

@@ -178,7 +178,6 @@ int oneCreature(List lc) :
     }
 |   (s = c_comment())
     {
-        Log.debug("Found comment : " + s);
         return(0);
     }
 |   <EOF>

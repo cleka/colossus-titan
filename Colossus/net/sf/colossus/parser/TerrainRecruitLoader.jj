@@ -726,7 +726,6 @@ int oneTerrain() :
     }
 |   (s = r_comment())
     {
-        Log.debug("Found comment : " + s);
         return(0);
     }
 |   <ACQUIRABLE> (al = r_acquirableDataList())

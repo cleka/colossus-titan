@@ -130,7 +130,6 @@ int oneLine(String[] ls) :
     }
 |   (s = v_comment())
     {
-        Log.debug("Found comment : " + s);
         return(0);
     }
 |   <EOF>

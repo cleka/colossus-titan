@@ -399,7 +399,7 @@ Log.debug("called Server.makeForcedStrikes() " + playerName + " " + rangestrike)
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.highlightEngagements(game.findEngagements());
+            client.highlightEngagements();
         }
     }
 

@@ -252,7 +252,6 @@ int oneBattlelandCase(BattleHex [][] h) :
     }
 |   (s = b_comment())
     {
-        Log.debug("Found comment : " + s);
         return(0);
     }
 |   <EOF>

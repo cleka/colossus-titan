@@ -1,16 +1,8 @@
-Need to bring active player's frame to front before muster phase, in case 
-   other player's was in front during engagement.  Do it after each 
-   engagement is resolved.
-
-Add some full board repaints, including frame, to fix menu corruption.
-
 Add unit tests for server options.
 Add JUnit section to build docs.
 Document test procedures.
 
 Add remaining command-line options.
-
-Save/load/test scale.
 
 Use SF project releases.
 
@@ -22,7 +14,7 @@ L&F menu should indicate current L&F somehow, and not show Windows if not
    allowed on this platform.  
 kunstoff L&F in swing.properties file fails.  Works in player cfg file.
 
-Add explicit cancel buttons to more dialogs.
+Add explicit cancel buttons to more dialogs.  (PickRecruit)
 
 Add "no 2s or 5s" mulligan option.
 Add optional additional handicap mulligans that can be used after turn 1.

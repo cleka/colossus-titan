@@ -2069,4 +2069,11 @@ public final class MasterBoard extends JPanel
         SwingUtilities.updateComponentTreeUI(this);
         SwingUtilities.updateComponentTreeUI(masterFrame);
     }
+
+
+    void fullRepaint()
+    {
+        masterFrame.repaint();
+        repaint();
+    }
 }

@@ -179,7 +179,6 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
             board.repaint();
             summonAngel = null;
 
-            // TODO Make this consistent.
             board.highlightEngagements();
             board.repaint();
         }
@@ -1381,13 +1380,15 @@ Log.debug("called Client.acquireAngelCallback()");
         battleChits.clear();
     }
 
-    // TODO Change to inform and let client control highlighting.
-    public void highlightEngagements(Set hexLabels)
+    public void highlightEngagements()
     {
         if (board != null)
         {
-            board.unselectAllHexes();
-            board.selectHexesByLabels(hexLabels);
+            if (playerName.equals(getActivePlayerName()))
+            {
+                board.getFrame().toFront();
+            }
+            board.highlightEngagements();
         }
     }
 
@@ -1572,6 +1573,8 @@ Log.debug("called Client.acquireAngelCallback()");
             if (playerName.equals(getActivePlayerName()))
             {
                 board.getFrame().toFront();
+                // XXX Fully paint once per turn to fix corrupt menus.
+                board.fullRepaint();
             }
         }
     }
@@ -1651,6 +1654,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
         if (map != null && playerName.equals(getBattleActivePlayerName()))
         {
+            map.getFrame().toFront();
             map.setupMoveMenu();
         }
     }
@@ -2466,14 +2470,12 @@ Log.debug("found " + set.size() + " hexes");
             UIManager.setLookAndFeel(lfName);
             updateEverything();
             Log.debug("Switched to Look & Feel: " + lfName);
-            options.setOption(Options.favoriteLookFeel,
-                              lfName);
+            options.setOption(Options.favoriteLookFeel, lfName);
             currentLookAndFeel = lfName;
         }
         catch (Exception e)
         {
-            System.err.println("Warning: Look & Feel " + lfName +
-                               " not usable (" + e + ")");
+            Log.error("Look & Feel " + lfName + " not usable (" + e + ")");
         }
     }
 

@@ -452,7 +452,6 @@ public final class Game
     private void assignTowers()
     {
         boolean balanced = getOption(Options.balancedTowers);
-Log.debug("Called Game.assignTowers() with balanced = " + balanced);
 
         int numPlayers = getNumPlayers();
         String[] playerTower = new String[numPlayers];
@@ -468,7 +467,6 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         if (balanced)
         {
             towerList = getBalancedTowers(numPlayers, towerList);
-            Log.debug("Got balanced towers: " + towerList); 
         }
 
         int playersLeft = numPlayers - 1;
@@ -1138,7 +1136,9 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
      *  "--latest" then load the latest savegame found in saveDirName. */
     void loadGame(String filename)
     {
-        File file;
+        options.loadOptions();
+
+        File file = null;
 
         if (filename.equals("--latest"))
         {
