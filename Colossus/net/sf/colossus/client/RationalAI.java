@@ -1486,24 +1486,8 @@ public class RationalAI implements AI
                     (lm.fromHex.equals(lm.toHex) &&
                     occupiedHexes.count(lm.toHex) == 1))
                 {
-                /** towi XCV, resolved conflict here, but unsure if correct!
-                boolean moved_legion = doMove(lm.markerId, lm.toHex);
-                if (moved_legion)
-                {
-                        Log.debug("Successfully moved? " + lm.markerId);
-                    occupiedHexes.remove(lm.fromHex); // hex is now free
-                    occupiedHexes.add(lm.toHex);
-                    bm.remove(); // move has been made
-                    moved = true;
-                }
-                    else
-                    {
-                        Log.debug("Did not move? " + lm.markerId);
-                    }
-                */
                     client.doMove(lm.markerId, lm.toHex);
                     return true;
-                /* towi, end of conflict */
                 }
             }
             tries++;
