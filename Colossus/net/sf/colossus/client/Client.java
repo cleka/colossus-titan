@@ -122,9 +122,11 @@ public final class Client implements IClient
     // For negotiation.
     private String attackerId;
     private String defenderId;
-    // XXX May need more than one of each.
     private Negotiate negotiate;
     private ReplyToProposal replyToProposal;
+
+    // XXX temporary until I get things synched
+    private boolean tookMulligan;
 
 
 
@@ -156,8 +158,15 @@ public final class Client implements IClient
         undoAllMoves();   // XXX Maybe move entirely to server
         clearUndoStack();
         clearRecruitChits();
+        tookMulligan = true;
 
         server.mulligan();
+    }
+
+    // XXX temp
+    public boolean tookMulligan()
+    {
+        return tookMulligan;
     }
 
 

@@ -25,6 +25,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 
 public class SimpleAI implements AI
 {
+
     public SimpleAI()
     {
     }
@@ -826,28 +827,22 @@ public class SimpleAI implements AI
         // the important ones get the first chance to move to good hexes.
         // player.sortLegions();
 
-Log.debug("1");
         handleVoluntaryMoves(client, player, moveMap, enemyAttackMap);
 
-Log.debug("2");
         // make sure we move splits (when forced)
         handleForcedSplitMoves(client, player, moveMap);
 
         // make sure we move at least one legion
         if (player.numLegionsMoved() == 0)
         {
-Log.debug("3");
             handleForcedSingleMove(client, player, moveMap);
 
             // Perhaps that forced move opened up a good move for another
             // legion, or forced a split move.  So iterate again.
-Log.debug("4");
             handleVoluntaryMoves(client, player, moveMap, enemyAttackMap);
-Log.debug("5");
             handleForcedSplitMoves(client, player, moveMap);
         }
 
-Log.debug("6");
         client.doneWithMoves();
     }
 
@@ -856,7 +851,8 @@ Log.debug("6");
     {
         // TODO: This is really stupid.  Do something smart here.
         if (client.getTurnNumber() == 1 && player.getMulligansLeft() > 0 &&
-            (client.getMovementRoll() == 2 || client.getMovementRoll() == 5))
+            (client.getMovementRoll() == 2 || client.getMovementRoll() == 5)
+            && !client.tookMulligan())
         {
             client.mulligan();
             // XXX Need to wait for new movement roll.

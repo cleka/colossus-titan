@@ -1360,6 +1360,31 @@ Log.debug("Called Server.reinforce()");
         }
     }
 
+    // XXX temp, until AIs can predict splits.
+    void aiFullyUpdateAllLegionContents()
+    {
+        Iterator it = game.getAllLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            aiRevealLegion(legion);
+        }
+    }
+
+    // XXX temp, until AIs can predict splits.
+    void aiRevealLegion(Legion legion)
+    {
+        Iterator it = game.getPlayers().iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            if (player.isAI())
+            {
+                oneRevealLegion(legion, player.getName());
+            }
+        }
+    }
+
     void allRevealCreature(Legion legion, String creatureName)
     {
         List names = new ArrayList();

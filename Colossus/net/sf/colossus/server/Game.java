@@ -1474,6 +1474,7 @@ Log.debug("Called Game.newGame2()");
         }
         else
         {
+            server.aiFullyUpdateAllLegionContents();
             server.allFullyUpdateLegionHeights();
             server.allFullyUpdateOwnLegionContents();
         }
@@ -2405,6 +2406,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         }
         else
         {
+            server.aiRevealLegion(legion);
             server.oneRevealLegion(legion, player.getName());
             server.oneRevealLegion(newLegion, player.getName());
         }
@@ -3133,6 +3135,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         }
         Player player = getActivePlayer();
         player.takeMulligan();
+        server.allUpdatePlayerInfo();
         setupPhase();
         return player.getMovementRoll();
     }
