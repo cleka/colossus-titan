@@ -520,6 +520,13 @@ public final class ResourceLoader
         {
             Thread.yield();
         }
+        if (tempIcon.getImageLoadStatus() != MediaTracker.COMPLETE)
+        {
+            System.err.println("Image loading of " + filename +
+                               " failed (" +
+                               tempIcon.getImageLoadStatus() + ")");
+            return null;
+        }
         int width = tempIcon.getIconWidth();
         int height = tempIcon.getIconHeight();
         
