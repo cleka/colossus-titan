@@ -23,30 +23,6 @@ Bug: Loaded a game with 2 human players and 4 AIs.  Only got one board.
 Bug: Out of memory error after many consecutive Load Game actions.  Find leak.
    Not enough memory to copy history from from savegame JDOM tree to new one?
 
-Bug: During AI split phase
-- split() for Gr01(8): Angel Gorgon* Cyclops Cyclops Cyclops* Lion Centaur : Gr01(10), Gr03(10) 2 Gr03 -1
-- revealCreatures() for Gr03(10): Cyclops Centaur [Cyclops, Centaur]
-java.util.ConcurrentModificationException
-at java.util.TreeMap$EntryIterator.nextEntry(TreeMap.java:1026)
-at java.util.TreeMap$KeyIterator.next(TreeMap.java:1051)
-at java.util.Collections$1.next(Collections.java:996)
-at net.sf.colossus.util.Glob.glob(Glob.java:58)
-at net.sf.colossus.server.Player.getStatusInfo(Player.java:818)
-at net.sf.colossus.server.Server.getPlayerInfo(Server.java:1361)
-at net.sf.colossus.server.Server.allUpdatePlayerInfo(Server.java:293)
-at net.sf.colossus.server.Server.allUpdatePlayerInfo(Server.java:299)
-at net.sf.colossus.server.Server.allSetupSplit(Server.java:518)
-at net.sf.colossus.server.Game.setupSplit(Game.java:810)
-at net.sf.colossus.server.Game.setupPhase(Game.java:780)
-at net.sf.colossus.server.Game.access$200(Game.java:36)
-at net.sf.colossus.server.Game$GamePhaseAdvancer.advancePhaseInternal(Game.java:744)
-at net.sf.colossus.server.Game$GamePhaseAdvancer.advancePhase(Game.java:726)
-at net.sf.colossus.server.Game.advancePhase(Game.java:714)
-at net.sf.colossus.server.Server.doneWithRecruits(Server.java:1310)
-at net.sf.colossus.server.SocketServerThread.callMethod(SocketServerThread.java:257)
-at net.sf.colossus.server.SocketServerThread.parseLine(SocketServerThread.java:105)
-at net.sf.colossus.server.SocketServerThread.run(SocketServerThread.java:65)
-
 Bug: After clicking on engagement, after computer declined to flee and I
    declined to concede:
 Rd10 (Star) (dripton) attacks Br08 (Ram) (Brown) in Brush hex 17
@@ -107,10 +83,6 @@ Fix the Titan Creature/Critter problem.
 
 Machine learning to tweak AI constants.
 
-Improve networking.  
-   Persistent servers, 
-   Reporting game openings to web page.
-
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
    Or make PickRecruit non-modal.
@@ -140,11 +112,8 @@ Add optional additional handicap mulligans that can be used after turn 1.
 
 Add UI for players to specify favorite colors.
 
-Put old, new web pages under CVS.
-Use SF project releases.
-
 ShowLegion on mouseover, not click, with permanent dialog.
-Show zoomed area around mouse cursor in a small window, for Abyssal9.
+Show zoomed area around mouse cursor in a small window, for big maps.
 
 Add confirm dialogs (for conceding with titan, skipping recruits, ...)
 
@@ -161,8 +130,7 @@ Add SetupBattle dialog, to allow setting up standalone battles.
    type, player scores for titan power.)
 
 Track all players' markers on client side.
-Add a ShowLegionMarkers window that shows each player's remaining
-   markers.
+Add a ShowLegionMarkers window that shows each player's remaining markers.
 
 Add a window that shows all players' units
 
@@ -194,6 +162,3 @@ Use creature-only images without chit background, and scale onto chits,
 Try PMD (lint tool).
 
 Dead players' markers should be zero in StatusScreen.
-
-Auto-advance on client side.
-Done button not on during empty engagement phase.
