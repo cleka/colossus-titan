@@ -1,7 +1,5 @@
 /** Attempted port of hexmap from MFC to Java dripton  12/10/97 */
 
-// TODO: Make the drawing of stacked chits less painful.
-// TODO: Double-buffer.
 // TODO: Add the dragon and hydra.
 
 import java.awt.*;
@@ -25,29 +23,22 @@ class Hex implements Shape
         y_vertex[1] = cy;
         x_vertex[2] = cx + 3 * scale;
         y_vertex[2] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
-                       * scale);
+                        * scale);
         x_vertex[3] = cx + 2 * scale;
         y_vertex[3] = cy + (int)java.lang.Math.round(2 * java.lang.Math.sqrt(3.0)
-                       * scale);
+                        * scale);
         x_vertex[4] = cx;
         y_vertex[4] = cy + (int)java.lang.Math.round(2 * java.lang.Math.sqrt(3.0)
-                       * scale);
+                        * scale);
         x_vertex[5] = cx - 1 * scale;
         y_vertex[5] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
-                       * scale);
+                        * scale);
 
         p = new Polygon(x_vertex, y_vertex, 6);
         rectBound = new Rectangle(x_vertex[5], y_vertex[0], x_vertex[2] - 
-            x_vertex[5], y_vertex[3] - y_vertex[0]);
+                        x_vertex[5], y_vertex[3] - y_vertex[0]);
     }
 
-
-    // Overridden to avoid clearing entire background
-    public void update(Graphics g)
-    {
-        paint(g);
-    }
-    
 
     public void paint(Graphics g)
     {
@@ -61,7 +52,7 @@ class Hex implements Shape
         else
         {
             g.setColor(java.awt.Color.white);
-	    g.fillPolygon(p);
+            g.fillPolygon(p);
             g.setColor(java.awt.Color.black);
             g.drawPolygon(p);
         }
@@ -73,9 +64,9 @@ class Hex implements Shape
         if (p.contains(point))
         {
             selected = !selected;
-	    return true;
+            return true;
         }
-	return false;
+        return false;
     }
 
     // Required by interface Shape
@@ -97,9 +88,14 @@ class Chit implements Shape
 {
     private boolean selected;
     private Rectangle rect;
-    // Need to let the container's MediaTracker access the image.
-    Image image;
     private Container container;
+    
+    // The container's MediaTracker needs to access the image.
+    Image image;
+
+    // offset of the mouse cursor within the chit.
+    int dx;
+    int dy;
 
     Chit(int cx, int cy, int scale, String image_filename, 
         Container my_container)
@@ -107,15 +103,12 @@ class Chit implements Shape
         selected = false;
         rect = new Rectangle(cx, cy, scale, scale);
         image = Toolkit.getDefaultToolkit().getImage(image_filename);
-	container = my_container;
+        container = my_container;
+        dx = 0;
+        dy = 0;
     }
 
-    // Overridden to avoid clearing entire background
-    public void update(Graphics g)
-    {
-        paint(g);
-    }
-
+    
     public void paint(Graphics g)
     {
         g.drawImage(image, rect.x, rect.y, container);
@@ -127,6 +120,8 @@ class Chit implements Shape
         if (rect.contains(point))
         {
             selected = true;
+            dx = point.x - rect.x;
+            dy = point.y - rect.y;
         }
         else
         {
@@ -138,6 +133,8 @@ class Chit implements Shape
 
     void move(Point point)
     {
+        point.x -= dx;
+        point.y -= dy;
         rect.setLocation(point);
     }
 
@@ -166,9 +163,9 @@ public class BattleMap extends Frame
         {false,true,true,true,true,false}
     };
     private Rectangle rectClip = new Rectangle();
-
-    // Hack: Do we need to clear the background of the current
-    //       clip on the next redraw?
+    private Image offImage;
+    private Graphics offGraphics;
+    private Dimension offDimension;
     private boolean needToClear;
     private MediaTracker tracker;
     private boolean imagesLoaded;
@@ -186,11 +183,11 @@ public class BattleMap extends Frame
         pack();
         resize(700, 700);
         setBackground(java.awt.Color.white);
-	setVisible(true);
+        setVisible(true);
         
         tracking = -1;
-	needToClear = false;
-	imagesLoaded = false;
+        needToClear = false;
+        imagesLoaded = false;
 
         for (int i = 0; i < 6; i++)
         {
@@ -233,19 +230,19 @@ public class BattleMap extends Frame
 
         for (int i = 0; i < 22; i++)
         {
-	    tracker.addImage(chits[i].image, 0);
-	}
+            tracker.addImage(chits[i].image, 0);
+        }
 
-	try
-	{
+        try
+        {
             // Wait until images are loaded.
             tracker.waitForAll();
         }
-	catch (InterruptedException e)
-	{
-	    System.out.println("waitForAll was interrupted");
-	}
-	imagesLoaded = true;
+        catch (InterruptedException e)
+        {
+            System.out.println("waitForAll was interrupted");
+        }
+        imagesLoaded = true;
 
         // Paint the whole BattleMap
         repaint();
@@ -254,8 +251,8 @@ public class BattleMap extends Frame
     public boolean handleEvent(Event event)
     {
         if (event.id == Event.WINDOW_DESTROY)
-	{
-	    System.exit(0);
+        {
+            System.exit(0);
         }
         return super.handleEvent(event);
     }
@@ -265,11 +262,11 @@ public class BattleMap extends Frame
         Point point = new Point(x,y);
         if (tracking != -1)
         {
-            Rectangle rectClip = new Rectangle(chits[tracking].getBounds());
+            Rectangle clip = new Rectangle(chits[tracking].getBounds());
             chits[tracking].move(point);
-            rectClip.add(chits[tracking].getBounds());
-            repaint(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
-	    needToClear = true;
+            clip.add(chits[tracking].getBounds());
+            needToClear = true;
+            repaint(clip.x, clip.y, clip.width, clip.height);
         }
         return false;
     }
@@ -297,11 +294,11 @@ public class BattleMap extends Frame
                     Chit tmpchit = chits[i];
                     for (int j = i; j > 0; j--)
                     {
-		        chits[j] = chits[j - 1];
+                        chits[j] = chits[j - 1];
                     }
                     chits[0] = tmpchit;
-                    Rectangle rectClip = new Rectangle(chits[0].getBounds());
-                    repaint(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
+                    Rectangle clip = new Rectangle(chits[0].getBounds());
+                    repaint(clip.x, clip.y, clip.width, clip.height);
                 }
                 return false;
             }
@@ -317,9 +314,9 @@ public class BattleMap extends Frame
                     System.out.println("Calling select for h[" + i + "]["
                         + j +"]");
                     h[i][j].select(point);
-                    Rectangle rectClip = new Rectangle(h[i][j].getBounds());
-                    repaint(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
-		    return false;
+                    Rectangle clip = new Rectangle(h[i][j].getBounds());
+                    repaint(clip.x, clip.y, clip.width, clip.height);
+                    return false;
                 }
             }
         }
@@ -330,15 +327,15 @@ public class BattleMap extends Frame
     public void paint(Graphics g)
     {
         System.out.println("Called BattleMap.paint()");
-	if (!imagesLoaded)
-	{
-	    System.out.println("Images are not loaded yet");
-	    return;
+        if (!imagesLoaded)
+        {
+            System.out.println("Images are not loaded yet");
+            return;
         }
 
         rectClip = g.getClipBounds();
         System.out.println("rectClip: " + rectClip.x + " " + rectClip.y 
-	    + " " + rectClip.width + " " + rectClip.height);
+            + " " + rectClip.width + " " + rectClip.height);
 
         for (int i = 0; i < 6; i++)
         {
@@ -355,28 +352,70 @@ public class BattleMap extends Frame
         // Draw chits from back to front.
         for (int i = chits.length - 1; i >= 0; i--)
         {
-	    if (rectClip.intersects(chits[i].getBounds()))
-	    {
+            if (rectClip.intersects(chits[i].getBounds()))
+            {
                 System.out.println("Drawing chits[" + i + "]");
                 chits[i].paint(g);
             }
         }
     }
 
+
     public void update(Graphics g)
     {
-        // Hack: Manually clear the background when chits are dragged.
-        if (needToClear)
-	{
-	    Rectangle rectClip = new Rectangle(g.getClipBounds());
-	    g.setColor(getBackground());
-	    g.fillRect(rectClip.x, rectClip.y, rectClip.width, rectClip.height);
-	    g.setColor(getForeground());
-	    needToClear = false;
+        System.out.println("Called BattleMap.update()");
+
+        Dimension d = getSize();
+        rectClip = g.getClipBounds();
+        
+        // Create the back buffer only if we don't have a good one.
+        if (offGraphics == null || d.width != offDimension.width || 
+            d.height != offDimension.height)
+        {
+            System.out.println("Creating a new back buffer");
+            offDimension = d;
+            offImage = createImage(d.width, d.height);
+            offGraphics = offImage.getGraphics();
         }
 
-        paint(g);
+        // TODO: Find out which is faster, this needToClear business
+        //       or just clearing the whole back buffer every time.
+
+        // Clear the background only when chits are dragged.
+        if (needToClear)
+        {
+            offGraphics.setColor(getBackground());
+            offGraphics.fillRect(rectClip.x, rectClip.y, rectClip.width, 
+                rectClip.height);
+            offGraphics.setColor(getForeground());
+            needToClear = false;
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
+                {
+                    System.out.println("drawing h[" + i + "][" + j + "]");
+                    h[i][j].paint(offGraphics);
+                }
+            }
+        }
+
+        // Draw chits from back to front.
+        for (int i = chits.length - 1; i >= 0; i--)
+        {
+            if (rectClip.intersects(chits[i].getBounds()))
+            {
+                System.out.println("Drawing chits[" + i + "]");
+                chits[i].paint(offGraphics);
+            }
+        }
+
+        g.drawImage(offImage, 0, 0, this);
     }
+
     
     public Dimension getMinimumSize()
     {
