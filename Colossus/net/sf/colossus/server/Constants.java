@@ -37,6 +37,8 @@ public final class Constants
     public static final String configVersion =
         "Colossus config file version 2";
 
+    public static final String logFileName = "lastgame.log";
+
 
 
     // Constants for savegames

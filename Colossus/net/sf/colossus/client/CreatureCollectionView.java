@@ -188,9 +188,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
                                                ") count for creature " + name);
                 }
                 
-                boolean immortal = false;
-                    // Creature.getCreatureByName(name).isImmortal() &&
-                    // !Creature.getCreatureByName(name).isTitan();
+                boolean immortal = 
+                    Creature.getCreatureByName(name).isImmortal();
                 String color;
                 if (count == 0)
                 {
@@ -223,7 +222,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
                                      "blue");
                 String htmlDeadCount =
                     htmlColorizeOnly(
-                                     immortal ?
+                                     immortal && deadCount == 0 ?
                                      "--" :
                                      (deadCount < 10 ? "0" : "") + 
                                      Integer.toString(deadCount), "red");

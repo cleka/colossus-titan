@@ -69,14 +69,12 @@ public final class Caretaker implements Cloneable
 
     public void setCount(String creatureName, int count)
     {
-        map.remove(creatureName);
         map.put(creatureName, new Integer(count)); 
         updateDisplays(creatureName);
     }
 
     public void setDeadCount(String creatureName, int count)
     {
-        deadMap.remove(creatureName);
         deadMap.put(creatureName, new Integer(count));
         updateDisplays(creatureName);
     }
@@ -209,7 +207,7 @@ public final class Caretaker implements Cloneable
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
-            if (creature.isImmortal() && !creature.isTitan())
+            if (creature.isImmortal())
             {
                 String name = creature.getName();
                 int dead = getDeadCount(name);

@@ -493,7 +493,7 @@ public final class Legion implements Comparable
                 }
                 if (returnCrittersToStacks)
                 {
-                    if (critter.isImmortal() && !critter.isTitan())
+                    if (critter.isImmortal())
                     {
                         game.getCaretaker().putOneBack(critter.getCreature());
                     }
@@ -715,13 +715,13 @@ public final class Legion implements Comparable
     /** Remove the creature in position i in the legion.  Return the
         removed creature. Put immortal creatures back on the stack
         and others to the Graveyard if returnImmortalToStack is true. */
-    Creature removeCreature(int i, boolean returnImmortalToStack,
+    Creature removeCreature(int i, boolean returnToStack,
         boolean disbandIfEmpty)
     {
         Critter critter = (Critter)critters.remove(i);
 
         // If the creature is an immortal, put it back in the stacks.
-        if (returnImmortalToStack)
+        if (returnToStack)
         {
             if (critter.isImmortal())
             {

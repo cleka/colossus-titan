@@ -196,7 +196,7 @@ public class Creature implements Comparable
 
     public boolean isImmortal()
     { // might not the same for derived class
-        return isLordOrDemiLord();
+        return isLordOrDemiLord() && !isTitan();
     }
 
     public boolean isTitan()

@@ -1,6 +1,9 @@
 package net.sf.colossus.util;
 
+import java.io.*;
+
 import net.sf.colossus.server.Server;
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.client.Client;
 
 
@@ -20,6 +23,7 @@ public final class Log
 
     private static boolean showDebug = true;
     private static boolean toStdout = true;
+    private static boolean toFile = true;
     private static boolean toWindow = false;
     private static boolean toRemote = false;
     private static LogWindow logWindow;
@@ -27,6 +31,7 @@ public final class Log
     private static Server server;
     /** First local client, for log window. */
     private static Client client;
+    private static PrintWriter fileout;
 
 
     public static boolean getShowDebug()
@@ -47,6 +52,16 @@ public final class Log
     public static void setToStdout(boolean toStdout)
     {
         Log.toStdout = toStdout;
+    }
+
+    public static boolean isToFile()
+    {
+        return toFile;
+    }
+
+    public static void setToFile(boolean toFile)
+    {
+        Log.toFile = toFile;
     }
 
     public static boolean isToWindow()
@@ -95,6 +110,25 @@ public final class Log
         if (toStdout)
         {
             System.out.println(s);
+        }
+        if (toFile)
+        {
+            String logPath = Constants.gameDataPath + Constants.logFileName;
+            try
+            {
+                if (fileout == null)
+                {
+                    fileout = new PrintWriter(new FileOutputStream(logPath), 
+                        true);
+                }
+                fileout.println(s);
+            }
+            catch (FileNotFoundException ex)
+            {
+                toFile = false;
+                Log.error("Could not open logfile " + logPath);
+                Log.error(ex.toString());
+            }
         }
         if (toWindow && client != null)
         {
