@@ -566,6 +566,23 @@ public final class MasterHex extends Hex
     }
 
 
+    public ArrayList getFriendlyLegions(Player player)
+    {
+	ArrayList list = new ArrayList();
+
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (legion.getPlayer() == player)
+            {
+                list.add(legion);
+            }
+        }
+	return list;
+    }
+
+
     /** Return the first legion not belonging to player. */
     public Legion getEnemyLegion(Player player)
     {
