@@ -284,7 +284,7 @@ public final class Client implements IClient, IOracle, IOptions
     }
 
     public void tellEngagementResults(String winnerId, String method,
-            int points)
+            int points, int turns)
     {
         JFrame frame = getMapOrBoardFrame();
         if (frame == null)
@@ -298,7 +298,7 @@ public final class Client implements IClient, IOracle, IOptions
             {
                 engagementResults = new EngagementResults(frame, this, this);
             }
-            engagementResults.addData(winnerId, method, points,
+            engagementResults.addData(winnerId, method, points, turns,
                 _tellEngagementResults_attackerStartingContents,
                 _tellEngagementResults_defenderStartingContents,
                 _tellEngagementResults_attackerLegionCertainities,

@@ -38,6 +38,10 @@ public final class Game
     private boolean summoning;
     private boolean reinforcing;
     private boolean acquiring;
+    private int pointsScored;
+    private int turnCombatFinished;
+    private String winnerId;
+    private String engagementResult;
     private boolean pendingAdvancePhase;
     private boolean loadingGame;
     private boolean gameOver;
@@ -96,6 +100,7 @@ public final class Game
         pendingAdvancePhase = false;
         gameOver = false;
         loadingGame = false;
+        engagementResult=null;
     }
 
     private void addPlayersFromOptions()
@@ -2123,10 +2128,7 @@ public final class Game
     void doneReinforcing()
     {
         reinforcing = false;
-        if (battle == null)
-        {
-            server.nextEngagement();
-        }
+        checkEngagementDone();
     }
 
     // Called by both human and AI.
@@ -2162,7 +2164,7 @@ public final class Game
         else
         {
             summoning = false;
-            server.nextEngagement();
+            checkEngagementDone();
         }
     }
 
@@ -2172,7 +2174,7 @@ public final class Game
     }
 
     synchronized void finishBattle(String hexLabel, boolean attackerEntered,
-            int points)
+            int points, int turnDone)
     {
         battle = null;
         server.allCleanupBattle();
@@ -2207,20 +2209,14 @@ public final class Game
                 }
             }
         }
-        engagementInProgress = false;
         battleInProgress = false;
 
-        server.allUpdatePlayerInfo();
-        String winnerId = null;
-        if (winner != null)
-        {
-            winnerId = winner.getMarkerId();
-        }
-        server.allTellEngagementResults(winnerId, "fight", points);
-        if (!summoning && !reinforcing && !acquiring)
-        {
-            server.nextEngagement();
-        }
+        setEngagementResult(
+            "fight",
+            winner == null ? null : winner.getMarkerId(),
+            points,
+            turnDone);
+        checkEngagementDone();
     }
 
     /** Return a set of hexLabels. */
@@ -2648,17 +2644,25 @@ public final class Game
                     " concedes to legion " + winner.getLongMarkerName());
         }
 
-        // Need to grab the player reference before the legion is
-        // removed.
-        Player losingPlayer = loser.getPlayer();
-
-        // Remove the dead legion.
-        loser.remove();
 
         // Add points, and angels if necessary.
         winner.addPoints(points);
         // Remove any fractional points.
         winner.getPlayer().truncScore();
+
+        // Need to grab the player reference before the legion is
+        // removed.
+        Player losingPlayer = loser.getPlayer();
+
+        server.allRevealEngagedLegion(
+            loser,
+            losingPlayer.equals(getActivePlayer()));
+
+        server.allRemoveLegion(loser.getMarkerId());
+
+        // Remove the dead legion.
+        loser.remove();
+        
 
         // If this was the titan stack, its owner dies and gives half
         // points to the victor.
@@ -2670,14 +2674,12 @@ public final class Game
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering
         // the battle.
-        engagementInProgress = false;
-        server.allUpdatePlayerInfo();
-        server.allTellEngagementResults(winner.getMarkerId(),
-                fled ? "flee" : "concede", points);
-        if (!acquiring)
-        {
-            server.nextEngagement();
-        }
+        setEngagementResult(
+            "flee",
+            winner.getMarkerId(),
+            points,
+            0);
+        checkEngagementDone();
     }
 
     private synchronized void handleNegotiation(Proposal results)
@@ -2798,11 +2800,13 @@ public final class Game
                 }
             }
         }
-        engagementInProgress = false;
-        server.allUpdatePlayerInfo();
-        server.allTellEngagementResults(winner == null ? null :
-                winner.getMarkerId(), "negotiate", points);
-        server.nextEngagement();
+
+        setEngagementResult(
+            "negotiate",
+            winner == null ? null : winner.getMarkerId(),
+            points,
+            0);
+        checkEngagementDone();
     }
 
     synchronized void askAcquireAngel(String playerName, String markerId,
@@ -2815,10 +2819,38 @@ public final class Game
     synchronized void doneAcquiringAngels()
     {
         acquiring = false;
-        if (!summoning && !reinforcing)
-        {
-            server.nextEngagement();
-        }
+        checkEngagementDone();
+    }
+
+    private void setEngagementResult(
+        String aResult,
+        String aWinner, 
+        int aPoints, 
+        int aTurn)
+    {
+        engagementResult = aResult;
+        winnerId= aWinner;
+        pointsScored = aPoints;
+        turnCombatFinished=aTurn;        
+    }
+
+    private synchronized void checkEngagementDone()
+    {
+        if (summoning || reinforcing || acquiring || engagementResult == null)
+            return;
+
+        engagementInProgress = false;
+
+        server.allUpdatePlayerInfo();
+
+        server.allTellEngagementResults(
+            winnerId, 
+            engagementResult, 
+            pointsScored,
+            turnCombatFinished);
+        
+        engagementResult=null;
+        server.nextEngagement();        
     }
 
     /** Return a list of all players' legions. */

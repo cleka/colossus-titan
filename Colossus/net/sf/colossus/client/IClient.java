@@ -16,7 +16,7 @@ public interface IClient
             String defenderId);
 
     public void tellEngagementResults(String winnerId, String method,
-            int points);
+            int points, int turns);
 
     public void tellMovementRoll(int roll);
 

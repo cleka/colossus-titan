@@ -1733,7 +1733,11 @@ public final class Battle
     private void cleanup()
     {
         battleOver = true;
-        game.finishBattle(masterHexLabel, attackerEntered, pointsScored);
+        game.finishBattle(
+            masterHexLabel, 
+            attackerEntered, 
+            pointsScored,
+            turnNumber);
     }
 
     /** Return a list of all critters in the battle. */

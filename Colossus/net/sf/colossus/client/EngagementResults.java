@@ -82,6 +82,7 @@ final class EngagementResults
         String winnerId, // null on mutual elim, flee, concede, negotiate
         String method,
         int points,
+        int turns,
         List attackerStartingContents,
         List defenderStartingContents,
         List attackerStartingCertainities,
@@ -93,7 +94,7 @@ final class EngagementResults
         elog.hexLabel = oracle.getBattleSite();
         elog.attackerId = oracle.getAttackerMarkerId();
         elog.defenderId = oracle.getDefenderMarkerId();
-        elog.battleTurn = oracle.getBattleTurnNumber();
+        elog.battleTurn = turns;
         elog.gameTurn = oracle.getTurnNumber();
 
         elog.attackerStartingContents = attackerStartingContents;
@@ -112,6 +113,7 @@ final class EngagementResults
 
         elog.setWinnerId(winnerId);
         elog.setMethod(method);
+        elog.points = points;
 
         engagementLog.add(elog);
         current = engagementLog.size() - 1;
@@ -163,7 +165,7 @@ final class EngagementResults
                 }
                 else
                 {
-                    Log.warn("EngagementResults: Bogus winnerId:" + winnerId);
+                    winnerId=null;
                 }
             }
         }
@@ -250,12 +252,12 @@ final class EngagementResults
 
             //    space for imagelists
             JPanel panelCenter = new JPanel();
-            panelCenter.setLayout(new GridLayout(4,1, 0,2));
+            panelCenter.setLayout(new GridLayout(3,1, 0,2));
             cnt.add(panelCenter, BorderLayout.CENTER);
 
             //    space for list labels
             JPanel panelWest = new JPanel();
-            panelWest.setLayout(new GridLayout(8,1, 0,2));
+            panelWest.setLayout(new GridLayout(6,1, 0,2));
             cnt.add(panelWest, BorderLayout.WEST);
 
             //    space for navigate buttons
@@ -276,57 +278,45 @@ final class EngagementResults
                 + " in "
                 + MasterBoard.getHexByLabel(hexLabel).getDescription()));
             panelNorth.add(new JLabel(_result));
-            panelNorth.add(new JLabel(winnerId + " earned "
-                + points + " points"));
+            if(winnerId!=null)
+            {
+                panelNorth.add(new JLabel(winnerId + " earned "
+                    + points + " points"));
+            }
 
             // west
-            panelWest.add(new JLabel("Starting"));
+            panelWest.add(new JLabel("Atacker"));
             JLabel l = new JLabel(attackerId);
             l.setForeground(Color.BLUE);
             panelWest.add(l);
-            panelWest.add(new JLabel("Final"));
-            panelWest.add(new JLabel(""));
-
-            panelWest.add(new JLabel(""));
-            panelWest.add(new JLabel("Starting"));
+            panelWest.add(new JLabel("Defender"));
             l = new JLabel(defenderId);
             l.setForeground(Color.BLUE);
             panelWest.add(l);
-            panelWest.add(new JLabel("Final"));
+            panelWest.add(new JLabel("Winner"));
+
 
             //  center
             _legion(attackerId,
                 attackerStartingContents, attackerStartingCertainities,
                 panelCenter, true, false, false);
-            if (winnerId == null || winnerId.equals(defenderId))
-            {
-                _legion(attackerId,
-                    attackerEndingContents, attackerEndingCertainities,
-                    panelCenter, false, false, true);
-            }
-            else
+
+            _legion(defenderId,
+                defenderStartingContents, defenderStartingCertainities,
+                panelCenter, true, true, false);
+            if (attackerId.equals(winnerId))
             {
                 _legion(attackerId,
                     attackerEndingContents, attackerEndingCertainities,
                     panelCenter, false, false, false);
             }
-
-            _legion(defenderId,
-                defenderStartingContents, defenderStartingCertainities,
-                panelCenter, true, true, false);
-            if (winnerId == null || winnerId.equals(attackerId))
-            {
-                _legion(defenderId,
-                defenderEndingContents, defenderEndingCertainities,
-                panelCenter, false, true, true);
-            }
-            else
+            else if (defenderId.equals(winnerId))
             {
                 _legion(defenderId,
                 defenderEndingContents, defenderEndingCertainities,
                 panelCenter, false, true, false);
             }
-
+ 
             //  south
             JButton prevButton = new JButton(PREV);
             prevButton.setActionCommand(PREV);

@@ -467,7 +467,8 @@ final class SocketClientThread extends Thread implements IServer
             String winnerId = (String)args.remove(0);
             String resMethod = (String)args.remove(0);
             int points = Integer.parseInt((String)args.remove(0));
-            client.tellEngagementResults(winnerId, resMethod, points);
+            int turns = Integer.parseInt((String)args.remove(0));
+            client.tellEngagementResults(winnerId, resMethod, points,turns);
         }
         else
         {

@@ -583,13 +583,14 @@ public final class Server implements IServer
         }
     }
 
-    void allTellEngagementResults(String winnerId, String method, int points)
+    void allTellEngagementResults(String winnerId, String method, 
+                                    int points, int turns)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.tellEngagementResults(winnerId, method, points);
+            client.tellEngagementResults(winnerId, method, points, turns);
         }
     }
 

@@ -327,10 +327,10 @@ final class SocketServerThread extends Thread implements IClient
     }
 
     public void tellEngagementResults(String winnerId, String method,
-            int points)
+            int points, int turns)
     {
         out.println(Constants.tellEngagementResults + sep + winnerId + sep +
-                method + sep + points);
+                method + sep + points + sep + turns);
     }
 
     public void tellMovementRoll(int roll)
