@@ -220,6 +220,19 @@ class Legion
         creatures[height - 1] = null;
         height--;
     }
+    
+    
+    void removeCreature(Creature creature)
+    {
+        for (int i = 0; i < height; i++)
+        {
+            if (creatures[i] == creature)
+            {
+                removeCreature(i);
+                return;
+            }
+        }
+    }
 
 
     // Recombine this legion into another legion.
