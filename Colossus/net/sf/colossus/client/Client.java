@@ -1367,9 +1367,11 @@ public final class Client implements IClient
 
     public synchronized void initBoard()
     {
+Log.debug(playerName + " Client.initBoard()");
         if (isRemote())
         {
-            VariantSupport.loadVariant(options.getStringOption(Options.variant), false);
+            VariantSupport.loadVariant(options.getStringOption(
+                Options.variant), false);
         }
 
         if (!getOption(Options.autoPlay))
@@ -2945,8 +2947,8 @@ Log.error("Got nak for recruit with " + markerId);
             {
                 Creature lesser = (Creature)liter.next();
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
-                    creature, terrain, hexLabel) <= info.numCreature(lesser)) &&
-                    (recruits.indexOf(creature) == -1))
+                    creature, terrain, hexLabel) <= info.numCreature(lesser)) 
+                    && (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
                 }

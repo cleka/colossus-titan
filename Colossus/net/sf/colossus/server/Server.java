@@ -68,8 +68,8 @@ public final class Server implements IServer
     {
         numClients = 0;
         maxClients = game.getNumLivingPlayers();
-Log.debug("initSocketServer maxClients = " + maxClients);
-Log.debug("About to create server socket on port " + port);
+        Log.debug("initSocketServer maxClients = " + maxClients);
+        Log.debug("About to create server socket on port " + port);
         try
         {
             if (serverSocket != null)
@@ -206,7 +206,7 @@ Log.debug("About to create server socket on port " + port);
 
     private void createLocalClient(String playerName)
     {
-Log.debug("Called Server.createLocalClient() for " + playerName);
+        Log.debug("Called Server.createLocalClient() for " + playerName);
         IClient client = new Client("127.0.0.1", port, playerName, false);
     }
 
@@ -214,7 +214,7 @@ Log.debug("Called Server.createLocalClient() for " + playerName);
     synchronized void addClient(final IClient client, final String playerName,
         final boolean remote)
     {
-Log.debug("Called Server.addClient() for " + playerName);
+        Log.debug("Called Server.addClient() for " + playerName);
         clients.add(client);
 
         if (remote)
@@ -407,7 +407,7 @@ Log.debug("Called Server.addClient() for " + playerName);
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            if (!player.isDead())
+            if (!player.isDead() && !player.getName().equals(firstHuman))
             {
                 IClient client = getClient(player.getName());
                 if (client != null)
@@ -498,7 +498,7 @@ Log.debug("Called Server.addClient() for " + playerName);
 
 
     /** Needed if loading game outside the split phase. */
-    void allSetupTurnState()
+    synchronized void allSetupTurnState()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -842,7 +842,7 @@ Log.debug("Called Server.addClient() for " + playerName);
 
     void allTellEngagement(String hexLabel, Legion attacker, Legion defender)
     {
-Log.debug("allTellEngagement() " + hexLabel);
+        Log.debug("allTellEngagement() " + hexLabel);
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
@@ -1621,19 +1621,17 @@ Log.debug("allTellEngagement() " + hexLabel);
     }
 
 
-    // XXX Disallow in network games
+    // XXX Disallow these in network games?
     public void newGame()
     {
         Start.startupDialog(game, null);
     }
 
-    // XXX Disallow in network games
     public void loadGame(String filename)
     {
         game.loadGame(filename);
     }
 
-    // XXX Disallow in network games
     public void saveGame(String filename)
     {
         game.saveGame(filename);
@@ -1642,7 +1640,8 @@ Log.debug("allTellEngagement() " + hexLabel);
     /** Used to change a player name after color is assigned. */
     void setPlayerName(String playerName, String newName)
     {
-Log.debug("Server.setPlayerName() from " + playerName + " to " + newName);
+        Log.debug("Server.setPlayerName() from " + playerName + " to " + 
+            newName);
         IClient client = getClient(playerName);
         client.setPlayerName(newName);
         clientMap.remove(playerName);

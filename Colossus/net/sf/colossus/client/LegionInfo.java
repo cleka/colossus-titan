@@ -235,6 +235,7 @@ public final class LegionInfo
 
     void merge(String splitoffId, int turn)
     {
+Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
         Node splitoff = getNode(splitoffId);
         getNode().merge(splitoff, turn);
     }

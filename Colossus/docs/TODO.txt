@@ -1,3 +1,5 @@
+Bug: AI player sometimes leaves reinforcements offboard unnecessarily.
+
 Bug: AI player didn't move at start of turn 2.  Just froze.
    Default, 1 human + 3 random AIs, first player froze.  Linux, 1.4.1.01
 
