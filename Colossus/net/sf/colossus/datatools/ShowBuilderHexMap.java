@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
-
 /**
  * Class ShowBuilderHexMap displays a battle map.
  * @version $Id$
@@ -108,7 +107,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setElevation(0);
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -116,7 +115,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setElevation(1);
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -124,7 +123,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setElevation(2);
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -132,8 +131,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setHexside(lastSide, 'd');
-                    h.repaint(lastComponent);
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint(lastComponent);
+                    h.repaint();
+                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
                 }
             };
 
@@ -141,8 +140,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setHexside(lastSide, 'c');
-                    h.repaint(lastComponent);
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint(lastComponent);
+                    h.repaint();
+                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
                 }
             };
 
@@ -150,8 +149,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setHexside(lastSide, 's');
-                    h.repaint(lastComponent);
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint(lastComponent);
+                    h.repaint();
+                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
                 }
             };
 
@@ -159,8 +158,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setHexside(lastSide, 'w');
-                    h.repaint(lastComponent);
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint(lastComponent);
+                    h.repaint();
+                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
                 }
             };
 
@@ -168,8 +167,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setHexside(lastSide, ' ');
-                    h.repaint(lastComponent);
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint(lastComponent);
+                    h.repaint();
+                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
                 }
             };
 
@@ -177,7 +176,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setTerrain('p');
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -185,7 +184,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setTerrain('w');
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -193,7 +192,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setTerrain('r');
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -201,7 +200,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setTerrain('s');
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -209,7 +208,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setTerrain('t');
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -217,7 +216,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setTerrain('o');
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -225,7 +224,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setTerrain('v');
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -233,7 +232,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setTerrain('d');
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 
@@ -241,7 +240,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 public void actionPerformed(ActionEvent e) {
                     GUIBuilderHex h = getHexContainingPoint(lastPoint);
                     h.setTerrain('l');
-                    h.repaint(lastComponent);
+                    h.repaint();
                 }
             };
 

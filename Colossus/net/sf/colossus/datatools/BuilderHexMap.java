@@ -6,6 +6,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import net.sf.colossus.parser.BattlelandLoader;
+import net.sf.colossus.client.Hex;
+import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.client.BasicGUIBattleHex;
 
 /**
  * Class BuilderHexMap displays a basic battle map.
@@ -73,7 +77,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
                     GUIBuilderHex hex = new GUIBuilderHex
                         ((int) Math.round(cx + 3 * i * scale),
                         (int) Math.round(cy + (2 * j + (i & 1)) *
-                        Hex.SQRT3 * scale), scale, i, j);
+                        Hex.SQRT3 * scale), scale, this, i, j);
 
                     h[i][j] = hex;
                     hexes.add(hex);
@@ -88,7 +92,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
      *  only on the high side, since they only interfere with
      *  uphill movement. */
     private synchronized void setupHexesGameState(char terrain, 
-        BuilderHex [][] h)
+        BattleHex [][] h)
     {
         if (filename != null)
         {
@@ -116,7 +120,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
 
 
     /** Add references to neighbor hexes. */
-    private void setupNeighbors(BuilderHex [][] h)
+    private void setupNeighbors(BattleHex [][] h)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -169,17 +173,17 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
     {
         // Initialize entrances.
         entrances[0] = new GUIBuilderHex(cx + 15 * scale,
-            (int) Math.round(cy + 1 * scale), scale, -1, 0);
+            (int) Math.round(cy + 1 * scale), scale, this, -1, 0);
         entrances[1] = new GUIBuilderHex(cx + 21 * scale,
-            (int) Math.round(cy + 10 * scale), scale, -1, 1);
+            (int) Math.round(cy + 10 * scale), scale, this, -1, 1);
         entrances[2] = new GUIBuilderHex(cx + 17 * scale,
-            (int) Math.round(cy + 22 * scale), scale, -1, 2);
+            (int) Math.round(cy + 22 * scale), scale, this, -1, 2);
         entrances[3] = new GUIBuilderHex(cx + 2 * scale,
-            (int) Math.round(cy + 21 * scale), scale, -1, 3);
+            (int) Math.round(cy + 21 * scale), scale, this, -1, 3);
         entrances[4] = new GUIBuilderHex(cx - 3 * scale,
-            (int) Math.round(cy + 10 * scale), scale, -1, 4);
+            (int) Math.round(cy + 10 * scale), scale, this, -1, 4);
         entrances[5] = new GUIBuilderHex(cx + 1 * scale,
-            (int) Math.round(cy + 1 * scale), scale, -1, 5);
+            (int) Math.round(cy + 1 * scale), scale, this, -1, 5);
 
         hexes.add(entrances[0]);
         hexes.add(entrances[1]);
@@ -189,8 +193,8 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         hexes.add(entrances[5]);
     }
 
-    private void setupEntrancesGameState(BuilderHex [] entrances,
-        BuilderHex [][] h)
+    private void setupEntrancesGameState(BattleHex [] entrances,
+        BattleHex [][] h)
     {
         // Add neighbors to entrances.
         entrances[0].setNeighbor(3, h[3][0]);
@@ -231,7 +235,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
             if (hex.isSelected())
             {
                 hex.unselect();
-                hex.repaint(this);
+                hex.repaint();
             }
         }
     }
@@ -245,7 +249,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
             if (hex.isSelected() && label.equals(hex.getLabel()))
             {
                 hex.unselect();
-                hex.repaint(this);
+                hex.repaint();
                 return;
             }
         }
@@ -260,7 +264,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
             if (hex.isSelected() && labels.contains(hex.getLabel()))
             {
                 hex.unselect();
-                hex.repaint(this);
+                hex.repaint();
             }
         }
     }
@@ -274,7 +278,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
             if (!hex.isSelected() && label.equals(hex.getLabel()))
             {
                 hex.select();
-                hex.repaint(this);
+                hex.repaint();
                 return;
             }
         }
@@ -289,7 +293,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
             if (!hex.isSelected() && labels.contains(hex.getLabel()))
             {
                 hex.select();
-                hex.repaint(this);
+                hex.repaint();
             }
         }
     }
@@ -336,7 +340,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            BuilderHex hex = (BuilderHex)it.next();
+            BattleHex hex = (BattleHex)it.next();
             set.add(hex.getLabel());
         }
         return set;

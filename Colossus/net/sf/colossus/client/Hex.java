@@ -59,8 +59,7 @@ public abstract class Hex
         this.terrain = terrain;
     }
 
-
-    Rectangle getBounds()
+    public Rectangle getBounds()
     {
         return rectBound;
     }
@@ -113,17 +112,17 @@ public abstract class Hex
     }
 
 
-    void select()
+    public void select()
     {
         selected = true;
     }
 
-    void unselect()
+    public void unselect()
     {
         selected = false;
     }
 
-    boolean isSelected()
+    public boolean isSelected()
     {
         return selected;
     }
@@ -162,7 +161,7 @@ public abstract class Hex
 
 
     /** Return the Point closest to the center of the polygon. */
-    Point findCenter()
+    public Point findCenter()
     {
         return new Point((int)Math.round((xVertex[2] + xVertex[5]) / 2),
             (int)Math.round((yVertex[0] + yVertex[3]) / 2));

@@ -279,7 +279,7 @@ public class BattleHex extends Hex
         }
     }
 
-    void setNeighbor(int i, BattleHex hex)
+    public void setNeighbor(int i, BattleHex hex)
     {
         if (i >= 0 && i < 6)
         {
