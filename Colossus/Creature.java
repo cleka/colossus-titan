@@ -10,19 +10,19 @@ import java.io.*;
 
 class Creature
 {
-    private String name;
-    private int power;
-    private int skill;
-    private boolean rangeStrikes;
-    private boolean flies;
-    private boolean nativeBramble;
-    private boolean nativeDrift;
-    private boolean nativeBog;
-    private boolean nativeSandDune;
-    private boolean nativeSlope;
-    private boolean lord;
-    private boolean demilord;
-    private int count;
+    protected String name;
+    protected int power;
+    protected int skill;
+    protected boolean rangeStrikes;
+    protected boolean flies;
+    protected boolean nativeBramble;
+    protected boolean nativeDrift;
+    protected boolean nativeBog;
+    protected boolean nativeSandDune;
+    protected boolean nativeSlope;
+    protected boolean lord;
+    protected boolean demilord;
+    protected int count;
 
 
     // Add various Creature archetypes as class members
@@ -115,9 +115,9 @@ class Creature
     }
 
 
-    public void setCount(int newcount)
+    public void setCount(int count)
     {
-        count = newcount;
+        this.count = count;
     }
 
 
@@ -136,6 +136,12 @@ class Creature
     public boolean isLord()
     {
         return lord;
+    }
+    
+    
+    public boolean isDemiLord()
+    {
+        return demilord;
     }
 
 
