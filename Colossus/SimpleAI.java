@@ -226,6 +226,8 @@ class SimpleAI implements AI
     {
 	int value =0;
 
+	// TODO: if we're 7 high, we can't recruit (unless exploring further turns?)
+
 	// consider making an attack
 	Legion enemyLegion = hex.getEnemyLegion(legion.getPlayer());
 	if (enemyLegion != null)
