@@ -80,12 +80,22 @@ class BattleChit extends Chit
 
     Hex getCurrentHex()
     {
-        return currentHex;        
+        return currentHex;
     }
     
     
     Hex getStartingHex()
     {
-        return startingHex;        
+        return startingHex;
+    }
+
+
+    void moveToHex(Hex hex)
+    {
+        currentHex.removeChit(this);
+        currentHex = hex;
+        currentHex.addChit(this);
+        moved = true;
+        // legion.markLastChitMoved(this);
     }
 }
