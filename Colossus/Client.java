@@ -256,7 +256,7 @@ public final class Client
     }
 
     /** Legion summoner summons unit from legion donor. */
-    void summon(String summoner, String donor, String unit)
+    void doSummon(String summoner, String donor, String unit)
     {
         server.doSummon(summoner, donor, unit);
         board.repaint();
@@ -908,12 +908,11 @@ public final class Client
         return summonAngel;
     }
 
-    // XXX Remove direct legion reference.
-    public void createSummonAngel(Legion legion)
+    public void createSummonAngel(String markerId, String longMarkerName)
     {
         board.deiconify();
-        summonAngel = SummonAngel.summonAngel(this, legion.getMarkerId(),
-            legion.getLongMarkerName());
+        summonAngel = SummonAngel.summonAngel(this, markerId,
+            longMarkerName);
     }
 
     public String getDonorId()

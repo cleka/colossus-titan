@@ -613,7 +613,8 @@ public final class Server
     public void createSummonAngel(Legion legion)
     {
         Client client = getClient(legion.getPlayerName());
-        client.createSummonAngel(legion);
+        client.createSummonAngel(legion.getMarkerId(), 
+            legion.getLongMarkerName());
     }
 
     public void doSummon(String markerId, String donorId, String angel)
@@ -623,7 +624,7 @@ public final class Server
         Creature creature = null;
         if (angel != null)
         {
-            Creature.getCreatureByName(angel);
+            creature = Creature.getCreatureByName(angel);
         }
         game.doSummon(legion, donor, creature);
     }

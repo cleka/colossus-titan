@@ -743,16 +743,10 @@ public final class Legion implements Comparable
             return false;
         }
 
-        if(angelAvailable())
-            return true;
-
-        if(archangelAvailable())
-            return true;
-
-        return false;
+        return angelAvailable() || archangelAvailable();
     }
 
-    /** Return true if this legion can summon an angel or archangel. */
+    /** Return true if this legion can summon an angel (only). */
     public boolean angelAvailable()
     {
         Player player = getPlayer();
@@ -772,7 +766,7 @@ public final class Legion implements Comparable
         return false;
     }
 
-    /** Return true if this legion can summon an angel or archangel. */
+    /** Return true if this legion can summon an archangel. */
     public boolean archangelAvailable()
     {
         Player player = getPlayer();

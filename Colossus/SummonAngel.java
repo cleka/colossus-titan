@@ -113,7 +113,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
     private void cleanup(String donorId, String angel)
     {
-        client.summon(markerId, donorId, angel);
+        client.doSummon(markerId, donorId, angel);
         dispose();
         active = false;
     }
