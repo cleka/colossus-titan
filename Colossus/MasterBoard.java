@@ -989,6 +989,13 @@ public class MasterBoard extends Frame implements MouseListener,
                                         SplitLegion(this, legion, player);
                                     // Update status window.
                                     game.updateStatusScreen();
+                                    // If we split, unselect this hex.
+                                    if (legion.getHeight() < 7)
+                                    {
+                                        MasterHex hex = getHexFromLabel(
+                                            legion.getCurrentHex());
+                                        hex.unselect();
+                                    }
                                     // XXX Repaint only affected areas?
                                     repaint();
                                     return;
@@ -1012,6 +1019,15 @@ public class MasterBoard extends Frame implements MouseListener,
                                         PickRecruit pickrecruit = new 
                                             PickRecruit(this, legion);
                                     }
+                                    // If we recruited, unselect this hex.
+                                    if (legion.hasMoved() == false)
+                                    {
+                                        MasterHex hex = getHexFromLabel(
+                                            legion.getCurrentHex());
+                                        hex.unselect();
+                                    }
+                                    // XXX Repaint only affected areas?
+                                    repaint();
                                     return;
                             }
                         }
