@@ -31,7 +31,7 @@ class Legion
     {
         this.markerId = markerId;
         this.splitFrom = splitFrom;
-        this.marker = new Chit(cx, cy, scale, getImageName(), container);
+        this.marker = new Marker(cx, cy, scale, getImageName(), container, this);
         this.height = height;
         this.currentHex = hex;
         this.startingHex = hex;
