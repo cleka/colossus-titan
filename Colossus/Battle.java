@@ -934,6 +934,7 @@ public final class Battle
                     // Remove critter from iterator rather than list to
                     // prevent concurrent modification problems.
                     it.remove();
+                    game.getServer().allRemoveBattleChit(critter.getTag());
                     game.getServer().allRepaintBattleHex(hexLabel);
                 }
                 else  // critter is alive
@@ -978,7 +979,6 @@ public final class Battle
         {
             // Nobody gets any points.
             // Make defender die first, to simplify turn advancing.
-Log.debug("mutual titan elimination");
             defender.getPlayer().die(null, false);
             attacker.getPlayer().die(null, true);
             cleanup();
@@ -987,7 +987,6 @@ Log.debug("mutual titan elimination");
         // Check for single Titan elimination.
         else if (attackerTitanDead)
         {
-Log.debug("attacker titan elimination");
             String slayerName = defender.getPlayerName();
             if (defenderElim)
             {
@@ -1002,7 +1001,6 @@ Log.debug("attacker titan elimination");
         }
         else if (defenderTitanDead)
         {
-Log.debug("defender titan elimination");
             String slayerName = attacker.getPlayerName();
             if (attackerElim)
             {
@@ -1019,7 +1017,6 @@ Log.debug("defender titan elimination");
         // Check for mutual legion elimination.
         else if (attackerElim && defenderElim)
         {
-Log.debug("mutual");
             attacker.remove();
             defender.remove();
             cleanup();
@@ -1028,14 +1025,12 @@ Log.debug("mutual");
         // Check for single legion elimination.
         else if (attackerElim)
         {
-Log.debug("attacker eliminated");
             defender.addBattleTallyToPoints();
             attacker.remove();
             cleanup();
         }
         else if (defenderElim)
         {
-Log.debug("defender eliminated");
             attacker.addBattleTallyToPoints();
             defender.remove();
             cleanup();
@@ -1970,19 +1965,15 @@ Log.debug("defender eliminated");
 
     public Critter getCritter(int tag)
     {
-Log.debug("called Battle.getCritter() for tag " + tag);
         Iterator it = getAllCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-Log.debug("checking " + critter.getName() + " with tag " + critter.getTag());
             if (critter.getTag() == tag)
             {
-Log.debug("found a match");
                 return critter;
             }
         }
-Log.debug("no match");
         return null;
     }
 

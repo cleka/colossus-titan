@@ -615,24 +615,30 @@ public final class Player implements Comparable
         {
             String splitoffId = (String)Client.popUndoStack();
             Legion splitoff = getLegionByMarkerId(splitoffId);
+            String hexLabelToAlign = splitoff.getCurrentHexLabel();
             splitoff.recombine(splitoff.getParent(), true);
+            game.getServer().allAlignLegions(hexLabelToAlign);
         }
     }
 
     public void undoAllSplits()
     {
+        HashSet hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
             Legion parent = legion.getParent();
             if (parent != null && parent != legion &&
-                parent.getCurrentHex() == legion.getCurrentHex())
+                parent.getCurrentHexLabel().equals(
+                legion.getCurrentHexLabel()))
             {
+                hexLabelsToAlign.add(legion.getCurrentHexLabel());
                 legion.recombine(parent, false);
                 it.remove();
             }
         }
+        game.getServer().allAlignLegions(hexLabelsToAlign);
     }
 
 

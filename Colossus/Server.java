@@ -440,6 +440,16 @@ public final class Server
         }
     }
 
+    public void allRemoveBattleChit(int tag)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.removeBattleChit(tag);
+        }
+    }
+
 
     /** Find out if the player wants to acquire and angel or archangel. */
     public String acquireAngel(String playerName, ArrayList recruits)

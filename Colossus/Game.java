@@ -17,6 +17,7 @@ public final class Game
     private int turnNumber = 1;  // Advance when every player has a turn
     private boolean engagementInProgress;
     private boolean battleInProgress;
+    private boolean summoningAngel;
     private Battle battle;
     private static Random random = new Random();
     private Caretaker caretaker = new Caretaker();
@@ -93,6 +94,7 @@ public final class Game
 	newGame.phase = phase;
 	newGame.engagementInProgress = engagementInProgress;
 	newGame.battleInProgress = battleInProgress;
+	newGame.summoningAngel = summoningAngel;
 
 	return newGame;
     }
@@ -103,6 +105,7 @@ public final class Game
         turnNumber = 1;
         engagementInProgress = false;
         battleInProgress = false;
+        summoningAngel = false;
         caretaker.resetAllCounts();
         players.clear();
 
@@ -522,8 +525,8 @@ public final class Game
         else
         {
             server.allSetupSplitMenu();
+            player.aiSplit();
         }
-        player.aiSplit();
     }
 
 
@@ -2341,6 +2344,7 @@ public final class Game
         }
         else
         {
+            summoningAngel = false;
             server.createSummonAngel(attacker);
         }
     }
@@ -2367,6 +2371,7 @@ public final class Game
         {
             battle.finishSummoningAngel(player.hasSummoned());
         }
+        summoningAngel = false;
     }
 
 
@@ -2386,7 +2391,7 @@ public final class Game
             server.engage(engagementHexLabel);
         }
 
-        if (findEngagements().size() == 0)
+        if (findEngagements().size() == 0 && !summoningAngel)
         {
             advancePhase(FIGHT);
         }
@@ -2443,6 +2448,7 @@ public final class Game
         }
         engagementInProgress = false;
         battleInProgress = false;
+        summoningAngel = false;
         aiSetupEngagements();
         server.allUpdateStatusScreen();
     }

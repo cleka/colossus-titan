@@ -22,7 +22,7 @@ public final class Client
     private SummonAngel summonAngel;
     private MovementDie movementDie;
     private BattleMap map;
-    public BattleDice battleDice;
+    private BattleDice battleDice;
 
     private ArrayList battleChits = new ArrayList();
 
@@ -275,6 +275,7 @@ public final class Client
 
     // TODO Add requests for info.
 
+
     public void setupDice(boolean enable)
     {
         if (enable)
@@ -514,11 +515,6 @@ public final class Client
     }
 
 
-    public BattleDice getBattleDice()
-    {
-        return battleDice;
-    }
-
     public void initBattleDice()
     {
         battleDice = new BattleDice(this);
@@ -641,17 +637,14 @@ public final class Client
     /** Create a new BattleChit and add it to the end of the list. */
     public void addBattleChit(String imageName, Critter critter)
     {
-Log.debug("Called Client.addBattleChit() for " + imageName + " with tag "
-+critter.getTag());
         BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
             map, critter);
         battleChits.add(chit);
     }
 
 
-    /** Remove the first BattleChit with this tag from the list. Return
-     *  the removed BattleChit. */
-    public BattleChit removeBattleChit(int tag)
+    /** Remove the first BattleChit with this tag from the list. */
+    public void removeBattleChit(int tag)
     {
         Iterator it = battleChits.iterator();
         while (it.hasNext())
@@ -660,10 +653,8 @@ Log.debug("Called Client.addBattleChit() for " + imageName + " with tag "
             if (chit.getTag() == tag)
             {
                 it.remove();
-                return chit;
             }
         }
-        return null;
     }
 
     public void placeNewChit(Critter critter, boolean inverted)
@@ -748,6 +739,12 @@ Log.debug("Called Client.addBattleChit() for " + imageName + " with tag "
         {
             board = new MasterBoard(this);
             board.requestFocus();
+
+            // XXX Should this be in a different method?
+            if (getOption(Options.showDice))
+            {
+                initMovementDie();
+            }
         }
     }
 
@@ -788,7 +785,7 @@ Log.debug("Called Client.addBattleChit() for " + imageName + " with tag "
     public void doSummon(Legion legion, Legion donor, Creature angel)
     {
         server.getGame().doSummon(legion, donor, angel);
-        //XXX Should just repaint donor and legion hexes.
+        //XXX Should just repaint donor and legion hexes, not the whole map.
         board.repaint();
         summonAngel = null;
         board.highlightEngagements();
@@ -1005,6 +1002,12 @@ Log.debug("Called Client.addBattleChit() for " + imageName + " with tag "
         {
             map = new BattleMap(this, masterHexLabel, battle);
             showBattleMap();
+
+            // XXX Should this be in a separate method?
+            if (getOption(Options.showDice))
+            {
+                initBattleDice();
+            }
         }
     }
 
@@ -1024,8 +1027,9 @@ Log.debug("Called Client.addBattleChit() for " + imageName + " with tag "
             map.dispose();
             map = null;
         }
-        // Should this be in a separate method?
+        // XXX Should these be in a separate method?
         battleChits.clear();
+        disposeBattleDice();
     }
 
 

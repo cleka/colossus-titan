@@ -78,35 +78,12 @@ Win98, 1.4b: Attacking AI creatures aren't aggressive enough near the end
 Win98, 1.4b: Chits are placed slightly off-center in battle hexes.
 
 
+Win98, 1.4b: Currently have to pick recruiter even with "all stacks visible" 
+   set.
 
+Win98, 1.4b: One player's info dialogs block all other players.  No real 
+   solution until we add threaded events.
 
-
-Current hot bugs:
-
-Currently have to pick recruiter even with "all stacks visible" set.
-
-One player's info dialogs block all other players.  No real solution
-   until we add threaded events.
-
-Some creatures show up on the battlemap but can't be clicked.  Not just
-   summoned angels.  "Engaged creature must strike" but can't click on
-   creature so battle sticks.  Bad chits vs. critter tag.  Chit is there,
-   but battle.getCritter() returns null, because chit's tag does not
-   match any critter's tag.  Removing battle chits from client at the
-   end of each battle doesn't help.
-
-BattleDice is not being dismissed at end of combat.
-
-Game zoomed past human player's split, move, fight phases to muster.
-   Is this a problem with a leftover 'D' characters in the buffer, or
-   with the AI calling advancePhase() too many times?  Human player's
-   legion was auto-split even with autoSplit option off, so it appears
-   that the wrong player's info is being used.  Can't undo the split,
-   because the game moves forward to movement.  Once it happens, it
-   keeps happening every turn.
-
-AI defender enters map, phase advances to human player's move, but
-   map goes inactive as if a modal dialog were pending somewhere.
-   Fixed by skipping negotiation.   Also happens when AI attacker
-   attacks human defender -- not fixed there.  Concede?
-   Doesn't happen immediately after loading a game -- some flag stuck?
+Win98, 1.4b: Need to re-highlight hexes with eligible recruits after each 
+   recruit, in case the last one was taken?  Also after each undo recruit, 
+   in case the last one came back?
