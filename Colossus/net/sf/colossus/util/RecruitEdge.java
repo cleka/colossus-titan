@@ -72,6 +72,6 @@ public class RecruitEdge
     {
         return "RecruitEdge from " + number + " " +
             src.getCreatureName() + " to " +
-            dst.getCreatureName() + " in " + terrain + ". ";
+            dst.getCreatureName() + " in " + terrain;
     }
 }

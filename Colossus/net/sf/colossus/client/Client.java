@@ -150,6 +150,8 @@ public final class Client implements IClient
         sct = new SocketClientThread(this, host, port);
         this.server = (IServer)sct;
         sct.start();
+
+        TerrainRecruitLoader.setCaretakerInfo(caretakerInfo);
     }
 
     boolean isRemote()

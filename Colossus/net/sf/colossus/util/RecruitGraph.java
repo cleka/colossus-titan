@@ -17,10 +17,10 @@ import net.sf.colossus.client.CaretakerInfo;
 
 public class RecruitGraph
 {
-    private final CaretakerInfo caretakerInfo;
-    private List allVertex = new ArrayList();
-    private List allEdge = new ArrayList();
-    private Map creatureToVertex = new HashMap();
+    private CaretakerInfo caretakerInfo;
+    private final List allVertex = new ArrayList();
+    private final List allEdge = new ArrayList();
+    private final Map creatureToVertex = new HashMap();
 
     private RecruitVertex addVertex(String name)
     {
@@ -32,7 +32,7 @@ public class RecruitGraph
         RecruitVertex temp = (RecruitVertex)creatureToVertex.get(cre);
         if (temp == null)
         {
-            temp = new RecruitVertex(cre, caretakerInfo);
+            temp = new RecruitVertex(cre, this);
             allVertex.add(temp);
             creatureToVertex.put(cre, temp);
         }
@@ -74,20 +74,44 @@ public class RecruitGraph
                    (2) enough in current legion + caretaker to traverse
                    (3) at least one of the destination still available
                 */
-                if ((!(visited.contains(v))) &&
-                    ((s.getRemaining() + already) >= e.getNumber()) &&
-                    (v.getRemaining() > 0))
+                if (!(visited.contains(v)))
                 {
-                    all.addAll(traverse(v, visited, legion));
+                    if (((s.getRemaining() + already) >= e.getNumber()) &&
+                        (v.getRemaining() > 0))
+                    {
+                        all.addAll(traverse(v, visited, legion));
+                    }
+                    else
+                    {
+                        Log.debug("GRAPH: ignoring " + e +
+                                  " as not enough creatures are left (a: " +
+                                  already + " s: " + s.getRemaining() +
+                                  " d: " + v.getRemaining() + ")");
+                    }
                 }
             }
         }
         return all;
     }
 
+    CaretakerInfo getCaretakerInfo()
+    {
+        return caretakerInfo;
+    }
+
     /* PUBLIC */
 
     public RecruitGraph(CaretakerInfo caretakerInfo)
+    {
+        this.caretakerInfo = caretakerInfo;
+    }
+
+    public RecruitGraph()
+    {
+        this.caretakerInfo = null;
+    }
+
+    public void setCaretakerInfo(CaretakerInfo caretakerInfo)
     {
         this.caretakerInfo = caretakerInfo;
     }
@@ -143,5 +167,13 @@ public class RecruitGraph
     public List traverse(String name, LegionInfo legion)
     {
         return traverse(Creature.getCreatureByName(name), legion);
+    }
+
+    public void clear()
+    {
+        caretakerInfo = null;
+        allVertex.clear();
+        allEdge.clear();
+        creatureToVertex.clear();
     }
 }

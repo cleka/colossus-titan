@@ -18,6 +18,7 @@ import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.util.RecruitEdge;
 import net.sf.colossus.util.RecruitVertex;
+import net.sf.colossus.client.CaretakerInfo;
 
 /**
  * TerrainRecruitLoader load the terrains and recruits descriptions.
@@ -62,8 +63,18 @@ public class TerrainRecruitLoader
      * Representation of the Recruiting Graph (for use)
      * (sometimes called Recruiting Tree).
      */
-    private static RecruitGraph graph = new RecruitGraph(null);
+    private static RecruitGraph graph = new RecruitGraph();
 
+    /**
+     * set the CaretakerInfo used by the graph
+     * (needed to know what creatures are still available)
+     */
+    public static void setCaretakerInfo(CaretakerInfo caretakerInfo)
+    {
+        Log.debug("GRAPH: Setting the CaretakerInfo");
+        graph.setCaretakerInfo(caretakerInfo);
+    }
+    
     /**
      * Add an entire terrain recruiting list to the Recruiting Graph.
      * @param rl The list of RecruitNumber to add to the graph.
@@ -115,7 +126,7 @@ public class TerrainRecruitLoader
         carToDisplayName.clear();
         carToColor.clear();
         carToBelow.clear();
-        graph = new RecruitGraph(null);
+        graph.clear();
     }
 
     /**

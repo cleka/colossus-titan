@@ -16,19 +16,19 @@ import net.sf.colossus.client.CaretakerInfo;
 public class RecruitVertex
 {
     private final Creature cre;
-    private final CaretakerInfo caretakerInfo;
+    private final RecruitGraph graph;
     private List outgoingEdges = new ArrayList();
     
-    RecruitVertex(Creature cre, CaretakerInfo caretakerInfo)
+    RecruitVertex(Creature cre, RecruitGraph graph)
     {
         this.cre = cre;
-        this.caretakerInfo = caretakerInfo;
+        this.graph = graph;
     }
     
-    RecruitVertex(String name, CaretakerInfo caretakerInfo)
+    RecruitVertex(String name, RecruitGraph graph)
     {
         this.cre = Creature.getCreatureByName(name);
-        this.caretakerInfo = caretakerInfo;
+        this.graph = graph;
     }
     
     List getOutgoingEdges()
@@ -60,9 +60,9 @@ public class RecruitVertex
 
     public int getRemaining()
     {
-        if (caretakerInfo != null)
+        if (graph.getCaretakerInfo() != null)
         {
-            return caretakerInfo.getCount(cre);
+            return graph.getCaretakerInfo().getCount(cre);
         }
         else
         {
@@ -87,6 +87,6 @@ public class RecruitVertex
     public String toString()
     {
         return "RecruitVertex " + cre.getName() + " with " +
-            outgoingEdges.size() + "exits. ";
+            outgoingEdges.size() + "exits";
     }
 }
