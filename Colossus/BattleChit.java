@@ -11,7 +11,7 @@ import java.util.*;
 class BattleChit extends Chit
 {
     private Legion legion;
-    private Creature creature;
+    private Critter critter;
     private BattleMap map;
     private boolean moved = false;
     private boolean struck = false;
@@ -27,11 +27,11 @@ class BattleChit extends Chit
 
 
     BattleChit(int cx, int cy, int scale, String imageFilename,
-        Container container, Creature creature, BattleHex hex,
+        Container container, Critter critter, BattleHex hex,
         Legion legion, BattleMap map)
     {
         super(cx, cy, scale, imageFilename, container);
-        this.creature = creature;
+        this.critter = critter;
         this.currentHex = hex;
         this.startingHex = hex;
         this.map = map;
@@ -39,9 +39,9 @@ class BattleChit extends Chit
     }
 
 
-    public Creature getCreature()
+    public Critter getCritter()
     {
-        return creature;
+        return critter;
     }
 
 
@@ -59,14 +59,7 @@ class BattleChit extends Chit
 
     public int getPower()
     {
-        if (creature == Creature.titan)
-        {
-            return legion.getPlayer().getTitanPower();
-        }
-        else
-        {
-            return creature.getPower();
-        }
+        return critter.getPower();
     }
 
 
@@ -207,7 +200,8 @@ class BattleChit extends Chit
             dice /= 2;
 
             // Dragon rangestriking from volcano: +2
-            if (creature == Creature.dragon && currentHex.getTerrain() == 'v')
+            if (critter.getName().equals("Dragon") && 
+                currentHex.getTerrain() == 'v')
             {
                 dice += 2;
             }
@@ -216,7 +210,8 @@ class BattleChit extends Chit
         {
             // Dice can be modified by terrain.
             // Dragon striking from volcano: +2
-            if (creature == Creature.dragon && currentHex.getTerrain() == 'v')
+            if (critter.getName().equals("Dragon") && 
+                currentHex.getTerrain() == 'v')
             {
                 dice += 2;
             }
@@ -227,17 +222,17 @@ class BattleChit extends Chit
             char oppHexside = currentHex.getOppositeHexside(direction);
 
             // Native striking down a dune hexside: +2
-            if (hexside == 'd' && creature.isNativeSandDune())
+            if (hexside == 'd' && critter.isNativeSandDune())
             {
                 dice += 2;
             }
             // Native striking down a slope hexside: +1
-            else if (hexside == 's' && creature.isNativeSlope())
+            else if (hexside == 's' && critter.isNativeSlope())
             {
                 dice++;
             }
             // Non-native striking up a dune hexside: -1
-            else if (oppHexside == 'd' && !creature.isNativeSandDune())
+            else if (oppHexside == 'd' && !critter.isNativeSandDune())
             {
                 dice--;
             }
@@ -251,7 +246,7 @@ class BattleChit extends Chit
     {
         BattleHex targetHex = target.getCurrentHex();
 
-        int attackerSkill = creature.getSkill();
+        int attackerSkill = critter.getSkill();
 
         boolean rangestrike = !inContact(true);
 
@@ -259,7 +254,7 @@ class BattleChit extends Chit
         if (!rangestrike)
         {
             // Non-native striking out of bramble: -1
-            if (currentHex.getTerrain() == 'r' && !creature.isNativeBramble())
+            if (currentHex.getTerrain() == 'r' && !critter.isNativeBramble())
             {
                 attackerSkill--;
             }
@@ -282,7 +277,7 @@ class BattleChit extends Chit
                 char hexside = targetHex.getHexside(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
-                if ((hexside == 's' && !creature.isNativeSlope()) ||
+                if ((hexside == 's' && !critter.isNativeSlope()) ||
                     hexside == 'w')
                 {
                     attackerSkill--;
@@ -290,7 +285,7 @@ class BattleChit extends Chit
             }
 
         }
-        else if (creature != Creature.warlock)
+        else if (!critter.getName().equals("Warlock"))
         {
             // Range penalty
             if (map.getRange(currentHex, targetHex) == 4)
@@ -299,7 +294,7 @@ class BattleChit extends Chit
             }
 
             // Non-native rangestrikes: -1 per intervening bramble hex
-            if (!creature.isNativeBramble())
+            if (!critter.isNativeBramble())
             {
                 attackerSkill -= map.countBrambleHexes(currentHex, targetHex);
             }
@@ -339,7 +334,7 @@ class BattleChit extends Chit
         boolean rangestrike = !inContact(true);
 
         int attackerSkill = getAttackerSkill(target);
-        int defenderSkill = target.getCreature().getSkill();
+        int defenderSkill = target.getCritter().getSkill();
 
         int strikeNumber = 4 - attackerSkill + defenderSkill;
 
@@ -348,9 +343,9 @@ class BattleChit extends Chit
         // Native defending in bramble, from rangestrike by a non-native
         //     non-warlock: +1
         if (targetHex.getTerrain() == 'r' &&
-            target.getCreature().isNativeBramble() &&
-            !creature.isNativeBramble() &&
-            !(rangestrike && creature == Creature.warlock))
+            target.getCritter().isNativeBramble() &&
+            !critter.isNativeBramble() &&
+            !(rangestrike && critter.getName().equals("Warlock")))
         {
             strikeNumber++;
         }
@@ -372,7 +367,7 @@ class BattleChit extends Chit
     private boolean chooseStrikePenalty(BattleChit carryTarget)
     {
         String promptString = "Take strike penalty to allow carrying to " +
-            carryTarget.getCreature().getName() + " in " +
+            carryTarget.getCritter().getName() + " in " +
             carryTarget.getCurrentHex().getTerrainName().toLowerCase() + "?";
 
         new OptionDialog(map, "Take Strike Penalty?", promptString, 
