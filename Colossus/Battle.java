@@ -409,7 +409,7 @@ public final class Battle
             Player player = getActivePlayer();
             if (player.getOption(Options.autoBattleMove))
             {
-                player.aiBattleMove(getActiveLegion(), this);
+                player.aiBattleMove();
             }
         }
     }
@@ -1372,6 +1372,11 @@ Game.logDebug("defender eliminated");
     public static int getRange(BattleHex hex1, BattleHex hex2,
         boolean allowEntrance)
     {
+        if (hex1 == null || hex2 == null)
+        {
+            Game.logDebug("passed null hex to getRange()");
+            return OUT_OF_RANGE;
+        }
         if (hex1.isEntrance() || hex2.isEntrance())
         {
             if (allowEntrance)
@@ -1389,7 +1394,7 @@ Game.logDebug("defender eliminated");
             }
             else
             {
-                // It's out of range.  Don't sweat the details.
+                // It's out of range.  No need to do the math.
                 return OUT_OF_RANGE;
             }
         }

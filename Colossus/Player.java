@@ -994,11 +994,11 @@ public final class Player implements Comparable
         return false;
     }
 
-    public void aiBattleMove(Legion legion, Battle battle)
+    public void aiBattleMove()
     {
         if (getOption(Options.autoBattleMove))
         {
-            ai.battleMove(legion, battle, game);
+            ai.battleMove(game);
         }
     }
 

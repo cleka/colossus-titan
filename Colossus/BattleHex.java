@@ -405,7 +405,7 @@ public final class BattleHex extends Hex
     {
         if (xCoord == -1)
         {
-            label = "entrance" + yCoord;
+            label = "X" + yCoord;
             return;
         }
 

@@ -854,6 +854,26 @@ public final class Legion implements Comparable
         critter.setMarkerId(markerId);
     }
 
+    /** Return the first critter with a matching creatureClass:
+     *  name + startingHexLabel */
+    public Critter getCritterByCreatureClass(String creatureClass)
+    {
+        int len = creatureClass.length();
+        String name = creatureClass.substring(0, len - 2);
+        String hexLabel = creatureClass.substring(len - 2);
+
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (name.equals(critter.getName()) && hexLabel.equals(
+                critter.getCurrentHexLabel()))
+            {
+                return critter;
+            }
+        }
+        return null;
+    }
 
     /** Move critter to the first position in the critters list.
      *  Return true if it was moved. */

@@ -76,8 +76,7 @@ inst: $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST)
 
 # Clean up
 clean:
-	rm -f *~ core javacore.txt *.bak *.jar
-	rm *.class
+	rm -f *~ core javacore.txt *.bak *.jar *.class
 
 # Make zip file.  Don't include saved games, CVS dirs, or other zip files.
 dist: $(JARFILE)

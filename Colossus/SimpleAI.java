@@ -2167,58 +2167,81 @@ class SimpleAI implements AI
      */
 
 
-    public void battleMove(Legion legion, Battle battle, Game game)
+    public void battleMove(Game game)
     {
-        debugln("Called battleMove() for legion " + legion.getMarkerId());
-        simpleBattleMove(legion, game);
-        debugln("Done with battleMove for legion " + legion.getMarkerId());
+        debugln("Called battleMove()");
+        ArrayList allCritterMoves = findBattleMoves(game);
+
+        // Now that critters are sorted into the order in which they
+        // should move, start moving them, using the real game data.
+        // If the preferred move fails, fall back to the critter's
+        // remaining moves.
+
+        Battle battle = game.getBattle();
+        BattleMap map = battle.getBattleMap();
+        final char terrain = battle.getTerrain();
+        Legion legion = battle.getActiveLegion();
+
+        Iterator it = allCritterMoves.iterator();
+        while (it.hasNext())
+        {
+            ArrayList moveList = (ArrayList)it.next();
+            Iterator it2 = moveList.iterator();
+            while (it2.hasNext())
+            {
+                CritterMove cm = (CritterMove)it2.next();
+                Critter critter = legion.getCritterByCreatureClass(
+                    cm.getCreatureName() + cm.getStartingHexLabel());
+                BattleHex hex = cm.getEndingHex(map);
+                debugln("applymove: try " + critter + " to " + hex.getLabel());
+                if (battle.doMove(critter, hex))
+                {
+                    // The move was okay, so continue to the next critter.
+                    break;
+                }
+            }
+        }
+
+        debugln("Done with battleMove");
     }
 
 
-    public void simpleBattleMove(Legion legion, Game game)
+    /** Compute a set of CritterMoves for the game's active legion.
+     *  Return an ArrayList containing one ArrayList of CritterMoves
+     *  for each Critter.
+     */
+    public ArrayList findBattleMoves(Game realGame)
     {
         // Consider one critter at a time, in order of importance.
-        // Sort all possible moves for that critter not already
-        // taken by a more important one.  Actually make the moves
-        // in a different order than computed, to avoid critters
-        // getting in each other's way.
+        // Examine all possible moves for that critter not already
+        // taken by a more important one.
 
         // TODO Handle summoned/recruited critters, in particular
         // getting stuff out of the way so that a reinforcement
         // has room to enter.
 
+        // Work on a copy of the game state.  The caller is responsible
+        // for actually making the moves.
+        final Game game = realGame.AICopy();
+
         final Battle battle = game.getBattle();
         final BattleMap map = battle.getBattleMap();
         final char terrain = battle.getTerrain();
-        ArrayList critters = battle.getActiveLegion().getCritters();
+        final Legion legion = battle.getActiveLegion();
+        ArrayList critters = legion.getCritters();
 
         debugln("There are " + critters.size() + " critters");
 
         // Sort critters in decreasing order of importance.  Keep
         // identical creatures together with a secondary sort by
         // creature name.
-        Collections.sort(critters, new Comparator()
-        {
-            public int compare(Object o1, Object o2)
-            {
-                Critter critter1 = (Critter)o1;
-                Critter critter2 = (Critter)o2;
-                int diff = getKillValue(critter2, terrain) -
-                    getKillValue(critter1, terrain);
-                if (diff != 0)
-                {
-                    return diff;
-                }
-                else
-                {
-                    return critter1.getName().compareTo(critter2.getName());
-                }
-            }
-        });
+        Collections.sort(critters, new CritterComparator(terrain));
 
-        // allCritterMoves is a HashMap of creature classes to moveLists.
-        final HashMap allCritterMoves = new HashMap();
+        // allCritterMoves is an ArrayList of moveLists.
+        final ArrayList allCritterMoves = new ArrayList();
         HashSet hexesTaken = new HashSet();
+
+        String lastCreatureClass = "";
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -2234,15 +2257,33 @@ class SimpleAI implements AI
             Set moves = battle.showMoves(critter);
 
             // Not moving is also an option, unless the critter is offboard.
-            if (!currentHexLabel.startsWith("entrance"))
+            if (!currentHexLabel.startsWith("X"))
             {
                 moves.add(currentHexLabel);
+            }
+
+            // Now that we've computed possible moves with them out
+            // of the way, move previously considered critters into
+            // position so we can take them into account when
+            // evaluating this critter's moves.
+            Iterator it2 = allCritterMoves.iterator();
+            while (it2.hasNext())
+            {
+                ArrayList moveList = (ArrayList)it2.next();
+                CritterMove cm = (CritterMove)moveList.get(0);
+                Critter critter2 = legion.getCritterByCreatureClass(
+                    cm.getCreatureClass());
+                // Might already have been moved.
+                if (critter2 != null)
+                {
+                    critter2.moveToHex(cm.getEndingHex(map));
+                }
             }
 
             // moveList is a list of CritterMoves for one critter.
             ArrayList moveList = new ArrayList();
 
-            Iterator it2 = moves.iterator();
+            it2 = moves.iterator();
             while (it2.hasNext())
             {
                 String hexLabel = (String)it2.next();
@@ -2254,25 +2295,18 @@ class SimpleAI implements AI
                     continue;
                 }
 
-                BattleHex hex = map.getHexFromLabel(hexLabel);
                 CritterMove cm = new CritterMove(critterName,
                    currentHexLabel, hexLabel);
+                BattleHex hex = map.getHexFromLabel(hexLabel);
 
-                // XXX Need to actually move critter to hex to evaluate.
-                // We should write some static battle methods to fix.
-                // Basically, AICopy() the battle (and critters), then
-                // effectively teleport critters to their desired hexes.
-                // When we're done evaluating, we can do error-checked
-                // moves with the real battle.
+                // Need to move the critter to evaluate.
                 critter.moveToHex(hex);
 
                 // Compute and save the value for each CritterMove.
-                // TODO Pretend that more important critters have already
-                // moved, so we can take them into account.
                 cm.setValue(evaluateCritterMove(battle, critter));
                 moveList.add(cm);
 
-                // XXX Need to put the critter back where it started.
+                // Move the critter back.
                 critter.moveToHex(critter.getStartingHex());
             }
 
@@ -2293,9 +2327,9 @@ class SimpleAI implements AI
             hexesTaken.add(hexLabel);
 
             // Show the moves considered.
-            StringBuffer buf = new StringBuffer("Considering " +
-                moveList.size() + " moves for " + critter.getDescription() +
-                ":");
+            StringBuffer buf = new StringBuffer("Considered " +
+                moveList.size() + " moves for " + critter.getName() + " in " +
+                critter.getStartingHexLabel() + ":");
             it2 = moveList.iterator();
             while (it2.hasNext())
             {
@@ -2304,7 +2338,7 @@ class SimpleAI implements AI
             }
             debugln(buf.toString());
 
-            allCritterMoves.put(critter.getCreatureClass(), moveList);
+            allCritterMoves.add(moveList);
         }
 
 
@@ -2331,19 +2365,29 @@ class SimpleAI implements AI
                     return -1;
                 }
 
-                ArrayList moveList = (ArrayList)allCritterMoves.get(
-                    critter1.getCreatureClass());
-                CritterMove cm = (CritterMove)moveList.get(0);
-                BattleHex desiredHex1 = cm.getEndingHex(map);
+                BattleHex desiredHex1 = null;
+                BattleHex desiredHex2 = null;
 
-                moveList = (ArrayList)allCritterMoves.get(
-                    critter2.getCreatureClass());
-                cm = (CritterMove)moveList.get(0);
-                BattleHex desiredHex2 = cm.getEndingHex(map);
+                Iterator it3 = allCritterMoves.iterator();
+                while (it3.hasNext())
+                {
+                    ArrayList moveList = (ArrayList)it3.next();
+                    CritterMove cm = (CritterMove)moveList.get(0);
+                    if (desiredHex1 == null &&
+                        cm.getCritter(legion) == critter1)
+                    {
+                        desiredHex1 = cm.getEndingHex(map);
+                    }
+                    else if (desiredHex2 == null &&
+                        cm.getCritter(legion) == critter2)
+                    {
+                        desiredHex2 = cm.getEndingHex(map);
+                    }
+                }
 
-                int diff = battle.getRange(critter2.getCurrentHex(),
+                int diff = battle.getRange(critter2.getStartingHex(),
                     desiredHex2, true) - battle.getRange(
-                    critter1.getCurrentHex(), desiredHex1, true);
+                    critter1.getStartingHex(), desiredHex1, true);
                 if (diff != 0)
                 {
                     return diff;
@@ -2373,88 +2417,7 @@ class SimpleAI implements AI
             }
         });
 
-        // Now that critters are sorted into the order in which they
-        // should move, start moving them.
-        // If the preferred move fails, fall back to the critter's
-        // remaining moves.
-        it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            ArrayList moveList = (ArrayList)allCritterMoves.get(
-                critter.getCreatureClass());
-            Iterator it2 = moveList.iterator();
-            while (it2.hasNext())
-            {
-                CritterMove cm = (CritterMove)it2.next();
-                BattleHex hex = cm.getEndingHex(map);
-                debugln("applymove: try " + critter + " to " + hex.getLabel());
-                if (battle.doMove(critter, hex))
-                {
-                    // The move was okay, so continue to the next critter.
-                    break;
-                }
-            }
-        }
-    }
-
-
-    class CritterMove implements Minimax.Move
-    {
-        private int value;
-        private String creatureName;
-        private String startingHexLabel;
-        private String endingHexLabel;
-
-        public CritterMove(String creatureName, String startingHexLabel,
-            String endingHexLabel)
-        {
-            super();
-            this.creatureName = creatureName;
-            this.startingHexLabel = startingHexLabel;
-            this.endingHexLabel = endingHexLabel;
-        }
-
-        public void setValue(int value)
-        {
-            this.value = value;
-        }
-
-        public int getValue()
-        {
-            return value;
-        }
-
-        public String getCreatureName()
-        {
-            return creatureName;
-        }
-
-        // Assumes the move has not yet been made.
-        public Critter getCritter(Battle battle)
-        {
-            return battle.getCritterFromHexLabel(startingHexLabel);
-        }
-
-        public String getStartingHexLabel()
-        {
-            return startingHexLabel;
-        }
-
-        public String getEndingHexLabel()
-        {
-            return endingHexLabel;
-        }
-
-        public BattleHex getStartingHex(BattleMap map)
-        {
-            return map.getHexFromLabel(startingHexLabel);
-        }
-
-        public BattleHex getEndingHex(BattleMap map)
-        {
-            return map.getHexFromLabel(endingHexLabel);
-        }
+        return allCritterMoves;
     }
 
 
@@ -2613,5 +2576,98 @@ class SimpleAI implements AI
         }
 
         return value;
+    }
+
+
+    /** Sort critters in decreasing order of importance.  Keep
+     *  identical creatures together with a secondary sort by
+     *  creature name. */
+    final class CritterComparator implements Comparator
+    {
+        private char terrain;
+
+        public CritterComparator(char terrain)
+        {
+            this.terrain = terrain;
+        }
+
+        public int compare(Object o1, Object o2)
+        {
+            Critter critter1 = (Critter)o1;
+            Critter critter2 = (Critter)o2;
+            int diff = getKillValue(critter2, terrain) -
+                getKillValue(critter1, terrain);
+            if (diff != 0)
+            {
+                return diff;
+            }
+            else
+            {
+                return critter1.getName().compareTo(critter2.getName());
+            }
+        }
+    }
+
+
+    class CritterMove implements Minimax.Move
+    {
+        private int value;
+        private String creatureName;
+        private String startingHexLabel;
+        private String endingHexLabel;
+
+        public CritterMove(String creatureName, String startingHexLabel,
+            String endingHexLabel)
+        {
+            super();
+            this.creatureName = creatureName;
+            this.startingHexLabel = startingHexLabel;
+            this.endingHexLabel = endingHexLabel;
+        }
+
+        public void setValue(int value)
+        {
+            this.value = value;
+        }
+
+        public int getValue()
+        {
+            return value;
+        }
+
+        public String getCreatureName()
+        {
+            return creatureName;
+        }
+
+        public String getCreatureClass()
+        {
+            return creatureName + endingHexLabel;
+        }
+
+        public Critter getCritter(Legion legion)
+        {
+            return legion.getCritterByCreatureClass(getCreatureClass());
+        }
+
+        public String getStartingHexLabel()
+        {
+            return startingHexLabel;
+        }
+
+        public String getEndingHexLabel()
+        {
+            return endingHexLabel;
+        }
+
+        public BattleHex getStartingHex(BattleMap map)
+        {
+            return map.getHexFromLabel(startingHexLabel);
+        }
+
+        public BattleHex getEndingHex(BattleMap map)
+        {
+            return map.getHexFromLabel(endingHexLabel);
+        }
     }
 }

@@ -31,6 +31,6 @@ public interface AI
     boolean chooseStrikePenalty(Critter critter, Critter target,
         Critter carryTarget, Battle battle, Game game);
 
-    /** make battle moves for legion */
-    void battleMove(Legion legion, Battle battle, Game game);
+    /** make battle moves for the active legion */
+    void battleMove(Game game);
 }
