@@ -37,6 +37,7 @@ public class Creature implements Comparable
     private final boolean nativeVolcano;
     private final boolean waterDwelling;
     private final boolean magicMissile;
+    private final boolean summonable;
     private final boolean lord;
     private final boolean demilord;
     private final int maxCount;
@@ -44,7 +45,7 @@ public class Creature implements Comparable
     /** For marking unknown enemy creatures when tracking PBEM games. */
     public static final Creature unknown = new Creature("Unknown", 1, 1,
         false, false, false, false, false, false, false,
-        false, false, false, false, false,
+        false, false, false, false, false, false,
         1, "Unknown");
 
     /** Sometimes we need to iterate through all creature types. */
@@ -55,6 +56,7 @@ public class Creature implements Comparable
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
         boolean nativeVolcano, boolean waterDwelling, boolean magicMissile,
+        boolean summonable,
         boolean lord, boolean demilord, int maxCount, String pluralName)
     {
         this.name = name;
@@ -70,6 +72,7 @@ public class Creature implements Comparable
         this.nativeVolcano = nativeVolcano;
         this.waterDwelling = waterDwelling;
         this.magicMissile = magicMissile;
+        this.summonable = summonable;
         this.lord = lord;
         this.demilord = demilord;
         this.maxCount = maxCount;
@@ -92,6 +95,7 @@ public class Creature implements Comparable
         this.nativeVolcano = creature.nativeVolcano;
         this.waterDwelling = creature.waterDwelling;
         this.magicMissile = creature.magicMissile;
+        this.summonable = creature.summonable;
         this.lord = creature.lord;
         this.demilord = creature.demilord;
         this.maxCount = creature.maxCount;
@@ -231,6 +235,11 @@ public class Creature implements Comparable
     public boolean useMagicMissile()
     {
         return magicMissile;
+    }
+
+    public boolean isSummonable()
+    {
+        return summonable;
     }
 
     public static Creature getCreatureByName(String name)

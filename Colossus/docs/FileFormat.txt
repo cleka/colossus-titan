@@ -114,23 +114,23 @@ as starting creatures.
 
 # The second kind is:
 
-ANGEL <point_value> <angel_name> ((<terrain_letter>,)*<terrain_letter>)?
+ACQUIRABLE <point_value> <acquirable_name> ((<terrain_letter>,)*<terrain_letter>)?
 
-ANGEL is the literal string ANGEL
+ACQUIRABLE is the literal string ACQUIRABLE
 
-<point_value> is the amount of points needed to recruit the Angel
-<angel_name> is the name of the Creature to consider as an Angel
+<point_value> is the amount of points needed to recruit the Acquirable
+<acquirable_name> is the name of the Creature to consider as an Acquirable
 <terrain_letter> is an (optional) comma-separated list of terrain
-letter (see above) that restrict the availability of the Angel.
-If the list is ommited, the Angel can bre recruited everywhere.
+letter (see above) that restrict the availability of the Acquirable.
+If the list is ommited, the Acquirable can bre recruited everywhere.
 
 Note that all <point_value> must be even multiple of the first
 <point_value> ; other values are erroneous and will be flagged
 as such.
 
 Multiple line can be present, in which case, the behavior is
-the same as if all the Angel where on one line. Order of
-Angel is not important, except for the first one, which
+the same as if all the Acquirable where on one line. Order of
+Acquirable is not important, except for the first one, which
 defines the reference for <point_value>.
 
 3) CRE file format (default file used: Default/Default.cre)

@@ -116,6 +116,7 @@ int oneCreature(List lc) :
     boolean nativeVolcano;
     boolean waterDwelling;
     boolean magicMissile;
+    boolean summonable;
     boolean lord;
     boolean demilord;
     int maxCount;
@@ -135,6 +136,7 @@ int oneCreature(List lc) :
     (nativeVolcano= c_bool())
     (waterDwelling= c_bool())
     (magicMissile= c_bool())
+    (summonable= c_bool())
     (lord= c_bool())
     (demilord= c_bool())
     (maxCount= c_number())
@@ -144,6 +146,7 @@ int oneCreature(List lc) :
                               flies, nativeBramble, nativeDrift,
                               nativeBog, nativeSandDune, nativeSlope,
                               nativeVolcano, waterDwelling, magicMissile,
+                              summonable,
                               lord, demilord, maxCount, pluralName));
         System.out.println(name + " is a " + power + " " + skill);
         return 1;
