@@ -84,6 +84,19 @@ got enemies that can attack on a 5 :[Bu03]
 got enemies that can attack on a 6 :[Bu03]
 EVAL Gd01 move to Plains hex 105 = 0
 
+Bug: The duplicate name detection code for network players is now
+   failing with the new initialization timing -- oscillating fixNames
+   between dripton and dripton4
+
+Bug: Saw 8-high enemy legion 3xUni, Chi, 3xGri, Ran.  Height shows up
+   as 7 on marker.  Savegame shows no ranger.  Should be fixed by
+   stack prediction code.
+
+Caretaker Titan has excess "Titan" at top, obscured by image.  Use
+   black 6-4 titan instead?
+
+Auto-redirect output to file lastlog in Colossus directory
+
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 
 

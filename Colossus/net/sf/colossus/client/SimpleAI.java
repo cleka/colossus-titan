@@ -2959,7 +2959,8 @@ Log.debug("Called findBattleMoves()");
         // don't just sit back and wait for a time loss.
         if (critter.isTitan())
         {
-            if (HexMap.terrainIsTower(terrain))
+            if (HexMap.terrainIsTower(terrain) && legion.getMarkerId().equals(
+                client.getAttackerMarkerId()))
             {
                 // Stick to the center of the tower.
                 value += bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation();
