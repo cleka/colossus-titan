@@ -25,7 +25,7 @@ final class Critter extends Creature implements Comparable
     private String currentHexLabel;
     private String startingHexLabel;
     /** Damage taken */
-    private int hits;
+    private int hits = 0;
     private Game game;
     /** Unique identifier for each critter. */
     private int tag;
@@ -598,7 +598,7 @@ final class Critter extends Creature implements Comparable
 
         if (carryPossible)
         {
-            findCarries(target, dice, strikeNumber);
+            findCarries(target);
 
             if (!penaltyOptions.isEmpty())
             {
@@ -680,27 +680,30 @@ Log.debug("calling Critter.assignStrikePenalty() with " + prompt);
      *  on penaltyOptions, battle.carryTargets. */
     boolean possibleStrikePenalty(Critter target)
     {
-        int dice = getDice(target);
-        int strikeNumber = getStrikeNumber(target);
-        findCarries(target, dice, strikeNumber);
+        findCarries(target);
         return (!penaltyOptions.isEmpty());
     }
 
-    // Side effects on penaltyOptions, Battle.carryTargets
-    private void findCarries(Critter target, int dice, int strikeNumber)
+    /** Side effects on penaltyOptions, Battle.carryTargets */
+    void findCarries(Critter target)
     {
-Log.debug("findCarries " + this.getDescription() + " striking " + target.getDescription() + " dice:" + dice + " strikeNumber:" + strikeNumber);
+Log.debug("findCarries " + this.getDescription() + " striking " + target.getDescription()); 
 
         battle.clearCarryTargets();
         penaltyOptions.clear();
+
+        // Abort if no carries are possible.
+        if (getDice(target) <= target.getPower() - target.getHits())
+        {
+            return;
+        }
 
         // Look for possible carries in each direction.
         for (int i = 0; i < 6; i++)
         {
             if (possibleCarryToDir(target.getCurrentHex(), i))
             {
-                findCarry(target, dice, strikeNumber, 
-                    getCurrentHex().getNeighbor(i));
+                findCarry(target, getCurrentHex().getNeighbor(i));
             }
         }
     }
@@ -731,12 +734,15 @@ Log.debug("findCarries " + this.getDescription() + " striking " + target.getDesc
     }
 
     /** For a strike on target, find any carries (including those
-     *  only allowed via strike penalty) to the creature in neighbor */
-    private void findCarry(Critter target, int dice, int strikeNumber, 
-        BattleHex neighbor)
+     *  only allowed via strike penalty) to the creature in neighbor
+     *  Side effects on penaltyOptions, Battle.carryTargets */
+    private void findCarry(Critter target, BattleHex neighbor)
     {
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
+
+        final int dice = getDice(target);
+        final int strikeNumber = getStrikeNumber(target);
 
         Critter victim = battle.getCritter(neighbor);
         if (victim == null || victim.getPlayer() == getPlayer() || 
@@ -747,7 +753,23 @@ Log.debug("findCarries " + this.getDescription() + " striking " + target.getDesc
         int tmpDice = getDice(victim);
         int tmpStrikeNumber = getStrikeNumber(victim);
 
-        if (tmpStrikeNumber <= strikeNumber && tmpDice >= dice)
+        // Can't actually get a bonus to carry.
+        if (tmpDice > dice)
+        {
+            tmpDice = dice;
+        }
+        if (tmpStrikeNumber < strikeNumber)
+        {
+            tmpStrikeNumber = strikeNumber;
+        }
+
+        // Abort if no carries are possible.
+        if (tmpDice <= target.getPower() - target.getHits())
+        {
+            return;
+        }
+
+        if (tmpStrikeNumber == strikeNumber && tmpDice == dice)
         {
             // Can carry with no need for a penalty.
             battle.addCarryTarget(neighbor.getLabel());
@@ -765,8 +787,8 @@ Log.debug("added carry target " + victim.getDescription());
                 if (po.getDice() == tmpDice &&
                     po.getStrikeNumber() == tmpStrikeNumber)
                 {
-Log.debug("existing penalty option: " + po.toString());
                     po.addCarryTarget(neighbor.getLabel());
+Log.debug("existing penalty option: " + po.toString());
                     return;
                 }
             }
@@ -835,6 +857,12 @@ Log.debug("new penalty option: " + po.toString());
                 strikeNumber, rolls, damage, carryDamage,
                 battle.getCarryTargetDescriptions());
         }
+    }
+
+
+    Set getPenaltyOptions()
+    {
+        return Collections.unmodifiableSortedSet(penaltyOptions);
     }
 
 
