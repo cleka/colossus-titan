@@ -335,6 +335,7 @@ public final class Server implements IServer
         {
             Log.error(getPlayerName() +
                     " illegally called doneWithBattleMoves()");
+            getClient(getPlayerName()).nak();
             return;
         }
         Battle battle = game.getBattle();
@@ -347,6 +348,7 @@ public final class Server implements IServer
         if (!isBattleActivePlayer() || battle.getPhase() < Constants.FIGHT)
         {
             Log.error(getPlayerName() + " illegally called doneWithStrikes()");
+            getClient(getPlayerName()).nak();
             return;
         }
         if (!battle.doneWithStrikes())
@@ -722,10 +724,6 @@ public final class Server implements IServer
         else
         {
             client.nak();
-
-            // XXX -- uncomment after verifying it doesn't cause hangs
-            // during reinforcement phase.  (May need to handle
-            // nak first.) 
             return;
         }
 
@@ -961,6 +959,19 @@ public final class Server implements IServer
             client.nak();
             return;
         }
+        if (target.getPlayer() == critter.getPlayer())
+        {
+            Log.error(critter.getDescription() + " tried to strike allied " +
+                target.getDescription());
+            client.nak();
+            return;
+        }
+        if (critter.hasStruck())
+        {
+            Log.error(critter.getDescription() + " tried to strike twice");
+            client.nak();
+            return;
+        }
         critter.strike(target);
     }
 
@@ -1070,10 +1081,11 @@ public final class Server implements IServer
 
     public void assignStrikePenalty(String prompt)
     {
-        if (!isBattleActivePlayer())
+        if (!isBattleActivePlayer() || striker.hasStruck())
         {
             Log.error(getPlayerName() +
                     " illegally called assignStrikePenalty()");
+            getClient(getPlayerName()).nak();
             return;
         }
         striker.assignStrikePenalty(prompt);
@@ -1170,12 +1182,14 @@ public final class Server implements IServer
         if (!isActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doneWithSplits()");
+            getClient(getPlayerName()).nak();
             return;
         }
         if (game.getTurnNumber() == 1 &&
                 game.getActivePlayer().getNumLegions() == 1)
         {
             showMessageDialog("Must split initial legion");
+            getClient(getPlayerName()).nak();
             return;
         }
         game.advancePhase(Constants.SPLIT, getPlayerName());
@@ -1186,6 +1200,7 @@ public final class Server implements IServer
         if (!isActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doneWithMoves()");
+            getClient(getPlayerName()).nak();
             return;
         }
 
@@ -1198,6 +1213,7 @@ public final class Server implements IServer
         {
             Log.debug("At least one legion must move.");
             showMessageDialog("At least one legion must move.");
+            getClient(getPlayerName()).nak();
             return;
         }
         // If legions share a hex and have a legal
@@ -1206,6 +1222,7 @@ public final class Server implements IServer
         {
             Log.debug("Split legions must be separated.");
             showMessageDialog("Split legions must be separated.");
+            getClient(getPlayerName()).nak();
             return;
         }
         // Otherwise, recombine all split legions still in
@@ -1223,12 +1240,14 @@ public final class Server implements IServer
         {
             Log.error(getPlayerName() +
                     " illegally called doneWithEngagements()");
+            getClient(getPlayerName()).nak();
             return;
         }
         // Advance only if there are no unresolved engagements.
         if (game.findEngagements().size() > 0)
         {
             showMessageDialog("Must resolve engagements");
+            getClient(getPlayerName()).nak();
             return;
         }
         game.advancePhase(Constants.FIGHT, getPlayerName());
@@ -1240,6 +1259,7 @@ public final class Server implements IServer
         {
             Log.error(getPlayerName() +
                     " illegally called doneWithRecruits()");
+            getClient(getPlayerName()).nak();
             return;
         }
         Player player = game.getActivePlayer();
@@ -1312,6 +1332,7 @@ public final class Server implements IServer
         }
         if (!game.doSplit(parentId, childId, results))
         {
+            Log.error("split failed for " + parentId);
             client.nak();
         }
     }

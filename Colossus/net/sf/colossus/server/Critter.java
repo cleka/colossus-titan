@@ -495,14 +495,6 @@ class Critter implements Comparable
      *  actual striking is now deferred to strike2(). */
     synchronized void strike(Critter target)
     {
-        // Sanity check
-        if (target.getPlayer() == getPlayer())
-        {
-            Log.error(getDescription() + " tried to strike allied " +
-                    target.getDescription());
-            return;
-        }
-
         battle.leaveCarryMode();
         carryPossible = true;
         if (numInContact(false) < 2)
@@ -523,14 +515,12 @@ class Critter implements Comparable
         if (carryPossible)
         {
             findCarries(target);
-
             if (!penaltyOptions.isEmpty())
             {
                 chooseStrikePenalty();
                 return;
             }
         }
-
         strike2(target, dice, strikeNumber);
     }
 
@@ -710,12 +700,6 @@ class Critter implements Comparable
      *  Roll the dice and apply damage.  Highlight legal carry targets. */
     private void strike2(Critter target, int dice, int strikeNumber)
     {
-        if (hasStruck())
-        {
-            Log.warn("Removed extra strike2() call for " + getDescription());
-            return;
-        }
-
         // Roll the dice.
         int damage = 0;
         // Check if we roll or if we don't
