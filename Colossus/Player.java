@@ -471,20 +471,9 @@ public final class Player implements Comparable
             return;
         }
 
-        if (game.getOption(Options.chooseMovement))
-        {
-            movementRoll = PickRoll.pickRoll(game.getMasterFrame(),
-                "Pick movement roll");
-            Log.event(getName() + " chooses a " + movementRoll +
-                " for movement");
-        }
-        else
-        {
-            movementRoll = Game.rollDie();
-            Log.event(getName() + " rolls a " + movementRoll +
-                " for movement");
-        }
-        game.showMovementRoll(movementRoll);
+        movementRoll = Game.rollDie();
+        Log.event(getName() + " rolls a " + movementRoll + " for movement");
+        game.getServer().allShowMovementRoll(movementRoll);
     }
 
 
@@ -910,12 +899,12 @@ public final class Player implements Comparable
      *  java.util.Properties keyword=value. */
     public void saveOptions()
     {
-        final String optionsFile = Game.optionsPath + Game.optionsSep +
-            name + Game.optionsExtension;
+        final String optionsFile = Options.optionsPath + Options.optionsSep +
+            name + Options.optionsExtension;
         try
         {
             FileOutputStream out = new FileOutputStream(optionsFile);
-            options.store(out, Game.configVersion);
+            options.store(out, Options.configVersion);
             out.close();
         }
         catch (IOException e)
@@ -929,8 +918,8 @@ public final class Player implements Comparable
      *  java.util.Properties keyword=value */
     public void loadOptions()
     {
-        final String optionsFile = Game.optionsPath + Game.optionsSep +
-            name + Game.optionsExtension;
+        final String optionsFile = Options.optionsPath + Options.optionsSep +
+            name + Options.optionsExtension;
         try
         {
             FileInputStream in = new FileInputStream(optionsFile);
@@ -970,7 +959,7 @@ public final class Player implements Comparable
         }
         else
         {
-            markerId = PickMarker.pickMarker(game.getMasterFrame(), name,
+            markerId = PickMarker.pickMarker(game.getBoard().getFrame(), name,
                 getMarkersAvailable());
         }
         return markerId;

@@ -478,20 +478,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 if (newScale != oldScale && newScale != -1)
                 {
                     Scale.set(newScale);
-                    game.rescaleAllWindows();
+                    client.rescaleAllWindows();
                 }
             }
         };
-
-        // If running as an applet, disable all file-related actions.
-        if (game.isApplet())
-        {
-            newGameAction.setEnabled(false);
-            loadGameAction.setEnabled(false);
-            saveGameAction.setEnabled(false);
-            saveGameAsAction.setEnabled(false);
-            saveOptionsAction.setEnabled(false);
-        }
     }
 
 
@@ -560,11 +550,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         // Game-wide options first
 
-        // Do not allow autosave if running as an applet.
-        if (game.isApplet())
-        {
-            game.setOption(Options.autosave, false);
-        }
         addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
         addCheckBox(gameMenu, Options.allStacksVisible, KeyEvent.VK_S);
 
@@ -601,26 +586,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
-
-        // Debug menu
-        JMenu debugMenu = new JMenu("Debug");
-        debugMenu.setMnemonic(KeyEvent.VK_D);
-        menuBar.add(debugMenu);
-
-        addCheckBox(debugMenu, Options.chooseMovement, KeyEvent.VK_M);
-        addCheckBox(debugMenu, Options.chooseHits, KeyEvent.VK_H);
-        addCheckBox(debugMenu, Options.chooseTowers, KeyEvent.VK_T);
     }
 
 
     public void twiddleOption(String name, boolean enable)
     {
-        // Handle special cases.
-        if (name.equals(Options.autosave) && game.isApplet())
-        {
-            enable = false;
-        }
-
         JCheckBoxMenuItem cbmi = (JCheckBoxMenuItem)checkboxes.get(name);
         if (cbmi != null)
         {
@@ -1573,20 +1543,17 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     private void setupIcon()
     {
-        if (!game.isApplet())
+        try
         {
-            try
-            {
-                masterFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(
-                    getClass().getResource(Chit.getImagePath(
-                    Creature.colossus.getImageName()))));
-            }
-            catch (NullPointerException e)
-            {
-                Log.error(e.toString() + " Couldn't find " +
-                    Creature.colossus.getImageName());
-                game.dispose();
-            }
+            masterFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(
+                getClass().getResource(Chit.getImagePath(
+                Creature.colossus.getImageName()))));
+        }
+        catch (NullPointerException e)
+        {
+            Log.error(e.toString() + " Couldn't find " +
+                Creature.colossus.getImageName());
+            game.dispose();
         }
     }
 

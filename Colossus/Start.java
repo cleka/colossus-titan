@@ -27,12 +27,16 @@ public final class Start
         if (args.length == 0)
         {
             // Start a new game.
-            new Game(null);
+            Game game = new Game();
+            game.newGame();
         }
         else
         {
             // Load a game.
-            new Game(null, args[0]);
+            Game game = new Game();
+            game.initBoard();
+            game.loadGame(args[0]);
+            game.updateStatusScreen();
         }
     }
 }

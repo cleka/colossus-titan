@@ -38,7 +38,6 @@ public final class Battle
     private int activeLegionNum;
     private String masterHexLabel;
     private char terrain;
-    private BattleDice battleDice;
     private int turnNumber;
     private int phase;
     private int summonState = NO_KILLS;
@@ -77,11 +76,6 @@ public final class Battle
      *  is non-null earlier. */
     public void init()
     {
-        if (game != null && game.getOption(Options.showDice))
-        {
-            initBattleDice();
-        }
-
         boolean advance = false;
         switch (getPhase())
         {
@@ -913,7 +907,7 @@ Log.debug("called game.createSummonAngel from Battle");
 
         if (needToRepaint)
         {
-            map.unselectAllHexes();
+            game.getServer().allClearAllCarries();
         }
     }
 
@@ -1353,10 +1347,11 @@ Log.debug("defender eliminated");
             map.unselectHexByLabel(label);
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
-            if (game != null && game.getOption(Options.showDice))
+            // XXX temporary hack
+            if (Client.battleDice != null)
             {
-                battleDice.setCarries(carryDamage);
-                battleDice.showRoll();
+                Client.battleDice.setCarries(carryDamage);
+                Client.battleDice.showRoll();
             }
         }
     }
@@ -1943,26 +1938,6 @@ Log.debug("defender eliminated");
     }
 
 
-    public BattleDice getBattleDice()
-    {
-        return battleDice;
-    }
-
-    public void initBattleDice()
-    {
-        battleDice = new BattleDice(game);
-    }
-
-    public void disposeBattleDice()
-    {
-        if (battleDice != null)
-        {
-            battleDice.dispose();
-            battleDice = null;
-        }
-    }
-
-
     public void actOnCritter(Critter critter)
     {
         // Only the active player can move or strike.
@@ -2110,7 +2085,6 @@ Log.debug("defender eliminated");
 
     public void cleanup()
     {
-        disposeBattleDice();
         map.dispose();
         battleOver = true;
         if (game != null)

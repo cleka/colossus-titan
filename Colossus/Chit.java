@@ -20,11 +20,6 @@ public class Chit extends JPanel
     /** Flag to mark chit as dead and paint it with an "X" through it. */
     private boolean dead;
 
-    /** We need to track whether we're running as an applet to load
-        images correctly.  setApplet() should be called before any
-        objects of this class (or its children) are created. */
-    protected static boolean isApplet;
-
     private String id;
 
     // Constants describing where to find image files.
@@ -64,39 +59,11 @@ public class Chit extends JPanel
 
         String imageFilename = getImagePath(id);
 
-        // The image-loading syntax that works correctly for applications
-        // packaged in executable jar files does not work correctly for
-        // applets, and vice-versa.
-
-        if (isApplet)
-        {
-            try
-            {
-                InputStream in = getClass().getResourceAsStream(imageFilename);
-                int length = in.available();
-                byte [] thanksToNetscape = new byte[length];
-                in.read(thanksToNetscape);
-                icon = new ImageIcon(thanksToNetscape);
-            }
-            catch (Exception e)
-            {
-                Log.error("Couldn't load image " + imageFilename + e);
-            }
-        }
-        else
-        {
-            // This syntax works with either images in a jar file or images
-            // in the local filesystem.
-            Image image = Toolkit.getDefaultToolkit().getImage(
-                getClass().getResource(imageFilename));
-            icon = new ImageIcon(image);
-        }
-    }
-
-
-    public static void setApplet(boolean isApplet)
-    {
-        Chit.isApplet = isApplet;
+        // This syntax works with either images in a jar file or images
+        // in the local filesystem.
+        Image image = Toolkit.getDefaultToolkit().getImage(
+            getClass().getResource(imageFilename));
+        icon = new ImageIcon(image);
     }
 
 

@@ -251,21 +251,17 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     private void setupIcon()
     {
-        if (battle.getGame() != null && !battle.getGame().isApplet())
+        try
         {
-            try
-            {
-                battleFrame.setIconImage(
-                    Toolkit.getDefaultToolkit().getImage(
-                    getClass().getResource(Chit.getImagePath(
-                    Creature.colossus.getImageName()))));
-            }
-            catch (NullPointerException e)
-            {
-                Log.error(e.toString() + " Couldn't find " +
-                    Creature.colossus.getImageName());
-                dispose();
-            }
+            battleFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(
+                getClass().getResource(Chit.getImagePath(
+                Creature.colossus.getImageName()))));
+        }
+        catch (NullPointerException e)
+        {
+            Log.error(e.toString() + " Couldn't find " +
+                Creature.colossus.getImageName());
+            dispose();
         }
     }
 

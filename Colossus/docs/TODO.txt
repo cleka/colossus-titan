@@ -1,12 +1,20 @@
+Create one Client per player, and one Server for the whole game.  Allow 
+   direct references between them for now, but try not to overuse them.
+
 Stuff to move out of Game:
    Client-side options.
    Applet stuff.
    Startup code.
-
+   All direct references to GUI classes.
 Split GUI parts of MasterBoard and the logical arrangement of the board into
    separate classes.  The GUI class only goes on the client side, but the
-   other stuff is needed on both sides.  Or have MasterBoard classes on both
-   sides but only use the GUI stuff in the client version?
+   other stuff is needed on both sides.
+
+Move all Chits to client side.  (Look up a Legion's marker in a hashmap 
+   kept on the Client.)
+
+Track selected mover on client side rather than in Player.
+
 
 Add UI for players to specify favorite colors.
 

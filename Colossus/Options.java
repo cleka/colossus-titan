@@ -7,17 +7,20 @@ import java.util.*;
 
 public final class Options
 {
+    // Constants related to the options config files
+    public static final String optionsPath = "Colossus";
+    public static final String optionsSep = "-";
+    public static final String optionsExtension = ".cfg";
+
+    public static final String configVersion =
+        "Colossus config file version 2";
+
+
     // Option names
 
     // Server options
     public static final String autosave = "Autosave";
     public static final String allStacksVisible = "All stacks visible";
-
-    // Debug options (server)
-    public static final String chooseMovement = "Choose movement roll";
-    public static final String chooseHits= "Choose number of hits";
-    public static final String chooseTowers = "Choose towers";
-    public static final String chooseCreatures = "Choose creatures";
 
     // Graphics options (client)
     public static final String showStatusScreen = "Show game status";
@@ -25,7 +28,7 @@ public final class Options
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
 
-    // AI options (player)
+    // AI options (player - put on client)
     public static final String autoPickColor = "Auto pick color";
     public static final String autoPickMarker = "Auto pick markers";
     public static final String autoSplit = "Auto split";
@@ -40,7 +43,6 @@ public final class Options
     public static final String autoAcquireAngels = "Auto acquire angels";
     public static final String autoRecruit = "Auto recruit";
     public static final String autoPickRecruiter = "Auto pick recruiters";
-
     public static final String autoPlay = "Auto play";
 
     // General per-player options
@@ -64,9 +66,7 @@ public final class Options
         perPlayerSet.add(autoAcquireAngels);
         perPlayerSet.add(autoRecruit);
         perPlayerSet.add(autoPickRecruiter);
-
         perPlayerSet.add(Options.autoPlay);
-
         perPlayerSet.add(Options.favoriteColors);
     }
 

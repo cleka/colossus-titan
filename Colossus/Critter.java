@@ -839,34 +839,6 @@ public final class Critter extends Creature implements Comparable
                 }
             }
         }
-        else if (game != null && game.getOption(Options.chooseHits))
-        {
-            do
-            {
-                String answer = JOptionPane.showInputDialog(
-                    battle.getBattleMap(), "Input number of hits (0-" +
-                    dice + ")");
-                try
-                {
-                    damage = Integer.parseInt(answer);
-                }
-                catch (NumberFormatException e)
-                {
-                    damage = -1;
-                }
-            }
-            while (damage < 0 || damage > dice);
-            for (int i = 0; i < damage; i++)
-            {
-                rolls[i] = 6;
-                rollString.append(rolls[i]);
-            }
-            for (int i = damage; i < dice; i++)
-            {
-                rolls[i] = 1;
-                rollString.append(rolls[i]);
-            }
-        }
         else
         {
             for (int i = 0; i < dice; i++)
@@ -908,12 +880,12 @@ public final class Critter extends Creature implements Comparable
         // Display the rolls in the BattleDice dialog, if enabled.
         if (game != null && game.getOption(Options.showDice))
         {
-            BattleDice battleDice = battle.getBattleDice();
-            if (battleDice != null)
+            // XXX temporary hack
+            if (Client.battleDice != null)
             {
-                battleDice.setValues(this, target, strikeNumber,
+                Client.battleDice.setValues(this, target, strikeNumber,
                     rolls, damage, carryDamage);
-                battleDice.showRoll();
+                Client.battleDice.showRoll();
             }
         }
     }

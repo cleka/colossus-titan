@@ -11,15 +11,15 @@ import javax.swing.*;
 
 public final class MovementDie extends JFrame implements WindowListener
 {
-    private Game game;
     private static Point location;
     private int lastRoll = 0;
+    private Client client;
 
 
-    public MovementDie(Game game)
+    public MovementDie(Client client)
     {
         super("Movement Die");
-        this.game = game;
+        this.client = client;
         setVisible(false);
         setupIcon();
         addWindowListener(this);
@@ -67,20 +67,17 @@ public final class MovementDie extends JFrame implements WindowListener
 
     private void setupIcon()
     {
-        if (game != null && !game.isApplet())
+        try
         {
-            try
-            {
-                setIconImage(Toolkit.getDefaultToolkit().getImage(
-                    getClass().getResource(Chit.getImagePath(
-                    Creature.colossus.getImageName()))));
-            }
-            catch (NullPointerException e)
-            {
-                Log.error(e.toString() + " Couldn't find " +
-                    Creature.colossus.getImageName());
-                dispose();
-            }
+            setIconImage(Toolkit.getDefaultToolkit().getImage(
+                getClass().getResource(Chit.getImagePath(
+                Creature.colossus.getImageName()))));
+        }
+        catch (NullPointerException e)
+        {
+            Log.error(e.toString() + " Couldn't find " +
+                Creature.colossus.getImageName());
+            dispose();
         }
     }
 
@@ -95,9 +92,9 @@ public final class MovementDie extends JFrame implements WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        if (game != null)
+        if (client != null)
         {
-            game.setOption(Options.showDice, false);
+            client.setOption(Options.showDice, false);
         }
     }
 

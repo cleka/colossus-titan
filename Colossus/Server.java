@@ -11,7 +11,6 @@ import java.net.*;
 
 public final class Server
 {
-
     public static final int port = 1969;
     private Game game;
 
@@ -46,6 +45,44 @@ public final class Server
 
     // TODO Event handling scheme to catch messages from clients.  Parsing
     // scheme to turn them into method calls.
+
+    /** Temporary convenience method until all client-side classes no longer
+     *  need game refs. */
+    public Game getGame()
+    {
+        return game;
+    }
+
+
+    public void allUpdateStatusScreen()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.updateStatusScreen();
+        }
+    }
+
+    public void allShowMovementRoll(int roll)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.showMovementRoll(roll);
+        }
+    }
+
+    public void allClearAllCarries()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.clearAllCarries();
+        }
+    }
 
 
     public static void main(String [] args)

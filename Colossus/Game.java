@@ -20,6 +20,7 @@ public final class Game
     private static Random random = new Random();
     private Caretaker caretaker = new Caretaker();
     private Properties options = new Properties();
+    private Server server;
 
     // Constants for phases of a turn.
     public static final int SPLIT = 1;
@@ -32,11 +33,8 @@ public final class Game
     // Stuff that needs to move to the client side.
     private MasterBoard board;  // Needs to be split up.
     private StatusScreen statusScreen;
-    private GameApplet applet;
     private MovementDie movementDie;
     private SummonAngel summonAngel;
-    private boolean isApplet;
-    private JFrame masterFrame;
 
 
     // Constants for savegames
@@ -54,34 +52,12 @@ public final class Game
     public static final String optionsExtension = ".cfg";
 
 
-    /** Start a new game. */
-    public Game(GameApplet applet)
-    {
-        this.applet = applet;
-        isApplet = (applet != null);
-        Chit.setApplet(isApplet);
-
-        newGame();
-    }
-
-    /** Load a saved game. */
-    public Game(GameApplet applet, String filename)
-    {
-        this.applet = applet;
-        isApplet = (applet != null);
-        Chit.setApplet(isApplet);
-        initBoard();
-        loadGame(filename);
-        updateStatusScreen();
-    }
-
-    /** Default constructor, for testing only. */
     public Game()
     {
     }
 
 
-    /** Initialize the board and masterFrame. */
+    /** Initialize the board. */
     public void initBoard()
     {
         if (board == null)
@@ -92,7 +68,6 @@ public final class Game
         {
             board.setGame(this);
         }
-        masterFrame = board.getFrame();
         board.requestFocus();
     }
 
@@ -117,7 +92,6 @@ public final class Game
 	newGame.activePlayerNum = activePlayerNum;
 	newGame.turnNumber = turnNumber;
 	newGame.statusScreen = null;
-	newGame.applet = null;
         if (battle != null)
 	{
             newGame.battle = battle.AICopy(newGame);
@@ -126,9 +100,7 @@ public final class Game
 	newGame.summonAngel = null;
 	newGame.caretaker = caretaker.AICopy();
 	newGame.phase = phase;
-	newGame.isApplet = false;
 	newGame.engagementInProgress = engagementInProgress;
-        newGame.masterFrame = masterFrame;
 
 	return newGame;
     }
@@ -243,7 +215,7 @@ public final class Game
         }
         board.loadInitialMarkerImages();
 
-        if (!isApplet && getOption(Options.autosave))
+        if (getOption(Options.autosave))
         {
             saveGame();
         }
@@ -254,11 +226,6 @@ public final class Game
         board.repaint();
 
         updateStatusScreen();
-
-        if (getOption(Options.showDice))
-        {
-            initMovementDie();
-        }
     }
 
     private static String getPhaseName(int phase)
@@ -299,16 +266,7 @@ public final class Game
             {
                 if (playerTower[i] == UNASSIGNED)
                 {
-                    if (getOption(Options.chooseTowers))
-                    {
-                        Player player = getPlayer(i);
-                        rolls[i] = PickRoll.pickRoll(masterFrame,
-                            "Choose tower roll for " + player.getName());
-                    }
-                    else
-                    {
-                        rolls[i] = rollDie();
-                    }
+                    rolls[i] = rollDie();
                 }
             }
 
@@ -338,16 +296,22 @@ public final class Game
         }
     }
 
+
     public Caretaker getCaretaker()
     {
         return caretaker;
+    }
+
+
+    public Server getServer()
+    {
+        return server;
     }
 
     public int getNumPlayers()
     {
         return players.size();
     }
-
 
     public void addPlayer(String name)
     {
@@ -358,7 +322,6 @@ public final class Game
     {
         players.add(player);
     }
-
 
     public int getNumLivingPlayers()
     {
@@ -374,7 +337,6 @@ public final class Game
         }
         return count;
     }
-
 
     public Player getActivePlayer()
     {
@@ -425,118 +387,6 @@ public final class Game
     }
 
 
-    public void setupDice(boolean enable)
-    {
-        if (enable)
-        {
-            initMovementDie();
-            if (battle != null)
-            {
-                battle.initBattleDice();
-            }
-        }
-        else
-        {
-            disposeMovementDie();
-            if (battle != null)
-            {
-                battle.disposeBattleDice();
-            }
-            if (board != null)
-            {
-                board.twiddleOption(Options.showDice, false);
-            }
-        }
-    }
-
-
-    // XXX This should be moved down to Client.
-    public void repaintAllWindows()
-    {
-        if (statusScreen != null)
-        {
-            statusScreen.repaint();
-        }
-        if (movementDie != null)
-        {
-            movementDie.repaint();
-        }
-        if (board != null)
-        {
-            masterFrame.repaint();
-        }
-        if (battle != null)
-        {
-            BattleDice dice = battle.getBattleDice();
-            if (dice != null)
-            {
-                dice.repaint();
-            }
-            BattleMap map = battle.getBattleMap();
-            if (map != null)
-            {
-                map.repaint();
-            }
-        }
-    }
-
-    // XXX This should be moved down to Client.
-    public void rescaleAllWindows()
-    {
-        if (statusScreen != null)
-        {
-            statusScreen.rescale();
-        }
-        if (movementDie != null)
-        {
-            movementDie.rescale();
-        }
-        if (board != null)
-        {
-            board.rescale();
-        }
-        if (battle != null)
-        {
-            BattleDice dice = battle.getBattleDice();
-            if (dice != null)
-            {
-                dice.rescale();
-            }
-            BattleMap map = battle.getBattleMap();
-            if (map != null)
-            {
-                map.rescale();
-            }
-        }
-        repaintAllWindows();
-    }
-
-
-    private void initMovementDie()
-    {
-        movementDie = new MovementDie(this);
-    }
-
-
-    private void disposeMovementDie()
-    {
-        if (movementDie != null)
-        {
-            movementDie.dispose();
-            movementDie = null;
-        }
-    }
-
-
-    public void showMovementRoll(int roll)
-    {
-        if (movementDie != null)
-        {
-            movementDie.showRoll(roll);
-        }
-    }
-
-
     public boolean getOption(String name)
     {
         if (Options.getPerPlayerOptions().contains(name))
@@ -574,21 +424,6 @@ public final class Game
         }
 
         options.setProperty(name, String.valueOf(value));
-
-        // Side effects
-        if (name.equals(Options.showStatusScreen))
-        {
-            updateStatusScreen();
-        }
-        else if (name.equals(Options.antialias))
-        {
-            Hex.setAntialias(value);
-            repaintAllWindows();
-        }
-        else if (name.equals(Options.showDice))
-        {
-            setupDice(value);
-        }
     }
 
 
@@ -662,12 +497,6 @@ public final class Game
                 board.twiddleOption(name, value);
             }
         }
-    }
-
-
-    public JFrame getMasterFrame()
-    {
-        return masterFrame;
     }
 
 
@@ -881,7 +710,7 @@ public final class Game
 
             player.syncCheckboxes();
             updateStatusScreen();
-            if (!isApplet && getOption(Options.autosave))
+            if (getOption(Options.autosave))
             {
                 saveGame();
             }
@@ -1210,7 +1039,6 @@ public final class Game
             players.clear();
             if (battle != null)
             {
-                battle.disposeBattleDice();
                 BattleMap map = battle.getBattleMap();
                 if (map != null)
                 {
@@ -1330,17 +1158,6 @@ public final class Game
             }
 
             loadOptions();
-
-            if (getOption(Options.showDice))
-            {
-                initMovementDie();
-                Player player = getActivePlayer();
-                int roll = player.getMovementRoll();
-                if (roll != 0)
-                {
-                    showMovementRoll(roll);
-                }
-            }
 
             // Setup MasterBoard
             board.loadInitialMarkerImages();
@@ -2254,10 +2071,11 @@ public final class Game
     {
         if (legion.hasMoved() && legion.canRecruit())
         {
-            Creature recruit = PickRecruit.pickRecruit(masterFrame, legion);
+            Creature recruit = PickRecruit.pickRecruit(board.getFrame(),
+                legion);
             if (recruit != null)
             {
-                doRecruit(recruit, legion, masterFrame);
+                doRecruit(recruit, legion, board.getFrame());
             }
 
             if (!legion.canRecruit())
@@ -2344,44 +2162,7 @@ public final class Game
 
     public void dispose()
     {
-        if (isApplet)
-        {
-            if (board != null)
-            {
-                masterFrame.dispose();
-            }
-            if (battle != null)
-            {
-                battle.disposeBattleDice();
-                BattleMap map = battle.getBattleMap();
-                if (map != null)
-                {
-                    map.dispose();
-                }
-            }
-            if (statusScreen != null)
-            {
-                statusScreen.dispose();
-            }
-            if (movementDie != null)
-            {
-                movementDie.dispose();
-            }
-            if (applet != null)
-            {
-                applet.destroy();
-            }
-        }
-        else
-        {
-            System.exit(0);
-        }
-    }
-
-
-    public boolean isApplet()
-    {
-        return isApplet;
+        System.exit(0);
     }
 
 
@@ -2405,7 +2186,7 @@ public final class Game
         {
             do
             {
-                selectedMarkerId = PickMarker.pickMarker(masterFrame,
+                selectedMarkerId = PickMarker.pickMarker(board.getFrame(),
                     name, player.getMarkersAvailable());
             }
             while (selectedMarkerId == null);
@@ -2798,13 +2579,14 @@ public final class Game
         }
         else
         {
+            JFrame frame = board.getFrame();
             // Make sure the MasterBoard is visible.
-            if (masterFrame.getState() == JFrame.ICONIFIED)
+            if (frame.getState() == JFrame.ICONIFIED)
             {
-                masterFrame.setState(JFrame.NORMAL);
+                frame.setState(JFrame.NORMAL);
             }
             // And bring it to the front.
-            masterFrame.show();
+            frame.show();
 
             summonAngel = SummonAngel.summonAngel(this, attacker);
         }
@@ -2850,7 +2632,7 @@ public final class Game
 
     public void finishBattle(String hexLabel, boolean attackerEntered)
     {
-        masterFrame.show();
+        board.getFrame().show();
 
         battle = null;
 
@@ -2994,7 +2776,7 @@ public final class Game
 
         String selectedMarkerId = player.pickMarker();
 
-        String results = SplitLegion.splitLegion(masterFrame, legion,
+        String results = SplitLegion.splitLegion(board.getFrame(), legion,
             selectedMarkerId);
         if (results != null)
         {
@@ -3151,7 +2933,7 @@ public final class Game
                 }
                 else
                 {
-                    side = PickEntrySide.pickEntrySide(masterFrame, board,
+                    side = PickEntrySide.pickEntrySide(board.getFrame(), board,
                         hexLabel, legion);
                 }
                 legion.clearAllEntrySides(hexLabel);
@@ -3177,7 +2959,7 @@ public final class Game
                     }
                     else
                     {
-                        legion.revealTeleportingLord(masterFrame,
+                        legion.revealTeleportingLord(board.getFrame(),
                             getOption(Options.allStacksVisible));
                     }
                 }
@@ -3223,6 +3005,8 @@ public final class Game
             attacker.sortCritters();
             defender.sortCritters();
 
+            JFrame frame = board.getFrame();
+
             if (defender.canFlee())
             {
                 // Fleeing gives half points and denies the
@@ -3235,7 +3019,7 @@ public final class Game
                 }
                 else
                 {
-                    flees = Concede.flee(masterFrame, defender, attacker);
+                    flees = Concede.flee(frame, defender, attacker);
                 }
                 if (flees)
                 {
@@ -3253,7 +3037,7 @@ public final class Game
             }
             else
             {
-                concedes = Concede.concede(masterFrame, attacker, defender);
+                concedes = Concede.concede(frame, attacker, defender);
             }
 
             if (concedes)
@@ -3263,7 +3047,7 @@ public final class Game
             }
 
             // The players may agree to a negotiated settlement.
-            NegotiationResults results = Negotiate.negotiate(masterFrame,
+            NegotiationResults results = Negotiate.negotiate(frame,
                 attacker, defender);
 
             if (results.isSettled())
@@ -3426,10 +3210,10 @@ public final class Game
                     // If the defender won the battle by agreement,
                     // he may recruit.
                     Creature recruit = PickRecruit.pickRecruit(
-                        masterFrame, defender);
+                        board.getFrame(), defender);
                     if (recruit != null)
                     {
-                        doRecruit(recruit, defender, masterFrame);
+                        doRecruit(recruit, defender, board.getFrame());
                     }
                 }
             }

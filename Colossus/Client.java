@@ -1,5 +1,7 @@
 import java.util.*;
 import java.net.*;
+import javax.swing.*;
+import java.io.*;
 
 /**
  *  Class Client lives on the client side and handles all communication
@@ -11,22 +13,39 @@ import java.net.*;
 
 public final class Client
 {
-    /** This is very temporary.  Don't use it. */
-    private Game game;
-
     /** This will eventually be a network interface rather than a
      *  direct reference.  So don't share this reference. */
     private Server server;
 
-    /** Temp constructor. Obviously the real one won't have a game ref. */
-    public Client(Game game)
-    {
-        this.game = game;
-        server = new Server(game);
-    }
+    // Moved here from Game.
 
-    /** Slightly more realistic temp constructor. The real client won't
-     *  have a direct server ref either. */
+    private MasterBoard board;
+    private StatusScreen statusScreen;
+    private SummonAngel summonAngel;
+    private MovementDie movementDie;
+
+    // Moved here from Battle.
+    private BattleMap map;
+    public static BattleDice battleDice; // XXX Only temporarily static.
+    /** Stack of critters moved, to allow multiple levels of undo. */
+    private LinkedList lastCrittersMoved = new LinkedList();
+
+    // Moved here from Player.
+    /** Stack of legion marker ids, to allow multiple levels of undo for
+     *  splits, moves, and recruits. */
+    private LinkedList undoStack = new LinkedList();
+    private String moverId;
+
+    // Per-client and per-player options should be kept here instead
+    // of in Game.
+    private Properties options = new Properties();
+
+    /** Help keep straight whose client this is. */
+    String playerName;
+    int playerNum;
+
+
+    /** Temporary constructor. */
     public Client(Server server)
     {
         this.server = server;
@@ -246,6 +265,262 @@ public final class Client
 
     // TODO Add requests for info.
 
+    public void setupDice(boolean enable)
+    {
+        if (enable)
+        {
+            initMovementDie();
+            initBattleDice();
+        }
+        else
+        {
+            disposeMovementDie();
+            disposeBattleDice();
+            if (board != null)
+            {
+                board.twiddleOption(Options.showDice, false);
+            }
+        }
+    }
+
+    public void repaintAllWindows()
+    {
+        if (statusScreen != null)
+        {
+            statusScreen.repaint();
+        }
+        if (movementDie != null)
+        {
+            movementDie.repaint();
+        }
+        if (board != null)
+        {
+            board.getFrame().repaint();
+        }
+        if (battleDice != null)
+        {
+            battleDice.repaint();
+        }
+        if (map != null)
+        {
+            map.repaint();
+        }
+    }
+
+    public void rescaleAllWindows()
+    {
+        if (statusScreen != null)
+        {
+            statusScreen.rescale();
+        }
+        if (movementDie != null)
+        {
+            movementDie.rescale();
+        }
+        if (board != null)
+        {
+            board.rescale();
+        }
+        if (battleDice != null)
+        {
+            battleDice.rescale();
+        }
+        if (map != null)
+        {
+            map.rescale();
+        }
+        repaintAllWindows();
+    }
+
+    public void showMovementRoll(int roll)
+    {
+        if (movementDie != null)
+        {
+            movementDie.showRoll(roll);
+        }
+    }
+
+
+
+    private void initMovementDie()
+    {
+        movementDie = new MovementDie(this);
+    }
+
+
+    private void disposeMovementDie()
+    {
+        if (movementDie != null)
+        {
+            movementDie.dispose();
+            movementDie = null;
+        }
+    }
+
+
+    public boolean getOption(String name)
+    {
+        String value = options.getProperty(name);
+        return (value != null && value.equals("true"));
+    }
+
+    public String getStringOption(String optname)
+    {
+        // If autoPlay is set, all options that start with "Auto" return true.
+        if (optname.startsWith("Auto"))
+        {
+            String value = options.getProperty(Options.autoPlay);
+            if (value != null && value.equals("true"))
+            {
+                return "true";
+            }
+        }
+
+        String value = options.getProperty(optname);
+        return value;
+    }
+
+    public void setOption(String name, boolean value)
+    {
+        options.setProperty(name, String.valueOf(value));
+
+        // Side effects
+        if (name.equals(Options.showStatusScreen))
+        {
+            updateStatusScreen();
+        }
+        else if (name.equals(Options.antialias))
+        {
+            Hex.setAntialias(value);
+            repaintAllWindows();
+        }
+        else if (name.equals(Options.showDice))
+        {
+            setupDice(value);
+        }
+    }
+
+    public void setStringOption(String optname, String value)
+    {
+        options.setProperty(optname, String.valueOf(value));
+        // TODO Add some triggers so that if autoPlay or autoSplit is set
+        // during this player's split phase, the appropriate action
+        // is called.
+    }
+
+
+    /** Save player options to a file.  The current format is standard
+     *  java.util.Properties keyword=value. */
+    public void saveOptions()
+    {
+        final String optionsFile = Options.optionsPath + Options.optionsSep +
+            playerName + Options.optionsExtension;
+        try
+        {
+            FileOutputStream out = new FileOutputStream(optionsFile);
+            options.store(out, Options.configVersion);
+            out.close();
+        }
+        catch (IOException e)
+        {
+            Log.error("Couldn't write options to " + optionsFile);
+        }
+    }
+
+    /** Load player options from a file. The current format is standard
+     *  java.util.Properties keyword=value */
+    public void loadOptions()
+    {
+        final String optionsFile = Options.optionsPath + Options.optionsSep +
+            playerName + Options.optionsExtension;
+        try
+        {
+            FileInputStream in = new FileInputStream(optionsFile);
+            options.load(in);
+        }
+        catch (IOException e)
+        {
+            Log.error("Couldn't read player options from " + optionsFile);
+            return;
+        }
+        syncCheckboxes();
+    }
+
+    public void clearAllOptions()
+    {
+        options.clear();
+    }
+
+    public void syncCheckboxes()
+    {
+        Enumeration en = options.propertyNames();
+        while (en.hasMoreElements())
+        {
+            String name = (String)en.nextElement();
+            boolean value = getOption(name);
+            if (board != null)
+            {
+                board.twiddleOption(name, value);
+            }
+        }
+    }
+
+
+    public void updateStatusScreen()
+    {
+        if (getOption(Options.showStatusScreen))
+        {
+            if (statusScreen != null)
+            {
+                statusScreen.updateStatusScreen();
+            }
+            else
+            {
+                statusScreen = new StatusScreen(server.getGame()); // XXX
+            }
+        }
+        else
+        {
+            board.twiddleOption(Options.showStatusScreen, false);
+            if (statusScreen != null)
+            {
+                statusScreen.dispose();
+            }
+            this.statusScreen = null;
+        }
+    }
+
+
+    public BattleDice getBattleDice()
+    {
+        return battleDice;
+    }
+
+    public void initBattleDice()
+    {
+        battleDice = new BattleDice(this);
+    }
+
+    public void disposeBattleDice()
+    {
+        if (battleDice != null)
+        {
+            battleDice.dispose();
+            battleDice = null;
+        }
+    }
+
+
+
+    public void dispose()
+    {
+        // TODO Call dispose() on every window
+    }
+
+    public void clearAllCarries()
+    {
+        map.unselectAllHexes();
+    }
 
 
     public static void main(String [] args)

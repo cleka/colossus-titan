@@ -28,6 +28,8 @@ public final class StatusScreen extends JFrame implements WindowListener
     private static Dimension size;
 
 
+    // TODO Should not take a direct Game reference, since that may contain
+    // privileged information.
     public StatusScreen(Game game)
     {
         super("Game Status");
@@ -150,20 +152,17 @@ public final class StatusScreen extends JFrame implements WindowListener
 
     private void setupIcon()
     {
-        if (!game.isApplet())
+        try
         {
-            try
-            {
-                setIconImage(Toolkit.getDefaultToolkit().getImage(
-                    getClass().getResource(Chit.getImagePath(
-                    Creature.colossus.getImageName()))));
-            }
-            catch (NullPointerException e)
-            {
-                Log.error(e.toString() + " Could not find " +
-                    Creature.colossus.getImageName());
-                dispose();
-            }
+            setIconImage(Toolkit.getDefaultToolkit().getImage(
+                getClass().getResource(Chit.getImagePath(
+                Creature.colossus.getImageName()))));
+        }
+        catch (NullPointerException e)
+        {
+            Log.error(e.toString() + " Could not find " +
+                Creature.colossus.getImageName());
+            dispose();
         }
     }
 

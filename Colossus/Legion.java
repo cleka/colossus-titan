@@ -315,7 +315,7 @@ public final class Legion implements Comparable
         else
         {
             // Make sure the board is visible.
-            JFrame masterFrame = game.getMasterFrame();
+            JFrame masterFrame = game.getBoard().getFrame();
             if (masterFrame.getState() == JFrame.ICONIFIED)
             {
                 masterFrame.setState(JFrame.NORMAL);
@@ -548,11 +548,11 @@ public final class Legion implements Comparable
 
         Player player = getPlayer();
         // XXX The player can be null if the legion has not been fully
-        // created.  Fix SplitLegion.
-        if (player == null)
-        {
-            player = game.getActivePlayer();
-        }
+        // created.  Fix SplitLegion.  Still needed?
+        //if (player == null)
+        //{
+        //    player = game.getActivePlayer();
+        //}
         player.getLegions().remove(this);
 
         game.getBoard().alignLegions(hexLabel);
@@ -590,12 +590,11 @@ public final class Legion implements Comparable
 
         // Free up the legion marker.
         Player player = getPlayer();
-        // XXX The player can be null if the legion has not been fully
-        // created.  Fix SplitLegion.
-        if (player == null)
-        {
-            player = game.getActivePlayer();
-        }
+        // XXX Is the bug that required this workaround fixed?
+        //if (player == null)
+        //{
+        //    player = game.getActivePlayer();
+        //}
         player.getMarkersAvailable().add(getMarkerId());
     }
 
@@ -1172,7 +1171,7 @@ public final class Legion implements Comparable
         }
 
         Marker newMarker = new Marker(marker.getBounds().width,
-            newMarkerId, game.getMasterFrame(), game);
+            newMarkerId, game.getBoard().getFrame(), game);
         newLegion.setMarker(newMarker);
 
         player.addLegion(newLegion);

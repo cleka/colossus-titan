@@ -1,4 +1,4 @@
-Colossus alpha     June 27, 2001    Copyright 2001 David Ripton
+Colossus alpha     June 28, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
@@ -19,15 +19,8 @@ Running the game requires the following:
    (Java development kit).  A JRE is a smaller download; a JDK also
    lets you compile Java programs, not just run them.
 
-   (Colossus will not run under JDK 1.0.x or 1.1.x  Sorry.)
-
-   Colossus should also run as an applet in a web browser, as long
-   as your browser is new enough to support JDK 1.2 applets.  That
-   probably means downloading a recent version of Sun's Java plug-in
-   (included with the JRE), since most browsers come with out-of-date
-   Java virtual machines.  If you're downloading the JRE, you might
-   as well use the JRE itself rather than the plug-in.  So running
-   as an applet is not really recommended. 
+   (Colossus will not run under JDK 1.0.x or 1.1.x  Colossus no longer
+   runs as an applet in a web browser.  Sorry.)
 
    Win32, Solaris, and x86 Linux versions of the JDK and JRE are
    freely downloadable from java.sun.com.  Another Linux port is
@@ -41,15 +34,15 @@ Running the game requires the following:
       1.2.0 and 1.2.1 appear to work at first but have very serious 
       memory leaks in the image handling code that will eventually
       cause crashes, so I recommend upgrading to 1.3.1.  1.4 beta 
-      is buggy.
+      is somewhat buggy.
 
    Solaris Sparc: Sun's JDK/JRE 1.3.1 and 1.3 are good.  1.2.x is 
-      okay.  1.4 beta is buggy.
+      okay.  1.4 beta is somewhat buggy.
 
    x86 Linux: Sun JDK/JRE 1.3.1 and 1.3, and Blackdown 1.3.0 are 
       good.  Sun and Blackdown 1.2.2 versions are okay.  IBM's JDK 
       1.3 is buggy.  kaffe is not yet fully compatible with JDK 1.2.
-      Sun 1.4 beta is buggy.
+      Sun 1.4 beta is somewhat buggy.
 
    If you have something else, you might find bugs that I haven't.
    If you manage to get Colossus running on a system I haven't tried,
@@ -92,11 +85,6 @@ a zip file, you'll need to unzip it and find the jar file inside.  Try
 double-clicking on Colossus.jar in your GUI file manager.  If that
 doesn't work, pop up a command prompt, cd to the directory where
 you unzipped the zip file, and try typing "java -jar Colossus.jar"
-
-Another alternative is to run Colossus as an applet.  Point your
-web browser to the included Colossus_applet_plug.html file, and hope
-it works.  If it doesn't, you probably need to install Sun's Java
-plug-in.
 
 Once you get things running, a dialog should pop up, allowing you to
 type in up to six player names.  Put names in some of the boxes, then

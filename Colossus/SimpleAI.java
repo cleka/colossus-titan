@@ -70,7 +70,8 @@ Log.debug("Setting for whatever color is left");
 
                 if (recruit != null)
                 {
-                    game.doRecruit(recruit, legion, game.getMasterFrame());
+                    game.doRecruit(recruit, legion,
+                        game.getBoard().getFrame());
                 }
             }
         }

@@ -11,11 +11,12 @@ import javax.swing.*;
 
 public final class BattleDice extends JFrame implements WindowListener
 {
-    private Game game;
+    private Client client;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private Insets insets = new Insets(5, 5, 5, 5);
     private static Point location;
+    // TODO Pass strings instead of critters.
     private Critter attacker;
     private Critter defender;
     private int numDice;
@@ -29,11 +30,11 @@ public final class BattleDice extends JFrame implements WindowListener
     private Chit [] dice;
 
 
-    public BattleDice(Game game)
+    public BattleDice(Client client)
     {
         super("Battle Dice Rolls");
 
-        this.game = game;
+        this.client = client;
         setVisible(false);
         addWindowListener(this);
         setupIcon();
@@ -67,7 +68,6 @@ public final class BattleDice extends JFrame implements WindowListener
         this.carries = carries;
     }
 
-
     public void setCarries(int carries)
     {
         this.carries = carries;
@@ -91,7 +91,6 @@ public final class BattleDice extends JFrame implements WindowListener
     }
 
 
-    // XXX Cache die images?
     /** Initialize and layout the components, in response to new data. */
     public void showRoll()
     {
@@ -195,20 +194,17 @@ public final class BattleDice extends JFrame implements WindowListener
 
     private void setupIcon()
     {
-        if (game != null && !game.isApplet())
+        try
         {
-            try
-            {
-                setIconImage(Toolkit.getDefaultToolkit().getImage(
-                    getClass().getResource(Chit.getImagePath(
-                    Creature.colossus.getImageName()))));
-            }
-            catch (NullPointerException e)
-            {
-                Log.error(e.toString() + " Couldn't find " +
-                    Creature.colossus.getImageName());
-                dispose();
-            }
+            setIconImage(Toolkit.getDefaultToolkit().getImage(
+                getClass().getResource(Chit.getImagePath(
+                Creature.colossus.getImageName()))));
+        }
+        catch (NullPointerException e)
+        {
+            Log.error(e.toString() + " Couldn't find " +
+                Creature.colossus.getImageName());
+            dispose();
         }
     }
 
@@ -223,9 +219,9 @@ public final class BattleDice extends JFrame implements WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        if (game != null)
+        if (client != null)
         {
-            game.setOption(Options.showDice, false);
+            client.setOption(Options.showDice, false);
         }
     }
 
