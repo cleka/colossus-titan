@@ -624,7 +624,8 @@ Log.debug("Called Battle.doneReinforcing()");
      *  so we know that there are no enemies on board, and all allies
      *  are mobile.
      */
-    private Set findUnoccupiedStartlistHexes(boolean ignoreMobileAllies, char t)
+    private Set findUnoccupiedStartlistHexes(boolean ignoreMobileAllies, 
+        char t)
     {
         Set set = new HashSet();
         Iterator it = HexMap.getTowerStartList(t).iterator();
@@ -789,7 +790,8 @@ Log.debug("Called Battle.doneReinforcing()");
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
-                int dam = critter.getCurrentHex().damageToCreature(critter.getCreature());
+                int dam = critter.getCurrentHex().damageToCreature(
+                    critter.getCreature());
                 if (dam > 0)
                 {
                     critter.wound(dam);

@@ -153,36 +153,37 @@ public final class Legion implements Comparable
         return pointValue;
     }
 
-
-   void addPoints(int points)
+    // Example: Start with 375, earn 150
+    void addPoints(int points)
     {
         if (game == null)
         {
             return;
         }
         Player player = getPlayer();
-        int score = player.getScore();
-        player.addPoints(points);
-        int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
-        int tmpScore = score;
-        int tmpPoints = points;
+        int score = player.getScore();   // 375
+        player.addPoints(points);        // 375 + 150 = 525
+        int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue(); 
+                                         // 100
+        int tmpScore = score;            // 375
+        int tmpPoints = points;          // 150
         
         // round Score down, and tmpPoints by the same amount.
         // this allow to keep all points
-        int round = (tmpScore % value);
-        tmpScore -= round;
-        tmpPoints += round;
+        int round = (tmpScore % value);  //  75
+        tmpScore -= round;               // 300
+        tmpPoints += round;              // 225
         
         List recruits;
         
         while ((getHeight() < 7) && (tmpPoints >= value))
         {
-            tmpScore += value;
-            tmpPoints -= value;
+            tmpScore += value;           // 400   500
+            tmpPoints -= value;          // 125    25
             recruits = game.findEligibleAngels(this, tmpScore);
             if ((recruits != null) && (!recruits.isEmpty()))
             {
-                angelsToAcquire++;
+                angelsToAcquire++;       // 1       2
                 game.askAcquireAngel(getPlayerName(), getMarkerId(), recruits);
             }
         }
