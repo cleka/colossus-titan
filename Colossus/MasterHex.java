@@ -7,29 +7,19 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class MasterHex
+class MasterHex extends Hex
 {
-    public static final double SQRT3 = Math.sqrt(3.0);
-    public static final double RAD_TO_DEG = 180 / Math.PI;
-
-    private int[] xVertex = new int[6];
-    private int[] yVertex = new int[6];
-    private Polygon p;
-    private Rectangle rectBound;
     private boolean inverted;
-    private int scale;
-    private double l;              // hexside length
     private int numLegions = 0;
     private Legion [] legions = new Legion[3];
-    private boolean selected = false;
     private MasterBoard board;
 
     private MasterHex [] neighbors = new MasterHex[6];
     
+    // Terrain types are:
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
     // Swamp, Tower, tundra, Woods
-    private char terrain;
 
     // Middle ring: 1-42
     // Outer ring: 101-142
@@ -43,7 +33,6 @@ class MasterHex
 
     private int entrySide;
 
-    // 0=none, 1=block, 2=arch, 3=arrow 4=arrows
     public static final int NONE = 0;
     public static final int BLOCK = 1;
     public static final int ARCH = 2;
@@ -54,9 +43,9 @@ class MasterHex
     MasterHex(int cx, int cy, int scale, boolean inverted, MasterBoard board)
     {
         this.inverted = inverted;
-        this.scale = scale;
         this.board = board;
-        l = scale / 3.0;
+        this.scale = scale;
+        len = scale / 3.0;
         if (inverted)
         {
             xVertex[0] = cx - scale;
@@ -88,7 +77,7 @@ class MasterHex
             yVertex[5] = cy + (int) Math.round(2 * SQRT3 * scale);
         }
 
-        p = new Polygon(xVertex, yVertex, 6);
+        hexagon = new Polygon(xVertex, yVertex, 6);
         // Add 1 to width and height because Java rectangles come up
         // one pixel short of the area actually painted.
         rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] -
@@ -99,7 +88,7 @@ class MasterHex
     void rescale(int cx, int cy, int scale)
     {
         this.scale = scale;
-        l = scale / 3.0;
+        len = scale / 3.0;
         if (inverted)
         {
             xVertex[0] = cx - scale;
@@ -131,8 +120,8 @@ class MasterHex
             yVertex[5] = cy + (int) Math.round(2 * SQRT3 * scale);
         }
 
-        p.xpoints = xVertex;
-        p.ypoints = yVertex;
+        hexagon.xpoints = xVertex;
+        hexagon.ypoints = yVertex;
 
         // Add 1 to width and height because Java rectangles come up
         // one pixel short of the area actually painted.
@@ -145,7 +134,7 @@ class MasterHex
 
     public void paint(Graphics g)
     {
-        if (selected)
+        if (isSelected())
         {
             g.setColor(java.awt.Color.white);
         }
@@ -154,9 +143,9 @@ class MasterHex
             g.setColor(getTerrainColor());
         }
 
-        g.fillPolygon(p);
+        g.fillPolygon(hexagon);
         g.setColor(java.awt.Color.black);
-        g.drawPolygon(p);
+        g.drawPolygon(hexagon);
 
         FontMetrics fontMetrics = g.getFontMetrics();
         String sLabel = Integer.toString(label);
@@ -245,14 +234,14 @@ class MasterHex
         switch (gateType)
         {
             case BLOCK:
-                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+                x[0] = (int) Math.round(x0 - len * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + len * Math.cos(theta));
+                x[1] = (int) Math.round(x0 + len * Math.sin(theta));
+                y[1] = (int) Math.round(y0 - len * Math.cos(theta));
+                x[2] = (int) Math.round(x1 + len * Math.sin(theta));
+                y[2] = (int) Math.round(y1 - len * Math.cos(theta));
+                x[3] = (int) Math.round(x1 - len * Math.sin(theta));
+                y[3] = (int) Math.round(y1 + len * Math.cos(theta));
 
                 g.setColor(java.awt.Color.white);
                 g.fillPolygon(x, y, 4);
@@ -261,22 +250,22 @@ class MasterHex
                 break;
 
             case ARCH:
-                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                x[1] = (int) Math.round(x0 + l * Math.sin(theta));
-                y[1] = (int) Math.round(y0 - l * Math.cos(theta));
-                x[2] = (int) Math.round(x1 + l * Math.sin(theta));
-                y[2] = (int) Math.round(y1 - l * Math.cos(theta));
-                x[3] = (int) Math.round(x1 - l * Math.sin(theta));
-                y[3] = (int) Math.round(y1 + l * Math.cos(theta));
+                x[0] = (int) Math.round(x0 - len * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + len * Math.cos(theta));
+                x[1] = (int) Math.round(x0 + len * Math.sin(theta));
+                y[1] = (int) Math.round(y0 - len * Math.cos(theta));
+                x[2] = (int) Math.round(x1 + len * Math.sin(theta));
+                y[2] = (int) Math.round(y1 - len * Math.cos(theta));
+                x[3] = (int) Math.round(x1 - len * Math.sin(theta));
+                y[3] = (int) Math.round(y1 + len * Math.cos(theta));
 
                 x2 = (int) Math.round((x0 + x1) / 2);
                 y2 = (int) Math.round((y0 + y1) / 2);
                 Rectangle rect = new Rectangle();
-                rect.x = x2 - (int) Math.round(l);
-                rect.y = y2 - (int) Math.round(l);
-                rect.width = (int) (2 * Math.round(l));
-                rect.height = (int) (2 * Math.round(l));
+                rect.x = x2 - (int) Math.round(len);
+                rect.y = y2 - (int) Math.round(len);
+                rect.width = (int) (2 * Math.round(len));
+                rect.height = (int) (2 * Math.round(len));
                 
                 g.setColor(java.awt.Color.white);
                 // Draw a bit more than a semicircle, to clean edge.
@@ -304,14 +293,14 @@ class MasterHex
                 break;
 
             case ARROW:
-                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                x[0] = (int) Math.round(x0 - len * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + len * Math.cos(theta));
+                x[1] = (int) Math.round((x0 + x1) / 2 + len * 
                     Math.sin(theta));
-                y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                y[1] = (int) Math.round((y0 + y1) / 2 - len * 
                     Math.cos(theta));
-                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+                x[2] = (int) Math.round(x1 - len * Math.sin(theta));
+                y[2] = (int) Math.round(y1 + len * Math.cos(theta));
 
                 g.setColor(java.awt.Color.white);
                 g.fillPolygon(x, y, 3);
@@ -328,14 +317,14 @@ class MasterHex
                     x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
                     y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
 
-                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
-                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
-                    x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                    x[0] = (int) Math.round(x0 - len * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + len * Math.cos(theta));
+                    x[1] = (int) Math.round((x0 + x1) / 2 + len * 
                            Math.sin(theta));
-                    y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                    y[1] = (int) Math.round((y0 + y1) / 2 - len * 
                            Math.cos(theta));
-                    x[2] = (int) Math.round(x1 - l * Math.sin(theta));
-                    y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+                    x[2] = (int) Math.round(x1 - len * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 + len * Math.cos(theta));
     
                     g.setColor(java.awt.Color.white);
                     g.fillPolygon(x, y, 3);
@@ -347,60 +336,9 @@ class MasterHex
     }
 
 
-    boolean select(Point point)
-    {
-        if (p.contains(point))
-        {
-            selected = !selected;
-            return true;
-        }
-        return false;
-    }
-
-
-    void select()
-    {
-        selected = true;
-    }
-
-
-    void unselect()
-    {
-        selected = false;
-    }
-
-
-    boolean isSelected()
-    {
-        return selected;
-    }
-
-
-    public Rectangle getBounds()
-    {
-        return rectBound;
-    }
-
-
-    public boolean contains(Point point)
-    {
-        return (p.contains(point));
-    }
-
-
-    char getTerrain()
-    {
-        return terrain;
-    }
-    
-    void setTerrain(char terrain)
-    {
-        this.terrain = terrain;
-    }
-
     String getTerrainName()
     {
-        switch (terrain)
+        switch (getTerrain())
         {
             case 'B':
                 return "BRUSH";
@@ -431,7 +369,7 @@ class MasterHex
 
     Color getTerrainColor()
     {
-        switch (terrain)
+        switch (getTerrain())
         {
             case 'B':
                 return java.awt.Color.green;
@@ -464,7 +402,7 @@ class MasterHex
     // Return the number of types of recruits for this terrain type.
     int getNumRecruitTypes()
     {
-        switch (terrain)
+        switch (getTerrain())
         {
             case 'B':
             case 'D':
@@ -492,7 +430,7 @@ class MasterHex
     // Return the ith recruit possible in this terrain type.
     Creature getRecruit(int i)
     {
-        switch (terrain)
+        switch (getTerrain())
         {
             case 'B':
                 switch (i)
@@ -657,7 +595,7 @@ class MasterHex
     // recruit possible in this terrain type. If not applicable, return 0.
     int getNumToRecruit(int i)
     {
-        switch (terrain)
+        switch (getTerrain())
         {
             case 'B':
                 switch (i)
