@@ -75,6 +75,8 @@ public class BattleMap extends JPanel implements MouseListener,
 
         setupIcon();
 
+        setOpaque(true);
+
         setBackground(Color.white);
 
         battleFrame.addWindowListener(this);

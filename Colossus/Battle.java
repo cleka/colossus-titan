@@ -23,6 +23,7 @@ public class Battle
     public static final int TOO_LATE = 2;
 
 
+    private Game game;
     private BattleMap map;
     private Legion attacker;
     private Legion defender;
@@ -53,6 +54,8 @@ public class Battle
         this.masterHex = masterHex;
         this.defender = defender;
         this.attacker = attacker;
+        this.game = board.getGame();
+
         activeLegion = defender;
 
         attacker.clearBattleTally();
@@ -63,7 +66,10 @@ public class Battle
         // XXX Assumes that battles load at the beginning of a phase.
         map.setupPhase();
 
-        showDice = new ShowDice(map.getFrame());
+        if (game.getShowShowDice())
+        {
+            showDice = new ShowDice(board.getGame());
+        }
     }
 
 
@@ -84,6 +90,12 @@ public class Battle
             default:
                 return "?????";
         }
+    }
+
+
+    public Game getGame()
+    {
+        return game;
     }
 
 
@@ -239,7 +251,7 @@ public class Battle
                 masterFrame.show();
 
                 summonAngel = new SummonAngel(board, attacker);
-                board.getGame().setSummonAngel(summonAngel);
+                game.setSummonAngel(summonAngel);
             }
 
             // This is the last chance to summon an angel until the
@@ -1023,7 +1035,7 @@ public class Battle
         dealt -= carryDamage;
         target.setCarryFlag(false);
 
-        Game.logEvent(dealt + (dealt == 1 ? "hit carries to " : 
+        Game.logEvent(dealt + (dealt == 1 ? " hit carries to " : 
             " hits carry to ") + target.getName() + " in " + 
             target.getCurrentHex().getLabel());
 
@@ -1035,8 +1047,15 @@ public class Battle
         {
             String label = target.getCurrentHex().getLabel();
             map.unselectHexByLabel(label);
-            showDice.setCarries(carryDamage);
-            showDice.setup();
+            if (game.getShowShowDice())
+            {
+                if (showDice == null)
+                {
+                    showDice = new ShowDice(board.getGame());
+                }
+                showDice.setCarries(carryDamage);
+                showDice.setup();
+            }
         }
     }
 
@@ -1592,7 +1611,28 @@ public class Battle
 
     public ShowDice getShowDice()
     {
-        return showDice;
+        if (game.getShowShowDice())
+        {
+            if (showDice == null)
+            {
+                showDice = new ShowDice(board.getGame());
+            }
+            return showDice;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+
+    public void clearShowDice()
+    {
+        if (showDice != null)
+        {
+            showDice.dispose();
+        }
+        showDice = null;
     }
 
 
@@ -1712,7 +1752,7 @@ public class Battle
 
                         SummonAngel summonAngel = new SummonAngel(board,
                             getAttacker());
-                        board.getGame().setSummonAngel(summonAngel);
+                        game.setSummonAngel(summonAngel);
                     }
                 }
             }
@@ -1732,7 +1772,7 @@ public class Battle
             legion.healAllCreatures();
         }
 
-        board.getGame().finishBattle();
+        game.finishBattle();
     }
 
 

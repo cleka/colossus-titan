@@ -50,16 +50,28 @@ public class Game
     public static final String saveExtension = ".sav";
     public static final String xmlSaveExtension = ".xml";
 
+    // Options names
+    public static final String sAutosave = "Autosave";
+    public static final String sAllStacksVisible = "All stacks visible";
+    public static final String sAutoPickRecruiter = "Autopick recruiter";
+    public static final String sShowStatusScreen = "Show game status";
+    public static final String sShowShowDice = "Show dice";
+
     // Per-player client options
     private static boolean autoPickRecruiter;
-    private static boolean showDice = true;
-    private static boolean showGameStatus = true;
+    private static boolean showShowDice = true;
+    private static boolean showStatusScreen = true;
+    // XXX Add default name, favorite colors by player name.
 
     // Server options
-    private static boolean autosaveEveryTurn = true;
-    private static boolean allVisible;
+    private static boolean autosave = true;
+    private static boolean allStacksVisible;
+
+    /** Preference file */
+    private static final String optionsPath = "Colossus.cfg";
 
 
+    /** Start a new game. */
     public Game(boolean isApplet, GameApplet applet)
     {
         this.isApplet = isApplet;
@@ -107,10 +119,12 @@ public class Game
             board.setVisible(true);
             board.repaint();
         }
+
+        loadOptions();
     }
 
 
-    // Load a saved game.
+    /** Load a saved game. */
     public Game(boolean isApplet, GameApplet applet, String filename)
     {
         this.isApplet = isApplet;
@@ -127,10 +141,12 @@ public class Game
         statusScreen = new StatusScreen(this);
         // XXX Assumes that we only load at the beginning of a phase.
         board.setupPhase();
+
+        loadOptions();
     }
 
 
-    // Load a saved game, and force the first movement roll.
+    /** Load a saved game, and force the first movement roll. */
     public Game(boolean isApplet, GameApplet applet, String filename,
         int forcedMovementRoll)
     {
@@ -144,7 +160,7 @@ public class Game
     }
 
 
-    // For testing only.
+    /** Default constructor, for testing only. */
     public Game()
     {
     }
@@ -168,7 +184,7 @@ public class Game
     }
 
 
-    // Randomize towers by rolling dice and rerolling ties.
+    /** Randomize towers by rolling dice and rerolling ties. */
     private void assignTowers()
     {
         int numPlayers = getNumPlayers();
@@ -223,10 +239,17 @@ public class Game
     }
 
 
-    public boolean getAllVisible()
+    public boolean getAllStacksVisible()
     {
-        return allVisible;
+        return allStacksVisible;
     }
+
+
+    public void setAllStacksVisible(boolean allStacksVisible)
+    {
+        this.allStacksVisible = allStacksVisible;
+    }
+
 
     public int getNumPlayers()
     {
@@ -283,6 +306,74 @@ public class Game
     public Collection getPlayers()
     {
         return players;
+    }
+
+
+    public boolean getAutoPickRecruiter()
+    {
+        return autoPickRecruiter;
+    }
+
+
+    public void setAutoPickRecruiter(boolean autoPickRecruiter)
+    {
+        this.autoPickRecruiter = autoPickRecruiter;
+    }
+
+
+    public boolean getShowStatusScreen()
+    {
+        return showStatusScreen;
+    }
+
+
+    public void setShowStatusScreen(boolean showStatusScreen)
+    {
+        boolean previous = this.showStatusScreen;
+        if (showStatusScreen != previous)
+        {
+            this.showStatusScreen = showStatusScreen;
+            updateStatusScreen();
+        }
+    }
+
+
+    public boolean getShowShowDice()
+    {
+        return showShowDice;
+    }
+
+
+    public void setShowShowDice(boolean showShowDice)
+    {
+        boolean previous = this.showShowDice;
+        if (showShowDice != previous)
+        {
+            this.showShowDice = showShowDice;
+            if (!showShowDice)
+            {
+                if (battle != null)
+                {
+                    battle.clearShowDice();
+                }
+                if (board != null)
+                {
+                    board.disableShowShowDice();
+                }
+            }
+        }
+    }
+
+
+    public boolean getAutosave()
+    {
+        return autosave;
+    }
+
+
+    public void setAutosave(boolean autosave)
+    {
+        this.autosave = autosave;
     }
 
 
@@ -374,7 +465,7 @@ public class Game
 
             updateStatusScreen();
 
-            if (!isApplet && autosaveEveryTurn)
+            if (!isApplet && getAutosave())
             {
                 saveGame();
             }
@@ -384,9 +475,22 @@ public class Game
 
     public void updateStatusScreen()
     {
-        if (statusScreen != null)
+        if (getShowStatusScreen())
         {
-            statusScreen.updateStatusScreen();
+            if (statusScreen != null)
+            {
+                statusScreen.updateStatusScreen();
+            }
+            else
+            {
+                statusScreen = new StatusScreen(this);
+            }
+        }
+        else
+        {
+            board.disableShowStatusScreen();
+            statusScreen.dispose();
+            this.statusScreen = null;
         }
     }
 
@@ -521,6 +625,67 @@ public class Game
             return;
         }
     }
+
+
+    // XXX Use separate files and methods for client and server options.
+
+    /** Save game options to a file.  The current format is standard
+     *  java.util.Properties keyword=value. */
+    public void saveOptions()
+    {
+        Properties options = new Properties();
+
+        options.setProperty(sAutosave, String.valueOf(autosave));
+        options.setProperty(sAllStacksVisible, String.valueOf(
+            allStacksVisible));
+        options.setProperty(sAutoPickRecruiter, String.valueOf(
+            autoPickRecruiter));
+        options.setProperty(sShowShowDice, String.valueOf(showShowDice));
+        options.setProperty(sShowStatusScreen, String.valueOf(
+            showStatusScreen));
+        try
+        {
+            FileOutputStream out = new FileOutputStream(optionsPath);
+            String header = "Colossus config file version 1.0";
+            options.store(out, header);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.toString());
+            System.out.println("Couldn't write options to " + optionsPath);
+        }
+    }
+
+
+    /** Load game options from a file. The current format is standard
+     *  java.util.Properties keyword=value */
+    public void loadOptions()
+    {
+        Properties options = new Properties();
+
+        try
+        {
+            FileInputStream in = new FileInputStream(optionsPath);
+            options.load(in);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.toString());
+            System.out.println("Couldn't read options from " + optionsPath);
+            return;
+        }
+
+        // XXX Handle partial options files?
+        autosave = (options.getProperty(sAutosave).equals("true"));
+        allStacksVisible = (options.getProperty(sAllStacksVisible).equals(
+            "true"));
+        autoPickRecruiter = (options.getProperty(sAutoPickRecruiter).equals(
+            "true"));
+        showShowDice = (options.getProperty(sShowShowDice).equals("true"));
+        showStatusScreen = (options.getProperty(sShowStatusScreen).equals(
+            "true"));
+    }
+
 
     /*
      *     Game name
@@ -1705,7 +1870,7 @@ public class Game
     }
 
 
-    public static void doRecruit(Creature recruit, Legion legion,
+    public void doRecruit(Creature recruit, Legion legion,
         JFrame parentFrame)
     {
         // Pick the recruiter(s) if necessary.
@@ -1718,7 +1883,7 @@ public class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (autoPickRecruiter || numEligibleRecruiters == 1 ||
+        else if (getAutoPickRecruiter() || numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
             // If there's only one possible recruiter, or if all

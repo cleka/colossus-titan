@@ -132,7 +132,8 @@ public class PickRecruit extends JDialog implements MouseListener,
             dialogLock = true;
 
             // Recruit the chosen creature.
-            Game.doRecruit((Creature)recruits.get(i), legion, parentFrame);
+            legion.getPlayer().getGame().doRecruit(
+                (Creature)recruits.get(i), legion, parentFrame);
 
             // Then exit.
             dispose();

@@ -701,14 +701,17 @@ public class Critter extends Creature
         struck = true;
 
         // Display the rolls in the showDice dialog.
-        ShowDice showDice = battle.getShowDice();
-        showDice.setAttacker(this);
-        showDice.setDefender(target);
-        showDice.setTargetNumber(strikeNumber);
-        showDice.setRolls(rolls);
-        showDice.setHits(damage);
-        showDice.setCarries(carryDamage);
-        showDice.setup();
+        if (battle.getGame().getShowShowDice())
+        {
+            ShowDice showDice = battle.getShowDice();
+            showDice.setAttacker(this);
+            showDice.setDefender(target);
+            showDice.setTargetNumber(strikeNumber);
+            showDice.setRolls(rolls);
+            showDice.setHits(damage);
+            showDice.setCarries(carryDamage);
+            showDice.setup();
+        }
 
         Game.logEvent(name + " in " + currentHex.getLabel() +
             " strikes " + target.getName() + " in " +

@@ -1,20 +1,21 @@
-Hook up remaining options in MasterBoard menu.
+Hook up remaining actions in MasterBoard menu.
+
+Clean up ShowDice tracking.
+
 Show movement die roll graphically.
+
+Disable file-related options when running as an applet.
+
 Add keyboard legion selection?
 Add toolbars?
 Add status bar to bottom of MasterBoard?
-
-Log carries.  Get out of carry mode when there are carries 
-   but no carry targets left.
+Add tooltips?
 
 Copy entrySide and teleported from MasterHex to Legion.
 
 Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
    undo moves.  "Done with Engagements" shouldn't be necessary.
-
-Add tooltips?
-
 
 Separate the battlemap out into a common HexMap class? 
 
@@ -36,14 +37,10 @@ Move GUI/client classes and model/server classes into separate
    Document remaining public classes, which are those that
    need to be included in the network protocol.
 
-Add a window that displays all terrain types and recruits.
+Add a ShowAllRecruits window that displays all recruits by terrain 
+   type.
 
 Finish SetupBattle class, to allow setting up standalone battles.
-
-Add server menu for save game, load game, new game, autosave, visible 
-   stacks option, ability to create or dismiss status screen, 
-   PickRecruits vs.  always reveal the biggest/smallest possible 
-   recruiter.  Read option defaults from a config file.
 
 Fix concession timing.
 

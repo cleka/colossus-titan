@@ -10,7 +10,7 @@ import javax.swing.*;
  */
 
 public class MasterBoard extends JPanel implements MouseListener,
-    WindowListener
+    WindowListener, ItemListener
 {
     // There are a total of 96 hexes
     // Their Titan labels are:
@@ -36,6 +36,9 @@ public class MasterBoard extends JPanel implements MouseListener,
     private JMenu optionsMenu;
     private JPopupMenu popupMenu;
 
+    private JCheckBoxMenuItem miShowStatusScreen;
+    private JCheckBoxMenuItem miShowShowDice;
+
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
 
@@ -47,11 +50,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     static final String saveGameAs = "Save game as";
     static final String concedeBattle = "Concede battle";
 
-    static final String autosave = "Autosave";
-    static final String allStacksVisible = "All stacks visible";
-    static final String autopickRecruiter = "Autopick recruiter";
-    static final String showGameStatus = "Show game status";
-    static final String showDice = "Show dice";
+    static final String saveOptions = "Save options";
 
     static final String undoLastSplit = "Undo Last Split";
     static final String undoAllSplits = "Undo All Splits";
@@ -86,11 +85,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     AbstractAction loadGameAction;
     AbstractAction saveGameAction;
     AbstractAction saveGameAsAction;
-    AbstractAction autosaveAction; 
-    AbstractAction allStacksVisibleAction;
-    AbstractAction autopickRecruiterAction;
-    AbstractAction showGameStatusAction;
-    AbstractAction showDiceAction;
+    AbstractAction saveOptionsAction;
 
 
     public MasterBoard(Game game)
@@ -104,6 +99,8 @@ public class MasterBoard extends JPanel implements MouseListener,
 
         scale = getScale();
 
+        setOpaque(true);
+
         setupIcon();
 
         setBackground(Color.black);
@@ -116,7 +113,7 @@ public class MasterBoard extends JPanel implements MouseListener,
         setupTopMenu();
 
         SetupMasterHexes.setupHexes(h, this, hexes);
-        
+
         contentPane.add(this, BorderLayout.CENTER);
         masterFrame.pack();
 
@@ -153,7 +150,7 @@ public class MasterBoard extends JPanel implements MouseListener,
                 Player player = game.getActivePlayer();
                 if (player.getMaxLegionHeight() > 7)
                 {
-                    JOptionPane.showMessageDialog(MasterBoard.this, 
+                    JOptionPane.showMessageDialog(MasterBoard.this,
                         "Must split.");
                     return;
                 }
@@ -191,7 +188,7 @@ public class MasterBoard extends JPanel implements MouseListener,
                 player.takeMulligan();
                 if (player.getMulligansLeft() == 0)
                 {
-                    // Remove the Take Mulligan button, and reroll movement. 
+                    // Remove the Take Mulligan button, and reroll movement.
                     setupPhase();
                 }
                 // Remove all moves from MasterBoard.
@@ -204,15 +201,15 @@ public class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
-                // If any legions has a legal non-teleport move, then the 
+                // If any legions has a legal non-teleport move, then the
                 // player must move at least one legion.
-                if (player.legionsMoved() == 0 && 
+                if (player.legionsMoved() == 0 &&
                     player.countMobileLegions() > 0)
                 {
                     // Highlight all unmoved legions, rather than the
-                    // locations to which the forced-to-move legion can move. 
+                    // locations to which the forced-to-move legion can move.
                     game.highlightUnmovedLegions();
-                    JOptionPane.showMessageDialog(MasterBoard.this, 
+                    JOptionPane.showMessageDialog(MasterBoard.this,
                         "At least one legion must move.");
                     return;
                 }
@@ -235,9 +232,9 @@ public class MasterBoard extends JPanel implements MouseListener,
                             }
                             else
                             {
-                                // Highlight all unmoved legions, rather than 
-                                // the locations to which the forced-to-move 
-                                // legion can move. 
+                                // Highlight all unmoved legions, rather than
+                                // the locations to which the forced-to-move
+                                // legion can move.
                                 game.highlightUnmovedLegions();
                                 JOptionPane.showMessageDialog(MasterBoard.this,
                                     "Split legions must be separated.");
@@ -261,8 +258,8 @@ public class MasterBoard extends JPanel implements MouseListener,
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(MasterBoard.this, 
-                        "Must Resolve Engagements."); 
+                    JOptionPane.showMessageDialog(MasterBoard.this,
+                        "Must Resolve Engagements.");
                 }
             }
         };
@@ -310,10 +307,10 @@ public class MasterBoard extends JPanel implements MouseListener,
                 options[1] = "No";
                 int answer = JOptionPane.showOptionDialog(MasterBoard.this,
                     "Are you sure you with to withdraw from the game?",
-                    "Confirm Withdrawal?", 
+                    "Confirm Withdrawal?",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, options, options[1]);
-    
+
                 if (answer == JOptionPane.YES_OPTION)
                 {
                    player.die(null, true);
@@ -333,7 +330,7 @@ public class MasterBoard extends JPanel implements MouseListener,
                 }
             }
         };
-        
+
         viewBattleMapAction = new AbstractAction(viewBattleMap)
         {
             public void actionPerformed(ActionEvent e)
@@ -345,28 +342,28 @@ public class MasterBoard extends JPanel implements MouseListener,
                 }
             }
         };
-        
+
         newGameAction = new AbstractAction(newGame)
         {
             public void actionPerformed(ActionEvent e)
             {
             }
         };
-        
+
         loadGameAction = new AbstractAction(loadGame)
         {
             public void actionPerformed(ActionEvent e)
             {
             }
         };
-        
+
         saveGameAction = new AbstractAction(saveGame)
         {
             public void actionPerformed(ActionEvent e)
             {
             }
         };
-        
+
         saveGameAsAction = new AbstractAction(saveGameAs)
         {
             public void actionPerformed(ActionEvent e)
@@ -374,43 +371,16 @@ public class MasterBoard extends JPanel implements MouseListener,
             }
         };
 
-        autosaveAction = new AbstractAction(autosave)
+        saveOptionsAction = new AbstractAction(saveOptions)
         {
             public void actionPerformed(ActionEvent e)
             {
-            }
-        };
-
-        allStacksVisibleAction = new AbstractAction(allStacksVisible)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-            }
-        };
-
-        autopickRecruiterAction = new AbstractAction(autopickRecruiter)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-            }
-        };
-
-        showGameStatusAction = new AbstractAction(showGameStatus)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-            }
-        };
-
-        showDiceAction = new AbstractAction(showDice)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+                game.saveOptions();
             }
         };
     }
-    
-    
+
+
     private void setupPopupMenu()
     {
         popupMenu = new JPopupMenu();
@@ -428,7 +398,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     {
         menuBar = new JMenuBar();
         masterFrame.setJMenuBar(menuBar);
-        
+
         fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
@@ -450,21 +420,56 @@ public class MasterBoard extends JPanel implements MouseListener,
         optionsMenu.setMnemonic(KeyEvent.VK_O);
         menuBar.add(optionsMenu);
 
-        mi = new JCheckBoxMenuItem(autosave);
+        mi = new JCheckBoxMenuItem(Game.sAutosave);
         mi.setMnemonic(KeyEvent.VK_A);
+        mi.setSelected(game.getAutosave());
+        mi.addItemListener(this);
         optionsMenu.add(mi);
-        mi = new JCheckBoxMenuItem(allStacksVisible);
+
+        mi = new JCheckBoxMenuItem(Game.sAllStacksVisible);
         mi.setMnemonic(KeyEvent.VK_S);
+        mi.setSelected(game.getAllStacksVisible());
+        mi.addItemListener(this);
         optionsMenu.add(mi);
-        mi = new JCheckBoxMenuItem(autopickRecruiter);
+
+        mi = new JCheckBoxMenuItem(Game.sAutoPickRecruiter);
         mi.setMnemonic(KeyEvent.VK_P);
+        mi.setSelected(game.getAutoPickRecruiter());
+        mi.addItemListener(this);
         optionsMenu.add(mi);
-        mi = new JCheckBoxMenuItem(showGameStatus);
-        mi.setMnemonic(KeyEvent.VK_G);
-        optionsMenu.add(mi);
-        mi = new JCheckBoxMenuItem(showDice);
-        mi.setMnemonic(KeyEvent.VK_D);
-        optionsMenu.add(mi);
+
+        miShowStatusScreen = new JCheckBoxMenuItem(Game.sShowStatusScreen);
+        miShowStatusScreen.setMnemonic(KeyEvent.VK_G);
+        miShowStatusScreen.setSelected(game.getShowStatusScreen());
+        miShowStatusScreen.addItemListener(this);
+        optionsMenu.add(miShowStatusScreen);
+
+        miShowShowDice = new JCheckBoxMenuItem(Game.sShowShowDice);
+        miShowShowDice.setMnemonic(KeyEvent.VK_D);
+        miShowShowDice.setSelected(game.getShowShowDice());
+        miShowShowDice.addItemListener(this);
+        optionsMenu.add(miShowShowDice);
+
+        optionsMenu.addSeparator();
+
+        mi = optionsMenu.add(saveOptionsAction);
+        mi.setMnemonic(KeyEvent.VK_O);
+    }
+
+
+    /** We need to disable the status screen checkbox if the user
+     *  closes the window. */
+    public void disableShowStatusScreen()
+    {
+        miShowStatusScreen.setSelected(false);
+    }
+
+
+    /** We need to disable the show dice checkbox if the user
+     *  closes the window. */
+    public void disableShowShowDice()
+    {
+        miShowShowDice.setSelected(false);
     }
 
 
@@ -495,8 +500,8 @@ public class MasterBoard extends JPanel implements MouseListener,
                 System.out.println("Bogus phase");
         }
     }
-    
-    
+
+
     private void setupPhaseMenu()
     {
         switch (game.getPhase())
@@ -530,13 +535,13 @@ public class MasterBoard extends JPanel implements MouseListener,
         }
         else
         {
-            masterFrame.setTitle(player.getName() + " Turn " + 
+            masterFrame.setTitle(player.getName() + " Turn " +
                 game.getTurnNumber() + " : Split stacks");
 
             setupSplitMenu();
 
             // Highlight hexes with legions that are 7 high.
-            player.highlightTallLegions();  
+            player.highlightTallLegions();
         }
     }
 
@@ -567,11 +572,11 @@ public class MasterBoard extends JPanel implements MouseListener,
     private void setupMove()
     {
         Player player = game.getActivePlayer();
-        
+
         player.rollMovement();
-        
-        masterFrame.setTitle(player.getName() + " Turn " + 
-            game.getTurnNumber() + " : Movement Roll: " + 
+
+        masterFrame.setTitle(player.getName() + " Turn " +
+            game.getTurnNumber() + " : Movement Roll: " +
             player.getMovementRoll() + " ");
 
         setupMoveMenu();
@@ -579,8 +584,8 @@ public class MasterBoard extends JPanel implements MouseListener,
         // Highlight hexes with legions that can move.
         game.highlightUnmovedLegions();
     }
-    
-    
+
+
     private void setupMoveMenu()
     {
         phaseMenu.removeAll();
@@ -623,14 +628,14 @@ public class MasterBoard extends JPanel implements MouseListener,
         else
         {
             String playerName = game.getActivePlayer().getName();
-            masterFrame.setTitle(playerName + " Turn " + 
+            masterFrame.setTitle(playerName + " Turn " +
                 game.getTurnNumber() + " : Resolve Engagements ");
 
             setupFightMenu();
         }
     }
-    
-    
+
+
     private void setupFightMenu()
     {
         phaseMenu.removeAll();
@@ -655,7 +660,7 @@ public class MasterBoard extends JPanel implements MouseListener,
         }
         else
         {
-            masterFrame.setTitle(player.getName() + " Turn " + 
+            masterFrame.setTitle(player.getName() + " Turn " +
                 game.getTurnNumber() + " : Muster Recruits ");;
 
             setupMusterMenu();
@@ -664,7 +669,7 @@ public class MasterBoard extends JPanel implements MouseListener,
             game.highlightPossibleRecruits();
         }
     }
-            
+
 
     private void setupMusterMenu()
     {
@@ -715,8 +720,8 @@ public class MasterBoard extends JPanel implements MouseListener,
             }
         }
     }
-    
-    
+
+
     private void setupIcon()
     {
         if (game != null && !game.isApplet())
@@ -793,9 +798,9 @@ public class MasterBoard extends JPanel implements MouseListener,
 
         return null;
     }
-    
-    
-    /** Return the Legion whose marker contains the given point, or null 
+
+
+    /** Return the Legion whose marker contains the given point, or null
      *  if none does. */
     private Legion getLegionWithMarkerContainingPoint(Point point)
     {
@@ -865,8 +870,8 @@ public class MasterBoard extends JPanel implements MouseListener,
             }
         }
     }
-    
-    
+
+
     public static void selectHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
@@ -941,14 +946,15 @@ public class MasterBoard extends JPanel implements MouseListener,
             // What to do depends on which mouse button was used
             // and the current phase of the turn.
 
-            // Right-click means to show the contents of the 
+            // Right-click means to show the contents of the
             // legion.
             if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
                 InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                 InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
             {
                 new ShowLegion(masterFrame, legion, point,
-                    game.getAllVisible() || player == game.getActivePlayer());
+                    game.getAllStacksVisible() ||
+                    player == game.getActivePlayer());
                 return;
             }
             else
@@ -977,7 +983,7 @@ public class MasterBoard extends JPanel implements MouseListener,
 
                 return;
             }
-            
+
             // Otherwise, the action to take depends on the phase.
             game.actOnHex(hex);
             hex.repaint();
@@ -1006,6 +1012,35 @@ public class MasterBoard extends JPanel implements MouseListener,
 
     public void mouseExited(MouseEvent e)
     {
+    }
+
+
+    public void itemStateChanged(ItemEvent e)
+    {
+        JMenuItem source = (JMenuItem)e.getSource();
+        String text = source.getText();
+        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+
+        if (text.equals(Game.sAutosave))
+        {
+            game.setAutosave(selected);
+        }
+        else if (text.equals(Game.sAllStacksVisible))
+        {
+            game.setAllStacksVisible(selected);
+        }
+        else if (text.equals(Game.sAutoPickRecruiter))
+        {
+            game.setAutoPickRecruiter(selected);
+        }
+        else if (text.equals(Game.sShowStatusScreen))
+        {
+            game.setShowStatusScreen(selected);
+        }
+        else if (text.equals(Game.sShowShowDice))
+        {
+            game.setShowShowDice(selected);
+        }
     }
 
 
@@ -1056,7 +1091,7 @@ public class MasterBoard extends JPanel implements MouseListener,
         {
             return;
         }
-        
+
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
@@ -1087,8 +1122,8 @@ public class MasterBoard extends JPanel implements MouseListener,
             }
         }
     }
-    
-    
+
+
     public Dimension getMinimumSize()
     {
         return new Dimension(64 * scale, 56 * scale);
@@ -1099,6 +1134,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     {
         return getMinimumSize();
     }
+
 
 
     public static void main(String [] args)

@@ -9,9 +9,9 @@ import javax.swing.*;
  */
 
 
-public class ShowDice extends JDialog implements WindowListener
+public class ShowDice extends JFrame implements WindowListener
 {
-    private JFrame parentFrame;
+    private Game game;
     private static final int scale = 60;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
@@ -30,11 +30,11 @@ public class ShowDice extends JDialog implements WindowListener
     private Chit [] dice;
 
 
-    public ShowDice(JFrame parentFrame)
+    public ShowDice(Game game)
     {
-        super(parentFrame, "Show Dice Rolls", false);
+        super("Show Dice Rolls");
 
-        this.parentFrame = parentFrame;
+        this.game = game;
 
         setVisible(false);
         setEnabled(false);
@@ -116,6 +116,7 @@ public class ShowDice extends JDialog implements WindowListener
     }
 
 
+    // XXX Cache die images?
     // Initialize and layout the components, in response to new data.
     public void setup()
     {
@@ -225,9 +226,7 @@ public class ShowDice extends JDialog implements WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        // XXX Don't allow disposing this until there's a
-        // menu that allows recalling it.
-        // dispose();
+        game.setShowShowDice(false);
     }
 
 

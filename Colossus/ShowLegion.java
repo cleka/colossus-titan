@@ -12,7 +12,7 @@ import java.util.*;
 public class ShowLegion extends JDialog implements MouseListener, WindowListener
 {
     public ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean
-        allVisible)
+        allStacksVisible)
     {
         super(parentFrame, "Contents of Legion " +
             legion.getMarkerId(), false);
@@ -59,7 +59,7 @@ public class ShowLegion extends JDialog implements MouseListener, WindowListener
         {
             Critter critter = (Critter)it.next();
             String imageName;
-            if (!allVisible && !critter.isVisible())
+            if (!allStacksVisible && !critter.isVisible())
             {
                 imageName = "Question";
             }
