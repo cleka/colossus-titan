@@ -192,7 +192,7 @@ class Hex
 
         theta = Math.atan2(vy2 - vy1, vx2 - vx1);
 
-        switch(hexsideType)
+        switch (hexsideType)
         {
             case 'c':     // cliff -- triangles
                 for (int j = 0; j < 3; j++)
