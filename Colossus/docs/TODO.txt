@@ -170,3 +170,19 @@ Move jdom, werken.opt out of source tree into separate jar files?
 
 Need to cache eval score for each legion move during AI movement phase,
    to speed things up when an AI player has many legions.
+
+After clicking on engagement, after computer declined to flee and I
+   declined to concede:
+Rd10 (Star) (dripton) attacks Br08 (Ram) (Brown) in Brush hex 17
+java.lang.NullPointerException
+        at net.sf.colossus.client.HexMap.getHexByLabel(HexMap.java:583)
+        at net.sf.colossus.client.BattleMap.getEntrance(BattleMap.java:385)
+        at net.sf.colossus.server.Battle.placeLegion(Battle.java:93)
+        at net.sf.colossus.server.Battle.<init>(Battle.java:87)
+        at net.sf.colossus.server.Game.fight(Game.java:2660)
+        at net.sf.colossus.server.Game.makeProposal(Game.java:2606)
+        at net.sf.colossus.server.Server.makeProposal(Server.java:880)
+        at net.sf.colossus.server.SocketServerThread.callMethod(SocketServerThread.java:188)
+        at net.sf.colossus.server.SocketServerThread.parseLine(SocketServerThread.java:104)
+        at net.sf.colossus.server.SocketServerThread.run(SocketServerThread.java:65)
+
