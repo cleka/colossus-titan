@@ -159,6 +159,6 @@ public final class PickMarker extends JDialog implements MouseListener,
             player.getMarkersAvailable());
         // XXX Pass a deep clone rather than the original list.
         // Or at least call Collections.unmodifyableSortedSet()
-        System.out.println("Chose " + choice);
+        Game.logEvent("Chose " + choice);
     }
 }

@@ -224,6 +224,6 @@ public final class PickRecruit extends JDialog implements MouseListener,
             null, null, player);
 
         Creature creature = PickRecruit.pickRecruit(frame, legion);
-        System.out.println("recruited " + creature);
+        Game.logEvent("Recruited " + creature);
     }
 }

@@ -2,6 +2,8 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
+import org.apache.log4j.*;
+
 
 /**
  * Class Game gets and holds high-level data about a Titan game.
@@ -36,6 +38,9 @@ public final class Game
 
     private boolean engagementInProgress;
 
+
+    /** log4j config file */
+    public static final String logConfigFilename = "log.cfg";
 
     // Constants for savegames
     public static final String saveDirname = "saves";
@@ -79,6 +84,20 @@ public final class Game
     public static final String autoSplit = "Auto split";
     public static final String autoMasterMove = "Auto masterboard move";
     public static final String autoPlay = "Auto play";
+
+
+    // log4j
+    // Make this public to start, so we don't have to set up a logger in
+    // each class.  Maybe change that later.
+    public static Category cat = Category.getInstance(Game.class.getName());
+
+
+    static
+    {
+        // log4j
+        PropertyConfigurator.configure(logConfigFilename);
+    }
+
 
     /** Start a new game. */
     public Game(GameApplet applet)
@@ -140,7 +159,7 @@ public final class Game
 
     public void newGame()
     {
-        logEvent("\nStarting new game");
+        logEvent("Starting new game");
 
         turnNumber = 1;
 
@@ -599,7 +618,7 @@ public final class Game
                 setupMuster();
                 break;
             default:
-                System.out.println("Bogus phase");
+                logError("Bogus phase");
         }
     }
 
@@ -689,8 +708,7 @@ public final class Game
         else
         {
             Player player = getActivePlayer();
-            logEvent("\n" + player.getName() + "'s turn, number " +
-                turnNumber);
+            logEvent(player.getName() + "'s turn, number " + turnNumber);
 
             player.syncCheckboxes();
             updateStatusScreen();
@@ -813,8 +831,8 @@ public final class Game
         }
         catch (IOException e)
         {
-            System.out.println(e.toString());
-            System.out.println("Couldn't open " + filename);
+            logError(e.toString());
+            logError("Couldn't open " + filename);
             return;
         }
         PrintWriter out = new PrintWriter(fileWriter);
@@ -885,7 +903,7 @@ public final class Game
 
         if (out.checkError())
         {
-            System.out.println("Write error " + filename);
+            logError("Write error " + filename);
             // XXX Delete the partial file?
             return;
         }
@@ -932,7 +950,7 @@ public final class Game
         {
              if (!savesDir.mkdir())
              {
-                 System.out.println("Could not create saves directory");
+                 logError("Could not create saves directory");
                  return;
              }
         }
@@ -957,13 +975,13 @@ public final class Game
             File dir = new File(saveDirname);
             if (!dir.exists() || !dir.isDirectory())
             {
-                System.out.println("No saves directory");
+                logError("No saves directory");
                 dispose();
             }
             String [] filenames = dir.list(new SaveGameFilter());
             if (filenames.length < 1)
             {
-                System.out.println("No savegames found in saves directory");
+                logError("No savegames found in saves directory");
                 dispose();
             }
             file = new File(saveDirname + File.separator +
@@ -987,7 +1005,7 @@ public final class Game
             buf = in.readLine();
             if (!buf.equals(saveGameVersion))
             {
-                System.out.println("Can't load this savegame version.");
+                logError("Can't load this savegame version.");
                 dispose();
             }
 
@@ -1154,8 +1172,7 @@ public final class Game
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
         {
-            e.printStackTrace();
-            System.out.println("Tried to load corrupt savegame.");
+            logError(e + "Tried to load corrupt savegame.");
             dispose();
         }
     }
@@ -1316,7 +1333,7 @@ public final class Game
         }
         catch (IOException e)
         {
-            System.out.println("Couldn't write options to " + optionsFile);
+            logError("Couldn't write options to " + optionsFile);
         }
 
         // Save options for each player
@@ -1341,8 +1358,7 @@ public final class Game
         }
         catch (IOException e)
         {
-            System.out.println("Couldn't read game options from " +
-                optionsFile);
+            logError("Couldn't read game options from " + optionsFile);
             return;
         }
 
@@ -2255,9 +2271,31 @@ public final class Game
     }
 
 
+    // log4j strategy
+    //    debug -- intended for developer only -- console or logfile
+    //    info  -- routine info -- console or logfile or GUI scroll window
+    //    warn  -- user mistake or important info -- message dialog
+    //    error -- serious program error -- message dialog or stderr
+    //    fatal -- fatal program error -- message dialog or stderr
+
+    /** Log an event using log4j at info priority. */
     public static void logEvent(String s)
     {
-        System.out.println(s);
+        cat.info(s);
+    }
+    
+    
+    /** Log an error using log4j. */
+    public static void logError(String s)
+    {
+        cat.error(s);
+    }
+    
+    
+    /** Log a debug message using log4j. */
+    public static void logDebug(String s)
+    {
+        cat.debug(s);
     }
 
 
@@ -2657,9 +2695,6 @@ public final class Game
         }
         battle = null;
         engagementInProgress = false;
-
-        // Insert a blank line in the log file after each battle.
-        logEvent("\n");
     }
 
 
@@ -3250,8 +3285,7 @@ public final class Game
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            System.out.println("Could not set look and feel.");
+            logError(e + "Could not set look and feel.");
         };
 
         if (args.length == 0)

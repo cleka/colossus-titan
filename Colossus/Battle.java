@@ -264,7 +264,7 @@ public final class Battle
                 setupFight();
                 break;
             default:
-                System.out.println("Bogus phase");
+                Game.logError("Bogus phase");
         }
     }
 

@@ -72,8 +72,7 @@ public class Chit extends JPanel
             }
             catch (Exception e)
             {
-                System.out.println("Couldn't load image " + imageFilename +
-                    "\n" + e);
+                Game.logError("Couldn't load image " + imageFilename + e);
             }
         }
         else
@@ -204,7 +203,7 @@ public class Chit extends JPanel
         File dir = new File(imageDirName);
         if (!dir.exists() || !dir.isDirectory())
         {
-            System.out.println("No images directory");
+            Game.logError("No images directory");
             return;
         }
         String [] filenames = dir.list();

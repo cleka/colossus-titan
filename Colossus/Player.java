@@ -814,7 +814,7 @@ public final class Player implements Comparable
         }
         catch (IOException e)
         {
-            System.out.println("Couldn't write options to " + optionsFile);
+            Game.logError("Couldn't write options to " + optionsFile);
         }
     }
 
@@ -832,8 +832,7 @@ public final class Player implements Comparable
         }
         catch (IOException e)
         {
-            System.out.println("Couldn't read player options from " +
-                optionsFile);
+            Game.logError("Couldn't read player options from " + optionsFile);
         }
     }
 

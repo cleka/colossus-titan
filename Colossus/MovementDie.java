@@ -71,7 +71,7 @@ public final class MovementDie extends JFrame implements WindowListener
             }
             catch (NullPointerException e)
             {
-                System.out.println(e.toString() + " Couldn't find " +
+                Game.logError(e.toString() + " Couldn't find " +
                     Creature.colossus.getImageName());
                 dispose();
             }

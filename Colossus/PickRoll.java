@@ -170,7 +170,7 @@ public final class PickRoll extends JDialog implements MouseListener,
         frame.setVisible(true);
 
         int roll = PickRoll.pickRoll(frame, "Pick roll");
-        System.out.println("Picked " + roll);
+        Game.logEvent("Picked " + roll);
         System.exit(0);
     }
 }

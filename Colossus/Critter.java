@@ -579,7 +579,7 @@ public final class Critter extends Creature
         // Sanity check
         if (target.getPlayer() == getPlayer())
         {
-            System.out.println(getName() + " tried to strike allied " +
+            Game.logError(getName() + " tried to strike allied " +
                 target.getName());
             return;
         }
@@ -635,8 +635,8 @@ public final class Critter extends Creature
                                 if (targetHex.getHexside(direction) != 'd')
                                 {
                                     critter.setCarryFlag(false);
-// XXX debug
-System.out.println("DENIED CARRY UP DUNE HEXSIDE");
+                                    Game.logDebug(
+                                        "DENIED CARRY UP DUNE HEXSIDE");
                                 }
                             }
 

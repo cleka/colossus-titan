@@ -218,8 +218,8 @@ public final class Concede extends JDialog implements ActionListener
         defender.setMarker(marker);
 
         boolean answer = Concede.flee(frame, defender, attacker);
-        System.out.println(answer);
+        Game.logEvent("Flee? " + answer);
         answer = Concede.concede(frame, attacker, defender);
-        System.out.println(answer);
+        Game.logEvent("Concede? " + answer);
     }
 }

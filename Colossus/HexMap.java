@@ -551,7 +551,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
         }
 
-        System.out.println("Could not find hex " + label);
+        Game.logError("Could not find hex " + label);
         return null;
     }
 

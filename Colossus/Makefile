@@ -51,9 +51,11 @@ JARFILE = Colossus.jar
 
 jar : $(JARFILE)
 
+LOG4J = org/apache/log4j/
+
 # Create jar file
 $(JARFILE): $(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
-	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif
+	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif $(LOG4J)*.class $(LOG4J)config/*.class $(LOG4J)helpers/*.class $(LOG4J)or/*.class $(LOG4J)spi/*.class
 	chmod +x Colossus.jar
 
 # Install jar and html files for applet
