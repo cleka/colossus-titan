@@ -178,7 +178,7 @@ public class BattleMap extends Frame implements MouseListener,
             BattleChit chit = chits[i];
             if (chit.getPlayer() == player)
             {
-                if (!chit.hasMoved() && !chit.isEngaged())
+                if (!chit.hasMoved() && !chit.inContact(false))
                 {
                     count++;
                     Hex hex = chit.getCurrentHex();
@@ -243,7 +243,7 @@ public class BattleMap extends Frame implements MouseListener,
     {
         unselectAllHexes();
 
-        if (!chit.hasMoved() && !chit.isEngaged())
+        if (!chit.hasMoved() && !chit.inContact(false))
         {
             Creature creature = chit.getCreature();
 
@@ -470,7 +470,7 @@ public class BattleMap extends Frame implements MouseListener,
             BattleChit chit = chits[i];
             if (chit.getPlayer() == player)
             {
-                if (chit.isEngaged() && !chit.hasStruck())
+                if (chit.inContact(false) && !chit.hasStruck())
                 {
                     return true;
                 }
@@ -531,8 +531,13 @@ public class BattleMap extends Frame implements MouseListener,
     // Check LOS, going to the left of hexspines if argument left is true, or
     // to the right if it is false.
     private boolean LOSBlockedDir(Hex initialHex, Hex currentHex, Hex finalHex, 
-        boolean left)
+        boolean left, int strikeElevation, boolean strikerAtop, boolean
+        strikerAtopCliff, boolean midObstacle, boolean midCliff, boolean 
+        midChit)
     {
+        boolean targetAtop = false;
+        boolean targetAtopCliff = false;
+
         if (currentHex == finalHex)
         {
             return false;
@@ -558,10 +563,85 @@ public class BattleMap extends Frame implements MouseListener,
             return true;
         }
 
-        if (nextHex == finalHex)
+        char hexside = currentHex.getHexside(direction);
+        char hexside2 = currentHex.getOppositeHexside(direction);
+
+        if (currentHex == initialHex)
         {
+            if (hexside != ' ')
+            {
+                strikerAtop = true; 
+                if (hexside == 'c')
+                {
+                    strikerAtopCliff = true;
+                }
+            }
+
+            if (hexside2 != ' ')
+            {
+                midObstacle = true;
+                if (hexside2 == 'c')
+                {
+                    midCliff = true;
+                }
+            }
+        }
+        else if (nextHex == finalHex)
+        {
+            if (hexside != ' ')
+            {
+                midObstacle = true;
+                if (hexside == 'c')
+                {
+                    midCliff = true;
+                }
+            }
+
+            if (hexside2 != ' ')
+            {
+                targetAtop = true;
+                if (hexside2 == 'c')
+                {
+                    targetAtopCliff = true;
+                }
+            }
+
+            if (midChit && !targetAtopCliff)
+            {
+                return true;
+            }
+
+            if (midCliff && !strikerAtopCliff && !targetAtopCliff)
+            {
+                return true;
+            }
+
+            if (midObstacle && !strikerAtop && !targetAtop)
+            {
+                return true;
+            }
+
             // Success!
             return false;
+        }
+        else
+        {
+            if (midChit)
+            {
+                // We're not in the initial or final hex, and we have already
+                // marked an mid chit, so it's not adjacent to the base of a 
+                // cliff that the target is atop.
+                return true;
+            }
+
+            if (hexside != ' ' || hexside2 != ' ')
+            {
+                midObstacle = true;
+                if (hexside == 'c' || hexside2 == 'c')
+                {
+                    midCliff = true;
+                }
+            }
         }
 
         // Trees block LOS.
@@ -570,20 +650,18 @@ public class BattleMap extends Frame implements MouseListener,
             return true;
         }
 
-        // Characters block LOS.
-        // XXX: Cliff exception: If striker or target is atop cliff, characters
-        //     at base do not block LOS.
-        // XXX: Height exception: If striker or target are both at higher
-        //     elevation than this hex, characters do not block.
-
-        if (nextHex.isOccupied())
+        // Chits block LOS, unless both striker and target are at higher
+        //     elevation than the chit, or unless the chit is at the base of 
+        //     a cliff and the striker or target is atop it.
+        if (nextHex.isOccupied() && nextHex.getElevation() >= strikeElevation
+            && (!strikerAtopCliff || currentHex != initialHex))
         {
-            return true;
+            midChit = true;
         }
 
-        // XXX: Unconnected cliffs, slopes, dunes, walls block LOS.
-
-        return LOSBlockedDir(initialHex, nextHex, finalHex, left);
+        return LOSBlockedDir(initialHex, nextHex, finalHex, left, 
+            strikeElevation, strikerAtop, strikerAtopCliff, 
+            midObstacle, midCliff, midChit);
     }
 
 
@@ -621,22 +699,30 @@ public class BattleMap extends Frame implements MouseListener,
         float xDist = x2 - x1;
         float yDist = y2 - y1;
 
+        // Chits below the level of the strike do not block LOS.
+        int strikeElevation = Math.min(hex1.getElevation(), 
+            hex2.getElevation());
+
         if (yDist == 0 || yDist == 1.5 * xDist || yDist == -1.5 * xDist)
         {
             // Hexspine; try both sides.
-            return (LOSBlockedDir(hex1, hex1, hex2, true) &&
-                LOSBlockedDir(hex1, hex1, hex2, false));
+            return (LOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
+                false, false, false, false, false) &&
+                LOSBlockedDir(hex1, hex1, hex2, false, strikeElevation, 
+                false, false, false, false, false));
         }
         else if ((xDist / yDist > 0 && yDist < 1.5 * xDist) ||
             yDist < -1.5 * xDist)
         {
             // LOS to left
-            return LOSBlockedDir(hex1, hex1, hex2, true);
+            return LOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
+                false, false, false, false, false);
         }
         else
         {
             // LOS to right
-            return LOSBlockedDir(hex1, hex1, hex2, false);
+            return LOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
+                false, false, false, false, false);
         }
     }
 
@@ -857,7 +943,7 @@ public class BattleMap extends Frame implements MouseListener,
             return 10;
         }
 
-        // Characters block LOS.  (There are no height differences on maps
+        // All chits block LOS.  (There are no height differences on maps
         //    with bramble.)
         if (nextHex.isOccupied())
         {
@@ -997,9 +1083,8 @@ public class BattleMap extends Frame implements MouseListener,
         }
 
         // Check for single Titan elimination.  Victor gets full points
-        // for eliminated characters, and half points for what's left,
-        // except for legions engaged with other players, who then get
-        // the half points.
+        // for eliminated chits, and half points for what's left, except for 
+        // legions engaged with other players, who then get the half points.
         else if (attacker.getPlayer().isTitanEliminated())
         {
             if (!defenderElim)
@@ -1126,20 +1211,16 @@ public class BattleMap extends Frame implements MouseListener,
                 h[1][3].setHexside(1, 'd');
                 h[1][3].setHexside(2, 'd');
                 h[1][3].setHexside(3, 'c');
-                h[1][4].setHexside(0, 'c'); // bottom
                 h[3][1].setHexside(4, 'd');
                 h[3][2].setHexside(2, 'd');
                 h[3][2].setHexside(3, 'c');
-                h[3][3].setHexside(0, 'c'); // bottom
                 h[3][2].setHexside(4, 'c');
-                h[2][3].setHexside(1, 'c'); // bottom
                 h[3][2].setHexside(5, 'd');
                 h[3][5].setHexside(0, 'd');
                 h[3][5].setHexside(5, 'd');
                 h[4][2].setHexside(2, 'd');
                 h[4][2].setHexside(3, 'd');
                 h[4][5].setHexside(0, 'c');
-                h[4][4].setHexside(3, 'c'); // bottom
                 h[4][5].setHexside(1, 'd');
                 h[4][5].setHexside(5, 'd');
                 break;
@@ -1265,7 +1346,6 @@ public class BattleMap extends Frame implements MouseListener,
                 h[1][3].setHexside(5, 's');
                 h[1][4].setHexside(0, 's');
                 h[1][4].setHexside(1, 'c');
-                h[2][4].setHexside(4, 'c'); // bottom
                 h[1][4].setHexside(2, 's');
                 h[1][4].setHexside(5, 's');
                 h[2][1].setHexside(2, 's');
@@ -1283,7 +1363,6 @@ public class BattleMap extends Frame implements MouseListener,
                 h[3][2].setHexside(2, 's');
                 h[3][2].setHexside(3, 's');
                 h[3][2].setHexside(4, 'c');
-                h[2][3].setHexside(1, 'c'); // bottom
                 h[3][2].setHexside(5, 's');
                 h[3][3].setHexside(2, 's');
                 h[3][3].setHexside(3, 's');
@@ -1296,7 +1375,6 @@ public class BattleMap extends Frame implements MouseListener,
                 h[5][3].setHexside(0, 's');
                 h[5][3].setHexside(3, 's');
                 h[5][3].setHexside(4, 'c');
-                h[4][4].setHexside(1, 'c'); // bottom
                 h[5][3].setHexside(5, 's');
                 h[5][4].setHexside(4, 's');
                 h[5][4].setHexside(5, 's');
@@ -1697,6 +1775,6 @@ public class BattleMap extends Frame implements MouseListener,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian, null, null,
             player2);
-        new BattleMap(attacker, defender, 'T', 'b');
+        new BattleMap(attacker, defender, 'm', 'b');
     }
 }
