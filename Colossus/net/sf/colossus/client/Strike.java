@@ -399,7 +399,7 @@ final class Strike
                 {
                     midCliff = true;
                 }
-                if (hexside == 'w')
+                if (hexside2 == 'w')
                 {
                     totalWalls++;
                 }
@@ -429,7 +429,7 @@ final class Strike
                 {
                     targetAtopCliff = true;
                 }
-                if (hexside == 'w')
+                if (hexside2 == 'w')
                 {
                     totalWalls++;
                 }
@@ -487,7 +487,7 @@ final class Strike
                 {
                     midCliff = true;
                 }
-                if (hexside == 'w')
+                if (hexside == 'w' || hexside2 == 'w')
                 {
                     totalWalls++;
                 }

@@ -1476,7 +1476,7 @@ Log.debug("Called Battle.doneReinforcing()");
                 {
                     midCliff = true;
                 }
-                if (hexside == 'w')
+                if (hexside2 == 'w')
                 {
                     totalWalls++;
                 }
@@ -1506,7 +1506,7 @@ Log.debug("Called Battle.doneReinforcing()");
                 {
                     targetAtopCliff = true;
                 }
-                if (hexside == 'w')
+                if (hexside2 == 'w')
                 {
                     totalWalls++;
                 }
@@ -1564,7 +1564,7 @@ Log.debug("Called Battle.doneReinforcing()");
                 {
                     midCliff = true;
                 }
-                if (hexside == 'w')
+                if (hexside == 'w' || hexside2 == 'w')
                 {
                     totalWalls++;
                 }

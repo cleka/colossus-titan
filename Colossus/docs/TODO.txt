@@ -74,6 +74,8 @@ Bug: LOSTest is failing.
 
 Bug: 1_LATEST_IS_date is broken in remote_inst.
 
+Show user.home, java.version system properties from Help/About
+
 Have server send marker names.
 Let client pick starting marker along with color.
 

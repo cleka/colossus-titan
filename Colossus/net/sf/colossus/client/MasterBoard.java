@@ -473,8 +473,12 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                client.showMessageDialog("Colossus build: " + 
-                    Client.getVersion());
+                client.showMessageDialog(
+                    "Colossus build: " + Client.getVersion() + 
+                    "\n" +
+                    "user.home:      " + System.getProperty("user.home") + 
+                    "\n" +
+                    "java.version:   " + System.getProperty("java.version"));
             }
         };
     }
