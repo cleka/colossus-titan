@@ -200,6 +200,23 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
+    // Clear all entry side and teleport information from all hexes.
+    public void clearAllEntrySides()
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    h[i][j].clearAllEntrySides();
+                    h[i][j].clearTeleported();
+                }
+            }
+        }
+    }
+
+
     // Recursively find conventional moves from this hex.  Select
     //    all legal final destinations.  If block >= 0, go only
     //    that way.  If block == -1, use arches and arrows.  If
@@ -1303,17 +1320,18 @@ System.out.println("MasterBoard.finishSummoningAngel");
                                     hex.setEntrySide(5);
                                 }
 
-                                // Pick entry side if necessary.
-                                // XXX: Pick entry side only if hex is 
-                                //      occupied by an enemy legion.
-                                if (hex.getNumEntrySides() > 1)
+                                // Pick entry side if hex is enemy-occupied 
+                                // and there is more than one possibility.
+                                if (hex.isOccupied() && 
+                                    hex.getNumEntrySides() > 1)
                                 {
                                     new PickEntrySide(this, hex);
                                 }
 
                                 // Unless the PickEntrySide was cancelled,
                                 // execute the move.
-                                if (hex.getNumEntrySides() == 1) 
+                                if (!hex.isOccupied() || 
+                                    hex.getNumEntrySides() == 1)
                                 {
                                     legion.moveToHex(hex);
                                     legion.getStartingHex().repaint();
