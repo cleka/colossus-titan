@@ -13,6 +13,7 @@ public final class MovementDie extends JFrame implements WindowListener
 {
     private Game game;
     private static Point location;
+    private int lastRoll = 0;
 
 
     public MovementDie(Game game)
@@ -48,6 +49,7 @@ public final class MovementDie extends JFrame implements WindowListener
     /** Initialize and layout the components, in response to new data. */
     public void showRoll(int roll)
     {
+        lastRoll = roll;
         Chit die = new Chit(4 * Scale.get(), getDieImageName(roll), this);
         Container contentPane = getContentPane();
         contentPane.removeAll();
@@ -55,6 +57,11 @@ public final class MovementDie extends JFrame implements WindowListener
         pack();
         setVisible(true);
         repaint();
+    }
+
+    public void rescale()
+    {
+        showRoll(lastRoll);
     }
 
 
@@ -82,11 +89,9 @@ public final class MovementDie extends JFrame implements WindowListener
     {
     }
 
-
     public void windowClosed(WindowEvent e)
     {
     }
-
 
     public void windowClosing(WindowEvent e)
     {
@@ -96,21 +101,17 @@ public final class MovementDie extends JFrame implements WindowListener
         }
     }
 
-
     public void windowDeactivated(WindowEvent e)
     {
     }
-
 
     public void windowDeiconified(WindowEvent e)
     {
     }
 
-
     public void windowIconified(WindowEvent e)
     {
     }
-
 
     public void windowOpened(WindowEvent e)
     {

@@ -526,28 +526,19 @@ public final class MasterHex extends Hex
         return label;
     }
 
+    public void setLabel(int label)
+    {
+        this.label = Integer.toString(label);
+    }
 
     public int getLabelSide()
     {
         return labelSide;
     }
 
-
-    public void setLabel(int label)
-    {
-        this.label = Integer.toString(label);
-    }
-
-
     public void setLabelSide(int labelSide)
     {
         this.labelSide = labelSide;
-    }
-
-
-    public void setExitType(int i, int exitType)
-    {
-        this.exitType[i] = exitType;
     }
 
 
@@ -556,15 +547,19 @@ public final class MasterHex extends Hex
         return exitType[i];
     }
 
-
-    public void setEntranceType(int i, int entranceType)
+    public void setExitType(int i, int exitType)
     {
-        this.entranceType[i] = entranceType;
+        this.exitType[i] = exitType;
     }
 
 
     public int getEntranceType(int i)
     {
         return entranceType[i];
+    }
+
+    public void setEntranceType(int i, int entranceType)
+    {
+        this.entranceType[i] = entranceType;
     }
 }

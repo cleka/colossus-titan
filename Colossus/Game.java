@@ -63,7 +63,6 @@ public final class Game
         newGame();
     }
 
-
     /** Load a saved game. */
     public Game(GameApplet applet, String filename)
     {
@@ -74,7 +73,6 @@ public final class Game
         loadGame(filename);
         updateStatusScreen();
     }
-
 
     /** Default constructor, for testing only. */
     public Game()
@@ -476,6 +474,36 @@ public final class Game
                 map.repaint();
             }
         }
+    }
+
+    public void rescaleAllWindows()
+    {
+        if (statusScreen != null)
+        {
+            statusScreen.rescale();
+        }
+        if (movementDie != null)
+        {
+            movementDie.rescale();
+        }
+        if (board != null)
+        {
+            board.rescale();
+        }
+        if (battle != null)
+        {
+            BattleDice dice = battle.getBattleDice();
+            if (dice != null)
+            {
+                dice.rescale();
+            }
+            BattleMap map = battle.getBattleMap();
+            if (map != null)
+            {
+                map.rescale();
+            }
+        }
+        repaintAllWindows();
     }
 
 
@@ -2405,7 +2433,7 @@ public final class Game
             do
             {
                 selectedMarkerId = PickMarker.pickMarker(masterFrame,
-                    name, player.getMarkersAvailable(), this);
+                    name, player.getMarkersAvailable());
             }
             while (selectedMarkerId == null);
         }
@@ -2991,18 +3019,36 @@ public final class Game
 
         legion.sortCritters();
 
-        SplitLegion.splitLegion(masterFrame, legion,
-            player.getOption(Options.autoPickMarker));
+        String selectedMarkerId = player.pickMarker();
+
+        String results = SplitLegion.splitLegion(masterFrame, legion,
+            selectedMarkerId);
+        if (results != null)
+        {
+            List strings = Utils.split(',', results);
+            String newMarkerId = (String)strings.remove(0);
+
+            // Need to replace strings with creatures.
+            ArrayList creatures = new ArrayList();
+            Iterator it = strings.iterator();
+            while (it.hasNext())
+            {
+                String name = (String)it.next();
+                Creature creature = Creature.getCreatureByName(name);
+                creatures.add(creature);
+            }
+            Legion newLegion = legion.split(creatures, newMarkerId);
+        }
 
         int newHeight = legion.getHeight();
-
-        updateStatusScreen();
 
         // If we split, unselect this hex.
         MasterHex hex = legion.getCurrentHex();
         if (newHeight < 7)
         {
+            updateStatusScreen();
             board.unselectHexByLabel(hex.getLabel());
+            board.alignLegions(hex.getLabel());
         }
 
         return (newHeight < oldHeight);

@@ -270,4 +270,10 @@ public final class StatusScreen extends JFrame implements WindowListener
     {
         return getMinimumSize();
     }
+
+    public void rescale()
+    {
+        int scale = Scale.get();
+        setSize(25 * scale, 15 * scale);
+    }
 }

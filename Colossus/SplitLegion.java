@@ -13,11 +13,13 @@ public final class SplitLegion extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
     private Legion oldLegion;
-    private Legion newLegion;
     private ArrayList oldChits = new ArrayList(8);
     private ArrayList newChits = new ArrayList(8);
-    private Marker oldMarker;
-    private Marker newMarker;
+
+    // Use Chits instead of markers since we won't paint heights.
+    private Chit oldMarker;
+    private Chit newMarker;
+
     private Player player;
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
@@ -25,9 +27,12 @@ public final class SplitLegion extends JDialog implements MouseListener,
     private static boolean active;
     private String selectedMarkerId;
 
+    /** new marker id,creature1,creature2... */
+    private static String results;
+
 
     private SplitLegion(JFrame parentFrame, Legion oldLegion, String name,
-        boolean autoPickMarker)
+        String selectedMarkerId)
     {
         super(parentFrame, name + ": Split Legion " +
             oldLegion.getLongMarkerName(), true);
@@ -40,35 +45,17 @@ public final class SplitLegion extends JDialog implements MouseListener,
         Game game = oldLegion.getGame();
         player = oldLegion.getPlayer();
 
-        if (autoPickMarker)
-        {
-            selectedMarkerId = player.getFirstAvailableMarker();
-        }
-        else
-        {
-            selectedMarkerId = PickMarker.pickMarker(parentFrame,
-                name, player.getMarkersAvailable(), game);
-        }
-
         if (selectedMarkerId == null)
         {
             dispose();
             return;
-        }
-        else
-        {
-            selectedMarkerId = player.selectMarkerId(selectedMarkerId);
         }
 
         pack();
 
         int scale = 4 * Scale.get();
 
-        newLegion = Legion.getEmptyLegion(selectedMarkerId,
-            oldLegion.getMarkerId(), oldLegion.getCurrentHexLabel(),
-            player.getName(), game);
-        newMarker = new Marker(scale, selectedMarkerId, this, game);
-        newLegion.setMarker(newMarker);
+        newMarker = new Chit(scale, selectedMarkerId, this);
 
         setBackground(Color.lightGray);
         setResizable(false);
@@ -76,8 +63,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         addMouseListener(this);
         addWindowListener(this);
 
-        oldMarker = new Marker(scale, oldLegion.getImageName(), this,
-            game);
+        oldMarker = new Chit(scale, oldLegion.getImageName(), this);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -108,8 +94,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
         button2.setMnemonic(KeyEvent.VK_C);
 
          // Attempt to center the buttons.
-        int chitWidth = Math.max(oldLegion.getHeight(),
-            newLegion.getHeight()) + 1;
+        int chitWidth = Math.max(oldChits.size(),
+            newChits.size()) + 1;
         if (chitWidth < 4)
         {
             constraints.gridwidth = 1;
@@ -144,35 +130,25 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
-    public static void splitLegion(JFrame parentFrame, Legion oldLegion,
-        boolean autoPickMarker)
+    public static String splitLegion(JFrame parentFrame, Legion oldLegion,
+        String selectedMarkerId)
     {
         if (!active)
         {
             active = true;
-            new SplitLegion(parentFrame, oldLegion,
-                oldLegion.getPlayerName(), autoPickMarker);
+            new SplitLegion(parentFrame, oldLegion, oldLegion.getPlayerName(),
+                selectedMarkerId);
             active = false;
+            return results;
         }
+        return null;
     }
 
 
-    private void cancel()
+    // Move a chit to the end of the other line.
+    private void moveChitToOtherLine(ArrayList fromChits, ArrayList
+        toChits, int oldPosition, int gridy)
     {
-        newLegion.recombine(oldLegion, true);
-        dispose();
-    }
-
-
-    // Move a Creature over to the other Legion and move its chit to the
-    // end of the other line.
-    private void moveCreatureToOtherLegion(Legion fromLegion, Legion toLegion,
-        ArrayList fromChits, ArrayList toChits, int oldPosition, int gridy)
-    {
-        Creature creature = fromLegion.removeCreature(oldPosition,
-            false, false);
-        toLegion.addCreature(creature, false);
-
         Chit chit = (Chit)fromChits.remove(oldPosition);
         remove(chit);
 
@@ -185,12 +161,29 @@ public final class SplitLegion extends JDialog implements MouseListener,
         Container contentPane = getContentPane();
         contentPane.add(chit);
 
-        // Update the stack heights on both markers.
-        oldMarker.repaint();
-        newMarker.repaint();
-
         pack();
         repaint();
+    }
+
+
+    private void cancel()
+    {
+        results = null;
+        dispose();
+    }
+
+    private void performSplit()
+    {
+        StringBuffer buf = new StringBuffer(newMarker.getId());
+        Iterator it = newChits.iterator();
+        while (it.hasNext())
+        {
+            buf.append(",");
+            Chit chit = (Chit)it.next();
+            buf.append(chit.getId());
+        }
+        results = buf.toString();
+        dispose();
     }
 
 
@@ -200,8 +193,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         int i = oldChits.indexOf(source);
         if (i != -1)
         {
-            moveCreatureToOtherLegion(oldLegion, newLegion, oldChits,
-                newChits, i, 1);
+            moveChitToOtherLine(oldChits, newChits, i, 1);
             return;
         }
         else
@@ -209,8 +201,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
             i = newChits.indexOf(source);
             if (i != -1)
             {
-                moveCreatureToOtherLegion(newLegion, oldLegion, newChits,
-                    oldChits, i, 0);
+                moveChitToOtherLine(newChits, oldChits, i, 0);
                 return;
             }
         }
@@ -271,20 +262,32 @@ public final class SplitLegion extends JDialog implements MouseListener,
      */
     private boolean isSplitLegal()
     {
-        if (oldLegion.getHeight() < 2 || newLegion.getHeight() < 2)
+        if (oldChits.size() < 2 || newChits.size() < 2)
         {
             JOptionPane.showMessageDialog(parentFrame, "Legion too short.");
             return false;
         }
-        if (oldLegion.getHeight() + newLegion.getHeight() == 8)
+        if (oldChits.size() + newChits.size() == 8)
         {
-            if (oldLegion.getHeight() != newLegion.getHeight())
+            if (oldChits.size() != newChits.size())
             {
                 JOptionPane.showMessageDialog(parentFrame,
                     "Initial split must be 4-4.");
                 return false;
             }
-            if (oldLegion.numLords() != 1)
+
+            int numLords = 0;
+            Iterator it = oldChits.iterator();
+            while (it.hasNext())
+            {
+                Chit chit = (Chit)it.next();
+                String id = chit.getId();
+                if (id.startsWith("Titan") || id.equals("Angel"))
+                {
+                    numLords++;
+                }
+            }
+            if (numLords != 1)
             {
                 JOptionPane.showMessageDialog(parentFrame,
                     "Each stack must have one lord.");
@@ -292,36 +295,6 @@ public final class SplitLegion extends JDialog implements MouseListener,
             }
         }
         return true;
-    }
-
-
-    private void performSplit()
-    {
-        // Make a new marker for the MasterBoard
-        Game game = oldLegion.getGame();
-        newMarker = new Marker(oldLegion.getMarker().getBounds().width,
-            selectedMarkerId, parentFrame, game);
-        newLegion.setMarker(newMarker);
-
-        // Add the new legion to the player.
-        if (player != null)
-        {
-            player.addLegion(newLegion);
-            player.setLastLegionSplitOff(newLegion);
-        }
-
-        // Hide the contents of both legions.
-        oldLegion.hideAllCreatures();
-        newLegion.hideAllCreatures();
-
-        // Sort both legions.
-        oldLegion.sortCritters();
-        newLegion.sortCritters();
-
-        Game.logEvent(newLegion.getHeight() +
-            " creatures are split off from legion " +
-            oldLegion.getLongMarkerName() +
-            " into new legion " + newLegion.getLongMarkerName());
     }
 
 
@@ -334,10 +307,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
                 return;
             }
             performSplit();
-            dispose();
-
         }
-
         else if (e.getActionCommand().equals("Cancel"))
         {
             cancel();
@@ -368,6 +338,9 @@ public final class SplitLegion extends JDialog implements MouseListener,
         Marker marker = new Marker(4 * scale, selectedMarkerId, frame, game);
         legion.setMarker(marker);
 
-        SplitLegion.splitLegion(frame, legion, false);
+        String retval = SplitLegion.splitLegion(frame, legion,
+            player.pickMarker());
+        System.out.println(retval);
+        System.exit(0);
     }
 }

@@ -50,4 +50,7 @@ public interface AI
 
     /** pick a color of legion markers */
     String pickColor(Set colors, List favoriteColors);
+
+    /** pick a legion marker */
+    String pickMarker(Collection markerIds);
 }

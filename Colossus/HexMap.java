@@ -47,12 +47,12 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     }
 
 
-    private void setupHexes()
+    protected void setupHexes()
     {
         char terrain = getMasterHex().getTerrain();
+        hexes.clear();
 
         int scale = 2 * Scale.get();
-
         int cx = 6 * scale;
         int cy = 3 * scale;
 
@@ -342,7 +342,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
 
     /** Add references to neighbor hexes. */
-    private void setupNeighbors()
+    protected void setupNeighbors()
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -457,7 +457,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-
     public void unselectHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
@@ -473,7 +472,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-
     public void unselectHexesByLabels(Set labels)
     {
         Iterator it = hexes.iterator();
@@ -487,7 +485,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
         }
     }
-
 
     public void selectHexByLabel(String label)
     {
@@ -504,7 +501,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-
     public void selectHexesByLabels(Set labels)
     {
         Iterator it = hexes.iterator();
@@ -518,7 +514,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
         }
     }
-
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null. */
@@ -537,7 +532,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         Game.logError("Could not find hex " + label);
         return null;
     }
-
 
     /** Return the BattleHex that contains the given point, or
      *  null if none does. */
@@ -569,56 +563,45 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
     }
 
-
     public void mouseReleased(MouseEvent e)
     {
     }
-
 
     public void mouseClicked(MouseEvent e)
     {
     }
 
-
     public void mouseEntered(MouseEvent e)
     {
     }
-
 
     public void mouseExited(MouseEvent e)
     {
     }
 
-
     public void windowActivated(WindowEvent e)
     {
     }
-
 
     public void windowClosed(WindowEvent e)
     {
     }
 
-
     public void windowClosing(WindowEvent e)
     {
     }
-
 
     public void windowDeactivated(WindowEvent e)
     {
     }
 
-
     public void windowDeiconified(WindowEvent e)
     {
     }
 
-
     public void windowIconified(WindowEvent e)
     {
     }
-
 
     public void windowOpened(WindowEvent e)
     {
@@ -652,7 +635,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         return getPreferredSize();
     }
-
 
     public Dimension getPreferredSize()
     {

@@ -46,6 +46,17 @@ debugln("Setting for whatever color is left");
     }
 
 
+    public String pickMarker(Collection markerIds)
+    {
+        Iterator it = markerIds.iterator();
+        if (it.hasNext())
+        {
+            return (String)it.next();
+        }
+        return null;
+    }
+
+
     public void muster(Game game)
     {
         // Do not recruit if this legion is a scooby snack.

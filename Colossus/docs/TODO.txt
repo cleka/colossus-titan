@@ -5,11 +5,10 @@ Add UI for players to specify favorite colors.
 
 Get minimax masterboard moves working.
 
-Rewrite SplitLegion to use Legion.split()  (Integrate Tom's code.)
-
 Add a configurable AI move delay to make it easier to follow what the
    AI is doing.
 Add AI time limits.
+Add AI progress indicator.
 
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
@@ -39,6 +38,7 @@ Add SetupBattle dialog, to allow setting up standalone battles.
    (terrain, entry side, creatures in attacking and defending legions,
    angel/archangel available to summon, recruits available for terrain
    type, player scores for titan power.)
+Add show stacks / show graveyard dialogs.  (From Prometheus.)
 
 Add a global rescale option.  Really need higher-res images and numbers 
    done with scalable fonts for this to look good.

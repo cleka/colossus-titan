@@ -187,6 +187,11 @@ public final class BattleDice extends JFrame implements WindowListener
         repaint();
     }
 
+    public void rescale()
+    {
+        showRoll();
+    }
+
 
     private void setupIcon()
     {
@@ -212,11 +217,9 @@ public final class BattleDice extends JFrame implements WindowListener
     {
     }
 
-
     public void windowClosed(WindowEvent e)
     {
     }
-
 
     public void windowClosing(WindowEvent e)
     {
@@ -226,21 +229,17 @@ public final class BattleDice extends JFrame implements WindowListener
         }
     }
 
-
     public void windowDeactivated(WindowEvent e)
     {
     }
-
 
     public void windowDeiconified(WindowEvent e)
     {
     }
 
-
     public void windowIconified(WindowEvent e)
     {
     }
-
 
     public void windowOpened(WindowEvent e)
     {

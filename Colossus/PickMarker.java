@@ -15,15 +15,11 @@ public final class PickMarker extends JDialog implements MouseListener,
 {
     private ArrayList markers = new ArrayList();
     private static String markerId;
-    private Game game;
 
 
-    private PickMarker(JFrame parentFrame, String name, Collection markerIds,
-        Game game)
+    private PickMarker(JFrame parentFrame, String name, Collection markerIds)
     {
         super(parentFrame, name + ": Pick Legion Marker", true);
-
-        this.game = game;
 
         addMouseListener(this);
         addWindowListener(this);
@@ -42,7 +38,7 @@ public final class PickMarker extends JDialog implements MouseListener,
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-            Marker marker = new Marker(4 * Scale.get(), markerId, this, game);
+            Marker marker = new Marker(4 * Scale.get(), markerId, this, null);
             markers.add(marker);
             contentPane.add(marker);
             marker.addMouseListener(this);
@@ -61,17 +57,14 @@ public final class PickMarker extends JDialog implements MouseListener,
     /** Return the chosen marker id, or null if none are available or
      *  the player aborts the selection. */
     public static String pickMarker(JFrame parentFrame, String name,
-        Collection markerIds, Game game)
+        Collection markerIds)
     {
         if (markerIds.isEmpty())
         {
             return null;
         }
-
         markerId = null;
-
-        new PickMarker(parentFrame, name, markerIds, game);
-
+        new PickMarker(parentFrame, name, markerIds);
         return markerId;
     }
 
@@ -88,57 +81,46 @@ public final class PickMarker extends JDialog implements MouseListener,
         }
     }
 
-
     public void mouseEntered(MouseEvent e)
     {
     }
-
 
     public void mouseExited(MouseEvent e)
     {
     }
 
-
     public void mouseClicked(MouseEvent e)
     {
     }
-
 
     public void mouseReleased(MouseEvent e)
     {
     }
 
-
     public void windowActivated(WindowEvent e)
     {
     }
 
-
     public void windowClosed(WindowEvent e)
     {
     }
-
 
     public void windowClosing(WindowEvent e)
     {
         dispose();
     }
 
-
     public void windowDeactivated(WindowEvent e)
     {
     }
-
 
     public void windowDeiconified(WindowEvent e)
     {
     }
 
-
     public void windowIconified(WindowEvent e)
     {
     }
-
 
     public void windowOpened(WindowEvent e)
     {
@@ -161,9 +143,10 @@ public final class PickMarker extends JDialog implements MouseListener,
         player.initMarkersAvailable();
 
         String choice = PickMarker.pickMarker(frame, player.getName(),
-            player.getMarkersAvailable(), game);
+            player.getMarkersAvailable());
         // XXX Pass a deep clone rather than the original list.
         // Or at least call Collections.unmodifyableSortedSet()
-        Game.logEvent("Chose " + choice);
+        System.out.println("Chose " + choice);
+        System.exit(0);
     }
 }

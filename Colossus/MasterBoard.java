@@ -2,7 +2,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import java.io.*;
 
 /**
@@ -45,8 +44,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     /** Last point clicked is needed for popup menus. */
     private static Point lastPoint;
-
-    private static JSlider slider;
 
     private static Container contentPane;
 
@@ -140,7 +137,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
     {
         this.game = game;
     }
-
 
     public Game getGame()
     {
@@ -469,17 +465,13 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
-                final int scale = Scale.get();
-                if (slider == null)
+                final int oldScale = Scale.get();
+                final int newScale = PickScale.pickScale(masterFrame,
+                    oldScale);
+                if (newScale != oldScale && newScale != -1)
                 {
-                    slider = new JSlider(JSlider.HORIZONTAL, 5, 25, scale);
-                    slider.setMajorTickSpacing(5);
-                    slider.setMinorTickSpacing(1);
-                    slider.setPaintTicks(true);
-                    slider.setPaintLabels(true);
-                    // TODO Position the slider somewhere reasonable.
-                    contentPane.add(slider);
-                    slider.addChangeListener(new SliderListener());
+                    Scale.set(newScale);
+                    game.rescaleAllWindows();
                 }
             }
         };
@@ -492,24 +484,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
             saveGameAction.setEnabled(false);
             saveGameAsAction.setEnabled(false);
             saveOptionsAction.setEnabled(false);
-        }
-    }
-
-
-    class SliderListener implements ChangeListener
-    {
-        public void stateChanged(ChangeEvent e)
-        {
-            JSlider source = (JSlider)e.getSource();
-            if (!source.getValueIsAdjusting())
-            {
-                int newScale = (int)source.getValue();
-                if (newScale != Scale.get())
-                {
-                    Scale.set(newScale);
-                    game.repaintAllWindows();
-                }
-            }
         }
     }
 
@@ -618,10 +592,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
         addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
         addCheckBox(graphicsMenu, Options.showDice, KeyEvent.VK_D);
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
-        /* TODO In progress.
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
-        */
 
         // Debug menu
         JMenu debugMenu = new JMenu("Debug");
@@ -674,6 +646,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         int cx = 3 * scale;
         int cy = 0 * scale;
+
+        hexes.clear();
 
         // Initialize hexes.
         for (int i = 0; i < h.length; i++)
@@ -1939,18 +1913,21 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-
-
     public Dimension getMinimumSize()
     {
         int scale = Scale.get();
         return new Dimension(64 * scale, 56 * scale);
     }
 
-
     public Dimension getPreferredSize()
     {
         return getMinimumSize();
+    }
+
+    public void rescale()
+    {
+        setupHexes();
+        loadInitialMarkerImages();
     }
 
 

@@ -23,7 +23,7 @@ public final class Critter extends Creature implements Comparable
     private BattleChit chit;
     private Game game;
     /** Used to uniquely compare critters after an AICopy */
-    private int tag;
+    private int tag = -1;
 
 
     public Critter(Creature creature, boolean visible, String markerId,

@@ -251,7 +251,7 @@ Programming:  David Ripton  dripton@wizard.net
               Bruce Sherrod (AI)  bruce@thematrix.com
               David Barr (applet conversion)
 
-Counter art:  Spectrex, David Lum, Tchula Ripton
+Counter art:  Jerry Reiger, David Lum, Tchula Ripton
 
 Network protocol: Falk Hueffner
 

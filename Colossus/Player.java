@@ -700,18 +700,15 @@ public final class Player implements Comparable
         return markersAvailable.size();
     }
 
-
     public Collection getMarkersAvailable()
     {
         return markersAvailable;
     }
 
-
     public boolean isMarkerAvailable(String markerId)
     {
         return (markersAvailable.contains(markerId));
     }
-
 
     public String getFirstAvailableMarker()
     {
@@ -721,7 +718,6 @@ public final class Player implements Comparable
         }
         return (String)markersAvailable.first();
     }
-
 
     /** Removes the selected marker from the list of those available.
      *  Returns the markerId if it was present, or null if it was not. */
@@ -737,12 +733,10 @@ public final class Player implements Comparable
         }
     }
 
-
     public void addLegionMarker(String markerId)
     {
         markersAvailable.add(markerId);
     }
-
 
     public void addLegionMarkers(Player player)
     {
@@ -963,6 +957,29 @@ public final class Player implements Comparable
         }
     }
 
+    public String pickMarker()
+    {
+        String markerId = null;
+        if (getOption(Options.autoPickMarker))
+        {
+            markerId = aiPickMarker();
+        }
+        else
+        {
+            markerId = PickMarker.pickMarker(game.getMasterFrame(), name,
+                getMarkersAvailable());
+        }
+        return markerId;
+    }
+
+    public String aiPickMarker()
+    {
+        if (getOption(Options.autoPickMarker))
+        {
+            return ai.pickMarker(getMarkersAvailable());
+        }
+        return null;
+    }
 
     public void aiSplit()
     {
@@ -1091,7 +1108,7 @@ public final class Player implements Comparable
             List favoriteColors = null;
             if (favorites != null)
             {
-                favoriteColors = split(',', favorites);
+                favoriteColors = Utils.split(',', favorites);
             }
             else
             {
@@ -1102,27 +1119,6 @@ public final class Player implements Comparable
         return null;
     }
 
-    /** Split the string into a list of substrings delimited by sep. */
-    public List split(char sep, String s)
-    {
-        ArrayList list = new ArrayList();
-
-        int pos = 0;
-        int len = s.length();
-        do
-        {
-            int splitAt = s.indexOf(sep, pos);
-            if (splitAt == -1)
-            {
-                list.add(s.substring(pos));
-                return list;
-            }
-            list.add(s.substring(pos, splitAt));
-            pos = splitAt + 1;
-        }
-        while (pos < len);
-        return list;
-    }
 
     /** Comparator that forces this player's legion markers to come
      *  before captured markers in sort order. */
