@@ -82,6 +82,13 @@ public class BattleMap extends JFrame implements MouseListener,
 
         getContentPane().setLayout(null);
 
+        // Make sure the board fits on the screen.
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        if (d.height < 1000)
+        {
+            scale = scale * d.height / 1000;
+        }
+
         pack();
         setSize(getPreferredSize());
         setIconImage(Toolkit.getDefaultToolkit().getImage(
@@ -2073,7 +2080,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(30 * scale, 30 * scale);
+        return new Dimension(30 * scale, 28 * scale);
     }
 
 
