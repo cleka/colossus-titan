@@ -445,6 +445,7 @@ class MasterBoard extends Frame implements MouseListener,
 
     void finishSummoningAngel()
     {
+System.out.println("MasterBoard.finishSummoningAngel");
         summoningAngel = false;
         highlightEngagements();
         summonAngel = null;
