@@ -22,11 +22,9 @@ public final class Constants
     public static final int FIGHT = 3;
     public static final int MUSTER = 4;
 
-
-
     /** Base path for all external game data files. */
-    public static final String gameDataPath = 
-        System.getProperty("user.home") + "/.colossus/";
+    public static final String gameDataPath =
+            System.getProperty("user.home") + "/.colossus/";
 
     // Constants related to the options config files
     public static final String optionsPath = gameDataPath;
@@ -35,10 +33,9 @@ public final class Constants
     public static final String optionsExtension = ".cfg";
 
     public static final String configVersion =
-        "Colossus config file version 2";
+            "Colossus config file version 2";
 
     public static final String logFileName = "lastgame.log";
-
 
     // Constants for savegames
 
@@ -82,29 +79,30 @@ public final class Constants
     public static final int NOWHERE = -1;
 
     // MasterBoard size
-    public static final int MIN_HORIZ_SIZE=15;
-    public static final int MIN_VERT_SIZE=8;
-    public static final int MAX_HORIZ_SIZE=60;
-    public static final int MAX_VERT_SIZE=32;
+    public static final int MIN_HORIZ_SIZE = 15;
+    public static final int MIN_VERT_SIZE = 8;
+    public static final int MAX_HORIZ_SIZE = 60;
+    public static final int MAX_VERT_SIZE = 32;
 
     /* the three arrays below must match ; see also
-       net.sf.colossus.server.Legion, it uses the
-       shortened name directly */
+     net.sf.colossus.server.Legion, it uses the
+     shortened name directly */
+    
     /* all should be MAX_MAX_PLAYERS long */
-    public static final String [] colorNames =
-        {"Black",  "Blue",   "Brown", "Gold", "Green", "Red",
-         "Orange", "Purple", "Silver"};
-    public static final String [] shortColorNames = 
-        {"Bk",     "Bu",     "Br",    "Gd",   "Gr",    "Rd" ,
-         "Or",     "Pu",     "Si"};
-    public static final int [] colorMnemonics = {
-        KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O,
+    public static final String[] colorNames = {"Black", "Blue", "Brown", "Gold",
+        "Green", "Red",
+        "Orange", "Purple", "Silver"};
+    public static final String[] shortColorNames = {"Bk", "Bu", "Br", "Gd",
+        "Gr", "Rd",
+        "Or", "Pu", "Si"};
+    public static final int[] colorMnemonics = { KeyEvent.VK_B, KeyEvent.VK_L,
+        KeyEvent.VK_O,
         KeyEvent.VK_G, KeyEvent.VK_E, KeyEvent.VK_R,
         KeyEvent.VK_A, KeyEvent.VK_P, KeyEvent.VK_S};
 
     public static final String noShortName = "XX";
     private static final java.util.HashMap shortNamesMap = new HashMap();
-    
+
     public static final int MIN_AI_DELAY = 0;      //in ms
     public static final int MAX_AI_DELAY = 3000;
     public static final int DEFAULT_AI_DELAY = 300;
@@ -120,20 +118,28 @@ public final class Constants
 
     /** Default directory for datafiles */
     public static final String defaultDirName = "Default";
+
     /** Images subdirectory name */
     public static final String imagesDirName = "images";
+
     /** Battlelands subdirectory name */
     public static final String battlelandsDirName = "Battlelands";
+
     /** Default CRE file */
     public static final String defaultCREFile = "Default.cre";
+
     /** Default MAP file */
     public static final String defaultMAPFile = "Default.map";
+
     /** Default TER file */
     public static final String defaultTERFile = "Default.ter";
+
     /** Default HINT file */
     public static final String defaultHINTFile = "Default.hin";
+
     /** Default VAR file */
     public static final String defaultVARFile = "Default.var";
+
     /** markers name are mapped in this one */
     public static final String markersNameFile = "MarkersName";
 
@@ -148,6 +154,7 @@ public final class Constants
     public static final String battlemapIconSubscript = "Battle";
 
     public static final int DEFAULT_MAX_PLAYERS = 6;
+
     /* number of available colours/markers */
     public static final int MAX_MAX_PLAYERS = 9;
 
@@ -160,7 +167,7 @@ public final class Constants
     public static final String anyAI = "A Random AI";
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI",
-                                             "CowardSimpleAI"};
+        "CowardSimpleAI"};
     public static final int numAITypes = aiArray.length;
     public static final String all = "All";
     public static final String aiPackage = "net.sf.colossus.client.";
@@ -169,7 +176,7 @@ public final class Constants
     public static final String byColor = "<By color>";
     public static final String byClient = "<By client>";
     public static final String username = System.getProperty("user.name",
-        byColor);
+            byColor);
 
     public static final String titan = "Titan";
     public static final String angel = "Angel";
@@ -179,7 +186,7 @@ public final class Constants
     // next one unused, the filr server port is (serverPort + 1)
     // public static final int defaultFileServerPort = 26568;
     public static final int numSavedServerNames = 10;
-    
+
     // Game actions used in several places.
     public static final String newGame = "New game";
     public static final String loadGame = "Load game";
@@ -187,17 +194,15 @@ public final class Constants
     public static final String quit = "Quit";
     public static final String runClient = "Run network client";
 
-
     /** Available internal variants  Try to keep this list mostly
      *  alphabetized for easier searching, with Default at the top. */
-    public static final String [] variantArray =
-    {
-        "Default",
+    public static final String[] variantArray = { "Default",
         "Abyssal6",
         "Abyssal9",
         "Badlands",
         "Badlands-JDG",
         "ExtTitan",
+        "Infinite",
         "Outlands",
         "SmallTitan",
         "TG-ConceptI",
@@ -208,9 +213,9 @@ public final class Constants
         "TG-Wild",
         "TitanPlus",
         "Undead",
+        "Unified",
         "Balrog",
-        "Random"
-    };
+        "Random" };
 
     public static final int numVariants = variantArray.length;
 
@@ -228,7 +233,6 @@ public final class Constants
     {
         return Collections.unmodifiableList(variantList);
     }
-
 
     // Protocol packet type constants
     /** XXX If any of the args in the protocol contain this string, then
@@ -296,8 +300,8 @@ public final class Constants
     public static final String setPlayerName = "setPlayerName";
     public static final String createSummonAngel = "createSummonAngel";
     public static final String askAcquireAngel = "askAcquireAngel";
-    public static final String askChooseStrikePenalty = 
-        "askChooseStrikePenalty";
+    public static final String askChooseStrikePenalty =
+            "askChooseStrikePenalty";
     public static final String showMessageDialog = "showMessageDialog";
     public static final String tellGameOver = "tellGameOver";
     public static final String tellPlayerElim = "tellPlayerElim";
@@ -350,12 +354,16 @@ public final class Constants
         {
             case SPLIT:
                 return "Split";
+
             case MOVE:
                 return "Move";
+
             case FIGHT:
                 return "Fight";
+
             case MUSTER:
                 return "Muster";
+
             default:
                 return "";
         }
@@ -367,14 +375,19 @@ public final class Constants
         {
             case Constants.SUMMON:
                 return "Summon";
+
             case Constants.RECRUIT:
                 return "Recruit";
+
             case Constants.MOVE:
                 return "Move";
+
             case Constants.FIGHT:
                 return "Fight";
+
             case Constants.STRIKEBACK:
                 return "Strikeback";
+
             default:
                 return "";
         }
@@ -384,8 +397,12 @@ public final class Constants
     {
         String temp = (String)shortNamesMap.get(c);
         if (temp != null)
+        {
             return temp;
+        }
         else
+        {
             return noShortName;
+        }
     }
 }

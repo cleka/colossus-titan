@@ -1,0 +1,21 @@
+green       Brush      true 	1 Gargoyle 2 Cyclops      2 Gorgon         3 Manticore
+darkGreen   Jungle     true	1 Gargoyle 2 Cyclops      3 Behemoth       2 Serpent
+darkGreen   Wasteland  true   1 Cyclops  2 Behemoth     3 Jabberwok
+violet      Graveyard  true 	1 Skeleton 2 Zombie       2 Lich           3 Necromancer
+purple      Tombs      true	1 Skeleton 2 Zombie       3 Wraith         2 Vampire
+indigo      Abyss      true	1 Zombie   2 Wraith       3 Reaper 
+sienna      Marsh      true	1 Ogre     2 Troll        2 Ranger         2 Salamander      
+yellow      Plains     true 	1 Centaur  2 Lion         2 Ranger         3 AirElemental    
+saddleBrown Hills      true	1 Ogre     3 Minotaur     2 Unicorn        3 EarthElemental  
+olive       Woods      true	1 Centaur  3 Warbear      2 Unicorn        2 Ent             
+orange      Desert     true	1 Lion     3 Griffon      2 Hydra          2 Chimera         
+blue        Swamp      true	1 Troll    3 Wyvern       2 Hydra          3 WaterElemental  
+red         Mountains  true	1 Lion     2 Minotaur     2 Magog          2 Colossus        3 FireElemental  
+skyBlue     Tundra     true	1 Troll    2 Warbear      2 Giant          2 Colossus        2 Mammoth	      
+# Tower is a special case
+grey		Tower      false  0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock 
+white		Castle     false  0 Anything 0 Skeleton 0 AnyNonLord 4 Knight
+black 	Keep       true   0 GreenDragon	1 BlueDragon	1 PurpleDragon	1 SilverDragon	1 BlackDragon 1 GoldDragon 1 RedDragon 1 Balrog
+ACQUIRABLE 100 Angel 100 GreenDragon 500 Archangel
+TITANTELEPORT 1000
+TITANIMPROVE 100
