@@ -51,7 +51,6 @@ public final class GetPlayers extends JDialog implements WindowListener,
     private static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
     // XXX MinimaxAI is currently very broken.
-    //private static String[] aiList = { "SimpleAI", "MinimaxAI" };
     private static String[] aiList = { "SimpleAI" };
 
     /** list of available Variant */
@@ -94,7 +93,11 @@ public final class GetPlayers extends JDialog implements WindowListener,
             }
             j++;
         }
-        typeChoices[2 + ainum] = anyAI;
+        // Only show random AI choice if more than one AI.
+        if (ainum >= 2)
+        {
+            typeChoices[2 + ainum] = anyAI;
+        }
 
         this.parentFrame = parentFrame;
         setBackground(Color.lightGray);
