@@ -79,7 +79,11 @@ class Player
 
     public String getShortColor()
     {
-        if (color.equals("Black"))
+        if (color == null)
+        {
+            return null;
+        }
+        else if (color.equals("Black"))
         {
             return new String("Bk");
         }
