@@ -65,6 +65,12 @@ class Chit
     }
 
 
+    void repaint()
+    {
+        container.repaint(rect.x, rect.y, rect.width, rect.height);
+    }
+
+
     boolean select(Point point)
     {
         if (rect.contains(point))
