@@ -424,7 +424,8 @@ final class EngagementResults
 
     void maybeShow()
     {
-        if (client.getOption(Options.showStatusScreen))
+        if (client.getOption(Options.showStatusScreen) &&
+                engagementLog.size() != 0)
         {
             pack();
             if (!isVisible())
@@ -454,7 +455,7 @@ final class EngagementResults
         String cmd = e.getActionCommand();
         if (cmd.equals(NEXT))
         {
-               current += 1;
+            current += 1;
         }
         else if (cmd.equals(PREV))
         {
@@ -462,11 +463,10 @@ final class EngagementResults
         }
         else if (cmd.equals(DROP))
         {
-            // TODO: currenty we disallow drop last.
-            //   does not look good in dialog.
-            if (engagementLog.size() > 1)
+            if (engagementLog.size() >= 1)
             {
                 engagementLog.remove(current);
+                current -= 1;
             }
         }
         // show
