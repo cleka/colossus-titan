@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
@@ -20,7 +21,7 @@ final class SummonAngel extends KDialog implements MouseListener,
     ActionListener, WindowListener
 {
     private String markerId;
-    private java.util.List sumChitList;
+    private java.util.List sumChitList = new ArrayList();
     private JButton cancelButton;
     private static boolean active;
     private Client client;
@@ -56,7 +57,7 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         java.util.List summonableList = Creature.getSummonableCreatures();
         java.util.Iterator it = summonableList.iterator();
-        sumChitList = new java.util.ArrayList();
+        sumChitList.clear();
         while (it.hasNext())
         {
             Chit tempChit;
