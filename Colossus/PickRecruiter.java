@@ -54,7 +54,6 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
         setSize(scale * (Math.max(numEligible, height + 1) + 1),
             (23 * scale / 5));
 
-        // XXX: This doesn't work under Solaris.
         setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -73,7 +72,7 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
         for (int i = 0; i < height; i++)
         {
             legionChits[i] = new Chit(scale * (2 * i + 3) / 2,
-                scale * 2 / 3, scale, legion.getCreature(i).getImageName(),
+                scale * 2 / 3, scale, legion.getCritter(i).getImageName(),
                 this);
         }
 

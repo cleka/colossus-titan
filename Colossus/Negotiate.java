@@ -59,7 +59,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         for (int i = 0; i < attacker.getHeight(); i++)
         {
             attackerChits[i] = new Chit((i + 1) * scale + (scale / 5),
-                scale / 2, scale, attacker.getCreature(i).getImageName(),
+                scale / 2, scale, attacker.getCritter(i).getImageName(),
                 this);
         }
 
@@ -67,7 +67,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         for (int i = 0; i < defender.getHeight(); i++)
         {
             defenderChits[i] = new Chit((i + 1) * scale + (scale / 5),
-                2 * scale, scale, defender.getCreature(i).getImageName(),
+                2 * scale, scale, defender.getCritter(i).getImageName(),
                 this);
         }
 

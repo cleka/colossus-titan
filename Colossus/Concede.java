@@ -63,7 +63,7 @@ class Concede extends Dialog implements ActionListener
         for (int i = 0; i < friend.getHeight(); i++)
         {
             friendChits[i] = new Chit((i + 1) * scale + (scale / 5), scale / 2,
-                scale, friend.getCreature(i).getImageName(), this);
+                scale, friend.getCritter(i).getImageName(), this);
         }
 
         // Leave space for angels.
@@ -71,7 +71,7 @@ class Concede extends Dialog implements ActionListener
         for (int i = 0; i < enemy.getHeight(); i++)
         {
             enemyChits[i] = new Chit((i + 1) * scale + (scale / 5),
-                2 * scale, scale, enemy.getCreature(i).getImageName(), this);
+                2 * scale, scale, enemy.getCritter(i).getImageName(), this);
         }
 
         friendMarker = new Marker(scale / 5, scale / 2, scale,
