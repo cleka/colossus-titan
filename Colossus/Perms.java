@@ -12,6 +12,7 @@ public final class Perms
     private PermGen pg;
     private boolean foundNext = false;
     private boolean anyLeft = true;
+    private boolean first = true;
     private int nextSwap;
 
 
@@ -26,8 +27,7 @@ public final class Perms
     }
 
     /** Returns an iterator that returns permutations of the originally
-     *  passed list. TODO Make the first permutation the unmodified
-     *  original list to simplify things for the caller? */
+     *  passed list.  The first permutation is the unmodified list. */
     public Iterator iterator()
     {
         return new Iterator()
@@ -38,6 +38,10 @@ public final class Perms
              *  is called. */
             public boolean hasNext()
             {
+                if (first)
+                {
+                    return true;
+                }
                 if (foundNext)
                 {
                     return anyLeft;
@@ -53,6 +57,13 @@ public final class Perms
 
             public Object next()
             {
+                // Return the unmodified list the first time.
+                if (first)
+                {
+                    first = false;
+                    return permList;
+                }
+
                 // If we haven't already found the next permutation, find it.
                 if (!foundNext)
                 {
@@ -60,13 +71,11 @@ public final class Perms
                     foundNext = true;
                     anyLeft = (nextSwap != -1);
                 }
-
                 // All done.
                 if (!anyLeft)
                 {
                     return null;
                 }
-
                 // Modify and return the list.
                 swap(nextSwap);
                 foundNext = false;

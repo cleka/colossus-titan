@@ -2023,7 +2023,7 @@ Game.logDebug("defender eliminated");
             case MOVE:
                 if (critterSelected)
                 {
-                    doMove(getActiveLegion().getCritter(0), hex);
+                    doMove(getActiveLegion().getCritter(0), hex, true);
                 }
                 break;
 
@@ -2060,21 +2060,27 @@ Game.logDebug("defender eliminated");
     }
 
 
-    /** If legal, move critter to hex *  and return true. Else return false. */
-    public boolean doMove(Critter critter, BattleHex hex)
+    /** If legal, move critter to hex and return true. Else return false. */
+    public boolean doMove(Critter critter, BattleHex hex, boolean log)
     {
         String hexLabel = hex.getLabel();
 
         // Allow null moves.
         if (hexLabel.equals(critter.getCurrentHexLabel()))
         {
-            Game.logEvent(critter.getDescription() + " does not move");
+            if (log)
+            {
+                Game.logEvent(critter.getDescription() + " does not move");
+            }
             return true;
         }
         else if (showMoves(critter, false).contains(hexLabel))
         {
-            Game.logEvent(critter.getName() + " moves from " +
-                critter.getCurrentHexLabel() + " to " + hexLabel);
+            if (log)
+            {
+                Game.logEvent(critter.getName() + " moves from " +
+                    critter.getCurrentHexLabel() + " to " + hexLabel);
+            }
             critter.moveToHex(hex);
             critterSelected = false;
             highlightMovableCritters();
@@ -2082,13 +2088,16 @@ Game.logDebug("defender eliminated");
         }
         else
         {
-            Game.logEvent(critter.getName() + " in " +
-                critter.getCurrentHexLabel() +
-                " tried to illegally move to " + hexLabel);
+            if (log)
+            {
+                Game.logEvent(critter.getName() + " in " +
+                    critter.getCurrentHexLabel() + 
+                    " tried to illegally move to " + hexLabel);
+            }
             return false;
         }
     }
-
+    
 
     public void actOnMisclick()
     {
