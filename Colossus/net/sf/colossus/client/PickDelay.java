@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import net.sf.colossus.server.Options;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.util.KDialog;
 
 

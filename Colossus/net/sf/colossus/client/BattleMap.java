@@ -8,7 +8,7 @@ import javax.swing.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.server.Options;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 

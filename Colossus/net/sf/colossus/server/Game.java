@@ -9,6 +9,7 @@ import java.awt.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
@@ -397,7 +398,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
 
     /** Return a list with a balanced order of numPlayer towers chosen
         from towerList, which must hold numeric strings. */
-    private static ArrayList getBalancedTowers(int numPlayers, 
+    static ArrayList getBalancedTowers(int numPlayers, 
         final ArrayList towerList)
     {
         int numTowers = towerList.size();
@@ -3074,26 +3075,4 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
             syncOptions();
         }
     }
-
-
-    // test for getBalancedTowers()   TODO JUnit 
-    public static void main(String [] args)
-    {
-        int numPlayers = 4;
-        int numTowers = 6;
-        if (args.length == 2)
-        {
-            numTowers = Integer.valueOf(args[0]).intValue();
-            numPlayers = Integer.valueOf(args[1]).intValue();
-        }
-
-        ArrayList towerList = new ArrayList();
-        for (int i = 0; i < numTowers; i++)
-        {
-            towerList.add("" + 100 * (i + 1));
-        }
-
-        System.out.println(getBalancedTowers(numPlayers, towerList));
-    }
 }
-

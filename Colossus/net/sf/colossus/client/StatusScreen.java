@@ -9,7 +9,7 @@ import java.util.*;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Log;
-import net.sf.colossus.server.Options;
+import net.sf.colossus.util.Options;
 
 
 /**

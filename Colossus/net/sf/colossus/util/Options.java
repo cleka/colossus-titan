@@ -1,4 +1,4 @@
-package net.sf.colossus.server;
+package net.sf.colossus.util;
 
 
 import java.util.*;

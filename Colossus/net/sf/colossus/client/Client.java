@@ -11,7 +11,7 @@ import java.awt.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.server.Server;
-import net.sf.colossus.server.Options;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.AI;

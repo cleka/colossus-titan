@@ -1,3 +1,6 @@
+Add JUnit section to build docs.
+Add test target to build.xml.  (Need a test suite first.)
+
 Bug: 6-AI game, one AI (dripton) showed a SummonAngel dialog rather than
    picking itself.  Loaded autoplay=false from cfg file and overrode isAI()?
 

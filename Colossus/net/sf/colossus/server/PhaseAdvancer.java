@@ -4,6 +4,8 @@ package net.sf.colossus.server;
 import javax.swing.*;
 import java.awt.event.*;
 
+import net.sf.colossus.util.Options;
+
 
 /**
  * Advances to the next phase.
