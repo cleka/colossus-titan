@@ -23,7 +23,7 @@ or JDK (Java development kit).
 as an applet in a web browser.  The obsolete Microsoft JVM that's bundled
 with IE and Windows won't work.  Sorry.)
 
-Win32, Solaris, and x86 Linux versions of the JRE and JDK are freely 
+Windows, Solaris, and x86 Linux versions of the JRE and JDK are freely 
 downloadable from http://java.sun.com.
 
 Another Linux port is available from http://www.blackdown.org.  
@@ -248,34 +248,27 @@ A.  Probably about April 2002.  No guarantees -- real life sometimes
 
 Q.  Why is the AI so dumb?
 
-A1. It's not.  You're just incredibly smart.
-
-A2. Nobody's doing much with the AI right now.  I'll start working
-    on it again after the network game is finished.  Feel free to
-    improve it in the meantime.
+A.  Nobody's doing much with the AI right now.  I'll start working
+    on it seriously again after the network game is finished.
 
 Q.  What's the difference between SimpleAI and MinimaxAI and RandomAI?
 
-A1. SimpleAI is faster and smarter.  MinimaxAI is slower and dumber.
-    RandomAI is not really a separate AI: it picks one of the other AIs 
-    at random.  Use SimpleAI for now since MinimaxAI isn't really done.
+A.  SimpleAI does a straightforward one-ply lookahead for MasterBoard
+    moves.  It works fairly well.  MinimaxAI uses a more general minimax 
+    algorithm that in theory should be stronger (but slower), but it's 
+    still very buggy so it's not recommended for non-developer use.  
+    RandomAI just chooses one of the available AIs at random -- this 
+    will be a more interesting option when there are multiple viable 
+    alternatives.
 
-A2. (More than you probably want to know)  SimpleAI is a handcoded 
-    one-ply expert system.  MinimaxAI uses the standard Minimax with 
-    Alpha-Beta Pruning algorithm for masterboard moves.  (It uses the 
-    same algorithm as SimpleAI for battle moves for now.)
-    In theory, MinimaxAI should be stronger, once we get it fully 
-    working.  But it's not working very well yet.
-
-Q.  What's the load variant button do? 
+Q.  What's the Load Variant button do? 
 
 A.  The maps and recruit trees and stuff used to be hardcoded.  Romain
     has recently pulled them out into data files, which means that you
     can customize parts of the game by making new data files instead of
     changing code.  If that interests you, see FileFormat.txt and
-    Variant-HOWTO.txt.  We'll include some variant data files in the 
-    package at some point.  Note that the AI has not been fully tested 
-    with variant maps.
+    Variant-HOWTO.txt.  The ExtTitan, Badlands, and TitanPlus variants 
+    are now included. 
 
 Q.  How can I help?
 

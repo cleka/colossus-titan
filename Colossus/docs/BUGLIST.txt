@@ -306,3 +306,11 @@ Legion Bk01 (Axes) in 400 tower teleports (null) to Tower hex 600 entering on Bo
 (Should mention titan.)
 
 Human forced strikes not taken after carry.  Fixed?
+Carry cursor not cleared after carry is taken.  Game does not advance
+   past the strike phase automatically after a carry if no strikes/carries 
+   left.  Carry damage is not shown on victim.
+
+AI markers need repainting after recruiting.
+
+Engagement hex not unselected after human player loses sole battle.
+   Phase does not automatically advance.

@@ -142,6 +142,7 @@
                 <fileset dir="." 
                  includes = 
                         "version,
+                         fixcrlf*,
                          **/core,
                          **/javacore.txt,
                          **/*~,
