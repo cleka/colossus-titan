@@ -88,8 +88,8 @@ public class DiceTest extends TestCase
     {
         mTest(rolls, random);
         signTest(rolls, random);
-        runsTest(rolls, random);
         mannKendallTest(rolls, random);
+        runsTest(rolls, random);
     }
 
     // Source of tests: http://www.stat.unc.edu/faculty/rs/s102/lec17a.pdf
