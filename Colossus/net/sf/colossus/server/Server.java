@@ -650,12 +650,16 @@ Log.debug("Called Server.addClient() for " + playerName);
     public void doRecruit(String markerId, String recruitName,
         String recruiterName)
     {
+        IClient client = getClient(getPlayerName());
+
         Legion legion = game.getLegionByMarkerId(markerId);
         if (!getPlayerName().equals(legion.getPlayerName()))
         {
             Log.error(getPlayerName() + " illegally called doRecruit()");
+            client.nakRecruit(markerId);
             return;
         }
+
         if (legion != null && (legion.hasMoved() || game.getPhase() ==
             Constants.FIGHT) && legion.canRecruit())
         {
@@ -677,6 +681,15 @@ Log.debug("Called Server.addClient() for " + playerName);
                 didRecruit(legion, recruit, recruiter);
             }
         }
+        else
+        {
+            client.nakRecruit(markerId);
+            // XXX -- uncomment after verifying it doesn't cause hangs
+            // during reinforcement phase.  (May need to handle
+            // nak first.) 
+            // return;
+        }
+
         // Need to always call this to keep game from hanging.
         if (game.getPhase() == Constants.FIGHT)
         {
@@ -828,12 +841,18 @@ Log.debug("Called Server.addClient() for " + playerName);
 
     public void doBattleMove(int tag, String hexLabel)
     {
+        IClient client = getClient(getPlayerName());
         if (!isBattleActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doBattleMove()");
+            client.nakBattleMove(tag);
             return;
         }
         boolean moved = game.getBattle().doMove(tag, hexLabel);
+        if (!moved)
+        {
+            client.nakBattleMove(tag);
+        }
     }
 
     void allTellBattleMove(int tag, String startingHex, String endingHex, 
@@ -850,21 +869,25 @@ Log.debug("Called Server.addClient() for " + playerName);
 
     public synchronized void strike(int tag, String hexLabel)
     {
+        IClient client = getClient(getPlayerName());
         if (!isBattleActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called strike()");
+            client.nakStrike(tag);
             return;
         }
         Battle battle = game.getBattle();
         if (battle == null)
         {
             Log.error("null battle in Server.strike()");
+            client.nakStrike(tag);
             return;
         }
         Legion legion = battle.getActiveLegion();
         if (legion == null)
         {
             Log.error("null active legion in Server.strike()");
+            client.nakStrike(tag);
             return;
         }
         Critter critter = legion.getCritterByTag(tag);
@@ -872,12 +895,14 @@ Log.debug("Called Server.addClient() for " + playerName);
         {
             Log.error("No critter with tag " + tag + " in Server.strike()");
             // XXX Hang here.
+            client.nakStrike(tag);
             return;
         }
         Critter target = battle.getCritter(hexLabel);
         if (target == null)
         {
             Log.error("No target in hex " + hexLabel + " in Server.strike()");
+            client.nakStrike(tag);
             return;
         }
         critter.strike(target);
@@ -1230,12 +1255,17 @@ Log.debug("Split legions must be separated.");
 
     public void doSplit(String parentId, String childId, String results)
     {
+        IClient client = getClient(getPlayerName());
         if (!isActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doSplit()");
+            client.nakSplit(parentId);
             return;
         }
-        game.doSplit(parentId, childId, results);
+        if (!game.doSplit(parentId, childId, results))
+        {
+            client.nakSplit(parentId);
+        }
     }
 
     /** Callback from game after this legion was split off. */
@@ -1255,9 +1285,11 @@ Log.debug("Split legions must be separated.");
     public void doMove(String markerId, String hexLabel, String entrySide,
         boolean teleport, String teleportingLord)
     {
+        IClient client = getClient(getPlayerName());
         if (!isActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doMove()");
+            client.nakMove(markerId);
             return;
         }
         Legion legion = game.getLegionByMarkerId(markerId);
@@ -1268,6 +1300,10 @@ Log.debug("Split legions must be separated.");
         {
             allTellDidMove(markerId, startingHexLabel, hexLabel, entrySide,
                 teleport);
+        }
+        else
+        {
+            client.nakMove(markerId);
         }
     }
 
