@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.event.*;
 
 /**
  * Class BattleHex describes one Battlemap hex.
@@ -9,8 +8,6 @@ import java.awt.event.*;
 
 class BattleHex extends Hex
 {
-    private double len;
-
     private BattleMap map;
 
     // Normal hexes hold only one chit, but entrances can hold up to 7.
