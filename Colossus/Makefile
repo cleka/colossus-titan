@@ -15,6 +15,7 @@ all: AcquireAngel.class \
      Chit.class \
      Concede.class \
      Creature.class \
+     Critter.class \
      Game.class \
      Hex.class \
      Legion.class \
@@ -53,6 +54,9 @@ Concede.class: Concede.java
 
 Creature.class: Creature.java
 	$(JC) Creature.java
+
+Critter.class: Critter.java
+	$(JC) Critter.java
 
 Game.class: Game.java
 	$(JC) Game.java
