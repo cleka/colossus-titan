@@ -159,7 +159,7 @@
 
 <!-- Be very careful modifying this.  It whacks whole directories easily. -->
 <target name="clean" depends="cleanjars"
-        description = "Delete most derived files">
+        description = "Delete derived files">
         <delete verbose="yes" quiet = "yes" includeemptydirs="yes"
                 defaultexcludes="no">
                 <fileset dir="."
@@ -175,18 +175,8 @@
                          **/*.class,
                          **/Colossus.*.zip,
                          TEST-*Test.txt,
-                         javadoc/**"
-                />
-        </delete>
-</target>
-
-
-<target name="fullyclean" depends="clean"
-        description = "Delete all derived files and savegames">
-        <delete verbose="yes" quiet = "yes" includeemptydirs="yes">
-                <fileset dir="."
-                 includes =
-                         "javamake.pdb"
+                         javadoc/**,
+                         javamake.pdb"
                 />
         </delete>
 </target>
