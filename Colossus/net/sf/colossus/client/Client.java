@@ -71,9 +71,7 @@ public final class Client implements IClient
     private BattleMap map;
     private BattleDice battleDice;
 
-    // XXX synch all iteration
-    private List battleChits =
-            Collections.synchronizedList(new ArrayList());
+    private List battleChits = new ArrayList();
 
     /** Stack of legion marker ids, to allow multiple levels of undo for
      *  splits, moves, and recruits. */
@@ -160,9 +158,6 @@ public final class Client implements IClient
 
     // XXX Make private and wrap consistently.
     boolean showAllRecruitChits = false;
-
-    // Last nakable method called on Server.  Set to null on success.
-    private String nakable = null;
 
 
     public Client(String host, int port, String playerName, boolean remote)
@@ -851,11 +846,10 @@ public final class Client implements IClient
         doAutoStrikes();
     }
 
-    synchronized void doneWithBattleMoves()
+    void doneWithBattleMoves()
     {
         aiPause();
         clearUndoStack();
-        nakable = Constants.doneWithBattleMoves;
         server.doneWithBattleMoves();
     }
 
@@ -919,14 +913,14 @@ public final class Client implements IClient
         }
     }
 
-    synchronized void doneWithStrikes()
+    void doneWithStrikes()
     {
         aiPause();
         server.doneWithStrikes();
     }
 
     /** Return true if any strikes were taken. */
-    synchronized boolean makeForcedStrikes()
+    boolean makeForcedStrikes()
     {
         if (isMyBattlePhase() && getOption(Options.autoForcedStrike))
         {
@@ -937,7 +931,7 @@ public final class Client implements IClient
     }
 
     /** Handle both forced strikes and AI strikes. */
-    synchronized void doAutoStrikes()
+    void doAutoStrikes()
     {
         if (isMyBattlePhase())
         {
@@ -1003,7 +997,7 @@ public final class Client implements IClient
     }
 
     /** Remove this eliminated legion, and clean up related stuff. */
-    public synchronized void removeLegion(String id)
+    public void removeLegion(String id)
     {
         Marker marker = getMarker(id);
         markers.remove(marker);
@@ -1077,7 +1071,7 @@ public final class Client implements IClient
     }
 
     /** Add a new creature to this legion. */
-    public synchronized void addCreature(String markerId, String name)
+    public void addCreature(String markerId, String name)
     {
         getLegionInfo(markerId).addCreature(name);
         if (board != null)
@@ -1088,7 +1082,7 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void removeCreature(String markerId, String name)
+    public void removeCreature(String markerId, String name)
     {
         LegionInfo info = getLegionInfo(markerId);
         String hexLabel = info.getHexLabel();
@@ -1106,7 +1100,7 @@ public final class Client implements IClient
     }
 
     /** Reveal creatures in this legion, some of which already may be known. */
-    public synchronized void revealCreatures(String markerId, final List names)
+    public void revealCreatures(String markerId, final List names)
     {
         String pName = getPlayerNameByMarkerId(markerId);
         if (predictSplits == null || getPredictSplits(pName) == null)
@@ -1118,7 +1112,7 @@ public final class Client implements IClient
 
     /** additionaly remember the images list for later, the engagement report
      * */
-    public synchronized void revealEngagedCreatures(
+    public void revealEngagedCreatures(
         String markerId, final List names, boolean isAttacker)
     {
         revealCreatures(markerId, names);
@@ -1189,7 +1183,7 @@ public final class Client implements IClient
         return null;
     }
 
-    public synchronized void removeDeadBattleChits()
+    public void removeDeadBattleChits()
     {
         Iterator it = battleChits.iterator();
         while (it.hasNext())
@@ -1217,7 +1211,7 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void placeNewChit(String imageName, boolean inverted,
+    public void placeNewChit(String imageName, boolean inverted,
             int tag, String hexLabel)
     {
         addBattleChit(imageName, inverted, tag, hexLabel);
@@ -1379,7 +1373,7 @@ public final class Client implements IClient
         return board;
     }
 
-    public synchronized void initBoard()
+    public void initBoard()
     {
         Log.debug(playerName + " Client.initBoard()");
         if (isRemote())
@@ -1504,7 +1498,6 @@ public final class Client implements IClient
      *  Used by human players only. */
     public void askChooseStrikePenalty(List choices)
     {
-        nakable = null;
         if (getOption(Options.autoPlay))
         {
             // TODO Teach AI to handle strike penalties.  This just takes
@@ -1519,7 +1512,6 @@ public final class Client implements IClient
 
     void assignStrikePenalty(String prompt)
     {
-        nakable = Constants.assignStrikePenalty;
         server.assignStrikePenalty(prompt);
     }
 
@@ -1537,7 +1529,7 @@ public final class Client implements IClient
         return frame;
     }
 
-    public void showMessageDialog(String message)
+    void showMessageDialog(String message)
     {
         // Don't bother showing messages to AI players.  Perhaps we
         // should log them.
@@ -1740,7 +1732,6 @@ public final class Client implements IClient
             int strikeNumber, List rolls, int damage, boolean killed,
             boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
-        nakable = null;
         BattleChit chit = getBattleChit(strikerTag);
         if (chit != null)
         {
@@ -1789,66 +1780,67 @@ public final class Client implements IClient
         }
     }
 
-    public void nak()
+    public void nak(String reason, String errmsg)
     {
-        Log.error(playerName + " got nak for " + nakable);
-        recoverFromNak();
+        Log.error(playerName + " got nak for " + reason + " " + errmsg);
+        recoverFromNak(reason, errmsg);
     }
 
-    private void recoverFromNak()
+    private void recoverFromNak(String reason, String errmsg)
     {
-        String reason = nakable;
-        nakable = null;
+        Log.debug(playerName + " recoverFromNak " + reason + " " + errmsg);
         if (reason == null)
         {
-            Log.error("recoverFromNak with null nakable!");
+            Log.error("recoverFromNak with null reason!");
         }
-        else if (reason == Constants.doSplit)
+        else if (reason.equals(Constants.doSplit))
         {
             kickSplit();
         }
-        else if (reason == Constants.doneWithSplits)
+        else if (reason.equals(Constants.doneWithSplits))
         {
             doneWithMoves();
         }
-        else if (reason == Constants.doMove)
+        else if (reason.equals(Constants.doMove))
         {
             kickMoves();
         }
-        else if (reason == Constants.doneWithMoves)
+        else if (reason.equals(Constants.doneWithMoves))
         {
             doneWithRecruits();
         }
-        else if (reason == Constants.doBattleMove)
+        else if (reason.equals(Constants.doBattleMove))
         {
             handleFailedBattleMove();
         }
-        else if (reason == Constants.doneWithBattleMoves)
+        else if (reason.equals(Constants.doneWithBattleMoves))
         {
-            doneWithStrikes();
         }
-        else if (reason == Constants.assignStrikePenalty)
-        {
-            doAutoStrikes();
-        }
-        else if (reason == Constants.strike)
+        else if (reason.equals(Constants.assignStrikePenalty))
         {
             doAutoStrikes();
         }
-        else if (reason == Constants.doneWithStrikes)
+        else if (reason.equals(Constants.strike))
         {
-            doneWithBattleMoves();
+            doAutoStrikes();
         }
-        else if (reason == Constants.doneWithEngagements)
+        else if (reason.equals(Constants.doneWithStrikes))
         {
         }
-        else if (reason == Constants.doRecruit)
+        else if (reason.equals(Constants.doneWithEngagements))
+        {
+        }
+        else if (reason.equals(Constants.doRecruit))
         {
             doneWithRecruits();
         }
-        else if (reason == Constants.doneWithRecruits)
+        else if (reason.equals(Constants.doneWithRecruits))
         {
             doneWithSplits();
+        }
+        else
+        {
+            Log.warn(playerName + " unexpected nak " + reason + " " + errmsg);
         }
     }
 
@@ -1929,7 +1921,7 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void cleanupBattle()
+    public void cleanupBattle()
     {
         Log.debug(playerName + " Client.cleanupBattle()");
         if (map != null)
@@ -1958,7 +1950,6 @@ public final class Client implements IClient
     public void nextEngagement()
     {
         highlightEngagements();
-        nakable = null;
         if (isMyTurn())
         {
             if (getOption(Options.autoPickEngagements))
@@ -2024,7 +2015,6 @@ public final class Client implements IClient
     {
         // Call server even if some arguments are null, to get past
         // reinforcement.
-        nakable = Constants.doRecruit;
         server.doRecruit(markerId, recruitName, recruiterName);
     }
 
@@ -2060,7 +2050,6 @@ public final class Client implements IClient
     public void didRecruit(String markerId, String recruitName,
             String recruiterName, int numRecruiters)
     {
-        nakable = null;
         String hexLabel = getHexForLegion(markerId);
         if (hexLabel == null)
         {
@@ -2174,10 +2163,8 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void setupSplit(String activePlayerName,
-            int turnNumber)
+    public void setupSplit(String activePlayerName, int turnNumber)
     {
-        nakable = null;
         clearUndoStack();
         cleanupNegotiationDialogs();
 
@@ -2220,9 +2207,8 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void setupMove()
+    public void setupMove()
     {
-        nakable = null;
         this.phase = Constants.MOVE;
         clearUndoStack();
         if (board != null)
@@ -2236,7 +2222,7 @@ public final class Client implements IClient
         updateStatusScreen();
     }
 
-    public synchronized void setupFight()
+    public void setupFight()
     {
         clearUndoStack();
         this.phase = Constants.FIGHT;
@@ -2257,9 +2243,8 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void setupMuster()
+    public void setupMuster()
     {
-        nakable = null;
         clearUndoStack();
         cleanupNegotiationDialogs();
 
@@ -2268,12 +2253,13 @@ public final class Client implements IClient
         if (board != null)
         {
             board.setupMusterMenu();
+            if (isMyTurn())
+            {
+                focusBoard();
+                defaultCursor();
+            }
         }
         updateStatusScreen();
-        if (isMyTurn())
-        {
-            defaultCursor();
-        }
 
         if (getOption(Options.autoRecruit) && !isGameOver())
         {
@@ -2287,10 +2273,9 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void setupBattleSummon(String battleActivePlayerName,
+    public void setupBattleSummon(String battleActivePlayerName,
             int battleTurnNumber)
     {
-        nakable = null;
         this.battlePhase = Constants.SUMMON;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
@@ -2311,10 +2296,9 @@ public final class Client implements IClient
         updateStatusScreen();
     }
 
-    public synchronized void setupBattleRecruit(String battleActivePlayerName,
+    public void setupBattleRecruit(String battleActivePlayerName,
             int battleTurnNumber)
     {
-        nakable = null;
         this.battlePhase = Constants.RECRUIT;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
@@ -2330,7 +2314,7 @@ public final class Client implements IClient
         updateStatusScreen();
     }
 
-    private synchronized void resetAllBattleMoves()
+    private void resetAllBattleMoves()
     {
         Iterator it = battleChits.iterator();
         while (it.hasNext())
@@ -2341,10 +2325,9 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void setupBattleMove(String battleActivePlayerName,
+    public void setupBattleMove(String battleActivePlayerName,
             int battleTurnNumber)
     {
-        nakable = null;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
@@ -2397,8 +2380,7 @@ public final class Client implements IClient
         aiPause();
     }
 
-    /** synchronized to prevent concurrent mod on bestMoveOrder */
-    private synchronized void retryFailedBattleMoves()
+    private void retryFailedBattleMoves()
     {
         bestMoveOrder = failedBattleMoves;
         failedBattleMoves = null;
@@ -2407,10 +2389,9 @@ public final class Client implements IClient
     }
 
     /** Used for both strike and strikeback. */
-    public synchronized void setupBattleFight(int battlePhase,
+    public void setupBattleFight(int battlePhase,
             String battleActivePlayerName)
     {
-        nakable = null;
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
         if (battlePhase == Constants.FIGHT)
@@ -2563,13 +2544,10 @@ public final class Client implements IClient
 
     void doBattleMove(int tag, String hexLabel)
     {
-        nakable = Constants.doBattleMove;
         server.doBattleMove(tag, hexLabel);
     }
 
-    /** synchronized to prevent concurrent mod on bestMoveOrder */
-    private synchronized void markBattleMoveSuccessful(int tag,
-            String endingHexLabel)
+    private void markBattleMoveSuccessful(int tag, String endingHexLabel)
     {
         if (bestMoveOrder != null)
         {
@@ -2589,9 +2567,9 @@ public final class Client implements IClient
         kickBattleMove();
     }
 
-    /** synchronized to prevent concurrent mod on bestMoveOrder */
-    private synchronized void handleFailedBattleMove()
+    private void handleFailedBattleMove()
     {
+        Log.debug(playerName + "handleFailedBattleMove");
         if (bestMoveOrder != null)
         {
             Iterator it = bestMoveOrder.iterator();
@@ -2604,14 +2582,13 @@ public final class Client implements IClient
                     failedBattleMoves.add(cm);
                 }
             }
-            kickBattleMove();
         }
+        kickBattleMove();
     }
 
     public void tellBattleMove(int tag, String startingHexLabel,
             String endingHexLabel, boolean undo)
     {
-        nakable = null;
         if (isMyCritter(tag) && !undo)
         {
             pushUndoStack(endingHexLabel);
@@ -2638,7 +2615,6 @@ public final class Client implements IClient
     /** Attempt to have critter tag strike the critter in hexLabel. */
     void strike(int tag, String hexLabel)
     {
-        nakable = Constants.strike;
         server.strike(tag, hexLabel);
     }
 
@@ -2976,7 +2952,6 @@ public final class Client implements IClient
             }
         }
 
-        nakable = Constants.doMove;
         server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
         return true;
     }
@@ -2991,7 +2966,6 @@ public final class Client implements IClient
     public void didMove(String markerId, String startingHexLabel,
             String currentHexLabel, String entrySide, boolean teleport)
     {
-        nakable = null;
         removeRecruitChit(startingHexLabel);
         if (isMyLegion(markerId))
         {
@@ -3253,7 +3227,7 @@ public final class Client implements IClient
     }
 
     /** Returns a list of markerIds. */
-    synchronized List getLegionsByPlayer(String name)
+    List getLegionsByPlayer(String name)
     {
         List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
@@ -3499,8 +3473,7 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void undidSplit(String splitoffId, String survivorId,
-            int turn)
+    public void undidSplit(String splitoffId, String survivorId, int turn)
     {
         LegionInfo info = getLegionInfo(survivorId);
         info.merge(splitoffId, turn);
@@ -3558,18 +3531,17 @@ public final class Client implements IClient
         }
     }
 
-    synchronized void doneWithSplits()
+    void doneWithSplits()
     {
         if (!isMyTurn())
         {
             return;
         }
-        nakable = Constants.doneWithSplits;
         server.doneWithSplits();
         clearRecruitChits();
     }
 
-    synchronized void doneWithMoves()
+    void doneWithMoves()
     {
         if (!isMyTurn())
         {
@@ -3577,29 +3549,26 @@ public final class Client implements IClient
         }
         aiPause();
         clearRecruitChits();
-        nakable = Constants.doneWithSplits;
         server.doneWithMoves();
     }
 
-    synchronized void doneWithEngagements()
+    void doneWithEngagements()
     {
         if (!isMyTurn())
         {
             return;
         }
         aiPause();
-        nakable = Constants.doneWithEngagements;
         server.doneWithEngagements();
     }
 
-    synchronized void doneWithRecruits()
+    void doneWithRecruits()
     {
         if (!isMyTurn())
         {
             return;
         }
         aiPause();
-        nakable = Constants.doneWithSplits;
         server.doneWithRecruits();
     }
 
@@ -3680,7 +3649,7 @@ public final class Client implements IClient
         return info.getMulligansLeft();
     }
 
-    synchronized void doSplit(String parentId)
+    void doSplit(String parentId)
     {
         Log.debug("Client.doSplit " + parentId);
         this.parentId = null;
@@ -3760,17 +3729,15 @@ public final class Client implements IClient
     {
         Log.debug("Client.doSplit " + parentId + " " + childId + " " + 
             results);
-        nakable = Constants.doSplit;
         server.doSplit(parentId, childId, results);
     }
 
     /** Callback from server after any successful split. */
-    public synchronized void didSplit(String hexLabel, String parentId,
-            String childId, int childHeight, List splitoffs, int turn)
+    public void didSplit(String hexLabel, String parentId, String childId, 
+            int childHeight, List splitoffs, int turn)
     {
         Log.debug("Client.didSplit " + hexLabel + " " + parentId + " " +
                 childId + " " + childHeight + " " + splitoffs + " " + turn);
-        nakable = null;
         LegionInfo childInfo = getLegionInfo(childId);
         childInfo.setHexLabel(hexLabel);
 

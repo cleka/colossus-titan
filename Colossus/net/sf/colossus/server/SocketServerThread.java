@@ -449,11 +449,6 @@ final class SocketServerThread extends Thread implements IClient
                 Glob.glob(choices));
     }
 
-    public void showMessageDialog(String message)
-    {
-        out.println(Constants.showMessageDialog + sep + message);
-    }
-
     public void tellGameOver(String message)
     {
         out.println(Constants.tellGameOver + sep + message);
@@ -628,8 +623,8 @@ final class SocketServerThread extends Thread implements IClient
             int childHeight, List splitoffs, int turn)
     {
         out.println(Constants.didSplit + sep + hexLabel + sep + parentId +
-                sep + childId + sep + childHeight + sep + Glob.glob(splitoffs) +
-                sep + turn);
+                sep + childId + sep + childHeight + sep + 
+                Glob.glob(splitoffs) + sep + turn);
     }
 
     public void askPickColor(List colorsLeft)
@@ -647,8 +642,8 @@ final class SocketServerThread extends Thread implements IClient
         out.println(Constants.log + sep + message);
     }
 
-    public void nak()
+    public void nak(String reason, String errmsg)
     {
-        out.println(Constants.nak);
+        out.println(Constants.nak + sep + reason + sep + errmsg);
     }
 }

@@ -225,11 +225,6 @@ final class SocketClientThread extends Thread implements IServer
             List choices = Split.split(Glob.sep, (String)args.remove(0));
             client.askChooseStrikePenalty(choices);
         }
-        else if (method.equals(Constants.showMessageDialog))
-        {
-            String message = (String)args.remove(0);
-            client.showMessageDialog(message);
-        }
         else if (method.equals(Constants.tellGameOver))
         {
             String message = (String)args.remove(0);
@@ -459,7 +454,7 @@ final class SocketClientThread extends Thread implements IServer
         }
         else if (method.equals(Constants.nak))
         {
-            client.nak();
+            client.nak((String)args.remove(0), (String)args.remove(0));
         }
         else if (method.equals(Constants.tellEngagement))
         {

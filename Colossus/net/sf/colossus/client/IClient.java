@@ -60,8 +60,6 @@ public interface IClient
 
     public void askChooseStrikePenalty(List choices);
 
-    public void showMessageDialog(String message);
-
     public void tellGameOver(String message);
 
     public void tellPlayerElim(String playerName, String slayerName);
@@ -137,5 +135,5 @@ public interface IClient
 
     public void log(String message);
 
-    public void nak();
+    public void nak(String reason, String errmsg);
 }

@@ -335,7 +335,6 @@ public final class Constants
     public static final String askAcquireAngel = "askAcquireAngel";
     public static final String askChooseStrikePenalty =
             "askChooseStrikePenalty";
-    public static final String showMessageDialog = "showMessageDialog";
     public static final String tellGameOver = "tellGameOver";
     public static final String tellPlayerElim = "tellPlayerElim";
     public static final String askConcede = "askConcede";

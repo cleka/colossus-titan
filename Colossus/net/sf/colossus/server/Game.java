@@ -701,7 +701,7 @@ public final class Game
         if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
         {
             Log.event("Not advancing because no humans remain");
-            // XXX buggy?  
+            // XXX buggy?
             server.allTellGameOver("All humans eliminated");
             setGameOver(true);
             return;
@@ -815,35 +815,14 @@ public final class Game
 
     private synchronized void setupFight()
     {
-        // If there are no engagements, move forward to the muster phase.
-        if (!summoning && !reinforcing && !acquiring &&
-                findEngagements().size() == 0)
-        {
-            advancePhase(Constants.FIGHT, getActivePlayerName());
-        }
-        else
-        {
-            server.allSetupFight();
-            kickEngagements();
-        }
+        server.allSetupFight();
+        server.nextEngagement();
     }
 
     private void setupMuster()
     {
-        Player player = getActivePlayer();
-
-        player.removeEmptyLegions();
-
-        // If this player was eliminated in combat, or can't recruit
-        // anything, advance to the next turn.
-        if (player.isDead() || !player.canRecruit())
-        {
-            advancePhase(Constants.MUSTER, player.getName());
-        }
-        else
-        {
-            server.allSetupMuster();
-        }
+        getActivePlayer().removeEmptyLegions();
+        server.allSetupMuster();
     }
 
     int getTurnNumber()
@@ -2139,7 +2118,7 @@ public final class Game
         reinforcing = false;
         if (battle == null)
         {
-            kickEngagements();
+            server.nextEngagement();
         }
     }
 
@@ -2176,23 +2155,13 @@ public final class Game
         else
         {
             summoning = false;
-            kickEngagements();
+            server.nextEngagement();
         }
     }
 
     Battle getBattle()
     {
         return battle;
-    }
-
-    private synchronized void kickEngagements()
-    {
-        server.nextEngagement();
-        if (findEngagements().size() == 0 && !summoning && !reinforcing &&
-                !acquiring)
-        {
-            advancePhase(Constants.FIGHT, getActivePlayerName());
-        }
     }
 
     synchronized void finishBattle(String hexLabel, boolean attackerEntered,
@@ -2243,7 +2212,7 @@ public final class Game
         server.allTellEngagementResults(winnerId, "fight", points);
         if (!summoning && !reinforcing && !acquiring)
         {
-            kickEngagements();
+            server.nextEngagement();
         }
     }
 
@@ -2290,16 +2259,14 @@ public final class Game
         // Need a legion marker to split.
         if (!player.isMarkerAvailable(childId))
         {
-            server.showMessageDialog(player.getName(),
-                    "Marker " + childId + " is not available.");
+            Log.error("Marker " + childId + " is not available.");
             return false;
         }
 
         // Pre-split legion must have 4+ creatures.
         if (legion.getHeight() < 4)
         {
-            server.showMessageDialog(player.getName(),
-                    "Legion " + parentId + " is too short to split.");
+            Log.error("Legion " + parentId + " is too short to split.");
             return false;
         }
 
@@ -2357,8 +2324,7 @@ public final class Game
             // Only allow a single split on turn 1.
             if (player.getNumLegions() > 1)
             {
-                server.showMessageDialog(player.getName(),
-                        "Cannot split twice on Turn 1.");
+                Log.error("Cannot split twice on Turn 1.");
                 return false;
             }
             // Each stack must contain exactly 4 creatures.
@@ -2701,7 +2667,7 @@ public final class Game
                 fled ? "flee" : "concede", points);
         if (!acquiring)
         {
-            kickEngagements();
+            server.nextEngagement();
         }
     }
 
@@ -2827,7 +2793,7 @@ public final class Game
         server.allUpdatePlayerInfo();
         server.allTellEngagementResults(winner == null ? null :
                 winner.getMarkerId(), "negotiate", points);
-        kickEngagements();
+        server.nextEngagement();
     }
 
     synchronized void askAcquireAngel(String playerName, String markerId,
@@ -2842,7 +2808,7 @@ public final class Game
         acquiring = false;
         if (!summoning && !reinforcing)
         {
-            kickEngagements();
+            server.nextEngagement();
         }
     }
 
