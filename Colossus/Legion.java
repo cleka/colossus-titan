@@ -223,7 +223,8 @@ class Legion
 
     public boolean canRecruit()
     {
-        if (recruited || height > 6)
+        if (recruited || height > 6 || 
+            PickRecruit.findEligibleRecruits(this, new Creature[6]) == 0)
         {
             return false;
         }
@@ -260,6 +261,30 @@ class Legion
 
             clearRecruited();
         }
+    }
+
+
+    // Return true if this legion can summon an angel or archangel.
+    public boolean canSummonAngel()
+    {
+        if (height >= 7 || summoned || !player.canSummonAngel())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion candidate = player.getLegion(i);
+            if (candidate != this &&
+                (candidate.numCreature(Creature.angel) > 0 ||
+                candidate.numCreature(Creature.archangel) > 0) &&
+                !candidate.getCurrentHex().isEngagement())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
