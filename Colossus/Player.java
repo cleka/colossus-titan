@@ -521,14 +521,8 @@ System.out.println("numMarkersAvailable is now " + numMarkersAvailable);
 
         game.getBoard().repaint();
 
-        // If only one player remains, note the victory.
+        // See if the game is over.
         game.checkForVictory();
-
-        // If it is this player's turn, advance to the next player.
-        if (game.getActivePlayer() == this) 
-        {
-            game.advanceTurn();
-        }
     }
 
 
