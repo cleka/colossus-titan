@@ -118,7 +118,7 @@ public final class LegionInfo
         }
     }
 
-    boolean contains(String creatureName)
+    public boolean contains(String creatureName)
     {
         return getContents().contains(creatureName);
     }
