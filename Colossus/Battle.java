@@ -67,6 +67,8 @@ public final class Battle
         this.turnNumber = turnNumber;
         this.phase = phase;
         map = new BattleMap(game.getBoard(), masterHexLabel, this);
+        map.getFrame().toFront();
+        map.requestFocus();
         terrain = getMasterHex().getTerrain();
     }
 
@@ -394,6 +396,8 @@ public final class Battle
         {
             advancePhase();
         }
+
+        map.requestFocus();
     }
 
 

@@ -92,6 +92,7 @@ public final class Game
             board.setGame(this);
         }
         masterFrame = board.getFrame();
+        board.requestFocus();
     }
 
 
@@ -759,6 +760,8 @@ public final class Game
         }
 
         setupPhase();
+
+        board.requestFocus();
     }
 
 

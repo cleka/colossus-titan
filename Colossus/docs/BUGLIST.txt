@@ -17,9 +17,6 @@ Solaris 1.3; Linux 1.3: JPopupMenu mnemonics don't work.  They work okay
 Win98 1.3: Popup menus are not erased properly.  They erase fine
    in Linux and Solaris 1.3.
 
-Solaris 1.4b: SplitLegion does not repaint chits properly.
-Solaris 1.4b: Ugly full MasterBoard repaints after battles, after
-   ShowLegion dialogs are dismissed, etc.
 Linux 1.4b: Problems running to a remote X display.  Some of the
    startup dialogs never show up.  Behind the MasterBoard?
 

@@ -276,4 +276,9 @@ public final class StatusScreen extends JFrame implements WindowListener
         int scale = Scale.get();
         setSize(25 * scale, 15 * scale);
     }
+
+    public boolean isFocusTraversable()
+    {
+        return false;
+    }
 }
