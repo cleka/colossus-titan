@@ -30,7 +30,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
 
     Negotiate(JFrame parentFrame, Legion attacker, Legion defender)
     {
-        super(parentFrame, attacker.getMarkerId() + " Negotiates with " + 
+        super(parentFrame, attacker.getMarkerId() + " Negotiates with " +
             defender.getMarkerId(), true);
 
         Container contentPane = getContentPane();
@@ -54,24 +54,24 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         attackerChits = new Chit[attacker.getHeight()];
         for (int i = 0; i < attacker.getHeight(); i++)
         {
-            attackerChits[i] = new Chit((i + 1) * scale + (scale / 5), 
+            attackerChits[i] = new Chit((i + 1) * scale + (scale / 5),
                 scale / 2, scale, attacker.getCreature(i).getImageName(),
-                this, false);
+                this);
         }
-        
+
         defenderChits = new Chit[defender.getHeight()];
         for (int i = 0; i < defender.getHeight(); i++)
         {
-            defenderChits[i] = new Chit((i + 1) * scale + (scale / 5), 
+            defenderChits[i] = new Chit((i + 1) * scale + (scale / 5),
                 2 * scale, scale, defender.getCreature(i).getImageName(),
-                this, false);
+                this);
         }
-            
-        attackerMarker = new Chit(scale / 5, scale / 2, scale, 
-            attacker.getImageName(), this, false);
-        
-        defenderMarker = new Chit(scale / 5, 2 * scale, scale, 
-            defender.getImageName(), this, false);
+
+        attackerMarker = new Chit(scale / 5, scale / 2, scale,
+            attacker.getImageName(), this);
+
+        defenderMarker = new Chit(scale / 5, 2 * scale, scale,
+            defender.getImageName(), this);
 
         tracker = new MediaTracker(this);
 
@@ -92,7 +92,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(parentFrame, 
+            JOptionPane.showMessageDialog(parentFrame,
                 "waitForAll was interrupted");
         }
         imagesLoaded = true;
@@ -142,10 +142,10 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
 
         if (!laidOut)
         {
-            Insets insets = getInsets(); 
-            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
+            Insets insets = getInsets();
+            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 -
                 insets.bottom, d.width / 3, d.height / 8);
-            button2.setBounds(5 * d.width / 9 - insets.right, 
+            button2.setBounds(5 * d.width / 9 - insets.right,
                 3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
             laidOut = true;
         }
@@ -156,8 +156,8 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         button1.repaint();
         button2.repaint();
     }
-    
-    
+
+
     public void paint(Graphics g)
     {
         // Double-buffer everything.
@@ -175,7 +175,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
             offImage.flush();
             offGraphics.dispose();
         }
-        
+
         if (imagesLoaded)
         {
             for (int i = 0; i < attacker.getHeight(); i++)
@@ -252,7 +252,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         if (e.getActionCommand() == "Agree")
         {
             // Count remaining chits.
-            int attackersLeft = 0; 
+            int attackersLeft = 0;
             for (int i = 0; i < attacker.getHeight(); i++)
             {
                 if (!attackerChits[i].isDead())
@@ -260,7 +260,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
                     attackersLeft++;
                 }
             }
-            int defendersLeft = 0; 
+            int defendersLeft = 0;
             for (int i = 0; i < defender.getHeight(); i++)
             {
                 if (!defenderChits[i].isDead())
@@ -272,7 +272,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
             // Ensure that at least one legion is completely eliminated.
             if (attackersLeft > 0 && defendersLeft > 0)
             {
-                JOptionPane.showMessageDialog(parentFrame, 
+                JOptionPane.showMessageDialog(parentFrame,
                     "At least one legion must be eliminated.");
                 return;
             }
@@ -286,13 +286,13 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
                 attacker.removeLegion();
                 defender.removeLegion();
 
-                // If either was the titan stack, its owner dies and gives 
+                // If either was the titan stack, its owner dies and gives
                 // half points to the victor.
                 if (attacker.numCreature(Creature.titan) == 1)
                 {
                     attacker.getPlayer().die(defender.getPlayer());
                 }
-            
+
                 if (defender.numCreature(Creature.titan) == 1)
                 {
                     defender.getPlayer().die(attacker.getPlayer());
@@ -322,19 +322,19 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
 
                 // Ensure that the winning legion doesn't contain a dead
                 // Titan.
-                for (int i = winner.getHeight() - 1; i >= 0; i--) 
+                for (int i = winner.getHeight() - 1; i >= 0; i--)
                 {
                     if (winnerChits[i].isDead() && winner.getCreature(i) ==
                         Creature.titan)
                     {
-                        JOptionPane.showMessageDialog(parentFrame, 
+                        JOptionPane.showMessageDialog(parentFrame,
                             "Titan cannot die unless his whole stack dies.");
                         return;
                     }
                 }
 
                 // Remove all dead creatures from the winning legion.
-                for (int i = winner.getHeight() - 1; i >= 0; i--) 
+                for (int i = winner.getHeight() - 1; i >= 0; i--)
                 {
                     if (winnerChits[i].isDead())
                     {
