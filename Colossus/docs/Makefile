@@ -33,5 +33,5 @@ html: $(DESTSHTML)
 %.html: %.tex
 	$(LATEX2HTML) $<
 
-cleanhtml:
+htmlclean:
 	rm -rf $(basename $(DESTSHTML))
