@@ -283,9 +283,7 @@ public final class Game
         // We need to set the autoPlay option before loading the board,
         // so that we can avoid showing boards for non-primary AI players.
         syncAutoPlay();
-
         syncOptions();
-
         server.allInitBoard();
         assignTowers();
 
@@ -397,7 +395,7 @@ public final class Game
             server.allUpdatePlayerInfo();
         }
 
-        server.allAddMarkers();
+        server.allTellAllLegionLocations();
         autoSave();
         setupPhase();
         caretaker.fullySyncDisplays();
@@ -1331,11 +1329,9 @@ public final class Game
             }
 
             server.allInitBoard();
-            server.allAddMarkers();
-
+            server.allTellAllLegionLocations();
             server.allSetupTurnState();
             setupPhase();
-
             caretaker.fullySyncDisplays();
         }
         // FileNotFoundException, IOException, NumberFormatException

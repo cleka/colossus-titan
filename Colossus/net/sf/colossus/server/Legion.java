@@ -1059,7 +1059,7 @@ final class Legion implements Comparable
         sortCritters();
         newLegion.sortCritters();
 
-        game.getServer().allAddMarker(newMarkerId);
+        game.getServer().allTellLegionLocation(newMarkerId);
 
         return newLegion;
     }

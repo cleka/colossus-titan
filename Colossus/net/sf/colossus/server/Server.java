@@ -177,6 +177,7 @@ public final class Server
     }
 
 
+    // XXX Excessive GUI control
     void allInitBoard()
     {
         Iterator it = clients.iterator();
@@ -188,18 +189,18 @@ public final class Server
     }
 
 
-    void allAddMarkers()
+    void allTellAllLegionLocations()
     {
         List markerIds = game.getAllLegionIds();
         Iterator it = markerIds.iterator();
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-            allAddMarker(markerId);
+            allTellLegionLocation(markerId);
         }
     }
 
-    void allAddMarker(String markerId)
+    void allTellLegionLocation(String markerId)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
         String hexLabel = legion.getCurrentHexLabel();
@@ -208,7 +209,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.addMarker(markerId, hexLabel);
+            client.tellLegionLocation(markerId, hexLabel);
         }
     }
 
@@ -351,13 +352,14 @@ public final class Server
     }
 
 
-    void allPlaceNewChit(Critter critter, boolean inverted)
+    void allPlaceNewChit(Critter critter)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.placeNewChit(critter.getImageName(), inverted,
+            client.placeNewChit(critter.getImageName(), 
+                critter.getMarkerId().equals(game.getBattle().getDefenderId()),
                 critter.getTag(), critter.getCurrentHexLabel());
         }
     }
@@ -1120,21 +1122,25 @@ public final class Server
     }
 
 
+    // XXX Disallow in network games
     public void newGame()
     {
         game.newGame();
     }
 
+    // XXX Disallow in network games
     public void loadGame(String filename)
     {
         game.loadGame(filename);
     }
 
+    // XXX Disallow in network games
     public void saveGame()
     {
         game.saveGame();
     }
 
+    // XXX Disallow in network games
     public void saveGame(String filename)
     {
         game.saveGame(filename);

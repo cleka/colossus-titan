@@ -66,7 +66,6 @@ public final class Client
 
     // Per-client and per-player options.
     private Options options;
-    private boolean optionChanged = false;
 
     /** Player who owns this client. */
     private String playerName;
@@ -173,15 +172,19 @@ public final class Client
         return markerId;
     }
 
-    /** Legion concedes. */
     void concede()
     {
-        server.concede(getMyEngagedMarkerId());
+        concede(getMyEngagedMarkerId());
     }
 
-    void doNotConcede()
+    private void concede(String markerId)
     {
-        server.doNotConcede(getMyEngagedMarkerId());
+        server.concede(markerId);
+    }
+
+    private void doNotConcede(String markerId)
+    {
+        server.doNotConcede(markerId);
     }
 
 
@@ -329,12 +332,17 @@ public final class Client
     /** public so that server can set autoPlay for AIs. */
     public void setOption(String optname, String value)
     {
+        boolean optionChanged = false;
         if (!value.equals(getStringOption(optname)))
         {
             optionChanged = true;
         }
         options.setOption(optname, value);
-        optionTrigger(optname, value);
+        if (optionChanged)
+        {
+            optionTrigger(optname, value);
+            syncOptions();
+        }
     }
 
     void setOption(String optname, boolean value)
@@ -358,6 +366,7 @@ public final class Client
             String value = getStringOption(name);
             optionTrigger(name, value);
         }
+        syncOptions();
     }
 
     /** Trigger side effects after changing an option value. */
@@ -410,7 +419,15 @@ public final class Client
         {
             setLookAndFeel(value);
         }
-        syncOptions();
+        else if (optname.equals(Options.scale))
+        {
+            int scale = Integer.parseInt(value);
+            if (scale > 0)
+            {
+                Scale.set(scale);
+                rescaleAllWindows();
+            }
+        }
     }
 
     /** Save player options to a file.  The current format is standard
@@ -425,33 +442,18 @@ public final class Client
     private void loadOptions()
     {
         options.loadOptions();
-        optionChanged = true;
         syncOptions();
+        if (!getOption(Options.autoPlay) || primary)
+        {
+            runAllOptionTriggers();
+        }
     }
 
-    /** Synchronize menu checkboxes, cfg file, and handle side effects
-     *  after an option change. */
+    /** Synchronize menu checkboxes and cfg file after an option change. */
     private void syncOptions()
     {
-        if (optionChanged)
-        {
-            syncCheckboxes();
-            saveOptions();
-            optionChanged = false;
-            
-            String lfName = getStringOption(Options.favoriteLookFeel);
-            if ((lfName != null) && !lfName.equals(currentLookAndFeel))
-            {
-                setLookAndFeel(lfName);
-            }
-
-            int scale = getIntOption(Options.scale);
-            if (scale > 0)
-            {
-                Scale.set(scale);
-                rescaleAllWindows();
-            }
-        }
+        syncCheckboxes();
+        saveOptions();
     }
 
     /** Ensure that Player menu checkboxes reflect the correct state. */
@@ -874,7 +876,6 @@ public final class Client
         }
     }
 
-    // XXX A bit too much direct server GUI control.
     public void placeNewChit(String imageName, boolean inverted, int tag, 
         String hexLabel)
     {
@@ -987,29 +988,15 @@ public final class Client
         return board;
     }
 
-    // TODO Should take board data from variant file, or stream, as argument.
-    // XXX Too much direct client GUI control.
     public void initBoard()
     {
         // Do not show boards for AI players, except primary client.
         if (!getOption(Options.autoPlay) || primary)
         {
             disposeMasterBoard();
-
-            String buf = getStringOption(Options.scale);
-            if (buf != null)
-            {
-                int scale = Integer.parseInt(buf);
-                if (scale > 0)
-                {
-                    Scale.set(scale);
-                }
-            }
-
             board = new MasterBoard(this);
             board.requestFocus();
         }
-        runAllOptionTriggers();
     }
 
 
@@ -1236,11 +1223,11 @@ Log.debug("called Client.acquireAngelCallback()");
     {
         if (answer)
         {
-            concede();
+            concede(markerId);
         }
         else
         {
-            doNotConcede();
+            doNotConcede(markerId);
         }
     }
 
@@ -1748,9 +1735,8 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    // XXX Excessive GUI control
-    /** Create a new marker and add it to the end of the list. */
-    public void addMarker(String markerId, String hexLabel)
+    /** Create marker if necessary, and place it in hexLabel. */
+    public void tellLegionLocation(String markerId, String hexLabel)
     {
         LegionInfo info = getLegionInfo(markerId);
         info.setHexLabel(hexLabel);
@@ -2870,7 +2856,7 @@ Log.debug("found " + set.size() + " hexes");
             while (color == null);
         }
 
-        this.color = color;
+        setColor(color);
 
         server.assignColor(playerName, color);
     }

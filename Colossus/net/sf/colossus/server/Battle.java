@@ -121,16 +121,17 @@ final class Battle
             critter.getLegion().getEntrySide());
         String entranceLabel = entrance.getLabel();
         critter.addBattleInfo(entranceLabel, entranceLabel, this);
+        server.allPlaceNewChit(critter);
     }
 
 
-    private void initBattleChits(Legion legion, boolean inverted)
+    private void initBattleChits(Legion legion)
     {
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            server.allPlaceNewChit(critter, inverted);
+            server.allPlaceNewChit(critter);
         }
     }
 
@@ -140,8 +141,8 @@ final class Battle
     void init()
     {
         server.allInitBattle(masterHexLabel);
-        initBattleChits(getAttacker(), false);
-        initBattleChits(getDefender(), true);
+        initBattleChits(getAttacker());
+        initBattleChits(getDefender());
 
         boolean advance = false;
         switch (getPhase())
@@ -576,7 +577,6 @@ final class Battle
             Legion attacker = getAttacker();
             Critter critter = attacker.getCritter(attacker.getHeight() - 1);
             placeCritter(critter);
-            server.allPlaceNewChit(critter, false);
         }
         if (phase == Constants.SUMMON)
         {
@@ -604,7 +604,6 @@ final class Battle
         {
             Critter newCritter = defender.getCritter(defender.getHeight() - 1);
             placeCritter(newCritter);
-            server.allPlaceNewChit(newCritter, true);
         }
         advancePhase();
     }
