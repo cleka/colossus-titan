@@ -1,10 +1,10 @@
-Colossus alpha     May 18, 2001    Copyright 2001 David Ripton
+Colossus alpha     June 19, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
-It's not done yet.  Right now it only allows hotseat play.  A computer player
-is under active development, and can play some phases of the game pretty well,
-but it's not done yet.  We'll do client / server network play next.
+It's not done yet.  Right now it allows hotseat play, and play against a
+mostly working but not-quite-ready-for-prime-time AI.  Client/server 
+networking will eventually follow.
 
 This program is freeware, distributed under the GNU public license, which
 is included in the file COPYING.GPL.  This means that you have the right to
@@ -19,8 +19,7 @@ Running the game requires the following:
    (Java development kit).  A JRE is a smaller download; a JDK also
    lets you compile Java programs, not just run them.
 
-   (Colossus used to run under JDK 1.1, but I recently made some
-   necessary changes that broke backwards compatibility.  Sorry.)
+   (Colossus will not run under JDK 1.0.x or 1.1.x  Sorry.)
 
    Colossus should also run as an applet in a web browser, as long
    as your browser is new enough to support JDK 1.2 applets.  That
@@ -28,7 +27,7 @@ Running the game requires the following:
    (included with the JRE), since most browsers come with out-of-date
    Java virtual machines.  If you're downloading the JRE, you might
    as well use the JRE itself rather than the plug-in.  So running
-   as an applet is not really recommended.
+   as an applet is not really recommended. 
 
    Win32, Solaris, and x86 Linux versions of the JDK and JRE are
    freely downloadable from java.sun.com.  Another Linux port is
@@ -36,20 +35,21 @@ Running the game requires the following:
    available at http://java.sun.com/cgi-bin/java-ports.cgi
 
    Here's my impression of how well various Java environments run
-   Colossus.  When I say that one is buggy, I mean that it has
-   serious problems running Colossus, not that it's worthless in
-   general.  All the Java environments have strong and weak points,
-   but the AWT is usually a weak point.
+   Colossus:
 
-   Windows: Sun's JDK 1.3 is good.  1.2.2 is okay.  1.2.0 and
-      1.2.1 have very serious memory leaks in the image handling
-      code, so I recommend upgrading to 1.3.
+   Windows: Sun's JDK/JRE 1.3.1 and 1.3 are good.  1.2.2 is okay.  
+      1.2.0 and 1.2.1 appear to work at first but have very serious 
+      memory leaks in the image handling code that will eventually
+      cause crashes, so I recommend upgrading to 1.3.1.  1.4 beta 
+      is buggy.
 
-   Solaris Sparc: Sun's JDK 1.3 is good.  1.2.x is okay.
+   Solaris Sparc: Sun's JDK/JRE 1.3.1 and 1.3 are good.  1.2.x is 
+      okay.  1.4 beta is buggy.
 
-   x86 Linux: Sun 1.3 and Blackdown 1.3 FCS are good.  Sun and
-      Blackdown 1.2.2 versions are okay.  IBM's JDK 1.3 is
-      buggy.  kaffe is not yet fully compatible with JDK 1.2.
+   x86 Linux: Sun JDK/JRE 1.3.1 and 1.3, and Blackdown 1.3.0 are 
+      good.  Sun and Blackdown 1.2.2 versions are okay.  IBM's JDK 
+      1.3 is buggy.  kaffe is not yet fully compatible with JDK 1.2.
+      Sun 1.4 beta is buggy.
 
    If you have something else, you might find bugs that I haven't.
    If you manage to get Colossus running on a system I haven't tried,
@@ -60,21 +60,23 @@ Running the game requires the following:
    with a two-button mouse.
 
    What is reasonably fast?  It depends.  I think Colossus runs acceptably
-   (not great) on a Pentium 133 with 64 MB and a JVM with a JIT.  Your opinion
-   may vary.
+   (not great) on a Pentium 133 with 64 MB and a JVM with a JIT or HotSpot.
+   The AI battle moves are the slowest part; I'll eventually add an
+   option to limit the amount of time the AI thinks.
 
    The game looks best in 1280x960 or higher, but I've added some scaling
    so you should be able to get by in 1024x768.  Less should work but will
-   be really ugly.  The Java AWT requires at least a 256-color display; it
-   might work with less, but colors will be off.
+   be really ugly.  (Fixing the scaling to make things look better on 
+   low-res displays is on the to-do list.)  The Java AWT requires at least 
+   a 256-color display; it might work with less, but colors will be off.
 
    Java handles mouse buttons beyond the first badly.  In a perfect world,
    option-click on a Macintosh and the second mouse button on a PC would
    fire the same Java event.  They don't.  Because I don't have a Mac,
    I don't know if Colossus works correctly on one.  If you have a Mac
-   with a one-button mouse, please let me know how things work.  I'm
-   in the process of adding menus and hotkeys to duplicate right-button
-   functionality.
+   with a one-button mouse, please let me know how things work.  I can
+   add menus and hotkeys to duplicate right-button functionality if
+   necessary, or try to get option-click working.
 
 
 Directions:
@@ -82,8 +84,8 @@ Directions:
 I assume you already know how to play Titan.  The rules are copyrighted by
 Avalon Hill, so I can't provide them.  Titan is an excellent boardgame, and I
 recommend that everyone buy a copy while you still can.  (Avalon Hill was
-recently bought by Hasbro, which may or may not decide to reprint Titan in
-something like its current form.)
+bought by Hasbro, which may or may not decide to reprint Titan in something 
+like its original form.)
 
 Probably the best way to run Colossus is to use the executable jar file.
 If you downloaded Colossus.jar by itself, you're set.  If you downloaded
@@ -105,7 +107,8 @@ tower number.  Pick colors for each player.  If you misclick, click
 "Restart"  When every player has a color, click "Done"
 
 Now a window will pop up for each player, letting him pick his initial legion
-marker.  Pick one.
+marker.  Pick one.  (If you really don't care, use the "Auto pick markers"
+option on the Player menu.)
 
 After each player has picked his initial legion marker, the MasterBoard window
 will pop up.  You'll see each player's initial legion marker sitting in a
@@ -114,7 +117,7 @@ screen.  This is the Game Status window, which tracks each player's score,
 number of legion markers remaining, etc.
 
 You can right-click on a legion to see its contents. (Unless you've selected
-"All stacks visible" on the top menu, the contents of other players' legions
+"All stacks visible" on the Game menu, the contents of other players' legions
 are hidden, except for those creatures which have recently been revealed via
 fighting, recruiting, or teleporting).  You can right-click on a hex to call
 up a menu, which lets you either see what you can recruit in that hex, or
@@ -163,19 +166,21 @@ except that after he finishes moving, it's striking time.
 Any creatures adjacent to an enemy must strike; rangestrikers with an enemy in
 range and line of sight may strike.  (If you turn on the "Auto forced strike"
 option, then creatures that are forced to strike and have only one legal
-target will strike first without any intervention on your part.)  Click the
-striker, and all his legal targets light up.  Pick one, and he tries to strike
-it.  (If it's legal to take a strike penalty in order to carry, then a dialog
-will pop up to ask if you want to do so.)  The number of hits are displayed on
-the target.  If the target is dead, it will have a big "X" displayed over it.
-If there is excess damage that can legally carry over, then the legal carry
-target(s) will light up, and the striking player needs to pick which one to
-carry to, or click somewhere else to decline the carry.  This process can
-repeat.  There's no way to undo strikes.  When done striking, choose "Done
-with Strikes"
+target will strike first without any intervention on your part, which speeds
+things up a bit.)  Click the striker, and all his legal targets light up.  
+Pick one, and he tries to strike it.  (If it's legal to take a strike penalty 
+in order to carry, then a dialog will pop up to ask if you want to do so.)  
+The number of hits are displayed on the target.  If the target is dead, it 
+will have a big "X" displayed over it.  If there is excess damage that can 
+legally carry over, then the legal carry target(s) will light up, and the 
+striking player needs to pick which one to carry to, or click somewhere else 
+to decline the carry.  This carry process can repeat if the strike blows 
+through more than one creature.  There's no way to undo strikes.  (That
+would be cheating.)  When done striking, choose "Done with Strikes"
 
 After the strike phase, the other player gets a strikeback phase.  It's
 identical to the strike phase, except that rangestrikes are not allowed.
+Dead creatures do get to strike back before being removed.
 
 The first turn after he kills an opposing character, the attacker may be
 allowed to summon an angel or archangel, if there is one available in an
@@ -187,7 +192,9 @@ archangel as appropriate in the dialog.
 
 During turn 4 of the battle, the defender may be allowed to muster a recruit.
 If so, a dialog will pop up showing the legal recruits.  If desired, pick one.
-If no recruit is desired, dismiss the recruit dialog.
+If no recruit is desired, dismiss the recruit dialog. (Click on the X in the
+top right corner, or double-click the top left corner, depending on how you
+normally dismiss dialogs in your OS.)
 
 When the battle finishes, the winner gets some points and maybe the option of
 acquiring one or more angels or archangels.  If the winner didn't summon
@@ -198,11 +205,18 @@ After all engagements are resolved, choose "Done with Engagements" to
 proceed to the mustering phase.  Legions that moved and can recruit will
 light up.  Click on each one and choose a recruit.  If more than one type of
 creature is capable of summoning that recruit, you'll have to choose the
-recruiter(s), unless the "Autopick recruiter" option has been selected.
-When done, click "Done with Turn" and pass the mouse to the next player.
+recruiter(s) to be revealed, unless the "Autopick recruiter" option has 
+been selected.  When done, click "Done with Turn" and pass the mouse to 
+the next player.
 
 The game ends when zero or one Titans remain.  The last player standing is
 the winner; if the game ends with a mutual elimination, it's a draw.
+
+To use the AI, select the Auto Play option from the Player menu for the
+players you want the computer to control.  If you select Save Options from
+the File menu, then all the current players' options will be saved by 
+player name, so next time you play you won't have to do this again if you
+use the same player names.
 
 
 Improvements:
@@ -210,8 +224,8 @@ Improvements:
 If you find any bugs that you think I can fix, please let me know, in
 as much detail as possible.  (In particular, include the OS and JVM version.)
 The best way to report bugs is via the bug tracker at SourceForge --
-go to http://colossus.sourceforge.net, click on the SourceForge icon,
-click on tracker, and click on bugs.
+go to http://colossus.sf.net, click on the SourceForge icon, click on 
+tracker, and click on bugs.
 
 Java is still evolving, and the JDK itself still has plenty of bugs,
 especially in the AWT.  You can vote for the ones that you find most
@@ -237,10 +251,12 @@ Programming:  David Ripton  dripton@wizard.net
               Bruce Sherrod (AI)  bruce@thematrix.com
               David Barr (applet conversion)
 
-Counter art:  Tchula Ripton, David Lum
+Counter art:  Spectrex, David Lum, Tchula Ripton
 
 Network protocol: Falk Hueffner
 
 Bug reports:  Anthony Kam, Augustin Ku, Sean McCulloch, Luca Ferraro, 
               Jonathan Woodward, Aneel Nazareth
+
+Web and CVS space, bug tracker, etc.: SourceForge
 

@@ -1,3 +1,6 @@
+Add a load game option to the GetPlayers dialog.  Also add AI/human
+   checkboxes next to each player name.
+
 Eliminate Legion.hexInfoMap and just recompute and store the info for
    one hex when the legion moves?  Or have listMoves return a set of
    HexInfo objects instead of just hexLabels, so that we do the same
@@ -12,6 +15,7 @@ Rewrite SplitLegion to use Legion.split()
 
 Add a configurable AI move delay to make it easier to follow what the
    AI is doing.  That means supporting non-boolean options.
+Add AI time limits.
 
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into

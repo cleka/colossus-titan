@@ -173,7 +173,7 @@ class SimpleAI implements AI
     {
         Player player = game.getActivePlayer();
 
-        // Using a for loop instead of a ListIterator to get around
+        // XXX Using a for loop instead of a ListIterator to get around
         // a pesky ConcurrentModificationException.
         outer: for (int i = player.getNumLegions() - 1; i >= 0; i--)
         {
@@ -183,14 +183,22 @@ class SimpleAI implements AI
             {
                 continue;
             }
-            // do not split if we're likely to be forced to attack and lose
-            // do not split if we're likely to want to fight and we need to
-            //     be 7 high.
-            // only consider this if we're not doing initial game split
 
+            // Do not split if we're likely to be forced to attack and lose
+            // Do not split if we're likely to want to fight and we need to
+            //     be 7 high.
+            // Do not split if there's no upwards recruiting or angel
+            //     acquiring potential.
+
+            // TODO: Don't split if we're about to be attacked and we
+            // need the muscle
+
+            // Only consider this if we're not doing initial game split
             if (legion.getHeight() == 7)
             {
                 int forcedToAttack = 0;
+                boolean goodRecruit = false;
+                legion.sortCritters();
 
                 for (int roll = 1; roll <= 6; roll++)
                 {
@@ -207,6 +215,11 @@ class SimpleAI implements AI
                         if (game.getNumEnemyLegions(hexLabel, player) == 0)
                         {
                             safeMoves++;
+                            if (!goodRecruit && couldRecruitUp(legion,
+                                hexLabel, null, game))
+                            {
+                                goodRecruit = true;
+                            }
                         }
                         else
                         {
@@ -219,8 +232,14 @@ class SimpleAI implements AI
                             {
                                 debugln("We can safely split AND attack with "
                                     + legion);
-
                                 safeMoves++;
+
+                                // Also consider acquiring angel.
+                                if (!goodRecruit && couldRecruitUp(legion,
+                                    hexLabel, enemy, game))
+                                {
+                                    goodRecruit = true;
+                                }
                             }
 
                             int result2 = estimateBattleResults(legion, false,
@@ -251,17 +270,72 @@ class SimpleAI implements AI
                         continue outer;
                     }
                 }
+                if (!goodRecruit)
+                {
+                    // No point in splitting, since we can't improve.
+                    debugln("Not splitting " + legion +
+                        " because it can't improve from here");
+                    continue outer;
+                }
             }
-
-            // TODO: don't split if we're about to be attacked and we
-            // need the muscle
-            // TODO: don't split if there's no upwards recruiting
-            // potential from our current location
 
             // create the new legion
             Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion,
                 game.getNumPlayers()));
         }
+    }
+
+    /** Return true if the legion could recruit or acquire something
+     *  better than its worst creature in hexLabel. */
+    private boolean couldRecruitUp(Legion legion, String hexLabel,
+        Legion enemy, Game game)
+    {
+        legion.sortCritters();
+        Critter weakest = legion.getCritter(legion.getHeight() - 1);
+
+        // Consider recruiting.
+        ArrayList recruits = game.findEligibleRecruits(legion,
+            game.getBoard().getHexByLabel(hexLabel));
+        if (!recruits.isEmpty())
+        {
+            Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
+            if (bestRecruit != null && bestRecruit.getPointValue() >
+                weakest.getPointValue())
+            {
+                return true;
+            }
+        }
+
+        // Consider acquiring angels.
+        if (enemy != null)
+        {
+            int pointValue = enemy.getPointValue();
+            boolean wouldFlee = flee(enemy, legion, game);
+            if (wouldFlee)
+            {
+                pointValue /= 2;
+            }
+            int currentScore = legion.getPlayer().getScore();
+            Creature bestRecruit = null;
+            Caretaker caretaker = game.getCaretaker();
+            if ((currentScore + pointValue) / 500 > currentScore / 500 &&
+                caretaker.getCount(Creature.archangel) >= 1)
+            {
+                bestRecruit = Creature.archangel;
+            }
+            else if ((currentScore + pointValue) / 100 > currentScore / 100 &&
+                caretaker.getCount(Creature.angel) >= 1)
+            {
+                bestRecruit = Creature.angel;
+            }
+            if (bestRecruit != null && bestRecruit.getPointValue() >
+                weakest.getPointValue())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
@@ -277,8 +351,7 @@ class SimpleAI implements AI
         //
         // idea: pick the 2 weakest creatures and kick them
         // out. if there are more than 2 weakest creatures,
-        // prefer a pair of matching ones.  if none match,
-        // kick out the left-most ones (the oldest ones)
+        // prefer a pair of matching ones.
         //
         // For an 8-high starting legion, call helper
         // method doInitialGameSplit()
@@ -1898,20 +1971,16 @@ class SimpleAI implements AI
     {
         // If we still have a 95% chance to kill target even after
         // taking the penalty to carry to carryTarget, return true.
+        final double carryThreshold = 0.95;
+
         int dice = Math.min(critter.getDice(target),
                 critter.getDice(carryTarget));
         int strikeNumber = Math.max(critter.getStrikeNumber(target),
                 critter.getStrikeNumber(carryTarget));
         int hitsNeeded = target.getPower() - target.getHits();
 
-        if (Probs.probHitsOrMore(dice, strikeNumber, hitsNeeded) >= 0.95)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (Probs.probHitsOrMore(dice, strikeNumber, hitsNeeded) >=
+            carryThreshold);
     }
 
 
@@ -1965,7 +2034,7 @@ class SimpleAI implements AI
     }
 
 
-    public static int getKillValue(Creature creature, char terrain)
+    private static int getKillValue(Creature creature, char terrain)
     {
         int val = creature.getPointValue();
         if (creature.isFlier())
@@ -2490,11 +2559,8 @@ debugln("There are " + critters.size() + " critters");
 
             Set moves = battle.showMoves(critter, true);
 
-            // Not moving is also an option, unless the critter is offboard.
-            if (!currentHexLabel.startsWith("X"))
-            {
-                moves.add(currentHexLabel);
-            }
+            // Not moving is also an option.
+            moves.add(currentHexLabel);
 
 debugln("Found " + moves.size() + " moves for " + critter.getDescription());
 
@@ -2550,10 +2616,15 @@ debugln("Found " + moves.size() + " moves for " + critter.getDescription());
                 }
             });
 
-            // Mark this critter's favorite move as taken.
+
+            // Mark this critter's favorite move as taken, unless it's
+            // offboard.
             CritterMove cm = (CritterMove)moveList.get(0);
             String hexLabel = cm.getEndingHexLabel();
-            hexesTaken.add(hexLabel);
+            if (!hexLabel.startsWith("X"))
+            {
+                hexesTaken.add(hexLabel);
+            }
 
             // Show the moves considered.
             StringBuffer buf = new StringBuffer("Considered " +
@@ -2653,14 +2724,11 @@ debugln(count + " tries");
             if (score > bestScore)
             {
                 bestOrder = (ArrayList)order.clone();
+                bestScore = score;
                 if (score >= perfectScore)
                 {
-debugln("got perfect score ");
+debugln("got perfect score: " + score);
                     break;
-                }
-                else
-                {
-                    bestScore = score;
                 }
             }
             lastOrder = (ArrayList)order.clone();
@@ -2736,13 +2804,13 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
         if (hex.isEntrance())
         {
             // Staying offboard to die is really bad.
-            value -= getCombatValue(critter, terrain);
+            value -= 10 * getCombatValue(critter, terrain);
         }
         else if (MasterHex.isNativeCombatBonus(critter, terrain))
         {
             if (hex.isNativeBonusTerrain())
             {
-                value += 1;
+                value += 10;
             }
             // Hack: We want marsh natives to slightly prefer
             // moving to bog hexes, even though there's no
@@ -2750,14 +2818,14 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
             // for non-native allies.
             else if (hex.getTerrain() == 'o')
             {
-                value += 1;
+                value += 9;
             }
         }
         else
         {
             if (hex.isNonNativePenaltyTerrain())
             {
-                value -= 2;
+                value -= 20;
             }
         }
 
@@ -2772,13 +2840,13 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
             if (!critter.isInContact(true))
             {
                 // Rangestrikes.
-                value += 3;
+                value += 30;
 
                 // Having multiple targets is good, in case someone else
                 // kills one.
                 if (numTargets >= 2)
                 {
-                    value += 1;
+                    value += 10;
                 }
 
                 // Non-warlock skill 4 rangestrikers should slightly prefer
@@ -2793,7 +2861,7 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
                     Critter target = battle.getCritter(hexLabel);
                     if (target.isTitan())
                     {
-                        value += 1;
+                        value += 10;
                     }
                     int strikeNum = critter.getStrikeNumber(target);
                     if (strikeNum == 4 - skill + target.getSkill())
@@ -2804,7 +2872,7 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
                 }
                 if (bonus)
                 {
-                    value += 1;
+                    value += 10;
                 }
             }
             else
@@ -2812,22 +2880,20 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
                 // Normal strikes.  If we can strike them, they can
                 // strike us.
 
-                // Slightly reward being adjacent to an enemy if attacking.
-                // Slightly penalize being adjacent to an enemy if defending.
+                // Reward being adjacent to an enemy if attacking.
                 if (legion == battle.getAttacker())
                 {
-                    value += 1;
+                    value += 40;
                 }
+                // Slightly penalize being adjacent to an enemy if defending.
                 else
                 {
-                    value -= 1;
+                    value -= 2;
                 }
 
-                // Penalize being next to multiple enemies.
-                if (numTargets > 2)
-                {
-                    value -= 1;
-                }
+                int killValue = 0;
+                int numKillableTargets = 0;
+                int hitsExpected = 0;
 
                 Iterator it = targetHexLabels.iterator();
                 while (it.hasNext())
@@ -2838,48 +2904,53 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
                     // Reward being next to enemy titans.  (Banzai!)
                     if (target.isTitan())
                     {
-                        value += 5;
-                    }
-
-                    // Reward being next to a wimpier critter.
-                    if (getKillValue(target, terrain) < getKillValue(critter,
-                        terrain))
-                    {
-                        value += 1;
+                        value += 50;
                     }
 
                     // Reward being next to a rangestriker, so it can't hang
                     // back and plink us.
                     if (target.isRangestriker() && !critter.isRangestriker())
                     {
-                        value += 5;
+                        value += 50;
                     }
 
                     // Reward being next to an enemy that we can probably
-                    // kill this turn.  Penalize being next to an enemy
-                    // that can probably kill us this turn.
+                    // kill this turn.
                     int dice = critter.getDice(target);
                     int strikeNum = critter.getStrikeNumber(target);
                     double meanHits = Probs.meanHits(dice, strikeNum);
                     if (meanHits + target.getHits() >= target.getPower())
                     {
-                        value += 2;
+                        numKillableTargets++;
+                        int targetValue = getKillValue(target, terrain);
+                        killValue = Math.max(targetValue, killValue);
                     }
 
+                    // Penalize damage that we can take this turn.
                     dice = target.getDice(critter);
                     strikeNum = target.getStrikeNumber(critter);
-                    meanHits = Probs.meanHits(dice, strikeNum);
-                    if (meanHits + critter.getHits() >= critter.getPower())
-                    {
-                        value -= 2;
-                    }
+                    hitsExpected += Probs.meanHits(dice, strikeNum);
+                }
+
+                value += 8 * killValue + numKillableTargets;
+
+                int power = critter.getPower();
+                int hits = critter.getHits();
+                if (hitsExpected + hits >= power)
+                {
+                    value -= 20 * getKillValue(critter, terrain);
+                }
+                else
+                {
+                    value -= 7 * getKillValue(critter, terrain) *
+                        hitsExpected / power;
                 }
             }
         }
 
         // Reward adjacent friendly creatures.
         int buddies = critter.numAdjacentAllies();
-        value += 2 * buddies;
+        value += 15 * buddies;
 
         BattleHex entrance = battle.getBattleMap().getEntrance(legion);
 
@@ -2889,24 +2960,24 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
         // don't just sit back and wait for a time loss.
         if (critter.isTitan())
         {
-            value += 5 * buddies;
+            value += 40 * buddies;
 
             if (terrain == 'T')
             {
                 // Stick to the center of the tower.
-                value += 10 * hex.getElevation();
+                value += 100 * hex.getElevation();
             }
             else
             {
-                if (battle.getTurnNumber() <= 5)
+                if (battle.getTurnNumber() <= 4)
                 {
-                    value -= 3 * battle.getRange(hex, entrance, true);
+                    value -= 30 * battle.getRange(hex, entrance, true);
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
                         if (neighbor == null || neighbor.getTerrain() == 't')
                         {
-                            value += 3;
+                            value += 40;
                         }
                     }
                 }
@@ -2920,31 +2991,30 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
             if (terrain == 'T')
             {
                 // Stick to the center of the tower.
-                value += 2 * hex.getElevation();
+                value += 8 * hex.getElevation();
             }
             else
             {
                 int range = battle.getRange(hex, entrance, true);
 
                 // To ensure that defending legions completely enter
-                // the board, prefer the second row to the first while
-                // more than 3 critters remain.  Also on turn 4 when
-                // recruits show up.
-                // Remember that titan ranges are double-inclusive.
+                // the board, prefer the second row to the first.  The
+                // exception is small legions early in the battle,
+                // when trying to survive long enough to recruit.
                 int preferredRange = 3;
-                if (legion.getHeight() <= 3 && battle.getTurnNumber() != 4)
+                if (legion.getHeight() <= 3 && battle.getTurnNumber() < 4)
                 {
                     preferredRange = 2;
                 }
                 if (range != preferredRange)
                 {
-                    value -= Math.min(range, 2);
+                    value -= 6 * Math.min(range, 2);
                 }
             }
         }
         else  // attacker
         {
-            value += battle.getRange(hex, entrance, true);
+            value += 10 * battle.getRange(hex, entrance, true);
         }
 
         debugln("EVAL " + critter.getName() +

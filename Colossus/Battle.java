@@ -840,7 +840,9 @@ Game.logDebug("called game.createSummonAngel from Battle");
     {
         if (anyOffboardCreatures())
         {
-            if (confirmLeavingCreaturesOffboard())
+            // Don't prompt AI players.
+            if (getActivePlayer().getOption(Options.autoBattleMove) ||
+                confirmLeavingCreaturesOffboard())
             {
                 removeOffboardCreatures();
             }
