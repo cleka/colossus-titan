@@ -11,15 +11,15 @@ public class GraveyardData
     implements java.io.Serializable, IGraveyardData
 {
     public GraveyardData()
-	{
-	    super("Graveyard");
-	}
+    {
+        super("Graveyard");
+    }
 
 
     public void retireCharacter(String strCharacterName)
-	{
-	    int nCount = getCount(strCharacterName);
-	    nCount++;
-	    setCount(strCharacterName, nCount);
-	}
+    {
+        int nCount = getCount(strCharacterName);
+        nCount++;
+        setCount(strCharacterName, nCount);
+    }
 }

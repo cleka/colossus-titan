@@ -504,7 +504,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void highlightCarries()
     {
-        Set set = battle.findCarryTargets();
+        Set set = battle.getCarryTargets();
         unselectAllHexes();
         selectHexesByLabels(set);
     }

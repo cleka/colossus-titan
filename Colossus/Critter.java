@@ -18,8 +18,6 @@ public final class Critter extends Creature implements Comparable
     private String startingHexLabel;
     /** Damage taken */
     private int hits;
-    /** Mark whether this critter is a legal carry target. */
-    private boolean carryFlag;
     private Game game;
     /** Unique identifier for each critter. */
     private int tag;
@@ -50,7 +48,6 @@ public final class Critter extends Creature implements Comparable
         newCritter.currentHexLabel = currentHexLabel;
         newCritter.startingHexLabel = startingHexLabel;
         newCritter.hits = hits;
-        newCritter.carryFlag = carryFlag;
         newCritter.tag = tag;
 
         return newCritter;
@@ -682,6 +679,7 @@ public final class Critter extends Creature implements Comparable
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
+        battle.clearAllCarries();
         boolean carryPossible = true;
         if (numInContact(false) < 2)
         {
@@ -728,7 +726,7 @@ public final class Critter extends Creature implements Comparable
                                 targetHex.getHexside(Battle.getDirection(
                                 targetHex, hex, false)) != 'd')
                             {
-                                critter.setCarryFlag(false);
+                                battle.removeCarryTarget(targetHex.getLabel());
                             }
 
                             else if (tmpStrikeNumber > strikeNumber ||
@@ -741,7 +739,7 @@ public final class Critter extends Creature implements Comparable
 
                             else
                             {
-                                critter.setCarryFlag(true);
+                                battle.addCarryTarget(targetHex.getLabel());
                                 haveCarryTarget = true;
                             }
                         }
@@ -798,7 +796,8 @@ public final class Critter extends Creature implements Comparable
                         while (it2.hasNext())
                         {
                             Critter critter = (Critter)it2.next();
-                            critter.setCarryFlag(true);
+                            battle.addCarryTarget(
+                                critter.getCurrentHexLabel());
                             haveCarryTarget = true;
                         }
                     }
@@ -876,18 +875,6 @@ public final class Critter extends Creature implements Comparable
                 target.getName(), currentHexLabel, target.getCurrentHexLabel(),
                 battle.getTerrain(), strikeNumber, damage, carryDamage, rolls);
         }
-    }
-
-
-    public boolean getCarryFlag()
-    {
-        return carryFlag;
-    }
-
-
-    public void setCarryFlag(boolean flag)
-    {
-        carryFlag = flag;
     }
 
 

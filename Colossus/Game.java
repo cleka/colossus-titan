@@ -42,7 +42,7 @@ public final class Game extends GameSource
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
-        "Colossus savegame version 7";
+        "Colossus savegame version 8";
 
     public static final String configVersion =
         "Colossus config file version 2";
@@ -803,7 +803,6 @@ public final class Game extends GameSource
      *             Current hex
      *             Starting hex
      *             Struck?
-     *             Carry flag
      *         ...
      *     Defending Legion:
      *         ...
@@ -886,6 +885,15 @@ public final class Game extends GameSource
             out.println(battle.getCarryDamage());
             out.println(battle.isDriftDamageApplied());
 
+            int numCarryTargets = battle.getCarryTargets().size();
+            out.println(numCarryTargets);
+            it = battle.getCarryTargets().iterator();
+            while (it.hasNext())
+            {
+                String carryTarget = (String)it.next();
+                out.println(carryTarget);
+            }
+
             dumpLegion(out, battle.getAttacker(), true);
             dumpLegion(out, battle.getDefender(), true);
         }
@@ -923,7 +931,6 @@ public final class Game extends GameSource
                 out.println(critter.getCurrentHexLabel());
                 out.println(critter.getStartingHexLabel());
                 out.println(critter.hasStruck());
-                out.println(critter.getCarryFlag());
             }
         }
     }
@@ -1140,6 +1147,15 @@ public final class Game extends GameSource
                 boolean driftDamageApplied =
                     Boolean.valueOf(buf).booleanValue();
 
+                buf = in.readLine();
+                int numCarryTargets = Integer.parseInt(buf);
+                HashSet carryTargets = new HashSet();
+                for (int i = 0; i < numCarryTargets; i++)
+                {
+                    buf = in.readLine();
+                    carryTargets.add(buf);
+                }
+
                 Player attackingPlayer = getActivePlayer();
                 Legion attacker = readLegion(in, attackingPlayer, true);
 
@@ -1163,6 +1179,7 @@ public final class Game extends GameSource
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
                 battle.setDriftDamageApplied(driftDamageApplied);
+                battle.setCarryTargets(carryTargets);
                 battle.init();
             }
 
@@ -1241,10 +1258,6 @@ public final class Game extends GameSource
                 buf = in.readLine();
                 boolean struck = Boolean.valueOf(buf).booleanValue();
                 critter.setStruck(struck);
-
-                buf = in.readLine();
-                boolean carry = Boolean.valueOf(buf).booleanValue();
-                critter.setCarryFlag(carry);
             }
 
             critters[k] = critter;

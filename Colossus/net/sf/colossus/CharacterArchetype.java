@@ -41,31 +41,32 @@ public class CharacterArchetype
     public static final String strWYVERN = "Wyvern";
     public static final String strUNKNOWN = "Unknown";
 
-    private static final String [] strCharactersArray = {
-	strANGEL,
-	strARCH_ANGEL,
-	strBEHEMOTH,
-	strCENTAUR,
-	strCOLUSSUS,
-	strCYCLOPS,
-	strDRAGON,
-	strGARGOYLE,
-	strGIANT,
-	strGORGON,
-	strGRIFFON,
-	strGUARDIAN,
-	strHYDRA,
-	strLION,
-	strMINOTAUR,
-	strOGRE,
-	strRANGER,
-	strSERPENT,
-	strTITAN,
-	strTROLL,
-	strUNICORN,
-	strWARBEAR,
-	strWARLOCK,
-	strWYVERN,
+    private static final String [] strCharactersArray = 
+    {
+        strANGEL,
+        strARCH_ANGEL,
+        strBEHEMOTH,
+        strCENTAUR,
+        strCOLUSSUS,
+        strCYCLOPS,
+        strDRAGON,
+        strGARGOYLE,
+        strGIANT,
+        strGORGON,
+        strGRIFFON,
+        strGUARDIAN,
+        strHYDRA,
+        strLION,
+        strMINOTAUR,
+        strOGRE,
+        strRANGER,
+        strSERPENT,
+        strTITAN,
+        strTROLL,
+        strUNICORN,
+        strWARBEAR,
+        strWARLOCK,
+        strWYVERN,
     };
 
     private static final List characters = Arrays.asList(strCharactersArray);
@@ -74,14 +75,14 @@ public class CharacterArchetype
      * Used by CreatureCollectionView
      */
     public static List getCharacters()
-	{
-	    return characters;
-	}
+    {
+        return characters;
+    }
 
     public static String[] getCharactersArray()
-	{
-	    return strCharactersArray;
-	}
+    {
+        return strCharactersArray;
+    }
 
 
     /** We are borrowing this new object to help re-implemnent the old
@@ -89,17 +90,17 @@ public class CharacterArchetype
      * caretakers stack, we are just borrowing it because it has the
      * maximum character counts */
     private static CreatureKeeperData s_oCreatureKeeperData = 
-    new CreatureKeeperData();
+        new CreatureKeeperData();
     static
-	{
-	    // Initialize the counts. Since we never change them they
-	    // will always be the maximum
-	    s_oCreatureKeeperData.resetAllCounts();
-	}
+    {
+        // Initialize the counts. Since we never change them they
+        // will always be the maximum
+        s_oCreatureKeeperData.resetAllCounts();
+    }
 
     /** For the Caretaker */
     public static int getMaxCount(String strCreatureName)
-	{
-	    return s_oCreatureKeeperData.getCount(strCreatureName);
-	}
+    {
+        return s_oCreatureKeeperData.getCount(strCreatureName);
+    }
 }

@@ -52,6 +52,8 @@ public final class Battle
     private boolean attackerEntered;
     private boolean conceded;
     private boolean driftDamageApplied;
+    /** Set of hexLabels for valid carry targets */
+    private HashSet carryTargets = new HashSet();
 
 
     public Battle(Game game, String attackerId, String defenderId,
@@ -904,22 +906,10 @@ public final class Battle
 
     public void clearAllCarries()
     {
-        boolean needToRepaint = false;
-
-        Iterator it = getInactiveLegion().getCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (critter.getCarryFlag())
-            {
-                critter.setCarryFlag(false);
-                needToRepaint = true;
-            }
-        }
         carryDamage = 0;
-
-        if (needToRepaint)
+        if (!carryTargets.isEmpty())
         {
+            carryTargets.clear();
             game.getServer().allClearAllCarries();
         }
     }
@@ -1291,21 +1281,27 @@ public final class Battle
 
 
     /** Return the set of hex labels for hexes with valid carry targets. */
-    public Set findCarryTargets()
+    public Set getCarryTargets()
     {
-        HashSet set = new HashSet();
+        return carryTargets;
+    }
 
-        Iterator it = getInactiveLegion().getCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter target = (Critter)it.next();
-            if (target.getCarryFlag())
-            {
-                set.add(target.getCurrentHexLabel());
-            }
-        }
 
-        return set;
+    public void setCarryTargets(HashSet carryTargets)
+    {
+        this.carryTargets = carryTargets;
+    }
+
+
+    public void addCarryTarget(String hexLabel)
+    {
+        carryTargets.add(hexLabel);
+    }
+
+
+    public void removeCarryTarget(String hexLabel)
+    {
+        carryTargets.remove(hexLabel);
     }
 
 
@@ -1314,12 +1310,12 @@ public final class Battle
         int dealt = carryDamage;
         carryDamage = target.wound(carryDamage);
         dealt -= carryDamage;
-        target.setCarryFlag(false);
+        carryTargets.remove(target.getCurrentHexLabel());
 
         Log.event(dealt + (dealt == 1 ? " hit carries to " :
             " hits carry to ") + target.getDescription());
 
-        if (carryDamage <= 0 || findCarryTargets().isEmpty())
+        if (carryDamage <= 0 || getCarryTargets().isEmpty())
         {
             clearAllCarries();
         }
@@ -1893,6 +1889,11 @@ public final class Battle
     // hexspine and there are two choices, pick the lower one.
     public int countBrambleHexes(BattleHex hex1, BattleHex hex2)
     {
+        // Bramble is found only in brush and jungle.
+        if (terrain != 'B' && terrain != 'J')
+        {
+            return 0;
+        }
         if (hex1 == hex2)
         {
             return 0;
@@ -1928,17 +1929,9 @@ public final class Battle
             return Math.min(countBrambleHexesDir(hex1, hex2, true, 0),
                 countBrambleHexesDir(hex1, hex2, false, 0));
         }
-
-        else if (xDist / yDist > 0)
-        {
-            // LOS to left
-            return countBrambleHexesDir(hex1, hex2, true, 0);
-        }
-
         else
         {
-            // LOS to right
-            return countBrambleHexesDir(hex1, hex2, false, 0);
+            return countBrambleHexesDir(hex1, hex2, toLeft(xDist, yDist), 0);
         }
     }
 
@@ -2154,16 +2147,16 @@ public final class Battle
         game.addPlayer("Defender");
         Player player2 = game.getPlayer(1);
         game.initBoard();
-        MasterHex hex = MasterBoard.getHexByLabel("130");
+        MasterHex hex = MasterBoard.getHexByLabel("5");
         Legion attacker = new Legion("Bk01", null, hex.getLabel(),
             hex.getLabel(), Creature.archangel, Creature.troll,
-            Creature.ranger, Creature.hydra, Creature.griffon,
+            Creature.ranger, Creature.hydra, Creature.minotaur,
             Creature.angel, Creature.warlock, null, player1.getName(),
             game);
         player1.addLegion(attacker);
         Legion defender = new Legion("Rd01", null, hex.getLabel(),
-            hex.getLabel(), Creature.serpent, Creature.lion,
-            Creature.gargoyle, Creature.cyclops, Creature.gorgon,
+            hex.getLabel(), Creature.serpent, Creature.hydra,
+            Creature.ranger, Creature.warlock, Creature.gorgon,
             Creature.guardian, Creature.minotaur, null, player2.getName(),
             game);
         player2.addLegion(defender);

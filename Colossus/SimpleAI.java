@@ -1933,9 +1933,7 @@ class SimpleAI implements AI
         {
             bestTarget = null;
 
-            Set set = battle.findCarryTargets();
-
-            it = set.iterator();
+            it = battle.getCarryTargets().iterator();
             while (it.hasNext())
             {
                 String hexLabel = (String)it.next();
@@ -1962,7 +1960,8 @@ class SimpleAI implements AI
                     }
                 }
 
-                Log.debug("Best carry target is " + bestTarget.getDescription());
+                Log.debug("Best carry target is " +
+                    bestTarget.getDescription());
                 battle.applyCarries(bestTarget);
             }
         }

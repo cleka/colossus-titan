@@ -17,10 +17,7 @@ public class CreatureCollectionView extends JFrame
 
     protected IImageUtility m_oImageUtility;
 
-    CreatureCount m_oCreatureCount;
-
     private static Point location;
-
 
 
     public CreatureCollectionView(ICreatureCollection oCollection,
@@ -99,7 +96,7 @@ public class CreatureCollectionView extends JFrame
         Iterator i = oCharacterList.iterator();
         for(; i.hasNext();)
         {
-            String strName = (String) i.next();
+            String strName = (String)i.next();
             oCreaturePanel.add(new CreatureCount(strName));
         }
                         
@@ -114,13 +111,37 @@ public class CreatureCollectionView extends JFrame
             Map.Entry entry = (Map.Entry)it.next();
             String strName = (String)entry.getKey();
             JLabel lbl = (JLabel)entry.getValue();
-            String strNewCount = Integer.toString(
-                m_oCollection.getCount(strName));
-            String strOldCount = lbl.getText();
-            lbl.setText(strNewCount);
+            int count = m_oCollection.getCount(strName);
+            String color;
+            if (count == 0)
+            {
+                color = "red";
+            }
+            else if (count == CharacterArchetype.getMaxCount(strName))
+            {
+                color = "green";
+            }
+            else
+            {
+                color = "black";
+            }
+            String htmlCount = htmlColorize(Integer.toString(count), color);
+            lbl.setText(htmlCount);
         }
 
         repaint();
+    }
+
+
+    /** Wrap the input string with html font color tags. */
+    private String htmlColorize(String input, String color)
+    {
+        StringBuffer sb = new StringBuffer("<html><font color=");
+        sb.append(color);
+        sb.append(">");
+        sb.append(input);
+        sb.append("</font></html>");
+        return sb.toString();
     }
 
 

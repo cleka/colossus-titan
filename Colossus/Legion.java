@@ -1338,20 +1338,20 @@ public final class Legion
 
 
     private String[] convertCritterListToStringArray(ArrayList oCritterList)
+    {
+        int nSize = oCritterList.size();
+        String[] strArray = new String[nSize];
+        int i = 0;
+        Iterator it = oCritterList.iterator();
+        while(it.hasNext())
         {
-            int nSize = oCritterList.size();
-            String[] strArray = new String[nSize];
-            int i = 0;
-            Iterator it = oCritterList.iterator();
-            while(it.hasNext())
-            {
-                Critter oCritter = (Critter) it.next();
-                String strName = oCritter.getName();
-                strArray[i++] = strName;
-            }
-
-            return strArray;
+            Critter oCritter = (Critter) it.next();
+            String strName = oCritter.getName();
+            strArray[i++] = strName;
         }
+
+        return strArray;
+    }
 
     public LegionMemo saveToMemo()
     {
@@ -1371,22 +1371,22 @@ public final class Legion
         return strName != null ? Creature.getCreatureByName(strName) : null;
     }
     public Legion(Game oGame, LegionMemo oMemo)
-        {
-            this(oMemo.getMarkerId(), 
-                 oMemo.getParentMarkerId(), 
-                 oMemo.getCurrentHexLabel(),
-                 oMemo.getStartingHexLabel(),
-                 getCreatureByName(oMemo.getCritter(0)),
-                 getCreatureByName(oMemo.getCritter(1)),
-                 getCreatureByName(oMemo.getCritter(2)),
-                 getCreatureByName(oMemo.getCritter(3)),
-                 getCreatureByName(oMemo.getCritter(4)),
-                 getCreatureByName(oMemo.getCritter(5)),
-                 getCreatureByName(oMemo.getCritter(6)),
-                 getCreatureByName(oMemo.getCritter(7)),
-                 oMemo.getPlayerName(),
-                 oGame);
-        }
+    {
+        this(oMemo.getMarkerId(), 
+             oMemo.getParentMarkerId(), 
+             oMemo.getCurrentHexLabel(),
+             oMemo.getStartingHexLabel(),
+             getCreatureByName(oMemo.getCritter(0)),
+             getCreatureByName(oMemo.getCritter(1)),
+             getCreatureByName(oMemo.getCritter(2)),
+             getCreatureByName(oMemo.getCritter(3)),
+             getCreatureByName(oMemo.getCritter(4)),
+             getCreatureByName(oMemo.getCritter(5)),
+             getCreatureByName(oMemo.getCritter(6)),
+             getCreatureByName(oMemo.getCritter(7)),
+             oMemo.getPlayerName(),
+             oGame);
+    }
 
 // --------------------------------------------
 // Implement Comparable

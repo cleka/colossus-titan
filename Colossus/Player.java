@@ -492,18 +492,7 @@ public final class Player implements Comparable
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
 
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-
-            // Hide all stack contents from other players.
-            // XXX Testing doing this when we split instead.
-            // legion.hideAllCreatures();
-
-            // Clear old entry side and teleport information.
-            legion.clearAllHexInfo();
-        }
+        clearAllHexInfo();
     }
 
     /** Clear entry side and teleport information from all of this
@@ -651,6 +640,7 @@ public final class Player implements Comparable
             String hexLabelToAlign = splitoff.getCurrentHexLabel();
             splitoff.recombine(splitoff.getParent(), true);
             game.getServer().allAlignLegions(hexLabelToAlign);
+            game.getServer().allUpdateStatusScreen();
         }
     }
 
