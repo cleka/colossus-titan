@@ -281,6 +281,16 @@ class Node implements Comparable
         return list;
     }
 
+    int numCertainCreatures()
+    {
+        return getCertainCreatures().size();
+    }
+
+    int numUncertainCreatures()
+    {
+        return getHeight() - numCertainCreatures();
+    }
+
     boolean allCertain()
     {
         for (Iterator it = getCreatures().iterator(); it.hasNext(); )
@@ -692,6 +702,42 @@ class Node implements Comparable
         }
     }
 
+    List findCertainChild(List certain, List uncertain, List possibles)
+    {
+        List li = new ArrayList();
+        Set set = new HashSet(certain);
+        for (Iterator it = set.iterator(); it.hasNext(); )
+        {
+            String name = (String)it.next();
+            int min = minCount(possibles, name) - count(uncertain, name);
+            for (int i = 0; i < min; i++)
+            {
+                li.add(name);
+            }
+        }
+        return li;
+    }
+
+    List mergeKnowns(List known1, List known2)
+    {
+        Set all = new HashSet(known1);
+        all.addAll(known2);
+        List li = new ArrayList();
+        for (Iterator it = all.iterator(); it.hasNext(); )
+        {
+            String name = (String)it.next();
+            List lili = new ArrayList();
+            lili.add(known1);
+            lili.add(known2);
+            int max = maxCount(lili, name);
+            for (int i = 0; i < max; i++)
+            {
+                li.add(name);
+            }
+        }
+        return li;
+    }
+
     /** If one of the child legions is fully known, assign the creatures in
      *  the other child legion the same certainty they have in the parent. */
     void inheritParentCertainty(List certain, List known, List other)
@@ -752,18 +798,18 @@ class Node implements Comparable
             turnSplit = turn;
         }
 
-        List knownKeep = new ArrayList();
-        List knownSplit = new ArrayList();
+        List knownKeep1 = new ArrayList();
+        List knownSplit1 = new ArrayList();
         if (hasSplit())
         {
-            knownKeep = child1.getCertainAtSplitOrRemovedCreatures().
+            knownKeep1 = child1.getCertainAtSplitOrRemovedCreatures().
                 getCreatureNames();
-            knownSplit = child2.getCertainAtSplitOrRemovedCreatures().
+            knownSplit1 = child2.getCertainAtSplitOrRemovedCreatures().
                 getCreatureNames();
         }
         List knownCombo = new ArrayList();
-        knownCombo.addAll(knownKeep);
-        knownCombo.addAll(knownSplit);
+        knownCombo.addAll(knownKeep1);
+        knownCombo.addAll(knownSplit1);
 
         List certain = getCertainCreatures().getCreatureNames();
         if (!superset(certain, knownCombo))
@@ -772,46 +818,28 @@ class Node implements Comparable
             // after the certainty information percolates up to the parent.
             return;
         }
+        List all = getCreatures().getCreatureNames();
+        List uncertain = subtractLists(all, certain);
 
         List possibleSplits = findAllPossibleSplits(childSize,
-                knownKeep, knownSplit);
+                knownKeep1, knownSplit1);
         List splitoffNames = chooseCreaturesToSplitOut(
                 possibleSplits);
 
-        List posSplitNames = new ArrayList();
-        List posKeepNames = new ArrayList();
+        List possibleKeeps = new ArrayList();
         for (Iterator it = possibleSplits.iterator(); it.hasNext(); )
         {
             List names = (List)it.next();
-            if (superset(certain, names))
-            {
-                posKeepNames.add(subtractLists(certain, names));
-                posSplitNames.add(names);
-            }
+            List keeps = subtractLists(all, names);
+            possibleKeeps.add(keeps);
         }
 
-        knownKeep.clear();
-        knownSplit.clear();
-        for (Iterator it = certain.iterator(); it.hasNext(); )
-        {
-            String name = (String)it.next();
-            if (!knownKeep.contains(name))
-            {
-                int minKeep = minCount(posKeepNames, name);
-                for (int i = 0; i < minKeep; i++)
-                {
-                    knownKeep.add(name);
-                }
-            }
-            if (!knownSplit.contains(name))
-            {
-                int minKeep = minCount(posSplitNames, name);
-                for (int i = 0; i < minKeep; i++)
-                {
-                    knownSplit.add(name);
-                }
-            }
-        }
+        List knownKeep2 = findCertainChild(certain, uncertain, possibleKeeps);
+        List knownSplit2 = findCertainChild(certain, uncertain, 
+                possibleSplits);
+
+        List knownKeep = mergeKnowns(knownKeep1, knownKeep2);
+        List knownSplit = mergeKnowns(knownSplit1, knownSplit2);
 
         if (knownSplit.size() == childSize)
         {
@@ -1017,6 +1045,19 @@ class Node implements Comparable
         }
         return min;
     }
+
+    /** lili is a list of lists.  Return the maximum number of times name
+     appears in any of the lists contained in lili. */
+    static int maxCount(List lili, String name)
+    {
+        int max = 0;
+        for (Iterator it = lili.iterator(); it.hasNext(); )
+        {
+            List li = (List)it.next();
+            max = Math.max(max, count(li, name));
+        }
+        return max;
+    }
 }
 
 
@@ -1058,6 +1099,42 @@ class NodeTurnComparator implements Comparator
         else
         {
             throw new ClassCastException();
+        }
+    }
+}
+
+
+class AllPredictSplits extends ArrayList
+{
+    Node getLeaf(String markerId)
+    {
+        for (Iterator it = iterator(); it.hasNext(); )
+        {
+            PredictSplits ps = (PredictSplits)it.next();
+            Node leaf = ps.getLeaf(markerId);
+            if (leaf != null)
+            {
+                return leaf;
+            }
+        }
+        return null;
+    }
+
+    void printLeaves()
+    {
+        for (Iterator it = iterator(); it.hasNext(); )
+        {
+            PredictSplits ps = (PredictSplits)it.next();
+            ps.printLeaves();
+        }
+    }
+
+    void printNodes()
+    {
+        for (Iterator it = iterator(); it.hasNext(); )
+        {
+            PredictSplits ps = (PredictSplits)it.next();
+            ps.printNodes();
         }
     }
 }
