@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
@@ -7,17 +6,19 @@ import java.util.*;
 /**
  * Class Game gets and holds high-level data about a Titan game.
  * @version $Id$
- * author David Ripton
+ * @author David Ripton
  */
 
 
-public class Game extends Frame implements WindowListener, ActionListener
+public class Game
 {
     private int numPlayers;
+    private String [] playerNames = new String[6];
     private Player [] players;
     private MasterBoard board;
     private int activePlayerNum = 0;
     private int turnNumber = 1;  // Advance when every player has a turn
+    private StatusScreen statusScreen;
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -25,150 +26,51 @@ public class Game extends Frame implements WindowListener, ActionListener
     public static final int MUSTER = 4;
     private int phase = SPLIT;
 
-    private TextField [] tf = new TextField[6];
-    private int currentColor;  // state holder during color choice
-    private Label [] colorLabel = new Label[6];
-    private Button [] colorButton = new Button[6];
-    private Label [] activeLabel;
-    private Label [] elimLabel;
-    private Label [] legionsLabel;
-    private Label [] markersLabel;
-    private Label [] creaturesLabel;
-    private Label [] titanLabel;
-    private Label [] scoreLabel;
-
     private boolean isApplet; 
 
 
     public Game(boolean isApplet)
     {
-        super("Player Setup");
         this.isApplet = isApplet;
         Chit.setApplet(isApplet);
-        setBackground(Color.lightGray);
-        pack();
 
-        setupIcon();
+        Frame frame = new Frame();
 
-        setLayout(new GridLayout(0, 2));
+        new GetPlayers(frame, this);
 
-        for (int i = 0; i < 6; i++)
+        // Fill in the player objects
+        players = new Player[numPlayers];
+        for (int i = 0; i < numPlayers; i++)
         {
-            String s = "Player " + (i + 1) + " Name";
-            add(new Label(s));
-            tf[i] = new TextField(20);
-            add(tf[i]);
+            players[i] = new Player(playerNames[i], this);
         }
 
-        Button button1 = new Button("OK");
-        add(button1);
-        button1.addActionListener(this);
-        Button button2 = new Button("Quit");
-        add(button2);
-        button2.addActionListener(this);
+        // Since the inputs are validated, it's time to roll for towers.
+        assignTowers();
 
-        pack();
-        
-        // Center dialog on screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
-                     - getSize().height / 2));
+        // Renumber players in descending tower order.
+        sortPlayers();
 
-        addWindowListener(this);
-        setVisible(true);
+        for (int i = 0; i < numPlayers; i++)
+        {
+            new PickColor(frame, this, i);
+            players[i].initMarkersAvailable();
+        }
+
+        statusScreen = new StatusScreen(this);
+        board = new MasterBoard(this, true);
     }
     
     
     // Load a saved game.
     public Game(boolean isApplet, String filename)
     {
-        super("Player Setup");
         this.isApplet = isApplet;
         Chit.setApplet(isApplet);
-        setBackground(Color.lightGray);
-        pack();
-
-        setupIcon();
-
-        addWindowListener(this);
 
         board = new MasterBoard(this, false);
-
         loadGame(filename);
-
-        initStatusScreen(false);
-    }
-
-
-    private void setupIcon()
-    {
-        if (!isApplet)
-        {
-            try
-            {
-                setIconImage(Toolkit.getDefaultToolkit().getImage(
-                    getClass().getResource(Creature.colossus.getImageName())));
-            }
-            catch (NullPointerException e)
-            {
-                System.out.println(e.toString() + " Could not find " + 
-                    Creature.colossus.getImageName());
-                dispose();
-            }
-        }
-    }
-
-
-    private void validateInputs()
-    {
-        boolean error = false;
-        String [] s = new String[6];
-        String [] playerName = new String[6];
-
-        for (int i = 0; i < 6; i++)
-        {
-            s[i] = tf[i].getText();
-        }
-
-        // Sort in reverse order so that empties go last.
-        sortStrings(s);
-
-        // Make sure each player has a unique name.
-        numPlayers = 0;
-        for (int i = 0; i < 6; i++)
-        {
-            if (s[i].length() > 0)
-            {
-                if (i > 0 && s[i].equals(s[i - 1]))
-                {
-                    error = true;
-                }
-                else
-                {
-                    playerName[numPlayers] = s[i];
-                    numPlayers++;
-                }
-            }
-        }
-
-        if (error || numPlayers == 0)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                tf[i].setText("");
-            }
-            return;
-        }
-
-        // Fill the player objects
-        players = new Player[numPlayers];
-        for (int i = 0; i < numPlayers; i++)
-        {
-            players[i] = new Player(playerName[i], this);
-        }
-
-        // Since the inputs are validated, it's time to roll for towers.
-        assignTowers();
+        statusScreen = new StatusScreen(this);
     }
 
 
@@ -197,239 +99,11 @@ public class Game extends Frame implements WindowListener, ActionListener
         {
             players[i].setTower(playerTower[i]);
         }
-
-        chooseColors();
     }
 
 
-    private void chooseColors()
-    {
-        removeAll();
-        setTitle("Choose Colors");
-        setLayout(new GridLayout(0, 3));
-
-        add(new Label("Tower"));
-        add(new Label("Name"));
-        add(new Label("Color"));
-
-        // Sort in increasing tower order
-        for (int i = 1; i <= 6; i++)
-        {
-            for (int j = 0; j < numPlayers; j++)
-            {
-                if (players[j].getTower() == i)
-                {
-                    add(new Label(String.valueOf(100 * i)));
-                    add(new Label(players[j].getName()));
-                    colorLabel[j] = new Label("");
-                    add(colorLabel[j]);
-                }
-            }
-        }
-
-        colorButton[0] = new Button("Black");
-        colorButton[0].setBackground(Color.black);
-        colorButton[0].setForeground(Color.white);
-        colorButton[1] = new Button("Blue");
-        colorButton[1].setBackground(Color.blue);
-        colorButton[1].setForeground(Color.white);
-        colorButton[2] = new Button("Brown");
-        colorButton[2].setBackground(new Color(180, 90, 0));
-        colorButton[2].setForeground(Color.white);
-        colorButton[3] = new Button("Gold");
-        colorButton[3].setBackground(Color.yellow);
-        colorButton[4] = new Button("Green");
-        colorButton[4].setBackground(Color.green);
-        colorButton[5] = new Button("Red");
-        colorButton[5].setBackground(Color.red);
-        for (int i = 0; i < 6; i++)
-        {
-            add(colorButton[i]);
-            colorButton[i].addActionListener(this);
-        }
-
-        Button button1 = new Button("Done");
-        add(button1);
-        button1.addActionListener(this);
-        Button button2 = new Button("Restart");
-        add(button2);
-        button2.addActionListener(this);
-        Button button3 = new Button("Quit");
-        add(button3);
-        button3.addActionListener(this);
-
-        // Center dialog on screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
-                     - getSize().height / 2));
-
-        pack();
-
-        for (int i = 1; i <= 6; i++)
-        {
-            for (int j = 0; j < numPlayers; j++)
-            {
-                if (players[j].getTower() == i)
-                {
-                    currentColor = i;
-                    colorLabel[j].setText("?");
-                    return;
-                }
-            }
-        }
-    }
-
-
-    private void processColorChoice(String color)
-    {
-        // Turn off the button that was just used.
-        int i = 0;
-        while (colorButton[i].getLabel() != color)
-        {
-            i++;
-        }
-        colorButton[i].setLabel("");
-        colorButton[i].setBackground(Color.lightGray);
-        colorButton[i].setForeground(Color.black);
-        colorButton[i].removeActionListener(this);
-
-
-        for (int j = 0; j < numPlayers; j++)
-        {
-            if (players[j].getTower() == currentColor)
-            {
-                players[j].setColor(color);
-                colorLabel[j].setText(color);
-                players[j].initMarkersAvailable();
-            }
-        }
-
-        for (i = currentColor + 1; i <= 6; i++)
-        {
-            for (int j = 0; j < numPlayers; j++)
-            {
-                if (players[j].getTower() == i)
-                {
-                    currentColor = i;
-                    colorLabel[j].setText("?");
-                    return;
-                }
-            }
-        }
-    }
-
-
-    private void initStatusScreen(boolean newgame)
-    {
-        setVisible(false);
-        removeAll();
-        setTitle("Game Status");
-        setLayout(new GridLayout(0, 10));
-
-        // Need to sort players in descending tower order
-        sortPlayers();
-
-        // active, player name, tower, color, colors eliminated, legions,
-        //     markers, creatures, titan power, score
-
-        add(new Label(""));
-        add(new Label("Player "));
-        add(new Label("Tower "));
-        add(new Label("Color "));
-        add(new Label("Elim "));
-        add(new Label("Legions "));
-        add(new Label("Markers "));
-        add(new Label("Creatures "));
-        add(new Label("Titan Power "));
-        add(new Label("Score"));
-
-        activeLabel = new Label[numPlayers];
-        elimLabel = new Label[numPlayers];
-        legionsLabel = new Label[numPlayers];
-        markersLabel = new Label[numPlayers];
-        creaturesLabel = new Label[numPlayers];
-        titanLabel = new Label[numPlayers];
-        scoreLabel = new Label[numPlayers];
-
-        for (int i = 0; i < numPlayers; i++)
-        {
-            activeLabel[i] = new Label(" ");
-            if (activePlayerNum == i)
-            {
-                activeLabel[i] = new Label("*");
-            }
-            else
-            {
-                activeLabel[i] = new Label(" ");
-            }
-            add(activeLabel[i]);
-            add(new Label(players[i].getName()));
-            add(new Label(
-                String.valueOf(100 * players[i].getTower())));
-            add(new Label(players[i].getColor()));
-            elimLabel[i] = new Label(players[i].getPlayersElim());
-            add(elimLabel[i]);
-            legionsLabel[i] = new Label(String.valueOf(
-                players[i].getNumLegions()));
-            add(legionsLabel[i]);
-            markersLabel[i] = new Label(String.valueOf(
-                players[i].getNumMarkersAvailable()));
-            add(markersLabel[i]);
-            creaturesLabel[i] = new Label(String.valueOf(
-                players[i].getNumCreatures()));
-            add(creaturesLabel[i]);
-            titanLabel[i] = new Label(String.valueOf(
-                players[i].getTitanPower()));
-            add(titanLabel[i]);
-            scoreLabel[i] = new Label(String.valueOf(
-                players[i].getScore()));
-            add(scoreLabel[i]);
-        }
-
-        pack();
-
-        // Move dialog to bottom right of screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width,
-            d.height - getSize().height));
-
-        setVisible(true);
-
-        if (newgame)
-        {
-            board = new MasterBoard(this, newgame);
-        }
-    }
-
-
-    public void updateStatusScreen()
-    {
-        for (int i = 0; i < numPlayers; i++)
-        {
-            if (activePlayerNum == i)
-            {
-                activeLabel[i].setText("*");
-            }
-            else
-            {
-                activeLabel[i].setText(" ");
-            }
-            elimLabel[i].setText(players[i].getPlayersElim());
-            legionsLabel[i].setText(String.valueOf(
-                players[i].getNumLegions()));
-            markersLabel[i].setText(String.valueOf(
-                players[i].getNumMarkersAvailable()));
-            creaturesLabel[i].setText(String.valueOf(
-                players[i].getNumCreatures()));
-            titanLabel[i].setText(String.valueOf(players[i].getTitanPower()));
-            scoreLabel[i].setText(String.valueOf(players[i].getScore()));
-        }
-
-        repaint();
-    }
-
-
-    // Sort player array into turn order, by descending tower number.
+    // Sort player array by descending tower number, into the order
+    // in which they'll move.
     private void sortPlayers()
     {
         for (int i = 0; i < numPlayers - 1; i++)
@@ -447,27 +121,25 @@ public class Game extends Frame implements WindowListener, ActionListener
     }
 
 
-    // Sort string array in reverse order
-    private void sortStrings(String [] s)
-    {
-        for (int i = 0; i < s.length - 1; i++)
-        {
-            for (int j = i + 1; j < s.length; j++)
-            {
-                if (s[i].compareTo(s[j]) > 0)
-                {
-                    String temp = s[i];
-                    s[i] = s[j];
-                    s[j] = temp;
-                }
-            }
-        }
-    }
-
-
     public int getNumPlayers()
     {
         return numPlayers;
+    }
+    
+    
+    public void setNumPlayers(int numPlayers)
+    {
+        this.numPlayers = numPlayers;
+    }
+
+
+    public void setPlayerName(int playerNum, String name)
+    {
+        if (playerNum < 0 || playerNum > getNumPlayers() - 1)
+        {
+            return;
+        }
+        playerNames[playerNum] = name;
     }
 
 
@@ -575,6 +247,15 @@ public class Game extends Frame implements WindowListener, ActionListener
         if (!isApplet)
         {
             saveGame();
+        }
+    }
+
+
+    public void updateStatusScreen()
+    {
+        if (statusScreen != null)
+        {
+            statusScreen.updateStatusScreen();
         }
     }
 
@@ -805,72 +486,6 @@ public class Game extends Frame implements WindowListener, ActionListener
     }
 
 
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-        dispose();
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getActionCommand().equals("Quit"))
-        {
-            dispose();
-        }
-        else if (e.getActionCommand().equals("OK"))
-        {
-            validateInputs();
-        }
-        else if (e.getActionCommand().equals("Restart"))
-        {
-            chooseColors();
-        }
-        else if (e.getActionCommand().equals("Done"))
-        {
-            // Make sure all colors are assigned before continuing.
-            for (int i = 0; i < numPlayers; i++)
-            {
-                if (players[i].getColor() == null)
-                {
-                    return;
-                }
-            }
-
-            // Change this window into a status screen, and then
-            //     move on to the first player's first turn.
-            initStatusScreen(true);
-        }
-        else
-        {
-            // Color button
-            processColorChoice(e.getActionCommand());
-        }
-    }
-
-
     public void dispose()
     {
         if (isApplet)
@@ -879,7 +494,10 @@ public class Game extends Frame implements WindowListener, ActionListener
             {
                 board.dispose();
             }
-            super.dispose();
+            if (statusScreen != null)
+            {
+                statusScreen.dispose();
+            }
         }
         else
         {
