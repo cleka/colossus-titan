@@ -13,8 +13,13 @@ class Player
     int angels;         // number of angels + archangels in legions
     boolean canSummonAngel; 
     String playersEliminated;  // e.g. 1356, based on starting tower
-    String [] markersAvailable = new String[12];
+    int numMarkersAvailable;
+    String [] markersAvailable = new String[60];
+    String markerSelected;
+    int numLegions;
     Legion [] legions;
+    boolean alive;
+    boolean myTurn;
 
 
     Player(String name)
@@ -23,6 +28,10 @@ class Player
         score = 0;
         angels = 1; 
         canSummonAngel = true;
+        numMarkersAvailable = 12;
+        numLegions = 0;
+        alive = true;
+        myTurn = false;
     }
 
 
