@@ -69,8 +69,14 @@ public class RecruitGraph
                 int already = (legion == null ? 0 :
                                legion.numCreature(s.getCreatureName()));
 
+                /* only explore if
+                   (1) not already visited
+                   (2) enough in current legion + caretaker to traverse
+                   (3) at least one of the destination still available
+                */
                 if ((!(visited.contains(v))) &&
-                    ((s.getRemaining() + already) >= e.getNumber()))
+                    ((s.getRemaining() + already) >= e.getNumber()) &&
+                    (v.getRemaining() > 0))
                 {
                     all.addAll(traverse(v, visited, legion));
                 }

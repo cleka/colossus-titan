@@ -150,9 +150,9 @@ public class SimpleAI implements AI
         Creature recruit = (Creature)recruits.get(recruits.size() - 1);
 
         Creature temprecruit =
-            getBestRecruitmentOneTurnAhead(legion,hex,recruits);
+            getBestRecruitmentOneTurnAhead(legion, hex, recruits);
         Creature temprecruit2 =
-            getBestRecruitmentInfinityAhead(recruits);
+            getBestRecruitmentInfinityAhead(recruits, legion);
 
         /*
         // graph code disabled ATM
@@ -1712,9 +1712,8 @@ public class SimpleAI implements AI
         return recruit;
     }
 
-    /* this one is dumb, it doesn't take into account how may creatures
-       we already have, and if intermediate are still available */
-    private Creature getBestRecruitmentInfinityAhead(List recruits)
+    private Creature getBestRecruitmentInfinityAhead(List recruits,
+                                                     LegionInfo legion)
     {
         ListIterator it = recruits.listIterator(recruits.size());
         Creature best = null;
@@ -1725,7 +1724,7 @@ public class SimpleAI implements AI
         {
             Creature recruit = (Creature)it.previous();
 
-            String temp = TerrainRecruitLoader.getBestPossibleRecruitEver(recruit.getName());
+            String temp = TerrainRecruitLoader.getBestPossibleRecruitEver(recruit.getName(), legion);
 
             int vp = (Creature.getCreatureByName(temp)).getPointValue();
 

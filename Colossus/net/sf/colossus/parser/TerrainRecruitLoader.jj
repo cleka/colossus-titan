@@ -13,6 +13,7 @@ import java.util.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.client.LegionInfo;
 
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.util.RecruitEdge;
@@ -687,15 +688,17 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Return the name of the best possible creature that is reachable trough the given creature.
+     * Return the name of the best possible creature that is reachable trough the given creature from the given LegionInfo (can be null).
      * @param name Name of the recruiting creature.
+     * @param legion The recruiting legion or null.
      * @return Name of the best possible recruit.
      */
-    public static String getBestPossibleRecruitEver(String name)
+    public static String getBestPossibleRecruitEver(String name,
+                                                    LegionInfo legion)
     {
         String best = name;
         int maxVP = -1;
-        List all = graph.traverse(name);
+        List all = graph.traverse(name, legion);
         Iterator it = all.iterator();
         while (it.hasNext())
         {
