@@ -41,8 +41,6 @@ Solaris, 1.3.1: Popup windows (e.g. ShowMasterHex) pop up in the wrong
    place if the window has been scrolled.  Scrollbars do not immediately
    appear / disappear after a rescale().
 
-Currently have to pick recruiter even with "all stacks visible" set.
-
 All enemy creatures are invisible after loading a game.
 
 Did File/New while winning AI was playing against itself:
@@ -83,23 +81,22 @@ java.lang.NullPointerException
         at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
         at java.awt.EventDispatchThread.run(EventDispatchThread.java:85)
 
+Need to better stop phase advancing on draw, not just win.  Human player
+   ended up AI-controlled after draw.
 
 Zero-height legion's (caused by angel being summoned out) marker
    doesn't go away.
 
-Need to better stop phase advancing on draw, not just win.  Human player
-   ended up AI-controlled after draw.
-
-Scale is not saved to (and maybe not loaded from) cfg file.
-
 CreatureCollectionView does not respect scale.
 
-Carry cursor sometimes fails without an error message.
+Carry cursor sometimes fails without an error message.  Race condition?
 
 Lost a legion marker somewhere?  Try to reproduce.  (Maybe with 1-high angels 
    stacks?)
 
 Teleport bug not fixed?  Try to reproduce.
+
+Negotiation is broken and disabled.
 
 
 

@@ -8,9 +8,6 @@ import java.awt.*;
 
 public final class Scale
 {
-    // Save the zoom delta in the config file, rather than the actual
-    // scale, so the game still scales with resolution.
-
     public static int scale = 15;
 
     static

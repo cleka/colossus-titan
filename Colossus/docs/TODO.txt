@@ -1,5 +1,7 @@
 Add a window that shows the recruiting tree.
 
+Version stamping, maybe showing up in an About menu.
+
 Allow dragging chits in addition to clicking source and destination.
 
 Eliminate persistent legion.hexInfo and instead return a temporary

@@ -546,6 +546,8 @@ public final class MasterBoard extends JPanel
                     oldScale);
                 if (newScale != oldScale && newScale != -1)
                 {
+                    client.setStringOption(Options.scale, 
+                        new Integer(newScale).toString());
                     Scale.set(newScale);
                     client.rescaleAllWindows();
                 }

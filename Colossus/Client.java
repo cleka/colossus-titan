@@ -362,8 +362,6 @@ public final class Client
 
     public boolean getOption(String name)
     {
-        String value = options.getProperty(name);
-
         // If autoplay is set, then return true for all other auto* options.
         if (name.startsWith("Auto") && !name.equals(Options.autoPlay))
         {
@@ -372,6 +370,7 @@ public final class Client
                 return true;
             }
         }
+        String value = options.getProperty(name);
         return (value != null && value.equals("true"));
     }
 
@@ -811,7 +810,16 @@ public final class Client
         if (!getOption(Options.autoPlay))
         {
             disposeMasterBoard();
-            // XXX Do we also need to handle StatusScreen here?
+
+            String buf = getStringOption(Options.scale);
+            if (buf != null)
+            {
+                int scale = Integer.parseInt(buf);
+                if (scale > 0)
+                {
+                    Scale.set(scale);
+                }
+            }
 
             board = new MasterBoard(this);
             board.requestFocus();

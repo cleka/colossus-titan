@@ -210,13 +210,13 @@ Programming:  David Ripton  dripton@wizard.net
               Bruce Sherrod (AI)  bruce@thematrix.com
               Tom Fruchterman
               David Barr (applet conversion)
-	      Romain Dolbeau
+	      Romain Dolbeau (variant support)
 
 Counter art:  Jerry Reiger, David Lum, Tchula Ripton
 
 Network protocol: Falk Hueffner
 
-GUI ideas: Kris Giesing
+GUI ideas: Kris Giesing, David Lum
 
 Bug reports:  Anthony Kam, Augustin Ku, Sean McCulloch, Luca Ferraro, 
               Jonathan Woodward, Aneel Nazareth, Paul Macgowan,

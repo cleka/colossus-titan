@@ -172,21 +172,31 @@ public final class Server
         return false;
     }
 
-    /** Get the option from the first human-controlled client.  If there are none,
-     *  get the option from the first AI-controlled client. */
-    public boolean getClientOption(String optname)
+    /** Return the number of the first human-controlled client, or -1 if
+     *  all clients are AI-controlled. */
+    public int getFirstHumanClientNum()
     {
-        // TODO Maybe we should remember which human joined first, rather than
-        // which one ended up first after towers were assigned.
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             Player player = game.getPlayer(i);
             if (player.getType().equals("Human"))
             {
-                return getClientOption(i, optname);
+                return i;
             }
         }
-        return getClientOption(0, optname);
+        return -1;
+    }
+
+    /** Get the option from the first human-controlled client.  If there are none,
+     *  get the option from the first AI-controlled client. */
+    public boolean getClientOption(String optname)
+    {
+        int clientNum = getFirstHumanClientNum();
+        if (clientNum == -1)
+        {
+            clientNum = 0;
+        }
+        return getClientOption(clientNum, optname);
     }
 
     public String getClientStringOption(String playerName, String optname)
