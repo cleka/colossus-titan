@@ -12,32 +12,7 @@ Add remaining command-line options.
 
 Save/load/test scale.
 
-Validate LOS for level 3 hexes in Badlands-JDG.
-
 Use SF project releases.
-
-Bug: All stacks visible is broken.
-
-Bug: Own legions not always shown sorted.
-
-Bug: Undo move with a recruitChit showing, not cleared.
-
-Bug: Still getting excess Acquire dialog, for 6-high legion that earns two
-   angels, but at least angel is not added.
-
-Bug: Non-overlay terrain layers shown a bit too far to the right.
-
-Bug: No T2T teleport on first turn only works for first player?
-
-Bug: Need to redo caretaker stack display when "Use black overlay on Chits"
-   is flipped.
-
-Bug: Chit-sized white space over map's terrain label in top left corner of
-   map.  Minimize/restore doesn't fix.  Presumably a null chit is being 
-   painted.
-
-Bug: All AIs forced to SimpleAI on load game.  Need to save final ai type
-   in savegame, not "A Random AI"
 
 Change Quit button in GetPlayers dialog to Cancel.  Go back to existing 
    game if there is one from Cancel, or quit if just starting.  Eliminate
