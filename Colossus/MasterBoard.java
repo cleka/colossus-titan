@@ -46,7 +46,7 @@ class MasterBoard extends Frame implements MouseListener,
     private Dimension offDimension;
     private MediaTracker tracker;
     private boolean imagesLoaded;
-    private static int scale;
+    private static int scale = 17;
     private static Game game;
     private boolean eraseFlag = false;
     private boolean summoningAngel = false;
@@ -59,8 +59,6 @@ class MasterBoard extends Frame implements MouseListener,
         super("MasterBoard");
 
         this.game = game;
-
-        scale = 17;
 
         setLayout(null);
         setSize(getPreferredSize());
