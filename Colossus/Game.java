@@ -45,7 +45,7 @@ public final class Game
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
-        "Colossus savegame version 1";
+        "Colossus savegame version 2";
 
     // Options names
     public static final String sAutosave = "Autosave";
@@ -594,9 +594,12 @@ public final class Game
      *     Current phase
      *     Creature counts
 
-     // XXX in progress
      *     Engagement hex
-
+     *     Battle turn number
+     *     Whose battle turn
+     *     Battle phase
+     *     Summon state
+     *     Carry damage
 
      *     Player 1:
      *         Name
@@ -618,6 +621,7 @@ public final class Game
      *             Entry side
      *             Parent
      *             Recruited?
+     *             Battle tally
      *             Height
      *             Creature 1:
      *                 Creature type
@@ -658,6 +662,25 @@ public final class Game
             Creature creature = (Creature)it.next();
             out.println(creature.getCount());
         }
+     
+        if (engagementInProgress)
+        {
+            out.println(battle.getMasterHex().getLabel());
+            out.println(battle.getTurnNumber());
+            out.println(battle.getActivePlayer().getName());
+            out.println(battle.getPhase());
+            out.println(battle.getSummonState());
+            out.println(battle.getCarryDamage());
+        }
+        else
+        {
+            out.println();
+            out.println();
+            out.println();
+            out.println();
+            out.println();
+            out.println();
+        }
 
         it = players.iterator();
         while (it.hasNext())
@@ -695,6 +718,7 @@ public final class Game
                 out.println(legion.getEntrySide());
                 out.println(legion.getParentId());
                 out.println(legion.hasRecruited());
+                out.println(legion.getBattleTally());
 
                 out.println(legion.getHeight());
 
@@ -821,7 +845,27 @@ public final class Game
 
             players.clear();
             board.clearLegions();
+            
+            // Battle            
+            buf = in.readLine();
+            MasterHex engagementHex = board.getHexFromLabel(buf);
+            
+            buf = in.readLine();
+            int battleTurnNum = Integer.parseInt(buf);
+            
+            buf = in.readLine();
+            String battleActivePlayerName = new String(buf);
+            
+            buf = in.readLine();
+            int battlePhase = Integer.parseInt(buf);
 
+            buf = in.readLine();
+            int summonState = Integer.parseInt(buf);
+
+            buf = in.readLine();
+            int carryDamage = Integer.parseInt(buf);
+
+            // Players
             for (int i = 0; i < numPlayers; i++)
             {
                 String name = in.readLine();
@@ -870,6 +914,9 @@ public final class Game
                 buf = in.readLine();
                 int numLegions = Integer.parseInt(buf);
 
+                BattleMap map = null;
+
+                // Legions
                 for (int j = 0; j < numLegions; j++)
                 {
                     String markerId = in.readLine();
@@ -888,12 +935,15 @@ public final class Game
 
                     buf = in.readLine();
                     boolean recruited = Boolean.valueOf(buf).booleanValue();
+                    
+                    buf = in.readLine();
+                    int battleTally = Integer.parseInt(buf);
 
                     buf = in.readLine();
                     int height = Integer.parseInt(buf);
 
+                    // Critters
                     Critter [] critters = new Critter[8];
-
                     for (int k = 0; k < height; k++)
                     {
                         buf = in.readLine();
@@ -907,9 +957,6 @@ public final class Game
                         buf = in.readLine();
                         int hits = Integer.parseInt(buf);
                         critter.setHits(hits);
-
-                        // Placeholder.  map must be initialized above.
-                        BattleMap map = null;
 
                         buf = in.readLine();
                         buf2 = in.readLine();
@@ -941,6 +988,7 @@ public final class Game
 
                     legion.setRecruited(recruited);
                     legion.setEntrySide(entrySide);
+                    legion.addToBattleTally(battleTally);
                     player.addLegion(legion);
                     MasterHex hex = legion.getCurrentHex();
                     hex.addLegion(legion, false);
@@ -964,6 +1012,16 @@ public final class Game
 
             board.setVisible(true);
             board.repaint();
+
+            if (engagementHex != null)
+            {
+                Legion attacker = engagementHex.getFriendlyLegion(
+                    getActivePlayer());
+                Legion defender = engagementHex.getEnemyLegion(
+                    getActivePlayer());
+                battle = new Battle(board, attacker, defender, engagementHex);
+                map = battle.getBattleMap();
+            }
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)

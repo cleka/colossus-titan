@@ -25,7 +25,6 @@ public final class Battle
     // A big number
     public static final int BIGNUM = 99;
 
-
     private Game game;
     private BattleMap map;
     private Legion attacker;
@@ -42,7 +41,6 @@ public final class Battle
     private boolean chitSelected;
     private ArrayList critters = new ArrayList();
     private Critter lastCritterMoved;
-    private Legion donor;
 
     private boolean attackerElim;
     private boolean defenderElim;
@@ -124,15 +122,39 @@ public final class Battle
     }
 
 
+    public void setActiveLegion(Legion activeLegion)
+    {
+        this.activeLegion = activeLegion;
+    }
+
+
+    public MasterHex getMasterHex()
+    {
+        return masterHex;
+    }
+
+
     public int getPhase()
     {
         return phase;
     }
 
 
+    public void setPhase(int phase)
+    {
+        this.phase = phase;
+    }
+
+
     public int getTurnNumber()
     {
         return turnNumber;
+    }
+
+
+    public void setTurnNumber(int turnNumber)
+    {
+        this.turnNumber = turnNumber;
     }
 
 
@@ -238,6 +260,18 @@ public final class Battle
     public BattleMap getBattleMap()
     {
         return map;
+    }
+
+
+    public int getSummonState()
+    {
+        return summonState;
+    }
+
+
+    public void setSummonState(int summonState)
+    {
+        this.summonState = summonState;
     }
 
 
@@ -667,7 +701,7 @@ public final class Battle
         attackerElim = true;
         defenderElim = true;
 
-        donor = null;
+        Legion donor = null;
 
         Iterator it = critters.iterator();
         while (it.hasNext())
