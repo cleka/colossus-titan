@@ -503,17 +503,6 @@ public final class Client
     }
 
 
-    public void doneWithCarries()
-    {
-Log.debug("Client.doneWithCarries()");
-        if (map != null)
-        {
-            map.unselectAllHexes();
-        }
-        // XXX Remove excessive round trips by handing this on the server.
-        makeForcedStrikes();
-    }
-
     /** Called from BattleMap to leave carry mode. */
     void leaveCarryMode()
     {
@@ -991,26 +980,27 @@ Log.debug("Client.makeForcedStrikes()");
     }
 
 
-    // TODO Use this method to mark chits as wounded / dead.
-    public void tellStrikeResults(String attackerName, String defenderName,
-        String attackerHexId, String defenderHexId, char terrain,
-        int strikeNumber, int damage, int carryDamage, int [] rolls,
+    public void tellStrikeResults(String strikerDesc, int strikerTag,
+        String targetDesc, int targetTag, int strikeNumber, int [] rolls, 
+        int damage, boolean wasCarry, int carryDamageLeft, 
         Set carryTargetDescriptions)
     {
         if (battleDice != null)
         {
-            battleDice.setValues(attackerName, defenderName, attackerHexId,
-                defenderHexId, terrain, strikeNumber, damage, carryDamage,
-                rolls);
+            battleDice.setValues(strikerDesc, targetDesc, strikeNumber, 
+                damage, rolls);
             battleDice.showRoll();
         }
         if (map != null)
         {
             map.unselectAllHexes();
         }
-        if (carryDamage >= 1 && !carryTargetDescriptions.isEmpty())
+        // TODO Mark hits / dead on target BattleChit, and eliminate
+        // the extra server-side call.
+
+        if (carryDamageLeft >= 1 && !carryTargetDescriptions.isEmpty())
         {
-            pickCarries(carryDamage, carryTargetDescriptions);
+            pickCarries(carryDamageLeft, carryTargetDescriptions);
         }
         else
         {
@@ -1020,21 +1010,6 @@ Log.debug("Client.makeForcedStrikes()");
             {
                 map.highlightCrittersWithTargets();
             }
-        }
-    }
-
-    /** The current target took carryDamageDealt points.  There are
-     *  carryDamageLeft points left to distribute. */ 
-    public void tellCarryResults(int carryDamageDealt, int carryDamageLeft, 
-        Set carryTargetDescriptions)
-    {
-        if (battleDice != null)
-        {
-            battleDice.setCarries(carryDamageDealt);
-        }
-        if (carryDamageLeft >= 1 && !carryTargetDescriptions.isEmpty())
-        {
-            pickCarries(carryDamageLeft, carryTargetDescriptions);
         }
     }
 
@@ -1071,7 +1046,7 @@ Log.debug("new PickCarry");
         }
     }
 
-    // TODO Handle this from setBattleValues()
+    // TODO Handle this from tellStrikeResults()
     public void setBattleChitDead(int tag)
     {
         Iterator it = battleChits.iterator();
@@ -1086,7 +1061,7 @@ Log.debug("new PickCarry");
         }
     }
 
-    // TODO Handle this from setBattleValues()
+    // TODO Handle this from tellStrikeResults()
     public void setBattleChitHits(int tag, int hits)
     {
         Iterator it = battleChits.iterator();

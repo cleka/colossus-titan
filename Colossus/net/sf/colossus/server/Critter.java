@@ -611,13 +611,15 @@ final class Critter extends Creature implements Comparable
             if (!penaltyOptions.isEmpty())
             {
                 // Add the non-penalty option as a choice.
-                penaltyOptions.add(new PenaltyOption(this, target, dice, 
-                    strikeNumber));
+                PenaltyOption po = new PenaltyOption(this, target, dice, 
+                    strikeNumber);
+                po.addCarryTargets(battle.getCarryTargets());
+                penaltyOptions.add(po);
 
                 if (game.getServer().getClientOption(getPlayerName(),
                     Options.autoStrike))
                 {
-                    PenaltyOption po = getPlayer().aiChooseStrikePenalty(
+                    po = getPlayer().aiChooseStrikePenalty(
                         Collections.unmodifiableSortedSet(penaltyOptions));
                     if (po == null)
                     {
@@ -838,9 +840,8 @@ Log.debug("new penalty option: " + po.toString());
 
         if (game != null)
         {
-            game.getServer().allTellStrikeResults(getName(), target.getName(), 
-                currentHexLabel, target.getCurrentHexLabel(), 
-                battle.getTerrain(), strikeNumber, damage, carryDamage, rolls,
+            game.getServer().allTellStrikeResults(this, target, 
+                strikeNumber, rolls, damage, carryDamage,
                 battle.getCarryTargetDescriptions());
         }
     }

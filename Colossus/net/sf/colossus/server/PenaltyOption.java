@@ -60,6 +60,12 @@ final class PenaltyOption implements Comparable
         carryTargets.add(carryTarget);
     }
 
+    /** Add all hexLabel Strings in Set to carry targets list. */
+    void addCarryTargets(Set targets)
+    {
+        carryTargets.addAll(targets);
+    }
+
     Set getCarryTargets()
     {
         return Collections.unmodifiableSet(carryTargets);

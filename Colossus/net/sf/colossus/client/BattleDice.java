@@ -15,18 +15,13 @@ import javax.swing.*;
 
 final class BattleDice extends JPanel
 {
-    private String attackerName = "";
-    private String defenderName = "";
-    private String attackerHexId = "";
-    private String defenderHexId = "";
+    private String strikerDesc = "";
+    private String targetDesc = "";
     private int numDice = 0;
     private int targetNumber = 0;
     private int [] rolls = new int[0];
     private int hits = 0;
-    private int carries = 0;
-    private char terrain = '?';
     private JLabel label1 = new JLabel();
-    private JLabel label2 = new JLabel();
     private Chit [] dice;
 
 
@@ -39,25 +34,15 @@ final class BattleDice extends JPanel
     }
 
 
-    void setValues(String attackerName, String defenderName,
-        String attackerHexId, String defenderHexId, char terrain,
-        int targetNumber, int hits, int carries, int [] rolls)
+    void setValues(String strikerDesc, String targetDesc, int targetNumber, 
+        int hits, int [] rolls)
     {
-        this.attackerName = attackerName;
-        this.defenderName = defenderName;
-        this.attackerHexId = attackerHexId;
-        this.defenderHexId = defenderHexId;
-        this.terrain = terrain;
+        this.strikerDesc = strikerDesc;
+        this.targetDesc = targetDesc;
         this.targetNumber = targetNumber;
         this.hits = hits;
-        this.carries = carries;
         this.rolls = rolls;
         numDice = rolls.length;
-    }
-
-    void setCarries(int carries)
-    {
-        this.carries = carries;
     }
 
 
@@ -84,16 +69,13 @@ final class BattleDice extends JPanel
         setVisible(false);
         removeAll();
 
-        if (attackerName.equals(""))
+        if (strikerDesc.equals(""))
         {
             label1.setText("");
         }
         else
         {
-            label1.setText(attackerName + " in " +
-                HexMap.getHexByLabel(terrain, attackerHexId).getDescription() +
-                " attacks " + defenderName + " in " +
-                HexMap.getHexByLabel(terrain, defenderHexId).getDescription());
+            label1.setText(strikerDesc + " attacks " + targetDesc); 
         }
         label1.setAlignmentX(Label.CENTER_ALIGNMENT);
         add(label1);
@@ -109,26 +91,6 @@ final class BattleDice extends JPanel
                 this);
             diceBox.add(dice[i]);
         }
-
-        String carryString;
-        if (carries == 1)
-        {
-            carryString = " carry";
-        }
-        else
-        {
-            carryString = " carries";
-        }
-        if (attackerName.equals(""))
-        {
-            label2.setText("");
-        }
-        else
-        {
-            label2.setText(carries + carryString);
-        }
-        label2.setAlignmentX(Label.CENTER_ALIGNMENT);
-        add(label2);
 
         setVisible(true);
         repaint();

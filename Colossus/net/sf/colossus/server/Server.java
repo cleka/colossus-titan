@@ -5,6 +5,7 @@ import java.util.*;
 import java.net.*;
 import javax.swing.*;
 
+import net.sf.colossus.util.Log;
 import net.sf.colossus.client.Client;
 // XXX temp
 import net.sf.colossus.client.Proposal;
@@ -21,7 +22,6 @@ import net.sf.colossus.client.Proposal;
 public final class Server
 {
     private Game game;
-    private Critter striker;
 
     // XXX Need to verify that various requests came from the correct
     // client for that player.
@@ -32,6 +32,13 @@ public final class Server
      *  the originating IP, in case a connection breaks and we need to
      *  authenticate reconnects.  Do not share these references. */
     private List clients = new ArrayList();
+
+    // Cached strike information.
+    Critter striker; 
+    Critter target;
+    int strikeNumber; 
+    int damage; 
+    int [] rolls;
 
 
     Server(Game game)
@@ -90,28 +97,7 @@ public final class Server
         }
     }
 
-    // TODO Merge with setBattleValues, setCarries, etc.
-    void allDoneWithCarries()
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.doneWithCarries();
-        }
-    }
 
-    void allTellCarryResults(int carryDamageDone, int carryDamageLeft, 
-        Set carryTargets)
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.tellCarryResults(carryDamageDone, carryDamageLeft, 
-                carryTargets);
-        }
-    }
 
 
     public void leaveCarryMode()
@@ -823,18 +809,44 @@ public final class Server
     }
 
 
-    void allTellStrikeResults(String attackerName, String defenderName, 
-        String attackerHexId, String defenderHexId, char terrain, 
-        int strikeNumber, int damage, int carryDamage, int [] rolls, 
+    void allTellStrikeResults(Critter striker, Critter target,
+        int strikeNumber, int [] rolls, int damage, int carryDamageLeft,
         Set carryTargetDescriptions)
     {
+        // Save strike info so that it can be reused for carries.
+        this.striker = striker;
+        this.target = target;
+        this.strikeNumber = strikeNumber;
+        this.damage = damage;
+        this.rolls = rolls;
+
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.tellStrikeResults(attackerName, defenderName,
-                attackerHexId, defenderHexId, terrain, strikeNumber,
-                damage, carryDamage, rolls, carryTargetDescriptions);
+            client.tellStrikeResults(striker.getDescription(), 
+                striker.getTag(), target.getDescription(), target.getTag(),
+                strikeNumber, rolls, damage, false, carryDamageLeft, 
+                carryTargetDescriptions);
+        }
+    }
+
+    void allTellCarryResults(int carryDamageDone, int carryDamageLeft, 
+        Set carryTargetDescriptions)
+    {
+        if (striker == null || target == null || rolls == null)
+        {
+            Log.error("Called allTellCarryResults() without setup.");
+            return;
+        }
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.tellStrikeResults(striker.getDescription(),
+                striker.getTag(), target.getDescription(), target.getTag(),
+                strikeNumber, rolls, carryDamageDone, true, carryDamageLeft, 
+                carryTargetDescriptions);
         }
     }
 

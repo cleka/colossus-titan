@@ -198,7 +198,8 @@ Did file/new game while game was being set up.  Got comodification exception.
 
 Stuff (markers, LogWindow) that is painted before the MasterBoard is ready
    end up dumping pixels onto the upper-left corner of the MasterFrame.
-   Need to setVisible(false) on master frame until later?
+   Need to setVisible(false) on master frame until later?  Or just force
+   a full repaint after initialization is done?
 
 Need to re-highlight strikers or carries after choosing a strike penalty.
 
@@ -306,9 +307,13 @@ forced to move split legion Bk01 to Tower hex 600 taking penalty 16 in order to 
 Human forced strikes not always(?) taken after carry.
 Game does not advance past the strike phase automatically after a carry if no
    strikes/carries left.
-No setDead() / repaint after autoSingleCarry when a creature was killed.
-Need to force a repaint of wounded creatures after auto forced strikes.
+
+Partial (top half only) repaints of some chits' hits , dead X during battle.
+   Try to fix by calling setDead / setHits from the Client tell* methods. 
+
 Engagement hex not unselected after human player loses sole battle.
    Phase does not automatically advance.
-Half repaints of some chits during battle.
+
+AcquireAngel at end of game can't be cancelled with Cancel button.
+   acquiring=false in kickEngagements
 

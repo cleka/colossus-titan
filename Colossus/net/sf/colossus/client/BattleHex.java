@@ -450,13 +450,11 @@ public class BattleHex extends Hex
     public int damageToCreature(Creature creature)
     {
         char terrain = getTerrain();
-        if ((terrain == 'd') &&
-            (!creature.isNativeDrift()))
+        if ((terrain == 'd') && (!creature.isNativeDrift()))
         { // Non-native take damage in Drift
             return 1;
         }
-        if ((terrain == 's') &&
-            (creature.isWaterDwelling()))
+        if ((terrain == 's') && (creature.isWaterDwelling()))
         { // Water Dweller (amphibious) take damage in Sand
             return 1;
         }

@@ -1219,16 +1219,29 @@ final class Legion implements Comparable
         // an imageList.
         List lords = new ArrayList();
 
-        Iterator it = critters.iterator();
-        while (it.hasNext())
+        // Titan teleport
+        if (game.getNumEnemyLegions(hexLabel, getPlayer()) >= 1)
         {
-            Critter critter = (Critter)it.next();
-            if (critter.isLord())
+            if (hasTitan())
             {
-                String name = critter.getName();
-                if (!lords.contains(name))
+                lords.add("Titan");
+            }
+        }
+
+        // Tower teleport
+        else
+        {
+            Iterator it = critters.iterator();
+            while (it.hasNext())
+            {
+                Critter critter = (Critter)it.next();
+                if (critter.isLord())
                 {
-                    lords.add(name);
+                    String name = critter.getName();
+                    if (!lords.contains(name))
+                    {
+                        lords.add(name);
+                    }
                 }
             }
         }

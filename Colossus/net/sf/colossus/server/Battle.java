@@ -42,7 +42,7 @@ final class Battle
     private boolean battleOver;
     private boolean attackerEntered;
     private boolean conceded;
-    private boolean driftDamageApplied;
+    private boolean driftDamageApplied = false;
     /** Set of hexLabels for valid carry targets */
     private Set carryTargets = new HashSet();
     private final int BIGNUM = 99;
@@ -913,20 +913,13 @@ final class Battle
 
     void leaveCarryMode()
     {
-        boolean notify = false;
         if (carryDamage > 0)
         {
             carryDamage = 0;
-            notify = true;
         }
         if (!carryTargets.isEmpty())
         {
             carryTargets.clear();
-            notify = true;
-        }
-        if (notify)
-        {
-            server.allDoneWithCarries();
         }
     }
 

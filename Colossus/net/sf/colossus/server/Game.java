@@ -1724,10 +1724,9 @@ public final class Game
     }
 
 
-    /** Recursively find tower teleport moves from this hex.  That's
-     *  all unoccupied hexes within 6 hexes.  Teleports to towers
-     *  are handled separately.  Do not double back. */
-    private Set findTowerTeleportMoves(MasterHex hex, Player player,
+    /** Recursively find all unoccupied hexes within roll hexes, for
+     *  tower teleport. */
+    private Set findNearbyUnoccupiedHexes(MasterHex hex, Player player,
         Legion legion, int roll, int cameFrom, boolean ignoreFriends)
     {
         // This hex is the final destination.  Mark it as legal if
@@ -1747,7 +1746,7 @@ public final class Game
                 if (i != cameFrom && (hex.getExitType(i) != Constants.NONE ||
                    hex.getEntranceType(i) != Constants.NONE))
                 {
-                    set.addAll(findTowerTeleportMoves(hex.getNeighbor(i),
+                    set.addAll(findNearbyUnoccupiedHexes(hex.getNeighbor(i),
                         player, legion, roll - 1, (i + 3) % 6, ignoreFriends));
                 }
             }
@@ -1831,7 +1830,7 @@ public final class Game
             !player.hasTeleported())
         {
             // Mark every unoccupied hex within 6 hexes.
-            set.addAll(findTowerTeleportMoves(hex, player, legion, 6,
+            set.addAll(findNearbyUnoccupiedHexes(hex, player, legion, 6,
                 Constants.NOWHERE, ignoreFriends));
 
             // Mark every unoccupied tower.
@@ -1842,7 +1841,8 @@ public final class Game
                 String hexLabel = (String)it.next();
                 if (MasterBoard.getHexByLabel(hexLabel) != null)
                 {
-                    if (!isOccupied(hexLabel) || ignoreFriends)  // XXX bug?
+                    if (!isOccupied(hexLabel) || (ignoreFriends && 
+                        getNumEnemyLegions(hexLabel, player) == 0))
                     {
                         set.add(hexLabel);
                     }
