@@ -43,6 +43,41 @@ another one of his stacks showed a titan with a ?.  Looks like we're not
 updating certainties at the beginning of the engagement.  This fixes itself at
 the end of the battle.
 
+Bug: Blue's turn, number 24
+- We can safely split AND attack with Bu01
+- We can safely split AND attack with Bu01
+- We can safely split AND attack with Bu01
+- We can safely split AND attack with Bu01
+- We can safely split AND attack with Bu01
+- We can safely split AND attack with Bu01
+- Client.doSplit Bu01 Bu07 Gorgon,Gorgon
+- From client Blue: doSplit ~ Bu01 ~ Bu07 ~ Gorgon,Gorgon
+- Server.doSplit Bu01 Bu07 Gorgon,Gorgon
+2 creatures are split off from legion Bu01 (Anchor) into new legion Bu07 (Fountain)
+- Server.didSplit 134 Bu01 Bu07 2
+java.util.ConcurrentModificationException
+        at java.util.TreeMap$EntryIterator.nextEntry(TreeMap.java:1026)
+        at java.util.TreeMap$KeyIterator.next(TreeMap.java:1051)
+        at java.util.Collections$1.next(Collections.java:996)
+        at net.sf.colossus.util.Glob.glob(Glob.java:58)
+        at net.sf.colossus.server.Player.getStatusInfo(Player.java:770)
+        at net.sf.colossus.server.Server.getPlayerInfo(Server.java:1309)
+        at net.sf.colossus.server.Server.allUpdatePlayerInfo(Server.java:292)
+        at net.sf.colossus.server.Server.allUpdatePlayerInfo(Server.java:298)
+        at net.sf.colossus.server.Server.allSetupSplit(Server.java:480)
+        at net.sf.colossus.server.Game.setupSplit(Game.java:805)
+        at net.sf.colossus.server.Game.setupPhase(Game.java:775)
+        at net.sf.colossus.server.Game.access$200(Game.java:31)
+        at net.sf.colossus.server.Game$GamePhaseAdvancer.advancePhaseInternal(Game.java:739)
+        at net.sf.colossus.server.Game$GamePhaseAdvancer.advancePhase(Game.java:721)
+        at net.sf.colossus.server.Game.advancePhase(Game.java:709)
+        at net.sf.colossus.server.Server.doneWithRecruits(Server.java:1260)
+        at net.sf.colossus.server.SocketServerThread.callMethod(SocketServerThread.java:255)
+        at net.sf.colossus.server.SocketServerThread.parseLine(SocketServerThread.java:104)
+        at net.sf.colossus.server.SocketServerThread.run(SocketServerThread.java:65)
+- Client.didSplit 134 Bu01 Bu07 2 24
+- From client Blue: doneWithSplits
+
 Remove advancePhaseInternal from PhaseAdvancer; make private
 
 Remove AWT dependency from server by moving image manipulation in
@@ -170,4 +205,3 @@ PickRecruiter should allow clicking on the top row (if applicable),
    not just the bottom.
 
 Try some Law of Demeter refactorings.
-
