@@ -229,6 +229,15 @@ class Player
         {
             if (legion == legions[i])
             {
+                // Return lords and demi-lords to the stacks.
+                for (int j = 0; j < legion.getHeight(); j++)
+                {
+                    if (legion.creatures[j].isImmortal())
+                    {
+                        legion.creatures[j].putOneBack();
+                    }
+                }
+
                 // Free up the legion marker.
                 markersAvailable[numMarkersAvailable] = legion.getMarkerId();
                 numMarkersAvailable++;
