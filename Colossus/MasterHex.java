@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class MasterHex describes one Masterboard hex
@@ -31,7 +32,9 @@ class MasterHex extends Hex
     private int[] exitType = new int[6];
     private int[] entranceType = new int[6];
 
-    private int entrySide;
+    // hexsides 0 - 5, though only 1, 3, and 5 are actually used.
+    private boolean[] entrySide = new boolean[6];
+    private boolean teleported = false;
 
     public static final int NONE = 0;
     public static final int BLOCK = 1;
@@ -773,6 +776,12 @@ class MasterHex extends Hex
     }
 
 
+    public boolean isOccupied()
+    {
+        return (numLegions > 0);
+    }
+
+
     public Legion getLegion(int i)
     {
         if (i < 0 || i > numLegions - 1)
@@ -1003,13 +1012,111 @@ class MasterHex extends Hex
 
     public void setEntrySide(int side)
     {
-        entrySide = side;
+        entrySide[side] = true;
     }
 
 
+    // Return a possible entry side.  If there are more than one, only one
+    // will be returned.
     public int getEntrySide()
     {
-        return entrySide;
+        for (int i = 0; i < 6; i++)
+        {
+            if (entrySide[i] == true)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+
+    // Return the number of possible entry sides.
+    public int getNumEntrySides()
+    {
+        int count = 0;
+        for (int i = 0; i < 6; i++)
+        {
+            if (entrySide[i])
+            {
+                count++;
+            }
+        }
+        
+        return count;
+    }
+
+
+    public boolean canEnterViaSide(int side)
+    {
+        if (0 <= side && side < 5)
+        {
+            return entrySide[side];
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    public boolean canEnterViaLand()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (entrySide[i])
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    public boolean teleported()
+    {
+        return teleported;
+    }
+
+
+    public void setTeleported()
+    {
+        teleported = true;
+    }
+
+
+    public void clearTeleported()
+    {
+        teleported = false;
+    }
+
+
+    public void clearAllEntrySides()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            entrySide[i] = false;
+        }
+    }
+
+
+    // Present a dialog allowing the player to enter via land or teleport.
+    public void chooseWhetherToTeleport()
+    {
+        String string1 = "Teleport";
+        String string2 = "Move Normally";
+        Object[] options = {string1, string2};
+        int optval = JOptionPane.showOptionDialog(board, "Teleport?", 
+            "Teleport?", JOptionPane.YES_NO_OPTION, 
+            JOptionPane.QUESTION_MESSAGE, null, options, string2);
+
+        // If Teleport, then leave teleported set.
+        if (optval == JOptionPane.NO_OPTION)
+        {
+            clearTeleported();
+        }
     }
 
 
