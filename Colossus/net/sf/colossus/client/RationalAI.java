@@ -1637,16 +1637,18 @@ public class RationalAI implements AI
             hex);
 
         int value = (int)result.getExpectedValue();
-
-        // apply penalty to attacks if we have few legions
-        int attackerLegions = attacker.getPlayerInfo().getNumLegions();
-        if (attackerLegions < 5)
+        
+        if (!I_HATE_HUMANS)
         {
-            return value - (7 -attackerLegions) * result.getAttackerDead();
+            // In rational AI mode do not reward early titan attacks
+            if (client.getTurnNumber() < 5)
+            {
+                return value - 100;
+            }
         }
         
         boolean defenderTitan = defender.hasTitan();
-
+        
         if (result.getExpectedValue() > 0)
         {
             if (attacker.hasTitan())
@@ -1654,7 +1656,12 @@ public class RationalAI implements AI
                 // unless we can win the game with this attack
                 if (defenderTitan)
                 {
-                    if (client.getNumLivingPlayers() == 2 &&
+                    if (I_HATE_HUMANS)
+                    {
+                        // do it and win the game, there is only 1 human
+                        value = 1000 + (int)result.getExpectedValue() * 1000;
+                    }
+                    else if (client.getNumLivingPlayers() == 2  &&
                         (attackerPointValue - result.getAttackerDead()) >
                         TITAN_SURVIVAL)
                     {
@@ -1727,6 +1734,15 @@ public class RationalAI implements AI
             }
         }
 
+        
+        // apply penalty to attacks if we have few legions
+        // Don't reward titan attacks with few stacks
+        int attackerLegions = attacker.getPlayerInfo().getNumLegions();
+        if (attackerLegions < 5)
+        {
+            return value - (result.getAttackerDead()/ attackerPointValue) * 1000;
+        }
+        
         return value;
     }
 
@@ -1754,7 +1770,7 @@ public class RationalAI implements AI
                 value = evaluateCombat(attacker, defender, hex);
             }
 
-            if (I_HATE_HUMANS && !isHumanLegion(defender))
+            if (I_HATE_HUMANS && !isHumanLegion(defender) && !isHumanLegion(attacker))
             {
                 // try not to attack other AIs                
                 if (value > -5000)
@@ -1962,7 +1978,7 @@ public class RationalAI implements AI
     // add in value of points received for killing group / 100
     // * (fraction of angel value = angel + arch = 24 + 12/5 
     //    + titan value = 10 -- arbitrary, it's worth more than 4)
-    final double KILLPOINTS = (24 + 12 / 5 + 10) / 100;
+    final double KILLPOINTS = (24.0 + 12.0 / 5.0 + 10.0) / 100.0;
 
     private BattleResults estimateBattleResults(LegionInfo attacker,
         LegionInfo defender,
@@ -2741,8 +2757,10 @@ public class RationalAI implements AI
 
     public boolean flee(LegionInfo legion, LegionInfo enemy)
     {
+        Log.debug("flee called.");
         if (legion.hasTitan())
         {
+            Log.debug("Do not flee.  Defender titan.");
             return false;
         } // Titan never flee !
 
@@ -2752,6 +2770,12 @@ public class RationalAI implements AI
             legion.getCurrentHex());
         I_HATE_HUMANS = save_hate;
         int result = (int)br.getExpectedValue();
+        
+        Log.debug("flee: attacking legion = " + enemy);
+        Log.debug("flee: defending legion = " + legion);
+        Log.debug("flee called. battle results value: " + result);
+        Log.debug("expected value of attacker dead = " + br.getAttackerDead());
+        Log.debug("expected value of defender dead = " + br.getDefenderDead());
 
         // For the first four turns never flee
         // Make attacker pay to minimize their future mustering
@@ -2760,13 +2784,73 @@ public class RationalAI implements AI
         {
             return false;
         }
+        
+        // Don't flee if we win
+        if (br.getAttackerDead()  > br.getDefenderDead())
+        {
+            return false;
+        }
+        
+        // find attacker's most likely recruit
+        double deniedMuster = 0;
+        List recruits = client.findEligibleRecruits(enemy.getMarkerId(),
+            legion.getCurrentHex().getLabel());
 
-        if (result <= 0)
+        if (!recruits.isEmpty())
+        {
+            Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
+            deniedMuster = bestRecruit.getPointValue();
+        }
+
+        
+        int currentScore = enemy.getPlayerInfo().getScore();
+        int pointValue = legion.getPointValue();
+        boolean canAcquireAngel = ((currentScore + pointValue) /
+                TerrainRecruitLoader.getAcquirableRecruitmentsValue() >
+                (currentScore /
+                TerrainRecruitLoader.getAcquirableRecruitmentsValue()));
+
+        if (canAcquireAngel)
+        {
+            if (deniedMuster > 0)
+            {
+                if (enemy.getHeight() >= 6)
+                {
+                    deniedMuster += 24;
+                }
+            }
+            else
+            {
+                if (enemy.getHeight() > 6)
+                {
+                    deniedMuster += 24;
+                }
+            }
+        }
+        else
+        {
+            if (enemy.getHeight() < 7)
+            {
+                deniedMuster = 0;
+            }
+        }
+        
+        Log.debug("expected value of denied muster = " + deniedMuster);
+        
+        double do_not_flee_value = br.getAttackerDead()  - br.getDefenderDead() * KILLPOINTS;
+        double flee_value = deniedMuster - (br.getDefenderDead() * KILLPOINTS) / 2.0;
+        
+        Log.debug("do_not_flee_value = " + do_not_flee_value);
+        Log.debug("flee_value = " + flee_value);
+        
+        if (do_not_flee_value >= flee_value)
         {
             // defender wins
+            Log.debug("don't flee: defending is worth more");
             return false;
         }
 
+        
         // defender loses but might not flee if
 
         if (enemy.hasTitan())
@@ -2775,49 +2859,11 @@ public class RationalAI implements AI
             {
                 // attacker loses at least 2 significant pieces 
                 // from Titan stack
+                Log.debug("don't flee: hurt titan");
                 return false;
             }
         }
 
-        // find attacker's most likely recruit
-        double attackerMuster = 0;
-        List recruits = client.findEligibleRecruits(enemy.getMarkerId(),
-            legion.getCurrentHex().getLabel());
-
-        if (!recruits.isEmpty())
-        {
-            Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
-            attackerMuster = bestRecruit.getPointValue();
-        }
-
-        if (br.getAttackerDead() < enemy.getPointValue() * 2 / 7 &&
-            enemy.getHeight() >= 6)
-        {
-            int currentScore = enemy.getPlayerInfo().getScore();
-            int pointValue = legion.getPointValue();
-            boolean canAcquireAngel = ((currentScore + pointValue) /
-                TerrainRecruitLoader.getAcquirableRecruitmentsValue() >
-                (currentScore /
-                TerrainRecruitLoader.getAcquirableRecruitmentsValue()));
-
-            // flee to deny a muster
-            if (canAcquireAngel || attackerMuster > 0)
-            {
-                return true;
-            }
-        }
-
-        if (enemy.getHeight() >= 6)
-        {
-            attackerMuster = 0;
-        }
-
-        if (br.getExpectedValue() >
-            (legion.getPointValue() / 2) * KILLPOINTS + attackerMuster)
-        {
-            // more valuable not to concede
-            return false;
-        }
 
         // flee
         return true;
@@ -2841,6 +2887,12 @@ public class RationalAI implements AI
         BattleResults br = estimateBattleResults(legion, enemy,
             legion.getCurrentHex());
         I_HATE_HUMANS = save_hate;
+        
+        Log.debug("concede: attacking legion = " + legion);
+        Log.debug("concede: defending legion = " + enemy);
+        Log.debug("concede called. battle results value: " + br.getExpectedValue());
+        Log.debug("expected value of attacker dead = " + br.getAttackerDead());
+        Log.debug("expected value of defender dead = " + br.getDefenderDead());
 
         if (br.getDefenderDead() < enemy.getPointValue() * 2 / 7 &&
             height >= 6)
