@@ -623,7 +623,8 @@ Log.debug("Called Server.addClient() for " + playerName);
 
 
     /** Find out if the player wants to acquire an angel or archangel. */
-    void askAcquireAngel(String playerName, String markerId, List recruits)
+    synchronized void askAcquireAngel(String playerName, String markerId, 
+        List recruits)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion.getHeight() < 7)
@@ -724,10 +725,11 @@ Log.debug("Called Server.addClient() for " + playerName);
         else
         {
             client.nakRecruit(markerId);
+
             // XXX -- uncomment after verifying it doesn't cause hangs
             // during reinforcement phase.  (May need to handle
             // nak first.) 
-            // return;
+            return;
         }
 
         // Need to always call this to keep game from hanging.

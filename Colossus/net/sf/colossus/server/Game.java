@@ -91,7 +91,7 @@ public final class Game
         server.initFileServer();
     }
 
-    private void clearFlags()
+    private synchronized void clearFlags()
     {
         engagementInProgress = false;
         battleInProgress = false;
@@ -824,7 +824,7 @@ public final class Game
         server.allSetupMove();
     }
 
-    private void setupFight()
+    private synchronized void setupFight()
     {
         // If there are no engagements, move forward to the muster phase.
         if (!summoning && !reinforcing && !acquiring &&
@@ -2253,7 +2253,8 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         }
     }
 
-    void finishBattle(String hexLabel, boolean attackerEntered, int points)
+    synchronized void finishBattle(String hexLabel, boolean attackerEntered, 
+        int points)
     {
         battle = null;
         server.allCleanupBattle();
@@ -2735,7 +2736,8 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         }
     }
 
-    private void handleConcession(Legion loser, Legion winner, boolean fled)
+    private synchronized void handleConcession(Legion loser, Legion winner, 
+        boolean fled)
     {
         // Figure how many points the victor receives.
         int points = loser.getPointValue();
@@ -2785,7 +2787,7 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         }
     }
 
-    private void handleNegotiation(Proposal results)
+    private synchronized void handleNegotiation(Proposal results)
     {
         Legion attacker = getLegionByMarkerId(results.getAttackerId());
         Legion defender = getLegionByMarkerId(results.getDefenderId());
@@ -2918,7 +2920,7 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
         kickEngagements();
     }
 
-    void askAcquireAngel(String playerName, String markerId,
+    synchronized void askAcquireAngel(String playerName, String markerId,
         java.util.List recruits)
     {
         acquiring = true;
