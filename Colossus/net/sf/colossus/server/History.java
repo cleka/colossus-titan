@@ -113,6 +113,7 @@ public class History
         {
             event.setAttribute("slayer", slayerName);
         }
+        root.addContent(event);
     }
 
     void copyTree(Element his)
@@ -222,7 +223,7 @@ public class History
         {
             String playerName = el.getAttributeValue("name");
             String slayerName = el.getAttributeValue("slayer");
-            server.allTellPlayerElim(playerName, slayerName);
+            server.allTellPlayerElim(playerName, slayerName, false);
         }
     }
 }

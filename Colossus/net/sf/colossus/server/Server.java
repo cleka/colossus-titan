@@ -475,7 +475,8 @@ public final class Server implements IServer
         }
     }
 
-    void allTellPlayerElim(String playerName, String slayerName)
+    void allTellPlayerElim(String playerName, String slayerName,
+        boolean updateHistory)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -483,7 +484,10 @@ public final class Server implements IServer
             IClient client = (IClient)it.next();
             client.tellPlayerElim(playerName, slayerName);
         }
-        game.history.playerElimEvent(playerName, slayerName);
+        if (updateHistory)
+        {
+            game.history.playerElimEvent(playerName, slayerName);
+        }
     }
 
     void allTellGameOver(String message)

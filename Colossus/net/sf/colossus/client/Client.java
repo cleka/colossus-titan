@@ -1509,9 +1509,12 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
+    // TODO Move legion markers to slayer on client side.
+    // TODO Clear dead player's split prediction tree.
     public void tellPlayerElim(String playerName, String slayerName)
     {
-        Log.debug("called tellPlayerElim() for " + playerName);
+        Log.debug(this.playerName + " tellPlayerElim(" + playerName +
+            ", " + slayerName + ")");
         PlayerInfo info = getPlayerInfo(playerName);
         info.setDead(true);
     }
@@ -1857,17 +1860,24 @@ Log.debug(playerName + " Client.initBoard()");
 
     public void nextEngagement()
     {
-        if (isMyTurn() && getOption(Options.autoPickEngagements))
+        if (isMyTurn()) 
         {
-            aiPause();
-            String hexLabel = ai.pickEngagement();
-            if (hexLabel != null)
+            if (getOption(Options.autoPickEngagements))
             {
-                engage(hexLabel);
+                aiPause();
+                String hexLabel = ai.pickEngagement();
+                if (hexLabel != null)
+                {
+                    engage(hexLabel);
+                }
+                else
+                {
+                    doneWithEngagements();
+                }
             }
             else
             {
-                doneWithEngagements();
+                defaultCursor();
             }
         }
     }
@@ -2045,12 +2055,18 @@ Log.debug(playerName + " Client.initBoard()");
 
     private void defaultCursor()
     {
-        board.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        if (board != null)
+        {
+            board.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
     }
 
     private void waitCursor()
     {
-        board.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        if (board != null)
+        {
+            board.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        }
     }
 
 
@@ -2100,7 +2116,7 @@ Log.debug(playerName + " Client.initBoard()");
         {
             board.setupMoveMenu();
         }
-        if (isMyTurn() && board != null)
+        if (isMyTurn())
         {
             defaultCursor();
         }
@@ -2117,14 +2133,14 @@ Log.debug(playerName + " Client.initBoard()");
         }
         updateStatusScreen();
 
-        if (isMyTurn() && board != null)
+        if (isMyTurn())
         {
             defaultCursor();
-        }
-        if (isMyTurn() && getOption(Options.autoPickEngagements))
-        {
-            aiPause();
-            ai.pickEngagement();
+            if (getOption(Options.autoPickEngagements))
+            {
+                aiPause();
+                ai.pickEngagement();
+            }
         }
     }
 
@@ -2140,7 +2156,7 @@ Log.debug(playerName + " Client.initBoard()");
             board.setupMusterMenu();
         }
         updateStatusScreen();
-        if (isMyTurn() && board != null)
+        if (isMyTurn())
         {
             defaultCursor();
         }

@@ -770,7 +770,7 @@ public final class Player implements Comparable
         game.getServer().allUpdatePlayerInfo();
 
         Log.event(getName() + " dies");
-        game.getServer().allTellPlayerElim(name, slayerName);
+        game.getServer().allTellPlayerElim(name, slayerName, true);
             
         // See if the game is over.
         if (checkForVictory)
