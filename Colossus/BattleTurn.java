@@ -46,6 +46,9 @@ class BattleTurn extends Dialog implements ActionListener
         pack();
 
         setVisible(true);
+
+        // Make sure that this window is in front of the Turn window.
+        toFront();
     }
 
 
@@ -99,8 +102,11 @@ System.out.println("SummonAngel");
 
         if (!summoningAngel)
         {
-System.out.println("summoningAngel is false");
-            advancePhase();
+System.out.println("summoningAngel is false  phase = " + phase);
+            if (phase == SUMMON)
+            {
+                advancePhase();
+            }
         }
         else
         {
@@ -133,6 +139,7 @@ System.out.println("placeNewChit");
         // If there are no legal moves, move on.
         if (map.highlightMovableChits() < 1)
         {
+System.out.println("No legal moves; advancing to strike phase");
             advancePhase();
         }
         else
