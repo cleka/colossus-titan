@@ -74,7 +74,7 @@ public final class Dice
         long val = 0L;
         for (int i = 0; i < 8; i++)
         {
-            val += bytes[i] << i;
+            val += bytes[i] << (8 * i);
         }
         return val;
     }
