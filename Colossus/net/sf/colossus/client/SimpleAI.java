@@ -28,26 +28,28 @@ public class SimpleAI implements AI
     private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
     private boolean timeIsUp;
     private Random random = new DevRandom();
-
     String[] hintSectionUsed = { Constants.sectionOffensiveAI };
+
+    static HashMap aiCreatureInfos;
+
+    static
+    {
+        final List allCreatures = Creature.getCreatures();
+        aiCreatureInfos = new HashMap(allCreatures.size());
+        Iterator it = allCreatures.iterator();
+        while (it.hasNext())
+        {
+            final Creature creature = (Creature)it.next();
+            AiCreatureInfo info = new AiCreatureInfo(creature);
+            aiCreatureInfos.put(creature, info);
+        }
+    }
+
 
     public SimpleAI(Client client)
     {
         this.client = client;
         // initialize the creature info needed by the AI
-        if (aiCreatureInfos != null)
-        {
-            // ok, its a static. but the first SimpleAI initializes it.
-            final List allCreatures = Creature.getCreatures();
-            aiCreatureInfos = new java.util.HashMap(allCreatures.size());
-            Iterator it = allCreatures.iterator();
-            while (it.hasNext())
-            {
-                final Creature creature = (Creature) it.next();
-                final AiCreatureInfo info = new AiCreatureInfo(creature);
-                aiCreatureInfos.put(creature, info);
-            }
-        }
     }
 
     public String pickColor(List colors, List favoriteColors)
@@ -2408,9 +2410,6 @@ public class SimpleAI implements AI
         return getKillValue(creature, null);
     }
 
-    // XXX titan power
-    // towi: titans killValue is "infinite" anyway. 
-    //   dont spend time for handling that special case. 
     static int getKillValue(final BattleChit chit, final String terrain)
     {
         return getKillValue(chit.getCreature(), terrain);
@@ -2419,63 +2418,29 @@ public class SimpleAI implements AI
     static int getKillValue(final Creature creature, String terrain)
     {
         int val;
+        if (creature == null)
+        {
+            Log.warn("Called getKillValue with null creature");
+            return 0;
+        }
         // get non-terrain modified part of kill value
-        if(creature.canChangeValue() || aiCreatureInfos == null)
+        if (creature.canChangeValue() || aiCreatureInfos == null)
         {
             // titans might change their value
-            val = getKillValue1(creature);
+            val = creature.getKillValue();
         }
         else
         {
             // use from pre-calced cache
             final AiCreatureInfo info = 
                 (AiCreatureInfo)aiCreatureInfos.get(creature);
-            val = info.getKillValue1();            
+            val = info.getKillValue1();
         }
         // modify with terrain
         if (terrain != null &&
                 MasterHex.isNativeCombatBonus(creature, terrain))
         {
             val += 3;
-        }
-        return val;
-    }
-    
-    /** get the non-terrainified part of the kill-value.
-     *  
-     * towi: Note that you have to take special care for creatures that
-     * might change their attributes -- like the Power of titans.
-     * since this modifies the getKillValue1() return value.
-     * on the other hand... since titans have a killValue>1000 anyway, 
-     * this might not matter at all. 
-     */
-    final static private int getKillValue1(final Creature creature)
-    {
-        int val = 10 * creature.getPointValue();
-        final int skill = creature.getSkill(); 
-        if (skill >= 4)
-        {
-            val += 2;
-        }
-        else if (skill <= 2)
-        {
-            val += 1;
-        }
-        if (creature.isFlier())
-        {
-            val += 4;
-        }
-        if (creature.isRangestriker())
-        {
-            val += 5;
-        }
-        if (creature.useMagicMissile())
-        {
-            val += 4;
-        }
-        if (creature.isTitan())
-        {
-            val += 1000;
         }
         return val;
     }
@@ -3478,48 +3443,4 @@ public class SimpleAI implements AI
             timeIsUp = true;
         }
     }
-    
-    // towi: AiCreatureInfo.
-    // the AI wants to save some useful informarmation along with 
-    //   each creature. i thought about extending the Creature class
-    //   by a aiData field, but we can have multiple AIs in a game.
-    //   so the data must be stored in the AI instance itselfs.
-    //   there is a 1:1 map from each Creature instance to AiCreatureInfo.
-    protected class AiCreatureInfo
-    {
-        /**
-         * @param killValue1 - the non-terrainified killValue.
-         */
-        AiCreatureInfo(final Creature creature)
-        {
-            this.creature = creature;
-            this.killValue1 = SimpleAI.getKillValue1(creature);
-        }
-        
-        /** only internal book keeping for now. 
-         * wanna make it readable? go ahead. */
-        private final Creature creature;
-        
-        /** is the same if creature is the same */
-        public int hashCode()
-        { 
-            return creature.hashCode();
-        }
-        
-        /** killvalue without terrain */
-        private int killValue1; 
-        final int getKillValue1()
-        { 
-            return killValue1;
-        }
-        final void setKillValue1(final int v)
-        {
-            this.killValue1 = v;
-        }         
-    }
-
-    protected static HashMap aiCreatureInfos = null;
-
-    
-
 }

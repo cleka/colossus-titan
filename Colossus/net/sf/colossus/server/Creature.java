@@ -590,4 +590,43 @@ implements
             return "";
         }
     }
+
+    /** get the non-terrainified part of the kill-value.
+     *  
+     * towi: Note that you have to take special care for creatures that
+     * might change their attributes -- like the Power of titans.
+     * since this modifies the getKillValue1() return value.
+     * on the other hand... since titans have a killValue>1000 anyway, 
+     * this might not matter at all. 
+     */
+    public int getKillValue()
+    {
+        int val = 10 * getPointValue();
+        final int skill = getSkill(); 
+        if (skill >= 4)
+        {
+            val += 2;
+        }
+        else if (skill <= 2)
+        {
+            val += 1;
+        }
+        if (isFlier())
+        {
+            val += 4;
+        }
+        if (isRangestriker())
+        {
+            val += 5;
+        }
+        if (useMagicMissile())
+        {
+            val += 4;
+        }
+        if (isTitan())
+        {
+            val += 1000;
+        }
+        return val;
+    }
 }
