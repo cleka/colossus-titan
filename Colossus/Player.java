@@ -18,10 +18,10 @@ class Player
     private String markerSelected;
     int numLegions = 0;
     Legion [] legions = new Legion[60];
+    private Legion selectedLegion = null;
     private boolean alive = true;
     private int mulligansLeft = 1;
     private int movementRoll;
-    private int selectedLegionNum = -1;
 
     Player(String name)
     {
@@ -210,6 +210,7 @@ class Player
         return height;
     }
 
+
     void addLegion(Legion legion)
     {
         numLegions++;
@@ -217,28 +218,34 @@ class Player
     }
 
 
-    void selectLegion(int i)
+    void removeLegion(Legion legion)
     {
-        selectedLegionNum = i;
+        for (int i = 0; i < numLegions; i++)
+        {
+            if (legion == legions[i])
+            {
+                for (int j = i; j < numLegions - 1; j++)
+                {
+                    legions[j] = legions[j + 1];
+                }
+                legions[numLegions - 1] = null;
+                numLegions--;
+            }
+        }
     }
 
 
-    int getSelectedLegionNum()
+    void selectLegion(Legion legion)
     {
-        return selectedLegionNum;
+        selectedLegion = legion;
     }
+
 
     Legion getSelectedLegion()
     {
-        if (selectedLegionNum >= 0 && selectedLegionNum < numLegions)
-        {
-            return legions[selectedLegionNum];
-        }
-        else
-        {
-            return null;
-        }
+        return selectedLegion;
     }
+
 
     int getNumMarkersAvailable()
     {
