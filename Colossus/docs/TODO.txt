@@ -1,5 +1,3 @@
-Per-side losses in pre-battle negotiation should be made public.
-
 Differently-highlight hexes where a legion could move if
    a friendly stack were not already there.
 

@@ -163,6 +163,12 @@ public class Legion
     {
         return markerId;
     }
+    
+    
+    public String getName()
+    {
+        return markerId;
+    }
 
 
     public String getImageName()

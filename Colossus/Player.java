@@ -534,8 +534,8 @@ public class Player
                 legion.getCurrentHex().removeLegion(legion);
 
                 StringBuffer log = new StringBuffer("Legion ");
-                log.append(name);
-                log.append("(");
+                log.append(legion.getName());
+                log.append(" (");
 
                 int height = legion.getHeight();
                 // Return lords and demi-lords to the stacks.

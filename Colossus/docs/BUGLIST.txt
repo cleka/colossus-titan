@@ -41,13 +41,11 @@ Solaris, jdk1.2.2, jdk1.3: Popup menu text is invisible
    black-on-black.  There is no way to set the background and 
    foreground colors.
 
-Solaris, jdk1.2.2: jar files made in Linux won't execute.
-   Exception in thread "main" java.lang.NoClassDefFoundError: Game
-
 Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle in 
    turn 15 of a 4-player game.  Also during turn 45 of a 5-player game.
    Also during movement phase of turn 14 of a 6-player game.
-   Image memory leak again?  Or somewhere else?
+   Image memory leak again?  Or somewhere else?  System.gc() calls don't
+   help.
 
 
 Current programming bugs:
@@ -108,14 +106,4 @@ java.lang.ArrayIndexOutOfBoundsException
 
 Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
    eliminates that chit's movement options.  "Undo last move" works.
-
-Solaris, jdk1.3: Reinforcement chit in lower right corner showed up
-   with just the top edge visible.  Clicking on it made the rest
-   appear.  Probably need to call repaint() from placeNewChit()
-   Fixed?
-
-all: "1 hits"  Fixed?
-
-Solaris, jdk1.3: Rangestriker adjacent to a dead target can now
-   rangestrike.  Fixed?
 
