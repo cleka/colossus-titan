@@ -504,6 +504,32 @@ class MasterHex
     }
 
 
+    Legion getFriendlyLegion(Player player)
+    {
+        for (int i = 0; i < numLegions; i++)
+        {
+            if (legions[i].getPlayer() == player)
+            {
+                return legions[i];
+            }
+        }
+        return null;
+    }
+
+
+    Legion getEnemyLegion(Player player)
+    {
+        for (int i = 0; i < numLegions; i++)
+        {
+            if (legions[i].getPlayer() != player)
+            {
+                return legions[i];
+            }
+        }
+        return null;
+    }
+
+
     void alignLegions()
     {
         if (numLegions == 0)
