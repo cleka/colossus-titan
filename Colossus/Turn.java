@@ -154,34 +154,43 @@ System.out.println("setupFightDialog");
     void setupMusterDialog()
     {
 System.out.println("setupMusterDialog");
-        removeAll();
-        setLayout(new GridLayout(0, 2));
-
-        add(new Label(game.getActivePlayer().getName() + " : Muster Recruits"));
-        Button button1 = new Button("End Turn");
-        add(button1);
-        button1.addActionListener(this);
-
-        pack();
-
-        // Place this window in the upper right corner.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width, 0));
-        
-        // Highlight hexes with legions eligible to muster.
-
-        Player player = game.getActivePlayer();
-        for (int i = 0; i < player.getNumLegions(); i++)
+        if (!game.getActivePlayer().isAlive())
         {
-            Legion legion = player.getLegion(i);
-            if (legion.canRecruit() && legion.hasMoved())
+            game.advanceTurn();
+            setupSplitDialog();
+        }
+        else
+        {
+            removeAll();
+            setLayout(new GridLayout(0, 2));
+
+            add(new Label(game.getActivePlayer().getName() + 
+                " : Muster Recruits"));
+            Button button1 = new Button("End Turn");
+            add(button1);
+            button1.addActionListener(this);
+
+            pack();
+
+            // Place this window in the upper right corner.
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            setLocation(new Point(d.width - getSize().width, 0));
+        
+            // Highlight hexes with legions eligible to muster.
+
+            Player player = game.getActivePlayer();
+            for (int i = 0; i < player.getNumLegions(); i++)
             {
-                Creature [] recruits = new Creature[5];
-                if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
+                Legion legion = player.getLegion(i);
+                if (legion.canRecruit() && legion.hasMoved())
                 {
-                    MasterHex hex = legion.getCurrentHex();
-                    hex.select();
-                    hex.repaint();
+                    Creature [] recruits = new Creature[5];
+                    if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
+                    {
+                        MasterHex hex = legion.getCurrentHex();
+                        hex.select();
+                        hex.repaint();
+                    }
                 }
             }
         }
