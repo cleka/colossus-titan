@@ -54,7 +54,7 @@ class Turn extends Dialog implements ActionListener
             Legion legion = player.legions[i];
             if (legion.getHeight() >= 7)
             {
-                MasterHex hex = board.getHexFromLabel(legion.getCurrentHex());
+                MasterHex hex = legion.getCurrentHex();
                 hex.select();
                 Rectangle clip = new Rectangle(hex.getBounds());
                 board.repaint(clip.x, clip.y, clip.width, clip.height);
@@ -149,8 +149,7 @@ class Turn extends Dialog implements ActionListener
                 Creature [] recruits = new Creature[5];
                 if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
                 {
-                    MasterHex hex = 
-                        board.getHexFromLabel(legion.getCurrentHex());
+                    MasterHex hex = legion.getCurrentHex();
                     hex.select();
                     Rectangle clip = new Rectangle(hex.getBounds());
                     board.repaint(clip.x, clip.y, clip.width, clip.height);

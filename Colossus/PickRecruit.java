@@ -32,7 +32,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
 
         recruits = new Creature[5];
         markers = new Chit[5];
-        hex = MasterBoard.getHexFromLabel(legion.getCurrentHex());
+        hex = legion.getCurrentHex();
 
         addMouseListener(this);
         addWindowListener(this);
@@ -89,7 +89,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     // Returns the number of eligible recruits.
     static int findEligibleRecruits(Legion legion, Creature [] recruits)
     {
-        MasterHex hex = MasterBoard.getHexFromLabel(legion.getCurrentHex());
+        MasterHex hex = legion.getCurrentHex();
 
         switch(hex.getTerrain())
         {

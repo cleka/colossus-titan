@@ -267,8 +267,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             player.addLegion(newLegion);
             
             // Set the new chit next to the old chit on the masterboard.
-            MasterBoard.getHexFromLabel(newLegion.getCurrentHex())
-                .addLegion(newLegion);
+            newLegion.getCurrentHex().addLegion(newLegion);
 
             // Exit.
             dispose();
