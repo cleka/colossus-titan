@@ -8,7 +8,7 @@ import java.awt.event.*;
  */
 
 class MasterBoard extends Frame implements MouseListener,
-    MouseMotionListener, WindowListener
+    WindowListener
 {
     // There are a total of 96 hexes
     // Their Titan labels are:
@@ -81,7 +81,6 @@ class MasterBoard extends Frame implements MouseListener,
 
         addWindowListener(this);
         addMouseListener(this);
-        addMouseMotionListener(this);
 
         imagesLoaded = false;
 
@@ -120,7 +119,7 @@ class MasterBoard extends Frame implements MouseListener,
                 Creature.gargoyle.takeOne();
                 Creature.gargoyle.takeOne();
 
-                Legion legion = new Legion(0, 0, 3 * scale,
+                Legion legion = new Legion(3 * scale,
                     game.getPlayer(i).getSelectedMarker(), null, this, 8,
                     hex, Creature.titan, Creature.angel, Creature.ogre,
                     Creature.ogre, Creature.centaur, Creature.centaur,
@@ -1592,15 +1591,16 @@ class MasterBoard extends Frame implements MouseListener,
                         case Game.FIGHT:
                             if (summoningAngel)
                             {
-                                Legion attacker =
+                                Legion donor =
                                     hex.getFriendlyLegion(player);
-                                player.selectLegion(attacker);
+                                player.selectLegion(donor);
                                 if (summonAngel == null)
                                 {
                                     summonAngel =
                                         map.getTurn().getSummonAngel();
                                 }
                                 summonAngel.repaint();
+                                donor.getMarker().repaint();
                             }
 
                             // Do not allow clicking on engagements if one is
@@ -1712,17 +1712,7 @@ class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    public void mouseDragged(MouseEvent e)
-    {
-    }
-
-
     public void mouseReleased(MouseEvent e)
-    {
-    }
-
-
-    public void mouseMoved(MouseEvent e)
     {
     }
 
@@ -1849,12 +1839,12 @@ class MasterBoard extends Frame implements MouseListener,
 
     public Dimension getMinimumSize()
     {
-        return getPreferredSize();
+        return new Dimension(64 * scale, 58 * scale);
     }
 
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(64 * scale, 58 * scale);
+        return new Dimension(64 * scale, 60 * scale);
     }
 }
