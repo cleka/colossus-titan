@@ -1530,6 +1530,7 @@ class PredictSplitsTestCase(unittest.TestCase):
 
         turn = 13
         print "Turn", turn
+        ps.getLeaf("Gr08").split(2, "Gr02", turn)
         ps.getLeaf("Gr07").revealCreatures(["Troll"])
         ps.getLeaf("Gr07").addCreature("Troll")
         ps.printLeaves()
