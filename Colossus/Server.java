@@ -405,7 +405,7 @@ public final class Server
     }
 
 
-    public void allNegotiate(Legion attacker, Legion defender)
+    public void twoNegotiate(Legion attacker, Legion defender)
     {
         Client client1 = getClient(attacker.getPlayerName());
         client1.askNegotiate(attacker, defender);
@@ -413,6 +413,41 @@ public final class Server
         client2.askNegotiate(attacker, defender);
     }
 
+
+    public void allSetBattleDiceValues(String attackerName,
+        String defenderName, String attackerHexId, String defenderHexId,
+        int strikeNumber, int damage, int carryDamage, int [] rolls)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setBattleDiceValues(attackerName, defenderName,
+                attackerHexId, defenderHexId, strikeNumber, damage,
+                carryDamage, rolls);
+        }
+    }
+
+    public void allSetBattleDiceCarries(int carries)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setBattleDiceCarries(carries);
+        }
+    }
+
+
+    public void allInitBattleMap()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.initBattleMap();
+        }
+    }
 
     public static void main(String [] args)
     {

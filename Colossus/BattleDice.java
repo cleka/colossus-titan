@@ -16,9 +16,10 @@ public final class BattleDice extends JFrame implements WindowListener
     private GridBagConstraints constraints = new GridBagConstraints();
     private Insets insets = new Insets(5, 5, 5, 5);
     private static Point location;
-    // TODO Pass strings instead of critters.
-    private Critter attacker;
-    private Critter defender;
+    private String attackerName;
+    private String defenderName;
+    private String attackerHexId;
+    private String defenderHexId;
     private int numDice;
     private int targetNumber;
     private int [] rolls;
@@ -56,16 +57,19 @@ public final class BattleDice extends JFrame implements WindowListener
     }
 
 
-    public void setValues(Critter attacker, Critter defender,
-        int targetNumber, int [] rolls, int hits, int carries)
+    public void setValues(String attackerName, String defenderName,
+        String attackerHexId, String defenderHexId, int targetNumber,
+        int hits, int carries, int [] rolls)
     {
-        this.attacker = attacker;
-        this.defender = defender;
+        this.attackerName = attackerName;
+        this.defenderName = defenderName;
+        this.attackerHexId = attackerHexId;
+        this.defenderHexId = defenderHexId;
         this.targetNumber = targetNumber;
-        this.rolls = rolls;
-        numDice = rolls.length;
         this.hits = hits;
         this.carries = carries;
+        this.rolls = rolls;
+        numDice = rolls.length;
     }
 
     public void setCarries(int carries)
@@ -103,10 +107,12 @@ public final class BattleDice extends JFrame implements WindowListener
         Container contentPane = getContentPane();
         contentPane.removeAll();
 
-        label1.setText(attacker.getName() + " in " +
-            attacker.getCurrentHex().getDescription() + " attacks " +
-            defender.getName() + " in " +
-            defender.getCurrentHex().getDescription());
+        BattleMap map = client.getBattleMap();
+
+        label1.setText(attackerName + " in " +
+            map.getHexByLabel(attackerHexId).getDescription() + " attacks " +
+            defenderName + " in " +
+            map.getHexByLabel(defenderHexId).getDescription());
         label1.setAlignmentX(Label.LEFT_ALIGNMENT);
         constraints.gridy = 0;
         constraints.gridwidth = 6;

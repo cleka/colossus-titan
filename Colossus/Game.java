@@ -2658,7 +2658,7 @@ public final class Game
 
             offers[Battle.DEFENDER] = new HashSet();
             offers[Battle.ATTACKER] = new HashSet();
-            server.allNegotiate(attacker, defender);
+            server.twoNegotiate(attacker, defender);
         }
     }
 

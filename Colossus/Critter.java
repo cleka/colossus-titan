@@ -879,15 +879,11 @@ public final class Critter extends Creature implements Comparable
         struck = true;
 
         // Display the rolls in the BattleDice dialog, if enabled.
-        if (game != null && game.getServer().getClientOption(Options.showDice))
+        if (game != null)
         {
-            // XXX temporary hack
-            if (Client.battleDice != null)
-            {
-                Client.battleDice.setValues(this, target, strikeNumber,
-                    rolls, damage, carryDamage);
-                Client.battleDice.showRoll();
-            }
+            game.getServer().allSetBattleDiceValues(getName(),
+                target.getName(), currentHexLabel, target.getCurrentHexLabel(),
+                strikeNumber, damage, carryDamage, rolls);
         }
     }
 

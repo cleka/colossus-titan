@@ -31,7 +31,6 @@ public final class Battle
 
 
     private Game game;
-    private BattleMap map;
     private String attackerId;
     private String defenderId;
     private String [] legions = new String[2];
@@ -63,10 +62,13 @@ public final class Battle
         this.activeLegionNum = activeLegionNum;
         this.turnNumber = turnNumber;
         this.phase = phase;
-        map = new BattleMap(masterHexLabel, this);
-        Client.setMap(map);
-        map.getFrame().toFront();
-        map.requestFocus();
+// XXX
+//        map = new BattleMap(masterHexLabel, this);
+//        Client.setMap(map);
+//        map.getFrame().toFront();
+//        map.requestFocus();
+        game.getServer().allInitBattleMap();
+
         terrain = getMasterHex().getTerrain();
         Client.clearUndoStack();
     }
@@ -400,7 +402,7 @@ public final class Battle
         boolean advance = true;
         if (summonState == Battle.FIRST_BLOOD)
         {
-            if (game != null && getAttacker().canSummonAngel())
+            if (getAttacker().canSummonAngel())
             {
                 game.createSummonAngel(getAttacker());
                 advance = false;
@@ -477,12 +479,6 @@ public final class Battle
     }
 
 
-    public BattleMap getBattleMap()
-    {
-        return map;
-    }
-
-
     public int getSummonState()
     {
         return summonState;
@@ -528,7 +524,7 @@ public final class Battle
             {
                 recruit = PickRecruit.pickRecruit(map.getFrame(), defender);
             }
-            if (recruit != null && game != null)
+            if (recruit != null)
             {
                 game.doRecruit(recruit, defender);
             }
@@ -1348,12 +1344,7 @@ Log.debug("defender eliminated");
             map.unselectHexByLabel(label);
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
-            // XXX temporary hack
-            if (Client.battleDice != null)
-            {
-                Client.battleDice.setCarries(carryDamage);
-                Client.battleDice.showRoll();
-            }
+            game.getServer().allSetBattleDiceCarries(carryDamage);
         }
     }
 
@@ -2000,14 +1991,11 @@ Log.debug("defender eliminated");
 
                 if (getCarryDamage() == 0)
                 {
-                    if (game != null)
+                    Player player = getActivePlayer();
+                    if (game.getServer().getClientOption(player.getName(),
+                        Options.autoForcedStrike))
                     {
-                        Player player = getActivePlayer();
-                        if (game.getServer().getClientOption(player.getName(),
-                            Options.autoForcedStrike))
-                        {
-                            makeForcedStrikes(false);
-                        }
+                        makeForcedStrikes(false);
                     }
                     highlightCrittersWithTargets();
                 }
@@ -2089,10 +2077,7 @@ Log.debug("defender eliminated");
     {
         map.dispose();
         battleOver = true;
-        if (game != null)
-        {
-            game.finishBattle(masterHexLabel, attackerEntered);
-        }
+        game.finishBattle(masterHexLabel, attackerEntered);
     }
 
 

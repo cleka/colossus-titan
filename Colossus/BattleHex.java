@@ -3,16 +3,13 @@ import java.util.*;
 import java.awt.geom.*;
 
 /**
- * Class BattleHex describes one Battlemap hex.
+ * Class BattleHex holds game state for battle hex.
  * @version $Id$
  * @author David Ripton
  */
 
-public final class BattleHex extends Hex
+public class BattleHex extends Hex
 {
-    private HexMap map;
-    private String name;
-
     /** Valid elevations are 0, 1, and 2. */
     private int elevation;
 
@@ -42,30 +39,10 @@ public final class BattleHex extends Hex
 
 
 
-    public BattleHex(int cx, int cy, int scale, HexMap map, int xCoord,
-        int yCoord)
+    public BattleHex(int xCoord, int yCoord)
     {
-        this.map = map;
         this.xCoord = xCoord;
         this.yCoord = yCoord;
-        len = scale / 3.0;
-
-        xVertex[0] = cx;
-        yVertex[0] = cy;
-        xVertex[1] = cx + 2 * scale;
-        yVertex[1] = cy;
-        xVertex[2] = cx + 3 * scale;
-        yVertex[2] = cy + SQRT3 * scale;
-        xVertex[3] = cx + 2 * scale;
-        yVertex[3] = cy + 2 * SQRT3 * scale;
-        xVertex[4] = cx;
-        yVertex[4] = cy + 2 * SQRT3 * scale;
-        xVertex[5] = cx - 1 * scale;
-        yVertex[5] = cy + SQRT3 * scale;
-
-        hexagon = makePolygon(6, xVertex, yVertex, true);
-        rectBound = hexagon.getBounds();
-        center = findCenter();
 
         for (int i = 0; i < 6; i++)
         {
@@ -74,227 +51,6 @@ public final class BattleHex extends Hex
 
         setTerrain('p');
         assignLabel();
-    }
-
-
-    public void paint(Graphics g)
-    {
-        Graphics2D g2 = (Graphics2D)g;
-        if (getAntialias())
-        {
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        }
-        else
-        {
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_OFF);
-        }
-
-        if (isSelected())
-        {
-            g2.setColor(Color.white);
-        }
-        else
-        {
-            g2.setColor(getTerrainColor());
-        }
-
-        g2.fill(hexagon);
-        g2.setColor(Color.black);
-        g2.draw(hexagon);
-
-
-        // Draw hexside features.
-        for (int i = 0; i < 6; i++)
-        {
-            char hexside = hexsides[i];
-            int n;
-            if (hexside != ' ')
-            {
-                n = (i + 1) % 6;
-                drawHexside(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
-                    hexside);
-            }
-
-            // Draw them again from the other side.
-            hexside = getOppositeHexside(i);
-            if (hexside != ' ')
-            {
-                n = (i + 1) % 6;
-                drawHexside(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
-                    hexside);
-            }
-        }
-
-        // Do not anti-alias text.
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_OFF);
-        if (name == null)
-        {
-            name = getTerrainName().toUpperCase();
-        }
-
-        FontMetrics fontMetrics = g2.getFontMetrics();
-
-        g2.drawString(name, rectBound.x + ((rectBound.width -
-            fontMetrics.stringWidth(name)) / 2),
-            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 2));
-
-        // Show hex label in upper left corner.
-        g2.drawString(label, rectBound.x + (rectBound.width -
-            fontMetrics.stringWidth(label)) / 3,
-            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 4));
-    }
-
-
-    public void repaint()
-    {
-        // If an entrance needs repainting, paint the whole map.
-        if (isEntrance())
-        {
-            map.repaint();
-        }
-        else
-        {
-            map.repaint(rectBound.x, rectBound.y, rectBound.width,
-                rectBound.height);
-        }
-    }
-
-
-    public void drawHexside(Graphics2D g2, double vx1, double vy1, double vx2,
-        double vy2, char hexsideType)
-    {
-        double x0;                     // first focus point
-        double y0;
-        double x1;                     // second focus point
-        double y1;
-        double x2;                     // center point
-        double y2;
-        double theta;                  // gate angle
-        double [] x = new double[4];   // hexside points
-        double [] y = new double[4];   // hexside points
-
-
-        x0 = vx1 + (vx2 - vx1) / 6;
-        y0 = vy1 + (vy2 - vy1) / 6;
-        x1 = vx1 + (vx2 - vx1) / 3;
-        y1 = vy1 + (vy2 - vy1) / 3;
-
-        theta = Math.atan2(vy2 - vy1, vx2 - vx1);
-
-        switch (hexsideType)
-        {
-            case 'c':     // cliff -- triangles
-                for (int j = 0; j < 3; j++)
-                {
-                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
-                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
-                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
-                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
-
-                    x[0] = x0 - len * Math.sin(theta);
-                    y[0] = y0 + len * Math.cos(theta);
-                    x[1] = (x0 + x1) / 2 + len * Math.sin(theta);
-                    y[1] = (y0 + y1) / 2 - len * Math.cos(theta);
-                    x[2] = x1 - len * Math.sin(theta);
-                    y[2] = y1 + len * Math.cos(theta);
-
-                    GeneralPath polygon = makePolygon(3, x, y, false);
-
-                    g2.setColor(Color.white);
-                    g2.fill(polygon);
-                    g2.setColor(Color.black);
-                    g2.draw(polygon);
-                }
-                break;
-
-            case 'd':     // dune --  arcs
-                for (int j = 0; j < 3; j++)
-                {
-                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
-                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
-                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
-                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
-
-                    x[0] = x0 - len * Math.sin(theta);
-                    y[0] = y0 + len * Math.cos(theta);
-                    x[1] = x0 + len * Math.sin(theta);
-                    y[1] = y0 - len * Math.cos(theta);
-                    x[2] = x1 + len * Math.sin(theta);
-                    y[2] = y1 - len * Math.cos(theta);
-                    x[3] = x1 - len * Math.sin(theta);
-                    y[3] = y1 + len * Math.cos(theta);
-
-                    x2 = (x0 + x1) / 2;
-                    y2 = (y0 + y1) / 2;
-                    Rectangle2D.Double rect = new Rectangle2D.Double();
-                    rect.x = x2 - len;
-                    rect.y = y2 - len;
-                    rect.width = 2 * len;
-                    rect.height = 2 * len;
-
-                    g2.setColor(Color.white);
-                    Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
-                        rect.width, rect.height,
-                        ((2 * Math.PI - theta) * RAD_TO_DEG), 180,
-                        Arc2D.OPEN);
-                    g2.fill(arc);
-                    g2.setColor(Color.black);
-                    g2.draw(arc);
-                }
-                break;
-
-            case 's':     // slope -- lines
-                for (int j = 0; j < 3; j++)
-                {
-                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
-                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
-                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
-                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
-
-                    x[0] = x0 - len / 3 * Math.sin(theta);
-                    y[0] = y0 + len / 3 * Math.cos(theta);
-                    x[1] = x0 + len / 3 * Math.sin(theta);
-                    y[1] = y0 - len / 3 * Math.cos(theta);
-                    x[2] = x1 + len / 3 * Math.sin(theta);
-                    y[2] = y1 - len / 3 * Math.cos(theta);
-                    x[3] = x1 - len / 3 * Math.sin(theta);
-                    y[3] = y1 + len / 3 * Math.cos(theta);
-
-                    g2.setColor(Color.black);
-                    g2.draw(new Line2D.Double(x[0], y[0], x[1], y[1]));
-                    g2.draw(new Line2D.Double(x[2], y[2], x[3], y[3]));
-                }
-                break;
-
-            case 'w':     // wall --  blocks
-                for (int j = 0; j < 3; j++)
-                {
-                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
-                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
-                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
-                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
-
-                    x[0] = x0 - len * Math.sin(theta);
-                    y[0] = y0 + len * Math.cos(theta);
-                    x[1] = x0 + len * Math.sin(theta);
-                    y[1] = y0 - len * Math.cos(theta);
-                    x[2] = x1 + len * Math.sin(theta);
-                    y[2] = y1 - len * Math.cos(theta);
-                    x[3] = x1 - len * Math.sin(theta);
-                    y[3] = y1 + len * Math.cos(theta);
-
-                    GeneralPath polygon = makePolygon(4, x, y, false);
-
-                    g2.setColor(Color.white);
-                    g2.fill(polygon);
-                    g2.setColor(Color.black);
-                    g2.draw(polygon);
-                }
-                break;
-        }
     }
 
 
@@ -465,24 +221,14 @@ public final class BattleHex extends Hex
     }
 
 
-    public void setElevation (int elevation)
-    {
-        this.elevation = elevation;
-    }
-
-
     public int getElevation()
     {
         return elevation;
     }
 
-
-    public void setNeighbor(int i, BattleHex hex)
+    public void setElevation (int elevation)
     {
-        if (i >= 0 && i < 6)
-        {
-            neighbors[i] = hex;
-        }
+        this.elevation = elevation;
     }
 
 
@@ -498,12 +244,19 @@ public final class BattleHex extends Hex
         }
     }
 
+    public void setNeighbor(int i, BattleHex hex)
+    {
+        if (i >= 0 && i < 6)
+        {
+            neighbors[i] = hex;
+        }
+    }
+
 
     public int getXCoord()
     {
         return xCoord;
     }
-
 
     public int getYCoord()
     {

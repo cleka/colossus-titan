@@ -26,10 +26,8 @@ public final class Client
     private MovementDie movementDie;
 
     // Moved here from Battle.
-    /** Temporarily static. */
-    private static BattleMap map;
-    /** Temporarily static. */
-    public static BattleDice battleDice;
+    private BattleMap map;
+    public BattleDice battleDice;
 
     // Moved here from Player.
     /** Stack of legion marker ids, to allow multiple levels of undo for
@@ -636,14 +634,14 @@ public final class Client
     }
 
 
-    public static BattleMap getBattleMap()
+    public BattleMap getBattleMap()
     {
         return map;
     }
 
-    public static void setMap(BattleMap map)
+    public void setBattleMap(BattleMap map)
     {
-        Client.map = map;
+        this.map = map;
     }
 
     /** Don't use this. */
@@ -791,6 +789,32 @@ public final class Client
             Negotiate.negotiate(board.getFrame(), attacker, defender);
     }
 
+    public void setBattleDiceValues(String attackerName, String defenderName,
+        String attackerHexId, String defenderHexId, int strikeNumber,
+        int damage, int carryDamage, int [] rolls)
+    {
+        if (battleDice != null)
+        {
+            battleDice.setValues(attackerName, defenderName, attackerHexId,
+                defenderHexId, strikeNumber, damage, carryDamage, rolls);
+            battleDice.showRoll();
+        }
+    }
+
+    public void setBattleDiceCarries(int carries)
+    {
+        if (battleDice != null)
+        {
+            battleDice.setCarries(carries);
+            battleDice.showRoll();
+        }
+    }
+
+
+    public void initBattleMap()
+    {
+        // TODO
+    }
 
     public static void main(String [] args)
     {
