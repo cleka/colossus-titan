@@ -1,6 +1,3 @@
-Fix variant option, command-line variant loading.  
-Remove extra variant loads. 
-
 Fix autoStop.
 
 Fix unit tests for server options.
@@ -11,9 +8,9 @@ Document test procedures.
 Mention werken.opts in docs.
 Add remaining command-line options.
 
-Initialize player lines in GetPlayers from options.
-
 Save/load/test scale.
+
+Bug: Titan teleport allowed in ExtTitan at 400 points, not 700.
 
 Bug: All stacks visible is broken.
 
@@ -35,8 +32,6 @@ Add optional additional handicap mulligans that can be used after turn 1.
 
 Add UI for setting server options before starting game.
 Add UI for players to specify favorite colors.
-
-Remember GetPlayers settings in server.cfg
 
 Remember window positions in player .cfg file.
 

@@ -39,6 +39,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private JFrame parentFrame;
 
+    private Vector typeChoices = new Vector();
     private JComboBox [] playerTypes = new JComboBox[6];
     private JComboBox [] playerNames = new JComboBox[6];
     private JEditorPane readme = new JEditorPane();
@@ -59,22 +60,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         this.options = options;
 
-        // Use a Vector because JComboBox does not know about Lists.
-        Vector typeChoices = new Vector();
-        typeChoices.add("Human");
-        typeChoices.add("None");
-        for (int i = 0 ; i < Constants.numAITypes; i++) 
-        {
-            if (!(Constants.aiArray[i].equals("")))
-            {
-                typeChoices.add(Constants.aiArray[i]);
-            }
-        }
-        // Only show random AI choice if more than one AI.
-        if (Constants.numAITypes >= 2)
-        {
-            typeChoices.add(Constants.anyAI);
-        }
+        setupTypeChoices();
 
         this.parentFrame = parentFrame;
         setBackground(Color.lightGray);
@@ -86,65 +72,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         for (int i = 0; i < 6; i++)
         {
-            Container playerPane = new Container();
-            playerPane.setLayout(new GridLayout(0, 3));
-            contentPane.add(playerPane);
-            
-            String s = "Player " + (i + 1);
-            playerPane.add(new JLabel(s));
-            
-            JComboBox playerType = new JComboBox(typeChoices);
-            
-            String type = options.getStringOption(Options.playerType + i);
-            if (type == null || type.length() == 0)
-            {
-                if (i == 0)
-                {
-                    type = "Human";
-                }
-                else
-                {
-                    type = Constants.defaultAI;
-                }
-            }
-            playerType.setSelectedItem(type);
-
-            playerPane.add(playerType);
-            playerType.addActionListener(this);
-            playerTypes[i] = playerType;
-
-
-            String name = options.getStringOption(Options.playerName + i);
-            if (name == null || name.length() == 0)
-            {
-                name = none;
-            }
-            if (name.startsWith(byColor))
-            {
-                name = byColor;
-            }
-
-            // Use a Vector because JComboBox does not know about Lists.
-            Vector nameChoices = new Vector();
-            nameChoices.add(name);
-            if (!nameChoices.contains(byColor))
-            {
-                nameChoices.add(byColor);
-            }
-            if (!nameChoices.contains(username))
-            {
-                nameChoices.add(username);
-            }
-            if (!nameChoices.contains(none))
-            {
-                nameChoices.add(none);
-            }
-
-            JComboBox playerName = new JComboBox(nameChoices);
-            playerName.setEditable(true);
-            playerPane.add(playerName);
-            playerName.addActionListener(this);
-            playerNames[i] = playerName;
+            doOnePlayer(i);
         }
 
         Container gamePane = new Container();
@@ -224,6 +152,79 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         addWindowListener(this);
         setVisible(true);
+    }
+
+    private void setupTypeChoices()
+    {
+        typeChoices.clear();
+        typeChoices.add("Human");
+        typeChoices.add("None");
+        for (int i = 0 ; i < Constants.numAITypes; i++) 
+        {
+            if (!(Constants.aiArray[i].equals("")))
+            {
+                typeChoices.add(Constants.aiArray[i]);
+            }
+        }
+        // Only show random AI choice if more than one AI.
+        if (Constants.numAITypes >= 2)
+        {
+            typeChoices.add(Constants.anyAI);
+        }
+    }
+
+    private void doOnePlayer(final int i)
+    {
+        Container playerPane = new Container();
+        playerPane.setLayout(new GridLayout(0, 3));
+        getContentPane().add(playerPane);
+        
+        String s = "Player " + (i + 1);
+        playerPane.add(new JLabel(s));
+        
+        JComboBox playerType = new JComboBox(typeChoices);
+        
+        String type = options.getStringOption(Options.playerType + i);
+        if (type == null || type.length() == 0)
+        {
+            type = none;
+        }
+        playerType.setSelectedItem(type);
+
+        playerPane.add(playerType);
+        playerType.addActionListener(this);
+        playerTypes[i] = playerType;
+
+        String name = options.getStringOption(Options.playerName + i);
+        if (name == null || name.length() == 0)
+        {
+            name = none;
+        }
+        if (name.startsWith(byColor))
+        {
+            name = byColor;
+        }
+
+        Vector nameChoices = new Vector();
+        nameChoices.add(name);
+        if (!nameChoices.contains(byColor))
+        {
+            nameChoices.add(byColor);
+        }
+        if (!nameChoices.contains(username))
+        {
+            nameChoices.add(username);
+        }
+        if (!nameChoices.contains(none))
+        {
+            nameChoices.add(none);
+        }
+
+        JComboBox playerName = new JComboBox(nameChoices);
+        playerName.setEditable(true);
+        playerPane.add(playerName);
+        playerName.addActionListener(this);
+        playerNames[i] = playerName;
     }
 
 
@@ -442,22 +443,31 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         {
                             playerNames[i].setSelectedItem(none);
                         }
+                        // If player type was changed away from none, also 
+                        // change player name to something else.
+                        else if (playerNames[i].getSelectedItem().equals(none))
+                        {
+                            playerNames[i].setSelectedItem(byColor);
+                        }
                     }
     
                     box = playerNames[i];
                     if (box == source)
                     {
-                        // If player name was changed to none, also change player
-                        // type to none.
+                        // If player name was changed to none, also change 
+                        // player type to none.
                         String value = (String)box.getSelectedItem();
                         if (value.equals(none))
                         {
                             playerTypes[i].setSelectedItem(none);
                         }
+                        // If player type was changed away from none, also 
+                        // change player name to something else.
+                        else if (playerTypes[i].getSelectedItem().equals(none))
+                        {
+                            playerTypes[i].setSelectedItem(Constants.anyAI);
+                        }
                     }
-
-                    // XXX If player type was changed away from none, change 
-                    // player name away from none?
                 }
             }
         }

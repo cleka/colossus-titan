@@ -181,8 +181,8 @@ public final class Game
      *  options to abort if something is wrong. */
     private void setupOptionsFromCommandLine(CommandLine cl)
     {
-        int numHumans = 1;
-        int numAIs = 5;
+        int numHumans = 0;
+        int numAIs = 0;
 
         if (cl.optIsSet('v'))
         {
@@ -196,11 +196,13 @@ public final class Game
         }
         if (cl.optIsSet('u'))
         {
+            options.clearPlayerInfo();
             String buf = cl.getOptValue('u');
             numHumans = Integer.parseInt(buf);
         }
         if (cl.optIsSet('i'))
         {
+            options.clearPlayerInfo();
             String buf = cl.getOptValue('i');
             numAIs = Integer.parseInt(buf);
         }
