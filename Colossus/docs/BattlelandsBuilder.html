@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>The Colossus Battlelands Builder</title>
+<!-- $Id$ -->
+  </head>
+  <body>
+    <h1 align="center">The Colossus Battlelands Builder</h1>
+    <div class="p">
+      <h2>
+      <a id="tth_sEc1" name="tth_sEc1">1</a>
+       BattlelandsBuilder</h2>
+    </div>
+    <div class="p">BattlelandsBuilder is a (crude) tool to interactively create
+    Battlelands for use with the &quot; 
+    <a href="http://colossus.sf.net/">Colossus</a>
+     &quot; Game. It has the same requirements as Colossus itself, see 
+    <a href="README.html">README</a>
+     and 
+    <a href="build.html">Colossus build-HOWTO</a>
+     .</div>
+    <div class="p">To create the program, just type &quot;make tools&quot; or
+    &quot;ant tools&quot;. See the 
+    <a href="build.html">Colossus build-HOWTO</a>
+     . for more details. This should create all the tools for Colossus,
+    including BattlelandsBuilder.</div>
+    <div class="p">You can use it directly, starting from a bare plains hex, or
+    you can give a pre-existing Battlelands as a starting point. Just give the
+    path to the file as the first argument to the command.</div>
+    <div class="p">Examples: 
+    <tt>java -jar BattlelandsBuilder.jar</tt>
+     
+    <tt>java -jar BattlelandsBuilder.jar Battlelands/Woods</tt>
+    </div>
+    <div class="p">Editing is point-and-click : click in the middle of an hex
+    to get a popup-menu to change the type and elevation of the hex ; click
+    near the border of an hex to get a popup-menu to change this border of this
+    hex (warning: beware slope or wall who can easily be put on the wrong hex,
+    as there&#39;s not much visual clue of their orientation).</div>
+    <div class="p">If at least on hex is selected (surrounded by red), that
+    means the terrain use a startlist, i.e. custom entry hexes for the defender
+    (like the Tower in regular Titan). If no hexes are selected, normal rules
+    apply.</div>
+    <div class="p">The &quot;File&quot; Menu:</div>
+    <div class="p">
+      <ul>
+        <li>The &quot;Load Map&quot; menu item is used to load a Battlelands
+        file in the map. The loaded battleland is 
+        <em>merged</em>
+         with the currently displayed battleland. Use &quot;Erase Map&quot;
+        below if you want to start from scratch.</li>
+        <li>The &quot;Save As&quot; menu item save the Battleland to a file
+        choosen by the user.</li>
+        <li>The &quot;Show Battleland&quot; menu item dump the Battleland on
+        standard output (can be seen only if you have a CLI or a way to access
+        standard output...)</li>
+        <li>The &quot;Erase Map&quot; menu item return the map to the default,
+        i.e. only Plains of elevation 0, and no hexside. Warning: startlist is
+        unchanged.</li>
+        <li>The &quot;Randomize Map&quot; menu item is used to generate a
+        random map from a description file. See the 
+        <a href="BattlelandsRandomizer.html">BattlelandsRandomizer</a>
+         for a description of the input file.</li>
+      </ul>
+    </div>
+    <div class="p">The &quot;Special&quot; Menu:</div>
+    <div class="p">
+      <ul>
+        <li>The &quot;Terrain is a Tower&quot; is used to specify if the
+        terrain is designed to be a Tower or not (i.e. the 
+        <tt>TOWER</tt>
+         flags explained in 
+        <a href="FileFormat.html">FileFormat</a>
+         ).</li>
+        <li>The &quot;Remove StartList&quot; removes all hexes from the
+        startlist. See the file format link above for a startlist
+        description.</li>
+      </ul>
+    </div>
+    <div class="p">
+      <h2>
+      <a id="tth_sEc2" name="tth_sEc2">2</a>
+       Frequently Asked Questions</h2>
+    </div>
+    <div class="p">
+      <ul>
+        <li>Q I can&#39;t get the hex side popup-menu, or my hex side is on the
+        wrong hex 
+        <p>A To get the hex side menu, you must be quite close to the side
+        itself. You must also not be on one of the outer side, without a
+        neighbor hex, as you can&#39;t put a hex side there. Finally, if the
+        hex side is put &quot;backward&quot;, that means you clicked on the
+        wrong Hex ; for instance, you must click behind the straight border, on
+        the Sand, to get a proper Dune. Clicking where you intend to get the
+        round part will put the Dune backward.</p>
+        </li>
+        <li>Q BattlelandsBuilder let me do something dumb! 
+        <p>A Well, yes. It&#39;s designed that way : you can do whatever you
+        please with it, including surrounding a Tree with dune or filling the
+        map with Volcanoes. It will try to flag some obviously
+        &quot;dangerous&quot; or &quot;wrong&quot; combinations with warnings,
+        but you can use the output anyway (the warnings are comments that will
+        be ignored by Colossus).</p>
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>
+

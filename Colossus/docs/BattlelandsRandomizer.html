@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>The Colossus Battlelands Randomizer</title>
+<!-- $Id$ -->
+  </head>
+  <body>
+    <h1 align="center">The Colossus Battlelands Randomizer</h1>
+    <div class="p">
+      <h2>
+      <a id="tth_sEc1" name="tth_sEc1">1</a>
+       BattlelandsRandomizer</h2>
+    </div>
+    <div class="p">BattlelandsRandomizer is a (very crude) tool to randomly
+    create Battlelands for use with the `` 
+    <a href="http://colossus.sf.net">Colossus</a>
+     &#39;&#39; Game. It has the same requirements as Colossus itself, see 
+    <a href="README.html">Colossus README</a>
+     and 
+    <a href="build.html">Colossus build-HOWTO</a>
+     .</div>
+    <div class="p">To create the program, just type ``make tools&#39;&#39; or
+    ``ant tools&#39;&#39;. See 
+    <a href="build.html">Building Colossus</a>
+     for more details. This should create all the tools for Colossus, including
+    BattlelandsRandomizer.</div>
+    <div class="p">BattlelandsRandomizer uses an input file that describes the
+    properties of the future Battleland, and generates one random Battleland.
+    At the moment, it&#39;s a purely static, text-based process.</div>
+    <div class="p">The Randomizer used can also be accessed from inside 
+    <a href="BattlelandsBuilder.html">BattlelandsBuilder</a>
+     , in a much more user-friendly way. An input file (described below) is
+    still needed.</div>
+    <div class="p">Examples of random input files can be found in the
+    ``Random&#39;&#39; subdirectory.</div>
+    <div class="p">Properties are lines of one of the three forms:</div>
+    <div class="p">
+      <ol type="1">
+        <li>
+          <tt>AREA &lt;list_of_hex&gt; HAZARDS &lt;list_of_hazards&gt;</tt>
+        </li>
+        <li>
+          <tt>LABEL &lt;label&gt; = &lt;list_of_hex&gt;</tt>
+        </li>
+        <li>
+          <tt>PAIR &lt;pair_of_hazard&gt; HEXSIDES &lt;list_of_hexsides
+          &gt;</tt>
+        </li>
+      </ol>
+    </div>
+    <div class="p">where</div>
+    <div class="p">
+      <ul>
+        <li>
+        <tt>AREA</tt>
+         , 
+        <tt>HAZARDS</tt>
+         , 
+        <tt>PAIR</tt>
+         , 
+        <tt>HEXSIDES</tt>
+         and 
+        <tt>LABEL</tt>
+         are the strings literals ; = is the character literal
+        &#39;=&#39;.</li>
+        <li>&lt;list_of_hex&gt; is a list of hex from the following available
+        forms: 
+        <ul>
+          <li>
+            <tt>&quot;(&quot; &lt;number&gt;, &lt;number &gt;&quot;)&quot;</tt>
+          </li>
+          <li>
+            <tt>&quot;(&quot; &lt;range&gt;, &lt;range&gt;&quot;)&quot;</tt>
+          </li>
+          <li>
+            <tt>&quot;(&quot; &lt;number&gt;, &lt;range&gt;&quot;)&quot;</tt>
+          </li>
+          <li>
+            <tt>&quot;(&quot; &lt;range&gt;, &lt;number&gt;&quot;)&quot;</tt>
+          </li>
+          <li>
+            <tt>&lt;hex_label&gt;</tt>
+          </li>
+          <li>
+            <tt>&quot;(&quot; &lt;label&gt;&quot;)&quot;</tt>
+          </li>
+          <li>
+            <tt>SOMEOF&quot;(&quot; &lt;number&gt;, &lt;list_of_hex
+            &gt;&quot;)&quot;</tt>
+          </li>
+          <li>
+            <tt>SURROUNDINGSOF&quot;(&quot; &lt;list_of_hex
+            &gt;&quot;)&quot;</tt>
+          </li>
+          <li>
+            <tt>SUBSTRACT&quot;(&quot; &lt;list_of_hex&gt;, &lt;list_of_hex
+            &gt;&quot;)&quot;</tt>
+          </li>
+        </ul>
+        where &lt;number&gt; is a number between 0 and 5, and &lt;range&gt; is
+        of the form &lt;number&gt;- &lt;number&gt; i.e. a range of number
+        between 0 and 5. &lt;hex_label&gt; is simply the label displayed on the
+        Battlemap (F4, C3,...) &lt;label&gt; is a label defined previously with
+        a 
+        <tt>LABEL</tt>
+         statement (see below)</li>
+        <li style="list-style: none">
+          <div class="p">There are some predefined labels available, including
+          : 
+          <ul>
+            <li>``inside&#39;&#39; representing everything but the most outside
+            Hex.</li>
+            <li>``leftdefenseentry&#39;&#39;, ``upperdefenseentry&#39;&#39; and
+            ``lowerdefenseentry&#39;&#39;, the 3 lines of 3 hexagons
+            representing the defense entry lines (left, upper-right, and
+            lower-right respectively).</li>
+            <li>``anywhere&#39;&#39; representing the whole Battlelands.</li>
+            <li>``leftover&#39;&#39; : special label representing all hexes
+            that were in the most recent 
+            <tt>AREA</tt>
+             statement, but didn&#39;t receive a Hazard.</li>
+            <li>``usedup&#39;&#39; : special label representing all hexes that
+            were in the most recent 
+            <tt>AREA</tt>
+             statement, and did receive a Hazard.</li>
+          </ul>
+          </div>
+          <div class="p">
+          <tt>SOMEOF</tt>
+           is a literal string ; result is a list of &lt;number&gt; hexes taken
+          randomly from the &lt;list_of_hex&gt; in parameter.</div>
+          <div class="p">
+          <tt>SURROUNDINGSOF</tt>
+           is a literal string ; result is the list of hexes adjacent to any
+          hex(es) in the &lt;list_of_hex&gt; in parameter. Note that all hexes
+          present in the &lt;list_of_hex&gt; are excluded from the
+          result.</div>
+          <div class="p">
+          <tt>SUBSTRACT</tt>
+           is a literal string ; result is the list of hexes that are in the
+          first list but not in the second.</div>
+        </li>
+        <li>&lt;list_of_hazards&gt; is a list of Hazard from the following
+        available forms: 
+        <ul>
+          <li>
+            <tt>&lt;hazard_letter&gt;(, &lt;probability&gt;)?(, &lt;elevation
+            &gt;)?</tt>
+          </li>
+          <li>
+            <tt>&lt;hazard_letter&gt;(, &lt;probability&gt;)?(,
+            &lt;probability_elevation_0&gt;, &lt;probability_elevation_1&gt;,
+            &lt;probability_elevation_2&gt;)?</tt>
+          </li>
+        </ul>
+        </li>
+        <li style="list-style: none">
+          <div class="p">where &lt;hazard_letter&gt; is a letter representing a
+          Hazard (&#39;r&#39; for Brush, and so on, see BattleHex.java),
+          &lt;probability&gt; is a float number representing the percentile of
+          chance of the hazard being present (a numerical point _must_ be
+          present for all probability), &lt;elevation&gt; is a hard-coded
+          elevation (integer between 0 and 2), and the three
+          &lt;probability_elevation_X&gt; are the odds of the hazard being at
+          elevation 0, 1 and 2 respectively (it&#39;s better is the sum is
+          100., but they will be normalized to percentile values). Only the
+          &lt;hazard_letter&gt; is mandatory, the other parts are optionals.
+          But if those other parts are present, they must respect the order
+          above (first probability if present, the either the elevation or the
+          elevation probabilities).</div>
+        </li>
+        <li>&lt;label&gt; is a lowercase-only string, that act afterwards as it
+        was the list of Hex on the right side of the &#39;=&#39;
+        character.</li>
+        <li>&lt;list_of_hexsides&gt; is alist of &lt;hexside_letter&gt;,
+        &lt;hexside_probability&gt;</li>
+        <li>&lt;pair_of_hazard&gt; is a pair of &quot;(&quot;
+        &lt;hazard_letter&gt;, &lt;elevation&gt;&quot;)&quot;. Elevation can be
+        0, 1, 2 or the character literal *, which means &#39;any
+        elevation&#39;. For all hexside between such a pair of hazard, all
+        hexside from the &lt;list_of_hexside&gt; will be tried in order, until
+        either one is present, or all have been tried (in which case no hexside
+        will be used between the two hazards). Not that the default Hazard, the
+        plains (character &#39;p&#39;), can be used.</li>
+      </ul>
+    </div>
+    <div class="p">BattlelandsRandomizer will then, for each 
+    <tt>AREA</tt>
+     , try to put the Hazard in any one of the Hexes in the 
+    <tt>AREA</tt>
+     . A Hex will not receive two hazards, but if a Hex is present multiple
+    times in the same 
+    <tt>AREA</tt>
+     , it may receive one Hazard per occurence of the Hex. In this case, only
+    the last Hazard is used.</div>
+    <div class="p">
+    <tt>AERA</tt>
+     s are processed in order, so an Hex that appears in multiple 
+    <tt>AREAS</tt>
+     may also receive multiple Hazards. In this case only the last Hazard is
+    used.</div>
+    <div class="p">Note that all hexsides use the same 
+    <tt>PAIR</tt>
+     -defined probability. Only the last 
+    <tt>PAIR</tt>
+     statement is used for a given pair. For this purpose, all elevations
+    including * are different. The more specific statement will be used (i.e.
+    (s,0)(p,0) will be used instead of (s,*)(p,*) for the hexside between a
+    0-height Sand and a 0-height Plains).</div>
+  </body>
+</html>
+
