@@ -23,6 +23,7 @@ import net.sf.colossus.server.Constants;
 public final class GUIMasterHex extends MasterHex
 {
     private boolean inverted;
+    private Font oldFont;
     private FontMetrics fontMetrics;
     private int halfFontHeight;
     private Point offCenter;
@@ -194,92 +195,115 @@ public final class GUIMasterHex extends MasterHex
 
         if (useOverlay && (overlay != null))
         {
+            paintLabel(g2);
             paintOverlay(g2);
         }
         else
         {
-            // Do not anti-alias text.
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                RenderingHints.VALUE_ANTIALIAS_OFF);
+            paintLabel(g2);
+            paintTerrainName(g2);
+        }
+    }
+
+    private void shrinkFont(Graphics2D g2)
+    {
+        oldFont = g2.getFont();
+        String fontName = oldFont.getName();
+        int size = oldFont.getSize();
+        int style = oldFont.getStyle();
+            
+        Font font = new Font(fontName, style,  9 * size / 10);
+        g2.setFont(font);
+        fontMetrics = g2.getFontMetrics();
+        halfFontHeight = (fontMetrics.getMaxAscent() +
+            fontMetrics.getLeading()) / 2;
+        name = getTerrainName().toUpperCase();
+    }
+
+    private void restoreFont(Graphics2D g2)
+    {
+        g2.setFont(oldFont);
+    }
+
+    private void paintLabel(Graphics2D g2) 
+    {
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_OFF);
+        shrinkFont(g2);
         
-            // Draw label and terrain name
-            if (fontMetrics == null)
-            {
-                fontMetrics = g2.getFontMetrics();
-                halfFontHeight = (fontMetrics.getMaxAscent() +
-                                  fontMetrics.getLeading()) / 2;
-                name = getTerrainName().toUpperCase();
-            }
-            
-            switch (getLabelSide())
-            {
-            case 0:
-                g2.drawString(label, rectBound.x +
-                    ((rectBound.width - fontMetrics.stringWidth(label)) / 2),
-                    rectBound.y + halfFontHeight + rectBound.height / 10);
-                break;
+        switch (getLabelSide())
+        {
+        case 0:
+            g2.drawString(label, rectBound.x +
+                ((rectBound.width - fontMetrics.stringWidth(label)) / 2),
+                rectBound.y + halfFontHeight + rectBound.height / 10);
+            break;
 
-            case 1:
-                g2.drawString(label, rectBound.x + (rectBound.width -
-                    fontMetrics.stringWidth(label)) * 4 / 5,
-                    rectBound.y + halfFontHeight + rectBound.height / 5);
-                break;
+        case 1:
+            g2.drawString(label, rectBound.x + (rectBound.width -
+                fontMetrics.stringWidth(label)) * 5 / 6,
+                rectBound.y + halfFontHeight + rectBound.height / 8);
+            break;
 
-            case 2:
-                g2.drawString(label, rectBound.x + (rectBound.width -
-                    fontMetrics.stringWidth(label)) * 4 / 5,
-                    rectBound.y + halfFontHeight +
-                    rectBound.height * 4 / 5);
-                break;
+        case 2:
+            g2.drawString(label, rectBound.x + (rectBound.width -
+                fontMetrics.stringWidth(label)) * 5 / 6,
+                rectBound.y + halfFontHeight +
+                rectBound.height * 7 / 8);
+            break;
 
-            case 3:
-                g2.drawString(label, rectBound.x + ((rectBound.width -
-                    fontMetrics.stringWidth(label)) / 2),
-                    rectBound.y + halfFontHeight +
-                    rectBound.height * 9 / 10);
-                break;
+        case 3:
+            g2.drawString(label, rectBound.x + ((rectBound.width -
+                fontMetrics.stringWidth(label)) / 2),
+                rectBound.y + halfFontHeight +
+                rectBound.height * 9 / 10);
+            break;
 
-            case 4:
-                g2.drawString(label, rectBound.x + (rectBound.width -
-                    fontMetrics.stringWidth(label)) / 5,
-                    rectBound.y + halfFontHeight +
-                    rectBound.height * 4 / 5);
-                break;
+        case 4:
+            g2.drawString(label, rectBound.x + (rectBound.width -
+                fontMetrics.stringWidth(label)) / 6,
+                rectBound.y + halfFontHeight +
+                rectBound.height * 5 / 6);
+            break;
 
-            case 5:
-                g2.drawString(label, rectBound.x + (rectBound.width -
-                    fontMetrics.stringWidth(label)) / 5,
-                    rectBound.y + halfFontHeight + rectBound.height / 5);
-                break;
-            }
-            
-            // The word "MOUNTAINS" needs to be printed in the wide part of
-            // the hex, with a smaller font.
-            if (name.equals("MOUNTAINS"))
-            {
-                Font oldFont = g2.getFont();
-                String fontName = oldFont.getName();
-                int size = oldFont.getSize();
-                int style = oldFont.getStyle();
-                
-                Font font = new Font(fontName, style,  9 * size / 10);
-                g2.setFont(font);
-                FontMetrics fontMetrics = g2.getFontMetrics();
-                halfFontHeight = (fontMetrics.getMaxAscent() +
-                                  fontMetrics.getLeading()) / 2;
-                
-                g2.drawString(name, rectBound.x + ((rectBound.width -
-                    fontMetrics.stringWidth(name)) / 2),
-                    rectBound.y + halfFontHeight + rectBound.height * 2 / 3);
+        case 5:
+            g2.drawString(label, rectBound.x + (rectBound.width -
+                fontMetrics.stringWidth(label)) / 6,
+                rectBound.y + halfFontHeight + rectBound.height / 8);
+            break;
+        }
 
-                g2.setFont(oldFont);
-            }
-            else
-            {
-                g2.drawString(name, rectBound.x + ((rectBound.width -
-                    fontMetrics.stringWidth(name)) / 2),
-                    rectBound.y + halfFontHeight + (rectBound.height / 2));
-            }
+        restoreFont(g2);
+    }
+
+    private void paintTerrainName(Graphics2D g2)
+    {
+        // Do not anti-alias text.
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_OFF);
+        if (fontMetrics == null)
+        {
+            fontMetrics = g2.getFontMetrics();
+            halfFontHeight = (fontMetrics.getMaxAscent() +
+                              fontMetrics.getLeading()) / 2;
+            name = getTerrainName().toUpperCase();
+        }
+
+        // The word "MOUNTAINS" needs to be printed in the wide part of
+        // the hex, with a smaller font.
+        if (name.equals("MOUNTAINS"))
+        {
+            shrinkFont(g2); 
+            g2.drawString(name, rectBound.x + ((rectBound.width -
+                fontMetrics.stringWidth(name)) / 2),
+                rectBound.y + halfFontHeight + rectBound.height * 2 / 3);
+            restoreFont(g2);
+        }
+        else
+        {
+            g2.drawString(name, rectBound.x + ((rectBound.width -
+                fontMetrics.stringWidth(name)) / 2),
+                rectBound.y + halfFontHeight + (rectBound.height / 2));
         }
     }
 
