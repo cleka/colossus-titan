@@ -30,6 +30,15 @@ public final class VariantSupport
     {
         String tempVarName = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
+        loadVariant(tempVarName, tempVarDirectory);
+    }
+    /**
+     * Load a Colossus Variant from the specified filename in the specified path.
+     * @param tempVarName The name of the file holding the Variant definition.
+     * @param tempVarDirectory The path to the directory holding the Variant.
+     */
+    public static void loadVariant(String tempVarName, String tempVarDirectory)
+    {
         Log.debug("Loading variant " + tempVarName +
                   ", data files in " + tempVarDirectory);
         try
