@@ -74,9 +74,7 @@ public final class LegionInfo
         }
         catch (NullPointerException ex)
         {
-            Log.error("null pointer in LegionInfo.getHeight() for " + 
-                    toString());
-            return 8;
+            return 0;
         }
     }
 
@@ -113,9 +111,8 @@ public final class LegionInfo
             return Collections.unmodifiableList(
                     getNode().getCreatures().getCreatureNames());
         }
-        catch (NullPointerException e)
+        catch (NullPointerException ex)
         {
-            Log.debug("NullPointerException in getContents()");
             return new ArrayList();
         }
     }
@@ -230,9 +227,9 @@ public final class LegionInfo
         getNode().revealCreatures(names);
     }
 
-    void split(int childHeight, String childId, List splitoffs, int turn)
+    void split(int childHeight, String childId, int turn)
     {
-        getNode().split(childHeight, childId, turn, splitoffs);
+        getNode().split(childHeight, childId, turn);
     }
 
     void merge(String splitoffId, int turn)
