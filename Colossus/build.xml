@@ -286,10 +286,10 @@
 </target>
 
 
+<!-- TODO Need to build and copy docs. -->
 <target name="inst" depends="init,sign,dist,changelog"
         description = "Copy files into htdocs tree on SF"> 
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
-        <copy file="docs/README.txt" todir="${HTMLDIR}"/>
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
         <copy file="ChangeLog" todir="${HTMLDIR}"/>
