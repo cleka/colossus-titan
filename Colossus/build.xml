@@ -65,15 +65,6 @@
 </target>
 
 
-<!-- Delete stale jar files before compiling -->
-<target name="cleanjars" depends=""
-        description = "Delete stale jar files">
-        <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
-</target>
-
-
 <taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake"/>
 
 <target name="compile" depends="init"
@@ -156,12 +147,19 @@
 </target>
 
 
+<!-- Delete stale jar files before compiling -->
+<target name="cleanjars" depends=""
+        description = "Delete stale jar files">
+        <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
+</target>
+
 
 <!-- Be very careful modifying this.  It whacks whole directories easily. -->
 <target name="clean" depends="cleanjars"
         description = "Delete derived files">
-        <delete verbose="yes" quiet = "yes" includeemptydirs="yes"
-                defaultexcludes="no">
+        <delete verbose="yes" quiet = "yes" includeemptydirs="yes">
                 <fileset dir="."
                  includes =
                         "version,
