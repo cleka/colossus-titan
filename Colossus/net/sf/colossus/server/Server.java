@@ -77,7 +77,7 @@ Log.debug("About to create server socket on port " + port);
                 serverSocket.close();
                 serverSocket = null;
             }
-            serverSocket = new ServerSocket(port);
+            serverSocket = new ServerSocket(port, Constants.MAX_PLAYERS);
         }
         catch (IOException ex)
         {
@@ -310,7 +310,9 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
 
     public synchronized void makeForcedStrikes(boolean rangestrike)
     {
-        if (isBattleActivePlayer())
+        if (isBattleActivePlayer() && 
+            (game.getBattle().getPhase() == Constants.FIGHT ||
+             game.getBattle().getPhase() == Constants.STRIKEBACK))
         {
             game.getBattle().makeForcedStrikes(rangestrike);
         }
@@ -661,6 +663,10 @@ Log.debug("Called Server.reinforce()");
             if (game.getBattle() != null)
             {
                 game.getBattle().doneReinforcing();
+            }
+            else
+            {
+                game.doneReinforcing();
             }
         }
     }

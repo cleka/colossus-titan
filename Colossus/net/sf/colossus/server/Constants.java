@@ -23,6 +23,7 @@ public final class Constants
     public static final int MUSTER = 4;
 
 
+
     /** Base path for all external game data files. */
     public static final String gameDataPath = 
         System.getProperty("user.home") + "/Colossus/";
@@ -284,4 +285,43 @@ public final class Constants
     public static final String askPickColor = "askPickColor";
     public static final String log = "log";
     public static final String showChatMessage = "showChatMessage";
+
+
+
+
+    public static final String getPhaseName(int phase)
+    {
+        switch (phase)
+        {
+            case SPLIT:
+                return "Split";
+            case MOVE:
+                return "Move";
+            case FIGHT:
+                return "Fight";
+            case MUSTER:
+                return "Muster";
+            default:
+                return "?????";
+        }
+    }
+
+    public static String getBattlePhaseName(int phase)
+    {
+        switch (phase)
+        {
+            case Constants.SUMMON:
+                return "Summon";
+            case Constants.RECRUIT:
+                return "Recruit";
+            case Constants.MOVE:
+                return "Move";
+            case Constants.FIGHT:
+                return "Fight";
+            case Constants.STRIKEBACK:
+                return "Strikeback";
+            default:
+                return "?????";
+        }
+    }
 }

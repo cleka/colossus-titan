@@ -201,26 +201,6 @@ final class Battle
     }
 
 
-    private static String getPhaseName(int phase)
-    {
-        switch (phase)
-        {
-            case Constants.SUMMON:
-                return "Summon";
-            case Constants.RECRUIT:
-                return "Recruit";
-            case Constants.MOVE:
-                return "Move";
-            case Constants.FIGHT:
-                return "Fight";
-            case Constants.STRIKEBACK:
-                return "Strikeback";
-            default:
-                return "?????";
-        }
-    }
-
-
     Game getGame()
     {
         return game;
@@ -382,14 +362,16 @@ final class Battle
             if (phase == Constants.SUMMON)
             {
                 phase = Constants.MOVE;
-                Log.event("Battle phase advances to " + getPhaseName(phase));
+                Log.event("Battle phase advances to " + 
+                    Constants.getBattlePhaseName(phase));
                 again = setupMove();
             }
     
             else if (phase == Constants.RECRUIT)
             {
                 phase = Constants.MOVE;
-                Log.event("Battle phase advances to " + getPhaseName(phase));
+                Log.event("Battle phase advances to " + 
+                    Constants.getBattlePhaseName(phase));
                 again = setupMove();
             }
     
@@ -403,7 +385,8 @@ final class Battle
                     attackerEntered = true;
                 }
                 phase = Constants.FIGHT;
-                Log.event("Battle phase advances to " + getPhaseName(phase));
+                Log.event("Battle phase advances to " + 
+                    Constants.getBattlePhaseName(phase));
                 again = setupFight();
             }
     
@@ -414,7 +397,8 @@ final class Battle
                 activeLegionNum = (activeLegionNum + 1) & 1;
                 driftDamageApplied = false;
                 phase = Constants.STRIKEBACK;
-                Log.event("Battle phase advances to " + getPhaseName(phase));
+                Log.event("Battle phase advances to " + 
+                    Constants.getBattlePhaseName(phase));
                 again = setupFight();
             }
     
@@ -607,6 +591,7 @@ Log.debug("Called Battle.doneReinforcing()");
             Critter newCritter = defender.getCritter(defender.getHeight() - 1);
             placeCritter(newCritter);
         }
+        game.doneReinforcing();
         advancePhase();
     }
 
@@ -948,8 +933,7 @@ Log.debug("Called Battle.doneReinforcing()");
         // After turn 1, offboard creatures are returned to the
         // stacks or the legion they were summoned from, with
         // no points awarded.
-        if (critter.getCurrentHex().isEntrance() &&
-            getTurnNumber() > 1)
+        if (critter.getCurrentHex().isEntrance() && getTurnNumber() > 1)
         {
             // XXX If a critter is both summonable and a recruitable
             // reinforcement, then this logic fails.
@@ -1134,6 +1118,12 @@ Log.debug("Called Battle.doneReinforcing()");
      *  technically forced. */
     synchronized void makeForcedStrikes(boolean rangestrike)
     {
+        if (getPhase() != Constants.FIGHT && 
+            getPhase() != Constants.STRIKEBACK)
+        {
+            Log.error("Called Battle.makeForcedStrikes() in wrong phase");
+            return;
+        }
         Legion legion = getActiveLegion();
         boolean repeat;
         do
@@ -1973,14 +1963,14 @@ Log.debug("Called Battle.doneReinforcing()");
         {
             Log.event(critter.getDescription() + " does not move");
             // Call moveToHex() anyway to sync client.
-            critter.moveToHex(hexLabel);
+            critter.moveToHex(hexLabel, true);
             return true;
         }
         else if (showMoves(critter, false).contains(hexLabel))
         {
             Log.event(critter.getName() + " moves from " +
                 critter.getCurrentHexLabel() + " to " + hexLabel);
-            critter.moveToHex(hexLabel);
+            critter.moveToHex(hexLabel, true);
             return true;
         }
         else
@@ -1999,7 +1989,7 @@ Log.debug("Called Battle.doneReinforcing()");
     {
         if (showMoves(critter, false).contains(hexLabel))
         {
-            critter.moveToHex(hexLabel);
+            critter.moveToHex(hexLabel, false);
             return true;
         }
         return false;

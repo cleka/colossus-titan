@@ -2189,22 +2189,34 @@ Log.debug("recruiters.size() is " + recruiters.size());
 
     static int getKillValue(Creature creature, char terrain)
     {
-        int val = 2 * creature.getPointValue();
+        int val = 10 * creature.getPointValue();
+        if (creature.getSkill() == 4)
+        {
+            val += 2;
+        }
+        if (creature.getSkill() == 2)
+        {
+            val += 1;
+        }
         if (creature.isFlier())
         {
-            val++;
+            val += 10;
         }
         if (creature.isRangestriker())
         {
-            val++;
+            val += 10;
+        }
+        if (creature.useMagicMissile())
+        {
+            val += 10;
         }
         if (MasterHex.isNativeCombatBonus(creature, terrain))
         {
-            val++;
+            val += 10;
         }
         if (creature.isTitan())
         {
-            val += 100;
+            val += 1000;
         }
         return val;
     }
@@ -2360,7 +2372,7 @@ Log.debug("recruiters.size() is " + recruiters.size());
                 Critter critter2 = cm.getCritter();
                 Log.debug("Simulating moving " + critter2.getName() + " to " + 
                     cm.getEndingHexLabel());
-                critter2.moveToHex(cm.getEndingHexLabel());
+                critter2.moveToHex(cm.getEndingHexLabel(), false);
             }
 
             // moveList is a list of CritterMoves for one critter.
@@ -2382,14 +2394,14 @@ Log.debug("recruiters.size() is " + recruiters.size());
                    currentHexLabel, hexLabel);
 
                 // Need to move the critter to evaluate.
-                critter.moveToHex(hexLabel);
+                critter.moveToHex(hexLabel, false);
 
                 // Compute and save the value for each CritterMove.
                 cm.setValue(evaluateCritterMove(battle, critter));
                 moveList.add(cm);
             }
             // Move the critter back where it started.
-            critter.moveToHex(critter.getStartingHexLabel());
+            critter.moveToHex(critter.getStartingHexLabel(), false);
 
             // Sort critter moves in descending order of score.
             Collections.sort(moveList, new Comparator()
@@ -2436,7 +2448,7 @@ Log.debug("recruiters.size() is " + recruiters.size());
                 moveList = (List)it2.next();
                 CritterMove cm = (CritterMove)moveList.get(0);
                 Critter critter2 = cm.getCritter();
-                critter2.moveToHex(cm.getStartingHexLabel());
+                critter2.moveToHex(cm.getStartingHexLabel(), false);
             }
         }
 

@@ -2,12 +2,11 @@ Bug: Enemy stack said it was 4-high, but when I jumped on it it became
    5-high.  Missed a height updated somewhere.  (Summoned angel or
    recruit?)
 
-Bug: Lost battle with titan stack, game stuck in my engagement phase.
-   Hit 'd' but then it got stuck in next player's engagement phase.
-   kickEngagements() summoning=false, reinforcing=true, acquiring=false
-   Looks like AI post-battle reinforcing is broken.  Added logging,
-   and called Game.clearFlags() from advanceTurn().  AI reinforcement
-   during battles appears to work.  Fixed?
+Bug: Critters still highlighted in battle sometimes after they've 
+   struck.  (Because of server-side forced strikes?)
+
+When getting both a PickRecruit and an AcquireAngel after a battle,
+   make sure the PickRecruit is on top, because it's modal.
 
 Show battle hex id, legion ids in BattleMap frame title.  (Trying to 
    set it, but it's not showing up.)
@@ -19,9 +18,6 @@ Do not ask player to pick a color if only one remains.
 
 Colorize chat window.
 Colorize StatusScreen.
-
-Sort creatures so that clopses/warbears, angels/guardiants, etc. 
-   aren't mixed.
 
 Observer clients.
 
@@ -72,11 +68,7 @@ ShowLegion on mouseover, not click, with permanent dialog.
 Highlight appropriate engagement hex while engagement is being resolved.
    (Except during angel summoning.)
 
-Initialize autoPickRecruiter and Show Graphical Overlays to true by default.
-
 Optional post-engagement status dialog.
-
-Always show the current turn, player, and phase in a panel somewhere.
 
 Add confirm dialogs (for conceding with titan, skipping recruits, ...)
 

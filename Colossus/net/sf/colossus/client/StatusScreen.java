@@ -34,6 +34,13 @@ final class StatusScreen extends KDialog implements WindowListener
     private JLabel [] titanLabel;
     private JLabel [] scoreLabel;
 
+    private JLabel activePlayerLabel;
+    private JLabel turnLabel;
+    private JLabel phaseLabel;
+    private JLabel battleActivePlayerLabel;
+    private JLabel battleTurnLabel;
+    private JLabel battlePhaseLabel;
+
     private Client client;
 
     private Point location;
@@ -54,7 +61,39 @@ final class StatusScreen extends KDialog implements WindowListener
         addWindowListener(this);
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(new GridLayout(10, 0));
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+
+        JPanel turnPane = new JPanel();
+        turnPane.setLayout(new GridLayout(0, 3));
+        turnPane.setBorder(BorderFactory.createEtchedBorder());
+        contentPane.add(turnPane);
+
+        turnPane.add(new JLabel(""));
+        turnPane.add(new JLabel("Game"));
+        turnPane.add(new JLabel("Battle"));
+
+        turnPane.add(new JLabel("Turn"));
+        turnLabel = new JLabel();
+        turnPane.add(turnLabel);
+        battleTurnLabel = new JLabel();
+        turnPane.add(battleTurnLabel);
+
+        turnPane.add(new JLabel("Player"));
+        activePlayerLabel = new JLabel();
+        turnPane.add(activePlayerLabel);
+        battleActivePlayerLabel = new JLabel();
+        turnPane.add(battleActivePlayerLabel);
+
+        turnPane.add(new JLabel("Phase"));
+        phaseLabel = new JLabel();
+        turnPane.add(phaseLabel);
+        battlePhaseLabel = new JLabel();
+        turnPane.add(battlePhaseLabel);
+
+        JPanel gridPane = new JPanel();
+        contentPane.add(gridPane);
+        gridPane.setLayout(new GridLayout(10, 0));
+        gridPane.setBorder(BorderFactory.createEtchedBorder());
 
         nameLabel = new JLabel[numPlayers];
         towerLabel = new JLabel[numPlayers];
@@ -67,84 +106,84 @@ final class StatusScreen extends KDialog implements WindowListener
         scoreLabel = new JLabel[numPlayers];
         valueLabel = new JLabel[numPlayers];
 
-        contentPane.add(new JLabel("Player"));
+        gridPane.add(new JLabel("Player"));
         for (int i = 0; i < numPlayers; i++)
         {
             nameLabel[i] = new JLabel();
             nameLabel[i].setOpaque(true);
-            contentPane.add(nameLabel[i]);
+            gridPane.add(nameLabel[i]);
         }
 
-        contentPane.add(new JLabel("Tower"));
+        gridPane.add(new JLabel("Tower"));
         for (int i = 0; i < numPlayers; i++)
         {
             towerLabel[i] = new JLabel();
             towerLabel[i].setOpaque(true);
-            contentPane.add(towerLabel[i]);
+            gridPane.add(towerLabel[i]);
         }
 
-        contentPane.add(new JLabel("Color"));
+        gridPane.add(new JLabel("Color"));
         for (int i = 0; i < numPlayers; i++)
         {
             colorLabel[i] = new JLabel();
             colorLabel[i].setOpaque(true);
-            contentPane.add(colorLabel[i]);
+            gridPane.add(colorLabel[i]);
         }
 
-        contentPane.add(new JLabel("Elim"));
+        gridPane.add(new JLabel("Elim"));
         for (int i = 0; i < numPlayers; i++)
         {
             elimLabel[i] = new JLabel();
             elimLabel[i].setOpaque(true);
-            contentPane.add(elimLabel[i]);
+            gridPane.add(elimLabel[i]);
         }
 
-        contentPane.add(new JLabel("Legions"));
+        gridPane.add(new JLabel("Legions"));
         for (int i = 0; i < numPlayers; i++)
         {
             legionsLabel[i] = new JLabel();
             legionsLabel[i].setOpaque(true);
-            contentPane.add(legionsLabel[i]);
+            gridPane.add(legionsLabel[i]);
         }
 
-        contentPane.add(new JLabel("Markers"));
+        gridPane.add(new JLabel("Markers"));
         for (int i = 0; i < numPlayers; i++)
         {
             markersLabel[i] = new JLabel();
             markersLabel[i].setOpaque(true);
-            contentPane.add(markersLabel[i]);
+            gridPane.add(markersLabel[i]);
         }
 
-        contentPane.add(new JLabel("Creatures"));
+        gridPane.add(new JLabel("Creatures"));
         for (int i = 0; i < numPlayers; i++)
         {
             creaturesLabel[i] = new JLabel();
             creaturesLabel[i].setOpaque(true);
-            contentPane.add(creaturesLabel[i]);
+            gridPane.add(creaturesLabel[i]);
         }
 
-        contentPane.add(new JLabel("Value"));
+        gridPane.add(new JLabel("Value"));
         for (int i = 0; i < numPlayers; i++)
         {
             valueLabel[i] = new JLabel();
             valueLabel[i].setOpaque(true);
-            contentPane.add(valueLabel[i]);
+            gridPane.add(valueLabel[i]);
         }
 
-        contentPane.add(new JLabel("Titan Size"));
+        gridPane.add(new JLabel("Titan Size"));
         for (int i = 0; i < numPlayers; i++)
         {
             titanLabel[i] = new JLabel();
             titanLabel[i].setOpaque(true);
-            contentPane.add(titanLabel[i]);
+            gridPane.add(titanLabel[i]);
         }
 
-        contentPane.add(new JLabel("Score"));
+        gridPane.add(new JLabel("Score"));
         for (int i = 0; i < numPlayers; i++)
         {
             scoreLabel[i] = new JLabel();
             scoreLabel[i].setOpaque(true);
-            contentPane.add(scoreLabel[i]);
+            gridPane.add(scoreLabel[i]);
         }
 
         updateStatusScreen();
@@ -200,6 +239,13 @@ final class StatusScreen extends KDialog implements WindowListener
 
     void updateStatusScreen()
     {
+        activePlayerLabel.setText(client.getActivePlayerName());
+        turnLabel.setText("" + client.getTurnNumber());
+        phaseLabel.setText(client.getPhaseName());
+        battleActivePlayerLabel.setText(client.getBattleActivePlayerName());
+        battleTurnLabel.setText("" + client.getBattleTurnNumberString());
+        battlePhaseLabel.setText(client.getBattlePhaseName());
+
         for (int i = 0; i < numPlayers; i++)
         {
             PlayerInfo info = client.getPlayerInfo(i);

@@ -95,7 +95,7 @@ public final class Client implements IClient
     private int phase = -1;
 
     private int battleTurnNumber = -1;
-    private String battleActivePlayerName = "none";
+    private String battleActivePlayerName = null;
     private int battlePhase = -1;
     private String attackerMarkerId = "none";
     private String defenderMarkerId = "none";
@@ -710,7 +710,7 @@ public final class Client implements IClient
     void doneWithBattleMoves()
     {
         clearUndoStack();
-        
+        markOffboardCreaturesDead();
         server.doneWithBattleMoves();
     }
 
@@ -727,6 +727,22 @@ public final class Client implements IClient
             }
         }
         return false;
+    }
+
+    void markOffboardCreaturesDead()
+    {
+        Iterator it = getBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getHexLabel().startsWith("X") &&
+                battleActivePlayerName.equals(
+                    getPlayerNameByTag(chit.getTag())))
+            {
+                chit.setDead(true);
+                chit.repaint();
+            }
+        }
     }
 
 
@@ -915,6 +931,7 @@ public final class Client implements IClient
     }
 
 
+    // XXX Does this need to be public?
     public void removeDeadBattleChits()
     {
         Iterator it = battleChits.iterator();
@@ -1087,7 +1104,6 @@ public final class Client implements IClient
 
     public void setPlayerName(String playerName)
     {
-Log.debug("Client.setPlayerName() from " + this.playerName + " to " + playerName);
         this.playerName = playerName;
         sct.fixName(playerName);
     }
@@ -1103,7 +1119,6 @@ Log.debug("Client.setPlayerName() from " + this.playerName + " to " + playerName
         if (getOption(Options.autoSummonAngels))
         {
             String typeColonDonor = ai.summonAngel(markerId, this);
-Log.debug("ai.summonAngel returned " + typeColonDonor);
             java.util.List parts = Split.split(':', typeColonDonor);
             String unit = (String)parts.get(0);
             String donor = (String)parts.get(1);
@@ -1483,7 +1498,6 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
     }
 
 
-    // XXX Too much direct GUI control
     public void cleanupBattle()
     {
         if (map != null)
@@ -1492,10 +1506,12 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
             map = null;
         }
         battleChits.clear();
+        battleTurnNumber = -1;
+        battlePhase = -1;
+        battleActivePlayerName = null;
     }
 
 
-    // XXX Too much direct GUI control
     public void highlightEngagements()
     {
         if (board != null)
@@ -1690,6 +1706,7 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
                 board.fullRepaint();
             }
         }
+        updateStatusScreen();
     }
 
     public void setupMove()
@@ -1700,6 +1717,7 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
         {
             board.setupMoveMenu();
         }
+        updateStatusScreen();
     }
 
     public void setupFight()
@@ -1709,6 +1727,7 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
         {
             board.setupFightMenu();
         }
+        updateStatusScreen();
     }
 
     public void setupMuster()
@@ -1719,6 +1738,7 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
         {
             board.setupMusterMenu();
         }
+        updateStatusScreen();
     }
 
 
@@ -1737,6 +1757,7 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
                 map.setupSummonMenu();
             }
         }
+        updateStatusScreen();
     }
 
     public void setupBattleRecruit(String battleActivePlayerName,
@@ -1754,6 +1775,7 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
                 map.setupRecruitMenu();
             }
         }
+        updateStatusScreen();
     }
 
     private void resetAllBattleMoves()
@@ -1782,6 +1804,7 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
             map.getFrame().toFront();
             map.setupMoveMenu();
         }
+        updateStatusScreen();
     }
 
     /** Used for both strike and strikeback. */
@@ -1801,6 +1824,7 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
                 map.setupFightMenu();
             }
         }
+        updateStatusScreen();
     }
 
 
@@ -1898,9 +1922,31 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
         return battlePhase;
     }
 
+    String getBattlePhaseName()
+    {
+        if (phase == Constants.FIGHT && battlePhase >= Constants.SUMMON &&
+            battlePhase <= Constants.STRIKEBACK)
+        {
+            return Constants.getBattlePhaseName(battlePhase);
+        }
+        return "";
+    }
+
     int getBattleTurnNumber()
     {
         return battleTurnNumber;
+    }
+
+    String getBattleTurnNumberString()
+    {
+        if (battleTurnNumber < 1)
+        {
+            return "";
+        }
+        else
+        {
+            return "" + battleTurnNumber;
+        }
     }
 
 
@@ -1926,6 +1972,7 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
         {
             map.alignChits(startingHexLabel);
             map.alignChits(endingHexLabel);
+            map.repaint();
         }
     }
 
@@ -2081,6 +2128,11 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
         return phase;
     }
 
+    String getPhaseName()
+    {
+        return Constants.getPhaseName(getPhase());
+    }
+
     int getTurnNumber()
     {
         return turnNumber;
@@ -2225,8 +2277,10 @@ Log.debug("ai.summonAngel returned " + typeColonDonor);
         }
         if (board != null)
         {
+            board.unselectHexByLabel(startingHexLabel);
             board.alignLegions(startingHexLabel);
             board.alignLegions(currentHexLabel);
+            board.repaint();
         }
     }
 

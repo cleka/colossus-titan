@@ -346,11 +346,14 @@ final class Critter extends Creature implements Comparable
 
     /** Most code should use Battle.doMove() instead, since it checks
      *  for legality and logs the move. */
-    void moveToHex(String hexLabel)
+    void moveToHex(String hexLabel, boolean tellClients)
     {
         currentHexLabel = hexLabel;
-        battle.getGame().getServer().allTellBattleMove(tag, startingHexLabel,
-            currentHexLabel, false);
+        if (tellClients)
+        {
+            battle.getGame().getServer().allTellBattleMove(tag, 
+                startingHexLabel, currentHexLabel, false);
+        }
     }
 
 

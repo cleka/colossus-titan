@@ -450,24 +450,6 @@ Log.debug("Called Game.newGame2()");
     }
 
 
-    private static String getPhaseName(int phase)
-    {
-        switch (phase)
-        {
-            case Constants.SPLIT:
-                return "Split";
-            case Constants.MOVE:
-                return "Move";
-            case Constants.FIGHT:
-                return "Fight";
-            case Constants.MUSTER:
-                return "Muster";
-            default:
-                return "?????";
-        }
-    }
-
-
     /** Randomize towers by rolling dice and rerolling ties. */
     private void assignTowers()
     {
@@ -812,7 +794,8 @@ Log.debug("Called Game.newGame2()");
             }
             else
             {
-                Log.event("Phase advances to " + getPhaseName(phase));
+                Log.event("Phase advances to " + 
+                    Constants.getPhaseName(phase));
             }
             pendingAdvancePhase = false;
             setupPhase();
@@ -2214,6 +2197,10 @@ Log.debug("Called Game.newGame2()");
     void doneReinforcing()
     {
         reinforcing = false;
+        if (battle == null)
+        {
+            kickEngagements();
+        }
     }
 
     // Called by both human and AI.
