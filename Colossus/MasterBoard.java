@@ -38,7 +38,7 @@ class MasterBoard extends Frame implements MouseListener,
         {true, true, true, true, true, true, true, true},
         {false, true, true, true, true, true, true, false},
         {false, false, true, true, true, true, false, false},
-        {false, false, false, true, true, false, false, false},
+        {false, false, false, true, true, false, false, false}
     };
 
     private Image offImage;
@@ -78,7 +78,7 @@ class MasterBoard extends Frame implements MouseListener,
         }
         catch (NullPointerException e)
         {
-            System.out.println("Couldn't find " +
+            System.out.println(e.toString() + " Couldn't find " +
                 Creature.colossus.getImageName());
             System.exit(1);
         }
@@ -157,7 +157,7 @@ class MasterBoard extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, "waitForAll was interrupted");
+            new MessageBox(this, e.toString() + " waitForAll was interrupted");
         }
 
         imagesLoaded = true;
@@ -1673,38 +1673,38 @@ class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    public void windowActivated(WindowEvent event)
+    public void windowActivated(WindowEvent e)
     {
     }
 
 
-    public void windowClosed(WindowEvent event)
+    public void windowClosed(WindowEvent e)
     {
     }
 
 
-    public void windowClosing(WindowEvent event)
+    public void windowClosing(WindowEvent e)
     {
         System.exit(0);
     }
 
 
-    public void windowDeactivated(WindowEvent event)
+    public void windowDeactivated(WindowEvent e)
     {
     }
 
 
-    public void windowDeiconified(WindowEvent event)
+    public void windowDeiconified(WindowEvent e)
     {
     }
 
 
-    public void windowIconified(WindowEvent event)
+    public void windowIconified(WindowEvent e)
     {
     }
 
 
-    public void windowOpened(WindowEvent event)
+    public void windowOpened(WindowEvent e)
     {
     }
 
