@@ -287,8 +287,7 @@ public class SimpleAI implements AI
             }
         }
 
-        if ((VariantSupport.getVarName().equals(Constants.defaultVARFile)) &&
-            (recruit != temprecruit4))
+        if (recruit != temprecruit4)
         {
             Log.debug("Variant Hint disagree with built-in heuristic: " +
                       temprecruit4 + " vs. " + recruit);
