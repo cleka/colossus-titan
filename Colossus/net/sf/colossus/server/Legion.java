@@ -38,6 +38,7 @@ public final class Legion implements Comparable
 
     static
     {
+        /* Black */
         markerNames.put("Bk01", "Axes");
         markerNames.put("Bk02", "Eye");
         markerNames.put("Bk03", "Die");
@@ -51,6 +52,7 @@ public final class Legion implements Comparable
         markerNames.put("Bk11", "Spearhead");
         markerNames.put("Bk12", "Tombstone");
 
+        /* Brown */
         markerNames.put("Br01", "Antlers");
         markerNames.put("Br02", "Bell");
         markerNames.put("Br03", "Chest");
@@ -64,6 +66,7 @@ public final class Legion implements Comparable
         markerNames.put("Br11", "Tankard");
         markerNames.put("Br12", "Wheel");
 
+        /* Blue */
         markerNames.put("Bu01", "Anchor");
         markerNames.put("Bu02", "Bat");
         markerNames.put("Bu03", "Candle");
@@ -77,6 +80,7 @@ public final class Legion implements Comparable
         markerNames.put("Bu11", "Tornado");
         markerNames.put("Bu12", "Trident");
 
+        /* Gold */
         markerNames.put("Gd01", "Caduceus");
         markerNames.put("Gd02", "Claw");
         markerNames.put("Gd03", "Coins");
@@ -90,6 +94,7 @@ public final class Legion implements Comparable
         markerNames.put("Gd11", "Sun");
         markerNames.put("Gd12", "Wheat");
 
+        /* Green */
         markerNames.put("Gr01", "Cauldron");
         markerNames.put("Gr02", "Dagger");
         markerNames.put("Gr03", "Diamond");
@@ -103,6 +108,7 @@ public final class Legion implements Comparable
         markerNames.put("Gr11", "Scales");
         markerNames.put("Gr12", "Snake");
 
+        /* Red */
         markerNames.put("Rd01", "Cross");
         markerNames.put("Rd02", "Eagle");
         markerNames.put("Rd03", "Fist");

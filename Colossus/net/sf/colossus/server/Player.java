@@ -182,33 +182,9 @@ Log.debug("Called Player.setType() for " + name + " " + type);
         {
             return null;
         }
-        else if (color.equals("Black"))
-        {
-            return "Bk";
-        }
-        else if (color.equals("Blue"))
-        {
-            return "Bu";
-        }
-        else if (color.equals("Brown"))
-        {
-            return "Br";
-        }
-        else if (color.equals("Gold"))
-        {
-            return "Gd";
-        }
-        else if (color.equals("Green"))
-        {
-            return "Gr";
-        }
-        else if (color.equals("Red"))
-        {
-            return "Rd";
-        }
         else
         {
-            return "XX";
+            return Constants.getShortColorName(color);
         }
     }
 

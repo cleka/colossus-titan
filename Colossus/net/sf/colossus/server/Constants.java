@@ -83,9 +83,16 @@ public final class Constants
     public static final int MAX_HORIZ_SIZE=60;
     public static final int MAX_VERT_SIZE=32;
 
+    /* the two arrays below must match ; see also
+       net.sf.colossus.server.Legion, it uses the
+       shortened name directly */
     public static final String [] colorNames =
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
-
+    public static final String [] shortColorNames = 
+        { "Bk",   "Bu",   "Br",    "Gd",   "Gr",    "Rd" };
+    public static final String noShortName = "XX";
+    private static final java.util.HashMap shortNamesMap = new HashMap();
+    
     public static final int MIN_DELAY = 0;      //in ms
     public static final int MAX_DELAY = 3000;
     public static final int DEFAULT_DELAY = 300;
@@ -120,8 +127,9 @@ public final class Constants
     public static final String battlemapIconTextColor = "black";
     public static final String battlemapIconSubscript = "Battle";
 
-    // XXX Not used everywhere yet, so don't change it.
     public static final int DEFAULT_MAX_PLAYERS = 6;
+    /* number of available colours/markers */
+    public static final int MAX_MAX_PLAYERS = 9;
 
     // Player types
     public static final String human = "Human";
@@ -287,8 +295,18 @@ public final class Constants
     public static final String log = "log";
     public static final String showChatMessage = "showChatMessage";
 
-
-
+    static
+    {
+        if (colorNames.length != shortColorNames.length)
+        {
+            System.err.println("ERROR: List of constants is wrong !");
+            System.exit(1);
+        }
+        for (int i = 0; i < colorNames.length; i++)
+        {
+            shortNamesMap.put(colorNames[i], shortColorNames[i]);
+        }
+    }
 
     public static final String getPhaseName(int phase)
     {
@@ -324,5 +342,14 @@ public final class Constants
             default:
                 return "";
         }
+    }
+
+    public static String getShortColorName(String c)
+    {
+        String temp = (String)shortNamesMap.get(c);
+        if (temp != null)
+            return temp;
+        else
+            return noShortName;
     }
 }
