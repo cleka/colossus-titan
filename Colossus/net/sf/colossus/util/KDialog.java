@@ -102,11 +102,12 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
         setLocation(location);
     }
 
+    // Move up a few pixels from the bottom, to help avoid taskbars.
     public void lowerRightCorner()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width - getSize().width,
-            d.height - getSize().height));
+            d.height - getSize().height - 30));
     }
 
 
