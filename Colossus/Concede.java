@@ -11,7 +11,7 @@ class Concede extends Dialog implements ActionListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
-    private final int scale = 60;
+    private static final int scale = 60;
     private Frame parentFrame;
     private Button button1;
     private Button button2;
@@ -23,6 +23,7 @@ class Concede extends Dialog implements ActionListener
     private Chit [] enemyChits;
     private Chit friendMarker;
     private Chit enemyMarker;
+
 
     Concede(Frame parentFrame, Legion friend, Legion enemy, boolean flee)
     {
@@ -49,7 +50,7 @@ class Concede extends Dialog implements ActionListener
         for (int i = 0; i < friend.getHeight(); i++)
         {
             friendChits[i] = new Chit((i + 1) * scale + (scale / 5), scale / 2,
-                scale, friend.creatures[i].getImageName(),this);
+                scale, friend.getCreature(i).getImageName(),this);
         }
 
         // Leave space for angels.
@@ -57,7 +58,7 @@ class Concede extends Dialog implements ActionListener
         for (int i = 0; i < enemy.getHeight(); i++)
         {
             enemyChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                2 * scale, scale, enemy.creatures[i].getImageName(), this);
+                2 * scale, scale, enemy.getCreature(i).getImageName(), this);
         }
 
         friendMarker = new Chit(scale / 5, scale / 2, scale, 
@@ -121,7 +122,8 @@ class Concede extends Dialog implements ActionListener
             if (friendChits[i] == null)
             {
                 friendChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                    scale / 2, scale, friend.creatures[i].getImageName(),this);
+                    scale / 2, scale, friend.getCreature(i).getImageName(),
+                    this);
             }
             friendChits[i].paint(g);
         }
@@ -130,7 +132,8 @@ class Concede extends Dialog implements ActionListener
             if (enemyChits[i] == null)
             {
                 enemyChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                    2 * scale, scale, enemy.creatures[i].getImageName(), this);
+                    2 * scale, scale, enemy.getCreature(i).getImageName(),
+                    this);
             }
 
             enemyChits[i].paint(g);
