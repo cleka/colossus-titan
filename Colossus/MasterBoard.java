@@ -355,6 +355,7 @@ public final class MasterBoard extends JPanel
                             else
                             {
                                 player.undoAllSplits();
+                                client.clearRecruitChits();
                                 game.advancePhase(Game.MOVE);
                             }
                         }
