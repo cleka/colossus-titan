@@ -23,7 +23,9 @@ all: AcquireAngel.class \
      MasterBoard.class \
      MasterHex.class \
      Negotiate.class \
+     OptionDialog.class \
      PickEntrySide.class \
+     PickLord.class \
      PickMarker.class \
      PickRecruit.class \
      PickRecruiter.class \
@@ -79,8 +81,14 @@ MasterHex.class: MasterHex.java
 Negotiate.class: Negotiate.java
 	$(JC) Negotiate.java
 
+OptionDialog.class: OptionDialog.java
+	$(JC) OptionDialog.java
+
 PickEntrySide.class: PickEntrySide.java
 	$(JC) PickEntrySide.java
+
+PickLord.class: PickLord.java
+	$(JC) PickLord.java
 
 PickMarker.class: PickMarker.java
 	$(JC) PickMarker.java
