@@ -20,7 +20,9 @@ public class VariantLoader
     public static final int MAP_INDEX = 0;
     public static final int CRE_INDEX = 1;
     public static final int TER_INDEX = 2;
-    public static final int DEPEND_INDEX = 3;
+    public static final int HINT_INDEX = 3;
+    public static final int DEPEND_INDEX = 4;
+    public static final int TOTAL_INDEX = 5; // number of indexes
     public int maxPlayers = -1;
 }
 
@@ -101,6 +103,15 @@ void v_ter(String[] ls) :
     { ls[TER_INDEX] = fn; }
 }
 
+void v_hint(String[] ls) :
+{
+    String fn;
+}
+{
+    "HINT:" (fn = v_chaine())
+    { ls[HINT_INDEX] = fn; }
+}
+
 void v_depend(String[] ls) :
 {
     String fn;
@@ -145,6 +156,10 @@ int oneLine(String[] ls) :
         return(1);
     }
 |   v_ter(ls)      
+    {
+        return(1);
+    }
+|   v_hint(ls)      
     {
         return(1);
     }

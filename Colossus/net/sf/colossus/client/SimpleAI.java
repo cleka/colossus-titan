@@ -155,7 +155,8 @@ public class SimpleAI implements AI
             getBestRecruitmentInfinityAhead(legion, hex, recruits);
         Creature temprecruit3 =
             getBestRecruitmentPlacesNextTurn(legion, hex, recruits);
-
+        Creature temprecruit4 =
+            getVariantRecruitHint(legion, hex, recruits);
         /*
         // graph code disabled ATM
         if (temprecruit != recruit)
@@ -1786,6 +1787,34 @@ public class SimpleAI implements AI
                       + maxwnum + ")");
         }
         return best;
+    }
+
+    private Creature getVariantRecruitHint(LegionInfo legion,
+                                           MasterHex hex,
+                                           List recruits)
+    {
+        String recruitName =
+            VariantSupport.getRecruitHint(hex.getTerrain(),legion);
+        if (recruitName == null)
+        {
+            Log.debug("No hint available");
+            return (Creature)recruits.get(recruits.size() - 1);
+        }
+        Creature recruit = Creature.getCreatureByName(recruitName);
+        String basic = ((Creature)recruits.get(recruits.size() - 1)).getName();
+        
+        if (!(recruits.contains(recruit)))
+        {
+            Log.warn("Invalid Hint for this variant !");
+            return ((Creature)recruits.get(recruits.size() - 1));
+        }
+        if (!(basic.equals(recruit.getName())))
+        {
+            Log.debug("GRAPH: (" + hex.getLabel() +
+                      ") variant hint suggest recruiting " +
+                      recruitName + " instead of " + basic);
+        }
+        return recruit;
     }
 
     private int getNumberOfWaysToTerrain(LegionInfo legion, 

@@ -68,7 +68,7 @@ CLASS_FILES = $(sources:%.java=%.class)
 
 classes : $(CLASS_FILES)
 
-IMAGES = $(wildcard */images/*.gif)
+IMAGES = $(wildcard */images/*.gif) $(wildcard */images/*.png)
 
 JARFILE = Colossus.jar
 
@@ -84,6 +84,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	net/sf/colossus/parser/CreatureLoader.java \
 	net/sf/colossus/parser/BattlelandLoader.java \
 	net/sf/colossus/parser/VariantLoader.java \
+	net/sf/colossus/parser/AIHintLoader.java \
 	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF version 
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
         net/sf/colossus/client/*.class net/sf/colossus/server/*.class \

@@ -129,6 +129,8 @@ public final class Constants
     public static final String defaultMAPFile = "Default.map";
     /** Default TER file */
     public static final String defaultTERFile = "Default.ter";
+    /** Default HINT file */
+    public static final String defaultHINTFile = "Default.hin";
     /** Default VAR file */
     public static final String defaultVARFile = "Default.var";
 

@@ -5,6 +5,7 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.parser.VariantLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.parser.AIHintLoader;
 import net.sf.colossus.client.HexMap;
 
 import java.io.*;
@@ -22,11 +23,13 @@ public final class VariantSupport
     private static String variantName = "";
     private static String mapName = "";
     private static String recruitName = "";
+    private static String hintName = "";
     private static String creaturesName = "";
     private static Document varREADME = null;
     private static java.util.List dependUpon = null;
     private static boolean loadedVariant = false;
     private static int maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
+    private static AIHintLoader aihl = null;
 
     /**
      * Load a Colossus Variant by name.
@@ -85,7 +88,7 @@ public final class VariantSupport
             else
             {
                 VariantLoader vl = new VariantLoader(varIS);
-                String[] data = new String[4];
+                String[] data = new String[VariantLoader.TOTAL_INDEX];
                 data[0] = data[1] = data[2] = data[3] = null;
                 while (vl.oneLine(data) >= 0) {}
                 if (vl.maxPlayers > 0)
@@ -132,6 +135,14 @@ public final class VariantSupport
                 {
                     recruitName = Constants.defaultTERFile;
                 }
+                if (data[VariantLoader.HINT_INDEX] != null)
+                {
+                    hintName = data[VariantLoader.HINT_INDEX];
+                }
+                else
+                {
+                    hintName = Constants.defaultHINTFile;
+                }
                 Log.debug("Variant using TER " + recruitName);
                 if (data[VariantLoader.DEPEND_INDEX] != null)
                 {
@@ -155,6 +166,7 @@ public final class VariantSupport
             variantName = Constants.defaultVARFile;
             mapName = Constants.defaultMAPFile;
             recruitName = Constants.defaultTERFile;
+            hintName = Constants.defaultHINTFile;
             creaturesName = Constants.defaultCREFile;
             maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
             varREADME = null;
@@ -165,6 +177,7 @@ public final class VariantSupport
             loadedVariant = true;
             Creature.loadCreatures();
             loadTerrainsAndRecruits();
+            loadHints();
         }
         else
         {
@@ -202,6 +215,11 @@ public final class VariantSupport
     public static String getRecruitName()
     {
         return recruitName;
+    }
+
+    public static String getHintName()
+    {
+        return hintName;
     }
 
     public static String getCreaturesName()
@@ -289,6 +307,40 @@ public final class VariantSupport
             Log.error("Masterboard loading failed : " + e);
             System.exit(1);
         }
+    }
+
+    public synchronized static void loadHints()
+    {
+        aihl = null;
+        try
+        {
+            java.util.List directories = 
+                VariantSupport.getVarDirectoriesList();
+            InputStream aihlIS = ResourceLoader.getInputStream(
+                VariantSupport.getHintName(), directories);
+            if (aihlIS == null) 
+            {
+                throw new FileNotFoundException(
+                    VariantSupport.getHintName());
+            }
+            aihl = new AIHintLoader(aihlIS);
+            while (aihl.oneHint() >= 0) {}
+        }
+        catch (Exception e) 
+        {
+            Log.error("Hints loading failed : " + e);
+            System.exit(1);
+        }
+    }
+
+    public static String getRecruitHint(char terrain,
+                                 net.sf.colossus.client.LegionInfo legion)
+    {
+        if (aihl != null)
+        {
+            return aihl.getRecruitHint(terrain,legion);
+        }
+        return null;
     }
 
     /** get maximum number of players in that variant */

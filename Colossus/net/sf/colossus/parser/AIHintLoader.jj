@@ -1,0 +1,235 @@
+options
+{
+  IGNORE_CASE = false;
+  STATIC = false;
+}
+
+PARSER_BEGIN(AIHintLoader)
+package net.sf.colossus.parser;
+
+import java.util.*;
+
+import net.sf.colossus.util.Log;
+import net.sf.colossus.client.LegionInfo;
+import net.sf.colossus.server.Creature;
+
+/**
+ * AIHintLoader load the hints to help the AI make "good" decisions.
+ * @author Romain Dolbeau
+ * @version $Id$
+ * @see net.sf.colossus.server.Creature
+ */
+public class AIHintLoader
+{
+    Map terrainToRecruitHintList = new HashMap();
+
+    private class recruitHintData
+    {
+        char terrain;
+        String recruiter;
+        int number;
+        String recruitee;
+
+        recruitHintData(char terrain,
+                        String recruiter,
+                        int number,
+                        String recruitee)
+        {
+            this.terrain = terrain;
+            this.recruiter = recruiter;
+            this.number = number;
+            this.recruitee = recruitee;
+        }
+
+        char getTerrain()
+        {
+            return terrain;
+        }
+
+        String getRecruitee()
+        {
+            return recruitee;
+        }
+
+        public boolean equals(Object o)
+        {
+            if (o instanceof recruitHintData)
+            {
+                recruitHintData temp = (recruitHintData)o;
+                return (temp.terrain == terrain &&
+                        temp.recruiter.equals(recruiter) &&
+                        temp.number == number &&
+                        temp.recruitee.equals(recruitee));
+            }
+            return false;
+        }
+
+        boolean match(char terrain,
+                             String recruiter,
+                             int number)
+        {
+            return (this.terrain == terrain &&
+                    this.recruiter.equals(recruiter) &&
+                    this.number == number);
+        }
+    }
+    
+    public String getRecruitHint(char terrain,
+                                 LegionInfo legion)
+    {
+        Character index = new Character(terrain);
+
+        List temp = (List)terrainToRecruitHintList.get(index);
+        String hint = null;
+
+        if (temp == null)
+        { // no hint for this terrain
+            return null;
+        }
+
+        Iterator hintIt = temp.iterator();
+        while (hintIt.hasNext() && (hint == null))
+        {
+            recruitHintData th = (recruitHintData)hintIt.next();
+            
+            Iterator legionIt = legion.getContents().iterator();
+            while (legionIt.hasNext() && (hint == null))
+            { // this will try creatures as many times as they exist. yuck !
+                String creature = (String)legionIt.next();
+                
+                if (th.match(terrain, creature, legion.numCreature(creature)))
+                {
+                    hint = th.getRecruitee();
+                }
+            }
+        }
+        return hint;
+    }
+}
+
+PARSER_END(AIHintLoader)
+
+SKIP :
+{
+    " "
+  | "\r"
+  | "\t"
+}
+
+TOKEN :
+{
+        < COMMENT : "#"(<NOTNEWLINE>)*"\r" | "#"(<NOTNEWLINE>)*"\n" >
+|       < #NOTNEWLINE : ~["\n","\r"] >
+}
+
+String h_comment() :
+{}
+{
+    <COMMENT>
+    {
+        return(new String(token.image));
+    }
+}
+
+TOKEN :
+{
+    < EOL: "\n" >
+}
+
+TOKEN :
+{
+    < RECRUIT : "RECRUIT" >
+}
+
+TOKEN :
+{
+    < NUMBER : ("-")?(<DIGIT>)+ >
+|   < #DIGIT : ["0" - "9"] >
+}
+
+TOKEN :
+{
+    < CHAINE : (<CAR>)+ >
+|   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
+|   < #CAR : ["a"-"z","A"-"Z"] >
+|   < #QUOTEDCAR : ["a"-"z","A"-"Z","0"-"9"," ","_"] >
+}
+
+char h_char() :
+{}
+{
+    <CHAINE>
+    { return (token.image.charAt(0)); }
+}
+
+String h_chaine() :
+{}
+{
+    <CHAINE>
+    {
+        return(new String(token.image));
+    }
+|   <QUOTEDCHAINE>
+    {
+        String tok = new String(token.image);
+        String cha = tok.substring(1, tok.length() - 1);
+        return(cha);
+    }
+}
+
+int h_number() :
+{}
+{
+    <NUMBER>
+    {
+        return(Integer.parseInt(token.image));
+    }
+}
+
+recruitHintData h_recruit_hint() :
+{
+    char tc;
+    String recruiter;
+    int number;
+    String recruitee;
+}
+{
+    <RECRUIT> (tc = h_char()) (recruiter = h_chaine()) (number = h_number()) (recruitee = h_chaine())
+        {
+            return new recruitHintData(tc,recruiter,number,recruitee);
+        }
+}
+
+int oneHint() :
+{
+    recruitHintData recruitHint;
+    String s;
+}
+{
+    (recruitHint = h_recruit_hint())
+    {
+        Character index = new Character(recruitHint.getTerrain());
+
+        List temp = (List)terrainToRecruitHintList.get(index);
+
+        if (temp == null)
+        {
+            temp = new ArrayList();
+            terrainToRecruitHintList.put(index, temp);
+        }
+        temp.add(recruitHint);
+        return(1);
+    }
+|   <EOL>
+    {
+        return(0);
+    }
+|   (s = h_comment())
+    {
+        return(0);
+    }
+|   <EOF>
+    {
+        return(-1);
+    }
+}
