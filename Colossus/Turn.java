@@ -16,7 +16,7 @@ class Turn extends JDialog implements ActionListener
     private Container contentPane;
 
 
-    Turn(JFrame parentFrame, Game game, MasterBoard board)
+    public Turn(JFrame parentFrame, Game game, MasterBoard board)
     {
         super(parentFrame, game.getActivePlayer().getName() + " Turn " +
             game.getTurnNumber());
@@ -37,9 +37,8 @@ class Turn extends JDialog implements ActionListener
     }
 
     
-    void setupSplitDialog()
+    private void setupSplitDialog()
     {
-System.out.println("setupSplitDialog");
         Player player = game.getActivePlayer();
         setTitle(player.getName() + " Turn " + game.getTurnNumber());
 
@@ -76,9 +75,8 @@ System.out.println("setupSplitDialog");
     }
 
 
-    void setupMoveDialog()
+    private void setupMoveDialog()
     {
-System.out.println("setupMoveDialog");
         contentPane = getContentPane();
         contentPane.removeAll();
         Player player = game.getActivePlayer();
@@ -126,9 +124,8 @@ System.out.println("setupMoveDialog");
     }
 
     
-    void setupFightDialog()
+    private void setupFightDialog()
     {
-System.out.println("setupFightDialog");
         // Highlight hexes with engagements.
         // If there are no engagements, move forward to the muster phase.
         if (board.highlightEngagements() < 1)
@@ -153,9 +150,8 @@ System.out.println("setupFightDialog");
     }
 
 
-    void setupMusterDialog()
+    private void setupMusterDialog()
     {
-System.out.println("setupMusterDialog");
         if (!game.getActivePlayer().isAlive())
         {
             game.advanceTurn();
@@ -245,10 +241,11 @@ System.out.println("setupMusterDialog");
 
         else if (e.getActionCommand() == "Done with Moves")
         {
-            if (player.legionsMoved() == 0)
+            // If any legions has a legal non-teleport move, then the 
+            // player must move at least one legion.
+            if (player.legionsMoved() == 0 && 
+                player.countMobileLegions() > 0)
             {
-                // XXX: Check for the wacky case where there are
-                // no legal moves at all.
                 return;
             }
 
