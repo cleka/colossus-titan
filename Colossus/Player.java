@@ -415,7 +415,7 @@ class Player
 
     void selectMarker(int i)
     {
-        if (i < 0 && i >= numMarkersAvailable)
+        if (i < 0 || i >= numMarkersAvailable)
         {
             markerSelected = null;
         }
@@ -445,6 +445,7 @@ class Player
             markersAvailable[numMarkersAvailable + i] = newMarkers[i];
         }
         numMarkersAvailable += len;
+System.out.println("numMarkersAvailable is now " + numMarkersAvailable);
     }
 
 
