@@ -71,12 +71,12 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             {
                 oldChits[i] = new Chit((i + 1) * scale + (scale / 5), 
                     scale / 2, scale, oldLegion.getCreature(i).getImageName(),
-                    this);
+                    this, false);
             }
             newChits = new Chit[oldLegion.getHeight()];
             
             oldMarker = new Chit(scale / 5, scale / 2, scale, 
-                oldLegion.getImageName(), this);
+                oldLegion.getImageName(), this, false);
 
             tracker = new MediaTracker(this);
 

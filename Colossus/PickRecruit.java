@@ -63,7 +63,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         for (int i = 0; i < numEligible; i++)
         {
             markers[i] = new Chit(cx + i * (21 * scale / 20), cy, scale,
-                recruits[i].getImageName(), this);
+                recruits[i].getImageName(), this, false);
         }
 
         imagesLoaded = false;
