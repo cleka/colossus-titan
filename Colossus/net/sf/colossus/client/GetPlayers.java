@@ -49,9 +49,10 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private static java.util.List playerStuff = new ArrayList();
 
     private static String anyAI = "A Random AI";
-    public static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
-    private static String[] aiList = { "SimpleAI" };
+    private static String[] aiList = { "SimpleAI", "CowardSimpleAI" };
+    /* default AI should be one of aiList or anyAI */
+    public static String defaultAI = anyAI;
 
     /** list of available Variant */
     private static String[] variantArray =
@@ -119,7 +120,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             }
             else
             {
-                playerType.setSelectedItem(aiList[0]);
+                playerType.setSelectedItem(defaultAI);
             }
             playerPane.add(playerType);
             playerType.addActionListener(this);
