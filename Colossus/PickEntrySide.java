@@ -424,8 +424,14 @@ class PickEntrySide extends Dialog implements ActionListener,
     public void update(Graphics g)
     {
         Dimension d = getSize();
-        Rectangle rectClip = g.getClipBounds();
         
+        // Abort if called too early.
+        Rectangle rectClip = g.getClipBounds();
+        if (rectClip == null)
+        {
+            return;
+        }
+
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
@@ -439,7 +445,8 @@ class PickEntrySide extends Dialog implements ActionListener,
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
+                if (show[i][j] && h[i][j] != null &&
+                    rectClip.intersects(h[i][j].getBounds()))
                 {
                     h[i][j].paint(offGraphics);
                 }
