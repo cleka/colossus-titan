@@ -7,7 +7,6 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Log;
-import Default.DefaultHint;
 import java.util.*;
 
 
