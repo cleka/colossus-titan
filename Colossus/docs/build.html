@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>Building Colossus</title>
+  </head>
+  <body>
+    <h1>Building Colossus</h1>
+    <p>Sorry this is so longwinded; we&#39;re trying to be thorough in case
+    someone who&#39;s not a Java programmer wants to make a small change. (If
+    you already know C++ you can learn basic Java in a weekend; the hard part is
+    learning all the tools.)</p>
+    <h2>Tools needed</h2>
+    <p>All of these tools are free downloads, and we need to avoid making the
+    game depend on tools that aren&#39;t.</p>
+    <h4>Java development kit</h4>
+    <p>You need a 
+    <a href="http://java.sun.com/j2se">JDK</a>
+     , which includes a javac compiler, a Java runtime environment, and various
+    utilities like jar and javadoc. The game should work with JDK 1.3 or newer.
+    1.4.1 seems to be the most stable. It&#39;s a good idea to keep a 1.3.x JDK
+    around for compatibility testing. Unless you have a great net connection,
+    also download the JDK docs, which are packaged separately.</p>
+    <p>Sun maintains the best-known (and IMO best) 
+    <a href="http://java.sun.com/j2se">JDK</a>
+     for MS Windows, Solaris Sparc and x86, and x86 Linux.</p>
+    <p>The 
+    <a href="http://blackdown.org">Blackdown JDK</a>
+     is the original port of Sun&#39;s Solaris JDK to Linux. Sun&#39;s Linux
+    JDK} in turn now uses Blackdown code. So the two are very close cousins. If
+    you have a non-x86 Linux box, you want Blackdown.</p>
+    <p>If you use MacOS, you want the 
+    <a href="http://apple.com">Apple JDK</a>.
+    </p>
+    <p>Unfortunately, the free gcj and kaffe projects don&#39;t yet have enough
+    GUI support yet to be useful for Colossus. Maybe someday.</p>
+    <p>If your platform is not listed above, a starting point for finding a JDK
+    is 
+    <a
+    href="http://java.sun.com/cgi-bin/java-ports.cgi">java.sun.com/cgi-bin/java-ports.cgi</a>
+    </p>
+    <p>Once you have installed your JDK, you probably want to set an
+    environment variable called 
+    <b>JAVA_HOME</b>
+     that points to its base directory. Then you want to put 
+    <b>$JAVA_HOME/bin</b>
+     in your 
+    <b>PATH</b>
+     . You also want to set 
+    <b>CLASSPATH</b>
+     to include 
+    <b>.</b>
+     (the current directory); you&#39;ll add stuff to it later as you add Java
+    tools. A few tools directly use JAVA_HOME. It also lets you easily switch
+    JDKs by changing one environment variable.</p>
+    <h4>Other compilers</h4>
+    <p>
+    <a
+    href="http://oss.software.ibm.com/developerworks/opensource/jikes/">Jikes</a>
+     is a very fast Open Source Java compiler originally written by IBM. I
+    don&#39;t recommend using it anymore, because it produces slightly
+    different class files than javac. If you need the speed, the combination of
+    
+    <a href="http://jakarta.apache.org/ant/">Ant</a>
+     and 
+    <a
+    href="http://www.experimentalstuff.com/Technologies/JavaMake/">Javamake</a>
+     helps a lot by compiling all files in one Java process, and only
+    recompiling the files that need to be recompiled.</p>
+    <h4>Build tools</h4>
+    <p>There are two main alternatives for building Colossus, Ant and make.</p>
+    <p>
+    <a href="http://jakarta.apache.org/ant/">Ant</a>
+     is a newer cross-platform build tool used by many Java projects. It&#39;s
+    faster than make for Colossus because all compiles are done in one Java
+    process. It uses a file called 
+    <b>build.xml</b>
+     . You need version 1.5 or newer. You&#39;ll need to set 
+    <b>ANT_HOME</b>
+     to its install directory, and you&#39;ll want 
+    <b>$ANT_HOME}/bin</b>
+     in your 
+    <b>PATH</b>
+     .</p>
+    <p>Make is the old-school Unix build tool. It uses a build file called 
+    <b>Makefile</b>
+     . (Colossus only has one, not nested Makefiles in each directory.) Make is
+    to Ant as C is to Java. It&#39;s fast, it&#39;s already included on Unix
+    boxes, it&#39;s portable only if you handle all the special cases yourself,
+    it&#39;s somewhat user-hostile, and a lot of people already know how to use
+    it because it&#39;s been around forever.</p>
+    <p>
+    <a
+    href="http://www.experimentalstuff.com/Technologies/JavaMake/">Javamake</a>
+     is a Java dependency checker from Sun Labs. It allows us to recompile only
+    the classes that need to be recompiled.</p>
+    <h4>Parser tools</h4>
+    <p>Colossus uses the 
+    <a href="http://www.webgain.com/trialware/javacc/JavaCC2_1.zip">JavaCC</a>
+     parser generator written by Sun and Matamata. (JavaCC has nothing to do
+    with javac, despite the similar name. It stands for Java Compiler
+    Compiler.) This turns .jj files into .java files, which are then compiled
+    normally. You want version 2.1. I set 
+    <b>JAVACC_HOME</b>
+     to its install location and then put 
+    <b>$JAVACC_HOME}/bin</b>
+     in my 
+    <b>PATH</b>
+     . (You can probably see the pattern by now.) You don&#39;t actually need
+    to know JavaCC unless you want to change parser files or make new ones. You
+    only need to install it and let build.xml drive it for you.</p>
+    <h4>Source code control</h4>
+    <p>We use 
+    <a href="http://cvshome.org">CVS</a>
+     , with the repository hosted on 
+    <a href="http://sf.net">SourceForge</a>
+     .</p>
+    <p>SourceForge requires using 
+    <a href="http://www.openssh.com">ssh</a>
+     instead of the insecure pserver as a transport mechanism, which
+    complicates cvs setup a bit. There are a lot of CVS + ssh setup directions
+    on 
+    <a href="http://sourceforge.net/docman/?group_id=1">SF</a>
+     . If you can&#39;t get it to work, ask for help.</p>
+    <p>If you&#39;re using Windows try 
+    <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</a>
+     for a good free SSH/Telnet client. . If you&#39;re using Unix (bash
+    syntax, I assume you can convert to csh or whatever): export
+    CVSROOT=username@cvs1.sourceforge.net:/cvsroot/colossus export CVS_RSH=ssh
+    If you&#39;re using Windows: set
+    CVSROOT=username@cvs1.sourceforge.net:/cvsroot/colossus set
+    CVS_RSH=c:/putty/plink.exe set PLINK_PROTOCOL=ssh</p>
+    <h4>Java Web Start</h4>
+    <p>If your JDK didn&#39;t include 
+    <a href="http://java.sun.com/products/javawebstart/">Java Web Start</a>
+     , you want that too, so that you can test that you haven&#39;t broken JWS
+    compatibility. (This is way too easy to do when you add resources.) Add 
+    <b>javaws</b>
+     to your 
+    <b>PATH</b>
+     .</p>
+    <h4>jar</h4>
+    <p>Jar is the standard java archive format. It basically uses the
+    compression algorithm from zip with command line syntax similar to tar. If
+    you need to uncompress a jar file on a machine with no jar, try your
+    favorite unzip tool. (But this may mess up permissions on a Unix box.) Jar
+    comes with the JDK.</p>
+    <h4>jarsigner</h4>
+    <p>Jars can be signed. Jars 
+    <b>must</b>
+     be signed to work over Java Web Start. But note that you can use
+    &quot;test&quot; keys -- you don&#39;t actually have to pay money to a
+    certifying authority and get a &quot;real&quot; key that actually
+    &quot;proves&quot; that you are who you say you are. The jarsigner tool
+    comes with the JDK. To use it, you need to create a personal authentication
+    key, and put it in a keystore file. The 
+    <b>sign</b>
+     targets in 
+    <b>build.xml</b>
+     and 
+    <b>Makefile</b>
+     assume that your key name and keystore filename match your username. If
+    you don&#39;t like this, you can add new targets.</p>
+    <h4>zip and unzip tools</h4>
+    <p>You need something that can work with the standard zip format. WinZip,
+    Info-Zip, PKZip, etc. Info-Zip is free -- most of the others are shareware.
+    In a pinch you can use jar to manipulate zip files.</p>
+    <h4>Text editors</h4>
+    <p>Your choice. It&#39;s a matter of taste. I recommend choosing something
+    that autoconverts tabs to the right number of spaces on the fly. (Tab
+    characters in code are 
+    <b>evil</b>
+     ; this is 
+    <b>not</b>
+     a matter of taste.) and can save files using Unix newline and end-of-file
+    conventions. If your editor can&#39;t do these, then you&#39;ll need to run
+    
+    <b>ant fix</b>
+     on your code before checking it into CVS, to avoid creating whole-file
+    false diffs or files that look awful if someone has different tab stop
+    settings than yours. (Yes, cross-platform development adds a few wrinkles.)
+    Two popular, powerful, free, portable editors are 
+    <a href="http://vim.org">Vim</a>
+     and 
+    <a href="http://xemacs.org">XEmacs</a>
+     Xemacs can use the 
+    <a href="http://jdee.sunsite.dk/rootpage.html">Java Development Environment
+    for Emacs (JDE)</a>
+    </p>
+    <h2>Optional tools</h2>
+    <h4>Debuggers</h4>
+    <p>(As any experienced programmer can tell you, the general problem with
+    debuggers is that they work great with simple code but tend to fall over
+    with complex, multithreaded, distributed code. So don&#39;t expect too
+    much.)</p>
+    <p>
+    <a href="http://www.bluemarsh.com/java/jswat/">JSwat</a>
+     is free and pretty good.</p>
+    <p>
+    <a href="http://www.lambdacs.com/debugger/debugger.html">ODB</a>
+     is new and still somewhat rough, but looks very promising.</p>
+    <h4>Profilers</h4>
+    <p>You can use 
+    <b>java -Xprof</b>
+     .</p>
+    <p>Or maybe try 
+    <a
+    href="http://www.hp.com/products1/unix/java/hpjmeter/index.html">HPjmeter</a>
+    </p>
+    <h4>Code reformatters</h4>
+    <p>If you just can&#39;t work with 
+    <a href="CodingStandards.html">our format</a>
+     then you need a tool to convert files to and from your personal pet format
+    to the one this project uses. 
+    <a href="http://www.tiobe.com/jacobe.htm">Jacobe</a>
+     is free (but not open source) and works pretty well. It&#39;s available
+    for Windows and Linux. The only important feature it lacks is full line length
+    control. See <b>buildtools/colossus-jacobe.cfg</b>. 
+    <p>There are other options, but I haven&#39;t found another good free one.</p>
+    <h4>Image editors</h4>
+    <p>Currently all images used in Colossus are GIFs or PNGs. (Though
+    we&#39;re starting to experiment with SVG.) JPEGs are great for photos but
+    not optimal for simple drawings. Any image editor that can save to standard
+    formats is fine. If you don&#39;t have one, 
+    <a href="http://www.gimp.org">The Gimp</a>
+     is good and free, but has a steep learning curve.</p>
+    <p>
+    <b>TODO</b>
+     Find a lighter-weight, easier-to-learn, free image editor.</p>
+    <h4>Testing tools</h4>
+    <p>We&#39;ve added a few unit tests using 
+    <a href="http://junit.org">JUnit</a>
+     . We need to add more. The JUnit test classes, named 
+    <b>*Test.java</b>
+     are not built by the normal compile commands, because they require
+    junit.jar in the CLASSPATH to compile, and we wanted to make it possible to
+    compile the rest of the game without JUnit. The ant 
+    <b>compileAll</b>
+     target compiles all classes including the JUnit tests. The ant 
+    <b>test</b>
+     target runs all tests, using the JUnit text UI.</p>
+    <h2>Build process</h2>
+    <p>Once you have the tools set up, Colossus basically builds itself.</p>
+    <p>First you need all the source files. Snag the latest zip file from 
+    <a
+    href="http://colossus.sf.net/download">http://colossus.sf.net/download/</a>
+     or (to get the newest possible code) pull from CVS.</p>
+    <p>If you just type 
+    <b>ant</b>
+     or 
+    <b>make</b>
+     from the project base directory, then you get the default target, which in
+    both cases will compile all the .jj files into .java files with JavaCC,
+    then compile all the .java files into .class files with javac, then make an
+    unsigned executable jar file.</p>
+    <p>Other interesting targets include 
+    <b>clean</b>
+     and 
+    <b>fullyclean</b>
+     (delete stuff, useful if you want to clean up or make sure that you fully
+    rebuild all your class files), 
+    <b>fix</b>
+     (ant only -- does a bit of text reformatting on java source files), 
+    <b>tools</b>
+     (builds standalone tools), 
+    <b>sign</b>
+     (signs a jarfile), and 
+    <b>dist</b>
+     (makes a zip file).</p>
+    <p>There are also some targets that automate installing the package onto a
+    web site -- these are designed for maintaining the SF site rather than
+    general use.</p>
+    <p>Basically, skim through 
+    <b>build.xml</b>
+     .</p>
+  </body>
+</html>
+
