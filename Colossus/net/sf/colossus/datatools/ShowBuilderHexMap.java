@@ -23,25 +23,83 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private Component lastComponent;
     private int lastSide;
 
-    private AbstractAction plain;
-    private AbstractAction tower;
-    private AbstractAction bramble;
-    private AbstractAction sand;
-    private AbstractAction tree;
-    private AbstractAction bog;
-    private AbstractAction volcano;
-    private AbstractAction drift;
-    private AbstractAction lake;
+    private static final String[] terrains = 
+    {
+        "Plain",
+        "Tower",
+        "Bramble",
+        "Sand",
+        "Tree",
+        "Bog",
+        "Volcano",
+        "Drift",
+        "Lake"
+    };
 
-    private AbstractAction dune;
-    private AbstractAction cliff;
-    private AbstractAction slope;
-    private AbstractAction wall;
-    private AbstractAction nothing;
+    private static final char[] c_terrains = 
+    {
+        'p', 'w', 'r', 's', 't', 'o', 'v', 'd', 'l'
+    };
 
-    private AbstractAction alt0;
-    private AbstractAction alt1;
-    private AbstractAction alt2;
+    class TerrainAction extends AbstractAction
+    {
+        char c;
+        TerrainAction(String t, char c)
+        {
+            super(t);
+            this.c = c;
+        }
+        public void actionPerformed(ActionEvent e) {
+            GUIBuilderHex h = getHexContainingPoint(lastPoint);
+            h.setTerrain(c);
+            h.repaint();
+        }
+    }
+
+    class ElevationAction extends AbstractAction
+    {
+        int el;
+        ElevationAction(String t, int el)
+        {
+            super(t);
+            this.el = el;
+        }
+        public void actionPerformed(ActionEvent e) {
+            GUIBuilderHex h = getHexContainingPoint(lastPoint);
+            h.setElevation(el);
+            h.repaint();
+        }
+    }
+
+    private static final String[] hexsides =
+    {
+        "Nothing",
+        "Dune",
+        "Cliff",
+        "Slope",
+        "Wall"
+    };
+
+    private static final char[] c_hexsides = 
+    {
+        ' ', 'd', 'c', 's', 'w'
+    };
+
+    class HexsideAction extends AbstractAction        
+    {
+        char c;
+        HexsideAction(String t, char c)
+        {
+            super(t);
+            this.c = c;
+        }
+        public void actionPerformed(ActionEvent e) {
+            GUIBuilderHex h = getHexContainingPoint(lastPoint);
+            h.setHexside(lastSide, c);
+            h.repaint();
+            ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
+        }
+    }
 
     private AbstractAction saveBattlelandAction;
     private AbstractAction saveBattlelandAsAction;
@@ -101,171 +159,31 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         dialog.pack();
         dialog.setVisible(true);
 
-        alt0 = new AbstractAction("Set Elevation to: 0") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setElevation(0);
-                    h.repaint();
-                }
-            };
-
-        alt1 = new AbstractAction("Set Elevation to: 1") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setElevation(1);
-                    h.repaint();
-                }
-            };
-
-        alt2 = new AbstractAction("Set Elevation to: 2") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setElevation(2);
-                    h.repaint();
-                }
-            };
-
-        dune = new AbstractAction("dune") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setHexside(lastSide, 'd');
-                    h.repaint();
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
-                }
-            };
-
-        cliff = new AbstractAction("cliff") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setHexside(lastSide, 'c');
-                    h.repaint();
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
-                }
-            };
-
-        slope = new AbstractAction("slope") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setHexside(lastSide, 's');
-                    h.repaint();
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
-                }
-            };
-
-        wall = new AbstractAction("wall") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setHexside(lastSide, 'w');
-                    h.repaint();
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
-                }
-            };
-
-        nothing = new AbstractAction("nothing") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setHexside(lastSide, ' ');
-                    h.repaint();
-                    ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
-                }
-            };
-
-        plain = new AbstractAction("plain") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setTerrain('p');
-                    h.repaint();
-                }
-            };
-
-        tower = new AbstractAction("tower") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setTerrain('w');
-                    h.repaint();
-                }
-            };
-
-        bramble = new AbstractAction("bramble") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setTerrain('r');
-                    h.repaint();
-                }
-            };
-
-        sand = new AbstractAction("sand") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setTerrain('s');
-                    h.repaint();
-                }
-            };
-
-        tree = new AbstractAction("tree") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setTerrain('t');
-                    h.repaint();
-                }
-            };
-
-        bog = new AbstractAction("bog") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setTerrain('o');
-                    h.repaint();
-                }
-            };
-
-        volcano = new AbstractAction("volcano") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setTerrain('v');
-                    h.repaint();
-                }
-            };
-
-        drift = new AbstractAction("drift") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setTerrain('d');
-                    h.repaint();
-                }
-            };
-
-        lake = new AbstractAction("lake") {
-                public void actionPerformed(ActionEvent e) {
-                    GUIBuilderHex h = getHexContainingPoint(lastPoint);
-                    h.setTerrain('l');
-                    h.repaint();
-                }
-            };
-
         popupMenuTerrain = new JPopupMenu("Choose Terrain");
         contentPane.add(popupMenuTerrain);
-        mi = popupMenuTerrain.add(plain);
-        mi = popupMenuTerrain.add(tower);
-        mi = popupMenuTerrain.add(bramble);
-        mi = popupMenuTerrain.add(sand);
-        mi = popupMenuTerrain.add(tree);
-        mi = popupMenuTerrain.add(bog);
-        mi = popupMenuTerrain.add(volcano);
-        mi = popupMenuTerrain.add(drift);
-        mi = popupMenuTerrain.add(lake);
+
+        for (int i = 0 ; i < terrains.length ; i++)
+        {
+            mi = popupMenuTerrain.add(new TerrainAction(terrains[i],
+                                                        c_terrains[i]));
+        }
         popupMenuTerrain.addSeparator();
-        mi = popupMenuTerrain.add(alt0);
-        mi = popupMenuTerrain.add(alt1);
-        mi = popupMenuTerrain.add(alt2);
+        for (int i = 0 ; i < 3 ; i++)
+        {
+            mi = popupMenuTerrain.add(new ElevationAction(
+                                      "Set Elevation to: " + i,
+                                      i));
+        }
 
         popupMenuBorder = new JPopupMenu("Choose Border");
         contentPane.add(popupMenuBorder);
-        mi = popupMenuBorder.add(dune);
-        mi = popupMenuBorder.add(cliff);
-        mi = popupMenuBorder.add(slope);
-        mi = popupMenuBorder.add(wall);
-        mi = popupMenuBorder.add(nothing);
 
+        for (int i = 0 ; i < hexsides.length ; i++)
+        {
+            mi = popupMenuBorder.add(new HexsideAction(hexsides[i],
+                                                       c_hexsides[i]));
+        }
+        
         lastPoint = new Point(0,0);
         lastComponent = contentPane;
         lastSide = 0;
