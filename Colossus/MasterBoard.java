@@ -285,14 +285,14 @@ class MasterBoard extends Frame implements MouseListener,
     // Return number of legal non-teleport moves.
     int showMoves(Legion legion)
     {
-        int count = 0;
-
         unselectAllHexes();
 
         if (legion.hasMoved())
         {
-            return count;
+            return 0;
         }
+        
+        int count = 0;
 
         MasterHex hex = legion.getCurrentHex();
 
@@ -1130,16 +1130,14 @@ class MasterBoard extends Frame implements MouseListener,
                                     break;
 
                                 case Game.MUSTER:
-                                    if (legion.getHeight() < 7 && 
-                                        legion.hasMoved())
+                                    if (legion.canRecruit())
                                     {
                                         new PickRecruit(this, legion);
                                     }
                                     // If we recruited, unselect this hex.
-                                    if (legion.hasMoved() == false)
+                                    if (legion.canRecruit() == false)
                                     {
-                                        MasterHex hex = legion.getCurrentHex();
-                                        hex.unselect();
+                                        legion.getCurrentHex().unselect();
                                     }
                                     // XXX Repaint only affected areas?
                                     repaint();
@@ -1222,28 +1220,42 @@ class MasterBoard extends Frame implements MouseListener,
                                         new Negotiate(this, attacker, 
                                             defender);
                                     }
+                                    
+                                    // Battle
+                                    if (hex.isEngagement())
+                                    {
+                                        // XXX: Calculate entry side.
+                                        new BattleMap(attacker, defender, 
+                                            hex.getTerrain(), 'b');
+                                        // XXX: Hex stays selected.
+                                        hex.unselect();
+                                        hex.repaint();
+                                    }
 
                                     if (hex.isEngagement() == false)
                                     {
                                         if (hex.getLegion(0) == defender &&
-                                            defender.getHeight() < 7)
+                                            defender.canRecruit())
                                         {
                                             // If the defender won the battle 
                                             // by agreement, he may recruit.
+                                            // XXX: Remember if he recruited
+                                            // during battle.
                                             new PickRecruit(this, defender);
                                         }
                                         else if (hex.getLegion(0) == attacker
-                                            && attacker.getHeight() < 7)
+                                            && attacker.getHeight() < 7
+                                            && player.canSummonAngel())
                                         {
                                             // If the attacker won the battle 
-                                            // by agreement, he may summon 
-                                            // an angel.
+                                            // by agreement or battle and has
+                                            // not already summoned an angel,
+                                            // he may summon an angel.
                                             summonAngel = new
                                                 SummonAngel(this, attacker);
                                         }
                                     }
 
-                                    // XXX: Add battle.
                                 }
                             }
                             break;
