@@ -216,7 +216,7 @@ public class PickRecruit extends JDialog implements MouseListener,
         hex.setTerrain('B');
 
         Player player = new Player("Test", null);
-        Legion legion = new Legion("Bk01", null, hex,
+        Legion legion = new Legion("Bk01", null, hex, hex,
             Creature.titan, Creature.gargoyle, Creature.gargoyle, 
             Creature.cyclops, Creature.cyclops, null, 
             null, null, player);

@@ -361,7 +361,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         player.setColor("Red");
         player.initMarkersAvailable();
         String selectedMarkerId = player.selectMarkerId("Rd01");
-        Legion attacker = new Legion(selectedMarkerId, null, hex,
+        Legion attacker = new Legion(selectedMarkerId, null, hex, hex,
             Creature.titan, Creature.colossus, Creature.serpent,
             Creature.archangel, Creature.hydra, Creature.giant,
             Creature.dragon, null, player);
@@ -373,7 +373,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         player.setColor("Blue");
         player.initMarkersAvailable();
         selectedMarkerId = player.selectMarkerId("Bl01");
-        Legion defender = new Legion(selectedMarkerId, null, hex,
+        Legion defender = new Legion(selectedMarkerId, null, hex, hex,
             Creature.ogre, Creature.centaur, Creature.gargoyle,
             null, null, null, null, null, player);
         marker = new Marker(scale, selectedMarkerId, frame, null);

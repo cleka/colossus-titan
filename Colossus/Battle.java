@@ -1767,11 +1767,11 @@ public class Battle
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('D');
         hex.setEntrySide(5);
-        Legion attacker = new Legion("Bk01", null, hex,
+        Legion attacker = new Legion("Bk01", null, hex, hex,
             Creature.archangel, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
             Creature.warlock, null, player1);
-        Legion defender = new Legion("Rd01", null, hex,
+        Legion defender = new Legion("Rd01", null, hex, hex,
             Creature.serpent, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian,
             Creature.minotaur, null, player2);

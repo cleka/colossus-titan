@@ -17,7 +17,7 @@ public class Player implements Comparable
     private boolean canTeleport = true;
     private String playersEliminated;  // RdBkGr
     private int mulligansLeft = 1;
-    private int movementRoll;
+    private int movementRoll;          // 0 if movement has not been rolled.
     private TreeSet markersAvailable = new TreeSet();
     private ArrayList legions = new ArrayList();
     private boolean dead;
@@ -235,6 +235,21 @@ public class Player implements Comparable
     {
         return (Legion)legions.get(i);
     }
+    
+    
+    public Legion getLegionByMarkerId(String markerId)
+    {
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (legion.getMarkerId().equals(markerId))
+            {
+                return legion;
+            }
+        }
+        return null;
+    }
 
 
     public List getLegions()
@@ -313,6 +328,12 @@ public class Player implements Comparable
     {
         return movementRoll;
     }
+    
+    
+    public void setMovementRoll(int movementRoll)
+    {
+        this.movementRoll = movementRoll;
+    }
 
 
     public int getMulligansLeft()
@@ -327,11 +348,11 @@ public class Player implements Comparable
     }
 
 
-    public void rollMovement()
+    public void resetTurnState()
     {
-        // It's a new turn, so once-per-turn things are allowed again.
         canSummonAngel = true;
         canTeleport = true;
+        movementRoll = 0;
 
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
@@ -346,6 +367,12 @@ public class Player implements Comparable
             Legion legion = (Legion)it.next();
             legion.hideAllCreatures();
         }
+    }
+
+
+    public void rollMovement()
+    {
+        // It's a new turn, so once-per-turn things are allowed again.
 
         if (game.getForcedMovementRoll() != 0)
         {
@@ -371,6 +398,7 @@ public class Player implements Comparable
             undoAllMoves();
             Game.logEvent(getName() + " took a mulligan");
             mulligansLeft--;
+            movementRoll = 0;
         }
     }
 

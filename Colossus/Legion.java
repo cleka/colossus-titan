@@ -12,7 +12,7 @@ public class Legion
 {
     private Marker marker;
     private String markerId;    // Bk03, Rd12, etc.
-    private Legion parent;
+    private String parentId;
     private ArrayList critters = new ArrayList();
     private MasterHex currentHex;
     private MasterHex startingHex;
@@ -25,15 +25,16 @@ public class Legion
     private Creature teleportingLord;
 
 
-    public Legion(String markerId, Legion parent, MasterHex hex,
-        Creature creature0, Creature creature1, Creature creature2,
-        Creature creature3, Creature creature4, Creature creature5,
-        Creature creature6, Creature creature7, Player player)
+    public Legion(String markerId, String parentId, MasterHex currentHex,
+        MasterHex startingHex, Creature creature0, Creature creature1, 
+        Creature creature2, Creature creature3, Creature creature4, 
+        Creature creature5, Creature creature6, Creature creature7, 
+        Player player)
     {
         this.markerId = markerId;
-        this.parent = parent;
-        this.currentHex = hex;
-        this.startingHex = hex;
+        this.parentId = parentId;
+        this.currentHex = currentHex;
+        this.startingHex = startingHex;
         this.player = player;
 
         if (creature0 != null)
@@ -193,11 +194,17 @@ public class Legion
     {
         return markerId;
     }
+    
+    
+    public String getParentId()
+    {
+        return parentId;
+    }
 
 
     public Legion getParent()
     {
-        return parent;
+        return player.getLegionByMarkerId(parentId);
     }
 
 
@@ -294,6 +301,12 @@ public class Legion
     public boolean hasMoved()
     {
         return moved;
+    }
+
+
+    public void setMoved(boolean moved)
+    {
+        this.moved = moved;
     }
 
 
@@ -400,6 +413,12 @@ public class Legion
     {
         return recruited;
     }
+    
+    
+    public void setRecruited(boolean recruited)
+    {
+        this.recruited = recruited;
+    }
 
 
     // hasMoved() is a separate check, so that this function can be used in
@@ -413,12 +432,6 @@ public class Legion
         }
 
         return true;
-    }
-
-
-    public void setRecruited(boolean recruited)
-    {
-        this.recruited = recruited;
     }
 
 

@@ -50,6 +50,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     private JCheckBoxMenuItem miShowStatusScreen;
     private JCheckBoxMenuItem miShowDice;
     private JCheckBoxMenuItem miAllStacksVisible;
+    private JCheckBoxMenuItem miAutoRecruit;
     private JCheckBoxMenuItem miAutoPickRecruiter;
     private JCheckBoxMenuItem miAutosave;
     private JCheckBoxMenuItem miAntialias;
@@ -489,6 +490,8 @@ public class MasterBoard extends JPanel implements MouseListener,
         mi.setMnemonic(KeyEvent.VK_S);
         mi = fileMenu.add(saveGameAsAction);
         mi.setMnemonic(KeyEvent.VK_A);
+        mi = fileMenu.add(quitGameAction);
+        mi.setMnemonic(KeyEvent.VK_Q);
 
         // Phase menu items change by phase and will be set up later.
         phaseMenu = new JMenu("Phase");
@@ -515,6 +518,12 @@ public class MasterBoard extends JPanel implements MouseListener,
 
         optionsMenu.addSeparator();
         // Then per-player options
+        
+        miAutoRecruit = new JCheckBoxMenuItem(Game.sAutoRecruit);
+        miAutoRecruit.setMnemonic(KeyEvent.VK_R);
+        miAutoRecruit.setSelected(game.getAutoRecruit());
+        miAutoRecruit.addItemListener(this);
+        optionsMenu.add(miAutoRecruit);
 
         miAutoPickRecruiter = new JCheckBoxMenuItem(Game.sAutoPickRecruiter);
         miAutoPickRecruiter.setMnemonic(KeyEvent.VK_P);
@@ -559,6 +568,12 @@ public class MasterBoard extends JPanel implements MouseListener,
     public void twiddleAllStacksVisible(boolean enable)
     {
         miAllStacksVisible.setSelected(enable);
+    }
+
+    
+    public void twiddleAutoRecruit(boolean enable)
+    {
+        miAutoRecruit.setSelected(enable);
     }
 
 
@@ -1278,7 +1293,6 @@ public class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    // XXX Assumes that we only load at the beginning of a phase.
     public void setupPhase()
     {
         switch (game.getPhase())
@@ -1326,6 +1340,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     private void setupSplit()
     {
         Player player = game.getActivePlayer();
+        player.resetTurnState();
 
         // If there are no markers available, skip forward to movement.
         if (player.getNumMarkersAvailable() == 0)
@@ -1372,7 +1387,10 @@ public class MasterBoard extends JPanel implements MouseListener,
     {
         Player player = game.getActivePlayer();
 
-        player.rollMovement();
+        if (player.getMovementRoll() == 0)
+        {
+            player.rollMovement();
+        }
 
         masterFrame.setTitle(player.getName() + " Turn " +
             game.getTurnNumber() + " : Movement Roll: " +
@@ -1862,6 +1880,10 @@ public class MasterBoard extends JPanel implements MouseListener,
         else if (text.equals(Game.sAllStacksVisible))
         {
             game.setAllStacksVisible(selected);
+        }
+        else if (text.equals(Game.sAutoRecruit))
+        {
+            game.setAutoRecruit(selected);
         }
         else if (text.equals(Game.sAutoPickRecruiter))
         {

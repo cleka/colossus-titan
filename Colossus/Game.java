@@ -44,17 +44,18 @@ public class Game
     // Constants for savegames
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
-    public static final String xmlSaveExtension = ".xml";
 
     // Options names
     public static final String sAutosave = "Autosave";
     public static final String sAllStacksVisible = "All stacks visible";
+    public static final String sAutoRecruit = "Auto recruit";
     public static final String sAutoPickRecruiter = "Autopick recruiter";
     public static final String sShowStatusScreen = "Show game status";
     public static final String sShowDice = "Show dice";
     public static final String sAntialias = "Antialias";
 
     // Per-player client options
+    private static boolean autoRecruit;
     private static boolean autoPickRecruiter;
     private static boolean showDice = true;
     private static boolean showStatusScreen = true;
@@ -171,7 +172,6 @@ public class Game
                 updateStatusScreen();
             }
             board.loadInitialMarkerImages();
-            // XXX Assumes that we only load at the beginning of a phase.
             board.setupPhase();
 
             board.setVisible(true);
@@ -331,6 +331,18 @@ public class Game
     }
 
 
+    public boolean getAutoRecruit()
+    {
+        return autoRecruit;
+    }
+
+
+    public void setAutoRecruit(boolean autoRecruit)
+    {
+        this.autoRecruit = autoRecruit;
+    }
+
+
     public boolean getAutoPickRecruiter()
     {
         return autoPickRecruiter;
@@ -409,13 +421,13 @@ public class Game
     }
 
 
-    public void initMovementDie()
+    private void initMovementDie()
     {
         movementDie = new MovementDie(this);
     }
 
 
-    public void disposeMovementDie()
+    private void disposeMovementDie()
     {
         if (movementDie != null)
         {
@@ -589,12 +601,16 @@ public class Game
      *         Players eliminated
      *         Number of markers left
      *         Remaining marker ids
-     *         XXX Add movement roll, last legion moved/split/recruited
+     *         Movement roll
+     *         XXX Add last legion moved/split/recruited?
      *         Number of Legions
      *         Legion 1:
      *             Marker id
      *             Hex label
-     *             XXX add parent, moved, recruited
+     *             Starting hex label
+     *             Parent
+     *             Moved?
+     *             Recruited?
      *             Height
      *             Creature 1:
      *                 Creature type
@@ -653,6 +669,7 @@ public class Game
                 out.println(markerId);
             }
 
+            out.println(player.getMovementRoll());
             out.println(player.getNumLegions());
 
             Collection legions = player.getLegions();
@@ -662,6 +679,10 @@ public class Game
                 Legion legion = (Legion)it2.next();
                 out.println(legion.getMarkerId());
                 out.println(legion.getCurrentHex().getLabel());
+                out.println(legion.getStartingHex().getLabel());
+                out.println(legion.getParentId());
+                out.println(legion.hasMoved());
+                out.println(legion.hasRecruited());
 
                 out.println(legion.getHeight());
 
@@ -707,277 +728,6 @@ public class Game
     }
 
 
-    // XXX Use separate files and methods for client and server options.
-
-    /** Save game options to a file.  The current format is standard
-     *  java.util.Properties keyword=value. */
-    public void saveOptions()
-    {
-        Properties options = new Properties();
-
-        options.setProperty(sAutosave, String.valueOf(autosave));
-        options.setProperty(sAllStacksVisible, String.valueOf(
-            allStacksVisible));
-        options.setProperty(sAutoPickRecruiter, String.valueOf(
-            autoPickRecruiter));
-        options.setProperty(sShowDice, String.valueOf(showDice));
-        options.setProperty(sShowStatusScreen, String.valueOf(
-            showStatusScreen));
-        options.setProperty(sAntialias, String.valueOf(antialias));
-        try
-        {
-            FileOutputStream out = new FileOutputStream(optionsPath);
-            String header = "Colossus config file version 1.0";
-            options.store(out, header);
-        }
-        catch (Exception e)
-        {
-            System.out.println("Couldn't write options to " + optionsPath);
-        }
-    }
-
-
-    /** Load game options from a file. The current format is standard
-     *  java.util.Properties keyword=value */
-    public void loadOptions()
-    {
-        Properties options = new Properties();
-
-        try
-        {
-            FileInputStream in = new FileInputStream(optionsPath);
-            options.load(in);
-        }
-        catch (Exception e)
-        {
-            System.out.println("Couldn't read options from " + optionsPath);
-            return;
-        }
-
-        // XXX Handle partial options files?
-        autosave = (options.getProperty(sAutosave, "false").equals("true"));
-        allStacksVisible = (options.getProperty(sAllStacksVisible,
-            "false").equals( "true"));
-        autoPickRecruiter = (options.getProperty(sAutoPickRecruiter,
-            "false").equals( "true"));
-        showDice = (options.getProperty(sShowDice, "true").equals("true"));
-        showStatusScreen = (options.getProperty(sShowStatusScreen,
-            "true").equals("true"));
-        antialias = (options.getProperty(sAntialias, "false").equals("true"));
-
-        board.twiddleAutosave(autosave);
-        board.twiddleAllStacksVisible(allStacksVisible);
-        board.twiddleAutoPickRecruiter(autoPickRecruiter);
-        board.twiddleShowStatusScreen(showStatusScreen);
-        board.twiddleShowDice(showDice);
-        board.twiddleAntialias(antialias);
-    }
-
-
-    /*
-     *     Game name
-     *     Moderator name
-     *     Date/time started
-     *     Date/time of last move
-     *
-     *
-     *     Number of players
-     *     Turn number
-     *     Whose turn
-     *     Current phase
-     *     Creature counts
-     *     Player 1:
-     *         Name
-     *         Color
-     *         Starting tower
-     *         Score
-     *         Alive?
-     *         Mulligans left
-     *         Players eliminated
-     *         Number of markers left
-     *         Remaining marker ids
-     *         Number of Legions
-     *         Legion 1:
-     *             Marker id
-     *             Hex label
-     *             Height
-     *             Creature 1:
-     *                 Creature type
-     *                 Visible?
-     *             ...
-     *         ...
-     *     ...
-     *
-     *     Battle
-               Attacker
-               Defender
-
-     */
-
-    /** Save the game to an xml file, saves/<time>.xml
-     *  This is meant to convey a current game state completely.
-     *  It might also be nice to show recent history.  (Full game
-     *  history would go in a bigger file.)
-     *  Format: (work in progress)
-
-        <?xml version="1.0" standalone="yes"?>
-        <titan_game_state>
-            <gamename>string</gamename>
-            <moderator>string</moderator>
-            <started>datetime</started>
-            <last>datetime</last>
-
-            <turn>number</turn>
-            <active>player</active>
-            <phase>phase</phase>
-
-            <lastevent>string</lastevent>
-
-            <player>
-                <playername>string</playername>
-                <color>color</color>
-                <tower>number</tower>
-                <score>number</score>
-                <mulligans>number</mulligans>
-                <eliminated>player</eliminated>
-                <movementroll>number</movementroll>
-
-                <legion>
-                    <marker>marker id</marker>
-                    <hex>hex id</hex>
-                    <split>boolean</split>
-                    <parent>legion</parent>
-                    <moved>boolean</moved>
-                    <entryside>hexside</entryside>
-                    <teleported>boolean</teleported>
-                    <oldhex>hex id</old hex>
-                    <fought>boolean</fought>
-                    <summoned>boolean</summoned>
-                    <opponent>legion</opponent>
-                    <mustered>boolean</mustered>
-                    <recruit>creature</recruit>
-                    <recruiter>creature</recruiter>
-                    ...
-                    <creature>creature</creature>
-                        <type>creature type</type>
-                        <battlehex>battle hex id</battlehex>
-                        <hits>number</hits>
-                        <battlemoved>boolean</battlemoved>
-                        <struck>boolean</struck>
-                        <strikerolls>numbers</strikerolls>
-                        <targethex>battle hex id</targethex>
-                        <targetnum>number</targetnum>
-                        <carries>number</carries>
-                        <carrytarget>battle hex id</carrytarget>
-                        ...
-                    ...
-                </legion>
-            <player>
-
-            <titan_battle_state>
-                <battleturn>number</battleturn>
-                <battleactive>player</battleactive>
-                <battlephase>phase</battlephase>
-                <attacker>legion</attacker>
-                <defender>legion</defender>
-                <summonstate>angel summoning state</summonstate>
-            </titan_battle_state>
-        </titan_game_state>
-     */
-    private void saveGameXML()
-    {
-        // XXX Need dialog to pick filename.
-        Date date = new Date();
-        File savesDir = new File(saveDirname);
-        if (!savesDir.exists() || !savesDir.isDirectory())
-        {
-             if (!savesDir.mkdir())
-             {
-                 System.out.println("Could not create saves directory");
-                 return;
-             }
-        }
-
-        String filename = saveDirname + File.separator +
-            date.getTime() + xmlSaveExtension;
-        FileWriter fileWriter;
-        try
-        {
-            fileWriter = new FileWriter(filename);
-        }
-        catch (IOException e)
-        {
-            System.out.println(e.toString());
-            System.out.println("Couldn't open " + filename);
-            return;
-        }
-        PrintWriter out = new PrintWriter(fileWriter);
-
-        out.println(getNumPlayers());
-        out.println(getTurnNumber());
-        out.println(getActivePlayerNum());
-        out.println(getPhase());
-
-        java.util.List creatures = Creature.getCreatures();
-        Iterator it = creatures.iterator();
-        while (it.hasNext())
-        {
-            Creature creature = (Creature)it.next();
-            out.println(creature.getCount());
-        }
-
-        it = players.iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            out.println(player.getName());
-            out.println(player.getColor());
-            out.println(player.getTower());
-            out.println(player.getScore());
-            // Check if the player is alive.
-            out.println(!player.isDead());
-            out.println(player.getMulligansLeft());
-            out.println(player.getPlayersElim());
-            out.println(player.getNumMarkersAvailable());
-
-            Collection markerIds = player.getMarkersAvailable();
-            Iterator it2 = markerIds.iterator();
-            while (it2.hasNext())
-            {
-                String markerId = (String)it2.next();
-                out.println(markerId);
-            }
-
-            out.println(player.getNumLegions());
-
-            Collection legions = player.getLegions();
-            it2 = legions.iterator();
-            while (it2.hasNext())
-            {
-                Legion legion = (Legion)it2.next();
-                out.println(legion.getMarkerId());
-                out.println(legion.getCurrentHex().getLabel());
-
-                out.println(legion.getHeight());
-
-                Collection critters = legion.getCritters();
-                Iterator it3 = critters.iterator();
-                while (it3.hasNext())
-                {
-                    Critter critter = (Critter)it3.next();
-                    out.println(critter.getName());
-                    out.println(critter.isVisible());
-                }
-            }
-        }
-
-        if (out.checkError())
-        {
-            System.out.println("Write error " + filename);
-            // XXX Delete the partial file?
-            return;
-        }
-    }
 
 
     /** Try to load a game from ./filename first, then from
@@ -1065,7 +815,6 @@ public class Game
                 player.setScore(score);
 
                 buf = in.readLine();
-
                 // Output whether the player is alive.
                 player.setDead(!Boolean.valueOf(buf).booleanValue());
 
@@ -1090,6 +839,10 @@ public class Game
                 }
 
                 buf = in.readLine();
+                int movementRoll = Integer.parseInt(buf);
+                player.setMovementRoll(movementRoll);
+
+                buf = in.readLine();
                 int numLegions = Integer.parseInt(buf);
 
                 for (int j = 0; j < numLegions; j++)
@@ -1097,7 +850,19 @@ public class Game
                     String markerId = in.readLine();
 
                     buf = in.readLine();
-                    String hexLabel = buf;
+                    String currentHexLabel = buf;
+
+                    buf = in.readLine();
+                    String startingHexLabel = buf;
+
+                    buf = in.readLine();
+                    String parentId = buf;
+
+                    buf = in.readLine();
+                    boolean moved = Boolean.valueOf(buf).booleanValue();
+
+                    buf = in.readLine();
+                    boolean recruited = Boolean.valueOf(buf).booleanValue();
 
                     buf = in.readLine();
                     int height = Integer.parseInt(buf);
@@ -1113,10 +878,15 @@ public class Game
                         visibles[k] = Boolean.valueOf(buf).booleanValue();
                     }
 
-                    Legion legion = new Legion(markerId, null,
-                        MasterBoard.getHexFromLabel(hexLabel), critters[0],
-                        critters[1], critters[2], critters[3], critters[4],
-                        critters[5], critters[6], critters[7], player);
+                    Legion legion = new Legion(markerId, parentId,
+                        MasterBoard.getHexFromLabel(currentHexLabel),
+                        MasterBoard.getHexFromLabel(startingHexLabel),
+                        critters[0], critters[1], critters[2], critters[3],
+                        critters[4], critters[5], critters[6], critters[7],
+                        player);
+
+                    legion.setMoved(moved);
+                    legion.setRecruited(recruited);
 
                     for (int k = 0; k < height; k++)
                     {
@@ -1136,10 +906,15 @@ public class Game
             if (showDice)
             {
                 initMovementDie();
+                Player player = getActivePlayer();
+                int roll = player.getMovementRoll();
+                if (roll != 0)
+                {
+                    showMovementRoll(roll);
+                }
             }
 
             board.loadInitialMarkerImages();
-            // XXX Assumes that we only load at the beginning of a phase.
             board.setupPhase();
 
             board.setVisible(true);
@@ -1202,6 +977,73 @@ public class Game
 
         return (String)Collections.max(Arrays.asList(filenames), new
             StringNumComparator());
+    }
+    
+    
+    // XXX Use separate files and methods for client and server options.
+
+    /** Save game options to a file.  The current format is standard
+     *  java.util.Properties keyword=value. */
+    public void saveOptions()
+    {
+        Properties options = new Properties();
+
+        options.setProperty(sAutosave, String.valueOf(autosave));
+        options.setProperty(sAllStacksVisible, String.valueOf(
+            allStacksVisible));
+        options.setProperty(sAutoPickRecruiter, String.valueOf(
+            autoPickRecruiter));
+        options.setProperty(sShowDice, String.valueOf(showDice));
+        options.setProperty(sShowStatusScreen, String.valueOf(
+            showStatusScreen));
+        options.setProperty(sAntialias, String.valueOf(antialias));
+        try
+        {
+            FileOutputStream out = new FileOutputStream(optionsPath);
+            String header = "Colossus config file version 1.0";
+            options.store(out, header);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Couldn't write options to " + optionsPath);
+        }
+    }
+
+
+    /** Load game options from a file. The current format is standard
+     *  java.util.Properties keyword=value */
+    public void loadOptions()
+    {
+        Properties options = new Properties();
+
+        try
+        {
+            FileInputStream in = new FileInputStream(optionsPath);
+            options.load(in);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Couldn't read options from " + optionsPath);
+            return;
+        }
+
+        // XXX Handle partial options files?
+        autosave = (options.getProperty(sAutosave, "false").equals("true"));
+        allStacksVisible = (options.getProperty(sAllStacksVisible,
+            "false").equals( "true"));
+        autoPickRecruiter = (options.getProperty(sAutoPickRecruiter,
+            "false").equals( "true"));
+        showDice = (options.getProperty(sShowDice, "true").equals("true"));
+        showStatusScreen = (options.getProperty(sShowStatusScreen,
+            "true").equals("true"));
+        antialias = (options.getProperty(sAntialias, "false").equals("true"));
+
+        board.twiddleAutosave(autosave);
+        board.twiddleAllStacksVisible(allStacksVisible);
+        board.twiddleAutoPickRecruiter(autoPickRecruiter);
+        board.twiddleShowStatusScreen(showStatusScreen);
+        board.twiddleShowDice(showDice);
+        board.twiddleAntialias(antialias);
     }
 
 
@@ -2127,7 +1969,7 @@ public class Game
         Creature.gargoyle.takeOne();
         Creature.gargoyle.takeOne();
 
-        Legion legion = new Legion(selectedMarkerId, null, hex,
+        Legion legion = new Legion(selectedMarkerId, null, hex, hex,
             Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
             Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);

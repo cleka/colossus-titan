@@ -42,8 +42,6 @@ Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
    undo moves.  "Done with Engagements" shouldn't be necessary.
 
-Finish XML savegame file.  Write saveGameXML and loadGameXML.
-
 Highlight selected legion better. 
 Highlight teleport and normal moves differently.
 Differently-highlight hexes where a legion could move if

@@ -53,9 +53,10 @@ public class SplitLegion extends JDialog implements MouseListener,
 
         pack();
 
-        newLegion = new Legion(selectedMarkerId, oldLegion,
-            oldLegion.getCurrentHex(), null, null, null, null, null,
-            null, null, null, player);
+        MasterHex hex = oldLegion.getCurrentHex();
+
+        newLegion = new Legion(selectedMarkerId, oldLegion.getMarkerId(), hex,
+            hex, null, null, null, null, null, null, null, null, player);
         String imageName = selectedMarkerId;
         newMarker = new Marker(scale, imageName, this, null);
         newLegion.setMarker(newMarker);
@@ -349,7 +350,7 @@ public class SplitLegion extends JDialog implements MouseListener,
         player.setColor("Red");
         player.initMarkersAvailable();
         String selectedMarkerId = player.selectMarkerId("Rd01");
-        Legion legion = new Legion(selectedMarkerId, null, null,
+        Legion legion = new Legion(selectedMarkerId, null, null, null,
             Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
             Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);
