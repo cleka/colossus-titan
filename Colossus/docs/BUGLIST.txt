@@ -43,9 +43,11 @@ Solaris, jdk1.2.2, jdk1.3: Popup menu text is invisible
 
 Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle, 
    usually around turn 15 of a 4-player game or turn 11 of a 6-player
-   game.  Where's the memory leak?
+   game.  Looks like a HotSpot memory leak.
    Things that don't help: System.gc() calls after every battle, -Xint,
    -client, -server, -Xincgc options to Java.
+   Things to try: Manually removing event listeners, manually removing
+   more GUI elements as dialogs are dismissed.
 
 
 Current programming bugs:
@@ -77,28 +79,9 @@ Linux, ibmjdk118: Angel summoned into battle can move on top of
 
 Linux, ibmjdk118; Win98, jdk1.3rc1: Tried to strike own creature!
 
-Linux, ibmjdk118; Solaris, jdk1.3: Battle did not end once when a 
-   player (always the attacker?) died.  BattleTurn was not dismissed, 
-   and the game could not continue.  Happened multiple times. 
-   Player.die() was called.  When the dying Titan ended the game, 
-   the following exception was (only sometimes) seen:
-Exception occurred during event dispatching:
-java.lang.ArrayIndexOutOfBoundsException
-        at Player.addLegionMarkers(Player.java:651)
-        at Player.die(Player.java:742)
-        at Battle.removeDeadCreatures(Battle.java:756)
-        at Battle.advancePhase(Battle.java:166)
-        at Battle.doneWithStrikes(Battle.java:850)
-        at BattleTurn.actionPerformed(BattleTurn.java:162)
-        at java.awt.Button.processActionEvent(Button.java:329)
-        at java.awt.Button.processEvent(Button.java:302)
-        at java.awt.Component.dispatchEventImpl(Component.java:2593)
-        at java.awt.Component.dispatchEvent(Component.java:2497)
-        at java.awt.EventQueue.dispatchEvent(EventQueue.java:333)
-        at java.awt.EventDispatchThread.pumpOneEvent(EventDispatchThread.java:103)
-        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
-        at java.awt.EventDispatchThread.run(EventDispatchThread.java:84)
-
 Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
    eliminates that chit's movement options.  "Undo last move" works.
 
+Solaris, jdk1.3: Mutual elimination, with defender's titan killed.
+   Got the message "Legion XXXX is eliminated" twice for the
+   attacking legion, once for the defender.

@@ -14,11 +14,11 @@ public class Player
     private double score;    // track half-points, then round
     private boolean canSummonAngel = true;
     private String playersEliminated;  // RdBkGr
-    private int numMarkersAvailable; 
-    private String [] markersAvailable = new String[72];
+
+    private ArrayList markersAvailable = new ArrayList();
     private String markerSelected;
-    private int numLegions; 
-    private Legion [] legions = new Legion[72];
+
+    private ArrayList legions = new ArrayList();
     private Legion selectedLegion = null;
     private boolean dead;
     private int mulligansLeft = 1;
@@ -65,9 +65,6 @@ public class Player
 
     public void initMarkersAvailable()
     {
-        numMarkersAvailable = 0;
-        markersAvailable = new String[72];
-
         for (int i = 1; i <= 9; i++)
         {
             addLegionMarker(getShortColor() + '0' + Integer.toString(i));
@@ -228,19 +225,13 @@ public class Player
 
     public int getNumLegions()
     {
-        return numLegions;
-    }
-
-
-    public void setNumLegions(int numLegions)
-    {
-        this.numLegions = numLegions;
+        return legions.size();
     }
 
 
     public Legion getLegion(int i)
     {
-        return legions[i];
+        return (Legion)legions.get(i);
     }
 
 
@@ -249,13 +240,16 @@ public class Player
         return game;
     }
 
-
+    /** Return the number of this player's legions that have moved. */
     public int legionsMoved()
     {
         int total = 0;
-        for (int i = 0; i < numLegions; i++)
+
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            if (legions[i].hasMoved())
+            Legion legion = (Legion)it.next();
+            if (legion.hasMoved())
             {
                 total++;
             }
@@ -265,15 +259,16 @@ public class Player
     }
 
 
-    // Return the number of this player's legions that have legal 
-    // non-teleport moves remaining.
+    /** Return the number of this player's legions that have legal 
+        non-teleport moves remaining. */
     public int countMobileLegions()
     {
         int count = 0;
-
-        for (int i = 0; i < getNumLegions(); i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            if (game.countConventionalMoves(getLegion(i)) > 0)
+            Legion legion = (Legion)it.next();
+            if (game.countConventionalMoves(legion) > 0)
             {
                 count++;
             }
@@ -285,9 +280,11 @@ public class Player
 
     public void commitMoves()
     {
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            legions[i].commitMove();
+            Legion legion = (Legion)it.next();
+            legion.commitMove();
         }
     }
 
@@ -335,9 +332,11 @@ public class Player
         game.getBoard().clearAllEntrySides();
 
         // Hide all stack contents from other players.
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            legions[i].hideAllCreatures();
+            Legion legion = (Legion)it.next();
+            legion.hideAllCreatures();
         }
 
         if (game.getForcedMovementRoll() != 0)
@@ -391,9 +390,11 @@ public class Player
 
     public void undoAllMoves()
     {
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            legions[i].undoMove();
+            Legion legion = (Legion)it.next();
+            legion.undoMove();
         }
     }
 
@@ -425,9 +426,11 @@ public class Player
     
     public void undoAllRecruits()
     {
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            legions[i].undoRecruit();
+            Legion legion = (Legion)it.next();
+            legion.undoRecruit();
         }
         
         // Update number of creatures in status window. 
@@ -439,9 +442,10 @@ public class Player
     {
         TreeSet set = new TreeSet();
 
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Legion legion = legions[i];
+            Legion legion = (Legion)it.next();
             if (legion.getHeight() >= 7)
             {
                 MasterHex hex = legion.getCurrentHex();
@@ -478,9 +482,12 @@ public class Player
 
     public void undoAllSplits()
     {
-        for (int i = numLegions - 1; i >= 0; i--)
+        // Run through the legion list backwards, since the newly split 
+        // legions that need to be combined will appear at the end.
+        ListIterator lit = legions.listIterator(legions.size());
+        while (lit.hasPrevious())
         {
-            Legion legion = legions[i];
+            Legion legion = (Legion)lit.previous();
             MasterHex hex = legion.getCurrentHex();
             if (hex.getNumLegions() > 1)
             {
@@ -499,13 +506,17 @@ public class Player
     public int getMaxLegionHeight()
     {
         int height = 0;
-        for (int i = 0; i < numLegions; i++)
+
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            if (legions[i].getHeight() > height)
+            Legion legion = (Legion)it.next();
+            if (legion.getHeight() > height)
             {
-                height = legions[i].getHeight();
+                height = legion.getHeight();
             }
         }
+
         return height;
     }
     
@@ -513,68 +524,63 @@ public class Player
     public int getNumCreatures()
     {
         int total = 0;
-        for (int i = 0; i < numLegions; i++)
+
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            total += legions[i].getHeight();
+            Legion legion = (Legion)it.next();
+            total += legion.getHeight();
         }
+
         return total;
     }
 
 
     public void addLegion(Legion legion)
     {
-        numLegions++;
-        legions[numLegions - 1] = legion;
+        legions.add(legion);
+    }
+
+    /** Do the cleanup required before this legion can be removed. */
+    private void prepareToRemoveLegion(Legion legion)
+    {
+        // Remove the legion from its current hex.
+        legion.getCurrentHex().removeLegion(legion);
+
+        StringBuffer log = new StringBuffer("Legion ");
+        log.append(legion.getName());
+        log.append(" (");
+
+        int height = legion.getHeight();
+        // Return lords and demi-lords to the stacks.
+        for (int j = 0; j < height; j++)
+        {
+            Creature creature = legion.getCreature(j);
+            log.append(creature.getName());
+            if (j < height - 1)
+            {
+                log.append(", ");
+            }
+            if (creature.isImmortal())
+            {
+                creature.putOneBack();
+            }
+        }
+        log.append(") is eliminated");
+        Game.logEvent(log.toString());
+
+        // Free up the legion marker.
+        markersAvailable.add(legion.getMarkerId());
+        Collections.sort(markersAvailable);
     }
 
 
     /** Eliminate this legion */
     public void removeLegion(Legion legion)
     {
-        for (int i = 0; i < numLegions; i++)
-        {
-            if (legion == legions[i])
-            {
-                // Remove the legion from its current hex.
-                legion.getCurrentHex().removeLegion(legion);
+        prepareToRemoveLegion(legion);
 
-                StringBuffer log = new StringBuffer("Legion ");
-                log.append(legion.getName());
-                log.append(" (");
-
-                int height = legion.getHeight();
-                // Return lords and demi-lords to the stacks.
-                for (int j = 0; j < height; j++)
-                {
-                    Creature creature = legion.getCreature(j);
-                    log.append(creature.getName());
-                    if (j < height - 1)
-                    {
-                        log.append(", ");
-                    }
-                    if (creature.isImmortal())
-                    {
-                        creature.putOneBack();
-                    }
-                }
-                log.append(") is eliminated");
-                Game.logEvent(log.toString());
-
-                // Free up the legion marker.
-                markersAvailable[numMarkersAvailable] = legion.getMarkerId();
-                numMarkersAvailable++;
-
-                // Compress the legions array.
-                for (int j = i; j < numLegions - 1; j++)
-                {
-                    legions[j] = legions[j + 1];
-                }
-                legions[numLegions - 1] = null;
-                numLegions--;
-            }
-        }
-
-        sortLegionMarkers();
+        legions.remove(legion);
     }
 
 
@@ -598,19 +604,19 @@ public class Player
 
     public int getNumMarkersAvailable()
     {
-        return numMarkersAvailable;
+        return markersAvailable.size();
     }
 
 
-    public String [] getMarkersAvailable()
+    public Collection getMarkersAvailable()
     {
-        return markersAvailable;
+        return (Collection)markersAvailable;
     }
 
 
     public String getMarker(int i)
     {
-        return markersAvailable[i];
+        return markersAvailable.get(i).toString();
     }
 
 
@@ -622,9 +628,8 @@ public class Player
 
     public void addSelectedMarker()
     {
-        markersAvailable[numMarkersAvailable] = new String(markerSelected);
-        numMarkersAvailable++;
-        sortLegionMarkers();
+        markersAvailable.add(new String(markerSelected));
+        Collections.sort(markersAvailable);
         markerSelected = null;
     }
 
@@ -637,63 +642,33 @@ public class Player
 
     public void selectMarker(int i)
     {
-        if (i < 0 || i >= numMarkersAvailable)
+        if (i < 0 || i >= getNumMarkersAvailable())
         {
             markerSelected = null;
         }
         else
         {
-            markerSelected = new String(markersAvailable[i]);
-
-            // Adjust other markers because this one is taken.
-            for (int j = i; j < numMarkersAvailable - 1; j++)
-            {
-                markersAvailable[j] = new String(markersAvailable[j + 1]);
-            }
-
-            markersAvailable[numMarkersAvailable - 1] = new String("");
-            numMarkersAvailable--;
+            // Remove the selected marker from the list of those available.
+            markerSelected = markersAvailable.remove(i).toString();
         }
     }
 
 
     public void addLegionMarker(String markerId)
     {
-        markersAvailable[numMarkersAvailable] = markerId;
-        numMarkersAvailable++;
-        sortLegionMarkers();
+        markersAvailable.add(markerId);
+        Collections.sort(markersAvailable);
     }
 
 
     public void addLegionMarkers(Player player)
     {
-        String [] newMarkers = player.getMarkersAvailable();
-        int len;
-        for (len = 0; newMarkers[len] != null; len++);
-        for (int i = 0; i < len; i++)
-        {
-            markersAvailable[numMarkersAvailable + i] = newMarkers[i];
-        }
-        numMarkersAvailable += len;
-        sortLegionMarkers();
+        Collection newMarkers = player.getMarkersAvailable();
+        markersAvailable.addAll(newMarkers);
+        Collections.sort(markersAvailable);
     }
 
 
-    public void sortLegionMarkers()
-    {
-        for (int i = 0; i < numMarkersAvailable; i++)
-        {
-            for (int j = i; j > 0 && markersAvailable[j - 1].compareTo(
-                markersAvailable[j]) > 0; j--)
-            {
-                String temp = markersAvailable[j - 1];
-                markersAvailable[j - 1] = markersAvailable[j];
-                markersAvailable[j] = temp;
-            }
-        }
-    }
-
-    
     /** Add points to this player's score.  Update the status window
      *  to reflect the addition. */
     public void addPoints(double points)
@@ -721,9 +696,10 @@ public class Player
         // engaged with.  All others give half points to slayer,
         // if non-null.
 
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Legion legion = legions[i];
+            Legion legion = (Legion)it.next();
             MasterHex hex = legion.getCurrentHex();
             Legion enemyLegion = hex.getEnemyLegion(this);
             double halfPoints = legion.getPointValue() / 2.0;
@@ -742,6 +718,11 @@ public class Player
             {
                 scorer.addPoints(halfPoints);
             }
+            
+            // Call the iterator's remove() method rather than 
+            // removeLegion() to avoid concurrent modification problems. 
+            prepareToRemoveLegion(legion);
+            it.remove();
         }
 
         // Truncate every player's score to an integer value.
@@ -750,25 +731,15 @@ public class Player
             game.getPlayer(i).truncScore();
         }
 
-
-        // Removing all legions is tricky because the array shrinks as
-        // each is removed.
-        for (int i = numLegions - 1; i >= 0; i--)
-        {
-            removeLegion(legions[i]);
-        }
-
         // Mark this player as dead.
         dead = true;
 
-        // Mark the slayer and give him this player's legion markers.
+        // Record the slayer and give him this player's legion markers.
         if (slayer != null)
         {
             slayer.addPlayerElim(this);
             slayer.addLegionMarkers(this);
         }
-
-        numMarkersAvailable = 0;
 
         game.updateStatusScreen();
 
