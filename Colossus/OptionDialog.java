@@ -62,8 +62,6 @@ class OptionDialog extends Dialog implements ActionListener
 
     public void actionPerformed(ActionEvent e)
     {
-        System.out.println(e.getActionCommand());
-
         if (e.getActionCommand().equals(yesString))
         {
             lastAnswer = YES_OPTION;
