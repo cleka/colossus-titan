@@ -104,7 +104,7 @@ public final class LegionInfo
        return getContents().contains(creatureName);
     }
 
-    int numCreature(String creatureName)
+    public int numCreature(String creatureName)
     {
         int count = 0;
         Iterator it = getContents().iterator();

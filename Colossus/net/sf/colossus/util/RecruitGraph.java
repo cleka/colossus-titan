@@ -2,6 +2,7 @@ package net.sf.colossus.util;
 
 
 import java.util.*;
+import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Caretaker;
 
@@ -48,7 +49,7 @@ public class RecruitGraph
         return e;
     }
 
-    private List traverse(RecruitVertex s, Set visited)
+    private List traverse(RecruitVertex s, Set visited, LegionInfo legion)
     {
         List all = new ArrayList();
 
@@ -65,9 +66,13 @@ public class RecruitGraph
             {
                 RecruitEdge e = (RecruitEdge)it.next();
                 RecruitVertex v = e.getDestination();
-                if (!(visited.contains(v)))
+                int already = (legion == null ? 0 :
+                               legion.numCreature(s.getCreatureName()));
+
+                if ((!(visited.contains(v))) &&
+                    ((s.getRemaining() + already) >= e.getNumber()))
                 {
-                    all.addAll(traverse(v, visited));
+                    all.addAll(traverse(v, visited, legion));
                 }
             }
         }
@@ -113,11 +118,24 @@ public class RecruitGraph
     public List traverse(Creature cre)
     {
         return traverse((RecruitVertex)creatureToVertex.get(cre),
-                        new HashSet());
+                        new HashSet(),
+                        null);
     }
     
     public List traverse(String name)
     {
         return traverse(Creature.getCreatureByName(name));
+    }
+
+    public List traverse(Creature cre, LegionInfo legion)
+    {
+        return traverse((RecruitVertex)creatureToVertex.get(cre),
+                        new HashSet(),
+                        legion);
+    }
+    
+    public List traverse(String name, LegionInfo legion)
+    {
+        return traverse(Creature.getCreatureByName(name), legion);
     }
 }
