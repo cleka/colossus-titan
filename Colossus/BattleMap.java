@@ -59,7 +59,7 @@ public class BattleMap extends JFrame implements MouseListener,
     private int defenderPoints = 0;
 
     private boolean chitSelected = false;
-    private int numCarries = 0;
+    private int carryDamage = 0;
 
     public static final int NO_KILLS = 0;
     public static final int FIRST_BLOOD = 1;
@@ -143,7 +143,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    void placeNewChit(Legion legion)
+    public void placeNewChit(Legion legion)
     {
         imagesLoaded = false;
         tracker = new MediaTracker(this);
@@ -175,7 +175,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    void unselectAllHexes()
+    public void unselectAllHexes()
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -191,7 +191,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    int highlightMovableChits()
+    public int highlightMovableChits()
     {
         unselectAllHexes();
 
@@ -253,7 +253,7 @@ public class BattleMap extends JFrame implements MouseListener,
                         // If there are movement points remaining, continue
                         // checking moves from there.  Fliers skip this
                         // because flying is more efficient.
-                        if (flies == false && movesLeft > entryCost)
+                        if (!flies && movesLeft > entryCost)
                         {
                             findMoves(neighbor, chit, creature, flies,
                                 movesLeft - entryCost, reverseDir);
@@ -275,7 +275,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
 
     // Find all legal moves for this chit.
-    void showMoves(BattleChit chit)
+    public void showMoves(BattleChit chit)
     {
         unselectAllHexes();
 
@@ -313,19 +313,19 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    void markLastChitMoved(BattleChit chit)
+    public void markLastChitMoved(BattleChit chit)
     {
         lastChitMoved = chit;
     }
 
 
-    void clearLastChitMoved()
+    public void clearLastChitMoved()
     {
         lastChitMoved = null;
     }
 
 
-    void undoLastMove()
+    public void undoLastMove()
     {
         chitSelected = false;
 
@@ -339,7 +339,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    void undoAllMoves()
+    public void undoAllMoves()
     {
         chitSelected = false;
 
@@ -355,7 +355,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // If any chits were left off-board, kill them.  If they were newly 
     //   summoned or recruited, unsummon or unrecruit them instead.
-    void removeOffboardChits()
+    public void removeOffboardChits()
     {
         Player player = turn.getActivePlayer();
         for (int i = 0; i < numChits; i++)
@@ -370,7 +370,7 @@ public class BattleMap extends JFrame implements MouseListener,
     
     
     // Mark all of the conceding player's chits as dead.
-    void concede(Player player)
+    public void concede(Player player)
     {
         for (int i = 0; i < numChits; i++)
         {
@@ -382,7 +382,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    void commitMoves()
+    public void commitMoves()
     {
         clearLastChitMoved();
 
@@ -393,7 +393,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    void applyDriftDamage()
+    public void applyDriftDamage()
     {
         // Drift hexes are only found on the tundra map.
         if (terrain == 't')
@@ -415,7 +415,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    int highlightChitsWithTargets()
+    public int highlightChitsWithTargets()
     {
         unselectAllHexes();
 
@@ -525,19 +525,31 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    int countStrikes(BattleChit chit)
+    public int countStrikes(BattleChit chit)
     {
         return countAndMaybeHighlightStrikes(chit, false);
     }
 
 
-    int highlightStrikes(BattleChit chit)
+    public int highlightStrikes(BattleChit chit)
     {
         return countAndMaybeHighlightStrikes(chit, true);
     }
 
 
-    int highlightCarries(BattleChit chit, int numCarries)
+    private void setCarryDamage(int damage)
+    {
+        carryDamage = damage;
+    }
+
+
+    private int getCarryDamage()
+    {
+        return carryDamage;
+    }
+
+
+    public int highlightCarries(BattleChit chit, int damage)
     {
         unselectAllHexes();
 
@@ -557,21 +569,21 @@ public class BattleMap extends JFrame implements MouseListener,
 
         if (count > 0)
         {
-            this.numCarries = numCarries;
+            setCarryDamage(damage);
         }
 
         return count;
     }
     
     
-    void applyCarries(BattleChit target)
+    public void applyCarries(BattleChit target)
     {
         int totalDamage = target.getHits();
-        totalDamage += numCarries;
+        totalDamage += getCarryDamage();
         int power = target.getPower();
         if (totalDamage > power)
         {
-            numCarries = totalDamage - power;
+            setCarryDamage(totalDamage - power);
             totalDamage = power;
             target.setCarryFlag(false);
         }
@@ -585,17 +597,17 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    void clearAllCarries()
+    public void clearAllCarries()
     {
         for (int i = 0; i < numChits; i++)
         {
             chits[i].setCarryFlag(false);
         }
-        numCarries = 0;
+        setCarryDamage(0);
     }
 
 
-    boolean forcedStrikesRemain()
+    public boolean forcedStrikesRemain()
     {
         Player player = turn.getActivePlayer();
 
@@ -617,7 +629,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // Returns the range in hexes from hex1 to hex2.  Titan ranges are
     // inclusive at both ends.
-    int getRange(BattleHex hex1, BattleHex hex2)
+    public int getRange(BattleHex hex1, BattleHex hex2)
     {
         int x1 = hex1.getXCoord();
         float y1 = hex1.getYCoord();
@@ -663,7 +675,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
 
     // Know that yDist != 0
-    boolean toLeft(float xDist, float yDist)
+    private boolean toLeft(float xDist, float yDist)
     {
         float ratio = xDist / yDist;
         if (ratio >= 1.5 || (ratio >= 0 && ratio <= .75) || 
@@ -839,7 +851,7 @@ public class BattleMap extends JFrame implements MouseListener,
     // Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
     // lies along a hexspine, check both and return true only if both are
     // blocked.
-    boolean LOSBlocked(BattleHex hex1, BattleHex hex2)
+    public boolean LOSBlocked(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {
@@ -891,7 +903,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
 
     // Return true if the rangestrike is possible.
-    boolean rangestrikePossible(BattleChit chit, BattleChit target)
+    public boolean rangestrikePossible(BattleChit chit, BattleChit target)
     {
         BattleHex currentHex = chit.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -924,7 +936,7 @@ public class BattleMap extends JFrame implements MouseListener,
     // Sometimes two directions are possible.  If the left parameter
     // is set, the direction further left will be given.  Otherwise,
     // the direction further right will be given.
-    int getDirection(BattleHex hex1, BattleHex hex2, boolean left)
+    public int getDirection(BattleHex hex1, BattleHex hex2, boolean left)
     {
         if (hex1 == hex2)
         {
@@ -1124,7 +1136,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // Return the number of intervening bramble hexes.  If LOS is along a
     // hexspine and there are two choices, pick the lower one.
-    int countBrambleHexes(BattleHex hex1, BattleHex hex2)
+    public int countBrambleHexes(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {
@@ -1176,7 +1188,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    void commitStrikes()
+    public void commitStrikes()
     {
         for (int i = 0; i < numChits; i++)
         {
@@ -1185,25 +1197,25 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    MasterBoard getBoard()
+    public MasterBoard getBoard()
     {
         return board;
     }
 
 
-    int getSummonState()
+    public int getSummonState()
     {
         return summonState;
     }
 
 
-    void setSummonState(int state)
+    public void setSummonState(int state)
     {
         summonState = state;
     }
 
 
-    void cleanup()
+    public void cleanup()
     {
         // Handle any after-battle angel summoning or recruiting.
         if (masterHex.getNumLegions() == 1)
@@ -1241,7 +1253,7 @@ System.out.println("board.show()");
     }
 
 
-    void removeDeadChits()
+    public void removeDeadChits()
     {
         // Initialize these to true, and then set them to false when a 
         // non-dead chit is found.
@@ -1334,7 +1346,6 @@ System.out.println("board.show()");
             defender.getPlayer().isTitanEliminated())
         {
             // Nobody gets any points.
-System.out.println("mutual Titan kill");
             // Make defender die first, to simplify turn advancing.
             defender.getPlayer().die(null);
             attacker.getPlayer().die(null);
@@ -1352,7 +1363,6 @@ System.out.println("mutual Titan kill");
             {
                 defender.addPoints(defenderPoints);
             }
-System.out.println("attacker's titan eliminated");
             attacker.getPlayer().die(defender.getPlayer());
             cleanup();
         }
@@ -1366,7 +1376,6 @@ System.out.println("attacker's titan eliminated");
             {
                 attacker.addPoints(defenderPoints);
             }
-System.out.println("defender's titan eliminated");
             defender.getPlayer().die(attacker.getPlayer());
             cleanup();
         }
@@ -1395,13 +1404,13 @@ System.out.println("defender's titan eliminated");
     }
 
 
-    BattleTurn getTurn()
+    public BattleTurn getTurn()
     {
         return turn;
     }
 
 
-    void setupHexes()
+    private void setupHexes()
     {
         int cx = 6 * scale;
         int cy = 3 * scale;
@@ -1771,7 +1780,7 @@ System.out.println("defender's titan eliminated");
     }
 
 
-    BattleHex getEntrance(Legion legion)
+    public BattleHex getEntrance(Legion legion)
     {
         if (legion == attacker)
         {
@@ -1852,7 +1861,7 @@ System.out.println("defender's titan eliminated");
 
                         case BattleTurn.FIGHT:
                         case BattleTurn.STRIKEBACK:
-                            if (numCarries > 0)
+                            if (getCarryDamage() > 0)
                             {
                                 applyCarries(h[i][j].getChit());
                             }
@@ -1861,7 +1870,8 @@ System.out.println("defender's titan eliminated");
                                 chits[0].strike(h[i][j].getChit());
                                 chitSelected = false;
                             }
-                            if (numCarries == 0)
+
+                            if (getCarryDamage() == 0)
                             {
                                 highlightChitsWithTargets();
                             }
@@ -1959,7 +1969,7 @@ System.out.println("defender's titan eliminated");
 
 
     // This is used to fix artifacts from chits outside visible hexes.
-    void setEraseFlag()
+    public void setEraseFlag()
     {
         eraseFlag = true;
     }
