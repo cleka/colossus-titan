@@ -387,8 +387,11 @@
         <exec executable="scp">
             <arg line="${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
         </exec>
+        <exec executable="ssh">
+            <arg line="${SERVER} rm -r ${DOCS_DIR}"/>
+        </exec>
         <exec executable="scp">
-            <arg line="-pr docs/* ${SERVER}:${DOCS_DIR}"/>
+            <arg line="-pr docs/ ${SERVER}:${HTMLDIR}"/>
         </exec>
         <delete> 
                 <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/> 
