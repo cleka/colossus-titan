@@ -20,8 +20,8 @@ public final class PickIntValue extends KDialog implements WindowListener,
     private static int newValue;
     private static int oldValue;
 
-    // A JSpinner would be better, but is not supported until JDK 1.4.
-    private JSlider slider;
+    private JSpinner spinner;
+    private SpinnerNumberModel model;
 
 
     private PickIntValue(JFrame parentFrame, int oldValue, String title,
@@ -38,13 +38,10 @@ public final class PickIntValue extends KDialog implements WindowListener,
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
-        slider = new JSlider(JSlider.HORIZONTAL, min, max, oldValue);
-        slider.setMajorTickSpacing((max - min) / 4);
-        slider.setMinorTickSpacing((max - min) / 16);
-        slider.setPaintTicks(true);
-        slider.setPaintLabels(true);
-        contentPane.add(slider);
-        slider.addChangeListener(this);
+        model = new SpinnerNumberModel(oldValue, min, max, 1);
+        spinner = new JSpinner(model);
+        contentPane.add(spinner);
+        spinner.addChangeListener(this);
 
         // Need another BoxLayout to place buttons horizontally.
         Box buttonBar = new Box(BoxLayout.X_AXIS);
@@ -76,7 +73,7 @@ public final class PickIntValue extends KDialog implements WindowListener,
 
     public void stateChanged(ChangeEvent e)
     {
-        newValue = slider.getValue();
+        newValue = ((Integer)spinner.getValue()).intValue();
     }
 
     public void actionPerformed(ActionEvent e)

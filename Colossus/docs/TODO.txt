@@ -126,7 +126,6 @@ Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
 
 JDK 1.4 changes:
-   JSpinner
    New focus model
    JProgressBar setIndeterminate()
    JFormattedTextField for some inputs?
