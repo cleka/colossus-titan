@@ -268,6 +268,9 @@ class Player
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
 
+        // Clear old entry side and teleport information.
+        game.getBoard().clearAllEntrySides();
+
         movementRoll = (int) Math.ceil(6 * Math.random());
     }
 
