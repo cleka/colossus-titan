@@ -32,11 +32,15 @@ class MasterHex
     int label;
 
     // n, ne, se, s, sw, nw
-    // 0=none, 1=block, 2=arch, 3=arrow 4=arrows
     int[] exitType = new int[6];
     int[] entranceType = new int[6];
 
-
+    // 0=none, 1=block, 2=arch, 3=arrow 4=arrows
+    static final int NONE = 0;
+    static final int BLOCK = 1;
+    static final int ARCH = 2;
+    static final int ARROW = 3;
+    static final int ARROWS = 4;
 
     MasterHex(int cx, int cy, int scale, boolean inverted)
     {
@@ -225,7 +229,7 @@ class MasterHex
 
         switch(gateType)
         {
-            case 1:   // block
+            case BLOCK:
                 x[0] = (int) Math.round(x0 - l * Math.sin(theta));
                 y[0] = (int) Math.round(y0 + l * Math.cos(theta));
                 x[1] = (int) Math.round(x0 + l * Math.sin(theta));
@@ -241,7 +245,7 @@ class MasterHex
                 g.drawPolyline(x, y, 4);
                 break;
 
-            case 2:   // arch
+            case ARCH:
                 x[0] = (int) Math.round(x0 - l * Math.sin(theta));
                 y[0] = (int) Math.round(y0 + l * Math.cos(theta));
                 x[1] = (int) Math.round(x0 + l * Math.sin(theta));
@@ -284,7 +288,7 @@ class MasterHex
                 g.drawLine(x[2], y[2], x0, y0);
                 break;
 
-            case 3:   // 1 arrow
+            case ARROW:
                 x[0] = (int) Math.round(x0 - l * Math.sin(theta));
                 y[0] = (int) Math.round(y0 + l * Math.cos(theta));
                 x[1] = (int) Math.round((x0 + x1) / 2 + l * 
@@ -300,7 +304,7 @@ class MasterHex
                 g.drawPolyline(x, y, 3);
                 break;
 
-            case 4:   // 3 arrows
+            case ARROWS:
                 x[0] = (int) Math.round(x0 - l * Math.sin(theta));
                 y[0] = (int) Math.round(y0 + l * Math.cos(theta));
                 x[1] = (int) Math.round((x0 + x1) / 2 + l * 
