@@ -6,6 +6,7 @@ import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import java.awt.geom.*;
+import java.awt.image.*;
 import java.net.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
@@ -22,6 +23,7 @@ import net.sf.colossus.client.VariantSupport;
 class Chit extends JPanel
 {
     private ImageIcon icon;
+    private ImageIcon invertedIcon;
     private Rectangle rect;
     private Container container;
 
@@ -70,16 +72,16 @@ class Chit extends JPanel
 
     static ImageIcon getImageIcon(String imageFilename)
     {
-        ImageIcon icon = null;
+        ImageIcon tempIcon = null;
         java.util.List directories = VariantSupport.getImagesDirectoriesList();
-        icon = ResourceLoader.getImageIcon(imageFilename, directories);
-        if (icon == null)
+        tempIcon = ResourceLoader.getImageIcon(imageFilename, directories);
+        if (tempIcon == null)
         {
             System.out.println("Couldn't get image :" + imageFilename);
             System.exit(1);
         }
         
-        return icon;
+        return tempIcon;
     }
 
 
@@ -106,20 +108,34 @@ class Chit extends JPanel
     {
         Graphics2D g2 = (Graphics2D)g;
         super.paintComponent(g2);
+        Image image = icon.getImage();
 
         if (inverted)
         {
-            g2.drawImage(icon.getImage(), 
-                rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
-                rect.width, rect.height, 0, 0,
-                container);
+            if (invertedIcon == null)
+            {
+                int width = icon.getIconWidth();
+                int height = icon.getIconHeight();
+                BufferedImage bi = new BufferedImage(
+                                           width, height,
+                                           BufferedImage.TYPE_INT_RGB);
+                Graphics2D biContext = bi.createGraphics();
+                biContext.drawImage(image, 0, 0, null);
+                double theta = Math.PI;
+                AffineTransform at = AffineTransform.getRotateInstance(
+                                         theta,
+                                         width / 2,
+                                         height / 2);
+                AffineTransformOp ato = new AffineTransformOp(at,
+                                            AffineTransformOp.TYPE_BILINEAR);
+                BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
+                bi2 = ato.filter(bi, bi2);
+                invertedIcon = new ImageIcon(bi2);
+            }
+            image = invertedIcon.getImage();
         }
-        else
-        {
-            g2.drawImage(icon.getImage(), rect.x, rect.y, rect.width,
-                rect.height, container);
-        }
-
+        g2.drawImage(image, rect.x, rect.y, rect.width,
+                     rect.height, container);
         if (isDead())
         {
             // Draw a triple-wide red X.
