@@ -530,8 +530,8 @@ public final class Battle
 
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back. */
-    private Set findMoves(BattleHex hex, Creature creature,
-        boolean flies, int movesLeft, int cameFrom)
+    private Set findMoves(BattleHex hex, Creature creature, boolean flies, 
+        int movesLeft, int cameFrom)
     {
         HashSet set = new HashSet();
 

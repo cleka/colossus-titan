@@ -3,12 +3,10 @@ import java.util.*;
 import org.apache.log4j.*;
 
 /**
- *
  * Simple implementation of a Titan AI
  * @version $Id$
  * @author Bruce Sherrod
  * @author David Ripton
- *
  */
 
 
@@ -649,7 +647,7 @@ class SimpleAI implements AI
                 final MasterHex hex = game.getBoard().getHexFromLabel(
                     hexLabel);
                 final int value = evaluateMove(game, legion, hex, true,
-                        enemyAttackMap);
+                    enemyAttackMap);
 
                 if (value > bestValue || bestHex == null)
                 {
@@ -926,7 +924,6 @@ class SimpleAI implements AI
                     debugln("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and WIN_WITH_HEAVY_LOSSES");
                 // don't do this with our titan unless we can win the game
-                {
                     Player player = legion.getPlayer();
                     List legions = player.getLegions();
                     boolean haveOtherAngels = false;
@@ -982,12 +979,9 @@ class SimpleAI implements AI
                         // TODO: if enemy titan, we also score half points
                         // (this may make the AI unfairly gun for your titan)
                     }
-                }
-
                     break;
 
                 case DRAW:
-                {
                     debugln("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and DRAW");
 
@@ -1010,12 +1004,9 @@ class SimpleAI implements AI
                         // otherwise no thanks
                         value += LOSE_LEGION + 2;
                     }
-                }
-
                     break;
 
                 case LOSE_BUT_INFLICT_HEAVY_LOSSES:
-                {
                     debugln("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex
                             + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
@@ -1023,18 +1014,13 @@ class SimpleAI implements AI
                     // TODO: how important is it that we damage
                     // his group?
                     value += LOSE_LEGION + 1;
-                }
-
                     break;
 
                 case LOSE:
-                {
                     debugln("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and LOSE");
 
                     value += LOSE_LEGION;
-                }
-
                     break;
             }
         }
@@ -1805,7 +1791,7 @@ class SimpleAI implements AI
             this.game = game.AICopy();
             this.activePlayerNum = activePlayerNum;
             enemyAttackMap = buildEnemyAttackMap(game,
-                    game.getPlayer(activePlayerNum));
+                game.getPlayer(activePlayerNum));
         }
 
 
@@ -1814,7 +1800,7 @@ class SimpleAI implements AI
             this.game = position.game.AICopy();
             this.activePlayerNum = position.activePlayerNum;
             enemyAttackMap = buildEnemyAttackMap(game,
-                    game.getPlayer(activePlayerNum));
+                game.getPlayer(activePlayerNum));
         }
 
 
@@ -1855,31 +1841,16 @@ class SimpleAI implements AI
 
             // check for victory
             {
-                int playersRemaining = 0;
-                Iterator it = game.getPlayers().iterator();
-                while (it.hasNext())
-                {
-                    Player player = (Player)it.next();
-
-                    if (!player.isDead())
-                    {
-                        playersRemaining++;
-                    }
-                }
-
+                int playersRemaining = game.getNumPlayersRemaining();
                 switch (playersRemaining)
                 {
                     case 0:
-                    {
                         debugln("evaluation: draw! " + 0);
                         return 0;
-                    }
 
                     case 1:
-                    {
                         debugln("evaluation: win! " + Integer.MAX_VALUE);
                         return Integer.MAX_VALUE;
-                    }
                 }
             }
 
@@ -1889,14 +1860,12 @@ class SimpleAI implements AI
                  playerIt.hasNext(); )
             {
                 Player player = (Player)playerIt.next();
-
                 if (player == activePlayer)
                 {
                     for (Iterator it = player.getLegions().iterator();
                          it.hasNext(); )
                     {
                         Legion legion = (Legion)it.next();
-
                         value += evaluateMove(game, legion,
                                 legion.getCurrentHex(), legion.hasMoved(),
                                 enemyAttackMap);
@@ -1910,7 +1879,6 @@ class SimpleAI implements AI
                          it.hasNext(); )
                     {
                         Legion legion = (Legion)it.next();
-
                         value += evaluateMove(game, legion,
                                 legion.getCurrentHex(), legion.hasMoved(),
                                 null);
@@ -1919,9 +1887,7 @@ class SimpleAI implements AI
                     // his stacks near each other
                 }
             }
-
             debugln("evaluation: " + value);
-
             return value;
         }
 
@@ -1937,22 +1903,11 @@ class SimpleAI implements AI
             if (activePlayer.isDead())                  // oops! we lost
             {
                 return new ArrayList().iterator();      // no moves
-                // check for victory
             }
 
+            // check for victory
             {
-                int playersRemaining = 0;
-                Iterator it = game.getPlayers().iterator();
-                while (it.hasNext())
-                {
-                    Player player = (Player)it.next();
-
-                    if (!player.isDead())
-                    {
-                        playersRemaining++;
-                    }
-                }
-
+                int playersRemaining = game.getNumPlayersRemaining();
                 if (playersRemaining < 2)               // draw or win
                 {
                     return new ArrayList().iterator();  // no moves
@@ -1970,7 +1925,6 @@ class SimpleAI implements AI
                 {
                     moves.add(new DiceMove(i, this));
                 }
-
                 return moves.iterator();
             }
 
@@ -1988,16 +1942,11 @@ class SimpleAI implements AI
                 String hexLabel = (String)it.next();
                 MasterHex hex = game.getBoard().getHexFromLabel(hexLabel);
                 HashMap moves = new HashMap();
-
                 moves.put(legion, hex);
-
                 PlayerMove move = new PlayerMove(moves, this);
-
                 allmoves.add(move);
             }
-
             debugln("considering " + allmoves.size() + " possible moves ");
-
             return allmoves.iterator();
         }
 
@@ -2198,20 +2147,19 @@ class SimpleAI implements AI
 
     public void battleMove(Legion legion, Battle battle, Game game)
     {
-        LegionMove legionMove = (LegionMove)minimax.search
-            (new BattleMapPosition(game, game.getActivePlayerNum()), 1);
+        LegionMove lm = (LegionMove)minimax.search
+            (new BattlePosition(game, game.getActivePlayerNum()), 1);
         BattleMap map = battle.getBattleMap();
         // Apply the LegionMove
-        Iterator it = legionMove.moves.entrySet().iterator();
+        Iterator it = lm.getMoves().iterator();
         while (it.hasNext())
         {
-            Map.Entry entry = (Map.Entry)it.next();
-            Critter critter = (Critter)entry.getKey();
-            BattleHex hex = (BattleHex)entry.getValue();
+            CritterMove cm = (CritterMove)it.next();
+            Critter critter = (Critter)cm.getCritter();
+            BattleHex hex = (BattleHex)cm.getHex();
             critter.moveToHex(hex);
         }
     }
-
 
     private static int evaluateCritterMove(Battle battle, Critter critter)
     {
@@ -2221,10 +2169,10 @@ class SimpleAI implements AI
         // Subtract for wounds.
         value -= critter.getPower() * critter.getHits() / 2;
 
-        // Add for sitting in favorable terrain.
-        // Subtract for sitting in unfavorable terrain.
         BattleHex hex = critter.getCurrentHex();
 
+        // Add for sitting in favorable terrain.
+        // Subtract for sitting in unfavorable terrain.
         if (hex.isEntrance())
         {
             // Staying offboard to die is really bad.
@@ -2246,13 +2194,13 @@ class SimpleAI implements AI
         }
 
         // Reward the ability to rangestrike.
+        // TODO Range 3 is better than range 4 for non-warlocks.
         if (critter.isRangestriker() &&!critter.isInContact(true)
             && battle.findStrikes(critter, true).size() >= 1)
         {
             value += 4;
         }
 
-        // TODO Range 3 is better than range 4 for non-warlocks.
         // Reward being adjacent to an enemy if attacking.
         // Penalize being adjacent to an enemy if defending.
         if (critter.isInContact(false))
@@ -2272,19 +2220,32 @@ class SimpleAI implements AI
 
         value += buddies;
 
-        // Reward titans sticking to the back row surrounded by allies.
+        // Reward titans sticking to the edges of the back row 
+        // surrounded by allies.
         if (critter.isTitan())
         {
             value += 5 * buddies;
 
-            BattleHex entrance =
-                battle.getBattleMap().getEntrance(critter.getLegion());
-
-            for (int i = 0; i < 6; i++)
+            if (terrain == 'T')
             {
-                if (entrance.getNeighbor(i) == hex)
+                // Stick to the center of the tower.
+                value += 50 * hex.getElevation();
+            }
+            else
+            {
+                BattleHex entrance =
+                    battle.getBattleMap().getEntrance(critter.getLegion());
+                for (int i = 0; i < 6; i++)
                 {
-                    value += 20;
+                    if (entrance.getNeighbor(i) == hex)
+                    {
+                        value += 20;
+                    }
+                    BattleHex neighbor = hex.getNeighbor(i);
+                    if (neighbor == null || neighbor.getTerrain() == 't')
+                    {
+                        value += 10;
+                    }
                 }
             }
         }
@@ -2293,20 +2254,20 @@ class SimpleAI implements AI
     }
 
 
-    class BattleMapPosition implements Minimax.GamePosition
+    class BattlePosition implements Minimax.GamePosition
     {
         private Game game;
         private Battle battle;
         private int activeLegionNum;
 
-        public BattleMapPosition(Game game, int activeLegionNum)
+        public BattlePosition(Game game, int activeLegionNum)
         {
             this.game = game.AICopy();
             this.battle = battle.AICopy();
             this.activeLegionNum = activeLegionNum;
         }
 
-        public BattleMapPosition(BattleMapPosition position)
+        public BattlePosition(BattlePosition position)
         {
             this.game = position.game.AICopy();
             this.battle = position.battle.AICopy();
@@ -2381,13 +2342,11 @@ class SimpleAI implements AI
                 if (player.isDead())
                 {
                     value = GAME_LOSS;
-
                     debugln("evaluation: game loss! " + value);
                 }
                 else
                 {
                     value = GAME_WIN;
-
                     debugln("evaluation: game win! " + value);
                 }
             }
@@ -2397,7 +2356,6 @@ class SimpleAI implements AI
                 if (battle.getAttackerElim() && battle.getDefenderElim())
                 {
                     value = BATTLE_DRAW;
-
                     debugln("evaluation: battle draw! " + value);
                 }
                 else if (battle.getAttackerElim())
@@ -2405,13 +2363,11 @@ class SimpleAI implements AI
                     if (activeLegionNum == battle.ATTACKER)
                     {
                         value = BATTLE_LOSS;
-
                         debugln("evaluation: battle loss! " + value);
                     }
                     else
                     {
                         value = BATTLE_WIN;
-
                         debugln("evaluation: battle win! " + value);
                     }
                 }
@@ -2420,13 +2376,11 @@ class SimpleAI implements AI
                     if (activeLegionNum == battle.DEFENDER)
                     {
                         value = BATTLE_LOSS;
-
                         debugln("evaluation: battle loss! " + value);
                     }
                     else
                     {
                         value = BATTLE_WIN;
-
                         debugln("evaluation: battle win! " + value);
                     }
                 }
@@ -2435,6 +2389,7 @@ class SimpleAI implements AI
         }
 
 
+        /** Generates LegionMoves. */
         public Iterator generateMoves()
         {
             debugln("generating battle moves..");
@@ -2444,35 +2399,121 @@ class SimpleAI implements AI
                 return new ArrayList().iterator();      // no moves
             }
 
-            ArrayList allmoves = new ArrayList();
-            BattleMap map = battle.getBattleMap();
+            final BattleMap map = battle.getBattleMap();
+            final char terrain = battle.getTerrain();
 
-            // TODO Because friendly critters can block one another's moves,
-            // we need to consider all possible sequences of critters.  Or
-            // at least assign priorities so the big critters get their
-            // preferred hexes.
-            Iterator it = battle.getCritters().iterator();
+            ArrayList allCritterMoves = new ArrayList();
+
+            // There are just too many possible combinations of creature
+            // moves to iterate through all of them.
+
+            // Let each critter pick its favorite reachable hex in 
+            // turn, without considering the moves of other critters.  
+            // Score each critter-move by multiplying its score by the 
+            // critter's importance.  Record (but do not actually make) 
+            // the highest-scoring move.  Then proceed down the list to
+            // the best remaining move for a critter that hasn't moved,
+            // to a hex that isn't taken.  When all critters have a 
+            // destination, try to find an ordering of the moves that
+            // allows all to reach their destination without getting in
+            // each other's way.  Move creatures that need to go far
+            // first, and fliers last.
+
+            // Take advantage of symmetry on turn one: one lion in the
+            // entrance is identical to another.
+
+            List critters = (List)battle.getCritters();
+            // Sort critters in decreasing order of importance.
+            Collections.sort(critters, new Comparator()
+            {
+                public int compare(Object o1, Object o2)
+                {
+                    Critter critter1 = (Critter)o1;
+                    Critter critter2 = (Critter)o2;
+                    return getKillValue(critter2, terrain) -
+                        getKillValue(critter1, terrain);
+                }
+            });
+
+            Iterator it = critters.iterator();
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
                 if (critter.getLegion() == battle.getActiveLegion())
                 {
+                    Set critterMoves = battle.showMoves(critter);
+                    // Not moving is also an option, unless the
+                    // critter is offboard.
+                    // XXX What about when creatures are forced to
+                    // stay offboard, e.g. 7 trolls defending in
+                    // the desert?
+                    String hexLabel = critter.getCurrentHexLabel();
+                    if (!hexLabel.startsWith("entrance"))
+                    {
+                        critterMoves.add(hexLabel);
+                    }
                     Iterator it2 = battle.showMoves(critter).iterator();
                     while (it2.hasNext())
                     {
-                        String hexLabel = (String)it2.next();
+                        hexLabel = (String)it2.next();
                         BattleHex hex = map.getHexFromLabel(hexLabel);
-                        HashMap moves = new HashMap();
-                        moves.put(critter, hex);
-                        LegionMove move = new LegionMove(moves, this);
-                        allmoves.add(move);
+                        CritterMove cm = new CritterMove(critter, hex);
+
+                        // Need to actually move critter to hex to evaluate.
+                        critter.moveToHex(hex);
+
+                        // Need to compute the value for each CritterMove
+                        // as it's generated, and save it.
+                        cm.setValue(evaluateCritterMove(battle, critter));
+                        allCritterMoves.add(cm);
+
+                        // Put the critter back.
+                        critter.undoMove();
                     }
                 }
             }
 
-            debugln("considering " + allmoves.size() + " possible moves ");
+            debugln("considering " + allCritterMoves.size() + 
+                " possible critter moves ");
 
-            return allmoves.iterator();
+            // Sort critter moves in descending order of score.
+            Collections.sort(allCritterMoves, new Comparator()
+            {
+                public int compare(Object o1, Object o2)
+                {
+                    CritterMove cm1 = (CritterMove)o1;
+                    CritterMove cm2 = (CritterMove)o2;
+                    return cm2.getValue() - cm1.getValue();
+                }
+            });
+
+            // Now we need to create legion moves from critter moves.
+            // Each legion move contains one critter move for each
+            // critter.
+
+            return generateLegionMoves(allCritterMoves);
+        }
+
+
+        final int MAX_LEGION_MOVES = 50;
+
+        /** Generate up to MAX_LEGION_MOVES different LegionMoves
+            from the provided list of CritterMoves. */
+        private Iterator generateLegionMoves(ArrayList allCritterMoves)
+        {
+            HashSet allLegionMoves = new HashSet();
+
+            for (int i = 0; i < MAX_LEGION_MOVES; i++)
+            {
+                // Pick a set of critterMoves.
+                ArrayList critterMoves = new ArrayList();
+
+                LegionMove lm = new LegionMove(critterMoves, this); 
+
+                allLegionMoves.add(lm);
+            }
+
+            return allLegionMoves.iterator();
         }
 
 
@@ -2480,21 +2521,21 @@ class SimpleAI implements AI
         {
             debugln("applying legion move");
 
-            LegionMove legionMove = (LegionMove)move;
-            BattleMapPosition position =
-                new BattleMapPosition(legionMove.position);
+            LegionMove LegionMove = (LegionMove)move;
+            BattlePosition position =
+                new BattlePosition(LegionMove.position);
             BattleMap map = battle.getBattleMap();
 
             // apply the CritterMoves
-            Iterator it = legionMove.moves.entrySet().iterator();
+            Iterator it = LegionMove.moves.iterator();
             while (it.hasNext())
             {
-                Map.Entry entry = (Map.Entry)it.next();
-                Critter critter = (Critter)entry.getKey();
-                String hexLabel = (String)entry.getValue();
+                CritterMove cm = (CritterMove)it.next();
+                Critter critter = (Critter)cm.getCritter();
+                BattleHex hex = (BattleHex)cm.getHex();
 
-                debugln("applymove: try " + critter + " to " + hexLabel);
-                critter.moveToHex(map.getHexFromLabel(hexLabel));
+                debugln("applymove: try " + critter + " to " + hex.getLabel());
+                critter.moveToHex(hex);
             }
 
             // advance phases until we reach the next move phase
@@ -2529,23 +2570,14 @@ class SimpleAI implements AI
         }
     }
 
-    /*
-     There are two types of moves, CritterMove and LegionMove.  A
-     CritterMove involves one critter moving to a new hex or staying
-     in its current hex.  A LegionMove combines CritterMoves for all
-     of a Legion's Critters.  A legal LegionMove does not place more
-     than one Critter in the same hex.  (Except possibly an offboard
-     entrance.)
-     */
 
     class LegionMove implements Minimax.Move
     {
-        private BattleMapPosition position;
+        private BattlePosition position;
         private int value;
-        /** Each move is a Map.Entry with Key critter and Value hex. */
-        private HashMap moves;
+        private ArrayList moves;  // List of CritterMoves
 
-        public LegionMove(HashMap moves, BattleMapPosition position)
+        public LegionMove(ArrayList moves, BattlePosition position)
         {
             this.position = position;
             this.moves = moves;
@@ -2559,6 +2591,44 @@ class SimpleAI implements AI
         public int getValue()
         {
             return value;
+        }
+
+        public ArrayList getMoves()
+        {
+            return moves;
+        }
+    }
+
+    class CritterMove implements Minimax.Move
+    {
+        private Critter critter;
+        private BattleHex hex;
+        private int value;
+
+        public CritterMove(Critter critter, BattleHex hex)
+        {
+            this.critter = critter;
+            this.hex = hex;
+        }
+
+        public void setValue(int value)
+        {
+            this.value = value;
+        }
+
+        public int getValue()
+        {
+            return value;
+        }
+
+        public Critter getCritter()
+        {
+            return critter;
+        }
+
+        public BattleHex getHex()
+        {
+            return hex;
         }
     }
 }

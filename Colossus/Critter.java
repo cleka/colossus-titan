@@ -345,6 +345,8 @@ public final class Critter extends Creature
     }
 
 
+    // TODO Check move for legality.
+    // TODO Check for move to current hex.
     public void moveToHex(BattleHex hex)
     {
         Game.logEvent(getName() + " moves from " + currentHexLabel +

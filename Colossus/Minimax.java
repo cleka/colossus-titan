@@ -133,8 +133,8 @@ class Minimax
                     break;
 
                 default:
-                    throw new RuntimeException("unknown value of maximize " 
-                            + maximize);
+                    throw new RuntimeException("unknown value of maximize " + 
+                        maximize);
             }
 
             int numMovesExamined = 0;

@@ -491,8 +491,11 @@ public final class MasterHex extends Hex
             case 'S':
                 return creature.isNativeBog();
 
-            case 'P':
             case 'T':
+                // Everyone benefits from walls.
+                return true;
+
+            case 'P':
             case 'W':
             default:
                 return false;
