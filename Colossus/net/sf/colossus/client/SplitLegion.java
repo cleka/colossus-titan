@@ -38,6 +38,9 @@ final class SplitLegion extends KDialog implements MouseListener,
     private JPanel newBox;
     private JPanel buttonBox;
 
+    private JButton button1;
+    private JButton button2;
+
     private int totalChits;
     private int scale;
 
@@ -110,12 +113,13 @@ final class SplitLegion extends KDialog implements MouseListener,
             newBox.add(Box.createRigidArea(new Dimension(scale, scale)));
         }
 
-        JButton button1 = new JButton("Done");
+        button1 = new JButton("Done");
+        button1.setEnabled(false);
         button1.setMnemonic(KeyEvent.VK_D);
         button1.addActionListener(this);
         buttonBox.add(button1);
 
-        JButton button2 = new JButton("Cancel");
+        button2 = new JButton("Cancel");
         button2.setMnemonic(KeyEvent.VK_C);
         button2.addActionListener(this);
         buttonBox.add(button2);
@@ -154,6 +158,8 @@ final class SplitLegion extends KDialog implements MouseListener,
         // Account for the marker and the spacer.
         toBox.add(chit, toChits.size() + 1);
 
+        button1.setEnabled(isSplitLegal(false));
+
         pack();
         repaint();
     }
@@ -162,18 +168,24 @@ final class SplitLegion extends KDialog implements MouseListener,
     /** Return true if the split is legal.  Each legion must have
      *  height >= 2.  If this was an initial split, each legion
      *  must have height == 4 and one lord. */
-    private boolean isSplitLegal()
+    private boolean isSplitLegal(boolean showMessage)
     {
         if (oldChits.size() < 2 || newChits.size() < 2)
         {
-            client.showMessageDialog("Legion too short.");
+            if (showMessage)
+            {
+                client.showMessageDialog("Legion too short.");
+            }
             return false;
         }
         if (oldChits.size() + newChits.size() == 8)
         {
             if (oldChits.size() != newChits.size())
             {
-                client.showMessageDialog("Initial split must be 4-4.");
+                if (showMessage)
+                {
+                    client.showMessageDialog("Initial split must be 4-4.");
+                }
                 return false;
             }
 
@@ -191,7 +203,10 @@ final class SplitLegion extends KDialog implements MouseListener,
             }
             if (numLords != 1)
             {
-                client.showMessageDialog("Each stack must have one lord.");
+                if (showMessage)
+                {
+                    client.showMessageDialog("Each stack must have one lord.");
+                }
                 return false;
             }
         }
@@ -258,7 +273,7 @@ final class SplitLegion extends KDialog implements MouseListener,
     {
         if (e.getActionCommand().equals("Done"))
         {
-            if (!isSplitLegal())
+            if (!isSplitLegal(true))
             {
                 return;
             }
