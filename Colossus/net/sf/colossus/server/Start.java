@@ -52,6 +52,7 @@ public final class Start
             opts.addOption('q', "quit", false, "Quit JVM when game ends");
             opts.addOption('p', "port", true, "Server port number");
             opts.addOption('d', "delay", true, "AI delay in ms");
+            opts.addOption('t', "timelimit", true, "AI time limit in s");
 
             cl = opts.parse(args);
         }

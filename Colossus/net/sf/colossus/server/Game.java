@@ -142,6 +142,12 @@ Log.debug("Called Game.initServer()");
             int delay = Integer.parseInt(buf);
             options.setOption(Options.aiDelay, delay);
         }
+        if (cl.optIsSet('t'))
+        {
+            String buf = cl.getOptValue('t');
+            int limit = Integer.parseInt(buf);
+            options.setOption(Options.aiTimeLimit, limit);
+        }
         // Quit if values are bogus.
         if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
             numHumans + numAIs + numNetworks > VariantSupport.getMaxPlayers())

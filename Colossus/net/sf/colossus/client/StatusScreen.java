@@ -298,7 +298,7 @@ final class StatusScreen extends KDialog implements WindowListener
     public Dimension getMinimumSize()
     {
         int scale = Scale.get();
-        return new Dimension(25 * scale, 15 * scale);
+        return new Dimension(25 * scale, 20 * scale);
     }
 
     public Dimension getPreferredSize()
@@ -309,7 +309,7 @@ final class StatusScreen extends KDialog implements WindowListener
     void rescale()
     {
         int scale = Scale.get();
-        setSize(25 * scale, 15 * scale);
+        setSize(getPreferredSize());
         pack();
     }
 }
