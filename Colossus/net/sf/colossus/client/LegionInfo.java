@@ -44,14 +44,14 @@ public final class LegionInfo
         this.client = client;
     }
 
-    private Node getNode(String markerId)
+    private PredictSplitNode getNode(String markerId)
     {
         PredictSplits ps = client.getPredictSplits(playerName);
-        Node node = ps.getLeaf(markerId);
+        PredictSplitNode node = ps.getLeaf(markerId);
         return node;
     }
 
-    private Node getNode()
+    private PredictSplitNode getNode()
     {
         return getNode(this.markerId);
     }
@@ -235,8 +235,7 @@ public final class LegionInfo
     void merge(String splitoffId, int turn)
     {
         Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
-        Node splitoff = getNode(splitoffId);
-        getNode().merge(splitoff, turn);
+        getNode().merge(getNode(splitoffId), turn);
     }
 
     public boolean hasTitan()

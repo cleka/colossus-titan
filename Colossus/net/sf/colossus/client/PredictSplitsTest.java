@@ -10,6 +10,43 @@ import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Log;
 
 
+/** Test helper */
+class AllPredictSplits extends ArrayList
+{
+    PredictSplitNode getLeaf(String markerId)
+    {
+        for (Iterator it = iterator(); it.hasNext(); )
+        {
+            PredictSplits ps = (PredictSplits)it.next();
+            PredictSplitNode leaf = ps.getLeaf(markerId);
+            if (leaf != null)
+            {
+                return leaf;
+            }
+        }
+        return null;
+    }
+
+    void printLeaves()
+    {
+        for (Iterator it = iterator(); it.hasNext(); )
+        {
+            PredictSplits ps = (PredictSplits)it.next();
+            ps.printLeaves();
+        }
+    }
+
+    void printNodes()
+    {
+        for (Iterator it = iterator(); it.hasNext(); )
+        {
+            PredictSplits ps = (PredictSplits)it.next();
+            ps.printNodes();
+        }
+    }
+}
+
+
 /**
  *  JUnit test for split prediction.
  *  @version $Id$
@@ -50,7 +87,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 1;
         Log.debug("Turn " + turn);
-        Node root = ps.getLeaf("Rd01");
+        PredictSplitNode root = ps.getLeaf("Rd01");
         assertTrue(root != null);
         assertTrue(ps.getLeaves(root) != null);
         ps.getLeaf("Rd01").split(4, "Rd02", turn);
@@ -374,7 +411,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 1;
         Log.debug("Turn " + turn);
-        Node root = ps.getLeaf("Rd11");
+        PredictSplitNode root = ps.getLeaf("Rd11");
         assertTrue(root != null);
         assertTrue(ps.getLeaves(root) != null);
         ps.getLeaf("Rd11").split(4, "Rd10", turn);
@@ -970,7 +1007,7 @@ public class PredictSplitsTest extends TestCase
 
         turn = 1;
         Log.debug("Turn " + turn);
-        Node root = ps.getLeaf("Gr07");
+        PredictSplitNode root = ps.getLeaf("Gr07");
         assertTrue(root != null);
         assertTrue(ps.getLeaves(root) != null);
         ps.getLeaf("Gr07").split(4, "Gr11", turn);
@@ -1027,7 +1064,7 @@ public class PredictSplitsTest extends TestCase
         cil.add(new CreatureInfo("Centaur", true, true));
         cil.add(new CreatureInfo("Centaur", false, true));
         cil.add(new CreatureInfo("Centaur", true, false));
-        Node n = new Node("Gd10", 1, cil, null);
+        PredictSplitNode n = new PredictSplitNode("Gd10", 1, cil, null);
         cnl.clear();
         cnl.add("Gargoyle");
         cnl.add("Gargoyle");
