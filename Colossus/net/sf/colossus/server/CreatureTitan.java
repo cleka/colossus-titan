@@ -1,6 +1,8 @@
 package net.sf.colossus.server;
 
+
 import net.sf.colossus.util.Log;
+
 
 /**
  * Class CreatureTitan represent the CONSTANT information about a
@@ -15,50 +17,50 @@ import net.sf.colossus.util.Log;
 public class CreatureTitan extends Creature
 {
     public CreatureTitan(String name,
-                         Integer power,
-                         Integer skill,
-                         Boolean rangestrikes,
-                         Boolean flies,
-                         Boolean nativeBramble,
-                         Boolean nativeDrift,
-                         Boolean nativeBog,
-                         Boolean nativeSandDune,
-                         Boolean nativeSlope,
-                         Boolean nativeVolcano,
-                         Boolean nativeRiver,
-                         Boolean nativeStone,
-                         Boolean nativeTree,
-                         Boolean waterDwelling,
-                         Boolean magicMissile,
-                         Boolean summonable,
-                         Boolean lord,
-                         Boolean demilord,
-                         Integer maxCount,
-                         String pluralName,
-                         String baseColor)
+            int power,
+            int skill,
+            boolean rangestrikes,
+            boolean flies,
+            boolean nativeBramble,
+            boolean nativeDrift,
+            boolean nativeBog,
+            boolean nativeSandDune,
+            boolean nativeSlope,
+            boolean nativeVolcano,
+            boolean nativeRiver,
+            boolean nativeStone,
+            boolean nativeTree,
+            boolean waterDwelling,
+            boolean magicMissile,
+            boolean summonable,
+            boolean lord,
+            boolean demilord,
+            int maxCount,
+            String pluralName,
+            String baseColor)
     {
         super(name,
-              power.intValue(),
-              skill.intValue(),
-              rangestrikes.booleanValue(),
-              flies.booleanValue(),
-              nativeBramble.booleanValue(),
-              nativeDrift.booleanValue(),
-              nativeBog.booleanValue(),
-              nativeSandDune.booleanValue(),
-              nativeSlope.booleanValue(),
-              nativeVolcano.booleanValue(),
-              nativeRiver.booleanValue(),
-              nativeStone.booleanValue(),
-              nativeTree.booleanValue(),
-              waterDwelling.booleanValue(),
-              magicMissile.booleanValue(),
-              summonable.booleanValue(),
-              lord.booleanValue(),
-              demilord.booleanValue(),
-              maxCount.intValue(),
-              pluralName,
-              baseColor);
+                power,
+                skill,
+                rangestrikes,
+                flies,
+                nativeBramble,
+                nativeDrift,
+                nativeBog,
+                nativeSandDune,
+                nativeSlope,
+                nativeVolcano,
+                nativeRiver,
+                nativeStone,
+                nativeTree,
+                waterDwelling,
+                magicMissile,
+                summonable,
+                lord,
+                demilord,
+                maxCount,
+                pluralName,
+                baseColor);
 
         if (!name.equals(Constants.titan))
         {
@@ -81,7 +83,7 @@ public class CreatureTitan extends Creature
         Log.warn("Calling getImageNames() for Titan");
         return super.getImageNames();
     }
-    
+
     public int getPointValue()
     {
         // Log.warn("Calling getPointValue() on Titan Creature"); 
@@ -92,7 +94,7 @@ public class CreatureTitan extends Creature
 
     public int getHintedRecruitmentValue()
     {
-        Log.warn("Calling getHintedRecruitmentValue() on CreatureTitan"); 
+        Log.warn("Calling getHintedRecruitmentValue() on CreatureTitan");
         int val = super.getHintedRecruitmentValue();
         Log.debug("getHintedRecruitmentValue() is " + val);
         return val;
