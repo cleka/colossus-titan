@@ -153,7 +153,7 @@ class BattleHex extends Hex
     void repaint()
     {
         // If an entrance needs repainting, paint the whole map.
-        if (xCoord == -1)
+        if (isEntrance())
         {
             map.repaint();
         }
@@ -334,8 +334,11 @@ class BattleHex extends Hex
             chits[numChits - 1] = null;
             numChits--;
 
-            // XXX: Do only for entrances?
-            map.setEraseFlag();
+            // Clearing the area is only necessary for entrances.
+            if (isEntrance())
+            {
+                map.setEraseFlag();
+            }
 
             // Reposition all chits within the hex.
             alignChits();
@@ -545,6 +548,12 @@ class BattleHex extends Hex
     int getYCoord()
     {
         return yCoord;
+    }
+
+
+    boolean isEntrance()
+    {
+        return (xCoord == -1);
     }
 
 
