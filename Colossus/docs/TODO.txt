@@ -125,12 +125,18 @@ Add a window that shows all game options.
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
 
-After JDK 1.4.1 for MacOS is released:
-   Update JNLP file to force 1.4+
+JDK 1.4 changes:
    JSpinner
    Boxes, not JPanels with BoxLayouts
    SO_REUSEADDR on server socket
-   Remove duplicated XML library code.
+   New focus model
+   JProgressBar setIndeterminate()
+   JFormattedTextField for some inputs?
+   Logging API?
+   asserts (make sure they're on)
+   Preferences instead of Properties?
+   NetworkInterface / localhost
+   LinkedHash*, IdentityHashMap, etc.
 
 Make split prediction optional.
 
