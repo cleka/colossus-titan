@@ -69,7 +69,7 @@ public class History
     }
 
     void revealEvent(boolean allPlayers, List playerNames, String markerId,
-            List creatureNames, boolean whole, int turn)
+            List creatureNames, int turn)
     {
         if (creatureNames.isEmpty())
         {
@@ -78,7 +78,6 @@ public class History
         }
         Element event = new Element("Reveal");
         event.setAttribute("markerId", markerId);
-        event.setAttribute("wholeLegion", "" + whole);
         event.setAttribute("allPlayers", "" + allPlayers);
         event.setAttribute("turn", "" + turn);
         if (!allPlayers)
@@ -146,12 +145,9 @@ public class History
             String allPlayers = el.getAttributeValue("allPlayers");
             boolean all = allPlayers != null && allPlayers.equals("true");
             String markerId = el.getAttributeValue("markerId");
-            String wholeLegion = el.getAttributeValue("wholeLegion");
-            boolean whole = (wholeLegion.equals("true"));
             List playerNames = new ArrayList();
             Element viewEl = el.getChild("viewers");
             String playerName = null;
-            String creatureName = null;
             if (viewEl != null)
             {
                 List viewers = viewEl.getChildren();
@@ -165,24 +161,19 @@ public class History
             }
             List creatureNames = new ArrayList();
             List creatures = el.getChild("creatures").getChildren();
-            Iterator it = creatures.iterator();
-            while (it.hasNext())
+            for (Iterator it = creatures.iterator(); it.hasNext(); )
             {
                 Element creature = (Element)it.next();
-                creatureName = creature.getTextNormalize();
+                String creatureName = creature.getTextNormalize();
                 creatureNames.add(creatureName);
             }
-            if (all && whole)
+            if (all)
             {
-                server.allRevealLegion(markerId, creatureNames);
+                server.allRevealCreatures(markerId, creatureNames);
             }
-            else if (whole)
+            else
             {
-                server.oneRevealLegion(playerName, markerId, creatureNames);
-            }
-            else if (all)
-            {
-                server.allRevealCreature(markerId, creatureName);
+                server.oneRevealCreatures(playerName, markerId, creatureNames);
             }
         }
         else if (el.getName().equals("Split"))

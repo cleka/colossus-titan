@@ -2433,7 +2433,9 @@ public final class Game
             {
                 return false;
             }
-            server.allRevealCreature(legion, teleportingLord);
+            List creatureNames = new ArrayList();
+            creatureNames.add(teleportingLord);
+            server.allRevealCreatures(legion, creatureNames);
         }
         legion.moveToHex(hex, entrySide, teleport, teleportingLord);
         return true;
@@ -3126,10 +3128,10 @@ public final class Game
     }
 
     void revealEvent(boolean allPlayers, List playerNames, String markerId,
-            List creatureNames, boolean whole)
+            List creatureNames)
     {
         history.revealEvent(allPlayers, playerNames, markerId, creatureNames,
-                whole, turnNumber);
+                turnNumber);
     }
 
     void playerElimEvent(String playerName, String slayerName)
