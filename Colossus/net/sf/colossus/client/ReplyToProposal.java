@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -175,6 +176,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
                 {
                     chit.setDead(true);
                     it2.remove();
+                    break;
                 }
             }
         }

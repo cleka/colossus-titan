@@ -46,6 +46,8 @@ Bug: Won battle as defender.  Was offered after-battle reinforcement and
    "Error: Called advancePhase illegally (reason: oldPhase != phase, 
    Fight != Recruit)"
 
+Bug: Loaded a game with 2 human players and 4 AIs.  Only got one board.
+
 
 Have server send marker names.
 
