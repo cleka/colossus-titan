@@ -118,7 +118,6 @@ public class ShowBattleMap extends Dialog implements WindowListener,
 
     public void mouseExited(MouseEvent e)
     {
-        dispose();
     }
 
 

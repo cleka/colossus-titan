@@ -24,16 +24,20 @@ public class BattleTurn extends Dialog implements ActionListener,
         this.battle = battle;
         
         setBackground(Color.lightGray);
+        addWindowListener(this);
         
         pack();
 
-        // Place this window in the upper left corner, or at the saved
-        // location of the last BattleTurn. 
+        // Place this window in the upper right corner, or at the saved
+        // location of the last BattleTurn.
         if (location == null)
         {
-            location = new Point(0, 0);
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            location = new Point(d.width - getSize().width, 0);
         }
         setLocation(location);
+
+        setResizable(false);
     }
 
 
@@ -42,7 +46,7 @@ public class BattleTurn extends Dialog implements ActionListener,
         removeAll();
         setTitle(battle.getActivePlayer().getName() + " Turn " + 
             battle.getTurnNumber());
-        setLayout(new GridLayout(0, 1));
+        setLayout(new GridLayout(1, 0));
         add(new Label(battle.getActivePlayer().getName() + " : Recruit"));
 
         battle.recruitReinforcement();
@@ -54,7 +58,7 @@ public class BattleTurn extends Dialog implements ActionListener,
         removeAll();
         setTitle(battle.getActivePlayer().getName() + " Turn " +
             battle.getTurnNumber());
-        setLayout(new GridLayout(0, 1));
+        setLayout(new GridLayout(1, 0));
         add(new Label(battle.getActivePlayer().getName() + " : Summon"));
         pack();
     }
@@ -72,7 +76,7 @@ public class BattleTurn extends Dialog implements ActionListener,
             removeAll();
             setTitle(battle.getActivePlayer().getName() + " Turn " + 
                 battle.getTurnNumber());
-            setLayout(new GridLayout(0, 5));
+            setLayout(new GridLayout(5, 0));
 
             add(new Label(battle.getActivePlayer().getName() + " : Move"));
 
@@ -110,7 +114,7 @@ public class BattleTurn extends Dialog implements ActionListener,
         else
         {
             removeAll();
-            setLayout(new GridLayout(0, 3));
+            setLayout(new GridLayout(3, 0));
 
             add(new Label(battle.getActivePlayer().getName() + 
                 ((battle.getPhase() == Battle.FIGHT) ? 
@@ -195,4 +199,17 @@ public class BattleTurn extends Dialog implements ActionListener,
     public void windowOpened(WindowEvent e)
     {
     }
+
+
+    public Dimension getMinimumSize()
+    {
+        int scale = MasterBoard.getScale();
+        return new Dimension(12 * scale, 12 * scale);
+    }
+
+    public Dimension getPreferredSize()
+    {
+        return getMinimumSize();
+    }
+
 }

@@ -52,10 +52,17 @@ Win98, jdk1.3: Bad repaint onto potential carry target with no carries.
 Win98, jdk1.3: OutOfMemoryError starting a battle in turn 15 of a 
    4-player game.  Image memory leak again?
 
+Solaris, jdk1.2.2, jdk1.3: Popup menu text is invisible 
+   black-on-black.  There is no way to set the background and 
+   foreground colors.
+
+Solaris, jdk1.2.2: jar files made in Linux won't execute.
+   Exception in thread "main" java.lang.NoClassDefFoundError: Game
+
 
 Current programming bugs:
 
-Win98, Linux, Solaris; jdk 1.1.7, 1.2, 1.3b, ibm118, kaffe 1.0b5, etc.: 
+Win98, Linux, Solaris; jdk 1.1.7, 1.2, 1.3, ibm118, kaffe 1.0b5, etc.: 
    Sometimes not all targets are highlighted on the first click on a
    potential striker.  Both hex.select() and hex.repaint() are being 
    called, but the repaint is occasionally failing.  Clicking again 
@@ -100,12 +107,28 @@ Linux, ibmjdk118: Numbers (sometimes overlapping) appear in the
    Stray legion heights?  They disappear in a repaint after a few 
    turns.
 
-Linux, ibmjdk118: Battle did not end once when a player died.
-   BattleTurn was not dismissed, and the game could not continue.
-   Happened twice -- see 968280760325.sav (movement 3)
-   Player.die() was called.
+Solaris, jdk1.3: Clicks on ShowMasterHex are ignored unless they're
+   on chits.
 
-Solaris, jdk1.2.2: Popup menu text is barely visible.
-
-Solaris, jdk1.2.2: jar files made in Linux won't execute.
-   Exception in thread "main" java.lang.NoClassDefFoundError: Game
+Linux, ibmjdk118; Solaris, jdk1.3: Battle did not end once when a 
+   player died.  BattleTurn was not dismissed, and the game could 
+   not continue.  Happened multiple times -- see 968280760325.sav 
+   (movement 3), 970008244885.sav  Player.die() was called.
+   When the dying Titan ended the game, the following exception
+   was seen:
+Exception occurred during event dispatching:
+java.lang.ArrayIndexOutOfBoundsException
+        at Player.addLegionMarkers(Player.java:651)
+        at Player.die(Player.java:742)
+        at Battle.removeDeadCreatures(Battle.java:756)
+        at Battle.advancePhase(Battle.java:166)
+        at Battle.doneWithStrikes(Battle.java:850)
+        at BattleTurn.actionPerformed(BattleTurn.java:162)
+        at java.awt.Button.processActionEvent(Button.java:329)
+        at java.awt.Button.processEvent(Button.java:302)
+        at java.awt.Component.dispatchEventImpl(Component.java:2593)
+        at java.awt.Component.dispatchEvent(Component.java:2497)
+        at java.awt.EventQueue.dispatchEvent(EventQueue.java:333)
+        at java.awt.EventDispatchThread.pumpOneEvent(EventDispatchThread.java:103)
+        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+        at java.awt.EventDispatchThread.run(EventDispatchThread.java:84)

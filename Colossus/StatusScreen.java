@@ -23,7 +23,8 @@ public class StatusScreen extends Frame implements WindowListener
 
     private Game game;
     
-    
+    // XXX Need to make labels narrower. 
+
     public StatusScreen(Game game)
     {
         super("Game Status");
@@ -33,22 +34,12 @@ public class StatusScreen extends Frame implements WindowListener
 
         setupIcon();
 
-        setLayout(new GridLayout(0, 9));
+        addWindowListener(this);
 
-        // active, player name, tower, color, colors eliminated, legions,
-        //     markers, creatures, titan power, score
-
-        add(new Label("Player "));
-        add(new Label("Tower "));
-        add(new Label("Color "));
-        add(new Label("Elim "));
-        add(new Label("Legions "));
-        add(new Label("Markers "));
-        add(new Label("Creatures "));
-        add(new Label("Titan Power "));
-        add(new Label("Score"));
+        setLayout(new GridLayout(9, 0));
 
         int numPlayers = game.getNumPlayers();
+
         nameLabel = new Label[numPlayers];
         towerLabel = new Label[numPlayers];
         colorLabel = new Label[numPlayers];
@@ -59,32 +50,66 @@ public class StatusScreen extends Frame implements WindowListener
         titanLabel = new Label[numPlayers];
         scoreLabel = new Label[numPlayers];
 
+
+        add(new Label("Player"));
         for (int i = 0; i < numPlayers; i++)
         {
             nameLabel[i] = new Label();
             add(nameLabel[i]);
+        }
 
+        add(new Label("Tower"));
+        for (int i = 0; i < numPlayers; i++)
+        {
             towerLabel[i] = new Label();
             add(towerLabel[i]);
+        }
 
+        add(new Label("Color"));
+        for (int i = 0; i < numPlayers; i++)
+        {
             colorLabel[i] = new Label();
             add(colorLabel[i]);
+        }
 
+        add(new Label("Elim"));
+        for (int i = 0; i < numPlayers; i++)
+        {
             elimLabel[i] = new Label();
             add(elimLabel[i]);
+        }
 
+        add(new Label("Legions"));
+        for (int i = 0; i < numPlayers; i++)
+        {
             legionsLabel[i] = new Label();
             add(legionsLabel[i]);
+        }
 
+        add(new Label("Markers"));
+        for (int i = 0; i < numPlayers; i++)
+        {
             markersLabel[i] = new Label();
             add(markersLabel[i]);
+        }
 
+        add(new Label("Creatures"));
+        for (int i = 0; i < numPlayers; i++)
+        {
             creaturesLabel[i] = new Label();
             add(creaturesLabel[i]);
+        }
 
+        add(new Label("Titan Size"));
+        for (int i = 0; i < numPlayers; i++)
+        {
             titanLabel[i] = new Label();
             add(titanLabel[i]);
+        }
 
+        add(new Label("Score"));
+        for (int i = 0; i < numPlayers; i++)
+        {
             scoreLabel[i] = new Label();
             add(scoreLabel[i]);
         }
@@ -205,4 +230,17 @@ public class StatusScreen extends Frame implements WindowListener
     public void windowOpened(WindowEvent e)
     {
     }
+
+
+    public Dimension getMinimumSize()
+    {
+        int scale = MasterBoard.getScale();
+        return new Dimension(25 * scale, 15 * scale);
+    }
+
+    public Dimension getPreferredSize()
+    {
+        return getMinimumSize();
+    }
+
 }

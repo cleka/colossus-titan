@@ -52,11 +52,12 @@ public class ShowDice extends Dialog implements WindowListener
         setBackground(Color.lightGray);
         setResizable(false);
 
-        // Move dialog to saved location, or upper right corner of screen.
+        // Move dialog to saved location, or middle right of screen.
         if (location == null)
         {
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            location = new Point(d.width - getSize().width, 0);
+            location = new Point(d.width - getSize().width, 
+                (d.height - getSize().height) / 2);
         }
         setLocation(location);
 

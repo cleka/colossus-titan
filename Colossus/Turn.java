@@ -11,6 +11,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
 {
     private static Game game;
     private MasterBoard board;
+    private Point location;
 
 
     public Turn(Game game, MasterBoard board)
@@ -22,11 +23,22 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         this.board = board;
 
         setBackground(Color.lightGray);
+
+        addWindowListener(this);
             
-        // Place this window in the upper left corner.
-        setLocation(new Point(0, 0));
+        // Move dialog to saved location, or upper right corner of screen.
+        if (location == null)
+        {
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            location = new Point(d.width - getSize().width, 0);
+        }
+        setLocation(location);
 
         setupSplitDialog();
+
+        // Since we repeatedly call removeAll() and pack(), which reset
+        // the window size, don't let the user resize the window. 
+        setResizable(false);
 
         setVisible(true);
     }
@@ -45,7 +57,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         else
         {
             removeAll();
-            setLayout(new GridLayout(0, 5));
+            setLayout(new GridLayout(5, 0));
 
             add(new Label(player.getName() + " : Split stacks "));
             Button button1 = new Button("Undo Last Split");
@@ -75,11 +87,11 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         Player player = game.getActivePlayer();
         if (player.getMulligansLeft() > 0)
         {
-            setLayout(new GridLayout(0, 6));
+            setLayout(new GridLayout(6, 0));
         }
         else
         {
-            setLayout(new GridLayout(0, 5));
+            setLayout(new GridLayout(5, 0));
         }
 
         player.rollMovement();
@@ -128,7 +140,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         else
         {
             removeAll();
-            setLayout(new GridLayout(0, 2));
+            setLayout(new GridLayout(2, 0));
 
             add(new Label(game.getActivePlayer().getName() + 
                 " : Resolve Engagements "));
@@ -150,7 +162,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         else
         {
             removeAll();
-            setLayout(new GridLayout(0, 5));
+            setLayout(new GridLayout(5, 0));
 
             add(new Label(game.getActivePlayer().getName() + 
                 " : Muster Recruits "));
@@ -388,5 +400,18 @@ public class Turn extends Dialog implements ActionListener, WindowListener
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    public Dimension getMinimumSize()
+    {
+        int scale = MasterBoard.getScale();
+        return new Dimension(12 * scale, 12 * scale);
+    }
+
+
+    public Dimension getPreferredSize()
+    {
+        return getMinimumSize();
     }
 }

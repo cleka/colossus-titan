@@ -28,7 +28,10 @@ public class ShowLegion extends Dialog implements MouseListener, WindowListener
         pack();
 
         setBackground(Color.lightGray);
+
         setResizable(false);
+
+        addWindowListener(this);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
         Point parentOrigin = parentFrame.getLocation();
@@ -146,14 +149,8 @@ public class ShowLegion extends Dialog implements MouseListener, WindowListener
     }
 
 
-    // Dispose if mouse exits the dialog, but not if it exits a
-    // chit within the dialog.
     public void mouseExited(MouseEvent e)
     {
-        if (e.getSource() == this) 
-        {
-            dispose();
-        }
     }
 
 
