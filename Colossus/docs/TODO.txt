@@ -1,6 +1,7 @@
 Hook up remaining actions in MasterBoard menu.
 
-Save size/position of StatusScreen, ShowBattleDice
+Write a minimal, complete Game.loadGame() that reuses existing 
+   objects as much as possible.
 
 Show movement die roll graphically.
 

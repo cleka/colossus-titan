@@ -23,6 +23,9 @@ public class StatusScreen extends JFrame implements WindowListener
     private JLabel [] scoreLabel;
 
     private Game game;
+
+    private static Point location;
+    private static Dimension size;
     
 
     public StatusScreen(Game game)
@@ -128,10 +131,19 @@ public class StatusScreen extends JFrame implements WindowListener
 
         pack();
 
-        // Move dialog to bottom right of screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width,
-            d.height - getSize().height));
+        if (location == null)
+        {
+            // Place dialog at bottom right of screen.
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            location = new Point(d.width - getSize().width,
+                d.height - getSize().height);
+        }
+        setLocation(location);
+
+        if (size != null)
+        {
+            setSize(size);
+        }
 
         setVisible(true);
     }
@@ -209,6 +221,14 @@ public class StatusScreen extends JFrame implements WindowListener
         }
 
         repaint();
+    }
+
+
+    public void dispose()
+    {
+        location = getLocation();
+        size = getSize();
+        super.dispose();
     }
 
 

@@ -510,7 +510,7 @@ public class Game
 
 
     /** Create a text file describing this game's state, in
-     *  file saves/<time>.sav
+     *  file filename.
      *  Format:
      *     Number of players
      *     Turn number
@@ -539,22 +539,8 @@ public class Game
      *         ...
      *     ...
      */
-    private void saveGame()
+    public void saveGame(String filename)
     {
-        // XXX Need dialog to pick filename.
-        Date date = new Date();
-        File savesDir = new File(saveDirname);
-        if (!savesDir.exists() || !savesDir.isDirectory())
-        {
-             if (!savesDir.mkdir())
-             {
-                 System.out.println("Could not create saves directory");
-                 return;
-             }
-        }
-
-        String filename = saveDirname + File.separator +
-            date.getTime() + saveExtension;
         FileWriter fileWriter;
         try
         {
@@ -632,6 +618,28 @@ public class Game
             // XXX Delete the partial file?
             return;
         }
+    }
+
+
+    /** Create a text file describing this game's state, in
+     *  file saves/<time>.sav */
+    public void saveGame()
+    {
+        Date date = new Date();
+        File savesDir = new File(saveDirname);
+        if (!savesDir.exists() || !savesDir.isDirectory())
+        {
+             if (!savesDir.mkdir())
+             {
+                 System.out.println("Could not create saves directory");
+                 return;
+             }
+        }
+
+        String filename = saveDirname + File.separator +
+            date.getTime() + saveExtension;
+
+        saveGame(filename);
     }
 
 
@@ -902,22 +910,6 @@ public class Game
             System.out.println("Write error " + filename);
             // XXX Delete the partial file?
             return;
-        }
-    }
-
-
-    private class SaveGameFilter implements FilenameFilter
-    {
-        public boolean accept(File dir, String name)
-        {
-            if (name.endsWith(saveExtension))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
     }
 
@@ -1860,6 +1852,11 @@ public class Game
     public static boolean allRecruitersVisible(Legion legion,
         ArrayList recruiters)
     {
+        if (allStacksVisible)
+        {
+            return true;
+        }
+
         Collection critters = legion.getCritters();
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -2617,7 +2614,7 @@ public class Game
                     if (!hex.isOccupied() || hex.getNumEntrySides() == 1)
                     {
                         // If the legion teleported, reveal a lord.
-                        if (hex.getTeleported())
+                        if (hex.getTeleported() && !allStacksVisible)
                         {
                             // If it was a Titan teleport, that
                             // lord must be the titan.

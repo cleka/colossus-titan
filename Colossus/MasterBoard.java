@@ -51,10 +51,9 @@ public class MasterBoard extends JPanel implements MouseListener,
     static final String loadGame = "Load game";
     static final String saveGame = "Save game";
     static final String saveGameAs = "Save game as";
+    static final String quitGame = "Quit game";
     static final String concedeBattle = "Concede battle";
-
     static final String saveOptions = "Save options";
-
     static final String undoLastSplit = "Undo Last Split";
     static final String undoAllSplits = "Undo All Splits";
     static final String withdrawFromGame = "Withdraw from Game";
@@ -89,6 +88,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     AbstractAction saveGameAction;
     AbstractAction saveGameAsAction;
     AbstractAction saveOptionsAction;
+    AbstractAction quitGameAction;
 
 
     public MasterBoard(Game game)
@@ -344,13 +344,24 @@ public class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                // XXX Offer the ability to re-use a save filename, 
+                // rather than always making a new one?
+                game.saveGame();
             }
         };
 
         saveGameAsAction = new AbstractAction(saveGameAs)
         {
+            // XXX Need a confirmation dialog on overwrite?
             public void actionPerformed(ActionEvent e)
             {
+                JFileChooser chooser = new JFileChooser(Game.saveDirname);
+                chooser.setFileFilter(new SaveGameFilter());
+                int returnVal = chooser.showSaveDialog(masterFrame);
+                if (returnVal == JFileChooser.APPROVE_OPTION)
+                {
+                    game.saveGame(chooser.getSelectedFile().getName());
+                }
             }
         };
 
@@ -359,6 +370,13 @@ public class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 game.saveOptions();
+            }
+        };
+        
+        quitGameAction = new AbstractAction(quitGame)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
             }
         };
     }

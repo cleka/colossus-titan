@@ -46,6 +46,6 @@ Solaris, jdk1.3: Square (red, black, or white) in NW corner of board
    like the color of the attacker's markers, but is sometimes two-toned,
    and sometimes changes color.
 
-Solaris, jdk1.3: BattleMap menu is not immediately active.  It takes a
-   few seconds to wake up.
+Solaris, jdk1.3; Win98, jdk1.3: BattleMap menu is not immediately active.  
+   It takes a few seconds to wake up.
 

@@ -1,4 +1,4 @@
-Colossus alpha     November 10, 2000    Copyright 2000 David Ripton
+Colossus alpha     November 27, 2000    Copyright 2000 David Ripton
 
 This is Colossus.  It's an attempt at a Java clone of Avalon Hill's
 Titan(tm) boardgame.
@@ -28,7 +28,7 @@ Running the game requires the following:
    changes were necessary to plug some major memory leaks, make 
    popup menus show up properly under Linux and Solaris, etc.)
 
-   Colossus will now also run as an applet in a web browser, as long
+   Colossus should also run as an applet in a web browser, as long
    as your browser is new enough to support JDK 1.2 applets.  That
    probably means downloading a recent version of Sun's Java plug-in
    (included with the JRE), since most browsers come with out-of-date
@@ -114,17 +114,16 @@ Pick one.
 
 After each player has picked his initial legion marker, the BattleMap window
 will pop up.  You'll see each player's initial legion marker sitting in a
-tower hex.  You'll also see two small windows near the top of the screen.  One
-is the Game Status window, which tracks each player's score, number of legion
-markers remaining, etc.  The other is the Turn dialog, which displays whose
-turn it is, which phase it is, and has some buttons that the active player can
-click.
+tower hex.  You'll also see a small windows in the lower right corner of the 
+screen.  This is the Game Status window, which tracks each player's score, 
+number of legion markers remaining, etc.
 
-You can right-click on a legion to see its contents (note that the contents
-of other players' legions are hidden, except for those creatures which have
-recently been revealed via fighting, recruiting, or teleporting).  You can
-right-click on a hex to call up a menu, which lets you either see what you
-can recruit in that hex, or its battle map.
+You can right-click on a legion to see its contents. (Unless you've selected
+"All stacks visible" on the top menu, the contents of other players' legions 
+are hidden, except for those creatures which have recently been revealed via 
+fighting, recruiting, or teleporting).  You can right-click on a hex to call 
+up a menu, which lets you either see what you can recruit in that hex, or 
+its battle map.
 
 The active player first needs to split his initial 8-high legion.  You'll
 notice that the hex containing the active player's legion is lit up as a
@@ -133,17 +132,17 @@ also legal to split legions with 4-6 characters in them.)  Click on the
 legion.  A dialog will come up to let you pick the new legion marker to use.
 Then another dialog will come up, allowing you to move characters between the
 two legions.  The game will not let you leave the split phase until each of
-your legions contains three Creatures and one Lord.  When you're ready, click
-"Done with Splits" in the Turn window.
+your legions contains three Creatures and one Lord.  When you're ready, 
+select "Done with Splits" from the Phase menu.
 
 Next comes the movement phase.  The game will tell you your movement roll.
 Click on a legion, and the places it can move will light up.  Click on one of
 those places, and the legion will move there.  (In some cases, you will need
 to choose whether to teleport or move normally.)  The "Undo Last Move" and
-"Undo All Moves" buttons are there in case you change your mind.  During the
-first turn only, and once only, there will be a "Take Mulligan" button which
+"Undo All Moves" actions are there in case you change your mind.  During the
+first turn only, and once only, there will be a "Take Mulligan" action which
 you can use to re-roll your movement.  When you're done moving everything you
-want to move, click "Done with Moves"
+want to move, select "Done with Moves"
 
 If you moved any legions onto enemy legions, then next comes the engagement
 phase.  Each hex with an engagement will light up.  Click on the one you want
@@ -161,9 +160,9 @@ when more than one is possible.)  The defender goes first.  Click on each
 character, and the places it can move light up.  Click on one of those
 places, and the character moves there.  Repeat until all characters are
 on-board, unless you'd like to leave some off-board to die for some reason.
-The "Undo Last Move" and "Undo All Moves" buttons are available.  When done,
-click "Done with Moves"  The attacker repeats the process, except that after
-he finishes moving, it's strike time.
+The "Undo Last Move" and "Undo All Moves" menu options are available.  When 
+done moving, click "Done with Moves"  The attacker repeats the process, 
+except that after he finishes moving, it's strike time.
 
 Any creatures adjacent to an enemy must strike; rangestrikers with an enemy in
 range and line of sight may strike.  Click the striker, and all his legal
@@ -174,16 +173,17 @@ target is dead, it will have a big "X" displayed over it.  If there is excess
 damage that can legally carry over, then the legal carry target(s) will light
 up, and the striking player needs to pick which one to carry to, or click
 somewhere else to decline the carry.  This process can repeat.  There's no way
-to undo strikes.  When done striking, click "Done with Strikes"
+to undo strikes.  When done striking, choose "Done with Strikes"
 
 After the strike phase, the other player gets a strikeback phase.  It's
 identical to the strike phase, except that rangestrikes are not allowed.
 
 The first turn after he kills an opposing character, the attacker may be
-allowed to summon an angel or archangel.  If so, a dialog will appear and all
-MasterBoard hexes with summonable angels will light up.  The attacker must
-click on one of those hexes, then select the angel or archangel as
-appropriate in the dialog.
+allowed to summon an angel or archangel, if there is one available in an
+unengaged legion, and he hasn't yet summoned an angel this turn.  If so, 
+a dialog will appear and all MasterBoard hexes with summonable angels will 
+light up.  The attacker must click on one of those hexes, then select the 
+angel or archangel as appropriate in the dialog.
 
 During turn 4 of the battle, the defender may be allowed to muster a recruit.
 If so, a dialog will pop up showing the legal recruits.  If desired, pick one.
@@ -193,12 +193,12 @@ acquiring one or more angels or archangels.  If the winner didn't summon
 an angel or recruit a reinforcement earlier, he will get another choice if
 eligible.
 
-After all engagements are resolved, click the "Done with Engagements" button
-to proceed to the mustering phase.  Legions that moved and can recruit will
+After all engagements are resolved, choose "Done with Engagements" to 
+proceed to the mustering phase.  Legions that moved and can recruit will
 light up.  Click on each one and choose a recruit.  If more than one type of
 creature is capable of summoning that recruit, you'll have to choose the
-recruiter(s).  When done, click "Done with Turn" and pass the mouse to the
-next player.
+recruiter(s), unless the "Autopick recruiter" option has been selected.  
+When done, click "Done with Turn" and pass the mouse to the next player.
 
 The game ends when zero or one Titans remain.  The last player standing is
 the winner; if the game ends with a mutual elimination, it's a draw.
@@ -221,13 +221,14 @@ in particular) are still off.  Bruno Wolff's Titan Errata and Clarifications
 at http://www.uwm.edu/~bruno/titan/errata.shtml is a good place to check for
 rules issues.
 
-There is currently some very rough save / load game code in place.  The
-game produces a numbered .sav file in the saves/ subdirectory every turn.
-If you start a new game with "java -jar Colossus.jar filename.sav"
-instead of just "java -jar Colossus" then the save file will be loaded.
-"java -jar Colossus.jar --latest" will load the most recent save game in
-the saves/ subdirectory.  You'll want to delete all those save files
-from time to time.  I'll add a better user interface for this eventually.
+There is currently some very rough save / load game code in place.  Unless
+you turn off the Autosave option, the game produces a numbered .sav file 
+in the saves/ subdirectory every turn.  If you start a new game with 
+"java -jar Colossus.jar filename.sav" instead of just "java -jar Colossus" 
+then the save file will be loaded.  "java -jar Colossus.jar --latest" will 
+load the most recent save game in the saves/ subdirectory.  You'll want to 
+manually delete all those save files from time to time.  I'll add a better 
+user interface for this soon.
 
 
 Credits:

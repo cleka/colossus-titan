@@ -1050,7 +1050,8 @@ public class Battle
         {
             String label = target.getCurrentHex().getLabel();
             map.unselectHexByLabel(label);
-            Game.logEvent(carryDamage + "carries available");
+            Game.logEvent(carryDamage + (carryDamage == 1 ?
+                "carry available" : "carries available"));
             if (game.getShowDice())
             {
                 battleDice.setCarries(carryDamage);
