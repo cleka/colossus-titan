@@ -282,23 +282,6 @@ public final class Client
     // TODO Add requests for info.
 
 
-    public void setupDice(boolean enable)
-    {
-        if (enable)
-        {
-            initBattleDice();
-        }
-        else
-        {
-            disposeMovementDie();
-            disposeBattleDice();
-            if (board != null)
-            {
-                board.twiddleOption(Options.showDice, false);
-            }
-        }
-    }
-
     public void repaintAllWindows()
     {
         if (statusScreen != null)
@@ -346,24 +329,13 @@ public final class Client
 
     public void showMovementRoll(int roll)
     {
-        if (getOption(Options.showDice))
+        if (movementDie == null || roll != movementDie.getLastRoll())
         {
-            if (movementDie == null || roll != movementDie.getLastRoll())
+            initMovementDie(roll);
+            if (board != null)
             {
-                initMovementDie(roll);
-                if (board != null)
-                {
-                    board.repaint();
-                }
+                board.repaint();
             }
-        }
-        else
-        {
-                movementDie = null;
-                if (board != null)
-                {
-                    board.repaint();
-                }
         }
     }
 
@@ -432,10 +404,6 @@ public final class Client
         {
             Hex.setAntialias(value);
             repaintAllWindows();
-        }
-        else if (name.equals(Options.showDice))
-        {
-            setupDice(value);
         }
         else if (name.equals(Options.logDebug))
         {
@@ -1123,12 +1091,7 @@ public final class Client
         {
             map = new BattleMap(this, masterHexLabel, battle);
             showBattleMap();
-
-            // XXX Should this be in a separate method?
-            if (getOption(Options.showDice))
-            {
-                initBattleDice();
-            }
+            initBattleDice();
         }
     }
 

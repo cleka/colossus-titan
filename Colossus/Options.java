@@ -27,7 +27,6 @@ public final class Options
     // Display options (client)
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";
-    public static final String showDice = "Show dice";
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
     public static final String aiDelay = "AI delay";
