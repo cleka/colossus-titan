@@ -134,7 +134,7 @@ public final class Client implements IClient
     /** For battle AI. */
     private java.util.List bestMoveOrder = null;
 
-
+    boolean showAllRecruitChits = false;
 
     public Client(String host, int port, String playerName, boolean remote)
     {
@@ -459,6 +459,10 @@ public final class Client implements IClient
         {
             Hex.setOverlay(bval);
             repaintAllWindows();
+        }
+        else if (optname.equals(Options.showAllRecruitChits))
+        {
+            showAllRecruitChits = bval;
         }
         else if (optname.equals(Options.noBaseColor))
         {
@@ -1195,6 +1199,48 @@ public final class Client implements IClient
         chit.setLocation(point);
         chit.setBorder(true);
         recruitChits.add(chit);
+    }
+
+    void addRecruitChit(java.util.List imageNameList, String hexLabel)
+    {
+        Iterator it = imageNameList.iterator();
+        int size = imageNameList.size();
+        int num = size;
+
+        while (it.hasNext())
+        {
+            Object o = it.next();
+            String imageName;
+            if (o instanceof String)
+            {
+                imageName = (String)o;
+            } else if (o instanceof Creature)
+            {
+                imageName = ((Creature)o).getName();
+            } else
+            {
+                Log.error("Only String or Creature in addRecruitChit() !");
+                return;
+            }
+            int scale = 2 * Scale.get();
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            Chit chit = new Chit(scale, imageName, board);
+            Point startingPoint = hex.getOffCenter();
+            Point point = new Point(startingPoint);
+            point.x -= scale / 2;
+            point.y -= scale / 2;
+            int offset = (num - ((size / 2) + 1));
+            point.x += ((offset * scale) +
+                        ((size % 2 == 0 ? (scale / 2) : 0)))
+                        / size;
+            point.y += ((offset * scale) +
+                        ((size % 2 == 0 ? (scale / 2) : 0)))
+                        / size;
+            num--;
+            chit.setLocation(point);
+            chit.setBorder(true);
+            recruitChits.add(chit);
+        }
     }
 
     void removeRecruitChit(String hexLabel)

@@ -55,6 +55,7 @@ public final class Options
     public static final String showChat = "Show chat";
     public static final String useOverlay = "Use Graphical Overlay";
     public static final String noBaseColor = "Use black overlay on Chits";
+    public static final String showAllRecruitChits = "Show all recruit Chits";
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
     public static final String serverName = "Server name";

@@ -571,6 +571,7 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
         addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
         addCheckBox(graphicsMenu, Options.noBaseColor, KeyEvent.VK_W);
+        addCheckBox(graphicsMenu, Options.showAllRecruitChits, 0);
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
         mi = graphicsMenu.add(viewFullRecruitTreeAction);
@@ -1399,13 +1400,23 @@ public final class MasterBoard extends JPanel
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            java.util.List recruits = client.findEligibleRecruits(markerId,
-                hexLabel);
+            java.util.List recruits =
+                client.findEligibleRecruits(markerId,
+                                            hexLabel);
             if (recruits != null && recruits.size() > 0)
             {
-                Creature recruit = (Creature)recruits.get(recruits.size() - 1);
-                String recruitName = recruit.getName();
-                client.addRecruitChit(recruitName, hexLabel);
+                if ((!client.showAllRecruitChits) ||
+                    (recruits.size() == 1))
+                {
+                    Creature recruit =
+                        (Creature)recruits.get(recruits.size() - 1);
+                    String recruitName = recruit.getName();
+                    client.addRecruitChit(recruitName, hexLabel);
+                }
+                else
+                {
+                    client.addRecruitChit(recruits, hexLabel);
+                }
             }
         }
     }
