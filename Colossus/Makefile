@@ -20,7 +20,7 @@ JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.2
 # Install directory for html and applet jar files.
 HTMLDIR = /home/groups/c/co/colossus/htdocs
 DOWNLOAD_DIR = $(HTMLDIR)/download
-FTPDIR = /home/groups/ftp/pub/Colossus
+FTPDIR = /home/groups/ftp/pub/colossus
 
 ZIPFILE = Colossus.`date +%Y%m%d`.zip
 
