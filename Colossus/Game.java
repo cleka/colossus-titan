@@ -132,7 +132,7 @@ public class Game extends Frame implements WindowListener, ActionListener
         {
             if (s[i].length() > 0)
             {
-                if (i > 0 && s[i].compareTo(s[i - 1]) == 0)
+                if (i > 0 && s[i].equals(s[i - 1]))
                 {
                     error = true;
                 }
