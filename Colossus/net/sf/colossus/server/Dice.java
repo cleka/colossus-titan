@@ -26,4 +26,10 @@ public final class Dice
     {
         return random.nextInt(size) + 1;
     }
+
+    public static Random getEntropySource()
+    {
+        return random;
+    }
 }
+

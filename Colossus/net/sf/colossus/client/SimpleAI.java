@@ -2541,6 +2541,8 @@ Log.debug("Called findBattleMoves()");
         int bestScore = Integer.MIN_VALUE;
         LegionMove best = null;
 
+        Collections.shuffle(legionMoves, Dice.getEntropySource());
+
         setupTimer();
 
         int count = 0;
@@ -2556,6 +2558,7 @@ Log.debug("Called findBattleMoves()");
             }
 
             count++;
+
             if (timeIsUp)
             {
                 Log.debug("findBestLegionMove() time up after " + count + 
@@ -2564,7 +2567,7 @@ Log.debug("Called findBattleMoves()");
             }
         }
         Log.debug("Best legion move: " + ((best == null) ? "none " : 
-            best.toString()));
+            best.toString()) + " (" + bestScore + ")");
         return best;
     }
 
