@@ -62,6 +62,10 @@ java.lang.NullPointerException
         at net.sf.colossus.server.SocketServerThread.parseLine(SocketServerThread.java:104)
         at net.sf.colossus.server.SocketServerThread.run(SocketServerThread.java:65)
 
+Remove advancePhaseInternal from PhaseAdvancer; make private
+
+Remove AWT dependency from server by moving image manipulation in
+   VariantSupport to client side.
 
 The updateHistory flag used to avoid infinite loops should be an instance
    variable rather than an argument to many methods.
