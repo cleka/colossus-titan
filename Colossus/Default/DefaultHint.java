@@ -6,6 +6,7 @@ import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.DevRandom;
+import net.sf.colossus.util.Log;
 import java.util.*;
 
 
@@ -19,16 +20,46 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             HintOracleInterface oracle,
             String[] section)
     {
+        Log.debug("getRecruitHint in DefaultHint called");
+        Log.debug("Terrain: " + terrain);
+        Log.debug("Legion: " + legion.getContents());
+        Log.debug("Recruits: " + recruits);
+        
         List sect = Arrays.asList(section);
 
-        if (terrain.equals("Brush"))
+        if (terrain.equals("Brush") || terrain.equals("Jungle"))
         {
-            if (recruits.contains("Cyclops") &&
-                    !legion.contains("Behemoth") &&
-                    legion.numCreature("Cyclops") == 2 &&
-                    oracle.creatureAvailable("Behemoth") >= 2)
+            int numCyclops = legion.numCreature("Cyclops");
+            Log.debug("Number of Cyclops: " + numCyclops);
+            Log.debug("Contains Behemoth: " + legion.contains("Behemoth"));
+            Log.debug("Recruits contains Cyclops: " + recruits.contains("Cyclops"));
+           
+            DELIBERATE COMPILE ERROR HERE!!!
+            recruits.contains is broken!!
+            
+            // N.B.!! Somehow recruits.contains("Cyclops") does not work correctly.
+            // It returns false even when the recruits list has a cyclops in it.
+            // I don't know enough java to understand why.
+            // All the other terrains are likely broken because of this as well!
+            // The if statement below marks an example.                
+            if (!recruits.contains("Cyclops") && numCyclops > 0)
             {
+                Log.error("Probable error!!!!! recruits.contains(Cyclops) incorrectly returns FALSE!  See DefaultHint.java line 42");
+            }
+                
+            
+            if (numCyclops > 0 &&
+                    numCyclops < 3 &&
+                    !legion.contains("Behemoth") &&
+                    oracle.creatureAvailable("Behemoth") >= 2 &&
+                    oracle.creatureAvailable("Cyclops") >= 1)
+            {
+                Log.debug("Returned Cyclops for hint.");
                 return "Cyclops";
+            }
+            else
+            {
+                Log.debug("DID NOT Return Cyclops for hint.");
             }
         }
         else if (terrain.equals("Plains"))

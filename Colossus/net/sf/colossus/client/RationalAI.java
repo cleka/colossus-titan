@@ -374,6 +374,13 @@ public class RationalAI implements AI
         {
             at_risk = true;
         }
+        
+        if (at_risk && legion.getHeight() < 7)
+        {
+            Log.debug("No split: height < 7 and legion can be attacked (or is a titan group)");
+            return true;
+        }
+        
 
         StringBuffer results = new StringBuffer();
         boolean hasMustered = false;
@@ -450,12 +457,16 @@ public class RationalAI implements AI
         // For Titan group, try to only split when at 7
         // The only exception should be if we are under
         // severe attack and splitting can save us
+        
+        // For now, just don't split titans under 7 tall no matter what 
+        /*
         if (legion.hasTitan() &&
-            (legion.getHeight() + child_legion.getHeight()) < 7)
+             (legion.getHeight() + child_legion.getHeight()) < 7)
         {
             split_value -= 10000;
             no_split_value += 10000;
         }
+         */
 
         // If expected value of split + 5 <= no split, do not split.
         // This gives tendency to split if not under attack.
@@ -463,7 +474,9 @@ public class RationalAI implements AI
         // Do not split.
         Log.debug("no split value: " + no_split_value);
         Log.debug("split value: " + split_value);
-        if (split_value * 1.02 <= no_split_value ||
+        // Inequality needs to be < here.  I_HATE_HUMANS will causes
+        // split_value = 0 on both sides.
+        if (split_value * 1.02 < no_split_value ||
             split_value < -20)
         {
             // Undo the split  
@@ -2733,8 +2746,11 @@ public class RationalAI implements AI
             return false;
         } // Titan never flee !
 
+        boolean save_hate = I_HATE_HUMANS;
+        I_HATE_HUMANS = false; //need true value of battle results here
         BattleResults br = estimateBattleResults(enemy, legion,
             legion.getCurrentHex());
+        I_HATE_HUMANS = save_hate;
         int result = (int)br.getExpectedValue();
 
         // For the first four turns never flee
@@ -2745,7 +2761,7 @@ public class RationalAI implements AI
             return false;
         }
 
-        if (result < 0)
+        if (result <= 0)
         {
             // defender wins
             return false;
@@ -2820,8 +2836,11 @@ public class RationalAI implements AI
         String terrain = legion.getCurrentHex().getTerrain();
         int height = enemy.getHeight();
 
+        boolean save_hate = I_HATE_HUMANS;
+        I_HATE_HUMANS = false; //need true value of battle results here
         BattleResults br = estimateBattleResults(legion, enemy,
             legion.getCurrentHex());
+        I_HATE_HUMANS = save_hate;
 
         if (br.getDefenderDead() < enemy.getPointValue() * 2 / 7 &&
             height >= 6)
