@@ -85,3 +85,4 @@ Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
 Solaris, jdk1.3: Mutual elimination, with defender's titan killed.
    Got the message "Legion XXXX is eliminated" twice for the
    attacking legion, once for the defender.
+

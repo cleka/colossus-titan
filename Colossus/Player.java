@@ -15,7 +15,7 @@ public class Player
     private boolean canSummonAngel = true;
     private String playersEliminated;  // RdBkGr
 
-    private ArrayList markersAvailable = new ArrayList();
+    private TreeSet markersAvailable = new TreeSet();
     private String markerSelected;
 
     private ArrayList legions = new ArrayList();
@@ -469,7 +469,7 @@ public class Player
                 Legion splitoff = hex.getLegion(1);
                 if (parent != splitoff)
                 {
-                    splitoff.recombine(parent);
+                    splitoff.recombine(parent, true);
                 }
             }
             
@@ -494,7 +494,8 @@ public class Player
                 Legion parent = hex.getLegion(0);
                 if (parent != legion)
                 {
-                    legion.recombine(parent);
+                    legion.recombine(parent, false);
+                    lit.remove();
                 }
             }
         }
@@ -542,7 +543,7 @@ public class Player
     }
 
     /** Do the cleanup required before this legion can be removed. */
-    private void prepareToRemoveLegion(Legion legion)
+    public void prepareToRemoveLegion(Legion legion)
     {
         // Remove the legion from its current hex.
         legion.getCurrentHex().removeLegion(legion);
@@ -571,7 +572,6 @@ public class Player
 
         // Free up the legion marker.
         markersAvailable.add(legion.getMarkerId());
-        Collections.sort(markersAvailable);
     }
 
 
@@ -614,12 +614,6 @@ public class Player
     }
 
 
-    public String getMarker(int i)
-    {
-        return markersAvailable.get(i).toString();
-    }
-
-
     public String getSelectedMarker()
     {
         return markerSelected;
@@ -629,7 +623,6 @@ public class Player
     public void addSelectedMarker()
     {
         markersAvailable.add(new String(markerSelected));
-        Collections.sort(markersAvailable);
         markerSelected = null;
     }
 
@@ -640,16 +633,17 @@ public class Player
     }
 
 
-    public void selectMarker(int i)
+    public void selectMarker(String markerId)
     {
-        if (i < 0 || i >= getNumMarkersAvailable())
+        // Remove the selected marker from the list of those available.
+        boolean found = markersAvailable.remove(markerId);
+        if (found)
         {
-            markerSelected = null;
+            markerSelected = markerId;
         }
         else
         {
-            // Remove the selected marker from the list of those available.
-            markerSelected = markersAvailable.remove(i).toString();
+            markerSelected = null;
         }
     }
 
@@ -657,7 +651,6 @@ public class Player
     public void addLegionMarker(String markerId)
     {
         markersAvailable.add(markerId);
-        Collections.sort(markersAvailable);
     }
 
 
@@ -665,7 +658,6 @@ public class Player
     {
         Collection newMarkers = player.getMarkersAvailable();
         markersAvailable.addAll(newMarkers);
-        Collections.sort(markersAvailable);
     }
 
 

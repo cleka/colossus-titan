@@ -125,7 +125,7 @@ public class AcquireAngel extends Dialog implements MouseListener,
             {
                 // Select that marker.
                 Creature creature = recruits[i];
-                legion.addCreature(creature);
+                legion.addCreature(creature, true);
 
                 Game.logEvent("Legion " + legion.getMarkerId() +
                     " acquired an " + creature.getName());

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 /**
  * Class PickEntrySide allows picking which side of a MasterBoard hex
@@ -12,6 +13,7 @@ public class PickEntrySide extends Dialog implements ActionListener,
     WindowListener
 {
     private static BattleHex [][] h = new BattleHex[6][6];
+    private static ArrayList hexes = new ArrayList(27);
 
     private static Image offImage;
     private static Graphics offGraphics;
@@ -73,7 +75,7 @@ public class PickEntrySide extends Dialog implements ActionListener,
         setResizable(false);
         setBackground(Color.white);
 
-        SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), null);
+        SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), null, hexes);
         hexesReady = true;
 
         setVisible(true);
@@ -101,14 +103,14 @@ public class PickEntrySide extends Dialog implements ActionListener,
             offGraphics = offImage.getGraphics();
         }
 
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
             {
-                if (SetupBattleHexes.show[i][j] && h[i][j] != null &&
-                    rectClip.intersects(h[i][j].getBounds()))
+                if (rectClip.intersects(hex.getBounds()))
                 {
-                    h[i][j].paint(offGraphics);
+                    hex.paint(offGraphics);
                 }
             }
         }

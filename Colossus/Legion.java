@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.*;
 
 /**
  * Class Legion represents a Titan stack of Creatures and its
@@ -10,10 +11,9 @@ import java.awt.*;
 public class Legion
 {
     private Marker marker;
-    private int height;
     private String markerId;    // Bk03, Rd12, etc.
     private Legion splitFrom;
-    private Critter [] critters = new Critter[8];  // 8 before initial splits
+    private ArrayList critters = new ArrayList();
     private MasterHex currentHex;
     private MasterHex startingHex;
     private boolean moved;
@@ -24,55 +24,54 @@ public class Legion
 
 
     public Legion(int scale, String markerId, Legion splitFrom,
-        Container container, int height, MasterHex hex,
-        Creature creature0, Creature creature1, Creature creature2,
-        Creature creature3, Creature creature4, Creature creature5,
-        Creature creature6, Creature creature7, Player player)
+        Container container, MasterHex hex, Creature creature0, 
+        Creature creature1, Creature creature2, Creature creature3, 
+        Creature creature4, Creature creature5, Creature creature6, 
+        Creature creature7, Player player)
     {
         this.markerId = markerId;
         this.splitFrom = splitFrom;
         this.marker = new Marker(scale, getImageName(), container, this);
-        this.height = height;
         this.currentHex = hex;
         this.startingHex = hex;
         this.player = player;
 
         if (creature0 != null)
         {
-            critters[0] = new Critter(creature0, false, this);
+            critters.add(new Critter(creature0, false, this));
         }
         if (creature1 != null)
         {
-            critters[1] = new Critter(creature1, false, this);
+            critters.add(new Critter(creature1, false, this));
         }
         if (creature2 != null)
         {
-            critters[2] = new Critter(creature2, false, this);
+            critters.add(new Critter(creature2, false, this));
         }
         if (creature3 != null)
         {
-            critters[3] = new Critter(creature3, false, this);
+            critters.add(new Critter(creature3, false, this));
         }
         if (creature4 != null)
         {
-            critters[4] = new Critter(creature4, false, this);
+            critters.add(new Critter(creature4, false, this));
         }
         if (creature5 != null)
         {
-            critters[5] = new Critter(creature5, false, this);
+            critters.add(new Critter(creature5, false, this));
         }
         if (creature6 != null)
         {
-            critters[6] = new Critter(creature6, false, this);
+            critters.add(new Critter(creature6, false, this));
         }
         if (creature7 != null)
         {
-            critters[7] = new Critter(creature7, false, this);
+            critters.add(new Critter(creature7, false, this));
         }
 
-        // Initial legion contents are public; contents of legions created 
+        // Initial legion contents are public; contents of legions created
         // by splits are private.
-        if (height == 8)
+        if (getHeight() == 8)
         {
             revealAllCreatures();
         }
@@ -88,9 +87,11 @@ public class Legion
     public int getPointValue()
     {
         int pointValue = 0;
-        for (int i = 0; i < height; i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            pointValue += critters[i].getPointValue();
+            Critter critter = (Critter)it.next();
+            pointValue += critter.getPointValue();
         }
         return pointValue;
     }
@@ -101,13 +102,13 @@ public class Legion
         try
         {
             player.addPoints(points);
-            
+
             MasterBoard board = player.getGame().getBoard();
             int score = player.getScore();
             int tmpScore = score;
             boolean didArchangel = false;
-            
-            while (height < 7 && tmpScore / 100 > (score - points) / 100)
+
+            while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
             {
                 if (tmpScore / 500 > (score - points) / 500 &&
                     !didArchangel)
@@ -163,8 +164,8 @@ public class Legion
     {
         return markerId;
     }
-    
-    
+
+
     public String getName()
     {
         return markerId;
@@ -185,9 +186,11 @@ public class Legion
 
     public boolean canFlee()
     {
-        for (int i = 0; i < height; i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            if (critters[i].isLord())
+            Critter critter = (Critter)it.next();
+            if (critter.isLord())
             {
                 return false;
             }
@@ -199,9 +202,11 @@ public class Legion
     public int numCreature(Creature creature)
     {
         int count = 0;
-        for (int i = 0; i < height; i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            if (critters[i].getName().equals(creature.getName()))
+            Critter critter = (Critter)it.next();
+            if (critter.getName().equals(creature.getName()))
             {
                 count++;
             }
@@ -213,9 +218,11 @@ public class Legion
     public int numLords()
     {
         int count = 0;
-        for (int i = 0; i < height; i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            if (critters[i].isLord())
+            Critter critter = (Critter)it.next();
+            if (critter.isLord())
             {
                 count++;
             }
@@ -226,13 +233,7 @@ public class Legion
 
     public int getHeight()
     {
-        return height;
-    }
-
-
-    public void setHeight(int height)
-    {
-        this.height = height;
+        return critters.size();
     }
 
 
@@ -258,8 +259,8 @@ public class Legion
     {
         boolean teleported = hex.getTeleported();
         Game.logEvent("Legion " + getMarkerId() + " in " +
-            currentHex.getDescription() + 
-            (teleported ? " teleports " : " moves ") + 
+            currentHex.getDescription() +
+            (teleported ? " teleports " : " moves ") +
             "to " + hex.getDescription());
 
         currentHex.removeLegion(this);
@@ -309,7 +310,7 @@ public class Legion
     // battle as well as during the muster phase.
     public boolean canRecruit()
     {
-        if (recruited || height > 6 || getPlayer().isDead() ||
+        if (recruited || getHeight() > 6 || getPlayer().isDead() ||
             Game.findEligibleRecruits(this, new Creature[5]) == 0)
         {
             return false;
@@ -329,15 +330,11 @@ public class Legion
     {
         if (hasRecruited())
         {
-            Critter critter = critters[height - 1];
+            ListIterator lit = critters.listIterator(critters.size());
+            Critter critter = (Critter)lit.previous();
 
-            // removeCreature() will automatically put immortal critters back
-            // on the stack, but mortal ones must be handled manually.
-            if (!critter.isImmortal())
-            {
-                critter.putOneBack();
-            }
-            removeCreature(height - 1);
+            critter.putOneBack();
+            removeCreature(critter, false, true);
 
             recruited = false;
 
@@ -349,7 +346,7 @@ public class Legion
     // Return true if this legion can summon an angel or archangel.
     public boolean canSummonAngel()
     {
-        if (height >= 7 || summoned || !player.canSummonAngel())
+        if (getHeight() >= 7 || summoned || !player.canSummonAngel())
         {
             return false;
         }
@@ -394,176 +391,189 @@ public class Legion
     }
 
 
-    public void addCreature(Creature creature)
+    /** Add a creature to this legion.  If takeFromStack is true,
+        then do this only if such a creature remains in the stacks,
+        and decrement the number of this creature type remaining. */
+    public void addCreature(Creature creature, boolean takeFromStack)
     {
-        if (creature.getCount() > 0)
+        if (takeFromStack)
         {
-            creature.takeOne();
-            height++;
-            // Newly added critters are visible.
-            critters[height - 1] = new Critter(creature, true, this);
+            if (creature.getCount() > 0)
+            {
+                creature.takeOne();
+            }
+            else
+            {
+                return;
+            }
         }
+        
+        // Newly added critters are visible.
+        critters.add(new Critter(creature, true, this));
     }
 
-
-    public void removeCreature(int i)
+    /** Remove the creature in position i in the legion.  Return the
+        removed creature. Put immortal creatures back on the stack
+        if returnImmortalToStack is true. */
+    public Creature removeCreature(int i, boolean returnImmortalToStack,
+        boolean disbandIfEmpty)
     {
-        if (i < 0 && i > height - 1)
-        {
-            return;
-        }
+        Critter critter = (Critter)critters.remove(i);
 
         // If the creature is a lord or demi-lord, put it back in the stacks.
-        if (critters[i].isImmortal())
+        if (returnImmortalToStack && critter.isImmortal())
         {
-            critters[i].putOneBack();
+            critter.putOneBack();
         }
-
-        for (int j = i; j < height - 1; j++)
-        {
-            critters[j] = critters[j + 1];
-        }
-        critters[height - 1] = null;
-        height--;
 
         // If there are no critters left, disband the legion.
-        if (height == 0)
+        if (disbandIfEmpty && getHeight() == 0)
         {
             removeLegion();
         }
+
+        return critter;
     }
 
 
-    public void removeCreature(Creature creature)
+    /** Remove the first creature matching the passed creature's type 
+        from the legion.  Return the removed creature. */
+    public Creature removeCreature(Creature creature, boolean
+        returnImmortalToStack, boolean disbandIfEmpty)
     {
-        for (int i = 0; i < height; i++)
+        // indexOf wants the same object, not just the same type.
+        // So use getCritter() to get the correct object.
+        Critter critter = getCritter(creature);
+        if (critter == null)
         {
-            if (critters[i].getName().equals(creature.getName()))
-            {
-                removeCreature(i);
-                return;
-            }
+            return null;
+        }
+        else
+        {
+            int i = critters.indexOf(critter);
+            return removeCreature(i, returnImmortalToStack, disbandIfEmpty);
         }
     }
 
 
     public Creature getCreature(int i)
     {
-        if (i > height - 1)
-        {
-            return null;
-        }
-        else
-        {
-            return critters[i].getCreature();
-        }
+        Critter critter = getCritter(i);
+        return critter.getCreature();
     }
-    
-    
+
+
     public Critter getCritter(int i)
     {
-        if (i > height - 1)
-        {
-            return null;
-        }
-        else
-        {
-            return critters[i];
-        }
+        return (Critter)critters.get(i);
     }
-    
-    
+
+
+    /** Gets the first critter in this legion with the same creature
+        type as the passed creature. */
     public Critter getCritter(Creature creature)
     {
-        for (int i = 0; i < height; i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            if (critters[i].getName().equals(creature.getName()))
+            Critter critter = (Critter)it.next();
+            if (critter.getName().equals(creature.getName()))
             {
-                return critters[i];
+                return critter;
             }
         }
         return null;
     }
 
 
-    public void setCreature(int i, Creature creature)
+    /** Recombine this legion into another legion. Only remove this
+        legion if remove is true.  If it's false, the caller is
+        responsible for removing the legion, which can avoid
+        concurrent access problems. */
+    public void recombine(Legion legion, boolean remove)
     {
-        // This is called from SplitLegion, so critter will be invisible.
-        if (creature == null)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            critters[i] = null;
+            Critter critter = (Critter)it.next();
+
+            legion.addCreature(critter, false);
+            
+            // Keep removeLegion from returning lords to stacks.
+            if (critter.isLord())
+            {
+                critter.takeOne();
+            }
+        }
+        if (remove)
+        {
+            player.removeLegion(this);
         }
         else
         {
-            critters[i] = new Critter(creature, false, this);
+            player.prepareToRemoveLegion(this);
         }
-    }
 
-
-    // Recombine this legion into another legion.
-    public void recombine(Legion legion)
-    {
-        for (int i = 0; i < height; i++)
-        {
-            critters[i].putOneBack();
-            legion.addCreature(critters[i]);
-        }
-        // Prevent double-returning lords to stacks.
-        height = 0;
-        removeLegion();
-
-        Game.logEvent("Legion " + getMarkerId() + 
+        Game.logEvent("Legion " + getMarkerId() +
             " recombined into legion " + legion.getMarkerId());
     }
 
 
     public void hideAllCreatures()
     {
-        for (int i = 0; i < height; i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            critters[i].setVisible(false);
+            Critter critter = (Critter)it.next();
+            critter.setVisible(false);
         }
     }
-    
-    
+
+
     public void revealAllCreatures()
     {
-        for (int i = 0; i < height; i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            critters[i].setVisible(true);
+            Critter critter = (Critter)it.next();
+            critter.setVisible(true);
         }
     }
-    
-    
+
+
     public void healAllCreatures()
     {
-        for (int i = 0; i < height; i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            critters[i].heal();
+            Critter critter = (Critter)it.next();
+            critter.heal();
         }
     }
-    
-    
+
+
     public void revealCreature(int index)
     {
-        if (index < getHeight())
-        {
-            critters[index].setVisible(true);
-        }
+        Critter critter = (Critter)critters.get(index);
+        critter.setVisible(true);
     }
 
 
     public void revealCreatures(Creature creature, int numberToReveal)
     {
         int numberAlreadyRevealed = 0;
-        for (int i = 0; i < height; i++)
+        
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            if (critters[i].getCreature().getName().equals(
-                creature.getName()) && critters[i].isVisible())
+            Critter critter = (Critter)it.next();
+            if (critter.getCreature().getName().equals(
+                creature.getName()) && critter.isVisible())
             {
                 numberAlreadyRevealed++;
             }
         }
+
         int excess = numberAlreadyRevealed + numberToReveal -
             numCreature(creature);
         if (excess > 0)
@@ -571,12 +581,14 @@ public class Legion
             numberToReveal -= excess;
         }
 
-        for (int i = 0; i < height; i++)
+        it = critters.iterator();
+        while (it.hasNext())
         {
-            if (critters[i].getCreature().getName().equals(
-                creature.getName()) && !critters[i].isVisible())
+            Critter critter = (Critter)it.next();
+            if (critter.getCreature().getName().equals(
+                creature.getName()) && !critter.isVisible())
             {
-                critters[i].setVisible(true);
+                critter.setVisible(true);
                 numberToReveal--;
                 if (numberToReveal == 0)
                 {
@@ -594,8 +606,8 @@ public class Legion
         // reveal it.
 
         // "There can be only one."
-        int titans = (numCreature(Creature.titan)); 
-        int angels = (numCreature(Creature.angel)); 
+        int titans = (numCreature(Creature.titan));
+        int angels = (numCreature(Creature.angel));
         if (angels > 1)
         {
             angels = 1;

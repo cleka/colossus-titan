@@ -12,6 +12,7 @@ public class BattleMap extends Frame implements MouseListener,
     WindowListener
 {
     private static BattleHex[][] h = new BattleHex[6][6];
+    private static ArrayList hexes = new ArrayList(27);
 
     // ne, e, se, sw, w, nw
     private static BattleHex [] entrances = new BattleHex[6];
@@ -31,6 +32,8 @@ public class BattleMap extends Frame implements MouseListener,
     private static Battle battle;
 
     private static Point location;
+
+    private static boolean runOnce;
 
 
 
@@ -71,8 +74,16 @@ public class BattleMap extends Frame implements MouseListener,
         validate();
 
         // Initialize the hexmap.
-        SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), this);
-        setupEntrances();
+        SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), this, hexes);
+
+        // Neighbors and entrances only need to be set up once, since
+        // they're the same for all maps.
+        if (!runOnce)
+        {
+            SetupBattleHexes.setupNeighbors(h);
+            setupEntrances();
+            runOnce = true;
+        }
 
         tracker = new MediaTracker(this);
 
@@ -173,37 +184,30 @@ public class BattleMap extends Frame implements MouseListener,
 
     public static void unselectAllHexes()
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.isSelected())
             {
-                if (SetupBattleHexes.show[i][j] && h[i][j].isSelected())
-                {
-                    h[i][j].unselect();
-                    h[i][j].repaint();
-                }
+                hex.unselect();
+                hex.repaint();
             }
         }
     }
 
-    
+
     public static void unselectHexByLabel(String label)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.isSelected() && label.equals(hex.getLabel()))
             {
-                if (SetupBattleHexes.show[i][j])
-                {
-                    BattleHex hex = h[i][j];
-
-                    if (hex.isSelected() && label.equals(hex.getLabel()))
-                    {
-                        hex.unselect();
-                        hex.repaint();
-                        return;
-                    }
-                }
+                hex.unselect();
+                hex.repaint();
+                return;
             }
         }
     }
@@ -211,42 +215,30 @@ public class BattleMap extends Frame implements MouseListener,
 
     public static void unselectHexesByLabels(Set labels)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.isSelected() && labels.contains(hex.getLabel()))
             {
-                if (SetupBattleHexes.show[i][j])
-                {
-                    BattleHex hex = h[i][j];
-
-                    if (hex.isSelected() && labels.contains(hex.getLabel()))
-                    {
-                        hex.unselect();
-                        hex.repaint();
-                    }
-                }
+                hex.unselect();
+                hex.repaint();
             }
         }
     }
-    
-    
+
+
     public static void selectHexByLabel(String label)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            BattleHex hex = (BattleHex)it.next();
+            if (!hex.isSelected() && label.equals(hex.getLabel()))
             {
-                if (SetupBattleHexes.show[i][j])
-                {
-                    BattleHex hex = h[i][j];
-
-                    if (!hex.isSelected() && label.equals(hex.getLabel()))
-                    {
-                        hex.select();
-                        hex.repaint();
-                        return;
-                    }
-                }
+                hex.select();
+                hex.repaint();
+                return;
             }
         }
     }
@@ -254,20 +246,14 @@ public class BattleMap extends Frame implements MouseListener,
 
     public static void selectHexesByLabels(Set labels)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            BattleHex hex = (BattleHex)it.next();
+            if (!hex.isSelected() && labels.contains(hex.getLabel()))
             {
-                if (SetupBattleHexes.show[i][j])
-                {
-                    BattleHex hex = h[i][j];
-
-                    if (!hex.isSelected() && labels.contains(hex.getLabel()))
-                    {
-                        hex.select();
-                        hex.repaint();
-                    }
-                }
+                hex.select();
+                hex.repaint();
             }
         }
     }
@@ -358,15 +344,13 @@ public class BattleMap extends Frame implements MouseListener,
     //    a match.  Return the hex, or null.
     public static BattleHex getHexFromLabel(String label)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.getLabel().equals(label))
             {
-                if (SetupBattleHexes.show[i][j] && h[i][j].getLabel().equals(
-                    (label)))
-                {
-                    return h[i][j];
-                }
+                return hex;
             }
         }
 
@@ -379,14 +363,13 @@ public class BattleMap extends Frame implements MouseListener,
     //    null if none does.
     private static BattleHex getHexContainingPoint(Point point)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.contains(point))
             {
-                if (SetupBattleHexes.show[i][j] && h[i][j].contains(point))
-                {
-                    return h[i][j];
-                }
+                return hex;
             }
         }
 
@@ -396,13 +379,13 @@ public class BattleMap extends Frame implements MouseListener,
 
     // Return the Critter whose chit contains the given point,
     //   or null if none does.
-    // XXX Use an iterator?
     private Critter getCritterWithChitContainingPoint(Point point)
     {
-        int numCritters = battle.getNumCritters();
-        for (int i = 0; i < numCritters; i++)
+        Collection critters = battle.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            Critter critter = battle.getCritter(i);
+            Critter critter = (Critter)it.next();
             Chit chit = critter.getChit();
             if (chit.contains(point))
             {
@@ -546,23 +529,23 @@ public class BattleMap extends Frame implements MouseListener,
             eraseFlag = false;
         }
 
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            BattleHex hex = (BattleHex)it.next();
+            if (rectClip.intersects(hex.getBounds()))
             {
-                if (SetupBattleHexes.show[i][j] &&
-                    rectClip.intersects(h[i][j].getBounds()))
-                {
-                    h[i][j].paint(offGraphics);
-                }
+                hex.paint(offGraphics);
             }
         }
 
         // Draw chits from back to front.
-        // XXX Use an iterator?
-        for (int i = battle.getNumCritters() - 1; i >= 0; i--)
+        ArrayList critters = (ArrayList)battle.getCritters();
+        ListIterator lit = critters.listIterator(critters.size());
+        while (lit.hasPrevious())
         {
-            Chit chit = battle.getCritter(i).getChit();
+            Critter critter = (Critter)lit.previous();
+            Chit chit = critter.getChit();
             if (rectClip.intersects(chit.getBounds()))
             {
                 chit.paint(offGraphics);

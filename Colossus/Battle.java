@@ -122,24 +122,21 @@ public class Battle
         if (phase == SUMMON)
         {
             phase = MOVE;
-            Game.logEvent("Battle phase advances to " + 
-                getPhaseName(phase));
+            Game.logEvent("Battle phase advances to " + getPhaseName(phase));
             turn.setupMoveDialog();
         }
         
         else if (phase == RECRUIT)
         {
             phase = MOVE;
-            Game.logEvent("Battle phase advances to " + 
-                getPhaseName(phase));
+            Game.logEvent("Battle phase advances to " + getPhaseName(phase));
             turn.setupMoveDialog();
         }
 
         else if (phase == MOVE)
         {
             phase = FIGHT;
-            Game.logEvent("Battle phase advances to " + 
-                getPhaseName(phase));
+            Game.logEvent("Battle phase advances to " + getPhaseName(phase));
             turn.setupFightDialog();
         }
 
@@ -155,8 +152,7 @@ public class Battle
             }
 
             phase = STRIKEBACK;
-            Game.logEvent("Battle phase advances to " + 
-                getPhaseName(phase));
+            Game.logEvent("Battle phase advances to " + getPhaseName(phase));
             turn.setupFightDialog();
         }
 
@@ -326,6 +322,12 @@ public class Battle
     public int getNumCritters()
     {
         return critters.size();
+    }
+
+
+    public Collection getCritters()
+    {
+        return (Collection)critters;
     }
 
 
@@ -680,10 +682,7 @@ public class Battle
                         critter.getName().equals("Archangel")) 
                     {
                         donor = legion.getPlayer().getLastLegionSummonedFrom();
-                        // Because addCreature grabs one from the stack, it
-                        //     must be returned there.
-                        critter.putOneBack();
-                        donor.addCreature(critter);
+                        donor.addCreature(critter, false);
                     }
                     else
                     {
@@ -707,7 +706,7 @@ public class Battle
                     }
                 }
 
-                legion.removeCreature(critter);
+                legion.removeCreature(critter, true, true);
                 // If an angel or archangel was returned to its donor instead
                 // of the stack, then the count must be adjusted.
                 if (donor != null)
@@ -1727,14 +1726,16 @@ public class Battle
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('J');
         hex.setEntrySide(3);
-        Legion attacker = new Legion(60, "Bk01", null, null, 7,
-            hex, Creature.archangel, Creature.troll, Creature.ranger,
+        Legion attacker = new Legion(60, "Bk01", null, null, hex, 
+            Creature.archangel, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
             Creature.warlock, null, player1);
-        Legion defender = new Legion(60, "Rd01", null, null, 7,
-            hex, Creature.serpent, Creature.lion, Creature.gargoyle,
+        Legion defender = new Legion(60, "Rd01", null, null, hex, 
+            Creature.serpent, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian,
             Creature.minotaur, null, player2);
+        hex.addLegion(attacker);
+        hex.addLegion(defender);
 
         new Battle(null, attacker, defender, hex);
     }

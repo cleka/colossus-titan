@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.*;
 
 /**
  * Class MasterHex describes one Masterboard hex
@@ -9,12 +10,11 @@ import java.awt.*;
 public class MasterHex extends Hex
 {
     private boolean inverted;
-    private int numLegions;
-    private Legion [] legions = new Legion[3];
+    private ArrayList legions = new ArrayList(3);
     private MasterBoard board;
 
     private MasterHex [] neighbors = new MasterHex[6];
-    
+
     // Terrain types are:
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
@@ -44,7 +44,7 @@ public class MasterHex extends Hex
     public static final int ARROWS = 4;
 
 
-    public MasterHex(int cx, int cy, int scale, boolean inverted, 
+    public MasterHex(int cx, int cy, int scale, boolean inverted,
         MasterBoard board)
     {
         this.inverted = inverted;
@@ -113,37 +113,37 @@ public class MasterHex extends Hex
         switch (getLabelSide())
         {
             case 0:
-                g.drawString(label, rectBound.x + 
+                g.drawString(label, rectBound.x +
                     (rectBound.width - fontMetrics.stringWidth(label)) / 2,
                     rectBound.y + fontHeight / 2 + rectBound.height / 10);
                 break;
 
             case 1:
-                g.drawString(label, rectBound.x + (rectBound.width - 
+                g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) * 4 / 5,
                     rectBound.y + fontHeight / 2 + rectBound.height / 5);
                 break;
 
             case 2:
-                g.drawString(label, rectBound.x + (rectBound.width - 
+                g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) * 4 / 5,
                     rectBound.y + fontHeight / 2 + rectBound.height * 4 / 5);
                 break;
 
             case 3:
-                g.drawString(label, rectBound.x + (rectBound.width - 
+                g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) / 2,
                     rectBound.y + fontHeight / 2 + rectBound.height * 9 / 10);
                 break;
 
             case 4:
-                g.drawString(label, rectBound.x + (rectBound.width - 
+                g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) / 5,
                     rectBound.y + fontHeight / 2 + rectBound.height * 4 / 5);
                 break;
 
             case 5:
-                g.drawString(label, rectBound.x + (rectBound.width - 
+                g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) / 5,
                     rectBound.y + fontHeight / 2 + rectBound.height / 5);
                 break;
@@ -162,7 +162,7 @@ public class MasterHex extends Hex
                 fontMetrics.stringWidth(name)) / 2,
                 rectBound.y + fontHeight / 2 + rectBound.height / 2);
         }
-        
+
 
         // Draw exits and entrances
         for (int i = inverted ? 0 : 1; i < 6; i += 2)
@@ -201,7 +201,7 @@ public class MasterHex extends Hex
     {
         try
         {
-            board.repaint(rectBound.x, rectBound.y, rectBound.width, 
+            board.repaint(rectBound.x, rectBound.y, rectBound.width,
                 rectBound.height);
         }
         catch (NullPointerException e)
@@ -212,7 +212,7 @@ public class MasterHex extends Hex
     }
 
 
-    private void drawGate(Graphics g, int vx1, int vy1, int vx2, int vy2, 
+    private void drawGate(Graphics g, int vx1, int vy1, int vx2, int vy2,
         int gateType)
     {
         int x0;                 // first focus point
@@ -267,17 +267,17 @@ public class MasterHex extends Hex
                 rect.y = y2 - (int) Math.round(len);
                 rect.width = (int) (2 * Math.round(len));
                 rect.height = (int) (2 * Math.round(len));
-                
+
                 g.setColor(Color.white);
                 // Draw a bit more than a semicircle, to clean edge.
                 g.fillArc(rect.x, rect.y, rect.width, rect.height,
-                    (int) Math.round((2 * Math.PI - theta) * 
+                    (int) Math.round((2 * Math.PI - theta) *
                     RAD_TO_DEG - 10), 200);
                 g.setColor(Color.black);
                 g.drawArc(rect.x, rect.y, rect.width, rect.height,
-                    (int) Math.round((2 * Math.PI - theta) * RAD_TO_DEG), 
+                    (int) Math.round((2 * Math.PI - theta) * RAD_TO_DEG),
                     180);
-                        
+
                 x[2] = x[0];
                 y[2] = y[0];
                 x[0] = x1;
@@ -296,9 +296,9 @@ public class MasterHex extends Hex
             case ARROW:
                 x[0] = (int) Math.round(x0 - len * Math.sin(theta));
                 y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                x[1] = (int) Math.round((x0 + x1) / 2 + len * 
+                x[1] = (int) Math.round((x0 + x1) / 2 + len *
                     Math.sin(theta));
-                y[1] = (int) Math.round((y0 + y1) / 2 - len * 
+                y[1] = (int) Math.round((y0 + y1) / 2 - len *
                     Math.cos(theta));
                 x[2] = (int) Math.round(x1 - len * Math.sin(theta));
                 y[2] = (int) Math.round(y1 + len * Math.cos(theta));
@@ -320,13 +320,13 @@ public class MasterHex extends Hex
 
                     x[0] = (int) Math.round(x0 - len * Math.sin(theta));
                     y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                    x[1] = (int) Math.round((x0 + x1) / 2 + len * 
+                    x[1] = (int) Math.round((x0 + x1) / 2 + len *
                            Math.sin(theta));
-                    y[1] = (int) Math.round((y0 + y1) / 2 - len * 
+                    y[1] = (int) Math.round((y0 + y1) / 2 - len *
                            Math.cos(theta));
                     x[2] = (int) Math.round(x1 - len * Math.sin(theta));
                     y[2] = (int) Math.round(y1 + len * Math.cos(theta));
-    
+
                     g.setColor(Color.white);
                     g.fillPolygon(x, y, 3);
                     g.setColor(Color.black);
@@ -592,8 +592,8 @@ public class MasterHex extends Hex
         }
     }
 
-    
-    // Return the number of the next lower creature needed to muster the ith 
+
+    // Return the number of the next lower creature needed to muster the ith
     // recruit possible in this terrain type. If not applicable, return 0.
     public int getNumToRecruit(int i)
     {
@@ -762,42 +762,37 @@ public class MasterHex extends Hex
     // a bit toward the fat side.
     private Point getOffCenter()
     {
-        return new Point((xVertex[0] + xVertex[1]) / 2, (yVertex[0] + 
-            yVertex[3]) / 2 + (inverted ? -(scale / 6) : (scale / 6))); 
+        return new Point((xVertex[0] + xVertex[1]) / 2, (yVertex[0] +
+            yVertex[3]) / 2 + (inverted ? -(scale / 6) : (scale / 6)));
     }
 
 
     public int getNumLegions()
     {
-        return numLegions;
+        return legions.size();
     }
 
 
     public boolean isOccupied()
     {
-        return (numLegions > 0);
+        return (legions.size() > 0);
     }
 
 
     public Legion getLegion(int i)
     {
-        if (i < 0 || i > numLegions - 1)
-        {
-            return null;
-        }
-        else
-        {
-            return legions[i];
-        }
+        return (Legion)legions.get(i);
     }
 
 
     public int getNumFriendlyLegions(Player player)
     {
         int count = 0;
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            if (legions[i].getPlayer() == player)
+            Legion legion = (Legion)it.next();
+            if (legion.getPlayer() == player)
             {
                 count++;
             }
@@ -805,13 +800,15 @@ public class MasterHex extends Hex
         return count;
     }
 
-    
+
     public int getNumEnemyLegions(Player player)
     {
         int count = 0;
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            if (legions[i].getPlayer() != player)
+            Legion legion = (Legion)it.next();
+            if (legion.getPlayer() != player)
             {
                 count++;
             }
@@ -822,12 +819,15 @@ public class MasterHex extends Hex
 
     public boolean isEngagement()
     {
-        if (numLegions > 0)
+        if (getNumLegions() > 1)
         {
-            Player player = legions[0].getPlayer();
-            for (int i = 1; i < numLegions; i++)
+            Iterator it = legions.iterator();
+            Legion legion = (Legion)it.next();
+            Player player = legion.getPlayer();
+            while (it.hasNext())
             {
-                if (legions[i].getPlayer() != player)
+                legion = (Legion)it.next();
+                if (legion.getPlayer() != player)
                 {
                     return true;
                 }
@@ -840,11 +840,13 @@ public class MasterHex extends Hex
 
     public Legion getFriendlyLegion(Player player)
     {
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            if (legions[i].getPlayer() == player)
+            Legion legion = (Legion)it.next();
+            if (legion.getPlayer() == player)
             {
-                return legions[i];
+                return legion;
             }
         }
         return null;
@@ -853,11 +855,13 @@ public class MasterHex extends Hex
 
     public Legion getEnemyLegion(Player player)
     {
-        for (int i = 0; i < numLegions; i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            if (legions[i].getPlayer() != player)
+            Legion legion = (Legion)it.next();
+            if (legion.getPlayer() != player)
             {
-                return legions[i];
+                return legion;
             }
         }
         return null;
@@ -866,57 +870,64 @@ public class MasterHex extends Hex
 
     private void alignLegions()
     {
+        int numLegions = getNumLegions();
         if (numLegions == 0)
         {
             return;
         }
 
-        int chitScale = legions[0].getMarker().getBounds().width;
-        Point point = getOffCenter();
+        Legion legion0 = (Legion)legions.get(0);
+        int chitScale = legion0.getMarker().getBounds().width;
+        Point startingPoint = getOffCenter();
+        Point point = new Point(startingPoint);
 
         if (numLegions == 1)
         {
             // Place legion in the center of the hex.
             point.x -= chitScale / 2;
             point.y -= chitScale / 2;
-            legions[0].getMarker().setLocation(point);     
+            legion0.getMarker().setLocation(point);
         }
         else if (numLegions == 2)
         {
             // Place legions in NW and SE corners.
             point.x -= 3 * chitScale / 4;
             point.y -= 3 * chitScale / 4;
-            legions[0].getMarker().setLocation(point);
+            legion0.getMarker().setLocation(point);
 
-            point = getOffCenter();
+            point = new Point(startingPoint);
             point.x -= chitScale / 4;
             point.y -= chitScale / 4;
-            legions[1].getMarker().setLocation(point);
+            Legion legion1 = (Legion)legions.get(1);
+            legion1.getMarker().setLocation(point);
         }
         else if (numLegions == 3)
         {
             // Place legions in NW, SE, NE corners.
             point.x -= 3 * chitScale / 4;
             point.y -= 3 * chitScale / 4;
-            legions[0].getMarker().setLocation(point);
+            legion0.getMarker().setLocation(point);
 
-            point = getOffCenter();
+            point = new Point(startingPoint);
             point.x -= chitScale / 4;
             point.y -= chitScale / 4;
-            legions[1].getMarker().setLocation(point);
+            Legion legion1 = (Legion)legions.get(1);
+            legion1.getMarker().setLocation(point);
 
-            point = getOffCenter();
+            point = new Point(startingPoint);
             point.x -= chitScale / 4;
             point.y -= chitScale;
-            legions[2].getMarker().setLocation(point);
+            Legion legion2 = (Legion)legions.get(2);
+            legion2.getMarker().setLocation(point);
         }
+
+        repaint();
     }
-    
-    
+
+
     public void addLegion(Legion legion)
     {
-        numLegions++;
-        legions[numLegions - 1] = legion;
+        legions.add(legion);
 
         // Reposition all legions within the hex.
         alignLegions();
@@ -925,29 +936,27 @@ public class MasterHex extends Hex
 
     public void removeLegion(Legion legion)
     {
-        for (int i = 0; i < numLegions; i++)
+        legions.remove(legion);
+
+        // Write over the bounding area of the hex with the background 
+        // color, to prevent artifacts from chits that used to hang outside 
+        // the hex boundary.
+        if (getNumLegions() >= 1)
         {
-            if (legions[i] == legion)
-            {
-                for (int j = i; j < numLegions - 1; j++)
-                {
-                    legions[j] = legions[j + 1];
-                }
-                legions[numLegions - 1] = null;
-                numLegions--;
+            board.setEraseFlag();
 
-                // Write over the bounding area of the hex with
-                // the background color, to prevent artifacts from
-                // chits that used to hang outside the hex boundary.
-                if (numLegions >= 1)
-                {
-                    board.setEraseFlag();
-                }
+            // Reposition all legions within the hex.
+            alignLegions();
+        }
+    }
 
-                // Reposition all legions within the hex.
-                alignLegions();
-                return;
-            }
+    /** Combines all the legions in the hex into the first legion.  Do
+        not call this unless all legions in the hex are friendly. */
+    public void recombineAllLegions()
+    {
+        for (int j = getNumLegions() - 1; j >= 1; j--)
+        {
+            getLegion(j).recombine(getLegion(0), true);
         }
     }
 
@@ -1005,7 +1014,7 @@ public class MasterHex extends Hex
     {
         return exitType[i];
     }
-    
+
 
     public void setEntranceType(int i, int entranceType)
     {
@@ -1036,7 +1045,7 @@ public class MasterHex extends Hex
                 count++;
             }
         }
-        
+
         return count;
     }
 
@@ -1089,7 +1098,7 @@ public class MasterHex extends Hex
         return teleported;
     }
 
-   
+
     public void setTeleported(boolean teleported)
     {
         this.teleported = teleported;

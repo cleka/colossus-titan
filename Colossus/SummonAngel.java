@@ -130,8 +130,8 @@ public class SummonAngel extends Dialog implements MouseListener,
             player.setLastLegionSummonedFrom(donor);
 
             // Move the angel or archangel.
-            donor.removeCreature(creature);
-            legion.addCreature(creature);
+            donor.removeCreature(creature, false, true);
+            legion.addCreature(creature, false);
 
             // Update the number of creatures displayed in both stacks.
             donor.getCurrentHex().repaint();

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 /**
  * Class ShowBattleMap displays a battle map. 
@@ -13,6 +14,7 @@ public class ShowBattleMap extends Dialog implements WindowListener,
     // Singleton class, so make everything static.
 
     private BattleHex [][] h = new BattleHex[6][6];
+    private ArrayList hexes = new ArrayList(27);
 
     private Image offImage;
     private Graphics offGraphics;
@@ -43,7 +45,7 @@ public class ShowBattleMap extends Dialog implements WindowListener,
         setResizable(false);
         setBackground(Color.white);
 
-        SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), null);
+        SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), null, hexes);
 
         setVisible(true);
         repaint();
@@ -70,15 +72,13 @@ public class ShowBattleMap extends Dialog implements WindowListener,
             offGraphics = offImage.getGraphics();
         }
 
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            BattleHex hex = (BattleHex)it.next();
+            if (rectClip.intersects(hex.getBounds()))
             {
-                if (SetupBattleHexes.show[i][j] && h[i][j] != null && 
-                    rectClip.intersects(h[i][j].getBounds()))
-                {
-                    h[i][j].paint(offGraphics);
-                }
+                hex.paint(offGraphics);
             }
         }
 

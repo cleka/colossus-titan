@@ -1,3 +1,5 @@
+import java.util.*;
+
 /**
  * Class SetupMasterHexes initializes the hexmap for a Titan masterboard.
  * @version $Id$ 
@@ -36,7 +38,8 @@ public class SetupMasterHexes
     };
 
 
-    public static void setupHexes(MasterHex [][] h, MasterBoard board)
+    public static void setupHexes(MasterHex [][] h, MasterBoard board,
+        ArrayList hexes)
     {
         int scale = MasterBoard.getScale();
         int cx = 3 * scale;
@@ -49,12 +52,17 @@ public class SetupMasterHexes
             {
                 if (show[i][j])
                 {
-                    h[i][j] = new MasterHex
-                        (cx + 4 * i * scale,
+                    MasterHex hex = new MasterHex(cx + 4 * i * scale,
                         (int) Math.round(cy + (3 * j + (i & 1) *
                         (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 * 
                         ((j + 1) / 2)) * Hex.SQRT3 * scale), scale, 
                         ((i + j) & 1) == 0, board);
+
+                    hex.setXCoord(i);
+                    hex.setYCoord(j);
+
+                    h[i][j] = hex;
+                    hexes.add(hex);
                 }
             }
         }
@@ -627,82 +635,79 @@ public class SetupMasterHexes
         h[14][4].setExitType(4, MasterHex.ARROWS);
 
         // Derive entrances from exits.
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            int i = hex.getXCoord();
+            int j = hex.getYCoord();
+            for (int k = 0; k < 6; k++)
             {
-                if (show[i][j])
+                int gateType = hex.getExitType(k);
+                if (gateType != MasterHex.NONE)
                 {
-                    for (int k = 0; k < 6; k++)
+                    switch (k)
                     {
-                        int gateType = h[i][j].getExitType(k);
-                        if (gateType != 0)
-                        {
-                            switch (k)
-                            {
-                                case 0:
-                                    h[i][j - 1].setEntranceType(3, gateType);
-                                    break;
-                                case 1:
-                                    h[i + 1][j].setEntranceType(4, gateType);
-                                    break;
-                                case 2:
-                                    h[i + 1][j].setEntranceType(5, gateType);
-                                    break;
-                                case 3:
-                                    h[i][j + 1].setEntranceType(0, gateType);
-                                    break;
-                                case 4:
-                                    h[i - 1][j].setEntranceType(1, gateType);
-                                    break;
-                                case 5:
-                                    h[i - 1][j].setEntranceType(2, gateType);
-                                break;
-                            }
-                        }
+                        case 0:
+                            h[i][j - 1].setEntranceType(3, gateType);
+                            break;
+                        case 1:
+                            h[i + 1][j].setEntranceType(4, gateType);
+                            break;
+                        case 2:
+                            h[i + 1][j].setEntranceType(5, gateType);
+                            break;
+                        case 3:
+                            h[i][j + 1].setEntranceType(0, gateType);
+                            break;
+                        case 4:
+                            h[i - 1][j].setEntranceType(1, gateType);
+                            break;
+                        case 5:
+                            h[i - 1][j].setEntranceType(2, gateType);
+                        break;
                     }
                 }
             }
         }
 
         // Add references to neighbor hexes.
-        for (int i = 0; i < h.length; i++)
+        it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            int i = hex.getXCoord();
+            int j = hex.getYCoord();
+
+            if (hex.getExitType(0) != MasterHex.NONE ||
+                hex.getEntranceType(0) != MasterHex.NONE)
             {
-                if (show[i][j])
-                {
-                    if (h[i][j].getExitType(0) != MasterHex.NONE ||
-                        h[i][j].getEntranceType(0) != MasterHex.NONE)
-                    {
-                        h[i][j].setNeighbor(0, h[i][j - 1]);
-                    }
-                    if (h[i][j].getExitType(1) != MasterHex.NONE ||
-                        h[i][j].getEntranceType(1) != MasterHex.NONE)
-                    {
-                        h[i][j].setNeighbor(1, h[i + 1][j]);
-                    }
-                    if (h[i][j].getExitType(2) != MasterHex.NONE ||
-                        h[i][j].getEntranceType(2) != MasterHex.NONE)
-                    {
-                        h[i][j].setNeighbor(2, h[i + 1][j]);
-                    }
-                    if (h[i][j].getExitType(3) != MasterHex.NONE ||
-                        h[i][j].getEntranceType(3) != MasterHex.NONE)
-                    {
-                        h[i][j].setNeighbor(3, h[i][j + 1]);
-                    }
-                    if (h[i][j].getExitType(4) != MasterHex.NONE ||
-                        h[i][j].getEntranceType(4) != MasterHex.NONE)
-                    {
-                        h[i][j].setNeighbor(4, h[i - 1][j]);
-                    }
-                    if (h[i][j].getExitType(5) != MasterHex.NONE ||
-                        h[i][j].getEntranceType(5) != MasterHex.NONE)
-                    {
-                        h[i][j].setNeighbor(5, h[i - 1][j]);
-                    }
-                }
+                hex.setNeighbor(0, h[i][j - 1]);
+            }
+            if (hex.getExitType(1) != MasterHex.NONE ||
+                hex.getEntranceType(1) != MasterHex.NONE)
+            {
+                hex.setNeighbor(1, h[i + 1][j]);
+            }
+            if (hex.getExitType(2) != MasterHex.NONE ||
+                hex.getEntranceType(2) != MasterHex.NONE)
+            {
+                hex.setNeighbor(2, h[i + 1][j]);
+            }
+            if (hex.getExitType(3) != MasterHex.NONE ||
+                hex.getEntranceType(3) != MasterHex.NONE)
+            {
+                hex.setNeighbor(3, h[i][j + 1]);
+            }
+            if (hex.getExitType(4) != MasterHex.NONE ||
+                hex.getEntranceType(4) != MasterHex.NONE)
+            {
+                hex.setNeighbor(4, h[i - 1][j]);
+            }
+            if (hex.getExitType(5) != MasterHex.NONE ||
+                hex.getEntranceType(5) != MasterHex.NONE)
+            {
+                hex.setNeighbor(5, h[i - 1][j]);
             }
         }
     }

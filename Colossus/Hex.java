@@ -20,7 +20,8 @@ public abstract class Hex
     protected int scale;
     protected double len;
     protected String label;
-
+    private int xCoord = -1;
+    private int yCoord = -1;
 
 
     public void select()
@@ -101,5 +102,25 @@ public abstract class Hex
     public String toString()
     {
         return getDescription();
+    }
+
+    public void setXCoord(int xCoord)
+    {
+        this.xCoord = xCoord;
+    }
+    
+    public int getXCoord()
+    {
+        return xCoord; 
+    }
+    
+    public void setYCoord(int yCoord)
+    {
+        this.yCoord = yCoord;
+    }
+    
+    public int getYCoord()
+    {
+        return yCoord; 
     }
 }

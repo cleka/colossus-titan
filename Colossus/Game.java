@@ -25,6 +25,7 @@ public class Game
     private SummonAngel summonAngel;
     private Battle battle;
     private BattleMap map;
+    private static Random random = new Random();
 
     // Keep multiple quick clicks from popping up multiples
     // of the same dialog.
@@ -37,7 +38,7 @@ public class Game
     public static final int MUSTER = 4;
     private int phase = SPLIT;
 
-    private boolean isApplet; 
+    private boolean isApplet;
     private boolean disposed;
 
     // For debugging, or if the game crashes after movement
@@ -49,7 +50,7 @@ public class Game
     private static boolean autosaveEveryTurn = true;
     private static boolean allVisible;
     private static boolean pickRecruiter = true;
-    
+
 
     public Game(boolean isApplet, GameApplet applet)
     {
@@ -100,8 +101,8 @@ public class Game
             board.repaint();
         }
     }
-    
-    
+
+
     // Load a saved game.
     public Game(boolean isApplet, GameApplet applet, String filename)
     {
@@ -117,8 +118,8 @@ public class Game
         loadGame(filename);
         statusScreen = new StatusScreen(this);
     }
-    
-    
+
+
     // Load a saved game, and force the first movement roll.
     public Game(boolean isApplet, GameApplet applet, String filename,
         int forcedMovementRoll)
@@ -131,9 +132,9 @@ public class Game
             this.forcedMovementRoll = forcedMovementRoll;
         }
     }
-    
 
-    // For testing only. 
+
+    // For testing only.
     public Game()
     {
         players = new Player[6];
@@ -229,7 +230,7 @@ public class Game
         }
     }
 
-    
+
     public boolean getAllVisible()
     {
         return allVisible;
@@ -239,8 +240,8 @@ public class Game
     {
         return numPlayers;
     }
-    
-    
+
+
     public void setNumPlayers(int numPlayers)
     {
         this.numPlayers = numPlayers;
@@ -377,7 +378,7 @@ public class Game
         }
         else
         {
-            logEvent("\n" + getActivePlayer().getName() + 
+            logEvent("\n" + getActivePlayer().getName() +
                 "'s turn, number " + turnNumber);
 
             updateStatusScreen();
@@ -422,8 +423,8 @@ public class Game
     //         Players eliminated
     //         Number of markers left
     //         Remaining marker ids
-    //         Number of Legions 
-    //         Legion 1: 
+    //         Number of Legions
+    //         Legion 1:
     //             Marker id
     //             Height
     //             Creature 1
@@ -480,10 +481,15 @@ public class Game
             out.println(player.getMulligansLeft());
             out.println(player.getPlayersElim());
             out.println(player.getNumMarkersAvailable());
-            for (int j = 0; j < player.getNumMarkersAvailable(); j++)
+
+            Collection markerIds = player.getMarkersAvailable();
+            Iterator it = markerIds.iterator();
+            while (it.hasNext())
             {
-                out.println(player.getMarker(j));
+                String markerId = (String)it.next();
+                out.println(markerId);
             }
+
             out.println(player.getNumLegions());
 
             for (int j = 0; j < player.getNumLegions(); j++)
@@ -500,8 +506,8 @@ public class Game
                 }
             }
         }
-        
-        if (out.checkError()) 
+
+        if (out.checkError())
         {
             System.out.println("Write error " + filename);
             // XXX Delete the partial file?
@@ -528,10 +534,10 @@ public class Game
 
     // Try to load a game from ./filename first, then from saves/filename.
     // If the filename is "--latest" then load the latest savegame found in
-    // saves/ 
+    // saves/
     private void loadGame(String filename)
     {
-        // XXX Need a dialog to pick the savegame's filename, and 
+        // XXX Need a dialog to pick the savegame's filename, and
         //     confirmation if there's already a game in progress.
         File file;
 
@@ -550,7 +556,7 @@ public class Game
                 dispose();
             }
             sortSaveFilenames(filenames);
-            file = new File("saves/" + filenames[0]); 
+            file = new File("saves/" + filenames[0]);
         }
         else
         {
@@ -560,7 +566,7 @@ public class Game
                 file = new File("saves/" + filename);
             }
         }
-         
+
         try
         {
             FileReader fileReader = new FileReader(file);
@@ -591,21 +597,21 @@ public class Game
             {
                 String name = in.readLine();
                 players[i] = new Player(name, this);
-                
+
                 String color = in.readLine();
                 players[i].setColor(color);
-                
+
                 buf = in.readLine();
                 int tower = Integer.parseInt(buf);
                 players[i].setTower(tower);
-                
+
                 buf = in.readLine();
                 int score = Integer.parseInt(buf);
                 players[i].setScore(score);
-                
+
                 buf = in.readLine();
 
-                // Output whether the player is alive. 
+                // Output whether the player is alive.
                 players[i].setDead(!Boolean.valueOf(buf).booleanValue());
 
                 buf = in.readLine();
@@ -618,7 +624,7 @@ public class Game
                     playersElim = new String("");
                 }
                 players[i].setPlayersElim(playersElim);
-                
+
                 buf = in.readLine();
                 int numMarkersAvailable = Integer.parseInt(buf);
 
@@ -639,7 +645,7 @@ public class Game
 
                     buf = in.readLine();
                     int hexLabel = Integer.parseInt(buf);
-    
+
                     buf = in.readLine();
                     int height = Integer.parseInt(buf);
 
@@ -654,8 +660,8 @@ public class Game
                         visibles[k] = Boolean.valueOf(buf).booleanValue();
                     }
 
-                    Legion legion = new Legion(3 * board.getScale(), 
-                        markerId, null, board, height, 
+                    Legion legion = new Legion(3 * board.getScale(),
+                        markerId, null, board,
                         MasterBoard.getHexFromLabel(hexLabel), creatures[0],
                         creatures[1], creatures[2], creatures[3], creatures[4],
                         creatures[5], creatures[6], creatures[7], players[i]);
@@ -671,7 +677,7 @@ public class Game
                     players[i].addLegion(legion);
                 }
             }
-            
+
             // Move all legions into their hexes.
             for (int i = 0; i < getNumPlayers(); i++)
             {
@@ -738,8 +744,8 @@ public class Game
             }
         }
     }
-    
-    
+
+
     // Returns the number of the given recruiter needed to muster the given
     // recruit in the given terrain.  Returns -1 on error.
     public static int numberOfRecruiterNeeded(Critter recruiter, Creature
@@ -750,7 +756,7 @@ public class Game
             case 'B':
                 if (recruit.getName().equals("Gargoyle"))
                 {
-                    if (recruiter.getName().equals("Gargoyle") || 
+                    if (recruiter.getName().equals("Gargoyle") ||
                         recruiter.getName().equals("Cyclops") ||
                         recruiter.getName().equals("Gorgon"))
                     {
@@ -781,11 +787,11 @@ public class Game
                     }
                 }
                 break;
-            
+
             case 'D':
                 if (recruit.getName().equals("Lion"))
                 {
-                    if (recruiter.getName().equals("Lion") || 
+                    if (recruiter.getName().equals("Lion") ||
                         recruiter.getName().equals("Griffon") ||
                         recruiter.getName().equals("Hydra"))
                     {
@@ -820,7 +826,7 @@ public class Game
             case 'H':
                 if (recruit.getName().equals("Ogre"))
                 {
-                    if (recruiter.getName().equals("Ogre") || 
+                    if (recruiter.getName().equals("Ogre") ||
                         recruiter.getName().equals("Minotaur") ||
                         recruiter.getName().equals("Unicorn"))
                     {
@@ -855,7 +861,7 @@ public class Game
             case 'J':
                 if (recruit.getName().equals("Gargoyle"))
                 {
-                    if (recruiter.getName().equals("Gargoyle") || 
+                    if (recruiter.getName().equals("Gargoyle") ||
                         recruiter.getName().equals("Cyclops") ||
                         recruiter.getName().equals("Behemoth") ||
                         recruiter.getName().equals("Serpent"))
@@ -904,7 +910,7 @@ public class Game
             case 'm':
                 if (recruit.getName().equals("Lion"))
                 {
-                    if (recruiter.getName().equals("Lion") || 
+                    if (recruiter.getName().equals("Lion") ||
                         recruiter.getName().equals("Minotaur") ||
                         recruiter.getName().equals("Dragon") ||
                         recruiter.getName().equals("Colossus"))
@@ -953,7 +959,7 @@ public class Game
             case 'M':
                 if (recruit.getName().equals("Ogre"))
                 {
-                    if (recruiter.getName().equals("Ogre") || 
+                    if (recruiter.getName().equals("Ogre") ||
                         recruiter.getName().equals("Troll") ||
                         recruiter.getName().equals("Ranger"))
                     {
@@ -988,7 +994,7 @@ public class Game
             case 'P':
                 if (recruit.getName().equals("Centaur"))
                 {
-                    if (recruiter.getName().equals("Centaur") || 
+                    if (recruiter.getName().equals("Centaur") ||
                         recruiter.getName().equals("Lion") ||
                         recruiter.getName().equals("Ranger"))
                     {
@@ -1023,7 +1029,7 @@ public class Game
             case 'S':
                 if (recruit.getName().equals("Troll"))
                 {
-                    if (recruiter.getName().equals("Troll") || 
+                    if (recruiter.getName().equals("Troll") ||
                         recruiter.getName().equals("Wyvern") ||
                         recruiter.getName().equals("Hydra"))
                     {
@@ -1058,7 +1064,7 @@ public class Game
             case 't':
                 if (recruit.getName().equals("Troll"))
                 {
-                    if (recruiter.getName().equals("Troll") || 
+                    if (recruiter.getName().equals("Troll") ||
                         recruiter.getName().equals("Warbear") ||
                         recruiter.getName().equals("Giant") ||
                         recruiter.getName().equals("Colossus"))
@@ -1153,7 +1159,7 @@ public class Game
             case 'W':
                 if (recruit.getName().equals("Centaur"))
                 {
-                    if (recruiter.getName().equals("Centaur") || 
+                    if (recruiter.getName().equals("Centaur") ||
                         recruiter.getName().equals("Warbear") ||
                         recruiter.getName().equals("Unicorn"))
                     {
@@ -1206,7 +1212,7 @@ public class Game
         {
             recruits[i] = null;
         }
-        
+
         MasterHex hex = legion.getCurrentHex();
 
         // Towers are a special case.
@@ -1252,7 +1258,7 @@ public class Game
             {
                 recruitTypes[i] = hex.getRecruit(i);
             }
-          
+
             for (int i = numRecruitTypes - 1; i >= 0; i--)
             {
                 int numCreature = legion.numCreature(recruitTypes[i]);
@@ -1311,7 +1317,7 @@ public class Game
     // array should be of length 4 and will be filled in with recruiters.
     // We use a Critter array instead of a Creature array so that Titan
     // power is shown properly.
-    public static int findEligibleRecruiters(Legion legion, Creature recruit, 
+    public static int findEligibleRecruiters(Legion legion, Creature recruit,
         Critter [] recruiters)
     {
         // Paranoia
@@ -1331,14 +1337,14 @@ public class Game
 
         if (hex.getTerrain() == 'T')
         {
-            // Towers are a special case.  The recruiter of tower creatures 
+            // Towers are a special case.  The recruiter of tower creatures
             // remains anonymous, so we only deal with guardians and warlocks.
             if (recruit.getName().equals("Guardian"))
             {
                 for (int i = 0; i < Creature.creatures.length; i++)
                 {
                     Creature creature = Creature.creatures[i];
-                    if (creature.getName().equals("Guardian") && 
+                    if (creature.getName().equals("Guardian") &&
                         legion.numCreature(creature) >= 1)
                     {
                         recruiters[count++] = legion.getCritter(creature);
@@ -1371,9 +1377,9 @@ public class Game
                 if (recruit.getName().equals(hex.getRecruit(i).getName()))
                 {
                     int numToRecruit = hex.getNumToRecruit(i);
-                    if (numToRecruit > 0 && 
-                        legion.numCreature(hex.getRecruit(i - 1)) >= 
-                        numToRecruit) 
+                    if (numToRecruit > 0 &&
+                        legion.numCreature(hex.getRecruit(i - 1)) >=
+                        numToRecruit)
                     {
                         // Can recruit up.
                         recruiters[count++] = legion.getCritter(
@@ -1400,7 +1406,7 @@ public class Game
     // Return true if all members of legion who are in recruiters are
     // already visible.  The passed-in recruiters array must be of
     // length 4.
-    public static boolean allRecruitersVisible(Legion legion, 
+    public static boolean allRecruitersVisible(Legion legion,
         Creature [] recruiters)
     {
         // Paranoia
@@ -1440,7 +1446,7 @@ public class Game
         Critter [] recruiters = new Critter[4];
         Critter recruiter;
 
-        int numEligibleRecruiters = findEligibleRecruiters(legion, recruit, 
+        int numEligibleRecruiters = findEligibleRecruiters(legion, recruit,
             recruiters);
 
         if (numEligibleRecruiters == 1)
@@ -1473,8 +1479,7 @@ public class Game
         if (recruit != null && (recruiter != null ||
             numEligibleRecruiters == 0))
         {
-            // Select that marker.
-            legion.addCreature(recruit);
+            legion.addCreature(recruit, true);
 
             // Mark the recruiter(s) as visible.
             int numRecruiters = numberOfRecruiterNeeded(recruiter,
@@ -1488,7 +1493,7 @@ public class Game
                 legion.getCurrentHex().getDescription() +
                 " recruits " + recruit.getName() + " with " +
                 (numRecruiters == 0 ? "nothing" :
-                numRecruiters + " " + (numRecruiters > 1 ? 
+                numRecruiters + " " + (numRecruiters > 1 ?
                 recruiter.getPluralName() : recruiter.getName())));
 
             // Recruits are one to a customer.
@@ -1504,7 +1509,7 @@ public class Game
     public static int findEligibleAngels(Legion legion, Creature [] recruits,
         boolean archangel)
     {
-        if (legion.getHeight() > 6)
+        if (legion.getHeight() >= 7)
         {
             return 0;
         }
@@ -1591,12 +1596,11 @@ public class Game
     }
 
 
-    // Put all die rolling in one place, in case we decide to
-    // change random number algorithms, use an external dice
-    // server, etc.
+    // Put all die rolling in one place, in case we decide to change random
+    // number algorithms, use an external dice server, etc.
     public static int rollDie()
     {
-        return (int) Math.floor(6 * Math.random()) + 1;
+        return random.nextInt(6) + 1;
     }
 
 
@@ -1616,7 +1620,7 @@ public class Game
     {
         // Lookup coords for chit starting from player[i].getTower()
         MasterHex hex = MasterBoard.getHexFromLabel(100 * player.getTower());
-    
+
         Creature.titan.takeOne();
         Creature.angel.takeOne();
         Creature.ogre.takeOne();
@@ -1627,11 +1631,10 @@ public class Game
         Creature.gargoyle.takeOne();
 
         Legion legion = new Legion(3 * MasterBoard.getScale(),
-            player.getSelectedMarker(), null, board, 8,
-            hex, Creature.titan, Creature.angel, Creature.ogre,
-            Creature.ogre, Creature.centaur, Creature.centaur,
-            Creature.gargoyle, Creature.gargoyle, player);
-    
+            player.getSelectedMarker(), null, board, hex, Creature.titan,
+            Creature.angel, Creature.ogre, Creature.ogre, Creature.centaur,
+            Creature.centaur, Creature.gargoyle, Creature.gargoyle, player);
+
         player.addLegion(legion);
         hex.addLegion(legion);
     }
@@ -1673,7 +1676,7 @@ public class Game
         forcedMovementRoll = 0;
     }
 
-        
+
     private static final int ARCHES_AND_ARROWS = -1;
     private static final int ARROWS_ONLY = -2;
 
@@ -1790,7 +1793,7 @@ public class Game
                 if (i != cameFrom && (hex.getExitType(i) != MasterHex.NONE ||
                    hex.getEntranceType(i) != MasterHex.NONE))
                 {
-                    set.addAll(findTowerTeleportMoves(hex.getNeighbor(i), 
+                    set.addAll(findTowerTeleportMoves(hex.getNeighbor(i),
                         player, legion, roll - 1, (i + 3) % 6));
                 }
             }
@@ -1799,14 +1802,14 @@ public class Game
         return set;
     }
 
-    
+
     /** Return number of legal non-teleport moves. */
     public int countConventionalMoves(Legion legion)
     {
         return showMoves(legion, false).size();
     }
-    
-    
+
+
     /** Select hexes where this legion can move. Return total number of
      *  legal moves. */
     public int highlightMoves(Legion legion)
@@ -1818,7 +1821,7 @@ public class Game
     }
 
 
-    /** Return set of hex labels where this legion can move. 
+    /** Return set of hex labels where this legion can move.
      *  Include teleport moves only if teleport is true. */
     private Set showMoves(Legion legion, boolean teleport)
     {
@@ -1828,7 +1831,7 @@ public class Game
         {
             return set;
         }
-        
+
         Player player = legion.getPlayer();
 
         // XXX entry sides
@@ -1859,7 +1862,7 @@ public class Game
                 player.canTeleport())
             {
                 // Mark every unoccupied hex within 6 hexes.
-                set.addAll(findTowerTeleportMoves(hex, player, legion, 6, 
+                set.addAll(findTowerTeleportMoves(hex, player, legion, 6,
                     NOWHERE));
 
                 // Mark every unoccupied tower.
@@ -1911,7 +1914,7 @@ public class Game
     /** Present a dialog allowing the player to enter via land or teleport. */
     private void chooseWhetherToTeleport(MasterHex hex)
     {
-        new OptionDialog(board, "Teleport?", "Teleport?", "Teleport", 
+        new OptionDialog(board, "Teleport?", "Teleport?", "Teleport",
             "Move Normally");
 
         // If Teleport, then leave teleported set.
@@ -1920,8 +1923,8 @@ public class Game
             hex.setTeleported(false);
         }
     }
-    
-    
+
+
     /** Return number of engagements found. */
     public int highlightEngagements()
     {
@@ -2022,8 +2025,8 @@ public class Game
 
         return count;
     }
-    
-    
+
+
     public void finishSummoningAngel()
     {
         summoningAngel = false;
@@ -2068,7 +2071,7 @@ public class Game
     }
 
 
-    public void actOnLegion(Legion legion)                    
+    public void actOnLegion(Legion legion)
     {
         Player player = legion.getPlayer();
 
@@ -2090,11 +2093,11 @@ public class Game
 
                 if (!dialogLock)
                 {
-                    dialogLock = true; 
+                    dialogLock = true;
                     new SplitLegion(board, legion, player);
-                    dialogLock = false; 
+                    dialogLock = false;
                 }
-                            
+
                 // Update status window.
                 updateStatusScreen();
                 // If we split, unselect this hex.
@@ -2123,7 +2126,7 @@ public class Game
                 {
                     if (!dialogLock)
                     {
-                        dialogLock = true; 
+                        dialogLock = true;
                         new PickRecruit(board, legion);
                         if (!legion.canRecruit())
                         {
@@ -2132,7 +2135,7 @@ public class Game
 
                             updateStatusScreen();
                         }
-                        dialogLock = false; 
+                        dialogLock = false;
                     }
                 }
 
@@ -2144,7 +2147,7 @@ public class Game
     public void actOnHex(MasterHex hex)
     {
         Player player = getActivePlayer();
-            
+
         switch (getPhase())
         {
             // If we're moving, and have selected a legion which
@@ -2197,7 +2200,7 @@ public class Game
                         if (hex.getTeleported())
                         {
 
-                            // If it was a Titan teleport, that 
+                            // If it was a Titan teleport, that
                             // lord must be the titan.
                             if (hex.isOccupied())
                             {
@@ -2270,7 +2273,7 @@ public class Game
                 // allowing the defender a reinforcement.
                 new Concede(board, attacker, defender, false);
 
-                // The players may agree to a negotiated 
+                // The players may agree to a negotiated
                 // settlement.
                 if (hex.isEngagement())
                 {
@@ -2282,7 +2285,7 @@ public class Game
                 {
                     if (hex.getLegion(0) == defender && defender.canRecruit())
                     {
-                        // If the defender won the battle by agreement, 
+                        // If the defender won the battle by agreement,
                         // he may recruit.
                         if (!dialogLock2)
                         {
@@ -2291,11 +2294,11 @@ public class Game
                             dialogLock2 = false;
                         }
                     }
-                    else if (hex.getLegion(0) == attacker && 
-                        attacker.getHeight() < 7 && 
+                    else if (hex.getLegion(0) == attacker &&
+                        attacker.getHeight() < 7 &&
                         player.canSummonAngel())
                     {
-                        // If the attacker won the battle by agreement, 
+                        // If the attacker won the battle by agreement,
                         // he may summon an angel.
                         summonAngel = new SummonAngel(board, attacker);
                     }

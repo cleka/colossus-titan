@@ -14,13 +14,15 @@ public class Chit extends Canvas
     private Rectangle rect;
     private static Container container;
 
-    // Flag to mark chit as dead and paint it with an "X" through it.
+    /** Flag to mark chit as dead and paint it with an "X" through it. */
     private boolean dead;
 
-    // We need to track whether we're running as an applet to load
-    // images correctly.  setApplet() should be called before any
-    // objects of this class (or its children) are created.
+    /** We need to track whether we're running as an applet to load
+        images correctly.  setApplet() should be called before any
+        objects of this class (or its children) are created. */
     protected static boolean isApplet = false;
+
+    private String id;
 
 
     public Chit(int scale, String imageFilename, Container container)
@@ -66,6 +68,18 @@ public class Chit extends Canvas
     public static void setApplet(boolean isApplet)
     {
         Chit.isApplet = isApplet;
+    }
+
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+
+    public String getId()
+    {
+        return id;
     }
     
 
@@ -118,14 +132,7 @@ public class Chit extends Canvas
 
     public boolean contains(Point point)
     {
-        if (rect.contains(point))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return rect.contains(point);
     }
 
 

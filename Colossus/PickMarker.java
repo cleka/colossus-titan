@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 /**
  * Class PickMarker allows a player to pick a legion marker.
@@ -10,7 +11,7 @@ import java.awt.event.*;
 
 public class PickMarker extends Dialog implements MouseListener, WindowListener
 {
-    private Chit [] markers;
+    private ArrayList markers = new ArrayList();
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private Player player;
@@ -24,7 +25,6 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
         super(parentFrame, player.getName() + ": Pick Legion Marker", true);
 
         this.player = player;
-        markers = new Chit[player.getNumMarkersAvailable()];
 
         addMouseListener(this);
         addWindowListener(this);
@@ -45,19 +45,20 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
             setBackground(Color.lightGray);
             setResizable(false);
 
-            for (int i = 0; i < player.getNumMarkersAvailable(); i++)
-            {
-                markers[i] = new Chit(scale,  
-                    "images/" + player.getMarker(i) + ".gif", this);
-                add(markers[i]);
-                markers[i].addMouseListener(this);
-            }
-
+            Collection markerIds = player.getMarkersAvailable();
             tracker = new MediaTracker(this);
-
-            for (int i = 0; i < markers.length; i++)
+            
+            Iterator it = markerIds.iterator();
+            while (it.hasNext())
             {
-                tracker.addImage(markers[i].getImage(), 0);
+                String markerId = (String)it.next();
+                Chit marker = new Chit(scale, "images/" + markerId + ".gif", 
+                    this);
+                marker.setId(markerId);    
+                markers.add(marker);
+                add(marker);
+                marker.addMouseListener(this);
+                tracker.addImage(marker.getImage(), 0);
             }
 
             try
@@ -122,12 +123,14 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
         }
 
         Object source = e.getSource();
-        for (int i = 0; i < markers.length; i++)
+        Iterator it = markers.iterator();
+        while (it.hasNext())
         {
-            if (markers[i] == source)
+            Chit marker = (Chit)it.next();
+            if (marker == source)
             {
                 // Select that marker.
-                player.selectMarker(i);
+                player.selectMarker(marker.getId());
 
                 // Then exit.
                 dispose();
@@ -192,5 +195,22 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    public static void main(String [] args)
+    {
+        Frame frame = new Frame("testing PickMarker");
+        int scale = 60;
+        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        frame.pack();
+        frame.setVisible(true);
+
+        Player player = new Player("Test", null);
+        player.setTower(1);
+        player.setColor("Red");
+        player.initMarkersAvailable();
+
+        new PickMarker(frame, player);
     }
 }

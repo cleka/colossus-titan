@@ -1,3 +1,5 @@
+import java.util.*;
+
 /**
  * Class SetupBattleHexes initializes hex contents for a Titan battlemap.
  * @version $Id$
@@ -17,25 +19,30 @@ public class SetupBattleHexes
     };
 
 
-    public static void setupHexes(BattleHex [][] h, char terrain,
-        BattleMap map)
+    public static void setupHexes(BattleHex [][] h, char terrain, 
+        BattleMap map, ArrayList hexes)
     {
         int scale = BattleMap.getScale();
 
         int cx = 6 * scale;
         int cy = 3 * scale;
         
-        // Initialize hexes.
+        // Initialize hex array.
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j])
                 {
-                    h[i][j] = new BattleHex
+                    BattleHex hex = new BattleHex
                         ((int) Math.round(cx + 3 * i * scale),
                         (int) Math.round(cy + (2 * j + (i & 1)) *
                         Hex.SQRT3 * scale), scale, map, i, j);
+                    hex.setXCoord(i);
+                    hex.setYCoord(j);
+
+                    h[i][j] = hex;
+                    hexes.add(hex);
                 }
             }
         }
@@ -302,11 +309,14 @@ public class SetupBattleHexes
                 h[4][3].setHexside(3, 'w');
                 break;
         }
+    }
+        
 
-
-        // XXX Since the hex array is static, this should only be
-        // done once.
-        // Add references to neighbor hexes.
+    /** Add references to neighbor hexes. Since the hex array is static, 
+        and neighbor data does not change with terrain, this should only
+        be done once. */
+    public static void setupNeighbors(BattleHex [][] h)
+    {
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)

@@ -353,7 +353,7 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
                         {
                             log.append(", ");
                         }
-                        winner.removeCreature(i);
+                        winner.removeCreature(i, true, true);
                     }
                 }
                 Game.logEvent(log.toString());

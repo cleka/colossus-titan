@@ -46,6 +46,10 @@ public class Turn extends Dialog implements ActionListener, WindowListener
 
     public static Point getSavedLocation()
     {
+        if (location == null)
+        {
+            location = new Point();
+        }
         return location;
     }
 
@@ -311,11 +315,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
                         // If there are no legal moves, recombine.
                         if (game.countConventionalMoves(legion) == 0)
                         {
-                            for (int j = hex.getNumLegions() - 1; j >= 1; j--)
-                            {
-                                hex.getLegion(j).recombine(hex.getLegion(0));
-                            }
-                            hex.repaint();
+                            hex.recombineAllLegions();
                         }
                         else
                         {

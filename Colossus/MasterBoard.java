@@ -22,6 +22,7 @@ public class MasterBoard extends Frame implements MouseListener,
     // in a 15x8 array, with some empty elements.
 
     private static MasterHex[][] h = new MasterHex[15][8];
+    private static ArrayList hexes = new ArrayList();
 
     private Image offImage;
     private Graphics offGraphics;
@@ -65,7 +66,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
         initializePopupMenu();
 
-        SetupMasterHexes.setupHexes(h, this);
+        SetupMasterHexes.setupHexes(h, this, hexes);
     }
 
 
@@ -153,15 +154,13 @@ public class MasterBoard extends Frame implements MouseListener,
      *  a match.  Return the hex, or null if none is found. */
     public static MasterHex getHexFromLabel(int label)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            if (hex.getLabel().equals(Integer.toString(label)))
             {
-                if (SetupMasterHexes.show[i][j] && h[i][j].getLabel().equals(
-                    Integer.toString(label)))
-                {
-                    return h[i][j];
-                }
+                return hex;
             }
         }
 
@@ -174,14 +173,13 @@ public class MasterBoard extends Frame implements MouseListener,
      *  null if none does. */
     private MasterHex getHexContainingPoint(Point point)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            if (hex.contains(point))
             {
-                if (SetupMasterHexes.show[i][j] && h[i][j].contains(point))
-                {
-                    return h[i][j];
-                }
+                return hex;
             }
         }
 
@@ -212,15 +210,14 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public static void unselectAllHexes()
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            if (hex.isSelected())
             {
-                if (SetupMasterHexes.show[i][j] && h[i][j].isSelected())
-                {
-                    h[i][j].unselect();
-                    h[i][j].repaint();
-                }
+                hex.unselect();
+                hex.repaint();
             }
         }
     }
@@ -228,21 +225,15 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public static void unselectHexByLabel(String label)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            if (hex.isSelected() && label.equals(hex.getLabel()))
             {
-                if (SetupMasterHexes.show[i][j])
-                {
-                    MasterHex hex = h[i][j];
-
-                    if (hex.isSelected() && label.equals(hex.getLabel()))
-                    {
-                        hex.unselect();
-                        hex.repaint();
-                        return;
-                    }
-                }
+                hex.unselect();
+                hex.repaint();
+                return;
             }
         }
     }
@@ -250,20 +241,14 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public static void unselectHexesByLabels(Set labels)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            if (hex.isSelected() && labels.contains(hex.getLabel()))
             {
-                if (SetupMasterHexes.show[i][j])
-                {
-                    MasterHex hex = h[i][j];
-
-                    if (hex.isSelected() && labels.contains(hex.getLabel()))
-                    {
-                        hex.unselect();
-                        hex.repaint();
-                    }
-                }
+                hex.unselect();
+                hex.repaint();
             }
         }
     }
@@ -271,21 +256,15 @@ public class MasterBoard extends Frame implements MouseListener,
     
     public static void selectHexByLabel(String label)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            if (!hex.isSelected() && label.equals(hex.getLabel()))
             {
-                if (SetupMasterHexes.show[i][j])
-                {
-                    MasterHex hex = h[i][j];
-
-                    if (!hex.isSelected() && label.equals(hex.getLabel()))
-                    {
-                        hex.select();
-                        hex.repaint();
-                        return;
-                    }
-                }
+                hex.select();
+                hex.repaint();
+                return;
             }
         }
     }
@@ -293,20 +272,14 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public static void selectHexesByLabels(Set labels)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            if (!hex.isSelected() && labels.contains(hex.getLabel()))
             {
-                if (SetupMasterHexes.show[i][j])
-                {
-                    MasterHex hex = h[i][j];
-
-                    if (!hex.isSelected() && labels.contains(hex.getLabel()))
-                    {
-                        hex.select();
-                        hex.repaint();
-                    }
-                }
+                hex.select();
+                hex.repaint();
             }
         }
     }
@@ -316,16 +289,14 @@ public class MasterBoard extends Frame implements MouseListener,
      *  by one or fewer legions. */
     public void clearAllNonFriendlyOccupiedEntrySides(Player player)
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            if (hex.getNumFriendlyLegions(player) == 0)
             {
-                if (SetupMasterHexes.show[i][j] &&
-                    h[i][j].getNumFriendlyLegions(player) == 0)
-                {
-                    h[i][j].clearAllEntrySides();
-                    h[i][j].setTeleported(false);
-                }
+                hex.clearAllEntrySides();
+                hex.setTeleported(false);
             }
         }
     }
@@ -334,16 +305,12 @@ public class MasterBoard extends Frame implements MouseListener,
     /** Clear all entry side and teleport information from all hexes. */
     public void clearAllEntrySides()
     {
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (SetupMasterHexes.show[i][j])
-                {
-                    h[i][j].clearAllEntrySides();
-                    h[i][j].setTeleported(false);
-                }
-            }
+            MasterHex hex = (MasterHex)it.next();
+            hex.clearAllEntrySides();
+            hex.setTeleported(false);
         }
     }
 
@@ -550,15 +517,13 @@ public class MasterBoard extends Frame implements MouseListener,
             eraseFlag = false;
         }
 
-        for (int i = 0; i < h.length; i++)
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
         {
-            for (int j = 0; j < h[0].length; j++)
+            MasterHex hex = (MasterHex)it.next();
+            if (rectClip.intersects(hex.getBounds()))
             {
-                if (SetupMasterHexes.show[i][j] && 
-                    rectClip.intersects(h[i][j].getBounds()))
-                {
-                    h[i][j].paint(offGraphics);
-                }
+                hex.paint(offGraphics);
             }
         }
 

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
@@ -14,8 +15,8 @@ public class SplitLegion extends Dialog implements MouseListener,
     private boolean imagesLoaded;
     private Legion oldLegion;
     private Legion newLegion;
-    private Chit [] oldChits;
-    private Chit [] newChits;
+    private ArrayList oldChits = new ArrayList(8);
+    private ArrayList newChits = new ArrayList(8);
     private Marker oldMarker;
     private Marker newMarker;
     private Player player;
@@ -50,7 +51,7 @@ public class SplitLegion extends Dialog implements MouseListener,
         pack();
 
         newLegion = new Legion(scale, player.getSelectedMarker(), oldLegion,
-            this, 0, oldLegion.getCurrentHex(), null, null, null, null, null,
+            this, oldLegion.getCurrentHex(), null, null, null, null, null,
             null, null, null, player);
 
         setBackground(Color.lightGray);
@@ -74,14 +75,14 @@ public class SplitLegion extends Dialog implements MouseListener,
             gridbag.setConstraints(oldMarker, constraints);
             add(oldMarker);
 
-            oldChits = new Chit[oldLegion.getHeight()];
             for (int i = 0; i < oldLegion.getHeight(); i++)
             {
-                oldChits[i] = new Chit(scale,
+                Chit chit = new Chit(scale,
                     oldLegion.getCritter(i).getImageName(), this);
-                gridbag.setConstraints(oldChits[i], constraints);
-                add(oldChits[i]);
-                oldChits[i].addMouseListener(this);
+                oldChits.add(chit);
+                gridbag.setConstraints(chit, constraints);
+                add(chit);
+                chit.addMouseListener(this);
             }
        
             newMarker = newLegion.getMarker();
@@ -91,13 +92,12 @@ public class SplitLegion extends Dialog implements MouseListener,
             gridbag.setConstraints(newMarker, constraints);
             add(newMarker);
 
-            newChits = new Chit[oldLegion.getHeight()];
-
             tracker = new MediaTracker(this);
 
             for (int i = 0; i < oldLegion.getHeight(); i++)
             {
-                tracker.addImage(oldChits[i].getImage(), 0);
+                Chit chit = (Chit)oldChits.get(i);
+                tracker.addImage(chit.getImage(), 0);
             }
             tracker.addImage(oldMarker.getImage(), 0);
             tracker.addImage(newMarker.getImage(), 0);
@@ -189,9 +189,7 @@ public class SplitLegion extends Dialog implements MouseListener,
 
         for (int i = 0; i < newLegion.getHeight(); i++)
         {
-            oldLegion.setHeight(oldLegion.getHeight() + 1);
-            oldLegion.setCreature(oldLegion.getHeight() - 1,
-                newLegion.getCreature(i));
+            oldLegion.addCreature(newLegion.getCreature(i), false);
         }
 
         dispose();
@@ -201,28 +199,21 @@ public class SplitLegion extends Dialog implements MouseListener,
     // Move a Creature over to the other Legion and move its chit to the
     // end of the other line.
     private void moveCreatureToOtherLegion(Legion fromLegion, Legion toLegion,
-        Chit [] fromChits, Chit [] toChits, int oldPosition, int gridy)
+        ArrayList fromChits, ArrayList toChits, int oldPosition, int gridy)
     {
-        toLegion.setHeight(toLegion.getHeight() + 1);
-        toLegion.setCreature(toLegion.getHeight() - 1,
-            fromLegion.getCreature(oldPosition));
-        toChits[toLegion.getHeight() - 1] = fromChits[oldPosition];
-        remove(fromChits[oldPosition]);
+        Creature creature = (Creature)fromLegion.removeCreature(oldPosition,
+            false, false);
+        toLegion.addCreature(creature, false);
+
+        Chit chit = (Chit)fromChits.remove(oldPosition);
+        remove(chit);
+
+        toChits.add(chit);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = gridy;
         constraints.gridwidth = 1;
-        gridbag.setConstraints(toChits[toLegion.getHeight() - 1],
-            constraints);
-        add(toChits[toLegion.getHeight() - 1]);
-
-        for (int j = oldPosition; j < fromLegion.getHeight() - 1; j++)
-        {
-            fromLegion.setCreature(j, fromLegion.getCreature(j + 1));
-            fromChits[j] = fromChits[j + 1];
-        }
-        fromLegion.setCreature(fromLegion.getHeight() - 1, null);
-        fromChits[fromLegion.getHeight() - 1] = null;
-        fromLegion.setHeight(fromLegion.getHeight() - 1);
+        gridbag.setConstraints(chit, constraints);
+        add(chit);
 
         // Update the stack heights on both markers.
         oldMarker.repaint();
@@ -239,7 +230,8 @@ public class SplitLegion extends Dialog implements MouseListener,
         Object source = e.getSource();
         for (int i = 0; i < oldLegion.getHeight(); i++)
         {
-            if (oldChits[i] == source)
+            Chit chit = (Chit)oldChits.get(i);
+            if (chit == source)
             {
                 moveCreatureToOtherLegion(oldLegion, newLegion,
                     oldChits, newChits, i, 1);
@@ -249,7 +241,8 @@ public class SplitLegion extends Dialog implements MouseListener,
 
         for (int i = 0; i < newLegion.getHeight(); i++)
         {
-            if (newChits[i] == source)
+            Chit chit = (Chit)newChits.get(i);
+            if (chit == source)
             {
                 moveCreatureToOtherLegion(newLegion, oldLegion,
                     newChits, oldChits, i, 0);
@@ -373,6 +366,13 @@ public class SplitLegion extends Dialog implements MouseListener,
                 " creatures were split off from legion " + 
                 oldLegion.getMarkerId() +
                 " into new legion " + newLegion.getMarkerId());
+
+            // This is needed for splits where the hex was not
+            // highlighted because the legion was not 7+ high.
+            if (hex != null)
+            {
+                hex.repaint();
+            }
         }
 
         else if (e.getActionCommand().equals("Cancel"))
@@ -393,13 +393,12 @@ public class SplitLegion extends Dialog implements MouseListener,
         player.setTower(1);
         player.setColor("Red");
         player.initMarkersAvailable();
-        player.selectMarker(0);
+        player.selectMarker("Rd01");
 
-        Legion legion = new Legion(scale,
-            player.getSelectedMarker(), null, frame, 8,
-            null, Creature.titan, Creature.angel, Creature.ogre,
+        Legion legion = new Legion(scale, player.getSelectedMarker(), null, 
+            frame, null, Creature.titan, Creature.angel, Creature.ogre,
             Creature.ogre, Creature.centaur, Creature.centaur,
-            Creature.gargoyle, Creature.gargoyle, player);
+            Creature.gargoyle, null, player);
 
         new SplitLegion(frame, legion, player);
     }
