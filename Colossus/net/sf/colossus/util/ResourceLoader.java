@@ -400,7 +400,7 @@ public final class ResourceLoader
                     }
                     if (tempImage[i] == null)
                     {
-                        System.err.println("During creation of \"" +
+                        System.err.println("Error: during creation of \"" +
                                            mapKey + "\", loading failed for " +
                                            filenames[i]);
                         return null;
@@ -418,8 +418,11 @@ public final class ResourceLoader
                                     basew, baseh,
                                     null);
             }
-            waitOnImage(bi);
-            imageCache.put(mapKey, bi);
+            if (bi != null)
+            {
+                waitOnImage(bi);
+                imageCache.put(mapKey, bi);
+            }
         }
         return bi;
     }
@@ -530,39 +533,50 @@ public final class ResourceLoader
         int width = tempIcon.getIconWidth();
         int height = tempIcon.getIconHeight();
         
-        // the following look-up replace black with the
-        // required color, everything else is white.
-        // Alpha channel is preserved.
-        byte[][] lookup = new byte[4][256];
-        for (int i = 1; i < 255; i++)
-        {
-            lookup[0][i] = lookup[1][i] = lookup[2][i] = (byte)255;
-            lookup[3][i] = (byte)i;
-        }
-        lookup[0][0] = (byte)color.getRed();
-        lookup[1][0] = (byte)color.getGreen();
-        lookup[2][0] = (byte)color.getBlue();
-        lookup[3][0] = (byte)0;
-        lookup[0][255] = (byte)255;
-        lookup[1][255] = (byte)255;
-        lookup[2][255] = (byte)255;
-        lookup[3][255] = (byte)255;
-
-        LookupTable lt = new ByteLookupTable(0, lookup);
-        LookupOp lo = new LookupOp(lt, null);
-        BufferedImage bi2, bi = new BufferedImage(width, height,
+        BufferedImage bi = new BufferedImage(width, height,
                                              BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
         biContext.drawImage(temp,
                             0, 0,
                             width, height,
                             null);
-        bi2 = lo.createCompatibleDestImage(bi, null);
-        bi = lo.filter(bi, bi2);
-        waitOnImage(bi);
+        if (bi != null)
+        {
+            waitOnImage(bi);
+        }
+
+        int[] pi;
+        WritableRaster ra = bi.getRaster();
+        // rebuild the image from the Alpha Channel
+        // fully-opaque pixel are set to the color,
+        // everything else is white.
+        // this should have been a LookupOp, but
+        // I couldn't make it reliable across platform :-(
+        for (int x = 0; x < width ; x++)
+        {
+            for (int y = 0 ; y < height ; y++)
+            {
+                pi = ra.getPixel(x,y, (int[])null);
+                if (pi[3] == 0xFF) // fully opaque
+                {
+                    pi[0] = color.getRed();
+                    pi[1] = color.getGreen();
+                    pi[2] = color.getBlue();
+                }
+                else
+                {
+                    pi[0] = pi[1] = pi[2] = 0xFF; 
+                }
+                ra.setPixel(x,y,pi);
+            }
+        }
+        
         synchronized (imageCache)
         {
-            imageCache.put(mapKey, bi);
+            if (bi != null)
+            {
+                imageCache.put(mapKey, bi);
+            }
         }
         return bi;
     }
