@@ -54,7 +54,8 @@ public class SimpleAI implements AI
         {
             markerId = (String)it.next();
             // Prefer own marker color.
-            if (markerId.startsWith(preferredShortColor))
+            if (preferredShortColor != null && 
+                markerId.startsWith(preferredShortColor))
             {
                 return markerId;
             }

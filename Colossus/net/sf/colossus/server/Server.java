@@ -1160,17 +1160,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         return 0;
     }
 
-
-    public String getPlayerColor(String playerName)
-    {
-        Player player = game.getPlayer(playerName);
-        if (player != null)
-        {
-            return player.getColor();
-        }
-        return "unknown";
-    }
-
     public String getBattleActivePlayerName()
     {
         return game.getBattle().getActivePlayerName();
@@ -1352,5 +1341,19 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     public void assignColor(String playerName, String color)
     {
         game.assignColor(playerName, color);
+    }
+
+    // XXX Hack to set color on load game.
+    void allSetColor()
+    {
+        Iterator it = game.getPlayers().iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            String name = player.getName();
+            String color = player.getColor();
+            Client client = getClient(name);
+            client.setColor(color);
+        }
     }
 }

@@ -1090,6 +1090,7 @@ public final class Game
             }
 
             initServerAndClients();
+            server.allSetColor();
 
             syncAutoPlay();
 

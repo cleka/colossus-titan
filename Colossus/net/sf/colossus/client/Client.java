@@ -464,7 +464,15 @@ public final class Client
             }
             this.statusScreen = null;
         }
+
+        // Side effects
         setupPlayerLabel();
+    }
+
+
+    public void setColor(String color)
+    {
+        this.color = color;
     }
 
 
