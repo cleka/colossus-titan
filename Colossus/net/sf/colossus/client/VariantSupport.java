@@ -16,11 +16,12 @@ import javax.swing.text.*;
 
 public final class VariantSupport
 {
-    private static String varDirectory = Constants.defaultDirName;
-    private static String variantName = Constants.defaultVARFile;
-    private static String mapName = Constants.defaultMAPFile;
-    private static String recruitName = Constants.defaultTERFile;
-    private static String creaturesName = Constants.defaultCREFile;
+    private static String varDirectory = "";
+    private static String variantName = "";
+    private static String mapName = "";
+    private static String recruitName = "";
+    private static String creaturesName = "";
+    private static Document varREADME = null;
     private static java.util.List dependUpon = null;
 
 
@@ -53,7 +54,13 @@ public final class VariantSupport
      */
     public static Document loadVariant(String tempVarName, String tempVarDirectory)
     {
-        Document readme = null;
+        if (variantName.equals(tempVarName) &&
+            varDirectory.equals(tempVarDirectory))
+        {
+            Log.debug("*not* loading already loaded variant " + tempVarName +
+                      ", data files in " + tempVarDirectory);
+            return varREADME;
+        }
         Log.debug("Loading variant " + tempVarName +
                   ", data files in " + tempVarDirectory);
         try
@@ -116,7 +123,7 @@ public final class VariantSupport
             }
             directories = new java.util.ArrayList();
             directories.add(tempVarDirectory);
-            readme = ResourceLoader.getDocument("README", directories);
+            varREADME = ResourceLoader.getDocument("README", directories);
         }
         catch (Exception e)
         {
@@ -126,9 +133,9 @@ public final class VariantSupport
             mapName = Constants.defaultMAPFile;
             recruitName = Constants.defaultTERFile;
             creaturesName = Constants.defaultCREFile;
-            readme = null;
+            varREADME = null;
         }
-        return readme;
+        return varREADME;
     }
 
     public static String getVarDirectory()

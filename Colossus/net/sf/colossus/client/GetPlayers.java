@@ -216,6 +216,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         readme.setContentType((String)doc.getProperty(
             ResourceLoader.keyContentType));
         readme.setDocument(doc);
+        options.setOption(Options.variant,variantName);
 
         pack();
         
@@ -342,9 +343,16 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             File varFile = varChooser.getSelectedFile();
             Document doc = VariantSupport.loadVariant(varFile);
-            readme.setContentType((String)doc.getProperty(
-            ResourceLoader.keyContentType));
-            readme.setDocument(doc);
+            if (doc != null)
+            {
+                String name = varFile.getName();
+                name = name.substring(0,name.lastIndexOf(".var"));
+                options.setOption(Options.variant,
+                                  name);
+                readme.setContentType((String)doc.getProperty(
+                           ResourceLoader.keyContentType));
+                readme.setDocument(doc);
+            }
         }
     }
 
@@ -413,6 +421,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         variantBox.removeItemAt(Constants.numVariants);
                     }
                     Document doc = VariantSupport.loadVariant(value);
+                    options.setOption(Options.variant,value);
                     String prop = (String)doc.getProperty(
                            ResourceLoader.keyContentType);
                     readme.setContentType(prop);
