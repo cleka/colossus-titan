@@ -14,24 +14,24 @@ class Game extends Frame implements WindowListener, ActionListener
     Player [] player;
     private MasterBoard board;
     private int activePlayerNum = 0;
-    private int turnNumber = 1;
+    private int turnNumber = 1;  // Advance when every player has a turn
 
-    static final int SPLIT = 1;
-    static final int MOVE = 2;
-    static final int FIGHT = 3;
-    static final int MUSTER = 4;
-    int phase = SPLIT;
+    public static final int SPLIT = 1;
+    public static final int MOVE = 2;
+    public static final int FIGHT = 3;
+    public static final int MUSTER = 4;
+    private int phase = SPLIT;
 
-    TextField [] tf = new TextField[6];
-    int currentColor;  // state holder during color choice
-    Label [] colorLabel = new Label[6];
-    Button [] colorButton = new Button[6];
-    Label [] activeLabel;
-    Label [] elimLabel;
-    Label [] legionsLabel;
-    Label [] markersLabel;
-    Label [] titanLabel;
-    Label [] scoreLabel;
+    private TextField [] tf = new TextField[6];
+    private int currentColor;  // state holder during color choice
+    private Label [] colorLabel = new Label[6];
+    private Button [] colorButton = new Button[6];
+    private Label [] activeLabel;
+    private Label [] elimLabel;
+    private Label [] legionsLabel;
+    private Label [] markersLabel;
+    private Label [] titanLabel;
+    private Label [] scoreLabel;
 
     Game()
     {
@@ -162,7 +162,7 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             for (int j = 0; j < numPlayers; j++)
             {
-                if (player[j].startingTower == i)
+                if (player[j].getTower() == i)
                 {
                     add(new Label(String.valueOf(100 * i)));
                     add(new Label(player[j].getName()));
@@ -214,7 +214,7 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             for (int j = 0; j < numPlayers; j++)
             {
-                if (player[j].startingTower == i)
+                if (player[j].getTower() == i)
                 {
                     currentColor = i;
                     colorLabel[j].setText("?");
@@ -241,7 +241,7 @@ class Game extends Frame implements WindowListener, ActionListener
 
         for (int j = 0; j < numPlayers; j++)
         {
-            if (player[j].startingTower == currentColor)
+            if (player[j].getTower() == currentColor)
             {
                 player[j].setColor(color);
                 colorLabel[j].setText(color);
@@ -252,7 +252,7 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             for (int j = 0; j < numPlayers; j++)
             {
-                if (player[j].startingTower == i)
+                if (player[j].getTower() == i)
                 {
                     currentColor = i;
                     colorLabel[j].setText("?");
@@ -299,7 +299,7 @@ class Game extends Frame implements WindowListener, ActionListener
             activeLabel[i] = new Label(" ");
             add(activeLabel[i]);
             add(new Label(player[i].getName()));
-            add(new Label(String.valueOf(100 * player[i].startingTower)));
+            add(new Label(String.valueOf(100 * player[i].getTower())));
             add(new Label(player[i].getColor()));
             elimLabel[i] = new Label("");
             add(elimLabel[i]); 
@@ -336,12 +336,12 @@ class Game extends Frame implements WindowListener, ActionListener
             {
                 activeLabel[i].setText(" ");
             }
-            elimLabel[i].setText(player[i].playersEliminated);
-            legionsLabel[i].setText(String.valueOf(player[i].numLegions));
+            elimLabel[i].setText(player[i].getPlayersElim());
+            legionsLabel[i].setText(String.valueOf(player[i].getNumLegions()));
             markersLabel[i].setText(String.valueOf(
-                player[i].numMarkersAvailable));
+                player[i].getNumMarkersAvailable()));
             titanLabel[i].setText(String.valueOf(player[i].titanPower()));
-            scoreLabel[i].setText(String.valueOf(player[i].score));
+            scoreLabel[i].setText(String.valueOf(player[i].getScore()));
         }
 
         repaint();
@@ -355,7 +355,7 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             for (int j = i + 1; j < numPlayers; j++)
             {
-                if (player[i].startingTower < player[j].startingTower)
+                if (player[i].getTower() < player[j].getTower())
                 {
                     Player tempPlayer = player[i];
                     player[i] = player[j];
@@ -402,6 +402,12 @@ class Game extends Frame implements WindowListener, ActionListener
     }
 
 
+    int getPhase()
+    {
+        return phase;
+    }
+
+
     void advancePhase()
     {
         phase++;
@@ -412,8 +418,21 @@ class Game extends Frame implements WindowListener, ActionListener
     {
         activePlayerNum++;
         activePlayerNum %= numPlayers;
-        turnNumber++;
+        if (activePlayerNum == 0)
+        {
+            turnNumber++;
+        }
         phase = SPLIT;
+        if (getActivePlayer().isAlive() == false)
+        {
+            advanceTurn();
+        }
+    }
+
+
+    int getTurnNumber()
+    {
+        return turnNumber;
     }
 
 
