@@ -54,9 +54,6 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
         setLocation(location);
 
         setVisible(true);
-
-        // Make sure that this window is in front of the Turn window.
-        toFront();
     }
 
 
@@ -172,7 +169,6 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
             button4.addActionListener(this);
 
             pack();
-
         }
     }
 
