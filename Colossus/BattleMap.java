@@ -17,6 +17,8 @@ public class BattleMap extends Frame implements MouseListener,
 
     private int numChits;
     private BattleChit[] chits = new BattleChit[14];
+    private BattleChit lastChitMoved;
+
     private int tracking = -1;
     private static final boolean[][] show =
     {
@@ -49,6 +51,7 @@ public class BattleMap extends Frame implements MouseListener,
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
     // Swamp, Tower, tundra, Woods
     private char terrain;
+    private BattleTurn turn;
 
 
     public BattleMap(Legion attacker, Legion defender, char terrain, char side)
@@ -95,7 +98,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale, 
                 attacker.getCreature(i).getImageName(), this,
                 attacker.getCreature(i), entrance,
-                attacker.getPlayer(), false);
+                attacker.getPlayer(), false, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -107,7 +110,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale, 
                 defender.getCreature(i - attackerHeight).getImageName(), this,
                 defender.getCreature(i - attackerHeight), entrance,
-                defender.getPlayer(), true);
+                defender.getPlayer(), true, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -123,6 +126,8 @@ public class BattleMap extends Frame implements MouseListener,
             System.out.println("waitForAll was interrupted");
         }
         imagesLoaded = true;
+
+        turn = new BattleTurn(this, this, attacker, defender);
 
         setVisible(true);
         repaint();
@@ -206,6 +211,62 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    void markLastChitMoved(BattleChit chit)
+    {
+        lastChitMoved = chit;
+    }
+
+
+    void clearLastChitMoved()
+    {
+        lastChitMoved = null;
+    }
+
+
+    void undoLastMove()
+    {
+        for (int i = 0; i < numChits; i++)
+        {
+            if (chits[i] == lastChitMoved)
+            {
+                chits[i].undoMove();
+            }
+        }
+    }
+
+
+    void undoAllMoves()
+    {
+        for (int i = 0; i < numChits; i++)
+        {
+            if (chits[i].hasMoved())
+            {
+                chits[i].undoMove();
+            }
+        }
+    }
+
+
+    void commitMoves()
+    {
+        clearLastChitMoved();
+
+        for (int i = 0; i < numChits; i++)
+        {
+            chits[i].commitMove();
+        }
+    }
+
+
+    int highlightStrikes()
+    {
+        Legion legion = turn.getActiveLegion();
+
+        // XXX return the actual number of possible strikes.
+        return 0;
+    }
+
+
     void setupHexes()
     {
         int cx = 6 * scale;
@@ -243,6 +304,9 @@ public class BattleMap extends Frame implements MouseListener,
 
 
         // Add terrain, hexsides, elevation, and exits to hexes.
+        // Cliffs are bidirectional; other hexside obstacles are noted
+        // only on the high side, since they only interfere with 
+        // uphill movement.
         switch (terrain)
         {
             case 'P':
@@ -281,16 +345,20 @@ public class BattleMap extends Frame implements MouseListener,
                 h[1][3].setHexside(1, 'd');
                 h[1][3].setHexside(2, 'd');
                 h[1][3].setHexside(3, 'c');
+                h[1][4].setHexside(0, 'c'); // bottom
                 h[3][1].setHexside(4, 'd');
                 h[3][2].setHexside(2, 'd');
                 h[3][2].setHexside(3, 'c');
+                h[3][3].setHexside(0, 'c'); // bottom
                 h[3][2].setHexside(4, 'c');
+                h[2][3].setHexside(1, 'c'); // bottom
                 h[3][2].setHexside(5, 'd');
                 h[3][5].setHexside(0, 'd');
                 h[3][5].setHexside(5, 'd');
                 h[4][2].setHexside(2, 'd');
                 h[4][2].setHexside(3, 'd');
                 h[4][5].setHexside(0, 'c');
+                h[4][4].setHexside(3, 'c'); // bottom
                 h[4][5].setHexside(1, 'd');
                 h[4][5].setHexside(5, 'd');
                 break;
@@ -416,6 +484,7 @@ public class BattleMap extends Frame implements MouseListener,
                 h[1][3].setHexside(5, 's');
                 h[1][4].setHexside(0, 's');
                 h[1][4].setHexside(1, 'c');
+                h[2][4].setHexside(4, 'c'); // bottom
                 h[1][4].setHexside(2, 's');
                 h[1][4].setHexside(5, 's');
                 h[2][1].setHexside(2, 's');
@@ -433,6 +502,7 @@ public class BattleMap extends Frame implements MouseListener,
                 h[3][2].setHexside(2, 's');
                 h[3][2].setHexside(3, 's');
                 h[3][2].setHexside(4, 'c');
+                h[2][3].setHexside(1, 'c'); // bottom
                 h[3][2].setHexside(5, 's');
                 h[3][3].setHexside(2, 's');
                 h[3][3].setHexside(3, 's');
@@ -445,6 +515,7 @@ public class BattleMap extends Frame implements MouseListener,
                 h[5][3].setHexside(0, 's');
                 h[5][3].setHexside(3, 's');
                 h[5][3].setHexside(4, 'c');
+                h[4][4].setHexside(1, 'c'); // bottom
                 h[5][3].setHexside(5, 's');
                 h[5][4].setHexside(4, 's');
                 h[5][4].setHexside(5, 's');
@@ -638,9 +709,24 @@ public class BattleMap extends Frame implements MouseListener,
                     chits[0].repaint();
                 }
 
-                // Highlight all legal destinations for this chit.
-                showMoves(chits[0]);
+                // Only the active player can move or strike.
+                if (chits[0].getPlayer() == turn.getActivePlayer())
+                {
+                    switch (turn.getPhase())
+                    {
+                        case BattleTurn.MOVE:
+                            // Highlight all legal destinations for this chit.
+                            showMoves(chits[0]);
+                            break;
 
+                        case BattleTurn.FIGHT:
+                            // XXX: Highlight all legal strikes for this chit.
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
                 return;
             }
         }
@@ -652,12 +738,21 @@ public class BattleMap extends Frame implements MouseListener,
             {
                 if (show[i][j] && h[i][j].isSelected(point))
                 {
-                    chits[0].moveToHex(h[i][j]);
-                    unselectAllHexes();
-                    //chits[0].getStartingHex().repaint();
-                    //h[i][j].repaint();
-                    repaint();
-                    return;
+                    switch (turn.getPhase())
+                    {
+                        case BattleTurn.MOVE:
+                            chits[0].moveToHex(h[i][j]);
+                            unselectAllHexes();
+                            repaint();
+                            break;
+
+                        case BattleTurn.FIGHT:
+                            // XXX: Strike.
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -804,6 +899,6 @@ public class BattleMap extends Frame implements MouseListener,
             null, Creature.centaur, Creature.lion, Creature.gargoyle, 
             Creature.cyclops, Creature.gorgon, Creature.guardian, null, null,
             player2);
-        new BattleMap(attacker, defender, 'J', 'b');
+        new BattleMap(attacker, defender, 'm', 'b');
     }
 }
