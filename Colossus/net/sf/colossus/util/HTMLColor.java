@@ -157,6 +157,8 @@ public final class HTMLColor
     // My additions.
     public static final Color darkYellow = new Color(200, 200, 0);
     public static final Color lightOlive = new Color(150, 150, 0);
+    public static final Color brambleGreen1 = new Color(0,200,0);
+    public static final Color brambleGreen2 = new Color(0,150,0);
 
     // More additions, for Creatures (based on Chit)
     public static final Color ogreRed = new Color(128,0,0);

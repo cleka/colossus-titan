@@ -167,7 +167,18 @@ public class BattleHex extends Hex
                 return HTMLColor.lightGray;
             }
         case 'r':  // bramble
-            return Color.green;
+            switch (elevation)
+            {
+            case 0:
+                return Color.green;
+            case 1:
+                return HTMLColor.brambleGreen1;
+            case 2:
+                return HTMLColor.brambleGreen2;
+            default:
+            case 3:
+                return HTMLColor.darkGreen;
+            }
         case 's':  // sand
             return Color.orange;
         case 't':  // tree
