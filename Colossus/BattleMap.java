@@ -217,7 +217,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     private void setupIcon()
     {
-        if (board != null && !board.getGame().isApplet())
+        if (battle.getGame() != null && !battle.getGame().isApplet())
         {
             try
             {
@@ -347,9 +347,9 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
-        if (board != null)
+        if (battle.getGame() != null)
         {
-            board.getGame().dispose();
+            battle.getGame().dispose();
         }
         battle.cleanup();
     }

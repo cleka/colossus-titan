@@ -37,8 +37,7 @@ public final class Critter extends Creature
     /** Deep copy for AI. */
     public Critter AICopy()
     {
-        Critter newCritter = new Critter(creature, visible, 
-            legion.AICopy());
+        Critter newCritter = new Critter(creature, visible, legion.AICopy());
 
         newCritter.map = map;
         newCritter.battle = battle;
@@ -281,8 +280,8 @@ public final class Critter extends Creature
 
         return count;
     }
-    
-    
+
+
     /** Return the number of friendly creatures adjacent to this critter.
      *  Dead critters do not count. */
     public int numAdjacentAllies()
@@ -550,7 +549,7 @@ public final class Critter extends Creature
      *  (fewer dice or higher strike number) in order to be
      *  allowed to carry.  Return true if the penalty is taken,
      *  or false if it is not. */
-    private boolean chooseStrikePenalty(Critter target, Collection 
+    private boolean chooseStrikePenalty(Critter target, Collection
         carryTargets)
     {
         StringBuffer prompt = new StringBuffer(

@@ -54,9 +54,11 @@ public final class Battle
     private LinkedList lastCrittersMoved = new LinkedList();
 
 
-    public Battle(MasterBoard board, Legion attacker, Legion defender,
-        int activeLegionNum, MasterHex masterHex, int turnNumber, int phase)
+    public Battle(Game game, MasterBoard board, Legion attacker,
+        Legion defender, int activeLegionNum, MasterHex masterHex,
+        int turnNumber, int phase)
     {
+        this.game = game;
         this.board = board;
         this.masterHex = masterHex;
         this.defender = defender;
@@ -66,12 +68,14 @@ public final class Battle
         this.activeLegionNum = activeLegionNum;
         this.turnNumber = turnNumber;
         this.phase = phase;
-        if (board != null)
-        {
-            this.game = board.getGame();
-        }
         map = new BattleMap(board, masterHex, this);
+    }
 
+
+    /** We need to do two-stage construction so that game.battle
+     *  is non-null earlier. */
+    public void init()
+    {
         setupPhase();
 
         if (game != null && game.getOption(Options.showDice))
@@ -92,6 +96,7 @@ public final class Battle
     {
         Battle newBattle = new Battle();
 
+        newBattle.game = null;   // Must set this later.
         newBattle.board = board; // don't need to deep copy
         newBattle.masterHex = masterHex; // don't need to deep copy
         newBattle.defender = defender.AICopy();
@@ -101,8 +106,7 @@ public final class Battle
         newBattle.activeLegionNum = activeLegionNum;
         newBattle.turnNumber = turnNumber;
         newBattle.phase = phase;
-        newBattle.game = board.getGame().AICopy();
-        newBattle.game.setOption(Options.showDice, false);
+        //newBattle.game.setOption(Options.showDice, false);
         newBattle.map = map; // don't need to deep copy
         newBattle.summonState = summonState;
         newBattle.carryDamage = carryDamage;
@@ -120,10 +124,6 @@ public final class Battle
             Critter critter = (Critter)it.next();
             newBattle.critters.add(critter.AICopy());
         }
-
-        // Need to break out GUI stuff from battle state?
-        newBattle.setupPhase();
-
         return newBattle;
     }
 
@@ -176,8 +176,8 @@ public final class Battle
     {
         return activeLegionNum;
     }
-    
-    
+
+
     public Legion getActiveLegion()
     {
         return legions[activeLegionNum];
@@ -218,8 +218,8 @@ public final class Battle
     {
         return attackerElim;
     }
-    
-    
+
+
     public boolean getDefenderElim()
     {
         return defenderElim;
@@ -364,6 +364,12 @@ public final class Battle
         else
         {
             map.setupMoveMenu();
+
+            Player player = getActivePlayer();
+            if (player.getOption(Options.autoBattleMove))
+            {
+                player.aiBattleMove(legions[activeLegionNum], this);
+            }
         }
     }
 
@@ -530,7 +536,7 @@ public final class Battle
 
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back. */
-    private Set findMoves(BattleHex hex, Creature creature, boolean flies, 
+    private Set findMoves(BattleHex hex, Creature creature, boolean flies,
         int movesLeft, int cameFrom)
     {
         HashSet set = new HashSet();
@@ -1250,7 +1256,7 @@ Game.logDebug("defender eliminated");
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && critter.isRangestriker() &&
-            getPhase() != STRIKEBACK && 
+            getPhase() != STRIKEBACK &&
             critter.getLegion() == legions[activeLegionNum])
         {
             Iterator it = critters.iterator();
@@ -2034,18 +2040,21 @@ Game.logDebug("defender eliminated");
         Player player1 = new Player("Attacker", null);
         Player player2 = new Player("Defender", null);
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setTerrain('D');
-        Legion attacker = new Legion("Bk01", null, hex, hex,
-            Creature.archangel, Creature.troll, Creature.ranger,
-            Creature.hydra, Creature.griffon, Creature.angel,
-            Creature.warlock, null, player1);
-        Legion defender = new Legion("Rd01", null, hex, hex,
-            Creature.serpent, Creature.lion, Creature.gargoyle,
-            Creature.cyclops, Creature.gorgon, Creature.guardian,
-            Creature.minotaur, null, player2);
+        hex.setTerrain('B');
+        hex.setLabel(130);
+        Legion attacker = new Legion("Bk01", null, hex.getLabel(),
+            hex.getLabel(), Creature.archangel, Creature.troll,
+            Creature.ranger, Creature.hydra, Creature.griffon,
+            Creature.angel, Creature.warlock, null, player1);
+        Legion defender = new Legion("Rd01", null, hex.getLabel(),
+            hex.getLabel(), Creature.serpent, Creature.lion,
+            Creature.gargoyle, Creature.cyclops, Creature.gorgon,
+            Creature.guardian, Creature.minotaur, null, player2);
         attacker.setEntrySide(5);
 
-        new Battle(null, attacker, defender, DEFENDER, hex, 1, MOVE);
+        Battle battle = new Battle(null, null, attacker, defender,
+            DEFENDER, hex, 1, MOVE);
+        battle.init();
     }
 }
 

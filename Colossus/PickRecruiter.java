@@ -197,11 +197,12 @@ public final class PickRecruiter extends JDialog implements MouseListener,
 
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('B');
+        hex.setLabel(130);
 
         Player player = new Player("Test", null);
-        Legion legion = new Legion("Bk01", null, hex, hex,
-            Creature.titan, Creature.gargoyle, Creature.gargoyle,
-            Creature.cyclops, Creature.cyclops, null,
+        Legion legion = new Legion("Bk01", null, hex.getLabel(),
+            hex.getLabel(), Creature.titan, Creature.gargoyle,
+            Creature.gargoyle, Creature.cyclops, Creature.cyclops, null,
             null, null, player);
 
         ArrayList recruiters = new ArrayList();

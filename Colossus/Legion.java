@@ -14,8 +14,8 @@ public final class Legion implements Comparable
     private String markerId;    // Bk03, Rd12, etc.
     private String parentId;
     private ArrayList critters = new ArrayList();
-    private MasterHex currentHex;
-    private MasterHex startingHex;
+    private String currentHexLabel;
+    private String startingHexLabel;
     private boolean moved;
     private boolean recruited;
     private Player player;
@@ -107,8 +107,8 @@ public final class Legion implements Comparable
     }
 
 
-    public Legion(String markerId, String parentId, MasterHex currentHex,
-        MasterHex startingHex, Creature creature0, Creature creature1,
+    public Legion(String markerId, String parentId, String currentHexLabel,
+        String startingHexLabel, Creature creature0, Creature creature1,
         Creature creature2, Creature creature3, Creature creature4,
         Creature creature5, Creature creature6, Creature creature7,
         Player player)
@@ -120,8 +120,8 @@ public final class Legion implements Comparable
         {
             parentId = null;
         }
-        this.currentHex = currentHex;
-        this.startingHex = startingHex;
+        this.currentHexLabel = currentHexLabel;
+        this.startingHexLabel = startingHexLabel;
         this.player = player;
 
         if (creature0 != null)
@@ -172,10 +172,10 @@ public final class Legion implements Comparable
     }
 
 
-    public static Legion getStartingLegion(String markerId, MasterHex hex,
+    public static Legion getStartingLegion(String markerId, String hexLabel,
         Player player)
     {
-        return new Legion(markerId, null, hex, hex, Creature.titan,
+        return new Legion(markerId, null, hexLabel, hexLabel, Creature.titan,
             Creature.angel, Creature.ogre, Creature.ogre,
             Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);
@@ -183,18 +183,19 @@ public final class Legion implements Comparable
 
 
     public static Legion getEmptyLegion(String markerId, String parentId,
-        MasterHex hex, Player player)
+        String hexLabel, Player player)
     {
-        return new Legion(markerId, parentId, hex, hex, null, null, null,
-            null, null, null, null, null, player);
+        return new Legion(markerId, parentId, hexLabel, hexLabel, null,
+            null, null, null, null, null, null, null, player);
     }
 
 
     /** deep copy for AI */
     public Legion AICopy()
     {
-        Legion newLegion = new Legion(markerId, parentId, currentHex, 
-            startingHex, critters.size()>=1?(Creature)critters.get(0):null,
+        Legion newLegion = new Legion(markerId, parentId, currentHexLabel,
+            startingHexLabel,
+            critters.size()>=1?(Creature)critters.get(0):null,
             critters.size()>=2?(Creature)critters.get(1):null,
             critters.size()>=3?(Creature)critters.get(2):null,
             critters.size()>=4?(Creature)critters.get(3):null,
@@ -210,6 +211,7 @@ public final class Legion implements Comparable
         newLegion.teleported = teleported;
         newLegion.teleportingLord = teleportingLord;
         newLegion.marker = marker;
+
         return newLegion;
     }
 
@@ -465,7 +467,7 @@ public final class Legion implements Comparable
     public void prepareToRemove()
     {
         // Remove the legion from its current hex.
-        currentHex.removeLegion(this);
+        getCurrentHex().removeLegion(this);
 
         StringBuffer log = new StringBuffer("Legion ");
         log.append(getLongMarkerName());
@@ -504,16 +506,16 @@ public final class Legion implements Comparable
         entrySide = hex.getEntrySide();
 
         Game.logEvent("Legion " + getLongMarkerName() + " in " +
-            currentHex.getDescription() +
+            getCurrentHex().getDescription() +
             (teleported ?
                 (hex.isOccupied() ? " titan teleports " :
                     " tower teleports (" + teleportingLord + ") " )
                 : " moves ") +
             "to " + hex.getDescription());
 
-        currentHex.removeLegion(this);
-        currentHex = hex;
-        currentHex.addLegion(this, true);
+        getCurrentHex().removeLegion(this);
+        currentHexLabel = hex.getLabel();
+        hex.addLegion(this, true);
         moved = true;
         player.setLastLegionMoved();
         // If we teleported, no more teleports are allowed this turn.
@@ -528,9 +530,9 @@ public final class Legion implements Comparable
     {
         if (moved)
         {
-            currentHex.removeLegion(this);
-            currentHex = startingHex;
-            currentHex.addLegion(this, true);
+            getCurrentHex().removeLegion(this);
+            currentHexLabel = startingHexLabel;
+            getCurrentHex().addLegion(this, true);
             moved = false;
             Game.logEvent("Legion " + getLongMarkerName() +
                 " undoes its move");
@@ -547,7 +549,7 @@ public final class Legion implements Comparable
 
     public void commitMove()
     {
-        startingHex = currentHex;
+        startingHexLabel = currentHexLabel;
         moved = false;
         recruited = false;
     }
@@ -623,15 +625,24 @@ public final class Legion implements Comparable
     }
 
 
-    public MasterHex getCurrentHex()
+    public String getCurrentHexLabel()
     {
-        return currentHex;
+        return currentHexLabel;
     }
 
+    public MasterHex getCurrentHex()
+    {
+        return MasterBoard.getHexFromLabel(currentHexLabel);
+    }
+
+    public String getStartingHexLabel()
+    {
+        return startingHexLabel;
+    }
 
     public MasterHex getStartingHex()
     {
-        return startingHex;
+        return MasterBoard.getHexFromLabel(startingHexLabel);
     }
 
 
@@ -823,7 +834,7 @@ public final class Legion implements Comparable
 
         player.selectMarkerId(newMarkerId);
         Legion newLegion = Legion.getEmptyLegion(newMarkerId, markerId,
-            currentHex, player);
+            currentHexLabel, player);
 
         Iterator it = creatures.iterator();
         while (it.hasNext())
@@ -845,7 +856,7 @@ public final class Legion implements Comparable
 
         player.addLegion(newLegion);
         player.setLastLegionSplitOff(newLegion);
-        currentHex.addLegion(newLegion, false);
+        getCurrentHex().addLegion(newLegion, false);
 
         Game.logEvent(newLegion.getHeight() +
             " creatures are split off from legion " + getLongMarkerName() +

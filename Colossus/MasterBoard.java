@@ -1470,12 +1470,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public Game getGame()
-    {
-        return game;
-    }
-
-
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
     public static MasterHex getHexFromLabel(String label)

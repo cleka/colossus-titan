@@ -108,23 +108,31 @@ public final class Game
      */
     public Game AICopy()
     {
-	//make sure to clear player options so that we don't get into an AI infinite loop
+	// Make sure to clear player options so that we don't get into
+        // an AI infinite loop.
 	Game newGame = new Game();
-	for (int i =0; i < players.size(); i++)
-	    newGame.players.add(i, ((Player)players.get(i)).AICopy());
+	for (int i = 0; i < players.size(); i++)
+        {
+            Player player = ((Player)players.get(i)).AICopy();
+            player.clearAllOptions();
+	    newGame.players.add(i, player);
+        }
 	newGame.board = board; // don't need to deep copy this
 	newGame.activePlayerNum = activePlayerNum;
 	newGame.turnNumber = turnNumber;
 	newGame.statusScreen = null;
 	newGame.applet = null;
-	newGame.battle = null;
+        if (battle != null)
+	{
+            newGame.battle = battle.AICopy();
+        }
 	newGame.movementDie = null;
 	newGame.summonAngel = null;
 	newGame.caretaker = caretaker.AICopy();
 	newGame.phase = phase;
 	newGame.isApplet = false;
 	newGame.masterFrame = null;
-	newGame.engagementInProgress = false;
+	newGame.engagementInProgress = engagementInProgress;
 	return newGame;
     }
 
@@ -351,6 +359,7 @@ public final class Game
     {
 	activePlayerNum = i;
     }
+
 
     public Player getPlayer(int i)
     {
@@ -1224,13 +1233,13 @@ public final class Game
                     activeLegionNum = Battle.DEFENDER;
                 }
 
-                battle = new Battle(board, attacker, defender, 
-                    activeLegionNum, engagementHex, battleTurnNum, 
+                battle = new Battle(this, board, attacker, defender,
+                    activeLegionNum, engagementHex, battleTurnNum,
                     battlePhase);
-
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
                 battle.setDriftDamageApplied(driftDamageApplied);
+                battle.init();
             }
 
             loadOptions();
@@ -1335,11 +1344,10 @@ public final class Game
         }
         else
         {
-            legion = new Legion(markerId, parentId,
-                MasterBoard.getHexFromLabel(currentHexLabel),
-                MasterBoard.getHexFromLabel(startingHexLabel),
-                critters[0], critters[1], critters[2], critters[3],
-                critters[4], critters[5], critters[6], critters[7], player);
+            legion = new Legion(markerId, parentId, currentHexLabel,
+                startingHexLabel, critters[0], critters[1], critters[2],
+                critters[3], critters[4], critters[5], critters[6],
+                critters[7], player);
             player.addLegion(legion);
             MasterHex hex = legion.getCurrentHex();
             hex.addLegion(legion, false);
@@ -2356,8 +2364,8 @@ public final class Game
         caretaker.takeOne(Creature.gargoyle);
         caretaker.takeOne(Creature.gargoyle);
 
-        Legion legion = Legion.getStartingLegion(selectedMarkerId, hex,
-            player);
+        Legion legion = Legion.getStartingLegion(selectedMarkerId,
+            hex.getLabel(), player);
         player.addLegion(legion);
         hex.addLegion(legion, false);
     }
@@ -2687,7 +2695,14 @@ public final class Game
         // And bring it to the front.
         masterFrame.show();
 
-        summonAngel = SummonAngel.summonAngel(board, attacker);
+        summonAngel = SummonAngel.summonAngel(this, attacker);
+    }
+
+
+    /** For AI. */
+    public Battle getBattle()
+    {
+        return battle;
     }
 
 
@@ -3123,8 +3138,9 @@ public final class Game
                 // Reveal both legions to all players.
                 attacker.revealAllCreatures();
                 defender.revealAllCreatures();
-                battle = new Battle(board, attacker, defender, Battle.DEFENDER,
-                    hex, 1, Battle.MOVE);
+                battle = new Battle(this, board, attacker, defender,
+                    Battle.DEFENDER, hex, 1, Battle.MOVE);
+                battle.init();
             }
         }
     }

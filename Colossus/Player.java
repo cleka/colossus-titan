@@ -240,7 +240,7 @@ public final class Player implements Comparable
 
     public void disbandEmptyDonor()
     {
-        if (lastLegionSummonedFrom != null && 
+        if (lastLegionSummonedFrom != null &&
             lastLegionSummonedFrom.getHeight() == 0)
         {
             lastLegionSummonedFrom.remove();
@@ -580,7 +580,7 @@ public final class Player implements Comparable
         {
             Legion legion = (Legion)it.next();
             Legion parent = legion.getParent();
-            if (parent != null && parent != legion && 
+            if (parent != null && parent != legion &&
                 parent.getCurrentHex() == legion.getCurrentHex())
             {
                 legion.recombine(parent, false);
@@ -867,6 +867,12 @@ public final class Player implements Comparable
     }
 
 
+    public void clearAllOptions()
+    {
+        options.clear();
+    }
+
+
     /** Ensure that Player menu checkboxes reflect the correct state. */
     public void syncCheckboxes()
     {
@@ -888,7 +894,6 @@ public final class Player implements Comparable
         }
     }
 
-
     public void aiMasterMove()
     {
         if (getOption(Options.autoMasterMove))
@@ -896,7 +901,6 @@ public final class Player implements Comparable
             ai.masterMove(game);
         }
     }
-
 
     public void aiRecruit()
     {
@@ -906,7 +910,6 @@ public final class Player implements Comparable
         }
     }
 
-
     public Creature aiReinforce(Legion legion)
     {
         if (getOption(Options.autoRecruit))
@@ -915,8 +918,7 @@ public final class Player implements Comparable
         }
         return null;
     }
-    
-    
+
     public boolean aiFlee(Legion legion, Legion enemy)
     {
         if (getOption(Options.autoFlee))
@@ -928,8 +930,7 @@ public final class Player implements Comparable
             return false;
         }
     }
-    
-    
+
     public boolean aiConcede(Legion legion, Legion enemy)
     {
         if (getOption(Options.autoFlee))
@@ -941,8 +942,7 @@ public final class Player implements Comparable
             return false;
         }
     }
-    
-    
+
     public void aiStrike(Legion legion, Battle battle, boolean fakeDice)
     {
         if (getOption(Options.autoStrike))
@@ -950,20 +950,18 @@ public final class Player implements Comparable
             ai.strike(legion, battle, game, fakeDice);
         }
     }
-    
-    
+
     public boolean aiChooseStrikePenalty(Critter critter, Critter target,
         Critter carryTarget, Battle battle)
     {
         if (getOption(Options.autoStrike))
         {
-            return ai.chooseStrikePenalty(critter, target, carryTarget, 
+            return ai.chooseStrikePenalty(critter, target, carryTarget,
                 battle, game);
         }
         return false;
     }
-    
-    
+
     public void aiBattleMove(Legion legion, Battle battle)
     {
         if (getOption(Options.autoBattleMove))
@@ -971,7 +969,7 @@ public final class Player implements Comparable
             ai.battleMove(legion, battle, game);
         }
     }
-    
+
 
     /** Comparator that forces this player's legion markers to come
      *  before captured markers in sort order. */

@@ -192,6 +192,7 @@ public final class Concede extends JDialog implements ActionListener
 
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('B');
+        hex.setLabel(130);
 
         Player player = new Player("Attacker", null);
         player.setScore(1400);
@@ -199,10 +200,10 @@ public final class Concede extends JDialog implements ActionListener
         player.setColor("Red");
         player.initMarkersAvailable();
         String selectedMarkerId = player.selectMarkerId("Rd01");
-        Legion attacker = new Legion(selectedMarkerId, null, hex, hex,
-            Creature.titan, Creature.colossus, Creature.serpent,
-            Creature.archangel, Creature.hydra, Creature.giant,
-            Creature.dragon, null, player);
+        Legion attacker = new Legion(selectedMarkerId, null, hex.getLabel(),
+            hex.getLabel(), Creature.titan, Creature.colossus,
+            Creature.serpent, Creature.archangel, Creature.hydra,
+            Creature.giant, Creature.dragon, null, player);
         Marker marker = new Marker(scale, selectedMarkerId, frame, null);
         attacker.setMarker(marker);
 
@@ -211,9 +212,9 @@ public final class Concede extends JDialog implements ActionListener
         player.setColor("Blue");
         player.initMarkersAvailable();
         selectedMarkerId = player.selectMarkerId("Bl01");
-        Legion defender = new Legion(selectedMarkerId, null, hex, hex,
-            Creature.ogre, Creature.centaur, Creature.gargoyle,
-            null, null, null, null, null, player);
+        Legion defender = new Legion(selectedMarkerId, null, hex.getLabel(),
+            hex.getLabel(), Creature.ogre, Creature.centaur,
+            Creature.gargoyle, null, null, null, null, null, player);
         marker = new Marker(scale, selectedMarkerId, frame, null);
         defender.setMarker(marker);
 

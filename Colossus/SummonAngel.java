@@ -15,6 +15,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
     private Player player;
     private Legion legion;
     private MasterBoard board;
+    private Game game;
     private static final int scale = 60;
     private Chit angelChit;
     private Chit archangelChit;
@@ -27,14 +28,15 @@ public final class SummonAngel extends JDialog implements MouseListener,
     private static boolean active;
 
 
-    private SummonAngel(MasterBoard board, Legion legion)
+    private SummonAngel(Game game, Legion legion)
     {
-        super(board.getFrame(), legion.getPlayer().getName() +
+        super(game.getBoard().getFrame(), legion.getPlayer().getName() +
             ": Summon Angel into Legion " + legion.getLongMarkerName(), false);
 
+        this.game = game;
         this.legion = legion;
         player = legion.getPlayer();
-        this.board = board;
+        this.board = game.getBoard();
 
         // Paranoia
         if (!legion.canSummonAngel())
@@ -45,7 +47,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
         // Count and highlight legions with summonable angels, and put
         // board into a state where those legions can be selected.
-        if (board.getGame().highlightSummonableAngels(legion) < 1)
+        if (game.highlightSummonableAngels(legion) < 1)
         {
             cleanup(null);
             return;
@@ -103,12 +105,12 @@ public final class SummonAngel extends JDialog implements MouseListener,
     }
 
 
-    public static SummonAngel summonAngel(MasterBoard board, Legion legion)
+    public static SummonAngel summonAngel(Game game, Legion legion)
     {
         if (!active)
         {
             active = true;
-            return new SummonAngel(board, legion);
+            return new SummonAngel(game, legion);
         }
         return null;
     }
@@ -153,7 +155,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
         dispose();
 
         // Let the game know to leave the angel-summoning state.
-        board.getGame().finishSummoningAngel();
+        game.finishSummoningAngel();
         active = false;
     }
 

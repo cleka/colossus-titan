@@ -467,8 +467,8 @@ public final class MasterHex extends Hex
                 return Color.black;
         }
     }
-    
-    
+
+
     public static boolean isNativeCombatBonus(Creature creature, char terrain)
     {
         switch (terrain)

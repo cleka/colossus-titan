@@ -162,12 +162,13 @@ public final class PickLord extends JDialog implements MouseListener,
 
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('B');
+        hex.setLabel(130);
 
         Player player = new Player("Test", null);
-        Legion legion = new Legion("Bk01", null, hex, hex,
-            Creature.titan, Creature.archangel, Creature.archangel,
-            Creature.angel, Creature.angel, Creature.warlock,
-            Creature.guardian, null, player);
+        Legion legion = new Legion("Bk01", null, hex.getLabel(),
+            hex.getLabel(), Creature.titan, Creature.archangel,
+            Creature.archangel, Creature.angel, Creature.angel,
+            Creature.warlock, Creature.guardian, null, player);
 
         Creature creature = PickLord.pickLord(frame, legion);
         Game.logEvent("Chose " + creature);

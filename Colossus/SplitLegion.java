@@ -62,10 +62,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
 
         pack();
 
-        MasterHex hex = oldLegion.getCurrentHex();
-
-        newLegion = Legion.getEmptyLegion(selectedMarkerId, 
-            oldLegion.getMarkerId(), hex, player);
+        newLegion = Legion.getEmptyLegion(selectedMarkerId,
+            oldLegion.getMarkerId(), oldLegion.getCurrentHexLabel(), player);
         String imageName = selectedMarkerId;
         newMarker = new Marker(scale, imageName, this, null);
         newLegion.setMarker(newMarker);
@@ -264,8 +262,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
-    /** 
-     *  Return true if the split is legal. Each legion must have 
+    /**
+     *  Return true if the split is legal. Each legion must have
      *  height >= 2.  If this was an initial split, each legion
      *  must have height == 4 and one lord.
      */

@@ -155,12 +155,13 @@ public final class AcquireAngel extends JDialog implements MouseListener,
 
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('B');
+        hex.setLabel(130);
 
         Player player = new Player("Test", null);
-        Legion legion = new Legion("Bk01", null, hex, hex,
-            Creature.titan, Creature.gargoyle, Creature.cyclops,
-            Creature.behemoth, Creature.serpent, Creature.warlock,
-            null, null, player);
+        Legion legion = new Legion("Bk01", null, hex.getLabel(),
+            hex.getLabel(), Creature.titan, Creature.gargoyle,
+            Creature.cyclops, Creature.behemoth, Creature.serpent,
+            Creature.warlock, null, null, player);
 
         ArrayList recruits = new ArrayList();
         recruits.add("Archangel");

@@ -3,7 +3,7 @@ import java.util.*;
 /**
  * Generic Minimax with alpha-beta pruning
  * also supports averaging for games with randomness
- * 
+ *
  * @version $Id$
  * @author Bruce Sherrod
  */
@@ -45,11 +45,17 @@ class Minimax
          */
         Iterator generateMoves();
 
+        /** Generate a do-nothing Move of the appropriate class for this
+         *  GamePosition.
+         */
+        Move generateNullMove();
+
         /**
          * advance game state ( this should adjust maximize() as necessary )
          */
         GamePosition applyMove(Move move);
     }
+
 
     /**
      * a move in the game to be searched.  Implementors of this
@@ -58,29 +64,13 @@ class Minimax
      */
     public interface Move
     {
-        // 
         // convenience methods so that Minimax can return a single
-        // object that contains a move and a score for that move.
-        // 
+        // object that contains a value and a score for that move.
+        //
         void setValue(int value);
         int getValue();
     }
 
-
-    private class FinalMove implements Move
-    {
-        private int value;
-
-        public void setValue(int value)
-        {
-            this.value = value;
-        }
-
-        public int getValue()
-        {
-            return value;
-        }
-    }
 
     public Move search(GamePosition position, int maxDepth)
     {
@@ -94,13 +84,14 @@ class Minimax
 
 
     /* package */
-    Move search(GamePosition position, 
+    Move search(
+        GamePosition position,
         int depth,       // current depth (in ply)
         int maxDepth,    // max depth of this search (in ply)
         int alpha,       // alpha
         int beta)        // beta
     {
-        SimpleAI.debugln("search d " + depth + " / " + maxDepth + " alpha " 
+        SimpleAI.debugln("search d " + depth + " / " + maxDepth + " alpha "
                          + alpha + " beta " + beta);
 
         int best_score;
@@ -109,9 +100,9 @@ class Minimax
 
         if (depth >= maxDepth)
         {
+            SimpleAI.debugln("at max depth");
             best_score = position.evaluation();
-            best_move = new FinalMove();
-
+            best_move = position.generateNullMove();
             SimpleAI.debugln(" returning score " + best_score);
         }
         else
@@ -133,7 +124,7 @@ class Minimax
                     break;
 
                 default:
-                    throw new RuntimeException("unknown value of maximize " + 
+                    throw new RuntimeException("unknown value of maximize " +
                         maximize);
             }
 
@@ -145,8 +136,8 @@ class Minimax
 
                 Move current_move = (Move)moves_list.next();
                 GamePosition newPosition = position.applyMove(current_move);
-                Move next_move = search(newPosition, depth + 1, maxDepth, 
-                        alpha, beta);
+                Move next_move = search(newPosition, depth + 1, maxDepth,
+                    alpha, beta);
                 int current_score = next_move.getValue();
 
                 switch (maximize)
@@ -200,19 +191,19 @@ class Minimax
             if (numMovesExamined == 0)
             {
                 // no legal moves from here, so terminate
+                SimpleAI.debugln("no moves found; terminating search");
                 best_score = position.evaluation();
-                best_move = new FinalMove();
+                best_move = position.generateNullMove();
             }
             else if (maximize == AVERAGE)
             {
                 best_score /= numMovesExamined;
-                best_move = new FinalMove();
+                best_move = position.generateNullMove();
             }
         }
 
         best_move.setValue(best_score);
-
-        return best_move;
+        return (Move)best_move;
     }
 
 
@@ -295,6 +286,11 @@ class Minimax
             return list.iterator();
         }
 
+        public Move generateNullMove()
+        {
+            return new TestMove("null move");
+        }
+
         public GamePosition applyMove(Move move)
         {
             TestGame newPosition = new TestGame();
@@ -314,8 +310,8 @@ class Minimax
 
         TestMove move = (TestMove)search(game, 2);
 
-        SimpleAI.debugln("Final result is to make move " + move.move 
-                         + " with value " + move.getValue());
+        SimpleAI.debugln("Final result is to make move " + move.move +
+            " with value " + move.getValue());
     }
 
     public static void main(String[] args)
