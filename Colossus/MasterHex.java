@@ -531,6 +531,10 @@ class MasterHex
         Player player = legions[0].getPlayer();
         for (int i = 1; i < numLegions; i++)
         {
+            if (legions[i] == null)
+            {
+                System.out.println("null legions " + i); 
+            }
             if (legions[i].getPlayer() != player)
             {
                 return true;
