@@ -20,6 +20,10 @@ Change some dialogs to show info in a label instead of the title (so
 Move code to center a dialog on screen to one place.  Maybe add a
    parent dialog class?
 
+Put web page under CVS.
+
+Set up a local Java Web Start test config.
+
 Change StatusScreen to use a JTable.
 
 Maybe add NullMap and NullBoard instances for AI clients, to reduce

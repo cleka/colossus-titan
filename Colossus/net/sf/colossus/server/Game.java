@@ -48,6 +48,7 @@ public final class Game
     private LinkedList colorPickOrder = new LinkedList();
     private Set colorsLeft;
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
+    private Properties options = new Properties();
 
     Game()
     {
@@ -195,8 +196,24 @@ public final class Game
 
         server.loadOptions();
 
-        // Override autoPlay option with selection.
-        it = players.iterator();
+        syncAutoPlay();
+
+        server.allInitBoard();
+
+        assignTowers();
+
+        // Renumber players in descending tower order.
+        Collections.sort(players);
+        activePlayerNum = 0;
+
+        assignColors();
+
+        fixMulligans();
+    }
+
+    private void syncAutoPlay()
+    {
+        Iterator it = players.iterator();
         while (it.hasNext())
         {
             Player player = (Player)it.next();
@@ -211,18 +228,6 @@ public final class Game
                     false);
             }
         }
-
-        server.allInitBoard();
-
-        assignTowers();
-
-        // Renumber players in descending tower order.
-        Collections.sort(players);
-        activePlayerNum = 0;
-
-        assignColors();
-
-        fixMulligans();
     }
 
     private void assignColors()
@@ -1103,21 +1108,7 @@ public final class Game
 
             initServerAndClients();
 
-            // Set up autoPlay options from player type.
-            it = players.iterator();
-            while (it.hasNext())
-            {
-                Player player = (Player)it.next();
-                String name = player.getName();
-                if (player.isAI())
-                {
-                    server.setClientOption(name, Options.autoPlay, true);
-                }
-                else
-                {
-                    server.setClientOption(name, Options.autoPlay, false);
-                }
-            }
+            syncAutoPlay();
 
             // Battle stuff
             buf = in.readLine();

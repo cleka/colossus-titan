@@ -87,17 +87,15 @@ public final class Server
         }
     }
 
-    void allShowMovementRoll(int roll)
+    void allTellMovementRoll(int roll)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.showMovementRoll(roll);
+            client.tellMovementRoll(roll);
         }
     }
-
-
 
 
     public void leaveCarryMode()
@@ -198,26 +196,6 @@ public final class Server
         return getClientOption(clientName, optname);
     }
 
-    String getClientStringOption(String playerName, String optname)
-    {
-        Client client = getClient(playerName);
-        if (client != null)
-        {
-            return client.getStringOption(optname);
-        }
-        return "false";
-    }
-
-    int getClientIntOption(String playerName, String optname)
-    {
-        Client client = getClient(playerName);
-        if (client != null)
-        {
-            return client.getIntOption(optname);
-        }
-        return -1;
-    }
-
     /** Get the option from the first human-controlled client.  If there 
      *  are none, get the option from the first AI-controlled client. */
     int getClientIntOption(String optname)
@@ -228,6 +206,16 @@ public final class Server
             clientName = game.getPlayer(0).getName();
         }
         return getClientIntOption(clientName, optname);
+    }
+
+    int getClientIntOption(String playerName, String optname)
+    {
+        Client client = getClient(playerName);
+        if (client != null)
+        {
+            return client.getIntOption(optname);
+        }
+        return -1;
     }
 
     void setClientOption(String playerName, String optname,

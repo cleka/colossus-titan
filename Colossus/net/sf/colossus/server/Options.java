@@ -27,6 +27,7 @@ public final class Options
     public static final String logDebug = "Log debug messages";
     public static final String allStacksVisible = "All stacks visible";
     public static final String debugMulligans = "Debug mulligans";
+    public static final String aiDelay = "AI delay";
 
     // Display options (client)
     public static final String showCaretaker = "Show Caretaker's stacks";
@@ -35,7 +36,6 @@ public final class Options
     public static final String useOverlay = "Use Graphical Overlay";
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";
-    public static final String aiDelay = "AI delay";
 
     // AI options (player - put on client)
     public static final String autoPickColor = "Auto pick color";

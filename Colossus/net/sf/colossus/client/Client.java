@@ -61,10 +61,7 @@ public final class Client
 
     private java.util.List recruitChits = new ArrayList();
 
-    // Per-client and per-player options should be kept here instead
-    // of in Game.  (For now we can move all options from Game/Player
-    // to client.  The few server options can be moved back to Game or
-    // Server later, and have their GUI manipulators removed or restricted.)
+    // Per-client and per-player options. 
     private Properties options = new Properties();
 
     /** Player who owns this client. */
@@ -198,7 +195,7 @@ public final class Client
         repaintAllWindows();
     }
 
-    public void showMovementRoll(int roll)
+    public void tellMovementRoll(int roll)
     {
         movementRoll = roll;
         if (movementDie == null || roll != movementDie.getLastRoll())
@@ -233,8 +230,6 @@ public final class Client
     }
 
     // XXX All the public option methods need to be non-public.
-    // XXX Server-side options need to be tracked on the server.
-    //    (Pass from controlling client at initialization.)
     public boolean getOption(String name)
     {
         // If autoplay is set, then return true for all other auto* options.
@@ -297,7 +292,7 @@ public final class Client
         }
     }
 
-    public void setStringOption(String optname, String value)
+    void setStringOption(String optname, String value)
     {
         options.setProperty(optname, String.valueOf(value));
         // TODO Add some triggers so that if autoPlay or autoSplit is set
@@ -305,7 +300,7 @@ public final class Client
         // is called.
     }
 
-    public void setIntOption(String optname, int value)
+    void setIntOption(String optname, int value)
     {
         options.setProperty(optname, String.valueOf(value));
     }

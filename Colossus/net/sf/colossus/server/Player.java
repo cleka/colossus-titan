@@ -525,7 +525,7 @@ public final class Player implements Comparable
         movementRoll = Game.rollDie();
         Log.event(getName() + " rolls a " + movementRoll + " for movement");
         Server server = game.getServer();
-        server.allShowMovementRoll(movementRoll);
+        server.allTellMovementRoll(movementRoll);
     }
 
 
