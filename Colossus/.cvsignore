@@ -1,7 +1,5 @@
 *Keystore
-*.jar
 ChangeLog
-Colossus-*.cfg
 version
 javamake.pdb
 TEST*.txt
