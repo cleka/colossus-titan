@@ -34,12 +34,20 @@ public final class Options
     public static final String logDebug = "Log debug messages";
     public static final String allStacksVisible = "All stacks visible";
     public static final String aiDelay = "AI delay";
+    public static final String autoStop = "AIs stop when humans dead";
     public static final String autoQuit = "Auto quit when game over";
-    public static final String balancedTowers = "Balanced towers";
-
+    public static final String balancedTowers = "Balanced starting towers";
 
     private static final String [] serverOptions = 
-        { autosave, logDebug, allStacksVisible, aiDelay, autoQuit };
+    { 
+        autosave, 
+        logDebug, 
+        allStacksVisible, 
+        aiDelay,
+        autoStop,
+        autoQuit, 
+        balancedTowers 
+    };
 
     public static List getServerOptions()
     {

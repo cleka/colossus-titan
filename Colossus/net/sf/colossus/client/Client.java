@@ -407,10 +407,6 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
         if (optionChanged)
         {
             syncCheckboxes();
-            if (isPrimary()) 
-            {
-                syncServerOptions();
-            }
             optionChanged = false;
             
             String lfName = getStringOption(Options.favoriteLookFeel);
@@ -434,21 +430,6 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
             String name = (String)en.nextElement();
             boolean value = getOption(name);
             board.twiddleOption(name, value);
-        }
-    }
-
-    private void syncServerOptions()
-    {
-        Enumeration en = options.propertyNames();
-        while (en.hasMoreElements())
-        {
-            String name = (String)en.nextElement();
-            String value = getStringOption(name);
-            // XXX Look out for infinite loops.
-            if (Options.getServerOptions().contains(name))
-            {
-                server.setOption(playerName, name, value);
-            }
         }
     }
 

@@ -18,6 +18,18 @@ import net.sf.colossus.util.Log;
 
 public final class Start
 {
+    private static void usage(Options opts)
+    {
+        System.out.println("Usage: java -jar Colossus.jar [options]");
+        Iterator it = opts.getOptions().iterator();
+        while (it.hasNext())
+        {
+            Option opt = (Option)it.next();
+            System.out.println(opt.toString());
+        }
+    }
+
+
     public static void main(String [] args)
     {
         // This is a werken Options, not a util Options.
@@ -54,27 +66,20 @@ public final class Start
 
         if (cl.optIsSet('l') || cl.optIsSet('z'))
         {
-            String filename = "--latest";
+            String filename = null;
             if (cl.optIsSet('l'))
             {
                 filename = cl.getOptValue('l');
+            }
+            else if (cl.optIsSet('z'))
+            {
+                filename = "--latest";
             }
             game.loadGame(filename);
         }
         else
         {
             game.newGame(); 
-        }
-    }
-
-    private static void usage(Options opts)
-    {
-        System.out.println("Usage: java -jar Colossus.jar [options]");
-        Iterator it = opts.getOptions().iterator();
-        while (it.hasNext())
-        {
-            Option opt = (Option)it.next();
-            System.out.println(opt.toString());
         }
     }
 }

@@ -27,7 +27,7 @@ public class CommandLineOptionsTest extends TestCase
         args[0] = "-l";
         args[1] = "savegamename";
         Start.main(args);
-        // Need to always have the savegame somewhere.
+        // TODO Need to always have the savegame somewhere.
         fail("Not done yet");
     }
 
@@ -36,7 +36,7 @@ public class CommandLineOptionsTest extends TestCase
         String [] args = new String[9];
         args[0] = "-z";
         Start.main(args);
-        // Need to always have the savegame somewhere.
+        // TODO Need to always have the savegame somewhere.
         fail("Not done yet");
     }
 
@@ -54,6 +54,7 @@ public class CommandLineOptionsTest extends TestCase
         args[1] = "-v";
         args[2] = "Outlands";
         Start.main(args);
+        // TODO Need to implement variant loading.
         fail("Not done yet");
     }
 

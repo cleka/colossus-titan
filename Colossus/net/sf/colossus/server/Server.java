@@ -1434,15 +1434,4 @@ Log.debug("called Server.createSummonAngel for " + legion);
     {
         allSetOption(optname, String.valueOf(value));
     }
-
-    // Allow the primary client (only) to change game options.
-    public void setOption(String playerName, String optname, String value)
-    {
-        if (!playerName.equals(primaryPlayerName))
-        {
-            Log.error("non-primary client tried to set server option");
-            return;
-        }
-        game.setOption(optname, value);
-    }
 }

@@ -145,7 +145,7 @@
 
 <!-- XXX Why does this fail if we set fork to yes? -->
 <!-- TODO Add test suite. -->
-<target name="test" depends="compileAll"
+<target name="test" depends="compileAll,jar"
         description = "Run all unit tests using JUnit">
         <junit printsummary="yes" fork="no" haltonfailure="no">
                 <formatter type="plain"/>

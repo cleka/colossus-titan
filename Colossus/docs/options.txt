@@ -1,0 +1,115 @@
+Colossus options design
+David Ripton  20020314
+
+There are two basic kinds of options in Colossus, client and server.
+
+Pretend that the game is networked.  It's not yet, but that's where 
+we're going soon, and design must revolve around what's best for 
+networking rather than what's best for hotseat or AI games.  Server 
+options are those for the whole game.  They may be ultimately controlled
+by the server operator, but for now the player who starts the game can
+specify them at game start.  Client options are for one client, or one 
+player.  (There is one client per player.  AI players get clients too, 
+even though their clients don't usually display GUIs.)
+
+There are three main ways to set an option: on the command line, with
+a GUI menu, or from a config file.  They should be as orthogonal as
+possible -- it should be possible to set any option in any of these 
+ways.  (Though it's not, yet.)
+
+The command line is a convenient place to set some options to allow
+automated testing, or quick startup for advanced users.  But most 
+endusers will run the game from a GUI or Java Web Start, where 
+command line options are difficult or impossible to set, so any 
+option available on the command line should also be available on a 
+menu.
+
+A config file is a convenient way to reuse earlier option settings.
+We use standard Java Properties files, with filenames 
+Colossus-{playername}.cfg or Colossus-server.cfg   We automatically
+load config files corresponding to the user's name during 
+initialization.  We also have save and load option menu items.
+
+Note that because of multiple ways to start the game (Java Web
+Start versus JRE on command line versus running a local executable 
+jar file from a GUI) it's not always obvious where to look for these
+config files.  Unix has the firm concept of a home directory for 
+each user, Windows has sort of added it over time in a half-assed
+way, but other operating systems may vary.  So the right place to
+look for a config file could be the user's home directory, or the
+Colossus starting directory (if there is one -- consider Java Web 
+Start) or maybe some centralized Java user properties directory.
+So the initial loading of the config file from the expected location 
+may fail, forcing the user to load it manually and traverse the 
+filesystem with the load dialog.  It's possible to hand-edit config 
+files, but we shouldn't expect users to do this, so there should be 
+GUI menus to set all options.
+
+It is very easy for users to view and change boolean options using 
+checkbox menu items.  Options with numeric or string values require 
+slightly more complex GUIs to view or change.  We should add generic
+dialogs for these.  PickScale is a good starting point for the 
+numeric version.
+
+There are two main GUI classes with menus that allow changing options.
+One is GetPlayers, which is used only by the primary client at the
+beginning of the game.  (Some functionality, like setting all of the
+player names from this dialog, will obviously change for networking.)
+The other is MasterBoard, which has menus that stay up for the whole
+game.  (BattleMap also has some menus, but in the interest of 
+simplicity we will not duplicate option setting there.)  Some options, 
+like balanced starting towers and variant, only work if set before the
+game starts.  Others can be varied during the game.
+
+The net.sf.colossus.util.Options class is used (separately) by the
+server and each client.  It actually stores the set of options in
+a Properties, which is in turn backed by a Hashtable of string
+keys to string values.  (Properties predates HashMap.)  So this 
+means that all options are really strings, and we need to do some
+conversion to return them as ints or booleans.  Properties includes
+the interface we use for file saving and loading.
+
+However, command-line options are parsed using the werken.opt 
+package.  It has certain limitations -- for example, each option 
+name can only be used once.  So in the short term, when the server
+and all clients run in the same JVM, we will only support 
+command-line setting of server options.  After the clients are split 
+out into separate JVMs, we can add setting of client options from 
+the command line.
+
+The rule when option settings conflict is that command-line options
+override options loaded from a config file at game start.  Options
+changed on a menu should override anything set earlier on the command 
+line or in a config file.  (If it's not legal to override an option, 
+then the menu control to do so should be missing or grayed -- it
+shouldn't just fail.)
+
+But we want to allow the primary client to override some server 
+options, both with his config file and from menus.  The permissions
+issues to allow this for debugging / player versus the AI but prevent
+cheating in multiplayer become rather complex.  
+
+The simple solution is to never duplicate options between client
+and server sides.  Client options are controlled from the MasterBoard
+menus and Colossus-{playername}.cfg.  Server options are controlled
+from the GetPlayers menus, Colossus-server.cfg, and command-line 
+options.  No server options can be changed in the middle of a game.
+(This is unfortunately inconvenient for some options.)  The player
+cfg files never override the server cfg file.
+
+
+Changes needed:
+
+Remove primary client's ability to set server options after game 
+   start.
+Remove unnecessary server setting of client options.  (isAI() / 
+   autoPlay mapping is needed, but maybe there's a cleaner way.)
+Remove Game options menu from MasterBoard.
+Add all server options to GetPlayers.
+Treat some other choices already in GetPlayers (like variant) as 
+   options.
+Save and load GetPlayers options using Colossus-server.cfg
+Allow setting all server options from command-line and ensure
+   that they're not overridden by automatic config file loading.
+Once this all works, start adding GUI options to the client side, 
+   like remembering window positions and sizes. 

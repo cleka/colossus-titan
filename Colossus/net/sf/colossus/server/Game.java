@@ -56,6 +56,7 @@ public final class Game
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = new Options(Options.optionsServerName);
 
+    // XXX Need to clear cl after initialization is done? 
     private CommandLine cl = null;
 
 
@@ -202,34 +203,24 @@ public final class Game
             String buf = cl.getOptValue('i');
             numAIs = Integer.parseInt(buf);
         }
-        // Try to coerce bogus values into legality. 
-        // Perhaps we should just punt instead?
-        if (numHumans < 0)
+        // Punt if values are bogus.
+        if (numHumans < 0 || numAIs < 0 ||
+            numHumans + numAIs > Constants.MAX_PLAYERS)
         {
-            numHumans = 0;
+            Log.error("Illegal number of players");
+            return playerStuff;
         }
-        if (numHumans > Constants.MAX_PLAYERS)
-        {
-            numHumans = Constants.MAX_PLAYERS;
-        }
-        if (numAIs > Constants.MAX_PLAYERS)
-        {
-            numAIs = Constants.MAX_PLAYERS; 
-        }
-        if (numAIs < 0)
-        {
-            numAIs = 0;
-        }
-        if (numHumans + numAIs > Constants.MAX_PLAYERS)
-        {
-            numAIs = Constants.MAX_PLAYERS - numHumans;
-        }
+
         for (int i = 0; i < numHumans; i++)
         {
-            String name = GetPlayers.byColor + i;
+            String name = null;
             if (i == 0)
             {
                 name = GetPlayers.username;
+            }
+            else
+            {
+                name = GetPlayers.byColor + i;
             }
             playerStuff.add(name + '~' + "Human"); 
         }
@@ -266,7 +257,7 @@ public final class Game
 
         if (playerStuff.isEmpty())
         {
-            // User selected Quit.
+            // Bad input, or user selected Quit.
             dispose();
         }
 

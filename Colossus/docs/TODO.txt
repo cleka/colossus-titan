@@ -1,11 +1,11 @@
 Add JUnit section to build docs.
-Add test target to build.xml.  (Need a test suite first.)
+Document test procedures.
 
 Mention werken.opts in docs.
 Add remaining command-line options.
+Fix unit tests for command-line options.
 
-Change some dialogs to show info in a label instead of the title (so
-   the dialog is wide enough) and add explicit cancel buttons.
+Bug: Fix timing of option loading at start of game.
 
 Bug: 6-AI game, one AI (dripton) showed a SummonAngel dialog rather than
    picking itself.  Loaded autoplay=false from cfg file and overrode isAI()?
@@ -14,6 +14,9 @@ Bug: Undo move with a recruitChit showing, not cleared.
 
 Bug: Still getting excess Acquire dialog, for 6-high legion that earns two
    angels, but angel is not added.
+
+Change some dialogs to show info in a label instead of the title (so
+   the dialog is wide enough) and add explicit cancel buttons.
 
 Add "no 2s or 5s" mulligan option.
 Add optional additional handicap mulligans that can be used after turn 1.
@@ -31,13 +34,6 @@ Put old, new web pages under CVS.
 Switch to new web page.
 
 Include a Colossus.ico file for Windows.
-
-Add command-line options to start a game with N AIs, have the game exit
-   java when done, etc. to support automated testing.  GetOpt package?
-Options to auto quit JVM when game over, auto stop when last human dies.
-
-Document test procedures.
-Add some JUnit tests.
 
 ShowLegion on mouseover, not click, with permanent dialog.
 
@@ -64,7 +60,6 @@ Add display of dead creatures / total creatures / creatures in play to
 
 Reveal all stacks at game end.
 
-
 Write more design docs.
 
 Add SetupBattle dialog, to allow setting up standalone battles.  
@@ -75,6 +70,7 @@ Add SetupBattle dialog, to allow setting up standalone battles.
 Add a ShowLegionMarkers window that shows each player's remaining 
    legion markers.
 
+Finish networked negotiation. 
 Allow players to specify that they automatically refuse to negotiate.  
    Check for this before showing negotiation dialog to opponent.
 
