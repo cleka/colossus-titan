@@ -189,9 +189,6 @@ class Player
 
     void commitMoves()
     {
-        // Wipe out any remaining mulligans.
-        mulligansLeft = 0;
-
         for (int i = 0; i < numLegions; i++)
         {
             legions[i].commitMove();
@@ -217,10 +214,19 @@ class Player
     }
 
 
+    void setMulligansLeft(int number)
+    {
+        mulligansLeft = number;
+    }
+
+
     void rollMovementDie()
     {
         // It's a new turn, so it is again legal to summon an angel.
         canSummonAngel = true;
+
+        // Make sure that all legions are allowed to move and recruit.
+        commitMoves();
 
         movementRoll = (int) Math.ceil(6 * Math.random());
     }
@@ -261,6 +267,21 @@ class Player
     }
 
 
+    void highlightTallLegions()
+    {
+        for (int i = 0; i < numLegions; i++)
+        {
+            Legion legion = legions[i];
+            if (legion.getHeight() >= 7)
+            {
+                MasterHex hex = legion.getCurrentHex();
+                hex.select();
+                hex.repaint();
+            }
+        }
+    }
+
+
     void undoAllSplits()
     {
         for (int i = numLegions - 1; i >= 0; i--)
@@ -276,6 +297,8 @@ class Player
                 }
             }
         }
+
+        highlightTallLegions();
     }
 
 
