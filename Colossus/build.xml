@@ -129,7 +129,8 @@
                     Creature.cre,
                     Default.var,
                     version,
-                    Battlelands/*"
+                    Battlelands/*,
+                    Default/*"
         />
 
         <chmod file="Colossus.jar" perm="755"/>
