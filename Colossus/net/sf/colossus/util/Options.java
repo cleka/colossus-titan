@@ -170,19 +170,16 @@ public final class Options
 
     public void setOption(String optname, String value)
     {
-Log.debug("Options.setOption() (String) " + optname + ", " + value);
         props.setProperty(optname, value);
     }
 
     public void setOption(String optname, boolean value)
     {
-Log.debug("Options.setOption() (boolean) " + optname + ", " + value);
         setOption(optname, String.valueOf(value));
     }
 
     public void setOption(String optname, int value)
     {
-Log.debug("Options.setOption() (int) " + optname + ", " + value);
         setOption(optname, String.valueOf(value));
     }
 

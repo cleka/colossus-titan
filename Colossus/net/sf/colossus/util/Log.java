@@ -137,7 +137,7 @@ public final class Log
         setToRemote(false);
         if (showDebug)
         {
-            out(s.trim());
+            out("- " + s.trim());
         }
         setToWindow(wasToWindow);
         setToRemote(wasToRemote);

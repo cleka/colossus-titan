@@ -1128,7 +1128,7 @@ public final class Client implements IClient
         {
             map.alignChits(hexLabel);
             // Make sure map is visible after summon or muster.
-            map.toFront();
+            focusMap();
         }
     }
 
@@ -1244,7 +1244,7 @@ public final class Client implements IClient
         {
             disposeMasterBoard();
             board = new MasterBoard(this);
-            board.requestFocus();
+            focusBoard();
             Log.setClient(this);
         }
     }
@@ -1291,7 +1291,7 @@ public final class Client implements IClient
         else
         {
             board.deiconify();
-            board.getFrame().toFront();
+            focusBoard();
             summonAngel = SummonAngel.summonAngel(this, markerId);
         }
     }
@@ -1710,8 +1710,7 @@ Log.error("Got nak for strike by " + tag);
             frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
             frame.pack();
             frame.setVisible(true);
-            map.requestFocus();
-            map.getFrame().toFront();
+            focusMap();
         }
     }
 
@@ -1737,7 +1736,7 @@ Log.debug(playerName + " Client.cleanupBattle()");
         {
             if (getPlayerName().equals(getActivePlayerName()))
             {
-                board.getFrame().toFront();
+                focusBoard();
             }
             board.highlightEngagements();
         }
@@ -1964,7 +1963,7 @@ Log.error("Got nak for recruit with " + markerId);
             board.setupSplitMenu();
             if (playerName.equals(getActivePlayerName()))
             {
-                board.getFrame().toFront();
+                focusBoard();
                 board.fullRepaint();
                 board.setCursor(Cursor.getPredefinedCursor(
                     Cursor.DEFAULT_CURSOR));
@@ -2044,7 +2043,7 @@ Log.error("Got nak for recruit with " + markerId);
         {
             if (isMyBattlePhase())
             {
-                map.getFrame().toFront();
+                focusMap();
                 map.setupSummonMenu();
                 map.setCursor(Cursor.getPredefinedCursor(
                     Cursor.DEFAULT_CURSOR));
@@ -2069,7 +2068,7 @@ Log.error("Got nak for recruit with " + markerId);
         {
             if (isMyBattlePhase())
             {
-                map.getFrame().toFront();
+                focusMap();
                 map.setupRecruitMenu();
             }
         }
@@ -2103,7 +2102,7 @@ Log.error("Got nak for recruit with " + markerId);
 
         if (map != null && isMyBattlePhase())
         {
-            map.getFrame().toFront();
+            focusMap();
             map.setupMoveMenu();
         }
         updateStatusScreen();
@@ -2158,7 +2157,7 @@ Log.error("Got nak for recruit with " + markerId);
         {
             if (isMyBattlePhase())
             {
-                map.getFrame().toFront();
+                focusMap();
                 map.setCursor(Cursor.getPredefinedCursor(
                     Cursor.DEFAULT_CURSOR));
             }
@@ -3741,6 +3740,26 @@ Log.error("Got nak for split of " + parentId);
         }
     }
 
+
+    private void focusMap()
+    {
+        if (map == null || chat != null)
+        {
+            return;
+        }
+        map.requestFocus();
+        map.getFrame().toFront();
+    }
+
+    private void focusBoard()
+    {
+        if (board == null || chat != null)
+        {
+            return;
+        }
+        board.requestFocus();
+        board.getFrame().toFront();
+    }
 
 
     class MarkerComparator implements Comparator
