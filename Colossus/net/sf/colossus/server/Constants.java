@@ -91,15 +91,15 @@ public final class Constants
        shortened name directly */
     /* all should be MAX_MAX_PLAYERS long */
     public static final String [] colorNames =
-        {"Black",  "Blue", "Brown", "Gold", "Green", "Red",
-         "Orange", "Purple"};
+        {"Black",  "Blue",   "Brown", "Gold", "Green", "Red",
+         "Orange", "Purple", "Silver"};
     public static final String [] shortColorNames = 
-        {"Bk",     "Bu",   "Br",    "Gd",   "Gr",    "Rd" ,
-         "Or",     "Pu"};
+        {"Bk",     "Bu",     "Br",    "Gd",   "Gr",    "Rd" ,
+         "Or",     "Pu",     "Si"};
     public static final int [] colorMnemonics = {
         KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O,
         KeyEvent.VK_G, KeyEvent.VK_E, KeyEvent.VK_R,
-        KeyEvent.VK_A, KeyEvent.VK_P};
+        KeyEvent.VK_A, KeyEvent.VK_P, KeyEvent.VK_S};
 
     public static final String noShortName = "XX";
     private static final java.util.HashMap shortNamesMap = new HashMap();
@@ -144,7 +144,7 @@ public final class Constants
 
     public static final int DEFAULT_MAX_PLAYERS = 6;
     /* number of available colours/markers */
-    public static final int MAX_MAX_PLAYERS = 8;
+    public static final int MAX_MAX_PLAYERS = 9;
 
     // Player types
     public static final String human = "Human";

@@ -1,0 +1,53 @@
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage{html}
+
+\begin{document}
+
+%$Header$
+
+\title{HOWTO Add A Marker Set to Colossus}
+
+\author{Romain Dolbeau}
+
+\maketitle
+
+\section{Introduction}
+
+This document explains how to add a set of stack markers to Colossus.
+
+\section{Requirements}
+
+To add a new set you'll need to supply:
+
+\begin{itemize}
+
+\item A new Color, preferably one that cannot be confused with any other, and that cannot be confused with the Masterboard Hexes.
+
+\item A two letters identificator for the Color, that cannot be confused with any other (see the file ``net/sf/colossus/server/Constants.java'', the two variables \texttt{colorNames} and \texttt{shortColorNames}). It's better if it's meaningful, as it is displayed to the player(s).
+
+\item A single letter color mnemonic used for Color selection. Must be unique. See again ``net/sf/colossus/server/Constants.java'', array \texttt{colorMnemonics}.
+
+\item Twelve 56x56 GIFs file with a unique name each (see ``net/sf/colossus/server/Legion.java''). Names must be the 2-letter description followed by the number (between 01 and 12), with the \texttt{.gif} extension. They probably can be PNG files with a \texttt{.png} extension.
+
+\end{itemize}
+
+\section{Adding the set}
+
+\begin{enumerate}
+
+\item Add the color to ``net/sf/colossus/util/HTMLColor.java'' as a static member. The name must be the full color name with a ``Colossus'' suffix.
+
+\item Add the color name, short name and mnemonic to ``net/sf/colossus/server/Constants.java'', in the three relevant arrays (\texttt{colorNames}, \texttt{shortColorNames} and \texttt{colorMnemonics}). Note that the order is important : AI will pick up the first 6 colors before all others, and the order must be the same in all three arrays.
+
+\item Add the image files to the ``Default/images/'' directory.
+
+\item Add the names in ``net/sf/colossus/server/Legion.java'' ; each name must be associated to the corresponding short description (2-letter + number) in the \texttt{markerNames} map.
+
+\item Increment the \texttt{MAX\_MAX\_PLAYERS} constants in ``net/sf/colossus/server/Constants.java''.
+
+\end{enumerate}
+
+The Titan Chit is colored on the fly using the color specified in the ``HTMLColor'' file, so you don't have to worry about it.
+
+\end{document}
