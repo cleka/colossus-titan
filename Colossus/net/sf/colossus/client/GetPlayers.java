@@ -43,6 +43,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private JComboBox [] playerTypes = new JComboBox[6];
     private JComboBox [] playerNames = new JComboBox[6];
+    private TextArea readme = null;
 
     /** List of Map.Entry objects that map player names to player types */
     private static java.util.List playerInfo = new ArrayList();
@@ -106,12 +107,19 @@ public final class GetPlayers extends KDialog implements WindowListener,
         Container contentPane = getContentPane();
         GridLayout baseLayout = new GridLayout(0, 1);
         contentPane.setLayout(baseLayout);
+
+        GridBagLayout baseBagLayout = new GridBagLayout();
+        GridBagConstraints baseConstraints = new GridBagConstraints();
+        baseConstraints.fill = baseConstraints.HORIZONTAL;
+        baseConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        //contentPane.setLayout(baseBagLayout);
                 
         for (int i = 0; i < 6; i++)
         {
             Container playerPane = new Container();
             playerPane.setLayout(new GridLayout(0, 3));
             contentPane.add(playerPane);
+            baseBagLayout.setConstraints(playerPane, baseConstraints);
             
             String s = "Player " + (i + 1);
             playerPane.add(new JLabel(s));
@@ -146,7 +154,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
         variantPane.setLayout(new GridLayout(0, 2));
 
         contentPane.add(gamePane);
+        baseBagLayout.setConstraints(gamePane, baseConstraints);
         contentPane.add(variantPane);
+        baseBagLayout.setConstraints(variantPane, baseConstraints);
         
         JButton button1 = new JButton(newGame);
         button1.setMnemonic(KeyEvent.VK_N);
@@ -175,6 +185,17 @@ public final class GetPlayers extends KDialog implements WindowListener,
         variantPane.add(buttonVariant);
         buttonVariant.addActionListener(this);
 
+        Container readmePane = new Container();
+        readmePane.setLayout(new GridLayout(0, 1));
+        readme = new TextArea("", 12, 60, TextArea.SCROLLBARS_VERTICAL_ONLY);
+        readme.setEditable(false);
+        readmePane.add(readme);
+        contentPane.add(readmePane);
+        baseBagLayout.setConstraints(readmePane, baseConstraints);
+
+        readme.setText(VariantSupport.loadVariant(variantArray[0] + ".var",
+                                                  variantArray[0]));
+        
         pack();
 
         centerOnScreen();
@@ -278,7 +299,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         }
     }
 
-    private static void doLoadVariant()
+    private void doLoadVariant()
     {
         javax.swing.JFileChooser varChooser = new JFileChooser(".");
         varChooser.setFileFilter(new varFileFilter());
@@ -289,7 +310,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File varFile = varChooser.getSelectedFile();
-            VariantSupport.loadVariant(varFile);
+            readme.setText(VariantSupport.loadVariant(varFile));
         }
     }
 
@@ -337,7 +358,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
                 { // selecting different ; remove all non-included
                     if (variantBox.getItemCount() > variantArray.length)
                         variantBox.removeItemAt(variantArray.length);
-                    VariantSupport.loadVariant(value + ".var", value);
+                    readme.setText(VariantSupport.loadVariant(value + ".var", value));
                 }
             }
             else

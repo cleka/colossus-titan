@@ -25,20 +25,23 @@ public final class VariantSupport
     /**
      * Load a Colossus Variant from the specified File
      * @param varFile The File to load as a Variant.
+     * @return A String describing the variant.
      */
-    public static void loadVariant(java.io.File varFile)
+    public static String loadVariant(java.io.File varFile)
     {
         String tempVarName = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
-        loadVariant(tempVarName, tempVarDirectory);
+        return loadVariant(tempVarName, tempVarDirectory);
     }
     /**
      * Load a Colossus Variant from the specified filename in the specified path.
      * @param tempVarName The name of the file holding the Variant definition.
      * @param tempVarDirectory The path to the directory holding the Variant.
+     * @return A String describing the variant.
      */
-    public static void loadVariant(String tempVarName, String tempVarDirectory)
+    public static String loadVariant(String tempVarName, String tempVarDirectory)
     {
+        String readme = "This variant doesn't have a README file";
         Log.debug("Loading variant " + tempVarName +
                   ", data files in " + tempVarDirectory);
         try
@@ -99,6 +102,26 @@ public final class VariantSupport
                     dependUpon = null;
                 }
             }
+            directories = new java.util.ArrayList();
+            directories.add(tempVarDirectory);
+            InputStream readmeIS = ResourceLoader.getInputStream("README",
+                                                                 directories);
+            if (readmeIS != null)
+            {
+                char[] buffer = new char[128];
+                StringBuffer sbuf = new StringBuffer();
+                InputStreamReader readmeISR = new InputStreamReader(readmeIS);
+                int read = 0;
+                while (read != -1)
+                {
+                    read = readmeISR.read(buffer, 0, 128);
+                    if (read != -1)
+                    {
+                        sbuf.append(buffer, 0, read);
+                    }
+                }
+                readme = sbuf.toString();
+            }
         }
         catch (Exception e) 
         {
@@ -109,6 +132,7 @@ public final class VariantSupport
             recruitName = Constants.defaultTERFile;
             creaturesName = Constants.defaultCREFile;
         }
+        return readme;
     }
 
     public static String getVarDirectory()
