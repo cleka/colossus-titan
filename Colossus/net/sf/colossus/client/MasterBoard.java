@@ -732,7 +732,7 @@ public final class MasterBoard extends JPanel
     }
 
     private static void readMapData()
-            throws Exception
+        throws Exception
     {
         java.util.List directories = VariantSupport.getVarDirectoriesList();
         InputStream mapIS = ResourceLoader.getInputStream(
@@ -1783,6 +1783,10 @@ public final class MasterBoard extends JPanel
     {
         switch (client.getPhase())
         {
+            case Constants.SPLIT:
+                highlightTallLegions();
+                break;
+
             // If we're moving, and have selected a legion which
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
