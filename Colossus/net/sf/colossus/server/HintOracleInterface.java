@@ -13,6 +13,7 @@ public interface HintOracleInterface
 
     public int creatureAvailable(String name); // how many in caretaker
     public int stackHeight(); // height of the Stack/Legion
+    public int biggestAttackerHeight(); // height of the bigger [height-wise] legion that can attack the Stack/Legion - 0 if none can attack.
 
     public String hexLabel(); // label of the (master)hex
 }

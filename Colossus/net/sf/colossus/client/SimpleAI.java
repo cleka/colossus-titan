@@ -1831,6 +1831,8 @@ public class SimpleAI implements AI
         LegionInfo legion;
         MasterHex hex;
         List recruits;
+        Map[] enemyAttackMap = null;
+
         SimpleAIOracle(LegionInfo legion,
                        MasterHex hex,
                        List recruits)
@@ -1838,6 +1840,7 @@ public class SimpleAI implements AI
             this.legion = legion;
             this.hex = hex;
             this.recruits = recruits;
+            
         }
 
         public boolean canReach(char t)
@@ -1863,6 +1866,33 @@ public class SimpleAI implements AI
         public String hexLabel()
         {
             return hex.getLabel();
+        }
+        public int biggestAttackerHeight()
+        {
+            if (enemyAttackMap == null)
+            {
+                enemyAttackMap =
+                    buildEnemyAttackMap(
+                        client.getPlayerInfo(client.getPlayerName()));
+            }
+            int worst = 0;
+            for (int i = 1; i < 6 ; i++)
+            {
+                List enemyList = (List)enemyAttackMap[i].get(legion.getHexLabel());
+                if (enemyList != null)
+                {
+                    Iterator it = enemyList.iterator();
+                    while (it.hasNext())
+                    {
+                        LegionInfo enemy = (LegionInfo)it.next();
+                        if (enemy.getHeight() > worst)
+                        {
+                            worst = enemy.getHeight();
+                        }
+                    }
+                }
+            }
+            return worst;
         }
     }
 

@@ -337,6 +337,31 @@ public class AIHintLoader
         }
     }
 
+    private class ConditionTreeNode_AllAttackerSmallerThan extends ConditionTreeNode_Leaf
+    {
+        int h;
+        
+        public ConditionTreeNode_AllAttackerSmallerThan(int h)
+        {
+            super();
+            this.h = h;
+        }
+        
+        public boolean isTrue()
+        {
+            if (oracle != null)
+            {
+                return (oracle.biggestAttackerHeight() <= h);
+            }
+            return true;
+        }
+        
+        public String toString()
+        {
+            return "( no attacker is bigger than size " + h + " )";
+        }
+    }
+
     private class ConditionTreeNode_Random extends ConditionTreeNode_Leaf
     {
         double p;
@@ -574,6 +599,7 @@ TOKEN :
 |   < CANRECRUIT : "CANRECRUIT" >
 |   < LABELIS : "LABELIS" >
 |   < AVAILABLE : "AVAILABLE" >
+|   < ALLATTACKERSMALLERTHAN : "ALLATTACKERSMALLERTHAN" >
 |   < RANDOM : "RANDOM" >
 |   < OR : "OR" >
 |   < AND : "AND" >
@@ -764,6 +790,10 @@ void h_recruit_leaf() :
 |   <LABELIS> (name = h_chaine())
     {
         argStack.push(new ConditionTreeNode_LabelIs(name));
+    }
+|   <ALLATTACKERSMALLERTHAN> (n = h_number())
+    {
+        argStack.push(new ConditionTreeNode_AllAttackerSmallerThan(n));
     }
 |   "(" h_recruit_ornode() ")"
 }

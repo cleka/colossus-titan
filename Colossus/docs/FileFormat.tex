@@ -230,6 +230,7 @@ and $\langle$optional\_condition$\rangle$ is an optional condition builded with 
 \item \texttt{( CANRECRUIT $\langle$creature\_name$\rangle$ )} : The stack can also recruit the creature $\langle$creature\_name$\rangle$.
 \item \texttt{( HEIGHTIS $\langle$number$\rangle$ )} : The stack is exactly $\langle$number$\rangle$ in height.
 \item \texttt{( LABELIS $\langle$hex\_label$\rangle$ )} : The stack is in hex $\langle$hex\_label$\rangle$.
+\item \texttt{( ALLATTACKERSMALLERTHAN $\langle$number$\rangle$ )} : The stack cannot by attacked by a stack more (strictly) than $\langle$number$\rangle$ in height. A value of 0 means that no enemy stack can attack.
 \end{itemize}
 
 If the recruitee's name is ``nothing'' or ``Nothing'', then the hint suggest not recruiting there.
