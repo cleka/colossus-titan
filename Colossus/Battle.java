@@ -541,6 +541,11 @@ public final class Battle
                 game.getServer().allPlaceNewChit(newCritter, true);
             }
         }
+        // Bring the BattleMap back to the front.
+        game.getServer().allShowBattleMap();
+
+        // Always returns true, because we always want to advance to
+        // the next phase.  (Unless we decide to support undo?)
         return true;
     }
 
@@ -1893,7 +1898,7 @@ public final class Battle
 
 
     /** Return a list of all critters in the battle. */
-    public ArrayList getAllCritters()
+    private ArrayList getAllCritters()
     {
         ArrayList critters = new ArrayList();
         Legion defender = getDefender();

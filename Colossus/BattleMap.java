@@ -443,31 +443,40 @@ public final class BattleMap extends HexMap implements MouseListener,
         GUIBattleHex hex = getGUIHexByLabel(hexLabel);
         ArrayList critters = battle.getCritters(hexLabel);
         int numCritters = critters.size();
+        if (numCritters < 1)
+        {
+            hex.repaint();
+            return;
+        }
+        Critter critter = (Critter)critters.get(0);
+        BattleChit chit = client.getBattleChit(critter.getTag());
+        if (chit == null)
+        {
+            hex.repaint();
+            return;
+        }
+        int chitscale = chit.getBounds().width;
+        int chitscale4 = chitscale / 4;
+
         Point point = new Point(hex.findCenter());
 
-        if (!hex.isEntrance() && numCritters > 1)
-        {
-            // The AI sometimes pretends two critters share a hex
-            // for a while.  Don't paint that.
-            numCritters = 1;
-        }
-
         // Cascade chits diagonally.
-        int chitScale4 = Scale.get();
-        int offset = (4 * Scale.get() * (1 + (numCritters))) / 4;
+        int offset = ((chitscale * (1 + numCritters))) / 4;
         point.x -= offset;
         point.y -= offset;
 
-        for (int i = 0; i < numCritters; i++)
+        chit.setLocation(point);
+
+        for (int i = 1; i < numCritters; i++)
         {
-            Critter critter = (Critter)critters.get(i);
-            BattleChit chit = client.getBattleChit(critter.getTag());
+            point.x += chitscale4;
+            point.y += chitscale4;
+            critter = (Critter)critters.get(i);
+            chit = client.getBattleChit(critter.getTag());
             if (chit != null)
             {
                 chit.setLocation(point);
             }
-            point.x += chitScale4;
-            point.y += chitScale4;
         }
         hex.repaint();
     }
@@ -695,14 +704,12 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        // Draw chits from back to front.
-        ArrayList critters = battle.getAllCritters();
-        ListIterator lit = critters.listIterator(critters.size());
+        ArrayList battleChits = client.getBattleChits();
+        ListIterator lit = battleChits.listIterator(battleChits.size());
         while (lit.hasPrevious())
         {
-            Critter critter = (Critter)lit.previous();
-            BattleChit chit = client.getBattleChit(critter.getTag());
-            if (chit != null && rectClip.intersects(chit.getBounds()))
+            BattleChit chit = (BattleChit)lit.previous();
+            if (rectClip.intersects(chit.getBounds()))
             {
                 chit.paintComponent(g);
             }

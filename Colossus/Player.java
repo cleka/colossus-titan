@@ -17,7 +17,8 @@ public final class Player implements Comparable
     private boolean summoned;
     private boolean teleported;
     private String playersEliminated;  // RdBkGr
-    private int mulligansLeft = 1;
+// XXX DEBUG XXX FIXME XXX
+private int mulligansLeft = 99;
     private int movementRoll;          // 0 if movement has not been rolled.
     private ArrayList legions = new ArrayList();
     private boolean dead;

@@ -2451,8 +2451,9 @@ public final class Game
         engagementInProgress = false;
         battleInProgress = false;
         summoningAngel = false;
-        aiSetupEngagements();
         server.allUpdateStatusScreen();
+        server.allHighlightEngagements();
+        aiSetupEngagements();
     }
 
 
@@ -2814,6 +2815,8 @@ public final class Game
         // defender flees or the attacker concedes before entering
         // the battle.
         engagementInProgress = false;
+        server.allUpdateStatusScreen();
+        server.allHighlightEngagements();
         aiSetupEngagements();
     }
 
@@ -2941,6 +2944,8 @@ public final class Game
             }
         }
         engagementInProgress = false;
+        server.allUpdateStatusScreen();
+        server.allHighlightEngagements();
         aiSetupEngagements();
     }
 

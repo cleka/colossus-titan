@@ -635,7 +635,7 @@ public final class Client
     }
 
 
-    public List getBattleChits()
+    public ArrayList getBattleChits()
     {
         return battleChits;
     }
@@ -809,8 +809,14 @@ public final class Client
     public void doSummon(Legion legion, Legion donor, Creature angel)
     {
         server.getGame().doSummon(legion, donor, angel);
-        //XXX Should just repaint donor and legion hexes, not the whole map.
-        board.repaint();
+
+        String hexLabel = legion.getCurrentHexLabel();
+        GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+        hex.repaint();
+        hexLabel = donor.getCurrentHexLabel();
+        hex = board.getGUIHexByLabel(hexLabel);
+        hex.repaint();
+
         summonAngel = null;
         board.highlightEngagements();
     }
@@ -1060,7 +1066,10 @@ public final class Client
 
     public void highlightEngagements()
     {
-        board.highlightEngagements();
+        if (board != null)
+        {
+            board.highlightEngagements();
+        }
     }
 
 

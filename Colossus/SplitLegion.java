@@ -210,7 +210,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
-    private void performSplit()
+    private void returnSplitResults()
     {
         StringBuffer buf = new StringBuffer(newMarker.getId());
         Iterator it = newChits.iterator();
@@ -218,7 +218,12 @@ public final class SplitLegion extends JDialog implements MouseListener,
         {
             buf.append(",");
             Chit chit = (Chit)it.next();
-            buf.append(chit.getId());
+            String creatureName = chit.getId();
+            if (creatureName.startsWith("Titan"))
+            {
+                creatureName = "Titan";
+            }
+            buf.append(creatureName);
         }
         results = buf.toString();
         dispose();
@@ -298,7 +303,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
             {
                 return;
             }
-            performSplit();
+            returnSplitResults();
         }
         else if (e.getActionCommand().equals("Cancel"))
         {
@@ -309,11 +314,6 @@ public final class SplitLegion extends JDialog implements MouseListener,
 
     public static void main(String [] args)
     {
-        JFrame frame = new JFrame("testing SplitLegion");
-        int scale = Scale.get();
-        frame.pack();
-        frame.setVisible(true);
-
         Game game = new Game();
         game.addPlayer("Test");
         Player player = game.getPlayer(0);
@@ -324,11 +324,12 @@ public final class SplitLegion extends JDialog implements MouseListener,
         Legion legion = Legion.getStartingLegion(selectedMarkerId,
             "130", player.getName(), game);
         player.addLegion(legion);
-        Client client = new Client();
-        client.addMarker(selectedMarkerId);
+
+        game.initBoard();
 
         selectedMarkerId = player.selectMarkerId("Rd02");
 
+        Client client = game.getServer().getClient(player.getName());
         String retval = SplitLegion.splitLegion(client, legion,
             selectedMarkerId);
 
