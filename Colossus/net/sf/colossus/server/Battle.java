@@ -904,13 +904,16 @@ Log.debug("Called Battle.doneReinforcing()");
                 donor = player.getDonor();
                 if (donor != null)
                 {
-                    Log.error("Null donor in Battle.cleanupOneDeadCritter()");
                     donor.addCreature(critter.getCreature(), false);
                     server.allTellAddCreature(donor.getMarkerId(), 
                         critter.getName());
                     // This summon doesn't count; the player can
                     // summon again later this turn.
                     player.setSummoned(false);
+                }
+                else
+                {
+                    Log.error("Null donor in Battle.cleanupOneDeadCritter()");
                 }
             }
             else
@@ -940,7 +943,8 @@ Log.debug("Called Battle.doneReinforcing()");
 
         // If an angel or archangel was returned to its donor instead of 
         // the stack, then don't put it back on the stack.
-        legion.prepareToRemoveCritter(critter, 
+        // XXX Buggy?
+        legion.prepareToRemoveCritter(critter,
             (donor == null || !critter.isSummonable()));
 
         if (critter.isTitan())

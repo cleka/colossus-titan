@@ -98,7 +98,7 @@ public final class Legion implements Comparable
         // after legion creation.
         if (getHeight() == 8)
         {
-            revealAllCreatures();
+            game.getServer().allRevealLegion(this);
         }
     }
 
@@ -456,17 +456,22 @@ public final class Legion implements Comparable
     }
 
     /** Eliminate this legion. */
-    void remove()
+    void remove(boolean returnCrittersToStacks)
     {
-        prepareToRemove();
+        prepareToRemove(returnCrittersToStacks);
         if (getPlayer() != null)
         {
             getPlayer().removeLegion(this);
         }
     }
 
+    void remove()
+    {
+        remove(true);
+    }
+
     /** Do the cleanup required before this legion can be removed. */
-    void prepareToRemove()
+    void prepareToRemove(boolean returnCrittersToStacks)
     {
         // XXX Use critters.toString() rather than doing it manually.
         StringBuffer log = new StringBuffer("Legion ");
@@ -486,13 +491,16 @@ public final class Legion implements Comparable
                 {
                     log.append(", ");
                 }
-                if (critter.isImmortal())
+                if (returnCrittersToStacks)
                 {
-                    game.getCaretaker().putOneBack(critter.getCreature());
-                }
-                else
-                {
-                    game.getCaretaker().putDeadOne(critter.getCreature());
+                    if (critter.isImmortal() && !critter.isTitan())
+                    {
+                        game.getCaretaker().putOneBack(critter.getCreature());
+                    }
+                    else
+                    {
+                        game.getCaretaker().putDeadOne(critter.getCreature());
+                    }
                 }
             }
             log.append("] ");
@@ -507,6 +515,11 @@ public final class Legion implements Comparable
         {
             getPlayer().addLegionMarker(getMarkerId());
         }
+    }
+
+    void prepareToRemove()
+    {
+        prepareToRemove(true);
     }
 
 
@@ -710,7 +723,7 @@ public final class Legion implements Comparable
         // If the creature is an immortal, put it back in the stacks.
         if (returnImmortalToStack)
         {
-            if(critter.isImmortal())
+            if (critter.isImmortal())
             {
                 game.getCaretaker().putOneBack(critter.getCreature());
             }
@@ -723,7 +736,7 @@ public final class Legion implements Comparable
         // If there are no critters left, disband the legion.
         if (disbandIfEmpty && getHeight() == 0)
         {
-            remove();
+            remove(false);
         }
         // return a Creature, not a Critter
         return critter.getCreature();
@@ -753,28 +766,21 @@ public final class Legion implements Comparable
     /** Do the cleanup associated with removing the critter from this
      *  legion.  Do not actually remove it, to prevent comodification
      *  errors.  Do not disband the legion if empty, since the critter
-     *  has not actually been removed. Return the critter if present. */
-    Creature prepareToRemoveCritter(Critter critter, boolean
-        returnImmortalToStack)
+     *  has not actually been removed. */
+    void prepareToRemoveCritter(Critter critter, boolean
+        returnToStacks)
     {
         if (critter == null || !critters.contains(critter))
         {
-            return null;
+            Log.error("Called prepareToRemoveCritter with bad critter");
+            return;
         }
-        // If the creature is an immortal, put it back in the stacks,
-        // else put it in the Graveyard
-        if (returnImmortalToStack)
+        // Put even immortal creatures in the graveyard; they will be
+        // pulled back out after the battle.
+        if (returnToStacks)
         {
-            if(critter.isImmortal())
-            {
-                game.getCaretaker().putOneBack(critter.getCreature());
-            }
-            else
-            {
-                game.getCaretaker().putDeadOne(critter.getCreature());
-            }
+            game.getCaretaker().putDeadOne(critter.getCreature());
         }
-        return critter.getCreature();
     }
 
 
@@ -878,14 +884,7 @@ public final class Legion implements Comparable
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-
             legion.addCreature(critter.getCreature(), false);
-
-            // Keep removeLegion() from returning immortals to stacks.
-            if (critter.isImmortal())
-            {
-                game.getCaretaker().takeOne(critter.getCreature());
-            }
         }
 
         // Let the client know that the legions have recombined.
@@ -894,11 +893,11 @@ public final class Legion implements Comparable
 
         if (remove)
         {
-            remove();
+            remove(false);
         }
         else
         {
-            prepareToRemove();
+            prepareToRemove(false);
         }
 
         Log.event("Legion " + getLongMarkerName() +
@@ -952,16 +951,6 @@ public final class Legion implements Comparable
         game.getServer().allTellLegionLocation(newMarkerId);
 
         return newLegion;
-    }
-
-
-    void revealAllCreatures()
-    {
-        Server server = game.getServer();
-        if (server != null)
-        {
-            server.allRevealLegion(this);
-        }
     }
 
 

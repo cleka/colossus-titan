@@ -275,6 +275,8 @@ public final class Constants
     //public static final String saveGame = "saveGame";
 
     // From server to client
+    public static final String tellEngagement = "tellEngagement";
+    public static final String tellEngagementResults = "tellEngagementResults";
     public static final String tellMovementRoll = "tellMovementRoll";
     public static final String setOption = "setOption";
     public static final String updatePlayerInfo = "updatePlayerInfo";

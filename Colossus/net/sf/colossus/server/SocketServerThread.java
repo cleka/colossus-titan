@@ -321,6 +321,20 @@ final class SocketServerThread extends Thread implements IClient
         return playerName;
     }
 
+    public void tellEngagement(String hexLabel, String attackerId, 
+        String defenderId)
+    {
+        out.println(Constants.tellEngagement + sep + hexLabel + sep +
+            attackerId + sep + defenderId);
+    }
+
+    public void tellEngagementResults(String winnerId, String method, 
+        int points)
+    {
+        out.println(Constants.tellEngagementResults + sep + winnerId + sep +
+            method + sep + points);
+    }
+
     public void tellMovementRoll(int roll)
     {
         out.println(Constants.tellMovementRoll + sep + roll);

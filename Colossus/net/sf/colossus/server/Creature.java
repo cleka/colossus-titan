@@ -43,7 +43,7 @@ public class Creature implements Comparable
     private final boolean summonable;
     private final boolean lord;
     private final boolean demilord;
-    private final int maxCount;
+    private int maxCount;  // Not final because we adjust for titans.
     private final String baseColor;
     private static boolean noBaseColor = false;
 
@@ -173,6 +173,12 @@ public class Creature implements Comparable
         return maxCount;
     }
 
+    /** Only called on Titans after numPlayers is known. */
+    void setMaxCount(int maxCount)
+    {
+        this.maxCount = maxCount;
+    }
+
     public boolean isLord()
     {
         return lord;
@@ -196,10 +202,9 @@ public class Creature implements Comparable
     public boolean isTitan()
     {
         return name.equals(Constants.titan);
-
     }
 
-    /* the name is an unique identifier and must not be changed,
+    /* The name is an unique identifier and must not be changed,
        so this function is final */
     public final String getName()
     {
@@ -221,11 +226,11 @@ public class Creature implements Comparable
         return name;
     }
 
-    public String[] getImagesNames()
+    public String[] getImageNames()
     {
         if (isTitan())
         {
-            Log.warn("Calling getImagesNames() for Titan, this is broken.");
+            Log.warn("Calling getImageNames() for Titan, this is broken.");
         }
         String[] tempNames;
         if (baseColor != null)

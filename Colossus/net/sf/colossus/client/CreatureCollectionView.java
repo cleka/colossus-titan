@@ -188,8 +188,9 @@ class CreatureCollectionView extends KDialog implements WindowListener
                                                ") count for creature " + name);
                 }
                 
-                boolean immortal =
-                    Creature.getCreatureByName(name).isImmortal();
+                boolean immortal = false;
+                    // Creature.getCreatureByName(name).isImmortal() &&
+                    // !Creature.getCreatureByName(name).isTitan();
                 String color;
                 if (count == 0)
                 {

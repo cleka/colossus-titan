@@ -14,6 +14,12 @@ public interface IClient
     // Not in network protocol
     public String getPlayerName();
 
+    public void tellEngagement(String hexLabel, String attackerId, 
+        String defenderId);
+
+    public void tellEngagementResults(String winnerId, String method,
+        int points);
+
     public void tellMovementRoll(int roll);
 
     public void setOption(String optname, String value);

@@ -43,7 +43,7 @@ public final class Client implements IClient
     private MovementDie movementDie;
     private Chat chat;
 
-    /** hexLabel of MasterHex for current or last battle. */
+    /** hexLabel of MasterHex for current or last engagement. */
     private String battleSite;
     private BattleMap map;
     private BattleDice battleDice;
@@ -75,7 +75,7 @@ public final class Client implements IClient
     /** Last movement roll for any player. */
     private int movementRoll = -1;
 
-    /** the parent frame for secondaries windows */
+    /** the parent frame for secondary windows */
     private JFrame secondaryParent = null;
 
     // XXX Should be per player
@@ -152,7 +152,8 @@ public final class Client implements IClient
         sct.start();
 
         TerrainRecruitLoader.setCaretakerInfo(caretakerInfo);
-        net.sf.colossus.server.CustomRecruitBase.addCaretakerInfo(caretakerInfo);
+        net.sf.colossus.server.CustomRecruitBase.addCaretakerInfo(
+            caretakerInfo);
     }
 
     boolean isRemote()
@@ -219,6 +220,29 @@ public final class Client implements IClient
     void fight(String land)
     {
         server.fight(land);
+    }
+
+
+    public void tellEngagement(String hexLabel, String attackerId, 
+        String defenderId)
+    {
+        this.battleSite = hexLabel;
+        this.attackerMarkerId = attackerId;
+        this.defenderMarkerId = defenderId;
+    }
+
+
+    public void tellEngagementResults(String winnerId, String method,
+        int points)
+    {
+        JFrame frame = getMapOrBoardFrame();
+        if (frame == null)
+        {
+            return;
+        }
+
+        EngagementResults er = new EngagementResults(frame, this, winnerId,
+            method, points);
     }
 
 
@@ -1382,14 +1406,8 @@ public final class Client implements IClient
     }
 
 
-    public void showMessageDialog(String message)
+    private JFrame getMapOrBoardFrame()
     {
-        // Don't bother showing messages to AI players.  Perhaps we
-        // should log them.
-        if (getOption(Options.autoPlay))
-        {
-            return;
-        }
         JFrame frame = null;
         if (map != null)
         {
@@ -1399,6 +1417,19 @@ public final class Client implements IClient
         {
             frame = board.getFrame();
         }
+        return frame;
+    }
+
+
+    public void showMessageDialog(String message)
+    {
+        // Don't bother showing messages to AI players.  Perhaps we
+        // should log them.
+        if (getOption(Options.autoPlay))
+        {
+            return;
+        }
+        JFrame frame = getMapOrBoardFrame();
         if (frame != null)
         {
             JOptionPane.showMessageDialog(frame, message);
@@ -2746,7 +2777,7 @@ Log.error("Got nak for move of " + tag);
 
     public void nakMove(String markerId)
     {
-Log.error("Got nak for move of " + markerId);
+        Log.error("Got nak for move of " + markerId);
     }
 
     public void undidMove(String markerId, String formerHexLabel,

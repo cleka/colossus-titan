@@ -104,8 +104,8 @@ public final class Caretaker implements Cloneable
         if (count == null)
         {
             Log.event("First " + creature.getName() + " recruited");
-            map.put(creature.getName(), new Integer(creature.getMaxCount() - 
-                1));
+            map.put(creature.getName(), new Integer(
+                creature.getMaxCount() - 1));
         }
         else
         {
@@ -197,6 +197,29 @@ public final class Caretaker implements Cloneable
         // because String and Integer are both immutable, a shallow copy is
         // the same as a deep copy
         newCaretaker.map = (HashMap)map.clone();
+        newCaretaker.deadMap = (HashMap)deadMap.clone();
         return newCaretaker;
+    }
+
+
+    /** Move dead non-Titan immortals back to stacks. */
+    void resurrectImmortals()
+    {
+        Iterator it = Creature.getCreatures().iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            if (creature.isImmortal() && !creature.isTitan())
+            {
+                String name = creature.getName();
+                int dead = getDeadCount(name);
+                if (dead > 0)
+                {
+                    int live = getCount(name);
+                    setCount(name, live + dead);
+                    setDeadCount(name, 0);
+                }
+            }
+        }
     }
 }

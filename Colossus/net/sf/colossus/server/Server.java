@@ -596,6 +596,17 @@ Log.debug("Called Server.addClient() for " + playerName);
         }
     }
 
+
+    void allTellEngagementResults(String winnerId, String method, int points)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = (IClient)it.next();
+            client.tellEngagementResults(winnerId, method, points);
+        }
+    }
+
     void nextEngagement()
     {
         IClient client = getClient(game.getActivePlayerName());
@@ -768,6 +779,17 @@ Log.debug("Called Server.addClient() for " + playerName);
             return;
         }
         game.engage(hexLabel);
+    }
+
+    void allTellEngagement(String hexLabel, Legion attacker, Legion defender)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = (IClient)it.next();
+            client.tellEngagement(hexLabel, attacker.getMarkerId(), 
+                defender.getMarkerId());
+        }
     }
 
 

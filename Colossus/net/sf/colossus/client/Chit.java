@@ -92,7 +92,7 @@ class Chit extends JPanel
         else
         {
             Creature cre = Creature.getCreatureByName(id);
-            icon = getImageIcon(cre.getImagesNames());
+            icon = getImageIcon(cre.getImageNames());
         }
     }
 

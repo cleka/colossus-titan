@@ -949,9 +949,9 @@ final class Critter /* extends Creature */ implements Comparable
         return creature.getDisplayName();
     }
 
-    public String[] getImagesNames()
+    public String[] getImageNames()
     {
-        return creature.getImagesNames();
+        return creature.getImageNames();
     }
 
     public int getSkill()

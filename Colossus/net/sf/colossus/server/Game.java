@@ -117,6 +117,8 @@ public final class Game
         }
         // No longer need the player name and type options. 
         options.clearPlayerInfo();
+
+        Creature.getCreatureByName("Titan").setMaxCount(getNumPlayers());
     }
 
     /** Start a new game. */
@@ -797,7 +799,7 @@ public final class Game
             dispose();
         }
         player.resetTurnState();
-        server.allFullyUpdateLegionHeights();  // XXX Bug workaround
+        server.allFullyUpdateOwnLegionContents();  // XXX Bug workaround
         server.allSetupSplit();
 
         // XXX Is this causing double advances?
@@ -1060,7 +1062,7 @@ public final class Game
 
     void autoSave()
     {
-        if (getOption(Options.autosave))
+        if (getOption(Options.autosave) && !isOver())
         {
             saveGame(null);
         }
@@ -2226,7 +2228,7 @@ public final class Game
             Legion legion = getFirstLegion(hexLabel);
 
             // Make all creatures in the victorious legion visible.
-            legion.revealAllCreatures();
+            server.allRevealLegion(legion);
             // Remove battle info from legion and its creatures.
             legion.clearBattleInfo();
 
@@ -2251,6 +2253,9 @@ public final class Game
         }
         engagementInProgress = false;
         battleInProgress = false;
+
+        caretaker.resurrectImmortals();
+
         server.allUpdatePlayerInfo();
         if (!summoning && !reinforcing && !acquiring)
         {
@@ -2508,6 +2513,8 @@ public final class Game
             Legion attacker = getFirstFriendlyLegion(hexLabel, player);
             Legion defender = getFirstEnemyLegion(hexLabel, player);
 
+            server.allTellEngagement(hexLabel, attacker, defender);
+
             attacker.sortCritters();
             defender.sortCritters();
 
@@ -2674,8 +2681,8 @@ public final class Game
             battleInProgress = true;
 
             // Reveal both legions to all players.
-            attacker.revealAllCreatures();
-            defender.revealAllCreatures();
+            server.allRevealLegion(attacker);
+            server.allRevealLegion(defender);
 
             battle = new Battle(this, attacker.getMarkerId(),
                         defender.getMarkerId(), Constants.DEFENDER, hexLabel,
