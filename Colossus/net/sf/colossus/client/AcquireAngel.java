@@ -65,8 +65,8 @@ final class AcquireAngel extends KDialog implements MouseListener,
 
         pack();
         numberOpen++;
-        centerOnScreen(basicXOffset * (numberOpen - 1),
-                       basicYOffset * (numberOpen - 1));
+        centerOnScreen(basicXOffset * numberOpen,
+                       basicYOffset * numberOpen);
         setVisible(true);
         repaint();
     }
