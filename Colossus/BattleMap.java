@@ -54,9 +54,6 @@ public class BattleMap extends Frame implements MouseListener,
     // Swamp, Tower, tundra, Woods
     private char terrain;
 
-    private int attackerPoints = 0;
-    private int defenderPoints = 0;
-
     private boolean chitSelected = false;
     private int carryDamage = 0;
 
@@ -167,6 +164,9 @@ public class BattleMap extends Frame implements MouseListener,
         imagesLoaded = true;
 
         turn = new BattleTurn(this, this, attacker, defender);
+
+        attacker.clearBattleTally();
+        defender.clearBattleTally();
 
         setVisible(true);
         repaint();
@@ -1337,11 +1337,11 @@ public class BattleMap extends Frame implements MouseListener,
 
                 else if (legion == attacker)
                 {
-                    defenderPoints += critter.getPointValue();
+                    defender.addToBattleTally(critter.getPointValue());
                 }
                 else
                 {
-                    attackerPoints += critter.getPointValue();
+                    attacker.addToBattleTally(critter.getPointValue());
 
                     // Chits left offboard do not trigger angel summoning.
                     if (summonState == NO_KILLS &&
@@ -1409,7 +1409,7 @@ public class BattleMap extends Frame implements MouseListener,
             }
             else
             {
-                defender.addPoints(defenderPoints);
+                defender.addBattleTallyToPoints();
             }
             attacker.getPlayer().die(defender.getPlayer(), true);
             cleanup();
@@ -1422,7 +1422,7 @@ public class BattleMap extends Frame implements MouseListener,
             }
             else
             {
-                attacker.addPoints(defenderPoints);
+                attacker.addBattleTallyToPoints();
             }
             defender.getPlayer().die(attacker.getPlayer(), true);
             cleanup();
@@ -1439,13 +1439,13 @@ public class BattleMap extends Frame implements MouseListener,
         // Check for single legion elimination.
         else if (attackerElim)
         {
-            defender.addPoints(defenderPoints);
+            defender.addBattleTallyToPoints();
             attacker.removeLegion();
             cleanup();
         }
         else if (defenderElim)
         {
-            attacker.addPoints(attackerPoints);
+            attacker.addBattleTallyToPoints();
             defender.removeLegion();
             cleanup();
         }
