@@ -8,20 +8,18 @@
 #    get converted to spaces.
 
 # Java compiler
-# jikes is really fast.  It supports -depend so all
-#    dependent objects will be recompiled when you change one.  But
-#    the jswat debugger has problems running its class files.  And jikes
-#    has problems compiling some code that javac accepts.  If you have a
-#    slow box you might want to use jikes during development cycles then
-#    recompile with javac before check-in.
-# javac is the standard; use it if you don't have jikes.  Sun has removed
-#    the -depend/-Xdepend option from javac in JDK 1.3, so be careful to
-#    manually recompile dependent classes when necessary.
+# jikes is really fast. But its depend option is broken (use Javamake)
+#    And the jswat debugger has problems running its class files.  And 
+#    jikes has problems compiling some code that javac accepts.  If you 
+#    have a slow box you might want to use jikes during most development 
+#    cycles then recompile with javac before check-in.
+# javac is the standard.
 # kjc comes with kaffe.  I like its --warning option.
 
 #JCC = jikes -g -depend -deprecation +P
-JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.2
+JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.3
 #JCC = kjc -g --deprecation --warning
+
 
 # JavaCC converts .jj parser description files to .java source
 # JavaCC 2.1 is available from 

@@ -4,10 +4,10 @@ package net.sf.colossus.server;
 import java.util.*;
 import javax.swing.*;
 
-import net.sf.colossus.util.Log;
 import com.werken.opt.Options;
 import com.werken.opt.Option;
 import com.werken.opt.CommandLine;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -41,16 +41,17 @@ public final class Start
         {
             // TODO Clean up the output.
             ex.printStackTrace();
-            System.exit(1);
+            return;
         }
 
         if (cl.optIsSet('h'))
         {
             usage(opts);
-            System.exit(0);
+            return;
         }
 
         Game game = new Game(cl);
+
         if (cl.optIsSet('l') || cl.optIsSet('z'))
         {
             String filename = "--latest";

@@ -977,6 +977,8 @@ Log.debug("Battle.setupSummon() advance will be " + advance);
         if (critter.getCurrentHex().isEntrance() &&
             getTurnNumber() > 1)
         {
+            // XXX If a critter is both summonable and a recruitable
+            // reinforcement, then this logic fails.
             if (critter.isSummonable())
             {
                 Player player = legion.getPlayer();

@@ -108,6 +108,15 @@
 </target>
 
 
+<!-- Delete stale jar files before compiling -->
+<target name="cleanjars" depends=""
+        description = "Delete stale jar files">
+        <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "test/Colossus.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
+</target>
+
 
 <taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake"/>
 
@@ -115,26 +124,20 @@
 
 <!-- If you don't have Javamake you can change "javamake" to "javac" --> 
 <!-- But get Javamake instead.  Good dependency checking helps a lot. --> 
-<target name="compile" depends="init,parsers"
+<target name="compile" depends="init,parsers,cleanjars"
         description = "Compile most .java files to .class files using javamake">
-        <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "test/Colossus.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
         <javamake debug="yes" deprecation="yes" target="1.2" srcdir="."
                 includes="**/*.java"
                 excludes="**/*Test.java"
         />
 </target>
 
+<!-- TODO Add an option to always compileAll based on an environment var. -->
+
 <!-- If you don't have Javamake you can change "javamake" to "javac" --> 
 <!-- But get Javamake instead.  Good dependency checking helps a lot. --> 
-<target name="compileAll" depends="init,parsers"
+<target name="compileAll" depends="init,parsers,cleanjars"
         description = "Compile all .java files to .class files using javamake">
-        <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "test/Colossus.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
-        <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
         <javamake debug="yes" deprecation="yes" target="1.2" srcdir="."
                 includes="**/*.java"
         />
@@ -147,6 +150,7 @@
         <junit printsummary="yes" fork="no" haltonfailure="no">
                 <formatter type="plain"/>
                 <test name="net.sf.colossus.server.BalancedTowersTest"/>
+                <test name="net.sf.colossus.server.CommandLineOptionsTest"/>
         </junit>
 </target>
 
@@ -184,7 +188,7 @@
 
 <!-- Be very careful modifying this.  It whacks whole directories easily. -->
 <!-- XXX Files like .#Colossus.jar.1.203 are not being deleted.  Ant bug? -->
-<target name="clean"
+<target name="clean" depends="cleanjars"
         description = "Delete most derived files"> 
         <delete verbose="yes" quiet = "yes" includeemptydirs="yes"> 
                 <fileset dir="." 
@@ -197,7 +201,6 @@
                          **/*.bak,
                          **/*.old,
                          **/*.class,
-                         **/Colossus.jar,
                          **/.#Colossus.jar*,
                          **/Colossus.*.zip,
                          TEST-*Test.txt,
