@@ -11,8 +11,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * Class BattleMap implements the GUI for a Titan
- * battlemap.
+ * Class BattleMap implements the GUI for a Titan battlemap.
  * @version $Id$
  * @author David Ripton
  */
@@ -49,8 +48,6 @@ public class BattleMap extends Frame implements MouseListener,
         int cy=80;
         int scale=25;
         
-        //System.out.println("Creating a BattleMap.");
-
         pack();
         setSize(700, 700);
         setBackground(java.awt.Color.white);
@@ -65,14 +62,14 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < h.length; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j])
                 {
                     h[i][j] = new Hex
-                        ((int)java.lang.Math.round(cx + 3 * i * scale),
-                        (int)java.lang.Math.round(cy + (2 * j + i % 2) *
-                        java.lang.Math.sqrt(3.0) * scale), scale);
+                        ((int)Math.round(cx + 3 * i * scale),
+                        (int)Math.round(cy + (2 * j + i % 2) *
+                        Math.sqrt(3.0) * scale), scale);
                 }
             }
         }
@@ -146,8 +143,6 @@ public class BattleMap extends Frame implements MouseListener,
         {
             if (chits[i].select(point))
             {
-                //System.out.println("Selected chits[" + i +"]");
-                // Move selected chit to top of Z-order
                 tracking = 0;
 
                 // Don't swap if it's already on top.
@@ -169,12 +164,10 @@ public class BattleMap extends Frame implements MouseListener,
         // No hits on chits, so check map.
         for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < h.length; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j] && h[i][j].contains(point))
                 {
-                    //System.out.println("Calling select for h[" + i + 
-                    //    "][" + j +"]");
                     h[i][j].select(point);
                     Rectangle clip = new Rectangle(h[i][j].getBounds());
                     repaint(clip.x, clip.y, clip.width, clip.height);
@@ -203,24 +196,19 @@ public class BattleMap extends Frame implements MouseListener,
 
     public void paint(Graphics g)
     {
-        //System.out.println("Called BattleMap.paint()");
         if (!imagesLoaded)
         {
-            //System.out.println("Images are not loaded yet");
             return;
         }
 
         rectClip = g.getClipBounds();
-        //System.out.println("rectClip: " + rectClip.x + " " + rectClip.y 
-        //    + " " + rectClip.width + " " + rectClip.height);
 
         for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < h.length; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
-                    //System.out.println("drawing h[" + i + "][" + j + "]");
                     h[i][j].paint(g);
                 }
             }
@@ -231,7 +219,6 @@ public class BattleMap extends Frame implements MouseListener,
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
-                //System.out.println("Drawing chits[" + i + "]");
                 chits[i].paint(g);
             }
         }
@@ -239,8 +226,6 @@ public class BattleMap extends Frame implements MouseListener,
 
     public void update(Graphics g)
     {
-        //System.out.println("Called BattleMap.update()");
-
         Dimension d = getSize();
         rectClip = g.getClipBounds();
         
@@ -248,7 +233,6 @@ public class BattleMap extends Frame implements MouseListener,
         if (gBack == null || d.width != offDimension.width || 
             d.height != offDimension.height)
         {
-            //System.out.println("Creating a new back buffer");
             offDimension = d;
             offImage = createImage(d.width, d.height);
             gBack = offImage.getGraphics();
@@ -269,11 +253,10 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < h.length; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
-                    //System.out.println("drawing h[" + i + "][" + j + "]");
                     h[i][j].paint(gBack);
                 }
             }
@@ -284,7 +267,6 @@ public class BattleMap extends Frame implements MouseListener,
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
-                //System.out.println("Drawing chits[" + i + "]");
                 chits[i].paint(gBack);
             }
         }
@@ -323,8 +305,8 @@ public class BattleMap extends Frame implements MouseListener,
 class Hex
 {
     private boolean selected;
-    private int[] x_vertex = new int[6];
-    private int[] y_vertex = new int[6];
+    private int[] xVertex = new int[6];
+    private int[] yVertex = new int[6];
     private Polygon p;
     private Rectangle rectBound;
 
@@ -333,26 +315,24 @@ class Hex
     {
         selected = false;
 
-        x_vertex[0] = cx;
-        y_vertex[0] = cy;
-        x_vertex[1] = cx + 2 * scale;
-        y_vertex[1] = cy;
-        x_vertex[2] = cx + 3 * scale;
-        y_vertex[2] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
-                        * scale);
-        x_vertex[3] = cx + 2 * scale;
-        y_vertex[3] = cy + (int)java.lang.Math.round(2 * 
-                        java.lang.Math.sqrt(3.0) * scale);
-        x_vertex[4] = cx;
-        y_vertex[4] = cy + (int)java.lang.Math.round(2 * 
-                        java.lang.Math.sqrt(3.0) * scale);
-        x_vertex[5] = cx - 1 * scale;
-        y_vertex[5] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
-                        * scale);
+        xVertex[0] = cx;
+        yVertex[0] = cy;
+        xVertex[1] = cx + 2 * scale;
+        yVertex[1] = cy;
+        xVertex[2] = cx + 3 * scale;
+        yVertex[2] = cy + (int)Math.round(Math.sqrt(3.0) * scale);
+        xVertex[3] = cx + 2 * scale;
+        yVertex[3] = cy + (int)Math.round(2 * Math.sqrt(3.0) * scale);
+        xVertex[4] = cx;
+        yVertex[4] = cy + (int)Math.round(2 * Math.sqrt(3.0) * scale);
+        xVertex[5] = cx - 1 * scale;
+        yVertex[5] = cy + (int)Math.round(Math.sqrt(3.0) * scale);
 
-        p = new Polygon(x_vertex, y_vertex, 6);
-        rectBound = new Rectangle(x_vertex[5], y_vertex[0], x_vertex[2] - 
-                        x_vertex[5], y_vertex[3] - y_vertex[0]);
+        p = new Polygon(xVertex, yVertex, 6);
+        // Add 1 to width and height because Java rectangles come up
+        // one pixel short.
+        rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] - 
+                        xVertex[5] + 1, yVertex[3] - yVertex[0] + 1);
     }
 
 
@@ -413,13 +393,13 @@ class Chit
     private int dy;
 
 
-    Chit(int cx, int cy, int scale, String image_filename, 
-        Container my_container)
+    Chit(int cx, int cy, int scale, String imageFilename, 
+        Container myContainer)
     {
         selected = false;
         rect = new Rectangle(cx, cy, scale, scale);
-        image = Toolkit.getDefaultToolkit().getImage(image_filename);
-        container = my_container;
+        image = Toolkit.getDefaultToolkit().getImage(imageFilename);
+        container = myContainer;
         dx = 0;
         dy = 0;
     }
