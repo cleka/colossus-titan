@@ -49,16 +49,17 @@ Win98, jdk1.3: Multiple fast right-clicks on a MasterHex do not succeed
 
 Win98, jdk1.3: Bad repaint onto potential carry target with no carries.
 
-Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle in 
-   turn 15 of a 4-player game.  Also during turn 45 of a 5-player game.  
-   Image memory leak again?
-
 Solaris, jdk1.2.2, jdk1.3: Popup menu text is invisible 
    black-on-black.  There is no way to set the background and 
    foreground colors.
 
 Solaris, jdk1.2.2: jar files made in Linux won't execute.
    Exception in thread "main" java.lang.NoClassDefFoundError: Game
+
+Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle in 
+   turn 15 of a 4-player game.  Also during turn 45 of a 5-player game.
+   Also during movement phase of turn 14 of a 6-player game.
+   Image memory leak again?  Or somewhere else?
 
 
 Current programming bugs:
@@ -133,3 +134,5 @@ java.lang.ArrayIndexOutOfBoundsException
         at java.awt.EventDispatchThread.pumpOneEvent(EventDispatchThread.java:103)
         at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
         at java.awt.EventDispatchThread.run(EventDispatchThread.java:84)
+
+All: Losses per-side in a pre-battle agreement should be made public.

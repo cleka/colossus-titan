@@ -1,3 +1,7 @@
+Make BattleMap frame a bit smaller, to waste less screen space.
+
+Make ShowDice a bit smaller?
+
 Add some keyboard shortcuts.
 
 Highlight selected legion better. 

@@ -29,6 +29,7 @@ public class Game
     // Keep multiple quick clicks from popping up multiples
     // of the same dialog.
     private boolean dialogLock;
+    private boolean dialogLock2;
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -2267,25 +2268,23 @@ public class Game
 
                 if (!hex.isEngagement())
                 {
-                    if (hex.getLegion(0) == defender &&
-                        defender.canRecruit())
+                    if (hex.getLegion(0) == defender && defender.canRecruit())
                     {
-                        // If the defender won the battle
-                        // by agreement, he may recruit.
-                        if (!dialogLock)
+                        // If the defender won the battle by agreement, 
+                        // he may recruit.
+                        if (!dialogLock2)
                         {
-                            dialogLock = true;
+                            dialogLock2 = true;
                             new PickRecruit(board, defender);
-                            dialogLock = false;
+                            dialogLock2 = false;
                         }
                     }
                     else if (hex.getLegion(0) == attacker && 
                         attacker.getHeight() < 7 && 
                         player.canSummonAngel())
                     {
-                        // If the attacker won the battle
-                        // by agreement, he may summon an
-                        // angel.
+                        // If the attacker won the battle by agreement, 
+                        // he may summon an angel.
                         summonAngel = new SummonAngel(board, attacker);
                     }
                 }

@@ -283,14 +283,23 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
                     defender.getMarkerId() + 
                     " agree to mutual elimination"); 
 
+                // If both Titans died, eliminate both players.
+                if (attacker.numCreature(Creature.titan) == 1 &&
+                    defender.numCreature(Creature.titan) == 1)
+                {
+                    // Make defender die first, to simplify turn advancing.
+                    defender.getPlayer().die(null, false);
+                    attacker.getPlayer().die(null, true);
+                }
+
                 // If either was the titan stack, its owner dies and gives
                 // half points to the victor.
-                if (attacker.numCreature(Creature.titan) == 1)
+                else if (attacker.numCreature(Creature.titan) == 1)
                 {
                     attacker.getPlayer().die(defender.getPlayer(), true);
                 }
 
-                if (defender.numCreature(Creature.titan) == 1)
+                else if (defender.numCreature(Creature.titan) == 1)
                 {
                     defender.getPlayer().die(attacker.getPlayer(), true);
                 }
