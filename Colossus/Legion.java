@@ -20,6 +20,7 @@ class Legion
     private MasterHex startingHex;
     private boolean moved = false;
     private boolean recruited = false;
+    private boolean summoned = false;
     private Player player;
 
 
@@ -200,6 +201,7 @@ class Legion
         startingHex = currentHex;
         moved = false;
         recruited = false;
+        summoned = false;
     }
 
 
@@ -220,15 +222,21 @@ class Legion
     }
 
 
-    void markRecruit()
+    void markRecruited()
     {
         recruited = true;
     }
 
 
-    void clearRecruit()
+    boolean summoned()
     {
-        recruited = false;
+        return summoned;
+    }
+
+    
+    void markSummoned()
+    {
+        summoned = true;
     }
 
 
