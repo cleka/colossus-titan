@@ -3395,7 +3395,7 @@ Log.debug("Called findBattleMoves()");
                 if (turn <= 4)
                 {
                     value += bec.TITAN_FORWARD_EARLY_PENALTY *
-                        client.getStrike().getRange(hex, entrance, true);
+                        Strike.getRange(hex, entrance, true);
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
@@ -3418,7 +3418,7 @@ Log.debug("Called findBattleMoves()");
             }
             else
             {
-                int range = client.getStrike().getRange(hex, entrance, true);
+                int range = Strike.getRange(hex, entrance, true);
 
                 // To ensure that defending legions completely enter
                 // the board, prefer the second row to the first.  The

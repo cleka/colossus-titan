@@ -1155,8 +1155,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
-    public static int getRange(BattleHex hex1, BattleHex hex2, 
-        boolean allowEntrance)
+    static int getRange(BattleHex hex1, BattleHex hex2, boolean allowEntrance)
     {
         if (hex1 == null || hex2 == null)
         {
@@ -1496,8 +1495,7 @@ Log.debug("Called Battle.doneReinforcing()");
      *  Sometimes two directions are possible.  If the left parameter
      *  is set, the direction further left will be given.  Otherwise,
      *  the direction further right will be given. */
-    public static int getDirection(BattleHex hex1, BattleHex hex2,
-        boolean left)
+    static int getDirection(BattleHex hex1, BattleHex hex2, boolean left)
     {
         if (hex1 == hex2)
         {
@@ -1674,7 +1672,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
     // Return the number of intervening bramble hexes.  If LOS is along a
     // hexspine and there are two choices, pick the lower one.
-    public static int countBrambleHexes(BattleHex hex1, BattleHex hex2)
+    static int countBrambleHexes(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {

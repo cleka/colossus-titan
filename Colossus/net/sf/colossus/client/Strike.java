@@ -6,7 +6,6 @@ import java.util.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Battle;
 
 
 /**
@@ -32,7 +31,7 @@ final class Strike
 
     /** Return the set of hex labels for hexes with critters that have
      *  valid strike targets. */
-    public Set findCrittersWithTargets()
+    Set findCrittersWithTargets()
     {
         Set set = new HashSet();
         Iterator it = client.getActiveBattleChits().iterator();
@@ -48,22 +47,6 @@ final class Strike
         return set;
     }
 
-
-    boolean isForcedStrikeRemaining()
-    {
-        java.util.List battleChits = client.getBattleChits();
-        Iterator it = battleChits.iterator();
-        while (it.hasNext())
-        {
-            BattleChit chit = (BattleChit)it.next();
-            if (client.isActive(chit) && !chit.hasStruck() && 
-                client.isInContact(chit, false))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /** Perform strikes for any creature that is forced to strike
      *  and has only one legal target. Forced strikes will never
@@ -106,12 +89,6 @@ final class Strike
     }
 
 
-    boolean isOccupied(BattleHex hex)
-    {
-        return !client.getBattleChits(hex.getLabel()).isEmpty();
-    }
-
-
     boolean canStrike(BattleChit striker, BattleChit target)
     {
         String targetHexLabel = target.getCurrentHexLabel();
@@ -128,7 +105,7 @@ final class Strike
     /** Return a set of hex labels for hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
      *  is true. */
-    Set findStrikes(BattleChit chit, boolean rangestrike)
+    private Set findStrikes(BattleChit chit, boolean rangestrike)
     {
         Set set = new HashSet();
 
@@ -198,7 +175,7 @@ final class Strike
     }
 
 
-    int countStrikes(BattleChit chit, boolean rangestrike)
+    private int countStrikes(BattleChit chit, boolean rangestrike)
     {
         return findStrikes(chit, rangestrike).size();
     }
@@ -206,8 +183,7 @@ final class Strike
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
-    static int getRange(BattleHex hex1, BattleHex hex2,
-        boolean allowEntrance)
+    static int getRange(BattleHex hex1, BattleHex hex2, boolean allowEntrance)
     {
         if (hex1 == null || hex2 == null)
         {
@@ -498,7 +474,7 @@ final class Strike
     /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
      *  lies along a hexspine, check both and return true only if both are
      *  blocked. */
-    boolean isLOSBlocked(BattleHex hex1, BattleHex hex2)
+    private boolean isLOSBlocked(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {
@@ -586,7 +562,8 @@ final class Strike
      *  Sometimes two directions are possible.  If the left parameter
      *  is set, the direction further left will be given.  Otherwise,
      *  the direction further right will be given. */
-    static int getDirection(BattleHex hex1, BattleHex hex2, boolean left)
+    private static int getDirection(BattleHex hex1, BattleHex hex2, 
+        boolean left)
     {
         if (hex1 == hex2)
         {
@@ -776,7 +753,7 @@ final class Strike
 
     // Return the number of intervening bramble hexes.  If LOS is along a
     // hexspine and there are two choices, pick the lower one.
-    int countBrambleHexes(BattleHex hex1, BattleHex hex2)
+    private int countBrambleHexes(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {
@@ -822,7 +799,7 @@ final class Strike
 
     /** Return the number of dice that will be rolled when striking this
      *  target, including modifications for terrain. */
-    public int getDice(BattleChit chit, BattleChit target)
+    int getDice(BattleChit chit, BattleChit target)
     {
         BattleHex hex = client.getBattleHex(chit);
         BattleHex targetHex = client.getBattleHex(target);
@@ -860,7 +837,7 @@ final class Strike
             }
 
             // Adjacent hex, so only one possible direction.
-            int direction = Battle.getDirection(hex, targetHex, false);
+            int direction = getDirection(hex, targetHex, false);
             char hexside = hex.getHexside(direction);
 
             // Native striking down a dune hexside: +2
@@ -907,7 +884,7 @@ final class Strike
             if (hex.getElevation() > targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = Battle.getDirection(hex, targetHex, false);
+                int direction = getDirection(hex, targetHex, false);
                 char hexside = hex.getHexside(direction);
                 // Striking down across wall: +1
                 if (hexside == 'w')
@@ -918,7 +895,7 @@ final class Strike
             else if (hex.getElevation() < targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = Battle.getDirection(targetHex, hex, false);
+                int direction = getDirection(targetHex, hex, false);
                 char hexside = targetHex.getHexside(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
@@ -932,7 +909,7 @@ final class Strike
         else if (!striker.getCreature().useMagicMissile())
         {
             // Range penalty
-            if (Battle.getRange(hex, targetHex, false) == 4)
+            if (getRange(hex, targetHex, false) == 4)
             {
                 attackerSkill--;
             }
@@ -940,7 +917,7 @@ final class Strike
             // Non-native rangestrikes: -1 per intervening bramble hex
             if (!striker.getCreature().isNativeBramble())
             {
-                attackerSkill -= Battle.countBrambleHexes(hex, targetHex);
+                attackerSkill -= countBrambleHexes(hex, targetHex);
             }
 
             // Rangestrike up across wall: -1 per wall
@@ -967,7 +944,7 @@ final class Strike
         return attackerSkill;
     }
 
-    public int getStrikeNumber(BattleChit striker, BattleChit target)
+    int getStrikeNumber(BattleChit striker, BattleChit target)
     {
         boolean rangestrike = !client.isInContact(striker, true);
 
