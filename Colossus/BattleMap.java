@@ -167,7 +167,7 @@ public class BattleMap extends Frame implements MouseListener,
 
     private void setupIcon()
     {
-        if (board != null && board.getGame().isApplet())
+        if (board != null && !board.getGame().isApplet())
         {
             try
             {
