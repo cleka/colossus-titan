@@ -23,7 +23,9 @@ final class AcquireAngel extends KDialog implements MouseListener,
     private static boolean active;
     private Client client;
     private String markerId;
-
+    private static int numberOpen = 0;
+    private static final int basicXOffset = 16;
+    private static final int basicYOffset = 32;
 
     AcquireAngel(JFrame parentFrame, Client client, String markerId, 
         java.util.List recruits)
@@ -62,7 +64,9 @@ final class AcquireAngel extends KDialog implements MouseListener,
         cancelButton.addActionListener(this);
 
         pack();
-        centerOnScreen();
+        numberOpen++;
+        centerOnScreen(basicXOffset * (numberOpen - 1),
+                       basicYOffset * (numberOpen - 1));
         setVisible(true);
         repaint();
     }
@@ -71,6 +75,7 @@ final class AcquireAngel extends KDialog implements MouseListener,
     void cleanup(String angelType)
     {
         client.acquireAngelCallback(markerId, angelType);
+        numberOpen--;
         dispose();
     }
 

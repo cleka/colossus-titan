@@ -85,6 +85,16 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
             d.height / 2 - getSize().height / 2));
     }
 
+    /** Center this dialog on the screen, with an additional offset.
+     * Must be called after the dialog size has been set. */
+    public void centerOnScreen(int xoffset, int yoffset)
+    {
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(
+             (d.width / 2 - getSize().width / 2) + xoffset,
+             (d.height / 2 - getSize().height / 2) + yoffset));
+    }
+
     public void upperRightCorner()
     {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
