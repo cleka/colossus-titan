@@ -312,15 +312,21 @@ Log.debug("Called Player.setType() for " + name + " " + type);
         setDonorId(donor.getMarkerId());
     }
 
-    void disbandEmptyDonor()
+    /** Remove all of this player's zero-height legions. */
+    void removeEmptyLegions()
     {
-        if (donorId != null)
+        Iterator it = getLegions().iterator(); 
+        while (it.hasNext())
         {
-            Legion donor = getDonor();
-            if (donor.getHeight() == 0)
+            Legion legion = (Legion)it.next();
+            if (legion.getHeight() == 0)
             {
-                donor.remove();
-                donorId = null;
+                if (donorId.equals(legion.getMarkerId()))
+                {
+                    donorId = null;
+                }
+                legion.prepareToRemove();
+                it.remove();
             }
         }
     }

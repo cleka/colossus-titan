@@ -656,7 +656,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         return remaining;
     }
 
-    int getNumHumanPlayersRemaining()
+    int getNumHumansRemaining()
     {
         int remaining = 0;
         Iterator it = players.iterator();
@@ -704,15 +704,15 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         {
             case 0:
                 Log.event("Draw");
-                setGameOver(true);
                 server.allTellGameOver("Draw");
+                setGameOver(true);
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
                 Log.event(winnerName + " wins");
-                setGameOver(true);
                 server.allTellGameOver(winnerName + " wins");
+                setGameOver(true);
                 break;
 
             default:
@@ -749,6 +749,13 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
             !playerName.equals(getActivePlayerName()))
         {
             Log.error("Called advancePhase illegally");
+            return;
+        }
+        if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
+        {
+            Log.event("Not advancing because no humans remain");
+            server.allTellGameOver("All humans eliminated");
+            setGameOver(true);
             return;
         }
         phaseAdvancer.advancePhase();
@@ -876,6 +883,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
     private void setupMuster()
     {
         Player player = getActivePlayer();
+        player.removeEmptyLegions();
 
         // If this player was eliminated in combat, or can't recruit
         // anything, advance to the next turn.
@@ -885,9 +893,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         }
         else
         {
-            player.disbandEmptyDonor();
             server.allSetupMuster();
-
             player.aiRecruit();
         }
     }
@@ -1105,6 +1111,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         File savesDir = new File(Constants.saveDirname);
         if (!savesDir.exists() || !savesDir.isDirectory())
         {
+             Log.event("Trying to make directory " + Constants.saveDirname);
              if (!savesDir.mkdirs())
              {
                  Log.error("Could not create saves directory");

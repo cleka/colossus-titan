@@ -115,6 +115,7 @@ public final class Options
         File optionsDir = new File(Constants.gameDataPath);
         if (!optionsDir.exists() || !optionsDir.isDirectory())
         {
+             Log.event("Trying to make directory " + Constants.gameDataPath);
              if (!optionsDir.mkdirs())
              {
                  Log.error("Could not create options directory");

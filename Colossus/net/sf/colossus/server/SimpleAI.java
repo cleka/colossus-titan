@@ -377,11 +377,7 @@ public class SimpleAI implements AI
 
             String markerId = pickMarker(player.getMarkersAvailable(),
                 player.getShortColor());
-/* XXX
-            // create the new legion
-            Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion),
-                markerId);
-*/
+
             StringBuffer results = new StringBuffer();
             List creatures = chooseCreaturesToSplitOut(legion);
             Iterator it = creatures.iterator();
