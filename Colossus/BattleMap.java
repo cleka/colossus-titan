@@ -95,7 +95,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale, 
                 attacker.getCreature(i).getImageName(), this,
                 attacker.getCreature(i), entrance,
-                attacker.getPlayer());
+                attacker.getPlayer(), false);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -107,7 +107,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale, 
                 defender.getCreature(i - attackerHeight).getImageName(), this,
                 defender.getCreature(i - attackerHeight), entrance,
-                defender.getPlayer());
+                defender.getPlayer(), true);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -161,7 +161,6 @@ public class BattleMap extends Frame implements MouseListener,
 
                     int entryCost = neighbor.getEntryCost(creature, 
                         reverseDir);
-
                     if (entryCost <= movesLeft)
                     {
                         // Mark that hex as a legal move.
@@ -231,14 +230,14 @@ public class BattleMap extends Frame implements MouseListener,
         // Initialize entrances.
         entrances[0] = new Hex(cx + 15 * scale,
             (int) Math.round(cy + 1 * scale), scale, this);
-        entrances[1] = new Hex(cx + 38 * scale,
-            (int) Math.round(cy + 9 * scale), scale, this);
+        entrances[1] = new Hex(cx + 21 * scale,
+            (int) Math.round(cy + 10 * scale), scale, this);
         entrances[2] = new Hex(cx + 17 * scale,
             (int) Math.round(cy + 22 * scale), scale, this);
-        entrances[3] = new Hex(cx + 1 * scale,
-            (int) Math.round(cy + 19 * scale), scale, this);
-        entrances[4] = new Hex(cx - 4 * scale,
-            (int) Math.round(cy + 9 * scale), scale, this);
+        entrances[3] = new Hex(cx + 2 * scale,
+            (int) Math.round(cy + 21 * scale), scale, this);
+        entrances[4] = new Hex(cx - 3 * scale,
+            (int) Math.round(cy + 10 * scale), scale, this);
         entrances[5] = new Hex(cx + 1 * scale,
             (int) Math.round(cy + 1 * scale), scale, this);
 
@@ -805,6 +804,6 @@ public class BattleMap extends Frame implements MouseListener,
             null, Creature.centaur, Creature.lion, Creature.gargoyle, 
             Creature.cyclops, Creature.gorgon, Creature.guardian, null, null,
             player2);
-        new BattleMap(attacker, defender, 'p', 'l');
+        new BattleMap(attacker, defender, 'J', 'b');
     }
 }
