@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
+
 /**
  * Class Game gets and holds high-level data about a Titan game.
  * @version $Id$
@@ -50,7 +51,8 @@ public class Game extends Frame implements WindowListener, ActionListener
         }
         catch (NullPointerException e)
         {
-            System.out.println("Couldn't find " + Creature.colossus.getImageName());
+            System.out.println("Couldn't find " + 
+                Creature.colossus.getImageName());
             System.exit(1);
         }
 
@@ -94,7 +96,8 @@ public class Game extends Frame implements WindowListener, ActionListener
         }
         catch (NullPointerException e)
         {
-            System.out.println("Couldn't find " + Creature.colossus.getImageName());
+            System.out.println("Couldn't find " + 
+                Creature.colossus.getImageName());
             System.exit(1);
         }
 
@@ -104,7 +107,7 @@ public class Game extends Frame implements WindowListener, ActionListener
         board = new MasterBoard(this, false);
 
         loadGame(filename);
-        
+
         initStatusScreen(false);
     }
 
@@ -344,6 +347,14 @@ public class Game extends Frame implements WindowListener, ActionListener
         for (int i = 0; i < numPlayers; i++)
         {
             activeLabel[i] = new Label(" ");
+            if (activePlayerNum == i)
+            {
+                activeLabel[i] = new Label("*");
+            }
+            else
+            {
+                activeLabel[i] = new Label(" ");
+            }
             add(activeLabel[i]);
             add(new Label(players[i].getName()));
             add(new Label(
