@@ -41,6 +41,8 @@ class MasterHex
     private int[] exitType = new int[6];
     private int[] entranceType = new int[6];
 
+    private int entrySide;
+
     // 0=none, 1=block, 2=arch, 3=arrow 4=arrows
     public static final int NONE = 0;
     public static final int BLOCK = 1;
@@ -1052,5 +1054,22 @@ class MasterHex
     int getEntranceType(int i)
     {
         return entranceType[i];
+    }
+
+
+    void setEntrySide(int side)
+    {
+        entrySide = side;
+    }
+
+    int getEntrySide()
+    {
+        return entrySide;
+    }
+
+
+    boolean inverted()
+    {
+        return inverted;
     }
 }
