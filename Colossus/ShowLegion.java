@@ -7,7 +7,7 @@ import java.awt.event.*;
  * author David Ripton
  */
 
-class ShowLegion extends Dialog implements MouseListener
+class ShowLegion extends Dialog implements MouseListener, WindowListener
 {
     MediaTracker tracker;
     boolean imagesLoaded;
@@ -35,7 +35,7 @@ class ShowLegion extends Dialog implements MouseListener
         for (int i = 0; i < legion.getHeight(); i++)
         {
             chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale, 
-                "images/" + legion.creatures[i].name + ".gif", this);
+                legion.creatures[i].getImageName(), this);
         }
 
         tracker = new MediaTracker(this);
@@ -51,7 +51,7 @@ class ShowLegion extends Dialog implements MouseListener
         }
         catch (InterruptedException e)
         {
-            System.out.println("waitForAll was interrupted");
+            new MessageBox(parentFrame, "waitForAll was interrupted");
         }
 
         imagesLoaded = true;
@@ -78,6 +78,7 @@ class ShowLegion extends Dialog implements MouseListener
 
     public void mouseClicked(MouseEvent e)
     {
+        dispose();
     }
     
     
@@ -88,17 +89,54 @@ class ShowLegion extends Dialog implements MouseListener
 
     public void mouseExited(MouseEvent e)
     {
+        dispose();
     }
     
 
     public void mousePressed(MouseEvent e)
     {
+        dispose();
     }
 
     
     public void mouseReleased(MouseEvent e)
     {
-        // Exit.
         dispose();
+    }
+
+
+    public void windowClosed(WindowEvent e)
+    {
+    }
+
+
+    public void windowActivated(WindowEvent e)
+    {
+    }
+
+
+    public void windowClosing(WindowEvent e)
+    {
+        dispose();
+    }
+
+
+    public void windowDeactivated(WindowEvent e)
+    {
+    }
+
+
+    public void windowDeiconified(WindowEvent e)
+    {
+    }
+
+
+    public void windowIconified(WindowEvent e)
+    {
+    }
+
+
+    public void windowOpened(WindowEvent e)
+    {
     }
 }
