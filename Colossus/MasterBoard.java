@@ -4,15 +4,15 @@
  * dripton
  */
 
-// TODO: Add the dragon and hydra.
 // TODO: Restrict chit dragging to within window
+// TODO: Add stack markers
+// TODO: Fix colors
 
 import java.awt.*;
 import java.awt.event.*;
 
 /**
- * Class MasterBoard implements the GUI for a Titan
- * masterboard.
+ * Class MasterBoard implements the GUI for a Titan masterboard.
  * @version $Id$
  * @author David Ripton
  */
@@ -68,8 +68,6 @@ public class MasterBoard extends Frame implements MouseListener,
         int cy=80;
         int scale=15;
         
-        //System.out.println("Creating a MasterBoard.");
-
         pack();
         setSize(1000, 1000);
         setBackground(java.awt.Color.white);
@@ -83,21 +81,231 @@ public class MasterBoard extends Frame implements MouseListener,
         imagesLoaded = false;
 
         // Initialize hexes
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j])
                 {
                     h[i][j] = new MasterHex
-                        ((int) java.lang.Math.round(cx + 4 * i * scale),
-                        (int) java.lang.Math.round(cy + (3 * j + (i % 2) * 
+                        ((int) Math.round(cx + 4 * i * scale),
+                        (int) Math.round(cy + (3 * j + (i % 2) * 
                         (1 + 2 * (j / 2)) + ((i + 1) % 2) * 2 * ((j + 1) / 2))
-                        * java.lang.Math.sqrt(3.0) * scale), scale,
-                        (i + j) % 2 == 0);
+                        * Math.sqrt(3.0) * scale), scale, (i + j) % 2 == 0);
                 }
             }
         }
+
+        // Add terrain types, id labels, and exits to hexes
+        h[0][3].terrain='S';
+        h[0][3].label=132;
+        h[0][4].terrain='P';
+        h[0][4].label=133;
+
+        h[1][2].terrain='B';
+        h[1][2].label=130;
+        h[1][3].terrain='M';
+        h[1][3].label=131;
+        h[1][4].terrain='B';
+        h[1][4].label=134;
+        h[1][5].terrain='J';
+        h[1][5].label=135;
+
+        h[2][1].terrain='D';
+        h[2][1].label=128;
+        h[2][2].terrain='P';
+        h[2][2].label=129;
+        h[2][3].terrain='H';
+        h[2][3].label=32;
+        h[2][4].terrain='J';
+        h[2][4].label=33;
+        h[2][5].terrain='M';
+        h[2][5].label=136;
+        h[2][6].terrain='B';
+        h[2][6].label=137;
+
+        h[3][0].terrain='M';
+        h[3][0].label=126;
+        h[3][1].terrain='B';
+        h[3][1].label=127;
+        h[3][2].terrain='T';
+        h[3][2].label=500;
+        h[3][3].terrain='B';
+        h[3][3].label=31;
+        h[3][4].terrain='P';
+        h[3][4].label=34;
+        h[3][5].terrain='T';
+        h[3][5].label=600;
+        h[3][6].terrain='P';
+        h[3][6].label=138;
+        h[3][7].terrain='D';
+        h[3][7].label=139;
+
+        h[4][0].terrain='J';
+        h[4][0].label=125;
+        h[4][1].terrain='J';
+        h[4][1].label=26;
+        h[4][2].terrain='M';
+        h[4][2].label=27;
+        h[4][3].terrain='W';
+        h[4][3].label=30;
+        h[4][4].terrain='D';
+        h[4][4].label=35;
+        h[4][5].terrain='B';
+        h[4][5].label=38;
+        h[4][6].terrain='W';
+        h[4][6].label=39;
+        h[4][7].terrain='M';
+        h[4][7].label=140;
+
+        h[5][0].terrain='P';
+        h[5][0].label=124;
+        h[5][1].terrain='W';
+        h[5][1].label=25;
+        h[5][2].terrain='S';
+        h[5][2].label=28;
+        h[5][3].terrain='P';
+        h[5][3].label=29;
+        h[5][4].terrain='M';
+        h[5][4].label=36;
+        h[5][5].terrain='H';
+        h[5][5].label=37;
+        h[5][6].terrain='J';
+        h[5][6].label=40;
+        h[5][7].terrain='B';
+        h[5][7].label=141;
+
+        h[6][0].terrain='B';
+        h[6][0].label=123;
+        h[6][1].terrain='B';
+        h[6][1].label=24;
+        h[6][2].terrain='H';
+        h[6][2].label=23;
+        h[6][3].terrain='m';
+        h[6][3].label=5000;
+        h[6][4].terrain='t';
+        h[6][4].label=6000;
+        h[6][5].terrain='S';
+        h[6][5].label=42;
+        h[6][6].terrain='M';
+        h[6][6].label=41;
+        h[6][7].terrain='S';
+        h[6][7].label=142;
+
+        h[7][0].terrain='M';
+        h[7][0].label=122;
+        h[7][1].terrain='T';
+        h[7][1].label=400;
+        h[7][2].terrain='M';
+        h[7][2].label=22;
+        h[7][3].terrain='t';
+        h[7][3].label=4000;
+        h[7][4].terrain='m';
+        h[7][4].label=1000;
+        h[7][5].terrain='P';
+        h[7][5].label=1;
+        h[7][6].terrain='T';
+        h[7][6].label=100;
+        h[7][7].terrain='P';
+        h[7][7].label=101;
+
+        h[8][0].terrain='S';
+        h[8][0].label=121;
+        h[8][1].terrain='P';
+        h[8][1].label=20;
+        h[8][2].terrain='D';
+        h[8][2].label=21;
+        h[8][3].terrain='m';
+        h[8][3].label=3000;
+        h[8][4].terrain='t';
+        h[8][4].label=2000;
+        h[8][5].terrain='W';
+        h[8][5].label=2;
+        h[8][6].terrain='B';
+        h[8][6].label=3;
+        h[8][7].terrain='B';
+        h[8][7].label=102;
+
+        h[9][0].terrain='B';
+        h[9][0].label=120;
+        h[9][1].terrain='J';
+        h[9][1].label=19;
+        h[9][2].terrain='W';
+        h[9][2].label=16;
+        h[9][3].terrain='P';
+        h[9][3].label=15;
+        h[9][4].terrain='M';
+        h[9][4].label=8;
+        h[9][5].terrain='D';
+        h[9][5].label=7;
+        h[9][6].terrain='H';
+        h[9][6].label=4;
+        h[9][7].terrain='M';
+        h[9][7].label=103;
+
+        h[10][0].terrain='P';
+        h[10][0].label=119;
+        h[10][1].terrain='H';
+        h[10][1].label=18;
+        h[10][2].terrain='B';
+        h[10][2].label=17;
+        h[10][3].terrain='S';
+        h[10][3].label=14;
+        h[10][4].terrain='H';
+        h[10][4].label=9;
+        h[10][5].terrain='P';
+        h[10][5].label=6;
+        h[10][6].terrain='J';
+        h[10][6].label=5;
+        h[10][7].terrain='J';
+        h[10][7].label=104;
+
+        h[11][0].terrain='D';
+        h[11][0].label=118;
+        h[11][1].terrain='M';
+        h[11][1].label=117;
+        h[11][2].terrain='T';
+        h[11][2].label=300;
+        h[11][3].terrain='M';
+        h[11][3].label=13;
+        h[11][4].terrain='B';
+        h[11][4].label=10;
+        h[11][5].terrain='T';
+        h[11][5].label=200;
+        h[11][6].terrain='B';
+        h[11][6].label=106;
+        h[11][7].terrain='P';
+        h[11][7].label=105;
+
+        h[12][1].terrain='B';
+        h[12][1].label=116;
+        h[12][2].terrain='P';
+        h[12][2].label=115;
+        h[12][3].terrain='J';
+        h[12][3].label=12;
+        h[12][4].terrain='W';
+        h[12][4].label=11;
+        h[12][5].terrain='M';
+        h[12][5].label=108;
+        h[12][6].terrain='D';
+        h[12][6].label=107;
+
+        h[13][2].terrain='J';
+        h[13][2].label=114;
+        h[13][3].terrain='B';
+        h[13][3].label=113;
+        h[13][4].terrain='P';
+        h[13][4].label=110;
+        h[13][5].terrain='B';
+        h[13][5].label=109;
+
+        h[14][3].terrain='M';
+        h[14][3].label=112;
+        h[14][4].terrain='S';
+        h[14][4].label=111;
+
+        // TODO: exits
+
 
         tracker = new MediaTracker(this);
 
@@ -168,7 +376,6 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             if (chits[i].select(point))
             {
-                //System.out.println("Selected chits[" + i +"]");
                 // Move selected chit to top of Z-order
                 tracking = 0;
 
@@ -191,13 +398,10 @@ public class MasterBoard extends Frame implements MouseListener,
         // No hits on chits, so check map.
         for (int i = 0; i < h.length; i++)
         {
-            //XXX
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j] && h[i][j].contains(point))
                 {
-                    //System.out.println("Calling select for h[" + i + 
-                    //    "][" + j +"]");
                     h[i][j].select(point);
                     Rectangle clip = new Rectangle(h[i][j].getBounds());
                     repaint(clip.x, clip.y, clip.width, clip.height);
@@ -226,25 +430,19 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public void paint(Graphics g)
     {
-        //System.out.println("Called MasterBoard.paint()");
         if (!imagesLoaded)
         {
-            //System.out.println("Images are not loaded yet");
             return;
         }
 
         rectClip = g.getClipBounds();
-        //System.out.println("rectClip: " + rectClip.x + " " + rectClip.y 
-        //    + " " + rectClip.width + " " + rectClip.height);
 
         for (int i = 0; i < h.length; i++)
         {
-            //XXX
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
-                    //System.out.println("drawing h[" + i + "][" + j + "]");
                     h[i][j].paint(g);
                 }
             }
@@ -255,7 +453,6 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
-                //System.out.println("Drawing chits[" + i + "]");
                 chits[i].paint(g);
             }
         }
@@ -263,8 +460,6 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public void update(Graphics g)
     {
-        //System.out.println("Called MasterBoard.update()");
-
         Dimension d = getSize();
         rectClip = g.getClipBounds();
         
@@ -272,7 +467,6 @@ public class MasterBoard extends Frame implements MouseListener,
         if (gBack == null || d.width != offDimension.width || 
             d.height != offDimension.height)
         {
-            //System.out.println("Creating a new back buffer");
             offDimension = d;
             offImage = createImage(d.width, d.height);
             gBack = offImage.getGraphics();
@@ -293,12 +487,10 @@ public class MasterBoard extends Frame implements MouseListener,
 
         for (int i = 0; i < h.length; i++)
         {
-            //XXX
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
-                    //System.out.println("drawing h[" + i + "][" + j + "]");
                     h[i][j].paint(gBack);
                 }
             }
@@ -309,7 +501,6 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
-                //System.out.println("Drawing chits[" + i + "]");
                 chits[i].paint(gBack);
             }
         }
@@ -348,75 +539,131 @@ public class MasterBoard extends Frame implements MouseListener,
 class MasterHex
 {
     private boolean selected;
-    private int[] x_vertex = new int[6];
-    private int[] y_vertex = new int[6];
+    private int[] xVertex = new int[6];
+    private int[] yVertex = new int[6];
     private Polygon p;
     private Rectangle rectBound;
 
+    // B,D,H,J,m,M,P,S,T,t,W
+    // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
+    // Swamp, Tower, tundra, Woods
+    char terrain;
+ 
+    // Middle ring: 1-42
+    // Outer ring: 101-142
+    // Towers: 100, 200, 300, 400, 500, 600
+    // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
+    int label;
+
+    // n, ne, se, s, sw, nw
+    // 0=none, 1=block, 2=arch, 3=arrow(s)
+    int[] exitType = new int[6];
+    MasterHex[] exitHex = new MasterHex[6];
 
     MasterHex(int cx, int cy, int scale, boolean inverted)
     {
         selected = false;
         if (!inverted)
         {
-            x_vertex[0] = cx;
-            y_vertex[0] = cy;
-            x_vertex[1] = cx + 2 * scale;
-            y_vertex[1] = cy;
-            x_vertex[2] = cx + 4 * scale;
-            y_vertex[2] = cy + (int)java.lang.Math.round(2 * java.lang.Math.sqrt(3.0)
-                            * scale);
-            x_vertex[3] = cx + 3 * scale;
-            y_vertex[3] = cy + (int)java.lang.Math.round(3 * 
-                            java.lang.Math.sqrt(3.0) * scale);
-            x_vertex[4] = cx - scale;
-            y_vertex[4] = cy + (int)java.lang.Math.round(3 * 
-                            java.lang.Math.sqrt(3.0) * scale);
-            x_vertex[5] = cx - 2 * scale;
-            y_vertex[5] = cy + (int)java.lang.Math.round(2 * java.lang.Math.sqrt(3.0)
-                            * scale);
+            xVertex[0] = cx;
+            yVertex[0] = cy;
+            xVertex[1] = cx + 2 * scale;
+            yVertex[1] = cy;
+            xVertex[2] = cx + 4 * scale;
+            yVertex[2] = cy + (int)Math.round(2 * Math.sqrt(3.0) * scale);
+            xVertex[3] = cx + 3 * scale;
+            yVertex[3] = cy + (int)Math.round(3 * Math.sqrt(3.0) * scale);
+            xVertex[4] = cx - scale;
+            yVertex[4] = cy + (int)Math.round(3 * Math.sqrt(3.0) * scale);
+            xVertex[5] = cx - 2 * scale;
+            yVertex[5] = cy + (int)Math.round(2 * Math.sqrt(3.0) * scale);
         }
         else
         {
-            x_vertex[0] = cx - scale;
-            y_vertex[0] = cy;
-            x_vertex[1] = cx + 3 * scale;
-            y_vertex[1] = cy;
-            x_vertex[2] = cx + 4 * scale;
-            y_vertex[2] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
-                            * scale);
-            x_vertex[3] = cx + 2 * scale;
-            y_vertex[3] = cy + (int)java.lang.Math.round(3 * 
-                            java.lang.Math.sqrt(3.0) * scale);
-            x_vertex[4] = cx;
-            y_vertex[4] = cy + (int)java.lang.Math.round(3 * 
-                            java.lang.Math.sqrt(3.0) * scale);
-            x_vertex[5] = cx - 2 * scale;
-            y_vertex[5] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
-                            * scale);
+            xVertex[0] = cx - scale;
+            yVertex[0] = cy;
+            xVertex[1] = cx + 3 * scale;
+            yVertex[1] = cy;
+            xVertex[2] = cx + 4 * scale;
+            yVertex[2] = cy + (int)Math.round(Math.sqrt(3.0) * scale);
+            xVertex[3] = cx + 2 * scale;
+            yVertex[3] = cy + (int)Math.round(3 * Math.sqrt(3.0) * scale);
+            xVertex[4] = cx;
+            yVertex[4] = cy + (int)Math.round(3 * Math.sqrt(3.0) * scale);
+            xVertex[5] = cx - 2 * scale;
+            yVertex[5] = cy + (int)Math.round(Math.sqrt(3.0) * scale);
         }
 
-        p = new Polygon(x_vertex, y_vertex, 6);
-        rectBound = new Rectangle(x_vertex[5], y_vertex[0], x_vertex[2] - 
-                        x_vertex[5], y_vertex[3] - y_vertex[0]);
+        p = new Polygon(xVertex, yVertex, 6);
+        // Add 1 to width and height because Java rectangles come up
+        // one pixel short.
+        rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] - 
+                        xVertex[5] + 1, yVertex[3] - yVertex[0] + 1);
     }
 
 
+    // TODO: Pick better colors.
     public void paint(Graphics g)
     {
         if (selected)
         {
-            g.setColor(java.awt.Color.red);
+            g.setColor(java.awt.Color.black);
             g.fillPolygon(p);
             g.setColor(java.awt.Color.black);
             g.drawPolygon(p);
         }
         else
         {
-            g.setColor(java.awt.Color.green);
+            switch(terrain)
+            {
+                case 'B':
+                    g.setColor(java.awt.Color.green);
+                    break; 
+                case 'D':
+                    g.setColor(java.awt.Color.blue);
+                    break;
+                case 'H':
+                    g.setColor(java.awt.Color.cyan);
+                    break;
+                case 'J':
+                    g.setColor(java.awt.Color.orange);
+                    break;
+                case 'm':
+                    g.setColor(java.awt.Color.red);
+                    break;
+                case 'M':
+                    g.setColor(java.awt.Color.pink);
+                    break;
+                case 'P':
+                    g.setColor(java.awt.Color.yellow);
+                    break;
+                case 'S':
+                    g.setColor(java.awt.Color.darkGray);
+                    break;
+                case 'T':
+                    g.setColor(java.awt.Color.gray);
+                    break;
+                case 't':
+                    g.setColor(java.awt.Color.lightGray);
+                    break;
+                case 'W':
+                    g.setColor(java.awt.Color.magenta);
+                    break;
+                default:
+                    g.setColor(java.awt.Color.white);
+                    break;
+            }
             g.fillPolygon(p);
             g.setColor(java.awt.Color.black);
             g.drawPolygon(p);
+            // XXX
+            FontMetrics fontMetrics = g.getFontMetrics();
+            g.drawString("" + label, rectBound.x + rectBound.width / 2 -
+                fontMetrics.stringWidth("" + label) / 2,
+                rectBound.y + rectBound.height / 3);
+            g.drawString(getTerrainName(), rectBound.x + rectBound.width / 2 -
+                fontMetrics.stringWidth(getTerrainName()) / 2,
+                rectBound.y + rectBound.height * 2 / 3);
         }
     }
 
@@ -441,7 +688,38 @@ class MasterHex
     {
         return (p.contains(point));
     }
-    
+
+    String getTerrainName()
+    {
+        switch(terrain)
+        {
+            case 'B':
+                return "brush";
+            case 'D':
+                return "desert";
+            case 'H':
+                return "hills";
+            case 'J':
+                return "jungle";
+            case 'm':
+                return "mountains";
+            case 'M':
+                return "marsh";
+            case 'P':
+                return "plains";
+            case 'S':
+                return "swamp";
+            case 'T':
+                return "tower";
+            case 't':
+                return "tundra";
+            case 'W':
+                return "woods";
+            default:
+                return "?????";
+        }
+    }
+
 }
 
 
@@ -459,13 +737,13 @@ class Chit
     private int dy;
 
 
-    Chit(int cx, int cy, int scale, String image_filename, 
-        Container my_container)
+    Chit(int cx, int cy, int scale, String imageFilename, 
+        Container myContainer)
     {
         selected = false;
         rect = new Rectangle(cx, cy, scale, scale);
-        image = Toolkit.getDefaultToolkit().getImage(image_filename);
-        container = my_container;
+        image = Toolkit.getDefaultToolkit().getImage(imageFilename);
+        container = myContainer;
         dx = 0;
         dy = 0;
     }
