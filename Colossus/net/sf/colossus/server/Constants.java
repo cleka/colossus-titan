@@ -123,7 +123,7 @@ public final class Constants
     public static final String battlelandsDirName = "Battlelands";
 
     /** Default CRE file */
-    public static final String defaultCREFile = "Default.cre";
+    public static final String defaultCREFile = "DefaultCre.xml";
 
     /** Default MAP file */
     public static final String defaultMAPFile = "Default.map";
@@ -212,9 +212,10 @@ public final class Constants
         "TG-Wild",
         "TitanPlus",
         "Undead",
-        "Unified",
-        "Balrog",
-        "Random" };
+        "Unified" };
+    // XXX Currently broken variants
+    //    "Balrog",
+    //    "Random" 
 
     public static final int numVariants = variantArray.length;
 

@@ -6,7 +6,7 @@ import java.io.*;
 
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
-import net.sf.colossus.parser.CreatureLoader;
+import net.sf.colossus.xmlparser.CreatureLoader;
 
 
 /**
@@ -128,8 +128,7 @@ public class Creature implements Comparable
         try
         {
             creatures.clear();
-            List directories =
-                    VariantSupport.getVarDirectoriesList();
+            List directories = VariantSupport.getVarDirectoriesList();
             InputStream creIS = ResourceLoader.getInputStream(
                     VariantSupport.getCreaturesName(), directories);
             if (creIS == null)
@@ -138,9 +137,7 @@ public class Creature implements Comparable
                         VariantSupport.getCreaturesName());
             }
             CreatureLoader creatureLoader = new CreatureLoader(creIS);
-            while (creatureLoader.oneCreature(creatures) >= 0)
-            {
-            }
+            creatures.addAll(creatureLoader.getCreatures());
         }
         catch (Exception e)
         {
@@ -234,8 +231,7 @@ public class Creature implements Comparable
         if (baseColor != null)
         {
             int specialIncrement = ((isFlier() || isRangestriker()) ? 1 : 0);
-            tempNames =
-                    new String[4 + specialIncrement];
+            tempNames = new String[4 + specialIncrement];
             String colorSuffix = "-" + (noBaseColor ? "black" : baseColor);
             tempNames[0] = getImageName();
             tempNames[1] = "Power-" + getPower() + colorSuffix;

@@ -1,4 +1,4 @@
 MAP:Default.map
 TER:DefaultTer.xml
-CRE:Default.cre
+CRE:DefaultCre.xml
 HINT:Default.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin

@@ -1,4 +1,4 @@
 MAP:Pantheon.map
-CRE:Pantheon.cre
+CRE:PantheonCre.xml
 TER:PantheonTer.xml
 DEPEND:ExtTitan

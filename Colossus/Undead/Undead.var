@@ -1,4 +1,4 @@
 MAP:Undead.map
-CRE:Undead.cre
+CRE:UndeadCre.xml
 TER:UndeadTer.xml
 HINT:Undead.hin

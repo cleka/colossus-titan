@@ -1,6 +1,6 @@
 MAP:ExtTitan.map
 TER:ExtTitanTer.xml
-CRE:ExtTitan.cre
+CRE:ExtTitanCre.xml
 HINT:ExtTitan.hin
 #HINT:ExtTitan.ExtTitanHint
 MAXPLAYERS: 8

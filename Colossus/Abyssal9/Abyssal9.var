@@ -1,5 +1,5 @@
 MAP:Abyssal9.map
-CRE:Abyssal9.cre
+CRE:Abyssal9Cre.xml
 TER:Abyssal9Ter.xml
 DEPEND:Abyssal6,ExtTitan
 MAXPLAYERS:9
