@@ -24,7 +24,8 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
     private Dimension offDimension;
     private Image offImage;
     private int height;
-    private int leadWidth;
+    private GridBagLayout gridbag = new GridBagLayout(); 
+    private GridBagConstraints constraints = new GridBagConstraints();
 
 
     PickRecruiter(Frame parentFrame, Legion legion, int numEligible, 
@@ -42,54 +43,69 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
         addMouseListener(this);
         addWindowListener(this);
 
-        setLayout(null);
+        setLayout(gridbag);
 
         pack();
 
         setBackground(Color.lightGray);
 
-        // setSize(scale * (numEligible + 1), (23 * scale / 10));
         height = legion.getHeight();
-
-        setSize(scale * (Math.max(numEligible, height + 1) + 1),
-            (23 * scale / 5));
 
         setResizable(false);
 
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
-
-        recruiterChits = new Chit[numEligible];
-        leadWidth = (getSize().width - (numEligible * scale)) / 2;
-        for (int i = 0; i < numEligible; i++)
-        {
-            recruiterChits[i] = new Chit(leadWidth + scale * i,
-                scale * 5 / 2, scale, recruiters[i].getImageName(), this);
-        }
-
+        legionMarker = new Marker(-1, -1, scale, legion.getImageName(), 
+            this, legion);
+        constraints.gridx = GridBagConstraints.RELATIVE;
+        constraints.gridy = 0;
+        gridbag.setConstraints(legionMarker, constraints);
+        add(legionMarker);
+        
         legionChits = new Chit[height];
         for (int i = 0; i < height; i++)
         {
-            legionChits[i] = new Chit(scale * (2 * i + 3) / 2,
-                scale * 2 / 3, scale, legion.getCritter(i).getImageName(),
-                this);
+            legionChits[i] = new Chit(-1, -1, scale, 
+                legion.getCritter(i).getImageName(), this);
+            constraints.gridx = GridBagConstraints.RELATIVE;
+            constraints.gridy = 0;
+            gridbag.setConstraints(legionChits[i], constraints);
+            add(legionChits[i]);
         }
 
-        legionMarker = new Marker(scale / 2, scale * 2 / 3, scale,
-            legion.getImageName(), this, legion);
+        recruiterChits = new Chit[numEligible];
 
-        tracker = new MediaTracker(this);
+        // There are height + 1 chits in the top row.  There
+        // are numEligible chits to place beneath.
+        // So we have (height + 1) - numEligible empty 
+        // columns, half of which we'll put in front.
+        int leadSpace = ((height + 1) - numEligible) / 2;
+        if (leadSpace < 0)
+        {
+            leadSpace = 0;
+        }
 
         for (int i = 0; i < numEligible; i++)
         {
-            tracker.addImage(recruiterChits[i].getImage(), 0);
+            recruiterChits[i] = new Chit(-1, -1, scale, 
+                recruiters[i].getImageName(), this);
+            constraints.gridx = leadSpace + i;
+            constraints.gridy = 1;
+            gridbag.setConstraints(recruiterChits[i], constraints);
+            add(recruiterChits[i]);
+            recruiterChits[i].addMouseListener(this);
         }
+
+
+        tracker = new MediaTracker(this);
+
+        tracker.addImage(legionMarker.getImage(), 0);
         for (int i = 0; i < height; i++)
         {
             tracker.addImage(legionChits[i].getImage(), 0);
         }
-        tracker.addImage(legionMarker.getImage(), 0);
+        for (int i = 0; i < numEligible; i++)
+        {
+            tracker.addImage(recruiterChits[i].getImage(), 0);
+        }
 
         try
         {
@@ -101,6 +117,12 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
                 " waitForAll was interrupted");
         }
         imagesLoaded = true;
+        
+        pack();
+        
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
+            d.height / 2 - getSize().height / 2));
 
         setVisible(true);
         repaint();
@@ -115,7 +137,6 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
         }
 
         Dimension d = getSize();
-        Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
@@ -125,21 +146,6 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
             offImage = createImage(2 * d.width, 2 * d.height);
             offGraphics = offImage.getGraphics();
         }
-
-        for (int i = 0; i < numEligible;  i++)
-        {
-            if (rectClip.intersects(recruiterChits[i].getBounds()))
-            {
-                recruiterChits[i].paint(offGraphics);
-            }
-        }
-
-        for (int i = 0; i < height; i++)
-        {
-            legionChits[i].paint(offGraphics);
-        }
-
-        legionMarker.paint(offGraphics);
 
         g.drawImage(offImage, 0, 0, this);
     }

@@ -15,16 +15,15 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
     private Legion defender;
     private Chit [] attackerChits;
     private Chit [] defenderChits;
-    private Chit attackerMarker;
-    private Chit defenderMarker;
+    private Marker attackerMarker;
+    private Marker defenderMarker;
     private static final int scale = 60;
     private Frame parentFrame;
-    private Button button1;
-    private Button button2;
-    private boolean laidOut = false;
     private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
+    private GridBagLayout gridbag = new GridBagLayout();
+    private GridBagConstraints constraints = new GridBagConstraints();
 
 
     Negotiate(Frame parentFrame, Legion attacker, Legion defender)
@@ -32,7 +31,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         super(parentFrame, attacker.getMarkerId() + " Negotiates with " +
             defender.getMarkerId(), true);
 
-        setLayout(null);
+        setLayout(gridbag);
 
         this.attacker = attacker;
         this.defender = defender;
@@ -40,42 +39,54 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
 
         pack();
         setBackground(Color.lightGray);
-        setSize(getPreferredSize());
         setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 
-        Point location = Concede.returnLocation();
-        if (location == null)
-        {
-            location = new Point(d.width / 2 - getSize().width / 2, d.height / 2
-                - getSize().height / 2);
-        }
-        setLocation(location);
-
         addMouseListener(this);
+
+        attackerMarker = new Marker(-1, -1, scale, attacker.getImageName(), 
+            this, attacker);
+        constraints.gridx = GridBagConstraints.RELATIVE;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        gridbag.setConstraints(attackerMarker, constraints);
+        add(attackerMarker);
 
         attackerChits = new Chit[attacker.getHeight()];
         for (int i = 0; i < attacker.getHeight(); i++)
         {
-            attackerChits[i] = new Chit((i + 1) * scale + (scale / 5),
-                scale / 2, scale, attacker.getCritter(i).getImageName(),
-                this);
+            attackerChits[i] = new Chit(-1, -1, scale, 
+                attacker.getCritter(i).getImageName(), this);
+            constraints.gridx = GridBagConstraints.RELATIVE;
+            constraints.gridy = 0;
+            constraints.gridwidth = 1;
+            gridbag.setConstraints(attackerChits[i], constraints);
+            add(attackerChits[i]);
+            attackerChits[i].addMouseListener(this);
         }
+        
+        defenderMarker = new Marker(-1, -1, scale, defender.getImageName(), 
+            this, defender);
+        constraints.gridx = GridBagConstraints.RELATIVE;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        gridbag.setConstraints(defenderMarker, constraints);
+        add(defenderMarker);
 
         defenderChits = new Chit[defender.getHeight()];
         for (int i = 0; i < defender.getHeight(); i++)
         {
-            defenderChits[i] = new Chit((i + 1) * scale + (scale / 5),
-                2 * scale, scale, defender.getCritter(i).getImageName(),
-                this);
+            defenderChits[i] = new Chit(-1, -1, scale,
+                defender.getCritter(i).getImageName(), this);
+            constraints.gridx = GridBagConstraints.RELATIVE;
+            constraints.gridy = 1;
+            constraints.gridwidth = 1;
+            gridbag.setConstraints(defenderChits[i], constraints);
+            add(defenderChits[i]);
+            defenderChits[i].addMouseListener(this);
         }
 
-        attackerMarker = new Marker(scale / 5, scale / 2, scale,
-            attacker.getImageName(), this, attacker);
-
-        defenderMarker = new Marker(scale / 5, 2 * scale, scale,
-            defender.getImageName(), this, defender);
 
         tracker = new MediaTracker(this);
 
@@ -101,12 +112,46 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         }
         imagesLoaded = true;
 
-        button1 = new Button("Agree");
-        button2 = new Button("Fight");
+        Button button1 = new Button("Agree");
+        Button button2 = new Button("Fight");
+
+        // Attempt to center the buttons.
+        int chitWidth = Math.max(attacker.getHeight(), 
+            defender.getHeight()) + 1;
+        if (chitWidth < 4)
+        {
+            constraints.gridwidth = 1;
+        }
+        else
+        {
+            constraints.gridwidth = 2;
+        }
+        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2; 
+        if (leadSpace < 0)
+        {
+            leadSpace = 0;
+        }
+
+        constraints.gridy = 2;
+        constraints.gridx = leadSpace;
+        gridbag.setConstraints(button1, constraints);
         add(button1);
-        add(button2);
         button1.addActionListener(this);
+        constraints.gridx = leadSpace + constraints.gridwidth;
+        gridbag.setConstraints(button2, constraints);
+        add(button2);
         button2.addActionListener(this);
+
+        pack();
+        
+        // Use the same location as the preceding Concede dialog.
+        Point location = Concede.returnLocation();
+        if (location == null)
+        {
+            location = new Point(d.width / 2 - getSize().width / 2, d.height / 2
+                - getSize().height / 2);
+        }
+        setLocation(location);
 
         setVisible(true);
         repaint();
@@ -138,28 +183,6 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
             offGraphics = offImage.getGraphics();
         }
 
-        attackerMarker.paint(offGraphics);
-        defenderMarker.paint(offGraphics);
-
-        for (int i = 0; i < attacker.getHeight(); i++)
-        {
-            attackerChits[i].paint(offGraphics);
-        }
-        for (int i = 0; i < defender.getHeight(); i++)
-        {
-            defenderChits[i].paint(offGraphics);
-        }
-
-        if (!laidOut)
-        {
-            Insets insets = getInsets();
-            button1.setBounds(insets.left + d.width / 9, 13 * d.height / 16 -
-                insets.bottom, d.width / 3, d.height / 8);
-            button2.setBounds(5 * d.width / 9 - insets.right,
-                13 * d.height / 16 - insets.bottom, d.width / 3, d.height / 8);
-            laidOut = true;
-        }
-
         g.drawImage(offImage, 0, 0, this);
     }
 
@@ -180,8 +203,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
             if (chit.select(point))
             {
                 chit.toggleDead();
-                Rectangle clip = chit.getBounds();
-                repaint(clip.x, clip.y, clip.width, clip.height);
+                chit.repaint();
                 return;
             }
         }
@@ -191,8 +213,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
             if (chit.select(point))
             {
                 chit.toggleDead();
-                Rectangle clip = chit.getBounds();
-                repaint(clip.x, clip.y, clip.width, clip.height);
+                chit.repaint();
                 return;
             }
         }
@@ -343,17 +364,5 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
             // Exit this dialog.
             cleanup();
         }
-    }
-
-
-    public Dimension getMinimumSize()
-    {
-        return getPreferredSize();
-    }
-
-    public Dimension getPreferredSize()
-    {
-        return new Dimension(scale * (Math.max(attacker.getHeight(),
-            defender.getHeight()) + 2), 4 * scale);
     }
 }
