@@ -770,7 +770,7 @@ public final class MasterBoard extends JPanel
                 }
             }
         }
-        System.out.println("Couldn't find Masterhex labeled " + label);
+        Log.warn("Couldn't find Masterhex labeled " + label);
         return null;
     }
 
@@ -791,7 +791,7 @@ public final class MasterBoard extends JPanel
             }
             if (mapIS == null) 
             {
-                System.out.println("Strategic map loading failed for map " +
+                Log.error("Strategic map loading failed for map " +
                     mapName);
                 System.exit(1);
             }
@@ -801,7 +801,7 @@ public final class MasterBoard extends JPanel
         } 
         catch (Exception e) 
         {
-            System.out.println("Strategic map loading failed : " + e);
+            Log.error("Strategic map loading failed : " + e);
             System.exit(1);
         }
         
@@ -819,8 +819,8 @@ public final class MasterBoard extends JPanel
                                 h[i][j].getBaseExitLabel(k));
                             if (dh == null) 
                             {
-                                System.out.println(
-                                    "null pointer ; i="+i+", j="+j+", k="+k);
+                                Log.error("null pointer ; i="+i+", j="+j+
+                                    ", k="+k);
                                 System.exit(1);
                             }
                             if (dh.getXCoord() == i) 
@@ -837,8 +837,8 @@ public final class MasterBoard extends JPanel
                                 } 
                                 else 
                                 {
-                                    System.out.println(
-                                        "bad exit ; i="+i+", j="+j+ ", k="+k);
+                                    Log.warn("bad exit ; i="+i+", j="+j+ 
+                                        ", k="+k);
                                 }
                             } 
                             else if (dh.getXCoord() == (i + 1)) 
@@ -850,8 +850,8 @@ public final class MasterBoard extends JPanel
                                 } 
                                 else 
                                 {
-                                    System.out.println(
-                                        "bad exit ; i="+i+", j="+j+ ", k="+k);
+                                    Log.warn("bad exit ; i="+i+", j="+j+ 
+                                        ", k="+k);
                                 }
                             } 
                             else if (dh.getXCoord() == (i - 1)) 
@@ -863,14 +863,14 @@ public final class MasterBoard extends JPanel
                                 } 
                                 else 
                                 {
-                                    System.out.println(
-                                        "bad exit ; i="+i+", j="+j+ ", k="+k);
+                                    Log.warn("bad exit ; i="+i+", j="+j+ 
+                                        ", k="+k);
                                 }
                             } 
                             else 
                             {
-                                System.out.println(
-                                    "bad exit ; i="+i+", j="+j+ ", k="+k);
+                                Log.warn("bad exit ; i="+i+", j="+j+ 
+                                    ", k="+k);
                             }
                         }
                     }

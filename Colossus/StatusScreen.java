@@ -257,10 +257,6 @@ public final class StatusScreen extends JDialog implements WindowListener
     {
         int scale = Scale.get();
         setSize(25 * scale, 15 * scale);
-    }
-
-    public boolean isFocusTraversable()
-    {
-        return false;
+        pack();
     }
 }

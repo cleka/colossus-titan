@@ -127,12 +127,10 @@ EVAL Guardian move to Plains hex F2 = -15
 EVAL Guardian move to Plains hex D6 = -25
 Considered 18 moves for Guardian in D4: D4 B2 E3 C3 F2 D5 B3 E4 C4 F3 B4 E5 C5 F4 D6 D3 E2 C2
 
-Add confirm dialog when quitting by exiting frame.
-
 AI sometimes concedes with its titan stack.  Check.
 
-rescale is broken and causes exceptions.  When it works, scale is not saved to (or
-   maybe not loaded from) cfg file.
+When it works, scale is not saved to (and maybe not loaded from) cfg file.
 
 autosave is happening even with autosave option off.
 
+Need to clear legion chits when the player takes a mulligan.

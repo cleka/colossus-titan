@@ -69,8 +69,8 @@ public class StrategicMapLoader implements StrategicMapLoaderConstants {
       jj_consume_token(EOL);
         nPosX = posX-1;
         nPosY = (posY-1)/2;
-        System.out.println("Adding case #" + p + " @(" + nPosX + "," + nPosY + "), type " + ter +
-                                        " with exit : " + s1 + ", " + s2 + ", " + s3);
+        Log.debug("Adding case #" + p + " @(" + nPosX + "," + nPosY +
+            "), type " + ter + " with exit : " + s1 + ", " + s2 + ", " + s3);
         h[nPosX][nPosY].setTerrain(ter);
         h[nPosX][nPosY].setLabel(p);
         h[nPosX][nPosY].setXCoord(nPosX);

@@ -164,12 +164,6 @@ public final class PickRoll extends JDialog implements MouseListener,
     }
 
 
-    public boolean isFocusTraversable()
-    {
-        return true;
-    }
-
-
     public boolean isRequestFocusEnabled()
     {
         return true;
@@ -185,7 +179,7 @@ public final class PickRoll extends JDialog implements MouseListener,
         frame.setVisible(true);
 
         int roll = PickRoll.pickRoll(frame, "Pick roll");
-        System.out.println("Picked " + roll);
+        Log.debug("Picked " + roll);
         System.exit(0);
     }
 }

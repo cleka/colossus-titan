@@ -73,9 +73,15 @@ public final class Battle
 
         // Set defender's entry side opposite attacker's.
         Legion attacker = getAttacker();
-        System.out.println("a: " + attacker);
-        System.out.println("label: " + masterHexLabel);
         int side = attacker.getEntrySide(masterHexLabel);
+        // XXX If invalid, default to 3, which is always valid.
+        if (side == -1)
+        {
+            Log.warn("Fixing bogus entry side!");
+            side = 3;
+            attacker.clearAllEntrySides(masterHexLabel);
+            attacker.setEntrySide(masterHexLabel, side);
+        }
         Legion defender = getDefender();
         defender.clearAllEntrySides(masterHexLabel);
         defender.setEntrySide(masterHexLabel, (side + 3) % 6);
@@ -1306,7 +1312,7 @@ public final class Battle
     {
         if (!carryTargets.contains(target.getCurrentHexLabel()))
         {
-            Log.debug("ILLEGAL CARRY ATTEMPT!");
+            Log.warn("ILLEGAL CARRY ATTEMPT!");
             return;
         }
         int dealt = carryDamage;
@@ -2114,7 +2120,6 @@ public final class Battle
         player1.addLegion(attacker);
         player2.addLegion(defender);
         String strMasterHex = oMemo.getMasterHex();
-        System.out.println("Battle.makeLegionsAndReturnGame: strMasterHex: " + strMasterHex);
         attacker.setEntrySide(strMasterHex, oMemo.getEntrySide());
 
         return game;
@@ -2126,8 +2131,6 @@ public final class Battle
         LegionMemo oDefender = oMemo.getDefender();
         String strAttackerId = oAttacker.getMarkerId();
         String strDefenderId = oDefender.getMarkerId();
-        System.out.println("a: " + oAttacker);
-        System.out.println("a id: " + strAttackerId);
 
         Game oGame = makeLegionsAndReturnGame(oMemo);
 

@@ -136,7 +136,7 @@ public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
       jj_consume_token(EOL);
         carToRecruits.put(new Character(tc), rl);
         carToName.put(new Character (tc), t);
-        System.out.println("Adding recruits for " + t);
+        Log.debug("Adding recruits for " + t);
         {if (true) return(1);}
       break;
     case EOL:

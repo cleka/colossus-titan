@@ -177,7 +177,7 @@ int oneTerrain() :
     {
         carToRecruits.put(new Character(tc), rl);
         carToName.put(new Character (tc), t);
-        System.out.println("Adding recruits for " + t);
+        Log.debug("Adding recruits for " + t);
         return(1);
     }
 |   <EOL>
