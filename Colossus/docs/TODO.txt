@@ -38,6 +38,8 @@ Bug: Eliminate warnings for calling methods on Titan Creature instead of
 
 Indicate which players have titan teleport in StatusScreen.
 
+Synchronize repaints in StatusScreen so yellow moves all at once.
+
 Save random seed in savegame?
 
 Do not scale chits in CreatureCollectionView

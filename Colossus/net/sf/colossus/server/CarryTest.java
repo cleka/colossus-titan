@@ -39,7 +39,7 @@ public class CarryTest extends TestCase
     protected void setUp()
     {
         game = new Game();
-        VariantSupport.loadVariant("Default");
+        VariantSupport.loadVariant("Default", true);
 
         game.addPlayer("Red", "SimpleAI");
         game.addPlayer("Blue", "SimpleAI");

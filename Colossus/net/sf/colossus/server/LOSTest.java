@@ -41,7 +41,7 @@ public class LOSTest extends TestCase
     protected void setUp()
     {
         game = new Game();
-        VariantSupport.loadVariant("Default");
+        VariantSupport.loadVariant("Default", true);
 
         game.addPlayer("Black", "SimpleAI");
         game.addPlayer("Green", "SimpleAI");
@@ -500,7 +500,7 @@ public class LOSTest extends TestCase
     public void testLOS5()
     {
         Log.debug("testLOS5()");
-        VariantSupport.loadVariant("TG-ConceptIII");
+        VariantSupport.loadVariant("TG-ConceptIII", true);
         String hexLabel = "1";  // Plains - Delta
 
         defender = new Legion("Gr03", "Gr01", hexLabel, null,
@@ -592,7 +592,7 @@ public class LOSTest extends TestCase
     public void testLOS6()
     {
         Log.debug("testLOS6()");
-        VariantSupport.loadVariant("Badlands-JDG");
+        VariantSupport.loadVariant("Badlands-JDG", true);
         String hexLabel = "5000";  // MountainsAlt
 
         defender = new Legion("Gr03", "Gr01", hexLabel, null,

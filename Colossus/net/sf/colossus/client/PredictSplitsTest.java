@@ -31,7 +31,7 @@ public class PredictSplitsTest extends TestCase
     {
         // Needed for Creatures
         Game game = new Game();
-        VariantSupport.loadVariant("Default");
+        VariantSupport.loadVariant("Default", true);
 
         cnl = new CreatureNameList();
         cnl.add("Titan");
