@@ -49,7 +49,11 @@ Bug: Eliminate warnings for calling methods on Titan Creature instead of
 
 Save random seed in savegame?
 
+Do not scale chits in CreatureCollectionView
+
 Recompile JDK without beeps.  Send patch to Sun.
+
+View hex recruit tree does not always paint.
 
 Allow clearing recruit chits, displaying stuff during other players' turns.
 

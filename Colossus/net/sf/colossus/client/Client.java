@@ -3310,6 +3310,7 @@ Log.error("Got nak for recruit with " + markerId);
         {
             String markerId = (String)popUndoStack();
             server.undoMove(markerId);
+            clearRecruitChits();
         }
     }
 
