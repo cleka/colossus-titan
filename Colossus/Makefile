@@ -60,13 +60,10 @@ $(JARFILE): $(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
 
 # Install jar and html files for applet
 INST_JARFILE = $(HTMLDIR)/$(JARFILE)
-INST_HTML = $(HTMLDIR)/Colossus_applet_plug.html
 INST_README = $(HTMLDIR)/README.txt
 INST_DIST = $(FTPDIR)/$(ZIPFILE)
 $(INST_JARFILE): $(JARFILE)
 	cp Colossus.jar $(HTMLDIR)
-$(INST_HTML): Colossus_applet_plug.html
-	cp Colossus_applet_plug.html $(HTMLDIR)
 $(INST_README): docs/README.txt
 	cp docs/README.txt $(HTMLDIR)
 $(INST_DIST): dist
