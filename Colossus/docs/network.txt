@@ -1,0 +1,70 @@
+Colossus network play
+David Ripton
+$Id$
+
+Colossus is now playable over a TCP/IP network.  However, the network 
+functionality is still new and probably buggy.  And turn-based games
+are inherently brittle -- if one player stops moving or drops his 
+connection, then the game is ruined for everybody.  (For now -- we'll
+add the ability to reconnect or have an AI take over later.)  So I
+recommend starting with 2-player games rather than 6-player games.
+
+One person needs to run the server.  For now, Colossus servers are 
+short-lived, staying up only for the length of one game.  The server
+needs a local copy of the Colossus code, and a Java Development Kit 
+or Java Runtime Environment.  The JDK/JRE bin directory needs to be 
+in the PATH.  And the server computer needs to have a well-known 
+hostname or IP address accessible to the other players' computers, 
+without draconian firewalling.
+
+The server operator needs to run the runserver script, which starts
+the rmiregistry program (if it's already running, this will fail and 
+throw an exception, which won't hurt anything) and then sets RMI 
+codebase and security policy locations and runs the server.  Because
+the codebase is set relative to the current directory, you need to run
+this script from its own directory, the base of the Colossus source tree.
+
+(Note: if you use the run script instead of the runserver script,
+remote clients won't be able to connect.)
+
+rmiregistry is a program included with the JDK/JRE that sets up named 
+RMI connections.  It binds to port 1099 by default.
+
+The startup dialog should appear, allowing you to set the variant,
+optional rules, and how many players of which types you want.  Human
+players are local to the server machine.  Network players are remote.
+The game will wait for *exactly* the number of network players you 
+specify, then start the game.  If you prefer, you can use command-line 
+options instead.  "run -h" to see them.
+
+Each client needs to wait for the server to be started, then run
+the runclient script.  It takes two arguments.  -p playername and
+-s server host name.  The player name will default to your OS user
+name if you don't specify one.  The server host will default to the
+local machine, which probably isn't what you want unless you're doing
+loopback testing.  So you'll want to run it like "runclient -s hostname"
+You can use the IP address instead of the hostname if you prefer.
+
+Once all the clients have connected, then the game should start up like
+a normal Colossus game.  When the game ends, kill all the clients and
+the server and restart from scratch next time.
+
+We don't have a built-in chat client yet, so you might want to run
+your favorite IRC or instant messenger client in the background. 
+
+
+FAQ:
+
+Q. I can't make it work because of my firewall.
+
+A. That means your firewall is working as designed.
+
+   If you control the firewall, configure it to allow inbound and 
+   outbound traffic on all ports > 1024 while playing.  If you don't 
+   control the firewall, you're probably hosed -- the game currently
+   uses Java RMI, which is not at all firewall-friendly.
+   
+   I plan to ditch RMI in favor of simple sockets with server-to-client 
+   traffic piggybacking on the original client-to-server connection.
+
+
