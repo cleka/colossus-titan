@@ -49,7 +49,8 @@ public final class Battle
     private int pointsScored = 0;
 
     Battle(Game game, String attackerId, String defenderId,
-            int activeLegionNum, String masterHexLabel, int turnNumber, int phase)
+            int activeLegionNum, String masterHexLabel, 
+            int turnNumber, int phase)
     {
         this.game = game;
         server = game.getServer();
@@ -483,7 +484,8 @@ public final class Battle
         Legion defender = getDefender();
         if (turnNumber == 4 && defender.canRecruit())
         {
-            Log.debug("Calling Game.reinforce() from Battle.recruitReinforcement()");
+            Log.debug("Calling Game.reinforce()"
+                + " from Battle.recruitReinforcement()");
             game.reinforce(defender);
             return false;
         }
@@ -519,7 +521,8 @@ public final class Battle
      *  is true, pretend that allied creatures that can move out of the
      *  way are not there. */
     private Set findMoves(BattleHex hex, Critter critter, boolean flies,
-            int movesLeft, int cameFrom, boolean ignoreMobileAllies, boolean first)
+            int movesLeft, int cameFrom, 
+            boolean ignoreMobileAllies, boolean first)
     {
         Set set = new HashSet();
         for (int i = 0; i < 6; i++)

@@ -1336,7 +1336,8 @@ public class RationalAI implements AI
         }
         else
         {
-            Log.debug("Combined optimum DOES NOT have constraint that we must move.");
+            Log.debug("Combined optimum DOES NOT have constraint "
+                + "that we must move.");
         }
 
         if (all_legionMoves.size() < 1)
@@ -1366,8 +1367,8 @@ public class RationalAI implements AI
             {
                 if (iter >= 1000)
                 {
-                    Log.debug("handleVoluntaryMoves() time up after " + iter +
-                        " iterations");
+                    Log.debug("handleVoluntaryMoves() time up after " 
+                        + iter + " iterations");
                     break;
                 }
             }
@@ -1440,8 +1441,11 @@ public class RationalAI implements AI
             {
                 continue;
             }
+
+            // Log.debug("New best move!");
             best_value = value;
             best_move = new LegionIndex(li);
+
         }
         Log.debug("Done computing best move.");
 
@@ -1482,8 +1486,24 @@ public class RationalAI implements AI
                     (lm.fromHex.equals(lm.toHex) &&
                     occupiedHexes.count(lm.toHex) == 1))
                 {
+                /** towi XCV, resolved conflict here, but unsure if correct!
+                boolean moved_legion = doMove(lm.markerId, lm.toHex);
+                if (moved_legion)
+                {
+                        Log.debug("Successfully moved? " + lm.markerId);
+                    occupiedHexes.remove(lm.fromHex); // hex is now free
+                    occupiedHexes.add(lm.toHex);
+                    bm.remove(); // move has been made
+                    moved = true;
+                }
+                    else
+                    {
+                        Log.debug("Did not move? " + lm.markerId);
+                    }
+                */
                     client.doMove(lm.markerId, lm.toHex);
                     return true;
+                /* towi, end of conflict */
                 }
             }
             tries++;

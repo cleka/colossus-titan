@@ -27,7 +27,8 @@ class CreatureInfo implements Cloneable
         this.atSplit = atSplit;
     }
 
-    String getName()
+    // towi: final for performance. hope it helps.
+    final String getName()
     {
         return name;
     }

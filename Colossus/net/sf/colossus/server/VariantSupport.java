@@ -3,11 +3,9 @@ package net.sf.colossus.server;
 
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Split;
 import net.sf.colossus.xmlparser.VariantLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.client.SimpleAI;
 
 import java.io.*;
 import java.util.Iterator;
@@ -18,7 +16,8 @@ import javax.swing.text.*;
 
 
 /**
- * Class VariantSupport hold the members and functions required to support Variants in Colossus
+ * Class VariantSupport hold the members and functions 
+ * required to support Variants in Colossus
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -60,8 +59,10 @@ public final class VariantSupport
 
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
-     * @param tempVarName The name of the file holding the soon-to-be-loaded Variant definition.
-     * @param tempVarDirectory The path to the directory holding the soon-to-be-loaded Variant.
+     * @param tempVarName The name of the file holding the 
+     *     soon-to-be-loaded Variant definition.
+     * @param tempVarDirectory The path to the directory holding the 
+     *     soon-to-be-loaded Variant.
      */
     public static void freshenVariant(String tempVarName,
             String tempVarDirectory)
@@ -83,8 +84,8 @@ public final class VariantSupport
     public static Document loadVariant(String variantName,
             boolean serverSide)
     {
-        return loadVariant(variantName + Constants.varEnd, variantName,
-                serverSide);
+        return loadVariant(variantName + Constants.varEnd, 
+            Constants.varPath + variantName, serverSide);
     }
 
     /**
@@ -102,7 +103,8 @@ public final class VariantSupport
     }
 
     /**
-     * Load a Colossus Variant from the specified filename in the specified path.
+     * Load a Colossus Variant from the specified filename 
+     *   in the specified path.
      * @param tempVarName The name of the file holding the Variant definition.
      * @param tempVarDirectory The path to the directory holding the Variant.
      * @param serverSide We're loading on a server.
@@ -197,6 +199,7 @@ public final class VariantSupport
         catch (Exception e)
         {
             Log.error("Variant loading failed : " + e);
+            e.printStackTrace(); //towi: added to get more info
             varDirectory = Constants.defaultDirName;
             variantName = Constants.defaultVARFile;
             mapName = Constants.defaultMAPFile;
@@ -373,26 +376,26 @@ public final class VariantSupport
         {
             o = ResourceLoader.getNewObject(hintName,
                     getVarDirectoriesList());
-            if ((o != null) && (o instanceof HintInterface))
-            {
-                aihl = (HintInterface)o;
-                Log.debug("Using class " + hintName +
-                        " to supply hints to the AIs.");
-            }
-            else
-            {
-                if (hintName.equals(Constants.defaultHINTFile))
-                {
-                    Log.error("Couldn't load default hints !");
-                    System.exit(1);
-                }
-            }
+        }
+        if ((o != null) && (o instanceof HintInterface))
+        {
+            aihl = (HintInterface)o;
+            Log.debug("Using class " + hintName +
+                    " to supply hints to the AIs.");
         }
         else
         {
-            Log.warn("Couldn't load hints. Trying with Default.");
-            hintName = Constants.defaultHINTFile;
-            loadHints();
+            if (hintName.equals(Constants.defaultHINTFile))
+            {
+                Log.error("Couldn't load default hints !");
+                System.exit(1);
+            }
+            else
+            {
+                Log.warn("Couldn't load hints. Trying with Default.");
+                hintName = Constants.defaultHINTFile;
+                loadHints();
+            }
         }
     }
 

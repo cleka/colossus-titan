@@ -9,7 +9,7 @@ import java.util.*;
  * @version $Id$
  * @author David Ripton
  */
-public final class Combos 
+public final class Combos
 {
     private ArrayList retlist;
 

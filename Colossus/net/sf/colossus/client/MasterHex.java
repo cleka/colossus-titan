@@ -78,7 +78,7 @@ public class MasterHex extends Hex
         int bonusHazardCount = 0;
         int bonusHazardSideCount = 0;
 
-        String[] hazard = BattleHex.getTerrains();
+        final String[] hazard = BattleHex.getTerrains();
 
         for (int i = 0; i < hazard.length; i++)
         {
@@ -97,7 +97,7 @@ public class MasterHex extends Hex
                 }
             }
         }
-        char[] hazardSide = BattleHex.getHexsides();
+        final char[] hazardSide = BattleHex.getHexsides();
 
         for (int i = 0; i < hazardSide.length; i++)
         {

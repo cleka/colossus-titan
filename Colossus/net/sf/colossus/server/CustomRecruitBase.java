@@ -9,7 +9,8 @@ import net.sf.colossus.server.Caretaker;
 import net.sf.colossus.util.Log;
 
 /**
- * Base class to implement custom recruiting functions (i.e. anything that is not a-number-of-creature to another creature)
+ * Base class to implement custom recruiting functions 
+ *   (i.e. anything that is not a-number-of-creature to another creature)
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -55,7 +56,8 @@ abstract public class CustomRecruitBase
         }
     }
     
-    synchronized public static final void everyoneAdvanceTurn(int newActivePlayer)
+    synchronized public static final void everyoneAdvanceTurn(
+        int newActivePlayer)
     {
         Iterator it = allCustomRecruitBase.iterator();
         while (it.hasNext())
@@ -125,7 +127,8 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                Log.error("in CustomRecruitBase, not all CaretakerInfo's count match !");
+                Log.error("in CustomRecruitBase, not all CaretakerInfo's"
+                    + " count match !");
             }
         }
         // second, update the Caretaker if we're server
@@ -136,7 +139,8 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                Log.error("in CustomRecruitBase, Caretaker's count doesn't match CaretakerInfo's counts!");
+                Log.error("in CustomRecruitBase, Caretaker's count "
+                    + "doesn't match CaretakerInfo's counts!");
             }
         }
         return count;
@@ -176,7 +180,8 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                Log.error("in CustomRecruitBase, not all CaretakerInfo's dead count match !");
+                Log.error("in CustomRecruitBase, not all CaretakerInfo's "
+                    +"dead count match !");
             }
         }
         // second, update the Caretaker if we're server
@@ -187,7 +192,8 @@ abstract public class CustomRecruitBase
             if ((oldcount != -1) &&
                 (count != oldcount))
             {
-                Log.error("in CustomRecruitBase, Caretaker's dead count doesn't match CaretakerInfo's counts!");
+                Log.error("in CustomRecruitBase, Caretaker's dead count "
+                    + "doesn't match CaretakerInfo's counts!");
             }
         }
         return count;
@@ -213,7 +219,8 @@ abstract public class CustomRecruitBase
         { // 2 legions, so we're in a Battle. Only the defender can recruit.
             return serverGame.getBattle().getDefender();
         }
-        // num > 2 this should not happen during recruiting, as only a three-way split can do that.
+        // num > 2 this should not happen during recruiting, 
+        //   as only a three-way split can do that.
         Log.warn("CUSTOM: 3 legions in recruiting hex " + hexLabel + " ?!?");
         return null;
     }
@@ -223,18 +230,21 @@ abstract public class CustomRecruitBase
     /** List all Creature that can recruit in this terrain in a special way */
     abstract public List getAllPossibleSpecialRecruiters(String terrain);
       
-    /** List all Creature that can be recruited in this terrain in a special way */
+    /** List all Creature that can be recruited in this terrain 
+     * in a special way */
     abstract public List getAllPossibleSpecialRecruits(String terrain);
 
     /** List Creature that can recruit in this terrain in a special way now */
     abstract public List getPossibleSpecialRecruiters(String terrain,
                                                       String hexLabel);
 
-    /** List Creature that can be recruited in this terrain in a special way now */
+    /** List Creature that can be recruited in this terrain 
+     * in a special way now */
     abstract public List getPossibleSpecialRecruits(String terrain,
                                                     String hexLabel);
 
-    /** number of recruiter needed to get a recruit in a special way in this terrain now */
+    /** number of recruiter needed to get a recruit 
+     * in a special way in this terrain now */
     abstract public int numberOfRecruiterNeeded(String recruiter,
                                                 String recruit,
                                                 String terrain,

@@ -6,7 +6,10 @@ import java.io.*;
 import net.sf.colossus.util.Log;
 
 /**
- * Class DevRandom generates random numbers from the "/dev/random" device, or any file or device supplying random binary data. If the source is unreachable it falls back on the regular java Random implementation.
+ * Class DevRandom generates random numbers from the "/dev/random" device,
+ * or any file or device supplying random binary data.
+ * If the source is unreachable it falls back on the
+ * regular java Random implementation.
  * @version $Id$
  * @author Romain Dolbeau
  * @author David Ripton

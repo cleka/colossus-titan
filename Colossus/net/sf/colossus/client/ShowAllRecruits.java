@@ -22,6 +22,7 @@ import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.RecruitGraph;
 
 
 /**
@@ -109,7 +110,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
             }
 
             JLabel numToRecruitLabel = new JLabel("");
-            if (numToRecruit > 0 && numToRecruit < 99)
+            if (numToRecruit > 0 && numToRecruit < RecruitGraph.BIGNUM)
             {
                 numToRecruitLabel.setText(Integer.toString(numToRecruit));
                 numToRecruitLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

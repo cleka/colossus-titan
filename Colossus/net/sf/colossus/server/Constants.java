@@ -123,8 +123,18 @@ public final class Constants
     public static final String right = "Right";
     public static final String left = "Left";
 
-    /** Default directory for datafiles */
-    public static final String defaultDirName = "Default";
+    /** all variants are subdirectories of this dir. 
+    /*  the default dir name can is not prepended by this. */
+    // towi: direcories not yet restructured: 
+    //public static final String varPath = "variants/"; //towi: variant path
+    public static final String varPath = "./";
+    
+    /** Default directory for datafiles, can be outside variants, 
+     * but should be there. 
+     */
+    // towi: direcories not yet restructured: 
+    //public static final String defaultDirName = "variants/Default"; 
+    public static final String defaultDirName = "./Default";
 
     /** Images subdirectory name */
     public static final String imagesDirName = "images";
@@ -142,7 +152,7 @@ public final class Constants
     public static final String defaultTERFile = "DefaultTer.xml";
 
     /** Default HINT file */
-    public static final String defaultHINTFile = "Default.DefaultHint";
+    public static final String defaultHINTFile = "DefaultHint";
 
     // AI types for hints
     public static final String sectionAllAI = "AllAI:";
@@ -310,6 +320,8 @@ public final class Constants
     public static final String addCreature = "addCreature";
     public static final String removeCreature = "removeCreature";
     public static final String revealCreatures = "revealCreatures";
+    public static final String revealEngagedCreatures = 
+        "revealEngagedCreatures"; //towi
     public static final String removeDeadBattleChits = "removeDeadBattleChits";
     public static final String placeNewChit = "placeNewChit";
     public static final String initBoard = "initBoard";

@@ -8,6 +8,7 @@ import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
+import net.sf.colossus.server.VariantSupport;
 
 
 /**
@@ -254,7 +255,8 @@ public final class Legion implements Comparable
 
     public static String getMarkerName(String markerId)
     {
-        return net.sf.colossus.server.VariantSupport.getMarkerNamesProperties().getProperty(markerId);
+        return VariantSupport.getMarkerNamesProperties()
+            .getProperty(markerId);
     }
 
     public static String getLongMarkerName(String markerId)

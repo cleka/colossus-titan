@@ -8,8 +8,10 @@ package net.sf.colossus.util;
  * elements. In many problem domains this allows a efficient dynamic
  * update of a permutation function.
  * @author Peter Unold
- * @see "Dershowitz, Nachum. "A simplified loop - free algorithm for generating permutations" BIT - 15 1975 158 - 164"
- * @see <a href="http://www.daimi.aau.dk/~pjunold/alg/dershowitz.html">Dershowitz's Permutation Generator</a>
+ * @see "Dershowitz, Nachum. "A simplified loop - 
+ *     free algorithm for generating permutations" BIT - 15 1975 158 - 164"
+ * @see <a href="http://www.daimi.aau.dk/~pjunold/alg/dershowitz.html">
+ *     Dershowitz's Permutation Generator</a>
  */
 class PermGen
 {

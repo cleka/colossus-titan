@@ -11,14 +11,24 @@ import java.util.List;
  */
 public interface HintOracleInterface
 {
-    public boolean hasCreature(String name); // in the Stack/Legion
-    public boolean otherFriendlyStackHasCreature(List allNames); // in a different Stack/Legion
-    public boolean canRecruit(String name); // name could be recruited
-    public boolean canReach(String terrain); // terrain can be reached by the Stack/Legion
+    /** in the Stack/Legion */
+    public boolean hasCreature(String name); 
+    /** in a different Stack/Legion */
+    public boolean otherFriendlyStackHasCreature(List allNames);
+    /** name could be recruited */ 
+    public boolean canRecruit(String name); 
+    /** terrain can be reached by the Stack/Legion */
+    public boolean canReach(String terrain); 
 
-    public int creatureAvailable(String name); // how many in caretaker
-    public int stackHeight(); // height of the Stack/Legion
-    public int biggestAttackerHeight(); // height of the bigger [height-wise] legion that can attack the Stack/Legion - 0 if none can attack.
+    /** how many in caretaker */
+    public int creatureAvailable(String name);
+    /** height of the Stack/Legion */ 
+    public int stackHeight(); 
+    /** height of the bigger [height-wise] legion that can attack 
+     * the Stack/Legion - 0 if none can attack.
+     */
+    public int biggestAttackerHeight(); 
 
-    public String hexLabel(); // label of the (master)hex
+    /** label of the (master)hex */
+    public String hexLabel(); 
 }

@@ -124,6 +124,7 @@ public final class LegionInfo
         return getContents().contains(creatureName);
     }
 
+    // TODO: great benefit from speeding this up
     public int numCreature(String creatureName)
     {
         int count = 0;
@@ -154,6 +155,7 @@ public final class LegionInfo
         return count;
     }
 
+    // TODO: ... or speed this up
     public int numCreature(Creature creature)
     {
         return numCreature(creature.getName());

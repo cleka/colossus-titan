@@ -55,7 +55,9 @@ public final class Server implements IServer
     private int numClients;
     private int maxClients;
 
-    private static Thread fileServerThread = null; /* static so that new instance of Server can destroy a previously allocated FileServerThread */
+    /* static so that new instance of Server can destroy a 
+     * previously allocated FileServerThread */
+    private static Thread fileServerThread = null; 
 
     Server(Game game, int port)
     {
@@ -167,6 +169,7 @@ public final class Server implements IServer
         return game.getPlayer(getPlayerName());
     }
 
+    /** return true if the active player is the player owning this client */
     private boolean isActivePlayer()
     {
         return getPlayerName().equals(game.getActivePlayerName());
@@ -577,8 +580,8 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.placeNewChit(critter.getName(),
-                    critter.getMarkerId().equals(game.getBattle().getDefenderId()),
-                    critter.getTag(), critter.getCurrentHexLabel());
+                critter.getMarkerId().equals(game.getBattle().getDefenderId()),
+                critter.getTag(), critter.getCurrentHexLabel());
         }
     }
 
@@ -1005,7 +1008,8 @@ public final class Server implements IServer
     }
 
     synchronized void allTellCarryResults(Critter carryTarget,
-            int carryDamageDone, int carryDamageLeft, Set carryTargetDescriptions)
+            int carryDamageDone, int carryDamageLeft, 
+            Set carryTargetDescriptions)
     {
         if (striker == null || target == null || rolls == null)
         {
@@ -1449,6 +1453,26 @@ public final class Server implements IServer
             IClient client = (IClient)it.next();
             client.revealCreatures(legion.getMarkerId(),
                     legion.getImageNames());
+        }
+        game.history.revealEvent(true, null, legion.getMarkerId(),
+                legion.getImageNames(), true);
+    }
+
+    /** pass to all clients the 'revealEngagedCreatures' message,
+     * then fire an 'revealEvent' to the history.
+     * @author Towi, copied from allRevealLegion
+     * @param legion the legion marker to reveal which is in a battle
+     * @param isAttacker true if the 'legion' is the atackker in the
+     *   battle, false for the defender.
+     */
+    void allRevealEngagedLegion(final Legion legion, final boolean isAttacker)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = (IClient) it.next();
+            client.revealEngagedCreatures(
+                legion.getMarkerId(), legion.getImageNames(), isAttacker);
         }
         game.history.revealEvent(true, null, legion.getMarkerId(),
                 legion.getImageNames(), true);

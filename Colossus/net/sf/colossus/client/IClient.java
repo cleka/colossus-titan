@@ -42,6 +42,9 @@ public interface IClient
 
     public void revealCreatures(String markerId, final List names);
 
+    public void revealEngagedCreatures(String markerId, final List names, 
+        boolean isAttacker);
+
     public void removeDeadBattleChits();
 
     public void placeNewChit(String imageName, boolean inverted, int tag,

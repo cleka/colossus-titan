@@ -120,7 +120,7 @@ public final class Movement
                 if (hex.getExitType(i) >= Constants.ARCH && i != cameFrom)
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
-                            roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null));
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null));
 
                 }
             }
@@ -132,7 +132,7 @@ public final class Movement
                 if (hex.getExitType(i) >= Constants.ARROW && i != cameFrom)
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), legion,
-                            roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null));
+                        roll - 1, Constants.ARROWS_ONLY, (i + 3) % 6, null));
                 }
             }
         }
@@ -395,7 +395,8 @@ public final class Movement
 
         if (teleport)
         {
-            if (listTeleportMoves(legion, currentHex, movementRoll).contains(targetHexLabel))
+            if (listTeleportMoves(legion, currentHex, movementRoll)
+                .contains(targetHexLabel))
             {
                 // Startlisted terrain only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.

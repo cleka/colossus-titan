@@ -16,6 +16,7 @@ import net.sf.colossus.client.StartClient;
 import net.sf.colossus.util.Options;
 
 
+
 /**
  *  Class Start contains code to start a hotseat game.
  *  @version $Id$
@@ -34,6 +35,7 @@ public final class Start
             Log.event(opt.toString());
         }
     }
+
 
     // TODO Detect contradictory options.
     private static void startClient(CommandLine cl)
@@ -76,7 +78,7 @@ public final class Start
     }
 
     private static void clearNonPersistentOptions(
-            net.sf.colossus.util.Options options)
+        net.sf.colossus.util.Options options)
     {
         options.setOption(Constants.runClient, false);
         options.removeOption(Constants.loadGame);
@@ -94,8 +96,8 @@ public final class Start
 
         if (options.isEmpty())
         {
-            // Bad input, or user selected Quit.
-            game.dispose();
+             // Bad input, or user selected Quit.
+             game.dispose();
         }
 
         // See if user hit the Load game button, and we should
@@ -118,6 +120,7 @@ public final class Start
             game.newGame();
         }
     }
+
 
     /** Modify options from command-line args if possible.  Clear
      *  options to abort if something is wrong. */
@@ -186,7 +189,7 @@ public final class Start
         }
         // Quit if values are bogus.
         if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
-                numHumans + numAIs + numNetworks > Constants.MAX_MAX_PLAYERS)
+            numHumans + numAIs + numNetworks > Constants.MAX_MAX_PLAYERS)
         {
             Log.error("Illegal number of players");
             options.clear();
@@ -213,8 +216,8 @@ public final class Start
             options.setOption(Options.playerName + j, name);
             options.setOption(Options.playerType + j, Constants.network);
         }
-        for (int k = numHumans + numNetworks;
-                k < numAIs + numHumans + numNetworks; k++)
+        for (int k = numHumans + numNetworks; 
+            k < numAIs + numHumans + numNetworks; k++)
         {
             String name = Constants.byColor + k;
             options.setOption(Options.playerName + k, name);
@@ -222,10 +225,12 @@ public final class Start
         }
     }
 
-    public static void main(String[] args)
+
+
+    public static void main(String [] args)
     {
-        Log.event("Start for Colossus version " + Client.getVersion() +
-                " at " + new Date().getTime());
+        Log.event("Start for Colossus version " + Client.getVersion() + 
+            " at " + new Date().getTime());
 
         com.werken.opt.Options opts = new com.werken.opt.Options();
         CommandLine cl = null;
@@ -288,7 +293,7 @@ public final class Start
         {
             game.getOptions().loadOptions();
             setupOptionsFromCommandLine(cl, game);
-            game.newGame();
+            game.newGame(); 
         }
         else
         {

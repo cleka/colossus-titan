@@ -74,7 +74,7 @@ public final class PredictSplits
                         if (leaf1.getTurnCreated() == leaf2.getTurnCreated())
                         {
                             throw new PredictSplitsException(
-                                    "Two leaf nodes with same markerId and turn");
+                                "Two leaf nodes with same markerId and turn");
                         }
                         else if (leaf1.getTurnCreated() <
                                 leaf2.getTurnCreated())
@@ -406,7 +406,7 @@ class Node implements Comparable
 
     void revealCreatures(List cnl)
     {
-        Log.debug("revealCreatures() for " + this + " " + cnl);
+        Log.debug("revealCreatures() for " + this + " ^ " + cnl);
         CreatureInfoList cil = new CreatureInfoList();
         Iterator it = cnl.iterator();
         while (it.hasNext())
@@ -436,7 +436,7 @@ class Node implements Comparable
             }
         }
 
-        if (count > getHeight())
+        if (count > getHeight()) // BUG: it happend! why?
         {
             throw new PredictSplitsException(
                     "Certainty error in revealCreatures -- count is " +

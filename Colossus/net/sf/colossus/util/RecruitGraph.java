@@ -23,6 +23,9 @@ public class RecruitGraph
     private final List allEdge = new ArrayList();
     private final Map creatureToVertex = new HashMap();
 
+    /** 99 creatures can muster one means: can not muster at all */
+    public static final int BIGNUM = 99;
+
     /**
      * The vertex of the Recruit Graph
      * @version $Id$
@@ -84,7 +87,7 @@ public class RecruitGraph
             }
             else
             {
-                return 99;
+                return BIGNUM;
             }
         }
 
@@ -225,7 +228,11 @@ public class RecruitGraph
     }
 
     /**
-     * Traverse the graph (depth first), assuming that all vertex in visited have been already visited, and using the given legion for availability of creatures (along with the caretakerInfo). This will ignore any strange stuff such as Anything, AnyNonLord, and so on. OTOH It will not ignore the Titan.
+     * Traverse the graph (depth first), assuming that all vertex in visited
+     * have been already visited, and using the given legion for availability
+     * of creatures (along with the caretakerInfo). This will ignore any
+     * strange stuff such as Anything, AnyNonLord, and so on. OTOH It will
+     * not ignore the Titan.
      * @param s The base vertex
      * @param visited Already visited vertexes
      * @param legion The legion to use for availability
@@ -304,7 +311,8 @@ public class RecruitGraph
     }
 
     /**
-     * Give the List of RecruitVertex still reachable through the given creature from the given Legion.
+     * Give the List of RecruitVertex still reachable through the given
+     * creature from the given Legion.
      * @param cre Name of the base creature
      * @return A List of all the reachable RecruitVertex.
      */
@@ -318,7 +326,8 @@ public class RecruitGraph
     /* PUBLIC */
 
     /**
-     * Add an edge is the graph from a Creature to another, in a given number, in a given terrain.
+     * Add an edge is the graph from a Creature to another, in a given number,
+     * in a given terrain.
      * @param src Name of the recruiting creature
      * @param dst Name of the recruited creature
      * @param number Number of recruiters
@@ -350,7 +359,7 @@ public class RecruitGraph
         boolean isDemiLord = (recruiterCre == null ?
                 false :
                 recruiterCre.isDemiLord());
-        int minValue = 99;
+        int minValue = BIGNUM;
 
         Iterator it = allEdge.iterator();
         while (it.hasNext())
@@ -374,9 +383,11 @@ public class RecruitGraph
                         minValue = theEdge.getNumber();
                     }
                 }
-                if (tempSrc.getCreatureName().startsWith(TerrainRecruitLoader.Keyword_Special))
+                if (tempSrc.getCreatureName().startsWith(
+                    TerrainRecruitLoader.Keyword_Special))
                 {
-                    CustomRecruitBase cri = TerrainRecruitLoader.getCustomRecruitBase(tempSrc.getCreatureName());
+                    CustomRecruitBase cri = TerrainRecruitLoader
+                        .getCustomRecruitBase(tempSrc.getCreatureName());
                     int v = cri.numberOfRecruiterNeeded(recruiter,
                             recruit,
                             terrain,
@@ -442,7 +453,8 @@ public class RecruitGraph
      * number of creature of the given name can recruit.
      * @param cre Name of the recruiting creature.
      * @param number Number of creature
-     * @return A List of String representing all Terrains where recruitment is possible.
+     * @return A List of String representing all Terrains where recruitment
+     *     is possible.
      */
     public List getAllTerrainsWhereThisNumberOfCreatureRecruit(String cre,
             int number)
@@ -464,7 +476,61 @@ public class RecruitGraph
     }
 
     /**
-     * Return the name of the recruit for the given number of the given recruiter in the given terrain, or null if there's none.
+     * a triple if lists what the creature 'CRE' can recruit.
+     * the positions in the lists accord to each other.
+     * <code>[ [ter1, ter2, ...], [cre1, cre2, ...], [num1, num2, ...] ]</code>
+     * means that in terrain='ter1' with 'num1' of 'CRE' you get one 'cre1'.
+     * @return [ [terrains], [creature names], [numbers] ]
+     */
+    public List[] getAllThatThisCreatureCanRecruit(String cre)
+    {
+        List[] result = new List[3]; // [[terrain],[creature],[number]] 
+        result[0] = new ArrayList();
+        result[1] = new ArrayList();
+        result[2] = new ArrayList();
+        //
+        List outgoing = getOutgoingEdges(cre);
+        Iterator it = outgoing.iterator();
+        while (it.hasNext())
+        {
+            RecruitEdge e = (RecruitEdge)it.next();
+            result[2].add(new Integer(e.getNumber()));
+            result[1].add(e.getDestination().getCreatureName());
+            result[0].add(e.getTerrain());
+        }
+        return result;
+    }
+
+    /** 
+     * a triple if lists what can recruit the creature 'CRE'.
+     * the positions in the lists accord to each other.
+     * <code>[ [ter1, ter2, ...], [cre1, cre2, ...], [num1, num2, ...] ]</code>
+     * means that in terrain='ter1' with 'num1' of 'cre1' you get one 'cre'.
+     * @return [ [terrains], [creature names], [numbers] ]
+     */
+    public List[] getAllThatCanRecruitThisCreature(String cre)
+    {
+        List[] result = new List[3]; // [[terrain],[creature],[number]] 
+        result[0] = new ArrayList();
+        result[1] = new ArrayList();
+        result[2] = new ArrayList();
+        //
+        List outgoing = getIncomingEdges(cre);
+        Iterator it = outgoing.iterator();
+        while (it.hasNext())
+        {
+            RecruitEdge e = (RecruitEdge)it.next();
+            result[2].add(new Integer(e.getNumber()));
+            result[1].add(e.getSource().getCreatureName());
+            result[0].add(e.getTerrain());
+        }
+        return result;
+    }
+
+
+    /**
+     * Return the name of the recruit for the given number of the given
+     * recruiter in the given terrain, or null if there's none.
      * @param cre Name of the recruiting creature.
      * @param number Number of creature
      * @param t Terrain in which the recruiting may occur.
@@ -493,7 +559,8 @@ public class RecruitGraph
     }
 
     /**
-     * Return the name of the best possible creature that is reachable trough the given creature from the given LegionInfo (can be null).
+     * Return the name of the best possible creature that is reachable
+     * trough the given creature from the given LegionInfo (can be null).
      * @param cre Name of the recruiting creature.
      * @param legion The recruiting legion or null.
      * @return Name of the best possible recruit.
@@ -508,7 +575,8 @@ public class RecruitGraph
         while (it.hasNext())
         {
             RecruitVertex v2 = (RecruitVertex)it.next();
-            Creature creature = Creature.getCreatureByName(v2.getCreatureName());
+            Creature creature = Creature.getCreatureByName(
+                v2.getCreatureName());
             int vp = (creature == null ? -1 : creature.getPointValue());
             if (vp > maxVP)
             {
@@ -530,7 +598,7 @@ public class RecruitGraph
      * is not what we are interested in.
      * @param lesser Name of the recruiting creature.
      * @param greater Name of the recruit we are trying to get to
-     * @distance number of steps to consider
+     * @param distance number of steps to consider
      */
     public boolean isRecruitDistanceLessThan(String lesser, String greater,
             int distance)

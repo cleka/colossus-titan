@@ -22,7 +22,10 @@ import net.sf.colossus.xmlparser.CreatureLoader;
  * @author Romain Dolbeau
  */
 
-public class Creature implements Comparable
+public class Creature 
+implements 
+    Comparable, 
+    net.sf.colossus.util.Terrains // H_xxx constants
 {
     private final String name;
     private final String pluralName;
@@ -202,6 +205,18 @@ public class Creature implements Comparable
     { // Titan use class CreatureTitan
         return false;
     }
+    
+    /** true if any if the values can change during the game returned by:
+     * - getPower, getSkill, (and therefore getPointValue)
+     * - isRangestriker, isFlier, useMagicMissile
+     * - isNativeTerraion(t), for all t
+     * - isNativeHexSide(h) for all h
+     * In Standard game only the titans change their attributes 
+     */
+    public boolean canChangeValue()
+    {
+        return isTitan();
+    }
 
     /* The name is an unique identifier and must not be changed,
      so this function is final */
@@ -292,43 +307,43 @@ public class Creature implements Comparable
 
     public boolean isNativeTerrain(String t)
     {
-        if (t.equals("Plains"))
+        if (t.equals(H_PLAINS))
         { /* undefined */
             return false;
         }
-        else if (t.equals("Tower"))
+        else if (t.equals(H_TOWER))
         { /* undefined, beneficial for everyone */
             return true;
         }
-        else if (t.equals("Brambles"))
+        else if (t.equals(H_BRAMBLES))
         {
             return isNativeBramble();
         }
-        else if (t.equals("Sand"))
+        else if (t.equals(H_SAND))
         {
             return isNativeSandDune();
         }
-        else if (t.equals("Tree"))
+        else if (t.equals(H_TREE))
         {
             return isNativeTree();
         }
-        else if (t.equals("Bog"))
+        else if (t.equals(H_BOG))
         {
             return isNativeBog();
         }
-        else if (t.equals("Volcano"))
+        else if (t.equals(H_VOLCANO))
         {
             return isNativeVolcano();
         }
-        else if (t.equals("Drift"))
+        else if (t.equals(H_DRIFT))
         {
             return isNativeDrift();
         }
-        else if (t.equals("Lake"))
+        else if (t.equals(H_LAKE))
         {
             return isWaterDwelling();
         }
-        else if (t.equals("Stone"))
+        else if (t.equals(H_STONE))
         {
             return isNativeStone();
         }
@@ -425,37 +440,94 @@ public class Creature implements Comparable
         return summonable;
     }
 
-    public static Creature getCreatureByName(String name)
-    {
-        if (name == null)
-        {
-            throw new NullPointerException("Calling Creature.getCreatureByName() on null");
-        }
-        Iterator it = creatures.iterator();
-        while (it.hasNext())
-        {
-            Creature creature = (Creature)it.next();
-            if (name.equalsIgnoreCase(creature.getName()))
-            {
-                return creature;
-            }
-        }
-        if (!(name.equals("null")))
-        {
-            // "null" (not a null pointer...) is used for recruiter
-            // when it is anonoymous, so it is known and legal,
-            // mapped to null (a null pointer, this time).
-            Log.debug("CUSTOM: unknown creature: " + name);
-        }
-        return null;
+    /** getCreatureByName cache.
+     *  towi: do you believe it? 20% of the time was spent in the
+     *    method getCreatureByName(). i had to do something about that!
+     *
+     *    since the names of the creatures do NOT change during a game
+     *    i implemented a simple caching mechanism, filles upon requests.
+     *    in this cache (aka Hashtable) we map from upper/lowercase variants
+     *    to the wanted creature.
+     *
+     *    we add null values when a creature is not found. if these are
+     *    queried we can transparently return this null.
+     *
+     *    Why do I use a "weak" HashMap? I dunno. I guessed in the init phase
+     *    of the game a certain set of different spelling variants might occur.
+     *    these can be discarded later. Hmm, doesnt matter really, i think.
+     */
+    private static java.util.Map _getCreatureByName_cache = new WeakHashMap();
+    // init the cache with predefined values.
+    static {
+        // "null" (not a null pointer...) is used for recruiter
+        // when it is anonoymous, so it is known and legal,
+        // mapped to null (a null pointer, this time).
+        _getCreatureByName_cache.put("null", null);
     }
 
-    public static boolean isCreature(String name)
+    /** case insensitive creature type lookup. its cached, its fast.
+     * 
+     * implementation description:
+     * - if creaturen name is found in cache (hash map String->Creature)
+     *   return it
+     * - if not, find it iterating
+     * - put pair into cache, with this specific spelling variant
+     * - return the creature
+     *
+     * @param name case insensitive (!) name of a creature type
+     * @return creature with the given name, null if not a creature.
+     * @raise NullPointerException whenname is null
+     */
+    public static Creature getCreatureByName(final String name)
+    {
+        // do not allow null key/name.
+        if (name == null)
+        {
+            throw new NullPointerException(
+                "Calling Creature.getCreatureByName() on null");
+        }
+
+        // first check the cache.
+        if (_getCreatureByName_cache.containsKey(name))
+        {
+            // we found it. can be null, from earlier adding null
+            //   as "not found" marker.
+            return (Creature) _getCreatureByName_cache.get(name);
+        }
+        else 
+        {
+            // find it the slow way and add to cache.
+            Iterator it = creatures.iterator();
+            while (it.hasNext())
+            {
+                Creature creature = (Creature) it.next();
+                if (name.equalsIgnoreCase(creature.getName()))
+                {
+                    // found it the hard way. now add this spelling to cache
+                    _getCreatureByName_cache.put(name, creature);
+                    // end search on success.
+                    return creature;
+                }
+            }
+            // not found the slow way? damn.
+            //   then store this as a negative result for the future, too.
+            Log.debug("CUSTOM: unknown creature: " + name);
+            _getCreatureByName_cache.put(name, null);
+            return null;
+        }
+    }
+
+    /** @param name (exact) name of a creature.
+     * @return true if this names represents a creature
+     * TODO: make more efficient. maybe use getCreatureByName()
+     * TODO: mayebe param name will becomde case insensitive.
+     */
+    public static boolean isCreature(final String name)
     {
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
-            Creature creature = (Creature)it.next();
+            Creature creature = (Creature) it.next();
             if (name != null && name.equals(creature.getName()))
             {
                 return true;

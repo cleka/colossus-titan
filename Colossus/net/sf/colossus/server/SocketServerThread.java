@@ -393,6 +393,20 @@ final class SocketServerThread extends Thread implements IClient
                 Glob.glob(names));
     }
 
+    /** print the 'revealEngagagedCreature'-message,
+     *   args: markerId, isAttacker, list of creature names
+     * @param markerId legion marker name that is currently in battle
+     * @param names List of creature names in this legion
+     * @param isAttacker true for attacker, false for defender
+     * @author Towi, copied from revealCreatures
+     */
+    public void revealEngagedCreatures(final String markerId, final List names,
+        final boolean isAttacker)
+    {
+        out.println(Constants.revealEngagedCreatures + sep + markerId
+            + sep + isAttacker + sep + Glob.glob(names));
+    }
+
     public void removeDeadBattleChits()
     {
         out.println(Constants.removeDeadBattleChits);

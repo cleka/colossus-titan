@@ -21,7 +21,8 @@ import org.apache.batik.util.XMLResourceDescriptor;
 
 
 /**
- * Class ResourceLoader is an utility class to load a resource from a filename and a list of directory.
+ * Class ResourceLoader is an utility class to load a resource from 
+ * a filename and a list of directory.
  * @version $Id$
  * @author Romain Dolbeau
  * @author David Ripton
@@ -59,8 +60,8 @@ public final class ResourceLoader
                 String shortClassName = className.substring(index + 1);
                 if (index == -1)
                 {
-                    Log.error("Loading of class \"" + className + "\" failed (" +
-                            "no dot in class name" + ")");
+                    Log.error("Loading of class \"" + className 
+                        + "\" failed (no dot in class name)");
                     return null;
                 }
                 InputStream classDataIS =
@@ -396,7 +397,8 @@ public final class ResourceLoader
     }
 
     /**
-     * Return the first InputStream from file of name filename in the list of directories.
+     * Return the first InputStream from file of name filename in the 
+     * list of directories.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
      * @return The InputStream, or null if it was not found.
@@ -408,7 +410,8 @@ public final class ResourceLoader
     }
 
     /**
-     * Return the first InputStream from file of name filename in the list of directories.
+     * Return the first InputStream from file of name filename in
+     * the list of directories.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
      * @param remote Ask the server for the stream.
@@ -499,8 +502,8 @@ public final class ResourceLoader
                         else
                         {
                             PrintWriter out =
-                                    new PrintWriter(fileSocket.getOutputStream(),
-                                    true);
+                                new PrintWriter(fileSocket.getOutputStream(),
+                                true);
                             out.print(filename);
                             java.util.Iterator it = directories.iterator();
                             while (it.hasNext())
@@ -528,8 +531,10 @@ public final class ResourceLoader
      * Return the content of the specified file as an array of byte.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
-     * @param cachedOnly Only look in the cache file, do not try to load the file from permanent storage.
-     * @return An array of byte representing the content of the file, or null if it fails.
+     * @param cachedOnly Only look in the cache file, 
+     *     do not try to load the file from permanent storage.
+     * @return An array of byte representing the content of the file, 
+     *     or null if it fails.
      */
     public static byte[] getBytesFromFile(String filename,
             List directories,
@@ -551,7 +556,8 @@ public final class ResourceLoader
     /**
      * Return the content of the specified InputStream as an array of byte.
      * @param InputStream The InputStream to use.
-     * @return An array of byte representing the content of the InputStream, or null if it fails.
+     * @return An array of byte representing the content 
+     *     of the InputStream, or null if it fails.
      */
     private static byte[] getBytesFromInputStream(InputStream is)
     {
@@ -592,15 +598,16 @@ public final class ResourceLoader
     {
         if (data == null)
         {
-            Log.warn("getInputStreamFromBytes:: " +
-                    " Can't create InputStream from null byte array");
+            Log.warn("getInputStreamFromBytes:: "
+                  + " Can't create InputStream from null byte array");
             return null;
         }
         return new ByteArrayInputStream(data);
     }
 
     /**
-     * Return the first OutputStream from file of name filename in the list of directories.
+     * Return the first OutputStream from file of name filename in 
+     *     the list of directories.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
      * @return The OutputStream, or null if it was not found.
@@ -631,8 +638,10 @@ public final class ResourceLoader
     }
 
     /**
-     * Return the first Document from file of name filename in the list of directories.
-     * It also add a property of key keyContentType and of type String describing the content type of the Document.
+     * Return the first Document from file of name filename in 
+     *   the list of directories.
+     * It also add a property of key keyContentType and of type String 
+     *   describing the content type of the Document.
      * This can currently load HTML and pure text.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
@@ -703,7 +712,8 @@ public final class ResourceLoader
      * Return the key to use in the image and file caches.
      * @param filename Name of the file.
      * @param directories List of directories.
-     * @return A String to use as a key when storing/loading in a cache the specified file from the specified list of directories.
+     * @return A String to use as a key when storing/loading in a cache
+     *   the specified file from the specified list of directories.
      */
     private static String getMapKey(String filename,
             List directories)
@@ -717,7 +727,9 @@ public final class ResourceLoader
      * Return the key to use in the image cache.
      * @param filenames Array of name of files.
      * @param directories List of directories.
-     * @return A String to use as a key when storing/loading in a cache the specified array of name of files from the specified list of directories.
+     * @return A String to use as a key when storing/loading in a cache
+     *   the specified array of name of files from the specified 
+     *   list of directories.
      */
     private static String getMapKey(String[] filenames,
             List directories)
@@ -742,7 +754,8 @@ public final class ResourceLoader
     }
 
     /**
-     * Return the composite image made from blending the given filenames from the given directories.
+     * Return the composite image made from blending the given filenames
+     *   from the given directories.
      * @param filenames Names of the Images files to load (without extension).
      * @param directories List of directories to search (in order).
      * @return The compisite Image, or null if any part was not found.
@@ -800,7 +813,9 @@ public final class ResourceLoader
     }
 
     /**
-     * Try to build an image when there is no source file to create it. Includes generation of some dynamic layers of images for composite image building.
+     * Try to build an image when there is no source file to create it.
+     *   Includes generation of some dynamic layers of images for
+     *   composite image building.
      * @see #getCompositeImage(String[], List)
      * @param filename The name of the missing file.
      * @param width Width of the image to create.
@@ -898,7 +913,8 @@ public final class ResourceLoader
         BufferedImage bi = new BufferedImage(width, height,
                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
-        biContext.setColor(new Color((float)1., (float)1., (float)1., (float)0.));
+        biContext.setColor(
+            new Color((float)1., (float)1., (float)1., (float)0.));
         biContext.fillRect(0, 0, width, height);
         biContext.setColor(color);
         int fontsize = (width + height) / 10;
@@ -940,7 +956,8 @@ public final class ResourceLoader
         BufferedImage bi = new BufferedImage(width, height,
                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
-        biContext.setColor(new Color((float)1., (float)1., (float)1., (float)0.));
+        biContext.setColor(
+            new Color((float)1., (float)1., (float)1., (float)0.));
         biContext.fillRect(0, 0, width, height);
         biContext.setColor(color);
         int fontsize = (width + height) / 10;
@@ -997,7 +1014,8 @@ public final class ResourceLoader
     }
 
     /**
-     * Create an Image that only contains a colored rectangle, with an optional border.
+     * Create an Image that only contains a colored rectangle, 
+     *   with an optional border.
      * @param width Width of the image to create.
      * @param height Height of the image to create
      * @param color The color to use to fill the rectangle.
@@ -1015,7 +1033,8 @@ public final class ResourceLoader
         BufferedImage bi = new BufferedImage(width, height,
                 BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
-        biContext.setColor(new Color((float)1., (float)1., (float)1., (float)0.));
+        biContext.setColor(
+            new Color((float)1., (float)1., (float)1., (float)0.));
         biContext.fillRect(0, 0, width, height);
         biContext.setColor(color);
         biContext.fillRect(t_x, t_y, t_w, t_h);
@@ -1033,7 +1052,8 @@ public final class ResourceLoader
      * @param filename Name of the Image file to load.
      * @param directories List of directories to search (in order).
      * @param color Color to use.
-     * @return An Image composed of the content of the file, with the transparent part filled the the given color.
+     * @return An Image composed of the content of the file, 
+     *     with the transparent part filled the the given color.
      */
     private static Image createColorizedImage(String filename, Color color,
             List directories, int width, int height)
@@ -1259,7 +1279,8 @@ public final class ResourceLoader
     }
 
     /**
-     * Create an instance of the class whose name is in parameter, using parameters.
+     * Create an instance of the class whose name is in parameter,
+     *     using parameters.
      * @param className The name of the class to use.
      * @param directories List of directories to search (in order).
      * @param paramter Array of parameters to pass to the constructor.
@@ -1349,7 +1370,9 @@ public final class ResourceLoader
     }
 
     /**
-     * Dump the filecache as a List of XML "DataFile" Element, with the file key as attribute "DataFileKey", and the file data as a CDATA content.
+     * Dump the filecache as a List of XML "DataFile" Element,
+     *     with the file key as attribute "DataFileKey", and the 
+     *     file data as a CDATA content.
      * @return A list of XML Element.
      */
     public static List getFileCacheDump()
@@ -1376,7 +1399,8 @@ public final class ResourceLoader
 
         public BufferedImage createImage(int width, int height)
         {
-            return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            return new BufferedImage(width, height, 
+                BufferedImage.TYPE_INT_ARGB);
         }
 
         public void writeImage(BufferedImage image, TranscoderOutput output)

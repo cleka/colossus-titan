@@ -6,6 +6,7 @@ import java.util.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.util.Options;
 
 
 /**
@@ -15,7 +16,9 @@ import net.sf.colossus.client.HexMap;
  * @author Romain Dolbeau
  */
 
-final class Critter implements Comparable
+// final
+public //  
+class Critter implements Comparable
 {
     private Creature creature;
     private String markerId;
@@ -36,7 +39,7 @@ final class Critter implements Comparable
     private SortedSet penaltyOptions = new TreeSet();
     private boolean carryPossible;
 
-    Critter(Creature creature, String markerId, Game game)
+    public Critter(Creature creature, String markerId, Game game)
     {
         this.creature = creature;
         this.markerId = markerId;
@@ -170,7 +173,7 @@ final class Critter implements Comparable
         this.struck = struck;
     }
 
-    BattleHex getCurrentHex()
+    protected BattleHex getCurrentHex()
     {
         return HexMap.getHexByLabel(battle.getTerrain(), currentHexLabel);
     }
@@ -236,7 +239,7 @@ final class Critter implements Comparable
 
     /** Return true if there are any enemies adjacent to this critter.
      *  Dead critters count as being in contact only if countDead is true. */
-    boolean isInContact(boolean countDead)
+    protected boolean isInContact(boolean countDead)
     {
         BattleHex hex = getCurrentHex();
 
@@ -297,7 +300,7 @@ final class Critter implements Comparable
 
     /** Return the number of dice that will be rolled when striking this
      *  target, including modifications for terrain. */
-    int getDice(Critter target)
+    protected int getDice(Critter target)
     {
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -403,7 +406,7 @@ final class Critter implements Comparable
             // Non-native rangestrikes: -1 per intervening bramble hex
             if (!isNativeBramble())
             {
-                attackerSkill -= battle.countBrambleHexes(hex, targetHex);
+                attackerSkill -= countBrambleHexes(targetHex);
             }
 
             // Rangestrike up across wall: -1 per wall
@@ -430,7 +433,12 @@ final class Critter implements Comparable
         return attackerSkill;
     }
 
-    int getStrikeNumber(Critter target)
+    protected int countBrambleHexes(final BattleHex targetHex)
+    {
+        return battle.countBrambleHexes(getCurrentHex(), targetHex);
+    }
+
+    protected int getStrikeNumber(Critter target)
     {
         boolean rangestrike = !isInContact(true);
 
@@ -711,8 +719,7 @@ final class Critter implements Comparable
         // Roll the dice.
         int damage = 0;
         // Check if we roll or if we don't
-        boolean randomized =
-                !(game.getOption(net.sf.colossus.util.Options.nonRandomBattleDice));
+        boolean randomized = !(game.getOption(Options.nonRandomBattleDice));
 
         List rolls = new ArrayList();
         StringBuffer rollString = new StringBuffer(36);
@@ -891,7 +898,8 @@ final class Critter implements Comparable
         // Must use our local, Titan-aware getPointValue()
         // return creature.getHintedRecruitmentValue();
         return getPointValue() +
-                VariantSupport.getHintedRecruitmentValueOffset(creature.getName());
+                VariantSupport.getHintedRecruitmentValueOffset(
+                    creature.getName());
     }
 
     public int getHintedRecruitmentValue(String[] section)
@@ -899,8 +907,9 @@ final class Critter implements Comparable
         // Must use our local, Titan-aware getPointValue()
         // return creature.getHintedRecruitmentValue(section);
         return getPointValue() +
-                VariantSupport.getHintedRecruitmentValueOffset(creature.getName(),
-                section);
+                VariantSupport.getHintedRecruitmentValueOffset(
+                    creature.getName(),
+                    section);
     }
 
     public boolean isRangestriker()

@@ -94,7 +94,8 @@ final class FileServerThread extends Thread
                 }
                 else
                 {
-                    Log.warn("SOMEBODY NOT A CLIENT IS TRYING TO ACCESS A FILE !");
+                    Log.warn("SOMEBODY NOT A CLIENT "
+                        +"IS TRYING TO ACCESS A FILE !");
                     Log.warn("Request was from " + fileClient);
                 }
                 fileClient.close();

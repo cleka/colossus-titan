@@ -34,6 +34,20 @@ public class SimpleAI implements AI
     public SimpleAI(Client client)
     {
         this.client = client;
+        // initialize the creature info needed by the AI
+        if (aiCreatureInfos != null)
+        {
+            // ok, its a static. but the first SimpleAI initializes it.
+            final List allCreatures = Creature.getCreatures();
+            aiCreatureInfos = new java.util.HashMap(allCreatures.size());
+            Iterator it = allCreatures.iterator();
+            while (it.hasNext())
+            {
+                final Creature creature = (Creature) it.next();
+                final AiCreatureInfo info = new AiCreatureInfo(creature);
+                aiCreatureInfos.put(creature, info);
+            }
+        }
     }
 
     public String pickColor(List colors, List favoriteColors)
@@ -41,7 +55,7 @@ public class SimpleAI implements AI
         Iterator it = favoriteColors.iterator();
         while (it.hasNext())
         {
-            String preferredColor = (String)it.next();
+            String preferredColor = (String) it.next();
             if (colors.contains(preferredColor))
             {
                 return preferredColor;
@@ -51,7 +65,7 @@ public class SimpleAI implements AI
         it = colors.iterator();
         if (it.hasNext())
         {
-            return (String)it.next();
+            return (String) it.next();
         }
         return null;
     }
@@ -1084,9 +1098,9 @@ public class SimpleAI implements AI
 
                     // we score a fraction of a basic acquirable
                     value += ((Creature.getCreatureByName(
-                                    TerrainRecruitLoader.getPrimaryAcquirable())).getPointValue() *
-                                    enemyPointValue) /
-                            TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+                            TerrainRecruitLoader.getPrimaryAcquirable())
+                        ).getPointValue() * enemyPointValue) /
+                        TerrainRecruitLoader.getAcquirableRecruitmentsValue();
                     // plus a fraction of a titan strength
                     // XXX Should be by variant
                     value += (6 * enemyPointValue) /
@@ -1148,8 +1162,9 @@ public class SimpleAI implements AI
                             !haveOtherSummonables &&
                             enemyPointValue <
                             ((int)((float)
-                            TerrainRecruitLoader.getAcquirableRecruitmentsValue() *
-                            .88)))
+                            TerrainRecruitLoader
+                              .getAcquirableRecruitmentsValue() * .88)
+                            ))
                     {
                         value += LOSE_LEGION + 5;
                     }
@@ -1157,12 +1172,13 @@ public class SimpleAI implements AI
                     {
                         // we score a fraction of a basic acquirable
                         value += ((Creature.getCreatureByName(
-                                        TerrainRecruitLoader.getPrimaryAcquirable())).getPointValue() *
-                                        enemyPointValue) /
-                                TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+                                TerrainRecruitLoader.getPrimaryAcquirable())
+                            ).getPointValue() * enemyPointValue) /
+                            TerrainRecruitLoader
+                                .getAcquirableRecruitmentsValue();
                         // plus a fraction of a titan strength
                         value += (6 * enemyPointValue) /
-                                TerrainRecruitLoader.getTitanImprovementValue();
+                            TerrainRecruitLoader.getTitanImprovementValue();
                         // but we lose this group
                         value -= (20 * legion.getPointValue()) / 100;
                         // TODO: if we have no other angels, more penalty here
@@ -1200,16 +1216,16 @@ public class SimpleAI implements AI
                     break;
 
                 case LOSE_BUT_INFLICT_HEAVY_LOSSES:
-                    Log.debug("legion " + legion + " can attack " + enemyLegion +
-                            " in " + hex + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
+                    Log.debug("legion " + legion + " can attack " + enemyLegion
+                        + " in " + hex + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
 
                     // TODO: how important is it that we damage his group?
                     value += LOSE_LEGION + 1;
                     break;
 
                 case LOSE:
-                    Log.debug("legion " + legion + " can attack " + enemyLegion +
-                            " in " + hex + " and LOSE");
+                    Log.debug("legion " + legion + " can attack " + enemyLegion
+                        + " in " + hex + " and LOSE");
 
                     value += LOSE_LEGION;
                     break;
@@ -2387,25 +2403,61 @@ public class SimpleAI implements AI
         return val;
     }
 
-    static int getKillValue(Creature creature)
+    static int getKillValue(final Creature creature)
     {
         return getKillValue(creature, null);
     }
 
     // XXX titan power
-    static int getKillValue(BattleChit chit, String terrain)
+    // towi: titans killValue is "infinite" anyway. 
+    //   dont spend time for handling that special case. 
+    static int getKillValue(final BattleChit chit, final String terrain)
     {
         return getKillValue(chit.getCreature(), terrain);
     }
 
-    static int getKillValue(Creature creature, String terrain)
+    static int getKillValue(final Creature creature, String terrain)
+    {
+        int val;
+        // get non-terrain modified part of kill value
+        if(creature.canChangeValue() || aiCreatureInfos == null)
+        {
+            // titans might change their value
+            val = getKillValue1(creature);
+        }
+        else
+        {
+            // use from pre-calced cache
+            final AiCreatureInfo info = 
+                (AiCreatureInfo)aiCreatureInfos.get(creature);
+            val = info.getKillValue1();            
+        }
+        // modify with terrain
+        if (terrain != null &&
+                MasterHex.isNativeCombatBonus(creature, terrain))
+        {
+            val += 3;
+        }
+        return val;
+    }
+    
+    /** get the non-terrainified part of the kill-value.
+     *  
+     * towi: Note that you have to take special care for creatures that
+     * might change their attributes -- like the Power of titans.
+     * since this modifies the getKillValue1() return value.
+     * on the other hand... since titans have a killValue>1000 anyway, 
+     * this might not matter at all. 
+     */
+    final static private int getKillValue1(final Creature creature)
     {
         int val = 10 * creature.getPointValue();
-        if (creature.getSkill() >= 4)
+        final int skill = creature.getSkill(); 
+        if (skill >= 4)
         {
             val += 2;
         }
-        if (creature.getSkill() <= 2)
+        else if (skill <= 2)
         {
             val += 1;
         }
@@ -2421,17 +2473,13 @@ public class SimpleAI implements AI
         {
             val += 4;
         }
-        if (terrain != null &&
-                MasterHex.isNativeCombatBonus(creature, terrain))
-        {
-            val += 3;
-        }
         if (creature.isTitan())
         {
             val += 1000;
         }
         return val;
     }
+    
 
     ////////////////////////////////////////////////////////////////
     // Battle move stuff
@@ -2981,7 +3029,8 @@ public class SimpleAI implements AI
         int GANG_UP_ON_CREATURE = 50;
     }
 
-    /** Return a map of target hex label to number of friendly creatures that can strike it */
+    /** Return a map of target hex label to number 
+     * of friendly creatures that can strike it */
     private Map findStrikeMap()
     {
         Map map = new HashMap();
@@ -3429,4 +3478,48 @@ public class SimpleAI implements AI
             timeIsUp = true;
         }
     }
+    
+    // towi: AiCreatureInfo.
+    // the AI wants to save some useful informarmation along with 
+    //   each creature. i thought about extending the Creature class
+    //   by a aiData field, but we can have multiple AIs in a game.
+    //   so the data must be stored in the AI instance itselfs.
+    //   there is a 1:1 map from each Creature instance to AiCreatureInfo.
+    protected class AiCreatureInfo
+    {
+        /**
+         * @param killValue1 - the non-terrainified killValue.
+         */
+        AiCreatureInfo(final Creature creature)
+        {
+            this.creature = creature;
+            this.killValue1 = SimpleAI.getKillValue1(creature);
+        }
+        
+        /** only internal book keeping for now. 
+         * wanna make it readable? go ahead. */
+        private final Creature creature;
+        
+        /** is the same if creature is the same */
+        public int hashCode()
+        { 
+            return creature.hashCode();
+        }
+        
+        /** killvalue without terrain */
+        private int killValue1; 
+        final int getKillValue1()
+        { 
+            return killValue1;
+        }
+        final void setKillValue1(final int v)
+        {
+            this.killValue1 = v;
+        }         
+    }
+
+    protected static HashMap aiCreatureInfos = null;
+
+    
+
 }

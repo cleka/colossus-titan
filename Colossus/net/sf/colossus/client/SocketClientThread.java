@@ -179,6 +179,14 @@ final class SocketClientThread extends Thread implements IServer
             List names = Split.split(Glob.sep, (String)args.remove(0));
             client.revealCreatures(markerId, names);
         }
+        else if (method.equals(Constants.revealEngagedCreatures))
+        {
+            String markerId = (String)args.remove(0);
+            boolean isAttacker =
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            List names = Split.split(Glob.sep, (String)args.remove(0));
+            client.revealEngagedCreatures(markerId, names, isAttacker);
+        }
         else if (method.equals(Constants.removeDeadBattleChits))
         {
             client.removeDeadBattleChits();

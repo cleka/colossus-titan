@@ -200,6 +200,17 @@ public final class HTMLColor
         return theColor;
     }
 
+    /** returns "#rrggbb" string that JTextPane can display */
+    public static String colorToCode(Color c)
+    {
+        // mask alpha out, fill with zeros to length 7, cut rightmost 6. 
+        return ("#"
+            + Integer.toHexString(
+                 (c.getRGB() & 0xffffff) + 0x1000000
+            ).substring(1) 
+        ); 
+    }
+
     public static Color invertRGBColor(Color c)
     {
         Color c2 = new Color(255 - c.getRed(),

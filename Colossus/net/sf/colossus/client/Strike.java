@@ -893,8 +893,8 @@ final class Strike
                 char hexside = targetHex.getHexside(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
-                if ((hexside == 's' && !striker.getCreature().isNativeSlope()) ||
-                        hexside == 'w')
+                if ((hexside == 's' && !striker.getCreature().isNativeSlope()
+                    ) || hexside == 'w')
                 {
                     attackerSkill--;
                 }

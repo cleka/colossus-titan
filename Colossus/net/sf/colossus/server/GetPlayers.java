@@ -19,7 +19,8 @@ import net.sf.colossus.client.PickIntValue;
 
 
 /**
- * Class GetPlayers is a dialog used to enter players' names, types, variant, etc. 
+ * Class GetPlayers is a dialog used to enter players' 
+ *   names, types, variant, etc. 
  * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
@@ -504,9 +505,12 @@ public final class GetPlayers extends KDialog implements WindowListener,
         }
         else if (e.getActionCommand().equals(Options.aiTimeLimit))
         {
-            final int newLimit = PickIntValue.pickIntValue(parentFrame,
-                    oldLimit, "Pick AI Time Limit (in s)",
-                    Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT, 1);
+            final int newLimit = PickIntValue.pickIntValue(
+                parentFrame,
+                oldLimit, "Pick AI Time Limit (in s)",
+                Constants.MIN_AI_TIME_LIMIT, 
+                Constants.MAX_AI_TIME_LIMIT, 
+                1);
             if (newLimit != oldLimit)
             {
                 options.setOption(Options.aiTimeLimit, newLimit);

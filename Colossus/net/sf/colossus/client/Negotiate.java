@@ -200,7 +200,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                             Constants.titan))
                     {
                         client.showMessageDialog(
-                                "Titan cannot die unless his whole stack dies.");
+                            "Titan cannot die unless his whole stack dies.");
                         return;
                     }
                 }

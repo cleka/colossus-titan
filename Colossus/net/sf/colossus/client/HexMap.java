@@ -280,7 +280,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             /* count all hazards & hazard sides */
 
             /* slow & inefficient... */
-            String[] hazards = BattleHex.getTerrains();
+            final String[] hazards = BattleHex.getTerrains();
             HashMap t2n = new HashMap();
             for (int i = 0; i < hazards.length; i++)
             {

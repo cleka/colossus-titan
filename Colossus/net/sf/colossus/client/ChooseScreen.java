@@ -16,7 +16,8 @@ import net.sf.colossus.util.KDialog;
 
 
 /**
- * Class ChooseScreen allows a player to choose the screen on which to display the secondaries windows.
+ * Class ChooseScreen allows a player to choose the screen 
+ *   on which to display the secondaries windows.
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -37,7 +38,8 @@ final class ChooseScreen extends KDialog implements ActionListener
         setBackground(Color.lightGray);
 
         GraphicsDevice[] all =
-                GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+                GraphicsEnvironment.getLocalGraphicsEnvironment()
+                  .getScreenDevices();
 
         for (int i = 0; i < all.length; i++)
         {
@@ -58,8 +60,8 @@ final class ChooseScreen extends KDialog implements ActionListener
     {
         String fullName = e.getActionCommand();
 
-        GraphicsDevice[] all =
-                GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+        GraphicsDevice[] all = GraphicsEnvironment
+            .getLocalGraphicsEnvironment().getScreenDevices();
         GraphicsDevice choosen = null;
 
         for (int i = 0; i < all.length; i++)

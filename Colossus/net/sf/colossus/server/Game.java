@@ -70,7 +70,7 @@ public final class Game
         return options;
     }
 
-    // XXX Set from option instead.
+    // TODO: Set from option instead.
     void setPort(int port)
     {
         this.port = port;
@@ -974,8 +974,12 @@ public final class Game
                 {
                     Legion legion = (Legion)it2.next();
 
-                    el.addContent(dumpLegion(doc, legion, battleInProgress && (legion == battle.getAttacker() ||
-                            legion == battle.getDefender())));
+                    el.addContent(dumpLegion(doc, legion, 
+                            battleInProgress && (
+                              legion == battle.getAttacker() || 
+                              legion == battle.getDefender()
+                            )
+                        ));
                 }
                 root.addContent(el);
             }
@@ -1147,10 +1151,10 @@ public final class Game
                 if (contentList.size() > 0)
                 {
                     String content = ((CDATA)contentList.get(0)).getText();
-                    Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" +
-                            content);
+                    Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" 
+                        + content);
                     ResourceLoader.putIntoFileCache(mapKey,
-                            content.getBytes());
+                        content.getBytes());
                 }
                 else
                 {
@@ -1273,7 +1277,7 @@ public final class Game
                 int carryDamage =
                         bat.getAttribute("carryDamage").getIntValue();
                 boolean driftDamageApplied =
-                        bat.getAttribute("driftDamageApplied").getBooleanValue();
+                    bat.getAttribute("driftDamageApplied").getBooleanValue();
 
                 java.util.List cts = bat.getChildren("CarryTarget");
                 Set carryTargets = new HashSet();
@@ -2231,7 +2235,7 @@ public final class Game
                 if (attackerEntered && winner.canRecruit())
                 {
                     Log.debug(
-                            "Calling Game.reinforce() from Game.finishBattle()");
+                        "Calling Game.reinforce() from Game.finishBattle()");
                     reinforce(winner);
                 }
             }
@@ -2654,8 +2658,8 @@ public final class Game
             battleInProgress = true;
 
             // Reveal both legions to all players.
-            server.allRevealLegion(attacker);
-            server.allRevealLegion(defender);
+            server.allRevealEngagedLegion(attacker, true);
+            server.allRevealEngagedLegion(defender, false);
 
             battle = new Battle(this, attacker.getMarkerId(),
                     defender.getMarkerId(), Constants.DEFENDER, hexLabel,

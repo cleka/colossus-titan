@@ -498,7 +498,8 @@ public final class GUIMasterHex extends MasterHex
         }
 
         Composite oldComp = g.getComposite();
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+        g.setComposite(AlphaComposite.getInstance(
+            AlphaComposite.SRC_OVER, 0.3f));
         g.drawImage(overlay,
                 rectBound.x,
                 rectBound.y,
