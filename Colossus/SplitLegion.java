@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
@@ -7,7 +8,8 @@ import java.awt.event.*;
  * author David Ripton
  */
 
-class SplitLegion extends Dialog implements MouseListener, ActionListener
+class SplitLegion extends JDialog implements MouseListener, ActionListener,
+    WindowListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded;
@@ -18,19 +20,23 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
     private Chit oldMarker;
     private Player player;
     private static final int scale = 60;
-    private Frame parentFrame;
-    private Button button1;
-    private Button button2;
+    private JFrame parentFrame;
+    private JButton button1;
+    private JButton button2;
     private boolean laidOut = false;
+    private boolean eraseFlag = false;
+    private Graphics gBack;
+    private Dimension offDimension;
+    private Image offImage;
 
 
-    SplitLegion(Frame parentFrame, Legion oldLegion, Player player)
+    SplitLegion(JFrame parentFrame, Legion oldLegion, Player player)
     {
         super(parentFrame, player.getName() + ": Split Legion " + 
             oldLegion.getMarkerId(), true);
 
         setResizable(false);
-        setLayout(null);
+        getContentPane().setLayout(null);
         setBackground(java.awt.Color.lightGray);
 
         this.oldLegion = oldLegion;
@@ -52,6 +58,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             oldLegion.getCurrentHex(), null, null, null, null, null, null, 
             null, null, player);
 
+        pack();
         setSize(getPreferredSize());
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -66,6 +73,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
         else
         {
             addMouseListener(this);
+            addWindowListener(this);
 
             oldChits = new Chit[oldLegion.getHeight()];
             for (int i = 0; i < oldLegion.getHeight(); i++)
@@ -94,55 +102,100 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             }
             catch (InterruptedException e)
             {
-                new MessageBox(parentFrame, "waitForAll was interrupted");
+                JOptionPane.showMessageDialog(parentFrame, 
+                    "waitForAll was interrupted");
             }
 
-            button1 = new Button("Done");
-            button2 = new Button("Cancel");
-            add(button1);
-            add(button2);
+            button1 = new JButton("Done");
+            button2 = new JButton("Cancel");
+            getContentPane().add(button1);
+            getContentPane().add(button2);
             button1.addActionListener(this);
             button2.addActionListener(this);
 
-            pack();
-
             imagesLoaded = true;
             setVisible(true);
-            repaint();
         }
     }
 
 
+    // Double-buffer everything.
     public void paint(Graphics g)
+    {
+        update(g);
+    }
+
+
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
 
-        oldMarker.paint(g);
+        Dimension d = getSize();
 
-        newLegion.getMarker().paint(g);
+        // Create the back buffer only if we don't have a good one.
+        if (gBack == null || d.width != offDimension.width ||
+            d.height != offDimension.height)
+        {
+            offDimension = d;
+            offImage = createImage(d.width, d.height);
+            gBack = offImage.getGraphics();
+            eraseFlag = true;
+        }
+
+        // Clear the chit area to clean up behind chits that have been moved.
+        if (eraseFlag)
+        {
+            gBack.setColor(getBackground());
+            gBack.fillRect(0, 0, d.width, d.height);
+            gBack.setColor(getForeground());
+            eraseFlag = false;
+        }
+
+        oldMarker.paint(gBack);
+
+        newLegion.getMarker().paint(gBack);
 
         for (int i = oldLegion.getHeight() - 1; i >= 0; i--)
         {
-            oldChits[i].paint(g);
+            oldChits[i].paint(gBack);
         }
         for (int i = newLegion.getHeight() - 1; i >= 0; i--)
         {
-            newChits[i].paint(g);
+            newChits[i].paint(gBack);
         }
 
         if (!laidOut)
         {
             Insets insets = getInsets(); 
-            Dimension d = getSize();
-            button1.setBounds(insets.left + d.width / 9, 7 * d.height / 8 - 
+            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right, 
-                7 * d.height / 8 - insets.bottom, d.width / 3, d.height / 8);
+                3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
+            laidOut = true;
         }
 
+        g.drawImage(offImage, 0, 0, this);
+
+        button1.repaint();
+        button2.repaint();
+    }
+
+
+    void cancel()
+    {
+        player.addSelectedMarker();
+
+        for (int i = 0; i < newLegion.getHeight(); i++)
+        {
+            oldLegion.setHeight(oldLegion.getHeight() + 1);
+            oldLegion.setCreature(oldLegion.getHeight() - 1,
+                newLegion.getCreature(i));
+        }
+
+        dispose();
     }
 
 
@@ -175,6 +228,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
                 oldChits[oldLegion.getHeight() - 1] = null;
                 oldLegion.setHeight(oldLegion.getHeight() - 1);
 
+                eraseFlag = true;
                 repaint();
                 return;
             }
@@ -205,6 +259,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
                 newChits[newLegion.getHeight() - 1] = null;
                 newLegion.setHeight(newLegion.getHeight() - 1);
 
+                eraseFlag = true;
                 repaint();
                 return;
             }
@@ -229,6 +284,37 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
     }
 
 
+
+    public void windowActivated(WindowEvent event)
+    {
+    }
+
+    public void windowClosed(WindowEvent event)
+    {
+    }
+
+    public void windowClosing(WindowEvent event)
+    {
+        cancel();
+    }
+
+    public void windowDeactivated(WindowEvent event)
+    {
+    }
+                                                                                                                     
+    public void windowDeiconified(WindowEvent event)
+    {
+    }
+
+    public void windowIconified(WindowEvent event)
+    {
+    }
+
+    public void windowOpened(WindowEvent event)
+    {
+    }
+
+
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand() == "Done")
@@ -239,21 +325,23 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             // must have height 4 and one lord.
             if (oldLegion.getHeight() < 2 || newLegion.getHeight() < 2)
             {
-                new MessageBox(parentFrame, "Legion too short.");
+                JOptionPane.showMessageDialog(parentFrame, 
+                    "Legion too short.");
                 return;
             }
             if (oldLegion.getHeight() + newLegion.getHeight() == 8)
             {
                 if (oldLegion.getHeight() != newLegion.getHeight())
                 {
-                    new MessageBox(parentFrame, "Initial split not 4-4.");
+                    JOptionPane.showMessageDialog(parentFrame, 
+                        "Initial split not 4-4.");
                     return;
                 }
                 else
                 {
                     if (oldLegion.numLords() != 1)
                     {
-                        new MessageBox(parentFrame, 
+                        JOptionPane.showMessageDialog(parentFrame, 
                             "Each stack must have one lord.");
                         return;
                     }
@@ -263,7 +351,8 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             // The split is legal.
 
             // Resize the new legion to MasterBoard scale.
-            newLegion.getMarker().rescale(oldLegion.getMarker().getBounds().width);
+            newLegion.getMarker().rescale(
+                oldLegion.getMarker().getBounds().width);
 
             // Add the new legion to the player.
             player.addLegion(newLegion);
@@ -277,27 +366,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
 
         else if (e.getActionCommand() == "Cancel")
         {
-            // Original legion must have had height < 8 for this
-            // to be allowed.
-            if (oldLegion.getHeight()  + newLegion.getHeight() >= 8)
-            {
-                new MessageBox(parentFrame, "Must split.");
-            }
-
-            // Put the stack marker back, reset the old legion, then exit.
-            else
-            {
-                player.addSelectedMarker();
-
-                for (int i = 0; i < newLegion.getHeight(); i++)
-                {
-                    oldLegion.setHeight(oldLegion.getHeight() + 1);
-                    oldLegion.setCreature(oldLegion.getHeight() - 1,
-                        newLegion.getCreature(i));
-                }
-
-                dispose();
-            }
+            cancel();
         }
     }
 
