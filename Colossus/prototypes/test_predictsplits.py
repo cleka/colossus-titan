@@ -1175,6 +1175,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr06").allCertain())
         assert(not ps.getLeaf("Gr08").allCertain())
+        assert(len(ps.getLeaf("Gr06").getCertainCreatures()) == 1)
 
         turn = 6
         print "Turn", turn

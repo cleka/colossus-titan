@@ -335,8 +335,8 @@ class Node:
           "knownCombo contains uncertain creatures"
 
         unknowns = getCreatureNames(self.creatures)
-        for ci in knownCombo:
-            unknowns.remove(ci)
+        for name in knownCombo:
+            unknowns.remove(name)
 
         numUnknownsToSplit = childSize - len(knownSplit)
 
