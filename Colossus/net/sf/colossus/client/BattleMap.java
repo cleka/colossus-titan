@@ -773,15 +773,15 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public static int entrySideNum(String side)
     {
-        if (side.equalsIgnoreCase("Right"))
+        if (side.equals("Right"))
         {
             return 1;
         }
-        else if (side.equalsIgnoreCase("Bottom"))
+        else if (side.equals("Bottom"))
         {
             return 3;
         }
-        else if (side.equalsIgnoreCase("Left"))
+        else if (side.equals("Left"))
         {
             return 5;
         }

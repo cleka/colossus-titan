@@ -2235,7 +2235,7 @@ reinforcing + " acquiring=" + acquiring);
         if (hex.getTerrain() == 'T' && !entrySide.equals("bottom")) 
         {
             Log.warn("Tried to enter invalid side of tower");
-            entrySide = "bottom";
+            entrySide = "Bottom";
         }
 
         // If the legion teleported, reveal a lord.

@@ -103,8 +103,6 @@ Consider recruit scarcity (last gargoyle possibly more valuable than
    native terrain.  Get scrub snacks out of nearby opponents' good 
    recruiting terrain and into blocking positions.
 
-AI is not titan teleporting anymore.  Fixed?  Tower teleport works.
-
 
 PROGRAMMING BUGS:
 
@@ -183,9 +181,6 @@ Save game in first turn's move phase, after rolling 6.  Load game,
 Turn 1, AI in tower 600 rolled 6, moved legions to 136 and 38.  One of those
    moves was illegal.
 
-Stack with titan, archangel, 2xangel tower teleports.  PickLord shows both
-   angels as choices, instead of just one.  Fixed? 
-
 First recruit of each game is very slow.  So is first SummonAngel if no
    previous recruits.  Handle some initialization in a background thread
    started earlier?
@@ -208,7 +203,6 @@ LogDebugMessages option does not work when set in cfg file.  They work okay
 
 Did file/new game while game was being set up.  Got comodification exception.
 
-When run from JWS in Windows, cfg files for AI players are created on desktop.
-
 MinimaxAI advances phases and turns illegally while a human player is trying
    to enter the battle map.
+
