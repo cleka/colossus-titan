@@ -21,7 +21,6 @@ class Player
     boolean alive = true;
     int mulligansLeft = 1;
     int movementRoll;
-    int legionsMoved = 0;
     int selectedLegion = -1;
 
     Player(String name)
@@ -92,5 +91,20 @@ class Player
     int titanPower()
     {
         return 6 + (score / 100);
+    }
+
+
+    int legionsMoved()
+    {
+        int total = 0;
+        for (int i = 0; i < numLegions; i++)
+        {
+            if (legions[i].moved)
+            {
+                total++;
+            }
+        }
+
+        return total;
     }
 }
