@@ -822,6 +822,7 @@ public class PredictSplitsTest extends TestCase
 
     public void testPredictSplits5()
     {
+        Log.debug("testPredictSplits5()");
         cnl.clear();
         cnl.add("Titan");
         cnl.add("Angel");
@@ -902,6 +903,138 @@ public class PredictSplitsTest extends TestCase
         ps.printLeaves();
         ps.getLeaf("Bk10").removeCreature("Gargoyle");
         ps.getLeaf("Bk10").removeCreature("Gargoyle");
+        assertTrue(ps.getLeaf("Bk06").allCertain());
+        assertTrue(ps.getLeaf("Bk09").allCertain());
+        ps.printLeaves();
+    }
+
+
+    public void testPredictSplits6()
+    {
+        Log.debug("testPredictSplits6()");
+        cnl.clear();
+        cnl.add("Titan");
+        cnl.add("Angel");
+        cnl.add("Gargoyle");
+        cnl.add("Gargoyle");
+        cnl.add("Centaur");
+        cnl.add("Centaur");
+        cnl.add("Ogre");
+        cnl.add("Ogre");
+        ps = new PredictSplits("Bk", "Bk06", cnl);
+
+        turn = 1;
+        Log.debug("Turn " + turn);
+        ps.getLeaf("Bk06").split(4, "Bk09", turn);
+        cnl.clear();
+        cnl.add("Ogre"); 
+        cnl.add("Ogre"); 
+        ps.getLeaf("Bk06").revealCreatures(cnl);
+        ps.getLeaf("Bk06").addCreature("Troll");
+        cnl.clear();
+        cnl.add("Centaur"); 
+        cnl.add("Centaur"); 
+        ps.getLeaf("Bk09").revealCreatures(cnl);
+        ps.getLeaf("Bk09").addCreature("Lion");
+        assertFalse(ps.getLeaf("Bk06").allCertain());
+        assertFalse(ps.getLeaf("Bk09").allCertain());
+        ps.printLeaves();
+
+        turn = 2;
+        Log.debug("Turn " + turn);
+        cnl.clear();
+        cnl.add("Ogre"); 
+        cnl.add("Ogre"); 
+        ps.getLeaf("Bk06").revealCreatures(cnl);
+        ps.getLeaf("Bk06").addCreature("Troll");
+        cnl.clear();
+        cnl.add("Centaur"); 
+        cnl.add("Centaur"); 
+        ps.getLeaf("Bk09").revealCreatures(cnl);
+        ps.getLeaf("Bk09").addCreature("Lion");
+        assertFalse(ps.getLeaf("Bk06").allCertain());
+        assertFalse(ps.getLeaf("Bk09").allCertain());
+        ps.printLeaves();
+
+        turn = 4;
+        Log.debug("Turn " + turn);
+        cnl.clear();
+        cnl.add("Gargoyle"); 
+        ps.getLeaf("Bk06").revealCreatures(cnl);
+        ps.getLeaf("Bk06").addCreature("Gargoyle");
+        ps.getLeaf("Bk09").addCreature("Centaur");
+        assertFalse(ps.getLeaf("Bk06").allCertain());
+        assertFalse(ps.getLeaf("Bk09").allCertain());
+        ps.printLeaves();
+
+        turn = 5;
+        Log.debug("Turn " + turn);
+        ps.getLeaf("Bk06").split(2, "Bk08", turn);
+        ps.getLeaf("Bk09").split(2, "Bk11", turn);
+        cnl.clear();
+        cnl.add("Angel"); 
+        ps.getLeaf("Bk09").revealCreatures(cnl);
+        cnl.clear();
+        cnl.add("Gargoyle"); 
+        cnl.add("Gargoyle"); 
+        ps.getLeaf("Bk08").revealCreatures(cnl);
+        ps.getLeaf("Bk08").removeCreature("Gargoyle");
+        ps.getLeaf("Bk09").removeCreature("Angel");
+        ps.getLeaf("Bk08").addCreature("Angel");
+        ps.getLeaf("Bk08").removeCreature("Gargoyle");
+        ps.getLeaf("Bk08").removeCreature("Angel");
+        cnl.clear();
+        cnl.add("Lion"); 
+        ps.getLeaf("Bk09").revealCreatures(cnl);
+        ps.getLeaf("Bk09").addCreature("Lion");
+        cnl.clear();
+        cnl.add("Centaur"); 
+        cnl.add("Centaur"); 
+        ps.getLeaf("Bk11").revealCreatures(cnl);
+        ps.getLeaf("Bk11").addCreature("Lion");
+        assertTrue(ps.getLeaf("Bk06").allCertain());
+        assertTrue(ps.getLeaf("Bk09").allCertain());
+        assertTrue(ps.getLeaf("Bk11").allCertain());
+        ps.printLeaves();
+
+        turn = 6;
+        Log.debug("Turn " + turn);
+        cnl.clear();
+        cnl.add("Lion"); 
+        cnl.add("Lion"); 
+        cnl.add("Lion"); 
+        ps.getLeaf("Bk09").revealCreatures(cnl);
+        ps.getLeaf("Bk09").addCreature("Guardian");
+        cnl.clear();
+        cnl.add("Lion"); 
+        ps.getLeaf("Bk11").revealCreatures(cnl);
+        ps.getLeaf("Bk11").addCreature("Lion");
+        assertTrue(ps.getLeaf("Bk06").allCertain());
+        assertTrue(ps.getLeaf("Bk09").allCertain());
+        assertTrue(ps.getLeaf("Bk11").allCertain());
+        ps.printLeaves();
+
+        turn = 7;
+        Log.debug("Turn " + turn);
+        cnl.clear();
+        cnl.add("Lion"); 
+        cnl.add("Lion"); 
+        cnl.add("Lion"); 
+        ps.getLeaf("Bk09").revealCreatures(cnl);
+        ps.getLeaf("Bk09").addCreature("Griffon");
+        ps.getLeaf("Bk11").removeCreature("Lion");
+        ps.getLeaf("Bk11").removeCreature("Lion");
+        ps.getLeaf("Bk11").removeCreature("Centaur");
+        ps.getLeaf("Bk11").removeCreature("Centaur");
+        assertTrue(ps.getLeaf("Bk06").allCertain());
+        assertTrue(ps.getLeaf("Bk09").allCertain());
+        ps.printLeaves();
+
+        turn = 8;
+        Log.debug("Turn " + turn);
+        ps.getLeaf("Bk09").split(2, "Bk12", turn);
+        ps.getLeaf("Bk12").removeCreature("Gargoyle");
+        ps.getLeaf("Bk12").removeCreature("Centaur");
         assertTrue(ps.getLeaf("Bk06").allCertain());
         assertTrue(ps.getLeaf("Bk09").allCertain());
         ps.printLeaves();
