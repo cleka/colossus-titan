@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.3
+#!/usr/bin/env python2
 # Needs Python 2.3 for optparse.  (Could use 2.2 and optik)
 # Needs PyXML
 
