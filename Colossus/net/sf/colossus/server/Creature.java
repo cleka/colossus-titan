@@ -18,7 +18,8 @@ import net.sf.colossus.client.VariantSupport;
  * recruited/available/dead are in Caretaker.
  *
  * @version $Id$
- * @author David Ripton, Bruce Sherrod 
+ * @author David Ripton, Bruce Sherrod
+ * @author Romain Dolbeau
 */
 
 public class Creature implements Comparable
@@ -50,6 +51,7 @@ public class Creature implements Comparable
 
     /** Sometimes we need to iterate through all creature types. */
     private static java.util.List creatures = new ArrayList();
+    private static java.util.List summonablesCreatures = new ArrayList();
 
 
     public Creature(String name, int power, int skill, boolean rangestrikes,
@@ -124,11 +126,25 @@ public class Creature implements Comparable
             System.out.println("Creatures def. loading failed : " + e);
             System.exit(1);
         }
+        Iterator it = creatures.iterator();
+        while (it.hasNext())
+        {
+            Creature c = (Creature)it.next();
+            if (c.isSummonable())
+            {
+                summonablesCreatures.add(c);
+            }
+        }
     }
 
     public static java.util.List getCreatures()
     {
-        return creatures;
+        return java.util.Collections.unmodifiableList(creatures);
+    }
+
+    public static java.util.List getSummonablesCreatures()
+    {
+        return java.util.Collections.unmodifiableList(summonablesCreatures);
     }
 
     public int getMaxCount()
