@@ -116,13 +116,16 @@ public final class GetPlayers extends KDialog implements WindowListener,
         addCheckbox(Options.towerToTowerTeleportOnly, teleportPane);
         addCheckbox(Options.noTowerTeleport, teleportPane);
 
-        Container delayPane = new JPanel();
-        BoxLayout delayLayout = new BoxLayout(delayPane, BoxLayout.X_AXIS);
-        delayPane.setLayout(delayLayout);
+        Container aiTimePane = new JPanel();
+        BoxLayout delayLayout = new BoxLayout(aiTimePane, BoxLayout.X_AXIS);
+        aiTimePane.setLayout(delayLayout);
+        contentPane.add(aiTimePane);
         JButton delayButton = new JButton(options.aiDelay);
         delayButton.addActionListener(this);
-        delayPane.add(delayButton);
-        contentPane.add(delayPane);
+        aiTimePane.add(delayButton);
+        JButton aiTimeLimitButton = new JButton(options.aiTimeLimit);
+        aiTimeLimitButton.addActionListener(this);
+        aiTimePane.add(aiTimeLimitButton);
         
 
         Container variantPane = new Container();
@@ -420,18 +423,35 @@ public final class GetPlayers extends KDialog implements WindowListener,
         else if (e.getActionCommand().equals(Options.aiDelay))
         {
             int oldDelay = options.getIntOption(Options.aiDelay);
-            if (oldDelay < Constants.MIN_DELAY || 
-                oldDelay > Constants.MAX_DELAY)
+            if (oldDelay < Constants.MIN_AI_DELAY || 
+                oldDelay > Constants.MAX_AI_DELAY)
             {
-                oldDelay = Constants.DEFAULT_DELAY;
+                oldDelay = Constants.DEFAULT_AI_DELAY;
             }
 
             final int newDelay = PickIntValue.pickIntValue(parentFrame,
-                oldDelay, "Pick AI Delay", Constants.MIN_DELAY, 
-                Constants.MAX_DELAY);
+                oldDelay, "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY, 
+                Constants.MAX_AI_DELAY);
             if (newDelay != oldDelay)
             {
                 options.setOption(Options.aiDelay, newDelay);
+            }
+        }
+        else if (e.getActionCommand().equals(Options.aiTimeLimit))
+        {
+            int oldLimit = options.getIntOption(Options.aiTimeLimit);
+            if (oldLimit < Constants.MIN_AI_TIME_LIMIT || 
+                oldLimit > Constants.MAX_AI_TIME_LIMIT)
+            {
+                oldLimit = Constants.DEFAULT_AI_TIME_LIMIT;
+            }
+
+            final int newLimit = PickIntValue.pickIntValue(parentFrame,
+                oldLimit, "Pick AI Time Limit (in s)", 
+                Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT);
+            if (newLimit != oldLimit)
+            {
+                options.setOption(Options.aiTimeLimit, newLimit);
             }
         }
         else if (e.getActionCommand().startsWith(loadVariant))

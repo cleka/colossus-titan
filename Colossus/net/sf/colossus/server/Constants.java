@@ -96,9 +96,13 @@ public final class Constants
     public static final String noShortName = "XX";
     private static final java.util.HashMap shortNamesMap = new HashMap();
     
-    public static final int MIN_DELAY = 0;      //in ms
-    public static final int MAX_DELAY = 3000;
-    public static final int DEFAULT_DELAY = 300;
+    public static final int MIN_AI_DELAY = 0;      //in ms
+    public static final int MAX_AI_DELAY = 3000;
+    public static final int DEFAULT_AI_DELAY = 300;
+
+    public static final int MIN_AI_TIME_LIMIT = 1;      //in s
+    public static final int MAX_AI_TIME_LIMIT = 200;
+    public static final int DEFAULT_AI_TIME_LIMIT = 30;
 
     // Entry sides
     public static final String bottom = "Bottom";

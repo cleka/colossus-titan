@@ -6,6 +6,7 @@ import java.util.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Probs;
 import net.sf.colossus.util.Perms;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
@@ -21,6 +22,8 @@ import net.sf.colossus.server.Dice;
 public class SimpleAI implements AI
 {
     private Client client;
+    private int timeLimit;   // in s
+    private boolean timeIsUp;
 
 
     public SimpleAI(Client client)
@@ -2184,6 +2187,10 @@ Log.debug("Best target is null, aborting");
     {
         Log.debug("Called battleMove()");
 
+        // Defer setting time limit until here where it's needed, to
+        // avoid initialization timing issues.
+        timeLimit = client.getIntOption(Options.aiTimeLimit);
+
         // Consider one critter at a time, in order of importance.
         // Examine all possible moves for that critter not already
         // taken by a more important one.
@@ -2192,15 +2199,18 @@ Log.debug("Best target is null, aborting");
         // getting stuff out of the way so that a reinforcement
         // has room to enter.
 
-        List bestOrder = findBattleMoves();
+        List legionMoves = findBattleMoves();
+        LegionMove bestLegionMove = findBestLegionMove(legionMoves);
+        List bestMoveOrder = findMoveOrder(bestLegionMove);
 
         // Now that critters are sorted into the order in which they
-        // should move, start moving them for real.  If the preferred
-        // move fails, fall back to the critter's remaining moves.
+        // should move, start moving them for real.  
+        // XXX If the preferred move fails, fall back to the critter's 
+        // remaining moves.
 
-        if (bestOrder != null)
+        if (bestMoveOrder != null)
         {
-            Iterator it = bestOrder.iterator();
+            Iterator it = bestMoveOrder.iterator();
             while (it.hasNext())
             {
                 CritterMove cm = (CritterMove)it.next();
@@ -2266,6 +2276,8 @@ Log.debug("Best target is null, aborting");
         List lastOrder = null;
         int count = 0;
 
+        setupTimer();
+
         it = new Perms(critterMoves).iterator();
         while (it.hasNext())
         {
@@ -2300,8 +2312,9 @@ Log.debug("Best target is null, aborting");
             lastOrder = (List)order.clone();
 
             // Bail out early
-            if (count > MAX_MOVE_ORDER_PERMUTATIONS)
+            if (timeIsUp)
             {
+                Log.debug("Time is up figuring move order");
                 break;
             }
         }
@@ -2461,21 +2474,30 @@ Log.debug("Called findBattleMoves()");
         }
 
         List legionMoves = findLegionMoves(allCritterMoves);
-
-        // Eval all legion moves to find the best.
-        // TODO Limit the number tested if too slow.
-        LegionMove best = findBestLegionMove(legionMoves);
-
-        List bestOrder = findMoveOrder(best);
-
-        return bestOrder;
+        return legionMoves;
     }
 
+
+    private void setupTimer()
+    {
+        // java.util.Timer, not Swing Timer
+        Timer timer = new Timer();
+        timeIsUp = false;
+        final int MS_PER_S = 1000;
+        timer.schedule(new TriggerTimeIsUp(), MS_PER_S * timeLimit);
+    }
+
+
+    /** Evaluate all legion moves in the list, and return the best one.
+     *  Break out early if the time limit is exceeded. */
     LegionMove findBestLegionMove(List legionMoves)
     {
         int bestScore = Integer.MIN_VALUE;
         LegionMove best = null;
 
+        setupTimer();
+
+        int count = 0;
         Iterator it = legionMoves.iterator();
         while (it.hasNext())
         {
@@ -2485,6 +2507,14 @@ Log.debug("Called findBattleMoves()");
             {
                 bestScore = score;
                 best = lm;
+            }
+
+            count++;
+            if (timeIsUp)
+            {
+                Log.debug("findBestLegionMove() time up after " + count + 
+                    " iterations");
+                break;
             }
         }
         Log.debug("Best legion move: " + ((best == null) ? "none " : 
@@ -2717,8 +2747,7 @@ Log.debug("Pruning a duplicate legion move");
         Set targetHexLabels = client.findStrikes(critter.getTag());
         int numTargets = targetHexLabels.size();
 
-        // TODO Reward ganging up on enemies.  Difficult because not
-        // all allies have yet moved.
+        // TODO Reward ganging up on enemies.
 
         if (numTargets >= 1)
         {
@@ -2762,8 +2791,7 @@ Log.debug("Pruning a duplicate legion move");
             }
             else
             {
-                // Normal strikes.  If we can strike them, they can
-                // strike us.
+                // Normal strikes.  If we can strike them, they can strike us.
 
                 // Reward being adjacent to an enemy if attacking.
                 if (legion.getMarkerId().equals(client.getAttackerMarkerId()))
@@ -3203,6 +3231,15 @@ Log.debug("Pruning a duplicate legion move");
         public int hashCode()
         {
             return toString().hashCode();
+        }
+    }
+
+
+    class TriggerTimeIsUp extends TimerTask
+    {
+        public void run()
+        {
+            timeIsUp = true;
         }
     }
 }

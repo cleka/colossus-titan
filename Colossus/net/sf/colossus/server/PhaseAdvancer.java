@@ -1,8 +1,7 @@
 package net.sf.colossus.server;
 
 
-import javax.swing.*;
-import java.awt.event.*;
+import java.util.*;
 
 import net.sf.colossus.util.Options;
 
@@ -15,31 +14,30 @@ import net.sf.colossus.util.Options;
 
 public abstract class PhaseAdvancer
 {
-    private javax.swing.Timer timer;
+    private Timer timer;
     private boolean isHuman;
 
 
     void startTimer(int delay)
     {
-        timer = new javax.swing.Timer(delay, new AdvancePhaseListener());
-        timer.setRepeats(false);
-        timer.start();
+        timer = new Timer();
+        timer.schedule(new AdvancePhaseListener(), delay);
     }
 
     int getDelay(Server server, boolean isHuman)
     {
-        int delay = Constants.MIN_DELAY;
+        int delay = Constants.MIN_AI_DELAY;
         if (server != null)
         {
             delay = server.getIntOption(Options.aiDelay);
         }
-        if (isHuman || delay < Constants.MIN_DELAY)
+        if (isHuman || delay < Constants.MIN_AI_DELAY)
         {
-            delay = Constants.MIN_DELAY;
+            delay = Constants.MIN_AI_DELAY;
         }
-        if (delay > Constants.MAX_DELAY)
+        if (delay > Constants.MAX_AI_DELAY)
         {
-            delay = Constants.MAX_DELAY;
+            delay = Constants.MAX_AI_DELAY;
         }
 
         return delay;
@@ -52,9 +50,9 @@ public abstract class PhaseAdvancer
     abstract void advanceTurn();
 
 
-    private class AdvancePhaseListener implements ActionListener
+    private class AdvancePhaseListener extends TimerTask
     {
-        public void actionPerformed(ActionEvent e)
+        public void run()
         {
             advancePhaseInternal();
         }

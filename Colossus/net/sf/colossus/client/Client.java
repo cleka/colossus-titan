@@ -755,7 +755,6 @@ public final class Client implements IClient
     /** Called from BattleMap to leave carry mode. */
     void leaveCarryMode()
     {
-Log.debug(playerName + " Called Client.leaveCarryMode()");
         server.leaveCarryMode();
         doAutoStrikes(); 
     }
@@ -815,7 +814,6 @@ Log.debug(playerName + " Called Client.leaveCarryMode()");
 
     void markOffboardCreaturesDead()
     {
-Log.debug(playerName + " Called Client.markOffboardCreaturesDead()");
         Iterator it = getActiveBattleChits().iterator();
         while (it.hasNext())
         {
@@ -1547,10 +1545,6 @@ Log.debug(playerName + " Called Client.markOffboardCreaturesDead()");
         int strikeNumber, java.util.List rolls, int damage, boolean killed, 
         boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
-if (isMyBattlePhase())
-{
-Log.debug("Client.tellStrikeResults() " + strikerTag + " " + targetTag + " " + strikeNumber + " " + damage + " " + killed + " " + wasCarry + " " + carryDamageLeft + " " + carryTargetDescriptions.size());
-}
         BattleChit chit = getBattleChit(strikerTag);
         if (chit != null)
         {
@@ -2047,8 +2041,6 @@ Log.debug("Client.tellStrikeResults() " + strikerTag + " " + targetTag + " " + s
     public synchronized void setupBattleFight(int battlePhase,
         String battleActivePlayerName)
     {
-Log.debug(playerName + " Called setupBattleFight() " + battlePhase + " " + battleActivePlayerName);
-
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
         if (battlePhase == Constants.FIGHT)
@@ -3450,7 +3442,6 @@ Log.debug(playerName + " Called setupBattleFight() " + battlePhase + " " + battl
     public void setType(final String aType)
     {
         String type = new String(aType);
-Log.debug("Called Client.setType() for " + playerName + " " + type);
         if (type.endsWith(Constants.anyAI))
         {
             int whichAI = Dice.rollDie(Constants.numAITypes) - 1;

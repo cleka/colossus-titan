@@ -83,6 +83,8 @@ public final class Options
     public static final String autoReinforce = "Auto reinforce";
     public static final String autoPlay = "Auto play";
 
+    public static final String aiTimeLimit = "AI time limit";
+
     // General per-player options
     public static final String favoriteColors = "Favorite colors";
     public static final String favoriteLookFeel = "Favorite Look And Feel";
