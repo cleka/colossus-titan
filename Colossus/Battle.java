@@ -592,7 +592,7 @@ public final class Battle
         if (turnNumber == 4 && defender.canRecruit())
         {
             // Allow recruiting a reinforcement.
-            Creature recruit;
+            Creature recruit = null;
             Player player = defender.getPlayer();
             if (game.getServer().getClientOption(player.getName(),
                 Options.autoRecruit))
@@ -602,7 +602,10 @@ public final class Battle
             else
             {
                 String recruitString = game.getServer().pickRecruit(defender);
-                recruit = Creature.getCreatureByName(recruitString);
+                if (recruitString != null)
+                {
+                    recruit = Creature.getCreatureByName(recruitString);
+                }
             }
             if (recruit != null)
             {
