@@ -188,6 +188,12 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
+    public int getScale()
+    {
+        return scale;
+    }
+
+
     // Do a brute-force search through the hex array, looking for
     //    a match.  Return the hex.
     public MasterHex getHexFromLabel(int label)
@@ -1283,6 +1289,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                         hex.unselect();
                                         // XXX: This repaint is failing.
                                         hex.repaint();
+                                        Thread.yield();
                                     }
                                     return;
 
@@ -1311,6 +1318,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                         legion.getCurrentHex().unselect();
                                         // XXX This repaint is failing.
                                         legion.getCurrentHex().repaint();
+                                        Thread.yield();
 
                                         // Update status window.
                                         game.updateStatusScreen();
