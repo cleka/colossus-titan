@@ -150,6 +150,18 @@ Log.debug("End of SocketClientThread while loop");
             int height = Integer.parseInt((String)args.remove(0));
             client.setLegionHeight(markerId, height);
         }
+        else if (method.equals(Constants.setLegionStatus))
+        {
+            String markerId = (String)args.remove(0);
+            boolean moved = 
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean teleported = 
+                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            int entrySide = Integer.parseInt((String)args.remove(0));
+            String lastRecruit = (String)args.remove(0);
+            client.setLegionStatus(markerId, moved, teleported, entrySide,
+                lastRecruit);
+        }
         else if (method.equals(Constants.setLegionContents))
         {
             String markerId = (String)args.remove(0);

@@ -375,7 +375,16 @@ public final class LegionInfo
 
     void setLastRecruit(String lastRecruit)
     {
-        this.lastRecruit = lastRecruit;
+        if (lastRecruit == null || lastRecruit.equals("null"))
+        {
+            this.lastRecruit = null;
+            setRecruited(false);
+        }
+        else
+        {
+            this.lastRecruit = lastRecruit;
+            setRecruited(true);
+        }
     }
 
     String getLastRecruit()

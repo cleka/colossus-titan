@@ -971,6 +971,17 @@ public final class Client implements IClient
         getLegionInfo(markerId).setHeight(height);
     }
 
+    /** Needed after loadGame() outside split phase. */
+    public void setLegionStatus(String markerId, boolean moved, 
+        boolean teleported, int entrySide, String lastRecruit)
+    {
+        LegionInfo info = getLegionInfo(markerId);
+        info.setMoved(moved);
+        info.setTeleported(teleported);
+        info.setEntrySide(entrySide);
+        info.setLastRecruit(lastRecruit);
+    }
+
 
     /** Return the full basename for a titan in legion markerId,
      *  first finding that legion's player, player color, and titan size.
@@ -2793,7 +2804,8 @@ Log.error("Got nak for move of " + markerId);
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
 
-        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
+        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, 
+            hexLabel);
         Iterator it = recruiters.iterator();
         while (it.hasNext())
         {

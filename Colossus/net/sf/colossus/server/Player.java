@@ -518,15 +518,17 @@ public final class Player implements Comparable
 
     void rollMovement()
     {
-        // Only allow rolling if it hasn't already been done.
+        // Only roll if it hasn't already been done.
         if (movementRoll != 0)
         {
-            Log.warn("Called rollMovement() illegally");
-            return;
+            Log.warn("Called rollMovement() more than once");
         }
-
-        movementRoll = Dice.rollDie();
-        Log.event(getName() + " rolls a " + movementRoll + " for movement");
+        else
+        {
+            movementRoll = Dice.rollDie();
+            Log.event(getName() + " rolls a " + movementRoll + 
+                " for movement");
+        }
         game.getServer().allTellMovementRoll(movementRoll);
     }
 

@@ -284,6 +284,7 @@ public final class Constants
     public static final String dispose = "dispose";
     public static final String removeLegion = "removeLegion";
     public static final String setLegionHeight = "setLegionHeight";
+    public static final String setLegionStatus = "setLegionStatus";
     public static final String setLegionContents = "setLegionContents";
     public static final String addCreature = "addCreature";
     public static final String removeCreature = "removeCreature";

@@ -1065,14 +1065,10 @@ public final class Game
         }
     }
 
-    void loadGame(String filename)
-    {
-        loadGameXML(filename);
-    }
 
     /** Try to load a game from saveDirName/filename.  If the filename is
      *  "--latest" then load the latest savegame found in saveDirName. */
-    void loadGameXML(String filename)
+    void loadGame(String filename)
     {
         File file = null;
 
@@ -1217,7 +1213,7 @@ public final class Game
                 {
                     Element leg = (Element)it2.next();
 
-                    readLegionXML(leg, player);
+                    readLegion(leg, player);
                 }
             }
             // Need all players' playersElim set up before we can do this.
@@ -1304,7 +1300,7 @@ public final class Game
         }
     }
 
-    private void readLegionXML(Element leg, Player player)
+    private void readLegion(Element leg, Player player)
         throws DataConversionException
     {
         String markerId = leg.getAttribute("name").getValue();
@@ -1313,12 +1309,16 @@ public final class Game
         boolean moved = leg.getAttribute("moved").getBooleanValue();
         int entrySide = leg.getAttribute("entrySide").getIntValue();
         String parentId = leg.getAttribute("parent").getValue();
+        if (parentId.equals("null"))
+        {
+            parentId = null;
+        }
         String recruitName = leg.getAttribute("recruitName").getValue();
-
         if (recruitName.equals("null"))
         {
             recruitName = null;
         }
+
         int battleTally = leg.getAttribute("battleTally").getIntValue();
 
         // Critters
@@ -1409,12 +1409,14 @@ public final class Game
         if (getOption(Options.allStacksVisible))
         {
             server.allFullyUpdateAllLegionContents();
+            server.allFullyUpdateLegionStatus();
         }
         else
         {
             server.aiFullyUpdateAllLegionContents();
             server.allFullyUpdateLegionHeights();
             server.allFullyUpdateOwnLegionContents();
+            server.allFullyUpdateLegionStatus();
         }
 
         server.allInitBoard();

@@ -548,7 +548,7 @@ public final class Legion implements Comparable
         if (moved)
         {
             // If this legion teleported, allow teleporting again.
-            if (getTeleported())
+            if (hasTeleported())
             {
                 setTeleported(false);
                 getPlayer().setTeleported(false);
@@ -661,7 +661,7 @@ public final class Legion implements Comparable
         return entrySide;
     }
 
-    boolean getTeleported()
+    boolean hasTeleported()
     {
         return teleported;
     }

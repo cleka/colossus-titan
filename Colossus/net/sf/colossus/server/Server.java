@@ -1380,6 +1380,26 @@ Log.debug("Split legions must be separated.");
         }
     }
 
+    void allFullyUpdateLegionStatus()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            IClient client = (IClient)it.next();
+            if (client != null)
+            {
+                Iterator it2 = game.getAllLegions().iterator();
+                while (it2.hasNext())
+                {
+                    Legion legion = (Legion)it2.next();
+                    client.setLegionStatus(legion.getMarkerId(), 
+                        legion.hasMoved(), legion.hasTeleported(),
+                        legion.getEntrySide(), legion.getRecruitName());
+                }
+            }
+        }
+    }
+
     void allFullyUpdateOwnLegionContents()
     {
         Iterator it = game.getPlayers().iterator();
