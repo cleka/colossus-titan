@@ -14,8 +14,6 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
     private MasterHex hex;
     private Chit [] chits;
     private int numChits;
-    private int [] numToRecruit;
-    private int [] count;
     private int scale = 60;
     private Graphics offGraphics;
     private Dimension offDimension;
@@ -32,7 +30,6 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         pack();
 
         setBackground(Color.lightGray);
-        setSize(3 * scale, numChits * scale + 3 * scale / 4);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
         Point parentOrigin = parentFrame.getLocation();
@@ -59,21 +56,31 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         }
         setLocation(origin);
 
-        setLayout(null);
+        setLayout(new GridLayout(0, 3));
 
         this.hex = hex;
 
         chits = new Chit[numChits];
-        numToRecruit = new int[numChits];
-        count = new int[numChits];
         for (int i = 0; i < numChits; i++)
         {
             Creature creature = hex.getRecruit(i);
 
-            numToRecruit[i] = hex.getNumToRecruit(i);
-            count[i] = creature.getCount();
-            chits[i] = new Chit(scale, scale / 2 + i * scale, scale,
-                creature.getImageName(), this);
+            chits[i] = new Chit(-1, -1, scale, creature.getImageName(), this);
+            add(chits[i]);
+            chits[i].addMouseListener(this);
+
+            int numToRecruit = hex.getNumToRecruit(i);
+            Label numToRecruitLabel = new Label("", Label.CENTER);
+            if (numToRecruit > 0)
+            {
+                numToRecruitLabel.setText(Integer.toString(numToRecruit));
+            }
+            add(numToRecruitLabel);
+
+            int count = creature.getCount();
+            Label countLabel = new Label(Integer.toString(count), 
+                Label.CENTER);
+            add(countLabel);
         }
 
         tracker = new MediaTracker(this);
@@ -95,6 +102,7 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         imagesLoaded = true;
 
         addMouseListener(this);
+        pack();
 
         setVisible(true);
         repaint();
@@ -119,25 +127,6 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
             offGraphics = offImage.getGraphics();
         }
 
-        FontMetrics fontMetrics = offGraphics.getFontMetrics();
-        int fontHeight = fontMetrics.getMaxAscent() + fontMetrics.getLeading();
-
-        for (int i = 0; i < numChits; i++)
-        {
-            chits[i].paint(offGraphics);
-
-            if (numToRecruit[i] > 0)
-            {
-                String numToRecruitLabel = Integer.toString(numToRecruit[i]);
-                offGraphics.drawString(numToRecruitLabel, scale / 3, (i + 1) *
-                scale + fontHeight / 2);
-            }
-
-            String countLabel = Integer.toString(count[i]);
-            offGraphics.drawString(countLabel, 7 * scale / 3, (i + 1) * scale +
-                fontHeight / 2);
-        }
-
         g.drawImage(offImage, 0, 0, this);
     }
 
@@ -160,10 +149,16 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
     }
 
 
+    // Dispose if mouse exits the dialog, but not if it exits a
+    // chit within the dialog.
     public void mouseExited(MouseEvent e)
     {
-        dispose();
+        if (e.getSource() == this) 
+        {
+            dispose();
+        }
     }
+
 
 
     public void mousePressed(MouseEvent e)
