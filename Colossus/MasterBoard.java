@@ -23,8 +23,9 @@ public class MasterBoard extends Frame implements MouseListener,
     public static final double SQRT3 = Math.sqrt(3.0);
 
     private MasterHex[][] h = new MasterHex[15][8];
-    private Chit[] chits = new Chit[4];
-    private int tracking;
+    // Will be replaced with game.player[].legion[].chit
+//    private Chit[] chits = new Chit[4];
+//    private int tracking;
     final private boolean[][] show =
     {
         {false, false, false, true, true, false, false, false},
@@ -43,7 +44,7 @@ public class MasterBoard extends Frame implements MouseListener,
         {false, false, true, true, true, true, false, false},
         {false, false, false, true, true, false, false, false},
     };
-    private Rectangle rectClip = new Rectangle();
+    private Rectangle rectClip;
     private Image offImage;
     private Graphics gBack;
     private Dimension offDimension;
@@ -51,28 +52,113 @@ public class MasterBoard extends Frame implements MouseListener,
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private int scale;
+    static Game game;
 
-    public MasterBoard()
+
+    public MasterBoard(Game game)
     {
         super("MasterBoard");
 
+        this.game = game;
+
         scale = 17;
-        int cx = 3 * scale;
-        int cy = 2 * scale;
 
         pack();
         setSize(69 * scale, 69 * scale);
         setBackground(java.awt.Color.black);
-        setVisible(true);
         addWindowListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        tracking = -1;
+        // tracking = -1;
         needToClear = false;
         imagesLoaded = false;
 
-        // Initialize hexes
+        // Initialize the hexmap
+        setupHexes();
+
+        // Each player needs to pick his first legion marker.
+        for (int i = 0; i < game.numPlayers; i++)
+        {
+            PickMarker pickmarker = new PickMarker(this, game.player[i]);
+        }
+
+        // Update status window
+        game.updateStatusScreen();
+
+        // Place initial legions.
+        for (int i = 0; i < game.numPlayers; i++)
+        {
+            // Lookup coords for chit starting from player[i].startingTower
+            Point point = get_vertex_from_label(100 * 
+                game.player[i].startingTower);
+
+            game.player[i].legions[0] = new Legion(point.x + scale, 
+                point.y + scale, 60, game.player[i].markerSelected, this, 8, 
+                Creature.titan, Creature.angel, Creature.ogre, Creature.ogre, 
+                Creature.centaur, Creature.centaur, Creature.gargoyle, 
+                Creature.gargoyle);
+
+            game.player[i].numLegions = 1;
+        }
+
+        tracker = new MediaTracker(this);
+
+/*
+        chits[0] = new Chit(100, 100, 60, "images/Bk01.gif", this);
+        chits[1] = new Chit(120, 120, 60, "images/Bk04.gif", this);
+        chits[2] = new Chit(140, 140, 60, "images/Rd08.gif", this);
+        chits[3] = new Chit(160, 160, 60, "images/Rd12.gif", this);
+
+        for (int i = 0; i < chits.length; i++)
+        {
+            tracker.addImage(chits[i].image, 0);
+        }
+*/
+
+        for (int i = 0; i < game.numPlayers; i++)
+        {
+            tracker.addImage(game.player[i].legions[0].chit.image, 0);
+        }
+        try
+        {
+            tracker.waitForAll();
+        }
+        catch (InterruptedException e)
+        {
+            System.out.println("waitForAll was interrupted");
+        }
+        imagesLoaded = true;
+        setVisible(true);
+        repaint();
+    }
+
+
+    // Do a brute-force search through the hex array, looking for
+    //    a match.  Return the northwest vertex of that hex.
+    Point get_vertex_from_label(int label)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j] && h[i][j].label == label)
+                {
+                    return new Point(h[i][j].xVertex[0], h[i][j].yVertex[0]);
+                }
+            }
+        }
+        // no match
+        return new Point(-1, -1);
+    }
+
+
+    void setupHexes()
+    {
+        int cx = 3 * scale;
+        int cy = 2 * scale;
+
+        // Initialize hexes 
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
@@ -595,31 +681,6 @@ public class MasterBoard extends Frame implements MouseListener,
                 }
             }
         }
-
-
-        tracker = new MediaTracker(this);
-
-        chits[0] = new Chit(100, 100, 60, "images/Bk01.gif", this);
-        chits[1] = new Chit(120, 120, 60, "images/Bk04.gif", this);
-        chits[2] = new Chit(140, 140, 60, "images/Rd08.gif", this);
-        chits[3] = new Chit(160, 160, 60, "images/Rd12.gif", this);
-
-        for (int i = 0; i < chits.length; i++)
-        {
-            tracker.addImage(chits[i].image, 0);
-        }
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            System.out.println("waitForAll was interrupted");
-        }
-        imagesLoaded = true;
-
-        repaint();
     }
 
 
@@ -647,6 +708,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public void mouseDragged(MouseEvent e)
     {
+/*
         if (tracking != -1)
         {
             Point point = e.getPoint();
@@ -661,16 +723,18 @@ public class MasterBoard extends Frame implements MouseListener,
             needToClear = true;
             repaint(clip.x, clip.y, clip.width, clip.height);
         }
+*/
     }
 
     public void mouseReleased(MouseEvent e)
     {
-        tracking = -1;
+//        tracking = -1;
     }
 
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
+/*
         for (int i=0; i < chits.length; i++)
         {
             if (chits[i].select(point))
@@ -693,6 +757,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 return;
             }
         }
+*/
 
         // No hits on chits, so check map.
         for (int i = 0; i < h.length; i++)
@@ -778,6 +843,7 @@ public class MasterBoard extends Frame implements MouseListener,
         }
 
         // Draw chits from back to front.
+/*
         for (int i = chits.length - 1; i >= 0; i--)
         {
             if (rectClip.intersects(chits[i].getBounds()))
@@ -785,6 +851,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 chits[i].paint(g);
             }
         }
+*/
     }
 
     public void update(Graphics g)
@@ -823,6 +890,7 @@ public class MasterBoard extends Frame implements MouseListener,
         }
 
         // Draw chits from back to front.
+/*
         for (int i = chits.length - 1; i >= 0; i--)
         {
             if (rectClip.intersects(chits[i].getBounds()))
@@ -830,6 +898,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 chits[i].paint(gBack);
             }
         }
+*/
 
         g.drawImage(offImage, 0, 0, this);
     }
@@ -848,9 +917,10 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public static void main(String args[])
     {
-        MasterBoard masterboard = new MasterBoard();
+        game = new Game();
+        MasterBoard masterboard = new MasterBoard(game);
+        //MasterBoard masterboard = new MasterBoard();
     }
-
 }
 
 
@@ -865,8 +935,8 @@ class MasterHex
     public static final double SQRT3 = Math.sqrt(3.0);
     public static final double RAD_TO_DEG = 180 / Math.PI;
     private boolean selected;
-    private int[] xVertex = new int[6];
-    private int[] yVertex = new int[6];
+    int[] xVertex = new int[6];
+    int[] yVertex = new int[6];
     private Polygon p;
     private Rectangle rectBound;
     private boolean inverted;
@@ -975,7 +1045,7 @@ class MasterHex
         p.ypoints = yVertex;
 
         // Add 1 to width and height because Java rectangles come up
-        // one pixel short.
+        // one pixel short of the area actually painted.
         rectBound.x =  xVertex[5];
         rectBound.y =  yVertex[0];
         rectBound.width = xVertex[2] - xVertex[5] + 1;
