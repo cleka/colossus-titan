@@ -8,7 +8,7 @@ import java.awt.event.*;
  */
 
 
-class PickMarker extends Dialog implements MouseListener
+class PickMarker extends Dialog implements MouseListener, WindowListener
 {
     Chit [] markers;
     MediaTracker tracker;
@@ -25,7 +25,7 @@ class PickMarker extends Dialog implements MouseListener
         markers = new Chit[player.numMarkersAvailable];
 
         addMouseListener(this);
-
+        addWindowListener(this);
 
         if (player.numMarkersAvailable == 0)
         {
@@ -148,6 +148,38 @@ class PickMarker extends Dialog implements MouseListener
     }
     
     public void mouseReleased(MouseEvent e)
+    {
+    }
+
+
+    public void windowActivated(WindowEvent event)
+    {
+    }
+
+    public void windowClosed(WindowEvent event)
+    {
+    }
+
+    public void windowClosing(WindowEvent event)
+    {
+        player.markerSelected = null;
+        dispose();
+        return;
+    }
+
+    public void windowDeactivated(WindowEvent event)
+    {
+    }
+                                                         
+    public void windowDeiconified(WindowEvent event)
+    {
+    }
+
+    public void windowIconified(WindowEvent event)
+    {
+    }
+
+    public void windowOpened(WindowEvent event)
     {
     }
 }
