@@ -8,6 +8,7 @@ import com.werken.opt.Option;
 import com.werken.opt.CommandLine;
 
 import net.sf.colossus.server.IRMIServer;
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Log;
 
 
@@ -20,7 +21,7 @@ import net.sf.colossus.util.Log;
 
 public class StartClient
 {
-    private static String playerName = "RemoteTest";
+    private static String playerName = Constants.username;
     private static String hostname = "localhost";
 
 

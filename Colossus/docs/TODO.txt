@@ -13,14 +13,21 @@ java.lang.NullPointerException
 	at net.sf.colossus.server.Game.placeInitialLegion(Game.java:1745)
 	at net.sf.colossus.server.Game.newGame3(Game.java:497)
 
+Bug: Remote player tower teleported, stack did not show up as moved until
+   next turn's repaint.  Happens on many masterboard moves.
+
+Bug: Remote player sees all of AI's possible battle moves.
+
+Colorize StatusScreen.
 
 Fix .java.policy file to allow as little as possible.
-Add script to drop proper .java.policy into {user.home}
 Add StartClient gui for setting playerName and hostname. 
 Add .java.policy, change rmiserver to set a property to point to it.
 Start rmiregistry from rmiserver?
 Document RMI: .java.policy, rmiregistry (PATH)
 Add Client.jnlp file.
+
+
 
 Eliminate excess arguments to Flee, Concede, Negotiate.
 

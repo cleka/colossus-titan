@@ -35,6 +35,7 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
      *  the originating IP, in case a connection breaks and we need to
      *  authenticate reconnects.  Do not share these references. */
     private List clients = new ArrayList();
+    private List remoteClients = new ArrayList();
 
     /** Map of player name to client. */
     private Map clientMap = new HashMap();
@@ -76,6 +77,9 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
 Log.debug("Adding client with unique name " + name); 
         clientMap.put(name, client);
         game.addRemoteClient(name);
+        remoteClients.add(client);
+        Log.setServer(this);
+        Log.setToRemote(true);
     }
 
 
@@ -1636,5 +1640,24 @@ Log.debug("Adding client with unique name " + name);
     void allSetOption(String optname, int value)
     {
         allSetOption(optname, String.valueOf(value));
+    }
+
+    /** public so that it can be called from Log. */
+    public void allLog(String message)
+    {
+        Iterator it = remoteClients.iterator();
+        while (it.hasNext())
+        {
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.log(message);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
+        }
     }
 }

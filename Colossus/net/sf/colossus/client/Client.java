@@ -3196,4 +3196,9 @@ Log.debug("found " + set.size() + " hexes");
         }
         repaintAllWindows();
     }
+
+    public void log(String message)
+    {
+        Log.event(message);
+    }
 }

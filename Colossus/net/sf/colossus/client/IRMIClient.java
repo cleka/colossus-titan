@@ -140,4 +140,6 @@ public interface IRMIClient extends Remote
         int childHeight) throws RemoteException;
 
     public void askPickColor(Set colorsLeft) throws RemoteException;
+
+    public void log(String message) throws RemoteException;
 }
