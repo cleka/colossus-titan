@@ -126,6 +126,10 @@ public class Abyssal9Hint implements net.sf.colossus.server.HintInterface
         }
         else if (terrain.equals("Tower"))
         {
+            if (recruits.contains("Knight"))
+            {
+                return "Knight";
+            }
             if (recruits.contains("Warlock"))
             {
                 return "Warlock";
