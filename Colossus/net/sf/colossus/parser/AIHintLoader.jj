@@ -20,7 +20,7 @@ import net.sf.colossus.server.HintOracleInterface;
  * @version $Id$
  * @see net.sf.colossus.server.Creature
  */
-public class AIHintLoader
+public class AIHintLoader implements net.sf.colossus.server.HintInterface
 {
     public static final String sectionAllAI = "AllAI:";
     public static final String sectionOffensiveAI = "OffensiveAI:";

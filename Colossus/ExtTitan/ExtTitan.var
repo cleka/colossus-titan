@@ -2,4 +2,5 @@ MAP:ExtTitan.map
 TER:ExtTitan.ter
 CRE:ExtTitan.cre
 HINT:ExtTitan.hin
+#HINT:ExtTitan.ExtTitanHint
 MAXPLAYERS: 8

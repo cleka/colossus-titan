@@ -792,4 +792,20 @@ public final class ResourceLoader
     {
         return filename.replace(' ', '_');
     }
+
+    /** create an instance of the class whose name is in parameter. */
+    public static Object getNewObject(String className)
+    {
+        try
+        {
+            Class theClass = cl.loadClass(className);
+            Object o = theClass.newInstance();
+            return o;
+        }
+        catch (Exception e)
+        {
+            Log.error("Loading of class \"" + className + "\" failed (" + e + ")");
+        }
+        return null;
+    }
 }

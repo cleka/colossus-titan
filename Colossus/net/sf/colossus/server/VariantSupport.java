@@ -29,7 +29,7 @@ public final class VariantSupport
     private static java.util.List dependUpon = null;
     private static boolean loadedVariant = false;
     private static int maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
-    private static AIHintLoader aihl = null;
+    private static HintInterface aihl = null;
     private static java.util.Properties markerNames;
 
     /**
@@ -149,7 +149,7 @@ public final class VariantSupport
                 {
                     dependUpon = Split.split(',', 
                         data[VariantLoader.DEPEND_INDEX]);
-                    Log.debug("Variant dependng upon " + dependUpon);
+                    Log.debug("Variant depending upon " + dependUpon);
                 }
                 else
                 {
@@ -280,13 +280,13 @@ public final class VariantSupport
         try
         {
             java.util.List directories = 
-                VariantSupport.getVarDirectoriesList();
+                getVarDirectoriesList();
             InputStream terIS = ResourceLoader.getInputStream(
-                VariantSupport.getRecruitName(), directories);
+                getRecruitName(), directories);
             if (terIS == null) 
             {
                 throw new FileNotFoundException(
-                    VariantSupport.getRecruitName());
+                    getRecruitName());
             }
             TerrainRecruitLoader trl = new TerrainRecruitLoader(terIS);
             while (trl.oneTerrain() >= 0) {}
@@ -315,7 +315,7 @@ public final class VariantSupport
     {
         java.util.Properties allNames = new java.util.Properties();
         java.util.List directories = 
-            VariantSupport.getVarDirectoriesList();
+            getVarDirectoriesList();
         /* unlike other, don't use file-level granularity ; 
            load all files in order, so that we get the
            default mapping at the end */
@@ -350,38 +350,64 @@ public final class VariantSupport
     public synchronized static void loadHints()
     {
         aihl = null;
-        try
-        {
-            java.util.List directories = 
-                VariantSupport.getVarDirectoriesList();
-            InputStream aihlIS = ResourceLoader.getInputStream(
-                VariantSupport.getHintName(), directories);
-            if (aihlIS == null) 
+        if (getHintName().endsWith(".hin"))
+        { // first if it's a .hin, use the AIHintLoader
+            try
             {
-                throw new FileNotFoundException(
-                    VariantSupport.getHintName());
+                java.util.List directories = 
+                    getVarDirectoriesList();
+                InputStream aihlIS = ResourceLoader.getInputStream(getHintName(),
+                                                                   directories);
+                if (aihlIS == null) 
+                {
+                    throw new FileNotFoundException(getHintName());
+                }
+                aihl = new AIHintLoader(aihlIS);
+                boolean done = false;
+                int totalHints = 0;
+                while (!done)
+                {
+                    int result = ((AIHintLoader)aihl).oneHint();
+                    if (result < 0)
+                    {
+                        done = true;
+                    }
+                    else
+                    {
+                        totalHints += result;
+                    }
+                }
+                Log.debug("Found " + totalHints + " hints in " + getHintName());
             }
-            aihl = new AIHintLoader(aihlIS);
-            boolean done = false;
-            int totalHints = 0;
-            while (!done)
+            catch (Exception e) 
             {
-                int result = aihl.oneHint();
-                if (result < 0)
-                {
-                    done = true;
-                }
-                else
-                {
-                    totalHints += result;
-                }
+                Log.error("Hints loading failed : " + e);
+                System.exit(1);
             }
-            Log.debug("Found " + totalHints + " hints in " + VariantSupport.getHintName());
         }
-        catch (Exception e) 
+        else
+        { // let's assume this is a class name, implementing HintInterface
+            Object o = ResourceLoader.getNewObject(getHintName());
+            if ((o != null) && (o instanceof HintInterface))
+            {
+                aihl = (HintInterface)o;
+                Log.debug("Using class " + getHintName() + " to supply hints to the AIs.");
+            }
+            else
+            {
+                aihl = null;
+            }
+        }
+        if (aihl == null)
         {
-            Log.error("Hints loading failed : " + e);
-            System.exit(1);
+            if (getHintName().equals(Constants.defaultHINTFile))
+            {
+                Log.error("Couldn't load default hints !");
+                System.exit(1);
+            }
+            Log.warn("Couldn't load hints. Trying with Default.");
+            hintName = Constants.defaultHINTFile;
+            loadHints();
         }
     }
 
