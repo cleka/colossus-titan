@@ -15,7 +15,6 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private Player player;
-    private MasterHex hex;
     private Legion legion;
     private Chit [] markers;
 
@@ -31,8 +30,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         player = legion.getPlayer();
 
         recruits = new Creature[5];
-        markers = new Chit[5];
-        hex = legion.getCurrentHex();
+        markers = new Chit[recruits.length];
 
         addMouseListener(this);
         addWindowListener(this);
@@ -353,7 +351,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         }
 
         // Check for availability of chits.
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < recruits.length; i++)
         {
             if (recruits[i] != null && recruits[i].getCount() < 1)
             {
@@ -362,20 +360,20 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         }
 
         // Pack the recruits array for display.
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < recruits.length - 1; i++)
         {
             if (recruits[i] == null)
             {
-                for (int j = i; j < 4; j++)
+                for (int j = i; j < recruits.length - 1; j++)
                 {
                     recruits[j] = recruits[j + 1];
                 }
-                recruits[4] = null;
+                recruits[recruits.length - 1] = null;
             }
         }
 
         int count = 0;
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < recruits.length; i++)
         {
             if (recruits[i] != null)
             {
