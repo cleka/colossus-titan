@@ -77,17 +77,13 @@ public final class Start
     {
         net.sf.colossus.util.Options options = game.getOptions();
         options.loadOptions();
-Log.debug("load:" + options.toString());
         clearNonPersistentOptions(options);
 
-Log.debug("clear: " + options.toString());
         new GetPlayers(new JFrame(), options);
         String loadFilename = options.getStringOption(Constants.loadGame);
-Log.debug("after dialog: " + options.toString());
 
         if (options.isEmpty())
         {
-Log.debug("Start.startupDialog() options.isEmpty()");
              // Bad input, or user selected Quit.
              game.dispose();
         }
@@ -96,7 +92,6 @@ Log.debug("Start.startupDialog() options.isEmpty()");
         // load a game instead of starting a new one.
         else if (loadFilename != null && loadFilename.length() > 0)
         {
-Log.debug("Start.startupDialog() loadFilename is " + loadFilename);
             options.clearPlayerInfo();
             game.loadGame(loadFilename);
         }
@@ -105,13 +100,11 @@ Log.debug("Start.startupDialog() loadFilename is " + loadFilename);
         // the server and run the client.
         else if (options.getOption(Constants.runClient))
         {
-Log.debug("Start.startupDialog() runClient");
             startClient(cl);
         }
 
         else
         {
-Log.debug("Start.startupDialog() newGame");
             game.newGame();
         }
     }

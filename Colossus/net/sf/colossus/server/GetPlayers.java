@@ -419,10 +419,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private void doRunClient()
     {
-Log.debug("GetPlayers.doRunClient()");
         setVisible(false);
         options.setOption(Constants.runClient, true);
-Log.debug("after setting runClient true: " + options.toString());
         dispose();
     }
 

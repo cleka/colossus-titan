@@ -80,7 +80,6 @@ public final class Game
 
     private void initServer()
     {
-Log.debug("Called Game.initServer()");
         if (server != null)
         {
             server.disposeAllClients();
@@ -105,7 +104,6 @@ Log.debug("Called Game.initServer()");
 
     private void addPlayersFromOptions()
     {
-Log.debug("Game.addPlayersFromOptions()");
         for (int i = 0; i < VariantSupport.getMaxPlayers(); i++)
         {
             String name = options.getStringOption(Options.playerName + i);
@@ -118,7 +116,6 @@ Log.debug("Game.addPlayersFromOptions()");
             }
         }
         // No longer need the player name and type options. 
-Log.debug("About to call options.clearPlayerInfo()");
         options.clearPlayerInfo();
     }
 
@@ -142,7 +139,6 @@ Log.debug("About to call options.clearPlayerInfo()");
 
     void newGame2()
     {
-Log.debug("Called Game.newGame2()");
         // We need to set the autoPlay option before loading the board,
         // so that we can avoid showing boards for AI players.
         syncAutoPlay();
@@ -2041,7 +2037,6 @@ Log.debug("Called Game.newGame2()");
     /** Return set of hexLabels for engagements found. */
     Set findEngagements()
     {
-Log.debug("Called Game.findEngagements()");
         Set set = new HashSet();
         Player player = getActivePlayer();
 
@@ -2127,10 +2122,6 @@ Log.debug("Called Game.findEngagements()");
 
     private synchronized void kickEngagements()
     {
-Log.debug("in kickEngagements() summoning=" + summoning + " reinforcing=" +
-reinforcing + " acquiring=" + acquiring); 
-Log.debug("" + findEngagements().size() + " engagements left");
-
         server.nextEngagement();
 
         if (findEngagements().size() == 0 && !summoning && !reinforcing && 
