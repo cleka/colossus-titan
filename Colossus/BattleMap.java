@@ -92,7 +92,9 @@ public class BattleMap extends Frame implements MouseListener,
 
         preferredSize = new Dimension(30 * scale, 30 * scale);
         setSize(preferredSize);
-        setResizable(false);
+
+        // XXX: Removed due to a bug in Linux jdk1.1.6v2.  Put back when fixed.
+        // setResizable(false);
 
         setBackground(java.awt.Color.white);
         addWindowListener(this);
@@ -1735,7 +1737,7 @@ System.out.println("defender's titan eliminated");
     {
         if (legion == attacker)
         {
-            switch(side)
+            switch (side)
             {
                 case 'l':
                     return entrances[5];
@@ -1752,7 +1754,7 @@ System.out.println("defender's titan eliminated");
         }
         else
         {
-            switch(side)
+            switch (side)
             {
                 case 'l':
                     return entrances[2];
