@@ -157,6 +157,7 @@ Log.debug("Creature.loadCreatures()");
                 summonableCreatures.add(c);
             }
         }
+        Collections.sort(creatures);
     }
 
 
