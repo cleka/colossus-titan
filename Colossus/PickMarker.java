@@ -19,6 +19,8 @@ class PickMarker extends Dialog implements MouseListener
     {
         super(parentFrame, player.name + ": Pick Legion Marker", true);
         
+        setResizable(false);
+
         this.player = player;
         markers = new Chit[player.numMarkersAvailable];
 
