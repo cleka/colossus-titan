@@ -334,11 +334,13 @@ public final class VariantSupport
     }
 
     public static String getRecruitHint(char terrain,
-                                 net.sf.colossus.client.LegionInfo legion)
+                                        net.sf.colossus.client.LegionInfo legion,
+                                        net.sf.colossus.server.CanReachTerrainInterface crti,
+                                        net.sf.colossus.server.HasCreatureInterface hci)
     {
         if (aihl != null)
         {
-            return aihl.getRecruitHint(terrain,legion);
+            return aihl.getRecruitHint(terrain,legion,crti,hci);
         }
         return null;
     }

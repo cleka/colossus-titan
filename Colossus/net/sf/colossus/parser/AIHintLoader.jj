@@ -2,6 +2,8 @@ options
 {
   IGNORE_CASE = false;
   STATIC = false;
+  LOOKAHEAD = 8;
+  FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(AIHintLoader)
@@ -29,6 +31,7 @@ public class AIHintLoader
         String recruiter;
         int number;
         String recruitee;
+        ConditionTreeNode ctn = null;
 
         recruitHintData(char terrain,
                         String recruiter,
@@ -51,6 +54,16 @@ public class AIHintLoader
             return recruitee;
         }
 
+        void setConditionTreeNode(ConditionTreeNode ctn)
+        {
+            this.ctn = ctn;
+        }
+
+        ConditionTreeNode getConditionTreeNode()
+        {
+            return ctn;
+        }
+
         public boolean equals(Object o)
         {
             if (o instanceof recruitHintData)
@@ -70,12 +83,159 @@ public class AIHintLoader
         {
             return (this.terrain == terrain &&
                     this.recruiter.equals(recruiter) &&
-                    this.number == number);
+                    this.number == number &&
+                    (ctn == null ? true : ctn.isTrue()));
+        }
+        
+        void setOracles(net.sf.colossus.server.CanReachTerrainInterface crti,
+                        net.sf.colossus.server.HasCreatureInterface hci)
+        {
+            if (ctn != null)
+            {
+                ctn.setOracles(crti,hci);
+            }
+        }
+    }
+
+    private abstract class ConditionTreeNode
+    {
+        net.sf.colossus.server.CanReachTerrainInterface crti;
+        net.sf.colossus.server.HasCreatureInterface hci;
+        
+        abstract public boolean isTrue();
+        
+        synchronized void setOracles(
+            net.sf.colossus.server.CanReachTerrainInterface crti,
+            net.sf.colossus.server.HasCreatureInterface hci)
+        {
+            this.crti = crti;
+            this.hci = hci;
+
+            if (this instanceof ConditionTreeNode_BinaryOp)
+            {
+                ((ConditionTreeNode_BinaryOp)this).ctn1.setOracles(crti,hci);
+                ((ConditionTreeNode_BinaryOp)this).ctn2.setOracles(crti,hci);
+
+            }
+            if (this instanceof ConditionTreeNode_UnaryOp)
+            {
+                ((ConditionTreeNode_UnaryOp)this).ctn1.setOracles(crti,hci);
+            }
+        }
+    }
+
+    private abstract class ConditionTreeNode_Leaf extends ConditionTreeNode
+    {
+        public ConditionTreeNode_Leaf()
+        {
+            
+        }
+    }
+
+    private class ConditionTreeNode_CanReach extends ConditionTreeNode_Leaf
+    {
+        char terrain;
+
+        public ConditionTreeNode_CanReach(char terrain)
+        {
+            super();
+            this.terrain = terrain;
+        }
+        
+        public boolean isTrue()
+        {
+            if (crti != null)
+            {
+                return crti.canReach(terrain);
+            }
+            return false;
+        }
+    }
+    
+    private class ConditionTreeNode_HasCreature extends ConditionTreeNode_Leaf
+    {
+        String name;
+
+        public ConditionTreeNode_HasCreature(String name)
+        {
+            super();
+            this.name = name;
+        }
+        
+        public boolean isTrue()
+        {
+            if (hci != null)
+            {
+                return hci.hasCreature(name);
+            }
+            return false;
+        }
+    }
+    
+    private abstract class ConditionTreeNode_BinaryOp extends ConditionTreeNode
+    {
+        ConditionTreeNode ctn1;
+        ConditionTreeNode ctn2;
+
+        public ConditionTreeNode_BinaryOp(ConditionTreeNode ctn1, ConditionTreeNode ctn2)
+        {
+            this.ctn1 = ctn1;
+            this.ctn2 = ctn2;
+        }
+    }
+
+    private class ConditionTreeNode_BinaryAnd extends ConditionTreeNode_BinaryOp
+    {
+        ConditionTreeNode_BinaryAnd(ConditionTreeNode ctn1, ConditionTreeNode ctn2)
+        {
+            super(ctn1,ctn2);
+        }
+        public boolean isTrue()
+        {
+            return (ctn1.isTrue() && ctn2.isTrue());
+        }
+    }
+
+    private class ConditionTreeNode_BinaryOr extends ConditionTreeNode_BinaryOp
+    {
+        ConditionTreeNode_BinaryOr(ConditionTreeNode ctn1, ConditionTreeNode ctn2)
+        {
+            super(ctn1,ctn2);
+        }
+        
+        public boolean isTrue()
+        {
+            return (ctn1.isTrue() || ctn2.isTrue());
+        }
+    }
+
+    private abstract class ConditionTreeNode_UnaryOp extends ConditionTreeNode
+    {
+        ConditionTreeNode ctn1;
+
+        public ConditionTreeNode_UnaryOp(ConditionTreeNode ctn1)
+        {
+            this.ctn1 = ctn1;
+        }
+    }
+
+    private class ConditionTreeNode_UnaryNot extends ConditionTreeNode_UnaryOp
+    {
+        public ConditionTreeNode_UnaryNot(ConditionTreeNode ctn1)
+        {
+            super(ctn1);
+        }
+
+        public boolean isTrue()
+        {
+            return (!(ctn1.isTrue()));
         }
     }
     
     public String getRecruitHint(char terrain,
-                                 LegionInfo legion)
+                                 LegionInfo legion,
+                                 net.sf.colossus.server.CanReachTerrainInterface crti,
+                                 net.sf.colossus.server.HasCreatureInterface hci)
     {
         Character index = new Character(terrain);
 
@@ -92,14 +252,21 @@ public class AIHintLoader
         {
             recruitHintData th = (recruitHintData)hintIt.next();
             
-            Iterator legionIt = legion.getContents().iterator();
-            while (legionIt.hasNext() && (hint == null))
-            { // this will try creatures as many times as they exist. yuck !
-                String creature = (String)legionIt.next();
+            ConditionTreeNode ctn = th.getConditionTreeNode();
+            
+            synchronized (ctn)
+            {
+                ctn.setOracles(crti,hci);
                 
-                if (th.match(terrain, creature, legion.numCreature(creature)))
-                {
-                    hint = th.getRecruitee();
+                Iterator legionIt = legion.getContents().iterator();
+                while (legionIt.hasNext() && (hint == null))
+                { // this will try creatures as many times as they exist. yuck !
+                    String creature = (String)legionIt.next();
+                    
+                    if (th.match(terrain, creature, legion.numCreature(creature)))
+                    {
+                        hint = th.getRecruitee();
+                    }
                 }
             }
         }
@@ -139,12 +306,26 @@ TOKEN :
 TOKEN :
 {
     < RECRUIT : "RECRUIT" >
+|   < CANREACH : "CANREACH" >
+|   < HASCREATURE : "HASCREATURE" >
+|   < OR : "OR" >
+|   < AND : "AND" >
+|   < NOT: "NOT" >
+|   < OPENPAR : "(" >
+|   < CLOSEPAR : ")" >
 }
 
 TOKEN :
 {
     < NUMBER : ("-")?(<DIGIT>)+ >
 |   < #DIGIT : ["0" - "9"] >
+}
+
+TOKEN:
+{
+    < TERRAINLIST : (<TERCAR><COMMA>)*<TERCAR> >
+|   < #TERCAR : ["a"-"z","A"-"Z"] >
+|   < #COMMA : "," >
 }
 
 TOKEN :
@@ -158,7 +339,7 @@ TOKEN :
 char h_char() :
 {}
 {
-    <CHAINE>
+    <TERRAINLIST>
     { return (token.image.charAt(0)); }
 }
 
@@ -186,6 +367,58 @@ int h_number() :
     }
 }
 
+char h_reachterrain() :
+{
+    char tc;
+}
+{
+    <CANREACH> (tc = h_char())
+        {
+            return tc;
+        }
+}
+
+String h_hascreature() :
+{
+    String name;
+}
+{
+    <HASCREATURE> (name = h_chaine())
+        {
+            return name;
+        }
+}
+
+ConditionTreeNode h_condnode() :
+{
+    ConditionTreeNode ctn1;
+    ConditionTreeNode ctn2;
+    char tc;
+    String name;
+}
+{
+    <OPENPAR> (ctn1 = h_condnode()) <OR> (ctn2 = h_condnode()) <CLOSEPAR>
+    {
+        return new ConditionTreeNode_BinaryOr(ctn1,ctn2);
+    }
+|   <OPENPAR> (ctn1 = h_condnode()) <AND> (ctn2 = h_condnode()) <CLOSEPAR>
+    {
+        return new ConditionTreeNode_BinaryAnd(ctn1,ctn2);
+    }
+|   <OPENPAR> <NOT> (ctn1 = h_condnode()) <CLOSEPAR>
+    {
+        return new ConditionTreeNode_UnaryNot(ctn1);
+    }
+|   <OPENPAR> (tc = h_reachterrain()) <CLOSEPAR>
+    {
+        return new ConditionTreeNode_CanReach(tc);
+    }
+|   <OPENPAR> (name = h_hascreature()) <CLOSEPAR>
+    {
+        return new ConditionTreeNode_HasCreature(name);
+    }
+}
+
 recruitHintData h_recruit_hint() :
 {
     char tc;
@@ -204,9 +437,10 @@ int oneHint() :
 {
     recruitHintData recruitHint;
     String s;
+    ConditionTreeNode ctn = null;
 }
 {
-    (recruitHint = h_recruit_hint())
+    (recruitHint = h_recruit_hint()) (ctn = h_condnode())?
     {
         Character index = new Character(recruitHint.getTerrain());
 
@@ -217,6 +451,12 @@ int oneHint() :
             temp = new ArrayList();
             terrainToRecruitHintList.put(index, temp);
         }
+        
+        if (ctn != null)
+        {
+            recruitHint.setConditionTreeNode(ctn);
+        }
+
         temp.add(recruitHint);
         return(1);
     }

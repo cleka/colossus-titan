@@ -1789,12 +1789,48 @@ public class SimpleAI implements AI
         return best;
     }
 
+    private class SimpleAICanReachTerrain implements
+        net.sf.colossus.server.CanReachTerrainInterface
+    {
+        LegionInfo legion;
+        MasterHex hex;
+        SimpleAICanReachTerrain(LegionInfo legion,
+                                MasterHex hex)
+        {
+            this.legion = legion;
+            this.hex = hex;
+        }
+
+        public boolean canReach(char t)
+        {
+            return (getNumberOfWaysToTerrain(legion,hex,t) > 0);
+        }
+    }
+
+    private class SimpleAIHasCreature implements
+        net.sf.colossus.server.HasCreatureInterface
+    {
+        LegionInfo legion;
+        SimpleAIHasCreature(LegionInfo legion)
+        {
+            this.legion = legion;
+        }
+
+        public boolean hasCreature(String name)
+        {
+            return (legion.numCreature(name) > 0);
+        }
+    }
+
     private Creature getVariantRecruitHint(LegionInfo legion,
                                            MasterHex hex,
                                            List recruits)
     {
         String recruitName =
-            VariantSupport.getRecruitHint(hex.getTerrain(),legion);
+            VariantSupport.getRecruitHint(hex.getTerrain(),
+                                          legion,
+                                          new SimpleAICanReachTerrain(legion,hex),
+                                          new SimpleAIHasCreature(legion));
         if (recruitName == null)
         {
             Log.debug("No hint available");

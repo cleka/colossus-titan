@@ -1,3 +1,3 @@
-RECRUIT B Cyclops 2 Cyclops
-RECRUIT P Lion 2 Lion
-RECRUIT M Troll 2 Troll
+RECRUIT B Cyclops 2 Cyclops (NOT (HASCREATURE Behemoth))
+RECRUIT P Lion 2 Lion ((CANREACH D) AND (NOT (HASCREATURE Griffon)))
+RECRUIT M Troll 2 Troll ((CANREACH S) AND (NOT (HASCREATURE Wyvern)))
