@@ -153,6 +153,8 @@ public class SimpleAI implements AI
             getBestRecruitmentOneTurnAhead(legion, hex, recruits);
         Creature temprecruit2 =
             getBestRecruitmentInfinityAhead(recruits, legion);
+        Creature temprecruit3 =
+            getBestRecruitmentPlacesNextTurn(legion, hex, recruits);
 
         /*
         // graph code disabled ATM
@@ -1742,6 +1744,41 @@ public class SimpleAI implements AI
                       " because it has the best creature in its tree");
         }
 
+        return best;
+    }
+
+    private Creature getBestRecruitmentPlacesNextTurn(LegionInfo legion,
+                                                      MasterHex hex,
+                                                      List recruits)
+    {
+        ListIterator it = recruits.listIterator(recruits.size());
+        Creature best = null;
+        String basic = ((Creature)recruits.get(recruits.size() - 1)).getName();
+        int maxwnum = 0;
+
+        while (it.hasPrevious())
+        {
+            Creature recruit = (Creature)it.previous();
+
+            int rnum = legion.numCreature(recruit);
+            java.util.List tl = TerrainRecruitLoader.getAllTerrainsWhereThisNumberOfCreatureRecruit(recruit.getName(), rnum + 1);
+            int wnum = getNumberOfWaysToTerrains(legion, hex, tl);
+            if (wnum > maxwnum)
+            {
+                best = recruit;
+                maxwnum = wnum;
+            }
+        }
+        if (best == null)
+        {
+            best = (Creature)recruits.get(recruits.size() - 1);
+        }
+        if (!(basic.equals(best.getName())))
+        {
+            Log.debug("GRAPH: PlacesNextTurn suggest recruiting " +
+                      best.getName() + " instead of " + basic +
+                      " because it recruits in the greater number of places");
+        }
         return best;
     }
 
