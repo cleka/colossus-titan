@@ -138,6 +138,7 @@
                        TitanPlus/**,
                        ExtTitan/**,
                        Badlands/**,
+                       Sakis/**,
                        Outlands/**"
              excludes="net/sf/colossus/datatools/*.class"
              />
@@ -215,6 +216,7 @@
              TitanPlus,
              ExtTitan,
              Badlands,
+             Sakis,
              Outlands"
         />
         <chmod file="BattlelandsBuilder.jar" perm="755"/>
@@ -233,6 +235,7 @@
              TitanPlus,
              ExtTitan,
              Badlands,
+             Sakis,
              Outlands"
         />
         <chmod file="BattlelandsRandomizer.jar" perm="755"/>

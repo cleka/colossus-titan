@@ -82,7 +82,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
         net/sf/colossus/client/*.class net/sf/colossus/server/*.class \
         net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \
-        Default TitanPlus ExtTitan Badlands Outlands version
+        Default TitanPlus ExtTitan Badlands Outlands Sakis version
 	chmod +x Colossus.jar
 
 # Sign jar file.  You need a keystore file named {your user name}Keystore

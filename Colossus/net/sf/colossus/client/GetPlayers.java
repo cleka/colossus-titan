@@ -59,6 +59,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         "TitanPlus",
         "ExtTitan", 
         "Badlands",
+        "Sakis",
         "Outlands"
     };
     private JComboBox variantBox;

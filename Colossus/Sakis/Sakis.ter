@@ -1,0 +1,31 @@
+B green       Ruins     true  1 Skeleton 2 Zombie  2 Lich     3 GostDragon
+
+D orange      Desert    true  1 Naga     3 Griffin  2 Manticore 2 BlackDragon
+
+H saddleBrown Hills     true  1 Troglodyte 2 Magog 2 Unicorn   2 Behemoth
+
+J darkGreen   Tombs     true  1 Skeleton 2 Zombie 3 Wraith  2 Vampire 2 BoneDragon
+
+M sienna      Marsh     true  1 Troglodyte    2 Ogre   2 Pegasus  3 GoldDragon
+
+m red         Mountains true  1 Naga     2 Magog 2 Manticore 2 RedDragon    2 Colossus
+
+P yellow      Plains    true  1 Paladin  2 Naga     2 Pegasus     3 GoldDragon
+
+S blue        Swamp     true  1 Ogre 3 Wyvern   2 Hydra   2 BlackDragon
+
+# Tower is a special case
+T grey        Tower     false 0 Anything 0 Paladin 0 Anything 0 Skeleton 0 Anything 0 Troglodyte 0 AnyNonLord 3 Golem 0 AnyNonLord 4 Harpy 0 AnyNonLord 5 Beholder -1 Titan 1 Wizard 
+
+t skyBlue     Tundra    true  1 Ogre 2 Basilisk  2 Hydra    2 Giant     2 Colossus
+
+W olive       Woods     true  1 Paladin 2 Basilisk 2 Dendroid   2 Behemoth
+
+TITANIMPROVE 75
+TITANTELEPORT 700
+
+ACQUIRABLE 100 Angel
+ACQUIRABLE 100 Fire D 100 Water S 100 Air W 100 Earth H 
+ACQUIRABLE 100 ArchDevil J 100 Efreet m 100 Genie t
+ACQUIRABLE 100 Necromancer T 300 TheReaper T
+ACQUIRABLE 300 Archangel
