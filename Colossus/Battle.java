@@ -8,7 +8,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class Battle 
+public class Battle
 {
     // Phases of a battle turn
     public static final int SUMMON = 0;
@@ -46,7 +46,7 @@ public class Battle
     private boolean defenderElim;
 
 
-    public Battle(MasterBoard board, Legion attacker, Legion defender, 
+    public Battle(MasterBoard board, Legion attacker, Legion defender,
         MasterHex masterHex)
     {
         this.board = board;
@@ -59,7 +59,7 @@ public class Battle
         defender.clearBattleTally();
 
         map = new BattleMap(board, masterHex, this);
-        
+
         // XXX Assumes that battles load at the beginning of a phase.
         map.setupPhase();
 
@@ -97,8 +97,8 @@ public class Battle
     {
         return attacker;
     }
-    
-    
+
+
     public Legion getDefender()
     {
         return defender;
@@ -125,7 +125,7 @@ public class Battle
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
             map.setupMove();
         }
-        
+
         else if (phase == RECRUIT)
         {
             phase = MOVE;
@@ -164,10 +164,11 @@ public class Battle
             // Make sure the battle isn't over before continuing.
             if (!attackerElim && !defenderElim)
             {
+                // Active legion is the one that was striking back.
                 if (activeLegion == attacker)
                 {
                     phase = SUMMON;
-                    Game.logEvent(getActivePlayer().getName() + 
+                    Game.logEvent(getActivePlayer().getName() +
                         "'s battle turn, number " + turnNumber);
                     map.setupSummon();
                     startSummoningAngel();
@@ -182,7 +183,7 @@ public class Battle
                         //    gets no points.
                         if (attacker.numCreature(Creature.titan) != 0)
                         {
-                            // This is the attacker's titan stack, so the 
+                            // This is the attacker's titan stack, so the
                             // defender gets his markers plus half points
                             // for his unengaged legions.
                             Player player = attacker.getPlayer();
@@ -199,7 +200,7 @@ public class Battle
                     {
                         phase = RECRUIT;
                         map.setupRecruit();
-                        Game.logEvent(getActivePlayer().getName() + 
+                        Game.logEvent(getActivePlayer().getName() +
                             "'s battle turn, number " + turnNumber);
                     }
                 }
@@ -298,7 +299,7 @@ public class Battle
     {
         return carryDamage;
     }
-    
+
 
     public void setCarryDamage(int carryDamage)
     {
@@ -316,13 +317,13 @@ public class Battle
     {
         chitSelected = true;
     }
-    
-    
+
+
     public void clearChitSelected()
     {
         chitSelected = false;
     }
-    
+
 
     public int getNumCritters()
     {
@@ -340,7 +341,7 @@ public class Battle
     {
         return (Critter)critters.get(i);
     }
-    
+
 
     public void addCritter(Critter critter)
     {
@@ -387,7 +388,7 @@ public class Battle
                     if (flies && movesLeft > 1 && (neighbor.getTerrain() != 'v'
                         || creature.getName().equals("Dragon")))
                     {
-                        set.addAll(findMoves(neighbor, creature, flies, 
+                        set.addAll(findMoves(neighbor, creature, flies,
                             movesLeft - 1, reverseDir));
                     }
                 }
@@ -466,7 +467,7 @@ public class Battle
 
     public void undoLastMove()
     {
-        clearChitSelected(); 
+        clearChitSelected();
 
         if (lastCritterMoved != null)
         {
@@ -479,7 +480,7 @@ public class Battle
 
     public void undoAllMoves()
     {
-        clearChitSelected(); 
+        clearChitSelected();
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -490,7 +491,7 @@ public class Battle
                 critter.undoMove();
             }
         }
-        
+
         highlightMovableChits();
     }
 
@@ -517,10 +518,10 @@ public class Battle
         String [] options = new String[2];
         options[0] = "Yes";
         options[1] = "No";
-        int answer = JOptionPane.showOptionDialog(map, 
+        int answer = JOptionPane.showOptionDialog(map,
             "Are you sure you with to concede the battle?",
             "Confirm Concession?",
-            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, 
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
             null, options, options[1]);
 
         if (answer == JOptionPane.YES_OPTION)
@@ -530,15 +531,15 @@ public class Battle
             advancePhase();
         }
     }
-    
-    
+
+
     public void tryToConcede()
     {
         tryToConcede(getActivePlayer());
     }
 
 
-    /** Return a set of hex labels for hex labels with critters eligible 
+    /** Return a set of hex labels for hex labels with critters eligible
      *  to move. */
     public Set findMovableChits()
     {
@@ -561,8 +562,8 @@ public class Battle
 
         return set;
     }
-    
-    /** Select all hexes containing critters eligible to move. 
+
+    /** Select all hexes containing critters eligible to move.
      *  Return the number of hexes selected (not the number
      *  of critters). */
     public int highlightMovableChits()
@@ -603,8 +604,8 @@ public class Battle
             critter.commitMove();
         }
     }
-    
-    
+
+
     public void doneWithMoves()
     {
         removeOffboardChits();
@@ -617,7 +618,7 @@ public class Battle
     {
         // Drift hexes are only found on the tundra map.
         // Drift damage is applied only once per player turn,
-        //    during the strike phase. 
+        //    during the strike phase.
         if (masterHex.getTerrain() == 't' && phase == FIGHT)
         {
             Iterator it = critters.iterator();
@@ -670,13 +671,15 @@ public class Battle
         }
     }
 
-    
+
     private void removeDeadCreatures()
     {
         // Initialize these to true, and then set them to false when a
         // non-dead chit is found.
         attackerElim = true;
         defenderElim = true;
+
+        donor = null;
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -685,14 +688,14 @@ public class Battle
             Legion legion = critter.getLegion();
             if (critter.isDead())
             {
-                // After turn 1, offboard creatures are returned to the 
-                // stacks or the legion they were summoned from, with 
+                // After turn 1, offboard creatures are returned to the
+                // stacks or the legion they were summoned from, with
                 // no points awarded.
                 if (critter.getCurrentHex().isEntrance() &&
                     getTurnNumber() > 1)
                 {
-                    if (critter.getName().equals("Angel") || 
-                        critter.getName().equals("Archangel")) 
+                    if (critter.getName().equals("Angel") ||
+                        critter.getName().equals("Archangel"))
                     {
                         donor = legion.getPlayer().getLastLegionSummonedFrom();
                         donor.addCreature(critter, false);
@@ -719,7 +722,7 @@ public class Battle
                     }
                 }
 
-                legion.removeCreature(critter, true, true);
+                legion.removeCreature(critter, true, false);
                 // If an angel or archangel was returned to its donor instead
                 // of the stack, then the count must be adjusted.
                 if (donor != null)
@@ -853,12 +856,12 @@ public class Battle
 
         return set;
     }
-    
-    /** Select hexes containing critters that have valid strike targets. 
+
+    /** Select hexes containing critters that have valid strike targets.
      *  Return the number of selected hexes. */
     public int highlightChitsWithTargets()
     {
-        Set set = findChitsWithTargets();    
+        Set set = findChitsWithTargets();
         map.unselectAllHexes();
         map.selectHexesByLabels(set);
         return set.size();
@@ -903,12 +906,12 @@ public class Battle
     }
 
 
-    /** Return a set of hex labels for hexes containing targets that the 
+    /** Return a set of hex labels for hexes containing targets that the
      *  critter may strike.
      */
     private Set findStrikes(Critter critter)
     {
-        HashSet set = new HashSet(); 
+        HashSet set = new HashSet();
 
         // Each creature may strike only once per turn.
         if (critter.hasStruck())
@@ -989,7 +992,7 @@ public class Battle
     public Set findCarries()
     {
         HashSet set = new HashSet();
-        
+
         Iterator it = critters.iterator();
         while (it.hasNext())
         {
@@ -1015,14 +1018,21 @@ public class Battle
 
     public void applyCarries(Critter target)
     {
+        int dealt = carryDamage;
         carryDamage = target.wound(carryDamage);
-        if (carryDamage < 0)
+        dealt -= carryDamage;
+        target.setCarryFlag(false);
+
+        Game.logEvent(dealt + (dealt == 1 ? "hit carries to " : 
+            " hits carry to ") + target.getName() + " in " + 
+            target.getCurrentHex().getLabel());
+
+        if (carryDamage <= 0 || findCarries().isEmpty())
         {
             clearAllCarries();
         }
         else
         {
-            target.setCarryFlag(false);
             String label = target.getCurrentHex().getLabel();
             map.unselectHexByLabel(label);
             showDice.setCarries(carryDamage);
@@ -1591,7 +1601,7 @@ public class Battle
         // Only the active player can move or strike.
         if (critter != null && critter.getPlayer() == getActivePlayer())
         {
-            setChitSelected(); 
+            setChitSelected();
 
             // Put selected chit at the top of the Z-order.
             moveToTop(critter);
@@ -1664,12 +1674,12 @@ public class Battle
             case MOVE:
                 highlightMovableChits();
                 break;
-    
+
             case FIGHT:
             case STRIKEBACK:
                 highlightChitsWithTargets();
                 break;
-    
+
             default:
                 break;
        }
@@ -1699,7 +1709,7 @@ public class Battle
                         }
                         // XXX And bring it to the front.
                         //board.getFrame().show();
-    
+
                         SummonAngel summonAngel = new SummonAngel(board,
                             getAttacker());
                         board.getGame().setSummonAngel(summonAngel);
@@ -1733,11 +1743,11 @@ public class Battle
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('J');
         hex.setEntrySide(3);
-        Legion attacker = new Legion("Bk01", null, hex, 
+        Legion attacker = new Legion("Bk01", null, hex,
             Creature.archangel, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
             Creature.warlock, null, player1);
-        Legion defender = new Legion("Rd01", null, hex, 
+        Legion defender = new Legion("Rd01", null, hex,
             Creature.serpent, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian,
             Creature.minotaur, null, player2);
