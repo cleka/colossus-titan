@@ -259,8 +259,8 @@ Log.debug("Creature.loadCreatures()");
         {
         case 'p': /* undefined */
             return false;
-        case 'w': /* undefined */
-            return false;
+        case 'w': /* undefined, beneficial for everyone */
+            return true;
         case 'r':
             return isNativeBramble();
         case 's':
@@ -296,9 +296,9 @@ Log.debug("Creature.loadCreatures()");
             return false;
         case 's':
             return isNativeSlope();
-        case 'w': /* undefined */
-            return false;
-        case 'r': 
+        case 'w': /* undefined, beneficial for everyone */
+            return true;
+        case 'r':
             return isNativeRiver();
         }
     }

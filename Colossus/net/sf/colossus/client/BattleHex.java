@@ -194,44 +194,68 @@ public class BattleHex extends Hex
         }
     }
 
-
-    public boolean isNativeBonusTerrain()
+    public static boolean isNativeBonusHazard(char t)
     {
-        char t = getTerrain();
         if (t == 'r' || t == 'v')
         {
             return true;
         }
-        for (int i = 0; i < 6; i++)
+        return false;
+    }
+    
+    public static boolean isNativeBonusHexside(char h)
+    {
+        if (h == 'w' || h == 's' || h == 'd')
         {
-            char h = getHexside(i);
-            if (h == 'w' || h == 's' || h == 'd')
-            {
-                return true;
-            }
+            return true;
         }
         return false;
     }
 
-
-    public boolean isNonNativePenaltyTerrain()
+    public boolean isNativeBonusTerrain()
     {
+        boolean result;
         char t = getTerrain();
+        result = isNativeBonusHazard(t);
+        
+        for (int i = 0; i < 6; i++)
+        {
+            char h = getHexside(i);
+            result = result || isNativeBonusHexside(h);
+        }
+        return result;
+    }
+    
+    public static boolean isNonNativePenaltyHazard(char t)
+    {
         if (t == 'r' || t == 'd')
         {
             return true;
         }
-        for (int i = 0; i < 6; i++)
-        {
-            char h = getOppositeHexside(i);
-            if (h == 'w' || h == 's' || h == 'd')
-            {
-                return true;
-            }
-        }
         return false;
     }
 
+    public static boolean isNonNativePenaltyHexside(char h)
+    {
+        if (h == 'w' || h == 's' || h == 'd')
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean isNonNativePenaltyTerrain()
+    {
+        boolean result;
+        char t = getTerrain();
+        result = isNonNativePenaltyHazard(t);
+        for (int i = 0; i < 6; i++)
+        {
+            char h = getOppositeHexside(i);
+            result = result || isNonNativePenaltyHexside(h);
+        }
+        return result;
+    }
 
     private void assignLabel()
     {

@@ -17,6 +17,7 @@ import net.sf.colossus.server.VariantSupport;
  * Class HexMap displays a basic battle map.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 public class HexMap extends JPanel implements MouseListener, WindowListener
@@ -35,6 +36,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static Map startlistMap = new HashMap();
     private static Map subtitleMap = new HashMap();
     private static Map towerStatusMap = new HashMap();
+    private static Map hazardNumberMap = new HashMap();
+    private static Map hazardSideNumberMap = new HashMap();
 
     /** ne, e, se, sw, w, nw */
     private GUIBattleHex [] entrances = new GUIBattleHex[6];
@@ -75,6 +78,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         startlistMap.clear();
         subtitleMap.clear();
         towerStatusMap.clear();
+        hazardNumberMap.clear();
+        hazardSideNumberMap.clear();
 
         char [] terrains = TerrainRecruitLoader.getTerrains();
         for (int t = 0; t < terrains.length; t++)
@@ -180,6 +185,52 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             towerStatusMap.put(new Character(terrain),
                                new Boolean(bl.isTower()));
             subtitleMap.put(new Character(terrain), bl.getSubtitle());
+            /* count all hazards & hazard sides */
+            /* slow & inefficient... */
+            char[] hazards = BattleHex.getTerrains();
+            HashMap t2n = new HashMap();
+            for (int i = 0; i < hazards.length; i++)
+            {
+                int count = 0;
+                for (int x = 0 ; x < 6; x++)
+                {
+                    for (int y = 0; y < 6; y++)
+                    {
+                        if (show[x][y])
+                        {
+                            if (h[x][y].getTerrain() == hazards[i])
+                                count++;
+                        }
+                    }
+                }
+                if (count >0)
+                    t2n.put(new Character(hazards[i]), new Integer(count));
+            }
+            hazardNumberMap.put(new Character(terrain), t2n);
+            char[] hazardSides = BattleHex.getHexsides();
+            HashMap s2n = new HashMap();
+            for (int i = 0; i < hazardSides.length; i++)
+            {
+                int count = 0;
+                for (int x = 0 ; x < 6; x++)
+                {
+                    for (int y = 0; y < 6; y++)
+                    {
+                        if (show[x][y])
+                        {
+                            for (int k = 0; k < 6; k++)
+                            {
+                                if (h[x][y].getHexside(k) ==
+                                    hazardSides[i])
+                                    count++;
+                            }
+                        }
+                    }
+                }
+                if (count >0)
+                    s2n.put(new Character(hazardSides[i]), new Integer(count));
+            }
+            hazardSideNumberMap.put(new Character(terrain), s2n);
         }
         catch (Exception e) 
         {
@@ -610,5 +661,31 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         java.util.List temp =
             (java.util.List)startlistMap.get(new Character(t));
         return (!(temp == null));
+    }
+
+    public static int getHazardCountInTerrain(char hazard, char terrain)
+    {
+        HashMap t2n = (HashMap)hazardNumberMap.get(new Character(terrain));
+        Object o = t2n.get(new Character(hazard));
+
+        if (o == null)
+            return 0;
+        
+        Integer number = (Integer)o;
+
+        return (number.intValue());
+    }
+
+    public static int getHazardSideCountInTerrain(char hazard, char terrain)
+    {
+        HashMap t2n = (HashMap)hazardSideNumberMap.get(new Character(terrain));
+        Object o = t2n.get(new Character(hazard));
+
+        if (o == null)
+            return 0;
+        
+        Integer number = (Integer)o;
+
+        return (number.intValue());
     }
 }

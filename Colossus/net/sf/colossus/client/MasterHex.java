@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.*;
 import java.awt.*;
 
+import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
@@ -12,6 +13,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  * Class MasterHex describes one Masterboard hex, without GUI info.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 public class MasterHex extends Hex
@@ -82,6 +84,7 @@ public class MasterHex extends Hex
 
     public static boolean isNativeCombatBonus(Creature creature, char terrain)
     {
+        /*
         switch (terrain)
         {
             case 'B':
@@ -112,8 +115,62 @@ public class MasterHex extends Hex
             default:
                 return false;
         }
-    }
+        */
 
+        int bonusHazardCount = 0;
+        int bonusHazardSideCount = 0;
+        
+        char[] hazard = BattleHex.getTerrains();
+
+        for (int i = 0; i < hazard.length ; i++)
+        {
+            int count =
+              net.sf.colossus.client.HexMap.getHazardCountInTerrain(
+                   hazard[i],
+                   terrain);
+            if (BattleHex.isNativeBonusHazard(hazard[i]) &&
+                creature.isNativeTerrain(hazard[i]))
+            {
+                bonusHazardCount += count;
+            }
+            else
+            {
+                if (BattleHex.isNonNativePenaltyHazard(hazard[i]) &&
+                    !creature.isNativeTerrain(hazard[i]))
+                {
+                    bonusHazardCount -= count;
+                }
+            }
+        }
+        char[] hazardSide = BattleHex.getHexsides();
+        
+        for (int i = 0; i < hazardSide.length ; i++)
+        {
+            int count =
+                net.sf.colossus.client.HexMap.getHazardSideCountInTerrain(
+                     hazardSide[i],
+                     terrain);
+            if (BattleHex.isNativeBonusHexside(hazardSide[i]) &&
+                creature.isNativeHexside(hazardSide[i]))
+            {
+                bonusHazardSideCount += count;
+            }
+            else
+            {
+                if (BattleHex.isNonNativePenaltyHexside(hazardSide[i]) &&
+                    !creature.isNativeHexside(hazardSide[i]))
+                {
+                    bonusHazardSideCount -= count;
+                }
+            }
+        }
+        if (((bonusHazardCount + bonusHazardSideCount) > 0)
+            && ((bonusHazardCount >= 3) || (bonusHazardSideCount >= 5)))
+        {
+            return true;
+        }
+        return false;
+    }
 
     public MasterHex getNeighbor(int i)
     {
