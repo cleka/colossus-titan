@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<variant name="Undead">
+    <strategic_map filename="UndeadMap.xml" />
+    <creatures filename="UndeadCre.xml" />
+    <terrain_recruits filename="UndeadTer.xml" />
+    <hint classname="Undead.UndeadHint" />
+</variant>
