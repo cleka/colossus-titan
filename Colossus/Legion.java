@@ -282,6 +282,12 @@ class Legion
         }
         creatures[height - 1] = null;
         height--;
+
+        // If there are no creatures left, disband the legion.
+        if (height == 0)
+        {
+            removeLegion();
+        }
     }
     
     
