@@ -71,7 +71,9 @@ public class BattleMap extends JFrame implements MouseListener,
     public BattleMap(MasterBoard board, Legion attacker, Legion defender,
         MasterHex masterHex, int entrySide)
     {
-        super(attacker.getMarkerId() + " attacks " + defender.getMarkerId());
+        super(attacker.getMarkerId() + " (" + attacker.getPlayer().getName() +
+            ") attacks " + defender.getMarkerId() + " (" +
+            defender.getPlayer().getName() + ")");
 
         this.attacker = attacker;
         this.defender = defender;
@@ -1401,8 +1403,8 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             // Nobody gets any points.
             // Make defender die first, to simplify turn advancing.
-            defender.getPlayer().die(null);
-            attacker.getPlayer().die(null);
+            defender.getPlayer().die(null, false);
+            attacker.getPlayer().die(null, true);
             cleanup();
         }
 
@@ -1417,7 +1419,7 @@ public class BattleMap extends JFrame implements MouseListener,
             {
                 defender.addPoints(defenderPoints);
             }
-            attacker.getPlayer().die(defender.getPlayer());
+            attacker.getPlayer().die(defender.getPlayer(), true);
             cleanup();
         }
         else if (defender.getPlayer().isTitanEliminated())
@@ -1430,7 +1432,7 @@ public class BattleMap extends JFrame implements MouseListener,
             {
                 attacker.addPoints(defenderPoints);
             }
-            defender.getPlayer().die(attacker.getPlayer());
+            defender.getPlayer().die(attacker.getPlayer(), true);
             cleanup();
         }
 
