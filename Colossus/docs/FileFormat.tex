@@ -111,6 +111,7 @@ To give the amount of points required for the Titan to improve by one. Said diff
 To give the amount of points required for the Titan to be able to Titan Teleport. The default supplied value is 400.
 
 \section{\texttt{CRE} file format (default file used: ``Default/Default.cre'')}
+\label{CRE}
 
 This file define the Colossus Creatures ; it's composed of a succession of lines:
 
@@ -121,6 +122,7 @@ $\langle$nativeVolcano$\rangle$ $\langle$waterDwelling$\rangle$ $\langle$magicMi
 $\langle$lord$\rangle$ $\langle$demilord$\rangle$
 $\langle$maxCount$\rangle$
 $\langle$pluralName$\rangle$
+($\langle$baseColorName$\rangle$)?
 
 all on one line.
 
@@ -134,6 +136,7 @@ all on one line.
 \item $\langle$lord$\rangle$ and $\langle$demilord$\rangle$ are boolean values, defining if the creature is a lord or a demilord (mutually exclusive).
 \item $\langle$maxCount$\rangle$ is the max number of creature in the caretaker stack.
 \item $\langle$pluralName$\rangle$ is the same as name, just plural.
+\item $\langle$baseColorName$\rangle$ (optional) is the name of the color to use for the name, power and skill value of the creature (when displayed on screen). This name (or lack of) is used to determine which overlay to use for name/power/skill, or which color to use for drawing them (black is the default in this case).
 \end{itemize}
 
 \section{Battleland file format (files used: by terrain name under ``Battlelands'')}
@@ -199,7 +202,7 @@ Two version of the file should be supplied, one with and one without the ``\_i''
 
 Other sizes \emph{may} work (they are resized on-the-fly), and odds are better if the aspect ratio is the same.
 
-\item Skill, Power, and the name of creature are overlay added to the main Chit. If they are not available, they are created on the fly. You may supply any or all of them. Name should be respectively ``Skill-$\langle$skill_factor$\rangle$.gif'', ``Power-$\langle$power_factor$\rangle$.gif'', and ``$\langle$creature_name$\rangle$-Name.gif''. At some future date, color-dependant version may become availble.
+\item Skill, Power, and the name of creature are overlay added to the main Chit. If they are not available, they are created on the fly, using the color specified in the creature (see above the \texttt{CRE} file, section \ref{CRE}). You may supply none, any or all of them. Name should be respectively ``Skill-$\langle$skill\_factor$\rangle$.gif'', ``Power-$\langle$power\_factor$\rangle$.gif'', and ``$\langle$creature\_name$\rangle$-Name.gif'' for Creature which don't specify a color at all, or  ``Skill-$\langle$skill\_factor$\rangle$-$\langle$color\_name$\rangle$.gif'', ``Power-$\langle$power\_factor$\rangle$-$\langle$color\_name$\rangle$.gif'', and ``$\langle$creature\_name$\rangle$-Name-$\langle$color\_name$\rangle$.gif'' for Creature with a color specified.
 
 \end{itemize}
 
