@@ -79,6 +79,16 @@ public final class Server
         }
     }
 
+    public void allUpdateCaretakerDisplay()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.updateCaretakerDisplay();
+        }
+    }
+
     public void allShowMovementRoll(int roll)
     {
         Iterator it = clients.iterator();

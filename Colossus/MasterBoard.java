@@ -10,8 +10,7 @@ import java.io.*;
  * @author David Ripton
  */
 
-public final class MasterBoard 
-	extends JPanel 
+public final class MasterBoard extends JPanel 
 {
     /** For easy of mapping to the GUI, hexes will be stored
      *  in a 15x8 array, with some empty elements. */
@@ -602,7 +601,7 @@ public final class MasterBoard
         mi.setMnemonic(KeyEvent.VK_B);
     }
 
-	private ItemListener m_oItemListener = new MasterBoardItemHandler();
+    private ItemListener m_oItemListener = new MasterBoardItemHandler();
 
     private void addCheckBox(JMenu menu, String name, int mnemonic)
     {
@@ -610,10 +609,10 @@ public final class MasterBoard
         cbmi.setMnemonic(mnemonic);
         cbmi.setSelected(client.getOption(name));
 
-		// Its a little wasteful to create a separate object
-		// but a little cleaner to have a separate inner class
-		// ditto for mouse and window listeners, where we saved
-		// LOC by extending adapter
+        // Its a little wasteful to create a separate object
+        // but a little cleaner to have a separate inner class
+        // ditto for mouse and window listeners, where we saved
+        // LOC by extending adapter
         cbmi.addItemListener(m_oItemListener);
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
@@ -2081,79 +2080,76 @@ public final class MasterBoard
             e.isAltDown());
     }
 
-	class MasterBoardMouseHandler extends MouseAdapter
-		{
-			public void mousePressed(MouseEvent e)
-				{
-					Point point = e.getPoint();
-					Marker marker = getMarkerAtPoint(point);
-					if (marker != null)
-					{
-						String markerId = marker.getId();
-						Legion legion = game.getLegionByMarkerId(markerId);
-						String playerName = legion.getPlayerName();
+    class MasterBoardMouseHandler extends MouseAdapter
+    {
+        public void mousePressed(MouseEvent e)
+        {
+            Point point = e.getPoint();
+            Marker marker = getMarkerAtPoint(point);
+            if (marker != null)
+            {
+                String markerId = marker.getId();
+                Legion legion = game.getLegionByMarkerId(markerId);
+                String playerName = legion.getPlayerName();
 
-						// Move the clicked-on marker to the top of the z-order.
-						client.setMarker(markerId, marker);
+                // Move the clicked-on marker to the top of the z-order.
+                client.setMarker(markerId, marker);
 
-						// What to do depends on which mouse button was used
-						// and the current phase of the turn.
+                // What to do depends on which mouse button was used
+                // and the current phase of the turn.
 
-						// Right-click means to show the contents of the
-						// legion.
-						if (isPopupButton(e))
-						{
-							// TODO We need a client-side legion class that doesn't
-							// know the full contents of every enemy legion.
-							legion.sortCritters();
-							new ShowLegion(masterFrame, legion, point,
-										   client.getOption(Options.allStacksVisible) ||
-										   playerName == client.getPlayerName());
-							return;
-						}
-						else
-						{
-							// Only the current player can manipulate his legions.
-							if (playerName.equals(client.getPlayerName()) &&
-								playerName.equals(game.getActivePlayerName()))
-							{
-								actOnLegion(legion);
-								return;
-							}
-						}
-					}
+                // Right-click means to show the contents of the legion.
+                if (isPopupButton(e))
+                {
+                    // TODO We need a client-side legion class that doesn't
+                    // know the full contents of every enemy legion.
+                    legion.sortCritters();
+                    new ShowLegion(masterFrame, legion, point, 
+                        client.getOption(Options.allStacksVisible) || 
+                        playerName == client.getPlayerName());
+                    return;
+                }
+                else
+                {
+                    // Only the current player can manipulate his legions.
+                    if (playerName.equals(client.getPlayerName()) &&
+                        playerName.equals(game.getActivePlayerName()))
+                    {
+                        actOnLegion(legion);
+                        return;
+                    }
+                }
+            }
 
-					// No hits on chits, so check map.
+            // No hits on chits, so check map.
+            GUIMasterHex hex = getHexContainingPoint(point);
+            if (hex != null)
+            {
+                if (isPopupButton(e))
+                {
+                    lastPoint = point;
+                    popupMenu.setLabel(hex.getDescription());
+                    popupMenu.show(e.getComponent(), point.x, point.y);
+                    return;
+                }
 
-					GUIMasterHex hex = getHexContainingPoint(point);
-					if (hex != null)
-					{
-						if (isPopupButton(e))
-						{
-							lastPoint = point;
-							popupMenu.setLabel(hex.getDescription());
-							popupMenu.show(e.getComponent(), point.x, point.y);
+                // Otherwise, the action to take depends on the phase.
+                // Only the current player can manipulate game state.
+                if (client.getPlayerName().equals(game.getActivePlayerName()))
+                {
+                    actOnHex(hex.getLabel());
+                    hex.repaint();
+                    return;
+                }
+            }
 
-							return;
-						}
-
-						// Otherwise, the action to take depends on the phase.
-						// Only the current player can manipulate game state.
-						if (client.getPlayerName().equals(game.getActivePlayerName()))
-						{
-							actOnHex(hex.getLabel());
-							hex.repaint();
-							return;
-						}
-					}
-
-					// No hits on chits or map, so re-highlight.
-					if (client.getPlayerName().equals(game.getActivePlayerName()))
-					{
-						actOnMisclick();
-					}
-				}
-		}
+            // No hits on chits or map, so re-highlight.
+            if (client.getPlayerName().equals(game.getActivePlayerName()))
+            {
+                actOnMisclick();
+            }
+        }
+    }
 
 
     private void actOnLegion(Legion legion)
@@ -2216,24 +2212,24 @@ public final class MasterBoard
         }
     }
 
-	class MasterBoardItemHandler implements ItemListener
-	{
-		public void itemStateChanged(ItemEvent e)
-		{
-			JMenuItem source = (JMenuItem)e.getSource();
-			String text = source.getText();
-			boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-			client.setOption(text, selected);
-		}
-	}
+    class MasterBoardItemHandler implements ItemListener
+    {
+        public void itemStateChanged(ItemEvent e)
+        {
+            JMenuItem source = (JMenuItem)e.getSource();
+            String text = source.getText();
+            boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+            client.setOption(text, selected);
+        }
+    }
 
-	class MasterBoardWindowHandler extends WindowAdapter
-	{
-		public void windowClosing(WindowEvent e)
-		{
-			game.dispose();
-		}
-	}
+    class MasterBoardWindowHandler extends WindowAdapter
+    {
+         public void windowClosing(WindowEvent e)
+         {
+             game.dispose();
+         }
+    }   
 
     public void paintComponent(Graphics g)
     {

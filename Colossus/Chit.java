@@ -61,59 +61,39 @@ public class Chit extends JPanel
 
         String imageFilename = getImagePath(id);
 
-		icon = getImageIcon(imageFilename);
+        icon = getImageIcon(imageFilename);
     }
 
-	/**
-	 * TMJF -- made this a utility function for the CreatureCollectionView.
-	 * It seems a step backwards from some of the code Dave is using now
-	 */
-	public ImageIcon getImageIcon(String strImageName)
-	{
+    /**
+     * TMJF -- made this a utility function for the CreatureCollectionView.
+     * It seems a step backwards from some of the code Dave is using now
+     */
+    public ImageIcon getImageIcon(String strImageName)
+    {
         // The image-loading syntax that works correctly for applications
         // packaged in executable jar files does not work correctly for
         // applets, and vice-versa.
 
-		ImageIcon icon = null;
-		boolean isApplet = false; // This be broken
-		Chit oChit = this;
+        ImageIcon icon = null;
+        Chit oChit = this;
 
-        if (isApplet)
-        {
-            try
-            {
-                InputStream in = oChit.getClass().getResourceAsStream(strImageName);
-                int length = in.available();
-                byte [] thanksToNetscape = new byte[length];
-                in.read(thanksToNetscape);
-                icon = new ImageIcon(thanksToNetscape);
-            }
-            catch (Exception e)
-            {
-                System.out.println("Couldn't load image " + strImageName +
-                    "\n" + e);
-            }
-        }
-        else
-        {
-            // This syntax works with either images in a jar file or images
-            // in the local filesystem.
-			
-			Toolkit oToolkit = Toolkit.getDefaultToolkit();
-			Class oClass = oChit.getClass();
-			java.net.URL oURL = oClass.getResource(strImageName);
-            Image image = oToolkit.getImage(oURL);
-            icon = new ImageIcon(image);
-        }
-		
-		return icon;
-	}
+        // This syntax works with either images in a jar file or images
+        // in the local filesystem.
+                        
+        Toolkit oToolkit = Toolkit.getDefaultToolkit();
+        Class oClass = oChit.getClass();
+        java.net.URL oURL = oClass.getResource(strImageName);
+        Image image = oToolkit.getImage(oURL);
+        icon = new ImageIcon(image);
+                
+        return icon;
+    }
 
-	private static Chit s_oChit = new Chit(1, "Angel", null);
-	public static ImageIcon getImageIconUtility(String strImageName)
-	{
-		return s_oChit.getImageIcon(strImageName);
-	}
+    private static Chit s_oChit = new Chit(1, "Angel", null);
+    public static ImageIcon getImageIconUtility(String strImageName)
+    {
+        return s_oChit.getImageIcon(strImageName);
+    }
 
 
     public String getId()
@@ -264,13 +244,13 @@ public class Chit extends JPanel
  */
 class ChitImageUtility implements IImageUtility
 {
-	public ImageIcon getImageIcon(String strPath)
-		{
-			return Chit.getImageIconUtility(strPath);
-		}
+    public ImageIcon getImageIcon(String strPath)
+    {
+        return Chit.getImageIconUtility(strPath);
+    }
 
-	public String getImagePath(String strName)
-		{
-			return Chit.getImagePath(strName);
-		}
+    public String getImagePath(String strName)
+    {
+        return Chit.getImagePath(strName);
+    }
 }

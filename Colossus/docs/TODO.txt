@@ -1,12 +1,10 @@
-Advance phases on space instead of 'D'?
+Consider switching from make to Ant to better handle packages.
 
-Need a prettier question.gif
+Advance phases on space instead of 'D'?
 
 Confirmation prompt to avoid skipping recruits?
 
 AI needs to stop moving when the game ends.
-
-Make AI advance phase delay configurable.
 
 Attacking AI creatures need to chargest closest enemy in the last few
    turns, rather than accepting a time loss.
@@ -45,7 +43,6 @@ Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
 
 Add a ShowLegionMarkers window that shows each player's remaining 
    legion markers.
-Add a ShowAllRecruits window that displays all recruits by terrain type.
 Add SetupBattle dialog, to allow setting up standalone battles.  
    (terrain, entry side, creatures in attacking and defending legions,
    angel/archangel available to summon, recruits available for terrain

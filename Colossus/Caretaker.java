@@ -19,59 +19,70 @@ public final class Caretaker implements Cloneable
      */
     private HashMap map = new HashMap();
 
-	/**
-	 * This is an adapter so that we can use the CreatureCollectionView
-	 * in the main program
-	 */
-	class CaretakerCollection implements ICreatureCollection
-	{
-		public String getName()
-			{
-				return "Caretaker's Stacks";
-			}
-		public void setCount(String strCharacterName, int nCount)
-			{
-				Caretaker.this.setCount(strCharacterName, nCount);
-			}
-		public int getCount(String strCharacterName)
-			{
-				return Caretaker.this.getCount(strCharacterName);
-			}
-	}
+    // XXX Temporary?  We need a Game reference for callback events.
+    private Game game;
 
-	public ICreatureCollection getCollectionInterface()
-		{
-			return new CaretakerCollection();
-		}
+    public Caretaker(Game game)
+    {
+        this.game = game;
+    }
 
-	protected int getCount(String strCreatureName)
-	{
-		Integer count = (Integer) map.get(strCreatureName);
-		if (count == null)
-		{
-			return CharacterArchetype.getMaxCount(strCreatureName);
-		}
-		return count.intValue();
-	}
+
+    /**
+     * This is an adapter so that we can use the CreatureCollectionView
+     * in the main program
+     */
+    class CaretakerCollection implements ICreatureCollection
+    {
+        public String getName()
+        {
+            return "Caretaker's Stacks";
+        }
+        public void setCount(String strCharacterName, int nCount)
+        {
+            Caretaker.this.setCount(strCharacterName, nCount);
+        }
+        public int getCount(String strCharacterName)
+        {
+            return Caretaker.this.getCount(strCharacterName);
+        }
+    }
+
+    public ICreatureCollection getCollectionInterface()
+    {
+        return new CaretakerCollection();
+    }
+
+    protected int getCount(String strCreatureName)
+    {
+        Integer count = (Integer) map.get(strCreatureName);
+        if (count == null)
+        {
+            return CharacterArchetype.getMaxCount(strCreatureName);
+        }
+        return count.intValue();
+    }
 
     public int getCount(Creature creature)
     {
-		return getCount(creature.getName());
+        return getCount(creature.getName());
     }
 
-	protected void setCount(String strCreatureName, int count)
-	{
-		map.put(strCreatureName, new Integer(count)); 
-	}
+    protected void setCount(String strCreatureName, int count)
+    {
+        map.put(strCreatureName, new Integer(count)); 
+        updateDisplays();
+    }
 
     public void setCount(Creature creature, int count)
-	{
-		setCount(creature.getName(), count);
-	}
+    {
+        setCount(creature.getName(), count);
+    }
 
     public void resetAllCounts()
     {
         map = new HashMap();
+        updateDisplays();
     }
 
     public void takeOne(Creature creature)
@@ -80,8 +91,8 @@ public final class Caretaker implements Cloneable
         if (count == null)
         {
             Log.event("First " + creature.getName() + " recruited");
-            map.put(creature.getName(), new Integer(
-		creature.getMaxCount() - 1));
+            map.put(creature.getName(), new Integer(creature.getMaxCount() - 
+                1));
         }
         else
         {
@@ -96,6 +107,7 @@ public final class Caretaker implements Cloneable
             }
             map.put(creature.getName(), new Integer(count.intValue()-1));
         }
+        updateDisplays();
     }
 
     public void putOneBack(Creature creature)
@@ -107,6 +119,19 @@ public final class Caretaker implements Cloneable
             count = new Integer(creature.getMaxCount() - 1);
         }
         map.put(creature.getName(), new Integer(count.intValue()+1));
+        updateDisplays();
+    }
+
+    public void updateDisplays()
+    {
+        if (game != null)
+        {
+            Server server = game.getServer();
+            if (server != null)
+            {
+                server.allUpdateCaretakerDisplay();
+            }
+        }
     }
 
     /**
@@ -114,18 +139,18 @@ public final class Caretaker implements Cloneable
      */
     public Caretaker AICopy()
     {
-		return (Caretaker) clone();
+        return (Caretaker) clone();
     }
 
-	// ---------------------------------
-	// Override from Object 
+    // ---------------------------------
+    // Override from Object 
 
-	public Object clone()
-		{
-			Caretaker newCaretaker = new Caretaker();
-			// because String and Integer are both immutable, a shallow copy is
-			// the same as a deep copy
-			newCaretaker.map = (HashMap) map.clone();
-			return newCaretaker;
-		}
+    public Object clone()
+    {
+        Caretaker newCaretaker = new Caretaker(game);
+        // because String and Integer are both immutable, a shallow copy is
+        // the same as a deep copy
+        newCaretaker.map = (HashMap) map.clone();
+        return newCaretaker;
+    }
 }

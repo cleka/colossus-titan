@@ -13,8 +13,7 @@ import net.sf.colossus.protocol.*;
  * @author Bruce Sherrod <bruce@thematrix.com>
  */
 
-public final class Game 
-    extends GameSource
+public final class Game extends GameSource
 {
     private ArrayList players = new ArrayList(6);
     private int activePlayerNum;
@@ -25,7 +24,7 @@ public final class Game
     private boolean pendingAdvancePhase;
     private Battle battle;
     private static Random random = new Random();
-    private Caretaker caretaker = new Caretaker();
+    private Caretaker caretaker = new Caretaker(this);
     private Server server;
     // Negotiation
     private Set [] offers = new HashSet[2];
@@ -88,27 +87,27 @@ public final class Game
      */
     public Game AICopy()
     {
-	// XXX Make sure to clear player options so that we don't get into
+        // XXX Make sure to clear player options so that we don't get into
         // an AI infinite loop.
-	Game newGame = new Game();
-	for (int i = 0; i < players.size(); i++)
+        Game newGame = new Game();
+        for (int i = 0; i < players.size(); i++)
         {
             Player player = ((Player)players.get(i)).AICopy(newGame);
-	    newGame.players.add(i, player);
+            newGame.players.add(i, player);
         }
-	newGame.activePlayerNum = activePlayerNum;
-	newGame.turnNumber = turnNumber;
+        newGame.activePlayerNum = activePlayerNum;
+        newGame.turnNumber = turnNumber;
         if (battle != null)
-	{
+        {
             newGame.battle = battle.AICopy(newGame);
         }
-	newGame.caretaker = caretaker.AICopy();
-	newGame.phase = phase;
-	newGame.engagementInProgress = engagementInProgress;
-	newGame.battleInProgress = battleInProgress;
-	newGame.summoningAngel = summoningAngel;
+        newGame.caretaker = caretaker.AICopy();
+        newGame.phase = phase;
+        newGame.engagementInProgress = engagementInProgress;
+        newGame.battleInProgress = battleInProgress;
+        newGame.summoningAngel = summoningAngel;
 
-	return newGame;
+        return newGame;
     }
 
 
@@ -229,6 +228,7 @@ public final class Game
         setupPhase();
 
         server.allUpdateStatusScreen();
+        server.allUpdateCaretakerDisplay();
     }
 
 
@@ -409,7 +409,7 @@ public final class Game
     /** for AI only */
     public void setActivePlayerNum(int i)
     {
-	activePlayerNum = i;
+        activePlayerNum = i;
     }
 
     public Player getPlayer(int i)
@@ -1115,6 +1115,7 @@ public final class Game
 
             // Setup status screen
             server.allUpdateStatusScreen();
+            server.allUpdateCaretakerDisplay();
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -3303,17 +3304,17 @@ public final class Game
         return null;
     }
 
-	private GameListener m_oListener = new GameAdapter()
-	{
-		public void legionChange(LegionEvent evt)
-			{
-				System.out.println("Game.GameListener.legionChange: " + evt);
-				fireEvent(evt);
-			}
-		};
+    private GameListener m_oListener = new GameAdapter()
+    {
+        public void legionChange(LegionEvent evt)
+        {
+            System.out.println("Game.GameListener.legionChange: " + evt);
+               fireEvent(evt);
+        }
+    };
 
-	public GameListener getListener()
-		{
-			return m_oListener;
-		}
+    public GameListener getListener()
+    {
+        return m_oListener;
+    }
 }

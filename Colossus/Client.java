@@ -21,6 +21,7 @@ public final class Client
 
     private MasterBoard board;
     private StatusScreen statusScreen;
+    private CreatureCollectionView caretakerDisplay;
     private SummonAngel summonAngel;
     private MovementDie movementDie;
     private BattleMap map;
@@ -302,6 +303,10 @@ public final class Client
         {
             statusScreen.repaint();
         }
+        if (caretakerDisplay != null)
+        {
+            caretakerDisplay.repaint();
+        }
         if (movementDie != null)
         {
             movementDie.repaint();
@@ -424,10 +429,10 @@ public final class Client
         {
             Log.setShowDebug(value);
         }
-		else if (name.equals(Options.showCaretaker))
-		{
-			updateCaretakerDisplay();
-		}
+        else if (name.equals(Options.showCaretaker))
+        {
+            updateCaretakerDisplay();
+        }
     }
 
     public void setStringOption(String optname, String value)
@@ -524,26 +529,35 @@ public final class Client
         }
     }
 
-	/**
-	 * This is a bad name because out first cur is modal
-	 * somehow the repainting of the MB also breaks when we bring this
-	 * up. To make this non-modal and dynamically update, we need events
-	 */
+
     public void updateCaretakerDisplay()
     {
-		// First cut, we make this modal and don't have a setting
         if (getOption(Options.showCaretaker))
         {
-			IImageUtility oImageUtility = new ChitImageUtility();
-			ICreatureCollection oCaretakerCollection = 
-				server.getGame().getCaretaker().getCollectionInterface();
-			JFrame oFrame = board.getFrame();
-			JDialog oDialog = 
-				new CreatureCollectionView(oFrame, 
-										   oCaretakerCollection,
-										   oImageUtility);
-			oDialog.pack();
-			oDialog.show();
+            if (caretakerDisplay == null)
+            {
+                IImageUtility oImageUtility = new ChitImageUtility();
+                ICreatureCollection oCaretakerCollection = 
+                    server.getGame().getCaretaker().getCollectionInterface();
+                caretakerDisplay = new CreatureCollectionView(
+                    oCaretakerCollection, oImageUtility, this);
+            }
+            else
+            {
+                caretakerDisplay.update();
+            }
+        }
+        else
+        {
+            if (board != null)
+            {
+                board.twiddleOption(Options.showCaretaker, false);
+            }
+            if (caretakerDisplay != null)
+            {
+                caretakerDisplay.dispose();
+                caretakerDisplay = null;
+            }
         }
     }
 

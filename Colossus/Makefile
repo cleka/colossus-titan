@@ -6,9 +6,12 @@
 #    problems with spurious ^M characters.
 
 # Java compiler
-# jikes is really fast, good, and free.  It supports -depend so all
+# jikes is really fast.  It supports -depend so all
 #    dependent objects will be recompiled when you change one.  But
-#    the jswat debugger has problems running its class files.
+#    the jswat debugger has problems running its class files.  And jikes
+#    has problems compiling some code that javac accepts.  If you have a
+#    slow box you might want to use jikes during development cycles then
+#    recompile with javac before check-in.
 # javac is the standard; use it if you don't have jikes.  Sun has removed
 #    the -depend/-Xdepend option from javac in JDK 1.3, so be careful to
 #    manually recompile dependent classes when necessary.
@@ -40,7 +43,7 @@ all: jar
 
 # Find target files
 
-sources = $(wildcard *.java) $(wildcard net/sf/colossus/*.java)
+sources = $(wildcard *.java) $(wildcard net/sf/colossus/*.java) $(wildcard net/sf/colossus/protocol/*.java)
 
 CLASS_FILES = $(sources:%.java=%.class)
 
@@ -54,7 +57,7 @@ jar : $(JARFILE)
 
 # Create jar file
 $(JARFILE): $(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
-	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class net/sf/colossus/*.class images/*.gif
+	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class net/sf/colossus/*.class net/sf/colossus/protocol/*.class images/*.gif
 	chmod +x Colossus.jar
 
 INST_JARFILE = $(HTMLDIR)/$(JARFILE)
@@ -72,7 +75,7 @@ inst: $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST)
 
 # Clean up
 clean:
-	rm -f *~ core javacore.txt *.bak *.jar *.class .#*.jar
+	rm -f *~ core javacore.txt *.bak *.jar *.class .#*.jar net/sf/colossus/*.class net/sf/colossus/protocol/*.class
 
 # Make zip file.  Don't include saved games, CVS dirs, or other zip files.
 dist: $(JARFILE)
@@ -81,5 +84,5 @@ dist: $(JARFILE)
 
 # Make javadoc docs
 javadoc:
-	javadoc -d javadoc/ -version -author -private *.java
+	javadoc -d javadoc/ -version -author -private *.java net/sf/colossus/*.java net/sf/colossus/protocol/*.java
 

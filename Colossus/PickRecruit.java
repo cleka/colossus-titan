@@ -39,7 +39,7 @@ public final class PickRecruit extends JDialog implements MouseListener,
 
         this.parentFrame = parentFrame;
         this.legion = legion;
-	Game game = legion.getGame();
+        Game game = legion.getGame();
 
         recruits = game.findEligibleRecruits(legion);
         int numEligible = recruits.size();
