@@ -1,10 +1,10 @@
 # $Header$
 
-LATEX=latex
+MAKEDVI=../buildtools/makedvi.sh
 DVIPS=dvips
 DVI2TTY=dvi2tty
 
-SOURCES=FileFormat CodingStandards FAQ
+SOURCES=FileFormat CodingStandards FAQ build
 DESTS=$(addsuffix .ps,$(SOURCES))
 DESTSTXT=$(addsuffix .txt,$(SOURCES))
 
@@ -15,9 +15,7 @@ all: $(DESTS) $(DESTSTXT)
 
 # three passes should make all the references OK
 %.dvi: %.tex
-	$(LATEX) $(basename $<)
-	$(LATEX) $(basename $<)
-	$(LATEX) $(basename $<)
+	$(MAKEDVI) $(basename $<)
 
 %.txt: %.dvi
 	$(DVI2TTY) $< -o $@
