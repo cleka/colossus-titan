@@ -39,16 +39,16 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
 
         PickMarker pickmarker = new PickMarker(parentFrame, player);
 
-        if (player.markerSelected == null)
+        if (player.getSelectedMarker() == null)
         {
             dispose();
             return;
         }
 
         newLegion = new Legion(scale / 5, 2 * scale, scale,
-            player.markerSelected, oldLegion.markerId, this, 0, 
+            player.getSelectedMarker(), oldLegion.markerId, this, 0, 
             oldLegion.getCurrentHex(), null, null, null, null, null, null, 
-            null, null);
+            null, null, player);
 
         setSize(getPreferredSize());
 
@@ -57,7 +57,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             - getSize().height / 2));
 
         // If there were no markers left to pick, exit.
-        if (player.markerSelected == null)
+        if (player.getSelectedMarker() == null)
         {
             dispose();
         }
@@ -118,30 +118,17 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             return;
         }
 
-        //Rectangle rectClip = g.getClipBounds();
+        oldMarker.paint(g);
 
-        //if (rectClip.intersects(oldMarker.getBounds()))
-        {
-            oldMarker.paint(g);
-        }
-        //if (rectClip.intersects(newLegion.chit.getBounds()))
-        {
-            newLegion.chit.paint(g);
-        }
+        newLegion.chit.paint(g);
 
         for (int i = oldLegion.getHeight() - 1; i >= 0; i--)
         {
-            //if (rectClip.intersects(oldChits[i].getBounds()))
-            {
-                oldChits[i].paint(g);
-            }
+            oldChits[i].paint(g);
         }
         for (int i = newLegion.getHeight() - 1; i >= 0; i--)
         {
-            //if (rectClip.intersects(newChits[i].getBounds()))
-            {
-                newChits[i].paint(g);
-            }
+            newChits[i].paint(g);
         }
 
         if (!laidOut)
@@ -272,14 +259,16 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             }
 
             // The split is legal.
-            // Set the new chit next to the old chit on the masterboard.
-            newLegion.chit.setLocationAbs(oldLegion.chit.center());
-            // Resize it.
+
+            // Resize the new legion to MasterBoard scale.
             newLegion.chit.rescale(oldLegion.chit.getBounds().width);
 
             // Add the new legion to the player.
-            player.numLegions++;
-            player.legions[player.numLegions - 1] = newLegion;
+            player.addLegion(newLegion);
+            
+            // Set the new chit next to the old chit on the masterboard.
+            MasterBoard.getHexFromLabel(newLegion.getCurrentHex())
+                .addLegion(newLegion);
 
             // Exit.
             dispose();
@@ -297,10 +286,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             // Put the stack marker back, reset the old legion, then exit.
             else
             {
-                player.numMarkersAvailable++;
-                player.markersAvailable[player.numMarkersAvailable - 1] =
-                    new String(player.markerSelected);
-                player.markerSelected = null;
+                player.addSelectedMarker();
 
                 for (int i = 0; i < newLegion.getHeight(); i++)
                 {
@@ -325,5 +311,4 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
         return new Dimension((21 * scale / 20) * (oldLegion.getHeight() + 
             newLegion.getHeight() + 1), 7 * scale / 2);
     }
-
 }
