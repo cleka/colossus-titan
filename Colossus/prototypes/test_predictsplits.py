@@ -394,6 +394,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(not ps.getLeaf("Rd10").allCertain())
         assert(not ps.getLeaf("Rd11").allCertain())
         ps.printLeaves()
+        ps.printNodes()
 
         turn = 10
         print "Turn", turn
@@ -1389,18 +1390,27 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Centaur"])
         ps.getLeaf("Gr08").addCreature("Centaur")
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 2
         print "Turn", turn
         ps.getLeaf("Gr04").revealCreatures(["Gargoyle"])
         ps.getLeaf("Gr04").addCreature("Gargoyle")
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 3
         print "Turn", turn
         ps.getLeaf("Gr04").revealCreatures(["Gargoyle", "Gargoyle"])
         ps.getLeaf("Gr04").addCreature("Cyclops")
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 4
         print "Turn", turn
@@ -1410,6 +1420,10 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Centaur", "Centaur"])
         ps.getLeaf("Gr08").addCreature("Lion")
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr06").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 5
         print "Turn", turn
@@ -1419,6 +1433,10 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Lion"])
         ps.getLeaf("Gr08").addCreature("Lion")
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr06").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 6
         print "Turn", turn
@@ -1430,6 +1448,11 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr06").addCreature("Ogre")
         ps.getLeaf("Gr11").removeCreatures(["Centaur", "Centaur"])
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr06").allCertain())
+        assert(not ps.getLeaf("Gr07").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 7
         print "Turn", turn
@@ -1440,6 +1463,12 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr07").revealCreatures(["Ogre"])
         ps.getLeaf("Gr07").addCreature("Ogre")
         ps.printLeaves()
+        ps.printNodes()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr06").allCertain())
+        assert(not ps.getLeaf("Gr07").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 8
         print "Turn", turn
@@ -1449,17 +1478,27 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Gargoyle"])
         ps.getLeaf("Gr08").addCreature("Gargoyle")
         ps.printNodes()
+        ps.dumpAsDot("turn%da.dot" % turn)
         ps.getLeaf("Gr06").removeCreatures(["Troll", "Gargoyle", "Gargoyle",
           "Ogre", "Ogre"])
+        ps.dumpAsDot("turn%db.dot" % turn)
         ps.printNodes()
         ps.getLeaf("Gr12").removeCreatures(["Cyclops", "Ogre"])
         ps.printNodes()
+        ps.dumpAsDot("turn%dc.dot" % turn)
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
 
         turn = 9
         print "Turn", turn
         ps.getLeaf("Gr08").revealCreatures(["Gargoyle", "Gargoyle"])
         ps.getLeaf("Gr08").addCreature("Cyclops")
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
 
         turn = 11
         print "Turn", turn
@@ -1469,6 +1508,11 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Cyclops"])
         ps.getLeaf("Gr08").addCreature("Cyclops")
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr01").allCertain())
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 12
         print "Turn", turn
@@ -1479,12 +1523,20 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.printLeaves()
         ps.getLeaf("Gr01").removeCreatures(["Gargoyle", "Gargoyle"])
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
 
         turn = 13
         print "Turn", turn
         ps.getLeaf("Gr07").revealCreatures(["Troll"])
         ps.getLeaf("Gr07").addCreature("Troll")
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
 
         turn = 14
         print "Turn", turn
@@ -1496,11 +1548,16 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr08").revealCreatures(["Cyclops"])
         ps.getLeaf("Gr08").addCreature("Cyclops")
         ps.printLeaves()
+        ps.dumpAsDot("turn%d.dot" % turn)
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(not ps.getLeaf("Gr06").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
 
         turn = 15
         print "Turn", turn
         ps.getLeaf("Gr06").removeCreatures(["Cyclops", "Cyclops", "Cyclops"])
-        ps.getLeaf("Gr02").revealCreatures(["Centaur"])
+        ps.getLeaf("Gr02").revealCreatures(["Centaur"]) # XXX
         ps.getLeaf("Gr02").addCreature("Centaur")
         ps.printLeaves()
 
@@ -1516,10 +1573,8 @@ class PredictSplitsTestCase(unittest.TestCase):
 
         turn = 17
         print "Turn", turn
-        ps.getLeaf("Gr02").revealCreatures(["Lion", "Centaur", "Centaur"])
         ps.getLeaf("Gr02").removeCreatures(["Lion", "Centaur", "Centaur"])
         ps.printLeaves()
-        
         ps.getLeaf("Gr08").split(2, "Gr12", turn)
         ps.getLeaf("Gr08").revealCreatures(["Cyclops", "Cyclops"])
         ps.getLeaf("Gr08").addCreature("Gorgon")
