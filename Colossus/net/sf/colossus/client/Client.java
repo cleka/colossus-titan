@@ -268,6 +268,11 @@ public final class Client
             Hex.setAntialias(value);
             repaintAllWindows();
         }
+        else if (name.equals(Options.useOverlay))
+        {
+            Hex.setOverlay(value);
+            repaintAllWindows();
+        }
         else if (name.equals(Options.logDebug))
         {
             Log.setShowDebug(value);

@@ -5,7 +5,9 @@ by Colossus. In all these files, comments start with
 a "#" and extend to the end-of-line.
 
 All files, and the two subdirectory 'Battlelands' and 'images'
-should be in the same directory.
+should be in the same directory (except for the default files,
+whose subdirectories are at the root of the Colossus package,
+but that shouldn't concern you :-)
 
 1) MAP file format (default file used: Default/Default.map)
 
@@ -164,3 +166,28 @@ Three different lines can exist, in any number and order
 CRE:<cre_filename>
 MAP:<map_filename>
 TER:<ter_filename>
+
+6) Images files under "images"
+
+# Chit (i.e. images representing a Creature) should be non-transparent
+GIF file, size 60 * 60 (other size may work but won't look as nice). 
+They should be named after the Creature they represent, with a '.gif'
+extension. If the files doesn't exist, troubles may occur.
+
+Two version of the file should be supplied, one with and one without
+the '_i' postfix to the name (i.e 'MyCreature.gif' and 'MyCreature_i.png').
+The first is used for upside-up Creature, the second for upside-down
+Creature.
+
+# Graphical Overlay for the Hexes on the Masterboard should be
+transparent PNG file, of size whatever-you-want (they are resized
+to the same size as the Hex the represent). Default supplied
+files are 255x255. Use them as examples of what is possible to do.
+If the file doesn't exist, the non-overlayed display is used
+instead (i.e. name of the terrain and the label in the proper
+corner).
+
+Two version of the file should be supplied, one with and one without
+the '_i' postfix to the name (i.e 'MyTerrain.png' and 'MyTerrain_i.png').
+The first is used when the biggest part of the hexagon is down,
+the second when the biggest part is up.

@@ -125,6 +125,7 @@
                 manifest="META-INF/MANIFEST.MF"
                 includes="**/*.class,
                     **/*.gif,
+                    **/*.png,
                     version,
                     Battlelands/*,
                     Default/*"

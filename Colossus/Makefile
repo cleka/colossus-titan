@@ -63,7 +63,7 @@ CLASS_FILES = $(sources:%.java=%.class)
 
 classes : $(CLASS_FILES)
 
-IMAGES = $(wildcard images/*.gif)
+IMAGES = $(wildcard images/*.gif) $(wildcard images/*.png) 
 
 JARFILE = Colossus.jar
 
@@ -85,7 +85,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
         net/sf/colossus/client/*.class net/sf/colossus/server/*.class \
         net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \
-        images/*.gif Default Battlelands
+        images/*.gif images/*.png Default Battlelands
 	chmod +x Colossus.jar
 
 # Sign jar file.  This target uses dripton's key; other developers can

@@ -38,6 +38,8 @@ public abstract class Hex
     Rectangle rectBound;
     /** Globally turns antialiasing on or off for all hexes. */
     static boolean antialias;
+    /** Globally turns overlay on or off for all hexes */
+    static boolean useOverlay;
 
     // Selection is in-between GUI and game state.
     private boolean selected;
@@ -136,6 +138,16 @@ public abstract class Hex
     static void setAntialias(boolean enabled)
     {
         antialias = enabled;
+    }
+
+    static boolean getOverlay()
+    {
+        return useOverlay;
+    }
+
+    static void setOverlay(boolean enabled)
+    {
+        useOverlay = enabled;
     }
 
 

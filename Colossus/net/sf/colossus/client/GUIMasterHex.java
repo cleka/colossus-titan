@@ -2,8 +2,13 @@ package net.sf.colossus.client;
 
 
 import java.awt.*;
+import java.awt.image.*;
 import java.util.*;
 import java.awt.geom.*;
+import java.net.*;
+import javax.swing.*;
+import java.io.*;
+import net.sf.colossus.util.Log;
 
 import net.sf.colossus.server.Constants;
 
@@ -12,6 +17,7 @@ import net.sf.colossus.server.Constants;
  * Class GUIMasterHex holds GUI information for a MasterHex.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 public final class GUIMasterHex extends MasterHex
@@ -110,6 +116,7 @@ public final class GUIMasterHex extends MasterHex
         at = AffineTransform.getTranslateInstance(center.getX() - 
             innerCenter.getX(), center.getY() - innerCenter.getY());
         innerHexagon.transform(at);
+        loadOverlay();
     }
 
 
@@ -185,21 +192,27 @@ public final class GUIMasterHex extends MasterHex
             }
         }
 
-        // Do not anti-alias text.
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_OFF);
-
-        // Draw label and terrain name
-        if (fontMetrics == null)
+        if (useOverlay && (overlay != null))
         {
-            fontMetrics = g2.getFontMetrics();
-            halfFontHeight = (fontMetrics.getMaxAscent() +
-                fontMetrics.getLeading()) / 2;
-            name = getTerrainName().toUpperCase();
+            paintOverlay(g2);
         }
-
-        switch (getLabelSide())
+        else
         {
+            // Do not anti-alias text.
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                RenderingHints.VALUE_ANTIALIAS_OFF);
+        
+            // Draw label and terrain name
+            if (fontMetrics == null)
+            {
+                fontMetrics = g2.getFontMetrics();
+                halfFontHeight = (fontMetrics.getMaxAscent() +
+                                  fontMetrics.getLeading()) / 2;
+                name = getTerrainName().toUpperCase();
+            }
+            
+            switch (getLabelSide())
+            {
             case 0:
                 g2.drawString(label, rectBound.x +
                     ((rectBound.width - fontMetrics.stringWidth(label)) / 2),
@@ -238,34 +251,35 @@ public final class GUIMasterHex extends MasterHex
                     fontMetrics.stringWidth(label)) / 5,
                     rectBound.y + halfFontHeight + rectBound.height / 5);
                 break;
-        }
+            }
+            
+            // The word "MOUNTAINS" needs to be printed in the wide part of
+            // the hex, with a smaller font.
+            if (name.equals("MOUNTAINS"))
+            {
+                Font oldFont = g2.getFont();
+                String fontName = oldFont.getName();
+                int size = oldFont.getSize();
+                int style = oldFont.getStyle();
+                
+                Font font = new Font(fontName, style,  9 * size / 10);
+                g2.setFont(font);
+                FontMetrics fontMetrics = g2.getFontMetrics();
+                halfFontHeight = (fontMetrics.getMaxAscent() +
+                                  fontMetrics.getLeading()) / 2;
+                
+                g2.drawString(name, rectBound.x + ((rectBound.width -
+                    fontMetrics.stringWidth(name)) / 2),
+                    rectBound.y + halfFontHeight + rectBound.height * 2 / 3);
 
-        // The word "MOUNTAINS" needs to be printed in the wide part of
-        // the hex, with a smaller font.
-        if (name.equals("MOUNTAINS"))
-        {
-            Font oldFont = g2.getFont();
-            String fontName = oldFont.getName();
-            int size = oldFont.getSize();
-            int style = oldFont.getStyle();
-
-            Font font = new Font(fontName, style,  9 * size / 10);
-            g2.setFont(font);
-            FontMetrics fontMetrics = g2.getFontMetrics();
-            halfFontHeight = (fontMetrics.getMaxAscent() +
-                fontMetrics.getLeading()) / 2;
-
-            g2.drawString(name, rectBound.x + ((rectBound.width -
-                fontMetrics.stringWidth(name)) / 2),
-                rectBound.y + halfFontHeight + rectBound.height * 2 / 3);
-
-            g2.setFont(oldFont);
-        }
-        else
-        {
-            g2.drawString(name, rectBound.x + ((rectBound.width -
-                fontMetrics.stringWidth(name)) / 2),
-                rectBound.y + halfFontHeight + (rectBound.height / 2));
+                g2.setFont(oldFont);
+            }
+            else
+            {
+                g2.drawString(name, rectBound.x + ((rectBound.width -
+                    fontMetrics.stringWidth(name)) / 2),
+                    rectBound.y + halfFontHeight + (rectBound.height / 2));
+            }
         }
     }
 
@@ -440,5 +454,95 @@ public final class GUIMasterHex extends MasterHex
     {
         super.unselect();
         selectColor = Color.white;
+    }
+
+    // overlay picture support
+    private static final String pathSeparator = "/";
+    private static String imageDirName = "images";
+    private static final String imageExtension = ".png";
+    private static final String invertedPostfix = "_i";
+    private Image overlay;
+
+    private void loadOverlay()
+    {
+        if (overlay == null)
+        {
+            try
+            {
+                URL url;
+                String imageFilename = getTerrainName() +
+                    (!inverted ? invertedPostfix : "") +
+                    imageExtension;
+                // try first with the var-specific directory
+                try {
+                    url = new URL("file:" +
+                                  GetPlayers.getVarDirectory() +
+                                  imageDirName +
+                                  pathSeparator +
+                                  imageFilename);
+                    // url will not be null even is the file doesn't exist,
+                    // so we need to check if connection can be opened
+                    if ((url != null) && (url.openStream() != null))
+                    {
+                        overlay = Toolkit.getDefaultToolkit().getImage(url);
+                    }
+                } catch (Exception e) {}
+                // try second with the default loader
+                if (overlay == null)
+                {
+                    ClassLoader cl = Client.class.getClassLoader();
+                    url = cl.getResource(imageDirName +
+                                         pathSeparator +
+                                         imageFilename);
+                    if (url != null)
+                    {
+                        overlay = (new ImageIcon(url)).getImage();
+                    }
+                }
+                if (overlay == null)
+                {
+                    throw new FileNotFoundException(imageFilename);
+                }
+            }
+            catch (Exception e) 
+            {
+                Log.debug("Couldn't get image :" + e);
+                return;
+            }
+            
+            int width = overlay.getWidth(board);
+            int height = overlay.getHeight(board);
+            BufferedImage bi = new BufferedImage(width, height,
+                                                 BufferedImage.TYPE_INT_ARGB);
+            Graphics2D biContext = bi.createGraphics();
+            biContext.drawImage(overlay, 0, 0, null);
+            
+            /* DISABLED
+            // code to use if we want rotate the overlay,
+            // to look more like the 'regular' Titan Masterboard
+            // need to give theta the proper value,
+            // depending where on the masterboard we are.
+            double theta = 0;;
+            AffineTransform at = AffineTransform.getRotateInstance(theta);
+            AffineTransformOp ato = new AffineTransformOp(at,
+                                        AffineTransformOp.TYPE_BILINEAR);
+            BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
+            bi2 = ato.filter(bi, bi2);
+            overlay = bi2;
+            */
+        }
+    }
+    
+    private void paintOverlay(Graphics2D g)
+    {
+        if (overlay == null)
+            return;
+
+        g.drawImage(overlay,
+                    rectBound.x,
+                    rectBound.y,
+                    rectBound.width,
+                    rectBound.height,
+                    board);
     }
 }
