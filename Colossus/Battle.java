@@ -38,7 +38,7 @@ public final class Battle
     private int phase;
     private int summonState = NO_KILLS;
     private int carryDamage;
-    private boolean chitSelected;
+    private boolean critterSelected;
     private ArrayList critters = new ArrayList();
 
     /** Stack of critters moved, to allow multiple levels of undo. */
@@ -291,7 +291,7 @@ public final class Battle
     private void setupMove()
     {
         // If there are no legal moves, move on.
-        if (highlightMovableChits() < 1)
+        if (highlightMovableCritters() < 1)
         {
             advancePhase();
         }
@@ -307,7 +307,7 @@ public final class Battle
         applyDriftDamage();
 
         // If there are no possible strikes, move on.
-        if (highlightChitsWithTargets() < 1)
+        if (highlightCrittersWithTargets() < 1)
         {
             advancePhase();
         }
@@ -327,7 +327,7 @@ public final class Battle
             }
 
             // If there are no possible strikes left, move on.
-            if (highlightChitsWithTargets() < 1)
+            if (highlightCrittersWithTargets() < 1)
             {
                 commitStrikes();
                 advancePhase();
@@ -574,7 +574,7 @@ public final class Battle
 
     public void undoLastMove()
     {
-        chitSelected = false;
+        critterSelected = false;
 
         if (!lastCrittersMoved.isEmpty())
         {
@@ -582,13 +582,13 @@ public final class Battle
             critter.undoMove();
         }
 
-        highlightMovableChits();
+        highlightMovableCritters();
     }
 
 
     public void undoAllMoves()
     {
-        chitSelected = false;
+        critterSelected = false;
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -600,7 +600,7 @@ public final class Battle
             }
         }
 
-        highlightMovableChits();
+        highlightMovableCritters();
     }
 
 
@@ -651,7 +651,7 @@ public final class Battle
 
     /** Return a set of hex labels for hex labels with critters eligible
      *  to move. */
-    public Set findMovableChits()
+    public Set findMovableCritters()
     {
         HashSet set = new HashSet();
         Player player = getActivePlayer();
@@ -676,9 +676,9 @@ public final class Battle
     /** Select all hexes containing critters eligible to move.
      *  Return the number of hexes selected (not the number
      *  of critters). */
-    public int highlightMovableChits()
+    public int highlightMovableCritters()
     {
-        Set set = findMovableChits();
+        Set set = findMovableCritters();
         map.unselectAllHexes();
         map.selectHexesByLabels(set);
         return set.size();
@@ -718,7 +718,7 @@ public final class Battle
     }
 
 
-    /** If any chits were left off-board, kill them.  If they were newly
+    /** If any creatures were left off-board, kill them.  If they were newly
      *  summoned or recruited, unsummon or unrecruit them instead. */
     private void removeOffboardCreatures()
     {
@@ -1023,7 +1023,7 @@ Game.logDebug("defender eliminated");
 
     /** Return the set of hex labels for hexes with critters that have
      *  valid strike targets. */
-    public Set findChitsWithTargets()
+    public Set findCrittersWithTargets()
     {
         Player player = getActivePlayer();
         HashSet set = new HashSet();
@@ -1032,12 +1032,10 @@ Game.logDebug("defender eliminated");
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (critter.getPlayer() == player)
+            if (critter.getPlayer() == player && 
+                countStrikes(critter, true) > 0)
             {
-                if (countStrikes(critter, true) > 0)
-                {
-                    set.add(critter.getCurrentHex().getLabel());
-                }
+                set.add(critter.getCurrentHex().getLabel());
             }
         }
 
@@ -1046,9 +1044,9 @@ Game.logDebug("defender eliminated");
 
     /** Select hexes containing critters that have valid strike targets.
      *  Return the number of selected hexes. */
-    public int highlightChitsWithTargets()
+    public int highlightCrittersWithTargets()
     {
-        Set set = findChitsWithTargets();
+        Set set = findCrittersWithTargets();
         map.unselectAllHexes();
         map.selectHexesByLabels(set);
         return set.size();
@@ -1099,25 +1097,21 @@ Game.logDebug("defender eliminated");
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
-                if (critter.getPlayer() == player)
+                if (critter.getPlayer() == player && !critter.hasStruck())
                 {
-                    if (!critter.hasStruck())
+                    Set set = findStrikes(critter, rangestrike);
+                    if (set.size() == 1)
                     {
-                        Set set = findStrikes(critter, rangestrike);
-                        if (set.size() == 1)
+                        String hexLabel = (String)(set.iterator().next());
+                        Critter target = getCritterFromHexLabel(hexLabel);
+                        critter.strike(target);
+
+                        // If that strike killed the target, it's possible
+                        // that some other creature that had two adjacent
+                        // enemies now has only one.
+                        if (target.isDead())
                         {
-                            Iterator it2 = set.iterator();
-                            String hexLabel = (String)it2.next();
-                            Critter target = getCritterFromHexLabel(hexLabel);
-                            critter.strike(target);
-    
-                            // If that strike killed the target, it's possible
-                            // that some other creature that had two adjacent
-                            // enemies now has only one.
-                            if (target.isDead())
-                            {
-                                repeat = true;
-                            }
+                            repeat = true;
                         }
                     }
                 }
@@ -1132,7 +1126,7 @@ Game.logDebug("defender eliminated");
         // Advance only if there are no unresolved strikes.
         if (isForcedStrikeRemaining())
         {
-            highlightChitsWithTargets();
+            highlightCrittersWithTargets();
             JOptionPane.showMessageDialog(map,
                 "Engaged creatures must strike.");
         }
@@ -1189,7 +1183,7 @@ Game.logDebug("defender eliminated");
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && critter.isRangestriker() &&
-            getPhase() != STRIKEBACK)
+            getPhase() != STRIKEBACK && critter.getLegion() == activeLegion)
         {
             Iterator it = critters.iterator();
             while (it.hasNext())
@@ -1206,7 +1200,6 @@ Game.logDebug("defender eliminated");
                 }
             }
         }
-
         return set;
     }
 
@@ -1214,22 +1207,6 @@ Game.logDebug("defender eliminated");
     public int countStrikes(Critter critter, boolean rangestrike)
     {
         return findStrikes(critter, rangestrike).size();
-    }
-
-
-    public boolean strikesRemain(Legion legion)
-    {
-        Collection critters = legion.getCritters();
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (countStrikes(critter, true) > 0)
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -1501,9 +1478,9 @@ Game.logDebug("defender eliminated");
             return true;
         }
 
-        // Chits block LOS, unless both striker and target are at higher
-        //     elevation than the chit, or unless the chit is at the base of
-        //     a cliff and the striker or target is atop it.
+        // Creatures block LOS, unless both striker and target are at higher
+        //     elevation than the creature, or unless the creature is at 
+        //     the base of a cliff and the striker or target is atop it.
         if (nextHex.isOccupied() && nextHex.getElevation() >= strikeElevation
             && (!strikerAtopCliff || currentHex != initialHex))
         {
@@ -1613,7 +1590,7 @@ Game.logDebug("defender eliminated");
         int x2 = hex2.getXCoord();
         double y2 = hex2.getYCoord();
 
-        // Offboard chits are not allowed.
+        // Offboard creatures are not allowed.
         if (x1 == -1 || x2 == -1)
         {
             return -1;
@@ -1773,8 +1750,8 @@ Game.logDebug("defender eliminated");
             return BIGNUM;
         }
 
-        // All chits block LOS.  (There are no height differences on maps
-        //    with bramble.)
+        // All creatures block LOS.  (There are no height differences on 
+        // maps with bramble.)
         if (nextHex.isOccupied())
         {
             return BIGNUM;
@@ -1870,7 +1847,7 @@ Game.logDebug("defender eliminated");
         // Only the active player can move or strike.
         if (critter != null && critter.getPlayer() == getActivePlayer())
         {
-            chitSelected = true;
+            critterSelected = true;
 
             // Put selected chit at the top of the z-order.
             moveToTop(critter);
@@ -1878,7 +1855,7 @@ Game.logDebug("defender eliminated");
             switch (getPhase())
             {
                 case MOVE:
-                    // Highlight all legal destinations for this chit.
+                    // Highlight all legal destinations for this critter.
                     highlightMoves(critter);
                     break;
 
@@ -1887,7 +1864,7 @@ Game.logDebug("defender eliminated");
                     // Leave carry mode.
                     clearAllCarries();
 
-                    // Highlight all legal strikes for this chit.
+                    // Highlight all legal strikes for this critter.
                     highlightStrikes(critter);
 
                     break;
@@ -1904,12 +1881,12 @@ Game.logDebug("defender eliminated");
         switch (getPhase())
         {
             case MOVE:
-                if (chitSelected)
+                if (critterSelected)
                 {
                     getCritter(0).moveToHex(hex);
-                    chitSelected = false;
+                    critterSelected = false;
                 }
-                highlightMovableChits();
+                highlightMovableCritters();
                 break;
 
             case FIGHT:
@@ -1918,10 +1895,10 @@ Game.logDebug("defender eliminated");
                 {
                     applyCarries(hex.getCritter());
                 }
-                else if (chitSelected)
+                else if (critterSelected)
                 {
                     getCritter(0).strike(hex.getCritter());
-                    chitSelected = false;
+                    critterSelected = false;
                 }
 
                 if (getCarryDamage() == 0)
@@ -1934,7 +1911,7 @@ Game.logDebug("defender eliminated");
                             makeForcedStrikes(false);
                         }
                     }
-                    highlightChitsWithTargets();
+                    highlightCrittersWithTargets();
                 }
                 break;
 
@@ -1949,14 +1926,14 @@ Game.logDebug("defender eliminated");
         switch (getPhase())
         {
             case MOVE:
-                chitSelected = false;
-                highlightMovableChits();
+                critterSelected = false;
+                highlightMovableCritters();
                 break;
 
             case FIGHT:
             case STRIKEBACK:
-                chitSelected = false;
-                highlightChitsWithTargets();
+                critterSelected = false;
+                highlightCrittersWithTargets();
                 break;
 
             default:

@@ -1263,9 +1263,8 @@ class SimpleAI implements AI
 
     public void strike(Legion legion, Battle battle, Game game)
     {
-        debugln("called SimpleAI.strike");
         // Repeat until no attackers with valid targets remain.
-        while (battle.strikesRemain(legion))
+        while (battle.highlightCrittersWithTargets() > 0)
         {
             doOneStrike(legion, battle);
         }
@@ -1274,47 +1273,44 @@ class SimpleAI implements AI
     
     private void doOneStrike(Legion legion, Battle battle)
     {
-        debugln("called doOneStrike");
         // Simple one-ply group strike algorithm.
 
         // First make forced strikes, including rangestrikes for 
         // rangestrikers with only one target.
         battle.makeForcedStrikes(true);
-        debugln("done with forced strikes");
 
-        // Then create a map containing each target
-        // and the likely number of hits it would take if all
-        // possible creatures attacked it.
+        // Then create a map containing each target and the likely number 
+        // of hits it would take if all possible creatures attacked it.
         HashMap map = new HashMap();
-        Collection critters = legion.getCritters();
+        Collection critters = battle.getCritters();
         Iterator it = critters.iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            Set set = battle.findStrikes(critter, true);
-            Iterator it2 = set.iterator();
-            while (it2.hasNext())
+            if (critter.getLegion() == legion)
             {
-                String hexLabel = (String)it2.next();
-                Critter target = battle.getCritterFromHexLabel(hexLabel);
-                int dice = critter.getDice(target);
-                int strikeNumber = critter.getStrikeNumber(target);
-                double h = averageNumberOfHits(dice, strikeNumber);
-
-                if (map.containsKey(target))
+                Set set = battle.findStrikes(critter, true);
+                Iterator it2 = set.iterator();
+                while (it2.hasNext())
                 {
-                    double d = ((Double)map.get(target)).doubleValue();
-                    h += d;
+                    String hexLabel = (String)it2.next();
+                    Critter target = battle.getCritterFromHexLabel(hexLabel);
+                    int dice = critter.getDice(target);
+                    int strikeNumber = critter.getStrikeNumber(target);
+                    double h = averageNumberOfHits(dice, strikeNumber);
+
+                    if (map.containsKey(target))
+                    {
+                        double d = ((Double)map.get(target)).doubleValue();
+                        h += d;
+                    }
+                    map.put(target, new Double(h));
                 }
-                debugln("adding " + target.getDescription() + " : " + h);
-                map.put(target, new Double(h));
             }
         }
-        debugln("done with target map");
 
-        // Pick the most important target that can likely be
-        // killed this turn.  If none can, pick the most important
-        // target.
+        // Pick the most important target that can likely be killed this 
+        // turn.  If none can, pick the most important target.
         boolean canKillSomething = false;
         Critter bestTarget = null;
         char terrain = battle.getTerrain();
@@ -1322,7 +1318,6 @@ class SimpleAI implements AI
         while (it.hasNext())
         {
             Critter target = (Critter)it.next();
-            debugln("checking target " + target.getDescription());
             double h = ((Double)map.get(target)).doubleValue();
             if (h + target.getHits() >= target.getPower())
             {
@@ -1352,6 +1347,11 @@ class SimpleAI implements AI
             return;
         }
         debugln("Best target is " + bestTarget.getDescription());
+
+        // XXX Best attacker algorithm should first look for 
+        // attackers with only one target.  (Even though forced 
+        // strikes should have already taken care of those,
+        // something is broken.)
 
         // Having found the target, pick an attacker.  The
         // first priority is finding one that does not need
@@ -1394,7 +1394,6 @@ class SimpleAI implements AI
         // Take a carry penalty if there is still a 95%
         // chance of killing this target. 
         bestAttacker.strike(bestTarget);
-        debugln("struck");
 
         // If there are any carries, apply them first to
         // the biggest creature that could be killed with
