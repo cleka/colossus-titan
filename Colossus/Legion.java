@@ -233,9 +233,11 @@ class Legion
     }
 
 
+    // hasMoved() is a separate check, so that this function can be used in
+    // battle as well as during the muster phase.
     public boolean canRecruit()
     {
-        if (recruited || height > 6 || !moved ||
+        if (recruited || height > 6 ||
             PickRecruit.findEligibleRecruits(this, new Creature[5]) == 0)
         {
             return false;
