@@ -120,8 +120,6 @@ public final class Client implements IClient, IOracle, IOptions
 
     private int numPlayers;
 
-    private String currentLookAndFeel = null;
-
     private Movement movement = new Movement(this);
     private BattleMovement battleMovement = new BattleMovement(this);
     private Strike strike = new Strike(this);
@@ -1747,7 +1745,7 @@ public final class Client implements IClient, IOracle, IOptions
         {
             battleDice.setValues(getBattleChitDescription(chit),
                     getBattleChitDescription(targetChit), strikeNumber,
-                    damage, rolls);
+                    rolls);
             battleDice.showRoll();
         }
         if (map != null)
@@ -3872,7 +3870,6 @@ public final class Client implements IClient, IOracle, IOptions
             updateEverything();
             Log.debug("Switched to Look & Feel: " + lfName);
             setOption(Options.favoriteLookFeel, lfName);
-            currentLookAndFeel = lfName;
         }
         catch (Exception e)
         {

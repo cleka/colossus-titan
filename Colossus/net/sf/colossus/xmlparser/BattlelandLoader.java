@@ -28,8 +28,6 @@ public class BattlelandLoader
     /** optional subtitle for the Battlelands */
     private String subtitle = null;
 
-    private String terrain = null;
-
     public BattlelandLoader(InputStream batIS, BattleHex[][] h)
     {
         SAXBuilder builder = new SAXBuilder();
@@ -37,7 +35,7 @@ public class BattlelandLoader
         {
             Document doc = builder.build(batIS);
             Element root = doc.getRootElement();
-            terrain = root.getAttributeValue("terrain");
+            // @todo check XML definition, here was: root.getAttributeValue("terrain");
             isTower = root.getAttribute("tower").getBooleanValue();
             subtitle = root.getAttributeValue("subtitle");
 

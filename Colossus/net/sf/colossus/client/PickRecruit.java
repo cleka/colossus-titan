@@ -39,7 +39,6 @@ final class PickRecruit extends KDialog implements MouseListener,
     private List recruitChits = new ArrayList();
     private Marker legionMarker;
     private List legionChits = new ArrayList();
-    private JFrame parentFrame;
     private static String recruit;
     private static boolean active;
 
@@ -49,7 +48,6 @@ final class PickRecruit extends KDialog implements MouseListener,
         super(parentFrame, client.getPlayerName() +
                 ": Pick Recruit in " + hexDescription, true);
 
-        this.parentFrame = parentFrame;
         this.recruits = recruits;
 
         addMouseListener(this);

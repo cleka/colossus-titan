@@ -185,7 +185,6 @@ public final class Start
         }
         if (cl.optIsSet('x'))
         {
-            String buf = cl.getOptValue('x');
             options.setOption(Options.logDebug, false);
         }
         // Quit if values are bogus.

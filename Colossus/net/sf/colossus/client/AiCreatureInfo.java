@@ -1,7 +1,5 @@
 package net.sf.colossus.client;
 
-import java.util.*;
-
 import net.sf.colossus.server.Creature;
 
 

@@ -5,7 +5,6 @@ import java.util.*;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Combos;
-import net.sf.colossus.util.Log;
 
 /**
  *  Predicts splits for one enemy player, and adjusts predictions as 

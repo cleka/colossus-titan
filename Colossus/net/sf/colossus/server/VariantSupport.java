@@ -318,7 +318,8 @@ public final class VariantSupport
             {
                 throw new FileNotFoundException(getRecruitName());
             }
-            TerrainRecruitLoader trl = new TerrainRecruitLoader(terIS);
+            // @todo parsing into static fields is a side effect of this constructor
+            new TerrainRecruitLoader(terIS);
 
             /* now initialize the static bits of the Battlelands */
             HexMap.staticBattlelandsInit(serverSide);

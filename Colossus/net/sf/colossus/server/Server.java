@@ -44,7 +44,6 @@ public final class Server implements IServer
     private Critter striker;
     private Critter target;
     private int strikeNumber;
-    private int damage;
     private List rolls;
 
     // Network stuff
@@ -982,7 +981,6 @@ public final class Server implements IServer
         this.striker = striker;
         this.target = target;
         this.strikeNumber = strikeNumber;
-        this.damage = damage;
         this.rolls = rolls;
 
         Iterator it = clients.iterator();
@@ -1029,7 +1027,6 @@ public final class Server implements IServer
     synchronized void allTellHexDamageResults(Critter target, int damage)
     {
         this.target = target;
-        this.damage = damage;
 
         Iterator it = clients.iterator();
         while (it.hasNext())

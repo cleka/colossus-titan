@@ -34,7 +34,6 @@ final class BattleChit extends Chit
     private String startingHexLabel;
     private boolean moved;
     private boolean struck;
-    private String colorName;
     private Color color;
     private static BasicStroke borderStroke;
     private Rectangle midRect;
@@ -52,9 +51,8 @@ final class BattleChit extends Chit
         this.scale = scale;
         this.tag = tag;
         this.currentHexLabel = currentHexLabel;
-        this.colorName = colorName;
         this.client = client;
-        color = HTMLColor.stringToColor(colorName + "Colossus");
+        this.color = HTMLColor.stringToColor(colorName + "Colossus");
         setBackground(Color.white);
     }
 

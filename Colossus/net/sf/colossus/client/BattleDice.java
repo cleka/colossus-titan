@@ -32,7 +32,6 @@ final class BattleDice extends Box
     private int numDice = 0;
     private int targetNumber = 0;
     private List rolls = new ArrayList();
-    private int hits = 0;
     private Chit[] dice;
     private int averageMiss = -1;
 
@@ -65,12 +64,11 @@ final class BattleDice extends Box
     }
 
     void setValues(String strikerDesc, String targetDesc, int targetNumber,
-            int hits, List rolls)
+            List rolls)
     {
         this.strikerDesc = strikerDesc;
         this.targetDesc = targetDesc;
         this.targetNumber = targetNumber;
-        this.hits = hits;
 
         this.rolls.clear();
         if (rolls != null)

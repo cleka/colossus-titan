@@ -1,7 +1,5 @@
 package net.sf.colossus.client;
 
-import java.util.*;
-
 /** Allows getting and setting options.
  *  An attempt to reduce the God-class nature of Client.
  *  @version $Id$

@@ -22,7 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
 
 
@@ -437,7 +436,6 @@ final class EngagementResults
     private final static String NEXT = "Next";
     private final static String PREV = "Previous";
     private final static String DROP = "Drop";
-    private final static String DISMISS = "Dismiss";
 
     /** handler for buttons */
     public void actionPerformed(ActionEvent e)

@@ -23,7 +23,6 @@ final class SocketServerThread extends Thread implements IClient
     private Server server;
     private Socket socket;
     private InputStream is;
-    private OutputStream os;
     private BufferedReader in;
     private PrintWriter out;
     private String playerName;
@@ -46,7 +45,6 @@ final class SocketServerThread extends Thread implements IClient
         {
             is = socket.getInputStream();
             in = new BufferedReader(new InputStreamReader(is));
-            os = socket.getOutputStream();
             out = new PrintWriter(socket.getOutputStream(), true);
         }
         catch (IOException ex)

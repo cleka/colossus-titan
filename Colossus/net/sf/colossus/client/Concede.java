@@ -31,7 +31,6 @@ import net.sf.colossus.util.KDialog;
 
 final class Concede extends KDialog implements ActionListener, WindowListener
 {
-    private JFrame parentFrame;
     private boolean flee;
     private Point location;
     private Client client;
@@ -52,7 +51,6 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         addWindowListener(this);
 
-        this.parentFrame = parentFrame;
         this.flee = flee;
         this.client = client;
         this.allyMarkerId = allyMarkerId;

@@ -106,7 +106,6 @@ public final class ShowCreatureDetails
         JEditorPane pane = new JEditorPane();
         pane.setEditable(false);
         // define the content
-        final int nTerrains = Terrains.ALL_HAZARD_TERRAINS.length;
         StringBuffer s = new StringBuffer();
         _head(s, creature);
         //
@@ -150,7 +149,6 @@ public final class ShowCreatureDetails
         // recruit
         //
         _section(s, "Recruit");
-        final RecruitGraph rg = TerrainRecruitLoader.getRecruitGraph();
         final String[] terrains = TerrainRecruitLoader.getTerrains();
         //   in
         for (int ti = 0; ti < terrains.length; ti++)
@@ -368,30 +366,6 @@ public final class ShowCreatureDetails
                 name,                        // 0
                 ""  + (HAZARDS.length + 1),  // 1
                 value,                       // 2
-            }));
-    }
-
-    /** a headered table row, the 2 data columns span each half the full span.
-     * @param s in/out
-     */
-    private static void _trSpan2(
-        StringBuffer s,
-        final String name,
-        final String val1,
-        final String val2)
-    {
-        final int spanTotal = HAZARDS.length + 1;
-        final int span1 = spanTotal / 2;
-        final int span2 = spanTotal - span1;
-        s.append(MessageFormat.format(
-            "<tr><th>{0}</th><td colspan={1}>{2}</td>"
-            + "<td colspan={3}>{4}</td></tr>",
-            new Object[] {
-                name,       // 0
-                "" + span1, // 1
-                val1,       // 2
-                "" + span2, // 3
-                val2,
             }));
     }
 
