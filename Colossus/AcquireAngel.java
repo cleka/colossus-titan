@@ -177,36 +177,6 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
     }
 
 
-    // Attempt to free resources to work around Java memory leaks.
-    private void cleanup()
-    {
-        setVisible(false);
-
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
-        for (int i = 0; i < numEligible; i++)
-        {
-            tracker.removeImage(markers[i].getImage());
-            markers[i].getImage().flush();
-        }
-
-        dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
-    }
-
-
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
@@ -218,7 +188,7 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
                 legion.addCreature(recruits[i]);
 
                 // Then exit.
-                cleanup();
+                dispose();
                 return;
             }
         }
@@ -257,7 +227,7 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent event)
     {
-        cleanup();
+        dispose();
     }
 
 

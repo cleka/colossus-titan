@@ -183,46 +183,6 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
     }
 
 
-    // Attempt to free resources to work around Java memory leaks.
-    private void cleanup()
-    {
-        setVisible(false);
-
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
-        if (imagesLoaded)
-        {
-            for (int i = 0; i < oldLegion.getHeight(); i++)
-            {
-                tracker.removeImage(oldChits[i].getImage());
-                oldChits[i].getImage().flush();
-            }
-            for (int i = 0; i < newLegion.getHeight(); i++)
-            {
-                tracker.removeImage(newChits[i].getImage());
-                newChits[i].getImage().flush();
-            }
-            tracker.removeImage(oldMarker.getImage());
-            oldMarker.getImage().flush();
-        }
-
-        dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
-    }
-
-
     void cancel()
     {
         player.addSelectedMarker();
@@ -234,7 +194,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
                 newLegion.getCreature(i));
         }
 
-        cleanup();
+        dispose();
     }
 
 
@@ -404,7 +364,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
             newLegion.hideAllCreatures();
 
             // Exit.
-            cleanup();
+            dispose();
         }
 
         else if (e.getActionCommand() == "Cancel")

@@ -153,39 +153,6 @@ class PickRecruiter extends JDialog implements MouseListener, WindowListener
     }
 
 
-    // Attempt to free resources to work around Java memory leaks.
-    private void cleanup()
-    {
-        setVisible(false);
-
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
-        if (imagesLoaded)
-        {
-            for (int i = 0; i < numEligible; i++)
-            {
-                tracker.removeImage(recruiterChits[i].getImage());
-                recruiterChits[i].getImage().flush();
-            }
-        }
-
-        dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
-    }
-
-
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
@@ -193,11 +160,12 @@ class PickRecruiter extends JDialog implements MouseListener, WindowListener
         {
             if (recruiterChits[i].select(point))
             {
-                // The selected recruiter will be placed in the 0th position of the array.
+                // The selected recruiter will be placed in the 0th 
+                // position of the array.
                 recruiters[0] = recruiters[i];
 
                 // Then exit.
-                cleanup();
+                dispose();
                 return;
             }
         }
@@ -236,7 +204,7 @@ class PickRecruiter extends JDialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent event)
     {
-        cleanup();
+        dispose();
     }
 
 

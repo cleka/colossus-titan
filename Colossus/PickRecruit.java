@@ -832,39 +832,6 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     }
 
 
-    // Attempt to free resources to work around Java memory leaks.
-    private void cleanup()
-    {
-        setVisible(false);
-
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
-        if (imagesLoaded)
-        {
-            for (int i = 0; i < numEligible; i++)
-            {
-                tracker.removeImage(recruitChits[i].getImage());
-                recruitChits[i].getImage().flush();
-            }
-        }
-
-        dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
-    }
-
-
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
@@ -918,7 +885,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
                 }
 
                 // Then exit.
-                cleanup();
+                dispose();
                 return;
             }
         }
@@ -957,7 +924,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent event)
     {
-        cleanup();
+        dispose();
     }
 
 

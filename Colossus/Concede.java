@@ -177,53 +177,6 @@ class Concede extends JDialog implements ActionListener
     }
 
 
-    // Attempt to free resources to work around Java memory leaks.
-    private void cleanup()
-    {
-        setVisible(false);
-
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
-        if (imagesLoaded)
-        {
-            for (int i = 0; i < friend.getHeight(); i++)
-            {
-                tracker.removeImage(friendChits[i].getImage());
-                friendChits[i].getImage().flush();
-            }
-            for (int i = 0; i < enemy.getHeight(); i++)
-            {
-                // Enemy may just have acquired an angel which does not have
-                // a chit here, so check for null.
-                if (enemyChits[i] != null)
-                {
-                    tracker.removeImage(enemyChits[i].getImage());
-                    enemyChits[i].getImage().flush();
-                }
-            }
-            tracker.removeImage(friendMarker.getImage());
-            friendMarker.getImage().flush();
-            tracker.removeImage(enemyMarker.getImage());
-            enemyMarker.getImage().flush();
-        }
-
-        dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
-    }
-
-
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand() == "Flee" || e.getActionCommand() ==
@@ -250,7 +203,7 @@ class Concede extends JDialog implements ActionListener
             }
 
             // Exit this dialog.
-            cleanup();
+            dispose();
 
             // Unselect and repaint the hex.
             MasterHex hex = enemy.getCurrentHex();
@@ -260,7 +213,7 @@ class Concede extends JDialog implements ActionListener
 
         else
         {
-            cleanup();
+            dispose();
         }
     }
 
