@@ -223,6 +223,9 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         {
             donor.removeCreature(Creature.angel);
             legion.addCreature(Creature.angel);
+	    // Mark the new angel as visible.
+	    legion.revealCreatures(Creature.angel, 1);
+	    // XXX Need to remove visible angel from donor stack?
             cleanup(true);
         }
 
@@ -230,6 +233,8 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         {
             donor.removeCreature(Creature.archangel);
             legion.addCreature(Creature.archangel);
+	    // Mark the new archangel as visible.
+	    legion.revealCreatures(Creature.archangel, 1);
             cleanup(true);
         }
     }
