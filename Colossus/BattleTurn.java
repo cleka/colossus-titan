@@ -160,7 +160,7 @@ System.out.println("No legal moves; advancing to strike phase");
             contentPane = getContentPane();
             contentPane.removeAll();
             setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
-            contentPane.setLayout(new GridLayout(0, 4));
+            contentPane.setLayout(new GridLayout(0, 5));
 
             contentPane.add(new JLabel(getActivePlayer().getName() + 
                 " : Move"));
@@ -173,9 +173,13 @@ System.out.println("No legal moves; advancing to strike phase");
             contentPane.add(button2);
             button2.addActionListener(this);
 
-            JButton button3 = new JButton("Done with Moves");
+            JButton button3 = new JButton("Concede Battle");
             contentPane.add(button3);
             button3.addActionListener(this);
+
+            JButton button4 = new JButton("Done with Moves");
+            contentPane.add(button4);
+            button4.addActionListener(this);
 
             pack();
 
@@ -204,13 +208,18 @@ System.out.println("setupFightDialog");
         {
             contentPane = getContentPane();
             contentPane.removeAll();
-            contentPane.setLayout(new GridLayout(0, 2));
+            contentPane.setLayout(new GridLayout(0, 3));
 
             contentPane.add(new JLabel(getActivePlayer().getName() +
                 ((phase == FIGHT) ? " : Strike" : " : Strikeback")));
-            JButton button1 = new JButton("Done with Strikes");
+
+            JButton button1 = new JButton("Concede Battle");
             contentPane.add(button1);
             button1.addActionListener(this);
+            
+            JButton button2 = new JButton("Done with Strikes");
+            contentPane.add(button2);
+            button2.addActionListener(this);
 
             pack();
 
@@ -362,6 +371,18 @@ System.out.println("leaving advancePhase() with phase " + phase);
                 map.commitStrikes();
                 advancePhase();
             }
+        }
+
+        else if (e.getActionCommand() == "Concede Battle")
+        {
+            // XXX: Concession timing is tricky.
+            int answer = JOptionPane.showConfirmDialog(parentFrame, 
+                "Are you sure you want to concede the battle?");
+            if (answer == JOptionPane.YES_OPTION)
+            {
+                map.concede(getActivePlayer());
+            }
+            advancePhase();
         }
     }
 }
