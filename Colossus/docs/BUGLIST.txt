@@ -24,9 +24,6 @@ Concession timing.  If both players want to concede, the non-phasing
 Striking continues after concession, until the normal time to check for
    creature (and then player) death.
 
-Solaris, jdk1.3; Win98, jdk1.3: BattleMap menu is not immediately active.  
-   It takes a few seconds to wake up.
-
 Linux, Solaris, jdk1.3: Dialogs sometimes beep for no good reason.
    Are modal dialogs moving behind other windows before being destroyed?
    Added setVisible(false) before dispose() calls, which doesn't seem

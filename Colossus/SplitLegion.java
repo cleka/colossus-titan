@@ -38,25 +38,25 @@ public class SplitLegion extends JDialog implements MouseListener,
         this.parentFrame = parentFrame;
         player = oldLegion.getPlayer();
 
-        String selectedMarker = PickMarker.pickMarker(parentFrame,
+        String selectedMarkerId = PickMarker.pickMarker(parentFrame,
             name, player.getMarkersAvailable());
 
-        if (selectedMarker == null)
+        if (selectedMarkerId == null)
         {
             dispose();
             return;
         }
         else
         {
-            player.selectMarkerId(selectedMarker);
+            selectedMarkerId = player.selectMarkerId(selectedMarkerId);
         }
 
         pack();
 
-        newLegion = new Legion(player.getSelectedMarkerId(), oldLegion,
+        newLegion = new Legion(selectedMarkerId, oldLegion,
             oldLegion.getCurrentHex(), null, null, null, null, null,
             null, null, null, player);
-        String imageName = player.getSelectedMarkerId();
+        String imageName = selectedMarkerId;
         newMarker = new Marker(scale, imageName, this, null);
         newLegion.setMarker(newMarker);
 
@@ -348,13 +348,12 @@ public class SplitLegion extends JDialog implements MouseListener,
         player.setTower(1);
         player.setColor("Red");
         player.initMarkersAvailable();
-        player.selectMarkerId("Rd01");
-        Legion legion = new Legion(player.getSelectedMarkerId(), null, null,
+        String selectedMarkerId = player.selectMarkerId("Rd01");
+        Legion legion = new Legion(selectedMarkerId, null, null,
             Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
             Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);
-        Marker marker = new Marker(scale, player.getSelectedMarkerId(),
-            frame, null);
+        Marker marker = new Marker(scale, selectedMarkerId, frame, null);
         legion.setMarker(marker);
 
         SplitLegion.splitLegion(frame, legion);

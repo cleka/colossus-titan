@@ -16,7 +16,6 @@ public class Player implements Comparable
     private String playersEliminated;  // RdBkGr
 
     private TreeSet markersAvailable = new TreeSet();
-    private String selectedMarkerId;
 
     private ArrayList legions = new ArrayList();
     private Legion selectedLegion = null;
@@ -597,23 +596,17 @@ public class Player implements Comparable
     }
 
 
-    public String getSelectedMarkerId()
+    /** Removes the selected marker from the list of those available.
+     *  Returns the markerId if it was present, or null if it was not. */
+    public String selectMarkerId(String markerId)
     {
-        return selectedMarkerId;
-    }
-
-
-    public void selectMarkerId(String markerId)
-    {
-        // Remove the selected marker from the list of those available.
-        boolean found = markersAvailable.remove(markerId);
-        if (found)
+        if (markersAvailable.remove(markerId))
         {
-            selectedMarkerId = markerId;
+            return markerId;
         }
         else
         {
-            selectedMarkerId = null;
+            return null;
         }
     }
 

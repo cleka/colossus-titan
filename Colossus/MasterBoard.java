@@ -431,6 +431,8 @@ public class MasterBoard extends JPanel implements MouseListener,
         optionsMenu.setMnemonic(KeyEvent.VK_O);
         menuBar.add(optionsMenu);
 
+        // Game-wide options first
+
         miAutosave = new JCheckBoxMenuItem(Game.sAutosave);
         miAutosave.setMnemonic(KeyEvent.VK_A);
         miAutosave.setSelected(game.getAutosave());
@@ -443,11 +445,17 @@ public class MasterBoard extends JPanel implements MouseListener,
         miAllStacksVisible.addItemListener(this);
         optionsMenu.add(miAllStacksVisible);
 
+        optionsMenu.addSeparator();
+        // Then per-player options
+
         miAutoPickRecruiter = new JCheckBoxMenuItem(Game.sAutoPickRecruiter);
         miAutoPickRecruiter.setMnemonic(KeyEvent.VK_P);
         miAutoPickRecruiter.setSelected(game.getAutoPickRecruiter());
         miAutoPickRecruiter.addItemListener(this);
         optionsMenu.add(miAutoPickRecruiter);
+
+        optionsMenu.addSeparator();
+        // Then per-client GUI options
 
         miShowStatusScreen = new JCheckBoxMenuItem(Game.sShowStatusScreen);
         miShowStatusScreen.setMnemonic(KeyEvent.VK_G);

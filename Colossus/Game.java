@@ -67,17 +67,59 @@ public class Game
 
 
     /** Start a new game. */
-    public Game(boolean isApplet, GameApplet applet)
+    public Game(GameApplet applet)
     {
-        this.isApplet = isApplet;
+        this.applet = applet;
+        isApplet = (applet != null);
         Chit.setApplet(isApplet);
-        if (applet != null)
-        {
-            this.applet = applet;
-        }
 
+        newGame();
+    }
+
+
+    /** Load a saved game. */
+    public Game(GameApplet applet, String filename)
+    {
+        this.applet = applet;
+        isApplet = (applet != null);
+        Chit.setApplet(isApplet);
+
+        board = new MasterBoard(this);
+        masterFrame = board.getFrame();
+        loadGame(filename);
+        board.loadInitialMarkerImages();
+        statusScreen = new StatusScreen(this);
+        // XXX Assumes that we only load at the beginning of a phase.
+        board.setupPhase();
+
+        loadOptions();
+    }
+
+
+    /** Load a saved game, and force the first movement roll. */
+    public Game(GameApplet applet, String filename, int forcedMovementRoll)
+    {
+        // Call the normal saved game constructor.
+        this(applet, filename);
+
+        if (forcedMovementRoll >= 1 && forcedMovementRoll <= 6)
+        {
+            this.forcedMovementRoll = forcedMovementRoll;
+        }
+    }
+
+
+    /** Default constructor, for testing only. */
+    public Game()
+    {
+    }
+
+
+    public void newGame()
+    {
         JFrame frame = new JFrame();
 
+        players.clear();
         TreeSet playerNames = GetPlayers.getPlayers(frame);
         Iterator it = playerNames.iterator();
         while (it.hasNext())
@@ -87,7 +129,6 @@ public class Game
             logEvent("Added player " + name);
         }
 
-        // Since the inputs are validated, it's time to roll for towers.
         assignTowers();
 
         // Renumber players in descending tower order.
@@ -112,7 +153,6 @@ public class Game
             while (it.hasNext())
             {
                 Player player = (Player)it.next();
-                pickInitialMarker(player);
                 placeInitialLegion(player);
                 updateStatusScreen();
             }
@@ -124,48 +164,6 @@ public class Game
         }
 
         loadOptions();
-    }
-
-
-    /** Load a saved game. */
-    public Game(boolean isApplet, GameApplet applet, String filename)
-    {
-        this.isApplet = isApplet;
-        Chit.setApplet(isApplet);
-        if (applet != null)
-        {
-            this.applet = applet;
-        }
-
-        board = new MasterBoard(this);
-        masterFrame = board.getFrame();
-        loadGame(filename);
-        board.loadInitialMarkerImages();
-        statusScreen = new StatusScreen(this);
-        // XXX Assumes that we only load at the beginning of a phase.
-        board.setupPhase();
-
-        loadOptions();
-    }
-
-
-    /** Load a saved game, and force the first movement roll. */
-    public Game(boolean isApplet, GameApplet applet, String filename,
-        int forcedMovementRoll)
-    {
-        // Call the normal saved game constructor.
-        this(isApplet, applet, filename);
-
-        if (forcedMovementRoll >= 1 && forcedMovementRoll <= 6)
-        {
-            this.forcedMovementRoll = forcedMovementRoll;
-        }
-    }
-
-
-    /** Default constructor, for testing only. */
-    public Game()
-    {
     }
 
 
@@ -980,6 +978,7 @@ public class Game
                 creature.setCount(count);
             }
 
+            players.clear();
             for (int i = 0; i < numPlayers; i++)
             {
                 String name = in.readLine();
@@ -1675,7 +1674,7 @@ public class Game
         // Towers are a special case.
         if (hex.getTerrain() == 'T')
         {
-            recruits = new ArrayList();
+            recruits = new ArrayList(5);
 
             recruits.add(Creature.centaur);
             recruits.add(Creature.gargoyle);
@@ -1788,7 +1787,7 @@ public class Game
     public static ArrayList findEligibleRecruiters(Legion legion,
         Creature recruit)
     {
-        ArrayList recruiters = new ArrayList();
+        ArrayList recruiters = new ArrayList(4);
 
         MasterHex hex = legion.getCurrentHex();
         char terrain = hex.getTerrain();
@@ -1950,7 +1949,7 @@ public class Game
             return null;
         }
 
-        ArrayList recruits = new ArrayList();
+        ArrayList recruits = new ArrayList(2);
 
         if (Creature.angel.getCount() >= 1)
         {
@@ -2015,7 +2014,7 @@ public class Game
     }
 
 
-    public void pickInitialMarker(Player player)
+    private void placeInitialLegion(Player player)
     {
         String name = player.getName();
         String selectedMarkerId;
@@ -2028,11 +2027,7 @@ public class Game
 
         player.selectMarkerId(selectedMarkerId);
         logEvent(name + " selected initial marker");
-    }
 
-
-    public void placeInitialLegion(Player player)
-    {
         // Lookup coords for chit starting from player[i].getTower()
         MasterHex hex = MasterBoard.getHexFromLabel(String.valueOf(
             100 * player.getTower()));
@@ -2046,7 +2041,7 @@ public class Game
         Creature.gargoyle.takeOne();
         Creature.gargoyle.takeOne();
 
-        Legion legion = new Legion(player.getSelectedMarkerId(), null, hex,
+        Legion legion = new Legion(selectedMarkerId, null, hex,
             Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
             Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);
@@ -2180,9 +2175,9 @@ public class Game
     }
 
 
-    // Recursively find tower teleport moves from this hex.  That's
-    // all unoccupied hexes within 6 hexes.  Teleports to towers
-    // are handled separately.  Do not double back.
+    /** Recursively find tower teleport moves from this hex.  That's
+     *  all unoccupied hexes within 6 hexes.  Teleports to towers
+     *  are handled separately.  Do not double back. */
     private Set findTowerTeleportMoves(MasterHex hex, Player player,
         Legion legion, int roll, int cameFrom)
     {
@@ -2732,7 +2727,7 @@ public class Game
     }
 
 
-    void handleConcession(Legion loser, Legion winner, boolean fled)
+    private void handleConcession(Legion loser, Legion winner, boolean fled)
     {
         // Figure how many points the victor receives.
         int points = loser.getPointValue();
@@ -2766,7 +2761,7 @@ public class Game
         // Unselect and repaint the hex.
         MasterHex hex = winner.getCurrentHex();
         MasterBoard.unselectHexByLabel(hex.getLabel());
-                
+
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering
         // the battle.
@@ -2810,17 +2805,17 @@ public class Game
         if (args.length == 0)
         {
             // Start a new game.
-            new Game(false, null);
+            new Game(null);
         }
         else if (args.length == 1)
         {
             // Load a game.
-            new Game(false, null, args[0]);
+            new Game(null, args[0]);
         }
         else
         {
             // Load a game, and specify the next movement roll.
-            new Game(false, null, args[0], Integer.parseInt(args[1]));
+            new Game(null, args[0], Integer.parseInt(args[1]));
         }
     }
 }

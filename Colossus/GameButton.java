@@ -26,7 +26,7 @@ public class GameButton extends JButton implements ActionListener
         // Don't allow multiple clicks to start multiple simultaneous games.
         if (game == null)
         {
-            game = new Game(true, applet);
+            game = new Game(applet);
         }
     }
 }

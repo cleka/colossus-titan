@@ -360,25 +360,23 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         player.setTower(1);
         player.setColor("Red");
         player.initMarkersAvailable();
-        player.selectMarkerId("Rd01");
-        Legion attacker = new Legion(player.getSelectedMarkerId(), null, hex,
+        String selectedMarkerId = player.selectMarkerId("Rd01");
+        Legion attacker = new Legion(selectedMarkerId, null, hex,
             Creature.titan, Creature.colossus, Creature.serpent,
             Creature.archangel, Creature.hydra, Creature.giant,
             Creature.dragon, null, player);
-        Marker marker = new Marker(scale, player.getSelectedMarkerId(),
-            frame, null);
+        Marker marker = new Marker(scale, selectedMarkerId, frame, null);
         attacker.setMarker(marker);
 
         player = new Player("Defender", null);
         player.setTower(2);
         player.setColor("Blue");
         player.initMarkersAvailable();
-        player.selectMarkerId("Bl01");
-        Legion defender = new Legion(player.getSelectedMarkerId(), null, hex,
+        selectedMarkerId = player.selectMarkerId("Bl01");
+        Legion defender = new Legion(selectedMarkerId, null, hex,
             Creature.ogre, Creature.centaur, Creature.gargoyle,
             null, null, null, null, null, player);
-        marker = new Marker(scale, player.getSelectedMarkerId(),
-            frame, null);
+        marker = new Marker(scale, selectedMarkerId, frame, null);
         defender.setMarker(marker);
 
         new Negotiate(frame, attacker, defender);
