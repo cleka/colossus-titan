@@ -1,7 +1,19 @@
 # $Id$
+
+# areaone to three are the second lines of attackers
+LABEL areaone=B3 C4 D5
+LABEL areatwo=B2 C2 D2
+LABEL areathree=E2 E3 E4
+
 # some brush in the inside, and maybe even a tree
-AREA (inside) TERRAINS r r r r,75. r,5. r,5. r,5. t,5.,1
+AREA (inside) TERRAINS r r r,75. r,50. r,5. r,5. r,5. t,5.,1
+
 # one brush on each entry side
-AREA (leftdefenseentry) TERRAINS r
-AREA (upperdefenseentry) TERRAINS r
-AREA (lowerdefenseentry) TERRAINS r
+AREA (leftdefenseentry) TERRAINS r,90.
+AREA (upperdefenseentry) TERRAINS r,90.
+AREA (lowerdefenseentry) TERRAINS r,90.
+
+# a bit more brush
+AREA (areaone) TERRAINS r,50.
+AREA (areatwo) TERRAINS r,50.
+AREA (areathree) TERRAINS r,50.
