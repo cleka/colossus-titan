@@ -1,5 +1,5 @@
 Angel      6 4 false true  false false false false false true  false 18 Angels
-Archangel  9 4 false true  false false false false false true  false  6 Archngels
+Archangel  9 4 false true  false false false false false true  false  6 Archangels
 Behemoth   8 3 false false true  false false false false false false 18 Behemoths
 Centaur    3 4 false false false false false false false false false 25 Centaurs
 Colossus  10 4 false false false true  false false true  false false 10 Colossi
@@ -10,7 +10,7 @@ Giant      7 4 true  false false true  false false false false false 18 Giants
 Gorgon     6 3 true  true  true  false false false false false false 25 Gorgons
 Griffon    5 4 false true  false false false true  false false false 18 Griffons
 Guardian  12 2 false true  false false false false false false true   6 Guardians
-Hydra     10 3 true  false false false true  true  false false false 10 Hydras
+Hydra     10 3 true  false false false true  true  false false false 10 Hydrae
 Lion       5 3 false false false false false true  true  false false 28 Lions
 Minotaur   4 4 true  false false false false false true  false false 21 Minotaurs
 Ogre       6 2 false false false false true  false true  false false 25 Ogres

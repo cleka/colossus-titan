@@ -24,14 +24,14 @@ final class Legion implements Comparable
     private String currentHexLabel;
     private String startingHexLabel;
     private boolean moved;
+    private int entrySide = -1;
+    private boolean teleported;
     private String recruitName;
     private String playerName;
     private int battleTally;
-    private Creature teleportingLord; // XXX Move into HexInfo?
+    private Creature teleportingLord;
     private static Map markerNames = new HashMap();
     private Game game;
-    /** Maps hex labels to HexInfo classes. */
-    private Map hexInfoMap = new HashMap();
 
     static
     {
@@ -197,16 +197,11 @@ final class Legion implements Comparable
     {
         // Initial legion contents are public; contents of legions created
         // by splits are private.
+        // When loading a game, we handle revealing visible creatures
+        // after legion creation.
         if (getHeight() == 8)
         {
             revealAllCreatures();
-        }
-        else
-        {
-            // XXX
-            // When loading a game, we handle revealing visible creatures
-            // after legion creation.
-            // hideAllCreatures();
         }
     }
 
@@ -251,15 +246,7 @@ final class Legion implements Comparable
         newLegion.battleTally = battleTally;
         newLegion.teleportingLord = teleportingLord;
 
-        // Deep copy hexInfoMap
-        Iterator it = hexInfoMap.entrySet().iterator();
-        while (it.hasNext())
-        {
-            Map.Entry entry = (Map.Entry)it.next();
-            String hexLabel = (String)entry.getKey();
-            HexInfo hexInfo = (HexInfo)entry.getValue();
-            newLegion.hexInfoMap.put(hexLabel, hexInfo.AICopy());
-        }
+        // XXX Make sure to copy entry side and teleport info
 
         return newLegion;
     }
@@ -652,7 +639,7 @@ final class Legion implements Comparable
     }
 
 
-    void moveToHex(MasterHex hex)
+    void moveToHex(MasterHex hex, int entrySide, boolean teleported)
     {
         Player player = getPlayer();
         String hexLabel = hex.getLabel();
@@ -660,11 +647,12 @@ final class Legion implements Comparable
         currentHexLabel = hexLabel;
         moved = true;
 
-        boolean teleported = getTeleported(hexLabel);
+        setEntrySide(entrySide);
 
         // If we teleported, no more teleports are allowed this turn.
         if (teleported)
         {
+            setTeleported(true);
             player.setTeleported(true);
         }
 
@@ -682,12 +670,19 @@ final class Legion implements Comparable
     }
 
 
+    boolean hasConventionalMove()
+    {
+        return !game.listNormalMoves(this, getCurrentHex(),
+            getPlayer().getMovementRoll(), false).isEmpty();
+    }
+
+
     void undoMove()
     {
         if (moved)
         {
             // If this legion teleported, allow teleporting again.
-            if (getTeleported(currentHexLabel))
+            if (getTeleported())
             {
                 getPlayer().setTeleported(false);
             }
@@ -697,8 +692,6 @@ final class Legion implements Comparable
 
             moved = false;
             Log.event("Legion " + getLongMarkerName() + " undoes its move");
-
-            clearAllHexInfo();
 
             Set set = new HashSet();
             set.add(currentHexLabel);
@@ -837,161 +830,26 @@ final class Legion implements Comparable
     }
 
 
-    // Track entry side and teleport information for a MasterHex.
-    final class HexInfo
+    void setEntrySide(int entrySide)
     {
-        String hexLabel;
-        TreeSet entrySides = new TreeSet();  // Holds Integers.
-        boolean teleported;
-
-        HexInfo AICopy()
-        {
-            HexInfo newHexInfo = new HexInfo();
-            // Strings and Integers are immutable.
-            newHexInfo.hexLabel = hexLabel;
-            newHexInfo.entrySides = (TreeSet)entrySides.clone();
-            newHexInfo.teleported = teleported;
-            return newHexInfo;
-        }
-
-        void setEntrySide(int side)
-        {
-            entrySides.add(new Integer(side));
-        }
-
-        int getNumEntrySides()
-        {
-            return entrySides.size();
-        }
-
-        boolean canEnterViaSide(int side)
-        {
-            return entrySides.contains(new Integer(side));
-        }
-
-        boolean canEnterViaLand()
-        {
-            return !entrySides.isEmpty();
-        }
-
-        /** Return the entry side.  If there are none or more than one,
-         *  return -1. */
-        int getEntrySide()
-        {
-            if (entrySides.size() != 1)
-            {
-                return -1;
-            }
-            else
-            {
-                return ((Integer)entrySides.first()).intValue();
-            }
-        }
-
-        void clearAllEntrySides()
-        {
-            entrySides.clear();
-        }
-
-        boolean getTeleported()
-        {
-            return teleported;
-        }
-
-        void setTeleported(boolean teleported)
-        {
-            this.teleported = teleported;
-        }
+        this.entrySide = entrySide;
     }
 
-    /** If the indicated hex has exactly one entry side, return it.
-     *  Otherwise return -1. */
-    int getEntrySide(String hexLabel)
+    int getEntrySide()
     {
-        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
-        if (hexInfo == null)
-        {
-            return -1;
-        }
-        return hexInfo.getEntrySide();
+        return entrySide;
     }
 
-    void setEntrySide(String hexLabel, int entrySide)
+    boolean getTeleported()
     {
-        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
-        if (hexInfo == null)
-        {
-            hexInfo = new HexInfo();
-        }
-        hexInfo.setEntrySide(entrySide);
-        hexInfoMap.put(hexLabel, hexInfo);
+        return teleported;
     }
 
-    int getNumEntrySides(String hexLabel)
+    void setTeleported(boolean teleported)
     {
-        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
-        if (hexInfo == null)
-        {
-            return 0;
-        }
-        return hexInfo.getNumEntrySides();
+        this.teleported = teleported;
     }
 
-    boolean canEnterViaSide(String hexLabel, int side)
-    {
-        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
-        if (hexInfo == null)
-        {
-            return false;
-        }
-        return hexInfo.canEnterViaSide(side);
-    }
-
-    boolean canEnterViaLand(String hexLabel)
-    {
-        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
-        if (hexInfo == null)
-        {
-            return false;
-        }
-        return hexInfo.canEnterViaLand();
-    }
-
-    void clearAllEntrySides(String hexLabel)
-    {
-        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
-        if (hexInfo != null)
-        {
-            hexInfo.clearAllEntrySides();
-        }
-    }
-
-    void clearAllHexInfo()
-    {
-        hexInfoMap.clear();
-    }
-
-
-    boolean getTeleported(String hexLabel)
-    {
-        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
-        if (hexInfo == null)
-        {
-            return false;
-        }
-        return hexInfo.getTeleported();
-    }
-
-    void setTeleported(String hexLabel, boolean teleported)
-    {
-        HexInfo hexInfo = (HexInfo)hexInfoMap.get(hexLabel);
-        if (hexInfo == null)
-        {
-            hexInfo = new HexInfo();
-        }
-        hexInfo.setTeleported(teleported);
-        hexInfoMap.put(hexLabel, hexInfo);
-    }
 
     /** convenience method for AI */
     void addCreature(Creature creature)

@@ -24,6 +24,7 @@ final class GUIMasterHex extends MasterHex
     /** Terrain name in upper case. */
     private String name;
     private GeneralPath innerHexagon;
+    private Color selectColor = Color.white;
 
 
     // The hex vertexes are numbered like this:
@@ -133,7 +134,7 @@ final class GUIMasterHex extends MasterHex
 
         if (isSelected())
         {
-            g2.setColor(Color.white);
+            g2.setColor(selectColor);
             g2.fill(hexagon);
 
             // Fill inscribed hexagon with the terrain color.
@@ -421,5 +422,23 @@ final class GUIMasterHex extends MasterHex
     boolean isInverted()
     {
         return inverted;
+    }
+
+
+    void setSelectColor(Color color)
+    {
+        this.selectColor = color;
+    }
+
+    void select()
+    {
+        super.select();
+        selectColor = Color.white;
+    }
+
+    void unselect()
+    {
+        super.unselect();
+        selectColor = Color.white;
     }
 }

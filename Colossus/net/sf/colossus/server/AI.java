@@ -41,7 +41,8 @@ interface AI
     void battleMove(Game game);
 
     /** pick an entry side */
-    int pickEntrySide(String hexLabel, Legion legion, Game game);
+    int pickEntrySide(String hexLabel, Legion legion, Game game,
+        boolean left, boolean bottom, boolean right);
 
     /** pick an engagement to resolve */
     String pickEngagement(Game game);

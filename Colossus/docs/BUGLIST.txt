@@ -101,6 +101,10 @@ Negotiation is broken and disabled.
 
 Red battle hex highlighting clashes with volcano.
 
+Save game in first turn's move phase, after rolling 6.  Load game, 
+   movement roll shows up as -1 in title, no die shown, but works 
+   as 6.
+
 
 AI bugs:
 

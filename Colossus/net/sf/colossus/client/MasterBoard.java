@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.io.*;
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Creature;
@@ -1315,10 +1316,18 @@ public final class MasterBoard extends JPanel
     /** Select hexes where this legion can move. */
     private void highlightMoves(String markerId)
     {
-        Set set = client.listMoves(markerId);
         unselectAllHexes();
-        selectHexesByLabels(set);
-        showBestRecruit(markerId, set);
+
+        Set teleport = client.listTeleportMoves(markerId);
+        selectHexesByLabels(teleport, HTMLColor.purple);
+
+        Set normal = client.listNormalMoves(markerId);
+        selectHexesByLabels(normal, Color.white);
+
+        Set combo = new HashSet();
+        combo.addAll(teleport);
+        combo.addAll(normal);
+        showBestRecruit(markerId, combo);
     }
 
 
@@ -1520,6 +1529,21 @@ public final class MasterBoard extends JPanel
             if (!hex.isSelected() && labels.contains(hex.getLabel()))
             {
                 hex.select();
+                hex.repaint();
+            }
+        }
+    }
+
+    void selectHexesByLabels(Set labels, Color color)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            GUIMasterHex hex = (GUIMasterHex)it.next();
+            if (labels.contains(hex.getLabel()))
+            {
+                hex.select();
+                hex.setSelectColor(color);
                 hex.repaint();
             }
         }

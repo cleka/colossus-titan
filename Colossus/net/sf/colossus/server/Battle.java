@@ -64,18 +64,16 @@ final class Battle
 
         // Set defender's entry side opposite attacker's.
         Legion attacker = getAttacker();
-        int side = attacker.getEntrySide(masterHexLabel);
+        int side = attacker.getEntrySide();
         // XXX If invalid, default to 3, which is always valid.
         if (side == -1)
         {
             Log.warn("Fixing bogus entry side!");
             side = 3;
-            attacker.clearAllEntrySides(masterHexLabel);
-            attacker.setEntrySide(masterHexLabel, side);
+            attacker.setEntrySide(side);
         }
         Legion defender = getDefender();
-        defender.clearAllEntrySides(masterHexLabel);
-        defender.setEntrySide(masterHexLabel, (side + 3) % 6);
+        defender.setEntrySide((side + 3) % 6);
 
         Log.event(attacker.getLongMarkerName() + " (" +
             attacker.getPlayerName() + ") attacks " +
@@ -91,7 +89,7 @@ final class Battle
     private void placeLegion(Legion legion)
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
-            legion.getEntrySide(masterHexLabel));
+            legion.getEntrySide());
         String entranceLabel = entrance.getLabel();
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
@@ -117,7 +115,7 @@ final class Battle
     private void placeCritter(Critter critter)
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
-            critter.getLegion().getEntrySide(masterHexLabel));
+            critter.getLegion().getEntrySide());
         String entranceLabel = entrance.getLabel();
         critter.addBattleInfo(entranceLabel, entranceLabel, this);
     }

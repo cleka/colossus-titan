@@ -39,7 +39,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
     public static final String byColor = "<By color>";
     public static final String username = System.getProperty("user.name",
         byColor);
-    private static String [] typeChoices = null;;
+    private static String [] typeChoices = null;
     private static String [] nameChoices = { byColor, username, none };
 
     private JFrame parentFrame;

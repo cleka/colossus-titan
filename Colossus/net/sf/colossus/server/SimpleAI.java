@@ -278,8 +278,8 @@ class SimpleAI implements AI
 
                 for (int roll = 1; roll <= 6; roll++)
                 {
-                    Set moves = game.listMoves(legion, true,
-                        legion.getCurrentHex(), roll, false, false);
+                    Set moves = game.listAllMoves(legion, 
+                        legion.getCurrentHex(), roll, false);
                     int safeMoves = 0;
                     Iterator moveIt = moves.iterator();
                     while (moveIt.hasNext())
@@ -778,7 +778,8 @@ class SimpleAI implements AI
                 // find the best move (1-ply search)
                 MasterHex bestHex = null;
                 int bestValue = Integer.MIN_VALUE;
-                Set set = game.listMoves(legion, true, false, false);
+                Set set = game.listAllMoves(legion, legion.getCurrentHex(),
+                    legion.getPlayer().getMovementRoll(), false);
 
                 for (Iterator moveIterator = set.iterator();
                     moveIterator.hasNext();)
@@ -801,7 +802,11 @@ class SimpleAI implements AI
                 // if we found a move that's better than sitting still, move
                 if (bestValue > sitStillMove.value)
                 {
-                    if (game.doMove(legion.getMarkerId(), bestHex.getLabel()))
+                    // XXX Need to track entrySide and teleport
+                    int entrySide = -1;
+                    boolean teleport = false;
+                    if (game.doMove(legion.getMarkerId(), bestHex.getLabel(),
+                        entrySide, teleport))
                     {
                         moved = true;
                         // Break out of the move loop and start over with
@@ -830,7 +835,7 @@ class SimpleAI implements AI
             List friendlyLegions = game.getFriendlyLegions(hexLabel, player);
 
             outer: while (friendlyLegions.size() > 1 &&
-                game.countConventionalMoves(legion) > 0)
+                legion.hasConventionalMove())
             {
                 // Pick the legion in this hex whose best move has the
                 // least difference with its sitStillValue, scaled by
@@ -875,14 +880,18 @@ class SimpleAI implements AI
                             + " to " + move.hex + " taking penalty "
                             + move.difference
                             + " in order to handle illegal legion " + legion);
+
+                    // XXX Need to track entrySide and teleport
+                    int entrySide = -1;
+                    boolean teleport = false;
                     game.doMove(move.legion.getMarkerId(),
-                        move.hex.getLabel());
+                        move.hex.getLabel(), entrySide, teleport);
 
                     // check again if this legion is ok; if so, break
                     friendlyLegions = game.getFriendlyLegions(hexLabel,
                         player);
-                    if (friendlyLegions.size() > 1
-                        && game.countConventionalMoves(legion) > 0)
+                    if (friendlyLegions.size() > 1 && 
+                        legion.hasConventionalMove())
                     {
                         continue;
                     }
@@ -946,7 +955,13 @@ class SimpleAI implements AI
             Log.debug("forced to move " + move.legion + " to " + move.hex
                     + " taking penalty " + move.difference
                     + " in order to handle illegal legion " + move.legion);
-            game.doMove(move.legion.getMarkerId(), move.hex.getLabel());
+
+            // XXX Need to track entrySide and teleport
+            int entrySide = -1;
+            boolean teleport = false;
+
+            game.doMove(move.legion.getMarkerId(), move.hex.getLabel(),
+                entrySide, teleport);
         }
     }
 
@@ -984,8 +999,8 @@ class SimpleAI implements AI
                 for (int roll = 1; roll <= 6; roll++)
                 {
                     // count the moves he can get to
-                    Set set = game.listMoves(legion, false,
-                            legion.getCurrentHex(), roll, false, false);
+                    Set set = game.listAllMoves(legion, legion.getCurrentHex(),
+                        roll, false);
                     Iterator moveIt = set.iterator();
                     while (moveIt.hasNext())
                     {
@@ -1272,7 +1287,7 @@ class SimpleAI implements AI
 
         for (int roll = 1; roll <= 6; roll++)
         {
-            Set moves = game.listMoves(legion, true, hex, roll, false, true);
+            Set moves = game.listAllMoves(legion, hex, roll, true);
             int bestRecruitVal = 0;
             Creature bestRecruit = null;
 
@@ -1614,15 +1629,22 @@ class SimpleAI implements AI
         return;
     }
 
-    public int pickEntrySide(String hexLabel, Legion legion, Game game)
+    // This is a really dumb placeholder.  TODO Make it smarter.
+    public int pickEntrySide(String hexLabel, Legion legion, Game game,
+        boolean left, boolean bottom, boolean right)
     {
-        // This is a really dumb placeholder.  TODO Make it smarter.
-        for (int i = 1; i <= 5; i += 2)
+        // Default to bottom to simplify towers.
+        if (bottom)
         {
-            if (legion.canEnterViaSide(hexLabel, i))
-            {
-                return i;
-            }
+            return 3;
+        }
+        if (left)
+        {
+            return 5;
+        }
+        if (right)
+        {
+            return 1;
         }
         return -1;
     }
@@ -2682,7 +2704,7 @@ class SimpleAI implements AI
         }
 
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
-            legion.getEntrySide(masterHexLabel));
+            legion.getEntrySide());
 
         // Reward titans sticking to the edges of the back row
         // surrounded by allies.  We need to relax this in the

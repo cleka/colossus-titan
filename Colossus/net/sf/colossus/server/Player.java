@@ -425,7 +425,7 @@ public final class Player implements Comparable
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            if (game.countConventionalMoves(legion) > 0)
+            if (legion.hasConventionalMove())
             {
                 count++;
             }
@@ -494,20 +494,6 @@ public final class Player implements Comparable
 
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
-
-        clearAllHexInfo();
-    }
-
-    /** Clear entry side and teleport information from all of this
-     *  player's legions. */
-    void clearAllHexInfo()
-    {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            legion.clearAllHexInfo();
-        }
     }
 
 
@@ -535,12 +521,6 @@ public final class Player implements Comparable
             Log.event(getName() + " takes a mulligan");
             mulligansLeft--;
             movementRoll = 0;
-
-            Iterator it = legions.iterator();
-            while (it.hasNext())
-            {
-                ((Legion)it.next()).clearAllHexInfo();
-            }
         }
     }
 
@@ -575,7 +555,7 @@ public final class Player implements Comparable
             Legion legion = (Legion)it.next();
             String hexLabel = legion.getCurrentHexLabel();
             if (game.getNumFriendlyLegions(hexLabel, this) > 1 &&
-                game.countConventionalMoves(legion) > 0)
+                legion.hasConventionalMove())
             {
                 return true;
             }
@@ -941,11 +921,13 @@ public final class Player implements Comparable
         }
     }
 
-    int aiPickEntrySide(String hexLabel, Legion legion)
+    int aiPickEntrySide(String hexLabel, Legion legion, boolean left, 
+        boolean bottom, boolean right)
     {
         if (game.getServer().getClientOption(name, Options.autoPickEntrySide))
         {
-            return ai.pickEntrySide(hexLabel, legion, game);
+            return ai.pickEntrySide(hexLabel, legion, game, left, bottom,
+                right);
         }
         return -1;
     }

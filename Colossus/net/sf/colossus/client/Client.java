@@ -44,7 +44,10 @@ public final class Client
      *  splits, moves, and recruits. */
     private LinkedList undoStack = new LinkedList();
 
+    // Information on the current moving legion.
     private String moverId;
+    private int entrySide;
+    private boolean teleport;
 
     /** The end of the list is on top in the z-order. */
     private java.util.List markers = new ArrayList();
@@ -785,7 +788,7 @@ public final class Client
 
     /** Present a dialog allowing the player to enter via land or teleport.
      *  Return true if the player chooses to teleport. */
-    public boolean chooseWhetherToTeleport()
+    private boolean chooseWhetherToTeleport()
     {
         String [] options = new String[2];
         options[0] = "Teleport";
@@ -794,7 +797,6 @@ public final class Client
             "Teleport?", JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
-        // If Teleport, then leave teleported set.
         return (answer == JOptionPane.YES_OPTION);
     }
 
@@ -835,14 +837,6 @@ public final class Client
         {
             JOptionPane.showMessageDialog(frame, message);
         }
-    }
-
-
-    public int pickEntrySide(String hexLabel, boolean left, boolean bottom,
-        boolean right)
-    {
-        return PickEntrySide.pickEntrySide(board.getFrame(), hexLabel, left,
-            bottom, right);
     }
 
 
@@ -1336,7 +1330,39 @@ public final class Client
 
     boolean doMove(String hexLabel)
     {
-        boolean moved = server.doMove(moverId, hexLabel);
+        if (moverId == null)
+        {
+            return false;
+        }
+
+        boolean teleport = false;
+
+        Set teleports = server.listTeleportMoves(moverId);
+        Set normals = server.listNormalMoves(moverId);
+        if (teleports.contains(hexLabel) && normals.contains(hexLabel))
+        {
+            teleport = chooseWhetherToTeleport();
+        }
+        else if (teleports.contains(hexLabel))
+        {
+            teleport = true;
+        }
+        else if (normals.contains(hexLabel))
+        {
+            teleport = false;
+        }
+        else
+        {
+            return false;
+        }
+
+        int entrySides = server.getPossibleEntrySides(moverId, hexLabel, 
+            teleport);
+
+        int entrySide = PickEntrySide.pickEntrySide(board.getFrame(),
+            hexLabel, entrySides);
+
+        boolean moved = server.doMove(moverId, hexLabel, entrySide, teleport);
         if (moved)
         {
             pushUndoStack(moverId);
@@ -1365,9 +1391,21 @@ public final class Client
     }
 
     /** Return a set of hexLabels. */
-    Set listMoves(String markerId)
+    Set listAllMoves(String markerId)
     {
-        return server.listMoves(markerId);
+        return server.listAllMoves(markerId);
+    }
+
+    /** Return a set of hexLabels. */
+    Set listTeleportMoves(String markerId)
+    {
+        return server.listTeleportMoves(markerId);
+    }
+
+    /** Return a set of hexLabels. */
+    Set listNormalMoves(String markerId)
+    {
+        return server.listNormalMoves(markerId);
     }
 
     java.util.List getAllLegionIds()

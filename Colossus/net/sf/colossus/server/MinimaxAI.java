@@ -44,7 +44,11 @@ class MinimaxAI extends SimpleAI implements AI
             Map.Entry entry = (Map.Entry)it.next();
             Legion legion = (Legion)entry.getKey();
             MasterHex hex = (MasterHex)entry.getValue();
-            game.doMove(legion.getMarkerId(), hex.getLabel());
+            // XXX Need to figure entrySide and teleport
+            int entrySide = -1;
+            boolean  teleport = false;
+            game.doMove(legion.getMarkerId(), hex.getLabel(), entrySide,
+                teleport);
         }
     }
 
@@ -220,12 +224,14 @@ class MinimaxAI extends SimpleAI implements AI
             // there and can't move.  Also two legions teleporting.)
 
             ArrayList allmoves = new ArrayList();
-            Iterator it = game.getActivePlayer().getLegions().iterator();
+            Player player = game.getActivePlayer();
+            Iterator it = player.getLegions().iterator();
             while (it.hasNext())
             {
                 Legion legion = (Legion)it.next();
 
-                Iterator it2 = game.listMoves(legion, true, false,
+                Iterator it2 = game.listAllMoves(legion, 
+                    legion.getCurrentHex(), player.getMovementRoll(), 
                     true).iterator();
                 while (it2.hasNext())
                 {
@@ -281,7 +287,12 @@ class MinimaxAI extends SimpleAI implements AI
                     MasterHex hex = (MasterHex)entry.getValue();
 
                     Log.debug("applymove: try " + legion + " to " + hex);
-                    game.doMove(legion.getMarkerId(), hex.getLabel());
+
+                    // XXX Need to figure entrySide and teleport
+                    int entrySide = -1;
+                    boolean  teleport = false;
+                    game.doMove(legion.getMarkerId(), hex.getLabel(),
+                        entrySide, teleport);
                 }
 
                 // advance phases until we reach the next move phase

@@ -697,16 +697,6 @@ public final class Server
     }
 
 
-    int pickEntrySide(String hexLabel, Legion legion)
-    {
-        Client client = getClient(legion.getPlayerName());
-        return client.pickEntrySide(hexLabel, 
-            legion.canEnterViaSide(hexLabel, 5),
-            legion.canEnterViaSide(hexLabel, 3),
-            legion.canEnterViaSide(hexLabel, 1));
-    }
-
-
     String pickLord(Legion legion)
     {
         Client client = getClient(legion.getPlayerName());
@@ -1275,9 +1265,10 @@ public final class Server
         return game.doSplit(markerId);
     }
 
-    public boolean doMove(String markerId, String hexLabel)
+    public boolean doMove(String markerId, String hexLabel, int entrySide,
+        boolean teleport)
     {
-        return game.doMove(markerId, hexLabel);
+        return game.doMove(markerId, hexLabel, entrySide, teleport);
     }
 
     /** Return a list of Creatures. */
@@ -1300,10 +1291,38 @@ public final class Server
     }
 
     /** Return a set of hexLabels. */
-    public Set listMoves(String markerId)
+    public Set listAllMoves(String markerId)
     {
-        return game.listMoves(markerId);
+        Legion legion = game.getLegionByMarkerId(markerId);
+        return game.listAllMoves(legion, legion.getCurrentHex(),
+            legion.getPlayer().getMovementRoll(), false);
     }
+
+    /** Return a set of hexLabels. */
+    public Set listTeleportMoves(String markerId)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        return game.listTeleportMoves(legion, legion.getCurrentHex(),
+            legion.getPlayer().getMovementRoll(), false);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set listNormalMoves(String markerId)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        return game.listNormalMoves(legion, legion.getCurrentHex(),
+            legion.getPlayer().getMovementRoll(), false);
+    }
+
+
+    /** Return an int which is all possible entry sides (1, 3, 5)
+     *  added together. */
+    public int getPossibleEntrySides(String markerId, String hexLabel,
+        boolean teleport)
+    {
+        return game.getPossibleEntrySides(markerId, hexLabel, teleport);
+    }
+
 
     public List getAllLegionIds()
     {
@@ -1362,12 +1381,6 @@ public final class Server
         return client.pickMarker(markersAvailable);
     }
 
-
-    boolean chooseWhetherToTeleport(String playerName)
-    {
-        Client client = getClient(playerName);
-        return client.chooseWhetherToTeleport();
-    }
 
     void setPlayerName(int i, String name)
     {
