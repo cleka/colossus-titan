@@ -23,7 +23,6 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
     {
         super(parentFrame, "Split Legion " + oldLegion.markerId, true);
 
-        setLocation(new Point(scale, 4 * scale));
         setLayout(null);
 
         this.oldLegion = oldLegion;
@@ -33,6 +32,10 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
 
         PickMarker pickmarker = new PickMarker(parentFrame, player);
         setSize((21 * scale / 20) * (oldLegion.height + 1), 7 * scale / 2);
+
+         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
+             - getSize().height / 2));
 
         // If there were no markers left to pick, exit.
         if (player.markerSelected == null)

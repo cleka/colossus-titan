@@ -34,14 +34,17 @@ class PickMarker extends Dialog implements MouseListener
 
             int scale = 60;
             setLayout(null);
-            setLocation(new Point(scale, 4 * scale));
-            setSize((21 * scale / 20) * (Math.max(12, 
+
+            setSize((21 * scale / 20) * (Math.min(12, 
                 player.numMarkersAvailable) + 1), (21 * scale / 20) * 
                 ((player.numMarkersAvailable - 1) / 12 + 2));
+            
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
+                - getSize().height / 2));
 
             int cx = scale / 2;
             int cy = scale * 2 / 3;
-
 
             for (int i = 0; i < player.numMarkersAvailable; i++)
             {
