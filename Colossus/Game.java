@@ -13,7 +13,9 @@ class Game extends Frame implements WindowListener, ActionListener
     int numPlayers;
     Player [] player;
     MasterBoard masterboard;
-    int turn = 0;
+    int activePlayer = 0;
+    int turnNumber = 1;
+    int phase = 1;   // 1 = split  2 = move  3 = fight  4 = muster 
 
     TextField [] tf = new TextField[6];
     int currentColor;  // state holder during color choice
@@ -44,12 +46,12 @@ class Game extends Frame implements WindowListener, ActionListener
             add(tf[i]);
         }
         
-        Button b1 = new Button("OK");
-        add(b1);
-        b1.addActionListener(this);
-        Button b2 = new Button("Quit");
-        add(b2);
-        b2.addActionListener(this);
+        Button button1 = new Button("OK");
+        add(button1);
+        button1.addActionListener(this);
+        Button button2 = new Button("Quit");
+        add(button2);
+        button2.addActionListener(this);
 
         pack();
         setVisible(true);
@@ -186,15 +188,15 @@ class Game extends Frame implements WindowListener, ActionListener
             colorButton[i].addActionListener(this);
         }
 
-        Button b1 = new Button("Done");
-        add(b1);
-        b1.addActionListener(this);
-        Button b2 = new Button("Restart");
-        add(b2);
-        b2.addActionListener(this);
-        Button b3 = new Button("Quit");
-        add(b3);
-        b3.addActionListener(this);
+        Button button1 = new Button("Done");
+        add(button1);
+        button1.addActionListener(this);
+        Button button2 = new Button("Restart");
+        add(button2);
+        button2.addActionListener(this);
+        Button button3 = new Button("Quit");
+        add(button3);
+        button3.addActionListener(this);
 
         setSize(230, 50 * numPlayers + 100);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
