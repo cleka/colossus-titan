@@ -20,7 +20,7 @@ public final class Player implements Comparable
     private Game game;
     private String name;
     private String color;              // Black, Blue, Brown, Gold, Green, Red
-    private int startingTower;         // 1-6
+    private String startingTower;      // hex label
     private double score;              // track half-points, then round
     private boolean summoned;
     private boolean teleported;
@@ -204,12 +204,12 @@ public final class Player implements Comparable
     }
 
 
-    void setTower(int startingTower)
+    void setTower(String startingTower)
     {
         this.startingTower = startingTower;
     }
 
-    int getTower()
+    String getTower()
     {
         return startingTower;
     }
@@ -222,7 +222,7 @@ public final class Player implements Comparable
         if (object instanceof Player)
         {
             Player other = (Player)object;
-            return (other.getTower() - this.getTower());
+            return (other.getTower().compareTo(this.getTower()));
         }
         else
         {
@@ -958,7 +958,7 @@ public final class Player implements Comparable
         buf.append(':');
         buf.append(name);
         buf.append(':');
-        buf.append(100 * getTower());
+        buf.append(getTower());
         buf.append(':');
         buf.append(getColor());
         buf.append(':');

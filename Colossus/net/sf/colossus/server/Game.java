@@ -187,7 +187,6 @@ public final class Game
             Log.event("Add " + type + " player " + name);
         }
 
-
         // We need to set the autoPlay option before loading the board,
         // so that we can avoid showing boards for AI players.
 
@@ -330,47 +329,33 @@ public final class Game
         }
     }
 
-
     /** Randomize towers by rolling dice and rerolling ties. */
     private void assignTowers()
     {
         int numPlayers = getNumPlayers();
-        int [] playerTower = new int[numPlayers];
-        int [] rolls = new int[numPlayers];
+        String[] playerTower = new String[numPlayers];
+        Set towerSet = MasterBoard.getTowerSet();
+        java.util.List towerList = new ArrayList();
 
-        final int UNASSIGNED = 0;
-        for (int i = 0; i < numPlayers; i++)
-        {
-            playerTower[i] = UNASSIGNED;
+        Iterator it = towerSet.iterator();
+        while (it.hasNext())
+        { // first, fill the list with all Label
+            towerList.add(it.next());
         }
 
-        int playersLeft = numPlayers;
-        while (playersLeft > 0)
-        {
-            for (int i = 0; i < numPlayers; i++)
-            {
-                if (playerTower[i] == UNASSIGNED)
-                {
-                    rolls[i] = rollDie();
-                }
-            }
+        int playersLeft = numPlayers - 1;
 
-            outer:
-            for (int i = 0; i < numPlayers; i++)
+        while ((playersLeft >= 0) && (!towerList.isEmpty()))
+        {
+            int which = rollDie(towerList.size());
+            it = towerList.iterator();
+            for (int i = 1; i < which ; i++)
             {
-                if (playerTower[i] == UNASSIGNED)
-                {
-                    for (int j = 0; j < numPlayers; j++)
-                    {
-                        if (i != j && rolls[i] == rolls[j])
-                        {
-                            continue outer;
-                        }
-                    }
-                    playerTower[i] = rolls[i];
-                    playersLeft--;
-                }
+                Object o = it.next();
             }
+            playerTower[playersLeft] = (String)it.next();
+            it.remove();
+            playersLeft--;
         }
 
         for (int i = 0; i < numPlayers; i++)
@@ -381,12 +366,10 @@ public final class Game
         }
     }
 
-
     Caretaker getCaretaker()
     {
         return caretaker;
     }
-
 
     Server getServer()
     {
@@ -1053,8 +1036,7 @@ public final class Game
                 String color = in.readLine();
                 player.setColor(color);
 
-                buf = in.readLine();
-                int tower = Integer.parseInt(buf);
+                String tower= in.readLine();
                 player.setTower(tower);
 
                 buf = in.readLine();
@@ -1588,6 +1570,10 @@ public final class Game
     {
         return random.nextInt(6) + 1;
     }
+    static int rollDie(int size)
+    {
+        return random.nextInt(size) + 1;
+    }
 
 
     private void placeInitialLegion(Player player, String markerId)
@@ -1597,7 +1583,7 @@ public final class Game
         Log.event(name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
-        String hexLabel = (String.valueOf(100 * player.getTower()));
+        String hexLabel = player.getTower();
 
         caretaker.takeOne(Creature.getCreatureByName("Titan"));
         caretaker.takeOne(Creature.getCreatureByName("Angel"));
