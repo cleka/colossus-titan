@@ -1,3 +1,5 @@
+Change Turn and BattleTurn into JToolbars.
+
 Use splitFrom instead of legions(0) to determine parent legion
    in hex with a split.  
 Highlight selected legion better. 
