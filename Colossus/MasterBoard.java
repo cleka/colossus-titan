@@ -14,7 +14,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
     WindowListener, ItemListener
 {
     private static ArrayList hexes = new ArrayList();
-    private static LinkedList markers = new LinkedList();
 
     public static final boolean[][] show =
     {
@@ -1414,26 +1413,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public void clearLegions()
-    {
-        markers.clear();
-
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            MasterHex hex = (MasterHex)it.next();
-            hex.clearLegions();
-            hex.unselect();
-        }
-
-        repaint();
-    }
-
-
+    /** Create markers for all existing legions. */
     public void loadInitialMarkerImages()
     {
-        Collection legions = game.getAllLegions();
-        for (Iterator it = legions.iterator(); it.hasNext();)
+        Iterator it = game.getAllLegions().iterator();
+        while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
             int chitScale = 3 * scale;
@@ -1445,10 +1429,100 @@ public final class MasterBoard extends JPanel implements MouseListener,
             Marker marker = new Marker(chitScale, legion.getImageName(),
                 this, game);
             legion.setMarker(marker);
-            MasterHex hex = legion.getCurrentHex();
-            hex.alignLegions();
-            moveMarkerToBottom(legion);
+            String hexLabel = legion.getCurrentHexLabel();
+            alignLegions(hexLabel);
         }
+    }
+
+
+    public void alignLegions(String hexLabel)
+    {
+        MasterHex hex = getHexFromLabel(hexLabel);
+        ArrayList markerIds = game.getLegionMarkerIds(hexLabel);
+        Player player = game.getActivePlayer();
+        if (player == null)
+        {
+            return;
+        }
+
+        // Put the current player's legions first.
+        Collections.sort(markerIds, player.getMarkerComparator());
+
+        int numLegions = markerIds.size();
+        if (numLegions == 0)
+        {
+            hex.repaint();
+            return;
+        }
+
+        String markerId = (String)markerIds.get(0);
+        Legion legion = game.getLegionByMarkerId(markerId);
+        Marker marker = legion.getMarker();
+        if (marker == null)
+        {
+            hex.repaint();
+            return;
+        }
+
+        int chitScale = marker.getBounds().width;
+        Point startingPoint = hex.getOffCenter();
+        Point point = new Point(startingPoint);
+
+        if (numLegions == 1)
+        {
+            // Place legion in the center of the hex.
+            int chitScale2 = chitScale / 2;
+            point.x -= chitScale2;
+            point.y -= chitScale2;
+            marker.setLocation(point);
+        }
+        else if (numLegions == 2)
+        {
+            // Place legions in NW and SE corners.
+            int chitScale4 = chitScale / 4;
+            point.x -= 3 * chitScale4;
+            point.y -= 3 * chitScale4;
+            marker.setLocation(point);
+
+            point = new Point(startingPoint);
+            point.x -= chitScale4;
+            point.y -= chitScale4;
+            markerId = (String)markerIds.get(1);
+            legion = game.getLegionByMarkerId(markerId);
+            marker = legion.getMarker();
+            if (marker != null)
+            {
+                // Second marker can be null when loading during
+                // the engagement phase.
+                marker.setLocation(point);
+            }
+        }
+        else if (numLegions == 3)
+        {
+            // Place legions in NW, SE, NE corners.
+            int chitScale4 = chitScale / 4;
+            point.x -= 3 * chitScale4;
+            point.y -= 3 * chitScale4;
+            marker.setLocation(point);
+
+            point = new Point(startingPoint);
+            point.x -= chitScale4;
+            point.y -= chitScale4;
+            markerId = (String)markerIds.get(1);
+            legion = game.getLegionByMarkerId(markerId);
+            marker = legion.getMarker();
+            marker.setLocation(point);
+
+            point = new Point(startingPoint);
+            point.x -= chitScale4;
+            point.y -= chitScale;
+            markerId = (String)markerIds.get(2);
+            legion = game.getLegionByMarkerId(markerId);
+            marker = legion.getMarker();
+            marker.setLocation(point);
+        }
+
+        hex.repaint();
     }
 
 
@@ -1546,16 +1620,23 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
 
     /** Return the topmost Legion whose marker contains the given point,
-     *  or null if none does. */
+     *  or null if none does.  If legions overlap, the active player's
+     *  legion is checked first. */
     private Legion getLegionAtPoint(Point point)
     {
-        Iterator it = markers.iterator();
+        Player player = game.getActivePlayer();
+        ArrayList legions = new ArrayList();
+        legions.addAll(player.getLegions());
+        legions.addAll(game.getAllEnemyLegions(player));
+
+        Iterator it = legions.iterator();
         while (it.hasNext())
         {
-            Marker marker = (Marker)it.next();
+            Legion legion = (Legion)it.next();
+            Marker marker = legion.getMarker();
             if (marker != null && marker.contains(point))
             {
-                return game.getLegionByMarkerId(marker.getId());
+                return legion;
             }
         }
         return null;
@@ -1647,7 +1728,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
         while (it.hasNext())
         {
             MasterHex hex = (MasterHex)it.next();
-            if (hex.getNumFriendlyLegions(player) == 0)
+            String hexLabel = hex.getLabel();
+            if (game.getNumFriendlyLegions(hexLabel, player) == 0)
             {
                 hex.clearAllEntrySides();
                 hex.setTeleported(false);
@@ -1665,32 +1747,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
             MasterHex hex = (MasterHex)it.next();
             hex.clearAllEntrySides();
             hex.setTeleported(false);
-        }
-    }
-
-
-    public void moveMarkerToTop(Legion legion)
-    {
-        Marker marker = legion.getMarker();
-        markers.remove(marker);
-        markers.add(0, marker);
-    }
-
-
-    public void moveMarkerToBottom(Legion legion)
-    {
-        Marker marker = legion.getMarker();
-        markers.remove(marker);
-        markers.add(marker);
-    }
-
-
-    public void removeMarker(Legion legion)
-    {
-        if (legion != null)
-        {
-            Marker marker = legion.getMarker();
-            markers.remove(marker);
         }
     }
 
@@ -1718,7 +1774,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             Player player = legion.getPlayer();
 
             // Move the clicked-on legion to the top of the z-order.
-            moveMarkerToTop(legion);
+            player.moveToTop(legion);
 
             // What to do depends on which mouse button was used
             // and the current phase of the turn.
@@ -1758,7 +1814,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
 
             // Otherwise, the action to take depends on the phase.
-            game.actOnHex(hex);
+            game.actOnHex(hex.getLabel());
             hex.repaint();
             return;
         }
@@ -1855,12 +1911,20 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
         }
 
-        // Paint markers in reverse order.
-        ListIterator lit = markers.listIterator(markers.size());
+        // Paint markers in reverse order.  The active player's
+        // markers are painted last.
+        Player player = game.getActivePlayer();
+        ArrayList legions = new ArrayList();
+        legions.addAll(player.getLegions());
+        legions.addAll(game.getAllEnemyLegions(player));
+
+        ListIterator lit = legions.listIterator(legions.size());
         while (lit.hasPrevious())
         {
-            Marker marker = (Marker)lit.previous();
-            if (marker != null && rectClip.intersects(marker.getBounds()))
+            Legion legion = (Legion)lit.previous();
+            Marker marker = legion.getMarker();
+            if (marker != null && rectClip.intersects(
+                legion.getCurrentHex().getBounds()))
             {
                 marker.paintComponent(g);
             }

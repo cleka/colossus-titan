@@ -13,9 +13,6 @@ public final class BattleHex extends Hex
     private HexMap map;
     private String name;
 
-    /** Normal hexes hold only one creature, but entrances can hold up to 7. */
-    private ArrayList critters = new ArrayList(7);
-
     /** Valid elevations are 0, 1, and 2. */
     private int elevation;
 
@@ -39,9 +36,9 @@ public final class BattleHex extends Hex
     // Letters increase left to right; numbers increase bottom to top.
 
     /** Movement costs */
-    private static final int IMPASSIBLE_COST = 99;
-    private static final int SLOW_COST = 2;
-    private static final int NORMAL_COST = 1;
+    public static final int IMPASSIBLE_COST = 99;
+    public static final int SLOW_COST = 2;
+    public static final int NORMAL_COST = 1;
 
 
 
@@ -302,73 +299,6 @@ public final class BattleHex extends Hex
     }
 
 
-    public int getNumCritters()
-    {
-        return critters.size();
-    }
-
-
-    public boolean isOccupied()
-    {
-        return (!critters.isEmpty());
-    }
-
-
-    public void addCritter(Critter critter)
-    {
-        critters.add(critter);
-        alignChits();
-    }
-
-
-    public void removeCritter(Critter critter)
-    {
-        critters.remove(critter);
-        alignChits();
-    }
-
-
-    public Critter getCritter()
-    {
-        if (critters.size() > 0)
-        {
-            return (Critter)critters.get(0);
-        }
-        return null;
-    }
-
-
-    private void alignChits()
-    {
-        if (critters.isEmpty())
-        {
-            return;
-        }
-
-        Point point = new Point(center);
-
-        int chitScale = map.getChitScale();
-
-        // Cascade chits diagonally.
-        int chitScale4 = chitScale / 4;
-        int offset = (chitScale * (1 + (critters.size()))) / 4;
-        point.x -= offset;
-        point.y -= offset;
-
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            BattleChit chit = critter.getChit();
-            chit.setLocation(point);
-            point.x += chitScale4;
-            point.y += chitScale4;
-        }
-
-        repaint();
-    }
-
-
     public String getTerrainName()
     {
         switch (getTerrain())
@@ -450,8 +380,8 @@ public final class BattleHex extends Hex
         }
         return false;
     }
-    
-    
+
+
     public boolean isNonNativePenaltyTerrain()
     {
         char t = getTerrain();
@@ -604,13 +534,14 @@ public final class BattleHex extends Hex
     /** Return the number of movement points it costs to enter this hex.
      *  For fliers, this is the cost to land in this hex, not fly over it.
      *  If entry is illegal, just return a cost greater than the maximum
-     *  possible number of movement points. */
+     *  possible number of movement points. This caller is responsible
+     *  for checking to see if this hex is already occupied. */
     public int getEntryCost(Creature creature, int cameFrom)
     {
         char terrain = getTerrain();
 
         // Check to see if the hex is occupied or totally impassable.
-        if (isOccupied() || terrain == 't' || (terrain == 'v' &&
+        if (terrain == 't' || (terrain == 'v' &&
             !creature.getName().equals("Dragon")) || (terrain == 'o' &&
             !creature.isNativeBog()))
         {
@@ -648,11 +579,5 @@ public final class BattleHex extends Hex
 
         // Other hexes only cost 1.
         return NORMAL_COST;
-    }
-
-
-    public static void main(String [] args)
-    {
-        BattleMap.main(args);
     }
 }

@@ -101,8 +101,6 @@ public final class Battle
         newBattle.turnNumber = turnNumber;
         newBattle.phase = phase;
 
-        // XXX We'd really like to not have to copy the map, but its
-        // battle reference needs to point to newBattle.
         newBattle.map = map.AICopy();
         newBattle.map.setBattle(newBattle);
 
@@ -348,8 +346,12 @@ public final class Battle
                     {
                         phase = RECRUIT;
                         setupRecruit();
-                        Game.logEvent(getActivePlayer().getName() +
+                        Player player = getActivePlayer();
+                        if (player != null)
+                        {
+                            Game.logEvent(player.getName() +
                             "'s battle turn, number " + turnNumber);
+                        }
                     }
                 }
             }
@@ -567,8 +569,17 @@ public final class Battle
                 {
                     int reverseDir = (i + 3) % 6;
 
-                    int entryCost = neighbor.getEntryCost(creature,
-                        reverseDir);
+                    int entryCost;
+                    if (isOccupied(neighbor))
+                    {
+                        entryCost = BattleHex.IMPASSIBLE_COST;
+                    }
+                    else
+                    {
+                        entryCost = neighbor.getEntryCost(creature,
+                            reverseDir);
+                    }
+
                     if (entryCost <= movesLeft)
                     {
                         // Mark that hex as a legal move.
@@ -606,14 +617,14 @@ public final class Battle
 
         BattleHex centerHex = map.getCenterHex();
 
-        if (!centerHex.isOccupied())
+        if (!isOccupied(centerHex))
         {
             set.add(centerHex.getLabel());
         }
         for (int i = 0; i < 6; i++)
         {
             BattleHex hex = centerHex.getNeighbor(i);
-            if (!hex.isOccupied())
+            if (!isOccupied(hex))
             {
                 set.add(hex.getLabel());
             }
@@ -857,10 +868,8 @@ public final class Battle
         //    during the strike phase.
         if (getTerrain() == 't' && phase == FIGHT &&
             !driftDamageApplied)
-        for (int i = DEFENDER; i <= ATTACKER; i++)
         {
-            Legion legion = getLegion(i);
-            Iterator it = legion.getCritters().iterator();
+            Iterator it = getAllCritters().iterator();
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
@@ -989,12 +998,10 @@ public final class Battle
                     }
 
                     BattleHex hex = critter.getCurrentHex();
-                    hex.removeCritter(critter);
-                    hex.repaint();
-
                     // Remove critter from iterator rather than list to
                     // prevent concurrent modification problems.
                     it.remove();
+                    hex.repaint();
                 }
                 else  // critter is alive
                 {
@@ -1157,8 +1164,7 @@ Game.logDebug("defender eliminated");
 
     public Critter getCritterFromHexLabel(String hexLabel)
     {
-        BattleHex hex = map.getHexFromLabel(hexLabel);
-        return hex.getCritter();
+        return getCritter(hexLabel);
     }
 
 
@@ -1246,9 +1252,9 @@ Game.logDebug("defender eliminated");
                 currentHex.getOppositeHexside(i) != 'c')
             {
                 BattleHex targetHex = currentHex.getNeighbor(i);
-                if (targetHex != null && targetHex.isOccupied())
+                if (targetHex != null && isOccupied(targetHex))
                 {
-                    Critter target = targetHex.getCritter();
+                    Critter target = getCritter(targetHex);
                     if (target.getPlayer() != player)
                     {
                         adjacentEnemy = true;
@@ -1568,7 +1574,7 @@ Game.logDebug("defender eliminated");
         // Creatures block LOS, unless both striker and target are at higher
         //     elevation than the creature, or unless the creature is at
         //     the base of a cliff and the striker or target is atop it.
-        if (nextHex.isOccupied() && nextHex.getElevation() >= strikeElevation
+        if (isOccupied(nextHex) && nextHex.getElevation() >= strikeElevation
             && (!strikerAtopCliff || currentHex != initialHex))
         {
             midChit = true;
@@ -1839,7 +1845,7 @@ Game.logDebug("defender eliminated");
 
         // All creatures block LOS.  (There are no height differences on
         // maps with bramble.)
-        if (nextHex.isOccupied())
+        if (isOccupied(nextHex))
         {
             return BIGNUM;
         }
@@ -1981,12 +1987,12 @@ Game.logDebug("defender eliminated");
             case STRIKEBACK:
                 if (getCarryDamage() > 0)
                 {
-                    applyCarries(hex.getCritter());
+                    applyCarries(getCritter(hex));
                 }
                 else if (critterSelected)
                 {
                     getActiveLegion().getCritter(0).strike(
-                        hex.getCritter(), false);
+                        getCritter(hex), false);
                     critterSelected = false;
                 }
 
@@ -2065,8 +2071,72 @@ Game.logDebug("defender eliminated");
         battleOver = true;
         if (game != null)
         {
-            game.finishBattle(getMasterHex(), attackerEntered);
+            game.finishBattle(masterHexLabel, attackerEntered);
         }
+    }
+
+
+    /** Return a list of all critters in the battle. */
+    public ArrayList getAllCritters()
+    {
+        ArrayList critters = new ArrayList();
+        critters.addAll(getDefender().getCritters());
+        critters.addAll(getAttacker().getCritters());
+        return critters;
+    }
+
+
+    public boolean isOccupied(String hexLabel)
+    {
+        Iterator it = getAllCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (hexLabel.equals(critter.getCurrentHexLabel()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isOccupied(BattleHex hex)
+    {
+        return isOccupied(hex.getLabel());
+    }
+
+    public Critter getCritter(BattleHex hex)
+    {
+        return getCritter(hex.getLabel());
+    }
+
+    public Critter getCritter(String hexLabel)
+    {
+        Iterator it = getAllCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (hexLabel.equals(critter.getCurrentHexLabel()))
+            {
+                return critter;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList getCritters(String hexLabel)
+    {
+        ArrayList critters = new ArrayList();
+        Iterator it = getAllCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (hexLabel.equals(critter.getCurrentHexLabel()))
+            {
+                critters.add(critter);
+            }
+        }
+        return critters;
     }
 
 

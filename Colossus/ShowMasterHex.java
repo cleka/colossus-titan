@@ -14,7 +14,8 @@ public final class ShowMasterHex extends JDialog implements MouseListener,
 {
     private static final int scale = 60;
 
-    public ShowMasterHex(JFrame parentFrame, Game game, MasterHex hex, Point point)
+    public ShowMasterHex(JFrame parentFrame, Game game, MasterHex hex,
+        Point point)
     {
         super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(),
             false);
@@ -165,11 +166,5 @@ public final class ShowMasterHex extends JDialog implements MouseListener,
 
     public void windowOpened(WindowEvent e)
     {
-    }
-
-
-    public static void main(String [] args)
-    {
-        MasterBoard.main(args);
     }
 }

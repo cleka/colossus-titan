@@ -1,9 +1,9 @@
 /** Class Options lists game options for Colossus.
- *  @version $Id$ 
+ *  @version $Id$
  *  @author David Ripton
  */
 
-public class Options
+public final class Options
 {
     // Option names
 

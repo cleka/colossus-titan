@@ -35,7 +35,6 @@ public final class Game
 
     private boolean isApplet;
     private JFrame masterFrame;
-
     private boolean engagementInProgress;
 
 
@@ -117,8 +116,6 @@ public final class Game
             player.clearAllOptions();
 	    newGame.players.add(i, player);
         }
-        // XXX We'd really like to not have to AICopy the board, but
-        // its Game reference needs to be correct.
 	newGame.board = board.AICopy(newGame);
 
 	newGame.activePlayerNum = activePlayerNum;
@@ -148,10 +145,6 @@ public final class Game
         turnNumber = 1;
 
         caretaker.resetAllCounts();
-        if (board != null)
-        {
-            board.clearLegions();
-        }
         players.clear();
         statusScreen = null;
 
@@ -349,7 +342,15 @@ public final class Game
 
     public Player getActivePlayer()
     {
-        return (Player)players.get(activePlayerNum);
+        // Sanity check in case called before all players are loaded.
+        if (activePlayerNum < players.size())
+        {
+            return (Player)players.get(activePlayerNum);
+        }
+        else
+        {
+            return null;
+        }
     }
 
 
@@ -1122,7 +1123,6 @@ public final class Game
             }
 
             players.clear();
-            board.clearLegions();
             if (battle != null)
             {
                 battle.disposeBattleDice();
@@ -1194,11 +1194,10 @@ public final class Game
             }
 
             // Battle stuff
-            MasterHex engagementHex = null;
             buf = in.readLine();
             if (buf != null && buf.length() > 0)
             {
-                engagementHex = board.getHexFromLabel(buf);
+                String engagementHexLabel = buf.toString();
 
                 buf = in.readLine();
                 int battleTurnNum = Integer.parseInt(buf);
@@ -1222,8 +1221,8 @@ public final class Game
                 Player attackingPlayer = getActivePlayer();
                 Legion attacker = readLegion(in, attackingPlayer, true);
 
-                Player defendingPlayer = engagementHex.getEnemyLegion(
-                    attackingPlayer).getPlayer();
+                Player defendingPlayer = getFirstEnemyLegion(
+                    engagementHexLabel, attackingPlayer).getPlayer();
                 Legion defender = readLegion(in, defendingPlayer, true);
 
                 int activeLegionNum;
@@ -1238,7 +1237,7 @@ public final class Game
 
                 battle = new Battle(this, attacker.getMarkerId(),
                     defender.getMarkerId(), activeLegionNum,
-                    engagementHex.getLabel(), battleTurnNum, battlePhase);
+                    engagementHexLabel, battleTurnNum, battlePhase);
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
                 battle.setDriftDamageApplied(driftDamageApplied);
@@ -1353,8 +1352,6 @@ public final class Game
                 critters[3], critters[4], critters[5], critters[6],
                 critters[7], player.getName(), this);
             player.addLegion(legion);
-            MasterHex hex = legion.getCurrentHex();
-            hex.addLegion(legion, false);
         }
 
         legion.setMoved(moved);
@@ -2356,8 +2353,7 @@ public final class Game
         logEvent(name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
-        MasterHex hex = MasterBoard.getHexFromLabel(String.valueOf(
-            100 * player.getTower()));
+        String hexLabel = (String.valueOf(100 * player.getTower()));
 
         caretaker.takeOne(Creature.titan);
         caretaker.takeOne(Creature.angel);
@@ -2369,9 +2365,8 @@ public final class Game
         caretaker.takeOne(Creature.gargoyle);
 
         Legion legion = Legion.getStartingLegion(selectedMarkerId,
-            hex.getLabel(), player.getName(), this);
+            hexLabel, player.getName(), this);
         player.addLegion(legion);
-        hex.addLegion(legion, false);
     }
 
 
@@ -2413,13 +2408,14 @@ public final class Game
         int roll, int block, int cameFrom)
     {
         HashSet set = new HashSet();
+        String hexLabel = hex.getLabel();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
         // also a friendly legion there, just stop recursing.
-        if (hex.getNumEnemyLegions(player) > 0)
+        if (getNumEnemyLegions(hexLabel, player) > 0)
         {
-            if (hex.getNumFriendlyLegions(player) == 0)
+            if (getNumFriendlyLegions(hexLabel, player) == 0)
             {
                 set.add(hex.getLabel());
                 // Set the entry side relative to the hex label.
@@ -2493,12 +2489,12 @@ public final class Game
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
-
+        String hexLabel = hex.getLabel();
         HashSet set = new HashSet();
 
-        if (!hex.isOccupied())
+        if (!isOccupied(hexLabel))
         {
-            set.add(hex.getLabel());
+            set.add(hexLabel);
 
             // Mover can choose side of entry.
             hex.setTeleported(true);
@@ -2591,13 +2587,13 @@ public final class Game
                 // Mark every unoccupied tower.
                 for (int tower = 100; tower <= 600; tower += 100)
                 {
-                    String label = String.valueOf(tower);
-                    hex = MasterBoard.getHexFromLabel(label);
-                    if (!hex.isOccupied())
+                    String hexLabel = String.valueOf(tower);
+                    if (!isOccupied(hexLabel))
                     {
-                        set.add(label);
+                        set.add(hexLabel);
 
                         // Mover can choose side of entry.
+                        hex = MasterBoard.getHexFromLabel(hexLabel);
                         hex.setTeleported(true);
                     }
                 }
@@ -2616,9 +2612,10 @@ public final class Game
                             j++)
                         {
                             hex = getPlayer(i).getLegion(j).getCurrentHex();
-                            if (!isEngagement(hex))
+                            String hexLabel = hex.getLabel();
+                            if (!isEngagement(hexLabel))
                             {
-                                set.add(hex.getLabel());
+                                set.add(hexLabel);
                                 // Mover can choose side of entry.
                                 hex.setTeleported(true);
                             }
@@ -2632,11 +2629,11 @@ public final class Game
     }
 
 
-    boolean isEngagement(MasterHex hex)
+    boolean isEngagement(String hexLabel)
     {
-        if (hex.getNumLegions() > 1)
+        if (getNumLegions(hexLabel) > 1)
         {
-            List markerIds = hex.getLegionMarkerIds();
+            ArrayList markerIds = getLegionMarkerIds(hexLabel);
             Iterator it = markerIds.iterator();
             String markerId = (String)it.next();
             Player player = getPlayerByMarkerId(markerId);
@@ -2689,11 +2686,11 @@ public final class Game
         for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion legion = player.getLegion(i);
-            MasterHex hex = legion.getCurrentHex();
-            if (hex.getNumEnemyLegions(player) > 0)
+            String hexLabel = legion.getCurrentHexLabel();
+            if (getNumEnemyLegions(hexLabel, player) > 0)
             {
                 count++;
-                set.add(hex.getLabel());
+                set.add(hexLabel);
             }
         }
 
@@ -2730,15 +2727,14 @@ public final class Game
     }
 
 
-    public void finishBattle(MasterHex hex, boolean attackerEntered)
+    public void finishBattle(String hexLabel, boolean attackerEntered)
     {
         masterFrame.show();
 
         // Handle any after-battle angel summoning or recruiting.
-        if (hex.getNumLegions() == 1)
+        if (getNumLegions(hexLabel) == 1)
         {
-            String markerId = hex.getLegionMarkerId(0);
-            Legion legion = getLegionByMarkerId(markerId);
+            Legion legion = getFirstLegion(hexLabel);
             // Make all creatures in the victorious legion visible.
             legion.revealAllCreatures();
             // Remove battle info from legion and its creatures.
@@ -2804,14 +2800,14 @@ public final class Game
             Legion candidate = player.getLegion(i);
             if (candidate != legion)
             {
-                MasterHex hex = candidate.getCurrentHex();
+                String hexLabel = candidate.getCurrentHexLabel();
                 if ((candidate.numCreature(Creature.angel) > 0 ||
                     candidate.numCreature(Creature.archangel) > 0) &&
-                    !isEngagement(hex))
+                    !isEngagement(hexLabel))
                 {
 
                     count++;
-                    set.add(hex.getLabel());
+                    set.add(hexLabel);
                 }
             }
         }
@@ -2924,7 +2920,7 @@ public final class Game
                 break;
 
             case Game.FIGHT:
-                doFight(legion.getCurrentHex(), player);
+                doFight(legion.getCurrentHexLabel(), player);
                 break;
 
             case Game.MUSTER:
@@ -2950,7 +2946,7 @@ public final class Game
     }
 
 
-    public void actOnHex(MasterHex hex)
+    public void actOnHex(String hexLabel)
     {
         Player player = getActivePlayer();
 
@@ -2960,14 +2956,14 @@ public final class Game
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
             case Game.MOVE:
-                doMove(player.getMover(), hex);
+                doMove(player.getMover(), hexLabel);
                 break;
 
             // If we're fighting and there is an engagement here,
             // resolve it.  If an angel is being summoned, mark
             // the donor legion instead.
             case Game.FIGHT:
-                doFight(hex, player);
+                doFight(hexLabel, player);
                 break;
 
             default:
@@ -2989,13 +2985,14 @@ public final class Game
     }
 
 
-    public void doMove(Legion legion, MasterHex hex)
+    public void doMove(Legion legion, String hexLabel)
     {
         // Verify that the move is legal, rather than trusting
         // hex.isSelected().
-        if (legion != null && listMoves(legion, true).contains(hex.getLabel()))
+        if (legion != null && listMoves(legion, true).contains(hexLabel))
         {
             Player player = legion.getPlayer();
+            MasterHex hex = MasterBoard.getHexFromLabel(hexLabel);
 
             // Pick teleport or normal move if necessary.
             if (hex.getTeleported() && hex.canEnterViaLand())
@@ -3032,7 +3029,7 @@ public final class Game
 
             // Pick entry side if hex is enemy-occupied
             // and there is more than one possibility.
-            if (hex.isOccupied() && hex.getNumEntrySides() > 1)
+            if (isOccupied(hexLabel) && hex.getNumEntrySides() > 1)
             {
                 int side;
                 if (player.getOption(Options.autoPickEntrySide))
@@ -3041,8 +3038,7 @@ public final class Game
                 }
                 else
                 {
-                    side = PickEntrySide.pickEntrySide(masterFrame,
-                        hex.getLabel());
+                    side = PickEntrySide.pickEntrySide(masterFrame, hexLabel);
                 }
                 hex.clearAllEntrySides();
                 if (side == 1 || side == 3 || side == 5)
@@ -3053,14 +3049,14 @@ public final class Game
 
             // Unless a PickEntrySide was cancelled or
             // disallowed, execute the move.
-            if (!hex.isOccupied() || hex.getNumEntrySides() == 1)
+            if (!isOccupied(hexLabel) || hex.getNumEntrySides() == 1)
             {
                 // If the legion teleported, reveal a lord.
                 if (hex.getTeleported())
                 {
                     // If it was a Titan teleport, that
                     // lord must be the titan.
-                    if (hex.isOccupied())
+                    if (isOccupied(hexLabel))
                     {
                         legion.revealCreatures(Creature.titan, 1);
                     }
@@ -3085,11 +3081,11 @@ public final class Game
     }
 
 
-    private void doFight(MasterHex hex, Player player)
+    private void doFight(String hexLabel, Player player)
     {
         if (summonAngel != null)
         {
-            Legion donor = hex.getFriendlyLegion(player);
+            Legion donor = getFirstFriendlyLegion(hexLabel, player);
             if (donor != null)
             {
                 player.setDonor(donor);
@@ -3102,11 +3098,11 @@ public final class Game
 
         // Do not allow clicking on engagements if one is
         // already being resolved.
-        if (isEngagement(hex) && !engagementInProgress)
+        if (isEngagement(hexLabel) && !engagementInProgress)
         {
             engagementInProgress = true;
-            Legion attacker = hex.getFriendlyLegion(player);
-            Legion defender = hex.getEnemyLegion(player);
+            Legion attacker = getFirstFriendlyLegion(hexLabel, player);
+            Legion defender = getFirstEnemyLegion(hexLabel, player);
 
             if (defender.canFlee())
             {
@@ -3164,7 +3160,7 @@ public final class Game
                 attacker.revealAllCreatures();
                 defender.revealAllCreatures();
                 battle = new Battle(this, attacker.getMarkerId(),
-                    defender.getMarkerId(), Battle.DEFENDER, hex.getLabel(),
+                    defender.getMarkerId(), Battle.DEFENDER, hexLabel,
                     1, Battle.MOVE);
                 battle.init();
             }
@@ -3204,8 +3200,8 @@ public final class Game
         }
 
         // Unselect and repaint the hex.
-        MasterHex hex = winner.getCurrentHex();
-        MasterBoard.unselectHexByLabel(hex.getLabel());
+        String hexLabel = winner.getCurrentHexLabel();
+        MasterBoard.unselectHexByLabel(hexLabel);
 
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering
@@ -3363,13 +3359,29 @@ public final class Game
 
 
     /** Return a list of all players' legions. */
-    public List getAllLegions()
+    public ArrayList getAllLegions()
     {
         ArrayList list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
-            list.addAll((ArrayList)player.getLegions());
+            list.addAll(player.getLegions());
+        }
+        return list;
+    }
+
+
+    /** Return a list of all legions not belonging to player. */
+    public ArrayList getAllEnemyLegions(Player player)
+    {
+        ArrayList list = new ArrayList();
+        for (Iterator it = players.iterator(); it.hasNext();)
+        {
+            Player nextPlayer = (Player)it.next();
+            if (nextPlayer != player)
+            {
+                list.addAll(nextPlayer.getLegions());
+            }
         }
         return list;
     }
@@ -3411,13 +3423,150 @@ public final class Game
     public int getAverageLegionPointValue()
     {
         int total = 0;
-        List legions = getAllLegions();
-        for (Iterator it = legions.iterator(); it.hasNext();)
+        ArrayList legions = getAllLegions();
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
             total += legion.getPointValue();
         }
         return total / legions.size();
+    }
+
+
+    public int getNumLegions(String hexLabel)
+    {
+        int count = 0;
+        Iterator it = getAllLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean isOccupied(String hexLabel)
+    {
+        Iterator it = getAllLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Legion getFirstLegion(String hexLabel)
+    {
+        Iterator it = getAllLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            {
+                return legion;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList getLegionMarkerIds(String hexLabel)
+    {
+        ArrayList markerIds = new ArrayList();
+        Iterator it = getAllLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            {
+                markerIds.add(legion.getMarkerId());
+            }
+        }
+        return markerIds;
+    }
+
+    public int getNumFriendlyLegions(String hexLabel, Player player)
+    {
+        int count = 0;
+        Iterator it = player.getLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public Legion getFirstFriendlyLegion(String hexLabel, Player player)
+    {
+        Iterator it = player.getLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            {
+                return legion;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList getFriendlyLegions(String hexLabel, Player player)
+    {
+        ArrayList legions = new ArrayList();
+        Iterator it = player.getLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()))
+            {
+                legions.add(legion);
+            }
+        }
+        return legions;
+    }
+
+    public int getNumEnemyLegions(String hexLabel, Player player)
+    {
+        String playerName = player.getName();
+        int count = 0;
+        Iterator it = getAllLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()) &&
+                !playerName.equals(legion.getPlayerName()))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public Legion getFirstEnemyLegion(String hexLabel, Player player)
+    {
+        String playerName = player.getName();
+        Iterator it = getAllLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (hexLabel.equals(legion.getCurrentHexLabel()) &&
+                !playerName.equals(legion.getPlayerName()))
+            {
+                return legion;
+            }
+        }
+        return null;
     }
 
 

@@ -93,7 +93,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         BattleMap newMap = new BattleMap(masterHexLabel);
 
-        // XXX Need to copy hexes? 
+        // XXX Need to copy hexes?
 
         return newMap;
     }
@@ -269,9 +269,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             critter);
         critter.addBattleInfo(entrance.getLabel(), entrance.getLabel(),
             this, chit, battle);
-        entrance.addCritter(critter);
-
-        chit.repaint();
+        alignChits(entrance.getLabel());
     }
 
 
@@ -299,7 +297,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             }
             critter.addBattleInfo(currentHexLabel, startingHexLabel,
                 this, chit, battle);
-            getHexFromLabel(currentHexLabel).addCritter(critter);
+            alignChits(currentHexLabel);
         }
     }
 
@@ -323,21 +321,48 @@ public final class BattleMap extends HexMap implements MouseListener,
      *  or null if none does. */
     private Critter getCritterAtPoint(Point point)
     {
-        for (int i = Battle.DEFENDER; i <= Battle.ATTACKER; i++)
+        Iterator it = battle.getAllCritters().iterator();
+        while (it.hasNext())
         {
-            Legion legion = battle.getLegion(i);
-            Iterator it = legion.getCritters().iterator();
-            while (it.hasNext())
+            Critter critter = (Critter)it.next();
+            Chit chit = critter.getChit();
+            if (chit.contains(point))
             {
-                Critter critter = (Critter)it.next();
-                Chit chit = critter.getChit();
-                if (chit.contains(point))
-                {
-                    return critter;
-                }
+                return critter;
             }
         }
         return null;
+    }
+
+
+    public void alignChits(String hexLabel)
+    {
+        BattleHex hex = getHexFromLabel(hexLabel);
+        ArrayList critters = battle.getCritters(hexLabel);
+        if (critters.isEmpty())
+        {
+            hex.repaint();
+            return;
+        }
+
+        Point point = new Point(hex.findCenter());
+
+        // Cascade chits diagonally.
+        int chitScale4 = chitScale / 4;
+        int offset = (chitScale * (1 + (critters.size()))) / 4;
+        point.x -= offset;
+        point.y -= offset;
+
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            BattleChit chit = critter.getChit();
+            chit.setLocation(point);
+            point.x += chitScale4;
+            point.y += chitScale4;
+        }
+        hex.repaint();
     }
 
 
@@ -389,19 +414,15 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
 
         // Draw chits from back to front.
-        for (int i = Battle.DEFENDER; i <= Battle.ATTACKER; i++)
+        ArrayList critters = battle.getAllCritters();
+        ListIterator lit = critters.listIterator(critters.size());
+        while (lit.hasPrevious())
         {
-            Legion legion = battle.getLegion(i);
-            ListIterator lit = legion.getCritters().listIterator(
-                legion.getHeight());
-            while (lit.hasPrevious())
+            Critter critter = (Critter)lit.previous();
+            Chit chit = critter.getChit();
+            if (rectClip.intersects(chit.getBounds()))
             {
-                Critter critter = (Critter)lit.previous();
-                Chit chit = critter.getChit();
-                if (rectClip.intersects(chit.getBounds()))
-                {
-                    chit.paintComponent(g);
-                }
+                chit.paintComponent(g);
             }
         }
     }
@@ -413,11 +434,5 @@ public final class BattleMap extends HexMap implements MouseListener,
         location = getLocation();
 
         battleFrame.dispose();
-    }
-
-
-    public static void main(String [] args)
-    {
-        Battle.main(args);
     }
 }

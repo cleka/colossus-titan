@@ -8,7 +8,7 @@ import java.util.*;
  * @author Bruce Sherrod
  */
 
-public class Caretaker
+public final class Caretaker
 {
     /**
      * mapping from String creature name to Integer count.  If the

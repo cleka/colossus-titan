@@ -175,10 +175,4 @@ public abstract class Hex
         return new Point((int)Math.round((xVertex[0] + xVertex[3]) / 2),
             (int)Math.round((yVertex[0] + yVertex[3]) / 2));
     }
-
-
-    public static void main(String [] args)
-    {
-        MasterHex.main(args);
-    }
 }

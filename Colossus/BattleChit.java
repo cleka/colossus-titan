@@ -82,10 +82,4 @@ public final class BattleChit extends Chit
             g.setFont(oldFont);
         }
     }
-
-
-    public static void main(String [] args)
-    {
-        Chit.main(args);
-    }
 }

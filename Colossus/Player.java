@@ -19,20 +19,21 @@ public final class Player implements Comparable
     private String playersEliminated;  // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll;          // 0 if movement has not been rolled.
-    private TreeSet markersAvailable = new TreeSet(new markerComparator());
     private ArrayList legions = new ArrayList();
     private boolean dead;
     private boolean titanEliminated;
     private Legion donor;
     private Legion mover;
     private Legion lastLegionSummonedFrom;
+    private MarkerComparator markerComparator = new MarkerComparator();
+    private TreeSet markersAvailable = new TreeSet(markerComparator);
 
     /** Stack of legions, to allow multiple levels of undo for splits,
      *  moves, and recruits. */
     private LinkedList undoStack = new LinkedList();
     private Properties options = new Properties();
-
     private AI ai = new SimpleAI();  // TODO Allow pluggable AIs.
+
 
     public Player(String name, Game game)
     {
@@ -66,17 +67,6 @@ public final class Player implements Comparable
         return newPlayer;
     }
 
-    // XXX Call after calling AICopy()
-    public void setGame(Game game)
-    {
-        this.game = game;
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            legion.setGame(game);
-        }
-    }
 
     public boolean isDead()
     {
@@ -300,7 +290,7 @@ public final class Player implements Comparable
     }
 
 
-    public List getLegions()
+    public ArrayList getLegions()
     {
         return legions;
     }
@@ -311,6 +301,31 @@ public final class Player implements Comparable
     public void sortLegions()
     {
         Collections.sort(legions);
+    }
+
+
+    public MarkerComparator getMarkerComparator()
+    {
+        return markerComparator;
+    }
+
+
+    /** Move legion to the first position in the legions list.
+     *  Return true if it was moved. */
+    public boolean moveToTop(Legion legion)
+    {
+        int i = legions.indexOf(legion);
+        if (i <= 0)
+        {
+            // Not found, or already first in the list.
+            return false;
+        }
+        else
+        {
+            legions.remove(i);
+            legions.add(0, legion);
+            return true;
+        }
     }
 
 
@@ -506,8 +521,8 @@ public final class Player implements Comparable
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            MasterHex hex = legion.getCurrentHex();
-            if (hex.getNumFriendlyLegions(this) > 1 &&
+            String hexLabel = legion.getCurrentHexLabel();
+            if (game.getNumFriendlyLegions(hexLabel, this) > 1 &&
                 game.countConventionalMoves(legion) > 0)
             {
                 return true;
@@ -617,6 +632,7 @@ public final class Player implements Comparable
     public void addLegion(Legion legion)
     {
         legions.add(legion);
+        game.getBoard().alignLegions(legion.getCurrentHexLabel());
     }
 
 
@@ -730,12 +746,13 @@ public final class Player implements Comparable
         // engaged with.  All others give half points to slayer,
         // if non-null.
 
+        HashSet hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            MasterHex hex = legion.getCurrentHex();
-            Legion enemyLegion = hex.getEnemyLegion(this);
+            String hexLabel = legion.getCurrentHexLabel();
+            Legion enemyLegion = game.getFirstEnemyLegion(hexLabel, this);
             double halfPoints = legion.getPointValue() / 2.0;
 
             Player scorer;
@@ -755,6 +772,7 @@ public final class Player implements Comparable
 
             // Call the iterator's remove() method rather than
             // removeLegion() to avoid concurrent modification problems.
+            hexLabelsToAlign.add(legion.getCurrentHexLabel());
             legion.prepareToRemove();
             it.remove();
         }
@@ -780,7 +798,13 @@ public final class Player implements Comparable
 
         game.updateStatusScreen();
 
-        game.getBoard().repaint();
+        MasterBoard board = game.getBoard();
+        it = hexLabelsToAlign.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            board.alignLegions(hexLabel);
+        }
 
         Game.logEvent(getName() + " dies");
 
@@ -981,7 +1005,7 @@ public final class Player implements Comparable
 
     /** Comparator that forces this player's legion markers to come
      *  before captured markers in sort order. */
-    final class markerComparator implements Comparator
+    final class MarkerComparator implements Comparator
     {
         public int compare(Object o1, Object o2)
         {

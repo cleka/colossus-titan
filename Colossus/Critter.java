@@ -304,7 +304,7 @@ public final class Critter extends Creature
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    Critter other = neighbor.getCritter();
+                    Critter other = battle.getCritter(neighbor);
                     if (other != null && other.getPlayer() != getPlayer() &&
                         (countDead || !other.isDead()))
                     {
@@ -334,7 +334,7 @@ public final class Critter extends Creature
             BattleHex neighbor = hex.getNeighbor(i);
             if (neighbor != null)
             {
-                Critter other = neighbor.getCritter();
+                Critter other = battle.getCritter(neighbor);
                 if (other != null && other.getPlayer() == getPlayer() &&
                     !other.isDead())
                 {
@@ -366,7 +366,7 @@ public final class Critter extends Creature
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    Critter other = neighbor.getCritter();
+                    Critter other = battle.getCritter(neighbor);
                     if (other != null && other.getPlayer() != getPlayer() &&
                         (countDead || !other.isDead()))
                     {
@@ -384,22 +384,21 @@ public final class Critter extends Creature
      *  for legality and logs the move. */
     public void moveToHex(BattleHex hex)
     {
-        getCurrentHex().removeCritter(this);
         currentHexLabel = hex.getLabel();
-        getCurrentHex().addCritter(this);
         battle.setLastCritterMoved(this);
-        map.repaint();
+        map.alignChits(startingHexLabel);
+        map.alignChits(currentHexLabel);
     }
 
 
     public void undoMove()
     {
-        getCurrentHex().removeCritter(this);
+        String formerHexLabel = currentHexLabel;
         currentHexLabel = startingHexLabel;
-        getCurrentHex().addCritter(this);
         Game.logEvent(getName() + " undoes move and returns to " +
             startingHexLabel);
-        map.repaint();
+        map.alignChits(formerHexLabel);
+        map.alignChits(currentHexLabel);
     }
 
 
@@ -654,7 +653,7 @@ public final class Critter extends Creature
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null && neighbor != targetHex)
                 {
-                    Critter critter = neighbor.getCritter();
+                    Critter critter = battle.getCritter(neighbor);
                     if (critter != null && critter.getPlayer() !=
                         getPlayer() && !critter.isDead())
                     {
@@ -730,7 +729,7 @@ public final class Critter extends Creature
                     BattleHex neighbor = hex.getNeighbor(i);
                     if (neighbor != null && neighbor != targetHex)
                     {
-                        Critter critter = neighbor.getCritter();
+                        Critter critter = battle.getCritter(neighbor);
                         if (critter != null && critter.getPlayer() !=
                             getPlayer() && !critter.isDead())
                         {

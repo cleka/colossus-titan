@@ -5,7 +5,7 @@
  */
 
 
-public class Probs
+public final class Probs
 {
     static int lastFakeDie = 5;
 

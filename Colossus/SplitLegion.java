@@ -24,6 +24,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private static boolean active;
+    private String selectedMarkerId;
 
 
     private SplitLegion(JFrame parentFrame, Legion oldLegion, String name,
@@ -40,7 +41,6 @@ public final class SplitLegion extends JDialog implements MouseListener,
         Game game = oldLegion.getGame();
         player = oldLegion.getPlayer();
 
-        String selectedMarkerId;
         if (autoPickMarker)
         {
             selectedMarkerId = player.getFirstAvailableMarker();
@@ -66,9 +66,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         newLegion = Legion.getEmptyLegion(selectedMarkerId,
             oldLegion.getMarkerId(), oldLegion.getCurrentHexLabel(),
             player.getName(), game);
-        player.addLegion(newLegion);
-        String imageName = selectedMarkerId;
-        newMarker = new Marker(scale, imageName, this, game);
+        newMarker = new Marker(scale, selectedMarkerId, this, game);
         newLegion.setMarker(newMarker);
 
         setBackground(Color.lightGray);
@@ -77,7 +75,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
         addMouseListener(this);
         addWindowListener(this);
 
-        oldMarker = new Marker(scale, oldLegion.getImageName(), this, game);
+        oldMarker = new Marker(scale, oldLegion.getImageName(), this,
+            game);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -297,21 +296,17 @@ public final class SplitLegion extends JDialog implements MouseListener,
 
     private void performSplit()
     {
-        // Resize the new legion's marker to MasterBoard scale.
-        newMarker.rescale(oldLegion.getMarker().getBounds().width);
+        // Make a new marker for the MasterBoard
+        Game game = oldLegion.getGame();
+        newMarker = new Marker(oldLegion.getMarker().getBounds().width,
+            selectedMarkerId, parentFrame, game);
+        newLegion.setMarker(newMarker);
 
         // Add the new legion to the player.
         if (player != null)
         {
             player.addLegion(newLegion);
             player.setLastLegionSplitOff(newLegion);
-        }
-
-        // Set the new chit next to the old chit on the masterboard.
-        MasterHex hex = newLegion.getCurrentHex();
-        if (hex != null)
-        {
-            hex.addLegion(newLegion, false);
         }
 
         // Hide the contents of both legions.

@@ -5,7 +5,7 @@ import java.util.*;
  *  @author David Ripton
  */
 
-public class PerPlayerOptions
+public final class PerPlayerOptions
 {
     private static HashSet set = new HashSet();
 

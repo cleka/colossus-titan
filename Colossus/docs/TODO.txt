@@ -1,3 +1,8 @@
+Rewrite SplitLegion to use Legion.split()
+
+Add a configurable AI move delay to make it easier to follow what the
+   AI is doing.
+
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
    account.

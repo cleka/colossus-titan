@@ -6,7 +6,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class NegotiationResults
+public final class NegotiationResults
 {
     private boolean settled;
     private boolean mutual;

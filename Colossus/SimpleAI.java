@@ -209,13 +209,14 @@ class SimpleAI implements AI
                         MasterHex hex = game.getBoard().getHexFromLabel(
                             hexLabel);
 
-                        if (hex.getNumEnemyLegions(player) == 0)
+                        if (game.getNumEnemyLegions(hexLabel, player) == 0)
                         {
                             safeMoves++;
                         }
                         else
                         {
-                            Legion enemy = hex.getEnemyLegion(player);
+                            Legion enemy = game.getFirstEnemyLegion(hexLabel,
+                                player);
                             int result = estimateBattleResults(legion, true,
                                     enemy, hex);
 
@@ -262,7 +263,7 @@ class SimpleAI implements AI
             // potential from our current location
             // create the new legion
             Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion,
-                    game.getNumPlayers()));
+                game.getNumPlayers()));
         }
     }
 
@@ -272,7 +273,7 @@ class SimpleAI implements AI
      * Creatures to remove.
      */
     private static List chooseCreaturesToSplitOut(Legion legion,
-            int numPlayers)
+        int numPlayers)
     {
         //
         // split a 7 or 8 high legion somehow
@@ -305,6 +306,12 @@ class SimpleAI implements AI
              critterIt.hasNext(); )
         {
             Critter critter = (Critter)critterIt.next();
+
+            // Never split out the titan.
+            if (critter.isTitan())
+            {
+                continue;
+            }
 
             if (weakest1 == null)
             {
@@ -538,7 +545,7 @@ class SimpleAI implements AI
                 Map.Entry entry = (Map.Entry)it.next();
                 Legion legion = (Legion)entry.getKey();
                 MasterHex hex = (MasterHex)entry.getValue();
-                game.doMove(legion, hex);
+                game.doMove(legion, hex.getLabel());
             }
         }
     }
@@ -663,7 +670,7 @@ class SimpleAI implements AI
             // if we found a move that's better than sitting still, move
             if (bestValue > sitStillMove.value)
             {
-                game.doMove(legion, bestHex);
+                game.doMove(legion, bestHex.getLabel());
                 movedALegion = true;
             }
         }
@@ -681,8 +688,8 @@ class SimpleAI implements AI
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            MasterHex hex = legion.getCurrentHex();
-            List friendlyLegions = hex.getFriendlyLegions(player);
+            String hexLabel = legion.getCurrentHexLabel();
+            List friendlyLegions = game.getFriendlyLegions(hexLabel, player);
 
             outer: while (friendlyLegions.size() > 1
                    && game.countConventionalMoves(legion) > 0)
@@ -730,11 +737,12 @@ class SimpleAI implements AI
                             + " to " + move.hex + " taking penalty "
                             + move.difference
                             + " in order to handle illegal legion " + legion);
-                    game.doMove(move.legion, move.hex);
+                    game.doMove(move.legion, move.hex.getLabel());
 
                     movedALegion = true;
                     // check again if this legion is ok; if so, break
-                    friendlyLegions = hex.getFriendlyLegions(player);
+                    friendlyLegions = game.getFriendlyLegions(hexLabel,
+                        player);
                     if (friendlyLegions.size() > 1
                         && game.countConventionalMoves(legion) > 0)
                     {
@@ -802,7 +810,7 @@ class SimpleAI implements AI
             debugln("forced to move " + move.legion + " to " + move.hex
                     + " taking penalty " + move.difference
                     + " in order to handle illegal legion " + move.legion);
-            game.doMove(move.legion, move.hex);
+            game.doMove(move.legion, move.hex.getLabel());
         }
     }
 
@@ -897,7 +905,8 @@ class SimpleAI implements AI
 
         int value = 0;
         // consider making an attack
-        final Legion enemyLegion = hex.getEnemyLegion(legion.getPlayer());
+        final Legion enemyLegion = game.getFirstEnemyLegion(hex.getLabel(),
+            legion.getPlayer());
 
         if (enemyLegion != null)
         {
@@ -1147,7 +1156,8 @@ class SimpleAI implements AI
                 // maximize over choices and average over die rolls.
                 // this would be essentially minimax but ignoring the
                 // others players ability to move.
-                Legion enemy = nextHex.getEnemyLegion(legion.getPlayer());
+                Legion enemy = game.getFirstEnemyLegion(nextHex.getLabel(),
+                    legion.getPlayer());
 
                 if (enemy != null
                     && estimateBattleResults(legion, enemy, nextHex)
@@ -1395,15 +1405,17 @@ class SimpleAI implements AI
 
 
     private static void findNormalMovesToTerrain(Legion legion, Player player,
-            MasterHex hex, int roll, int block, int cameFrom,
-            char terrainType, boolean[] moves)
+        MasterHex hex, int roll, int block, int cameFrom, char terrainType,
+        boolean[] moves)
     {
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
         // also a friendly legion there, just stop recursing.
-        if (hex.getNumEnemyLegions(player) > 0)
+        String hexLabel = hex.getLabel();
+        Game game = legion.getGame();
+        if (game.getNumEnemyLegions(hexLabel, player) > 0)
         {
-            if (hex.getNumFriendlyLegions(player) == 0)
+            if (game.getNumFriendlyLegions(hexLabel, player) == 0)
             {
                 // we can move to here
                 if (hex.getTerrain() == terrainType)
@@ -1985,7 +1997,7 @@ class SimpleAI implements AI
                     MasterHex hex = (MasterHex)entry.getValue();
 
                     debugln("applymove: try " + legion + " to " + hex);
-                    game.doMove(legion, hex);
+                    game.doMove(legion, hex.getLabel());
                 }
 
                 // advance phases until we reach the next move phase
@@ -2003,8 +2015,9 @@ class SimpleAI implements AI
                             for (int i = 0; i < player.getNumLegions(); i++)
                             {
                                 Legion legion = player.getLegion(i);
-                                MasterHex hex = legion.getCurrentHex();
-                                Legion enemy = hex.getEnemyLegion(player);
+                                String hexLabel= legion.getCurrentHexLabel();
+                                Legion enemy = game.getFirstEnemyLegion(
+                                    hexLabel, player);
 
                                 if (enemy == null)
                                 {
@@ -2332,23 +2345,17 @@ class SimpleAI implements AI
                 Legion thisLegion = battle.getLegion(AILegionNum);
 
                 // Iterate over both players' critters in battle.
-                for (int i = Battle.DEFENDER; i <= Battle.ATTACKER; i++)
+                Iterator it = battle.getAllCritters().iterator();
+                while (it.hasNext())
                 {
-                    Legion legion = battle.getLegion(i);
-                    Iterator it = legion.getCritters().iterator();
-                    while (it.hasNext())
+                    Critter critter = (Critter)it.next();
+                    if (critter.getLegion() == thisLegion)
                     {
-                        Critter critter = (Critter)it.next();
-                        if (critter.getLegion() == thisLegion)
-                        {
-                            value += evaluateCritterMove(battle, critter,
-                                true);
-                        }
-                        else
-                        {
-                            value -= evaluateCritterMove(battle, critter,
-                                true);
-                        }
+                        value += evaluateCritterMove(battle, critter, true);
+                    }
+                    else
+                    {
+                        value -= evaluateCritterMove(battle, critter, true);
                     }
                 }
                 debugln("evaluation: " + value);

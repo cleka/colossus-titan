@@ -88,10 +88,4 @@ public final class Marker extends Chit
         // Restore the font.
         g.setFont(oldFont);
     }
-
-
-    public static void main(String [] args)
-    {
-        Chit.main(args);
-    }
 }
