@@ -1,10 +1,16 @@
+Sort legion markers with one's own color first, then captured colors.
+
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.
 
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 
+Add an optional JScrollPane.
+
 Centralize scale handling.  Add a global rescale option.
+
+Need to be able to undo an auto recruit of a reinforcement in battle.
 
 Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
@@ -76,8 +82,6 @@ Move GUI/client classes and model/server classes into separate
 
 Add a ShowAllRecruits window that displays all recruits by terrain
    type.
-
-Allow setting Look and Feel from a menu.
 
 Add SetupBattle class, to allow setting up standalone battles.
 

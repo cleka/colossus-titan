@@ -188,7 +188,7 @@ public final class Game
             updateStatusScreen();
         }
         board.loadInitialMarkerImages();
-        board.setupPhase();
+        setupPhase();
 
         board.setVisible(true);
         board.repaint();
@@ -508,7 +508,24 @@ public final class Game
 
     public void setAntialias(boolean antialias)
     {
-        this.antialias = antialias;
+        if (this.antialias != antialias)
+        {
+            this.antialias = antialias;
+
+            // Repaint board and map.
+            if (board != null)
+            {
+                board.repaint();
+            }
+            if (battle != null)
+            {
+                BattleMap map = battle.getBattleMap();
+                if (map != null)
+                {
+                    map.repaint();
+                }
+            }
+        }
     }
 
 
@@ -617,6 +634,100 @@ public final class Game
         {
             board.unselectAllHexes();
             logEvent("Phase advances to " + getPhaseName(phase));
+        }
+
+        setupPhase();
+    }
+
+
+    public void setupPhase()
+    {
+        switch (getPhase())
+        {
+            case Game.SPLIT:
+                setupSplit();
+                break;
+            case Game.MOVE:
+                setupMove();
+                break;
+            case Game.FIGHT:
+                setupFight();
+                break;
+            case Game.MUSTER:
+                setupMuster();
+                break;
+            default:
+                System.out.println("Bogus phase");
+        }
+    }
+
+
+    private void setupSplit()
+    {
+        Player player = getActivePlayer();
+        player.resetTurnState();
+
+        // If there are no markers available, skip forward to movement.
+        if (player.getNumMarkersAvailable() == 0)
+        {
+            advancePhase();
+        }
+        else
+        {
+            board.setupSplitMenu();
+
+            // Highlight hexes with legions that are 7 high.
+            player.highlightTallLegions();
+        }
+    }
+
+
+    private void setupMove()
+    {
+        Player player = getActivePlayer();
+        player.clearUndoStack();
+        player.rollMovement();
+        board.setupMoveMenu();
+
+        // Highlight hexes with legions that can move.
+        highlightUnmovedLegions();
+    }
+
+
+    private void setupFight()
+    {
+        // Highlight hexes with engagements.
+        // If there are no engagements, move forward to the muster phase.
+        if (highlightEngagements() == 0)
+        {
+            advancePhase();
+        }
+        else
+        {
+            board.setupFightMenu();
+        }
+    }
+
+
+    private void setupMuster()
+    {
+        Player player = getActivePlayer();
+        if (player.isDead())
+        {
+            advancePhase();
+        }
+        else
+        {
+            player.clearUndoStack();
+            board.setupMusterMenu();
+
+            // Highlight hexes with legions eligible to muster.
+            highlightPossibleRecruits();
+
+            if (getAutoRecruit())
+            {
+                doAutoRecruit();
+            }
         }
     }
 
@@ -1033,7 +1144,7 @@ public final class Game
 
             // Setup MasterBoard
             board.loadInitialMarkerImages();
-            board.setupPhase();
+            setupPhase();
             board.setVisible(true);
             board.repaint();
 

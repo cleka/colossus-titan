@@ -19,7 +19,6 @@ public final class BattleMap extends HexMap implements MouseListener,
     private Battle battle;
 
     private JFrame battleFrame;
-    private JMenuItem mi;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
 
@@ -147,118 +146,70 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    public void setupPhase()
+    public void setupSummonMenu()
     {
-        switch (battle.getPhase())
-        {
-            case Battle.SUMMON:
-                setupSummon();
-                break;
-            case Battle.RECRUIT:
-                setupRecruit();
-                break;
-            case Battle.MOVE:
-                setupMove();
-                break;
-            case Battle.FIGHT:
-            case Battle.STRIKEBACK:
-                setupFight();
-                break;
-            default:
-                System.out.println("Bogus phase");
-        }
-    }
-
-
-    public void setupSummon()
-    {
-        battleFrame.setTitle(battle.getActivePlayer().getName() + " Turn " +
+         battleFrame.setTitle(battle.getActivePlayer().getName() + " Turn " +
             battle.getTurnNumber() + " : Summon");
+         phaseMenu.removeAll();
     }
 
 
-    public void setupRecruit()
+    public void setupRecruitMenu()
     {
-        battleFrame.setTitle(battle.getActivePlayer().getName() + " Turn " +
+         battleFrame.setTitle(battle.getActivePlayer().getName() + " Turn " +
             battle.getTurnNumber() + " : Recruit");
-
-        battle.recruitReinforcement();
+         phaseMenu.removeAll();
     }
 
 
-    public void setupMove()
+    public void setupMoveMenu()
     {
-        // If there are no legal moves, move on.
-        if (battle.highlightMovableChits() < 1)
-        {
-            battle.advancePhase();
-        }
-        else
-        {
-            battleFrame.setTitle(battle.getActivePlayer().getName() +
-                " Turn " + battle.getTurnNumber() + " : Move");
+        battleFrame.setTitle(battle.getActivePlayer().getName() +
+            " Turn " + battle.getTurnNumber() + " : Move");
 
-            phaseMenu.removeAll();
+        phaseMenu.removeAll();
 
-            mi = phaseMenu.add(undoLastMoveAction);
-            mi.setMnemonic(KeyEvent.VK_U);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
+        JMenuItem mi;
 
-            mi = phaseMenu.add(undoAllMovesAction);
-            mi.setMnemonic(KeyEvent.VK_A);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+        mi = phaseMenu.add(undoLastMoveAction);
+        mi.setMnemonic(KeyEvent.VK_U);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
 
-            mi = phaseMenu.add(doneWithMovesAction);
-            mi.setMnemonic(KeyEvent.VK_D);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+        mi = phaseMenu.add(undoAllMovesAction);
+        mi.setMnemonic(KeyEvent.VK_A);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
 
-            phaseMenu.addSeparator();
+        mi = phaseMenu.add(doneWithMovesAction);
+        mi.setMnemonic(KeyEvent.VK_D);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
-            mi = phaseMenu.add(concedeBattleAction);
-            mi.setMnemonic(KeyEvent.VK_C);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
-        }
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(concedeBattleAction);
+        mi.setMnemonic(KeyEvent.VK_C);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
     }
 
 
-    public void setupFight()
+    public void setupFightMenu()
     {
-        battle.applyDriftDamage();
-
-        // If there are no possible strikes, move on.
-        if (battle.highlightChitsWithTargets() < 1)
-        {
-            battle.advancePhase();
-        }
-        else
-        {
-            battleFrame.setTitle(battle.getActivePlayer().getName() +
+         battleFrame.setTitle(battle.getActivePlayer().getName() +
                 ((battle.getPhase() == Battle.FIGHT) ?
                 " : Strike" : " : Strikeback"));
 
-            phaseMenu.removeAll();
+        phaseMenu.removeAll();
 
-            mi = phaseMenu.add(doneWithStrikesAction);
-            mi.setMnemonic(KeyEvent.VK_D);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+        JMenuItem mi;
 
-            phaseMenu.addSeparator();
+        mi = phaseMenu.add(doneWithStrikesAction);
+        mi.setMnemonic(KeyEvent.VK_D);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
-            mi = phaseMenu.add(concedeBattleAction);
-            mi.setMnemonic(KeyEvent.VK_C);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
+        phaseMenu.addSeparator();
 
-            // Automatically perform forced strikes if applicable.
-            if (board.getGame().getAutoForcedStrike())
-            {
-                battle.makeForcedStrikes();
-                // If there are no possible strikes left, move on.
-                if (battle.highlightChitsWithTargets() < 1)
-                {
-                    battle.advancePhase();
-                }
-            }
-        }
+        mi = phaseMenu.add(concedeBattleAction);
+        mi.setMnemonic(KeyEvent.VK_C);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
     }
 
 

@@ -76,7 +76,7 @@ public final class Battle
 
         map = new BattleMap(board, masterHex, this, inProgress);
 
-        map.setupPhase();
+        setupPhase();
 
         if (getShowDice())
         {
@@ -153,14 +153,14 @@ public final class Battle
         {
             phase = MOVE;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            map.setupMove();
+            setupMove();
         }
 
         else if (phase == RECRUIT)
         {
             phase = MOVE;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            map.setupMove();
+            setupMove();
         }
 
         else if (phase == MOVE)
@@ -174,7 +174,7 @@ public final class Battle
             }
             phase = FIGHT;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            map.setupFight();
+            setupFight();
         }
 
         else if (phase == FIGHT)
@@ -190,7 +190,7 @@ public final class Battle
             driftDamageApplied = false;
             phase = STRIKEBACK;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            map.setupFight();
+            setupFight();
         }
 
         else if (phase == STRIKEBACK)
@@ -207,7 +207,7 @@ public final class Battle
                     phase = SUMMON;
                     Game.logEvent(getActivePlayer().getName() +
                         "'s battle turn, number " + turnNumber);
-                    map.setupSummon();
+                    setupSummon();
                     startSummoningAngel();
                 }
                 else
@@ -236,10 +236,88 @@ public final class Battle
                     else
                     {
                         phase = RECRUIT;
-                        map.setupRecruit();
+                        setupRecruit();
                         Game.logEvent(getActivePlayer().getName() +
                             "'s battle turn, number " + turnNumber);
                     }
+                }
+            }
+        }
+    }
+
+
+    private void setupPhase()
+    {
+        switch (getPhase())
+        {
+            case Battle.SUMMON:
+                setupSummon();
+                break;
+            case Battle.RECRUIT:
+                setupRecruit();
+                break;
+            case Battle.MOVE:
+                setupMove();
+                break;
+            case Battle.FIGHT:
+            case Battle.STRIKEBACK:
+                setupFight();
+                break;
+            default:
+                System.out.println("Bogus phase");
+        }
+    }
+
+
+    private void setupSummon()
+    {
+        map.setupSummonMenu();
+    }
+
+
+    private void setupRecruit()
+    {
+        map.setupRecruitMenu();
+        recruitReinforcement();
+    }
+
+
+    private void setupMove()
+    {
+        // If there are no legal moves, move on.
+        if (highlightMovableChits() < 1)
+        {
+            advancePhase();
+        }
+        else
+        {
+            map.setupMoveMenu();
+        }
+    }
+
+
+    private void setupFight()
+    {
+        applyDriftDamage();
+
+        // If there are no possible strikes, move on.
+        if (highlightChitsWithTargets() < 1)
+        {
+            advancePhase();
+        }
+        else
+        {
+            map.setupFightMenu();
+
+            // Automatically perform forced strikes if applicable.
+            if (board.getGame().getAutoForcedStrike())
+            {
+                makeForcedStrikes();
+                // If there are no possible strikes left, move on.
+                if (highlightChitsWithTargets() < 1)
+                {
+                    commitStrikes();
+                    advancePhase();
                 }
             }
         }

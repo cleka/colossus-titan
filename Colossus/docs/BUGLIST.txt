@@ -56,13 +56,3 @@ Post-battle angel summoning is messed up.  Usually hexes with eligible
    interfered with recruit highlighting, which was fixed with undo
    all recruits.  Is the SummonAngel dialog showing up behind the
    MasterBoard?
-
-With auto forced strikes on, an opposing cyclops and lion sat adjacent
-   to each other, neither striking, and players were allowed to
-   advance past strike phases.
-With auto forced strikes on, the last defending creature was killed,
-   and the battle ended before it got a chance to strike back.
-With auto forced strikes on, a Titan moved next to an enemy
-   angel, but the strike phase was skipped.  The angel auto-struck
-   back.
-

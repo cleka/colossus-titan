@@ -178,7 +178,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 }
                 else
                 {
-                    advancePhase();
+                    game.advancePhase();
                 }
             }
         };
@@ -212,7 +212,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
                 // Reroll movement die.  Remove Take Mulligan option
                 // if applicable.
-                setupPhase();
+                game.setupPhase();
             }
         };
 
@@ -245,7 +245,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                     else
                     {
                         player.undoAllSplits();
-                        advancePhase();
+                        game.advancePhase();
                     }
                 }
             }
@@ -258,7 +258,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 // Advance only if there are no unresolved engagements.
                 if (game.highlightEngagements() == 0)
                 {
-                    advancePhase();
+                    game.advancePhase();
                 }
                 else
                 {
@@ -296,7 +296,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 player.commitMoves();
                 // Mulligans are only allowed on turn 1.
                 player.setMulligansLeft(0);
-                advancePhase();
+                game.advancePhase();
             }
         };
 
@@ -317,7 +317,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 if (answer == JOptionPane.YES_OPTION)
                 {
                    player.die(null, true);
-                   advancePhase();
+                   game.advancePhase();
                 }
             }
         };
@@ -1374,82 +1374,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    private void advancePhase()
+    public void setupSplitMenu()
     {
-        game.advancePhase();
-        setupPhase();
-    }
-
-
-    public void setupPhase()
-    {
-        switch (game.getPhase())
-        {
-            case Game.SPLIT:
-                setupSplit();
-                break;
-            case Game.MOVE:
-                setupMove();
-                break;
-            case Game.FIGHT:
-                setupFight();
-                break;
-            case Game.MUSTER:
-                setupMuster();
-                break;
-            default:
-                System.out.println("Bogus phase");
-        }
-    }
-
-
-    private void setupPhaseMenu()
-    {
-        switch (game.getPhase())
-        {
-            case Game.SPLIT:
-                setupSplitMenu();
-                break;
-            case Game.MOVE:
-                setupMoveMenu();
-                break;
-            case Game.FIGHT:
-                setupFightMenu();
-                break;
-            case Game.MUSTER:
-                setupMusterMenu();
-                break;
-            default:
-                System.out.println("Bogus phase");
-        }
-    }
-
-
-    private void setupSplit()
-    {
-        Player player = game.getActivePlayer();
-        player.resetTurnState();
-
-        // If there are no markers available, skip forward to movement.
-        if (player.getNumMarkersAvailable() == 0)
-        {
-            advancePhase();
-        }
-        else
-        {
-            masterFrame.setTitle(player.getName() + " Turn " +
+        masterFrame.setTitle(game.getActivePlayer().getName() + " Turn " +
                 game.getTurnNumber() + " : Split stacks");
 
-            setupSplitMenu();
-
-            // Highlight hexes with legions that are 7 high.
-            player.highlightTallLegions();
-        }
-    }
-
-
-    private void setupSplitMenu()
-    {
         phaseMenu.removeAll();
 
         mi = phaseMenu.add(undoLastSplitAction);
@@ -1471,26 +1400,13 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    private void setupMove()
+    public void setupMoveMenu()
     {
         Player player = game.getActivePlayer();
-        player.clearUndoStack();
-
-        player.rollMovement();
-
         masterFrame.setTitle(player.getName() + " Turn " +
             game.getTurnNumber() + " : Movement Roll: " +
-            player.getMovementRoll() + " ");
+            player.getMovementRoll());
 
-        setupMoveMenu();
-
-        // Highlight hexes with legions that can move.
-        game.highlightUnmovedLegions();
-    }
-
-
-    private void setupMoveMenu()
-    {
         phaseMenu.removeAll();
 
         mi = phaseMenu.add(undoLastMoveAction);
@@ -1520,27 +1436,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    private void setupFight()
+    public void setupFightMenu()
     {
-        // Highlight hexes with engagements.
-        // If there are no engagements, move forward to the muster phase.
-        if (game.highlightEngagements() == 0)
-        {
-            advancePhase();
-        }
-        else
-        {
-            String playerName = game.getActivePlayer().getName();
-            masterFrame.setTitle(playerName + " Turn " +
-                game.getTurnNumber() + " : Resolve Engagements ");
+        masterFrame.setTitle(game.getActivePlayer().getName() + " Turn " +
+            game.getTurnNumber() + " : Resolve Engagements ");
 
-            setupFightMenu();
-        }
-    }
-
-
-    private void setupFightMenu()
-    {
         phaseMenu.removeAll();
 
         mi = phaseMenu.add(doneWithEngagementsAction);
@@ -1554,33 +1454,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    private void setupMuster()
+    public void setupMusterMenu()
     {
-        Player player = game.getActivePlayer();
-        if (player.isDead())
-        {
-            advancePhase();
-        }
-        else
-        {
-            masterFrame.setTitle(player.getName() + " Turn " +
-                game.getTurnNumber() + " : Muster Recruits ");
-            player.clearUndoStack();
-            setupMusterMenu();
+        masterFrame.setTitle(game.getActivePlayer().getName() + " Turn " +
+            game.getTurnNumber() + " : Muster Recruits ");
 
-            // Highlight hexes with legions eligible to muster.
-            game.highlightPossibleRecruits();
-
-            if (game.getAutoRecruit())
-            {
-                game.doAutoRecruit();
-            }
-        }
-    }
-
-
-    private void setupMusterMenu()
-    {
         phaseMenu.removeAll();
 
         mi = phaseMenu.add(undoLastRecruitAction);
@@ -1875,27 +1753,37 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+    /** Return true if the MouseEvent e came from button 2 or 3.
+     *  In theory, isPopupTrigger() is the right way to check for
+     *  this.  In practice, the poor design choice of only having
+     *  isPopupTrigger() fire on mouse release on Windows makes
+     *  it useless here. */
+    private static boolean isPopupButton(MouseEvent e)
+    {
+        int modifiers = e.getModifiers();
+        return (((modifiers & InputEvent.BUTTON2_MASK) != 0) ||
+            ((modifiers & InputEvent.BUTTON3_MASK) != 0) ||
+            e.isAltDown());
+    }
+
+
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
-
         Legion legion = getLegionAtPoint(point);
-
         if (legion != null)
         {
+            Player player = legion.getPlayer();
+
             // Move the clicked-on legion to the top of the z-order.
             moveMarkerToTop(legion);
-
-            Player player = legion.getPlayer();
 
             // What to do depends on which mouse button was used
             // and the current phase of the turn.
 
             // Right-click means to show the contents of the
             // legion.
-            if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
-                InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
-                InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
+            if (isPopupButton(e))
             {
                 new ShowLegion(masterFrame, legion, point,
                     game.getAllStacksVisible() ||
@@ -1918,9 +1806,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         MasterHex hex = getHexContainingPoint(point);
         if (hex != null)
         {
-            if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
-                InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
-                InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
+            if (isPopupButton(e))
             {
                 lastPoint = point;
                 popupMenu.setLabel(hex.getDescription());
