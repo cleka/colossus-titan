@@ -1307,20 +1307,6 @@ Log.debug("called Client.acquireAngelCallback()");
             map.unselectAllHexes();
         }
 
-        if (carryDamageLeft >= 1 && !carryTargetDescriptions.isEmpty())
-        {
-            pickCarries(carryDamageLeft, carryTargetDescriptions);
-        }
-        else
-        {
-            makeForcedStrikes();
-
-            if (map != null)
-            {
-                map.highlightCrittersWithTargets();
-            }
-        }
-
         BattleChit targetChit = getBattleChit(targetTag);
         if (targetChit != null)
         {
@@ -1336,6 +1322,21 @@ Log.debug("called Client.acquireAngelCallback()");
                 }
             }
         }
+
+        if (carryDamageLeft >= 1 && !carryTargetDescriptions.isEmpty())
+        {
+            pickCarries(carryDamageLeft, carryTargetDescriptions);
+        }
+        else
+        {
+            makeForcedStrikes();
+
+            if (map != null)
+            {
+                map.highlightCrittersWithTargets();
+            }
+        }
+
     }
 
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
