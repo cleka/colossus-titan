@@ -83,7 +83,7 @@ public final class MasterBoard extends JPanel
     public static final String viewBattleMap = "View Battle Map";
     public static final String changeScale = "Change Scale";
 
-    private static String mapName = GetPlayers.mapName;
+    private static String mapName = GetPlayers.getMapName();
 
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;

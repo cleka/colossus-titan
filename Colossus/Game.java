@@ -54,23 +54,23 @@ public final class Game extends GameSource
     }
 
 
-    // XXX temp
     public void initServerAndClients()
     {
         try 
         {
+            String recruitName = GetPlayers.getRecruitName();
             ClassLoader cl = Game.class.getClassLoader();
             InputStream terIS = 
-                cl.getResourceAsStream(GetPlayers.recruitName);
+                cl.getResourceAsStream(recruitName);
             if (terIS == null)
             {
-                terIS = new FileInputStream(GetPlayers.recruitName);
+                terIS = new FileInputStream(recruitName);
             }
             if (terIS == null) 
             {
                 System.out.println(
                     "Recruit-per-terrain loading failed for file " + 
-                    GetPlayers.recruitName);
+                     recruitName);
                 System.exit(1);
             }
             trl = new TerrainRecruitLoader(terIS);
@@ -1380,61 +1380,33 @@ public final class Game extends GameSource
         // Towers are a special case.
         if (terrain == 'T')
         {
-	    recruits = getPossibleRecruits(terrain);
-	    if (legion.numCreature(Creature.titan) < 1 &&
+            recruits = getPossibleRecruits(terrain);
+            if (legion.numCreature(Creature.titan) < 1 &&
                 legion.numCreature((Creature)recruits.get(4)) < 1)
-	    { /* no Titan, no itself */ 
-		recruits.remove(4);
-	    }
-	    java.util.List creatures = Creature.getCreatures();
-	    Iterator it = creatures.iterator();
-	    boolean keepGuardian = false; /* guardian or something else... */
-	    while (it.hasNext() && !keepGuardian)
-            {
-		Creature creature = (Creature)it.next();
-		if ((legion.numCreature(creature) >= 3) &&
-		    (!creature.isImmortal()))
-		    keepGuardian = true;
-	    }
-	    if (!keepGuardian)
-	    { /* no non-lord creature is 3 or more in number */
-		recruits.remove(3);
-	    }
-	    /*
-            recruits = new ArrayList(5);
-
-            recruits.add(Creature.centaur);
-            recruits.add(Creature.gargoyle);
-            recruits.add(Creature.ogre);
-            if (legion.numCreature(Creature.behemoth) >= 3 ||
-                legion.numCreature(Creature.centaur) >= 3 ||
-                legion.numCreature(Creature.colossus) >= 3 ||
-                legion.numCreature(Creature.cyclops) >= 3 ||
-                legion.numCreature(Creature.dragon) >= 3 ||
-                legion.numCreature(Creature.gargoyle) >= 3 ||
-                legion.numCreature(Creature.giant) >= 3 ||
-                legion.numCreature(Creature.gorgon) >= 3 ||
-                legion.numCreature(Creature.griffon) >= 3 ||
-                legion.numCreature(Creature.guardian) >= 1 ||
-                legion.numCreature(Creature.hydra) >= 3 ||
-                legion.numCreature(Creature.lion) >= 3 ||
-                legion.numCreature(Creature.minotaur) >= 3 ||
-                legion.numCreature(Creature.ogre) >= 3 ||
-                legion.numCreature(Creature.ranger) >= 3 ||
-                legion.numCreature(Creature.serpent) >= 3 ||
-                legion.numCreature(Creature.troll) >= 3 ||
-                legion.numCreature(Creature.unicorn) >= 3 ||
-                legion.numCreature(Creature.warbear) >= 3 ||
-                legion.numCreature(Creature.wyvern) >= 3)
-            {
-                recruits.add(Creature.guardian);
+            { /* no Titan, no itself */ 
+                recruits.remove(4);
             }
-            if (legion.numCreature(Creature.titan) >= 1 ||
-                legion.numCreature(Creature.warlock) >= 1)
+            java.util.List creatures = Creature.getCreatures();
+            Iterator it = creatures.iterator();
+            boolean keepGuardian = false; /* guardian or something else... */
+            Creature guardian = (Creature)recruits.get(3);
+            if (legion.numCreature(guardian) >= 1)
             {
-                recruits.add(Creature.warlock);
+                keepGuardian = true;
             }
-	    */
+            while (it.hasNext() && !keepGuardian)
+            {
+                Creature creature = (Creature)it.next();
+                if ((legion.numCreature(creature) >= 3) && 
+                    !creature.isImmortal())
+                {
+                    keepGuardian = true;
+                }
+            }
+            if (!keepGuardian)
+            { /* no non-lord creature is 3 or more in number */
+                recruits.remove(3);
+            }
         }
         else
         {
@@ -1523,40 +1495,40 @@ public final class Game extends GameSource
         {
             // Towers are a special case.  The recruiter of tower creatures
             // remains anonymous, so we only deal with guardians and warlocks.
-	    ArrayList possibleRecruiters = getPossibleRecruits(terrain);
-	    Creature warlockOrNot = (Creature)possibleRecruiters.get(4);
-	    Creature guardianOrNot = (Creature)possibleRecruiters.get(3);
-	    if (recruit.getName().equals(warlockOrNot.getName()))
-	    {
-		if (legion.numCreature(Creature.titan) >= 1)
+            ArrayList possibleRecruiters = getPossibleRecruits(terrain);
+            Creature warlockOrNot = (Creature)possibleRecruiters.get(4);
+            Creature guardianOrNot = (Creature)possibleRecruiters.get(3);
+            if (recruit.getName().equals(warlockOrNot.getName()))
+            {
+                if (legion.numCreature(Creature.titan) >= 1)
                 {
                     recruiters.add(legion.getCritter(Creature.titan));
                 }
-		if (legion.numCreature(warlockOrNot) >= 1)
+                if (legion.numCreature(warlockOrNot) >= 1)
                 {
                     recruiters.add(legion.getCritter(warlockOrNot));
                 }
-	    }
-	    else if (recruit.getName().equals(guardianOrNot.getName()))
-	    {
+            }
+            else if (recruit.getName().equals(guardianOrNot.getName()))
+            {
                 java.util.List creatures = Creature.getCreatures();
                 Iterator it = creatures.iterator();
                 while (it.hasNext())
-		{
-		    Creature creature = (Creature)it.next();
+                {
+                    Creature creature = (Creature)it.next();
                     if (creature.getName().equals(guardianOrNot.getName()) &&
                         (legion.numCreature(creature) >= 1))
-		    {
-			recruiters.add(legion.getCritter(creature));
-		    }
+                    {
+                        recruiters.add(legion.getCritter(creature));
+                    }
                     else if (!creature.isImmortal() &&
-			     legion.numCreature(creature) >= 3)
-		    {
-			recruiters.add(legion.getCritter(creature));
-		    }
-		}
-	    }
-	    /*
+                             legion.numCreature(creature) >= 3)
+                    {
+                        recruiters.add(legion.getCritter(creature));
+                    }
+                }
+            }
+            /*
             if (recruit.getName().equals("Warlock"))
             {
                 if (legion.numCreature(Creature.titan) >= 1)
@@ -1587,7 +1559,7 @@ public final class Game extends GameSource
                     }
                 }
             }
-	    */
+            */
         }
         else
         {

@@ -1,3 +1,5 @@
+Allow dragging chits in addition to clicking source and destination.
+
 Eliminate persistent legion.hexInfo and instead return a temporary
    object containing all the entry sides and teleport possibilities
    along with the possible hexes that the legion can move to.

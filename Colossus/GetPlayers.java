@@ -16,16 +16,17 @@ public final class GetPlayers extends JDialog implements WindowListener,
     ActionListener
 {
     public static final int maxAIsupported = 16;
-    public static String newGame = "New Game";
-    public static String loadGame = "Load Game";
-    public static String loadMap = "Load Map";
-    public static String loadRec = "Load Recruiters";
-    public static String quit = "Quit";
-    public static String none = "None";
-    public static String byColor = "<By color>";
-    public static String username = System.getProperty("user.name", byColor);
-    public static String [] typeChoices = null;;
-    public static String [] nameChoices = { byColor, username, none };
+    public static final String newGame = "New Game";
+    public static final String loadGame = "Load Game";
+    public static final String loadMap = "Load Map";
+    public static final String loadRec = "Load Recruiters";
+    public static final String quit = "Quit";
+    public static final String none = "None";
+    public static final String byColor = "<By color>";
+    public static final String username = System.getProperty("user.name",
+        byColor);
+    private static String [] typeChoices = null;;
+    private static String [] nameChoices = { byColor, username, none };
 
     private JFrame parentFrame;
 
@@ -35,8 +36,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
     /** List of Map.Entry objects that map player names to player types */
     private static ArrayList playerInfo = new ArrayList();
 
-    public static String mapName = "StrategicMap.map";
-    public static String recruitName = "Recruit.ter";
+    private static String mapName = "StrategicMap.map";
+    private static String recruitName = "Recruit.ter";
     private static String anyAI = "A Random AI";
     private static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
@@ -70,7 +71,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
             }
             j++;
         }
-	typeChoices[2 + ainum] = anyAI;
+        typeChoices[2 + ainum] = anyAI;
 
         this.parentFrame = parentFrame;
         setBackground(Color.lightGray);
@@ -154,7 +155,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         playerInfo.clear();
         HashSet namesTaken = new HashSet();
         int numPlayers = 0;
-	Random aiRand = new Random();
+        Random aiRand = new Random();
 
         for (int i = 0; i < 6; i++)
         {
@@ -167,10 +168,10 @@ public final class GetPlayers extends JDialog implements WindowListener,
                 {
                     return;
                 }
-		if (type.equals(anyAI))
-		{
-		    type = aiList[aiRand.nextInt(aiList.length)];
-		}
+                if (type.equals(anyAI))
+                {
+                    type = aiList[aiRand.nextInt(aiList.length)];
+                }
                 numPlayers++;
                 String entry = name + "~" + type;
                 playerInfo.add(entry);
@@ -255,6 +256,11 @@ public final class GetPlayers extends JDialog implements WindowListener,
             return("Colossus MAP file");
         }
     }
+
+    public static String getMapName()
+    {
+        return mapName;
+    }
     
     static class recFileFilter extends javax.swing.filechooser.FileFilter 
     {
@@ -275,8 +281,13 @@ public final class GetPlayers extends JDialog implements WindowListener,
             return("Colossus RECruiters file");
         }
     }
+
+    public static String getRecruitName()
+    {
+        return recruitName;
+    }
     
-    static String chooseMap() 
+    private static String chooseMap() 
     {
         javax.swing.JFileChooser mapChooser = new JFileChooser();
         mapChooser.setFileFilter(new mapFileFilter());
@@ -291,7 +302,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         return (mapName);
     }
 
-    static String chooseRec() 
+    private static String chooseRec() 
     {
         javax.swing.JFileChooser recChooser = new JFileChooser();
         recChooser.setFileFilter(new recFileFilter());

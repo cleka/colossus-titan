@@ -133,3 +133,8 @@ When it works, scale is not saved to (and maybe not loaded from) cfg file.
 
 autosave is happening even with autosave option off.
 
+CreatureCollectionView does not respect scale.
+
+Carry cursor sometimes fails.  Seems OS dependant -- it mostly works on Unix and 
+   always fails on Windows.
+

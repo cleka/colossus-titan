@@ -43,10 +43,9 @@ public class CreatureCollectionView extends JDialog
 
         if (location == null)
         {
-            // Place dialog at middle right side of screen.
+            // Place dialog at upper right corner of screen.
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            location = new Point(d.width - getSize().width,
-                (d.height - getSize().height) / 2);
+            location = new Point(d.width - getSize().width, 0);
         }
         setLocation(location);
 
