@@ -238,4 +238,14 @@ public final class PlayerInfo
     {
         markersAvailable.remove(markerId);
     }
+
+    void removeAllLegions()
+    {
+        Iterator it = getLegionIds().iterator();
+        while (it.hasNext())
+        {
+            String id = (String)it.next();
+            client.removeLegion(id);
+        }
+    }
 }

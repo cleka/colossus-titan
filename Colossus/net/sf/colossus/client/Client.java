@@ -1510,13 +1510,17 @@ Log.debug(playerName + " Client.initBoard()");
     }
 
     // TODO Move legion markers to slayer on client side.
-    // TODO Clear dead player's split prediction tree.
     public void tellPlayerElim(String playerName, String slayerName)
     {
         Log.debug(this.playerName + " tellPlayerElim(" + playerName +
             ", " + slayerName + ")");
         PlayerInfo info = getPlayerInfo(playerName);
+
+        // TODO Merge these
         info.setDead(true);
+        info.removeAllLegions();
+
+        predictSplits[getPlayerNum(playerName)] = null;
     }
 
     public void tellGameOver(String message)
