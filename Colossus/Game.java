@@ -289,13 +289,13 @@ public class Game extends JFrame implements WindowListener, ActionListener
         //     markers, titan power, score
 
         contentPane.add(new JLabel(""));
-        contentPane.add(new JLabel("Player"));
-        contentPane.add(new JLabel("Tower"));
-        contentPane.add(new JLabel("Color"));
-        contentPane.add(new JLabel("Colors Elim"));
-        contentPane.add(new JLabel("Legions"));
-        contentPane.add(new JLabel("Markers"));
-        contentPane.add(new JLabel("Titan Power"));
+        contentPane.add(new JLabel("Player "));
+        contentPane.add(new JLabel("Tower "));
+        contentPane.add(new JLabel("Color "));
+        contentPane.add(new JLabel("Elim "));
+        contentPane.add(new JLabel("Legions "));
+        contentPane.add(new JLabel("Markers "));
+        contentPane.add(new JLabel("Titan Power "));
         contentPane.add(new JLabel("Score"));
 
         activeLabel = new JLabel[numPlayers];
