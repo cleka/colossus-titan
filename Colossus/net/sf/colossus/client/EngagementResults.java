@@ -62,6 +62,7 @@ final class EngagementResults
 	private JLabel defenderIdLabel;
 	private JPanel panelCenter;
 	private boolean moveNext;
+    private boolean advanceToLast=false;
 
     /** 
      * inits the diaolog, not opens it.
@@ -145,7 +146,7 @@ final class EngagementResults
         	this.current = 0;
         }
         
-        if(attackersTurn || this.moveNext) {
+        if(attackersTurn || this.moveNext || advanceToLast) {
         	this.current = this.engagementLog.size() - 1;
         }
         // iff we are in the attackers turn, the next engagement
@@ -236,6 +237,7 @@ final class EngagementResults
         firstButton.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
                 current = 0;
+                advanceToLast=false;
                 showCurrent();
         	}    
         });
@@ -245,6 +247,7 @@ final class EngagementResults
         prevButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
                 current--;
+                advanceToLast=false;
                 showCurrent();
         	}   
         });
@@ -254,6 +257,7 @@ final class EngagementResults
         nextButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 current++;
+                advanceToLast=false;
                 showCurrent();
 			}   
         });
@@ -263,6 +267,7 @@ final class EngagementResults
         lastButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
                 current = engagementLog.size() - 1;
+                advanceToLast=true;
                 showCurrent();
 			}
         });
