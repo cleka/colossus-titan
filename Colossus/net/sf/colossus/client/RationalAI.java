@@ -1045,7 +1045,7 @@ public class RationalAI implements AI
      *  updates the client with the results of a move or mulligan. */
     public boolean masterMove()
     {
-        // Log.debug("This is RationalAI.");
+        Log.debug("This is RationalAI.");
 
         boolean failure = false;
 
@@ -1383,8 +1383,7 @@ public class RationalAI implements AI
         }
 
         // find initial optimum, assuming optimum will move a legion
-        boolean conflicted = handleConflictedMoves(all_legionMoves, !moved,
-                occupiedHexes);
+        handleConflictedMoves(all_legionMoves, !moved, occupiedHexes);
     }
 
     // find optimimum move for a set of legion moves given by all_legionMoves.
@@ -1395,6 +1394,11 @@ public class RationalAI implements AI
     private boolean handleConflictedMoves(List all_legionMoves,
             boolean mustMove, MultiSet occupiedHexes)
     {
+        // If we have more than one legion in a hex, one must move.
+        if (occupiedHexes.max() > 1)
+        {
+            mustMove = true;
+        }
         if (mustMove)
         {
             Log.debug("Ack! Combined optimum has constraint that we must move.");
@@ -1554,7 +1558,7 @@ public class RationalAI implements AI
                     if (moved_legion)
                     {
                         Log.debug("Successfully moved? " + lm.markerId);
-                        occupiedHexes.remove(lm.fromHex); // hex is now free
+                        occupiedHexes.remove(lm.fromHex); // hex is not necessarily free
                         occupiedHexes.add(lm.toHex);
                         bm.remove(); // move has been made
                         moved = true;
