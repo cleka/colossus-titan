@@ -420,7 +420,7 @@ public class BattleHex extends Hex
         return false;
     }
 
-    public boolean blockLineOfSight()
+    public boolean blocksLineOfSight()
     {
         char terrain = getTerrain();
 

@@ -134,7 +134,7 @@
 
 <!-- If you don't have Javamake you can change "javamake" to "javac" --> 
 <!-- But get Javamake instead.  Good dependency checking helps a lot. --> 
-<target name="compile" depends="init,parsers,cleanjars"
+<target name="compile" depends="init,parsers"
         description = "Compile most .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.3" srcdir="."
                 includes="**/*.java"
@@ -146,7 +146,7 @@
 
 <!-- If you don't have Javamake you can change "javamake" to "javac" --> 
 <!-- But get Javamake instead.  Good dependency checking helps a lot. --> 
-<target name="compileAll" depends="init,parsers,cleanjars"
+<target name="compileAll" depends="init,parsers"
         description = "Compile all .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.3" srcdir="."
                 includes="**/*.java"
@@ -155,7 +155,6 @@
 
 
 <!-- XXX Why does this fail if we set fork to yes? -->
-<!-- TODO Add test suite. -->
 <target name="test" depends="compileAll,jar"
         description = "Run all unit tests using JUnit">
         <junit printsummary="yes" fork="no" haltonfailure="no">
@@ -167,7 +166,6 @@
         </junit>
 </target>
 
-<!-- TODO Add GUI test task. -->
 
 <target name="javadoc" depends="compile"
         description = "Make javadoc files">

@@ -1424,7 +1424,7 @@ Log.debug("Called Battle.doneReinforcing()");
     private boolean isLOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
         BattleHex finalHex, boolean left, int strikeElevation,
         boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle,
-        boolean midCliff, boolean midChit, int totalObstacles, int totalWalls)
+        boolean midCliff, boolean midChit, int totalObstacles)
     {
         boolean targetAtop = false;
         boolean targetAtopCliff = false;
@@ -1462,10 +1462,6 @@ Log.debug("Called Battle.doneReinforcing()");
                 {
                     strikerAtopCliff = true;
                 }
-                if (hexside == 'w')
-                {
-                    totalWalls++;
-                }
             }
 
             if (isObstacle(hexside2))
@@ -1478,7 +1474,8 @@ Log.debug("Called Battle.doneReinforcing()");
                 }
                 if (hexside2 == 'w')
                 {
-                    totalWalls++;
+                    // Down a wall -- blocked
+                    return true;
                 }
             }
         }
@@ -1494,7 +1491,8 @@ Log.debug("Called Battle.doneReinforcing()");
                 }
                 if (hexside == 'w')
                 {
-                    totalWalls++;
+                    // Down a wall -- blocked
+                    return true;
                 }
             }
 
@@ -1505,10 +1503,6 @@ Log.debug("Called Battle.doneReinforcing()");
                 if (hexside2 == 'c')
                 {
                     targetAtopCliff = true;
-                }
-                if (hexside2 == 'w')
-                {
-                    totalWalls++;
                 }
             }
 
@@ -1535,18 +1529,10 @@ Log.debug("Called Battle.doneReinforcing()");
                 return true;
             }
 
-            // If there are two walls, striker or target must be at elevation
-            //     2 and range must not be 3.
-            if (totalWalls >= 2 &&
-                getRange(initialHex, finalHex, false) == 3)
-            {
-                return true;
-            }
-
             // Success!
             return false;
         }
-        else
+        else   // not leaving first or entering last hex
         {
             if (midChit)
             {
@@ -1564,15 +1550,10 @@ Log.debug("Called Battle.doneReinforcing()");
                 {
                     midCliff = true;
                 }
-                if (hexside == 'w' || hexside2 == 'w')
-                {
-                    totalWalls++;
-                }
             }
         }
 
-        // hes that block LOS.
-        if (nextHex.blockLineOfSight())
+        if (nextHex.blocksLineOfSight())
         {
             return true;
         }
@@ -1588,7 +1569,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
         return isLOSBlockedDir(initialHex, nextHex, finalHex, left,
             strikeElevation, strikerAtop, strikerAtopCliff,
-            midObstacle, midCliff, midChit, totalObstacles, totalWalls);
+            midObstacle, midCliff, midChit, totalObstacles);
     }
 
     /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
@@ -1633,14 +1614,14 @@ Log.debug("Called Battle.doneReinforcing()");
         {
             // Hexspine; try both sides.
             return (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, 0, 0) &&
+                false, false, false, false, false, 0) &&
                 isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                false, false, false, false, false, 0, 0));
+                false, false, false, false, false, 0));
         }
         else
         {
             return isLOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
-                strikeElevation, false, false, false, false, false, 0, 0);
+                strikeElevation, false, false, false, false, false, 0);
         }
     }
 

@@ -2,6 +2,7 @@ package net.sf.colossus.server;
 
 import java.util.*;
 import junit.framework.*;
+import net.sf.colossus.util.Log;
 
 
 
@@ -44,6 +45,8 @@ public class LOSTest extends TestCase
 
         game.addPlayer("Black", "SimpleAI");
         game.addPlayer("Green", "SimpleAI");
+        game.addPlayer("Red", "SimpleAI");
+        game.addPlayer("Blue", "SimpleAI");
 
         cyclops = Creature.getCreatureByName("Cyclops");
         troll = Creature.getCreatureByName("Troll");
@@ -61,8 +64,48 @@ public class LOSTest extends TestCase
         minotaur = Creature.getCreatureByName("Minotaur");
     }
 
-    public void testLOS()
+    // Example 6 from Bruno Wolff's clarifications.
+    // TODO Should allow two different strike numbers against centaur.
+    public void testLOS1()
     {
+        Log.debug("testLOS1()");
+        String hexLabel = "3";  // Brush
+
+        defender = new Legion("Rd03", "Rd01", hexLabel, null,
+            centaur, gargoyle, null, null, null, null, null, null,
+            "Red", game);
+        attacker = new Legion("Bl03", "Bl01", hexLabel, null,
+            hydra, null, null, null, null, null, null, null,
+            "Black", game);
+
+        game.getPlayer("Red").addLegion(defender);
+        game.getPlayer("Blue").addLegion(attacker);
+
+        attacker.setEntrySide(1);
+
+        battle = new Battle(game, attacker.getMarkerId(), 
+            defender.getMarkerId(), Constants.ATTACKER, hexLabel,
+            1, Constants.FIGHT);
+
+        Critter centaur1 = defender.getCritter(0);
+        Critter gargoyle1 = defender.getCritter(1);
+
+        Critter hydra1 = attacker.getCritter(0);
+
+        centaur1.setCurrentHexLabel("B3");
+        gargoyle1.setCurrentHexLabel("B4");
+
+        hydra1.setCurrentHexLabel("D4");
+
+        assertTrue(!battle.isLOSBlocked(hydra1.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(hydra1.getCurrentHex(),
+            gargoyle1.getCurrentHex()));
+    }
+
+    public void testLOS2()
+    {
+        Log.debug("testLOS2()");
         String hexLabel = "40";  // Jungle
 
         defender = new Legion("Gr03", "Gr01", hexLabel, null,
@@ -158,7 +201,6 @@ public class LOSTest extends TestCase
         assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
             ranger4.getCurrentHex()));
 
-
         assertTrue(battle.isLOSBlocked(gorgon1.getCurrentHex(),
             centaur1.getCurrentHex()));
         assertTrue(battle.isLOSBlocked(gorgon1.getCurrentHex(),
@@ -205,8 +247,259 @@ public class LOSTest extends TestCase
             ranger3.getCurrentHex()));
     }
 
-    public void testLOS2()
+    public void testLOS3()
     {
+        Log.debug("testLOS3()");
+        String hexLabel = "100";  // Tower
+
+        defender = new Legion("Gr03", "Gr01", hexLabel, null,
+            centaur, lion, ranger, ranger, null, null, null, null,
+            "Green", game);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null,
+            cyclops, gorgon, gorgon, gorgon, gorgon, ranger, ranger, null,
+            "Black", game);
+
+        game.getPlayer("Green").addLegion(defender);
+        game.getPlayer("Black").addLegion(attacker);
+
+        attacker.setEntrySide(3);
+
+        battle = new Battle(game, attacker.getMarkerId(), 
+            defender.getMarkerId(), Constants.ATTACKER, hexLabel,
+            1, Constants.FIGHT);
+
+        Critter centaur1 = defender.getCritter(0);
+        Critter lion1 = defender.getCritter(1);
+        Critter ranger1 = defender.getCritter(2);
+        Critter ranger2 = defender.getCritter(3);
+
+        Critter cyclops1 = attacker.getCritter(0);
+        Critter gorgon1 = attacker.getCritter(1);
+        Critter gorgon2 = attacker.getCritter(2);
+        Critter gorgon3 = attacker.getCritter(3);
+        Critter gorgon4 = attacker.getCritter(4);
+        Critter ranger3 = attacker.getCritter(5);
+        Critter ranger4 = attacker.getCritter(6);
+
+        centaur1.setCurrentHexLabel("D3");
+        lion1.setCurrentHexLabel("E3");
+        ranger1.setCurrentHexLabel("C3");
+        ranger2.setCurrentHexLabel("D4");
+
+        cyclops1.setCurrentHexLabel("D2");
+        gorgon1.setCurrentHexLabel("A3");
+        gorgon2.setCurrentHexLabel("A2");
+        gorgon3.setCurrentHexLabel("A1");
+        gorgon4.setCurrentHexLabel("C1");
+        ranger3.setCurrentHexLabel("F1");
+        ranger4.setCurrentHexLabel("B4");
+
+        assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(),
+            cyclops1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(),
+            gorgon1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(),
+            gorgon2.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(),
+            gorgon3.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(),
+            gorgon4.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger1.getCurrentHex(),
+            ranger3.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(),
+            ranger4.getCurrentHex()));
+
+        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(),
+            cyclops1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger2.getCurrentHex(),
+            gorgon1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(),
+            gorgon2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(),
+            gorgon3.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(),
+            gorgon4.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(),
+            ranger3.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(),
+            ranger4.getCurrentHex()));
+
+
+        assertTrue(battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            ranger2.getCurrentHex()));
+
+        assertTrue(battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            ranger2.getCurrentHex()));
+        
+        assertTrue(!battle.isLOSBlocked(gorgon3.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon3.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon3.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon3.getCurrentHex(),
+            ranger2.getCurrentHex()));
+        
+        assertTrue(!battle.isLOSBlocked(gorgon4.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon4.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon4.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon4.getCurrentHex(),
+            ranger2.getCurrentHex()));
+        
+        assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger3.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger3.getCurrentHex(),
+            ranger2.getCurrentHex()));
+        
+        assertTrue(battle.isLOSBlocked(ranger4.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger4.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger4.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger4.getCurrentHex(),
+            ranger2.getCurrentHex()));
+    }
+
+    public void testLOS4()
+    {
+        Log.debug("testLOS4()");
+        String hexLabel = "4";  // Hills
+
+        defender = new Legion("Gr03", "Gr01", hexLabel, null,
+            centaur, centaur, lion, lion, ranger, ranger, null, null,
+            "Green", game);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null,
+            gorgon, gorgon, ranger, ranger, null, null, null, null,
+            "Black", game);
+
+        game.getPlayer("Green").addLegion(defender);
+        game.getPlayer("Black").addLegion(attacker);
+
+        attacker.setEntrySide(3);
+
+        battle = new Battle(game, attacker.getMarkerId(), 
+            defender.getMarkerId(), Constants.ATTACKER, hexLabel,
+            1, Constants.FIGHT);
+
+        Critter centaur1 = defender.getCritter(0);
+        Critter centaur2 = defender.getCritter(1);
+        Critter lion1 = defender.getCritter(2);
+        Critter lion2 = defender.getCritter(3);
+        Critter ranger1 = defender.getCritter(4);
+        Critter ranger2 = defender.getCritter(5);
+
+        Critter gorgon1 = attacker.getCritter(0);
+        Critter gorgon2 = attacker.getCritter(1);
+        Critter ranger3 = attacker.getCritter(2);
+        Critter ranger4 = attacker.getCritter(3);
+
+        centaur1.setCurrentHexLabel("D4");
+        centaur2.setCurrentHexLabel("B1");
+        lion1.setCurrentHexLabel("C5");
+        lion2.setCurrentHexLabel("B2");
+        ranger1.setCurrentHexLabel("D6");
+        ranger2.setCurrentHexLabel("E3");
+
+        gorgon1.setCurrentHexLabel("D2");
+        gorgon2.setCurrentHexLabel("D3");
+        ranger3.setCurrentHexLabel("B3");
+        ranger4.setCurrentHexLabel("F1");
+
+        assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(),
+            gorgon1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger1.getCurrentHex(),
+            gorgon2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger1.getCurrentHex(),
+            ranger3.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger1.getCurrentHex(),
+            ranger4.getCurrentHex()));
+
+        assertTrue(!battle.isLOSBlocked(ranger2.getCurrentHex(),
+            gorgon1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger2.getCurrentHex(),
+            gorgon2.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger2.getCurrentHex(),
+            ranger3.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger2.getCurrentHex(),
+            ranger4.getCurrentHex()));
+
+
+        assertTrue(battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            centaur2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            lion2.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon1.getCurrentHex(),
+            ranger2.getCurrentHex()));
+
+        assertTrue(!battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            centaur2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            lion2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(gorgon2.getCurrentHex(),
+            ranger2.getCurrentHex()));
+        
+        assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
+            centaur2.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
+            lion2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger3.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
+            ranger2.getCurrentHex()));
+        
+        assertTrue(battle.isLOSBlocked(ranger4.getCurrentHex(),
+            centaur1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger4.getCurrentHex(),
+            centaur2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger4.getCurrentHex(),
+            lion1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger4.getCurrentHex(),
+            lion2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger4.getCurrentHex(),
+            ranger1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger4.getCurrentHex(),
+            ranger2.getCurrentHex()));
+    }
+
+    public void testLOS5()
+    {
+        Log.debug("testLOS5()");
         VariantSupport.loadVariant("TG-ConceptIII");
         String hexLabel = "1";  // Plains - Delta
 
@@ -296,10 +589,11 @@ public class LOSTest extends TestCase
         assertTrue(ranger3.canStrike(wyvern1));
     }
 
-    public void testLOS3()
+    public void testLOS6()
     {
+        Log.debug("testLOS6()");
         VariantSupport.loadVariant("Badlands-JDG");
-        String hexLabel = "1000";  // Mountains
+        String hexLabel = "5000";  // MountainsAlt
 
         defender = new Legion("Gr03", "Gr01", hexLabel, null,
             dragon, dragon, minotaur, minotaur, minotaur, null, null, null,
@@ -368,11 +662,11 @@ public class LOSTest extends TestCase
         assertTrue(!ranger2.canStrike(dragon2));
         assertTrue(!ranger2.canStrike(minotaur1));
         assertTrue(ranger2.canStrike(minotaur2));
-        assertTrue(ranger2.canStrike(minotaur3));
+        assertTrue(!ranger2.canStrike(minotaur3));
 
         assertTrue(battle.isLOSBlocked(ranger3.getCurrentHex(),
             dragon1.getCurrentHex()));
-        assertTrue(battle.isLOSBlocked(ranger3.getCurrentHex(),
+        assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
             dragon2.getCurrentHex()));
         assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
             minotaur1.getCurrentHex()));
