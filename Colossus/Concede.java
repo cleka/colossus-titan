@@ -44,14 +44,16 @@ class Concede extends Dialog implements ActionListener
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
             - getSize().height / 2));
 
-        friendChits = new Chit[friend.getHeight()];
+        // Leave space for angels.
+        friendChits = new Chit[7];
         for (int i = 0; i < friend.getHeight(); i++)
         {
             friendChits[i] = new Chit((i + 1) * scale + (scale / 5), scale / 2,
                 scale, friend.creatures[i].getImageName(),this);
         }
 
-        enemyChits = new Chit[enemy.getHeight()];
+        // Leave space for angels.
+        enemyChits = new Chit[7];
         for (int i = 0; i < enemy.getHeight(); i++)
         {
             enemyChits[i] = new Chit((i + 1) * scale + (scale / 5), 
@@ -112,18 +114,31 @@ class Concede extends Dialog implements ActionListener
 
         enemyMarker.paint(g);
 
+        // ArrayIndexOutOfBoundsException when an angel is acquired?
         for (int i = friend.getHeight() - 1; i >= 0; i--)
         {
+            // If the stack just acquired an angel, make a chit for it.
+            if (friendChits[i] == null)
+            {
+                friendChits[i] = new Chit((i + 1) * scale + (scale / 5), 
+                    scale / 2, scale, friend.creatures[i].getImageName(),this);
+            }
             friendChits[i].paint(g);
         }
         for (int i = enemy.getHeight() - 1; i >= 0; i--)
         {
+            if (enemyChits[i] == null)
+            {
+                enemyChits[i] = new Chit((i + 1) * scale + (scale / 5), 
+                    2 * scale, scale, enemy.creatures[i].getImageName(), this);
+            }
+
             enemyChits[i].paint(g);
         }
 
         if (!laidOut)
         {
-            Insets insets = getInsets(); 
+            Insets insets = getInsets();
             Dimension d = getSize();
             button1.setBounds(insets.left + d.width / 9, 7 * d.height / 8 - 
                 insets.bottom, d.width / 3, d.height / 8);
