@@ -54,6 +54,7 @@ class BattleTurn extends Dialog implements ActionListener
 
     void setupRecruitDialog()
     {
+System.out.println("setupRecruitDialog");
         removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
         setLayout(new GridLayout(0, 1));
@@ -141,6 +142,7 @@ System.out.println("placeNewChit");
 
     void setupMoveDialog()
     {
+System.out.println("setupMoveDialog");
         // If there are no legal moves, move on.
         if (map.highlightMovableChits() < 1)
         {
@@ -178,6 +180,7 @@ System.out.println("No legal moves; advancing to strike phase");
 
     void setupFightDialog()
     {
+System.out.println("setupFightDialog");
         // Apply drift damage only once per player turn.
         if (phase == FIGHT)
         {
