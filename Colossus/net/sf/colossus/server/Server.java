@@ -490,47 +490,52 @@ Log.debug("Called Server.addClient() for " + playerName);
 
     void allSetupBattleSummon()
     {
+        Battle battle = game.getBattle();
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.setupBattleSummon(game.getBattle().getActivePlayerName(),
-                game.getBattle().getTurnNumber());
+            client.setupBattleSummon(battle.getActivePlayerName(),
+                battle.getTurnNumber());
         }
     }
 
     void allSetupBattleRecruit()
     {
+        Battle battle = game.getBattle();
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.setupBattleRecruit(
-                game.getBattle().getActivePlayerName(),
-                game.getBattle().getTurnNumber());
+            client.setupBattleRecruit(battle.getActivePlayerName(),
+                battle.getTurnNumber());
         }
     }
 
     void allSetupBattleMove()
     {
+        Battle battle = game.getBattle();
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.setupBattleMove(
-                game.getBattle().getActivePlayerName(),
-                game.getBattle().getTurnNumber());
+            client.setupBattleMove(battle.getActivePlayerName(),
+                battle.getTurnNumber());
         }
     }
 
     void allSetupBattleFight()
     {
+        Battle battle = game.getBattle();
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.setupBattleFight(game.getBattle().getPhase(),
-                game.getBattle().getActivePlayerName());
+            if (battle != null)
+            {
+                client.setupBattleFight(battle.getPhase(),
+                    battle.getActivePlayerName());
+            }
         }
     }
 

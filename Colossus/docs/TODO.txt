@@ -15,8 +15,26 @@ From client dripton: leaveCarryMode
 Error: dripton illegally called leaveCarryMode()
 From client dripton: doneWithStrikes
 
+Bug: Complete modal lockup of defender (human network client) battlemap 
+   window (only) at beginning of game.
+
+Bug: Chat window went modal and started beeping.  Killing it from the
+   Graphics menu worked.
+
+Bug: Brown's turn, number 6
+We can safely split AND attack with Br02
+We can safely split AND attack with Br02
+We can safely split AND attack with Br02
+We can safely split AND attack with Br02
+(Hung here)
+
+
+Add link from client to LogWindow; advance scroll thumb at end of various
+   phases. 
 
 More AI delays within phases (between moves, strikes, etc.). 
+
+Should be able to clear recruitChits in any phase.  Move to Graphics menu?
 
 Real whole-legion battle eval function, including gang hits.
 

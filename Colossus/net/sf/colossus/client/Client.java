@@ -2007,6 +2007,7 @@ Log.debug(playerName + " Client.cleanupBattle()");
     public synchronized void setupBattleSummon(String battleActivePlayerName,
         int battleTurnNumber)
     {
+Log.debug(playerName + " Client.setupBattleSummon()");
         this.battlePhase = Constants.SUMMON;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
@@ -2025,6 +2026,7 @@ Log.debug(playerName + " Client.cleanupBattle()");
     public synchronized void setupBattleRecruit(String battleActivePlayerName,
         int battleTurnNumber)
     {
+Log.debug(playerName + " Client.setupBattleRecruit()");
         this.battlePhase = Constants.RECRUIT;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
@@ -2054,6 +2056,7 @@ Log.debug(playerName + " Client.cleanupBattle()");
     public synchronized void setupBattleMove(String battleActivePlayerName,
         int battleTurnNumber)
     {
+Log.debug(playerName + " Client.setupBattleMove()");
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
@@ -2083,6 +2086,7 @@ Log.debug(playerName + " Client.cleanupBattle()");
     public synchronized void setupBattleFight(int battlePhase,
         String battleActivePlayerName)
     {
+Log.debug(playerName + " Client.setupBattleFight()");
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
         if (battlePhase == Constants.FIGHT)

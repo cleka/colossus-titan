@@ -68,7 +68,9 @@ public final class LogWindow extends JTextArea
     public void append(String s)
     {
         super.append(s);
-        scrollToEnd();
+        
+        // XXX Removed because of graphical corruption
+        // scrollToEnd();   
     }
 
 
