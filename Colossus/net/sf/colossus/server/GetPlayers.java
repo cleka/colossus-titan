@@ -42,10 +42,17 @@ public final class GetPlayers extends KDialog implements WindowListener,
     /** This is Game's options, which we will modify directly. */
     private Options options;
 
+    private int oldDelay;
+    private JLabel delayLabel;
+    private int oldLimit;
+    private JLabel timeLimitLabel;
+
+
+
     /** Clear options to abort */
     public GetPlayers(JFrame parentFrame, Options options)
     {
-        super(parentFrame, "Player Setup", true);
+        super(parentFrame, "Game Setup", true);
 
         this.options = options;
 
@@ -73,12 +80,19 @@ public final class GetPlayers extends KDialog implements WindowListener,
             Log.error(ex.toString());
         }
 
+        JPanel allPlayersPane = new JPanel();
+        allPlayersPane.setBorder(new TitledBorder("Players"));
+        BoxLayout allPlayersLayout = new BoxLayout(allPlayersPane, 
+            BoxLayout.Y_AXIS);
+        allPlayersPane.setLayout(allPlayersLayout);
+        contentPane.add(allPlayersPane);
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
-            doOnePlayer(i);
+            doOnePlayer(i, allPlayersPane);
         }
 
-        Container gamePane = new Container();
+        JPanel gamePane = new JPanel();
+        gamePane.setBorder(new TitledBorder("Game Startup"));
         gamePane.setLayout(new GridLayout(0, 3));
         contentPane.add(gamePane);
         
@@ -116,19 +130,39 @@ public final class GetPlayers extends KDialog implements WindowListener,
         addCheckbox(Options.towerToTowerTeleportOnly, teleportPane);
         addCheckbox(Options.noTowerTeleport, teleportPane);
 
-        Container aiTimePane = new JPanel();
-        BoxLayout delayLayout = new BoxLayout(aiTimePane, BoxLayout.X_AXIS);
-        aiTimePane.setLayout(delayLayout);
+        JPanel aiTimePane = new JPanel(new FlowLayout());
+        aiTimePane.setBorder(new TitledBorder("AI Timing"));
         contentPane.add(aiTimePane);
+
+        oldDelay = options.getIntOption(Options.aiDelay);
+        if (oldDelay < Constants.MIN_AI_DELAY || 
+            oldDelay > Constants.MAX_AI_DELAY)
+        {
+            oldDelay = Constants.DEFAULT_AI_DELAY;
+        }
+        delayLabel = new JLabel();
+        setDelayLabel(oldDelay);
+        aiTimePane.add(delayLabel);
         JButton delayButton = new JButton(options.aiDelay);
         delayButton.addActionListener(this);
         aiTimePane.add(delayButton);
-        JButton aiTimeLimitButton = new JButton(options.aiTimeLimit);
-        aiTimeLimitButton.addActionListener(this);
-        aiTimePane.add(aiTimeLimitButton);
-        
 
-        Container variantPane = new Container();
+        oldLimit = options.getIntOption(Options.aiTimeLimit);
+        if (oldLimit < Constants.MIN_AI_TIME_LIMIT || 
+            oldLimit > Constants.MAX_AI_TIME_LIMIT)
+        {
+            oldLimit = Constants.DEFAULT_AI_TIME_LIMIT;
+        }
+        timeLimitLabel = new JLabel();
+        setTimeLimitLabel(oldLimit);
+        aiTimePane.add(timeLimitLabel);
+        JButton timeLimitButton = new JButton(options.aiTimeLimit);
+        timeLimitButton.addActionListener(this);
+        aiTimePane.add(timeLimitButton);
+
+
+        JPanel variantPane = new JPanel();
+        variantPane.setBorder(new TitledBorder("Variant"));
         variantPane.setLayout(new GridLayout(0, 2));
         contentPane.add(variantPane);
 
@@ -171,6 +205,18 @@ public final class GetPlayers extends KDialog implements WindowListener,
         setVisible(true);
     }
 
+
+    private void setDelayLabel(int delay)
+    {
+        delayLabel.setText("  Current AI delay: " + delay + " ms  ");
+    }
+
+    private void setTimeLimitLabel(int limit)
+    {
+        timeLimitLabel.setText("  Current AI time limit: " + limit + " s  ");
+    }
+
+
     private void setupTypeChoices()
     {
         typeChoices.clear();
@@ -191,14 +237,14 @@ public final class GetPlayers extends KDialog implements WindowListener,
         typeChoices.add(Constants.none);
     }
 
-    private void doOnePlayer(final int i)
+    private void doOnePlayer(final int i, Container allPlayersPane)
     {
-        Container playerPane = new Container();
-        playerPane.setLayout(new GridLayout(0, 3));
-        getContentPane().add(playerPane);
+        JPanel onePlayerPane = new JPanel();
+        onePlayerPane.setLayout(new GridLayout(0, 3));
+        allPlayersPane.add(onePlayerPane);
         
         String s = "Player " + (i + 1);
-        playerPane.add(new JLabel(s));
+        onePlayerPane.add(new JLabel(s));
         
         JComboBox playerType = new JComboBox(typeChoices);
         
@@ -209,7 +255,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         }
         playerType.setSelectedItem(type);
 
-        playerPane.add(playerType);
+        onePlayerPane.add(playerType);
         playerType.addActionListener(this);
         playerType.setEnabled(false);
         playerTypes[i] = playerType;
@@ -241,7 +287,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         JComboBox playerName = new JComboBox(nameChoices);
         playerName.setEditable(true);
-        playerPane.add(playerName);
+        onePlayerPane.add(playerName);
         playerName.addActionListener(this);
         playerName.setEnabled(false);
         playerNames[i] = playerName;
@@ -422,13 +468,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
         }
         else if (e.getActionCommand().equals(Options.aiDelay))
         {
-            int oldDelay = options.getIntOption(Options.aiDelay);
-            if (oldDelay < Constants.MIN_AI_DELAY || 
-                oldDelay > Constants.MAX_AI_DELAY)
-            {
-                oldDelay = Constants.DEFAULT_AI_DELAY;
-            }
-
             final int newDelay = PickIntValue.pickIntValue(parentFrame,
                 oldDelay, "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY, 
                 Constants.MAX_AI_DELAY);
@@ -436,16 +475,10 @@ public final class GetPlayers extends KDialog implements WindowListener,
             {
                 options.setOption(Options.aiDelay, newDelay);
             }
+            setDelayLabel(newDelay);
         }
         else if (e.getActionCommand().equals(Options.aiTimeLimit))
         {
-            int oldLimit = options.getIntOption(Options.aiTimeLimit);
-            if (oldLimit < Constants.MIN_AI_TIME_LIMIT || 
-                oldLimit > Constants.MAX_AI_TIME_LIMIT)
-            {
-                oldLimit = Constants.DEFAULT_AI_TIME_LIMIT;
-            }
-
             final int newLimit = PickIntValue.pickIntValue(parentFrame,
                 oldLimit, "Pick AI Time Limit (in s)", 
                 Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT);
@@ -453,6 +486,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             {
                 options.setOption(Options.aiTimeLimit, newLimit);
             }
+            setTimeLimitLabel(newLimit);
         }
         else if (e.getActionCommand().startsWith(loadVariant))
         {
@@ -563,7 +597,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(640, 640);
+        return new Dimension(640, 768);
     }
 
 

@@ -8,9 +8,8 @@ Bug: Loading game on AI turn causes AI client to drop?
 Bug: Attacked a 5-high enemy legion and it became 3-high.
 
 
-Show current AI delay and time limit in GetPlayers.
-Command-line option for AI time limit.
 
+Real whole-legion battle eval function, including gang hits.
 
 Split prediction.
 

@@ -1871,6 +1871,11 @@ public class SimpleAI implements AI
         while (it.hasNext())
         {
             BattleChit critter = (BattleChit)it.next();
+            // Offboard critters can't strike.
+            if (critter.getCurrentHexLabel().startsWith("X"))
+            {
+                continue;
+            }
             Set set = client.findStrikes(critter.getTag());
             Iterator it2 = set.iterator();
             while (it2.hasNext())
@@ -1996,7 +2001,7 @@ public class SimpleAI implements AI
         else
         {
             Log.debug("Best carry target is " + bestTarget.getDescription());
-            client.applyCarries(bestTarget.getHexLabel());
+            client.applyCarries(bestTarget.getCurrentHexLabel());
         }
     }
 
@@ -2038,7 +2043,7 @@ Log.debug("Best target is null, aborting");
         // Having found the target and attacker, strike.
         // Take a carry penalty if there is still a 95%
         // chance of killing this target.
-        client.strike(bestAttacker.getTag(), bestTarget.getHexLabel());
+        client.strike(bestAttacker.getTag(), bestTarget.getCurrentHexLabel());
         return true;
     }
 
@@ -2420,12 +2425,11 @@ Log.debug("Called findBattleMoves()");
 
         // The caller is responsible for actually making the moves.
 
-        List critters = client.getActiveBattleChits();
 
         // allCritterMoves is an ArrayList (for clone()) of moveLists.
         final ArrayList allCritterMoves = new ArrayList();
 
-        Iterator it = critters.iterator();
+        Iterator it = client.getActiveBattleChits().iterator();
         while (it.hasNext())
         {
             BattleChit critter = (BattleChit)it.next();
@@ -2478,8 +2482,8 @@ Log.debug("Called findBattleMoves()");
 
             // Show the moves considered.
             StringBuffer buf = new StringBuffer("Considered " +
-                moveList.size() + " moves for " + critter.getName() + " in " +
-                critter.getStartingHexLabel() + ":");
+                moveList.size() + " moves for " + critter.getTag() + " " +
+                critter.getCreatureName() + " in " + currentHexLabel+ ":");
             it2 = moveList.iterator();
             while (it2.hasNext())
             {

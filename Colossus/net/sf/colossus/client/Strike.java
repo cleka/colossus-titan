@@ -42,7 +42,7 @@ final class Strike
             BattleChit chit = (BattleChit)it.next();
             if (countStrikes(chit, true) > 0)
             {
-                set.add(chit.getHexLabel());
+                set.add(chit.getCurrentHexLabel());
             }
         }
 
@@ -114,7 +114,7 @@ final class Strike
 
     boolean canStrike(BattleChit striker, BattleChit target)
     {
-        String targetHexLabel = target.getHexLabel();
+        String targetHexLabel = target.getCurrentHexLabel();
         return findStrikes(striker, true).contains(targetHexLabel);
     }
 
@@ -137,6 +137,11 @@ final class Strike
         {
             return set;
         }
+        // Offboard creatures can't strike.
+        if (chit.getCurrentHexLabel().startsWith("X"))
+        {
+            return set;
+        }
 
         boolean inverted = chit.isInverted();
         BattleHex currentHex = client.getBattleHex(chit);
@@ -150,7 +155,8 @@ final class Strike
             if (!currentHex.isCliff(i))
             {
                 BattleHex targetHex = currentHex.getNeighbor(i);
-                if (targetHex != null && client.isOccupied(targetHex))
+                if (targetHex != null && client.isOccupied(targetHex) &&
+                    !targetHex.isEntrance())
                 {
                     BattleChit target = client.getBattleChit(
                         targetHex.getLabel());
@@ -172,15 +178,13 @@ final class Strike
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && creature.isRangestriker() &&
-            client.getBattlePhase() != Constants.STRIKEBACK &&
-            client.isActive(chit))
+            client.getBattlePhase() != Constants.STRIKEBACK)
         {
-            Iterator it = client.getBattleChits().iterator();
+            Iterator it = client.getInactiveBattleChits().iterator();
             while (it.hasNext())
             {
                 BattleChit target = (BattleChit)it.next();
-                if (chit.isInverted() != target.isInverted() && 
-                    !target.isDead())
+                if (!target.isDead())
                 {
                     BattleHex targetHex = client.getBattleHex(target);
                     if (isRangestrikePossible(chit, target))
@@ -571,6 +575,11 @@ final class Strike
 
         BattleHex currentHex = client.getBattleHex(chit);
         BattleHex targetHex = client.getBattleHex(target);
+
+        if (currentHex.isEntrance() || targetHex.isEntrance())
+        {
+            return false;
+        }
 
         int range = getRange(currentHex, targetHex, false);
         int skill = creature.getSkill();

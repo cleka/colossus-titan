@@ -69,10 +69,6 @@ final class BattleChit extends Chit
         }
     }
 
-    String getHexLabel()
-    {
-        return currentHexLabel;
-    }
 
     String getCurrentHexLabel()
     {
@@ -226,7 +222,7 @@ final class BattleChit extends Chit
 
     public String getDescription()
     {
-        return getCreatureName() + " in " + getHexLabel();
+        return getCreatureName() + " in " + getCurrentHexLabel();
     }
 
     public String toString()

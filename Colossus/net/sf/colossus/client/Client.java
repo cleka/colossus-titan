@@ -772,7 +772,7 @@ public final class Client implements IClient
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
-            if (chit.getHexLabel().startsWith("X"))
+            if (chit.getCurrentHexLabel().startsWith("X"))
             {
                 return true;
             }
@@ -818,7 +818,7 @@ public final class Client implements IClient
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
-            if (chit.getHexLabel().startsWith("X"))
+            if (chit.getCurrentHexLabel().startsWith("X"))
             {
                 chit.setDead(true);
                 chit.repaint();
@@ -1024,7 +1024,7 @@ public final class Client implements IClient
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
-            if (hexLabel.equals(chit.getHexLabel()))
+            if (hexLabel.equals(chit.getCurrentHexLabel()))
             {
                 chits.add(chit);
             }
@@ -1516,7 +1516,8 @@ public final class Client implements IClient
 
     BattleHex getBattleHex(BattleChit chit)
     {
-        return HexMap.getHexByLabel(getBattleTerrain(), chit.getHexLabel());
+        return HexMap.getHexByLabel(getBattleTerrain(), 
+            chit.getCurrentHexLabel());
     }
 
     BattleHex getStartingBattleHex(BattleChit chit)
@@ -2322,7 +2323,7 @@ public final class Client implements IClient
             BattleChit chit = (BattleChit)it.next();
             if (!chit.hasMoved() && !isInContact(chit, false))
             {
-                set.add(chit.getHexLabel());
+                set.add(chit.getCurrentHexLabel());
             }
         }
         return set;

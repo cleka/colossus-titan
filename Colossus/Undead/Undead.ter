@@ -26,7 +26,7 @@ TITANIMPROVE 75
 TITANTELEPORT 700
 
 ACQUIRABLE 100 Angel
-ACQUIRABLE 100 Fire D        100 Water S     100 Air W   100 Earth H 
+ACQUIRABLE 100 FireElemental D  100 WaterElemental S  100 AirElemental W  100 EarthElemental H 
 ACQUIRABLE 100 ArchDevil J   100 Efreet m    100 Genie t
 ACQUIRABLE 100 Necromancer T 300 TheReaper T
 ACQUIRABLE 300 Archangel
