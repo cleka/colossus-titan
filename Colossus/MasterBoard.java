@@ -1712,7 +1712,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public void highlightTallLegions(Player player)
+    private void highlightTallLegions(Player player)
     {
         HashSet set = new HashSet();
 
@@ -1729,7 +1729,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         selectHexesByLabels(set);
     }
 
-    public void highlightUnmovedLegions()
+    private void highlightUnmovedLegions()
     {
         unselectAllHexes();
         Player player = game.getActivePlayer();
@@ -1748,14 +1748,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    /** Select hexes where this legion can move. Return total number of
-     *  legal moves. */
-    public int highlightMoves(Legion legion)
+    /** Select hexes where this legion can move. */
+    private void highlightMoves(Legion legion)
     {
         Set set = game.listMoves(legion, true, true, false);
         unselectAllHexes();
         selectHexesByLabels(set);
-        return set.size();
     }
 
 
@@ -1778,7 +1776,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-
     /** Return number of legions with summonable angels. */
     public int highlightSummonableAngels(Legion legion)
     {
@@ -1789,7 +1786,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public void highlightPossibleRecruits()
+    private void highlightPossibleRecruits()
     {
         int count = 0;
         Player player = game.getActivePlayer();

@@ -1,3 +1,6 @@
+All GUI method calls need to be moved out of non-GUI classes.
+Split GUI classes from model classes.
+
 Add UI for players to specify favorite colors.
 
 Get minimax masterboard moves working.
@@ -73,9 +76,6 @@ Color code StatusScreen better.
 
 Add the ability to change the creature type of a creature in a legion,
    and to specify "unknown" as a creature type, for tracking PBEM games.
-
-All GUI method calls need to be moved out of non-GUI classes.
-Split GUI classes from model classes.
 
 Move GUI/client classes and model/server classes into separate
    packages.  Make all possible public classes package private.

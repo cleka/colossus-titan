@@ -82,13 +82,12 @@ Win98, 1.4b: Chits are placed slightly off-center in battle hexes.
 
 Need to allow first human player to control game options, load game, etc.
 
-Undo move: legion teleported to a new hex and grew to 10 critters.  (Bogus
-   recombine with its parent when playing with undosplit?)
+Currently have to pick recruiter even with all stacks visible set.
 
-Have to pick recruiter even with all stacks visible set.
+AI players need to unhighlight hexes more often, and not highlight
+   stuff on other players' turns.
 
-AI players need to unhighlight hexes more often.
+Need to re-highlight after taking forced or auto strikes.
 
-Don't let non-active player's client's battlemap click on stuff. 
-
-Extra BattleMap caused by double Fight during negotiation.  Need to lock.
+One player's dialogs block all other players.  Need to not display dialogs
+   to AI players.

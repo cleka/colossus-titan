@@ -281,8 +281,11 @@ public final class BattleMap extends HexMap implements MouseListener,
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
-        highlightMobileCritters();
-        requestFocus();
+        if (client.getPlayerName().equals(battle.getActivePlayerName()))
+        {
+            highlightMobileCritters();
+            requestFocus();
+        }
     }
 
 
@@ -310,8 +313,11 @@ public final class BattleMap extends HexMap implements MouseListener,
         mi.setMnemonic(KeyEvent.VK_C);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
-        highlightCrittersWithTargets();
-        requestFocus();
+        if (client.getPlayerName().equals(battle.getActivePlayerName()))
+        {
+            highlightCrittersWithTargets();
+            requestFocus();
+        }
     }
 
 
@@ -471,51 +477,43 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    /** Select all hexes containing critters eligible to move.
-     *  Return the number of hexes selected (not the number
-     *  of critters). */
-    public int highlightMobileCritters()
+    /** Select all hexes containing critters eligible to move. */
+    private void highlightMobileCritters()
     {
         Set set = battle.findMobileCritters();
         unselectAllHexes();
         selectHexesByLabels(set);
-        return set.size();
     }
 
-    public void highlightMoves(Critter critter)
+    private void highlightMoves(Critter critter)
     {
         Set set = battle.showMoves(critter, false);
         unselectAllHexes();
         selectHexesByLabels(set);
     }
 
-    /** Select hexes containing critters that have valid strike targets.
-     *  Return the number of selected hexes. */
-    public int highlightCrittersWithTargets()
+    /** Select hexes containing critters that have valid strike targets. */
+    private void highlightCrittersWithTargets()
     {
         Set set = battle.findCrittersWithTargets();
         unselectAllHexes();
         selectHexesByLabels(set);
-        return set.size();
     }
 
-    /** Highlight all hexes with targets that the critter can strike.
-     *  Return the number of hexes highlighted. */
-    public int highlightStrikes(Critter critter)
+    /** Highlight all hexes with targets that the critter can strike. */
+    private void highlightStrikes(Critter critter)
     {
         Set set = battle.findStrikes(critter, true);
         unselectAllHexes();
         selectHexesByLabels(set);
-        return set.size();
     }
 
 
-    public int highlightCarries()
+    public void highlightCarries()
     {
         Set set = battle.findCarryTargets();
         unselectAllHexes();
         selectHexesByLabels(set);
-        return set.size();
     }
 
 
@@ -568,8 +566,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
     }
 
-
-    public void actOnHex(BattleHex hex)
+    private void actOnHex(BattleHex hex)
     {
         switch (battle.getPhase())
         {

@@ -16,6 +16,7 @@ public final class Game
     private int activePlayerNum;
     private int turnNumber = 1;  // Advance when every player has a turn
     private boolean engagementInProgress;
+    private boolean battleInProgress;
     private Battle battle;
     private static Random random = new Random();
     private Caretaker caretaker = new Caretaker();
@@ -91,6 +92,7 @@ public final class Game
 	newGame.caretaker = caretaker.AICopy();
 	newGame.phase = phase;
 	newGame.engagementInProgress = engagementInProgress;
+	newGame.battleInProgress = battleInProgress;
 
 	return newGame;
     }
@@ -99,6 +101,8 @@ public final class Game
     public void newGame()
     {
         turnNumber = 1;
+        engagementInProgress = false;
+        battleInProgress = false;
         caretaker.resetAllCounts();
         players.clear();
 
@@ -2422,6 +2426,7 @@ public final class Game
             }
         }
         engagementInProgress = false;
+        battleInProgress = false;
         server.highlightEngagements(getActivePlayerName());
         server.allUpdateStatusScreen();
     }
@@ -2670,6 +2675,12 @@ public final class Game
 
     public void negotiate(String playerName, NegotiationResults offer)
     {
+        // If it's too late to negotiate, just throw this away.
+        if (battleInProgress)
+        {
+            return;
+        }
+
         int thisPlayerSet;
         if (playerName.equals(getActivePlayerName()))
         {
@@ -2706,18 +2717,22 @@ public final class Game
 
     public void fight(String hexLabel)
     {
-        Player player = getActivePlayer();
-        Legion attacker = getFirstFriendlyLegion(hexLabel, player);
-        Legion defender = getFirstEnemyLegion(hexLabel, player);
+        if (!battleInProgress)
+        {
+            battleInProgress = true;
+            Player player = getActivePlayer();
+            Legion attacker = getFirstFriendlyLegion(hexLabel, player);
+            Legion defender = getFirstEnemyLegion(hexLabel, player);
 
-        // Reveal both legions to all players.
-        attacker.revealAllCreatures();
-        defender.revealAllCreatures();
+            // Reveal both legions to all players.
+            attacker.revealAllCreatures();
+            defender.revealAllCreatures();
 
-        battle = new Battle(this, attacker.getMarkerId(),
-            defender.getMarkerId(), Battle.DEFENDER, hexLabel,
-            1, Battle.MOVE);
-        battle.init();
+            battle = new Battle(this, attacker.getMarkerId(),
+                defender.getMarkerId(), Battle.DEFENDER, hexLabel,
+                1, Battle.MOVE);
+            battle.init();
+        }
     }
 
 
