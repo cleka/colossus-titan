@@ -1367,6 +1367,27 @@ public final class Game extends GameSource
         // Towers are a special case.
         if (terrain == 'T')
         {
+	    recruits = getPossibleRecruits(terrain);
+	    if (legion.numCreature(Creature.titan) < 1 &&
+                legion.numCreature((Creature)recruits.get(4)) < 1)
+	    { /* no Titan, no itself */ 
+		recruits.remove(4);
+	    }
+	    java.util.List creatures = Creature.getCreatures();
+	    Iterator it = creatures.iterator();
+	    boolean keepGuardian = false; /* guardian or something else... */
+	    while (it.hasNext() && !keepGuardian)
+            {
+		Creature creature = (Creature)it.next();
+		if ((legion.numCreature(creature) >= 3) &&
+		    (!creature.isImmortal()))
+		    keepGuardian = true;
+	    }
+	    if (!keepGuardian)
+	    { /* no non-lord creature is 3 or more in number */
+		recruits.remove(3);
+	    }
+	    /*
             recruits = new ArrayList(5);
 
             recruits.add(Creature.centaur);
@@ -1400,10 +1421,11 @@ public final class Game extends GameSource
             {
                 recruits.add(Creature.warlock);
             }
+	    */
         }
         else
         {
-            recruits = getPossibleRecruits(hex.getTerrain());
+            recruits = getPossibleRecruits(terrain);
 
             ListIterator lit = recruits.listIterator(recruits.size());
             while (lit.hasPrevious())
@@ -1488,6 +1510,40 @@ public final class Game extends GameSource
         {
             // Towers are a special case.  The recruiter of tower creatures
             // remains anonymous, so we only deal with guardians and warlocks.
+	    ArrayList possibleRecruiters = getPossibleRecruits(terrain);
+	    Creature warlockOrNot = (Creature)possibleRecruiters.get(4);
+	    Creature guardianOrNot = (Creature)possibleRecruiters.get(3);
+	    if (recruit.getName().equals(warlockOrNot.getName()))
+	    {
+		if (legion.numCreature(Creature.titan) >= 1)
+                {
+                    recruiters.add(legion.getCritter(Creature.titan));
+                }
+		if (legion.numCreature(warlockOrNot) >= 1)
+                {
+                    recruiters.add(legion.getCritter(warlockOrNot));
+                }
+	    }
+	    else if (recruit.getName().equals(guardianOrNot.getName()))
+	    {
+                java.util.List creatures = Creature.getCreatures();
+                Iterator it = creatures.iterator();
+                while (it.hasNext())
+		{
+		    Creature creature = (Creature)it.next();
+                    if (creature.getName().equals(guardianOrNot.getName()) &&
+                        (legion.numCreature(creature) >= 1))
+		    {
+			recruiters.add(legion.getCritter(creature));
+		    }
+                    else if (!creature.isImmortal() &&
+			     legion.numCreature(creature) >= 3)
+		    {
+			recruiters.add(legion.getCritter(creature));
+		    }
+		}
+	    }
+	    /*
             if (recruit.getName().equals("Warlock"))
             {
                 if (legion.numCreature(Creature.titan) >= 1)
@@ -1518,6 +1574,7 @@ public final class Game extends GameSource
                     }
                 }
             }
+	    */
         }
         else
         {

@@ -52,17 +52,18 @@ public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
             return (((recruitNumber)al.get(iRe)).number);
         }
         /* Tower, special */
-        if (recruit.getName().equals("Centaur") ||
-                    recruit.getName().equals("Gargoyle") ||
-                    recruit.getName().equals("Ogre"))
-        {
+        ArrayList to = getPossibleRecruits(terrain); /* this is 'T' */
+        if (recruit.getName().equals(((Creature)to.get(0)).getName()) ||
+                    recruit.getName().equals(((Creature)to.get(1)).getName()) ||
+                    recruit.getName().equals(((Creature)to.get(2)).getName()))
+        { /* first three can be recruited by anything */
             return 0;
         }
-        else if (recruit.getName().equals("Warlock"))
+        else if (recruit.getName().equals(((Creature)to.get(4)).getName()))
         {
             if (recruiter.getName().equals("Titan") ||
-                recruiter.getName().equals("Warlock"))
-            {
+                recruiter.getName().equals(((Creature)to.get(4)).getName()))
+            { /* fifth recruited by Titan or itself */
                 return 1;
             }
             else
@@ -70,9 +71,9 @@ public class TerrainRecruitLoader implements TerrainRecruitLoaderConstants {
                 return 99;
             }
         }
-        else if (recruit.getName().equals("Guardian"))
-        {
-            if (recruiter.getName().equals("Guardian"))
+        else if (recruit.getName().equals(((Creature)to.get(3)).getName()))
+        { /* fourth recruited by any 3 or itself */
+            if (recruiter.getName().equals(((Creature)to.get(3)).getName()))
             {
                 return 1;
             }

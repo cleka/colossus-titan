@@ -64,3 +64,6 @@ except for the next-to-last that should be '3'. First three
 are 'anything  can recruit' creature, 4the fourth is 'anything
 numerous enough can recruit', the fifth and last is 'Titan can
 recruit'.
+
+Note: for the guardian or the guardian replacement, any value
+othe than '3' will _not_ work.
