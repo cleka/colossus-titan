@@ -4,7 +4,6 @@ package net.sf.colossus.server;
 import java.util.*;
 
 import net.sf.colossus.client.IClient;
-import net.sf.colossus.client.Proposal;   // XXX
 
 
 /**

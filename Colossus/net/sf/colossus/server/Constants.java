@@ -40,7 +40,6 @@ public final class Constants
     public static final String logFileName = "lastgame.log";
 
 
-
     // Constants for savegames
 
     /** Must include trailing slash. */

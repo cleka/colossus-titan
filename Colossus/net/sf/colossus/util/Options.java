@@ -17,19 +17,30 @@ public final class Options
     // Everything is public because we use this class in both the client
     // and server packages.  (With separate data.)
 
+    // Will add player numbers 0 through n-1 to the end of these.
+    public static final String playerName = "Player name ";
+    public static final String playerType = "Player type ";
 
     // Option names
 
     // Server options
     public static final String autosave = "Autosave";
     public static final String logDebug = "Log debug messages";
-    public static final String balancedTowers = "Balanced starting towers";
-    public static final String allStacksVisible = "All stacks visible";
+
     public static final String autoStop = "AIs stop when humans dead";
     public static final String autoQuit = "Auto quit when game over";
-    public static final String aiDelay = "AI delay";  // int
-    public static final String variant = "Variant";   // string
-    // t-port option
+
+    public static final String variant = "Variant";
+
+    // rules options
+    public static final String balancedTowers = "Balanced starting towers";
+    public static final String allStacksVisible = "All stacks visible";
+    public static final String cumulativeSlow = "Slowing is cumulative";
+    public static final String oneHexAllowed = "Always allows one hex";
+    public static final String nonRandomBattleDice = 
+        "Use non-random battle dice";
+
+    // teleport rules options
     public static final String noFirstTurnT2TTeleport = 
         "No tower-to-tower Teleport on first turn";
     public static final String noFirstTurnTeleport = 
@@ -38,17 +49,10 @@ public final class Options
         "Tower-to-Tower Teleport only";
     public static final String noTowerTeleport = "No Tower Teleport";
     public static final String noTitanTeleport = "No Titan Teleport";
-    // more rules options
-    public static final String cumulativeSlow = "Slowing is cumulative";
-    public static final String oneHexAllowed = "Always allows one hex";
-    public static final String nonRandomBattleDice = "Use non-random battle dice";
-
-    // Will add player numbers 0-5 to the end of these.
-    public static final String playerName = "Player name ";
-    public static final String playerType = "Player type ";
 
 
-    // Display options (client)
+
+    // Display options (client only)
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";
     public static final String showLogWindow = "Show log window";
@@ -62,13 +66,13 @@ public final class Options
     public static final String scale = "Scale";
     public static final String serverName = "Server name";
 
-    // Window locations and sizes
+    // Window locations and sizes (client only)
     public static final String locX = "Location X";
     public static final String locY = "Location Y";
     public static final String sizeX = "Size X";
     public static final String sizeY = "Size Y";
 
-    // AI options (player - on client)
+    // AI options (client only)
     public static final String autoPickColor = "Auto pick color";
     public static final String autoPickMarker = "Auto pick markers";
     public static final String autoSplit = "Auto split";
@@ -90,6 +94,7 @@ public final class Options
     public static final String autoPlay = "Auto play";
 
     public static final String aiTimeLimit = "AI time limit";
+    public static final String aiDelay = "AI delay";
 
     // General per-player options
     public static final String favoriteColors = "Favorite colors";

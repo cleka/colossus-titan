@@ -515,7 +515,7 @@ public final class Client implements IClient
         }
         else if (optname.equals(Options.logDebug))
         {
-            Log.setShowDebug(bval);
+            Log.setShowDebug(bval);   // XXX move this to server
         }
         else if (optname.equals(Options.showCaretaker))
         {
