@@ -122,10 +122,22 @@ public final class Constants
     // XXX Not used everywhere yet, so don't change it.
     public static final int MAX_PLAYERS = 6;
 
+    // Player types
+    public static final String human = "Human";
+    public static final String network = "Network";
+    public static final String none = "None";
+    public static final String ai = "AI";
     public static final String anyAI = "A Random AI";
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI" };
     public static final int numAITypes = aiArray.length;
+
+    // Player names
+    public static final String byColor = "<By color>";
+    public static final String byClient = "<By client>";
+    public static final String username = System.getProperty("user.name",
+        byColor);
+
 
     /** Available internal variants */
     public static final String [] variantArray =

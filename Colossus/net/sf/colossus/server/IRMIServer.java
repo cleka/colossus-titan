@@ -4,6 +4,7 @@ package net.sf.colossus.server;
 import java.util.*;
 import java.rmi.*;
 
+import net.sf.colossus.client.IRMIClient;
 import net.sf.colossus.client.Proposal;
 
 
@@ -14,6 +15,9 @@ import net.sf.colossus.client.Proposal;
  */
 public interface IRMIServer extends Remote
 {
+    public void addRemoteClient(IRMIClient client, String playerName) 
+        throws RemoteException;
+
     public void leaveCarryMode() throws RemoteException;
 
     public void doneWithBattleMoves() throws RemoteException;

@@ -59,6 +59,9 @@ public final class Game
     // XXX Need to clear cl after initialization is done? 
     private CommandLine cl = null;
 
+    /** Number of remote clients we're waiting for. */
+    private int waitingForClients;
+
 
     Game()
     {
@@ -82,6 +85,7 @@ public final class Game
             {
                 Log.error(e.toString());
                 e.printStackTrace();
+                dispose();
             }
         }
         else
@@ -91,7 +95,16 @@ public final class Game
         for (int i = 0; i < getNumPlayers(); i++)
         {
             Player player = (Player)players.get(i);
-            server.addClient(player.getName(), (i == getPrimaryPlayerNum()));
+            if (player.getType().endsWith(Constants.network))
+            {
+                waitingForClients++;
+Log.debug("Incremented waitingForClients to " + waitingForClients);
+            }
+            else
+            {
+                server.addLocalClient(player.getName(), 
+                    (i == getPrimaryPlayerNum()));
+            }
         }
     }
 
@@ -158,6 +171,7 @@ public final class Game
         acquiring = false;
         pendingAdvancePhase = false;
         gameOver = false;
+        waitingForClients = 0;
     }
 
 
@@ -204,18 +218,18 @@ public final class Game
             String name = null;
             if (i == 0)
             {
-                name = GetPlayers.username;
+                name = Constants.username;
             }
             else
             {
-                name = GetPlayers.byColor + i;
+                name = Constants.byColor + i;
             }
             options.setOption(Options.playerName + i, name);
-            options.setOption(Options.playerType + i, "Human");
+            options.setOption(Options.playerType + i, Constants.human);
         }
         for (int j = numHumans; j < numAIs + numHumans; j++)
         {
-            String name = GetPlayers.byColor + j;
+            String name = Constants.byColor + j;
             options.setOption(Options.playerName + j, name);
             options.setOption(Options.playerType + j, Constants.defaultAI);
         }
@@ -228,7 +242,7 @@ public final class Game
             String name = options.getStringOption(Options.playerName + i);
             String type = options.getStringOption(Options.playerType + i);
 
-            if (name != null && type != null && !type.equals(GetPlayers.none))
+            if (name != null && type != null && !type.equals(Constants.none))
             {
                 addPlayer(name, type);
                 Log.event("Add " + type + " player " + name);
@@ -289,6 +303,19 @@ public final class Game
 
         initServerAndClients();
 
+        if (waitingForClients == 0)
+        {
+            newGame2();
+        }
+        else
+        {
+            initRMI();
+        }
+    }
+
+    private void newGame2()
+    {
+Log.debug("Called Game.newGame2()");
         // We need to set the autoPlay option before loading the board,
         // so that we can avoid showing boards for non-primary AI players.
         syncAutoPlay();
@@ -300,6 +327,76 @@ public final class Game
         Collections.sort(players);
         activePlayerNum = 0;
         assignColors();
+    }
+
+    private void initRMI()
+    {
+Log.debug("Called Game.initRMI()");
+        if (System.getSecurityManager() == null)
+        {
+            System.setSecurityManager(new RMISecurityManager());
+        }
+        String name = "//" + "localhost" + "/Colossus";
+        try
+        {
+            Naming.rebind(name, server);
+            System.out.println("RMIServer bound");
+        }
+        catch (Exception e)
+        {
+            System.err.println("RMIServer main() exception: " +
+                e.getMessage());
+            e.printStackTrace();
+            dispose();
+        }
+    }
+
+    private boolean nameIsTaken(String name)
+    {
+        for (int i = 0; i < getNumPlayers(); i++)
+        {
+            Player player = (Player)players.get(i);
+            if (player.getName().equals(name))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** If the name is taken, add random digits to the end. */ 
+    String getUniqueName(final String name)
+    {
+        if (!nameIsTaken(name))
+        {
+            return name;
+        }
+        return getUniqueName(name + rollDie());
+    }
+
+    void addRemoteClient(final String playerName)
+    {
+Log.debug("Called Game.addedRemoteClient for " + playerName);
+        for (int i = 0; i < getNumPlayers(); i++)
+        {
+            Player player = (Player)players.get(i);
+            if (player.getType().endsWith(Constants.network) &&
+                player.getName().startsWith(Constants.byClient))
+            {
+                player.setName(playerName);
+
+                // XXX broken
+                // In case we had to change a duplicate name.
+                server.setPlayerName(playerName, playerName);
+                waitingForClients--;
+                if (waitingForClients <= 0)
+                {
+                    newGame2();
+                }
+                break;
+            }
+        }
+
     }
 
 
@@ -368,7 +465,7 @@ public final class Game
         else
         {
             // All players are done picking colors; continue.
-            newGame2();
+            newGame3();
         }
     }
 
@@ -379,7 +476,7 @@ public final class Game
         Player player = getPlayer(playerName);
         colorsLeft.remove(color);
         player.setColor(color);
-        if (player.getName().startsWith(GetPlayers.byColor))
+        if (player.getName().startsWith(Constants.byColor))
         {
             server.setPlayerName(player.getName(), color);
             player.setName(color);
@@ -391,7 +488,7 @@ public final class Game
     }
 
     /** Done picking player colors; proceed to start game. */
-    private void newGame2()
+    private void newGame3()
     {
         server.allUpdatePlayerInfo();
 

@@ -57,8 +57,7 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
     }
 
 
-    /** Temporary.  We will not use direct client refs later. */
-    void addClient(String playerName, boolean primary)
+    void addLocalClient(String playerName, boolean primary)
     {
         IRMIClient client = ClientFactory.createClient(this, playerName,
             primary);
@@ -68,6 +67,15 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
         {
             primaryPlayerName = playerName;
         }
+    }
+
+    public void addRemoteClient(IRMIClient client, String playerName)
+    {
+        clients.add(client);
+        String name = game.getUniqueName(playerName);
+Log.debug("Adding client with unique name " + name); 
+        clientMap.put(name, client);
+        game.addRemoteClient(name);
     }
 
 
@@ -166,7 +174,7 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
         Battle battle = game.getBattle();
         if (!playerName.equals(battle.getActivePlayerName()))
         {
-            Log.error(playerName + "illegally called doneWithStrikes()");
+            Log.error(playerName + " illegally called doneWithStrikes()");
             return;
         }
         if (!battle.doneWithStrikes())
@@ -215,7 +223,6 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
     }
 
 
-    // XXX Excessive GUI control
     void allInitBoard()
     {
         Iterator it = clients.iterator();
@@ -1091,7 +1098,7 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
     {
         if (!playerName.equals(game.getActivePlayerName()))
         {
-            Log.error(playerName + "illegally called mulligan()");
+            Log.error(playerName + " illegally called mulligan()");
             return;
         }
         int roll = game.mulligan();
@@ -1105,7 +1112,7 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
 
     public void undoSplit(String playerName, String splitoffId)
     {
-        if (playerName != game.getActivePlayerName())
+        if (!playerName.equals(game.getActivePlayerName()))
         {
             return;
         }
@@ -1133,7 +1140,7 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
 
     public void undoMove(String playerName, String markerId)
     {
-        if (playerName != game.getActivePlayerName())
+        if (!playerName.equals(game.getActivePlayerName()))
         {
             return;
         }
@@ -1160,7 +1167,7 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
 
     public void undoRecruit(String playerName, String markerId)
     {
-        if (playerName != game.getActivePlayerName())
+        if (!playerName.equals(game.getActivePlayerName()))
         {
             return;
         }
@@ -1170,9 +1177,9 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
 
     public void doneWithSplits(String playerName)
     {
-        if (playerName != game.getActivePlayerName())
+        if (!playerName.equals(game.getActivePlayerName()))
         {
-            Log.error(playerName + "illegally called doneWithSplits()");
+            Log.error(playerName + " illegally called doneWithSplits()");
             return;
         }
         if (game.getTurnNumber() == 1 &&
@@ -1186,9 +1193,9 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
 
     public void doneWithMoves(String playerName)
     {
-        if (playerName != game.getActivePlayerName())
+        if (!playerName.equals(game.getActivePlayerName()))
         {
-            Log.error(playerName + "illegally called doneWithMoves()");
+            Log.error(playerName + " illegally called doneWithMoves()");
             return;
         }
 
@@ -1220,9 +1227,9 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
 
     public void doneWithEngagements(String playerName)
     {
-        if (playerName != game.getActivePlayerName())
+        if (!playerName.equals(game.getActivePlayerName()))
         {
-            Log.error(playerName + "illegally called doneWithEngagements()");
+            Log.error(playerName + " illegally called doneWithEngagements()");
             return;
         }
         // Advance only if there are no unresolved engagements.
@@ -1236,9 +1243,9 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
 
     public void doneWithRecruits(String playerName)
     {
-        if (playerName != game.getActivePlayerName())
+        if (!playerName.equals(game.getActivePlayerName()))
         {
-            Log.error(playerName + "illegally called doneWithRecruits()");
+            Log.error(playerName + " illegally called doneWithRecruits()");
             return;
         }
         Player player = game.getPlayer(playerName);

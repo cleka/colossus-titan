@@ -145,7 +145,7 @@
 
 <target name="rmi" depends="compile"
         description = "Compile RMI stubs">
-        <rmic base="" debug="yes"
+        <rmic base="" debug="yes" stubversion="1.2"
               includes = "net/sf/colossus/client/Client.class,
                           net/sf/colossus/server/Server.class"
         />

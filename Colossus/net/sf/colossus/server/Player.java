@@ -78,17 +78,22 @@ public final class Player implements Comparable
 
     boolean isHuman()
     {
-        return type.endsWith("Human");
+        return type.endsWith(Constants.human) || isNetwork();
+    }
+
+    boolean isNetwork()
+    {
+        return type.endsWith(Constants.network);
     }
 
     boolean isAI()
     {
-        return type.endsWith("AI");
+        return type.endsWith(Constants.ai);
     }
 
     boolean isNone()
     {
-        return type.endsWith("none");
+        return type.endsWith(Constants.none);
     }
 
     String getType()

@@ -138,6 +138,19 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         loadOptions();
     }
 
+    void attachToServer()
+    {
+        try
+        {
+            server.addRemoteClient(this, playerName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
+    }
+
 
     boolean isPrimary()
     {
@@ -1082,6 +1095,8 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
 
     public void initBoard()
     {
+        VariantSupport.loadVariant(options.getStringOption(Options.variant));
+
         // Do not show boards for AI players, except primary client.
         if (!getOption(Options.autoPlay) || primary)
         {

@@ -30,10 +30,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
     public static final String loadGame = "Load Game";
     public static final String loadVariant = "Load External Variant";
     public static final String quit = "Quit";
-    public static final String none = "None";
-    public static final String byColor = "<By color>";
-    public static final String username = System.getProperty("user.name",
-        byColor);
 
     private JFrame parentFrame;
 
@@ -161,8 +157,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private void setupTypeChoices()
     {
         typeChoices.clear();
-        typeChoices.add("Human");
-        typeChoices.add("None");
+        typeChoices.add(Constants.human);
+        typeChoices.add(Constants.network);
         for (int i = 0 ; i < Constants.numAITypes; i++) 
         {
             if (!(Constants.aiArray[i].equals("")))
@@ -175,6 +171,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             typeChoices.add(Constants.anyAI);
         }
+        typeChoices.add(Constants.none);
     }
 
     private void doOnePlayer(final int i)
@@ -191,7 +188,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         String type = options.getStringOption(Options.playerType + i);
         if (type == null || type.length() == 0)
         {
-            type = none;
+            type = Constants.none;
         }
         playerType.setSelectedItem(type);
 
@@ -202,26 +199,26 @@ public final class GetPlayers extends KDialog implements WindowListener,
         String name = options.getStringOption(Options.playerName + i);
         if (name == null || name.length() == 0)
         {
-            name = none;
+            name = Constants.none;
         }
-        if (name.startsWith(byColor))
+        if (name.startsWith(Constants.byColor))
         {
-            name = byColor;
+            name = Constants.byColor;
         }
 
         Vector nameChoices = new Vector();
         nameChoices.add(name);
-        if (!nameChoices.contains(byColor))
+        if (!nameChoices.contains(Constants.byColor))
         {
-            nameChoices.add(byColor);
+            nameChoices.add(Constants.byColor);
         }
-        if (!nameChoices.contains(username))
+        if (!nameChoices.contains(Constants.username))
         {
-            nameChoices.add(username);
+            nameChoices.add(Constants.username);
         }
-        if (!nameChoices.contains(none))
+        if (!nameChoices.contains(Constants.none))
         {
-            nameChoices.add(none);
+            nameChoices.add(Constants.none);
         }
 
         JComboBox playerName = new JComboBox(nameChoices);
@@ -253,10 +250,12 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             String name = (String)(playerNames[i].getSelectedItem());
             String type = (String)(playerTypes[i].getSelectedItem());
-            if (name.length() > 0 && !name.equals(none) && !type.equals(none))
+            if (name.length() > 0 && !name.equals(Constants.none) && 
+                !type.equals(Constants.none))
             {
                 // Make byColor names unique by appending row number.
-                if (name.equals(byColor))
+                if (name.equals(Constants.byColor) || 
+                    name.equals(Constants.byClient))
                 {
                     name = name + i;
                 }
@@ -443,15 +442,20 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         // If player type was changed to none, also change 
                         // player name to none.
                         String value = (String)box.getSelectedItem();
-                        if (value.equals(none))
+                        if (value.equals(Constants.none))
                         {
-                            playerNames[i].setSelectedItem(none);
+                            playerNames[i].setSelectedItem(Constants.none);
+                        }
+                        else if (value.equals(Constants.network))
+                        {
+                            playerNames[i].setSelectedItem(Constants.byClient);
                         }
                         // If player type was changed away from none, also 
                         // change player name to something else.
-                        else if (playerNames[i].getSelectedItem().equals(none))
+                        else if (playerNames[i].getSelectedItem().equals(
+                            Constants.none))
                         {
-                            playerNames[i].setSelectedItem(byColor);
+                            playerNames[i].setSelectedItem(Constants.byColor);
                         }
                     }
     
@@ -461,13 +465,14 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         // If player name was changed to none, also change 
                         // player type to none.
                         String value = (String)box.getSelectedItem();
-                        if (value.equals(none))
+                        if (value.equals(Constants.none))
                         {
-                            playerTypes[i].setSelectedItem(none);
+                            playerTypes[i].setSelectedItem(Constants.none);
                         }
                         // If player type was changed away from none, also 
                         // change player name to something else.
-                        else if (playerTypes[i].getSelectedItem().equals(none))
+                        else if (playerTypes[i].getSelectedItem().equals(
+                            Constants.none))
                         {
                             playerTypes[i].setSelectedItem(Constants.anyAI);
                         }
