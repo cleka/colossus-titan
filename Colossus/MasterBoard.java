@@ -69,7 +69,34 @@ public class MasterBoard extends Frame implements MouseListener,
 
         imagesLoaded = false;
 
-        // Initialize the popup menu.
+        initializePopupMenu();
+
+        SetupMasterHexes.setupHexes(h, this);
+
+        // This initialization needs to be skipped if we loaded a
+        // game rather than starting a new one.
+        if (newgame)
+        {
+            for (int i = 0; i < game.getNumPlayers(); i++)
+            {
+                pickInitialMarker(game.getPlayer(i));
+                placeInitialLegion(game.getPlayer(i));
+
+                game.updateStatusScreen();
+            }
+        }
+
+        loadInitialMarkers();
+
+        if (newgame)
+        {
+            finishInit(true);
+        }
+    }
+        
+
+    private void initializePopupMenu()
+    {
         popupMenu = new PopupMenu();
         menuItemHex = new MenuItem("View Recruit Info");
         menuItemMap = new MenuItem("View BattleMap");
@@ -78,58 +105,48 @@ public class MasterBoard extends Frame implements MouseListener,
         add(popupMenu);
         menuItemHex.addActionListener(this);
         menuItemMap.addActionListener(this);
-
-        // Initialize the hexmap.
-        SetupMasterHexes.setupHexes(h, this);
-
-        // This initialization needs to be skipped if we loaded a
-        // game rather than starting a new one.
-        if (newgame)
+    }
+                
+                
+    private void pickInitialMarker(Player player)
+    {
+        do
         {
-            // Each player needs to pick his first legion marker.
-            for (int i = 0; i < game.getNumPlayers(); i++)
-            {
-                do
-                {
-                    new PickMarker(this, game.getPlayer(i));
-                }
-                while (game.getPlayer(i).getSelectedMarker() == null);
-                Game.logEvent(game.getPlayer(i).getName() + 
-                    " selected initial marker");
-                // Update status window to reflect marker taken.
-                game.updateStatusScreen();
-            }
-
-            // Place initial legions.
-            for (int i = 0; i < game.getNumPlayers(); i++)
-            {
-                // Lookup coords for chit starting from player[i].getTower()
-                MasterHex hex = getHexFromLabel(100 *
-                    game.getPlayer(i).getTower());
-    
-                Creature.titan.takeOne();
-                Creature.angel.takeOne();
-                Creature.ogre.takeOne();
-                Creature.ogre.takeOne();
-                Creature.centaur.takeOne();
-                Creature.centaur.takeOne();
-                Creature.gargoyle.takeOne();
-                Creature.gargoyle.takeOne();
-
-                Legion legion = new Legion(3 * scale,
-                    game.getPlayer(i).getSelectedMarker(), null, this, 8,
-                    hex, Creature.titan, Creature.angel, Creature.ogre,
-                    Creature.ogre, Creature.centaur, Creature.centaur,
-                    Creature.gargoyle, Creature.gargoyle, game.getPlayer(i));
-    
-                game.getPlayer(i).addLegion(legion);
-                hex.addLegion(legion);
-            }
+            new PickMarker(this, player);
         }
+        while (player.getSelectedMarker() == null);
 
-        // Update status window to reflect new legions.
-        game.updateStatusScreen();
+        Game.logEvent(player.getName() + " selected initial marker");
+    }
 
+
+    private void placeInitialLegion(Player player)
+    {
+        // Lookup coords for chit starting from player[i].getTower()
+        MasterHex hex = getHexFromLabel(100 * player.getTower());
+    
+        Creature.titan.takeOne();
+        Creature.angel.takeOne();
+        Creature.ogre.takeOne();
+        Creature.ogre.takeOne();
+        Creature.centaur.takeOne();
+        Creature.centaur.takeOne();
+        Creature.gargoyle.takeOne();
+        Creature.gargoyle.takeOne();
+
+        Legion legion = new Legion(3 * scale,
+            player.getSelectedMarker(), null, this, 8,
+            hex, Creature.titan, Creature.angel, Creature.ogre,
+            Creature.ogre, Creature.centaur, Creature.centaur,
+            Creature.gargoyle, Creature.gargoyle, player);
+    
+        player.addLegion(legion);
+        hex.addLegion(legion);
+    }
+        
+
+    private void loadInitialMarkers()
+    {
         tracker = new MediaTracker(this);
 
         for (int i = 0; i < game.getNumPlayers(); i++)
@@ -137,7 +154,8 @@ public class MasterBoard extends Frame implements MouseListener,
             Player player = game.getPlayer(i);
             for (int j = 0; j < player.getNumLegions(); j++)
             {
-                tracker.addImage(player.getLegion(j).getMarker().getImage(), 0);
+                tracker.addImage(player.getLegion(j).getMarker().getImage(),
+                    0);
             }
         }
 
@@ -151,12 +169,8 @@ public class MasterBoard extends Frame implements MouseListener,
         }
 
         imagesLoaded = true;
-
-        if (newgame)
-        {
-            finishInit(true);
-        }
     }
+
         
     
     private void setupIcon()
