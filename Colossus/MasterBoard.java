@@ -61,7 +61,7 @@ public class MasterBoard extends Frame implements MouseListener,
         scale = 17;
 
         pack();
-        setSize(69 * scale, 69 * scale);
+        setSize(getPreferredSize());
         setBackground(java.awt.Color.black);
         addWindowListener(this);
         addMouseListener(this);
@@ -843,18 +843,11 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public Dimension getMinimumSize()
     {
-        return new Dimension(69 * scale, 69 * scale);
+        return getPreferredSize();
     }
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(69 * scale, 69 * scale);
-    }
-
-
-    public static void main(String args[])
-    {
-        game = new Game();
-        MasterBoard masterboard = new MasterBoard(game);
+        return new Dimension(64 * scale, 58 * scale);
     }
 }
