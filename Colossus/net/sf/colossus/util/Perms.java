@@ -108,10 +108,9 @@ public final class Perms
       * by the previous permutation by a single interchange of two adjacent
       * elements. In many problem domains this allows a efficient dynamic
       * update of a permutation function.
-      * @see Dershowitz, Nachum. "A simplified loop - free algorithm for
-      * generating permutations" BIT - 15 1975 158 - 164
       * @author Peter Unold
-      * @see http://www.daimi.aau.dk/~pjunold/alg/dershowitz.html
+      * @see "Dershowitz, Nachum. "A simplified loop - free algorithm for generating permutations" BIT - 15 1975 158 - 164"
+      * @see <a href="http://www.daimi.aau.dk/~pjunold/alg/dershowitz.html">Dershowitz's Permutation Generator</a>
      */
     class PermGen
     {
