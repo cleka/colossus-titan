@@ -29,6 +29,15 @@ RECRUIT T Centaur   0 Centaur  ((6 Lion AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian))))
 
+RECRUIT P Centaur   2 Centaur  ((NOT (HASCREATURE Warbear)) AND
+                                (HEIGHTIS 2) AND
+                                (ALLATTACKERSMALLERTHAN 0) AND
+                                (CANREACH W))
+RECRUIT M Ogre      2 Ogre     ((NOT (HASCREATURE Minotaur)) AND
+                                (HEIGHTIS 2) AND
+                                (ALLATTACKERSMALLERTHAN 0) AND
+                                (CANREACH H))
+
 INITIALSPLIT "100" 0.5 ( Titan Gargoyle Centaur Centaur ) ( Angel Gargoyle Ogre Ogre )
 INITIALSPLIT "100" 1.0 ( Titan Gargoyle Gargoyle Ogre ) ( Angel Centaur Centaur Ogre )
 INITIALSPLIT "200" 1.0 ( Titan Gargoyle Ogre Ogre ) ( Angel Gargoyle Centaur Centaur )
