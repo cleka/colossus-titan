@@ -1253,9 +1253,11 @@ class MasterBoard extends JFrame implements MouseListener,
                     // What to do depends on which mouse button was used
                     // and the current phase of the turn.
 
-                    // Right-click or alt-click means to show the contents
-                    // of the legion.  Must also check this in mouseReleased()
-                    if (e.isPopupTrigger())
+                    // Right-click or means to show the contents of the 
+                    // legion.
+                    if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
+                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
+                        InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
                         new ShowLegion(this, legion, point, 
                             i == game.getActivePlayerNum());
@@ -1349,8 +1351,10 @@ class MasterBoard extends JFrame implements MouseListener,
                     MasterHex hex = h[i][j];
 
                     // Right-click or alt-click means to show the contents
-                    // of the hex.  Must also check for this in mouseReleased()
-                    if (e.isPopupTrigger())
+                    // of the hex.
+                    if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
+                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
+                        InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
                         new ShowMasterHex(this, hex, point);
                         return;
@@ -1581,55 +1585,8 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
-    // isPopupTrigger() under Windows only works on mouseReleased()
     public void mouseReleased(MouseEvent e)
     {
-        Point point = e.getPoint();
-
-        for (int i = 0; i < game.getNumPlayers(); i++)
-        {
-            Player player = game.getPlayer(i);
-            for (int j = 0; j < player.getNumLegions(); j++)
-            {
-                Legion legion = player.getLegion(j);
-                if (legion.getMarker().select(point))
-                {
-                    // What to do depends on which mouse button was used
-                    // and the current phase of the turn.
-
-                    // Right-click or alt-click means to show the contents
-                    // of the legion.
-                    if (e.isPopupTrigger())
-                    {
-                        new ShowLegion(this, legion, point, 
-                            i == game.getActivePlayerNum());
-                        return;
-                    }
-                }
-            }
-        }
-
-        // No hits on chits, so check map.
-
-        Player player = game.getActivePlayer();
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (show[i][j] && h[i][j].contains(point))
-                {
-                    MasterHex hex = h[i][j];
-
-                    // Right-click or alt-click means to show the contents
-                    // of the hex.
-                    if (e.isPopupTrigger())
-                    {
-                        new ShowMasterHex(this, hex, point);
-                        return;
-                    }
-                }
-            }
-        }
     }
 
 
