@@ -64,7 +64,11 @@ class MasterBoard extends JFrame implements MouseListener,
 
         contentPane = getContentPane();
         contentPane.setLayout(null);
+
         setSize(getPreferredSize());
+        setIconImage(Toolkit.getDefaultToolkit().getImage(
+            Creature.colossus.getImageName()));
+
         setBackground(java.awt.Color.black);
 
         addWindowListener(this);
