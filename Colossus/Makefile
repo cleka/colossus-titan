@@ -102,7 +102,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	org/jdom/*/*.class \
 	org/xml/sax/*.class \
 	org/xml/sax/*/*.class \
-        Default TitanPlus ExtTitan Badlands Outlands Undead \
+        Default TitanPlus ExtTitan ExtTitan8 Badlands Outlands Undead \
 	Abyssal6 Abyssal9 \
 	TG-ConceptI TG-ConceptII TG-ConceptIII TG-SetII TG-SetIII TG-Wild \
 	Badlands-JDG SmallTitan Balrog version
