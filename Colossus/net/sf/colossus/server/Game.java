@@ -620,7 +620,6 @@ public final class Game
             {
                 Log.event(getActivePlayerName() + "'s turn, number " + 
                     turnNumber);
-                server.allUpdateStatusScreen();
                 autoSave();
             }
         }
@@ -663,7 +662,7 @@ public final class Game
         }
         else
         {
-            server.allSetupSplitMenu();
+            server.allSetupSplit();
             player.aiSplit();
         }
     }
@@ -673,7 +672,7 @@ public final class Game
     {
         Player player = getActivePlayer();
         player.rollMovement();
-        server.allSetupMoveMenu();
+        server.allSetupMove();
 
         player.aiMasterMove();
     }
@@ -688,7 +687,7 @@ public final class Game
         }
         else
         {
-            server.allSetupFightMenu();
+            server.allSetupFight();
             kickEngagements();
         }
     }
@@ -707,7 +706,7 @@ public final class Game
         else
         {
             player.disbandEmptyDonor();
-            server.allSetupMusterMenu();
+            server.allSetupMuster();
 
             player.aiRecruit();
         }

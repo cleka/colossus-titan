@@ -8,6 +8,7 @@ import java.util.*;
 
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Options;
 
 
@@ -141,7 +142,10 @@ final class StatusScreen extends KDialog implements WindowListener
             contentPane.add(scoreLabel[i]);
         }
 
-        updateStatusScreen(playerInfo);
+        if (playerInfo != null)
+        {
+            updateStatusScreen(playerInfo);
+        }
 
         pack();
 
@@ -186,13 +190,12 @@ final class StatusScreen extends KDialog implements WindowListener
         for (int i = 0; i < playerInfo.length; i++)
         {
             java.util.List data = Split.split(':', playerInfo[i]);
-
             Color color;
             if ("true".equals((String)data.get(0)))
             {
                 color = Color.red;
             }
-            else if (client.getActivePlayerNum() == i)
+            else if (client.getActivePlayerName().equals((String)data.get(1)))
             {
                 color = Color.yellow;
             }

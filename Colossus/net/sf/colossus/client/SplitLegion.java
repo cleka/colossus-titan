@@ -34,11 +34,11 @@ final class SplitLegion extends KDialog implements MouseListener,
     private static String results;
 
 
-    private SplitLegion(Client client, String oldMarkerId, String 
-        longMarkerName, String selectedMarkerId, java.util.List imageNames)
+    private SplitLegion(Client client, String oldMarkerId,
+        String selectedMarkerId, java.util.List imageNames)
     {
         super(client.getBoard().getFrame(), client.getPlayerName() + 
-            ": Split Legion " + longMarkerName, true);
+            ": Split Legion " + oldMarkerId, true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
@@ -124,14 +124,12 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     /** Return childMarkerId,splitCreature1,splitCreature2,etc. */
     static String splitLegion(Client client, String oldMarkerId,
-        String longMarkerName, String selectedMarkerId, 
-        java.util.List imageNames)
+        String selectedMarkerId, java.util.List imageNames)
     {
         if (!active)
         {
             active = true;
-            new SplitLegion(client, oldMarkerId, longMarkerName,
-                selectedMarkerId, imageNames);
+            new SplitLegion(client, oldMarkerId, selectedMarkerId, imageNames);
             active = false;
             return results;
         }

@@ -90,20 +90,16 @@ public class SimpleAI implements AI
                 {
                     java.util.List recruiters = game.findEligibleRecruiters(
                         legion.getMarkerId(), recruit.getName());
+
+                    Creature recruiter = null;
                     if (!recruiters.isEmpty())
                     {
                         // Just take the first one.
-                        Creature recruiter = (Creature)recruiters.get(0);
-                        game.doRecruit(legion, recruit, recruiter);
-                        game.getServer().didRecruit(legion);
+                        recruiter = (Creature)recruiters.get(0);
                     }
+                    game.doRecruit(legion, recruit, recruiter);
+                    game.getServer().didRecruit(legion);
                 }
-            }
-// XXX Why doesn't the AI recruit base tower creatures?
-            else if (legion.getCurrentHex().getTerrain() == 'T')
-            {
-Log.debug(legion.getLongMarkerName() + " not recruiting in tower  moved=" +
-legion.hasMoved() + " canRecruit=" + legion.canRecruit());
             }
         }
     }
@@ -756,7 +752,7 @@ legion.hasMoved() + " canRecruit=" + legion.canRecruit());
             player.takeMulligan();
             player.rollMovement();
             // Necessary to update the movement roll in the title bar.
-            game.getServer().allSetupMoveMenu();
+            game.getServer().allSetupMove();
         }
     }
 

@@ -1,3 +1,8 @@
+Add callbacks for various phase advances, client caching of this info.
+   Make attempts to advance phase void, and handle errors in callbacks.
+
+Fix slow overlay loading.  Need to explicitly handle icons' image observers?
+
 Copy various new docs to web page from inst.  tex -> html first when possible.
 Put old, new web pages under CVS.
 ant inst all html stuff to web site.
@@ -12,8 +17,6 @@ ShowLegion on mouseover, not click, with permanent dialog.
 Highlight appropriate engagement hex while engagement is being resolved.
    (Except during angel summoning.)
 
-Make most returned collections unmodifiable.
-
 Initialize autoPickRecruiter and Show Graphical Overlays to true by default.
 
 Optional post-engagement status dialog.
@@ -24,16 +27,12 @@ Change some dialogs to show info in a label instead of the title (so
 Change StatusScreen to use a JTable.  
 Pass smaller chunks of changed info to StatusScreen, from generalized
     info update messages. 
-Cache legion heights, then known legion contents in Client.
 
-Change remaining client->server information methods to void requests 
-   and callbacks.
-
-Cache known legion contents in Client.  Requires sending events to all 
-   clients when a legion is formed (game start or load), splits/joins, 
-   moves/unmoves, recruits/unrecruits, reinforces, acquires, summons, 
-   dies (flees/concedes/negotiates/battles), or gets reduced (by 
-   negotiation or battle).
+Cache legion heights and then known legion contents in Client.  
+   Requires sending events to all clients when a legion is formed (game 
+   start or load), splits/joins, moves/unmoves, recruits/unrecruits, 
+   reinforces, acquires, summons, dies (flees/concedes/negotiates/battles), 
+   or gets reduced (by negotiation or battle).
 
 Remove remaining public Client methods that only directly control the GUI
    in favor of higher-level events.
@@ -41,9 +40,6 @@ Remove remaining public Client methods that only directly control the GUI
 Always show the current turn, player, and phase in a panel somewhere.
 
 Add confirm dialogs (for conceding with titan, skipping recruits, ...)
-
-If there is more than one human player, move the active player's
-   map/board to the front.
 
 Make BattleMap less tall.
 Highlight entrances somehow.  Maybe use fixed boxes with an arrow to
@@ -65,8 +61,6 @@ Include an .ico file for Windows.
 Remember window positions in .cfg file.
 
 Add UI for players to specify favorite colors.
-
-Get minimax masterboard moves working.
 
 When a stack flees, make the winning stack visible, to the fleeing
    legion's player's client only.  (Per-player rather than global

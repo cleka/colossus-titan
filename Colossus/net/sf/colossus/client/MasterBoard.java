@@ -1711,8 +1711,7 @@ public final class MasterBoard extends JPanel
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                    new ShowLegion(masterFrame,
-                        client.getLongMarkerName(markerId),
+                    new ShowLegion(masterFrame, markerId,
                         client.getLegionImageNames(markerId), point);
                     return;
                 }

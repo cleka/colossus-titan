@@ -127,7 +127,7 @@ public final class Server
 
     public void makeForcedStrikes(String playerName, boolean rangestrike)
     {
-        if (playerName.equals(getBattleActivePlayerName()))
+        if (playerName.equals(game.getBattle().getActivePlayerName()))
         {
             game.getBattle().makeForcedStrikes(rangestrike);
         }
@@ -283,46 +283,48 @@ public final class Server
     }
 
 
-    void allSetupSplitMenu()
+    void allSetupSplit()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            setupSplitMenu(client);
+            setupSplit(client);
         }
+        allUpdateStatusScreen();
     }
 
-    private void setupSplitMenu(Client client)
+    private void setupSplit(Client client)
     {
         // TODO Keep a map on the server side.
         String playerName = client.getPlayerName();
         Player player = game.getPlayer(playerName);
-        client.setupSplitMenu(player.getMarkersAvailable());
+        client.setupSplit(player.getMarkersAvailable(), 
+            game.getActivePlayerName(), game.getTurnNumber());
     }
 
 
-    void allSetupMoveMenu()
+    void allSetupMove()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setupMoveMenu();
+            client.setupMove();
         }
     }
 
-    void allSetupFightMenu()
+    void allSetupFight()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setupFightMenu();
+            client.setupFight();
         }
     }
 
-    void allSetupMusterMenu()
+    void allSetupMuster()
     {
         Set hexLabels = game.findAllEligibleRecruitHexes();
 
@@ -330,48 +332,51 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setupMusterMenu(hexLabels);
+            client.setupMuster(hexLabels);
         }
     }
 
 
-    void allSetupBattleSummonMenu()
+    void allSetupBattleSummon()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setupBattleSummonMenu();
+            client.setupBattleSummon(game.getBattle().getActivePlayerName(),
+                game.getBattle().getTurnNumber());
         }
     }
 
-    void allSetupBattleRecruitMenu()
+    void allSetupBattleRecruit()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setupBattleRecruitMenu();
+            client.setupBattleRecruit(game.getBattle().getActivePlayerName(),
+                game.getBattle().getTurnNumber());
         }
     }
 
-    void allSetupBattleMoveMenu()
+    void allSetupBattleMove()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setupBattleMoveMenu();
+            client.setupBattleMove();
         }
     }
 
-    void allSetupBattleFightMenu()
+    void allSetupBattleFight()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setupBattleFightMenu();
+            client.setupBattleFight(game.getBattle().getPhase(),
+                game.getBattle().getActivePlayerName());
         }
     }
 
@@ -631,10 +636,9 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     }
 
 
-    public boolean tryToConcede(String markerId)
+    public void tryToConcede(String markerId)
     {
-        Battle battle = game.getBattle();
-        return game.getBattle().concede(markerId);
+        game.getBattle().concede(markerId);
     }
 
 
@@ -673,9 +677,26 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     }
 
 
-    public boolean doBattleMove(int tag, String hexLabel)
+    public void doBattleMove(int tag, String hexLabel)
     {
-        return game.getBattle().doMove(tag, hexLabel);
+        boolean moved = game.getBattle().doMove(tag, hexLabel);
+        if (moved)
+        {
+            Critter critter = game.getBattle().getCritter(tag);
+            String startingHexLabel = critter.getStartingHexLabel();
+            allTellDidBattleMove(tag, startingHexLabel, hexLabel);
+        }
+    }
+
+    void allTellDidBattleMove(int tag, String startingHexLabel,
+        String endingHexLabel)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.didBattleMove(tag, startingHexLabel, endingHexLabel);
+        }
     }
 
 
@@ -694,11 +715,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         battle.applyCarries(target);
     }
 
-    public int getCarryDamage()
-    {
-        Battle battle = game.getBattle();
-        return battle.getCarryDamage();
-    }
 
     public Set getCarryTargets()
     {
@@ -707,10 +723,9 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     }
 
 
-    public boolean undoBattleMove(String hexLabel)
+    public void undoBattleMove(String hexLabel)
     {
-        Battle battle = game.getBattle();
-        return battle.undoMove(hexLabel);
+        game.getBattle().undoMove(hexLabel);
     }
 
 
@@ -859,7 +874,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     /** Takes a Set of PenaltyOptions. */
     void askChooseStrikePenalty(SortedSet penaltyOptions)
     {
-        String playerName = getBattleActivePlayerName();
+        String playerName = game.getBattle().getActivePlayerName();
         Client client = getClient(playerName);
         ArrayList choices = new ArrayList();
         Iterator it = penaltyOptions.iterator();
@@ -880,11 +895,13 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     void allInitBattle(String masterHexLabel)
     {
+        Battle battle = game.getBattle();
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.initBattle(masterHexLabel);
+            client.initBattle(masterHexLabel, battle.getTurnNumber(),
+                battle.getActivePlayerName(), battle.getPhase());
         }
     }
 
@@ -914,19 +931,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         }
     }
 
-
-    public String getLongMarkerName(String markerId)
-    {
-        Legion legion = game.getLegionByMarkerId(markerId);
-        if (legion != null)
-        {
-            return legion.getLongMarkerName();
-        }
-        else
-        {
-            return "Bogus legion";
-        }
-    }
 
     public List getLegionImageNames(String markerId, String playerName)
     {
@@ -994,7 +998,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     }
 
 
-
+    // TODO void and callback
     /** Return true if it's okay to advance to the next phase. */
     public boolean doneWithSplits(String playerName)
     {
@@ -1011,6 +1015,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         return true;
     }
 
+    // TODO void and callback
     /** Return an error message, or an empty string if okay. */
     public String doneWithMoves(String playerName)
     {
@@ -1044,6 +1049,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         }
     }
 
+    // TODO void and callback
     /** Return true if it's okay to advance to the next phase. */
     public boolean doneWithEngagements(String playerName)
     {
@@ -1063,6 +1069,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         }
     }
 
+    // TODO void and callback
     /** Return true if it's okay to advance to the next phase. */
     public boolean doneWithRecruits(String playerName)
     {
@@ -1085,17 +1092,13 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         return game.getActivePlayerName();
     }
 
-    public boolean withdrawFromGame(String playerName)
+    // XXX Need to support inactive players quitting.
+    // XXX If player quits while engaged, might need to set slayer.
+    // TODO Notify all players.
+    public void withdrawFromGame(String playerName)
     {
-        // XXX Need to support inactive players quitting.
-        if (!playerName.equals(getActivePlayerName()))
-        {
-            return false;
-        }
-        // XXX If player quits while engaged, might need to set slayer.
         game.getPlayer(playerName).die(null, true);
         game.advancePhase(game.getPhase(), playerName);
-        return true;
     }
 
 
@@ -1151,7 +1154,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     }
 
     // XXX Stringify the return value.
-    public String [] getPlayerInfo()
+    private String [] getPlayerInfo()
     {
         String [] info = new String[game.getNumPlayers()];
         Iterator it = game.getPlayers().iterator();
@@ -1175,33 +1178,8 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         return 0;
     }
 
-    public String getBattleActivePlayerName()
-    {
-        return game.getBattle().getActivePlayerName();
-    }
 
-    public int getBattlePhase()
-    {
-        return game.getBattle().getPhase();
-    }
-
-    public int getBattleTurnNumber()
-    {
-        return game.getBattle().getTurnNumber();
-    }
-
-    public int getPhase()
-    {
-        return game.getPhase();
-    }
-
-    public int getTurnNumber()
-    {
-        return game.getTurnNumber();
-    }
-
-
-    // XXX Delete?
+    // XXX Delete
     /** Return the available legion markers for playerName. */
     public Set getMarkersAvailable(String playerName)
     {
@@ -1296,12 +1274,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         boolean teleport)
     {
         return game.getPossibleEntrySides(markerId, hexLabel, teleport);
-    }
-
-
-    public int getActivePlayerNum()
-    {
-        return game.getActivePlayerNum();
     }
 
 

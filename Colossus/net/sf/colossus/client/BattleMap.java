@@ -150,11 +150,12 @@ public final class BattleMap extends HexMap implements MouseListener,
                 switch (phase)
                 {
                     case Constants.MOVE:
+                        // TODO Check this locally rather than asking for help.
                         if (!client.getOption(Options.autoBattleMove) &&
                             client.anyOffboardCreatures() && 
                             !confirmLeavingCreaturesOffboard())
                         {
-                                return;
+                            return;
                         }
                         client.doneWithBattleMoves();
                         break;

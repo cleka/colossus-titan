@@ -74,7 +74,7 @@ public final class Client
     private int movementRoll = -1;
 
     /** Sorted set of available legion markers for this player. */
-    private TreeSet markersAvailable;
+    private TreeSet markersAvailable = new TreeSet();
     private String parentId;
     private int numSplitsThisTurn;
 
@@ -89,6 +89,13 @@ public final class Client
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
      *  is missing then we assume it is set to the maximum. */
     private Map creatureCounts = new HashMap();
+
+    int turnNumber = -1;
+    String activePlayerName = "none";
+    int phase = -1;
+    int battleTurnNumber = -1;
+    String battleActivePlayerName = "none";
+    int battlePhase = -1;
 
 
     public Client(Server server, String playerName)
@@ -114,9 +121,9 @@ public final class Client
     }
 
     /** Legion concedes. */
-    boolean concede()
+    void concede()
     {
-        return server.tryToConcede(playerName);
+        server.tryToConcede(playerName);
     }
 
     /** Cease negotiations and fight a battle in land. */
@@ -163,17 +170,12 @@ public final class Client
     /** This player quits the whole game. The server needs to always honor
      *  this request, because if it doesn't players will just drop
      *  connections when they want to quit in a hurry. */
-    boolean withdrawFromGame()
+    void withdrawFromGame()
     {
         // XXX Right now the game breaks if a player quits outside his
         // own turn.  But we need to support this, or players will
         // just drop connections.
-        if (playerName != server.getActivePlayerName())
-        {
-            return false;
-        }
         server.withdrawFromGame(playerName);
-        return true;
     }
 
 
@@ -286,11 +288,7 @@ public final class Client
         options.setProperty(name, String.valueOf(value));
 
         // Side effects
-        if (name.equals(Options.showStatusScreen))
-        {
-            updateStatusScreen(server.getPlayerInfo());
-        }
-        else if (name.equals(Options.antialias))
+        if (name.equals(Options.antialias))
         {
             Hex.setAntialias(value);
             repaintAllWindows();
@@ -571,6 +569,7 @@ Log.debug("Client.leaveCarryMode()");
         return server.anyOffboardCreatures();
     }
 
+    // TODO void and callback
     /** Returns true if okay, or false if forced strikes remain. */
     boolean doneWithStrikes()
     {
@@ -1194,9 +1193,14 @@ Log.debug("new PickCarry");
     }
 
 
-    public void initBattle(String masterHexLabel)
+    public void initBattle(String masterHexLabel, int battleTurnNumber,
+        String battleActivePlayerName, int battlePhase)
     {
         cleanupNegotiationDialogs();
+
+        this.battleTurnNumber = battleTurnNumber;
+        this.battleActivePlayerName = battleActivePlayerName;
+        this.battlePhase = battlePhase;
 
         // Do not show map for AI players.
         if (!getOption(Options.autoPlay))
@@ -1373,9 +1377,14 @@ Log.debug("Called Client.reinforce for " + markerId);
     }
 
     // TODO Update markersAvailable more often.
-    public void setupSplitMenu(Set markersAvailable)
+    public void setupSplit(Set markersAvailable, String activePlayerName,
+        int turnNumber)
     {
-        this.markersAvailable = new TreeSet();
+        this.activePlayerName = activePlayerName;
+        this.turnNumber = turnNumber;
+        this.phase = Constants.SPLIT;
+
+        this.markersAvailable.clear();
         this.markersAvailable.addAll(markersAvailable);
 
         numSplitsThisTurn = 0;
@@ -1390,24 +1399,27 @@ Log.debug("Called Client.reinforce for " + markerId);
         }
     }
 
-    public void setupMoveMenu()
+    public void setupMove()
     {
+        this.phase = Constants.MOVE;
         if (board != null)
         {
             board.setupMoveMenu();
         }
     }
 
-    public void setupFightMenu()
+    public void setupFight()
     {
+        this.phase = Constants.FIGHT;
         if (board != null)
         {
             board.setupFightMenu();
         }
     }
 
-    public void setupMusterMenu(Set possibleRecruitHexes)
+    public void setupMuster(Set possibleRecruitHexes)
     {
+        this.phase = Constants.MUSTER;
         this.possibleRecruitHexes = new HashSet(possibleRecruitHexes);
 
         if (board != null)
@@ -1417,7 +1429,7 @@ Log.debug("Called Client.reinforce for " + markerId);
     }
 
 
-    // Temp  Should be handled on client side.
+    // TODO  Should be handled fully on client side.
     public void alignLegions(Set hexLabels)
     {
         if (board != null)
@@ -1427,8 +1439,13 @@ Log.debug("Called Client.reinforce for " + markerId);
     }
 
 
-    public void setupBattleSummonMenu()
+    public void setupBattleSummon(String battleActivePlayerName,
+        int battleTurnNumber)
     {
+        this.battlePhase = Constants.SUMMON;
+        this.battleActivePlayerName = battleActivePlayerName;
+        this.battleTurnNumber = battleTurnNumber;
+
         if (map != null)
         {
             if (playerName.equals(getBattleActivePlayerName()))
@@ -1439,8 +1456,13 @@ Log.debug("Called Client.reinforce for " + markerId);
         }
     }
 
-    public void setupBattleRecruitMenu()
+    public void setupBattleRecruit(String battleActivePlayerName,
+        int battleTurnNumber)
     {
+        this.battlePhase = Constants.RECRUIT;
+        this.battleActivePlayerName = battleActivePlayerName;
+        this.battleTurnNumber = battleTurnNumber;
+
         if (map != null)
         {
             if (playerName.equals(getBattleActivePlayerName()))
@@ -1451,11 +1473,13 @@ Log.debug("Called Client.reinforce for " + markerId);
         }
     }
 
-    public void setupBattleMoveMenu()
+    public void setupBattleMove()
     {
         // Just in case the other player started the battle
         // really quickly.
         cleanupNegotiationDialogs();
+
+        this.battlePhase = Constants.MOVE;
 
         if (map != null)
         {
@@ -1463,8 +1487,13 @@ Log.debug("Called Client.reinforce for " + markerId);
         }
     }
 
-    public void setupBattleFightMenu()
+    /** Used for both strike and strikeback. */
+    public void setupBattleFight(int battlePhase,  
+        String battleActivePlayerName)
     {
+        this.battlePhase = battlePhase;
+        this.battleActivePlayerName = battleActivePlayerName;
+
         if (map != null)
         {
             if (playerName.equals(getBattleActivePlayerName()))
@@ -1538,32 +1567,33 @@ Log.debug("Called Client.reinforce for " + markerId);
     }
 
 
-    // TODO Cache this
     String getBattleActivePlayerName()
     {
-        return server.getBattleActivePlayerName();
+        return battleActivePlayerName;
     }
-
     int getBattlePhase()
     {
-        return server.getBattlePhase();
+        return battlePhase;
     }
 
     int getBattleTurnNumber()
     {
-        return server.getBattleTurnNumber();
+        return battleTurnNumber;
     }
 
 
-    /** Returns true if the move was legal, or false if it was not allowed. */
-    boolean doBattleMove(int tag, String hexLabel)
+    void doBattleMove(int tag, String hexLabel)
     {
-        boolean moved = server.doBattleMove(tag, hexLabel);
-        if (moved)
+        server.doBattleMove(tag, hexLabel);
+    }
+
+    public void didBattleMove(int tag, String startingHexLabel, 
+        String endingHexLabel)
+    {
+        if (isMyCritter(tag))
         {
-            pushUndoStack(hexLabel);
+            pushUndoStack(endingHexLabel);
         }
-        return moved;
     }
 
 
@@ -1583,12 +1613,6 @@ Log.debug("Client.applyCarries() for " + hexLabel);
             map.unselectHexByLabel(hexLabel);
             map.repaint();
         }
-    }
-
-    Set getCarryTargets()
-    {
-Log.debug("Client.getCarryTargets()");
-        return server.getCarryTargets();
     }
 
 
@@ -1639,24 +1663,30 @@ Log.debug("Client.getCarryTargets()");
         return server.findCrittersWithTargets();
     }
 
+    // TODO Cache this
     String getPlayerNameByTag(int tag)
     {
         return server.getPlayerNameByTag(tag);
     }
 
+    boolean isMyCritter(int tag)
+    {
+        return (playerName.equals(getPlayerNameByTag(tag)));
+    }
+
     String getActivePlayerName()
     {
-        return server.getActivePlayerName();
+        return activePlayerName;
     }
 
     int getPhase()
     {
-        return server.getPhase();
+        return phase;
     }
 
     int getTurnNumber()
     {
-        return server.getTurnNumber();
+        return turnNumber;
     }
 
 
@@ -1788,11 +1818,6 @@ Log.debug("Client.getCarryTargets()");
         return server.listNormalMoves(markerId);
     }
 
-    int getActivePlayerNum()
-    {
-        return server.getActivePlayerNum();
-    }
-
 
     int getCreatureCount(String creatureName)
     {
@@ -1858,10 +1883,6 @@ Log.debug("Client.getCarryTargets()");
         server.saveGame(filename);
     }
 
-    String getLongMarkerName(String markerId)
-    {
-        return server.getLongMarkerName(markerId);
-    }
 
     // TODO Cache this on client. */
     /** Return a list of Strings. */
@@ -1940,7 +1961,7 @@ Log.debug("Client.getCarryTargets()");
 
     void doneWithSplits()
     {
-        if (!playerName.equals(server.getActivePlayerName()))
+        if (!playerName.equals(getActivePlayerName()))
         {
             return;
         }
@@ -1955,7 +1976,7 @@ Log.debug("Client.getCarryTargets()");
 
     void doneWithMoves()
     {
-        if (!playerName.equals(server.getActivePlayerName()))
+        if (!playerName.equals(getActivePlayerName()))
         {
             return;
         }
@@ -1974,7 +1995,7 @@ Log.debug("Client.getCarryTargets()");
 
     void doneWithEngagements()
     {
-        if (!playerName.equals(server.getActivePlayerName()))
+        if (!playerName.equals(getActivePlayerName()))
         {
             return;
         }
@@ -1987,7 +2008,7 @@ Log.debug("Client.getCarryTargets()");
 
     void doneWithRecruits()
     {
-        if (!playerName.equals(server.getActivePlayerName()))
+        if (!playerName.equals(getActivePlayerName()))
         {
             return;
         }
@@ -1995,10 +2016,15 @@ Log.debug("Client.getCarryTargets()");
         server.doneWithRecruits(playerName);
     }
 
+    // TODO cache this
+    private String getPlayerNameByMarkerId(String markerId)
+    {
+        return (server.getPlayerNameByMarkerId(markerId));
+    }
 
     boolean isMyLegion(String markerId)
     {
-        return (playerName.equals(server.getPlayerNameByMarkerId(markerId)));
+        return (playerName.equals(getPlayerNameByMarkerId(markerId)));
     }
 
     int getMovementRoll()
@@ -2065,8 +2091,7 @@ Log.debug("Client.getCarryTargets()");
         }
 
         String results = SplitLegion.splitLegion(this, parentId,
-            getLongMarkerName(parentId), childId,
-            getLegionImageNames(parentId));
+            childId, getLegionImageNames(parentId));
 
         if (results != null)
         {

@@ -491,7 +491,7 @@ final class Battle
 
     private boolean setupSummon()
     {
-        server.allSetupBattleSummonMenu();
+        server.allSetupBattleSummon();
         boolean advance = true;
         if (summonState == Constants.FIRST_BLOOD)
         {
@@ -510,7 +510,7 @@ final class Battle
 
     private boolean setupRecruit()
     {
-        server.allSetupBattleRecruitMenu();
+        server.allSetupBattleRecruit();
         return recruitReinforcement();
     }
 
@@ -523,7 +523,7 @@ final class Battle
         }
         else
         {
-            server.allSetupBattleMoveMenu();
+            server.allSetupBattleMove();
             Player player = getActivePlayer();
             if (server.getClientOption(player.getName(),
                 Options.autoBattleMove))
@@ -567,7 +567,7 @@ final class Battle
                 return true;
             }
 
-            server.allSetupBattleFightMenu();
+            server.allSetupBattleFight();
         }
         return false;
     }
@@ -750,18 +750,16 @@ final class Battle
     }
 
 
-    boolean undoMove(String hexLabel)
+    void undoMove(String hexLabel)
     {
         Critter critter = getCritter(hexLabel);
         if (critter != null)
         {
             critter.undoMove();
-            return true;
         }
         else
         {
             Log.error("Undo move error: no critter in " + hexLabel);
-            return false;
         }
     }
 
@@ -781,7 +779,7 @@ final class Battle
 
 
     /** Mark all of the conceding player's critters as dead. */
-    boolean concede(String playerName)
+    void concede(String playerName)
     {
         Legion legion = getLegionByPlayerName(playerName);
         String markerId = legion.getMarkerId();
@@ -799,7 +797,6 @@ final class Battle
         {
             advancePhase();
         }
-        return true;
     }
 
 

@@ -18,10 +18,10 @@ import net.sf.colossus.util.KDialog;
 final class ShowLegion extends KDialog implements MouseListener,
     WindowListener
 {
-    ShowLegion(JFrame parentFrame, String longMarkerName, 
+    ShowLegion(JFrame parentFrame, String markerId, 
         java.util.List imageNames, Point point)
     {
-        super(parentFrame, "Legion " + longMarkerName, false);
+        super(parentFrame, "Legion " + markerId, false);
 
         if (imageNames.isEmpty())
         {
