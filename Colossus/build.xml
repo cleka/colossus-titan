@@ -102,6 +102,7 @@
 <target name="compile" depends="init,parsers"
         description = "Compile .java files to .class files">
         <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
+        <delete verbose="yes" quiet = "yes" file = "test/Colossus.jar"/>
         <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
         <javac debug="yes" deprecation="yes" target="1.2" srcdir="."
                 includes="**/*.java"
@@ -124,12 +125,12 @@
         <jar jarfile = "Colossus.jar" basedir="."
              manifest="META-INF/MANIFEST.MF"
              includes="**/*.class,
-             version,
-             Default/**,
-             TitanPlus/**,
-             ExtTitan/**,
-             Badlands/**,
-             Outlands/**"
+                       version,
+                       Default/**,
+                       TitanPlus/**,
+                       ExtTitan/**,
+                       Badlands/**,
+                       Outlands/**"
              excludes="net/sf/colossus/datatools/*.class"
              />
         <chmod file="Colossus.jar" perm="755"/>
@@ -212,8 +213,6 @@
 </target>
 
 
-<!-- Tasks from here down are only needed for installation on the web site. -->
-
 <!-- TODO If jar is already signed, don't sign it again. -->
 <target name="sign" depends="jar"
         description = "Sign jar file">
@@ -223,8 +222,12 @@
                  storepass="${env.JARPASSWORD}"
         />
         <chmod file="Colossus.jar" perm="755"/>
+        <copy file="Colossus.jar" todir="test"/>
 </target>
 
+
+
+<!-- Tasks from here down are only needed for installation on the web site. -->
 
 <!-- TODO Get cvs+plink+pageant working in Windows, and then make a Windows
      version of this task -->
@@ -248,7 +251,8 @@
                  *cfg,
                  *properties*,
                  BattlelandsBuilder.jar,
-                 .*"
+                 .*,
+                 test/*.jar"
         />
 </target>
 

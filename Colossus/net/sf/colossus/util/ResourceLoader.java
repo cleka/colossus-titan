@@ -2,6 +2,7 @@ package net.sf.colossus.util;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
 
 /**
  * Class ResourceLoader is an utility class to load a resource from a filename and a list of directory.
@@ -12,11 +13,8 @@ import java.awt.*;
 
 public final class ResourceLoader
 {
-    // File.separator does not work right in jar files.  A hardcoded
-    // forward-slash does, and works in *x and Windows.  So I'm ignoring
-    // JavaPureCheck's opinion and using a forward slash.
-    // XXX Is there a way to detect whether a program is running from a
-    // jar file?
+    // File.separator does not work in jar files, except in Unix.
+    // A hardcoded '/' works in Unix, Windows, MacOS X, and jar files.
     private static final String pathSeparator = "/";
     private static final String imageExtension = ".gif";
 
@@ -143,15 +141,51 @@ public final class ResourceLoader
         return icon;
     }
 
+    // XXX Not used yet, because I haven't found a method that takes a URL
+    // and returns an InputStream that works correctly over JWS.
+    // "new ImageIcon(URL)" above works.  Unfortunately, ImageIcon passes the
+    // URL to Toolkit.getImage(), which is native, so I can't see exactly how.
+    // I really don't want to use javax.jnlp code if we can help it.
+    // Maybe make a JarURLConnection and then call getInputStream()?
+    // Or we can put the variant text files on the web site and stream them
+    // to JWS clients.  Sounds wasteful, but we'll need to do that anyway
+    // to keep variants in sync for net games.
+    // Or we can bury them in an image file using Steganography.  :->
+    private static InputStream tryLoadInputStreamFromResource(String filename, String path)
+    {
+        InputStream stream = null;
+        try
+        {
+            java.net.URL url;
+            java.lang.ClassLoader cl =
+                java.lang.ClassLoader.getSystemClassLoader();
+            url = cl.getResource(path +
+                                 pathSeparator +
+                                 filename);
+            // url will not be null even is the file doesn't exist,
+            // so we need to check if connection can be opened
+            if ((url != null) && (url.openStream() != null))
+            {
+                // The method below does not exist.
+                // stream = cl.getResourceAsStream(url);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.error("ResourceLoader caught " + e);
+        }
+        return stream;
+    }
+
     /**
      * Return the first InputStream from file of name filename in the list of directories.
      * @param filename Name of the file to load.
      * @param directories List of directories to search (in order).
      * @return The InputStream, or null if it was not found.
      */
-    public static java.io.InputStream getInputStream(String filename, java.util.List directories)
+    public static InputStream getInputStream(String filename, java.util.List directories)
     {
-        java.io.InputStream stream = null;
+        InputStream stream = null;
         java.lang.ClassLoader cl =
             java.lang.ClassLoader.getSystemClassLoader();
         java.util.Iterator it = directories.iterator();
@@ -161,17 +195,18 @@ public final class ResourceLoader
             if (o instanceof String)
             {
                 String path = (String)o;
+Log.event("trying path: " + o);
+                String fullPath = path + pathSeparator + filename;
                 try
                 {
-                    stream = new java.io.FileInputStream(path +
-                                                         pathSeparator +
-                                                         filename);
-                } catch (Exception e) { stream = null; }
+Log.event("trying FileInputStream constructor for: " + fullPath);
+                    stream = new FileInputStream(fullPath);
+                } 
+                catch (Exception e) { stream = null; }
                 if (stream == null)
                 {
-                    stream = cl.getResourceAsStream(path +
-                                                    pathSeparator +
-                                                    filename);
+Log.event("trying cl.getResourceAsStream for: " + fullPath);
+                    stream = cl.getResourceAsStream(fullPath);
                 }
             }
         }

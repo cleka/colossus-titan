@@ -1835,7 +1835,6 @@ public final class Game
         while (it.hasNext())
         {
             String tuple = (String)it.next();
-Log.debug(tuple);
             java.util.List parts = Split.split(':', tuple);
             String hl = (String)parts.get(0);
             if (hl.equals(targetHexLabel))
@@ -2184,7 +2183,6 @@ reinforcing + " acquiring=" + acquiring);
         {
             teleportingLord = (String)(legion.listTeleportingLords(
                 hexLabel).get(0));
-Log.debug("teleportingLord is " + teleportingLord);
         }
 
         Set sides = getPossibleEntrySides(markerId, hexLabel, teleport);
@@ -2193,7 +2191,6 @@ Log.debug("teleportingLord is " + teleportingLord);
         {
             entrySide = (String)(sides.iterator().next());
         }
-Log.debug("entrySide is" + entrySide);
 
         return doMove(markerId, hexLabel, entrySide, teleport, 
             teleportingLord);

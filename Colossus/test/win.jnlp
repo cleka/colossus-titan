@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
      <!-- JNLP File for Colossus local testing -->
-     <!-- TODO Find a way to make the codebase relative -->
+     <!-- TODO Find a way to make the codebase path relative -->
      <jnlp
-       codebase="file:///home/dripton/src/Colossus"
-       href="unix.jnlp">
+       codebase="file:///c:/src/Colossus/test"
+       href="win.jnlp">
        <application-desc main-class="net.sf.colossus.server.Start"/>
        <information>
          <title>Colossus</title>
