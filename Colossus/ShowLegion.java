@@ -9,10 +9,11 @@ import java.awt.event.*;
 
 class ShowLegion extends Dialog implements MouseListener, WindowListener
 {
-    MediaTracker tracker;
-    boolean imagesLoaded;
-    Legion legion;
-    Chit [] chits;
+    private MediaTracker tracker;
+    private boolean imagesLoaded;
+    private Legion legion;
+    private Chit [] chits;
+
 
     ShowLegion(Frame parentFrame, Legion legion, Point point)
     {
@@ -59,7 +60,7 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
         for (int i = 0; i < legion.getHeight(); i++)
         {
             chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale, 
-                legion.creatures[i].getImageName(), this);
+                legion.getCreature(i).getImageName(), this);
         }
 
         tracker = new MediaTracker(this);
