@@ -18,6 +18,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
     public static final int maxAIsupported = 16;
     public static String newGame = "New Game";
     public static String loadGame = "Load Game";
+    public static String loadMap = "Load Map";
+    public static String loadRec = "Load Recruiters";
     public static String quit = "Quit";
     public static String none = "None";
     public static String byColor = "<By color>";
@@ -33,6 +35,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
     /** List of Map.Entry objects that map player names to player types */
     private static ArrayList playerInfo = new ArrayList();
 
+    public static String mapName = "StrategicMap.map";
+    public static String recruitName = "Recruit.ter";
 
     private GetPlayers(JFrame parentFrame)
     {
@@ -115,6 +119,12 @@ public final class GetPlayers extends JDialog implements WindowListener,
         button3.setMnemonic(KeyEvent.VK_Q);
         contentPane.add(button3);
         button3.addActionListener(this);
+        JButton button4 = new JButton(loadMap);
+        contentPane.add(button4);
+        button4.addActionListener(this);
+        JButton button5 = new JButton(loadRec);
+        contentPane.add(button5);
+        button5.addActionListener(this);
 
         pack();
 
@@ -218,6 +228,76 @@ public final class GetPlayers extends JDialog implements WindowListener,
     {
     }
 
+    static class mapFileFilter extends javax.swing.filechooser.FileFilter 
+    {
+        public boolean accept(File f) 
+        {
+            if (f.isDirectory()) 
+            {
+                return(true);
+            }
+            if (f.getName().endsWith(".map")) 
+            {
+                return(true);
+            }
+            return(false);
+        }
+        public String getDescription() 
+        {
+            return("Colossus MAP file");
+        }
+    }
+    
+    static class recFileFilter extends javax.swing.filechooser.FileFilter 
+    {
+        public boolean accept(File f) 
+        {
+            if (f.isDirectory()) 
+            {
+                return(true);
+            }
+            if (f.getName().endsWith(".ter")) 
+            {
+                return(true);
+            }
+            return(false);
+        }
+        public String getDescription() 
+        {
+            return("Colossus RECruiters file");
+        }
+    }
+    
+    static String chooseMap() 
+    {
+        javax.swing.JFileChooser mapChooser = new JFileChooser();
+        mapChooser.setFileFilter(new mapFileFilter());
+        mapChooser.setDialogTitle(
+            "Choose your map (or cancel for default map)");
+        int returnVal = mapChooser.showOpenDialog(mapChooser);
+        String mapName = "StrategicMap.map";
+        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) 
+        {
+            mapName = mapChooser.getSelectedFile().getAbsolutePath();
+        }
+        return (mapName);
+    }
+
+    static String chooseRec() 
+    {
+        javax.swing.JFileChooser recChooser = new JFileChooser();
+        recChooser.setFileFilter(new recFileFilter());
+        recChooser.setDialogTitle(
+            "Choose your recruiters base (or cancel for default base)");
+        int returnVal = recChooser.showOpenDialog(recChooser);
+        String recName = "Recruit.ter";
+        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) 
+        {
+            recName = recChooser.getSelectedFile().getAbsolutePath();
+        }
+        return (recName);
+    }
+
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals(quit))
@@ -231,6 +311,14 @@ public final class GetPlayers extends JDialog implements WindowListener,
         else if (e.getActionCommand().equals(loadGame))
         {
             doLoadGame();
+        }
+        else if (e.getActionCommand().equals(loadMap))
+        {
+            mapName = chooseMap();
+        }
+        else if (e.getActionCommand().equals(loadRec))
+        {
+            recruitName = chooseRec();
         }
         else
         {

@@ -26,6 +26,8 @@ public class MasterHex extends Hex
     // n, ne, se, s, sw, nw
     private int labelSide;
     protected int[] exitType = new int[6];
+    protected int[] baseExitType = new int[3];
+    protected int[] baseExitLabel = new int[3];
     protected int[] entranceType = new int[6];
 
     // Constants for hexside gates.
@@ -207,6 +209,25 @@ public class MasterHex extends Hex
         this.exitType[i] = exitType;
     }
 
+    public int getBaseExitType(int i)
+    {
+        return baseExitType[i];
+    }
+
+    public void setBaseExitType(int i, int exitType)
+    {
+        this.baseExitType[i] = exitType;
+    }
+
+    public int getBaseExitLabel(int i)
+    {
+        return baseExitLabel[i];
+    }
+
+    public void setBaseExitLabel(int i, int label)
+    {
+        this.baseExitLabel[i] = label;
+    }
 
     public int getEntranceType(int i)
     {

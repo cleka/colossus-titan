@@ -1,0 +1,190 @@
+options
+{
+  IGNORE_CASE = false;
+  STATIC = false;
+}
+
+PARSER_BEGIN(TerrainRecruitLoader)
+import java.util.*;
+
+public class TerrainRecruitLoader
+{
+    Hashtable carToRecruits = new Hashtable();
+    Hashtable carToName = new Hashtable();
+
+    class recruitNumber
+    {
+        public String name;
+        public int number;
+        public recruitNumber(String n, int i)
+        {
+            name = n; number = i;
+        }
+    }
+    public ArrayList getPossibleRecruits(char terrain)
+    {
+        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
+        ArrayList re = new ArrayList();
+        for (int i = 0; i < al.size() ; i++)
+        {
+            recruitNumber tr = (recruitNumber)al.get(i);
+            re.add(Creature.getCreatureByName(tr.name));
+        }
+        return(re);
+    }
+    public int numberOfRecruiterNeeded(Creature recruiter, Creature recruit, char terrain)
+    {
+        if (terrain != 'T') /* handle Tower with care */
+        {
+            ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
+            ArrayList pc = getPossibleRecruits(terrain);
+
+            int iReer = pc.indexOf(recruiter);
+            int iRe = pc.indexOf(recruit);
+            if ((iReer == -1) || (iRe == -1))
+            {
+                return 99; /* can't recruit/be recruited here */
+            }
+
+            if (iReer >= iRe)
+            {
+                return 1; /* only one to recruit same or below */
+            }
+
+            if ((iReer+1) < iRe)
+            {
+                return 99; /* can't recruit 2 above */
+            }
+
+            return (((recruitNumber)al.get(iRe)).number);
+        }
+        /* Tower, special */
+        if (recruit.getName().equals("Centaur") ||
+                    recruit.getName().equals("Gargoyle") ||
+                    recruit.getName().equals("Ogre"))
+        {
+            return 0;
+        } 
+        else if (recruit.getName().equals("Warlock"))
+        {
+            if (recruiter.getName().equals("Titan") ||
+                recruiter.getName().equals("Warlock"))
+            {
+                return 1;
+            } 
+            else 
+            {
+                return 99;
+            }
+        } 
+        else if (recruit.getName().equals("Guardian"))
+        {
+            if (recruiter.getName().equals("Guardian"))
+            {
+                return 1;
+            } 
+            else 
+            {
+                return 3;
+            }
+        } 
+        else 
+        {
+            return 99;
+        }
+    }
+}
+
+PARSER_END(TerrainRecruitLoader)
+
+SKIP :
+{
+    " "
+  | "\r"
+  | "\t"
+}
+
+TOKEN :
+{
+    < EOL: "\n" >
+}
+
+TOKEN :
+{
+    < NUMBER : (<DIGIT>)+ >
+|   < #DIGIT : ["0" - "9"] >
+}
+
+TOKEN :
+{
+    < TERCAR : ["a"-"z","A"-"Z"] >
+}
+
+TOKEN :
+{
+    < CHAINE : (<CAR>)+ >
+|   < #CAR : ["a"-"z","A"-"Z"] >
+}
+
+char r_char() :
+{}
+{
+    <TERCAR>
+    { return (token.image.charAt(0)); }
+}
+
+String r_chaine() :
+{}
+{
+    <CHAINE>
+    {
+        return(new String(token.image));
+    }
+}
+
+int r_number() :
+{}
+{
+    <NUMBER>
+    {
+        return(Integer.parseInt(token.image));
+    }
+}
+
+ArrayList r_allRecruit() :
+{
+    ArrayList temp;
+    int i;
+    String n;
+}
+{
+    (i = r_number()) (n = r_chaine()) (temp = r_allRecruit())
+    { temp.add(0, new recruitNumber(n, i)); return temp; }
+|   /* empty */
+    { return new ArrayList(); }
+
+}
+
+int oneTerrain() :
+{
+    String t;
+    char tc;
+    ArrayList rl;
+}
+{
+    (tc = r_char()) (t = r_chaine()) (rl = r_allRecruit()) <EOL>
+    {
+        carToRecruits.put(new Character(tc), rl);
+        carToName.put(new Character (tc), t);
+        System.out.println("Adding recruits for " + t);
+        return(1);
+    }
+|   <EOL>
+    {
+        return(0);
+    }
+|   <EOF>
+    {
+        return(-1);
+    }
+}

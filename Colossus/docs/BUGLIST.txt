@@ -148,6 +148,7 @@ Need to make recruitChits optional.
 recruitChits show up even for 7-high legions.  This might make sense
    in hexes where a battle could thin the stack, or where an angel
    could be summoned out, but some 7-high legions can never recruit.
+   Worth distinguishing?
 
 Add confirm dialog when quitting by exiting frame.
 

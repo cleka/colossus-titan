@@ -18,10 +18,15 @@
 JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.2
 #JCC = kjc -g --deprecation --warning
 
+# JavaCC converts .jj parser description files to .java source
+# JavaCC 2.1 is available from 
+# http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
+
+JAVACC= javacc
+
 
 HTMLDIR = /home/groups/c/co/colossus/htdocs
 DOWNLOAD_DIR = $(HTMLDIR)/download
-FTPDIR = /home/groups/ftp/pub/colossus
 
 ZIPFILE = Colossus.`date +%Y%m%d`.zip
 
@@ -37,13 +42,17 @@ all: jar
 %.class : %.java
 	$(JCC) $<
 
+%.java: %.jj
+	$(JAVACC) -STATIC=false $<
 
 # Find target files
 
 sources = $(wildcard *.java) $(wildcard net/sf/colossus/*.java) \
 	$(wildcard net/sf/colossus/protocol/*.java) \
 	$(wildcard net/sf/colossus/masterboard/*.java) \
-	$(wildcard net/sf/colossus/battle/*.java) 
+	$(wildcard net/sf/colossus/battle/*.java) \
+	StrategicMapLoader.java \
+	TerrainRecruitLoader.java
 
 CLASS_FILES = $(sources:%.java=%.class)
 
@@ -56,19 +65,19 @@ JARFILE = Colossus.jar
 jar : $(JARFILE)
 
 # Create jar file
-$(JARFILE): $(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
-	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class net/sf/colossus/*.class net/sf/colossus/protocol/*.class images/*.gif
+$(JARFILE): StrategicMapLoader.java TerrainRecruitLoader.java \
+	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF StrategicMap.map
+	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class net/sf/colossus/*.class net/sf/colossus/protocol/*.class images/*.gif StrategicMap.map Recruit.ter
 	chmod +x Colossus.jar
 
 INST_JARFILE = $(HTMLDIR)/$(JARFILE)
 INST_README = $(HTMLDIR)/README.txt
-INST_DIST = $(FTPDIR)/$(ZIPFILE)
+INST_DIST = $(DOWNLOAD_DIR)/$(ZIPFILE)
 $(INST_JARFILE): $(JARFILE)
 	cp Colossus.jar $(HTMLDIR)
 $(INST_README): docs/README.txt
 	cp docs/README.txt $(HTMLDIR)
 $(INST_DIST): dist
-	cp $(ZIPFILE) $(FTPDIR)
 	cp $(ZIPFILE) $(DOWNLOAD_DIR)
 
 inst: $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST)

@@ -24,13 +24,11 @@ public final class BattleMap extends HexMap implements MouseListener,
     private boolean critterSelected;
 
     public static final String undoLast = "Undo Last";
-    public static final String redoLast = "Redo Last";
     public static final String undoAll = "Undo All";
     public static final String doneWithPhase = "Done";
     public static final String concedeBattle = "Concede Battle";
 
     private AbstractAction undoLastAction;
-    private AbstractAction redoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
     private AbstractAction concedeBattleAction;

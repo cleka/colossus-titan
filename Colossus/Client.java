@@ -35,7 +35,6 @@ public final class Client
     /** Stack of legion marker ids, to allow multiple levels of undo for
      *  splits, moves, and recruits. */
     private static LinkedList undoStack = new LinkedList();
-    private static LinkedList redoStack = new LinkedList();
 
     private String moverId;
 
@@ -797,7 +796,6 @@ public final class Client
     public static void clearUndoStack()
     {
         undoStack.clear();
-        redoStack.clear();
     }
 
     public static Object topUndoStack()
@@ -808,24 +806,17 @@ public final class Client
     public static Object popUndoStack()
     {
         Object ob = undoStack.removeFirst();
-        redoStack.addFirst(ob);
         return ob;
     }
 
     public static void pushUndoStack(Object object)
     {
         undoStack.addFirst(object);
-        redoStack.clear();
     }
 
     public static boolean isUndoStackEmpty()
     {
         return undoStack.isEmpty();
-    }
-
-    public static Object popRedoStack()
-    {
-        return redoStack.removeFirst();
     }
 
 

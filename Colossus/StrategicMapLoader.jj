@@ -1,0 +1,158 @@
+options
+{
+  IGNORE_CASE = true;
+  STATIC = false;
+}
+
+PARSER_BEGIN(StrategicMapLoader)
+import java.util.*;
+
+public class StrategicMapLoader
+{
+    static Hashtable stringToTerrain;
+    static Hashtable stringToWay;
+    static final String[] terrainString = { "BRUSH","DESERT","HILLS","JUNGLE",
+        "MOUNTAINS","MARSH","PLAINS","SWAMP","TOWER","TUNDRA","WOODS" };
+        
+    public void StrategicMapLoaderInit()
+    {
+        stringToTerrain = new Hashtable(11);
+        for (int i = 0 ; i < terrainString.length ; i++)
+        {
+            stringToTerrain.put(terrainString[i], new Character(MasterHex.terrains[i]));
+        }
+                
+        stringToWay = new Hashtable(4);
+        stringToWay.put("ARROW", new Integer(MasterHex.ARROW));
+        stringToWay.put("ARROWS",  new Integer(MasterHex.ARROWS));
+        stringToWay.put("ARCH",  new Integer(MasterHex.ARCH));
+        stringToWay.put("BLOCK", new Integer(MasterHex.BLOCK));
+    }
+}
+
+PARSER_END(StrategicMapLoader)
+
+SKIP :
+{
+        " "
+  |     "\r"
+  |     "\t"
+}
+
+TOKEN :
+{
+        < EOL: "\n" >
+}
+
+TOKEN :
+{
+        < CASE : "CASE" >
+}
+
+TOKEN :
+{
+        < NUMBER : (<DIGIT>)+ >
+|       < #DIGIT: ["0" - "9"] >
+}
+
+TOKEN :
+{
+        < TERRAIN : "TOWER"|"BRUSH"|"JUNGLE"|"PLAINS"|"WOODS"|"DESERT"|"MARSH"|"HILLS"|"SWAMP"|"MOUNTAINS"|"TUNDRA" >
+}
+
+TOKEN :
+{
+        < WAY : "ARROW"|"ARROWS"|"ARCH"|"BLOCK" >
+}
+
+char c_terrain() :
+{}
+{
+    <TERRAIN>
+    {
+        return(((Character)stringToTerrain.get(token.image)).charValue());
+    }
+}
+
+int c_number() :
+{}
+{
+    <NUMBER>
+    {
+        return(Integer.parseInt(token.image));
+    }
+}
+
+int c_way() :
+{}
+{
+    <WAY>
+    {
+        return(((Integer)stringToWay.get(token.image)).intValue());
+    }
+}
+
+int oneCase(MasterHex [][] h) :
+{
+    char ter;
+    int p;
+    int s1;
+    int s2;
+    int s3;
+    int ts1;
+    int ts2;
+    int ts3;
+    int posX;
+    int posY;
+    int nPosX;
+    int nPosY;
+}
+{
+    <CASE> (p = c_number()) (ter = c_terrain()) (s1 = c_number()) (ts1 = c_way()) (s2 = c_number()) (ts2 = c_way()) (s3 = c_number()) (ts3 = c_way()) (posX = c_number()) (posY = c_number()) <EOL>
+    {
+        nPosX = posX-1;
+        nPosY = (posY-1)/2;
+        System.out.println("Adding case #" + p + " @(" + nPosX + "," + nPosY + "), type " + ter +
+                                        " with exit : " + s1 + ", " + s2 + ", " + s3);
+        h[nPosX][nPosY].setTerrain(ter);
+        h[nPosX][nPosY].setLabel(p);
+        h[nPosX][nPosY].setXCoord(nPosX);
+        h[nPosX][nPosY].setYCoord(nPosY);
+        if (s1 > 0) 
+        {
+            h[nPosX][nPosY].setBaseExitType(0, ts1);
+        }
+        else 
+        {
+            h[nPosX][nPosY].setBaseExitType(0, MasterHex.NONE);
+        }
+        h[nPosX][nPosY].setBaseExitLabel(0, s1);
+        if (s2 > 0) 
+        {
+            h[nPosX][nPosY].setBaseExitType(1, ts2);
+        } 
+        else 
+        {
+            h[nPosX][nPosY].setBaseExitType(1, MasterHex.NONE);
+        }
+        h[nPosX][nPosY].setBaseExitLabel(1, s2);
+        if (s3 > 0) 
+        {
+            h[nPosX][nPosY].setBaseExitType(2, ts3);
+        } 
+        else 
+        {
+            h[nPosX][nPosY].setBaseExitType(2, MasterHex.NONE);
+        }
+        h[nPosX][nPosY].setBaseExitLabel(2, s3);
+        return(1);
+    }
+|       <EOL>
+        {
+                return(0);
+        }
+|       <EOF>
+        {
+                return(-1);
+        }
+}

@@ -1,4 +1,4 @@
-Colossus alpha     July 27, 2001    Copyright 2001 David Ripton
+Colossus alpha     October 24, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
@@ -16,60 +16,24 @@ please send me a copy so that I can fold them into the master code.
 Running the game requires the following:
 
 1. A 1.2 or later version of a JRE (Java runtime environment) or JDK
-   (Java development kit).  A JRE is a smaller download; a JDK also
-   lets you compile Java programs, not just run them.
+   (Java development kit).
 
-   (Colossus will not run under JDK 1.0.x or 1.1.x  Colossus does not
-   currently run as an applet in a web browser.  Sorry.)
+   (Colossus will not run under JRE 1.0.x or 1.1.x  Colossus does not
+   currently run as an applet in a web browser.  The obsolete 
+   Microsoft JVM that's bundled with IE won't work.  Sorry.)
 
-   Win32, Solaris, and x86 Linux versions of the JDK and JRE are
+   Win32, Solaris, and x86 Linux versions of the JRE and JDK are
    freely downloadable from java.sun.com.  Another Linux port is
    available from www.blackdown.org.  Info on other ports is
    available at http://java.sun.com/cgi-bin/java-ports.cgi
 
-   Here's my impression of how well various Java environments run
-   Colossus:
+   The current recommended version is Sun JRE 1.3.1.
+   If in doubt, you probably want:
+   http://java.sun.com/j2se/1.3/jre/download-windows.html
 
-   Windows: Sun's JDK/JRE 1.3.1 and 1.3 are good.  1.2.2 is okay.  
-      1.2.0 and 1.2.1 appear to work at first but have very serious 
-      memory leaks in the image handling code that will eventually
-      cause crashes, so I recommend upgrading to 1.3.1.  1.4 beta 
-      is somewhat buggy.
-
-   Solaris Sparc: Sun's JDK/JRE 1.3.1 and 1.3 are good.  1.2.x is 
-      okay.  1.4 beta is somewhat buggy.
-
-   x86 Linux: Sun JDK/JRE 1.3.1 and 1.3, and Blackdown 1.3.0 are 
-      good.  Sun and Blackdown 1.2.2 versions are okay.  IBM's JDK 
-      1.3 is buggy.  kaffe is not yet fully compatible with JDK 1.2.
-      Sun 1.4 beta is somewhat buggy.
-
-   If you have something else, you might find bugs that I haven't.
-   If you manage to get Colossus running on a system I haven't tried,
-   please email me.  (In particular, I'd like to know if it works on
-   a Mac.)
-
-2. A reasonably fast computer capable of displaying high resolution graphics,
-   with a two-button mouse.
-
-   What is reasonably fast?  It depends.  I think Colossus runs acceptably
-   (not great) on a Pentium 133 with 64 MB and a JVM with a JIT or HotSpot.
-   The AI battle moves are the slowest part; I'll eventually add an
-   option to limit the amount of time the AI thinks.
-
-   The game looks best in 1280x960 or higher, but I've added some scaling
-   so you should be able to get by in 1024x768.  Less should work but will
-   be really ugly.  The Java AWT requires at least a 256-color display; it 
-   might work with less, but colors will be off.
-
-   Java handles mouse buttons beyond the first badly.  In a perfect world,
-   option-click on a Macintosh and the second mouse button on a PC would
-   fire the same Java event.  They don't.  Because I don't have a Mac,
-   I don't know if Colossus works correctly on one.  If you have a Mac
-   with a one-button mouse, please let me know how things work.  I can
-   add menus and hotkeys to duplicate right-button functionality if
-   necessary, or try to get option-click working.
-
+2. The minimum computer spec is about a 133 MHz CPU, 64 MB RAM, 
+   2-button mouse, 800x600 256-color display.  You'll get better 
+   results with about a 300 MHz CPU and 1024x768 display.
 
 Directions:
 
@@ -138,7 +102,7 @@ the attacker is given a chance to concede.  If both legions stick around, then
 a negotiation window pops up, where creatures can be clicked on to "X" them
 away.  If the combatants can come to an agreement where all the creatures on
 at least one side die, then there's no need to fight.  Otherwise, it's time
-for battle.
+for battle.  (Negotiation is currently disabled but will be put back in.)
 
 During a battle, the appropriate BattleMap pops up, with each legion on the
 appropriate entry side.  (You have to choose an entry side during movement
@@ -215,6 +179,10 @@ down the game a bit.
 If you select Save Options from the File menu, then all the current players' 
 options will be saved in files called <player name>.cfg 
 
+Support for variable maps and recruit trees has recently been added.  It's
+still very new and things might not work correctly with other than the
+defaults.
+
 
 Improvements:
 
@@ -236,7 +204,6 @@ rules issues.
 
 
 
-
 Credits:
 
 Programming:  David Ripton  dripton@wizard.net
@@ -252,7 +219,8 @@ Network protocol: Falk Hueffner
 GUI ideas: Kris Giesing
 
 Bug reports:  Anthony Kam, Augustin Ku, Sean McCulloch, Luca Ferraro, 
-              Jonathan Woodward, Aneel Nazareth, Paul Macgowan
+              Jonathan Woodward, Aneel Nazareth, Paul Macgowan,
+              Magnus Berglund
 
 Web and CVS space, bug tracker, mailing lists, etc.: SourceForge
 
