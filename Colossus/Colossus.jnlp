@@ -14,6 +14,8 @@
        </information>
        <resources>
          <jar href="Colossus.jar"/>
+         <jar href="libs/werken.opt.jar"/>
+         <jar href="libs/jdom.jar"/>
          <jar href="libs/batik-awt-util.jar"/>
          <jar href="libs/batik-bridge.jar"/>
          <jar href="libs/batik-css.jar"/>

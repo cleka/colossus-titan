@@ -15,12 +15,16 @@
     <h2>Tools needed</h2>
     <p>All of these tools are free downloads, and we need to avoid making the
     game depend on tools that aren&#39;t.</p>
+    <p>Where practical (a combination of friendly licensing and reasonably small
+    size), we now put the tools in CVS, in the libs/ subdirectory.  If you
+    add $COLOSSUS_HOME/libs to your CLASSPATH, you can use these tools without
+    further configuration.
     <h4>Java development kit</h4>
     <p>You need a 
     <a href="http://java.sun.com/j2se">JDK</a>
      , which includes a javac compiler, a Java runtime environment, and various
     utilities like jar and javadoc. The game should work with JDK 1.4 or newer.
-    1.4.1 seems to be the most stable.  Unless you have a great net connection,
+    1.4.2 seems to be the most stable.  Unless you have a great net connection,
     also download the JDK docs, which are packaged separately.</p>
     <p>Sun maintains the best-known (and IMO best) 
     <a href="http://java.sun.com/j2se">JDK</a>
@@ -67,7 +71,8 @@
     <a
     href="http://www.experimentalstuff.com/Technologies/JavaMake/">Javamake</a>
      helps a lot by compiling all files in one Java process, and only
-    recompiling the files that need to be recompiled.</p>
+    recompiling the files that need to be recompiled.  The JavaMake jars are
+    included in the Colossus libs/ subdirectory; include it in your CLASSPATH.</p>
     <h4>Build tools</h4>
     <a href="http://jakarta.apache.org/ant/">Ant</a>
      is a newer cross-platform build tool used by many Java projects. It&#39;s
@@ -86,21 +91,6 @@
     href="http://www.experimentalstuff.com/Technologies/JavaMake/">Javamake</a>
      is a Java dependency checker from Sun Labs. It allows us to recompile only
     the classes that need to be recompiled.</p>
-    <h4>Parser tools</h4>
-    <p>Colossus uses the 
-    <a href="http://www.webgain.com/trialware/javacc/JavaCC2_1.zip">JavaCC</a>
-     parser generator written by Sun and Matamata. (JavaCC has nothing to do
-    with javac, despite the similar name. It stands for Java Compiler
-    Compiler.) This turns .jj files into .java files, which are then compiled
-    normally. You want version 2.1. I set 
-    <b>JAVACC_HOME</b>
-     to its install location and then put 
-    <b>$JAVACC_HOME}/bin</b>
-     in my 
-    <b>PATH</b>
-     . (You can probably see the pattern by now.) You don&#39;t actually need
-    to know JavaCC unless you want to change parser files or make new ones. You
-    only need to install it and let build.xml drive it for you.</p>
     <h4>Source code control</h4>
     <p>We use 
     <a href="http://cvshome.org">CVS</a>
@@ -213,7 +203,9 @@
      is free (but not open source) and works pretty well. It&#39;s available
     for Windows and Linux. See CVSROOT/colossus-jacobe.cfg
     </p>
-    <p>There are other options, but I haven&#39;t found another good free one.</p>
+    <p>Another one that looks promising is
+    <a href="http://jalopy.sf.net">Jalopy</a>
+    <p>Unfortunately, neither breaks long lines perfectly.</p>
     <h4>Image editors</h4>
     <p>Currently all images used in Colossus are GIFs or PNGs. (Though
     we&#39;re starting to experiment with SVG.) JPEGs are great for photos but
@@ -227,15 +219,11 @@
     <h4>Testing tools</h4>
     <p>We&#39;ve added a few unit tests using 
     <a href="http://junit.org">JUnit</a>
-     . We need to add more. The JUnit test classes, named 
+     . We need to add more. The JUnit test classes are the ones named
     <b>*Test.java</b>
-     are not built by the normal compile commands, because they require
-    junit.jar in the CLASSPATH to compile, and we wanted to make it possible to
-    compile the rest of the game without JUnit. The ant 
-    <b>compileAll</b>
-     target compiles all classes including the JUnit tests. The ant 
-    <b>test</b>
-     target runs all tests, using the JUnit text UI.</p>
+     The ant <b>test</b>
+     target runs all tests, using the JUnit text UI.  We now include junit.jar
+     in the libs subdirectory, so you have no excuse not to add tests.</p>
     <h2>Build process</h2>
     <p>Once you have the tools set up, Colossus basically builds itself.</p>
     <p>First you need all the source files. Snag the latest zip file from 
@@ -245,9 +233,8 @@
     <p>If you just type 
     <b>ant</b>
      from the project base directory, then you get the default target, which
-    will compile all the .jj files into .java files with JavaCC,
-    then compile all the .java files into .class files with javac, then make an
-    unsigned executable jar file.</p>
+     will compile all the .java files into .class files with javac, then make an
+     unsigned executable jar file.</p>
     <p>Other interesting targets include 
     <b>clean</b>
      and 
@@ -255,7 +242,7 @@
      (delete stuff, useful if you want to clean up or make sure that you fully
     rebuild all your class files), 
     <b>fix</b>
-     (ant only -- does a bit of text reformatting on java source files), 
+     (does a bit of text reformatting on java source files), 
     <b>tools</b>
      (builds standalone tools), 
     <b>sign</b>

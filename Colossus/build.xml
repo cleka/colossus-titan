@@ -4,12 +4,13 @@
 <!-- $Id$ -->
 
 <!-- To use this you need:
-     Sun JDK 1.4+    http://java.sun.com  (currently recommend 1.4.1)
+     Sun JDK 1.4+    http://java.sun.com  (currently recommend 1.4.2)
      Ant 1.5+        http://jakarta.apache.org/ant/
      Javamake 1.2.8+ http://www.experimentalstuff.com/Technologies/JavaMake/
-        javamake.jar needs to be in your CLASSPATH.
+        javamake.jar and javamake-ant15.jar need to be in your CLASSPATH.
+        (Jars are included in the libs subdirectory.)
      JUnit 3.8.1+      http://junit.org
-        junit.jar AND the junit directory need to be in your CLASSPATH.
+        (Jars are included in the libs subdirectory.)
      To sign jarfiles, you need a file called usernameKeystore,
         (substituting your username for "username")
         with an alias matching your username, and you need to put
@@ -65,32 +66,29 @@
 
 <taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake"/>
 
-<!-- TODO Find a way to switch between javamake and javac using a variable -->
-
-<!-- If you don't have Javamake you can change "javamake" to "javac" -->
-<!-- But get Javamake instead.  Good dependency checking helps a lot. -->
 <target name="compile" depends="init"
         description = "Compile most .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
                 includes="**/*.java"
-                excludes="**/*Test.java,
-                          **/datatools/*.java">
+                excludes="**/datatools/*.java">
             <classpath>
+                <pathelement location="libs/junit.jar"/>
+                <pathelement location="libs/werken.opt.jar"/>
+                <pathelement location="libs/jdom.jar"/>
                 <pathelement location="libs/batik-transcoder.jar"/>
                 <pathelement location="libs/batik-util.jar"/>
             </classpath>
         </javamake>
 </target>
 
-<!-- TODO Add an option to always compileAll based on an environment var. -->
-
-<!-- If you don't have Javamake you can change "javamake" to "javac" -->
-<!-- But get Javamake instead.  Good dependency checking helps a lot. -->
 <target name="compileAll" depends="init"
         description = "Compile all .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
                 includes="**/*.java">
             <classpath>
+                <pathelement location="libs/junit.jar"/>
+                <pathelement location="libs/werken.opt.jar"/>
+                <pathelement location="libs/jdom.jar"/>
                 <pathelement location="libs/batik-transcoder.jar"/>
                 <pathelement location="libs/batik-util.jar"/>
             </classpath>
@@ -99,7 +97,7 @@
 
 
 <!-- XXX Why does this fail if we set fork to yes? -->
-<target name="test" depends="compileAll,jar"
+<target name="test" depends="compile,jar"
         description = "Run all unit tests using JUnit">
         <junit printsummary="yes" fork="no" haltonfailure="no">
                 <formatter type="plain"/>
@@ -185,8 +183,7 @@
         <delete verbose="yes" quiet = "yes" includeemptydirs="yes">
                 <fileset dir="."
                  includes =
-                         "net/sf/colossus/parser/*.java,
-                          javamake.pdb"
+                         "javamake.pdb"
                 />
         </delete>
 </target>
@@ -196,7 +193,7 @@
         description = "Fix end of line characters and eliminate tabs">
         <fixcrlf srcDir="." eol="lf" tab="remove" javafiles="yes"
                 eof="remove" tablength="8"
-                includes="**/*.java,**/*.jj"
+                includes="**/*.java"
         />
 </target>
 
@@ -226,7 +223,7 @@
              TitanPlus,
              ExtTitan,
              Badlands,
-             Sakis,
+             Undead,
              Outlands"
         />
         <chmod file="BattlelandsBuilder.jar" perm="755"/>
@@ -245,7 +242,7 @@
              TitanPlus,
              ExtTitan,
              Badlands,
-             Sakis,
+             Undead,
              Outlands"
         />
         <chmod file="BattlelandsRandomizer.jar" perm="755"/>
@@ -255,6 +252,21 @@
 <target name="sign" depends="jar"
         description = "Sign jar file">
         <signjar jar="Colossus.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/jdom.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/junit.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/werken.opt.jar"
                  alias="${user.name}"
                  keystore="${user.name}Keystore"
                  storepass="${env.JARPASSWORD}"
