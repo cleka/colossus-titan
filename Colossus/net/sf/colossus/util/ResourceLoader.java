@@ -1313,7 +1313,7 @@ public final class ResourceLoader
         }
         catch (Exception e)
         {
-            Log.error("Instanciation of class' constructor for \"" +
+            Log.error("Instantiation of class's constructor for \"" +
                     className + "\" failed (" + e + ")");
             return null;
         }
