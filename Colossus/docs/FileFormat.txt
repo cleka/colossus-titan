@@ -39,6 +39,12 @@ All of those should be on one line.
  master board, case 126 and 125 are on the same line number 0
 and on columns 4 and 3).
 
+NOTE: Put at least 6 towers currently, as having less Towers than
+players is going to cause problems. The upper number is not
+constrained (or isn't supposed to be), and neither are the labels.
+For readability reasons, it's probably better to use 100 to 900
+as the labels for the first 9 towers.
+
 WARNING: The way the Hex are displayed (pointy part upside or
 downside) depend on the parity of the X+Y sum. It is possible
 to create a perfectly legit MAP where all the Hex are upside-down !
