@@ -5,7 +5,7 @@ import java.util.*;
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.client.CaretakerInfo;
-import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.CustomRecruitBase;
 
 

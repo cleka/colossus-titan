@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.util.Split;
 

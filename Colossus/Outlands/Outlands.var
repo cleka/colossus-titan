@@ -1,4 +1,4 @@
 MAP:Outlands.map
 CRE:Default.cre
-TER:Default.ter
+TER:DefaultTer.xml
 HINT:Default.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin

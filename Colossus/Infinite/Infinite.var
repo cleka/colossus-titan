@@ -1,5 +1,5 @@
 MAP:Infinite.map
 CRE:Infinite.cre
-TER:Default.ter
+TER:DefaultTer.xml
 HINT:Default.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin
 

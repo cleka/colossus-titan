@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Dice;

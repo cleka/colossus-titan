@@ -1,5 +1,5 @@
 MAP:SmallTitan.map
 CRE:Default.cre
-TER:Default.ter
+TER:DefaultTer.xml
 MAXPLAYERS:3
 HINT:Default.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin

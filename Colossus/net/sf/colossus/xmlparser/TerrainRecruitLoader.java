@@ -1,14 +1,11 @@
-options
-{
-  IGNORE_CASE = false;
-  STATIC = false;
-}
-
-PARSER_BEGIN(TerrainRecruitLoader)
-package net.sf.colossus.parser;
+package net.sf.colossus.xmlparser;
 
 
 import java.util.*;
+import java.io.*;
+
+import org.jdom.*;
+import org.jdom.input.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.HTMLColor;
@@ -18,6 +15,7 @@ import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.RecruitGraph;
 import net.sf.colossus.client.CaretakerInfo;
 import net.sf.colossus.server.CustomRecruitBase;
+
 
 /**
  * TerrainRecruitLoader load the terrains and recruits descriptions.
@@ -36,34 +34,42 @@ public class TerrainRecruitLoader
      * Map a String (representing a terrain) to a list of recruits.
      */
     private static HashMap strToRecruits = new HashMap();
+
     /**
      * Map a String (representing a terrain) to a terrain display name.
      */
+
     private static HashMap strToDisplayName = new HashMap();
+
     /**
      * Map a String (representing a terrain) to a terrain color.
      */
     private static HashMap strToColor = new HashMap();
+
     /**
      * Map a String (representing a terrain) to a boolean,
      * telling if a Creature can recruit in the usual way or not.
      */
     private static HashMap strToBelow = new HashMap();
+
     /**
      * Map a String (representing a terrain) to an optional BattlelandsRandomizer filename.
      */
     private static HashMap strToRnd = new HashMap();
+
     /**
      * All the Strings that are valid terrains.
      */
     private static String[] terrains = null;
+
     /**
      * The list of Acquirable Creature, as acquirableData.
-     * @see net.sf.colossus.parser.TerrainRecruitLoader.acquirableData
+     * @see net.sf.colossus.xmlparser.TerrainRecruitLoader.acquirableData
      */
     private static List acquirableList = null;
+
     /** support for the custom recruiting functions ; map the class name to an
-        instance of the class. */
+     instance of the class. */
     private static HashMap nameToInstance = new HashMap();
 
     /**
@@ -81,7 +87,7 @@ public class TerrainRecruitLoader
         Log.debug("GRAPH: Setting the CaretakerInfo");
         graph.setCaretakerInfo(caretakerInfo);
     }
-    
+
     /**
      * Add an entire terrain recruiting list to the Recruiting Graph.
      * @param rl The list of RecruitNumber to add to the graph.
@@ -91,20 +97,20 @@ public class TerrainRecruitLoader
         Iterator it = rl.iterator();
         String v1 = null;
         boolean regularRecruit =
-            ((Boolean)strToBelow.get(t)).booleanValue();
-        try 
+                ((Boolean)strToBelow.get(t)).booleanValue();
+        try
         {
             while (it.hasNext())
             {
                 recruitNumber tr = (recruitNumber)it.next();
                 String v2 = tr.getName();
                 if ((v2 != null) &&
-                    !(v2.equals(Keyword_Anything)) &&
-                    !(v2.equals(Keyword_AnyNonLord)) &&
-                    !(v2.equals("Titan")) &&
-                    !(v2.equals(Keyword_Lord)) &&
-                    !(v2.startsWith(Keyword_Special)) &&
-                    !(tr.getNumber() < 0))
+                        !(v2.equals(Keyword_Anything)) &&
+                        !(v2.equals(Keyword_AnyNonLord)) &&
+                        !(v2.equals("Titan")) &&
+                        !(v2.equals(Keyword_Lord)) &&
+                        !(v2.startsWith(Keyword_Special)) &&
+                        !(tr.getNumber() < 0))
                 { // we musn't add the Edges going to non-recruitable
                     if (v1 != null)
                     {
@@ -117,16 +123,16 @@ public class TerrainRecruitLoader
                     {
                         recruitNumber tr2 = (recruitNumber)it2.next();
                         if ((tr == tr2) || // same List, same objects
-                            regularRecruit)
+                                regularRecruit)
                         {
                             // one can always recruit itself at one/zero
                             // level, and also below if regularRecruit is on.
                             String v3 = tr2.getName();
                             if (!(v3.equals(Keyword_Anything)) &&
-                                !(v3.equals(Keyword_AnyNonLord)) &&
-                                !(v3.equals("Titan")) &&
-                                !(v3.equals(Keyword_Lord)) &&
-                                !(v3.startsWith(Keyword_Special)))
+                                    !(v3.equals(Keyword_AnyNonLord)) &&
+                                    !(v3.equals("Titan")) &&
+                                    !(v3.equals(Keyword_Lord)) &&
+                                    !(v3.startsWith(Keyword_Special)))
                             {
                                 if ((tr2.getNumber() > 0))
                                 {
@@ -148,7 +154,7 @@ public class TerrainRecruitLoader
                 { // special recruitment, need to add edge between the special aned every possible recruit
                     CustomRecruitBase cri = getCustomRecruitBase(v2);
                     java.util.List allRecruits =
-                        cri.getAllPossibleSpecialRecruits(t);
+                            cri.getAllPossibleSpecialRecruits(t);
                     Iterator it3 = allRecruits.iterator();
                     while (it3.hasNext())
                     {
@@ -165,7 +171,7 @@ public class TerrainRecruitLoader
             Log.error("Couldn't fill graph : " + e);
         }
     }
-    
+
     /* make sure that all static elements are null or empty when creating a
      * new TerrainRecruitLoader object...
      */
@@ -173,15 +179,15 @@ public class TerrainRecruitLoader
         if (acquirableList != null)
         {
             Log.debug("TerrainRecruitLoader: Destroying previous " +
-                      "``acquirableList'' ; this should never happen " +
-                      "during a game...");
+                    "``acquirableList'' ; this should never happen " +
+                    "during a game...");
             acquirableList = null;
         }
         if (terrains != null)
         {
             Log.debug("TerrainRecruitLoader: Destroying previous " +
-                      "``terrains'' ; this should never happen during " +
-                      "a game...");
+                    "``terrains'' ; this should never happen during " +
+                    "a game...");
             terrains = null;
         }
         strToRecruits.clear();
@@ -191,6 +197,128 @@ public class TerrainRecruitLoader
         strToRnd.clear();
         nameToInstance.clear();
         graph.clear();
+    }
+
+    public TerrainRecruitLoader(InputStream terIS)
+    {
+        SAXBuilder builder = new SAXBuilder();
+        try
+        {
+            Document doc = builder.build(terIS);
+            Element root = doc.getRootElement();
+
+            List terrains = root.getChildren("terrain");
+            for (Iterator it = terrains.iterator(); it.hasNext();)
+            {
+                Element el = (Element)it.next();
+                handleTerrain(el);
+            }
+
+            List acquirables = root.getChildren("acquirable");
+            for (Iterator it = acquirables.iterator(); it.hasNext();)
+            {
+                Element el = (Element)it.next();
+                handleAcquirable(el);
+            }
+
+            Element el = root.getChild("titan_improve");
+            if (el != null)
+            {
+                handleTitanImprove(el);
+            }
+
+            el = root.getChild("titan_teleport");
+            if (el != null)
+            {
+                handleTitanTeleport(el);
+            }
+        }
+        catch (JDOMException ex)
+        {
+            Log.error("JDOM" + ex.toString());
+        }
+        catch (IOException ex)
+        {
+            Log.error("IO" + ex.toString());
+        }
+        catch (ParseException ex)
+        {
+            Log.error("Parse" + ex.toString());
+        }
+    }
+
+    private void handleTerrain(Element el)
+        throws JDOMException
+    {
+        String name = el.getAttributeValue("name");
+        String displayName = el.getAttributeValue("display_name");
+        if (displayName == null)
+        {
+            displayName = name;
+        }
+        String color = el.getAttributeValue("color");
+        ArrayList rl = new ArrayList();
+
+        boolean regularRecruit = el.getAttribute(
+                "regular_recruit").getBooleanValue();
+        List recruits = el.getChildren("recruit");
+        for (Iterator it = recruits.iterator(); it.hasNext();)
+        {
+            Element recruit = (Element)it.next();
+            String recruitName = recruit.getAttributeValue("name");
+            int recruitNum = recruit.getAttribute("number").getIntValue();
+            recruitNumber rn = new recruitNumber(recruitName, recruitNum);
+            rl.add(rn);
+        }
+
+        this.strToRecruits.put(name, rl);
+        this.strToDisplayName.put(name, displayName);
+        this.strToColor.put(name, HTMLColor.stringToColor(color));
+        this.strToBelow.put(name, new Boolean(regularRecruit));
+        this.strToRnd.put(name, null);   // XXX Random not yet supported
+
+        if (this.terrains == null)
+        {
+            this.terrains = new String[1];
+        }
+        else
+        {
+            String[] t2 = new String[this.terrains.length + 1];
+            for (int i = 0; i < this.terrains.length; i++)
+            {
+                t2[i] = this.terrains[i];
+            }
+            t2[this.terrains.length] = name;
+            this.terrains = t2;
+        }
+
+        addToGraph(rl, name);
+    }
+
+    private void handleAcquirable(Element el)
+        throws JDOMException, ParseException
+    {
+        String name = el.getAttribute("name").getValue();
+        int points = el.getAttribute("points").getIntValue();
+        String terrain = el.getAttributeValue("name");
+        acquirableData ad = new acquirableData(name, points);
+        if (terrain != null)
+        {
+            ad.addTerrain(terrain);
+        }
+        addAcquirable(ad);
+    }
+
+    private void handleTitanImprove(Element el)
+        throws JDOMException
+    {
+        this.titanImprove = el.getAttribute("points").getIntValue();
+    }
+
+    private void handleTitanTeleport(Element el)
+        throws JDOMException
+    {
+        this.titanTeleport = el.getAttribute("points").getIntValue();
     }
 
     /**
@@ -210,14 +338,17 @@ public class TerrainRecruitLoader
      */
     private class recruitNumber
     {
+
         /**
          * Name of the creature
          */
         private final String name;
+
         /**
          * Number of creatures needed to recruit it, depend on the terrain.
          */
         private final int number;
+
         /**
          * @param n Name of the creature
          * @param i Number of creatures needed to recruit it in the
@@ -225,36 +356,40 @@ public class TerrainRecruitLoader
          */
         public recruitNumber(String n, int i)
         {
-            name = n; number = i;
+            name = n;
+            number = i;
         }
+
         String getName()
         {
             return name;
         }
+
         int getNumber()
         {
             return number;
         }
+
         /**
          * Textual representation of the data.
          * @return Textual representation of the data as a String.
          */
         public String toString()
         {
-            return("(" + number + "," + name +")");
+            return("(" + number + "," + name + ")");
         }
     }
     public static CustomRecruitBase getCustomRecruitBase(String specialString)
     {
         CustomRecruitBase cri =
-            (CustomRecruitBase)nameToInstance.get(specialString);
+                (CustomRecruitBase)nameToInstance.get(specialString);
         if (cri != null)
         {
             return cri;
         }
         String className = specialString.substring(8);
         Object o = net.sf.colossus.util.ResourceLoader.getNewObject(className,
-                                                                    VariantSupport.getVarDirectoriesList());
+                VariantSupport.getVarDirectoriesList());
         if (o == null)
         {
             Log.error("CustomRecruitBase doesn't exist for: " + specialString);
@@ -264,6 +399,7 @@ public class TerrainRecruitLoader
         nameToInstance.put(specialString, cri);
         return cri;
     }
+
     /**
      * Give an array of the starting creatures, those available in the first
      * turn and in a particular kind of Tower.
@@ -280,6 +416,7 @@ public class TerrainRecruitLoader
         bc[2] = (Creature)to.get(2);
         return(bc);
     }
+
     /**
      * Give the display name of the terrain.
      * @param tc String representing a terrain.
@@ -289,6 +426,7 @@ public class TerrainRecruitLoader
     {
         return((String)strToDisplayName.get(tc));
     }
+
     /**
      * Give the color of the terrain.
      * @param tc String representing a terrain.
@@ -298,6 +436,7 @@ public class TerrainRecruitLoader
     {
         return((java.awt.Color)strToColor.get(tc));
     }
+
     /**
      * Give the name of the random filename to use to generate this terrain,
      * or null if it's a static Battlelands.
@@ -308,6 +447,7 @@ public class TerrainRecruitLoader
     {
         return((String)strToRnd.get(tc));
     }
+
     /**
      * Give a modifiable list of the possible recruits in a terrain.
      * @param terrain String representing a terrain.
@@ -315,7 +455,7 @@ public class TerrainRecruitLoader
      * @see net.sf.colossus.server.Creature
      */
     public static java.util.List getPossibleRecruits(String terrain,
-                                                     String hexLabel)
+            String hexLabel)
     {
         ArrayList al = (ArrayList)strToRecruits.get(terrain);
         ArrayList re = new ArrayList();
@@ -324,28 +464,29 @@ public class TerrainRecruitLoader
         {
             recruitNumber tr = (recruitNumber)it.next();
             if ((tr.getNumber() >= 0) &&
-                !(tr.getName().equals(Keyword_Anything)) &&
-                !(tr.getName().equals(Keyword_AnyNonLord)) &&
-                !(tr.getName().equals("Titan")) &&
-                !(tr.getName().equals(Keyword_Lord)) &&
-                !(tr.getName().startsWith(Keyword_Special)))
+                    !(tr.getName().equals(Keyword_Anything)) &&
+                    !(tr.getName().equals(Keyword_AnyNonLord)) &&
+                    !(tr.getName().equals("Titan")) &&
+                    !(tr.getName().equals(Keyword_Lord)) &&
+                    !(tr.getName().startsWith(Keyword_Special)))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
             }
             if (tr.getName().startsWith(Keyword_Special))
             {
                 CustomRecruitBase cri =
-                    getCustomRecruitBase(tr.getName());
+                        getCustomRecruitBase(tr.getName());
                 if (cri != null)
                 {
                     List temp = cri.getPossibleSpecialRecruits(terrain,
-                                                               hexLabel);
+                            hexLabel);
                     re.addAll(temp);
                 }
             }
         }
         return(re);
     }
+
     /**
      * Give a modifiable list of the possible recruiters in a terrain.
      * @param terrain String representing a terrain.
@@ -353,7 +494,7 @@ public class TerrainRecruitLoader
      * @see net.sf.colossus.server.Creature
      */
     public static java.util.List getPossibleRecruiters(String terrain,
-                                                       String hexLabel)
+            String hexLabel)
     {
         ArrayList al = (ArrayList)strToRecruits.get(terrain);
         ArrayList re = new ArrayList();
@@ -362,9 +503,9 @@ public class TerrainRecruitLoader
         {
             recruitNumber tr = (recruitNumber)it.next();
             if (!(tr.getName().equals(Keyword_Anything)) &&
-                !(tr.getName().equals(Keyword_AnyNonLord)) &&
-                !(tr.getName().equals(Keyword_Lord)) &&
-                !(tr.getName().startsWith(Keyword_Special)))
+                    !(tr.getName().equals(Keyword_AnyNonLord)) &&
+                    !(tr.getName().equals(Keyword_Lord)) &&
+                    !(tr.getName().startsWith(Keyword_Special)))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
             }
@@ -396,11 +537,11 @@ public class TerrainRecruitLoader
                 if (tr.getName().startsWith(Keyword_Special))
                 {
                     CustomRecruitBase cri =
-                        getCustomRecruitBase(tr.getName());
+                            getCustomRecruitBase(tr.getName());
                     if (cri != null)
                     {
                         List temp = cri.getPossibleSpecialRecruiters(terrain,
-                                                                     hexLabel);
+                                hexLabel);
                         re.addAll(temp);
                     }
                 }
@@ -419,32 +560,32 @@ public class TerrainRecruitLoader
      * @return Number of recruiter needed.
      * @see net.sf.colossus.server.Creature
      */
-    public static int numberOfRecruiterNeeded(Creature recruiter, 
-                                              Creature recruit,
-                                              String terrain,
-                                              String hexLabel)
+    public static int numberOfRecruiterNeeded(Creature recruiter,
+            Creature recruit,
+            String terrain,
+            String hexLabel)
     {
         int g_value = graph.numberOfRecruiterNeeded(recruiter.getName(),
-                                                    recruit.getName(),
-                                                    terrain,
-                                                    hexLabel);
+                recruit.getName(),
+                terrain,
+                hexLabel);
         return g_value;
     }
 
     public static boolean anonymousRecruitLegal(Creature recruit,
-                                                String terrain,
-                                                String hexLabel)
+            String terrain,
+            String hexLabel)
     {
         int g_value = graph.numberOfRecruiterNeeded(Keyword_Anything,
-                                                    recruit.getName(),
-                                                    terrain,
-                                                    hexLabel);
+                recruit.getName(),
+                terrain,
+                hexLabel);
         if (g_value != 0)
         { // we really shoud ensure the caller *has* AnyNonLord...
             g_value = graph.numberOfRecruiterNeeded(Keyword_AnyNonLord,
-                                                    recruit.getName(),
-                                                    terrain,
-                                                    hexLabel);
+                    recruit.getName(),
+                    terrain,
+                    hexLabel);
         }
         return (g_value == 0);
     }
@@ -466,18 +607,22 @@ public class TerrainRecruitLoader
             value = v;
             where = new ArrayList();
         }
+
         String getName()
         {
             return name;
         }
+
         int getValue()
         {
             return value;
         }
+
         void addTerrain(String t)
         {
             where.add(t);
         }
+
         /**
          * Tell if the Acquirable can be Acquired in the terrain.
          * @param t The terrain in which the Acquirements occurs.
@@ -487,7 +632,7 @@ public class TerrainRecruitLoader
         boolean isAvailable(String t)
         {
             if (where.isEmpty() ||
-                ((where.indexOf(t)) != -1))
+                    ((where.indexOf(t)) != -1))
             {
                 return true;
             }
@@ -496,15 +641,17 @@ public class TerrainRecruitLoader
                 return false;
             }
         }
+
         public String toString()
         {
             return("Acquirable by name of " + name +
-                   ", available every " + value +
-                   (where.isEmpty() ? "" : ", in terrain " + where));
+                    ", available every " + value +
+                    (where.isEmpty() ? "" : ", in terrain " + where));
         }
     }
 
-    private void addAcquirable(acquirableData ad) throws ParseException
+    private void addAcquirable(acquirableData ad)
+        throws ParseException
     {
         if (acquirableList == null)
         {
@@ -514,8 +661,8 @@ public class TerrainRecruitLoader
         if ((ad.getValue() % getAcquirableRecruitmentsValue()) != 0)
         {
             throw new ParseException("Wrong Value for an Acquirable : " +
-                                     ad + " ; should multiple of " +
-                                     getAcquirableRecruitmentsValue());
+                    ad + " ; should multiple of " +
+                    getAcquirableRecruitmentsValue());
         }
     }
 
@@ -618,6 +765,7 @@ public class TerrainRecruitLoader
 
     /** Base amount of points needed for Titan improvement. */
     private static int titanImprove = 100;
+
     /** Amount of points needed for Titan Teleport. */
     private static int titanTeleport = 400;
 
@@ -651,268 +799,5 @@ public class TerrainRecruitLoader
     public static RecruitGraph getRecruitGraph()
     {
         return graph;
-    }
-}
-
-PARSER_END(TerrainRecruitLoader)
-
-SKIP :
-{
-    " "
-  | "\r"
-  | "\t"
-}
-
-TOKEN :
-{
-        < COMMENT : "#"(<NOTNEWLINE>)*"\r" | "#"(<NOTNEWLINE>)*"\n" >
-|       < #NOTNEWLINE : ~["\n","\r"] >
-}
-
-String r_comment() :
-{}
-{
-    <COMMENT>
-    {
-        return(new String(token.image));
-    }
-}
-
-TOKEN :
-{
-    < EOL: "\n" >
-}
-
-TOKEN :
-{
-    < ACQUIRABLE : "ACQUIRABLE" >
-|   < TITANIMPROVE : "TITANIMPROVE" >
-|   < TITANTELEPORT : "TITANTELEPORT" >
-}
-
-TOKEN :
-{
-    < NUMBER : ("-")?(<DIGIT>)+ >
-|   < #DIGIT : ["0" - "9"] >
-}
-
-TOKEN :
-{
-    < BOOL: "true"|"false" >
-|   < COMMA: "," >
-}
-
-TOKEN :
-{
-    < SPECIALCHAINE : "Special:" (<NUMCAR>)+ >
-|   < RANDOMCHAINE : "Random:" (<NUMCAR>)+ ".rnd" >
-|   < CHAINE : <CAR> (<NUMCAR>)* >
-|   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
-|   < #CAR : ["a"-"z","A"-"Z",".","_"] >
-|   < #NUMCAR : <CAR>|["0"-"9"] >
-|   < #QUOTEDCAR : <NUMCAR>|" " >
-}
-
-boolean r_bool() :
-{}
-{
-    <BOOL>
-    { if (token.image.equals("true")) return true; else return false; }
-}
-
-String r_random_chaine() :
-{}
-{
-    <RANDOMCHAINE>
-    {
-        return((new String(token.image)).substring(7));
-    }
-}
-
-String r_chaine() :
-{}
-{
-    <CHAINE>
-    {
-        return(new String(token.image));
-    }
-|   <SPECIALCHAINE>
-    {
-        return(new String(token.image));
-    }
-|   <QUOTEDCHAINE>
-    {
-        String tok = new String(token.image);
-        String cha = tok.substring(1, tok.length() - 1);
-        return(cha);
-    }
-}
-
-String r_terrainList() :
-{
-    String temp1;
-    String temp2 = null;
-}
-{
-    (temp1 = r_chaine()) (<COMMA> (temp2 = r_terrainList()))?
-    {
-        return(temp1 + (temp2 == null ? "" : ("," + temp2)));
-    }
-}
-
-acquirableData r_acquirableData() :
-{
-    String name;
-    int value;
-    String tl = null;
-}
-{
-    (value = r_number()) (name = r_chaine()) (tl = r_terrainList())?
-    {
-        acquirableData ad = new acquirableData(name, value);
-        if (tl != null)
-        {
-        List li = net.sf.colossus.util.Split.split(',',tl);
-        Iterator it = li.iterator();
-        while (it.hasNext())
-        {
-            String ter = (String)it.next();
-            ad.addTerrain(ter);
-        }
-        }
-        return ad;
-    }
-}
-
-int r_number() :
-{}
-{
-    <NUMBER>
-    {
-        return(Integer.parseInt(token.image));
-    }
-}
-
-ArrayList r_allRecruit() :
-{
-    ArrayList temp;
-    int i;
-    String n;
-}
-{
-    (i = r_number()) (n = r_chaine()) (temp = r_allRecruit())
-    {
-        temp.add(0, new recruitNumber(n, i));
-        return temp;
-    }
-|   /* empty */
-    { return new ArrayList(); }
-
-}
-
-List r_acquirableDataList() :
-{
-    acquirableData ad;
-    List temp;
-}
-{
-    (ad = r_acquirableData()) (temp = r_acquirableDataList())
-    {
-        temp.add(ad);
-        return temp;
-    }
-|   /* empty */
-    { return new ArrayList(); }
-}
-
-/**
- * Load a terrain and the recruit possibility in this terrain.
- * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
- */
-int oneTerrain() :
-{
-    String t, dt = null;
-    String rnd = null;
-    String col;
-    ArrayList rl;
-    String s;
-    boolean rb;
-    List al;
-    int val;
-}
-{
-    (col = r_chaine()) (t = r_chaine())
-        (rb = r_bool()) (rl = r_allRecruit()) (dt = r_chaine())? (rnd = r_random_chaine())?
-    {
-        strToRecruits.put(t, rl);
-        strToDisplayName.put(t, dt == null ? t : dt);
-        strToColor.put(t, HTMLColor.stringToColor(col));
-        strToBelow.put(t, new Boolean (rb));
-        strToRnd.put(t, rnd);
-        if (terrains == null)
-        {
-            terrains = new String[1];
-            terrains[0] = t;
-        } 
-        else 
-        {
-            String[] t2 = new String[terrains.length + 1];
-            for (int i = 0; i < terrains.length ; i++)
-            {
-                t2[i] = terrains[i];
-            }
-            t2[terrains.length] = t;
-            terrains = t2;
-        }
-        Log.debug("Adding recruits for " + t + " " + rl);
-
-        addToGraph(rl, t);
-
-        return(1);
-    }
-|   <EOL>
-    {
-        return(0);
-    }
-|   (s = r_comment())
-    {
-        return(0);
-    }
-|   <ACQUIRABLE> (al = r_acquirableDataList())
-    {
-        ListIterator it = al.listIterator(al.size());
-        while (it.hasPrevious())
-        {
-            acquirableData ad = (acquirableData)it.previous();
-            addAcquirable(ad);
-        }
-        Log.debug("Using Acquirable List : " + acquirableList);
-        return(0);
-    }
-|   <TITANIMPROVE> (val = r_number())
-    {
-        if (val > 0)
-            titanImprove = val;
-        else
-        {
-            throw new ParseException("Wrong Value for Titan Improvement : "
-                                     + val);
-        }
-        return(0);
-    }
-|   <TITANTELEPORT> (val = r_number())
-    {
-        if (val > 0)
-            titanTeleport = val;
-        else
-        {
-            throw new ParseException("Wrong Value for Titan Teleport : "
-                                     + val);
-        }
-        return(0);
-    }
-|   <EOF>
-    {
-        return(-1);
     }
 }

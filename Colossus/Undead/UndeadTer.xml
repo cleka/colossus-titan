@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<terrains>
+    <terrain name="Ruins" color="green" regular_recruit="True" >
+        <recruit name="Skeleton" number="1" />
+        <recruit name="Zombie" number="2" />
+        <recruit name="Lich" number="2" />
+        <recruit name="GhostDragon" number="3" />
+    </terrain>
+    <terrain name="Desert" color="orange" regular_recruit="True" >
+        <recruit name="Naga" number="1" />
+        <recruit name="Griffin" number="3" />
+        <recruit name="Manticore" number="2" />
+        <recruit name="BlackDragon" number="2" />
+    </terrain>
+    <terrain name="Hills" color="saddleBrown" regular_recruit="True" >
+        <recruit name="Troglodyte" number="1" />
+        <recruit name="Magog" number="2" />
+        <recruit name="Unicorn" number="2" />
+        <recruit name="GreenDragon" number="2" />
+    </terrain>
+    <terrain name="Tombs" color="darkGreen" regular_recruit="True" >
+        <recruit name="Skeleton" number="1" />
+        <recruit name="Zombie" number="2" />
+        <recruit name="Wraith" number="3" />
+        <recruit name="Vampire" number="2" />
+        <recruit name="BoneDragon" number="2" />
+    </terrain>
+    <terrain name="Marsh" color="sienna" regular_recruit="True" >
+        <recruit name="Troglodyte" number="1" />
+        <recruit name="Orc" number="2" />
+        <recruit name="Pegasus" number="2" />
+        <recruit name="GoldDragon" number="3" />
+    </terrain>
+    <terrain name="Mountains" color="red" regular_recruit="True" >
+        <recruit name="Naga" number="1" />
+        <recruit name="Magog" number="2" />
+        <recruit name="Manticore" number="2" />
+        <recruit name="RedDragon" number="2" />
+        <recruit name="Colossus" number="2" />
+    </terrain>
+    <terrain name="Plains" color="yellow" regular_recruit="True" >
+        <recruit name="Paladin" number="1" />
+        <recruit name="Naga" number="2" />
+        <recruit name="Pegasus" number="2" />
+        <recruit name="GoldDragon" number="3" />
+    </terrain>
+    <terrain name="Swamp" color="blue" regular_recruit="True" >
+        <recruit name="Orc" number="1" />
+        <recruit name="Wyvern" number="3" />
+        <recruit name="Hydra" number="2" />
+        <recruit name="BlackDragon" number="2" />
+    </terrain>
+    <terrain name="Tundra" color="skyBlue" regular_recruit="True" >
+        <recruit name="Orc" number="1" />
+        <recruit name="Basilisk" number="2" />
+        <recruit name="Hydra" number="2" />
+        <recruit name="Giant" number="2" />
+        <recruit name="Colossus" number="2" />
+    </terrain>
+    <terrain name="Woods" color="olive" regular_recruit="True" >
+        <recruit name="Paladin" number="1" />
+        <recruit name="Basilisk" number="2" />
+        <recruit name="Dendroid" number="2" />
+        <recruit name="GreenDragon" number="2" />
+    </terrain>
+<!--  Tower is a special case -->
+    <terrain name="Tower" color="grey" regular_recruit="False" >
+        <recruit name="Anything" number="0" />
+        <recruit name="Paladin" number="0" />
+        <recruit name="Anything" number="0" />
+        <recruit name="Skeleton" number="0" />
+        <recruit name="Anything" number="0" />
+        <recruit name="Troglodyte" number="0" />
+        <recruit name="AnyNonLord" number="0" />
+        <recruit name="Golem" number="3" />
+        <recruit name="AnyNonLord" number="0" />
+        <recruit name="Harpy" number="4" />
+        <recruit name="AnyNonLord" number="0" />
+        <recruit name="Beholder" number="5" />
+        <recruit name="Titan" number="-1" />
+        <recruit name="Wizard" number="1" />
+    </terrain>
+    <titan_improve points="75" />
+    <titan_teleport points="700" />
+    <acquirable name="Angel" points="100" />
+    <acquirable name="FireElemental" points="100"" terrain="Desert" />
+    <acquirable name="WaterElemental" points="100"" terrain="Swamp" />
+    <acquirable name="AirElemental" points="100"" terrain="Woods" />
+    <acquirable name="EarthElemental" points="100"" terrain="Hills" />
+    <acquirable name="Archdevil" points="100"" terrain="Jungle" />
+    <acquirable name="Efreet" points="100"" terrain="Moutains" />
+    <acquirable name="Genie" points="100"" terrain="Tundra" />
+    <acquirable name="Necromancer" points="100"" terrain="Tower" />
+    <acquirable name="TheReaper" points="300"" terrain="Tower" />
+    <acquirable name="Archangel" points="300" />
+</terrains>

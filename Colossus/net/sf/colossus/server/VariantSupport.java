@@ -5,7 +5,7 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.parser.VariantLoader;
-import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.parser.AIHintLoader;
 import net.sf.colossus.client.HexMap;
 
@@ -340,19 +340,14 @@ public final class VariantSupport
 
         try
         {
-            List directories =
-                    getVarDirectoriesList();
+            List directories = getVarDirectoriesList();
             InputStream terIS = ResourceLoader.getInputStream(
                     getRecruitName(), directories);
             if (terIS == null)
             {
-                throw new FileNotFoundException(
-                        getRecruitName());
+                throw new FileNotFoundException(getRecruitName());
             }
             TerrainRecruitLoader trl = new TerrainRecruitLoader(terIS);
-            while (trl.oneTerrain() >= 0)
-            {
-            }
 
             /* now initialize the static bits of the Battlelands */
             HexMap.staticBattlelandsInit(serverSide);
@@ -377,8 +372,7 @@ public final class VariantSupport
     private static java.util.Properties loadMarkerNamesProperties()
     {
         java.util.Properties allNames = new java.util.Properties();
-        List directories =
-                getVarDirectoriesList();
+        List directories = getVarDirectoriesList();
 
         /* unlike other, don't use file-level granularity ; 
          load all files in order, so that we get the

@@ -5,7 +5,7 @@ import java.util.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Glob;
-import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 
 
 /**

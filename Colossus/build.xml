@@ -61,7 +61,6 @@
         depends="BattlelandLoader,
                  CreatureLoader,
                  StrategicMapLoader,
-                 TerrainRecruitLoader,
                  VariantLoader,
                  AIHintLoader,
                  BattlelandRandomizerLoader"
@@ -82,12 +81,6 @@
 
 <target name="StrategicMapLoader">
         <javacc target="net/sf/colossus/parser/StrategicMapLoader.jj"
-                javacchome="${env.JAVACC_HOME}"
-        />
-</target>
-
-<target name="TerrainRecruitLoader">
-        <javacc target="net/sf/colossus/parser/TerrainRecruitLoader.jj"
                 javacchome="${env.JAVACC_HOME}"
         />
 </target>

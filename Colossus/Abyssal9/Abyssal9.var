@@ -1,6 +1,6 @@
 MAP:Abyssal9.map
 CRE:Abyssal9.cre
-TER:Abyssal9.ter
+TER:Abyssal9Ter.xml
 DEPEND:Abyssal6,ExtTitan
 MAXPLAYERS:9
 HINT:Abyssal6.hin,Abyssal6TowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin

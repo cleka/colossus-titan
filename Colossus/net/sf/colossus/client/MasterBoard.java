@@ -26,7 +26,7 @@ import java.util.*;
 import javax.swing.*;
 
 import net.sf.colossus.parser.StrategicMapLoader;
-import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.VariantSupport;

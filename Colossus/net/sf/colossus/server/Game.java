@@ -16,7 +16,7 @@ import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.BattleMap;
-import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.client.HexMap;
 
 

@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 
 import net.sf.colossus.parser.BattlelandLoader;
 import net.sf.colossus.parser.BattlelandRandomizerLoader;
-import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
@@ -198,8 +198,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                     startlistMap.put(terrain,
                             tempTowerStartList);
                 }
-                towerStatusMap.put(terrain,
-                        new Boolean(bl.isTower()));
+                towerStatusMap.put(terrain, new Boolean(bl.isTower()));
                 subtitleMap.put(terrain, bl.getSubtitle());
             }
             else
@@ -542,7 +541,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     /** Look for the Hex matching the Label in the terrain static map */
     public static BattleHex getHexByLabel(String terrain, String label)
     {
-        int x = 0, y = Integer.parseInt(new String(label.substring(1)));
+        int x = 0;
+        int y = Integer.parseInt(new String(label.substring(1)));
         switch (label.charAt(0))
         {
             case 'A':
@@ -755,9 +755,16 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public static boolean terrainIsTower(String t)
     {
-        boolean temp =
-                ((Boolean)towerStatusMap.get(t)).booleanValue();
-        return temp;
+        try
+        {
+            return ((Boolean)towerStatusMap.get(t)).booleanValue();
+        }
+        catch (NullPointerException ex)
+        // XXX Called too early, before towerStatusMap is setup?
+        {
+            Log.error(ex.toString());
+            return false;
+        }
     }
 
     public boolean terrainHasStartlist()

@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<terrains>
+    <terrain name="Brush" color="green" regular_recruit="True" >
+        <recruit name="Gargoyle" number="1" />
+        <recruit name="Cyclops" number="2" />
+        <recruit name="Gorgon" number="2" />
+        <recruit name="Manticore" number="3" />
+    </terrain>
+    <terrain name="Jungle" color="darkGreen" regular_recruit="True" >
+        <recruit name="Gargoyle" number="1" />
+        <recruit name="Cyclops" number="2" />
+        <recruit name="Behemoth" number="3" />
+        <recruit name="Serpent" number="2" />
+    </terrain>
+    <terrain name="Wasteland" color="darkGreen" regular_recruit="True" >
+        <recruit name="Cyclops" number="1" />
+        <recruit name="Behemoth" number="2" />
+        <recruit name="Jabberwok" number="3" />
+    </terrain>
+    <terrain name="Graveyard" color="violet" regular_recruit="True" >
+        <recruit name="Skeleton" number="1" />
+        <recruit name="Zombie" number="2" />
+        <recruit name="Lich" number="2" />
+        <recruit name="Necromancer" number="3" />
+    </terrain>
+    <terrain name="Tombs" color="purple" regular_recruit="True" >
+        <recruit name="Skeleton" number="1" />
+        <recruit name="Zombie" number="2" />
+        <recruit name="Wraith" number="3" />
+        <recruit name="Vampire" number="2" />
+    </terrain>
+    <terrain name="Abyss" color="indigo" regular_recruit="True" >
+        <recruit name="Zombie" number="1" />
+        <recruit name="Wraith" number="2" />
+        <recruit name="Reaper" number="3" />
+    </terrain>
+    <terrain name="Marsh" color="sienna" regular_recruit="True" >
+        <recruit name="Ogre" number="1" />
+        <recruit name="Troll" number="2" />
+        <recruit name="Ranger" number="2" />
+        <recruit name="Salamander" number="2" />
+    </terrain>
+    <terrain name="Plains" color="yellow" regular_recruit="True" >
+        <recruit name="Centaur" number="1" />
+        <recruit name="Lion" number="2" />
+        <recruit name="Ranger" number="2" />
+        <recruit name="AirElemental" number="3" />
+    </terrain>
+    <terrain name="Hills" color="saddleBrown" regular_recruit="True" >
+        <recruit name="Ogre" number="1" />
+        <recruit name="Minotaur" number="3" />
+        <recruit name="Unicorn" number="2" />
+        <recruit name="EarthElemental" number="3" />
+    </terrain>
+    <terrain name="Woods" color="olive" regular_recruit="True" >
+        <recruit name="Centaur" number="1" />
+        <recruit name="Warbear" number="3" />
+        <recruit name="Unicorn" number="2" />
+        <recruit name="Ent" number="2" />
+    </terrain>
+    <terrain name="Desert" color="orange" regular_recruit="True" >
+        <recruit name="Lion" number="1" />
+        <recruit name="Griffon" number="3" />
+        <recruit name="Hydra" number="2" />
+        <recruit name="Chimera" number="2" />
+    </terrain>
+    <terrain name="Swamp" color="blue" regular_recruit="True" >
+        <recruit name="Troll" number="1" />
+        <recruit name="Wyvern" number="3" />
+        <recruit name="Hydra" number="2" />
+        <recruit name="WaterElemental" number="3" />
+    </terrain>
+    <terrain name="Mountains" color="red" regular_recruit="True" >
+        <recruit name="Lion" number="1" />
+        <recruit name="Minotaur" number="2" />
+        <recruit name="Magog" number="2" />
+        <recruit name="Colossus" number="2" />
+        <recruit name="FireElemental" number="3" />
+    </terrain>
+    <terrain name="Tundra" color="skyBlue" regular_recruit="True" >
+        <recruit name="Troll" number="1" />
+        <recruit name="Warbear" number="2" />
+        <recruit name="Giant" number="2" />
+        <recruit name="Colossus" number="2" />
+        <recruit name="Mammoth" number="2" />
+    </terrain>
+<!--  Tower is a special case -->
+    <terrain name="Tower" color="grey" regular_recruit="False" >
+        <recruit name="Anything" number="0" />
+        <recruit name="Centaur" number="0" />
+        <recruit name="Anything" number="0" />
+        <recruit name="Gargoyle" number="0" />
+        <recruit name="Anything" number="0" />
+        <recruit name="Ogre" number="0" />
+        <recruit name="AnyNonLord" number="0" />
+        <recruit name="Guardian" number="3" />
+        <recruit name="Titan" number="-1" />
+        <recruit name="Warlock" number="1" />
+    </terrain>
+    <terrain name="Castle" color="white" regular_recruit="False" >
+        <recruit name="Anything" number="0" />
+        <recruit name="Skeleton" number="0" />
+        <recruit name="AnyNonLord" number="0" />
+        <recruit name="Knight" number="4" />
+    </terrain>
+    <terrain name="Keep" color="darkGray" regular_recruit="True" >
+        <recruit name="GreenDragon" number="0" />
+        <recruit name="BlueDragon" number="1" />
+        <recruit name="PurpleDragon" number="1" />
+        <recruit name="SilverDragon" number="1" />
+        <recruit name="BlackDragon" number="1" />
+        <recruit name="GoldDragon" number="1" />
+        <recruit name="RedDragon" number="1" />
+        <recruit name="Balrog" number="1" />
+    </terrain>
+    <acquirable name="Angel" points="100" />
+    <acquirable name="GreenDragon" points="100" />
+    <acquirable name="Archangel" points="500" />
+    <titan_teleport points="1000" />
+    <titan_improve points="100" />
+</terrains>

@@ -6,7 +6,7 @@
 import sys
 
 class Terrain:
-    display_order = ['name', 'color', 'regular_recruit']
+    display_order = ['name', 'display_name', 'color', 'regular_recruit']
     def __init__(self, line):
         atoms = line.split()
         self.color = atoms[0]
@@ -14,6 +14,8 @@ class Terrain:
         self.regular_recruit = (atoms[2] == 'true')
         self.recruits = []
         pairs = atoms[3:]
+        if len(pairs) & 1 == 1:
+            self.display_name = pairs.pop()
         while pairs:
             number = pairs.pop(0)
             name = pairs.pop(0)
@@ -22,7 +24,8 @@ class Terrain:
     def __str__(self):
         s = '<terrain '
         for key in self.display_order:
-            s += ('%s="%s" ' % (key, getattr(self, key)))
+            if hasattr(self, key):
+                s += ('%s="%s" ' % (key, getattr(self, key)))
         s += '>\n'
         for (name, number) in self.recruits:
             s += '        <recruit name="%s" number="%s" />\n' % (name, number)
@@ -62,7 +65,7 @@ def handle_line(line):
     if not line:
         pass
     elif line.startswith('#'):
-        print '<-- ' + line[1:] + ' -->'
+        print '<!-- ' + line[1:] + ' -->'
     elif line.startswith("ACQUIRABLE"):
         atoms = line.strip().split()[1:]
         while atoms:

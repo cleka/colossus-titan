@@ -8,7 +8,7 @@ import net.sf.colossus.util.Probs;
 import net.sf.colossus.util.Perms;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.DevRandom;
-import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Dice;
