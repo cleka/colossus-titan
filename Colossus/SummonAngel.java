@@ -138,6 +138,14 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
         dispose();
         System.gc();
+        try
+        {
+            finalize();
+        }
+        catch (Throwable e)
+        {
+            System.out.println("caught " + e.toString());
+        }
 
         // Let the MasterBoard know to leave the angel-summoning state.
         board.finishSummoningAngel();

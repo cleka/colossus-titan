@@ -1284,9 +1284,18 @@ public class BattleMap extends JFrame implements MouseListener,
         if (turn != null)
         {
             turn.dispose();
+            // XXX: Need turn.cleanup() ?
         }
         dispose();
         System.gc();
+        try
+        {
+            finalize();
+        }
+        catch (Throwable e)
+        {
+            System.out.println("caught " + e.toString());
+        }
 
         masterHex.unselect();
         masterHex.repaint();

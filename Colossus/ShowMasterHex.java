@@ -172,6 +172,14 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 
         dispose();
         System.gc();
+        try
+        {
+            finalize();
+        }
+        catch (Throwable e)
+        {
+            System.out.println("caught " + e.toString());
+        }
     }
 
 
