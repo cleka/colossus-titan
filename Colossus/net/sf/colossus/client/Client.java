@@ -1259,6 +1259,10 @@ public final class Client implements IClient
 
     void doFight(String hexLabel)
     {
+        if (!isMyTurn())
+        {
+            return;
+        }
         if (summonAngel != null)
         {
             java.util.List legions = getLegionsByHex(hexLabel);
@@ -1534,7 +1538,8 @@ public final class Client implements IClient
     void doRecruit(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
-        if (info == null || !info.canRecruit())
+        if (info == null || !info.canRecruit() || !isMyTurn() || 
+            !isMyLegion(markerId))
         {
             return;
         }
@@ -2850,6 +2855,16 @@ public final class Client implements IClient
         return (playerName.equals(getPlayerNameByMarkerId(markerId)));
     }
 
+    boolean isMyTurn()
+    {
+        return playerName.equals(getActivePlayerName());
+    }
+
+    boolean isMyBattlePhase()
+    {
+        return playerName.equals(getBattleActivePlayerName());
+    }
+
     int getMovementRoll()
     {
         return movementRoll;
@@ -2866,6 +2881,10 @@ public final class Client implements IClient
     {
         this.parentId = null;
 
+        if (!isMyTurn())
+        {
+            return;
+        }
         // Need a legion marker to split.
         if (markersAvailable.size() < 1)
         {

@@ -2264,7 +2264,7 @@ Log.debug("Called Game.newGame2()");
         String engagementHexLabel = player.aiPickEngagement();
         if (engagementHexLabel != null)
         {
-            server.engage(engagementHexLabel);
+            engage(engagementHexLabel);
         }
 Log.debug("in kickEngagements() summoning=" + summoning + " reinforcing=" +
 reinforcing + " acquiring=" + acquiring); 
