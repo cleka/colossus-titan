@@ -82,9 +82,7 @@ public final class MasterBoard extends JPanel
     public static final String changeAIDelay = "Change AI Delay";
 
     public static final String about = "About";
-
-    private static String mapName = GetPlayers.getMapName();
-
+    
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;
     private AbstractAction saveGameAction;
@@ -712,18 +710,17 @@ public final class MasterBoard extends JPanel
     {
         // Add terrain types, id labels, label sides, and exits to hexes.
         MasterHex[][] localH = null;
+        java.util.List directories = new java.util.ArrayList();
+        directories.add(GetPlayers.getVarDirectory());
+        directories.add(Constants.defaultDirName);
+        InputStream mapIS = ResourceLoader.getInputStream(
+                                           GetPlayers.getMapName(),
+                                           directories);
         try
         {
-            ClassLoader cl = Client.class.getClassLoader();
-            InputStream mapIS = 
-                cl.getResourceAsStream(mapName);
-            if (mapIS == null)
-            {
-                mapIS = new FileInputStream(mapName);
-            }
             if (mapIS == null) 
             {
-                throw new FileNotFoundException(mapName);
+                throw new FileNotFoundException(GetPlayers.getMapName());
             }
             StrategicMapLoader sml = new StrategicMapLoader(mapIS);
             sml.StrategicMapLoaderInit();

@@ -324,7 +324,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     public static String getMapName()
     {
-        return (getVarDirectory() + mapName);
+        return (mapName);
     }
     
     static class recFileFilter extends javax.swing.filechooser.FileFilter 

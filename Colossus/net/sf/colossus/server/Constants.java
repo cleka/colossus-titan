@@ -78,6 +78,8 @@ public final class Constants
     public static final String right = "Right";
     public static final String left = "Left";
 
+    /** Default directory for datafiles */
+    public static String defaultDirName = "Default";
     /** Images subdirectory name */
     public static String imageDirName = "images";
 }

@@ -33,7 +33,7 @@ public final class ResourceLoader
      * Return the first Image of name filename in the list of directories.
      * @param filename Name of the Image file to load (without extension).
      * @param directories List of directories to search (in order).
-     * @return The Image, or null if it was not found
+     * @return The Image, or null if it was not found.
      */
     public static Image getImage(String filename, java.util.List directories)
     {
@@ -45,11 +45,11 @@ public final class ResourceLoader
             if (o instanceof String)
             {
                 String path = (String)o;
-                image = tryLoadFromFile(filename +
+                image = tryLoadImageFromFile(filename +
                                         imageExtension, path);
                 if (image == null)
                 {
-                    ImageIcon temp = tryLoadFromResource(filename +
+                    ImageIcon temp = tryLoadImageIconFromResource(filename +
                                                          imageExtension, path);
                     if (temp != null)
                     {
@@ -65,7 +65,7 @@ public final class ResourceLoader
      * Return the first ImageIcon of name filename in the list of directories.
      * @param filename Name of the ImageIcon file to load (without extension).
      * @param directories List of directories to search (in order).
-     * @return The ImageIcon, or null if it was not found
+     * @return The ImageIcon, or null if it was not found.
      */
     public static ImageIcon getImageIcon(String filename, java.util.List directories)
     {
@@ -77,11 +77,11 @@ public final class ResourceLoader
             if (o instanceof String)
             {
                 String path = (String)o;
-                Image temp  = tryLoadFromFile(filename +
+                Image temp  = tryLoadImageFromFile(filename +
                                               imageExtension, path);
                 if (temp == null)
                 {
-                    icon = tryLoadFromResource(filename +
+                    icon = tryLoadImageIconFromResource(filename +
                                                imageExtension, path);
                 }
                 else
@@ -93,7 +93,7 @@ public final class ResourceLoader
         return(icon);
     }
 
-    private static Image tryLoadFromFile(String filename, String path)
+    private static Image tryLoadImageFromFile(String filename, String path)
     {
         Image image = null;
         try
@@ -117,7 +117,7 @@ public final class ResourceLoader
         return image;
     }
 
-    private static ImageIcon tryLoadFromResource(String filename, String path)
+    private static ImageIcon tryLoadImageIconFromResource(String filename, String path)
     {
         ImageIcon icon = null;
         try
@@ -141,5 +141,40 @@ public final class ResourceLoader
             // nothing to do
         }
         return icon;
+    }
+
+    /**
+     * Return the first InputStream from file of name filename in the list of directories.
+     * @param filename Name of the file to load.
+     * @param directories List of directories to search (in order).
+     * @return The InputStream, or null if it was not found.
+     */
+    public static java.io.InputStream getInputStream(String filename, java.util.List directories)
+    {
+        java.io.InputStream stream = null;
+        java.lang.ClassLoader cl =
+            java.lang.ClassLoader.getSystemClassLoader();
+        java.util.Iterator it = directories.iterator();
+        while (it.hasNext() && (stream == null))
+        {
+            Object o = it.next();
+            if (o instanceof String)
+            {
+                String path = (String)o;
+                try
+                {
+                    stream = new java.io.FileInputStream(path +
+                                                         pathSeparator +
+                                                         filename);
+                } catch (Exception e) { stream = null; }
+                if (stream == null)
+                {
+                    stream = cl.getResourceAsStream(path +
+                                                    pathSeparator +
+                                                    filename);
+                }
+            }
+        }
+        return(stream);
     }
 }
