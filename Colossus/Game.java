@@ -32,7 +32,8 @@ class Game extends Frame implements WindowListener, ActionListener
         pack();
         setSize(300, 250);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(d.width / 2 - 150, d.height / 2 - 125);
+        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
+                     - getSize().height / 2));
         
         setLayout(new GridLayout(0, 2));
 
@@ -139,8 +140,7 @@ class Game extends Frame implements WindowListener, ActionListener
     }
 
 
-    // XXX This should be one dialog per player.
-    // XXX It would be nice to have a working setSize here.
+    // XXX This should eventually be one dialog per player.
     void chooseColors()
     {
         removeAll();
@@ -198,6 +198,10 @@ class Game extends Frame implements WindowListener, ActionListener
         b3.addActionListener(this);
 
         pack();
+        setSize(230, 50 * numPlayers + 100);
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
+                     - getSize().height / 2));
 
         for (int i = 1; i <= 6; i++)
         {
@@ -303,9 +307,10 @@ class Game extends Frame implements WindowListener, ActionListener
         }
 
         pack();
-        Dimension d1= Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension d2 = getSize();
-        setLocation((d1.width - d2.width) / 2, 0);
+
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2, 0));
+
         setVisible(true);
 
         masterboard = new MasterBoard(this);
