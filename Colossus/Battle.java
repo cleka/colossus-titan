@@ -29,6 +29,7 @@ public class Battle
     private MasterBoard board;
     private MasterHex masterHex;
     private BattleTurn turn;
+    private SummonAngel summonAngel;
 
     private int turnNumber = 1;
     private int phase = MOVE;
@@ -46,6 +47,7 @@ public class Battle
     public Battle(MasterBoard board, Legion attacker, Legion defender, 
         MasterHex masterHex)
     {
+        this.board = board;
         this.attacker = attacker;
         this.defender = defender;
         activeLegion = defender;
@@ -119,9 +121,6 @@ public class Battle
 
     public void advancePhase()
     {
-        // XXX We are getting a NullPointerException during initialization,
-        // because we're trying to use map and turn before they're fully
-        // set up.
         try
         {
             if (phase == SUMMON)
@@ -178,6 +177,7 @@ public class Battle
                         Game.logEvent(getActivePlayer().getName() + 
                             "'s battle turn, number " + turnNumber);
                         turn.setupSummonDialog();
+                        startSummoningAngel();
                     }
                     else
                     {
@@ -215,6 +215,7 @@ public class Battle
         }
         catch (NullPointerException e)
         {
+            e.printStackTrace();
         }
     }
 
@@ -225,15 +226,40 @@ public class Battle
     }
 
 
-    public int getSummonState()
+    public SummonAngel getSummonAngel()
     {
-        return summonState;
+        return summonAngel;
     }
 
 
-    public void setSummonState(int state)
+    public void startSummoningAngel()
     {
-        summonState = state;
+        if (summonState == Battle.FIRST_BLOOD)
+        {
+            if (attacker.canSummonAngel())
+            {
+                summoningAngel = true;
+
+                // Make sure the MasterBoard is visible.
+                board.deiconify();
+                board.show();
+
+                summonAngel = new SummonAngel(board, attacker);
+                board.setSummonAngel(summonAngel);
+            }
+
+            // This is the last chance to summon an angel until the
+            // battle is over.
+            summonState = Battle.TOO_LATE;
+        }
+
+        if (!summoningAngel)
+        {
+            if (phase == Battle.SUMMON)
+            {
+                advancePhase();
+            }
+        }
     }
 
 
@@ -246,6 +272,7 @@ public class Battle
         }
 
         summoningAngel = false;
+        summonAngel = null;
 
         if (phase == SUMMON)
         {
@@ -632,10 +659,10 @@ public class Battle
                     attacker.addToBattleTally(critter.getPointValue());
 
                     // Creatures left offboard do not trigger angel summoning.
-                    if (getSummonState() == Battle.NO_KILLS &&
+                    if (summonState == Battle.NO_KILLS &&
                         !critter.getCurrentHex().isEntrance())
                     {
-                        setSummonState(Battle.FIRST_BLOOD);
+                        summonState = Battle.FIRST_BLOOD;
                     }
                 }
 

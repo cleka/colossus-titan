@@ -12,8 +12,6 @@ public class BattleTurn extends Dialog implements ActionListener,
 {
     private Frame parentFrame;
     private BattleMap map;
-    private SummonAngel summonAngel;
-    private boolean summoningAngel = false;
     private static Point location;
     private Battle battle;
 
@@ -70,36 +68,7 @@ public class BattleTurn extends Dialog implements ActionListener,
             battle.getTurnNumber());
         setLayout(new GridLayout(0, 1));
         add(new Label(battle.getActivePlayer().getName() + " : Summon"));
-
-        int summonState = battle.getSummonState();
-
-        if (summonState == Battle.FIRST_BLOOD)
-        {
-            if (battle.getAttacker().canSummonAngel())
-            {
-                summoningAngel = true;
-
-                // Make sure the MasterBoard is visible.
-                battle.getBoard().deiconify();
-                battle.getBoard().show();
-
-                summonAngel = new SummonAngel(battle.getBoard(),
-                    battle.getAttacker());
-                battle.getBoard().setSummonAngel(summonAngel);
-            }
-
-            // This is the last chance to summon an angel until the
-            // battle is over.
-            battle.setSummonState(Battle.TOO_LATE);
-        }
-
-        if (!summoningAngel)
-        {
-            if (battle.getPhase() == Battle.SUMMON)
-            {
-                battle.advancePhase();
-            }
-        }
+        pack();
     }
 
 
@@ -173,12 +142,6 @@ public class BattleTurn extends Dialog implements ActionListener,
 
             pack();
         }
-    }
-
-
-    public SummonAngel getSummonAngel()
-    {
-        return summonAngel;
     }
 
 

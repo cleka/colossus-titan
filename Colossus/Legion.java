@@ -129,6 +129,7 @@ public class Legion
         {
             // If we're testing battles with player or game or board
             // null, don't crash.
+            e.printStackTrace();
         }
     }
 

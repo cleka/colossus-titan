@@ -754,6 +754,7 @@ public class MasterBoard extends Frame implements MouseListener,
         turn.setVisible(true);
         turn.setEnabled(true);
 
+        // Insert a blank line in the log file after each battle.
         Game.logEvent("\n");
     }
 
@@ -1670,7 +1671,7 @@ public class MasterBoard extends Frame implements MouseListener,
                         player.selectLegion(donor);
                         if (summonAngel == null)
                         {
-                            summonAngel = map.getTurn().getSummonAngel();
+                            summonAngel = battle.getSummonAngel();
                         }
                         summonAngel.repaint();
                         donor.getMarker().repaint();

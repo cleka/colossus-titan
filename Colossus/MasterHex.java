@@ -254,6 +254,7 @@ public class MasterHex extends Hex
         catch (NullPointerException e)
         {
             // Don't crash if we're testing a battle and board is null.
+            e.printStackTrace();
         }
     }
 

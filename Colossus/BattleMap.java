@@ -67,7 +67,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         setLayout(null);
 
-        // Make sure the board fits on the screen.
+        // Make sure the map fits on the screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         if (d.height < 1000)
         {
@@ -293,6 +293,7 @@ public class BattleMap extends Frame implements MouseListener,
         catch (NullPointerException e)
         {
             // Don't crash if we're testing battles with no MasterBoard.
+            e.printStackTrace();
         }
     }
 
