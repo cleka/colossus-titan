@@ -119,6 +119,21 @@ public final class LegionInfo
         return count;
     }
 
+    int numSummonableCreature()
+    {
+        int count = 0;
+        Iterator it = getContents().iterator();
+        while (it.hasNext())
+        {
+            Creature c = Creature.getCreatureByName((String)it.next());
+            if (c.isSummonable())
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public int numCreature(Creature creature)
     {
         return numCreature(creature.getName());

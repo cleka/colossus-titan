@@ -422,7 +422,7 @@ public class TerrainRecruitLoader
      * To obtain all the Creature that can be Acquired.
      * @return The list of name (as String) that can be Acquired
      */
-    public List getAcquirableList()
+    public static List getAcquirableList()
     {
         List al = new ArrayList();
         Iterator it = acquirableList.iterator();
@@ -436,7 +436,7 @@ public class TerrainRecruitLoader
 
     /**
      * To obtain the base amount of points needed for Acquirement.
-     * All Acquirements must occur at even multiple of this.
+     * All Acquirements must occur at integer multiple of this.
      * @return The base amount of points needed for Acquirement.
      */
     public static int getAcquirableRecruitmentsValue()

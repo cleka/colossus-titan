@@ -11,6 +11,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Dice;
+import net.sf.colossus.server.VariantSupport;
 
 /**
  * Simple implementation of a Titan AI
@@ -312,7 +313,7 @@ public class SimpleAI implements AI
                         {
                             safeMoves++;
                             if (!goodRecruit && couldRecruitUp(legion,
-                                hexLabel, null))
+                                hexLabel, null, hex.getTerrain()))
                             {
                                 goodRecruit = true;
                             }
@@ -334,7 +335,7 @@ public class SimpleAI implements AI
 
                                 // Also consider acquiring angel.
                                 if (!goodRecruit && couldRecruitUp(legion,
-                                    hexLabel, enemy))
+                                    hexLabel, enemy, hex.getTerrain()))
                                 {
                                     goodRecruit = true;
                                 }
@@ -397,7 +398,7 @@ public class SimpleAI implements AI
     /** Return true if the legion could recruit or acquire something
      *  better than its worst creature in hexLabel. */
     private boolean couldRecruitUp(LegionInfo legion, String hexLabel,
-        LegionInfo enemy)
+        LegionInfo enemy, char terrain)
     {
         legion.sortContents();
         Creature weakest = Creature.getCreatureByName(
@@ -426,21 +427,27 @@ public class SimpleAI implements AI
                 pointValue /= 2;
             }
 
-// XXX Not correct for some variants.
+            // should work with all variants
             int currentScore = legion.getPlayerInfo().getScore();
+            int arv = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+            int nextScore = (currentScore / arv) * (arv + 1);
             Creature bestRecruit = null;
-            if ((currentScore + pointValue) / 500 > currentScore / 500 &&
-                client.getCreatureCount(Creature.getCreatureByName(
-                    "Archangel")) >= 1)
+            while ((currentScore + pointValue) >= nextScore)
             {
-                bestRecruit = Creature.getCreatureByName("Archangel");
+                java.util.List ral = TerrainRecruitLoader.getRecruitableAcquirableList(terrain, nextScore);
+                java.util.Iterator it = ral.iterator();
+                while (it.hasNext())
+                {
+                    Creature tempRecruit =
+                        Creature.getCreatureByName((String)it.next());
+                    if ((bestRecruit == null) ||
+                        (tempRecruit.getPointValue() >=
+                         bestRecruit.getPointValue()))
+                        bestRecruit = tempRecruit;
+                    nextScore += arv;
+                }
             }
-            else if ((currentScore + pointValue) / 100 > currentScore / 100 &&
-                client.getCreatureCount(Creature.getCreatureByName(
-                    "Angel")) >= 1)
-            {
-                bestRecruit = Creature.getCreatureByName("Angel");
-            }
+
             if (bestRecruit != null && bestRecruit.getPointValue() >
                 weakest.getPointValue())
             {
@@ -1109,10 +1116,13 @@ public class SimpleAI implements AI
                     Log.debug("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and WIN_WITH_MINIMAL_LOSSES");
 
-                    // we score a fraction of an angel
-                    value += (24 * enemyPointValue) / 100;
+                    // we score a fraction of a basic acquirable
+                    value += ((Creature.getCreatureByName(TerrainRecruitLoader.getPrimaryAcquirable())).getPointValue() *
+                              enemyPointValue) /
+                        TerrainRecruitLoader.getAcquirableRecruitmentsValue();
                     // plus a fraction of a titan strength
-                    value += (6 * enemyPointValue) / 100;
+                    value += (6 * enemyPointValue) /
+                        TerrainRecruitLoader.getTitanImprovementValue();
                     // plus some more for killing a group (this is arbitrary)
                     value += (10 * enemyPointValue) / 100;
 
@@ -1124,7 +1134,7 @@ public class SimpleAI implements AI
                     Log.debug("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and WIN_WITH_HEAVY_LOSSES");
                     // don't do this with our titan unless we can win the game
-                    boolean haveOtherAngels = false;
+                    boolean haveOtherSummonables = false;
                     PlayerInfo player = legion.getPlayerInfo();
                     List markerIds = player.getLegionIds();
                     Iterator it = markerIds.iterator();
@@ -1138,13 +1148,12 @@ public class SimpleAI implements AI
                             continue;
                         }
 
-                        if (l.numCreature(Creature.getCreatureByName(
-                            "Angel")) == 0)
+                        if (l.numSummonableCreature() == 0)
                         {
                             continue;
                         }
 
-                        haveOtherAngels = true;
+                        haveOtherSummonables = true;
 
                         break;
                     }
@@ -1164,18 +1173,23 @@ public class SimpleAI implements AI
                             value += LOSE_LEGION + 10;
                         }
                     }
-                    // don't do this if we'll lose our only angel group
+                    // don't do this if we'll lose our only summonable group
                     // and won't score enough points to make up for it
-                    else if (legion.numCreature(Creature.getCreatureByName(
-                        "Angel")) > 0 &&!haveOtherAngels && 
-                        enemyPointValue < 88)
+                    else if (legion.numSummonableCreature() > 0 &&
+                             !haveOtherSummonables && 
+                             enemyPointValue < ((int)((float)TerrainRecruitLoader.getAcquirableRecruitmentsValue() * .88)))
                     {
                         value += LOSE_LEGION + 5;
                     }
                     else
                     {
-                        // we score a fraction of an angel & titan strength
-                        value += (30 * enemyPointValue) / 100;
+                        // we score a fraction of a basic acquirable
+                        value += ((Creature.getCreatureByName(TerrainRecruitLoader.getPrimaryAcquirable())).getPointValue() *
+                                  enemyPointValue) /
+                            TerrainRecruitLoader.getAcquirableRecruitmentsValue();
+                        // plus a fraction of a titan strength
+                        value += (6 * enemyPointValue) /
+                            TerrainRecruitLoader.getTitanImprovementValue();
                         // but we lose this group
                         value -= (20 * legion.getPointValue()) / 100;
                         // TODO: if we have no other angels, more penalty here
@@ -1688,7 +1702,7 @@ public class SimpleAI implements AI
         {
             int currentScore = client.getPlayerInfo(playerName).getScore();
             int fleeValue = defender.getPointValue() / 2;
-            if ((currentScore + fleeValue) / 100 > currentScore / 100)
+            if (((currentScore + fleeValue) / TerrainRecruitLoader.getAcquirableRecruitmentsValue()) > (currentScore / TerrainRecruitLoader.getAcquirableRecruitmentsValue()))
             {
                 if (attacker.getHeight() == 7 || attacker.getHeight() == 6 &&
                     attacker.canRecruit())
@@ -1751,8 +1765,11 @@ public class SimpleAI implements AI
         {
             int currentScore = enemy.getPlayerInfo().getScore();
             int pointValue = legion.getPointValue();
-            boolean canAcquireAngel = ((currentScore + pointValue) / 100 >
-                currentScore / 100);
+            boolean canAcquireAngel =
+                ((currentScore + pointValue) /
+                 TerrainRecruitLoader.getAcquirableRecruitmentsValue() >
+                 (currentScore /
+                  TerrainRecruitLoader.getAcquirableRecruitmentsValue()));
             // Can't use Legion.getRecruit() because it checks for
             // 7-high legions.
             boolean canRecruit = !client.findEligibleRecruits(
@@ -1770,21 +1787,28 @@ public class SimpleAI implements AI
     }
 
 
-// XXX Not correct for some variants.
+    // should be correct for most variants.
     public String acquireAngel(String markerId, List recruits)
     {
         // TODO If the legion is 6 high and can recruit something better,
         // or if the legion is a tiny scooby snack that's about to get
         // smooshed, turn down the angel.
-        if (recruits.contains("Archangel"))
+
+        java.util.List al = TerrainRecruitLoader.getAcquirableList();
+        java.util.Iterator it = al.iterator();
+        Creature c = null;
+
+        // heuristic : pick-up the most valuable of all available.
+        while (it.hasNext())
         {
-            return "Archangel";
+            String name = (String)it.next();
+            Creature tc = Creature.getCreatureByName(name);
+            if (recruits.contains(name) &&
+                ((c == null) || (tc.getPointValue() > c.getPointValue())))
+                c = tc;
         }
-        if (recruits.contains("Angel"))
-        {
-            return "Angel";
-        }
-        return null;
+
+        return (c == null ? null : c.getName());
     }
 
 
