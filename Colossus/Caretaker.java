@@ -2,7 +2,11 @@ import java.util.*;
 
 /**
  *
- * Class Careture represents the caretaker's stacks
+ * Class Caretaker represents the caretaker's stacks
+ *
+ * <P><B>TODO: </B>We should also have a graveyard -- it serves
+ * no game purpose, but it is cool. Unfortunately there are several
+ * ways that characters can die, not all are accounted for
  *
  * @version $Id$
  * @author Bruce Sherrod
