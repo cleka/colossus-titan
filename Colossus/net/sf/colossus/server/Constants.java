@@ -301,7 +301,7 @@ public final class Constants
             case MUSTER:
                 return "Muster";
             default:
-                return "?????";
+                return "";
         }
     }
 
@@ -320,7 +320,7 @@ public final class Constants
             case Constants.STRIKEBACK:
                 return "Strikeback";
             default:
-                return "?????";
+                return "";
         }
     }
 }

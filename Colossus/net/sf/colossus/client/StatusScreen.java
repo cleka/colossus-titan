@@ -240,7 +240,7 @@ final class StatusScreen extends KDialog implements WindowListener
     void updateStatusScreen()
     {
         activePlayerLabel.setText(client.getActivePlayerName());
-        turnLabel.setText("" + client.getTurnNumber());
+        turnLabel.setText("" + client.getTurnNumberString());
         phaseLabel.setText(client.getPhaseName());
         battleActivePlayerLabel.setText(client.getBattleActivePlayerName());
         battleTurnLabel.setText("" + client.getBattleTurnNumberString());

@@ -1,26 +1,19 @@
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
+   Or make PickRecruit non-modal.
 
 Show battle hex id, legion ids in BattleMap frame title.  (Trying to 
    set it, but it's not showing up.)
-
-Authenticate all remote calls to ensure that they come from the correct
-   client.  (By socket, using the thread name, set to player name.)
-
-Do not ask player to pick a color if only one remains.
 
 Colorize chat window.
 Colorize StatusScreen.
 
 Observer clients.
 
-Fix docs.
-
 Sometimes refuse remote newGame/loadGame/saveGame calls?
 
 Cleanup network shutdown -- when game over or player eliminated, don't
    whine if its client drops.
-
 
 Eliminate LegionInfo, PlayerInfo, Strike, Movement and instead use
    slightly different versions of Game, Legion, Player, Battle, etc. 
@@ -28,9 +21,6 @@ Eliminate LegionInfo, PlayerInfo, Strike, Movement and instead use
 
 Set Client movementRoll when loading during movement phase after roll.
 Set which legions have recruited when loading during recruit phase.
-
-Add JUnit section to build docs.
-Document test procedures.
 
 Use SF project releases.
 
@@ -53,6 +43,7 @@ Add UI for players to specify favorite colors.
 
 Put old, new web pages under CVS.
 Switch to new web page.
+Add link to http://validator.w3.org/check/referer  Fix errors.
 
 Include a Colossus.ico file for Windows.
 

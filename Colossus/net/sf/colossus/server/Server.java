@@ -24,9 +24,6 @@ public final class Server implements IServer
 {
     private Game game;
 
-    // XXX Need to verify that various requests came from the correct
-    // client for that player.
-
     /** 
      *  Maybe also save things like the originating IP, in case a 
      *  connection breaks and we need to authenticate reconnects.  
@@ -85,7 +82,6 @@ Log.debug("About to create server socket on port " + port);
             ex.printStackTrace();
             return;
         }
-
         createLocalClients();
 
         while (numClients < maxClients)
@@ -281,6 +277,11 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
 
     public void leaveCarryMode()
     {
+        if (!isBattleActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called leaveCarryMode()");
+            return;
+        }
         Battle battle = game.getBattle();
         battle.leaveCarryMode();
     }
@@ -288,6 +289,12 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
 
     public void doneWithBattleMoves()
     {
+        if (!isBattleActivePlayer())
+        {
+            Log.error(getPlayerName() + 
+                " illegally called doneWithBattleMoves()");
+            return;
+        }
         Battle battle = game.getBattle();
         battle.doneWithMoves();
     }
@@ -295,12 +302,12 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
 
     public void doneWithStrikes()
     {
-        Battle battle = game.getBattle();
         if (!isBattleActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doneWithStrikes()");
             return;
         }
+        Battle battle = game.getBattle();
         if (!battle.doneWithStrikes())
         {
             showMessageDialog("Must take forced strikes");
@@ -580,6 +587,12 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     public void acquireAngel(String markerId, String angelType)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
+        if (!getPlayerName().equals(legion.getPlayerName()))
+        {
+            Log.error(getPlayerName() + " illegally called acquireAngel()");
+            return;
+        }
+
         if (legion != null)
         {
             legion.addAngel(angelType);
@@ -609,6 +622,11 @@ Log.debug("Called Server.reinforce()");
 
     public void doSummon(String markerId, String donorId, String angel)
     {
+        if (!isActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called doSummon()");
+            return;
+        }
         Legion legion = game.getLegionByMarkerId(markerId);
         Legion donor = game.getLegionByMarkerId(donorId);
         Creature creature = null;
@@ -625,6 +643,11 @@ Log.debug("Called Server.reinforce()");
         String recruiterName)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
+        if (!getPlayerName().equals(legion.getPlayerName()))
+        {
+            Log.error(getPlayerName() + " illegally called doRecruit()");
+            return;
+        }
         if (legion != null && (legion.hasMoved() || game.getPhase() ==
             Constants.FIGHT) && legion.canRecruit())
         {
@@ -695,6 +718,11 @@ Log.debug("Called Server.reinforce()");
 
     public synchronized void engage(String hexLabel)
     {
+        if (!isActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called engage()");
+            return;
+        }
         game.engage(hexLabel);
     }
 
@@ -706,11 +734,11 @@ Log.debug("Called Server.reinforce()");
         {
             if (ally.getPlayer().aiConcede(ally, enemy))
             {
-                concede(ally.getMarkerId());
+                game.concede(ally.getMarkerId());
             }
             else
             {
-                doNotConcede(ally.getMarkerId());
+                game.doNotConcede(ally.getMarkerId());
             }
         }
         else
@@ -722,11 +750,23 @@ Log.debug("Called Server.reinforce()");
 
     public void concede(String markerId)
     {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (!getPlayerName().equals(legion.getPlayerName()))
+        {
+            Log.error(getPlayerName() + " illegally called concede()");
+            return;
+        }
         game.concede(markerId);
     }
 
     public void doNotConcede(String markerId)
     {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (!getPlayerName().equals(legion.getPlayerName()))
+        {
+            Log.error(getPlayerName() + " illegally called doNotConcede()");
+            return;
+        }
         game.doNotConcede(markerId);
     }
 
@@ -737,11 +777,11 @@ Log.debug("Called Server.reinforce()");
         {
             if (ally.getPlayer().aiFlee(ally, enemy))
             {
-                flee(ally.getMarkerId());
+                game.flee(ally.getMarkerId());
             }
             else
             {
-                doNotFlee(ally.getMarkerId());
+                game.doNotFlee(ally.getMarkerId());
             }
         }
         else
@@ -753,11 +793,23 @@ Log.debug("Called Server.reinforce()");
 
     public void flee(String markerId)
     {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (!getPlayerName().equals(legion.getPlayerName()))
+        {
+            Log.error(getPlayerName() + " illegally called flee()");
+            return;
+        }
         game.flee(markerId);
     }
 
     public void doNotFlee(String markerId)
     {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (!getPlayerName().equals(legion.getPlayerName()))
+        {
+            Log.error(getPlayerName() + " illegally called doNotFlee()");
+            return;
+        }
         game.doNotFlee(markerId);
     }
 
@@ -782,6 +834,7 @@ Log.debug("Called Server.reinforce()");
     /** playerName makes a proposal. */
     public void makeProposal(String proposalString)
     {
+        // XXX Validate calling player
         game.makeProposal(getPlayerName(), proposalString);
     }
 
@@ -794,12 +847,18 @@ Log.debug("Called Server.reinforce()");
 
     public void fight(String hexLabel)
     {
+        // XXX Validate calling player
         game.fight(hexLabel);
     }
 
 
     public void doBattleMove(int tag, String hexLabel)
     {
+        if (!isBattleActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called strike()");
+            return;
+        }
         boolean moved = game.getBattle().doMove(tag, hexLabel);
         if (moved)
         {
@@ -823,14 +882,23 @@ Log.debug("Called Server.reinforce()");
 
     public synchronized void strike(int tag, String hexLabel)
     {
+        if (!isBattleActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called strike()");
+            return;
+        }
         Battle battle = game.getBattle();
         battle.getActiveLegion().getCritterByTag(tag).strike(
             battle.getCritter(hexLabel));
     }
 
-    // XXX Error checks.
     public synchronized void applyCarries(String hexLabel)
     {
+        if (!isBattleActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called applyCarries()");
+            return;
+        }
         Battle battle = game.getBattle();
         Critter target = battle.getCritter(hexLabel);
         battle.applyCarries(target);
@@ -839,6 +907,11 @@ Log.debug("Called Server.reinforce()");
 
     public void undoBattleMove(String hexLabel)
     {
+        if (!isBattleActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called undoBattleMove()");
+            return;
+        }
         game.getBattle().undoMove(hexLabel);
     }
 
@@ -928,10 +1001,13 @@ Log.debug("Called Server.reinforce()");
 
     public void assignStrikePenalty(String prompt)
     {
-        if (isBattleActivePlayer())
+        if (!isBattleActivePlayer())
         {
-            striker.assignStrikePenalty(prompt);
+            Log.error(getPlayerName() + 
+                " illegally called assignStrikePenalty()");
+            return;
         }
+        striker.assignStrikePenalty(prompt);
     }
 
     void allInitBattle(String masterHexLabel)
@@ -1111,7 +1187,7 @@ Log.debug("Called Server.reinforce()");
 
     // XXX Need to support inactive players quitting.
     // XXX If player quits while engaged, might need to set slayer.
-    // TODO Notify all players.
+    // XXX Notify all players.
     public void withdrawFromGame()
     {
         game.getPlayer(getPlayerName()).die(null, true);
@@ -1121,6 +1197,11 @@ Log.debug("Called Server.reinforce()");
 
     public void setDonor(String markerId)
     {
+        if (!isActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called setDonor()");
+            return;
+        }
         Player player = game.getActivePlayer();
         Legion donor = game.getLegionByMarkerId(markerId);
         if (donor != null && donor.getPlayer() == player)
@@ -1149,6 +1230,11 @@ Log.debug("Called Server.reinforce()");
 
     public void doSplit(String parentId, String childId, String results)
     {
+        if (!isActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called doSplit()");
+            return;
+        }
         game.doSplit(parentId, childId, results);
     }
 
@@ -1169,6 +1255,11 @@ Log.debug("Called Server.reinforce()");
     public void doMove(String markerId, String hexLabel, String entrySide,
         boolean teleport, String teleportingLord)
     {
+        if (!isActivePlayer())
+        {
+            Log.error(getPlayerName() + " illegally called doMove()");
+            return;
+        }
         Legion legion = game.getLegionByMarkerId(markerId);
         String startingHexLabel = legion.getCurrentHexLabel();
 
@@ -1327,9 +1418,13 @@ Log.debug("Server.setPlayerName() from " + playerName + " to " + newName);
         }
     }
 
-    // XXX Verify that it's this player's turn.
     public synchronized void assignColor(String color)
     {
+        if (!getPlayerName().equals(game.getNextColorPicker()))
+        {
+            Log.error(getPlayerName() + " illegally called assignColor()");
+            return;
+        }
         if (getPlayer() == null || getPlayer().getColor() == null)
         {
             game.assignColor(getPlayerName(), color);

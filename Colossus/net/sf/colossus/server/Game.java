@@ -401,10 +401,15 @@ Log.debug("Called Game.newGame2()");
 
     private void nextPickColor()
     {
-        if (!colorPickOrder.isEmpty())
+        if (colorPickOrder.size() > 1)
         {
-            String playerName = (String)colorPickOrder.removeFirst();
+            String playerName = (String)colorPickOrder.getFirst();
             server.askPickColor(playerName, colorsLeft);
+        }
+        else if (colorPickOrder.size() == 1)
+        {
+            String playerName = (String)colorPickOrder.getFirst();
+            assignColor(playerName, (String)(colorsLeft.iterator().next()));
         }
         else
         {
@@ -416,6 +421,7 @@ Log.debug("Called Game.newGame2()");
     void assignColor(String playerName, String color)
     {
         Player player = getPlayer(playerName);
+        colorPickOrder.remove(playerName);
         colorsLeft.remove(color);
         player.setColor(color);
         if (player.getName().startsWith(Constants.byColor))
@@ -427,6 +433,11 @@ Log.debug("Called Game.newGame2()");
         player.initMarkersAvailable();
 
         nextPickColor();
+    }
+
+    String getNextColorPicker()
+    {
+        return (String)colorPickOrder.getFirst();
     }
 
     /** Done picking player colors; proceed to start game. */
@@ -2217,7 +2228,7 @@ Log.debug("Called Game.newGame2()");
             donor.removeCreature(angel, false, false);
             legion.addCreature(angel, false);
 
-            // TODO Maybe replace with a special-purpose summon notification?
+            // XXX Maybe replace with a special-purpose summon notification?
             server.allTellRemoveCreature(donor.getMarkerId(), angel.getName());
             server.allTellAddCreature(legion.getMarkerId(), angel.getName());
 

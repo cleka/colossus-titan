@@ -91,7 +91,7 @@ public final class Client implements IClient
 
 
     private int turnNumber = -1;
-    private String activePlayerName = "none";
+    private String activePlayerName = "";
     private int phase = -1;
 
     private int battleTurnNumber = -1;
@@ -2141,6 +2141,18 @@ public final class Client implements IClient
     int getTurnNumber()
     {
         return turnNumber;
+    }
+
+    String getTurnNumberString()
+    {
+        if (turnNumber < 1)
+        {
+            return "";
+        }
+        else
+        {
+            return "" + turnNumber;
+        }
     }
 
 

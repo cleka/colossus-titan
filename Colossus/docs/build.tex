@@ -269,6 +269,17 @@ but has a steep learning curve, much like Photoshop.
 can save to our file formats.
 \end{itemize}
 
+\subsection{Testing tools}
+
+We've added a few unit tests using \hypercite{JUnit}{JUnit}{}{JUNIT}.  
+We need to add more.
+
+The JUnit test classes, named ``*Test.java'' are not built by the normal 
+compile commands, because they require junit.jar in the CLASSPATH to compile,
+and we wanted to make it possible to compile the rest of the game without
+JUnit.  The ant ``compileAll'' target compiles all classes including the
+JUnit tests.  The ant ``test'' target runs all tests, using the JUnit text UI.
+
 \section{Build process}
 
 Once you have the tools set up, Colossus basically builds itself.
@@ -291,12 +302,6 @@ a jarfile), and ``dist'' (makes a zip file). There are also some
 targets that automate installing the package onto a web site --
 these are designed for maintaining the \texttt{SF} site rather than general
 use. Basically, skim through ``build.xml''.
-
-\section{Testing}
-
-Most testing is currently manual.  You play the game a lot and look for 
-problems.  This misses a lot of bugs, so we've started adding JUnit tests.
-``ant test'' will run the ones we have.  Feel free to add more.
 
 \addcontentsline{toc}{section}{References}
 \bibliographystyle{plain}

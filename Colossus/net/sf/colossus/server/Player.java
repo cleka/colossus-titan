@@ -33,7 +33,7 @@ public final class Player implements Comparable
     private SortedSet markersAvailable = new TreeSet();
     private String type;               // "Human" or ".*AI"
 
-    private AI ai = new SimpleAI();    // TODO Allow pluggable AIs.
+    private AI ai = new SimpleAI();
 
 
     Player(String name, Game game)
