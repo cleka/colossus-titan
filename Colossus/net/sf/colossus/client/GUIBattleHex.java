@@ -14,6 +14,7 @@ import net.sf.colossus.util.Log;
  * Class GUIBattleHex holds GUI info for one battle hex.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 public class GUIBattleHex extends BattleHex
