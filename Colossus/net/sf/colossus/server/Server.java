@@ -308,17 +308,6 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     }
 
 
-    public synchronized void makeForcedStrikes(boolean rangestrike)
-    {
-        if (isBattleActivePlayer() && 
-            (game.getBattle().getPhase() == Constants.FIGHT ||
-             game.getBattle().getPhase() == Constants.STRIKEBACK))
-        {
-            game.getBattle().makeForcedStrikes(rangestrike);
-        }
-    }
-
-
     private IClient getClient(String playerName)
     {
         if (clientMap.containsKey(playerName))

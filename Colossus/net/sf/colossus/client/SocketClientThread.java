@@ -467,11 +467,6 @@ Log.debug("End of SocketClientThread while loop");
         out.println(Constants.doneWithStrikes);
     }
 
-    public synchronized void makeForcedStrikes(boolean rangestrike)
-    {
-        out.println(Constants.makeForcedStrikes + sep + rangestrike);
-    }
-
     public void acquireAngel(String markerId, String angelType)
     {
         out.println(Constants.acquireAngel + sep + markerId + sep + angelType);

@@ -761,7 +761,7 @@ public final class Client implements IClient
         if (playerName.equals(getBattleActivePlayerName()) &&
             getOption(Options.autoForcedStrike))
         {
-            server.makeForcedStrikes(getOption(Options.autoRangeSingle));
+            strike.makeForcedStrikes(getOption(Options.autoRangeSingle));
         }
     }
 
@@ -869,11 +869,23 @@ public final class Client implements IClient
     public void addCreature(String markerId, String name)
     {
         getLegionInfo(markerId).addCreature(name);
+        if (board != null)
+        {
+            String hexLabel = getHexForLegion(markerId);
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            hex.repaint();
+        }
     }
 
     public void removeCreature(String markerId, String name)
     {
         getLegionInfo(markerId).removeCreature(name);
+        if (board != null)
+        {
+            String hexLabel = getHexForLegion(markerId);
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            hex.repaint();
+        }
     }
 
     /** Reveal creatures in this legion, some of which already may be known. */
@@ -1165,13 +1177,6 @@ public final class Client implements IClient
     void acquireAngelCallback(String markerId, String angelType)
     {
         server.acquireAngel(markerId, angelType);
-
-        if (board != null)
-        {
-            String hexLabel = getHexForLegion(markerId);
-            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-            hex.repaint();
-        }
     }
 
 
@@ -2278,9 +2283,9 @@ public final class Client implements IClient
         }
         if (board != null)
         {
-            board.unselectHexByLabel(startingHexLabel);
             board.alignLegions(startingHexLabel);
             board.alignLegions(currentHexLabel);
+            board.highlightUnmovedLegions();
             board.repaint();
         }
     }
@@ -2516,7 +2521,8 @@ public final class Client implements IClient
         while (it.hasNext())
         {
             LegionInfo info = (LegionInfo)it.next();
-            if (!info.hasMoved() && playerName.equals(info.getPlayerName()))
+            if (!info.hasMoved() && 
+                getActivePlayerName().equals(info.getPlayerName()))
             {
                 set.add(info.getHexLabel());
             }

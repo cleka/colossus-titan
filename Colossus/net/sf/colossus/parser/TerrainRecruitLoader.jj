@@ -457,7 +457,6 @@ public class TerrainRecruitLoader
         return ad.getName();
     }
 
-    // XXX Why does the list sometimes contain duplicates?  Double-init?
     /**
      * To obtain all the Creature that can be acquired at the given amount of points in the given terrain.
      * @param t The Terrain in which the recruitement occurs.

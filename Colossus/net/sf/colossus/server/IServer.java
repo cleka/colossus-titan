@@ -20,8 +20,6 @@ public interface IServer
 
     public void doneWithStrikes();
 
-    public void makeForcedStrikes(boolean rangestrike);
-
     public void acquireAngel(String markerId, String angelType);
 
     public void doSummon(String markerId, String donorId, String angel);

@@ -130,13 +130,6 @@ Log.debug("Got fixName new:" + newName + " old:" + playerName);
         {
             server.doneWithStrikes();
         }
-        else if (method.equals(Constants.makeForcedStrikes))
-        {
-            boolean rangestrike =
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
-            server.makeForcedStrikes(rangestrike);
-            return;
-        }
         else if (method.equals(Constants.acquireAngel))
         {
             String markerId = (String)args.remove(0);

@@ -199,7 +199,6 @@ public final class Constants
     public static final String leaveCarryMode = "leaveCarryMode";
     public static final String doneWithBattleMoves = "doneWithBattleMoves";
     public static final String doneWithStrikes = "doneWithStrikes";
-    public static final String makeForcedStrikes = "makeForcedStrikes";
     public static final String acquireAngel = "acquireAngel";
     public static final String doSummon = "doSummon";
     public static final String doRecruit = "doRecruit";

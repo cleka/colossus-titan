@@ -62,6 +62,36 @@ final class Strike
         return false;
     }
 
+    /** Perform strikes for any creature that is forced to strike
+     *  and has only one legal target. Forced strikes will never
+     *  generate carries, since there's only one target. If
+     *  rangestrike is true, also perform rangestrikes for
+     *  creatures with only one target, even though they're not
+     *  technically forced. */
+    synchronized void makeForcedStrikes(boolean rangestrike)
+    {
+        if (client.getBattlePhase() != Constants.FIGHT && 
+            client.getBattlePhase() != Constants.STRIKEBACK)
+        {
+            Log.error("Called Strike.makeForcedStrikes() in wrong phase");
+            return;
+        }
+        Iterator it = client.getBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (client.isActive(chit) && !chit.hasStruck())
+            {
+                Set set = findStrikes(chit, rangestrike);
+                if (set.size() == 1)
+                {
+                    String hexLabel = (String)(set.iterator().next());
+                    client.strike(chit.getTag(), hexLabel);
+                }
+            }
+        }
+    }
+
 
     boolean isOccupied(BattleHex hex)
     {

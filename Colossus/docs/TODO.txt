@@ -1,10 +1,3 @@
-Bug: Enemy stack said it was 4-high, but when I jumped on it it became
-   5-high.  Missed a height updated somewhere.  (Summoned angel or
-   recruit?)
-
-Bug: Critters still highlighted in battle sometimes after they've 
-   struck.  (Because of server-side forced strikes?)
-
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
 

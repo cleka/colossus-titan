@@ -2200,19 +2200,19 @@ Log.debug("recruiters.size() is " + recruiters.size());
         }
         if (creature.isFlier())
         {
-            val += 10;
+            val += 4;
         }
         if (creature.isRangestriker())
         {
-            val += 10;
+            val += 5;
         }
         if (creature.useMagicMissile())
         {
-            val += 10;
+            val += 4;
         }
         if (MasterHex.isNativeCombatBonus(creature, terrain))
         {
-            val += 10;
+            val += 3;
         }
         if (creature.isTitan())
         {
