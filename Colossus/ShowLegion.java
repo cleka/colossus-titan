@@ -20,7 +20,7 @@ class ShowLegion extends Dialog implements MouseListener
 
         int scale = 60;
         setLocation(new Point(point.x - scale, point.y - scale));
-        setSize((22 * scale / 20) * (legion.height), 8 * scale / 5);
+        setSize((22 * scale / 20) * (legion.getHeight()), 8 * scale / 5);
         
         setLayout(null);
 
@@ -31,8 +31,8 @@ class ShowLegion extends Dialog implements MouseListener
 
         imagesLoaded = false;
 
-        chits = new Chit[legion.height];
-        for (int i = 0; i < legion.height; i++)
+        chits = new Chit[legion.getHeight()];
+        for (int i = 0; i < legion.getHeight(); i++)
         {
             chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale, 
                 "images/" + legion.creatures[i].name + ".gif", this);
@@ -40,7 +40,7 @@ class ShowLegion extends Dialog implements MouseListener
 
         tracker = new MediaTracker(this);
 
-        for (int i = 0; i < legion.height; i++)
+        for (int i = 0; i < legion.getHeight(); i++)
         {
             tracker.addImage(chits[i].image, 0);
         }
@@ -69,7 +69,7 @@ class ShowLegion extends Dialog implements MouseListener
 
         // No need to mess around with clipping rectangles, since
         //    this window is ephemeral.
-        for (int i = legion.height - 1; i >= 0; i--)
+        for (int i = legion.getHeight() - 1; i >= 0; i--)
         {
             chits[i].paint(g);
         }
