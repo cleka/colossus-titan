@@ -68,18 +68,6 @@ public class BattleMap extends Frame implements MouseListener,
         needToClear = false;
         imagesLoaded = false;
 
-        // XXX Scale scrollbars and don't display if not needed
-        tx =  0;
-        ty =  0;
-        Dimension d = getSize();
-        vBar = new Scrollbar(Scrollbar.VERTICAL, 0, scale, 0, 
-            20 * scale - d.height);
-        hBar = new Scrollbar(Scrollbar.HORIZONTAL, 0, scale, 0,
-            20 * scale - d.width);
-        add("East", vBar);
-        add("South", hBar);
-        vBar.addAdjustmentListener(this);
-        hBar.addAdjustmentListener(this);
         
         mb = new MenuBar();
         m1 = new Menu("Size", false);
@@ -175,6 +163,20 @@ public class BattleMap extends Frame implements MouseListener,
         }
         imagesLoaded = true;
 
+        // XXX Scale scrollbars and don't display if not needed
+        tx =  0;
+        ty =  0;
+        Dimension dWin = getSize();
+        Dimension dMap = getMapSize();
+        vBar = new Scrollbar(Scrollbar.VERTICAL, 0, scale, 0, 
+            dMap.height - dWin.height);
+        hBar = new Scrollbar(Scrollbar.HORIZONTAL, 0, scale, 0,
+            dMap.width - dWin.width);
+        add("East", vBar);
+        add("South", hBar);
+        vBar.addAdjustmentListener(this);
+        hBar.addAdjustmentListener(this);
+
         repaint();
     }
 
@@ -213,10 +215,11 @@ public class BattleMap extends Frame implements MouseListener,
 
         // XXX Rescale scrollbars
 
-        Dimension d = getSize();
-        vBar.setValues(ty, scale, 0, 20 * scale - d.height);
+        Dimension dWin = getSize();
+        Dimension dMap = getMapSize();
+        vBar.setValues(ty, scale, 0, dMap.height - dWin.height);
         vBar.setBlockIncrement(scale);
-        hBar.setValues(tx, scale, 0, 20 * scale - d.width);
+        hBar.setValues(tx, scale, 0, dMap.width - dWin.width);
         hBar.setBlockIncrement(scale);
 
         validate();
@@ -249,6 +252,7 @@ public class BattleMap extends Frame implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
+System.out.println("mouse: " + point.x + " " + point.y);
         point.x += tx;
         point.y += ty;
 
@@ -476,6 +480,14 @@ public class BattleMap extends Frame implements MouseListener,
         return preferredSize;
     }
 
+    public Dimension getMapSize()
+    {
+        Rectangle xRect = h[5][3].getBounds();
+        Rectangle yRect = h[3][5].getBounds(); 
+System.out.println((xRect.x + xRect.width) + " " +  (yRect.y + yRect.height));
+        return new Dimension(xRect.x + xRect.width, yRect.y + yRect.height);
+    }
+
 
     public static void main(String args[])
     {
@@ -579,6 +591,8 @@ class Hex
         if (p.contains(point))
         {
             selected = !selected;
+System.out.println("selected hex with bounds: " + rectBound.x + " " + rectBound.y +
+" " + (rectBound.x + rectBound.width) + " " + (rectBound.y + rectBound.height));
             return true;
         }
         return false;
