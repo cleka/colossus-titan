@@ -25,7 +25,7 @@ class PickEntrySide extends JDialog implements ActionListener,
     };
 
     private Image offImage;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
 
     private static int scale = 30;
@@ -417,12 +417,12 @@ class PickEntrySide extends JDialog implements ActionListener,
         Rectangle rectClip = g.getClipBounds();
         
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
         for (int i = 0; i < h.length; i++)
@@ -431,7 +431,7 @@ class PickEntrySide extends JDialog implements ActionListener,
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
-                    h[i][j].paint(gBack);
+                    h[i][j].paint(offGraphics);
                 }
             }
         }
@@ -506,7 +506,18 @@ class PickEntrySide extends JDialog implements ActionListener,
         {
             masterHex.setEntrySide(side);
         }
+
+        // Attempt to free resources to work around Java memory leaks.
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+
         dispose();
+        System.gc();
     }
 
 

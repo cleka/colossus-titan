@@ -31,7 +31,7 @@ public class BattleMap extends JFrame implements MouseListener,
     };
     private Rectangle rectClip = new Rectangle();
     private Image offImage;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
@@ -1228,7 +1228,7 @@ public class BattleMap extends JFrame implements MouseListener,
                 {
                     // Make sure the MasterBoard is visible.
                     board.deiconify();
-System.out.println("board.show()");
+                    // And bring it to the front.
                     board.show();
 
                     SummonAngel summonAngel = new SummonAngel(board, attacker);
@@ -1245,8 +1245,31 @@ System.out.println("board.show()");
             }
         }
 
-        turn.dispose();
+        // Attempt to free resources to work around Java memory leaks.
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+
+        if (imagesLoaded)
+        {
+            for (int i = 0; i < numChits; i++)
+            {
+                tracker.removeImage(chits[i].getImage());
+                chits[i].getImage().flush();
+            }
+        }
+
+        if (turn != null)
+        {
+            turn.dispose();
+        }
         dispose();
+        System.gc();
+
         masterHex.unselect();
         masterHex.repaint();
         board.finishBattle();
@@ -1320,6 +1343,10 @@ System.out.println("board.show()");
                 BattleHex hex = chits[i].getCurrentHex();
                 hex.removeChit(chits[i]);
                 hex.repaint();
+
+                // Attempt to free resources to work around leaks.
+                tracker.removeImage(chits[i].getImage());
+                chits[i].getImage().flush();
 
                 for (int j = i; j < numChits - 1; j++)
                 {
@@ -1986,18 +2013,18 @@ System.out.println("board.show()");
         rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
         // If the erase flag is set, erase the background.
         if (eraseFlag)
         {
-            gBack.clearRect(0, 0, d.width, d.height);
+            offGraphics.clearRect(0, 0, d.width, d.height);
             eraseFlag = false;
         }
 
@@ -2007,7 +2034,7 @@ System.out.println("board.show()");
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
-                    h[i][j].paint(gBack);
+                    h[i][j].paint(offGraphics);
                 }
             }
         }
@@ -2017,7 +2044,7 @@ System.out.println("board.show()");
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
-                chits[i].paint(gBack);
+                chits[i].paint(offGraphics);
             }
         }
 

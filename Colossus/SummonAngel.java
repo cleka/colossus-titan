@@ -26,7 +26,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
     private Chit archangelChit;
     private boolean imagesLoaded = false;
     private Legion donor;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
 
@@ -90,6 +90,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         {
             JOptionPane.showMessageDialog(board, "waitForAll was interrupted");
         }
+        imagesLoaded = true;
 
         button1 = new JButton("Summon");
         button2 = new JButton("Cancel");
@@ -98,7 +99,6 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         button1.addActionListener(this);
         button2.addActionListener(this);
 
-        imagesLoaded = true;
         setVisible(true);
         repaint();
     }
@@ -110,7 +110,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
     }
 
 
-    void cleanup(boolean summoned)
+    private void cleanup(boolean summoned)
     {
         if (summoned)
         {
@@ -120,9 +120,27 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             player.setLastLegionSummonedFrom(donor);
         }
 
-        board.finishSummoningAngel();
+        // Attempt to free resources to work around Java memory leaks.
+        setVisible(false);
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+        
+        if (imagesLoaded)
+        {
+            tracker.removeImage(angelChit.getImage());
+            angelChit.getImage().flush();
+            tracker.removeImage(archangelChit.getImage());
+            archangelChit.getImage().flush();
+        }
 
         dispose();
+        System.gc();
+
+        // Let the MasterBoard know to leave the angel-summoning state.
+        board.finishSummoningAngel();
     }
 
 
@@ -137,12 +155,12 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
         donor = player.getSelectedLegion();
@@ -155,8 +173,8 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             archangelChit.setDead(archangels == 0);
         }
 
-        angelChit.paint(gBack);
-        archangelChit.paint(gBack);
+        angelChit.paint(offGraphics);
+        archangelChit.paint(offGraphics);
 
         if (!laidOut)
         {
@@ -281,7 +299,8 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
             if (angels == 0 && archangels == 0)
             {
-                JOptionPane.showMessageDialog(board, "No angels are available.");
+                JOptionPane.showMessageDialog(board, 
+                    "No angels are available.");
                 return;
             }
 
