@@ -4,23 +4,16 @@ Eliminate Legion.hexInfoMap and just recompute and store the info for
    computation but hold the results in locals instead of member
    variables during the Move phase?  We still need to hold entry side 
    and teleport info for the one hex that legion actually moved to in 
-   members.
+   member variables.
 
 Get minimax masterboard moves working.
 
 Teach the AI how to summon angels.
 
-Teach the AI how to acquire angels.
-
-Consider all permutations of creatures' ideal destination hexes when 
-   trying to move creatures in battle, rather than relying on 
-   MoveOrderComparator to try to figure out the best order to move
-   creatures.  7! is only 5040.
-
 Rewrite SplitLegion to use Legion.split()
 
 Add a configurable AI move delay to make it easier to follow what the
-   AI is doing.
+   AI is doing.  That means supporting non-boolean options.
 
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into

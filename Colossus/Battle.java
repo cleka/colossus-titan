@@ -37,6 +37,7 @@ public final class Battle
     private String [] legions = new String[2];
     private int activeLegionNum;
     private String masterHexLabel;
+    private char terrain;
     private BattleDice battleDice;
     private int turnNumber;
     private int phase;
@@ -66,6 +67,7 @@ public final class Battle
         this.turnNumber = turnNumber;
         this.phase = phase;
         map = new BattleMap(masterHexLabel, this);
+        terrain = getMasterHex().getTerrain();
     }
 
 
@@ -90,9 +92,11 @@ public final class Battle
     public Battle AICopy(Game game)
     {
         Battle newBattle = new Battle();
-
         newBattle.game = game;
+        newBattle.map = map.AICopy(newBattle);
+
         newBattle.masterHexLabel = masterHexLabel;
+        newBattle.terrain = terrain;
         newBattle.defenderId = defenderId;
         newBattle.attackerId = attackerId;
         newBattle.legions[0] = defenderId;
@@ -100,9 +104,6 @@ public final class Battle
         newBattle.activeLegionNum = activeLegionNum;
         newBattle.turnNumber = turnNumber;
         newBattle.phase = phase;
-
-        newBattle.map = map.AICopy(newBattle);
-
         newBattle.summonState = summonState;
         newBattle.carryDamage = carryDamage;
         newBattle.critterSelected = critterSelected;
@@ -234,7 +235,7 @@ public final class Battle
 
     public char getTerrain()
     {
-        return getMasterHex().getTerrain();
+        return terrain;
     }
 
 
@@ -242,7 +243,6 @@ public final class Battle
     {
         return phase;
     }
-
 
     public int getTurnNumber()
     {
@@ -406,7 +406,7 @@ public final class Battle
     private void setupMove()
     {
         // If there are no legal moves, move on.
-        if (highlightMovableCritters() < 1)
+        if (highlightMobileCritters() < 1)
         {
             advancePhase();
         }
@@ -568,7 +568,6 @@ public final class Battle
         int movesLeft, int cameFrom, boolean ignoreMobileAllies)
     {
         HashSet set = new HashSet();
-
         for (int i = 0; i < 6; i++)
         {
             // Do not double back.
@@ -619,30 +618,29 @@ public final class Battle
                 }
             }
         }
-
         return set;
     }
 
 
-    private Set findUnoccupiedTowerHexes()
+    /** This method is called by the defender on turn 1 in the tower.
+     *  So we know that there are no enemies on board, and all allies
+     *  are mobile. */
+    private Set findUnoccupiedTowerHexes(boolean ignoreMobileAllies)
     {
         HashSet set = new HashSet();
-
         BattleHex centerHex = map.getCenterHex();
-
-        if (!isOccupied(centerHex))
+        if (ignoreMobileAllies || !isOccupied(centerHex))
         {
             set.add(centerHex.getLabel());
         }
         for (int i = 0; i < 6; i++)
         {
             BattleHex hex = centerHex.getNeighbor(i);
-            if (!isOccupied(hex))
+            if (ignoreMobileAllies || !isOccupied(hex))
             {
                 set.add(hex.getLabel());
             }
         }
-
         return set;
     }
 
@@ -654,10 +652,10 @@ public final class Battle
         Set set = new HashSet();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
-            if (getTerrain() == 'T' && getTurnNumber() == 1 &&
-                getActivePlayer() == getDefender().getPlayer())
+            if (terrain == 'T' && turnNumber == 1 &&
+                activeLegionNum == DEFENDER)
             {
-                set = findUnoccupiedTowerHexes();
+                set = findUnoccupiedTowerHexes(ignoreMobileAllies);
             }
             else
             {
@@ -694,7 +692,7 @@ public final class Battle
             critter.undoMove();
         }
 
-        highlightMovableCritters();
+        highlightMobileCritters();
     }
 
 
@@ -712,7 +710,7 @@ public final class Battle
             }
         }
 
-        highlightMovableCritters();
+        highlightMobileCritters();
     }
 
 
@@ -761,7 +759,7 @@ public final class Battle
 
     /** Return a set of hex labels for hex labels with critters eligible
      *  to move. */
-    public Set findMovableCritters()
+    public Set findMobileCritters()
     {
         HashSet set = new HashSet();
         Legion legion = getActiveLegion();
@@ -783,9 +781,9 @@ public final class Battle
     /** Select all hexes containing critters eligible to move.
      *  Return the number of hexes selected (not the number
      *  of critters). */
-    public int highlightMovableCritters()
+    public int highlightMobileCritters()
     {
-        Set set = findMovableCritters();
+        Set set = findMobileCritters();
         map.unselectAllHexes();
         map.selectHexesByLabels(set);
         return set.size();
@@ -845,8 +843,7 @@ public final class Battle
     {
         lastCrittersMoved.clear();
 
-        Legion legion = getActiveLegion();
-        Iterator it = legion.getCritters().iterator();
+        Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
@@ -878,8 +875,7 @@ public final class Battle
         // Drift hexes are only found on the tundra map.
         // Drift damage is applied only once per player turn,
         //    during the strike phase.
-        if (getTerrain() == 't' && phase == FIGHT &&
-            !driftDamageApplied)
+        if (terrain == 't' && phase == FIGHT && !driftDamageApplied)
         {
             Iterator it = getAllCritters().iterator();
             while (it.hasNext())
@@ -1580,7 +1576,7 @@ Game.logDebug("defender eliminated");
 
             // If there are two walls, striker or target must be at elevation
             //     2 and range must not be 3.
-            if (getTerrain() == 'T' && totalObstacles >= 2 &&
+            if (terrain == 'T' && totalObstacles >= 2 &&
                 getRange(initialHex, finalHex, false) == 3)
             {
                 return true;
@@ -2023,7 +2019,7 @@ Game.logDebug("defender eliminated");
             case MOVE:
                 if (critterSelected)
                 {
-                    doMove(getActiveLegion().getCritter(0), hex, true);
+                    doMove(getActiveLegion().getCritter(0), hex);
                 }
                 break;
 
@@ -2061,43 +2057,49 @@ Game.logDebug("defender eliminated");
 
 
     /** If legal, move critter to hex and return true. Else return false. */
-    public boolean doMove(Critter critter, BattleHex hex, boolean log)
+    public boolean doMove(Critter critter, BattleHex hex)
     {
         String hexLabel = hex.getLabel();
 
         // Allow null moves.
         if (hexLabel.equals(critter.getCurrentHexLabel()))
         {
-            if (log)
-            {
-                Game.logEvent(critter.getDescription() + " does not move");
-            }
+            Game.logEvent(critter.getDescription() + " does not move");
             return true;
         }
         else if (showMoves(critter, false).contains(hexLabel))
         {
-            if (log)
-            {
-                Game.logEvent(critter.getName() + " moves from " +
-                    critter.getCurrentHexLabel() + " to " + hexLabel);
-            }
+            Game.logEvent(critter.getName() + " moves from " +
+                critter.getCurrentHexLabel() + " to " + hexLabel);
             critter.moveToHex(hex);
             critterSelected = false;
-            highlightMovableCritters();
+            highlightMobileCritters();
             return true;
         }
         else
         {
-            if (log)
-            {
-                Game.logEvent(critter.getName() + " in " +
-                    critter.getCurrentHexLabel() + 
-                    " tried to illegally move to " + hexLabel);
-            }
+            Game.logEvent(critter.getName() + " in " +
+                critter.getCurrentHexLabel() +
+                " tried to illegally move to " + hexLabel);
             return false;
         }
     }
-    
+
+    /** A streamlined version of doMove for the AI. If legal, move critter
+     *  to hex and return true. Else return false.  Do not allow null moves.
+     */
+    public boolean testMove(Critter critter, BattleHex hex)
+    {
+        String hexLabel = hex.getLabel();
+
+        if (showMoves(critter, false).contains(hexLabel))
+        {
+            critter.moveToHex(hex);
+            return true;
+        }
+        return false;
+    }
+
 
     public void actOnMisclick()
     {
@@ -2105,7 +2107,7 @@ Game.logDebug("defender eliminated");
         {
             case MOVE:
                 critterSelected = false;
-                highlightMovableCritters();
+                highlightMobileCritters();
                 break;
 
             case FIGHT:

@@ -13,12 +13,11 @@ public final class BattleMap extends HexMap implements MouseListener,
     WindowListener
 {
     private static Point location;
-
-    private Battle battle;
-
     private JFrame battleFrame;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
+    private Battle battle;
+    private int tag = 0;
 
     public static final String undoLastMove = "Undo Last Move";
     public static final String undoAllMoves = "Undo All Moves";
@@ -38,7 +37,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         super(masterHexLabel);
 
         battleFrame = new JFrame();
-
         Legion attacker = battle.getAttacker();
         Legion defender = battle.getDefender();
 
@@ -282,7 +280,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             critter.getImageName(legion == battle.getDefender()), this,
             critter);
         critter.addBattleInfo(entrance.getLabel(), entrance.getLabel(),
-            chit, battle);
+            chit, battle, ++tag);
         alignChits(entrance.getLabel());
     }
 
@@ -310,7 +308,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 startingHexLabel = entrance.getLabel();
             }
             critter.addBattleInfo(currentHexLabel, startingHexLabel,
-                chit, battle);
+                chit, battle, ++tag);
             alignChits(currentHexLabel);
         }
     }
@@ -344,7 +342,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             Critter critter = (Critter)it.next();
             Chit chit = critter.getChit();
-            if (chit.contains(point))
+            if (chit != null && chit.contains(point))
             {
                 return critter;
             }
@@ -439,7 +437,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             Critter critter = (Critter)lit.previous();
             Chit chit = critter.getChit();
-            if (rectClip.intersects(chit.getBounds()))
+            if (chit != null && rectClip.intersects(chit.getBounds()))
             {
                 chit.paintComponent(g);
             }

@@ -457,7 +457,7 @@ public final class Player implements Comparable
         // Only allow rolling if it hasn't already been done.
         if (movementRoll != 0)
         {
-            Game.logDebug("Called rollMovement() illegally");
+            Game.logWarn("Called rollMovement() illegally");
             return;
         }
 
@@ -935,7 +935,7 @@ public final class Player implements Comparable
     /** Ensure that Player menu checkboxes reflect the correct state. */
     public void syncCheckboxes()
     {
-        Iterator it = PerPlayerOptions.iterator();
+        Iterator it = Options.getPerPlayerOptions().iterator();
         while (it.hasNext())
         {
             String optname = (String)it.next();
@@ -1038,6 +1038,15 @@ public final class Player implements Comparable
         if (getOption(Options.autoPickEngagement))
         {
             return ai.pickEngagement(game);
+        }
+        return null;
+    }
+
+    public String aiAcquireAngel(Legion legion, ArrayList recruits, Game game)
+    {
+        if (getOption(Options.autoAcquireAngels))
+        {
+            return ai.acquireAngel(legion, recruits, game);
         }
         return null;
     }

@@ -10,7 +10,6 @@ import javax.swing.*;
  * @author Bruce Sherrod <bruce@thematrix.com>
  */
 
-
 public final class Game
 {
     private ArrayList players = new ArrayList(6);
@@ -115,9 +114,7 @@ public final class Game
 	newGame.caretaker = caretaker.AICopy();
 	newGame.phase = phase;
 	newGame.isApplet = false;
-	newGame.masterFrame = null;
 	newGame.engagementInProgress = engagementInProgress;
-
         newGame.masterFrame = masterFrame;
 
 	return newGame;
@@ -445,7 +442,7 @@ public final class Game
 
     public boolean getOption(String name)
     {
-        if (PerPlayerOptions.contains(name))
+        if (Options.getPerPlayerOptions().contains(name))
         {
             try
             {
@@ -473,7 +470,7 @@ public final class Game
 
     public void setOption(String name, boolean value)
     {
-        if (PerPlayerOptions.contains(name))
+        if (Options.getPerPlayerOptions().contains(name))
         {
             getActivePlayer().setOption(name, value);
             return;
@@ -2243,9 +2240,7 @@ public final class Game
         {
             return null;
         }
-
         ArrayList recruits = new ArrayList(2);
-
         if (caretaker.getCount(Creature.angel) >= 1)
         {
             recruits.add(Creature.angel.toString());
@@ -2254,7 +2249,6 @@ public final class Game
         {
             recruits.add(Creature.archangel.toString());
         }
-
         return recruits;
     }
 
@@ -2482,7 +2476,7 @@ public final class Game
                 if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), player,
-                        legion, roll - 1, ARROWS_ONLY, (i + 3) % 6, 
+                        legion, roll - 1, ARROWS_ONLY, (i + 3) % 6,
                         affectEntrySides, ignoreFriends));
                 }
             }
@@ -2558,7 +2552,7 @@ public final class Game
 
 
     /** Return set of hex labels where this legion can move.
-     *  Include teleport moves only if teleport is true. 
+     *  Include teleport moves only if teleport is true.
      *  Change the legion's entry sides only if affectEntrySides
      *  is true. Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
@@ -2719,13 +2713,12 @@ public final class Game
         board.unselectAllHexes();
         board.selectHexesByLabels(set);
 
-            // XXX Doesn't really belong here -- just testing.
-            Player player = getActivePlayer();
-            String engagementHexLabel = player.aiPickEngagement();
-            if (engagementHexLabel != null)
-            {
-                doFight(engagementHexLabel, player);
-            }
+        Player player = getActivePlayer();
+        String engagementHexLabel = player.aiPickEngagement();
+        if (engagementHexLabel != null)
+        {
+            doFight(engagementHexLabel, player);
+        }
 
         return set.size();
     }
@@ -3012,7 +3005,7 @@ public final class Game
         boolean moved = false;
 
         // Verify that the move is legal.
-        if (legion != null && listMoves(legion, true, true, 
+        if (legion != null && listMoves(legion, true, true,
             false).contains(hexLabel))
         {
             Player player = legion.getPlayer();

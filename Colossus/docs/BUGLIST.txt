@@ -82,9 +82,7 @@ java.lang.NullPointerException
         at Game.actOnLegion(Game.java:2735)
         at MasterBoard.mousePressed(MasterBoard.java:1708)
 
-Solaris 1.3.1: BattleMap title bar not updated from recruit to
-   move when AI is moving.
-
-Solaris 1.3.1: AI still sometimes leaves creatures offboard
-   unnecessarily.
-
+Solaris, 1.3.1: Loading in the middle of a battle resets turn
+   number to 1 while leaving critters in the middle of the
+   map, keeps the map around after the battle is over, etc.  It's
+   a mess.

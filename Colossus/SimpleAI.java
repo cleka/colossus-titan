@@ -1632,6 +1632,23 @@ class SimpleAI implements AI
         return false;
     }
 
+    public String acquireAngel(Legion legion, ArrayList recruits, Game game)
+    {
+        // This is a dumb placeholder.
+        // TODO If the legion is 6 high and can recruit something better,
+        // or if the legion is a tiny scooby snack that's about to get
+        // smooshed, turn down the angel.
+        if (recruits.contains("Archangel"))
+        {
+            return "Archangel";
+        }
+        if (recruits.contains("Angel"))
+        {
+            return "Angel";
+        }
+        return null;
+    }
+
 
     public void strike(Legion legion, Battle battle, Game game,
                        boolean fakeDice)
@@ -2080,7 +2097,7 @@ class SimpleAI implements AI
             {
                 Legion legion = (Legion)it.next();
 
-                Iterator it2 = game.listMoves(legion, true, false, 
+                Iterator it2 = game.listMoves(legion, true, false,
                     true).iterator();
                 while (it2.hasNext())
                 {
@@ -2302,8 +2319,6 @@ class SimpleAI implements AI
      */
 
 
-
-    // XXX This method needs to be broken up.
     public void battleMove(Game game)
     {
         debugln("Called battleMove()");
@@ -2316,13 +2331,70 @@ class SimpleAI implements AI
         // getting stuff out of the way so that a reinforcement
         // has room to enter.
 
+        ArrayList bestOrder = findBattleMoves(game);
+
+        // Now that critters are sorted into the order in which they
+        // should move, start moving them for real.  If the preferred
+        // move fails, fall back to the critter's remaining moves.
+
+        Battle battle = game.getBattle();
+        BattleMap map = battle.getBattleMap();
+        Legion legion = battle.getActiveLegion();
+
+        if (bestOrder != null)
+        {
+            Iterator it = bestOrder.iterator();
+            while (it.hasNext())
+            {
+                ArrayList moveList = (ArrayList)it.next();
+                Iterator it2 = moveList.iterator();
+                while (it2.hasNext())
+                {
+                    CritterMove cm = (CritterMove)it2.next();
+                    Critter fakeCritter = cm.getCritter();
+                    // Get the critter in this legion with the same tag.
+                    Critter critter = legion.getCritterByTag(
+                        fakeCritter.getTag());
+
+                    BattleHex hex = cm.getEndingHex(map);
+                    debugln("applymove: try " + critter + " to " +
+                        hex.getLabel());
+                    if (battle.doMove(critter, hex))
+                    {
+                        // The move was okay, so continue to the next critter.
+                        break;
+                    }
+                }
+            }
+        }
+
+        debugln("Done with battleMove");
+    }
+
+    /** Compute a set of CritterMoves for the game's active legion.
+     *  Return an ArrayList containing one ArrayList of CritterMoves
+     *  for each Critter. */
+    public ArrayList findBattleMoves(Game realGame)
+    {
+        // Consider one critter at a time, in order of importance.
+        // Examine all possible moves for that critter not already
+        // taken by a more important one.
+
+        // TODO Handle summoned/recruited critters, in particular
+        // getting stuff out of the way so that a reinforcement
+        // has room to enter.
+
+        // Work on a copy of the game state.  The caller is responsible
+        // for actually making the moves.
+        final Game game = realGame.AICopy();
+
         final Battle battle = game.getBattle();
         final BattleMap map = battle.getBattleMap();
         final char terrain = battle.getTerrain();
         final Legion legion = battle.getActiveLegion();
         ArrayList critters = legion.getCritters();
 
-        debugln("There are " + critters.size() + " critters");
+debugln("There are " + critters.size() + " critters");
 
         // Sort critters in decreasing order of importance.  Keep
         // identical creatures together with a secondary sort by
@@ -2342,9 +2414,9 @@ class SimpleAI implements AI
             // moves is a list of hex labels where one critter
             // can move.
 
-            // Sometimes friendly critters need to get out of the way 
-            // to clear a path for a more important critter.  We 
-            // consider moves that the critter could make, 
+            // Sometimes friendly critters need to get out of the way
+            // to clear a path for a more important critter.  We
+            // consider moves that the critter could make,
             // disregarding mobile allies.
 
             // TODO Make less important creatures get out of the way.
@@ -2359,8 +2431,8 @@ class SimpleAI implements AI
 
 debugln("Found " + moves.size() + " moves for " + critter.getDescription());
 
-            // Move previously considered critters into their preferred 
-            // position so we can take them into account when evaluating 
+            // Move previously considered critters into their preferred
+            // position so we can take them into account when evaluating
             // this critter's moves.
             Iterator it2 = allCritterMoves.iterator();
             while (it2.hasNext())
@@ -2442,18 +2514,14 @@ debugln("Found " + moves.size() + " moves for " + critter.getDescription());
             }
         }
 
-        // Figure the order in which creatures should move to get in
-        // each other's way as little as possible.
-        // Iterate through all permutations of critter move orders, 
-        // tracking how many critters get their preferred hex with each 
-        // order, until we find an order that lets every creature reach 
-        // its preferred hex.  If none does, take the best we can find.
 
-        // Remove critters that don't want to move from the list 
-        // before finding permutations.
-
+        // Remove critters that don't want to move from the list
+        // before finding permutations of move orders.
         int perfectScore = 0;
         ArrayList trimmedCritterMoves = (ArrayList)allCritterMoves.clone();
+
+        Collections.sort(trimmedCritterMoves, new MoveOrderComparator(battle));
+
         it = trimmedCritterMoves.iterator();
         while (it.hasNext())
         {
@@ -2465,7 +2533,6 @@ debugln("Found " + moves.size() + " moves for " + critter.getDescription());
             }
             else
             {
-debugln(cm.getCritter().getName() + " : " + cm.getCritter().getPointValue());
                 perfectScore += cm.getCritter().getPointValue();
             }
         }
@@ -2474,23 +2541,54 @@ debugln("perfect score is : " + perfectScore);
         if (perfectScore == 0)
         {
             // No moves, so exit.
-debugln("no moves -- Done with battleMove");
-            return;
+debugln("no moves");
+            return null;
         }
 
+        // Figure the order in which creatures should move to get in
+        // each other's way as little as possible.
+        // Iterate through all permutations of critter move orders,
+        // tracking how many critters get their preferred hex with each
+        // order, until we find an order that lets every creature reach
+        // its preferred hex.  If none does, take the best we can find.
+
+        // This is too slow.  TODO Optimize it.  Move it to a separate
+        // worker thread if necessary, so that the GUI stays responsive.
+        // Need a progress indicator.
+
+        int turn = battle.getTurnNumber();
         int bestScore = 0;
-        ArrayList bestOrder = null; 
+        ArrayList bestOrder = null;
+        ArrayList lastOrder = null;
+        int count = 0;
+
         it = new Perms(trimmedCritterMoves).iterator();
         while (it.hasNext())
         {
             ArrayList order = (ArrayList)it.next();
+
+            // On turn 1, all moving critters of the same creature type are
+            // identical (since all come from the same entrance and none
+            // are wounded), so we should be able to skip testing any
+            // permutations that just swapped like creatures.
+            if (turn == 1 && creatureNames(order).equals(creatureNames(
+                lastOrder)))
+            {
+                continue;
+            }
+
+            count++;
+if (count % 100 == 0)
+{
+debugln(count + " tries");
+}
             int score = testMoveOrder(order, battle);
             if (score > bestScore)
             {
                 bestOrder = (ArrayList)order.clone();
                 if (score >= perfectScore)
                 {
-debugln("got perfect score: " + score);
+debugln("got perfect score ");
                     break;
                 }
                 else
@@ -2498,35 +2596,13 @@ debugln("got perfect score: " + score);
                     bestScore = score;
                 }
             }
+            lastOrder = (ArrayList)order.clone();
         }
-
-
-        // Now that critters are sorted into the order in which they
-        // should move, start moving them for real.  If the preferred
-        // move fails, fall back to the critter's remaining moves.
-
-        it = bestOrder.iterator();
-        while (it.hasNext())
-        {
-            ArrayList moveList = (ArrayList)it.next();
-            Iterator it2 = moveList.iterator();
-            while (it2.hasNext())
-            {
-                CritterMove cm = (CritterMove)it2.next();
-                Critter critter = cm.getCritter();
-                BattleHex hex = cm.getEndingHex(map);
-                debugln("applymove: try " + critter + " to " + hex.getLabel());
-                if (battle.doMove(critter, hex, true))
-                {
-                    // The move was okay, so continue to the next critter.
-                    break;
-                }
-            }
-        }
-
-        debugln("Done with battleMove");
+debugln("Got score " + bestScore + " in " + count + " permutations");
+        return bestOrder;
     }
 
+    // TODO Optimize this method.
     /** Try each of the moves in order.  Return the number that succeed,
      *  scaled by the importance of each critter. */
     private int testMoveOrder(ArrayList order, Battle battle)
@@ -2539,9 +2615,9 @@ debugln("got perfect score: " + score);
             CritterMove cm = (CritterMove)moveList.get(0);
             Critter critter = cm.getCritter();
             BattleHex hex = cm.getEndingHex(battle.getBattleMap());
-            if (battle.doMove(critter, hex, false))
+            if (battle.testMove(critter, hex))
             {
-                val += critter.getPointValue(); 
+                val += critter.getPointValue();
             }
         }
         // Move them all back where they started.
@@ -2555,6 +2631,27 @@ debugln("got perfect score: " + score);
             critter.setCurrentHexLabel(hexLabel);
         }
         return val;
+    }
+
+    /** For an ArrayList of moveLists, which are ArrayLists of CritterMoves,
+     *  concatenate all the creature names in order.  If the list is null
+     *  or empty, return an empty String. */
+    private String creatureNames(ArrayList list)
+    {
+        if (list == null)
+        {
+            return "";
+        }
+        StringBuffer buf = new StringBuffer("");
+        Iterator it = list.iterator();
+        while (it.hasNext())
+        {
+            ArrayList moveList = (ArrayList)it.next();
+            CritterMove cm = (CritterMove)moveList.get(0);
+            Critter critter = cm.getCritter();
+            buf.append(critter.getName());
+        }
+        return buf.toString();
     }
 
     private static int evaluateCritterMove(Battle battle, Critter critter)
@@ -2790,6 +2887,79 @@ debugln("got perfect score: " + score);
         return value;
     }
 
+
+    /** Fliers should move last, since they can fly over allies.
+     *  Those moving far should move before those staying close to home.
+     *  Non-natives should move before natives, since natives can often
+     *     move through hexes that non-natives can't.
+     *  More important creatures should move before less important
+     *     creatures. */
+    final class MoveOrderComparator implements Comparator
+    {
+        private Battle battle;
+
+        public MoveOrderComparator(Battle battle)
+        {
+            this.battle = battle;
+        }
+
+        public int compare(Object o1, Object o2)
+        {
+            final BattleMap map = battle.getBattleMap();
+            final char terrain = battle.getTerrain();
+            final Legion legion = battle.getActiveLegion();
+
+            ArrayList moveList1 = (ArrayList)o1;
+            ArrayList moveList2 = (ArrayList)o2;
+            CritterMove cm1 = (CritterMove)moveList1.get(0);
+            CritterMove cm2 = (CritterMove)moveList2.get(0);
+            Critter critter1 = cm1.getCritter();
+            Critter critter2 = cm2.getCritter();
+            BattleHex desiredHex1 = cm1.getEndingHex(map);
+            BattleHex desiredHex2 = cm2.getEndingHex(map);
+
+            if (critter1.isFlier() && !critter2.isFlier())
+            {
+                return 1;
+            }
+            else if (critter2.isFlier() && !critter1.isFlier())
+            {
+                return -1;
+            }
+
+            int range1 = battle.getRange(critter1.getStartingHex(),
+                desiredHex1, true);
+            int range2 = battle.getRange(critter2.getStartingHex(),
+                desiredHex2, true);
+            int diff = range2 - range1;
+            if (diff != 0)
+            {
+                return diff;
+            }
+
+            if (MasterHex.isNativeCombatBonus(critter1, terrain) &&
+                !MasterHex.isNativeCombatBonus(critter2, terrain))
+            {
+                return 1;
+            }
+            else if (MasterHex.isNativeCombatBonus(critter2, terrain) &&
+                !MasterHex.isNativeCombatBonus(critter1, terrain))
+            {
+                return -1;
+            }
+
+            diff = getKillValue(critter2, terrain) -
+                getKillValue(critter1, terrain);
+            if (diff != 0)
+            {
+                return diff;
+            }
+            else
+            {
+                return critter1.getName().compareTo(critter2.getName());
+            }
+        }
+    }
 
     /** Sort critters in decreasing order of importance.  Keep
      *  identical creatures together with a secondary sort by

@@ -553,19 +553,20 @@ public final class MasterBoard extends JPanel implements MouseListener,
         playerMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(playerMenu);
 
-        addCheckBox(playerMenu, Options.autoPickMarker, KeyEvent.VK_M);
+        addCheckBox(playerMenu, Options.autoPickMarker, KeyEvent.VK_I);
         addCheckBox(playerMenu, Options.autoSplit, KeyEvent.VK_S);
-        addCheckBox(playerMenu, Options.autoMasterMove, KeyEvent.VK_A);
+        addCheckBox(playerMenu, Options.autoMasterMove, KeyEvent.VK_M);
         addCheckBox(playerMenu, Options.autoPickEntrySide, KeyEvent.VK_E);
         addCheckBox(playerMenu, Options.autoFlee, KeyEvent.VK_F);
         addCheckBox(playerMenu, Options.autoPickEngagement, KeyEvent.VK_N);
         addCheckBox(playerMenu, Options.autoBattleMove, KeyEvent.VK_B);
         addCheckBox(playerMenu, Options.autoForcedStrike, KeyEvent.VK_K);
         addCheckBox(playerMenu, Options.autoStrike, KeyEvent.VK_T);
+        addCheckBox(playerMenu, Options.autoAcquireAngels, KeyEvent.VK_A);
         addCheckBox(playerMenu, Options.autoRecruit, KeyEvent.VK_R);
-        addCheckBox(playerMenu, Options.autoPickRecruiter, KeyEvent.VK_P);
+        addCheckBox(playerMenu, Options.autoPickRecruiter, KeyEvent.VK_U);
         playerMenu.addSeparator();
-        addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_U);
+        addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_P);
 
         // Then per-client GUI options
         JMenu graphicsMenu = new JMenu("Graphics");

@@ -1,3 +1,5 @@
+import java.util.*;
+
 /** Class Options lists game options for Colossus.
  *  @version $Id$
  *  @author David Ripton
@@ -32,8 +34,35 @@ public final class Options
     public static final String autoBattleMove = "Auto battle move";
     public static final String autoForcedStrike = "Auto forced strike";
     public static final String autoStrike = "Auto strike";
+    public static final String autoAcquireAngels = "Auto acquire angels";
     public static final String autoRecruit = "Auto recruit";
     public static final String autoPickRecruiter = "Auto pick recruiter";
 
     public static final String autoPlay = "Auto play";
+
+    private static HashSet perPlayerSet = new HashSet();
+
+    static
+    {
+        perPlayerSet.add(autoPickMarker);
+        perPlayerSet.add(autoSplit);
+        perPlayerSet.add(autoMasterMove);
+        perPlayerSet.add(autoPickEntrySide);
+        perPlayerSet.add(autoPickEngagement);
+        perPlayerSet.add(autoFlee);
+        perPlayerSet.add(autoBattleMove);
+        perPlayerSet.add(autoForcedStrike);
+        perPlayerSet.add(autoStrike);
+        perPlayerSet.add(autoAcquireAngels);
+        perPlayerSet.add(autoRecruit);
+        perPlayerSet.add(autoPickRecruiter);
+
+        perPlayerSet.add(Options.autoPlay);
+    }
+
+
+    public static Set getPerPlayerOptions()
+    {
+        return perPlayerSet;
+    }
 }

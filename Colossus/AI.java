@@ -1,3 +1,5 @@
+import java.util.*;
+
 /**
  * interface to allow for multiple AI implementations
  *
@@ -39,4 +41,7 @@ public interface AI
 
     /** pick an engagement to resolve */
     String pickEngagement(Game game);
+
+    /** choose whether to acquire an angel or archangel */
+    String acquireAngel(Legion legion, ArrayList recruits, Game game);
 }

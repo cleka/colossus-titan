@@ -22,6 +22,8 @@ public final class Critter extends Creature implements Comparable
     private boolean carryFlag;
     private BattleChit chit;
     private Game game;
+    /** Used to uniquely compare critters after an AICopy */
+    private int tag;
 
 
     public Critter(Creature creature, boolean visible, String markerId,
@@ -48,18 +50,20 @@ public final class Critter extends Creature implements Comparable
         newCritter.hits = hits;
         newCritter.carryFlag = carryFlag;
         newCritter.chit = chit;
+        newCritter.tag = tag;
 
         return newCritter;
     }
 
 
     public void addBattleInfo(String currentHexLabel, String startingHexLabel,
-        BattleChit chit, Battle battle)
+        BattleChit chit, Battle battle, int tag)
     {
         this.currentHexLabel = currentHexLabel;
         this.startingHexLabel = startingHexLabel;
         this.chit = chit;
         this.battle = battle;
+        this.tag = tag;
     }
 
     public void setGame(Game game)
@@ -107,6 +111,11 @@ public final class Critter extends Creature implements Comparable
         return chit;
     }
 
+    int getTag()
+    {
+        return tag;
+    }
+
     /** Return only the base part of the image name for this critter. */
     public String getImageName(boolean inverted)
     {
@@ -127,23 +136,6 @@ public final class Critter extends Creature implements Comparable
     public String getDescription()
     {
         return getName() + " in " + getCurrentHex().getDescription();
-    }
-
-
-    /** A creature class is the creature name and the label of its
-     *  current BattleHex.  This is useful when doing AI battle moves,
-     *  since one offboard lion is identical to another. It also
-     *  prevents AICopy() problems since Strings are immutable. */
-    public String getCreatureClass()
-    {
-        if (currentHexLabel == null)
-        {
-            return getName();
-        }
-        else
-        {
-            return getName() + currentHexLabel;
-        }
     }
 
 

@@ -281,57 +281,66 @@ public final class Legion implements Comparable
 
     public void addPoints(int points)
     {
-        try
+        if (game == null)
         {
-            if (game == null)
-            {
-                return;
-            }
-            Player player = getPlayer();
-            player.addPoints(points);
-            JFrame masterFrame = game.getBoard().getFrame();
-            if (masterFrame.getState() == JFrame.ICONIFIED)
-            {
-                masterFrame.setState(JFrame.NORMAL);
-            }
-            int score = player.getScore();
-            int tmpScore = score;
+            return;
+        }
+        Player player = getPlayer();
+        player.addPoints(points);
+        int score = player.getScore();
+        int tmpScore = score;
 
-            // It's practically impossible to get more than one archangel
-            // from a single battle.
-            boolean didArchangel = false;
+        // It's practically impossible to get more than one archangel
+        // from a single battle.
+        boolean didArchangel = false;
 
-            ArrayList recruits;
+        ArrayList recruits;
 
-            while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
+        while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
+        {
+            recruits = game.findEligibleAngels(this, tmpScore / 500 >
+                (score - points) / 500 && !didArchangel);
+            String angelType = acquireAngel(recruits);
+            tmpScore -= 100;
+            if (angelType != null && recruits.contains(angelType))
             {
-                recruits = game.findEligibleAngels(this, tmpScore / 500 >
-                    (score - points) / 500 && !didArchangel);
-                String type = AcquireAngel.acquireAngel(masterFrame,
-                    player.getName(), recruits);
-                tmpScore -= 100;
-                if (type != null && recruits.contains(type))
+                Creature angel = Creature.getCreatureByName(angelType);
+                if (angel != null)
                 {
-                    Creature angel = Creature.getCreatureByName(type);
-                    if (angel != null)
+                    addCreature(angel, true);
+                    Game.logEvent("Legion " + getLongMarkerName() +
+                        " acquires an " + angelType);
+                    if (angelType.equals("Archangel"))
                     {
-                        addCreature(angel, true);
-                        Game.logEvent("Legion " + getLongMarkerName() +
-                            " acquires an " + type);
-                        if (type.equals("Archangel"))
-                        {
-                            didArchangel = true;
-                        }
+                        didArchangel = true;
                     }
                 }
             }
         }
-        catch (NullPointerException e)
+    }
+
+
+    /** recruits holds the types of angels can can acquire. */
+    private String acquireAngel(ArrayList recruits)
+    {
+        Player player = getPlayer();
+        String angelType = null;
+        if (player.getOption(Options.autoAcquireAngels))
         {
-            // If we're testing battles with player or game or board
-            // null, don't crash.
-            Game.logError(e.toString());
+            angelType = player.aiAcquireAngel(this, recruits, game);
         }
+        else
+        {
+            // Make sure the board is visible.
+            JFrame masterFrame = game.getMasterFrame();
+            if (masterFrame.getState() == JFrame.ICONIFIED)
+            {
+                masterFrame.setState(JFrame.NORMAL);
+            }
+            angelType = AcquireAngel.acquireAngel(masterFrame,
+                playerName, recruits);
+        }
+        return angelType;
     }
 
 
@@ -356,7 +365,7 @@ public final class Legion implements Comparable
         {
             Critter critter = (Critter)it.next();
             critter.heal();
-            critter.addBattleInfo(null, null, null, null);
+            critter.addBattleInfo(null, null, null, null, -1);
         }
     }
 
@@ -1036,20 +1045,14 @@ public final class Legion implements Comparable
         critter.setMarkerId(markerId);
     }
 
-    /** Return the first critter with a matching creatureClass:
-     *  name + currentHexLabel */
-    public Critter getCritterByCreatureClass(String creatureClass)
+    /** Return the first critter with a matching tag. */
+    public Critter getCritterByTag(int tag)
     {
-        int len = creatureClass.length();
-        String name = creatureClass.substring(0, len - 2);
-        String hexLabel = creatureClass.substring(len - 2);
-
         Iterator it = critters.iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (name.equals(critter.getName()) && hexLabel.equals(
-                critter.getCurrentHexLabel()))
+            if (tag == critter.getTag())
             {
                 return critter;
             }
@@ -1111,7 +1114,7 @@ public final class Legion implements Comparable
         // Sanity check
         if (legion == this)
         {
-            Game.logDebug("Tried to recombine a legion with itself!");
+            Game.logWarn("Tried to recombine a legion with itself!");
             return;
         }
         Iterator it = critters.iterator();
@@ -1166,7 +1169,7 @@ public final class Legion implements Comparable
 
         player.selectMarkerId(newMarkerId);
         Legion newLegion = Legion.getEmptyLegion(newMarkerId, markerId,
-            currentHexLabel, player.getName(), game);
+            currentHexLabel, playerName, game);
 
         Iterator it = creatures.iterator();
         while (it.hasNext())
