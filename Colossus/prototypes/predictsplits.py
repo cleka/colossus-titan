@@ -32,6 +32,7 @@ def superset(big, little):
     return True
 
 def subtractLists(big, little):
+    assert superset(big, little)
     li = big[:]
     for el in little:
         li.remove(el)
@@ -44,14 +45,6 @@ def numCreature(li, creatureName):
             count += 1
     return count
 
-def removeCreatureByName(li, creatureName):
-    """Remove the first CreatureInfo matching the passed name.
-       Return True if found, False if not."""
-    for ci in li:
-        if ci.name == creatureName:
-            li.remove(ci)
-            return True
-    return False
 
 def getCreatureInfo(li, creatureName):
     """Return the first CreatureInfo that matches the passed name."""
@@ -166,8 +159,6 @@ class CreatureInfo:
         return self.name
 
 
-
-
 class Node:
     def __init__(self, markerId, turnCreated, creatures, parent):
         self.markerId = markerId        # Not unique!
@@ -227,7 +218,7 @@ class Node:
             return self.child2
         elif child == self.child2:
             return self.child1
-        raise RuntimeError, "Not my child in Node.getOtherChild()"
+        raise RuntimeError, "Not my child in Node.getOtherChild"
 
     def getOtherChildMarkerId(self):
         if self.child1.markerId != self.markerId:
@@ -235,12 +226,13 @@ class Node:
         else:
             return self.child2.markerId
 
-    def getCreatureNames(self):
-        return [ci.name for ci in self.creatures]
+    def getSibling(self):
+        if self.parent is None:
+            return None
+        return self.parent.getOtherChild(self)
 
     def getHeight(self):
         return len(self.creatures)
-
 
     def revealCreatures(self, cnl):
         """cnl is a list of creature names"""
@@ -301,10 +293,10 @@ class Node:
             removeLastUncertainCreature(self.creatures)
         print " end revealCreatures", self
         if self.parent is not None:
-            self.parent.tellChildContents(self)
+            self.parent._updateChildContents()
 
 
-    def childCreaturesMatch(self):
+    def _childCreaturesMatch(self):
         """Return True if creatures in children are consistent with self."""
         if self.child1 is None:
             assert self.child2 is None
@@ -312,19 +304,18 @@ class Node:
         all = (self.child1.getAtSplitCreatures() + self.child1.removed +
                 self.child2.getAtSplitCreatures() + self.child2.removed)
         for ci in all:
-            if numCreature(all, ci.name) != numCreature(
-                    self.creatures, ci.name):
+            if numCreature(all, ci.name) != numCreature(self.creatures, 
+              ci.name):
                 return False
         return True
 
-
-    def isLegalInitialSplitoff(self):
+    def _isLegalInitialSplitoff(self):
         if self.getHeight() != 4:
             return False
-        names = self.getCreatureNames()
+        names = getCreatureNames(self.creatures)
         return (names.count("Titan") + names.count("Angel") == 1)
 
-    def findAllPossibleSplits(self, childSize, knownKeep, knownSplit):
+    def _findAllPossibleSplits(self, childSize, knownKeep, knownSplit):
         """ Return a list of all legal combinations of splitoffs. """
         # Sanity checks
         if len(knownSplit) > childSize:
@@ -335,16 +326,16 @@ class Node:
         elif len(creatures) == 8:
             if childSize != 4:
                 raise RuntimeError, "Illegal initial split"
-            if not "Titan" in self.getCreatureNames():
+            if not "Titan" in getCreatureNames(self.creatures):
                 raise RuntimeError, "No titan in 8-high legion"
-            if not "Angel" in self.getCreatureNames():
+            if not "Angel" in getCreatureNames(self.creatures):
                 raise RuntimeError, "No angel in 8-high legion"
 
         knownCombo = knownSplit + knownKeep
         if not superset(creatures, knownCombo):
             print " Known creatures not in parent legion"
             self.revealCreatures(getCreatureNames(knownCombo))
-            return self.findAllPossibleSplits(childSize, knownKeep, knownSplit)
+            return self._findAllPossibleSplits(childSize, knownKeep, knownSplit)
 
         unknowns = copy.deepcopy(creatures)
         for ci in knownCombo:
@@ -362,15 +353,15 @@ class Node:
                 possibleSplits.append(pos)
             else:
                 posnode = Node(None, None, pos, self)
-                if posnode.isLegalInitialSplitoff():
+                if posnode._isLegalInitialSplitoff():
                     possibleSplits.append(pos)
         return possibleSplits
 
 
-    def chooseCreaturesToSplitOut(self, pos):
+    def _chooseCreaturesToSplitOut(self, pos):
         """Decide how to split this legion, and return a list of Creatures to
         remove.  Return null on error."""
-        print "chooseCreaturesToSplitOut for", self, pos
+        print "_chooseCreaturesToSplitOut for", self, pos
         maximize = (2 * len(pos[0]) > self.getHeight())
 
         bestKillValue = None
@@ -409,8 +400,8 @@ class Node:
         print " knownSplit is", knownSplit
         print " knownKeep is", knownKeep
 
-        pos = self.findAllPossibleSplits(childSize, knownKeep, knownSplit)
-        splitoffCreatures = self.chooseCreaturesToSplitOut(pos)
+        pos = self._findAllPossibleSplits(childSize, knownKeep, knownSplit)
+        splitoffCreatures = self._chooseCreaturesToSplitOut(pos)
         print " splitoffCreatures is", splitoffCreatures
 
         splitoffNames = getCreatureNames(splitoffCreatures)
@@ -523,6 +514,13 @@ class Node:
             assert self.childSize2 == 0
             self.childSize1 = self.child1.getHeight()
             self.childSize2 = self.child2.getHeight()
+
+        print " child1:", self.child1
+        print " child2:", self.child2
+
+        self.child1._updateParentContents()
+        self.child2._updateParentContents()
+
         print " child1:", self.child1
         print " child2:", self.child2
 
@@ -550,17 +548,25 @@ class Node:
               self.markerId, turn)
 
 
-    def tellChildContents(self, child):
-        """ Tell this parent legion the known contents of one of its children.
-        """
-
-        print "tellChildContents for node", self, "from node", child
-
-        self.revealCreatures(getCreatureNames(
-          child.getCertainAtSplitCreatures()))
-
+    def _updateChildContents(self):
+        """Tell this parent legion the updated contents of its children."""
+        print "_updateChildContents for node", self
+        for child in [self.child1, self.child2]:
+            self.revealCreatures(getCreatureNames(
+              child.getCertainAtSplitCreatures()))
         # XXX Resplitting "too often" fixes some certainty issues.
         self.split(self.childSize2, self.getOtherChildMarkerId())
+
+    def _updateParentContents(self):
+        """Tell this child legion the updated known contents of its parent."""
+        print "_updateParentContents for node", self
+        if (self.parent.allCertain() and self.getSibling().allCertain() and
+          not self.allCertain()):
+            self.revealCreatures(subtractLists(getCreatureNames(self.parent.creatures), 
+              getCreatureNames(self.getSibling().getAtSplitCreatures())))
+        if self.child1 is not None:
+            self.child1._updateParentContents()
+            self.child2._updateParentContents()
 
 
     def addCreature(self, creatureName):
@@ -582,7 +588,7 @@ class Node:
         # predictions if it was here at the time of the split.
         if ci.atSplit:
             self.removed.append(ci)
-        removeCreatureByName(self.creatures, creatureName)
+        self.creatures.remove(ci)
 
     def removeCreatures(self, creatureNames):
         self.revealCreatures(creatureNames)
@@ -660,3 +666,4 @@ class PredictSplits:
             if leaf.markerId == markerId:
                 return leaf
         return None
+
