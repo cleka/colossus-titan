@@ -2,15 +2,28 @@ README for Colossus Undead Variant
 
 The Undead variant was contributed by OdysseasX Hal.
 
-The overall feel is more and bigger creatures on a standard-sized board.
+The overall feel is bigger and more varied creatures on a 
+standard-sized board.
 
-Brush and Jungle are replaced with Ruins and Tombs.  Many creatures
-are replaced with undead.  There are several large dragons atop the
-recruiting tree, which is otherwise similar to ExtTitan's.
+Brush and Jungle are replaced with Ruins and Tombs.  Many 
+creatures are replaced with undead.  There are several large 
+dragons atop the recruiting tree, which is otherwise similar 
+to ExtTitan's.
 
-Titans get bigger every 75 points.  Titan teleport comes at 700 points.
-Archangels are earned every 300 points.  Elementals, Necromancers,
-and The Reaper can be acquired instead of angels after winning engagements
-in certain terrain types.
+Titans get bigger every 75 points.  Titan teleport comes at 
+700 points.  Archangels are earned every 300 points.  
+Elementals, Necromancers, and The Reaper can be acquired 
+(instead of angels / archangels) after winning engagements in 
+certain terrain types, as follows:
+
+Type         Terrain       Points
+---------------------------------
+Air          Woods         100
+Earth        Hills         100
+Fire         Desert        100
+Water        Swamp         100
+Necromancer  Tower         100
+TheReaper    Tower         300
+
 
 File Version: $Header$
