@@ -13,11 +13,11 @@ import java.util.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.client.MasterHex;
-import net.sf.colossus.client.GUIMasterHex;
 
 /**
  * StrategicMapLoader load the description of the MasterBoard.
  * @author Romain Dolbeau
+ * @author David Ripton
  * @version $Id$
  * @see net.sf.colossus.client.MasterHex
  */
@@ -119,8 +119,7 @@ int c_way() :
  * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
  * @see net.sf.colossus.client.MasterHex
  */
-int oneCase(MasterHex [][] array, java.util.List list, boolean [][] show, 
-    boolean isGUI) :
+int oneCase(MasterHex [][] array, java.util.List list, boolean [][] show) :
 {
     String s;
     char ter;
@@ -144,14 +143,8 @@ int oneCase(MasterHex [][] array, java.util.List list, boolean [][] show,
         Log.debug("Adding case #" + p + " @(" + posX + "," + posY +
             "), type " + ter + " with exit : " +
             s1 + ", " + s2 + ", " + s3);
-        if (isGUI)
-        {
-            array[posX][posY] = new GUIMasterHex();
-        }
-        else
-        {
-            array[posX][posY] = new MasterHex();
-        }
+
+        array[posX][posY] = new MasterHex();
         show[posX][posY] = true;
         list.add(array[posX][posY]);
 

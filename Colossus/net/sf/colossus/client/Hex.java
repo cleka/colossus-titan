@@ -124,6 +124,11 @@ public abstract class Hex
         selected = false;
     }
 
+    public void setSelected(boolean selected)
+    {
+        this.selected = selected;
+    }
+
     public boolean isSelected()
     {
         return selected;

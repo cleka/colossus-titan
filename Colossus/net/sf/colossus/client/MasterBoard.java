@@ -113,7 +113,8 @@ public final class MasterBoard extends JPanel
     private static StrategicMapLoader sml = null;
 
 
-    /** Must ensure that variant is loaded before referencing this class. */
+    /** Must ensure that variant is loaded before referencing this class,
+     *  since readMapData() needs it. */
     static
     {
 Log.debug("Called MasterBoard static initializer");
@@ -126,9 +127,7 @@ Log.debug("Called MasterBoard static initializer");
             Log.error("Reading map data for non-GUI failed : " + e);
             System.exit(1);
         }
-        plainHexArray = new MasterHex[horizSize][vertSize];
-        plainHexList = new ArrayList(horizSize * vertSize);
-        setupHexesGameState(plainHexArray, plainHexList, false);
+        setupPlainHexes();
         setupTowerSet();
     }
 
@@ -653,44 +652,22 @@ Log.debug("Called MasterBoard constructor");
     }
 
 
-    private synchronized void setupGUIHexes()
+    private void setupGUIHexes()
     {
-        try
-        {
-            // Shouldn't need to do this twice, but sml is stateful.
-            readMapData();
-        }
-        catch (Exception e) 
-        {
-            Log.error("Reading map data for GUI failed : " + e);
-            System.exit(1);
-        }
         guiHexArray = new GUIMasterHex[horizSize][vertSize];
-        guiHexList = new ArrayList(horizSize * vertSize);
-        setupHexesGameState(guiHexArray, guiHexList, true);
-        setupHexesGUI();
-    }
-
-    private void setupHexesGUI()
-    {
-        // For easy of mapping to the GUI, they'll initially be stored
-        // in a horizSize*vertSize array, with some empty elements.
-        // For ease of iterating through all hexes, they'll then be
-        // stored in a List.
+        guiHexList = new ArrayList(plainHexList.size());
 
         int scale = Scale.get();
-
         int cx = 3 * scale;
         int cy = 0 * scale;
 
-        // Initialize hexes.
         for (int i = 0; i < guiHexArray.length; i++)
         {
             for (int j = 0; j < guiHexArray[0].length; j++)
             {
                 if (show[i][j])
                 {
-                    GUIMasterHex hex = guiHexArray[i][j]; 
+                    GUIMasterHex hex = new GUIMasterHex(plainHexArray[i][j]);
                     hex.init(
                         cx + 4 * i * scale,
                         (int) Math.round(cy + (3 * j + ((i + boardParity) & 1) 
@@ -699,12 +676,12 @@ Log.debug("Called MasterBoard constructor");
                         scale,
                         isHexInverted(i, j),
                         this);
-
-                    hex.setXCoord(i);
-                    hex.setYCoord(j);
+                    guiHexArray[i][j] = hex;
+                    guiHexList.add(hex);
                 }
             }
         }
+        setupNeighbors(guiHexArray);
     }
 
 
@@ -763,12 +740,20 @@ Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
 
     /** Add terrain types, id labels, label sides, and exits to hexes.
      *  Side effects on passed list. */
-    private static synchronized void setupHexesGameState(
-        final MasterHex [][] array, final java.util.List list, boolean isGUI)
+    private static synchronized void setupPlainHexes()
     {
+        plainHexArray = new MasterHex[horizSize][vertSize];
+        plainHexList = new ArrayList(horizSize * vertSize);
+        for (int i = 0; i < show.length; i++)
+        {
+            for (int j = 0; j < show[i].length; j++)
+            {
+                show[i][j] = false;
+            }
+        }
         try
         {
-            setupHexArray(array, list, isGUI);
+            while (sml.oneCase(plainHexArray, plainHexList, show) >= 0) {}
         }
         catch (Exception e) 
         {
@@ -777,26 +762,12 @@ Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
         }
 
         computeBoardParity();
-        setupExits(array);
-        setupEntrances(array);
-        setupHexLabelSides(array);
-        setupNeighbors(array);
+        setupExits(plainHexArray);
+        setupEntrances(plainHexArray);
+        setupHexLabelSides(plainHexArray);
+        setupNeighbors(plainHexArray);
     }
 
-    /** Side effects on array, list, and show. */
-    private static void setupHexArray(final MasterHex [][] array, 
-        final java.util.List list, final boolean isGUI) throws ParseException
-    {
-        list.clear();
-        for (int i = 0; i < show.length; i++)
-        {
-            for (int j = 0; j < show[i].length; j++)
-            {
-                show[i][j] = false;
-            }
-        }
-        while (sml.oneCase(array, list, show, isGUI) >= 0) {}
-    }
 
     private static void computeBoardParity()
     {
@@ -1962,7 +1933,7 @@ Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
 
     void rescale()
     {
-        setupHexesGUI();
+        setupGUIHexes();
         client.recreateMarkers();
         setSize(getPreferredSize());
         masterFrame.pack();

@@ -54,9 +54,33 @@ public final class GUIMasterHex extends MasterHex
     // Use two-stage initialization so that we can clone the GUIMasterHex
     // from an existing MasterHex, then add the GUI info.
 
-    public GUIMasterHex()
+    GUIMasterHex()
     {
         super();
+    }
+
+    /** Create a near-clone of the passed MasterHex.  Need to call
+     *  init to setup GUI values, and need to setup neighbors. */
+    GUIMasterHex(MasterHex mh)
+    {
+        super();
+
+        setSelected(mh.isSelected());
+        setTerrain(mh.getTerrain());
+        setXCoord(mh.getXCoord());
+        setYCoord(mh.getYCoord());
+        setLabel(mh.getLabel());
+        setLabelSide(mh.getLabelSide());
+        for (int i = 0; i < 6; i++)
+        {
+            setEntranceType(i, mh.getEntranceType(i));
+            setExitType(i, mh.getExitType(i));
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            setBaseExitType(i, mh.getBaseExitType(i));
+            setBaseExitLabel(i, mh.getBaseExitLabel(i));
+        }
     }
 
     void init(int cx, int cy, int scale, boolean inverted, MasterBoard board)
