@@ -1,0 +1,16 @@
+# $Id$
+
+# just put a load of drift anywhere but the defense/attack entry
+
+AREA (inside) HAZARDS d d d d,25. d,25. d,25. d,25. d,25. d,25.
+AREA (leftdefenseentry) HAZARDS d,80.
+AREA (upperdefenseentry) HAZARDS d,80.
+AREA (lowerdefenseentry) HAZARDS d,80.
+
+LABEL smallrightattackentry=F2 F3
+LABEL smallupperattackentry=B4 C5
+LABEL smalllowerattackentry=B1 C1
+
+AREA (smallrightattackentry) HAZARDS d,80.
+AREA (smallupperattackentry) HAZARDS d,80.
+AREA (smalllowerattackentry) HAZARDS d,80.
