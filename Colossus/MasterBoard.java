@@ -88,6 +88,8 @@ class MasterBoard extends JFrame implements MouseListener,
         // Initialize the hexmap.
         setupHexes();
 
+        // This initialization needs to be skipped if we loaded a
+        // game rather than starting a new one.
         if (newgame)
         {
             // Each player needs to pick his first legion marker.
@@ -128,12 +130,6 @@ class MasterBoard extends JFrame implements MouseListener,
                 hex.addLegion(legion);
             }
         }
-        else
-        {
-            // XXX loaded game
-            System.out.println("loaded game");
-
-        }
 
         // Update status window to reflect new legions.
         game.updateStatusScreen();
@@ -159,8 +155,34 @@ class MasterBoard extends JFrame implements MouseListener,
         }
 
         imagesLoaded = true;
+
+        if (newgame)
+        {
+            finishInit(true);
+        }
+    }
+
+
+    // These steps need to be delayed if we're loading a game. 
+    public void finishInit(boolean newgame)
+    {
         setVisible(true);
         repaint();
+            
+        if (!newgame)
+        {
+            // Move all legions into their hexes.
+            for (int i = 0; i < game.getNumPlayers(); i++)
+            {
+                Player player = game.getPlayer(i);
+                for (int j = 0; j < player.getNumLegions(); j++)
+                {
+                    Legion legion = player.getLegion(j);
+                    MasterHex hex = legion.getCurrentHex();
+                    hex.addLegion(legion);
+                }
+            }
+        }
 
         turn = new Turn(this, game, this);
     }
@@ -168,7 +190,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
     // Do a brute-force search through the hex array, looking for
     //    a match.  Return the hex.
-    private MasterHex getHexFromLabel(int label)
+    public MasterHex getHexFromLabel(int label)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -182,6 +204,7 @@ class MasterBoard extends JFrame implements MouseListener,
         }
 
         // Error, so return a bogus hex.
+        System.out.println("Could not find hex " + label);
         return new MasterHex(-1, -1, -1, false, null);
     }
 
@@ -1196,16 +1219,8 @@ class MasterBoard extends JFrame implements MouseListener,
 
     public void deiconify()
     {
-        // This is only supported in JDK 1.2+, so it's important to 
-        // catch the exception under JDK 1.1
-        try
-        {
-            setState(Frame.NORMAL);
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.toString());
-        }
+        // XXX - Need to find a way to call this only under 1.2+.
+        // setState(Frame.NORMAL);
     }
 
 
