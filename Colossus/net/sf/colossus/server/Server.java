@@ -39,6 +39,9 @@ public final class Server implements IServer
     /** Number of remote clients we're waiting for. */
     private int waitingForClients;
 
+    /** Server socket port. */
+    private int port;
+
     // Cached strike information.
     Critter striker;
     Critter target;
@@ -48,15 +51,16 @@ public final class Server implements IServer
 
 
 
-    Server(Game game)
+    Server(Game game, int port)
     {
         this.game = game;
+        this.port = port;
         waitingForClients = game.getNumPlayers();
     }
 
     void initSocketServer() 
     {
-        new SocketServer(this, Constants.defaultPort, game.getNumPlayers());
+        new SocketServer(this, port, game.getNumPlayers());
     }
 
     /** Each server thread's name is set to its player's name. */
@@ -72,7 +76,8 @@ public final class Server implements IServer
 
     private boolean isBattleActivePlayer()
     {
-        return getPlayerName().equals(game.getBattle().getActivePlayerName());
+        return game.getBattle() != null &&
+            getPlayerName().equals(game.getBattle().getActivePlayerName());
     }
 
 
@@ -94,8 +99,8 @@ Log.debug("Called Server.addLocalClients()");
     {
 Log.debug("Called Server.addLocalClient() for " + playerName);
 
-        IClient client = new Client("localhost", Constants.defaultPort, 
-            playerName, false);
+        IClient client = new Client(Constants.localhost, port, playerName, 
+            false);
         clients.add(client);
         clientMap.put(playerName, client);
         waitingForClients--;

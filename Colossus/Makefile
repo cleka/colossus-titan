@@ -18,7 +18,6 @@
 
 #JCC = jikes -g -depend -deprecation +P
 JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.3
-RMIC= rmic
 #JCC = kjc -g --deprecation --warning
 
 
@@ -78,9 +77,6 @@ jar : $(JARFILE)
 version : classes
 	echo `date +%Y%m%d` > version
 
-rmi:	net/sf/colossus/client/Client.class net/sf/colossus/server/Server.class
-	$(RMIC) $(subst /,.,$(basename $^))
-
 
 # Create jar file
 $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
@@ -88,8 +84,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	net/sf/colossus/parser/CreatureLoader.java \
 	net/sf/colossus/parser/BattlelandLoader.java \
 	net/sf/colossus/parser/VariantLoader.java \
-	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF version \
-	rmi
+	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF version 
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
         net/sf/colossus/client/*.class net/sf/colossus/server/*.class \
         net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \

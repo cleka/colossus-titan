@@ -120,6 +120,7 @@ public final class Client implements IClient
     private Strike strike = new Strike(this);
 
     private boolean remote;
+    private SocketClientThread sct; 
 
 
     public Client(String host, int port, String playerName, boolean remote)
@@ -133,8 +134,9 @@ public final class Client implements IClient
         // Need to load options early so they don't overwrite server options.
         loadOptions();
 
-        SocketClient socketClient = new SocketClient(this, host, port);
-        this.server = (IServer)socketClient;
+        sct = new SocketClientThread(this, host, port);
+        this.server = (IServer)sct;
+        sct.start();
     }
 
     public boolean isRemote()
@@ -641,6 +643,10 @@ public final class Client implements IClient
         disposeMovementDie();
         disposeStatusScreen();
         disposeMasterBoard();
+        if (isRemote())
+        {
+            System.exit(0);
+        }
     }
 
 
@@ -1027,6 +1033,7 @@ public final class Client implements IClient
     public void setPlayerName(String playerName)
     {
         this.playerName = playerName;
+        sct.setName("Client " + playerName);
     }
 
 
@@ -2286,7 +2293,6 @@ public final class Client implements IClient
      * public for client-side AI -- do not call from server side. */
     public Set findSummonableAngelHexes(String summonerId)
     {
-Log.debug("Called Client.findSummonableAngelHexes for " + summonerId);
         Set set = new HashSet();
         LegionInfo summonerInfo = getLegionInfo(summonerId);
         String playerName = summonerInfo.getPlayerName();
@@ -2294,10 +2300,8 @@ Log.debug("Called Client.findSummonableAngelHexes for " + summonerId);
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-Log.debug("checking " + markerId);
             if (!markerId.equals(summonerId))
             {
-Log.debug(markerId + " not the same as summoner");
                 LegionInfo info = getLegionInfo(markerId);
                 if (info.hasSummonable() && !(info.isEngaged()))
                 {
@@ -2305,7 +2309,6 @@ Log.debug(markerId + " not the same as summoner");
                 }
             }
         }
-Log.debug("found " + set.size() + " hexes");
         return set;
     }
 

@@ -326,7 +326,7 @@ Log.debug("Called Player.setType() for " + name + " " + type);
             Legion legion = (Legion)it.next();
             if (legion.getHeight() == 0)
             {
-                if (donorId.equals(legion.getMarkerId()))
+                if (donorId != null && donorId.equals(legion.getMarkerId()))
                 {
                     donorId = null;
                 }

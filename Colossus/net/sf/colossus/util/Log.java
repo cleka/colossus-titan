@@ -133,10 +133,13 @@ public final class Log
     {
         boolean wasToWindow = isToWindow();
         setToWindow(false);
+        boolean wasToRemote = isToRemote();
+        setToRemote(false);
         if (showDebug)
         {
             out(s.trim());
         }
         setToWindow(wasToWindow);
+        setToRemote(wasToRemote);
     }
 }

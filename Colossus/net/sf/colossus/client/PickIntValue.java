@@ -14,7 +14,7 @@ import net.sf.colossus.util.KDialog;
  *  @author David Ripton
  */
 
-final class PickIntValue extends KDialog implements WindowListener,
+public final class PickIntValue extends KDialog implements WindowListener,
     ChangeListener, ActionListener
 {
     private static int newValue;
@@ -66,8 +66,8 @@ final class PickIntValue extends KDialog implements WindowListener,
 
     /** Return the new value if the user accepted it, or oldValue if
      *  user cancelled the dialog. */
-    static int pickIntValue(JFrame parentFrame, int oldValue, String title,
-        int min, int max)
+    public static int pickIntValue(JFrame parentFrame, int oldValue, 
+        String title, int min, int max)
     {
         new PickIntValue(parentFrame, oldValue, title, min, max);
         return newValue;

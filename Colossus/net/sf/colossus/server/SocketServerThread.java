@@ -9,7 +9,6 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.client.IClient;
-import net.sf.colossus.client.Proposal;    // XXX
 
 /**
  *  Thread to handle one client connection.
@@ -68,7 +67,17 @@ final class SocketServerThread extends Thread implements IClient
         {
             Log.error(ex.toString());
         }
-        // XXX Shutdown client then close socket.
+
+        // Shut down the client.
+        dispose();
+        try
+        {
+            socket.close();
+        }
+        catch (IOException ex)
+        {
+            Log.error(ex.toString());
+        }
     }
 
 
@@ -114,7 +123,7 @@ final class SocketServerThread extends Thread implements IClient
         }
         else if (method.equals(Constants.makeForcedStrikes))
         {
-            boolean rangestrike = 
+            boolean rangestrike =
                 Boolean.valueOf((String)args.remove(0)).booleanValue();
             server.makeForcedStrikes(rangestrike);
             return;

@@ -1,4 +1,4 @@
-package net.sf.colossus.client;
+package net.sf.colossus.server;
 
 
 import java.awt.*;
@@ -12,8 +12,8 @@ import java.util.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.SaveGameFilter;
+import net.sf.colossus.client.VariantSupport;
+import net.sf.colossus.client.PickIntValue;
 
 /**
  * Class GetPlayers is a dialog used to enter players' names, types, variant, etc. 
@@ -26,10 +26,7 @@ import net.sf.colossus.server.SaveGameFilter;
 public final class GetPlayers extends KDialog implements WindowListener,
     ActionListener, ItemListener
 {
-    public static final String newGame = "New Game";
-    public static final String loadGame = "Load Game";
     public static final String loadVariant = "Load External Variant";
-    public static final String quit = "Quit";
 
     private JFrame parentFrame;
 
@@ -70,15 +67,15 @@ public final class GetPlayers extends KDialog implements WindowListener,
         gamePane.setLayout(new GridLayout(0, 3));
         contentPane.add(gamePane);
         
-        JButton button1 = new JButton(newGame);
+        JButton button1 = new JButton(Constants.newGame);
         button1.setMnemonic(KeyEvent.VK_N);
         gamePane.add(button1);
         button1.addActionListener(this);
-        JButton button2 = new JButton(loadGame);
+        JButton button2 = new JButton(Constants.loadGame);
         button2.setMnemonic(KeyEvent.VK_L);
         gamePane.add(button2);
         button2.addActionListener(this);
-        JButton button3 = new JButton(quit);
+        JButton button3 = new JButton(Constants.quit);
         button3.setMnemonic(KeyEvent.VK_Q);
         gamePane.add(button3);
         button3.addActionListener(this);
@@ -302,7 +299,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             options.clearPlayerInfo();
             // Set key to "load game" and value to savegame filename.
-            options.setOption(loadGame, chooser.getSelectedFile().getName());
+            options.setOption(Constants.loadGame, 
+                chooser.getSelectedFile().getName());
             dispose();
         }
     }
@@ -311,6 +309,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     public void windowClosing(WindowEvent e)
     {
         dispose();
+        System.exit(0);
     }
 
 
@@ -362,16 +361,17 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     public synchronized void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand().equals(quit))
+        if (e.getActionCommand().equals(Constants.quit))
         {
             options.clear();
             dispose();
+            System.exit(0);
         }
-        else if (e.getActionCommand().equals(newGame))
+        else if (e.getActionCommand().equals(Constants.newGame))
         {
             validateInputs();
         }
-        else if (e.getActionCommand().equals(loadGame))
+        else if (e.getActionCommand().equals(Constants.loadGame))
         {
             doLoadGame();
         }

@@ -39,13 +39,13 @@ prefer, you can use command-line options instead.  ``\texttt{run -h}''
 to see them.
 
 Each client needs to wait for the server to be started, then run
-the runclient script.  It takes two arguments.  -p playername and
--s server host name.  The player name will default to your OS user
-name if you don't specify one.  The server host will default to the
-local machine, which probably isn't what you want unless you're doing
-loopback testing.  So you'll want to run it like
-``\texttt{runclient -s hostname}''
-You can use the IP address instead of the hostname if you prefer.
+the runclient script.  It will pop up a dialog that lets you enter
+a player name, hostname, and port.  The player name will default to 
+your OS user name.  The server host will default to the local machine, 
+which probably isn't what you want unless you're doing loopback testing.  
+You can use the IP address instead of the hostname if you prefer.  Most
+servers will use the default port.  Again, you can use command-line 
+options instead.  ``\texttt{runclient -h}'' to see them.
 
 Once all the clients have connected, then the game should start up like
 a normal Colossus game.  When the game ends, kill all the clients and
@@ -63,10 +63,10 @@ your favorite IRC or instant messenger client in the background.
 
 \item[A] We changed from RMI to simple sockets, so the game should be
 much more firewall-friendly.  The server accepts connections from 
-clients on port 1969, and piggybacks return traffic on the same sockets
+clients on one port, and piggybacks return traffic on the same sockets
 rather than opening more.  So as long as the client machines have the
-ability to connect out to high ports, and the server machine has inbound
-port 1969 open, it should work.
+ability to connect out to high ports, and the server machine has one
+inbound port open, it should work.
 
 \end{itemize}
 

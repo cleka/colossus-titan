@@ -56,11 +56,7 @@ public final class MasterBoard extends JPanel
     private Container contentPane;
     private JLabel playerLabel;
 
-    public static final String newGame = "New game";
-    public static final String loadGame = "Load game";
-    public static final String saveGame = "Save game";
     public static final String saveGameAs = "Save game as";
-    public static final String quitGame = "Quit game";
 
     public static final String clearRecruitChits = "Clear recruit chits";
 
@@ -329,7 +325,7 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        newGameAction = new AbstractAction(newGame)
+        newGameAction = new AbstractAction(Constants.newGame)
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -354,7 +350,7 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        loadGameAction = new AbstractAction(loadGame)
+        loadGameAction = new AbstractAction(Constants.loadGame)
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -370,7 +366,7 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        saveGameAction = new AbstractAction(saveGame)
+        saveGameAction = new AbstractAction(Constants.saveGame)
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -401,7 +397,7 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        quitGameAction = new AbstractAction(quitGame)
+        quitGameAction = new AbstractAction(Constants.quit)
         {
             public void actionPerformed(ActionEvent e)
             {

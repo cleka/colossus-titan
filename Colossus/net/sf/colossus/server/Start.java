@@ -41,12 +41,13 @@ public final class Start
             opts.addOption('h', "help", false, "Show options help");
             opts.addOption('l', "load", true, "Load savegame");
             opts.addOption('z', "latest", false, "Load latest savegame");
-            opts.addOption('s', "start", false, "Start new game immediately");
+            opts.addOption('g', "go", false, "Start new game immediately");
             opts.addOption('v', "variant", true, "Set variant");
             opts.addOption('u', "nhuman", true, "Number of humans");
             opts.addOption('i', "nai", true, "Number of SimpleAIs");
             opts.addOption('n', "nnetwork", true, "Number of network slots");
             opts.addOption('q', "quit", false, "Quit JVM when game ends");
+            opts.addOption('p', "port", true, "Server port number");
 
             cl = opts.parse(args);
         }

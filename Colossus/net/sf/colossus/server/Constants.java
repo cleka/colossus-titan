@@ -138,7 +138,15 @@ public final class Constants
     public static final String username = System.getProperty("user.name",
         byColor);
 
+    // Network stuff
     public static final int defaultPort = 1969;
+    public static final String localhost = "localhost";
+
+    // Game actions used in several places.
+    public static final String newGame = "New game";
+    public static final String loadGame = "Load game";
+    public static final String saveGame = "Save game";
+    public static final String quit = "Quit";
 
 
     /** Available internal variants */
@@ -214,9 +222,9 @@ public final class Constants
     public static final String doSplit = "doSplit";
     public static final String doMove = "doMove";
     public static final String assignColor = "assignColor";
-    public static final String newGame = "newGame";
-    public static final String loadGame = "loadGame";
-    public static final String saveGame = "saveGame";
+    //public static final String newGame = "newGame";
+    //public static final String loadGame = "loadGame";
+    //public static final String saveGame = "saveGame";
 
     // From server to client
     public static final String tellMovementRoll = "tellMovementRoll";

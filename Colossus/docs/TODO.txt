@@ -4,28 +4,25 @@ Bug: Log window text sometimes appears over board, map.
 Bug: Load game is completely broken.
 
 Authenticate all remote calls to ensure that they come from the correct
-   client or server.  (By socket, using the thread name, set to player name.)
-Remove RMI stuff from Makefile.
-Fix remote logging.
+   client.  (By socket, using the thread name, set to player name.)
 
 Add StartClient gui for setting playerName and hostname. 
-Add Client.jnlp file.
-Add Server.jnlp file.
-
-Refuse remote newGame/loadGame/saveGame calls?
-Disconnect all clients on a newGame.
 
 Chat window.
 
-Colorize StatusScreen.
+Add Client.jnlp file.
 
-Eliminate excess arguments to Flee, Concede, Negotiate.
+Refuse remote newGame/loadGame/saveGame calls?
+
+
+Colorize StatusScreen.
 
 Eliminate LegionInfo, PlayerInfo, Strike, Movement and instead use
    slightly different versions of Game, Legion, Player, Battle, etc. 
    on client side.
 
 Set Client movementRoll when loading during movement phase after roll.
+Set which legions have recruited when loading during recruit phase.
 
 Add JUnit section to build docs.
 Document test procedures.
@@ -37,7 +34,7 @@ Change Quit button in GetPlayers dialog to Cancel.  Go back to existing
    confirmation before calling dialog.
 
 L&F menu should indicate current L&F somehow, and not show Windows if not
-   allowed on this platform.  
+   allowed on this platform.
 If player chose L&F from config file, it should be added to menu.
 Kunststoff L&F in swing.properties file fails.  Works in player cfg file.
 Add Kunststoff L&F to jar file?
@@ -85,7 +82,7 @@ Add a ShowLegionMarkers window that shows each player's remaining
    legion markers.
 
 Finish networked negotiation. 
-Allow players to specify that they automatically refuse to negotiate.  
+Allow players to specify that they automatically refuse to negotiate.
    Check for this before showing negotiation dialog to opponent.
 
 Show StatusScreen and ShowLegion info in the masterboard window, rather 

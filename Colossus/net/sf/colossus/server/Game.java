@@ -15,7 +15,6 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
-import net.sf.colossus.client.GetPlayers;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.parser.TerrainRecruitLoader;
@@ -58,6 +57,9 @@ public final class Game
     // XXX Need to clear cl after initialization is done? 
     private CommandLine cl = null;
 
+    /** Server port number. */
+    private int port = Constants.defaultPort;
+
 
     Game()
     {
@@ -72,7 +74,11 @@ public final class Game
     private void initServer()
     {
 Log.debug("Called Game.initServer()");
-        server = new Server(this);
+        if (server != null)
+        {
+            server.disposeAllClients();
+        }
+        server = new Server(this, port);
         server.initSocketServer();
     }
 
@@ -156,6 +162,11 @@ Log.debug("Called Game.initServer()");
             String buf = cl.getOptValue('n');
             numNetworks = Integer.parseInt(buf);
         }
+        if (cl.optIsSet('p'))
+        {
+            String buf = cl.getOptValue('p');
+            port = Integer.parseInt(buf);
+        }
         // Quit if values are bogus.
         if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
             numHumans + numAIs + numNetworks > Constants.MAX_PLAYERS)
@@ -231,7 +242,7 @@ Log.debug("Called Game.initServer()");
         }
 
         // Load game options 'l' and 'z' are handled separately.
-        if (!cl.optIsSet('s')) 
+        if (!cl.optIsSet('g')) 
         {
             new GetPlayers(new JFrame(), options);
         }
@@ -244,7 +255,7 @@ Log.debug("Called Game.initServer()");
 
         // See if user hit the Load game button, and we should
         // load a game instead of starting a new one.
-        String filename = options.getStringOption(GetPlayers.loadGame);
+        String filename = options.getStringOption(Constants.loadGame);
         if (filename != null && filename.length() > 0)
         {
             options.clearPlayerInfo();
