@@ -209,8 +209,14 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                         new BattlelandRandomizerLoader(brlIS);
                     while (brl.oneArea(h) >= 0) {}
                     brl.resolveAllHexsides(h);
+                    java.util.List tempTowerStartList = brl.getStartList();
+                    if (tempTowerStartList != null)
+                    {
+                        startlistMap.put(terrain,
+                                         tempTowerStartList);
+                    }
                     towerStatusMap.put(terrain,
-                                       new Boolean(false));
+                                       new Boolean(brl.isTower()));
                     subtitleMap.put(terrain, null);
                     StringBuffer buf = new StringBuffer();
                     for (int i = 0; i < 6; i++)
@@ -271,7 +277,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                                          tempTowerStartList);
                     }
                     towerStatusMap.put(terrain,
-                                       new Boolean(false));
+                                       new Boolean(bl.isTower()));
                     subtitleMap.put(terrain, null);
                 }
             }

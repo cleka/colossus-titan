@@ -1,0 +1,19 @@
+# $Id$
+
+LABEL heighest = D4
+LABEL nextdoor = SURROUNDINGSOF((heighest))
+
+AREA (heighest) HAZARDS Tower,100.,2
+AREA (nextdoor) HAZARDS Tower,100.,1 Tower,100.,1 Tower,100.,1
+LABEL nextdoorusedup = (usedup)(heighest)
+AREA SURROUNDINGSOF((nextdoorusedup)) HAZARDS Tower,100.,1 Tower,100.,1 Tower,100.,1
+LABEL alltower=(usedup)(nextdoorusedup)
+
+PAIR (Tower,2)(Tower,1) HEXSIDES w,100.
+PAIR (Tower,2)(Tower,0) HEXSIDES c,100.
+PAIR (Tower,1)(Tower,0) HEXSIDES w,100.
+PAIR (Tower,2)(Plains,0) HEXSIDES c,100.
+PAIR (Tower,1)(Plains,0) HEXSIDES w,100.
+
+STARTLIST (alltower)
+TOWER

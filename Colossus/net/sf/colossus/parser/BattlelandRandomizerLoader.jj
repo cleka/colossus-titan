@@ -163,6 +163,38 @@ public class BattlelandRandomizerLoader
         {
             return "(" + x + "," + y + ")";
         }
+        public String toCaseLabel()
+        {
+            char xc = 'X';char yc = 'X';
+            switch (x)
+            {
+            case 0:
+                xc = 'A';
+                yc = Integer.toString(5 - y).charAt(0);
+                break;
+            case 1:
+                xc = 'B';
+                yc = Integer.toString(5 - y).charAt(0);
+                break;
+            case 2:
+                xc = 'C';
+                yc = Integer.toString(6 - y).charAt(0);
+                break;
+            case 3:
+                xc = 'D';
+                yc = Integer.toString(6 - y).charAt(0);
+                break;
+            case 4:
+                xc = 'E';
+                yc = Integer.toString(6 - y).charAt(0);
+                break;
+            case 5:
+                xc = 'F';
+                yc = Integer.toString(5 - y).charAt(0);
+                break;
+            }
+            return (xc + "" + yc);
+        }
         public int compareTo(Object o)
         {
             address other = (address)o;
@@ -220,6 +252,7 @@ public class BattlelandRandomizerLoader
             hex.setElevation(2);
         usedup.add(a);
     }
+    
     private void resolveAll(BattleHex[][] h, List al, List tl)
     {
         usedup = new ArrayList();
@@ -314,6 +347,7 @@ public class BattlelandRandomizerLoader
                                                  ""));
         }
     }
+    
     private List findHazardPairBestMatch(hazardPair p)
     {
         hazardPair p2;
@@ -336,6 +370,7 @@ public class BattlelandRandomizerLoader
             return al;
         return null;
     }
+    
     public void resolveAllHexsides(BattleHex h[][])
     {
         for (int i = 0; i < 6; i++)
@@ -375,6 +410,35 @@ public class BattlelandRandomizerLoader
                 }
             }
         }
+        if (startlistAddress != null)
+        {
+            startlist = new java.util.ArrayList();
+            java.util.Iterator it = startlistAddress.iterator();
+            while (it.hasNext())
+            {
+                address ad = (address)it.next();
+                startlist.add(ad.toCaseLabel());
+            }
+        }
+    }
+
+    /** hold the list of label for the startlist */
+    private java.util.List startlist = null;
+
+    /** hold the list of address prior resolution for the startlist */
+    private java.util.List startlistAddress = null;
+    
+    /** is the terrain a Tower ? */
+    private boolean isTower = false;
+    
+    public java.util.List getStartList()
+    {
+        return startlist;
+    }
+    
+    public boolean isTower()
+    {
+        return isTower;
     }
 }
 
@@ -415,6 +479,8 @@ TOKEN :
 |   < HEXSIDES : "HEXSIDES" >
 |   < LEFTOVER : "leftover" >
 |   < USEDUP : "usedup" >
+|   < STARTLIST: "STARTLIST" >
+|   < TOWER: "TOWER" >
 }
 
 TOKEN :
@@ -779,6 +845,16 @@ int oneArea(BattleHex h[][]) :
         hexsideRandomness.put(hp,tl);
         //System.out.println("NOW: " + hexsideRandomness);
         return(0);
+    }
+|   <TOWER>
+    {
+        isTower = true;
+        return 0;
+    }
+|   <STARTLIST> (al = z_listAddress())
+    {
+        startlistAddress = new java.util.ArrayList(al);
+        return 0;
     }
 |   <EOL>
     {

@@ -88,6 +88,14 @@ red Mountains3 true 1 Lion 2 Minotaur 2 Dragon 2 Colossus Mountains Random:Mount
 skyBlue Tundra1 true 1 Troll 2 Warbear 2 Giant 2 Colossus Tundra Random:Tundra.rnd
 skyBlue Tundra2 true 1 Troll 2 Warbear 2 Giant 2 Colossus Tundra Random:Tundra.rnd
 skyBlue Tundra3 true 1 Troll 2 Warbear 2 Giant 2 Colossus Tundra Random:Tundra.rnd
-# Tower is a special case
-grey        Tower     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock
+
+# Towers are special cases
+grey        Tower1     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock Tower Random:Tower.rnd
+grey        Tower2     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock Tower Random:Tower.rnd
+grey        Tower3     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock Tower Random:Tower.rnd
+grey        Tower4     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock Tower Random:Tower.rnd
+grey        Tower5     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock Tower Random:Tower.rnd
+grey        Tower6     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock Tower Random:Tower.rnd
+
 ACQUIRABLE 100 Angel 500 Archangel
+

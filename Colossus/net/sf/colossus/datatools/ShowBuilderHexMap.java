@@ -73,6 +73,10 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 try {
                     while (parser.oneArea(h) >= 0) {}
                     parser.resolveAllHexsides(h);
+                    towerItem.setState(parser.isTower());
+                    java.util.List startList = parser.getStartList();
+                    if (startList != null)
+                        selectHexesByLabels(new java.util.HashSet(startList));
                 } catch (Exception e) { System.err.println(e); }
             }
         }
@@ -102,7 +106,8 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     towerItem.setState(parser.isTower());
                     isTower = parser.isTower();
                     java.util.List startList = parser.getStartList();
-                    selectHexesByLabels(new java.util.HashSet(startList));
+                    if (startList != null)
+                        selectHexesByLabels(new java.util.HashSet(startList));
                 } catch (Exception e) { System.err.println(e); }
             }
         }
