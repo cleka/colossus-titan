@@ -84,7 +84,7 @@ public class Game
             playerTower[i] = i + 1;
         }
 
-        for (int i = numPlayers - 1; i >= 0; i--)
+        for (int i = playerTower.length - 1; i >= 0; i--)
         {
             int j = (int) Math.floor((i + 1) * Math.random());
             if (i != j)
