@@ -26,6 +26,53 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private Component lastComponent;
     private int lastSide;
 
+    class rndFileFilter extends javax.swing.filechooser.FileFilter 
+    {
+        public boolean accept(java.io.File f) 
+        {
+            if (f.isDirectory()) 
+            {
+                return(true);
+            }
+            if (f.getName().endsWith(".rnd")) 
+            {
+                return(true);
+            }
+            return(false);
+        }
+        public String getDescription() 
+        {
+            return("Colossus RaNDom generator file");
+        }
+    }
+
+    private void doLoadRandom(BattleHex[][] h)
+    {
+        javax.swing.JFileChooser rndChooser = new JFileChooser(".");
+        rndChooser.setFileFilter(new rndFileFilter());
+        rndChooser.setDialogTitle(
+                   "Choose the RaNDom file (or cancel for nothing)");
+        int returnVal = rndChooser.showOpenDialog(rndChooser);
+        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
+        {
+            java.io.File rndFile = rndChooser.getSelectedFile();
+            String tempRndName = rndFile.getName();
+            String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
+            java.util.List directories = new java.util.ArrayList();
+            directories.add(tempRndDirectory);
+            java.io.InputStream inputFile =
+                net.sf.colossus.util.ResourceLoader.getInputStream(tempRndName, directories);
+            if (inputFile != null)
+            {
+                net.sf.colossus.parser.BattlelandRandomizerLoader parser = 
+                    new net.sf.colossus.parser.BattlelandRandomizerLoader(inputFile);
+                try {
+                    while (parser.oneArea(h) >= 0) {}
+                } catch (Exception e) { System.err.println(e); }
+            }
+        }
+    }
+
     class TerrainAction extends AbstractAction
     {
         char c;
@@ -76,6 +123,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private AbstractAction saveBattlelandAsAction;
     private AbstractAction quitAction;
     private AbstractAction eraseAction;
+    private AbstractAction randomizeAction;
 
     JMenuBar menuBar;
 
@@ -118,12 +166,19 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                 }
             };
 
+        randomizeAction = new AbstractAction("Randomize Map (from file)") {
+                public void actionPerformed(ActionEvent e) {
+                    doLoadRandom(getBattleHexArray());
+                    repaint();
+                }
+            };
 
         mi = fileMenu.add(saveBattlelandAction);
         mi.setMnemonic(KeyEvent.VK_S);
         mi = fileMenu.add(saveBattlelandAsAction);
         mi.setMnemonic(KeyEvent.VK_A);
         mi = fileMenu.add(eraseAction);
+        mi = fileMenu.add(randomizeAction);
         mi = fileMenu.add(quitAction);
         mi.setMnemonic(KeyEvent.VK_Q);
 

@@ -11,6 +11,10 @@ the properties of the future Battleland, and generate
 one random Battleland. At the moment, it's a purely
 static, text-based process.
 
+The Randomizer used can also be accessed from inside
+BattlelandsBuilder, in a much more user-friendly
+way. An input file (described below) is still needed.
+
 It's not finished yet, as no inter-hexagon hazard
 are generated yet (such as slope, ...).
 

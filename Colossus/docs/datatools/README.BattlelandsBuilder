@@ -31,6 +31,11 @@ they both dump the Battleland on the standard output.
 Copy/Paste them (or use a redirection) to the proper
 file.
 
+The 'Randomize Map' menu item is used to generate
+a random map from a description file. See the
+README.BattlelandsRandomizer for a description of
+the input file.
+
 FAQ:
 
 1) I can't get the Hex Side popup-menu !
