@@ -19,7 +19,7 @@ final class ShowLegion extends KDialog implements MouseListener,
     WindowListener
 {
     ShowLegion(JFrame parentFrame, String markerId, java.util.List imageNames, 
-        java.util.List certain, Point point)
+        java.util.List certain, Point point, JScrollPane pane)
     {
         super(parentFrame, "Legion " + markerId, false);
 
@@ -32,9 +32,10 @@ final class ShowLegion extends KDialog implements MouseListener,
         pack();
         setBackground(Color.lightGray);
         addWindowListener(this);
+        
+        placeRelative(parentFrame, point, pane);
 
-        placeRelative(parentFrame, point);
-
+        
         Container contentPane = getContentPane();
         contentPane.setLayout(new FlowLayout());
 

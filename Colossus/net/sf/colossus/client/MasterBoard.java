@@ -54,9 +54,12 @@ public final class MasterBoard extends JPanel
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
 
+    /**The scrollbarspanel, needed to correct lastPoint.*/
+    private JScrollPane scrollPane;
+    
     private Container contentPane;
     private JLabel playerLabel;
-
+    
     public static final String saveGameAs = "Save game as";
 
     public static final String clearRecruitChits = "Clear recruit chits";
@@ -107,7 +110,6 @@ public final class MasterBoard extends JPanel
 
     private boolean playerLabelDone;
 
-    private MediaTracker boardTracker = new MediaTracker(this);
     private static StrategicMapLoader sml = null;
 
     private JMenu lfMenu;
@@ -164,7 +166,9 @@ public final class MasterBoard extends JPanel
         setupActions();
         setupPopupMenu();
         setupTopMenu();
-        contentPane.add(new JScrollPane(this), BorderLayout.CENTER);
+        
+        scrollPane = new JScrollPane(this);
+        contentPane.add(scrollPane, BorderLayout.CENTER);
 
         setupPlayerLabel();
 
@@ -316,7 +320,8 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 new ShowAllRecruits(masterFrame, 
-                    TerrainRecruitLoader.getTerrains(), null, null);
+                    TerrainRecruitLoader.getTerrains(), null, null, 
+                    scrollPane);
             }
         };
 
@@ -329,7 +334,7 @@ public final class MasterBoard extends JPanel
                 {
                     String[] terrains = { hex.getTerrain() };
                     new ShowAllRecruits(masterFrame, terrains, lastPoint,
-                                        hex.getLabel());
+                                        hex.getLabel(), scrollPane);
                 }
             }
         };
@@ -1698,7 +1703,8 @@ public final class MasterBoard extends JPanel
                 {
                     new ShowLegion(masterFrame, markerId,
                         client.getLegionImageNames(markerId), 
-                        client.getLegionCreatureCertainties(markerId), point);
+                        client.getLegionCreatureCertainties(markerId), 
+                        point, scrollPane);
                     return;
                 }
                 else if (client.isMyLegion(markerId))
@@ -1992,9 +1998,9 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    MediaTracker getBoardTracker()
+    JScrollPane getScrollPane()
     {
-        return boardTracker;
+        return scrollPane;
     }
 
     /** Return a set of all hex labels. */

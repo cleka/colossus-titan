@@ -28,7 +28,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
 
 
     ShowAllRecruits(JFrame parentFrame, String[] terrains, Point point,
-                    String singleTerrainHexLabel)
+                    String singleTerrainHexLabel, JScrollPane pane)
     {
         super(parentFrame, "Recruits", false);
 
@@ -58,7 +58,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
 
         if (point != null)
         {
-            placeRelative(parentFrame, point);
+            placeRelative(parentFrame, point, pane);
         }
 
         setVisible(true);

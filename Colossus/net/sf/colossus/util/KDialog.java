@@ -50,30 +50,21 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
 
     /** Place dialog relative to parentFrame's origin, offset by 
      *  point, and fully on-screen. */
-    public void placeRelative(JFrame parentFrame, Point point)
+    public void placeRelative(JFrame parentFrame, Point point, 
+        JScrollPane pane)
     {
+  
+        JViewport viewPort = pane.getViewport();
+        
+        // Absolute coordinate in the screen since the window is toplevel
         Point parentOrigin = parentFrame.getLocation();
-        Point origin = new Point(point.x + parentOrigin.x, point.y +
-            parentOrigin.y);
-        if (origin.x < 0)
-        {
-            origin.x = 0;
-        }
-        if (origin.y < 0)
-        {
-            origin.y = 0;
-        }
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        int adj = origin.x + getSize().width - d.width;
-        if (adj > 0)
-        {
-            origin.x -= adj;
-        }
-        adj = origin.y + getSize().height - d.height;
-        if (adj > 0)
-        {
-            origin.y -= adj;
-        }
+        
+        // Relative coordinate of the view, change when scrolling
+        Point viewOrigin = viewPort.getViewPosition();
+        
+        Point origin = new Point(point.x + parentOrigin.x - viewOrigin.x, 
+            point.y + parentOrigin.y - viewOrigin.y);
+       
         setLocation(origin);
     }
 
