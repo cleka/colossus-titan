@@ -41,7 +41,7 @@ class MasterBoard extends JFrame implements MouseListener,
         {false, false, true, true, true, true, false, false},
         {false, false, false, true, true, false, false, false},
     };
-    private Rectangle rectClip;
+
     private Image offImage;
     private Graphics offGraphics;
     private Dimension offDimension;
@@ -65,6 +65,13 @@ class MasterBoard extends JFrame implements MouseListener,
 
         contentPane = getContentPane();
         contentPane.setLayout(null);
+
+        // Make sure that the board fits on the screen.
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        if (d.height < 1000)
+        {
+            scale = scale * d.height / 1000;
+        }
 
         setSize(getPreferredSize());
         setIconImage(Toolkit.getDefaultToolkit().getImage(
@@ -98,7 +105,7 @@ class MasterBoard extends JFrame implements MouseListener,
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             // Lookup coords for chit starting from player[i].getTower()
-            MasterHex hex = getHexFromLabel(100 * 
+            MasterHex hex = getHexFromLabel(100 *
                 game.getPlayer(i).getTower());
 
             Creature.titan.takeOne();
@@ -110,10 +117,10 @@ class MasterBoard extends JFrame implements MouseListener,
             Creature.gargoyle.takeOne();
             Creature.gargoyle.takeOne();
 
-            Legion legion = new Legion(0, 0, 3 * scale, 
-                game.getPlayer(i).getSelectedMarker(), null, this, 8, 
-                hex, Creature.titan, Creature.angel, Creature.ogre, 
-                Creature.ogre, Creature.centaur, Creature.centaur, 
+            Legion legion = new Legion(0, 0, 3 * scale,
+                game.getPlayer(i).getSelectedMarker(), null, this, 8,
+                hex, Creature.titan, Creature.angel, Creature.ogre,
+                Creature.ogre, Creature.centaur, Creature.centaur,
                 Creature.gargoyle, Creature.gargoyle, game.getPlayer(i));
 
             game.getPlayer(i).addLegion(legion);
@@ -225,7 +232,7 @@ class MasterBoard extends JFrame implements MouseListener,
     //    block == -2, use only arrows.  Do not double back in
     //    the direction you just came from.  Return the number of
     //    moves found.
-    private int findMoves(MasterHex hex, Player player, Legion legion, 
+    private int findMoves(MasterHex hex, Player player, Legion legion,
         int roll, int block, int cameFrom)
     {
         int count = 0;
@@ -285,7 +292,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
         if (block >= 0)
         {
-            count += findMoves(hex.getNeighbor(block), player, legion, 
+            count += findMoves(hex.getNeighbor(block), player, legion,
                 roll - 1, -2, (block + 3) % 6);
         }
         else if (block == -1)
@@ -294,7 +301,7 @@ class MasterBoard extends JFrame implements MouseListener,
             {
                 if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
                 {
-                    count += findMoves(hex.getNeighbor(i), player, legion, 
+                    count += findMoves(hex.getNeighbor(i), player, legion,
                         roll - 1, -2, (i + 3) % 6);
                 }
             }
@@ -305,7 +312,7 @@ class MasterBoard extends JFrame implements MouseListener,
             {
                 if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
                 {
-                    count += findMoves(hex.getNeighbor(i), player, legion, 
+                    count += findMoves(hex.getNeighbor(i), player, legion,
                         roll - 1, -2, (i + 3) % 6);
                 }
             }
@@ -313,12 +320,12 @@ class MasterBoard extends JFrame implements MouseListener,
 
         return count;
     }
-    
-    
+
+
     // Recursively find tower teleport moves from this hex.  That's
     // all unoccupied hexes within 6 hexes.  Teleports to towers
     // are handled separately.  Do not double back.
-    private void findTowerTeleportMoves(MasterHex hex, Player player, 
+    private void findTowerTeleportMoves(MasterHex hex, Player player,
         Legion legion, int roll, int cameFrom)
     {
         // This hex is the final destination.  Mark it as legal if
@@ -339,7 +346,7 @@ class MasterBoard extends JFrame implements MouseListener,
                 if (i != cameFrom && (hex.getExitType(i) != MasterHex.NONE ||
                    hex.getEntranceType(i) != MasterHex.NONE))
                 {
-                    findTowerTeleportMoves(hex.getNeighbor(i), player, legion, 
+                    findTowerTeleportMoves(hex.getNeighbor(i), player, legion,
                         roll - 1, (i + 3) % 6);
                 }
             }
@@ -358,7 +365,7 @@ class MasterBoard extends JFrame implements MouseListener,
         }
 
         clearAllNonengagementEntrySides();
-        
+
         int count = 0;
 
         MasterHex hex = legion.getCurrentHex();
@@ -371,14 +378,14 @@ class MasterBoard extends JFrame implements MouseListener,
         {
             if (hex.getExitType(j) == MasterHex.BLOCK)
             {
-                // Only this path is allowed. 
+                // Only this path is allowed.
                 block = j;
             }
         }
 
         Player player = legion.getPlayer();
 
-        count += findMoves(hex, player, legion, player.getMovementRoll(), 
+        count += findMoves(hex, player, legion, player.getMovementRoll(),
             block, -1);
 
         if (player.getMovementRoll() == 6)
@@ -405,15 +412,15 @@ class MasterBoard extends JFrame implements MouseListener,
             }
 
             // Titan teleport
-            if (player.canTitanTeleport() && 
+            if (player.canTitanTeleport() &&
                 legion.numCreature(Creature.titan) > 0)
             {
-                // Mark every hex containing an enemy unit. 
+                // Mark every hex containing an enemy unit.
                 for (int i = 0; i < game.getNumPlayers(); i++)
                 {
                     if (game.getPlayer(i) != player)
                     {
-                        for (int j = 0; j < game.getPlayer(i).getNumLegions(); 
+                        for (int j = 0; j < game.getPlayer(i).getNumLegions();
                             j++)
                         {
                             hex = game.getPlayer(i).getLegion(j).
@@ -439,7 +446,7 @@ class MasterBoard extends JFrame implements MouseListener,
         Player player = game.getActivePlayer();
         player.unselectLegion();
 
-        for (int i = 0; i < player.getNumLegions(); i++) 
+        for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion legion = player.getLegion(i);
             if (!legion.hasMoved())
@@ -467,7 +474,7 @@ class MasterBoard extends JFrame implements MouseListener,
             MasterHex hex = legion.getCurrentHex();
             if (hex.getNumEnemyLegions(player) > 0)
             {
-                count++; 
+                count++;
                 hex.select();
                 hex.repaint();
             }
@@ -476,7 +483,7 @@ class MasterBoard extends JFrame implements MouseListener,
         return count;
     }
 
-    
+
     // Returns number of legions with summonable angels.
     public int highlightSummonableAngels(Legion legion)
     {
@@ -497,8 +504,8 @@ class MasterBoard extends JFrame implements MouseListener,
                     candidate.numCreature(Creature.archangel) > 0) &&
                     !hex.isEngagement())
                 {
-                    
-                    count++; 
+
+                    count++;
                     hex.select();
                     hex.repaint();
                 }
@@ -584,7 +591,7 @@ class MasterBoard extends JFrame implements MouseListener,
         int cx = 3 * scale;
         int cy = 2 * scale;
 
-        // Initialize hexes. 
+        // Initialize hexes.
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
@@ -1110,7 +1117,7 @@ class MasterBoard extends JFrame implements MouseListener,
                 }
             }
         }
-        
+
         // Add references to neighbor hexes.
         for (int i = 0; i < h.length; i++)
         {
@@ -1177,7 +1184,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
 
     // This is a place-holder function, until the JDK adds the required
-    // functionality.  (It's supposed to be in JDK 1.2beta4.1) 
+    // functionality.  (It's supposed to be in JDK 1.2beta4.1)
     public void deiconify()
     {
     }
@@ -1201,7 +1208,7 @@ class MasterBoard extends JFrame implements MouseListener,
                     // Right-click or alt-click means to show the contents
                     // of the legion.
                     if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
-                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() & 
+                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
                         new ShowLegion(this, legion, point);
@@ -1218,7 +1225,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                     // Need a legion marker to split.
                                     if (player.getNumMarkersAvailable() == 0)
                                     {
-                                        JOptionPane.showMessageDialog(this, 
+                                        JOptionPane.showMessageDialog(this,
                                             "No markers are available.");
                                         return;
                                     }
@@ -1247,13 +1254,13 @@ class MasterBoard extends JFrame implements MouseListener,
                                     // Mark this legion as active.
                                     player.selectLegion(legion);
 
-                                    // Highlight all legal destinations 
+                                    // Highlight all legal destinations
                                     // for this legion.
                                     showMoves(legion);
                                     return;
 
                                 case Game.FIGHT:
-                                    // Fall through, to allow clicking on 
+                                    // Fall through, to allow clicking on
                                     // either engaged legion or the hex.
                                     break;
 
@@ -1286,11 +1293,11 @@ class MasterBoard extends JFrame implements MouseListener,
                 if (show[i][j] && h[i][j].contains(point))
                 {
                     MasterHex hex = h[i][j];
-                    
+
                     // Right-click or alt-click means to show the contents
                     // of the hex.
                     if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
-                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() & 
+                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
                         new ShowMasterHex(this, hex, point);
@@ -1300,8 +1307,8 @@ class MasterBoard extends JFrame implements MouseListener,
                     // Otherwise, the action to take depends on the phase.
                     switch (game.getPhase())
                     {
-                        // If we're moving, and have selected a legion which 
-                        // has not yet moved, and this hex is a legal 
+                        // If we're moving, and have selected a legion which
+                        // has not yet moved, and this hex is a legal
                         // destination, move the legion here.
                         case Game.MOVE:
                             Legion legion = player.getSelectedLegion();
@@ -1329,9 +1336,9 @@ class MasterBoard extends JFrame implements MouseListener,
                                     hex.setEntrySide(5);
                                 }
 
-                                // Pick entry side if hex is enemy-occupied 
+                                // Pick entry side if hex is enemy-occupied
                                 // and there is more than one possibility.
-                                if (hex.isOccupied() && 
+                                if (hex.isOccupied() &&
                                     hex.getNumEntrySides() > 1)
                                 {
                                     new PickEntrySide(this, hex);
@@ -1339,7 +1346,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
                                 // Unless the PickEntrySide was cancelled,
                                 // execute the move.
-                                if (!hex.isOccupied() || 
+                                if (!hex.isOccupied() ||
                                     hex.getNumEntrySides() == 1)
                                 {
                                     legion.moveToHex(hex);
@@ -1366,7 +1373,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                 player.selectLegion(attacker);
                                 if (summonAngel == null)
                                 {
-                                    summonAngel = 
+                                    summonAngel =
                                         map.getTurn().getSummonAngel();
                                 }
                                 summonAngel.repaint();
@@ -1376,42 +1383,42 @@ class MasterBoard extends JFrame implements MouseListener,
                             // already being resolved.
                             else if (hex.isEngagement() && map == null)
                             {
-                                Legion attacker = 
+                                Legion attacker =
                                     hex.getFriendlyLegion(player);
-                                Legion defender = 
+                                Legion defender =
                                     hex.getEnemyLegion(player);
 
-                                if (defender.canFlee()) 
+                                if (defender.canFlee())
                                 {
                                     // Fleeing gives half points and denies the
                                     // attacker the chance to summon an angel.
-                                    new Concede(this, defender, attacker, 
+                                    new Concede(this, defender, attacker,
                                         true);
                                 }
 
                                 if (hex.isEngagement())
                                 {
-                                    // The attacker may concede now without 
+                                    // The attacker may concede now without
                                     // allowing the defender a reinforcement.
 
-                                    new Concede(this, attacker, defender, 
+                                    new Concede(this, attacker, defender,
                                         false);
 
                                     // The players may agree to a negotiated
                                     // settlement.
                                     if (hex.isEngagement())
                                     {
-                                        new Negotiate(this, attacker, 
+                                        new Negotiate(this, attacker,
                                             defender);
                                     }
-                                    
+
 
                                     if (!hex.isEngagement())
                                     {
                                         if (hex.getLegion(0) == defender &&
                                             defender.canRecruit())
                                         {
-                                            // If the defender won the battle 
+                                            // If the defender won the battle
                                             // by agreement, he may recruit.
                                             new PickRecruit(this, defender);
                                         }
@@ -1419,8 +1426,8 @@ class MasterBoard extends JFrame implements MouseListener,
                                             && attacker.getHeight() < 7
                                             && player.canSummonAngel())
                                         {
-                                            // If the attacker won the battle 
-                                            // by agreement, he may summon an 
+                                            // If the attacker won the battle
+                                            // by agreement, he may summon an
                                             // angel.
                                             summonAngel = new
                                                 SummonAngel(this, attacker);
@@ -1434,7 +1441,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                         turn.setVisible(false);
                                         turn.setEnabled(false);
 
-                                        map = new BattleMap(this, attacker, 
+                                        map = new BattleMap(this, attacker,
                                             defender, hex, hex.getEntrySide());
                                     }
                                 }
@@ -1476,7 +1483,7 @@ class MasterBoard extends JFrame implements MouseListener,
                 break;
         }
     }
-    
+
 
     public void mouseDragged(MouseEvent e)
     {
@@ -1527,7 +1534,7 @@ class MasterBoard extends JFrame implements MouseListener,
     public void windowDeactivated(WindowEvent event)
     {
     }
-    
+
 
     public void windowDeiconified(WindowEvent event)
     {
@@ -1551,7 +1558,7 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
-    // This is used to fix artifacts from legions hanging outside hexes. 
+    // This is used to fix artifacts from legions hanging outside hexes.
     public void setEraseFlag()
     {
         eraseFlag = true;
@@ -1566,7 +1573,7 @@ class MasterBoard extends JFrame implements MouseListener,
         }
 
         Dimension d = getSize();
-        rectClip = g.getClipBounds();
+        Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
