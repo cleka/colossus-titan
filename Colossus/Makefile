@@ -50,7 +50,7 @@ all: jar
 
 # Find target files
 
-allsources = $(wildcard *.java) \
+basesources= $(wildcard *.java) \
 	$(wildcard net/sf/colossus/client/*.java) \
 	$(wildcard net/sf/colossus/server/*.java) \
 	$(wildcard net/sf/colossus/util/*.java) \
@@ -62,7 +62,9 @@ testsources= $(wildcard *Test.java) \
 	$(wildcard net/sf/colossus/util/*Test.java) \
 	$(wildcard net/sf/colossus/parser/*Test.java) \
 	$(wildcard com/werken/opt/*Test.java)
-sources=$(filter-out $(testsources), $(allsources))
+variantsources=$(wildcard */*.java)
+allsources=$(basesources) $(variantsources)
+sources=$(filter-out $(testsources), $(allsources) )
 
 CLASS_FILES = $(sources:%.java=%.class)
 
