@@ -4,7 +4,6 @@ import java.util.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.Combos;
 
@@ -990,7 +989,7 @@ class Node implements Comparable
 }
 
 
-// XXX RuntimeException for now -- handle later
+// TODO Make this a checked exception.
 class PredictSplitsException extends RuntimeException
 {
     PredictSplitsException(String s)
