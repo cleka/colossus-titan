@@ -1376,15 +1376,14 @@ Log.debug("Called Client.reinforce for " + markerId);
     /** Create new markers in response to a rescale. */
     void recreateMarkers()
     {
-        ListIterator it = markers.listIterator();
+        java.util.List oldId = new ArrayList();
+        Iterator it = markers.iterator();
         while (it.hasNext())
         {
-            Marker marker = (Marker)it.next();
-            String markerId = marker.getId();
-            marker = new Marker(3 * Scale.get(), markerId,
-                                board.getFrame(), this);
-            it.set(marker);
+            oldId.add(((Marker)it.next()).getId());
         }
+        markers.clear();
+        addMarkers(oldId);
     }
 
     private void setupPlayerLabel()
