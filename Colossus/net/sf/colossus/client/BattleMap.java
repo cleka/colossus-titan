@@ -88,8 +88,13 @@ public final class BattleMap extends HexMap implements MouseListener,
         // Do not call pack() or setVisible(true) until after
         // BattleDice is added to frame.
 
-        battleFrame.setTitle(attackerMarkerId + " attacks " + 
-            defenderMarkerId + " in " + masterHexLabel);
+        battleFrame.setTitle(
+            net.sf.colossus.server.Legion.getMarkerName(attackerMarkerId) +
+            " (" + attackerMarkerId +
+            ") attacks " + 
+            net.sf.colossus.server.Legion.getMarkerName(defenderMarkerId) +
+            " (" + defenderMarkerId +
+            ") in " + masterHexLabel);
     }
 
 
