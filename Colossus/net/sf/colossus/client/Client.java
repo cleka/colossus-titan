@@ -3427,6 +3427,17 @@ Log.debug(playerName + " Client.setupBattleFight()");
         try
         {
             UIManager.setLookAndFeel(lfName);
+            UIManager.LookAndFeelInfo[] lfInfo =
+                UIManager.getInstalledLookAndFeels();
+            boolean exist = false;
+            for (int i = 0; i < lfInfo.length ; i++)
+            {
+                exist = exist || lfInfo[i].getClassName().equals(lfName);
+            }
+            if (!exist)
+                UIManager.installLookAndFeel(
+                    new UIManager.LookAndFeelInfo(
+                        UIManager.getLookAndFeel().getName(), lfName));
             updateEverything();
             Log.debug("Switched to Look & Feel: " + lfName);
             setOption(Options.favoriteLookFeel, lfName);
