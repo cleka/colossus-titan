@@ -36,7 +36,12 @@ jar: classes
 	chmod +x Colossus.jar
 
 # Clean up
-
 clean:
 	@@ echo 'rm -f *~ *.class core *.bak *.jar'
 	@@rm -f *~ *.class core *.bak *.jar
+
+# Make zip file
+dist:
+	@@ echo 'zip -pr Colossus.`date +%Y%m%d`.zip *'
+	@@zip -pr Colossus.`date +%Y%m%d`.zip *
+
