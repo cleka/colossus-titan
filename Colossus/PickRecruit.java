@@ -369,14 +369,12 @@ System.out.println("numEligible is " + numEligible);
         }
 
         // Pack the recruits array for display.
-        for (int i = 0; i < recruits.length - 1; i++)
+        for (int i = 0, k = 0; i < recruits.length - 1; i++)
         {
-System.out.println("i is " + i);
-            if (recruits[i] == null)
+            while (recruits[i] == null && k < recruits.length)
             {
                 for (int j = i; j < recruits.length - 1; j++)
                 {
-System.out.println("j is " + i);
                     recruits[j] = recruits[j + 1];
                 }
                 recruits[recruits.length - 1] = null;
