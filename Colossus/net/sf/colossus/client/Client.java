@@ -2189,7 +2189,8 @@ public final class Client implements IClient
             {
                 String name = (String)it.next();
                 Creature creature = Creature.getCreatureByName(name);
-                if (creature != null && creature.isLord())
+                if (creature != null && creature.isLord() && 
+                    !lords.contains(name))
                 {
                     if (creature.isTitan())
                     {

@@ -2455,7 +2455,12 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
         // If the legion teleported, reveal a lord.
         if (teleport)
         {
-            // TODO Make sure teleportingLord is legal
+            // Verify teleporting lord.
+            if (teleportingLord == null || !legion.listTeleportingLords(
+                hexLabel).contains(teleportingLord))
+            {
+                return false;
+            }
 
             server.allRevealCreature(legion, teleportingLord);
         }
