@@ -1,3 +1,21 @@
+Bug: Hang at end of AI vs. AI battle, after defender's titan eliminated.
+Win98, 1.4.0.  BattleMap never dismissed.
+Called ai.strike() for Gd01
+Best target is Cyclops in B2
+Best attacker is Titan in B1
+From client Gold: strike ~ 32 ~ B2
+Titan in B1 strikes Cyclops in Plains hex B2 with strike number 2 : 623332: 6 hits
+Called ai.strike() for Gd01
+Best target is null, aborting
+From client Gold: doneWithStrikes
+Silver earns 96.0 points
+Legion Gd01 (Caduceus) is eliminated
+From client Silver: acquireAngel ~ Si01 ~ EarthElemental
+First EarthElemental recruited
+Legion Si01 (Axes2) acquires one EarthElemental
+Silver earns 50.0 points
+in kickEngagements() summoning=false reinforcing=false acquiring=false
+
 Bug: Defender won battle in turn 7 strikeback.  BattleMap never cleared.
    Never got cleanupBattle() call.  So never called Game.finishBattle()?
 From client Blue: doneWithStrikes
