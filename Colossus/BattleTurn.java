@@ -170,7 +170,11 @@ class BattleTurn extends Dialog implements ActionListener
                 turnNumber++;
                 if (turnNumber > 7)
                 {
-                    // XXX: Time loss.
+                    // Time loss.  Attacker is eliminated but defender
+                    //    gets no points.
+                    attacker.removeLegion();
+                    dispose();
+                    map.dispose();
                 }
                 else
                 {
@@ -196,9 +200,7 @@ class BattleTurn extends Dialog implements ActionListener
 
         else if (e.getActionCommand() == "Done with Moves")
         {
-            // XXX: If any chits were left off-board, kill them.
-            // If they were newly summoned, unsummon them.
-
+            map.removeOffboardChits();
             map.commitMoves();
             advancePhase();
         }
