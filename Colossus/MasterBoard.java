@@ -51,6 +51,7 @@ class MasterBoard extends Frame implements MouseListener,
     private boolean eraseFlag = false;
     private boolean summoningAngel = false;
     private SummonAngel summonAngel;
+    private BattleMap map;
 
 
     public MasterBoard(Game game)
@@ -1188,6 +1189,11 @@ class MasterBoard extends Frame implements MouseListener,
                                 Legion attacker =
                                     hex.getFriendlyLegion(player);
                                 player.selectLegion(attacker);
+                                if (summonAngel == null)
+                                {
+                                    summonAngel = 
+                                        map.getTurn().getSummonAngel();
+                                }
                                 summonAngel.repaint();
                             }
                             else if (hex.isEngagement())
@@ -1221,26 +1227,14 @@ class MasterBoard extends Frame implements MouseListener,
                                             defender);
                                     }
                                     
-                                    // Battle
-                                    if (hex.isEngagement())
-                                    {
-                                        // XXX: Calculate entry side.
-                                        new BattleMap(attacker, defender, 
-                                            hex.getTerrain(), 'b');
-                                        // XXX: Hex stays selected.
-                                        hex.unselect();
-                                        hex.repaint();
-                                    }
 
-                                    if (hex.isEngagement() == false)
+                                    if (!hex.isEngagement())
                                     {
                                         if (hex.getLegion(0) == defender &&
                                             defender.canRecruit())
                                         {
                                             // If the defender won the battle 
                                             // by agreement, he may recruit.
-                                            // XXX: Remember if he recruited
-                                            // during battle.
                                             new PickRecruit(this, defender);
                                         }
                                         else if (hex.getLegion(0) == attacker
@@ -1248,14 +1242,20 @@ class MasterBoard extends Frame implements MouseListener,
                                             && player.canSummonAngel())
                                         {
                                             // If the attacker won the battle 
-                                            // by agreement or battle and has
-                                            // not already summoned an angel,
-                                            // he may summon an angel.
+                                            // by agreement, he may summon an 
+                                            // angel.
                                             summonAngel = new
                                                 SummonAngel(this, attacker);
                                         }
                                     }
 
+                                    // Battle
+                                    if (hex.isEngagement())
+                                    {
+                                        // XXX: Calculate entry side.
+                                        map = new BattleMap(attacker, defender, 
+                                            hex, 'b', this);
+                                    }
                                 }
                             }
                             break;
