@@ -1,4 +1,8 @@
-/** Attempted port of hexmap from MFC to Java dripton  12/10/97 */
+/* 
+ * BattleMap, for Titan
+ * version $Id$
+ * dripton
+ */
 
 // TODO: Add the dragon and hydra.
 // TODO: Restrict chit dragging to within window
@@ -6,146 +10,12 @@
 import java.awt.*;
 import java.awt.event.*;
 
-
-class Hex
-{
-    private boolean selected;
-    private int[] x_vertex = new int[6];
-    private int[] y_vertex = new int[6];
-    private Polygon p;
-    private Rectangle rectBound;
-
-    Hex(int cx, int cy, int scale)
-    {
-        selected = false;
-
-        x_vertex[0] = cx;
-        y_vertex[0] = cy;
-        x_vertex[1] = cx + 2 * scale;
-        y_vertex[1] = cy;
-        x_vertex[2] = cx + 3 * scale;
-        y_vertex[2] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
-                        * scale);
-        x_vertex[3] = cx + 2 * scale;
-        y_vertex[3] = cy + (int)java.lang.Math.round(2 * java.lang.Math.sqrt(3.0)
-                        * scale);
-        x_vertex[4] = cx;
-        y_vertex[4] = cy + (int)java.lang.Math.round(2 * java.lang.Math.sqrt(3.0)
-                        * scale);
-        x_vertex[5] = cx - 1 * scale;
-        y_vertex[5] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
-                        * scale);
-
-        p = new Polygon(x_vertex, y_vertex, 6);
-        rectBound = new Rectangle(x_vertex[5], y_vertex[0], x_vertex[2] - 
-                        x_vertex[5], y_vertex[3] - y_vertex[0]);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        if (selected)
-        {
-            g.setColor(java.awt.Color.red);
-            g.fillPolygon(p);
-            g.setColor(java.awt.Color.black);
-            g.drawPolygon(p);
-        }
-        else
-        {
-            g.setColor(java.awt.Color.white);
-            g.fillPolygon(p);
-            g.setColor(java.awt.Color.black);
-            g.drawPolygon(p);
-        }
-    }
-
-
-    boolean select(Point point)
-    {
-        if (p.contains(point))
-        {
-            selected = !selected;
-            return true;
-        }
-        return false;
-    }
-
-    public Rectangle getBounds()
-    {
-        return rectBound;
-    }
-
-    public boolean contains(Point point)
-    {
-        return (p.contains(point));
-    }
-    
-}
-
-
-
-class Chit
-{
-    private boolean selected;
-    private Rectangle rect;
-    private Container container;
-    
-    // The container's MediaTracker needs to access the image.
-    Image image;
-
-    // offset of the mouse cursor within the chit.
-    int dx;
-    int dy;
-
-    Chit(int cx, int cy, int scale, String image_filename, 
-        Container my_container)
-    {
-        selected = false;
-        rect = new Rectangle(cx, cy, scale, scale);
-        image = Toolkit.getDefaultToolkit().getImage(image_filename);
-        container = my_container;
-        dx = 0;
-        dy = 0;
-    }
-
-    
-    public void paint(Graphics g)
-    {
-        g.drawImage(image, rect.x, rect.y, container);
-    }
-
-
-    boolean select(Point point)
-    {
-        if (rect.contains(point))
-        {
-            selected = true;
-            dx = point.x - rect.x;
-            dy = point.y - rect.y;
-        }
-        else
-        {
-            selected = false;
-        }
-        return selected;
-    }
-
-
-    void setLocation(Point point)
-    {
-        point.x -= dx;
-        point.y -= dy;
-        rect.setLocation(point);
-    }
-
-    public Rectangle getBounds()
-    {
-        return rect;
-    }
-
-}
-
+/**
+ * Class BattleMap implements the GUI for a Titan
+ * battlemap.
+ * @version $Id$
+ * @author David Ripton
+ */
 
 
 public class BattleMap extends Frame implements MouseListener,
@@ -165,7 +35,7 @@ public class BattleMap extends Frame implements MouseListener,
     };
     private Rectangle rectClip = new Rectangle();
     private Image offImage;
-    private Graphics offGraphics;
+    private Graphics gBack;
     private Dimension offDimension;
     private boolean needToClear;
     private MediaTracker tracker;
@@ -193,9 +63,9 @@ public class BattleMap extends Frame implements MouseListener,
         needToClear = false;
         imagesLoaded = false;
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < h.length; j++)
             {
                 if (show[i][j])
                 {
@@ -232,14 +102,13 @@ public class BattleMap extends Frame implements MouseListener,
         chits[20] = new Chit(520, 520, 60, "images/Warbear.gif", this);
         chits[21] = new Chit(540, 540, 60, "images/Warlock.gif", this);
 
-        for (int i = 0; i < 22; i++)
+        for (int i = 0; i < chits.length; i++)
         {
             tracker.addImage(chits[i].image, 0);
         }
 
         try
         {
-            // Wait until images are loaded.
             tracker.waitForAll();
         }
         catch (InterruptedException e)
@@ -248,19 +117,9 @@ public class BattleMap extends Frame implements MouseListener,
         }
         imagesLoaded = true;
 
-        // Paint the whole BattleMap
         repaint();
     }
 
-
-    class InnerWindowAdapter extends WindowAdapter 
-    {
-        public void windowClosing(WindowEvent event)
-        {
-            System.exit(0);
-        }
-    }
-    
 
     public void mouseDragged(MouseEvent e)
     {
@@ -308,9 +167,9 @@ public class BattleMap extends Frame implements MouseListener,
         }
 
         // No hits on chits, so check map.
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < h.length; j++)
             {
                 if (show[i][j] && h[i][j].contains(point))
                 {
@@ -340,8 +199,6 @@ public class BattleMap extends Frame implements MouseListener,
     public void mouseExited(MouseEvent e)
     {
     }
-    
-
 
 
     public void paint(Graphics g)
@@ -357,9 +214,9 @@ public class BattleMap extends Frame implements MouseListener,
         //System.out.println("rectClip: " + rectClip.x + " " + rectClip.y 
         //    + " " + rectClip.width + " " + rectClip.height);
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < h.length; j++)
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
@@ -380,7 +237,6 @@ public class BattleMap extends Frame implements MouseListener,
         }
     }
 
-
     public void update(Graphics g)
     {
         //System.out.println("Called BattleMap.update()");
@@ -389,36 +245,36 @@ public class BattleMap extends Frame implements MouseListener,
         rectClip = g.getClipBounds();
         
         // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width || 
+        if (gBack == null || d.width != offDimension.width || 
             d.height != offDimension.height)
         {
             //System.out.println("Creating a new back buffer");
             offDimension = d;
             offImage = createImage(d.width, d.height);
-            offGraphics = offImage.getGraphics();
+            gBack = offImage.getGraphics();
         }
 
-        // TODO: Find out which is faster, this needToClear business
-        //       or just clearing the whole back buffer every time.
+        // XXX: Find out which is faster, this needToClear business
+        //      or just clearing the whole back buffer every time.
 
         // Clear the background only when chits are dragged.
         if (needToClear)
         {
-            offGraphics.setColor(getBackground());
-            offGraphics.fillRect(rectClip.x, rectClip.y, rectClip.width, 
+            gBack.setColor(getBackground());
+            gBack.fillRect(rectClip.x, rectClip.y, rectClip.width, 
                 rectClip.height);
-            offGraphics.setColor(getForeground());
+            gBack.setColor(getForeground());
             needToClear = false;
         }
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < h.length; j++)
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
                     //System.out.println("drawing h[" + i + "][" + j + "]");
-                    h[i][j].paint(offGraphics);
+                    h[i][j].paint(gBack);
                 }
             }
         }
@@ -429,7 +285,7 @@ public class BattleMap extends Frame implements MouseListener,
             if (rectClip.intersects(chits[i].getBounds()))
             {
                 //System.out.println("Drawing chits[" + i + "]");
-                chits[i].paint(offGraphics);
+                chits[i].paint(gBack);
             }
         }
 
@@ -447,9 +303,158 @@ public class BattleMap extends Frame implements MouseListener,
         return new Dimension(700, 700);
     }
 
+
     public static void main(String args[])
     {
         BattleMap battlemap = new BattleMap();
     }
 
+
+    class InnerWindowAdapter extends WindowAdapter 
+    {
+        public void windowClosing(WindowEvent event)
+        {
+            System.exit(0);
+        }
+    }
 }
+
+
+class Hex
+{
+    private boolean selected;
+    private int[] x_vertex = new int[6];
+    private int[] y_vertex = new int[6];
+    private Polygon p;
+    private Rectangle rectBound;
+
+
+    Hex(int cx, int cy, int scale)
+    {
+        selected = false;
+
+        x_vertex[0] = cx;
+        y_vertex[0] = cy;
+        x_vertex[1] = cx + 2 * scale;
+        y_vertex[1] = cy;
+        x_vertex[2] = cx + 3 * scale;
+        y_vertex[2] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
+                        * scale);
+        x_vertex[3] = cx + 2 * scale;
+        y_vertex[3] = cy + (int)java.lang.Math.round(2 * 
+                        java.lang.Math.sqrt(3.0) * scale);
+        x_vertex[4] = cx;
+        y_vertex[4] = cy + (int)java.lang.Math.round(2 * 
+                        java.lang.Math.sqrt(3.0) * scale);
+        x_vertex[5] = cx - 1 * scale;
+        y_vertex[5] = cy + (int)java.lang.Math.round(java.lang.Math.sqrt(3.0)
+                        * scale);
+
+        p = new Polygon(x_vertex, y_vertex, 6);
+        rectBound = new Rectangle(x_vertex[5], y_vertex[0], x_vertex[2] - 
+                        x_vertex[5], y_vertex[3] - y_vertex[0]);
+    }
+
+
+    public void paint(Graphics g)
+    {
+        if (selected)
+        {
+            g.setColor(java.awt.Color.red);
+            g.fillPolygon(p);
+            g.setColor(java.awt.Color.black);
+            g.drawPolygon(p);
+        }
+        else
+        {
+            g.setColor(java.awt.Color.white);
+            g.fillPolygon(p);
+            g.setColor(java.awt.Color.black);
+            g.drawPolygon(p);
+        }
+    }
+
+
+    boolean select(Point point)
+    {
+        if (p.contains(point))
+        {
+            selected = !selected;
+            return true;
+        }
+        return false;
+    }
+
+
+    public Rectangle getBounds()
+    {
+        return rectBound;
+    }
+
+    public boolean contains(Point point)
+    {
+        return (p.contains(point));
+    }
+    
+}
+
+
+class Chit
+{
+    // The container's MediaTracker needs to access the image.
+    Image image;
+
+    private boolean selected;
+    private Rectangle rect;
+    private Container container;
+
+    // offset of the mouse cursor within the chit.
+    private int dx;
+    private int dy;
+
+
+    Chit(int cx, int cy, int scale, String image_filename, 
+        Container my_container)
+    {
+        selected = false;
+        rect = new Rectangle(cx, cy, scale, scale);
+        image = Toolkit.getDefaultToolkit().getImage(image_filename);
+        container = my_container;
+        dx = 0;
+        dy = 0;
+    }
+    
+    public void paint(Graphics g)
+    {
+        g.drawImage(image, rect.x, rect.y, container);
+    }
+
+    boolean select(Point point)
+    {
+        if (rect.contains(point))
+        {
+            selected = true;
+            dx = point.x - rect.x;
+            dy = point.y - rect.y;
+        }
+        else
+        {
+            selected = false;
+        }
+        return selected;
+    }
+
+    void setLocation(Point point)
+    {
+        point.x -= dx;
+        point.y -= dy;
+        rect.setLocation(point);
+    }
+
+    public Rectangle getBounds()
+    {
+        return rect;
+    }
+
+}
+
