@@ -363,16 +363,46 @@ class BattleChit extends Chit
     // (fewer dice or higher strike number) in order to be
     // allowed to carry.  Return true if the penalty is taken,
     // or false if it is not.
-    private boolean chooseStrikePenalty(BattleChit carryTarget)
+    private boolean chooseStrikePenalty(BattleChit [] carryTargets)
     {
-        String promptString = "Take strike penalty to allow carrying to " +
-            carryTarget.getCritter().getName() + " in " +
-            carryTarget.getCurrentHex().getTerrainName().toLowerCase() + "?";
+        StringBuffer prompt = new StringBuffer(
+            "Take strike penalty to allow carrying to ");
 
-        new OptionDialog(map, "Take Strike Penalty?", promptString, 
+        for (int i = 0; i < carryTargets.length; i++)
+        {
+            prompt.append(carryTargets[i].getCritter().getName() + " in " +
+                carryTargets[i].getCurrentHex().getTerrainName().toLowerCase());
+            if (i < carryTargets.length - 1)
+            {
+                prompt.append(", ");
+            }
+        }
+        prompt.append("?");
+
+        new OptionDialog(map, "Take Strike Penalty?", prompt.toString(), 
             "Take Penalty", "Do Not Take Penalty");
 
         return (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION);
+    }
+
+
+    // Sort penalty options by number of dice (ascending), then by
+    //    strike number (descending).
+    private void sortPenaltyOptions(PenaltyOption [] penaltyOptions,
+        int numPenaltyOptions)
+    {
+        for (int i = 0; i < numPenaltyOptions - 1; i++)
+        {
+            for (int j = i + 1; j < numPenaltyOptions; j++)
+            {
+                if (penaltyOptions[i].compareTo(penaltyOptions[j]) > 0)
+                {
+                    PenaltyOption temp = penaltyOptions[i];
+                    penaltyOptions[i] = penaltyOptions[j];
+                    penaltyOptions[j] = temp;
+                }
+            }
+        }
     }
 
 
@@ -414,6 +444,12 @@ class BattleChit extends Chit
             // Count legal carry targets.
             int numCarryTargets = 0;
 
+            // Count strike penalty options
+            int numPenaltyOptions = 0;
+
+            PenaltyOption [] penaltyOptions = new PenaltyOption[5];
+
+
             for (int i = 0; i < 6; i++)
             {
                 // Adjacent creatures separated by a cliff are not in contact.
@@ -444,25 +480,11 @@ class BattleChit extends Chit
                             else if (tmpStrikeNumber > strikeNumber ||
                                 tmpDice < dice)
                             {
-                                // Allow choosing a less effective strike in
-                                // order to possibly carry.
-                                if (chooseStrikePenalty(chit))
-                                {
-                                    if (tmpStrikeNumber > strikeNumber)
-                                    {
-                                        strikeNumber = tmpStrikeNumber;
-                                    }
-                                    if (tmpDice < dice)
-                                    {
-                                        dice = tmpDice;
-                                    }
-                                    chit.setCarryFlag(true);
-                                    numCarryTargets++;
-                                }
-                                else
-                                {
-                                    chit.setCarryFlag(false);
-                                }
+                                // Add this scenario to the list. 
+                                penaltyOptions[numPenaltyOptions] = new 
+                                    PenaltyOption(chit, tmpDice, 
+                                    tmpStrikeNumber);
+                                numPenaltyOptions++;
                             }
 
                             else
@@ -474,6 +496,61 @@ class BattleChit extends Chit
                     }
                 }
             }
+
+
+            // Sort penalty options by number of dice (ascending), then by
+            //    strike number (descending).
+            sortPenaltyOptions(penaltyOptions, numPenaltyOptions);
+
+
+            // Find the group of PenaltyOptions with identical dice and
+            //    strike numbers.
+
+            int last = -1;
+
+            while (++last < numPenaltyOptions)
+            {
+                int first = last; 
+                while (last + 1 < numPenaltyOptions && 
+                    penaltyOptions[last + 1].getDice() == 
+                        penaltyOptions[first].getDice() &&
+                    penaltyOptions[last + 1].getStrikeNumber() ==
+                        penaltyOptions[first].getStrikeNumber())
+                {
+                    last++;
+                }
+
+                int tmpDice = penaltyOptions[first].getDice();
+                int tmpStrikeNumber = penaltyOptions[first].getStrikeNumber();
+
+                // Make sure the penalty is still relevant.
+                if (tmpStrikeNumber > strikeNumber || tmpDice < dice) 
+                {
+                    BattleChit [] chits = new BattleChit[last - first + 1];
+                    for (int i = first; i <= last; i++)
+                    {
+                        chits[i - first] = penaltyOptions[i].getChit();
+                    }
+                                    
+                    if (chooseStrikePenalty(chits))
+                    {
+                        if (tmpStrikeNumber > strikeNumber)
+                        {
+                            strikeNumber = tmpStrikeNumber;
+                        }
+                        if (tmpDice < dice)
+                        {
+                            dice = tmpDice;
+                        }
+                        for (int i = 0; i < chits.length; i++)
+                        {
+                            chits[i].setCarryFlag(true);
+                            numCarryTargets++;
+                        }
+                    }
+                }
+            }
+
 
             if (numCarryTargets == 0)
             {
