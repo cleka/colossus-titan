@@ -110,7 +110,8 @@ public class BattleMap extends Frame implements MouseListener,
         }
         catch (NullPointerException e)
         {
-            System.out.println("Couldn't find " + Creature.colossus.getImageName());
+            System.out.println(e.toString() + " Couldn't find " +
+                Creature.colossus.getImageName());
             System.exit(1);
         }
 
@@ -159,7 +160,8 @@ public class BattleMap extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, "waitForAll was interrupted");
+            new MessageBox(this, e.toString() +
+                " waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -199,7 +201,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, "waitForAll was interrupted");
+            new MessageBox(this, e.toString() + "waitForAll was interrupted");
         }
         imagesLoaded = true;
     }
@@ -525,8 +527,6 @@ public class BattleMap extends Frame implements MouseListener,
         if (!chit.inContact(true) && critter.rangeStrikes() &&
             turn.getPhase() != turn.STRIKEBACK)
         {
-            int skill = critter.getSkill();
-
             for (int i = 0; i < numChits; i++)
             {
                 BattleChit bogie = chits[i];
@@ -580,7 +580,7 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    public int highlightCarries(BattleChit chit, int damage)
+    public int highlightCarries(int damage)
     {
         unselectAllHexes();
 
@@ -742,13 +742,8 @@ public class BattleMap extends Frame implements MouseListener,
             return false;
         }
 
-        int x1 = currentHex.getXCoord();
-        float y1 = currentHex.getYCoord();
-        int x2 = finalHex.getXCoord();
-        float y2 = finalHex.getYCoord();
-
         // Offboard hexes are not allowed.
-        if (x1 == -1 || x2 == -1)
+        if (currentHex.getXCoord() == -1 || finalHex.getXCoord() == -1)
         {
             return true;
         }
@@ -1124,13 +1119,8 @@ public class BattleMap extends Frame implements MouseListener,
     {
         int count = previousCount;
 
-        int x1 = hex1.getXCoord();
-        float y1 = hex1.getYCoord();
-        int x2 = hex2.getXCoord();
-        float y2 = hex2.getYCoord();
-
         // Offboard hexes are not allowed.
-        if (x1 == -1 || x2 == -1)
+        if (hex1.getXCoord() == -1 || hex2.getXCoord() == -1)
         {
             return 10;
         }
@@ -1771,7 +1761,7 @@ public class BattleMap extends Frame implements MouseListener,
 
                     if (i < 5 && show[i + 1][j - ((i + 1) & 1)])
                     {
-                        h[i][j].setNeighbor(1, h[i + 1][j - ((i + 1) & 1)]);;
+                        h[i][j].setNeighbor(1, h[i + 1][j - ((i + 1) & 1)]);
                     }
 
                     if (i < 5 && j + (i & 1) < 6 && show[i + 1][j + (i & 1)])
@@ -2100,7 +2090,7 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    public static void main(String args[])
+    public static void main(String [] args)
     {
         Player player1 = new Player("Attacker", null);
         Player player2 = new Player("Defender", null);
