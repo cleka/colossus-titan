@@ -19,9 +19,6 @@ class PickLord extends Dialog implements MouseListener, WindowListener
     private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
-    private int titans;
-    private int angels;
-    private int archangels;
     private Creature [] lords;
 
 
@@ -41,55 +38,47 @@ class PickLord extends Dialog implements MouseListener, WindowListener
 
         setBackground(Color.lightGray);
 
-        setSize(5 * scale, 3 * scale);
 
-        // XXX: This doesn't work under Solaris.
+        lords = new Critter[3];
+
+        int numLordTypes = 0;
+        if (legion.numCreature(Creature.titan) > 0)
+        {
+            lords[numLordTypes] = legion.getCritter(Creature.titan);
+            numLordTypes++;
+        }
+        if (legion.numCreature(Creature.archangel) > 0)
+        {
+            lords[numLordTypes] = legion.getCritter(Creature.archangel);
+            numLordTypes++;
+        }
+        if (legion.numCreature(Creature.angel) > 0)
+        {
+            lords[numLordTypes] = legion.getCritter(Creature.angel);
+            numLordTypes++;
+        }
+        
+
+        setSize((numLordTypes + 2) * scale, 3 * scale);
+
         setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
 
-        lords = new Creature[3];
-        lords[0] = Creature.titan;
-        lords[1] = Creature.archangel;
-        lords[2] = Creature.angel;
 
-        chits = new Chit[3];
-        for (int i = 0; i < 3; i++)
+        chits = new Chit[numLordTypes];
+
+        for (int i = 0; i < chits.length; i++)
         {
             chits[i] = new Chit(scale * (i + 1), scale, scale, 
                 lords[i].getImageName(), this);
         }
         
-        titans = legion.numCreature(Creature.titan);
-        angels = legion.numCreature(Creature.angel); 
-        if (angels > 1)
-        {
-            angels = 1;
-        }
-        int archangels = legion.numCreature(Creature.archangel);
-        if (archangels > 1)
-        {
-            archangels = 1;
-        }
-
-        if (titans == 0)
-        {
-            chits[0].setDead(true);
-        }
-        if (archangels == 0)
-        {
-            chits[1].setDead(true);
-        }
-        if (angels == 0)
-        {
-            chits[2].setDead(true);
-        }
-
         tracker = new MediaTracker(this);
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < chits.length; i++)
         {
             tracker.addImage(chits[i].getImage(), 0);
         }
@@ -128,7 +117,7 @@ class PickLord extends Dialog implements MouseListener, WindowListener
             offGraphics = offImage.getGraphics();
         }
 
-        for (int i = 0; i < 3;  i++)
+        for (int i = 0; i < chits.length;  i++)
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
@@ -150,9 +139,9 @@ class PickLord extends Dialog implements MouseListener, WindowListener
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < chits.length; i++)
         {
-            if (chits[i].select(point) && ! chits[i].isDead())
+            if (chits[i].select(point))
             {
                 legion.revealCreatures(lords[i], 1);
                 dispose();
