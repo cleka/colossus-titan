@@ -85,7 +85,7 @@ class MasterHex extends Hex
     }
 
 
-    void rescale(int cx, int cy, int scale)
+    public void rescale(int cx, int cy, int scale)
     {
         this.scale = scale;
         len = scale / 3.0;
@@ -205,14 +205,15 @@ class MasterHex extends Hex
     }
 
 
-    void repaint()
+    public void repaint()
     {
         board.repaint(rectBound.x, rectBound.y, rectBound.width, 
             rectBound.height);
     }
 
 
-    void drawGate(Graphics g, int vx1, int vy1, int vx2, int vy2, int gateType)
+    private void drawGate(Graphics g, int vx1, int vy1, int vx2, int vy2, 
+        int gateType)
     {
         int x0;                 // first focus point
         int y0;
@@ -336,7 +337,7 @@ class MasterHex extends Hex
     }
 
 
-    String getTerrainName()
+    public String getTerrainName()
     {
         switch (getTerrain())
         {
@@ -367,7 +368,8 @@ class MasterHex extends Hex
         }
     }
 
-    Color getTerrainColor()
+
+    public Color getTerrainColor()
     {
         switch (getTerrain())
         {
@@ -400,7 +402,7 @@ class MasterHex extends Hex
 
 
     // Return the number of types of recruits for this terrain type.
-    int getNumRecruitTypes()
+    public int getNumRecruitTypes()
     {
         switch (getTerrain())
         {
@@ -428,7 +430,7 @@ class MasterHex extends Hex
 
 
     // Return the ith recruit possible in this terrain type.
-    Creature getRecruit(int i)
+    public Creature getRecruit(int i)
     {
         switch (getTerrain())
         {
@@ -593,7 +595,7 @@ class MasterHex extends Hex
     
     // Return the number of the next lower creature needed to muster the ith 
     // recruit possible in this terrain type. If not applicable, return 0.
-    int getNumToRecruit(int i)
+    public int getNumToRecruit(int i)
     {
         switch (getTerrain())
         {
@@ -755,22 +757,23 @@ class MasterHex extends Hex
         }
     }
 
+
     // Return a point near the center of the hex, vertically offset
     // a bit toward the fat side.
-    Point getOffCenter()
+    public Point getOffCenter()
     {
         return new Point((xVertex[0] + xVertex[1]) / 2, (yVertex[0] + 
             yVertex[3]) / 2 + (inverted ? -(scale / 6) : (scale / 6))); 
     }
 
 
-    int getNumLegions()
+    public int getNumLegions()
     {
         return numLegions;
     }
 
 
-    Legion getLegion(int i)
+    public Legion getLegion(int i)
     {
         if (i < 0 || i > numLegions - 1)
         {
@@ -783,7 +786,7 @@ class MasterHex extends Hex
     }
 
 
-    int getNumFriendlyLegions(Player player)
+    public int getNumFriendlyLegions(Player player)
     {
         int count = 0;
         for (int i = 0; i < numLegions; i++)
@@ -797,7 +800,7 @@ class MasterHex extends Hex
     }
 
     
-    int getNumEnemyLegions(Player player)
+    public int getNumEnemyLegions(Player player)
     {
         int count = 0;
         for (int i = 0; i < numLegions; i++)
@@ -811,7 +814,7 @@ class MasterHex extends Hex
     }
 
 
-    boolean isEngagement()
+    public boolean isEngagement()
     {
         if (numLegions > 0)
         {
@@ -829,7 +832,7 @@ class MasterHex extends Hex
     }
 
 
-    Legion getFriendlyLegion(Player player)
+    public Legion getFriendlyLegion(Player player)
     {
         for (int i = 0; i < numLegions; i++)
         {
@@ -842,7 +845,7 @@ class MasterHex extends Hex
     }
 
 
-    Legion getEnemyLegion(Player player)
+    public Legion getEnemyLegion(Player player)
     {
         for (int i = 0; i < numLegions; i++)
         {
@@ -855,7 +858,7 @@ class MasterHex extends Hex
     }
 
 
-    void alignLegions()
+    public void alignLegions()
     {
         if (numLegions == 0)
         {
@@ -904,7 +907,7 @@ class MasterHex extends Hex
     }
     
     
-    void addLegion(Legion legion)
+    public void addLegion(Legion legion)
     {
         numLegions++;
         legions[numLegions - 1] = legion;
@@ -914,7 +917,7 @@ class MasterHex extends Hex
     }
 
 
-    void removeLegion(Legion legion)
+    public void removeLegion(Legion legion)
     {
         for (int i = 0; i < numLegions; i++)
         {
@@ -943,13 +946,13 @@ class MasterHex extends Hex
     }
 
 
-    void setNeighbor(int i, MasterHex hex)
+    public void setNeighbor(int i, MasterHex hex)
     {
         neighbors[i] = hex;
     }
 
 
-    MasterHex getNeighbor(int i)
+    public MasterHex getNeighbor(int i)
     {
         if (i < 0 || i > 6)
         {
@@ -962,51 +965,55 @@ class MasterHex extends Hex
     }
 
 
-    int getLabel()
+    public int getLabel()
     {
         return label;
     }
 
 
-    void setLabel(int label)
+    public void setLabel(int label)
     {
         this.label = label;
     }
 
 
-    void setExitType(int i, int exitType)
+    public void setExitType(int i, int exitType)
     {
         this.exitType[i] = exitType;
     }
 
-    int getExitType(int i)
+
+    public int getExitType(int i)
     {
         return exitType[i];
     }
     
-    void setEntranceType(int i, int entranceType)
+
+    public void setEntranceType(int i, int entranceType)
     {
         this.entranceType[i] = entranceType;
     }
 
-    int getEntranceType(int i)
+
+    public int getEntranceType(int i)
     {
         return entranceType[i];
     }
 
 
-    void setEntrySide(int side)
+    public void setEntrySide(int side)
     {
         entrySide = side;
     }
 
-    int getEntrySide()
+
+    public int getEntrySide()
     {
         return entrySide;
     }
 
 
-    boolean inverted()
+    public boolean inverted()
     {
         return inverted;
     }
