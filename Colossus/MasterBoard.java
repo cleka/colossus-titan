@@ -45,6 +45,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private JMenu fileMenu;
     private JMenu phaseMenu;
     private JMenu optionsMenu;
+    private JMenu debugMenu;
     private JPopupMenu popupMenu;
 
     private JCheckBoxMenuItem miShowStatusScreen;
@@ -54,6 +55,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private JCheckBoxMenuItem miAutoPickRecruiter;
     private JCheckBoxMenuItem miAutosave;
     private JCheckBoxMenuItem miAntialias;
+    private JCheckBoxMenuItem miChooseMovement;
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
@@ -489,6 +491,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
         menuBar = new JMenuBar();
         masterFrame.setJMenuBar(menuBar);
 
+        // File menu
+
         fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
@@ -533,6 +537,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         optionsMenu.add(miAllStacksVisible);
 
         optionsMenu.addSeparator();
+
         // Then per-player options
 
         miAutoRecruit = new JCheckBoxMenuItem(Game.sAutoRecruit);
@@ -548,6 +553,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         optionsMenu.add(miAutoPickRecruiter);
 
         optionsMenu.addSeparator();
+
         // Then per-client GUI options
 
         miShowStatusScreen = new JCheckBoxMenuItem(Game.sShowStatusScreen);
@@ -572,6 +578,21 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         mi = optionsMenu.add(saveOptionsAction);
         mi.setMnemonic(KeyEvent.VK_O);
+        
+        // Debug menu 
+
+        debugMenu = new JMenu("Debug");
+        debugMenu.setMnemonic(KeyEvent.VK_D);
+        menuBar.add(debugMenu);
+        
+        miChooseMovement = new JCheckBoxMenuItem(Game.sChooseMovement);
+        miChooseMovement.setMnemonic(KeyEvent.VK_M);
+        miChooseMovement.setSelected(game.getChooseMovement());
+        miChooseMovement.addItemListener(this);
+        debugMenu.add(miChooseMovement);
+
+        // Force number of hits
+        // Allow changing creature types
     }
 
 
@@ -1408,10 +1429,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     {
         Player player = game.getActivePlayer();
 
-        if (player.getMovementRoll() == 0)
-        {
-            player.rollMovement();
-        }
+        player.rollMovement();
 
         masterFrame.setTitle(player.getName() + " Turn " +
             game.getTurnNumber() + " : Movement Roll: " +
@@ -1926,6 +1944,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         else if (text.equals(Game.sAntialias))
         {
             game.setAntialias(selected);
+        }
+        else if (text.equals(Game.sChooseMovement))
+        {
+            game.setChooseMovement(selected);
         }
     }
 

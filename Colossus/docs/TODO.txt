@@ -1,5 +1,7 @@
-Create a list of options to save/load, rather than hardcoding
-   each one.
+For PBEM and debug, add a menu with the ability to specify tower 
+   assignments and number of hits in combat.  Also allow the ability 
+   to replace any creature in a legion with a different creature type, 
+   and a creature type of "unknown"
 
 Add per-player option menu, with results saved to playername.cfg
 
@@ -61,6 +63,8 @@ Move GUI/client classes and model/server classes into separate
 
 Add a ShowAllRecruits window that displays all recruits by terrain 
    type.
+
+Allow setting Look and Feel from a menu.
 
 Add SetupBattle class, to allow setting up standalone battles.
 

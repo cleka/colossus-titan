@@ -35,10 +35,6 @@ public final class Game
 
     private boolean engagementInProgress;
 
-    /** For debugging, or if the game crashes after movement
-     *  has been rolled, we can force the next movement roll
-     *  from the command line. */
-    private int forcedMovementRoll;
 
     // Constants for savegames
     public static final String saveDirname = "saves";
@@ -46,7 +42,7 @@ public final class Game
     public static final String saveGameVersion =
         "Colossus savegame version 4";
 
-    // Options names
+    // Option names
     public static final String sAutosave = "Autosave";
     public static final String sAllStacksVisible = "All stacks visible";
     public static final String sAutoRecruit = "Auto recruit";
@@ -54,6 +50,10 @@ public final class Game
     public static final String sShowStatusScreen = "Show game status";
     public static final String sShowDice = "Show dice";
     public static final String sAntialias = "Antialias";
+    public static final String sChooseMovement = "Choose movement roll";
+    public static final String sChooseHits= "Choose number of hits";
+    public static final String sChooseTowers = "Choose towers";
+    public static final String sChooseCreatures = "Choose creatures";
 
     // Per-player client options
     private static boolean autoRecruit;
@@ -66,6 +66,13 @@ public final class Game
     // Server options
     private static boolean autosave = true;
     private static boolean allStacksVisible;
+
+    // Debug options
+    private static boolean chooseMovement;
+    private static boolean chooseHits;
+    private static boolean chooseTowers;
+    private static boolean chooseCreatures;
+
 
     /** Preference file */
     private static final String optionsPath = "Colossus.cfg";
@@ -95,19 +102,6 @@ public final class Game
 
         loadOptions();
         updateStatusScreen();
-    }
-
-
-    /** Load a saved game, and force the first movement roll. */
-    public Game(GameApplet applet, String filename, int forcedMovementRoll)
-    {
-        // Call the normal saved game constructor.
-        this(applet, filename);
-
-        if (forcedMovementRoll >= 1 && forcedMovementRoll <= 6)
-        {
-            this.forcedMovementRoll = forcedMovementRoll;
-        }
     }
 
 
@@ -276,6 +270,24 @@ public final class Game
     public void setAllStacksVisible(boolean allStacksVisible)
     {
         this.allStacksVisible = allStacksVisible;
+    }
+
+
+    public boolean getChooseMovement()
+    {
+        return chooseMovement;
+    }
+    
+    
+    public void setChooseMovement(boolean chooseMovement)
+    {
+        this.chooseMovement = chooseMovement;
+    }
+
+
+    public int pickRoll()
+    {
+        return PickRoll.pickRoll(masterFrame);
     }
 
 
@@ -1216,7 +1228,7 @@ public final class Game
         showStatusScreen = (options.getProperty(sShowStatusScreen,
             "true").equals("true"));
         antialias = (options.getProperty(sAntialias, "false").equals("true"));
-        autoRecruit = (options.getProperty(sAutoRecruit, 
+        autoRecruit = (options.getProperty(sAutoRecruit,
             "false").equals("true"));
 
         board.twiddleAutosave(autosave);
@@ -2211,18 +2223,6 @@ public final class Game
     }
 
 
-    public int getForcedMovementRoll()
-    {
-        return forcedMovementRoll;
-    }
-
-
-    public void clearForcedMovementRoll()
-    {
-        forcedMovementRoll = 0;
-    }
-
-
     private static final int ARCHES_AND_ARROWS = -1;
     private static final int ARROWS_ONLY = -2;
 
@@ -2968,15 +2968,10 @@ public final class Game
             // Start a new game.
             new Game(null);
         }
-        else if (args.length == 1)
+        else
         {
             // Load a game.
             new Game(null, args[0]);
-        }
-        else
-        {
-            // Load a game, and specify the next movement roll.
-            new Game(null, args[0], Integer.parseInt(args[1]));
         }
     }
 }

@@ -373,12 +373,11 @@ public final class Player implements Comparable
     {
         // It's a new turn, so once-per-turn things are allowed again.
 
-        if (game.getForcedMovementRoll() != 0)
+        if (game.getChooseMovement())
         {
-            movementRoll = game.getForcedMovementRoll();
-            Game.logEvent(getName() + " rolled a " + movementRoll +
-                " for movement (forced!)");
-            game.clearForcedMovementRoll();
+            movementRoll = game.pickRoll();
+            Game.logEvent(getName() + " chose a " + movementRoll +
+                " for movement");
         }
         else
         {
