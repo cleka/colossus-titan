@@ -302,6 +302,18 @@ public final class Server
     }
 
 
+    /** Needed if loading game outside the split phase. */
+    void allSetupTurnState()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setupTurnState(game.getActivePlayerName(), 
+                game.getTurnNumber());
+        }
+    }
+
     void allSetupSplit()
     {
         Iterator it = game.getPlayers().iterator();

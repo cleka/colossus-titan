@@ -9,6 +9,7 @@
         with corresponding optional.jar installed in $ANT_HOME/lib
      JavaCC 2.1    http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
         Environment var JAVACC_HOME pointing to JavaCC install root
+     Javamake      //http://www.experimentalstuff.com/Technologies/JavaMake/
      To sign jarfiles, you need a file called usernameKeystore,
         (substituting your username for "username")
         with an alias matching your username, and you need to put
@@ -38,6 +39,8 @@
 
         <!-- Set this to jikes or kjc to use those instead of javac -->
         <property name="build.compiler" value="modern"/>
+
+
 
         <property name="HTMLDIR" value="/home/groups/c/co/colossus/htdocs"/>
         <property name="DOWNLOAD_DIR" value="${HTMLDIR}/download"/>
@@ -101,7 +104,7 @@
         />
 </target>
 
-<!-- Ant's depend task is broken, so just delete all class files. -->
+<!-- XXX Ant's depend task is broken, so just delete all class files. -->
 <target name="dep"
         description = "Delete dependant class files"> 
         <delete verbose="yes" quiet = "yes"> 
@@ -112,16 +115,20 @@
         </delete>
 </target>
 
+<taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake"/>
+
+<!-- Change "javamake" to "javac" in the task below if you want. -->
 <target name="compile" depends="init,parsers"
-        description = "Compile .java files to .class files">
+        description = "Compile .java files to .class files using javamake">
         <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
         <delete verbose="yes" quiet = "yes" file = "test/Colossus.jar"/>
         <delete verbose="yes" quiet = "yes" file = "BattlelandsBuilder.jar"/>
         <delete verbose="yes" quiet = "yes" file = "BattlelandsRandomizer.jar"/>
-        <javac debug="yes" deprecation="yes" target="1.2" srcdir="."
+        <javamake debug="yes" deprecation="yes" target="1.2" srcdir="."
                 includes="**/*.java"
         />
 </target>
+
 
 
 <target name="javadoc" depends="compile"

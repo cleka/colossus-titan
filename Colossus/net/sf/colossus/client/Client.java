@@ -1640,6 +1640,14 @@ Log.debug("called Client.acquireAngelCallback()");
         return recruiterName;
     }
 
+    /** Needed if we load a game outside the split phase, where 
+     *  active player and turn are usually set. */
+    public void setupTurnState(String activePlayerName, int turnNumber)
+    {
+        this.activePlayerName = activePlayerName;
+        this.turnNumber = turnNumber;
+    }
+
     // TODO Update markersAvailable more often.
     public void setupSplit(Set markersAvailable, String activePlayerName,
         int turnNumber)

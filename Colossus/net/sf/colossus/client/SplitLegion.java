@@ -31,8 +31,10 @@ final class SplitLegion extends KDialog implements MouseListener,
     /** new marker id,creature1,creature2... */
     private static String results;
 
-    private Box oldBox;
-    private Box newBox;
+    // XXX Using Boxes here caused invisible chits in 1.3.1 but worked
+    // in 1.4.0.  JPanels with BoxLayouts work.
+    private JPanel oldBox;
+    private JPanel newBox;
     private Box buttonBox;
 
     private Component oldGlue;
@@ -66,8 +68,11 @@ final class SplitLegion extends KDialog implements MouseListener,
 
         scale = 4 * Scale.get();
 
-        oldBox = Box.createHorizontalBox();
-        newBox = Box.createHorizontalBox();
+        oldBox = new JPanel();
+        oldBox.setLayout(new BoxLayout(oldBox, BoxLayout.X_AXIS));
+        newBox = new JPanel();
+        newBox.setLayout(new BoxLayout(newBox, BoxLayout.X_AXIS));
+
         buttonBox = Box.createHorizontalBox();
 
         contentPane.add(oldBox);
@@ -76,7 +81,7 @@ final class SplitLegion extends KDialog implements MouseListener,
 
         oldMarker = new Marker(scale, parentId, this, null);
         oldBox.add(oldMarker);
-        oldBox.add(Box.createHorizontalStrut(scale / 4));
+        oldBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
         java.util.List imageNames = client.getLegionImageNames(parentId);
         totalChits = imageNames.size();
@@ -94,7 +99,7 @@ final class SplitLegion extends KDialog implements MouseListener,
 
         newMarker = new Marker(scale, selectedMarkerId, this, null);
         newBox.add(newMarker);
-        newBox.add(Box.createHorizontalStrut(scale / 4));
+        newBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
         oldGlue = Box.createHorizontalGlue();
         newGlue = Box.createHorizontalGlue();
@@ -103,14 +108,13 @@ final class SplitLegion extends KDialog implements MouseListener,
 
         JButton button1 = new JButton("Done");
         button1.setMnemonic(KeyEvent.VK_D);
+        button1.addActionListener(this);
+        buttonBox.add(button1);
+
         JButton button2 = new JButton("Cancel");
         button2.setMnemonic(KeyEvent.VK_C);
-
-        buttonBox.add(button1);
-        button1.addActionListener(this);
-
-        buttonBox.add(button2);
         button2.addActionListener(this);
+        buttonBox.add(button2);
 
         pack();
         centerOnScreen();
@@ -135,7 +139,7 @@ final class SplitLegion extends KDialog implements MouseListener,
 
     /** Move a chit to the end of the other line. */
     private void moveChitToOtherLine(java.util.List fromChits, java.util.List
-        toChits, Box fromBox, Box toBox, int oldPosition)
+        toChits, Container fromBox, Container toBox, int oldPosition)
     {
         oldBox.remove(oldGlue);
         newBox.remove(newGlue);

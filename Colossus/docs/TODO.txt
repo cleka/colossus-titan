@@ -1,6 +1,10 @@
 Put old, new web pages under CVS.
 Switch to new web page.
 
+Do some (optional?) sorting of chits within legions on client side.
+
+Document Javadepend in build.tex
+
 Fix pic used for minimized icon.
 Include an .ico file for Windows.  (ImageMagick can autogenerate one.)
 
@@ -10,9 +14,6 @@ Options to auto quit JVM when game over, auto stop when last human dies.
 
 Document test procedures.
 Add some JUnit tests.
-
-Find a better Java dependency checker (javadepend?), and add a real 
-   depend target.  
 
 ShowLegion on mouseover, not click, with permanent dialog.
 

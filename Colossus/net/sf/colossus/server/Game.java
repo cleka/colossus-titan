@@ -582,7 +582,7 @@ public final class Game
 
     /** Advance to the next phase, only if the passed oldPhase and playerName
      *  are current. */
-    void advancePhase(final int oldPhase, final String playerName)
+    synchronized void advancePhase(final int oldPhase, final String playerName)
     {
         if (oldPhase != phase || pendingAdvancePhase ||
             !playerName.equals(getActivePlayerName()))
@@ -1172,7 +1172,6 @@ public final class Game
                 battle.init();
             }
 
-
             server.allUpdatePlayerInfo();
 
             if (server.getClientOption(Options.allStacksVisible))
@@ -1189,6 +1188,7 @@ public final class Game
             server.allInitBoard();
             server.allAddMarkers();
 
+            server.allSetupTurnState();
             setupPhase();
 
             caretaker.fullySyncDisplays();
