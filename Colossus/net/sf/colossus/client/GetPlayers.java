@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
-//import java.lang.reflect.*;
 
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Log;
@@ -562,85 +561,4 @@ public final class GetPlayers extends JDialog implements WindowListener,
     {
         return getMinimumSize();
     }
-
-
-
-    /*
-    class AIFilenameFilter implements FilenameFilter 
-    {
-        public boolean accept(File dir, String name) 
-        {
-            if (name.endsWith("AI.class"))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public String getDescription() 
-        {
-            return("Filter file that ends in AI.class");
-        }
-    }
-
-    public String[] getAIList() 
-    { // not working properly yet.
-        String [] aiList = new String[maxAIsupported];
-        File simpleAIFile = new File("SimpleAI.class");
-        int ainum = 0;
-        for (int i = 0; i < maxAIsupported; i++)
-        {
-            aiList[i] = "";
-        }
-        
-        Class interfaceAIClass = null;
-        try 
-        {
-            interfaceAIClass = Class.forName("AI");
-        } 
-        catch (Exception e) 
-        {
-            System.out.println("Checking AI interface failed : " + e);
-            System.exit(1);
-        }
-
-        String [] tempAIList = simpleAIFile.getAbsoluteFile().
-            getParentFile().list(new AIFilenameFilter());
-        for (int i = 0; i < tempAIList.length ; i++) 
-        {
-            if ((!tempAIList[i].equals("AI.class")) && 
-                (ainum < maxAIsupported)) 
-            {
-                String aiClassName = tempAIList[i].substring(0, 
-                    tempAIList[i].lastIndexOf(".class"));
-                Class aiClass = null;
-
-                System.out.print("Checking AI by the name of " + aiClassName);
-                try 
-                {
-                    aiClass = Class.forName(aiClassName);
-                } 
-                catch (Exception e) 
-                {
-                    System.out.println(" ; Checking failed : " + e);
-                    System.exit(1);
-                }
-                if (interfaceAIClass.isAssignableFrom(aiClass)) 
-                {
-                    System.out.println(" ; success");
-                    aiList[ainum] = aiClassName; ainum++;
-                }
-                else
-                {
-                    System.out.println(" ; failure");
-                }
-            }
-        }
-        return(aiList);
-    }
-    */
-
 }

@@ -1391,12 +1391,6 @@ public final class Client
     }
 
     /** Return a set of hexLabels. */
-    Set listAllMoves(String markerId)
-    {
-        return server.listAllMoves(markerId);
-    }
-
-    /** Return a set of hexLabels. */
     Set listTeleportMoves(String markerId)
     {
         return server.listTeleportMoves(markerId);

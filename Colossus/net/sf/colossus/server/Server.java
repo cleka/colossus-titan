@@ -1291,14 +1291,6 @@ public final class Server
     }
 
     /** Return a set of hexLabels. */
-    public Set listAllMoves(String markerId)
-    {
-        Legion legion = game.getLegionByMarkerId(markerId);
-        return game.listAllMoves(legion, legion.getCurrentHex(),
-            legion.getPlayer().getMovementRoll(), false);
-    }
-
-    /** Return a set of hexLabels. */
     public Set listTeleportMoves(String markerId)
     {
         Legion legion = game.getLegionByMarkerId(markerId);

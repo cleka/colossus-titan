@@ -109,7 +109,7 @@
 
 
 <!-- TODO If the jar is newer than all its contents, don't build. -->
-<target name="jar" depends="compile,version"
+<target name="jar" depends="init,compile,version"
         description = "Make jar file">
         <jar jarfile = "Colossus.jar" basedir="."
                 manifest="META-INF/MANIFEST.MF"
@@ -138,7 +138,7 @@
 </target>
 
 
-<target name="dist" depends="sign"
+<target name="dist" depends="init,sign"
         description = "Make zip file for user download">
         <zip zipfile="${ZIPFILE}" basedir="."
              excludes="**/*.sav,

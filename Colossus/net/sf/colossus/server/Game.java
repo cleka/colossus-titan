@@ -1825,7 +1825,7 @@ public final class Game
     /** Return set of hexLabels describing where this legion can move.
      *  Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
-    Set listAllMoves(Legion legion, MasterHex hex, int movementRoll, 
+    private Set listAllMoves(Legion legion, MasterHex hex, int movementRoll, 
         boolean ignoreFriends)
     {
         Set set = listNormalMoves(legion, hex, movementRoll, ignoreFriends);
@@ -2248,46 +2248,6 @@ public final class Game
         }
     }
 
-
-/*   XXX Move this logic to the client side.
-        // Pick teleport or normal move if necessary.
-        if (legion.getTeleported(hexLabel) &&
-            legion.canEnterViaLand(hexLabel))
-        {
-            boolean answer;
-            if (server.getClientOption(playerName, Options.autoPickEntrySide))
-            {
-                // Always choose to move normally rather
-                // than teleport if auto-picking entry sides.
-                answer = false;
-            }
-            else
-            {
-                answer = server.chooseWhetherToTeleport(playerName);
-            }
-            legion.setTeleported(hexLabel, answer);
-        }
-
-        // Pick entry side if hex is enemy-occupied and there is
-        // more than one possibility.
-        if (isOccupied(hexLabel) && legion.getNumEntrySides(hexLabel) > 1)
-        {
-            int side;
-            if (server.getClientOption(playerName, Options.autoPickEntrySide))
-            {
-                side = player.aiPickEntrySide(hexLabel, legion);
-            }
-            else
-            {
-                side = server.pickEntrySide(hexLabel, legion);
-            }
-            legion.clearAllEntrySides(hexLabel);
-            if (side == 1 || side == 3 || side == 5)
-            {
-                legion.setEntrySide(hexLabel, side);
-            }
-        }
-*/
 
     /** Move the legion to the hex if legal.  Return true if the
      *  legion was moved or false if the move was illegal. */
