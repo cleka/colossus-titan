@@ -216,32 +216,25 @@ class BattleChit extends Chit
                 dice += 2;
             }
 
-            if (currentHex.getElevation() > targetHex.getElevation())
+            // Adjacent hex, so only one possible direction.
+            int direction = map.getDirection(currentHex, targetHex, false);
+            char hexside = currentHex.getHexside(direction);
+            char oppHexside = currentHex.getOppositeHexside(direction);
+
+            // Native striking down a dune hexside: +2
+            if (hexside == 'd' && creature.isNativeSandDune())
             {
-                // Adjacent hex, so only one possible direction.
-                int direction = map.getDirection(currentHex, targetHex, false);
-                char hexside = currentHex.getHexside(direction);
-                // Native striking down a dune hexside: +2
-                if (hexside == 'd' && creature.isNativeSandDune())
-                {
-                    dice += 2;
-                }
-                // Native striking down a slope hexside: +1
-                else if (hexside == 's' && creature.isNativeSlope())
-                {
-                    dice++;
-                }
+                dice += 2;
             }
-            else if (targetHex.getElevation() > currentHex.getElevation())
+            // Native striking down a slope hexside: +1
+            else if (hexside == 's' && creature.isNativeSlope())
             {
-                // Adjacent hex, so only one possible direction.
-                int direction = map.getDirection(targetHex, currentHex, false);
-                char hexside = targetHex.getHexside(direction);
-                // Non-native striking up a dune hexside: -1
-                if (hexside == 'd' && !creature.isNativeSandDune())
-                {
-                    dice--;
-                }
+                dice++;
+            }
+            // Non-native striking up a dune hexside: -1
+            else if (oppHexside == 'd' && !creature.isNativeSandDune())
+            {
+                dice--;
             }
         }
 
