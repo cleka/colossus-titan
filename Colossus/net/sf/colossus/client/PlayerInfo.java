@@ -28,7 +28,6 @@ public final class PlayerInfo
     private String playersElim;
     private int numLegions;
     private int numCreatures;
-    private int creatureValue;
     private int titanPower;
     private int score;
     private int mulligansLeft;
@@ -197,16 +196,6 @@ public final class PlayerInfo
     int getNumCreatures()
     {
         return numCreatures;
-    }
-
-    void setCreatureValue(int creatureValue)
-    {
-        this.creatureValue = creatureValue;
-    }
-
-    int getCreatureValue()
-    {
-        return creatureValue;
     }
 
     void setTitanPower(int titanPower)

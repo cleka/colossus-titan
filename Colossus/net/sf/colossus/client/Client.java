@@ -709,16 +709,18 @@ public final class Client implements IClient
     }
 
 
+    /** Return the average point value of all legions in the game. */
     int getAverageLegionPointValue()
     {
         int totalValue = 0;
         int totalLegions = 0;
 
-        for (int i = 0; i < playerInfo.length; i++)
+        Iterator it = legionInfo.values().iterator();
+        while (it.hasNext())
         {
-            PlayerInfo info = playerInfo[i];
-            totalLegions += info.getNumLegions();
-            totalValue += info.getCreatureValue();
+            LegionInfo info = (LegionInfo)it.next();
+            totalLegions++;
+            totalValue = info.getPointValue();
         }
         return (int)(Math.round((double)totalValue / totalLegions));
     }
