@@ -141,7 +141,7 @@ BBMANIFEST=META-INF/datatools/BattlelandsBuilder/MANIFEST.MF
 datatools: $(BBJAR)
 
 
-$(BBJAR): $(BBCLASS)
+$(BBJAR): net/sf/colossus/datatools/BattlelandLoader.java $(BBCLASS)
 	jar -cmf $(BBMANIFEST) $@ net/sf/colossus/datatools/*.class \
                                   net/sf/colossus/util/HTMLColor.class
 	chmod +x $@
