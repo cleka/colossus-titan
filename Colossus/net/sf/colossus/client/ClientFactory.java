@@ -1,7 +1,9 @@
 package net.sf.colossus.client;
 
 
-import net.sf.colossus.server.IServer;
+import java.rmi.*;
+import net.sf.colossus.server.IRMIServer;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -13,10 +15,19 @@ import net.sf.colossus.server.IServer;
 
 public class ClientFactory
 {
-    public static IClient createClient(IServer server, String playerName, 
+    public static IRMIClient createClient(IRMIServer server, String playerName,
         boolean primary)
     {
-        Client client = new Client(server, playerName, primary);
-        return (IClient)client;
+        try
+        {
+            Client client = new Client(server, playerName, primary);
+            return (IRMIClient)client;
+        }
+        catch (RemoteException e)
+        {
+            Log.error("ClientFactory().createClient()");
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -4,9 +4,12 @@ package net.sf.colossus.server;
 import java.util.*;
 import java.net.*;
 import javax.swing.*;
+import java.rmi.*;
+import java.rmi.server.*;
 
 import net.sf.colossus.util.Log;
-import net.sf.colossus.client.IClient;
+import net.sf.colossus.client.IRMIClient;
+import net.sf.colossus.client.IRMIClient;
 import net.sf.colossus.client.ClientFactory;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.parser.TerrainRecruitLoader;
@@ -19,7 +22,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  *  @version $Id$
  *  @author David Ripton
  */
-public final class Server implements IServer
+public final class Server extends UnicastRemoteObject implements IRMIServer
 {
     private Game game;
 
@@ -39,16 +42,17 @@ public final class Server implements IServer
     private String primaryPlayerName = null;
 
     // Cached strike information.
-    Critter striker; 
+    Critter striker;
     Critter target;
-    int strikeNumber; 
-    int damage; 
+    int strikeNumber;
+    int damage;
     int [] rolls;
 
 
 
-    Server(Game game)
+    Server(Game game) throws RemoteException
     {
+        super();
         this.game = game;
     }
 
@@ -56,7 +60,8 @@ public final class Server implements IServer
     /** Temporary.  We will not use direct client refs later. */
     void addClient(String playerName, boolean primary)
     {
-        IClient client = ClientFactory.createClient(this, playerName, primary);
+        IRMIClient client = ClientFactory.createClient(this, playerName,
+            primary);
         clients.add(client);
         clientMap.put(playerName, client);
         if (primary)
@@ -71,8 +76,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.dispose();
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.dispose();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
         clients.clear();
     }
@@ -83,8 +96,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.updatePlayerInfo(getPlayerInfo());
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.updatePlayerInfo(getPlayerInfo());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -93,8 +114,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.updateCreatureCount(creatureName, count);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.updateCreatureCount(creatureName, count);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -104,8 +133,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.tellMovementRoll(roll);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.tellMovementRoll(roll);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -123,13 +160,13 @@ public final class Server implements IServer
         battle.doneWithMoves();
     }
 
-    
+
     public void doneWithStrikes(String playerName)
     {
         Battle battle = game.getBattle();
         if (!playerName.equals(battle.getActivePlayerName()))
         {
-            Log.error(playerName + "illegally called doneWithStrikes()"); 
+            Log.error(playerName + "illegally called doneWithStrikes()");
             return;
         }
         if (!battle.doneWithStrikes())
@@ -148,11 +185,11 @@ public final class Server implements IServer
     }
 
 
-    private IClient getClient(String playerName)
+    private IRMIClient getClient(String playerName)
     {
         if (clientMap.containsKey(playerName))
         {
-            return (IClient)clientMap.get(playerName);
+            return (IRMIClient)clientMap.get(playerName);
         }
         else
         {
@@ -184,8 +221,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.initBoard();
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.initBoard();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -209,8 +254,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.tellLegionLocation(markerId, hexLabel);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.tellLegionLocation(markerId, hexLabel);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -219,16 +272,32 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.removeLegion(markerId);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.removeLegion(markerId);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
 
     void showMessageDialog(String playerName, String message)
     {
-        IClient client = getClient(playerName);
-        client.showMessageDialog(message);
+        IRMIClient client = getClient(playerName);
+        try
+        {
+            client.showMessageDialog(message);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     void allShowMessageDialog(String message)
@@ -236,8 +305,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.showMessageDialog(message);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.showMessageDialog(message);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -246,8 +323,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.tellGameOver(message);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.tellGameOver(message);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -258,9 +343,17 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setupTurnState(game.getActivePlayerName(), 
-                game.getTurnNumber());
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setupTurnState(game.getActivePlayerName(),
+                    game.getTurnNumber());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -270,9 +363,17 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            IClient client = getClient(player.getName());
-            client.setupSplit(player.getMarkersAvailable(), 
+            IRMIClient client = getClient(player.getName());
+            try
+            {
+                client.setupSplit(player.getMarkersAvailable(),
                 game.getActivePlayerName(), game.getTurnNumber());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
         allUpdatePlayerInfo();
     }
@@ -283,8 +384,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setupMove();
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setupMove();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -293,8 +402,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setupFight();
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setupFight();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -303,8 +420,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setupMuster();
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setupMuster();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -314,9 +439,17 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setupBattleSummon(game.getBattle().getActivePlayerName(),
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setupBattleSummon(game.getBattle().getActivePlayerName(),
                 game.getBattle().getTurnNumber());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -325,9 +458,18 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setupBattleRecruit(game.getBattle().getActivePlayerName(),
-                game.getBattle().getTurnNumber());
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setupBattleRecruit(
+                    game.getBattle().getActivePlayerName(),
+                    game.getBattle().getTurnNumber());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -336,8 +478,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setupBattleMove();
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setupBattleMove();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -346,9 +496,17 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setupBattleFight(game.getBattle().getPhase(),
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setupBattleFight(game.getBattle().getPhase(),
                 game.getBattle().getActivePlayerName());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -358,10 +516,18 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.placeNewChit(critter.getImageName(), 
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.placeNewChit(critter.getImageName(),
                 critter.getMarkerId().equals(game.getBattle().getDefenderId()),
                 critter.getTag(), critter.getCurrentHexLabel());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -371,8 +537,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.removeDeadBattleChits();
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.removeDeadBattleChits();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -382,8 +556,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.highlightEngagements();
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.highlightEngagements();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -394,10 +576,18 @@ public final class Server implements IServer
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion.getHeight() < 7)
         {
-            IClient client = getClient(playerName);
+            IRMIClient client = getClient(playerName);
             if (client != null)
             {
-                client.askAcquireAngel(markerId, recruits);
+                try
+                {
+                    client.askAcquireAngel(markerId, recruits);
+                }
+                catch (RemoteException e)
+                {
+                    Log.error(e.toString());
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -414,9 +604,17 @@ public final class Server implements IServer
 
     void createSummonAngel(Legion legion)
     {
-        IClient client = getClient(legion.getPlayerName());
-        client.createSummonAngel(legion.getMarkerId(), 
+        IRMIClient client = getClient(legion.getPlayerName());
+        try
+        {
+            client.createSummonAngel(legion.getMarkerId(),
             legion.getLongMarkerName());
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     void reinforce(Legion legion)
@@ -427,8 +625,16 @@ public final class Server implements IServer
         }
         else
         {
-            IClient client = getClient(legion.getPlayerName());
-            client.doReinforce(legion.getMarkerId());
+            IRMIClient client = getClient(legion.getPlayerName());
+            try
+            {
+                client.doReinforce(legion.getMarkerId());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -445,7 +651,7 @@ public final class Server implements IServer
     }
 
 
-    /** Handle mustering for legion. */ 
+    /** Handle mustering for legion. */
     public void doRecruit(String markerId, String recruitName,
         String recruiterName)
     {
@@ -496,9 +702,17 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.didRecruit(legion.getMarkerId(), recruit.getName(),
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.didRecruit(legion.getMarkerId(), recruit.getName(),
                 recruiterName, numRecruiters);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -508,8 +722,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.undidRecruit(legion.getMarkerId(), recruitName);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.undidRecruit(legion.getMarkerId(), recruitName);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -536,10 +758,18 @@ public final class Server implements IServer
         }
         else
         {
-            IClient client = getClient(ally.getPlayerName());
-            client.askConcede(ally.getLongMarkerName(),
+            IRMIClient client = getClient(ally.getPlayerName());
+            try
+            {
+                client.askConcede(ally.getLongMarkerName(),
                 ally.getCurrentHex().getDescription(), ally.getMarkerId(),
                 enemy.getMarkerId());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -569,10 +799,18 @@ public final class Server implements IServer
         }
         else
         {
-            IClient client = getClient(ally.getPlayerName());
-            client.askFlee(ally.getLongMarkerName(),
+            IRMIClient client = getClient(ally.getPlayerName());
+            try
+            {
+                client.askFlee(ally.getLongMarkerName(),
                 ally.getCurrentHex().getDescription(), ally.getMarkerId(),
                 enemy.getMarkerId());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -590,14 +828,14 @@ public final class Server implements IServer
     void twoNegotiate(Legion attacker, Legion defender)
     {
     /* TODO Put negotiation back in.
-        IClient client1 = getClient(defender.getPlayerName());
-        client1.askNegotiate(attacker.getLongMarkerName(), 
-            defender.getLongMarkerName(), attacker.getMarkerId(), 
+        IRMIClient client1 = getClient(defender.getPlayerName());
+        client1.askNegotiate(attacker.getLongMarkerName(),
+            defender.getLongMarkerName(), attacker.getMarkerId(),
             defender.getMarkerId(), attacker.getCurrentHexLabel());
 
-        IClient client2 = getClient(attacker.getPlayerName());
-        client2.askNegotiate(attacker.getLongMarkerName(), 
-            defender.getLongMarkerName(), attacker.getMarkerId(), 
+        IRMIClient client2 = getClient(attacker.getPlayerName());
+        client2.askNegotiate(attacker.getLongMarkerName(),
+            defender.getLongMarkerName(), attacker.getMarkerId(),
             defender.getMarkerId(), attacker.getCurrentHexLabel());
     */
 
@@ -614,8 +852,16 @@ public final class Server implements IServer
     /** Tell playerName about proposal. */
     void tellProposal(String playerName, Proposal proposal)
     {
-        IClient client = getClient(playerName);
-        client.tellProposal(proposal);
+        IRMIClient client = getClient(playerName);
+        try
+        {
+            client.tellProposal(proposal);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
     }
 
     public void fight(String hexLabel)
@@ -641,8 +887,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.tellBattleMove(tag, startingHex, endingHex, undo);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.tellBattleMove(tag, startingHex, endingHex, undo);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -670,7 +924,7 @@ public final class Server implements IServer
 
 
     void allTellStrikeResults(Critter striker, Critter target,
-        int strikeNumber, int [] rolls, int damage, int carryDamageLeft, 
+        int strikeNumber, int [] rolls, int damage, int carryDamageLeft,
         Set carryTargetDescriptions)
     {
         // Save strike info so that it can be reused for carries.
@@ -683,15 +937,23 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.tellStrikeResults(striker.getDescription(), 
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.tellStrikeResults(striker.getDescription(),
                 striker.getTag(), target.getDescription(), target.getTag(),
-                strikeNumber, rolls, damage, target.isDead(), false, 
+                strikeNumber, rolls, damage, target.isDead(), false,
                 carryDamageLeft, carryTargetDescriptions);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
-    void allTellCarryResults(Critter carryTarget, int carryDamageDone, 
+    void allTellCarryResults(Critter carryTarget, int carryDamageDone,
         int carryDamageLeft, Set carryTargetDescriptions)
     {
         if (striker == null || target == null || rolls == null)
@@ -714,12 +976,20 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.tellStrikeResults(striker.getDescription(),
-                striker.getTag(), carryTarget.getDescription(), 
-                carryTarget.getTag(), strikeNumber, rolls, carryDamageDone, 
-                carryTarget.isDead(), true, carryDamageLeft, 
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.tellStrikeResults(striker.getDescription(),
+                striker.getTag(), carryTarget.getDescription(),
+                carryTarget.getTag(), strikeNumber, rolls, carryDamageDone,
+                carryTarget.isDead(), true, carryDamageLeft,
                 carryTargetDescriptions);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -731,10 +1001,18 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.tellStrikeResults("hex damage", -1, target.getDescription(),
-                target.getTag(), 0, null, damage, target.isDead(), false, 
-                0, null);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.tellStrikeResults("hex damage", -1, 
+                    target.getDescription(), target.getTag(), 0, null, 
+                    damage, target.isDead(), false, 0, null);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -743,7 +1021,7 @@ public final class Server implements IServer
     void askChooseStrikePenalty(SortedSet penaltyOptions)
     {
         String playerName = game.getBattle().getActivePlayerName();
-        IClient client = getClient(playerName);
+        IRMIClient client = getClient(playerName);
         ArrayList choices = new ArrayList();
         Iterator it = penaltyOptions.iterator();
         while (it.hasNext())
@@ -752,7 +1030,15 @@ public final class Server implements IServer
             striker = po.getStriker();
             choices.add(po.toString());
         }
-        client.askChooseStrikePenalty(choices);
+        try
+        {
+            client.askChooseStrikePenalty(choices);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     public void assignStrikePenalty(String playerName, String prompt)
@@ -766,10 +1052,18 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.initBattle(masterHexLabel, battle.getTurnNumber(),
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.initBattle(masterHexLabel, battle.getTurnNumber(),
                 battle.getActivePlayerName(), battle.getPhase(),
                 battle.getAttackerId(), battle.getDefenderId());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -779,8 +1073,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.cleanupBattle();
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.cleanupBattle();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -789,7 +1091,7 @@ public final class Server implements IServer
     {
         if (!playerName.equals(game.getActivePlayerName()))
         {
-            Log.error(playerName + "illegally called mulligan()"); 
+            Log.error(playerName + "illegally called mulligan()");
             return;
         }
         int roll = game.mulligan();
@@ -815,8 +1117,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.undidSplit(splitoffId);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.undidSplit(splitoffId);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -834,8 +1144,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.undidMove(markerId, formerHexLabel, currentHexLabel);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.undidMove(markerId, formerHexLabel, currentHexLabel);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -854,10 +1172,10 @@ public final class Server implements IServer
     {
         if (playerName != game.getActivePlayerName())
         {
-            Log.error(playerName + "illegally called doneWithSplits()"); 
+            Log.error(playerName + "illegally called doneWithSplits()");
             return;
         }
-        if (game.getTurnNumber() == 1 && 
+        if (game.getTurnNumber() == 1 &&
             game.getPlayer(playerName).getNumLegions() == 1)
         {
             showMessageDialog(playerName, "Must split initial legion");
@@ -870,7 +1188,7 @@ public final class Server implements IServer
     {
         if (playerName != game.getActivePlayerName())
         {
-            Log.error(playerName + "illegally called doneWithMoves()"); 
+            Log.error(playerName + "illegally called doneWithMoves()");
             return;
         }
 
@@ -904,7 +1222,7 @@ public final class Server implements IServer
     {
         if (playerName != game.getActivePlayerName())
         {
-            Log.error(playerName + "illegally called doneWithEngagements()"); 
+            Log.error(playerName + "illegally called doneWithEngagements()");
             return;
         }
         // Advance only if there are no unresolved engagements.
@@ -920,7 +1238,7 @@ public final class Server implements IServer
     {
         if (playerName != game.getActivePlayerName())
         {
-            Log.error(playerName + "illegally called doneWithRecruits()"); 
+            Log.error(playerName + "illegally called doneWithRecruits()");
             return;
         }
         Player player = game.getPlayer(playerName);
@@ -966,7 +1284,7 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            info[i++] = player.getStatusInfo(); 
+            info[i++] = player.getStatusInfo();
         }
         return info;
     }
@@ -985,8 +1303,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.didSplit(hexLabel, parentId, childId, height);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.didSplit(hexLabel, parentId, childId, height);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1010,9 +1336,17 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.didMove(markerId, startingHexLabel, endingHexLabel, 
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.didMove(markerId, startingHexLabel, endingHexLabel,
                 teleport);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1022,8 +1356,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.addCreature(markerId, creatureName);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.addCreature(markerId, creatureName);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1032,8 +1374,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.removeCreature(markerId, creatureName);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.removeCreature(markerId, creatureName);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1042,17 +1392,33 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setLegionContents(legion.getMarkerId(), 
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setLegionContents(legion.getMarkerId(),
                 legion.getImageNames());
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
     void oneRevealLegion(Legion legion, String playerName)
     {
-        IClient client = getClient(playerName);
-        client.setLegionContents(legion.getMarkerId(),
+        IRMIClient client = getClient(playerName);
+        try
+        {
+            client.setLegionContents(legion.getMarkerId(),
             legion.getImageNames());
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     void allFullyUpdateLegionHeights()
@@ -1060,13 +1426,21 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
+            IRMIClient client = (IRMIClient)it.next();
             Iterator it2 = game.getAllLegions().iterator();
             while (it2.hasNext())
             {
                 Legion legion = (Legion)it2.next();
-                client.setLegionHeight(legion.getMarkerId(),
+                try
+                {
+                    client.setLegionHeight(legion.getMarkerId(),
                     legion.getHeight());
+                }
+                catch (RemoteException e)
+                {
+                    Log.error(e.toString());
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -1077,13 +1451,13 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            IClient client = getClient(player.getName());
+            IRMIClient client = getClient(player.getName());
 
             Iterator it2 = player.getLegions().iterator();
             while (it2.hasNext())
             {
                 Legion legion = (Legion)it2.next();
-                oneRevealLegion(legion, player.getName()); 
+                oneRevealLegion(legion, player.getName());
             }
         }
     }
@@ -1105,8 +1479,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.revealCreatures(legion.getMarkerId(), names);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.revealCreatures(legion.getMarkerId(), names);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1138,16 +1520,32 @@ public final class Server implements IServer
     /** Used to change a player name after color is assigned. */
     void setPlayerName(String playerName, String newName)
     {
-        IClient client = getClient(playerName);
-        client.setPlayerName(newName);
+        IRMIClient client = getClient(playerName);
+        try
+        {
+            client.setPlayerName(newName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
         clientMap.remove(playerName);
         clientMap.put(newName, client);
     }
 
     void askPickColor(String playerName, Set colorsLeft)
     {
-        IClient client = getClient(playerName);
-        client.askPickColor(colorsLeft);
+        IRMIClient client = getClient(playerName);
+        try
+        {
+            client.askPickColor(colorsLeft);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     public void assignColor(String playerName, String color)
@@ -1164,8 +1562,16 @@ public final class Server implements IServer
             Player player = (Player)it.next();
             String name = player.getName();
             String color = player.getColor();
-            IClient client = getClient(name);
-            client.setColor(color);
+            IRMIClient client = getClient(name);
+            try
+            {
+                client.setColor(color);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1180,8 +1586,16 @@ public final class Server implements IServer
 
     void oneSetOption(String playerName, String optname, String value)
     {
-        IClient client = getClient(playerName);
-        client.setOption(optname, value);
+        IRMIClient client = getClient(playerName);
+        try
+        {
+            client.setOption(optname, value);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     void oneSetOption(String playerName, String optname, boolean value)
@@ -1194,8 +1608,16 @@ public final class Server implements IServer
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            IClient client = (IClient)it.next();
-            client.setOption(optname, value);
+            IRMIClient client = (IRMIClient)it.next();
+            try
+            {
+                client.setOption(optname, value);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 

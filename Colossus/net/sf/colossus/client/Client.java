@@ -7,10 +7,12 @@ import javax.swing.*;
 import java.io.*;
 import java.awt.event.*;
 import java.awt.*;
+import java.rmi.*;
+import java.rmi.server.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.server.IServer;
+import net.sf.colossus.server.IRMIServer;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.server.Creature;
@@ -29,11 +31,11 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  */
 
 
-public final class Client implements IClient
+public final class Client extends UnicastRemoteObject implements IRMIClient
 {
     /** This will eventually be a network interface rather than a
      *  direct reference.  So don't share this reference. */
-    private IServer server;
+    private IRMIServer server;
 
     private MasterBoard board;
     private StatusScreen statusScreen;
@@ -123,8 +125,11 @@ public final class Client implements IClient
     private Strike strike = new Strike(this);
 
 
-    Client(IServer server, String playerName, boolean primary)
+    Client(IRMIServer server, String playerName, boolean primary)
+        throws RemoteException
     {
+        super();
+
         this.server = server;
         this.playerName = playerName;
         this.primary = primary;
@@ -147,14 +152,30 @@ public final class Client implements IClient
         clearUndoStack();
         clearRecruitChits();
 
-        server.mulligan(playerName);
+        try
+        {
+            server.mulligan(playerName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
 
     /** Resolve engagement in land. */
     void engage(String land)
     {
-        server.engage(land);
+        try
+        {
+            server.engage(land);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     String getMyEngagedMarkerId()
@@ -178,26 +199,58 @@ public final class Client implements IClient
 
     private void concede(String markerId)
     {
-        server.concede(markerId);
+        try
+        {
+            server.concede(markerId);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     private void doNotConcede(String markerId)
     {
-        server.doNotConcede(markerId);
+        try
+        {
+            server.doNotConcede(markerId);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
 
     /** Cease negotiations and fight a battle in land. */
     void fight(String land)
     {
-        server.fight(land);
+        try
+        {
+            server.fight(land);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
 
     /** Legion summoner summons unit from legion donor. */
     void doSummon(String summoner, String donor, String unit)
     {
-        server.doSummon(summoner, donor, unit);
+        try
+        {
+            server.doSummon(summoner, donor, unit);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
         if (board != null)
         {
             board.repaint();
@@ -217,7 +270,15 @@ public final class Client implements IClient
         // XXX Right now the game breaks if a player quits outside his
         // own turn.  But we need to support this, or players will
         // just drop connections.
-        server.withdrawFromGame(playerName);
+        try
+        {
+            server.withdrawFromGame(playerName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
 
@@ -289,7 +350,7 @@ public final class Client implements IClient
         movementRoll = roll;
         if (board != null)
         {
-            movementDie = new MovementDie(4 * Scale.get(), 
+            movementDie = new MovementDie(4 * Scale.get(),
                 MovementDie.getDieImageName(roll), board);
         }
     }
@@ -640,14 +701,30 @@ public final class Client implements IClient
     /** Called from BattleMap to leave carry mode. */
     void leaveCarryMode()
     {
-        server.leaveCarryMode();
+        try
+        {
+            server.leaveCarryMode();
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
 
     void doneWithBattleMoves()
     {
         clearUndoStack();
-        server.doneWithBattleMoves();
+        try
+        {
+            server.doneWithBattleMoves();
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     boolean anyOffboardCreatures()
@@ -668,7 +745,15 @@ public final class Client implements IClient
 
     void doneWithStrikes()
     {
-        server.doneWithStrikes(playerName);
+        try
+        {
+            server.doneWithStrikes(playerName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     private void makeForcedStrikes()
@@ -676,8 +761,16 @@ public final class Client implements IClient
         if (playerName.equals(getBattleActivePlayerName()) &&
             getOption(Options.autoForcedStrike))
         {
-            server.makeForcedStrikes(playerName, getOption(
-                Options.autoRangeSingle));
+            try
+            {
+                server.makeForcedStrikes(playerName, getOption(
+                    Options.autoRangeSingle));
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -707,7 +800,7 @@ public final class Client implements IClient
         return getLegionInfo(id).getMarker();
     }
 
-    /** Add the marker to the end of the list and to the LegionInfo.  
+    /** Add the marker to the end of the list and to the LegionInfo.
         If it's already in the list, remove the earlier entry. */
     void setMarker(String id, Marker marker)
     {
@@ -875,7 +968,7 @@ public final class Client implements IClient
         }
     }
 
-    public void placeNewChit(String imageName, boolean inverted, int tag, 
+    public void placeNewChit(String imageName, boolean inverted, int tag,
         String hexLabel)
     {
         if (map != null)
@@ -888,7 +981,7 @@ public final class Client implements IClient
     }
 
     /** Create a new BattleChit and add it to the end of the list. */
-    private void addBattleChit(final String bareImageName, boolean inverted, 
+    private void addBattleChit(final String bareImageName, boolean inverted,
         int tag, String hexLabel)
     {
         String imageName = bareImageName;
@@ -1041,7 +1134,7 @@ public final class Client implements IClient
         {
             board.deiconify();
             board.getFrame().toFront();
-            summonAngel = SummonAngel.summonAngel(this, markerId, 
+            summonAngel = SummonAngel.summonAngel(this, markerId,
                 longMarkerName);
         }
     }
@@ -1078,8 +1171,15 @@ public final class Client implements IClient
 
     void acquireAngelCallback(String markerId, String angelType)
     {
-Log.debug("called Client.acquireAngelCallback()");
-        server.acquireAngel(markerId, angelType);
+        try
+        {
+            server.acquireAngel(markerId, angelType);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
         if (board != null)
         {
             String hexLabel = getHexForLegion(markerId);
@@ -1125,7 +1225,15 @@ Log.debug("called Client.acquireAngelCallback()");
 
     void assignStrikePenalty(String prompt)
     {
-        server.assignStrikePenalty(playerName, prompt);
+        try
+        {
+            server.assignStrikePenalty(playerName, prompt);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
 
@@ -1179,10 +1287,18 @@ Log.debug("called Client.acquireAngelCallback()");
             }
             String markerId = (String)legions.get(0);
             donorId = markerId;
-            server.setDonor(markerId);
-            summonAngel.updateChits();
-            summonAngel.repaint();
-            getLegionInfo(markerId).getMarker().repaint();
+            try
+            {
+                server.setDonor(markerId);
+                summonAngel.updateChits();
+                summonAngel.repaint();
+                getLegionInfo(markerId).getMarker().repaint();
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
         else
         {
@@ -1208,13 +1324,21 @@ Log.debug("called Client.acquireAngelCallback()");
 
     void answerFlee(String markerId, boolean answer)
     {
-        if (answer)
+        try
         {
-            server.flee(markerId);
+            if (answer)
+            {
+                server.flee(markerId);
+            }
+            else
+            {
+                server.doNotFlee(markerId);
+            }
         }
-        else
+        catch (RemoteException e)
         {
-            server.doNotFlee(markerId);
+            Log.error(e.toString());
+            e.printStackTrace();
         }
     }
 
@@ -1232,22 +1356,22 @@ Log.debug("called Client.acquireAngelCallback()");
 
 
     // XXX too many arguments
-    public void askNegotiate(String attackerLongMarkerName, 
-        String defenderLongMarkerName, String attackerId, String defenderId, 
+    public void askNegotiate(String attackerLongMarkerName,
+        String defenderLongMarkerName, String attackerId, String defenderId,
         String hexLabel)
     {
         Proposal proposal = null;
         if (getOption(Options.autoNegotiate))
         {
             // TODO AI players just fight for now.
-            proposal = new Proposal(attackerId, defenderId, true, false, 
+            proposal = new Proposal(attackerId, defenderId, true, false,
                 null, null, hexLabel);
             makeProposal(proposal);
         }
         else
         {
         /* TODO Finish
-            negotiate = new Negotiate(this, attackerLongMarkerName, 
+            negotiate = new Negotiate(this, attackerLongMarkerName,
                 defenderLongMarkerName, attackerId, defenderId,
                 hexLabel);
         */
@@ -1274,7 +1398,15 @@ Log.debug("called Client.acquireAngelCallback()");
     private void makeProposal(Proposal proposal)
     {
         // XXX Stringify the proposal.
-        server.makeProposal(playerName, proposal);
+        try
+        {
+            server.makeProposal(playerName, proposal);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
 
@@ -1286,7 +1418,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
     // XXX too many arguments
     public void tellStrikeResults(String strikerDesc, int strikerTag,
-        String targetDesc, int targetTag, int strikeNumber, int [] rolls, 
+        String targetDesc, int targetTag, int strikeNumber, int [] rolls,
         int damage, boolean killed, boolean wasCarry, int carryDamageLeft,
         Set carryTargetDescriptions)
     {
@@ -1298,7 +1430,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
         if (battleDice != null)
         {
-            battleDice.setValues(strikerDesc, targetDesc, strikeNumber, 
+            battleDice.setValues(strikerDesc, targetDesc, strikeNumber,
                 damage, rolls);
             battleDice.showRoll();
         }
@@ -1365,7 +1497,7 @@ Log.debug("called Client.acquireAngelCallback()");
         }
         else
         {
-            new PickCarry(map.getFrame(), this, carryDamage, 
+            new PickCarry(map.getFrame(), this, carryDamage,
                 carryTargetDescriptions);
         }
     }
@@ -1454,7 +1586,7 @@ Log.debug("called Client.acquireAngelCallback()");
         String hexDescription =
             MasterBoard.getHexByLabel(hexLabel).getDescription();
 
-        String recruitName = PickRecruit.pickRecruit(board.getFrame(), 
+        String recruitName = PickRecruit.pickRecruit(board.getFrame(),
             recruits, hexDescription, markerId, this);
 
         if (recruitName == null)
@@ -1469,7 +1601,15 @@ Log.debug("called Client.acquireAngelCallback()");
             return;
         }
 
-        server.doRecruit(markerId, recruitName, recruiterName);
+        try
+        {
+            server.doRecruit(markerId, recruitName, recruiterName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     /** Currently used for human players only.  Always needs to call
@@ -1483,7 +1623,7 @@ Log.debug("called Client.acquireAngelCallback()");
         String hexDescription =
             MasterBoard.getHexByLabel(hexLabel).getDescription();
 
-        String recruitName = PickRecruit.pickRecruit(board.getFrame(), 
+        String recruitName = PickRecruit.pickRecruit(board.getFrame(),
             recruits, hexDescription, markerId, this);
 
         String recruiterName = null;
@@ -1493,7 +1633,15 @@ Log.debug("called Client.acquireAngelCallback()");
                 hexDescription);
         }
 
-        server.doRecruit(markerId, recruitName, recruiterName);
+        try
+        {
+            server.doRecruit(markerId, recruitName, recruiterName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     public void didRecruit(String markerId, String recruitName,
@@ -1551,7 +1699,7 @@ Log.debug("called Client.acquireAngelCallback()");
     {
         String recruiterName = null;
 
-        java.util.List recruiters = findEligibleRecruiters(markerId, 
+        java.util.List recruiters = findEligibleRecruiters(markerId,
             recruitName);
 
         int numEligibleRecruiters = recruiters.size();
@@ -1560,7 +1708,7 @@ Log.debug("called Client.acquireAngelCallback()");
             // A warm body recruits in a tower.
             recruiterName = "none";
         }
-        else if (getOption(Options.autoPickRecruiter) || 
+        else if (getOption(Options.autoPickRecruiter) ||
             numEligibleRecruiters == 1)
         {
             // If there's only one possible recruiter, or if
@@ -1576,7 +1724,7 @@ Log.debug("called Client.acquireAngelCallback()");
         return recruiterName;
     }
 
-    /** Needed if we load a game outside the split phase, where 
+    /** Needed if we load a game outside the split phase, where
      *  active player and turn are usually set. */
     public void setupTurnState(String activePlayerName, int turnNumber)
     {
@@ -1716,7 +1864,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
     /** Used for both strike and strikeback. */
-    public void setupBattleFight(int battlePhase, 
+    public void setupBattleFight(int battlePhase,
         String battleActivePlayerName)
     {
         this.battlePhase = battlePhase;
@@ -1763,14 +1911,14 @@ Log.debug("called Client.acquireAngelCallback()");
             LegionInfo info = (LegionInfo)entry.getValue();
             String markerId = info.getMarkerId();
             String hexLabel = info.getHexLabel();
-            Marker marker = new Marker(3 * Scale.get(), markerId, 
+            Marker marker = new Marker(3 * Scale.get(), markerId,
                 board.getFrame(), this);
             info.setMarker(marker);
             markers.add(marker);
             board.alignLegions(hexLabel);
         }
     }
-            
+
 
     private void setupPlayerLabel()
     {
@@ -1837,10 +1985,18 @@ Log.debug("called Client.acquireAngelCallback()");
 
     void doBattleMove(int tag, String hexLabel)
     {
-        server.doBattleMove(tag, hexLabel);
+        try
+        {
+            server.doBattleMove(tag, hexLabel);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
-    public void tellBattleMove(int tag, String startingHexLabel, 
+    public void tellBattleMove(int tag, String startingHexLabel,
         String endingHexLabel, boolean undo)
     {
         if (isMyCritter(tag) && !undo)
@@ -1864,13 +2020,29 @@ Log.debug("called Client.acquireAngelCallback()");
     /** Attempt to have critter tag strike the critter in hexLabel. */
     void strike(int tag, String hexLabel)
     {
-        server.strike(tag, hexLabel);
+        try
+        {
+            server.strike(tag, hexLabel);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     /** Attempt to apply carries to the critter in hexLabel. */
     void applyCarries(String hexLabel)
     {
-        server.applyCarries(hexLabel);
+        try
+        {
+            server.applyCarries(hexLabel);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
         if (map != null)
         {
             map.unselectHexByLabel(hexLabel);
@@ -1884,7 +2056,15 @@ Log.debug("called Client.acquireAngelCallback()");
         if (!isUndoStackEmpty())
         {
             String hexLabel = (String)popUndoStack();
-            server.undoBattleMove(hexLabel);
+            try
+            {
+                server.undoBattleMove(hexLabel);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1924,7 +2104,7 @@ Log.debug("called Client.acquireAngelCallback()");
                 if (neighbor != null)
                 {
                     BattleChit other = getBattleChit(neighbor.getLabel());
-                    if (other != null && 
+                    if (other != null &&
                         (other.isInverted() != chit.isInverted()) &&
                         (countDead || !other.isDead()))
                     {
@@ -2021,7 +2201,7 @@ Log.debug("called Client.acquireAngelCallback()");
     private String figureTeleportingLord(String hexLabel)
     {
         java.util.List lords = listTeleportingLords(moverId, hexLabel);
-        switch (lords.size()) 
+        switch (lords.size())
         {
             case 0:
                 return null;
@@ -2034,7 +2214,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
     /** List the lords eligible to teleport this legion to hexLabel,
      *  as strings. */
-    private java.util.List listTeleportingLords(String moverId, 
+    private java.util.List listTeleportingLords(String moverId,
         String hexLabel)
     {
         // Needs to be a List not a Set so that it can be passed as
@@ -2121,7 +2301,16 @@ Log.debug("called Client.acquireAngelCallback()");
             teleportingLord = figureTeleportingLord(hexLabel);
         }
 
-        server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
+        try
+        {
+            server.doMove(moverId, hexLabel, entrySide, teleport,
+                teleportingLord);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     private boolean goodEntrySide(String entrySide)
@@ -2181,9 +2370,9 @@ Log.debug("called Client.acquireAngelCallback()");
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
 
-        java.util.List tempRecruits = 
+        java.util.List tempRecruits =
             TerrainRecruitLoader.getPossibleRecruits(terrain);
-        java.util.List recruiters = 
+        java.util.List recruiters =
             TerrainRecruitLoader.getPossibleRecruiters(terrain);
 
         Iterator lit = tempRecruits.iterator();
@@ -2194,7 +2383,7 @@ Log.debug("called Client.acquireAngelCallback()");
             while (liter.hasNext())
             {
                 Creature lesser = (Creature)liter.next();
-                if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser, 
+                if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
                     creature, terrain) <= info.numCreature(lesser)) &&
                     (recruits.indexOf(creature) == -1))
                 {
@@ -2276,7 +2465,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    /** Return a set of hexLabels for all other unengaged legions of 
+    /** Return a set of hexLabels for all other unengaged legions of
      *  markerId's player that have summonables.
      * public for client-side AI -- do not call from server side. */
     public Set findSummonableAngelHexes(String summonerId)
@@ -2290,7 +2479,7 @@ Log.debug("Called Client.findSummonableAngelHexes for " + summonerId);
         {
             String markerId = (String)it.next();
 Log.debug("checking " + markerId);
-            if (!markerId.equals(summonerId)) 
+            if (!markerId.equals(summonerId))
             {
 Log.debug(markerId + " not the same as summoner");
                 LegionInfo info = getLegionInfo(markerId);
@@ -2320,7 +2509,7 @@ Log.debug("found " + set.size() + " hexes");
         return movement.listNormalMoves(info, hex, movementRoll);
     }
 
-    Set listPossibleEntrySides(String moverId, String hexLabel, 
+    Set listPossibleEntrySides(String moverId, String hexLabel,
         boolean teleport)
     {
         return movement.listPossibleEntrySides(moverId, hexLabel, teleport);
@@ -2387,7 +2576,7 @@ Log.debug("found " + set.size() + " hexes");
         while (it.hasNext())
         {
             LegionInfo info = (LegionInfo)it.next();
-            if (!info.hasMoved() && playerName.equals(info.getPlayerName())) 
+            if (!info.hasMoved() && playerName.equals(info.getPlayerName()))
             {
                 set.add(info.getHexLabel());
             }
@@ -2407,7 +2596,7 @@ Log.debug("found " + set.size() + " hexes");
         {
             Map.Entry entry = (Map.Entry)it.next();
             LegionInfo info = (LegionInfo)entry.getValue();
-            if (info.getHeight() >= 7 && 
+            if (info.getHeight() >= 7 &&
                 activePlayerName.equals(info.getPlayerName()))
             {
                 set.add(info.getHexLabel());
@@ -2529,23 +2718,55 @@ Log.debug("found " + set.size() + " hexes");
     void newGame()
     {
         clearUndoStack();
-        server.newGame();
+        try
+        {
+            server.newGame();
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     void loadGame(String filename)
     {
         clearUndoStack();
-        server.loadGame(filename);
+        try
+        {
+            server.loadGame(filename);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     void saveGame()
     {
-        server.saveGame();
+        try
+        {
+            server.saveGame();
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     void saveGame(String filename)
     {
-        server.saveGame(filename);
+        try
+        {
+            server.saveGame(filename);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
 
@@ -2554,9 +2775,17 @@ Log.debug("found " + set.size() + " hexes");
         if (!isUndoStackEmpty())
         {
             String splitoffId = (String)popUndoStack();
-            server.undoSplit(playerName, splitoffId);
-            markersAvailable.add(splitoffId);
-            numSplitsThisTurn--;
+            try
+            {
+                server.undoSplit(playerName, splitoffId);
+                markersAvailable.add(splitoffId);
+                numSplitsThisTurn--;
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -2565,7 +2794,15 @@ Log.debug("found " + set.size() + " hexes");
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            server.undoMove(playerName, markerId);
+            try
+            {
+                server.undoMove(playerName, markerId);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -2585,7 +2822,15 @@ Log.debug("found " + set.size() + " hexes");
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
-            server.undoRecruit(playerName, markerId);
+            try
+            {
+                server.undoRecruit(playerName, markerId);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
             String hexLabel = getHexForLegion(markerId);
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
             hex.repaint();
@@ -2623,7 +2868,15 @@ Log.debug("found " + set.size() + " hexes");
         {
             return;
         }
-        server.doneWithSplits(playerName);
+        try
+        {
+            server.doneWithSplits(playerName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
         clearUndoStack();
         clearRecruitChits();
     }
@@ -2635,7 +2888,15 @@ Log.debug("found " + set.size() + " hexes");
             return;
         }
         clearRecruitChits();
-        server.doneWithMoves(playerName);
+        try
+        {
+            server.doneWithMoves(playerName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
         clearUndoStack();
     }
 
@@ -2645,7 +2906,15 @@ Log.debug("found " + set.size() + " hexes");
         {
             return;
         }
-        server.doneWithEngagements(playerName);
+        try
+        {
+            server.doneWithEngagements(playerName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
         clearUndoStack();
     }
 
@@ -2656,7 +2925,15 @@ Log.debug("found " + set.size() + " hexes");
             return;
         }
         clearUndoStack();
-        server.doneWithRecruits(playerName);
+        try
+        {
+            server.doneWithRecruits(playerName);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
 
@@ -2774,7 +3051,15 @@ Log.debug("found " + set.size() + " hexes");
 
         if (results != null)
         {
-            server.doSplit(parentId, childId, results);
+            try
+            {
+                server.doSplit(parentId, childId, results);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -2833,11 +3118,11 @@ Log.debug("found " + set.size() + " hexes");
             }
             color = ai.pickColor(colorsLeft, favoriteColors);
         }
-        else 
+        else
         {
             do
             {
-                color = PickColor.pickColor(board.getFrame(), playerName, 
+                color = PickColor.pickColor(board.getFrame(), playerName,
                     colorsLeft);
             }
             while (color == null);
@@ -2845,7 +3130,15 @@ Log.debug("found " + set.size() + " hexes");
 
         setColor(color);
 
-        server.assignColor(playerName, color);
+        try
+        {
+            server.assignColor(playerName, color);
+        }
+        catch (RemoteException e)
+        {
+            Log.error(e.toString());
+            e.printStackTrace();
+        }
     }
 
     private String getHexForLegion(String markerId)

@@ -6,6 +6,7 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
+import java.rmi.*;
 
 import com.werken.opt.CommandLine;
 
@@ -73,7 +74,15 @@ public final class Game
     {
         if (server == null)
         {
-            server = new Server(this);
+            try
+            {
+                server = new Server(this);
+            }
+            catch (RemoteException e)
+            {
+                Log.error(e.toString());
+                e.printStackTrace();
+            }
         }
         else
         {
