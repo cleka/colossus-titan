@@ -47,6 +47,16 @@ public class BattlelandLoader
                 Element el = (Element)it.next();
                 handleHex(el, h);
             }
+            Element startlistEl = root.getChild("startlist");
+            if (startlistEl != null)
+            {
+                List startlistHexes = startlistEl.getChildren("battlehex");
+                for (Iterator it = startlistHexes.iterator(); it.hasNext();)
+                {
+                    Element el = (Element)it.next();
+                    handleStartlistHex(el);
+                }
+            }
         }
         catch (JDOMException ex)
         {
@@ -78,6 +88,20 @@ public class BattlelandLoader
             int number = border.getAttribute("number").getIntValue();
             char type = border.getAttributeValue("type").charAt(0);
             hex.setHexside(number, type);
+        }
+    }
+
+    private void handleStartlistHex(Element el)
+        throws JDOMException
+    {
+        String label = el.getAttributeValue("label");
+        if (startlist == null && label != null)
+        {
+            startlist = new ArrayList();
+        }
+        if (label != null)
+        {
+            startlist.add(label);
         }
     }
 
