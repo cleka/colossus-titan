@@ -670,6 +670,7 @@ public final class Legion implements Comparable
     }
 
 
+    /** Called at end of player turn. */
     public void commitMove()
     {
         startingHexLabel = currentHexLabel;

@@ -23,6 +23,8 @@ AI: Consider recruit scarcity (last gargoyle more valuable than troll).
    Give some value to sitting in native terrain.  Get scrub snacks out of 
    nearby opponents' good recruiting terrain, and into blocking positions.
 
+Write some design docs.
+
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.
 

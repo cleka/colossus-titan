@@ -22,13 +22,13 @@ public final class Player implements Comparable
     private ArrayList legions = new ArrayList();
     private boolean dead;
     private boolean titanEliminated;
-    private Legion donor;              // XXX Change to string.
-    private Legion mover;              // XXX Change to string.
+    private String donorId;
+    private String moverId;
     private MarkerComparator markerComparator = new MarkerComparator();
     private TreeSet markersAvailable = new TreeSet(markerComparator);
 
-    /** Stack of legions, to allow multiple levels of undo for splits,
-     *  moves, and recruits. */
+    /** Stack of legion marker ids, to allow multiple levels of undo for
+     *  splits, moves, and recruits. */
     private LinkedList undoStack = new LinkedList();
     private Properties options = new Properties();
     private AI ai = new SimpleAI();  // TODO Allow pluggable AIs.
@@ -57,11 +57,12 @@ public final class Player implements Comparable
         newPlayer.dead = dead;
         newPlayer.ai = ai;
         newPlayer.titanEliminated = titanEliminated;
+        newPlayer.donorId = donorId;
+        newPlayer.moverId = moverId;
         for (int i = 0; i < legions.size(); i++)
         {
             newPlayer.legions.add(i, ((Legion)legions.get(i)).AICopy(game));
         }
-        // XXX Need to add donor, mover once they are changed to strings.
 
         // Strings are immutable, so a shallow copy == a deep copy
         newPlayer.markersAvailable = (TreeSet) markersAvailable.clone();
@@ -233,22 +234,36 @@ public final class Player implements Comparable
         this.summoned = summoned;
     }
 
-    public Legion getDonor()
+    public String getDonorId()
     {
-        return donor;
+        return donorId;
     }
 
-    public void setDonor(Legion legion)
+    public Legion getDonor()
     {
-        donor = legion;
+        return getLegionByMarkerId(donorId);
+    }
+
+    public void setDonorId(String markerId)
+    {
+        donorId = markerId;
+    }
+
+    public void setDonor(Legion donor)
+    {
+        setDonorId(donor.getMarkerId());
     }
 
     public void disbandEmptyDonor()
     {
-        if (donor != null && donor.getHeight() == 0)
+        if (donorId != null)
         {
-            donor.remove();
-            donor = null;
+            Legion donor = getDonor();
+            if (donor.getHeight() == 0)
+            {
+                donor.remove();
+                donorId = null;
+            }
         }
     }
 
@@ -411,7 +426,7 @@ public final class Player implements Comparable
     public void resetTurnState()
     {
         summoned = false;
-        donor = null;
+        donorId = null;
 
         teleported = false;
         movementRoll = 0;
@@ -501,14 +516,14 @@ public final class Player implements Comparable
 
     public void setLastLegionMoved()
     {
-        undoStack.addFirst(mover);
-        mover = null;
+        undoStack.addFirst(moverId);
+        moverId = null;
     }
 
 
     public void setLastLegionSplitOff(Legion legion)
     {
-        undoStack.addFirst(legion);
+        undoStack.addFirst(legion.getMarkerId());
     }
 
 
@@ -516,7 +531,8 @@ public final class Player implements Comparable
     {
         if (!undoStack.isEmpty())
         {
-            Legion legion = (Legion)undoStack.removeFirst();
+            String markerId = (String)undoStack.removeFirst();
+            Legion legion = getLegionByMarkerId(markerId);
             legion.undoMove();
         }
     }
@@ -556,7 +572,8 @@ public final class Player implements Comparable
     {
         if (!undoStack.isEmpty())
         {
-            Legion legion = (Legion)undoStack.removeFirst();
+            String markerId = (String)undoStack.removeFirst();
+            Legion legion = getLegionByMarkerId(markerId);
             legion.undoRecruit();
         }
 
@@ -567,7 +584,7 @@ public final class Player implements Comparable
 
     public void setLastLegionRecruited(Legion legion)
     {
-        undoStack.addFirst(legion);
+        undoStack.addFirst(legion.getMarkerId());
     }
 
 
@@ -608,7 +625,8 @@ public final class Player implements Comparable
     {
         if (!undoStack.isEmpty())
         {
-            Legion splitoff = (Legion)undoStack.removeFirst();
+            String splitoffId = (String)undoStack.removeFirst();
+            Legion splitoff = getLegionByMarkerId(splitoffId);
             String hexLabel = splitoff.getCurrentHexLabel();
             splitoff.recombine(splitoff.getParent(), true);
             game.getBoard().alignLegions(hexLabel);
@@ -661,13 +679,12 @@ public final class Player implements Comparable
 
     public void setMover(Legion mover)
     {
-        this.mover = mover;
+        this.moverId = mover.getMarkerId();
     }
-
 
     public Legion getMover()
     {
-        return mover;
+        return getLegionByMarkerId(moverId);
     }
 
 

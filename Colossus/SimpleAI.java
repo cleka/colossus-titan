@@ -36,9 +36,9 @@ class SimpleAI implements AI
         {
             Legion legion = (Legion)it.next();
 
-            if (legion.hasMoved() && legion.canRecruit()
-                && (legion.hasTitan() ||
-                legion.getPointValue() >= minimumSizeToRecruit))
+            if (legion.hasMoved() && legion.canRecruit() &&
+                (legion.hasTitan() || legion.getPointValue() >=
+                minimumSizeToRecruit))
             {
                 Creature recruit = chooseRecruit(game, legion,
                         legion.getCurrentHex());
@@ -69,10 +69,10 @@ class SimpleAI implements AI
         if (recruits.size() == 0)
         {
             return null;
-            // pick the last creature in the list (which is the
-            // best/highest recruit)
         }
 
+        // pick the last creature in the list (which is the
+        // best/highest recruit)
         Creature recruit = (Creature)recruits.get(recruits.size() - 1);
 
         // take third cyclops in brush
@@ -115,10 +115,9 @@ class SimpleAI implements AI
             recruit = Creature.troll;
         }
         // tower creature selection:
-        else if (recruits.contains(Creature.ogre)
-                 && recruits.contains(Creature.centaur)
-                 && recruits.contains(Creature.gargoyle)
-                 && recruits.size() == 3)
+        else if (recruits.contains(Creature.ogre) &&
+            recruits.contains(Creature.centaur) &&
+            recruits.contains(Creature.gargoyle) && recruits.size() == 3)
         {
             // if we have 2 centaurs or ogres, take a third
             if (legion.numCreature(Creature.ogre) == 2)
@@ -162,7 +161,7 @@ class SimpleAI implements AI
                      && legion.numCreature(Creature.centaur) < 2)
             {
                 recruit = Creature.centaur;
-                // else we dont really care; take anything
+                // else we don't really care; take anything
             }
         }
 
@@ -174,7 +173,9 @@ class SimpleAI implements AI
     {
         Player player = game.getActivePlayer();
 
-        for (int i = player.getNumLegions() - 1; i >= 0; i--)
+        // Using a for loop instead of a ListIterator to get around
+        // a pesky ConcurrentModificationException.
+        outer: for (int i = player.getNumLegions() - 1; i >= 0; i--)
         {
             Legion legion = player.getLegion(i);
 
@@ -234,6 +235,7 @@ class SimpleAI implements AI
                                     " because we want the muscle to attack");
 
                                 forcedToAttack = 999;
+                                continue outer;
                             }
                         }
                     }
@@ -242,12 +244,12 @@ class SimpleAI implements AI
                     {
                         forcedToAttack++;
                     }
-                }
-
-                // If we'll be forced to attack on 2 or more rolls; don't split
-                if (forcedToAttack >= 2)
-                {
-                    continue;
+                    // If we'll be forced to attack on 2 or more rolls,
+                    // don't split.
+                    if (forcedToAttack >= 2)
+                    {
+                        continue outer;
+                    }
                 }
             }
 

@@ -19,7 +19,6 @@ public final class SummonAngel extends JDialog implements MouseListener,
     private static final int scale = 60;
     private Chit angelChit;
     private Chit archangelChit;
-    private Legion donor;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private JButton button1;
@@ -40,7 +39,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
         // Paranoia
         if (!legion.canSummonAngel())
         {
-            cleanup(null);
+            cleanup(null, null);
             return;
         }
 
@@ -48,7 +47,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
         // board into a state where those legions can be selected.
         if (game.highlightSummonableAngels(legion) < 1)
         {
-            cleanup(null);
+            cleanup(null, null);
             return;
         }
 
@@ -119,7 +118,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
         return legion;
     }
 
-    private void cleanup(Creature angel)
+    private void cleanup(Legion donor, Creature angel)
     {
         game.doSummon(legion, donor, angel);
         dispose();
@@ -129,7 +128,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
     public void mousePressed(MouseEvent e)
     {
-        donor = player.getDonor();
+        Legion donor = player.getDonor();
         if (donor == null)
         {
             return;
@@ -137,65 +136,54 @@ public final class SummonAngel extends JDialog implements MouseListener,
         Object source = e.getSource();
         if (angelChit == source && !angelChit.isDead())
         {
-            cleanup(Creature.angel);
+            cleanup(donor, Creature.angel);
         }
         else if (archangelChit == source && !archangelChit.isDead())
         {
-            cleanup(Creature.archangel);
+            cleanup(donor, Creature.archangel);
         }
     }
-
 
     public void mouseEntered(MouseEvent e)
     {
     }
 
-
     public void mouseExited(MouseEvent e)
     {
     }
-
 
     public void mouseClicked(MouseEvent e)
     {
     }
 
-
     public void mouseReleased(MouseEvent e)
     {
     }
-
 
     public void windowActivated(WindowEvent e)
     {
     }
 
-
     public void windowClosed(WindowEvent e)
     {
     }
 
-
     public void windowClosing(WindowEvent e)
     {
-        cleanup(null);
+        cleanup(null, null);
     }
-
 
     public void windowDeactivated(WindowEvent e)
     {
     }
 
-
     public void windowDeiconified(WindowEvent e)
     {
     }
 
-
     public void windowIconified(WindowEvent e)
     {
     }
-
 
     public void windowOpened(WindowEvent e)
     {
@@ -205,7 +193,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
     /** Upstate state of angel and archangel chits to reflect donor */
     public void updateChits()
     {
-        donor = player.getDonor();
+        Legion donor = player.getDonor();
         if (donor == null)
         {
             return;
@@ -223,7 +211,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
     {
         if (e.getActionCommand().equals("Summon"))
         {
-            donor = player.getDonor();
+            Legion donor = player.getDonor();
             if (donor == null)
             {
                 JOptionPane.showMessageDialog(board, "Must select a legion.");
@@ -243,12 +231,12 @@ public final class SummonAngel extends JDialog implements MouseListener,
             if (archangels == 0)
             {
                 // Must take an angel.
-                cleanup(Creature.angel);
+                cleanup(donor, Creature.angel);
             }
             else if (angels == 0)
             {
                 // Must take an archangel.
-                cleanup(Creature.archangel);
+                cleanup(donor, Creature.archangel);
             }
             else
             {
@@ -260,7 +248,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
         else if (e.getActionCommand().equals("Cancel"))
         {
-            cleanup(null);
+            cleanup(null, null);
         }
     }
 }

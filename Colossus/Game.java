@@ -1273,6 +1273,10 @@ public final class Game
         String parentId = in.readLine();
 
         String recruitName = in.readLine();
+        if (recruitName.equals("null"))
+        {
+            recruitName = null;
+        }
 
         buf = in.readLine();
         int battleTally = Integer.parseInt(buf);
@@ -2718,8 +2722,7 @@ public final class Game
 
             // Set up the donor in case the summon gets cancelled.
             Legion donor = player.getLegionByMarkerId(donorId);
-            // XXX Fix this when donor becomes a string
-            player.setDonor(donor);
+            player.setDonorId(donorId);
             Creature angel = Creature.getCreatureByName(angelType);
             doSummon(attacker, donor, angel);
         }
@@ -2739,8 +2742,8 @@ public final class Game
 
     public void doSummon(Legion legion, Legion donor, Creature angel)
     {
-        // Sanity check, just in case this got called twice.
-        if (angel != null && legion.canSummonAngel())
+        // Sanity check.
+        if (angel != null && donor != null && legion.canSummonAngel())
         {
             Player player = getActivePlayer();
 
@@ -2796,14 +2799,13 @@ public final class Game
                 // Attacker won, so possibly summon angel.
                 if (legion.canSummonAngel())
                 {
-logDebug("calling createSummonAngel from game.finishBattle()");
                     createSummonAngel(legion);
                 }
             }
             else
             {
                 // Defender won, so possibly recruit reinforcement.
-                if (legion.canRecruit() && attackerEntered)
+                if (attackerEntered && legion.canRecruit())
                 {
                     Creature recruit;
                     Player player = legion.getPlayer();
@@ -2825,10 +2827,6 @@ logDebug("calling createSummonAngel from game.finishBattle()");
         }
         engagementInProgress = false;
         updateStatusScreen();
-
-        // Performance is a bit slow after battles, so try to
-        // force the system to clean up.
-        System.gc();
 
         if (summonAngel == null)
         {
@@ -2935,7 +2933,6 @@ logDebug("calling createSummonAngel from game.finishBattle()");
         {
             board.unselectHexByLabel(hex.getLabel());
         }
-        hex.repaint();
 
         return (newHeight < oldHeight);
     }
