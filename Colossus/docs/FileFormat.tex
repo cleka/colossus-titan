@@ -1,0 +1,264 @@
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+
+\begin{document}
+
+%$Header$
+
+\title{The Colossus Files Formats}
+
+\author{Romain Dolbeau}
+
+\maketitle
+
+
+\section* {introduction}
+
+This file document file formats for the various datafile used
+by Colossus. In all these files, comments start with
+a ``\#'' and extend to the end-of-line.
+
+All files, and the two subdirectory ``Battlelands'' and ``images''
+should be in the same directory. Default files live in
+``Default'', ``Default/images'' and ``Default/Battelands''.
+
+\section {MAP file format (default file used: ``Default/Default.map'')}
+
+This file define the Colossus Masterboard ; what terrain type to use
+for an hex and what sort of exit to which hex. It's composed
+first of a pair of integer represanting the map size
+(horizontaly then vertically), and then
+of a succession of line:
+
+\texttt{$\langle$case\_label$\rangle$ $\langle$case\_type$\rangle$
+ $\langle$exit\_1\_label$\rangle$ $\langle$exit\_1\_type$\rangle$
+ $\langle$exit\_2\_label$\rangle$ $\langle$exit\_2\_type$\rangle$
+ $\langle$exit\_3\_label$\rangle$ $\langle$exit\_3\_type$\rangle$
+ $\langle$X\_pos$\rangle$ $\langle$Y\_pos$\rangle$}
+
+All of those should be on one line.
+
+\begin{itemize}
+\item $\langle$case\_label$\rangle$ is the numeric label of the Hex.
+\item $\langle$case\_type$\rangle$ is the letter of the terrain type of the hex (same as in the TER file).
+\item $\langle$exit\_N\_label$\rangle$ are numeric labels for exits 1-3, or 0 for no (second, third) exit.
+\item $\langle$exit\_N\_type$\rangle$ is the type of exits (ARROW, ARROWS, ARCH, BLOCK) ; for exit of label '0' (no exit) any of the four value can be used, as exit type is irrelevant.
+\item $\langle$X\_pos$\rangle$ and $\langle$Y\_pos$\rangle$ is the position X, of the Hex on the masterboard. They both start from 'zero', on the first line and first column. Not all lines are different (i.e. on the default master board, case 126 and 125 are on the same line number 0 and on columns 4 and 3).
+\end{itemize}
+
+NOTE: Put at least 6 towers currently, as having less Towers than
+players is going to cause problems. The upper number is not
+constrained (or isn't supposed to be), and neither are the labels.
+For readability reasons, it's probably better to use 100 to 900
+as the labels for the first 9 towers.
+
+WARNING: The way the Hex are displayed (pointy part upside or
+downside) depend on the parity of the X+Y sum. It is possible
+to create a perfectly legit MAP where all the Hex are upside-down !
+Should this happen, the only way to fix this 'feature' currently,
+is to move everything one column right \emph{or} one row down, i.e.,
+force the reversal of the parity. Sorry about that, the problem
+hasn't yet been solved.
+
+\section{TER file format (default file used: ``Default/Default.ter'')}
+
+This file define the Colossus Recruit Trees ; what
+can recruit and be recruited on what terrain. it's composed
+of a succession of line of two different kind.
+
+\subsubsection*{The first kind is:}
+
+\texttt{$\langle$terrain\_letter$\rangle$ $\langle$terrain\_color$\rangle$ $\langle$terrain\_name$\rangle$ $\langle$regular\_recruit$\rangle$ ($\langle$recruiter\_needed$\rangle$ $\langle$recruit$\rangle$)+ $\langle$terrain\_display\_name$\rangle$?}
+
+\begin{itemize}
+\item $\langle$terrain\_letter$\rangle$ is the letter internaly used to identify the terrain. they must all be different.
+\item $\langle$terrain\_color$\rangle$ is the color used to display this terrain type, see HTMLColor.java for the various available color.
+\item $\langle$terrain\_name$\rangle$ is the descriptive name of the terrain (Brush, \ldots) ; it is used also as the Battlelands file name. If $\langle$terrain\_display\_name$\rangle$ is not present, it is also used as the display name.
+\item $\langle$regular\_recruit$\rangle$$\rangle$ is a boolean (i.e. true or false) telling if a Creature can recruit below or above its rank (usually true except for Tower).
+\item $\langle$recruiter\_needed$\rangle$ is the number of lower-rank creature needed to recruit the next creature.
+\item $\langle$recruit$\rangle$ is the name of the recruit creature (Gargoyle, \ldots)
+\item $\langle$terrain\_display\_name$\rangle$ is an optional string, used to display the name of the terrain on the MasterBoard, and as the name of the overlay file (see section \ref{images} ``Images files'' below). If absent, $\langle$terrain\_name$\rangle$ is used instead.
+\end{itemize}
+
+The last two as a pair can be repeated any number of time.
+Any later creature can recruit a previous one or itself.
+A creature can recruit the next one only if they are numerous
+enough, as indicated by the $\langle$recruiter\_needed$\rangle$ \emph{of the recruit}.
+
+Three specials names exist (pseudo-creature) : ``Anything'', which
+means any creature can recruit the following creature provided
+thay are numerous enough, ``AnyNonLord'' which is the same but
+excludes Immortal (Lord or DemiLord) from the possible recruiters
+and ``Lord''  which means a Lord (Angel, Titan, Archangel, etc., but
+not a DemiLord) can recruit the following creature.
+
+Note that for ``Lord'' and ``Titan'', only one recruiter
+is needed, and the number before the recruits indicate
+how many of the creatures \emph{before} Lord or Titan are
+needed.
+
+When $\langle$recruiter\_needed$\rangle$ is 0 (zero), then the creature
+can be recruited, but the recruiter will remain anonymous.
+This is useful only if the recruiter is 'Anything' or
+'AnyNonLord', of course. Don't use with a regular recruiter.
+
+When $\langle$recruiter\_needed$\rangle$ is -1 (minus one), then the creature can
+recruit, but cannot be recruited. Such creature, and the
+pseudo-creature above, are ignored for the purpose of
+normal recruitements. If you put 'Titan' as a recruiter,
+it should \emph{always} be -1, as beeing able to recruit
+Titan is going to cause lots of trouble.
+
+exemple: if you use ``0 Anything 3 ogre 0 Titan 2 Gargoyle'',
+you will be able to recruit an Ogre with any 3 creatures
+or with a Gargoyle, and you will be able to recruits
+a gargoyle with two Ogres or the Titan. You won't be
+able to recruit ``Anything'' or ``Titan'', of course.
+
+The line that starts with 'T' and of name 'Tower' (mandatory) is
+special. There should always be at least 3 regular creatures,
+recruitable with zero of Anything, and should be marked
+as 'non-regular' recruitments. The 3 creatures will be used
+as starting creatures.
+
+\subsubsection*{The second kind is:}
+
+\texttt{ACQUIRABLE $\langle$point\_value$\rangle$ $\langle$acquirable\_name$\rangle$ (($\langle$terrain\_letter$\rangle$,)*$\langle$terrain\_letter$\rangle$)?}
+
+ACQUIRABLE is the literal string ACQUIRABLE
+
+\begin{itemize}
+\item $\langle$point\_value$\rangle$ is the amount of points needed to recruit the Acquirable
+\item $\langle$acquirable\_name$\rangle$ is the name of the Creature to consider as an Acquirable
+\item $\langle$terrain\_letter$\rangle$ is an (optional) comma-separated list of terrain letter (see above) that restrict the availability of the Acquirable. If the list is ommited, the Acquirable can be recruited everywhere.
+\end{itemize}
+
+Note that all $\langle$point\_value$\rangle$ must be even multiple of the first
+$\langle$point\_value$\rangle$ ; other values are erroneous and will be flagged
+as such. Also, the first acquirable creature should be a Lord,
+and is recruited in the starting stack (it's the 'primary'
+acquirable creature.
+
+Multiple line can be present, in which case, the behavior is
+the same as if all the Acquirable where on one line. Order of
+Acquirable is not important, except for the first one, which
+defines the reference for $\langle$point\_value$\rangle$ and the primary
+acquirable creature.
+
+\section{CRE file format (default file used: ``Default/Default.cre'')}
+
+This file define the Colossus Creatures ; it's composed
+of a succession of lines:
+
+\texttt{$\langle$name$\rangle$ $\langle$power$\rangle$ $\langle$skill$\rangle$
+$\langle$rangestrikes$\rangle$ $\langle$flies$\rangle$
+$\langle$nativeBramble$\rangle$ $\langle$nativeDrift$\rangle$ $\langle$nativeBog$\rangle$ $\langle$nativeSandDune$\rangle$ $\langle$nativeSlope$\rangle$
+$\langle$nativeVolcano$\rangle$ $\langle$waterDwelling$\rangle$ $\langle$magicMissile$\rangle$}
+$\langle$lord$\rangle$ $\langle$demilord$\rangle$
+$\langle$maxCount$\rangle$
+$\langle$pluralName$\rangle$
+
+all on one line.
+
+\begin{itemize}
+\item $\langle$name$\rangle$ is the display name of the creature
+\item $\langle$power$\rangle$ and $\langle$skill$\rangle$ are the numeric value of power and skill respectively.
+\item $\langle$rangestrikes$\rangle$ $\langle$and flies$\rangle$ are boolean values ('true' or 'false'), defining if the creature can rangestrike or fly respectively.
+\item $\langle$nativeXXX$\rangle$ are boolean values defining if the creature is native for terrain type XXX.
+\item $\langle$waterDwelling$\rangle$ is a boolean value defining if the creature can live in water (i.e., Bog or Lake). Water Dweller don't like being dry, and as such take damage in Sand as other Creatures do in Drift.
+\item $\langle$magicMissile$\rangle$ is a boolean value defining if the creature use magic missile, i.e. it can fires through anything (foe, obstacle, \ldots) toward anyone (including lord).
+\item $\langle$lord$\rangle$ and $\langle$demilord$\rangle$ are boolean values, defining if the creature is a lord or a demilord (mutually exclusive).
+\item $\langle$maxCount$\rangle$ is the max number of creature in the caretaker stack.
+\item $\langle$pluralName$\rangle$ is the same as name, just plural.
+\end{itemize}
+
+\section{Battleland file format (files used: by terrain name under ``Battlelands'')}
+
+These files define the Colossus Battlelands. they're composed
+of a succession of lines:
+
+\texttt{$\langle$X\_pos$\rangle$ $\langle$Y\_pos$\rangle$ $\langle$terrain\_type$\rangle$ $\langle$terrain\_elevation$\rangle$ ($\langle$border\_number$\rangle$ $\langle$border\_type$\rangle$)*}
+
+all on one line.
+
+Any cas not mentioned in this file is assumed to be of type 'p', at elevation '0', and no border.
+
+\begin{itemize}
+\item $\langle$X\_pos$\rangle$ and $\langle$Y\_pos$\rangle$ are the X and Y position of the modified case.
+\item $\langle$terrain\_type$\rangle$ is the terrain type of the case ; it's currently one of: p, r, s, t, o, v, d, w, l (Plain, bRamble, Sand, Tree, bOg, Volcano, Drift, toWer, Lake)
+\item $\langle$terrain\_elevation$\rangle$ is the altitude of the terrain (between 0 and 2)
+\end{itemize}
+
+finally. between 0 and 6 pair of the form $\langle$border\_number$\rangle$ $\langle$border\_type$\rangle$, where $\langle$border\_number$\rangle$ is between 0 and 5 and $\langle$bordet\_type$\rangle$ is currently one of: d, c, s, w (Dune, Cliff, Slope, Wall).
+
+NOTE: Theres' a graphical tools, ``BattlelandsBuilder'', designed to allow easy creations of Battlelands; see ``docs/datatools/README.BattlelandsBuilder''.
+
+\section{VAR file format (default file used: ``Default/Default.var'')}
+
+This file contains a variant definition, i.e. which
+MAP, CRE and TER file should be used and other informations
+such as which other variants are required.
+
+Four different lines can exist, in any number and order
+(only the last one of each type is used):
+
+\texttt{CRE:$\langle$cre\_filename$\rangle$}
+
+\texttt{MAP:$\langle$map\_filename$\rangle$}
+
+\texttt{TER:$\langle$ter\_filename$\rangle$}
+
+\texttt{DEPEND:$\langle$comma-separated list of dependecies$\rangle$}
+
+Note: if one of the  first three type is missing, the Default
+file is implied. if DEPEND is missing, no dependecies are implied.
+In all case, the ``Default'' directory is looked-up last, so
+mentioning ``Default'' as a dependency is not required.
+
+Exemple: A variant that use creatures from ExtTitan, Battlelands from Badlands and a local map could be described as:
+
+\texttt{CRE:ExtTitan.cre}
+
+\texttt{MAP:MyBadlandsExtTitan.map}
+
+\texttt{TER:Badlands.ter}
+
+\texttt{DEPEND:ExtTitan,Badlands}
+
+\section{Images files under ``images''}
+\label{images}
+
+\begin{itemize}
+\item Chit (i.e. images representing a Creature) should be non-transparent
+GIF file, size 60 * 60 (other size may work but won't look as nice). 
+They should be named after the Creature they represent, with a '.gif'
+extension. If the file doesn't exist, troubles may occur.
+
+\item Graphical Overlay for the Hexes on the Masterboard should be
+transparent GIF file, of size whatever-you-want (they are resized
+to the same size as the Hex the represent). Default supplied
+files are 255x255. Use them as examples of what is possible to do.
+If the file doesn't exist, the non-overlayed display is used
+instead (i.e. name of the terrain and the label in the proper
+corner).
+
+Two version of the file should be supplied, one with and one without
+the ``\_i'' postfix to the name (i.e 'MyTerrain.gif' and 'MyTerrain\_i.gif').
+The first is used when the biggest part of the hexagon is down,
+the second when the biggest part is up. The Display Name (see
+above, ``TER file format'') is used if present, and Name is used
+if not.
+
+\item Graphical overlay for the Hexes on the Battlelands (aka
+Hazard) should be transparent GIF file, of size 216x188
+for the interior of the hexes (Bog, Sand\ldots), and size 248x220
+for the hexsides (Cliff, Slope\ldots). The filename should the name
+of the hazard followed by ``\_Hazard'', followed by the extension
+``.gif'' (for instance ``MySea\_Hazard.gif''). Only one version
+is needed.
+
+Other sizes \emph{may} work (they are resized on-the-fly), and odds are
+better if the aspect ratio is the same.
+\end{itemize}
+
+\end{document}
