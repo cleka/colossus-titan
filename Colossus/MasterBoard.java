@@ -57,7 +57,7 @@ class MasterBoard extends JFrame implements MouseListener,
     private Turn turn;
 
 
-    public MasterBoard(Game game)
+    public MasterBoard(Game game, boolean newgame)
     {
         super("MasterBoard");
 
@@ -88,43 +88,51 @@ class MasterBoard extends JFrame implements MouseListener,
         // Initialize the hexmap.
         setupHexes();
 
-        // Each player needs to pick his first legion marker.
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        if (newgame)
         {
-            do
+            // Each player needs to pick his first legion marker.
+            for (int i = 0; i < game.getNumPlayers(); i++)
             {
-                new PickMarker(this, game.getPlayer(i));
+                do
+                {
+                    new PickMarker(this, game.getPlayer(i));
+                }
+                while (game.getPlayer(i).getSelectedMarker() == null);
+                // Update status window to reflect marker taken.
+                game.updateStatusScreen();
             }
-            while (game.getPlayer(i).getSelectedMarker() == null);
-            // Update status window to reflect marker taken.
-            game.updateStatusScreen();
+
+            // Place initial legions.
+            for (int i = 0; i < game.getNumPlayers(); i++)
+            {
+                // Lookup coords for chit starting from player[i].getTower()
+                MasterHex hex = getHexFromLabel(100 *
+                    game.getPlayer(i).getTower());
+    
+                Creature.titan.takeOne();
+                Creature.angel.takeOne();
+                Creature.ogre.takeOne();
+                Creature.ogre.takeOne();
+                Creature.centaur.takeOne();
+                Creature.centaur.takeOne();
+                Creature.gargoyle.takeOne();
+                Creature.gargoyle.takeOne();
+
+                Legion legion = new Legion(0, 0, 3 * scale,
+                    game.getPlayer(i).getSelectedMarker(), null, this, 8,
+                    hex, Creature.titan, Creature.angel, Creature.ogre,
+                    Creature.ogre, Creature.centaur, Creature.centaur,
+                    Creature.gargoyle, Creature.gargoyle, game.getPlayer(i));
+    
+                game.getPlayer(i).addLegion(legion);
+                hex.addLegion(legion);
+            }
         }
-
-
-        // Place initial legions.
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        else
         {
-            // Lookup coords for chit starting from player[i].getTower()
-            MasterHex hex = getHexFromLabel(100 *
-                game.getPlayer(i).getTower());
+            // XXX loaded game
+            System.out.println("loaded game");
 
-            Creature.titan.takeOne();
-            Creature.angel.takeOne();
-            Creature.ogre.takeOne();
-            Creature.ogre.takeOne();
-            Creature.centaur.takeOne();
-            Creature.centaur.takeOne();
-            Creature.gargoyle.takeOne();
-            Creature.gargoyle.takeOne();
-
-            Legion legion = new Legion(0, 0, 3 * scale,
-                game.getPlayer(i).getSelectedMarker(), null, this, 8,
-                hex, Creature.titan, Creature.angel, Creature.ogre,
-                Creature.ogre, Creature.centaur, Creature.centaur,
-                Creature.gargoyle, Creature.gargoyle, game.getPlayer(i));
-
-            game.getPlayer(i).addLegion(legion);
-            hex.addLegion(legion);
         }
 
         // Update status window to reflect new legions.
@@ -134,8 +142,11 @@ class MasterBoard extends JFrame implements MouseListener,
 
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            tracker.addImage(game.getPlayer(i).getLegion(0).getMarker().
-                getImage(), 0);
+            Player player = game.getPlayer(i);
+            for (int j = 0; j < player.getNumLegions(); j++)
+            {
+                tracker.addImage(player.getLegion(j).getMarker().getImage(), 0);
+            }
         }
 
         try
@@ -1183,10 +1194,18 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
-    // This is a place-holder function, until the JDK adds the required
-    // functionality.  (It's supposed to be in JDK 1.2beta4.1)
     public void deiconify()
     {
+        // This is only supported in JDK 1.2+, so it's important to 
+        // catch the exception under JDK 1.1
+        try
+        {
+            setState(Frame.NORMAL);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.toString());
+        }
     }
 
 
@@ -1211,7 +1230,8 @@ class MasterBoard extends JFrame implements MouseListener,
                         InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
-                        new ShowLegion(this, legion, point, i == game.getActivePlayerNum());
+                        new ShowLegion(this, legion, point, 
+                            i == game.getActivePlayerNum());
                         return;
                     }
                     else
