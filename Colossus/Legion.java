@@ -107,8 +107,6 @@ public final class Legion implements Comparable
         markerNames.put("Rd12", "Torch");
     }
 
-    // XXX Need to eliminate the duplicated code between the constructors.
-
     public Legion(String markerId, String parentId, String currentHexLabel,
         String startingHexLabel, Creature creature0, Creature creature1,
         Creature creature2, Creature creature3, Creature creature4,
@@ -160,37 +158,17 @@ public final class Legion implements Comparable
             critters.add(new Critter(creature7, false, markerId, game));
         }
 
-        // Initial legion contents are public; contents of legions created
-        // by splits are private.
-        if (getHeight() == 8)
-        {
-            revealAllCreatures();
-        }
-        else
-        {
-            // When loading a game, we handle revealing visible creatures
-            // after legion creation.
-            hideAllCreatures();
-        }
+        initCreatureVisibility();
     }
 
 
-    // For AICopy()
+    //* For AICopy() */
     public Legion(String markerId, String parentId, String currentHexLabel,
         String startingHexLabel, ArrayList critters, String playerName,
         Game game)
     {
-        this.markerId = markerId;
-        this.parentId = parentId;
-        // Sanity check
-        if (parentId != null && parentId.equals(markerId))
-        {
-            parentId = null;
-        }
-        this.currentHexLabel = currentHexLabel;
-        this.startingHexLabel = startingHexLabel;
-        this.playerName = playerName;
-        this.game = game;
+        this(markerId, parentId, currentHexLabel, startingHexLabel, null,
+            null, null, null, null, null, null, null, playerName, game);
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -200,6 +178,11 @@ public final class Legion implements Comparable
             this.critters.add(myCritter);
         }
 
+        initCreatureVisibility();
+    }
+
+    private void initCreatureVisibility()
+    {
         // Initial legion contents are public; contents of legions created
         // by splits are private.
         if (getHeight() == 8)

@@ -17,7 +17,7 @@ public final class PickColor extends JDialog implements WindowListener,
     private JLabel [] colorLabel = new JLabel[6];
     private Game game;
     private Player player;
-    private static final String [] colorNames =
+    public static final String [] colorNames =
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
     private static final int [] colorMnemonics =
         {KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O, KeyEvent.VK_G,

@@ -215,7 +215,7 @@ public final class Critter extends Creature implements Comparable
 
     public boolean hasMoved()
     {
-        return (!startingHexLabel.equals(currentHexLabel));
+        return (!currentHexLabel.equals(startingHexLabel));
     }
 
 
@@ -737,7 +737,6 @@ public final class Critter extends Creature implements Comparable
                                 targetHex, hex, false)) != 'd')
                             {
                                 critter.setCarryFlag(false);
-                                Game.logWarn("DENIED CARRY UP DUNE HEXSIDE");
                             }
 
                             else if (tmpStrikeNumber > strikeNumber ||

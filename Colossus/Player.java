@@ -775,11 +775,13 @@ public final class Player implements Comparable
     }
 
 
-    public void die(Player slayer, boolean checkForVictory)
+    public void die(String slayerName, boolean checkForVictory)
     {
         // Engaged legions give half points to the player they're
         // engaged with.  All others give half points to slayer,
         // if non-null.
+
+        Player slayer = game.getPlayerByName(slayerName);
 
         HashSet hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();
@@ -867,27 +869,37 @@ public final class Player implements Comparable
      *  to false if there is no such option. */
     public boolean getOption(String optname)
     {
-        // If autoPlay is set, all per-player options return true.
-        String value = options.getProperty(Options.autoPlay);
+        String value = getStringOption(optname);
         if (value != null && value.equals("true"))
         {
             return true;
         }
-
-        value = options.getProperty(optname);
-        if (value != null && value.equals("true"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
+    public String getStringOption(String optname)
+    {
+        // If autoPlay is set, all options that start with "Auto" return true.
+        if (optname.startsWith("Auto"))
+        {
+            String value = options.getProperty(Options.autoPlay);
+            if (value != null && value.equals("true"))
+            {
+                return "true";
+            }
+        }
+
+        String value = options.getProperty(optname);
+        return value;
+    }
 
     /** Set option name to (a string version of) the given boolean value. */
     public void setOption(String optname, boolean value)
+    {
+        setStringOption(optname, String.valueOf(value));
+    }
+
+    public void setStringOption(String optname, String value)
     {
         options.setProperty(optname, String.valueOf(value));
         // TODO Add some triggers so that if autoPlay or autoSplit is set
@@ -1073,11 +1085,44 @@ public final class Player implements Comparable
     {
         if (getOption(Options.autoPickColor))
         {
-            return ai.pickColor(colors);
+            // Convert favorite colors from a comma-separated string
+            // to a list.
+            String favorites = getStringOption(Options.favoriteColors);
+            List favoriteColors = null;
+            if (favorites != null)
+            {
+                favoriteColors = split(',', favorites);
+            }
+            else
+            {
+                favoriteColors = new ArrayList();
+            }
+            return ai.pickColor(colors, favoriteColors);
         }
         return null;
     }
 
+    /** Split the string into a list of substrings delimited by sep. */
+    public List split(char sep, String s)
+    {
+        ArrayList list = new ArrayList();
+
+        int pos = 0;
+        int len = s.length();
+        do
+        {
+            int splitAt = s.indexOf(sep, pos);
+            if (splitAt == -1)
+            {
+                list.add(s.substring(pos));
+                return list;
+            }
+            list.add(s.substring(pos, splitAt));
+            pos = splitAt + 1;
+        }
+        while (pos < len);
+        return list;
+    }
 
     /** Comparator that forces this player's legion markers to come
      *  before captured markers in sort order. */

@@ -49,5 +49,5 @@ public interface AI
     String summonAngel(Legion legion, Game game);
 
     /** pick a color of legion markers */
-    String pickColor(Set colors);
+    String pickColor(Set colors, List favoriteColors);
 }

@@ -23,14 +23,24 @@ class SimpleAI implements AI
     }
 
 
-    // TODO Save favorite colors for each player in options.
-    public String pickColor(Set colors)
+    public String pickColor(Set colors, List favoriteColors)
     {
-        Iterator it = colors.iterator();
+        Iterator it = favoriteColors.iterator();
+        while (it.hasNext())
+        {
+            String preferredColor = (String)it.next();
+debugln("Looking for " + preferredColor);
+            if (colors.contains(preferredColor))
+            {
+                return preferredColor;
+            }
+        }
+        // Can't have one of our favorites, so take what's there.
+        it = colors.iterator();
         if (it.hasNext())
         {
-            String color = (String)it.next();
-            return color;
+debugln("Setting for whatever color is left");
+            return (String)it.next();
         }
         return null;
     }
@@ -2343,7 +2353,8 @@ class SimpleAI implements AI
 
                                     if (enemyTitan)
                                     {
-                                        enemyPlayer.die(player, false);
+                                        enemyPlayer.die(player.getName(),
+                                            false);
                                     }
                                 }
                                 else if (enemyPV * 0.8 > myPV)
@@ -2354,7 +2365,8 @@ class SimpleAI implements AI
 
                                     if (myTitan)
                                     {
-                                        player.die(enemyPlayer, false);
+                                        player.die(enemyPlayer.getName(),
+                                            false);
                                     }
                                 }
                                 else

@@ -42,6 +42,9 @@ public final class Options
 
     public static final String autoPlay = "Auto play";
 
+    // General per-player options
+    public static final String favoriteColors = "Favorite colors";
+
     private static HashSet perPlayerSet = new HashSet();
 
     static
@@ -62,6 +65,8 @@ public final class Options
         perPlayerSet.add(autoPickRecruiter);
 
         perPlayerSet.add(Options.autoPlay);
+
+        perPlayerSet.add(Options.favoriteColors);
     }
 
 

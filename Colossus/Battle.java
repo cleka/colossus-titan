@@ -366,7 +366,7 @@ public final class Battle
                             // for his unengaged legions.
                             Player player = attacker.getPlayer();
                             attacker.remove();
-                            player.die(getDefender().getPlayer(), true);
+                            player.die(getDefender().getPlayerName(), true);
                         }
                         else
                         {
@@ -1049,6 +1049,7 @@ Game.logDebug("mutual titan elimination");
         else if (attackerTitanDead)
         {
 Game.logDebug("attacker titan elimination");
+            String slayerName = defender.getPlayerName();
             if (defenderElim)
             {
                 defender.remove();
@@ -1057,12 +1058,13 @@ Game.logDebug("attacker titan elimination");
             {
                 defender.addBattleTallyToPoints();
             }
-            attacker.getPlayer().die(defender.getPlayer(), true);
+            attacker.getPlayer().die(slayerName, true);
             cleanup();
         }
         else if (defenderTitanDead)
         {
 Game.logDebug("defender titan elimination");
+            String slayerName = attacker.getPlayerName();
             if (attackerElim)
             {
                 attacker.remove();
@@ -1071,7 +1073,7 @@ Game.logDebug("defender titan elimination");
             {
                 attacker.addBattleTallyToPoints();
             }
-            defender.getPlayer().die(attacker.getPlayer(), true);
+            defender.getPlayer().die(slayerName, true);
             cleanup();
         }
 

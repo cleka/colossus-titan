@@ -1,37 +1,27 @@
-Handle non-boolean player options.
+Make GetPlayers dialog less hideous.  (Use BoxLayout to group radio buttons
+   closer together.)  Change tab order to do all player names first.
 
-Make GetPlayers dialog less hideous.
-
-Eliminate Legion.hexInfoMap and just recompute and store the info for
-   one hex when the legion moves?  Or have listMoves return a set of
-   HexInfo objects instead of just hexLabels, so that we do the same
-   computation but hold the results in locals instead of member
-   variables during the Move phase?  We still need to hold entry side 
-   and teleport info for the one hex that legion actually moved to in 
-   member variables.
+Add UI for players to specify favorite colors.
 
 Get minimax masterboard moves working.
 
 Rewrite SplitLegion to use Legion.split()
 
 Add a configurable AI move delay to make it easier to follow what the
-   AI is doing.  That means supporting non-boolean options.
+   AI is doing.
 Add AI time limits.
 
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
    account.
 
-AI: Consider recruit scarcity (last gargoyle more valuable than troll).  
-   Don't leave non-moved legion highlighted.  Don't cheat and peek at the 
-   opposing stack unless all stacks are visible or some cheat option is set.
-   Give some value to sitting in native terrain.  Get scrub snacks out of 
-   nearby opponents' good recruiting terrain, and into blocking positions.
+AI: Consider recruit scarcity (last gargoyle possibly more valuable than 
+   troll).  Don't cheat and peek at opposing stacks unless all stacks 
+   are visible or some cheat option is set.  Give some value to sitting in 
+   native terrain.  Get scrub snacks out of nearby opponents' good 
+   recruiting terrain and into blocking positions.
 
 Write some design docs.
-
-Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
-   bolts.
 
 Movement die should be displayed immediately when enabled, rather than
    waiting until the next turn, unless no movement die has been rolled
@@ -55,8 +45,8 @@ Add an option to show information about MasterBoard hexes when a
    there, and how many die rolls from that hex would let the
    legion recruit next turn.
 
-Add allow the ability to replace any creature in a legion with a
-   different creature type or "unknown," for PBEM and debug.
+Add the ability to replace any creature in a legion with a different 
+   creature type or "unknown," for PBEM and debug.
 
 Change more modal dialogs to use a factory that returns a value,
    rather than a public constructor and a call to a mutator.
@@ -66,12 +56,7 @@ Change more modal dialogs to use a factory that returns a value,
    the dialogs should eventually be read-only or clones, with all
    changes to game state done by the caller.
 
-Add test main() to remaining dialogs.
-
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
-
-Add ability to specify computer opponents in GetPlayers.  Also a
-   way to pick which AI subclass each uses.
 
 Add keyboard legion selection?
 Add toolbars?

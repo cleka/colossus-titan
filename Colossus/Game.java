@@ -204,6 +204,12 @@ public final class Game
             }
         }
 
+        HashSet colorsLeft = new HashSet();
+        for (int i = 0; i < PickColor.colorNames.length; i++)
+        {
+            colorsLeft.add(PickColor.colorNames[i]);
+        }
+
         ListIterator lit = players.listIterator(players.size());
         while (lit.hasPrevious())
         {
@@ -211,10 +217,17 @@ public final class Game
             String color;
             do
             {
-                // TODO Add AI pickColor call here.
-                color = PickColor.pickColor(frame, this, player);
+                if (player.getOption(Options.autoPickColor))
+                {
+                    color = player.aiPickColor(colorsLeft);
+                }
+                else
+                {
+                    color = PickColor.pickColor(frame, this, player);
+                }
             }
             while (color == null);
+            colorsLeft.remove(color);
             logEvent(player.getName() + " chooses color " + color);
             player.setColor(color);
             player.initMarkersAvailable();
@@ -394,6 +407,20 @@ public final class Game
     public Collection getPlayers()
     {
         return players;
+    }
+
+    public Player getPlayerByName(String name)
+    {
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            if (name.equals(player.getName()))
+            {
+                return player;
+            }
+        }
+        return null;
     }
 
 
@@ -2936,6 +2963,7 @@ public final class Game
     }
 
 
+    /** Only used for human players, not for auto splits */
     private boolean doSplit(Legion legion, Player player)
     {
         // Need a legion marker to split.
@@ -2960,6 +2988,8 @@ public final class Game
         }
 
         int oldHeight = legion.getHeight();
+
+        legion.sortCritters();
 
         SplitLegion.splitLegion(masterFrame, legion,
             player.getOption(Options.autoPickMarker));
@@ -3265,7 +3295,7 @@ public final class Game
         // points to the victor.
         if (loser.hasTitan())
         {
-            loser.getPlayer().die(winner.getPlayer(), true);
+            loser.getPlayer().die(winner.getPlayerName(), true);
         }
 
         // Unselect and repaint the hex.
@@ -3305,12 +3335,12 @@ public final class Game
              // half points to the victor.
              else if (attacker.hasTitan())
              {
-                 attacker.getPlayer().die(defender.getPlayer(), true);
+                 attacker.getPlayer().die(defender.getPlayerName(), true);
              }
 
              else if (defender.hasTitan())
              {
-                 defender.getPlayer().die(attacker.getPlayer(), true);
+                 defender.getPlayer().die(attacker.getPlayerName(), true);
              }
         }
         else
@@ -3362,7 +3392,7 @@ public final class Game
             // points to the victor.
             if (loser.hasTitan())
             {
-                loser.getPlayer().die(winner.getPlayer(), true);
+                loser.getPlayer().die(winner.getPlayerName(), true);
             }
 
             if (winner == defender)
