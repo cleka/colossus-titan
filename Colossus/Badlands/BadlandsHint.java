@@ -91,7 +91,8 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
                         !legion.contains("Minotaur") &&
                         legion.getHeight() < 6 &&
                         oracle.biggestAttackerHeight() == 0 &&
-                        oracle.canReach("Hills") &&
+                        (oracle.canReach("Hills") ||
+                        oracle.canReach("HillsAlt")) &&
                         !oracle.hexLabel().equals("8") &&
                         !oracle.hexLabel().equals("22") &&
                         !oracle.hexLabel().equals("36"))
@@ -106,7 +107,8 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
                         !legion.contains("Minotaur") &&
                         legion.getHeight() <= 2 &&
                         oracle.biggestAttackerHeight() == 0 &&
-                        oracle.canReach("Hills"))
+                        (oracle.canReach("Hills") ||
+                        oracle.canReach("HillsAlt")))
                 {
                     return "Ogre";
                 }
