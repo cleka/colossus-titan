@@ -340,6 +340,8 @@ class MasterBoard extends Frame implements MouseListener,
                     {
                         hex.select();
                         hex.repaint();
+                        // Mover can choose side of entry.
+                        hex.setEntrySide(-1);
                     }
                 }
             }
