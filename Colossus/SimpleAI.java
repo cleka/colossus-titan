@@ -147,16 +147,21 @@ class SimpleAI implements AI
             {
                 recruit = Creature.getCreatureByName("Ogre");
             }
-            else if (legion.numCreature(Creature.getCreatureByName("Centaur")) == 2)
+            else if (legion.numCreature(
+		         Creature.getCreatureByName("Centaur")) == 2)
             {
                 recruit = Creature.getCreatureByName("Centaur");
                 // else if we have 1 of a tower creature, take a matching one
 		// if more than one tower creature is a possible recruit,
-		// take the one with the more higher-level creatures still available
+		// take the one with the more higher-level creatures
+		// still available
             }
-            else if ((legion.numCreature(Creature.getCreatureByName("Gargoyle")) == 1) ||
-		     (legion.numCreature(Creature.getCreatureByName("Ogre")) == 1) ||
-		     (legion.numCreature(Creature.getCreatureByName("Centaur")) == 1))
+            else if ((legion.numCreature(
+		          Creature.getCreatureByName("Gargoyle")) == 1) ||
+		     (legion.numCreature(
+		          Creature.getCreatureByName("Ogre")) == 1) ||
+		     (legion.numCreature(
+			  Creature.getCreatureByName("Centaur")) == 1))
 	    {
 		int cyclopsLeft = game.getCaretaker().getCount(
 		    Creature.getCreatureByName("Cyclops"));
@@ -164,15 +169,18 @@ class SimpleAI implements AI
 		    Creature.getCreatureByName("Lion"));
 		int trollLeft = game.getCaretaker().getCount(
                     Creature.getCreatureByName("Troll"));
-		if (legion.numCreature(Creature.getCreatureByName("Gargoyle")) != 1)
+		if (legion.numCreature(
+		        Creature.getCreatureByName("Gargoyle")) != 1)
 		{ // don't take a gargoyle -> ignore cyclops
 		    cyclopsLeft = -1;
 		}
-		if (legion.numCreature(Creature.getCreatureByName("Ogre")) != 1)
+		if (legion.numCreature(
+			Creature.getCreatureByName("Ogre")) != 1)
 		{ // don't take an ogre -> ignore troll
 		    trollLeft = -1;
 		}
-		if (legion.numCreature(Creature.getCreatureByName("Centaur")) != 1)
+		if (legion.numCreature(
+			Creature.getCreatureByName("Centaur")) != 1)
 	        { // don't take a centaur -> ignore lion
 		    lionLeft = -1;
 		}
@@ -191,22 +199,28 @@ class SimpleAI implements AI
                 // else if there's cyclops left and we don't have 2
                 // gargoyles, take a gargoyle
             }
-            else if (game.getCaretaker().getCount(Creature.getCreatureByName("Cyclops")) > 6
-                && legion.numCreature(Creature.getCreatureByName("Gargoyle")) < 2)
+            else if ((game.getCaretaker().getCount(
+		          Creature.getCreatureByName("Cyclops")) > 6) &&
+		     (legion.numCreature(
+			  Creature.getCreatureByName("Gargoyle")) < 2))
             {
                 recruit = Creature.getCreatureByName("Gargoyle");
                 // else if there's trolls left and we don't have 2 ogres,
                 // take an ogre
             }
-            else if (game.getCaretaker().getCount(Creature.getCreatureByName("Troll")) > 6
-                && legion.numCreature(Creature.getCreatureByName("Ogre")) < 2)
+            else if ((game.getCaretaker().getCount(
+		          Creature.getCreatureByName("Troll")) > 6) &&
+		     (legion.numCreature(
+			  Creature.getCreatureByName("Ogre")) < 2))
             {
                 recruit = Creature.getCreatureByName("Ogre");
                 // else if there's lions left and we don't have 2 lions,
                 // take a centaur
             }
-            else if (game.getCaretaker().getCount(Creature.getCreatureByName("Lion")) > 6
-                && legion.numCreature(Creature.getCreatureByName("Centaur")) < 2)
+            else if ((game.getCaretaker().getCount(
+		          Creature.getCreatureByName("Lion")) > 6) &&
+		     (legion.numCreature(
+			  Creature.getCreatureByName("Centaur")) < 2))
             {
                 recruit = Creature.getCreatureByName("Centaur");
                 // else we don't really care; take anything
