@@ -465,11 +465,9 @@ public class TerrainRecruitLoader
      */
     public static List getRecruitableAcquirableList(char t, int value)
     {
-Log.debug("getRecruitableAcquireableList() t=" + t + " value=" + value);
         List al = new ArrayList();
         if ((value % getAcquirableRecruitmentsValue()) != 0)
         {
-Log.debug("getRecruitableAcquireableList() returning empty list");
             return al;
         }
         Iterator it = acquirableList.iterator();
@@ -478,7 +476,6 @@ Log.debug("getRecruitableAcquireableList() returning empty list");
             acquirableData ad = (acquirableData)it.next();
             if (ad.isAvailable(t) && ((value % ad.getValue()) == 0))
             {
-Log.debug("getRecruitableAcquireableList() adding " + ad.getName());
                 al.add(ad.getName());
             }
         }

@@ -301,7 +301,7 @@ public final class Legion implements Comparable
                 {
                     addCreature(angel, true);
                     Log.event("Legion " + getLongMarkerName() +
-                        " acquires an " + angelType);
+                        " acquires one " + angelType);
                     game.getServer().allTellAddCreature(getMarkerId(), 
                         angelType);
                 }

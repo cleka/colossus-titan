@@ -2189,7 +2189,7 @@ Log.debug("Called Game.newGame2()");
             server.allTellRemoveCreature(donor.getMarkerId(), angel.getName());
             server.allTellAddCreature(legion.getMarkerId(), angel.getName());
 
-            Log.event("An " + angel.getName() +
+            Log.event("One " + angel.getName() +
                 " is summoned from legion " + donor.getLongMarkerName() +
                 " into legion " + legion.getLongMarkerName());
         }
