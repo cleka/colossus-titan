@@ -60,7 +60,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
 
             for (int i = 0; i < markers.length; i++)
             {
-                tracker.addImage(markers[i].image, 0);
+                tracker.addImage(markers[i].getImage(), 0);
             }
 
             try

@@ -67,7 +67,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
 
         for (int i = 0; i < numEligible; i++)
         {
-            tracker.addImage(markers[i].image, 0);
+            tracker.addImage(markers[i].getImage(), 0);
         }
 
         try
