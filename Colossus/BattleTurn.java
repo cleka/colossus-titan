@@ -45,6 +45,8 @@ class BattleTurn extends Dialog implements ActionListener
     
     void setupMoveDialog()
     {
+        // XXX: If there are no legal moves, move on.
+
         removeAll();
         setLayout(new GridLayout(0, 4));
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
@@ -73,20 +75,29 @@ class BattleTurn extends Dialog implements ActionListener
     
     void setupFightDialog()
     {
-        removeAll();
-        setLayout(new GridLayout(0, 2));
+        // If there are no possible strikes, move on.
+        if (map.highlightChitsWithTargets() < 1)
+        {
+            advancePhase();
+        }
+        else
+        {
+            removeAll();
+            setLayout(new GridLayout(0, 2));
+            setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
 
-        add(new Label(activeLegion.getPlayer().getName() + 
-            " : Strike"));
-        Button button1 = new Button("Done with Strikes");
-        add(button1);
-        button1.addActionListener(this);
+            add(new Label(activeLegion.getPlayer().getName() + 
+                " : Strike"));
+            Button button1 = new Button("Done with Strikes");
+            add(button1);
+            button1.addActionListener(this);
 
-        pack();
+            pack();
 
-        // Place this window in the upper right corner.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width, 0));
+            // Place this window in the upper right corner.
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            setLocation(new Point(d.width - getSize().width, 0));
+        }
     }
 
     
@@ -122,6 +133,7 @@ class BattleTurn extends Dialog implements ActionListener
             setupFightDialog();
         }
 
+        // phase == FIGHT
         else if (activeLegion == defender)
         {
             activeLegion = attacker;
@@ -129,6 +141,7 @@ class BattleTurn extends Dialog implements ActionListener
             setupMoveDialog();
         }
 
+        // phase == FIGHT, activeLegion == attacker
         else
         {
             activeLegion = defender;
@@ -161,6 +174,7 @@ class BattleTurn extends Dialog implements ActionListener
         else if (e.getActionCommand() == "Done with Moves")
         {
             // XXX: If any chits were left off-board, kill them.
+            // If they were newly summoned, unsummon them.
 
             map.commitMoves();
             advancePhase();
@@ -169,7 +183,7 @@ class BattleTurn extends Dialog implements ActionListener
         else if (e.getActionCommand() == "Done with Strikes")
         {
             // Advance only if there are no unresolved strikes.
-            if (map.highlightStrikes() == 0)
+            if (map.forcedStrikesRemain() == false)
             {
                 advancePhase();
             }
