@@ -103,12 +103,6 @@ class Creature
     }
 
 
-    public int getPointValue()
-    {
-        return power * skill;
-    }
-
-
     public int getCount()
     {
         return count;
@@ -157,28 +151,37 @@ class Creature
     }
 
 
-    public String getImageName()
-    {
-        return "images/" + name + ".gif";
-    }
-
-
+    // File.separator does not work right in jar files.  A hardcoded 
+    // forward-slash does, and works in *x and Windows.  I have
+    // no idea if it works on the Mac, etc.
     public String getImageName(boolean inverted)
     {
         if (inverted)
         {
-            return "images" + File.separator + "i_" + name + ".gif";
+            return "images/i_" + name + ".gif";
         }
         else
         {
-            return "images" + File.separator + name + ".gif";
+            return "images/" + name + ".gif";
         }
+    }
+    
+    
+    public String getImageName()
+    {
+        return getImageName(false);
     }
 
 
     public int getPower()
     {
         return power;
+    }
+
+
+    protected void setPower(int power) 
+    {
+        this.power = power;
     }
 
 
