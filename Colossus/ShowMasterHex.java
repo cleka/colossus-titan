@@ -10,7 +10,7 @@ import java.awt.event.*;
 class ShowMasterHex extends Dialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private MasterHex hex;
     private Chit [] chits;
     private int numChits;

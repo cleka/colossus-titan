@@ -10,7 +10,7 @@ import java.awt.event.*;
 public class ShowLegion extends Dialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Legion legion;
     private Chit [] chits;
     private Graphics offGraphics;

@@ -18,7 +18,7 @@ public class SummonAngel extends Dialog implements MouseListener,
     private static final int scale = 60;
     private Chit angelChit;
     private Chit archangelChit;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Legion donor;
     private Graphics offGraphics;
     private Dimension offDimension;

@@ -14,7 +14,7 @@ public class PickRecruiter extends Dialog implements MouseListener,
     private int numEligible;
     private Critter [] recruiters;
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Player player;
     private Legion legion;
     private Chit [] recruiterChits;

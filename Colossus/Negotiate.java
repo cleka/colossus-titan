@@ -10,7 +10,7 @@ import java.awt.event.*;
 public class Negotiate extends Dialog implements MouseListener, ActionListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Legion attacker;
     private Legion defender;
     private Chit [] attackerChits;

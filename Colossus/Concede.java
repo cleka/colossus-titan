@@ -10,7 +10,7 @@ import java.awt.event.*;
 public class Concede extends Dialog implements ActionListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private static final int scale = 60;
     private Frame parentFrame;
     private boolean flee;

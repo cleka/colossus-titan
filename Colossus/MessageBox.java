@@ -9,7 +9,7 @@ import java.awt.event.*;
 
 public class MessageBox extends Dialog implements ActionListener
 {
-    private static boolean standalone = false;
+    private static boolean standalone;
 
 
     public MessageBox(Frame parentFrame, String message)

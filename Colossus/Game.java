@@ -16,7 +16,7 @@ public class Game
     private String [] playerNames = new String[6];
     private Player [] players;
     private MasterBoard board;
-    private int activePlayerNum = 0;
+    private int activePlayerNum;
     private int turnNumber = 1;  // Advance when every player has a turn
     private StatusScreen statusScreen;
 

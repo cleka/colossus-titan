@@ -11,16 +11,17 @@ public class BattleHex extends Hex
     private BattleMap map;
 
     // Normal hexes hold only one creature, but entrances can hold up to 7.
-    private int numCritters = 0;
+    private int numCritters;
     private Critter [] critters = new Critter[7];
 
     // Valid elevations are 0, 1, and 2.
-    private int elevation = 0;
+    private int elevation;
 
-    // Terrain types are:
+    // Hex terrain types are:
     // p, r, s, t, o, v, d
     // plain, bramble, sand, tree, bog, volcano, drift
 
+    // Hexside terrain types are:
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
     // The hexside is marked only in the higher hex.

@@ -12,17 +12,17 @@ public class Critter extends Creature
 
     private BattleMap map;
     private Battle battle;
-    private boolean moved = false;
-    private boolean struck = false;
+    private boolean moved;
+    private boolean struck;
 
     private BattleHex currentHex;
     private BattleHex startingHex;
 
     // Damage taken
-    private int hits = 0;
+    private int hits;
 
     // Mark whether this critter is a legal carry target.
-    private boolean carryFlag = false;
+    private boolean carryFlag;
 
     private BattleChit chit;
 

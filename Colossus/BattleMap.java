@@ -29,8 +29,8 @@ public class BattleMap extends Frame implements MouseListener,
     private Graphics offGraphics;
     private Dimension offDimension;
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
-    private boolean eraseFlag = false;
+    private boolean imagesLoaded;
+    private boolean eraseFlag;
 
     private static int scale;
     private static int chitScale;

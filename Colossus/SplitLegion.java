@@ -11,7 +11,7 @@ public class SplitLegion extends Dialog implements MouseListener,
     ActionListener, WindowListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Legion oldLegion;
     private Legion newLegion;
     private Chit [] oldChits;

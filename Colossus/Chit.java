@@ -15,7 +15,7 @@ public class Chit extends Canvas
     private static Container container;
 
     // Flag to mark chit as dead and paint it with an "X" through it.
-    private boolean dead = false;
+    private boolean dead;
 
     // We need to track whether we're running as an applet to load
     // images correctly.  setApplet() should be called before any

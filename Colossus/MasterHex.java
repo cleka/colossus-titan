@@ -9,7 +9,7 @@ import java.awt.*;
 public class MasterHex extends Hex
 {
     private boolean inverted;
-    private int numLegions = 0;
+    private int numLegions;
     private Legion [] legions = new Legion[3];
     private MasterBoard board;
 
@@ -35,7 +35,7 @@ public class MasterHex extends Hex
     // 1 is right, 3 is bottom, 5 is left
     private boolean[] entrySide = new boolean[6];
 
-    private boolean teleported = false;
+    private boolean teleported;
 
     public static final int NONE = 0;
     public static final int BLOCK = 1;

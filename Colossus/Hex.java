@@ -15,7 +15,7 @@ public class Hex
     protected int[] yVertex = new int[6];
     protected Polygon hexagon;
     protected Rectangle rectBound;
-    private boolean selected = false;
+    private boolean selected;
     private char terrain;
     protected int scale;
     protected double len;

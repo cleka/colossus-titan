@@ -36,7 +36,7 @@ public class PickEntrySide extends Dialog implements ActionListener,
     private Button button3;  // bottom
     private Button button1;  // right
 
-    private boolean laidOut = false;
+    private boolean laidOut;
 
 
     public PickEntrySide(Frame parentFrame, MasterHex masterHex)

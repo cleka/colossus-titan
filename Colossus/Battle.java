@@ -34,10 +34,10 @@ public class Battle
     private int turnNumber = 1;
     private int phase = MOVE;
     private int summonState = NO_KILLS;
-    private boolean summoningAngel = false;
-    private int carryDamage = 0;
-    private boolean chitSelected = false;
-    private int numCritters = 0;
+    private boolean summoningAngel;
+    private int carryDamage;
+    private boolean chitSelected;
+    private int numCritters;
     private Critter [] critters = new Critter[14];
     private Critter lastCritterMoved;
     private Legion donor;

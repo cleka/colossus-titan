@@ -48,19 +48,19 @@ public class MasterBoard extends Frame implements MouseListener,
     private boolean imagesLoaded;
     private static int scale = 17;
     private static Game game;
-    private boolean eraseFlag = false;
-    private boolean summoningAngel = false;
+    private boolean eraseFlag;
+    private boolean summoningAngel;
     private SummonAngel summonAngel;
     private Battle battle;
     private BattleMap map;
     private Turn turn;
 
     // Setting this to true will make all stacks public.
-    private boolean allVisible = false;
+    private boolean allVisible;
 
     // Keep multiple quick clicks from popping up multiples
     // of the same dialog.
-    private boolean dialogLock = false;
+    private boolean dialogLock;
 
     private PopupMenu popupMenu;
     private MenuItem menuItemHex; 

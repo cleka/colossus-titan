@@ -11,7 +11,7 @@ import java.awt.event.*;
 public class PickLord extends Dialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Player player;
     private Legion legion;
     private Chit [] chits;

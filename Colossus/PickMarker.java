@@ -12,7 +12,7 @@ public class PickMarker extends Dialog implements MouseListener, WindowListener
 {
     private Chit [] markers;
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Player player;
     private Graphics offGraphics;
     private Dimension offDimension;

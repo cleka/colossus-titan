@@ -13,7 +13,7 @@ public class ShowDice extends Dialog implements WindowListener
     private Frame parentFrame;
     private MediaTracker tracker;
     private static final int scale = 60;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;

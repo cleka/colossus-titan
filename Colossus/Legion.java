@@ -16,11 +16,11 @@ public class Legion
     private Critter [] critters = new Critter[8];  // 8 before initial splits
     private MasterHex currentHex;
     private MasterHex startingHex;
-    private boolean moved = false;
-    private boolean recruited = false;
-    private boolean summoned = false;
+    private boolean moved;
+    private boolean recruited;
+    private boolean summoned;
     private Player player;
-    private int battleTally = 0;
+    private int battleTally;
 
 
     public Legion(int scale, String markerId, Legion splitFrom,

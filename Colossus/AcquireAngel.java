@@ -11,10 +11,10 @@ import java.awt.event.*;
 public class AcquireAngel extends Dialog implements MouseListener,
     WindowListener
 {
-    private int numEligible = 0;
+    private int numEligible;
     private Creature [] recruits;
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Player player;
     private Legion legion;
     private Chit [] chits;

@@ -9,13 +9,13 @@ public class Player
     private String name;
     private String color;       // Black, Blue, Brown, Gold, Green, Red
     private int startingTower;  // 1-6
-    private double score = 0;    // track half-points, then round
+    private double score;    // track half-points, then round
     private boolean canSummonAngel = true;
     private String playersEliminated;  // RdBkGr
-    private int numMarkersAvailable = 0;
+    private int numMarkersAvailable; 
     private String [] markersAvailable = new String[72];
     private String markerSelected;
-    private int numLegions = 0;
+    private int numLegions; 
     private Legion [] legions = new Legion[72];
     private Legion selectedLegion = null;
     private boolean alive = true;
@@ -24,7 +24,7 @@ public class Player
     private Game game;
     private Legion lastLegionMoved;
     private Legion lastLegionSplit;
-    private boolean titanEliminated = false;
+    private boolean titanEliminated;
     private Legion lastLegionSummonedFrom;
     private boolean canTeleport = true;
     private Legion lastLegionRecruited;

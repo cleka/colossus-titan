@@ -14,7 +14,7 @@ public class PickRecruit extends Dialog implements MouseListener,
     private int numEligible;
     private Creature [] recruits;
     private MediaTracker tracker;
-    private boolean imagesLoaded = false;
+    private boolean imagesLoaded;
     private Player player;
     private Legion legion;
     private Chit [] recruitChits;
@@ -27,7 +27,7 @@ public class PickRecruit extends Dialog implements MouseListener,
     private Frame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
-    private boolean dialogLock = false;
+    private boolean dialogLock;
 
 
     public PickRecruit(Frame parentFrame, Legion legion)
