@@ -152,7 +152,7 @@ class MasterHex extends Hex
         // Draw label and terrain name
         FontMetrics fontMetrics = g.getFontMetrics();
         String sLabel = Integer.toString(label);
-        String sName = getTerrainName();
+        String name = getTerrainName().toUpperCase();
         int fontHeight = fontMetrics.getMaxAscent() + fontMetrics.getLeading();
 
         switch (getLabelSide())
@@ -195,16 +195,16 @@ class MasterHex extends Hex
         }
 
         // The word "MOUNTAINS" needs to be printed in the wide part of the hex.
-        if (sName.equals("MOUNTAINS"))
+        if (name.equals("MOUNTAINS"))
         {
-            g.drawString(sName, rectBound.x + (rectBound.width -
-                fontMetrics.stringWidth(sName)) / 2,
+            g.drawString(name, rectBound.x + (rectBound.width -
+                fontMetrics.stringWidth(name)) / 2,
                 rectBound.y + fontHeight / 2 + rectBound.height * 2 / 3);
         }
         else
         {
-            g.drawString(sName, rectBound.x + (rectBound.width -
-                fontMetrics.stringWidth(sName)) / 2,
+            g.drawString(name, rectBound.x + (rectBound.width -
+                fontMetrics.stringWidth(name)) / 2,
                 rectBound.y + fontHeight / 2 + rectBound.height / 2);
         }
         
@@ -379,27 +379,27 @@ class MasterHex extends Hex
         switch (getTerrain())
         {
             case 'B':
-                return "BRUSH";
+                return "Brush";
             case 'D':
-                return "DESERT";
+                return "Desert";
             case 'H':
-                return "HILLS";
+                return "Hills";
             case 'J':
-                return "JUNGLE";
+                return "Jungle";
             case 'm':
-                return "MOUNTAINS";
+                return "Mountains";
             case 'M':
-                return "MARSH";
+                return "Marsh";
             case 'P':
-                return "PLAINS";
+                return "Plains";
             case 'S':
-                return "SWAMP";
+                return "Swamp";
             case 'T':
-                return "TOWER";
+                return "Tower";
             case 't':
-                return "TUNDRA";
+                return "Tundra";
             case 'W':
-                return "WOODS";
+                return "Woods";
             default:
                 return "?????";
         }
