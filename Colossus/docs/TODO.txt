@@ -8,7 +8,7 @@ Optional post-engagement status dialog showing which legions/players
    fought, known stack contents, what lived and died, summons, acquires,
    reinforcements, and points.
 
-Change some dialogs to show info in a label instead of the title 
+Change some dialogs to show info in a label instead of the title, 
    and add explicit cancel buttons.  AcquireAngel...
 
 Move code to center a dialog on screen to one place.
@@ -43,17 +43,11 @@ Add total value of all a player's creatures to StatusScreen.
 
 Reveal all stacks at game end.
 
-Optionally show the contents of a legion that flees or concedes.
-
 Allow players to specify that they automatically refuse to negotiate.  
    Check for this before showing negotiation dialog to opponent.
 
 Prompt player whether to continue game after last human player dies
    if AIs remain.
-
-Reduce imports between client and server packages.  Document remaining 
-   public classes, which are those that need to be included in the 
-   network protocol.
 
 Include an .ico file for Windows.
 

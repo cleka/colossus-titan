@@ -90,19 +90,42 @@ EVAL Guardian move to Plains hex F2 = -15
 EVAL Guardian move to Plains hex D6 = -25
 Considered 18 moves for Guardian in D4: D4 B2 E3 C3 F2 D5 B3 E4 C4 F3 B4 E5 C5 F4 D6 D3 E2 C2
 
-AI sometimes concedes with its titan stack.  Check.
-
 AI needs to be more careful about protecting Titan. 
 
 Legions full of trolls/ogres/clopses should try harder to
    avoid the desert.  (Ditto for non-natives attacking into
    marsh, swamp, brush, jungle...)
 
-Consider recruit scarcity (last gargoyle possibly more valuable than 
-   troll).  Don't cheat and peek at opposing stacks unless all stacks 
-   are visible or some cheat option is set.  Give some value to sitting in 
-   native terrain.  Get scrub snacks out of nearby opponents' good 
-   recruiting terrain and into blocking positions.
+Give some value to sitting in native terrain.  
+
+MinimaxAI's advancePhase() calls are broken?  8-high starting stack split,
+   rolled 6, processed a bunch, and illegally recombined.
+
+At end of game, with MultimaxAI player:
+Gold rolls a 6 for movement
+Exception occurred during event dispatching:
+java.lang.NullPointerException
+        at MinimaxAI.masterMove(MinimaxAI.java:32)
+        at Player.aiMasterMove(Player.java:893)
+        at Game.setupMove(Game.java:666)
+        at Game.setupPhase(Game.java:625)
+        at Game.advancePhaseInternal(Game.java:613)
+        at Game.access$000(Game.java:16)
+        at Game$1.actionPerformed(Game.java:580)
+        at javax.swing.Timer.fireActionPerformed(Timer.java:150)
+        at javax.swing.Timer$DoPostEvent.run(Timer.java:108)
+        at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:154)
+        at java.awt.EventQueue.dispatchEvent(EventQueue.java:337)
+        at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:131)
+        at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:98)
+        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+        at java.awt.EventDispatchThread.run(EventDispatchThread.java:85)
+
+MinimaxAI advances phases and turns illegally while a human player is trying
+   to enter the battle map.
+
+Turn 1, AI in tower 600 rolled 6, moved legions to 136 and 38.  One of those
+   moves was illegal.
 
 
 PROGRAMMING BUGS:
@@ -142,26 +165,6 @@ java.lang.NullPointerException
         at java.awt.Component.setVisible(Component.java:903)
         at GetPlayers.<init>(GetPlayers.java:96)
 
-At end of game, with MultimaxAI player:
-Gold rolls a 6 for movement
-Exception occurred during event dispatching:
-java.lang.NullPointerException
-        at MinimaxAI.masterMove(MinimaxAI.java:32)
-        at Player.aiMasterMove(Player.java:893)
-        at Game.setupMove(Game.java:666)
-        at Game.setupPhase(Game.java:625)
-        at Game.advancePhaseInternal(Game.java:613)
-        at Game.access$000(Game.java:16)
-        at Game$1.actionPerformed(Game.java:580)
-        at javax.swing.Timer.fireActionPerformed(Timer.java:150)
-        at javax.swing.Timer$DoPostEvent.run(Timer.java:108)
-        at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:154)
-        at java.awt.EventQueue.dispatchEvent(EventQueue.java:337)
-        at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:131)
-        at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:98)
-        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
-        at java.awt.EventDispatchThread.run(EventDispatchThread.java:85)
-
 Need to better stop phase advancing on draw, not just win.  Human player
    ended up AI-controlled after draw.
 
@@ -179,52 +182,20 @@ Save game in first turn's move phase, after rolling 6.  Load game,
    as 6.  Need to fix movement phase initialization timing from 
    loadGame() path.
 
-Turn 1, AI in tower 600 rolled 6, moved legions to 136 and 38.  One of those
-   moves was illegal.
-
 First recruit of each game is very slow.  So is first SummonAngel if no
    previous recruits.  Handle some initialization in a background thread
    started earlier?
 
-MinimaxAI's advancePhase() calls are broken?  8-high starting stack split,
-   rolled 6, processed a bunch, and illegally recombined.
-
 Need to reveal legion contents to each other during negotiation.  Requires
    per-client memory of enemy stacks.
-
-Desert 128 got attacked from hills 32.  Defending the "top" (d6 e5 f4) edge.
-   (20020102 build)  AI entry side problem.  Fixed?
 
 Can't play with more than one human player.  Does not allow first human to
    split starting stack.  Works for me -- try to reproduce in Win98.
 
-LogWindow does not appear at start of game even if option is set in cfg file.
-LogDebugMessages option does not work when set in cfg file.  They work okay
-   if twiddled off and back on, so this is just lack of initialization.
-
 Did file/new game while game was being set up.  Got comodification exception.
-
-MinimaxAI advances phases and turns illegally while a human player is trying
-   to enter the battle map.
 
 Stuff (markers, LogWindow) that is painted before the MasterBoard is ready
    end up dumping pixels onto the upper-left corner of the MasterFrame.
-   Need to setVisible(false) on master frame until later.
+   Need to setVisible(false) on master frame until later?
 
-On every SimpleAI move:
-   Error: Could not find hex 700
-   Error: Could not find hex 800
-   Error: Could not find hex 900
-
-From SimpleAI:  (Works, but...)
-   Warn: Tried to enter invalid side of tower
-   Legion Gd02 (Claw) in 400 tower teleports (null) to Tower hex 500 entering 
-      on Bottom
-   Legion Gd01 (Caduceus) in 400 moves to Woods hex 25 entering on Left
-
-We routinely get "Warn: Tried to enter invalid side of tower"
-   I think this is harmless (we're trying to enter it as if it were 
-   another terrain type), but we should eliminate the warning by changing 
-   all entry side routines to always return the bottom for towers.
-
-Need to repaint after choosing a strike penalty.
+Need to re-highlight strikers or carries after choosing a strike penalty.

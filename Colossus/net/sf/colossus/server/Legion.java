@@ -882,9 +882,13 @@ final class Legion implements Comparable
         and decrement the number of this creature type remaining. */
     void addCreature(Creature creature, boolean takeFromStack)
     {
+        if (getHeight() >= 7)
+        {
+            Log.error("Tried to add to 7-high legion!");
+            return;
+        }
         if (takeFromStack)
         {
-
             Caretaker caretaker = game.getCaretaker();
             if (caretaker.getCount(creature) > 0)
             {

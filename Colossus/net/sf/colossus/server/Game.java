@@ -1645,7 +1645,15 @@ public final class Game
                 // Set the entry side relative to the hex label.
                 if (cameFrom != -1)
                 {
-                    int entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
+                    int entrySide; 
+                    if (hex.getTerrain() == 'T') 
+                    {
+                        entrySide = 3;
+                    }
+                    else
+                    {
+                        entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
+                    }
                     set.add(hexLabel + ":" + BattleMap.entrySideName(
                         entrySide));
                 }
