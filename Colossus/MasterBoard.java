@@ -409,9 +409,12 @@ class MasterBoard extends Frame implements MouseListener,
     // Returns number of legions with summonable angels.
     int highlightSummonableAngels(Legion legion)
     {
-        int count = 0;
+        unselectAllHexes();
+
         Player player = legion.getPlayer();
         player.unselectLegion();
+
+        int count = 0;
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
