@@ -391,33 +391,6 @@ public final class Player implements Comparable
     }
 
 
-    /** Sort legions into order of descending importance.  Titan legion
-     *  first, then others by point value. */
-    void sortLegions()
-    {
-        Collections.sort(legions);
-    }
-
-
-    /** Move legion to the first position in the legions list.
-     *  Return true if it was moved. */
-    boolean moveToTop(Legion legion)
-    {
-        int i = legions.indexOf(legion);
-        if (i <= 0)
-        {
-            // Not found, or already first in the list.
-            return false;
-        }
-        else
-        {
-            legions.remove(i);
-            legions.add(0, legion);
-            return true;
-        }
-    }
-
-
     /** Return the number of this player's legions that have moved. */
     int legionsMoved()
     {
@@ -630,10 +603,11 @@ public final class Player implements Comparable
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            Legion parent = legion.getParent();
-            if (parent != null && parent != legion && 
-                parent.getCurrentHexLabel().equals(
-                legion.getCurrentHexLabel()))
+            // Don't use the legion's real parent, as there could have been
+            // a 3-way split and the parent could be gone.
+            Legion parent = game.getFirstFriendlyLegion(
+                legion.getCurrentHexLabel(), this);
+            if (legion != parent)
             {
                 game.getServer().undidSplit(legion.getMarkerId());
                 legion.recombine(parent, false);

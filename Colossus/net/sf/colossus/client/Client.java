@@ -1938,6 +1938,7 @@ Log.error("Got nak for recruit with " + markerId);
     public void setupSplit(Set markersAvailable, String activePlayerName,
         int turnNumber)
     {
+        clearUndoStack();
         cleanupNegotiationDialogs();
 
         this.activePlayerName = activePlayerName;
@@ -1993,6 +1994,7 @@ Log.error("Got nak for recruit with " + markerId);
 
     public void setupFight()
     {
+        clearUndoStack();
         this.phase = Constants.FIGHT;
         if (board != null)
         {
@@ -2009,6 +2011,7 @@ Log.error("Got nak for recruit with " + markerId);
 
     public void setupMuster()
     {
+        clearUndoStack();
         cleanupNegotiationDialogs();
 
         this.phase = Constants.MUSTER;
@@ -3271,7 +3274,6 @@ Log.error("Got nak for move of " + markerId);
         }
         aiPause();
         server.doneWithSplits();
-        clearUndoStack();
         clearRecruitChits();
     }
 
@@ -3283,7 +3285,6 @@ Log.error("Got nak for move of " + markerId);
         }
         aiPause();
         clearRecruitChits();
-        clearUndoStack();
         server.doneWithMoves();
     }
 
@@ -3295,7 +3296,6 @@ Log.error("Got nak for move of " + markerId);
         }
         aiPause();
         server.doneWithEngagements();
-        clearUndoStack();
     }
 
     void doneWithRecruits()
@@ -3304,7 +3304,6 @@ Log.error("Got nak for move of " + markerId);
         {
             return;
         }
-        clearUndoStack();
         aiPause();
         server.doneWithRecruits();
     }
