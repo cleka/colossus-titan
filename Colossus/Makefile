@@ -9,6 +9,8 @@
 JCC = jikes -g -depend +P
 #JCC = javac -J-Djavac.pipe.output=true -g -deprecation -Xdepend
 
+# Directory for html and applet jar files
+HTMLDIR = /home/httpd/html
 
 # Targets
 
@@ -28,22 +30,21 @@ sources = $(wildcard *.java)
 
 classes: $(sources:%.java=%.class)
 
-
-
 # Create jar file
 jar: classes
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif
 	chmod +x Colossus.jar
 
-# Install jar file
-inst: classes
-	cp Colossus.jar /home/httpd/html
+# Install jar and html files for applet
+inst: classes jar
+	cp Colossus.jar $(HTMLDIR)
+	cp Colossus_applet.html $(HTMLDIR)
 
 # Clean up
 clean:
-	rm -f *~ *.class core *.bak *.jar
+	rm -f *~ *.class core javacore.txt *.bak *.jar
 
-# Make zip file
+# Make zip file.  Don't include saved games or other zip files.
 dist:
-	zip -pr Colossus.`date +%Y%m%d`.zip *
+	zip -pr Colossus.`date +%Y%m%d`.zip * -x *.sav -x *.zip
 
