@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<variant name="Balrog">
+    <terrain_recruits filename="BalrogTer.xml" />
+    <creatures filename="BalrogCre.xml" />
+    <depends>
+        <depend variant="ExtTitan" />
+    </depends>
+    <hint classname="Balrog.BalrogHint" />
+</variant>
