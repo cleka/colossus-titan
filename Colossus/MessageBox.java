@@ -9,12 +9,13 @@ import java.awt.event.*;
 
 class MessageBox extends Dialog implements ActionListener
 {
+    static boolean standalone = false;
 
     MessageBox(Frame parentFrame, String message)
     {
         super(parentFrame, "Message");
 
-        int scale = 60;
+        setLayout(new GridLayout(0, 1));
 
         add(new Label(message));
 
@@ -22,11 +23,12 @@ class MessageBox extends Dialog implements ActionListener
         add(button);
         button.addActionListener(this);
 
+        pack();
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
         
-        pack();
         setVisible(true);
     }
 
@@ -34,5 +36,23 @@ class MessageBox extends Dialog implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
         dispose();
+        if (standalone)
+        {
+            System.exit(0);
+        }
+    }
+
+
+    public static void main(String [] args)
+    {
+        standalone = true;
+        if (args.length < 1)
+        {
+            new MessageBox(new Frame(), "Your message here");
+        }
+        else
+        {
+            new MessageBox(new Frame(), args[0]);
+        }
     }
 }
