@@ -102,5 +102,6 @@ Linux, ibmjdk118: Numbers (sometimes overlapping) appear in the
 
 Linux, ibmjdk118: Battle did not end once when a player died.
    BattleTurn was not dismissed, and the game could not continue.
-   Unable to duplicate so far.
+   Happened twice -- see 968280760325.sav (movement 3)
+   Player.die() was called.
 

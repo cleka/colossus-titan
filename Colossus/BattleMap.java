@@ -25,10 +25,8 @@ public class BattleMap extends Frame implements MouseListener,
     private static int scale;
     private static int chitScale;
 
-    private static BattleTurn turn;
     private static MasterBoard board;
     private static MasterHex masterHex;
-    private static ShowDice showDice;
     private static Battle battle;
 
     private static Point location;
@@ -77,31 +75,8 @@ public class BattleMap extends Frame implements MouseListener,
 
         tracker = new MediaTracker(this);
 
-        BattleHex entrance = getEntrance(attacker);
-        for (int i = 0; i < attacker.getHeight(); i++)
-        {
-            Critter critter = attacker.getCritter(i);
-            battle.addCritter(critter);
-            BattleChit chit = new BattleChit(chitScale, 
-                critter.getImageName(false), this, critter);
-            tracker.addImage(chit.getImage(), 0);
-            critter.addBattleInfo(entrance, this, chit, battle);
-            entrance.addCritter(critter);
-        }
-        entrance.alignChits();
-
-        entrance = getEntrance(defender);
-        for (int i = 0; i < defender.getHeight(); i++)
-        {
-            Critter critter = defender.getCritter(i);
-            battle.addCritter(critter);
-            BattleChit chit = new BattleChit(chitScale, 
-                critter.getImageName(true), this, critter);
-            tracker.addImage(chit.getImage(), 0);
-            critter.addBattleInfo(entrance, this, chit, battle);
-            entrance.addCritter(critter);
-        }
-        entrance.alignChits();
+        placeLegion(attacker, false);
+        placeLegion(defender, true);
 
         try
         {
@@ -112,9 +87,6 @@ public class BattleMap extends Frame implements MouseListener,
             new MessageBox(this, e.toString() + " waitForAll was interrupted");
         }
         imagesLoaded = true;
-
-        turn = new BattleTurn(this, this, battle);
-        showDice = new ShowDice(this);
 
         pack();
         
@@ -177,6 +149,23 @@ public class BattleMap extends Frame implements MouseListener,
         }
         imagesLoaded = true;
     }
+        
+
+    private void placeLegion(Legion legion, boolean inverted)
+    {
+        BattleHex entrance = getEntrance(legion);
+        for (int i = 0; i < legion.getHeight(); i++)
+        {
+            Critter critter = legion.getCritter(i);
+            battle.addCritter(critter);
+            BattleChit chit = new BattleChit(chitScale, 
+                critter.getImageName(inverted), this, critter);
+            tracker.addImage(chit.getImage(), 0);
+            critter.addBattleInfo(entrance, this, chit, battle);
+            entrance.addCritter(critter);
+        }
+        entrance.alignChits();
+    }
 
 
     public static void unselectAllHexes()
@@ -216,70 +205,6 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    public void cleanup()
-    {
-        try
-        {
-            // Handle any after-battle angel summoning or recruiting.
-            if (masterHex.getNumLegions() == 1)
-            {
-                Legion legion = masterHex.getLegion(0);
-                if (legion == battle.getAttacker())
-                {
-                    // Summon angel
-                    if (legion.canSummonAngel())
-                    {
-                        if (board != null)
-                        {
-                            // Make sure the MasterBoard is visible.
-                            board.deiconify();
-                            // And bring it to the front.
-                            board.show();
-        
-                            SummonAngel summonAngel = new SummonAngel(board,
-                                battle.getAttacker());
-                            board.getGame().setSummonAngel(summonAngel);
-                        }
-                    }
-                }
-                else
-                {
-                    // Recruit reinforcement
-                    if (legion.canRecruit())
-                    {
-                        new PickRecruit(this, legion);
-                    }
-                }
-    
-                // Make all creatures in the victorious legion visible.
-                legion.revealAllCreatures();
-    
-                // Heal all creatures in the winning legion.
-                legion.healAllCreatures();
-            }
-    
-            if (turn != null)
-            {
-                turn.cleanup();
-            }
-    
-            // Save location for next object.
-            location = getLocation();
-    
-            dispose();
-    
-            masterHex.unselect();
-            masterHex.repaint();
-            board.getGame().finishBattle();
-        }
-        catch (NullPointerException e)
-        {
-            // Don't crash if we're testing battles with no MasterBoard.
-            e.printStackTrace();
-        }
-    }
-
-
     public static int getScale()
     {
         int scale;
@@ -299,18 +224,6 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    public static BattleTurn getTurn()
-    {
-        return turn;
-    }
-
-
-    public static ShowDice getShowDice()
-    {
-        return showDice;
-    }
-    
-    
     private void setupEntrances()
     {
         int cx = 6 * scale;
@@ -395,94 +308,26 @@ public class BattleMap extends Frame implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
-        Player player = battle.getActivePlayer();
-
         Critter critter = battle.getCritterWithChitContainingPoint(point);
+        BattleHex hex = getHexContainingPoint(point);
 
         // Only the active player can move or strike.
-        if (critter != null && critter.getPlayer() == player)
+        if (critter != null && critter.getPlayer() == battle.getActivePlayer())
         {
-            battle.setChitSelected(); 
-
-            // Put selected chit at the top of the Z-order.
-            battle.moveToTop(critter);
-
-            switch (battle.getPhase())
-            {
-                case Battle.MOVE:
-                    // Highlight all legal destinations for this chit.
-                    battle.showMoves(critter);
-                    break;
-
-                case Battle.FIGHT:
-                case Battle.STRIKEBACK:
-                    // Highlight all legal strikes for this chit.
-                    battle.highlightStrikes(critter);
-
-                    // Leave carry mode.
-                    battle.clearAllCarries();
-                    break;
-
-                default:
-                    break;
-            }
-
-            return;
+            battle.actOnCritter(critter);
         }
     
         // No hits on chits, so check map.
-        BattleHex hex = getHexContainingPoint(point);
-        if (hex != null && hex.isSelected())
+        else if (hex != null && hex.isSelected())
         {
-            switch (battle.getPhase())
-            {
-                case Battle.MOVE:
-                    if (battle.isChitSelected())
-                    {
-                        battle.getCritter(0).moveToHex(hex);
-                        battle.clearChitSelected();
-                    }
-                    battle.highlightMovableChits();
-                    return;
-    
-                case Battle.FIGHT:
-                case Battle.STRIKEBACK:
-                    if (battle.getCarryDamage() > 0)
-                    {
-                        battle.applyCarries(hex.getCritter());
-                    }
-                    else if (battle.isChitSelected())
-                    {
-                        battle.getCritter(0).strike(hex.getCritter());
-                        battle.clearChitSelected();
-                    }
-    
-                    if (battle.getCarryDamage() == 0)
-                    {
-                        battle.highlightChitsWithTargets();
-                    }
-                    return;
-    
-                default:
-                    return;
-            }
+            battle.actOnHex(hex);
         }
-    
+
         // No hits on selected hexes, so clean up.
-        switch (battle.getPhase())
+        else
         {
-            case Battle.MOVE:
-                battle.highlightMovableChits();
-                break;
-    
-            case Battle.FIGHT:
-            case Battle.STRIKEBACK:
-                battle.highlightChitsWithTargets();
-                break;
-    
-            default:
-                break;
-       }
+            battle.actOnMisclick();
+        }
     }
     
     
@@ -522,7 +367,7 @@ public class BattleMap extends Frame implements MouseListener,
         {
             board.getGame().dispose();
         }
-        dispose();
+        battle.cleanup();
     }
     
     
@@ -617,6 +462,15 @@ public class BattleMap extends Frame implements MouseListener,
         // Double-buffer everything.
         update(g);
     }
+
+
+    public void dispose()
+    {
+        // Save location for next object.
+        location = getLocation();
+
+        super.dispose();
+    }
     
     
     public Dimension getMinimumSize()
@@ -633,20 +487,6 @@ public class BattleMap extends Frame implements MouseListener,
     
     public static void main(String [] args)
     {
-        Player player1 = new Player("Attacker", null);
-        Player player2 = new Player("Defender", null);
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setTerrain('J');
-        hex.setEntrySide(3);
-        Legion attacker = new Legion(chitScale, "Bk01", null, null, 7,
-            hex, Creature.archangel, Creature.troll, Creature.ranger,
-            Creature.hydra, Creature.griffon, Creature.angel,
-            Creature.warlock, null, player1);
-        Legion defender = new Legion(chitScale, "Rd01", null, null, 7,
-            hex, Creature.serpent, Creature.lion, Creature.gargoyle,
-            Creature.cyclops, Creature.gorgon, Creature.guardian,
-            Creature.minotaur, null, player2);
-
-        new Battle(null, attacker, defender, hex);
+        Battle.main(args);
     }
 }

@@ -705,7 +705,7 @@ public class Critter extends Creature
         struck = true;
 
         // Display the rolls in the showDice dialog.
-        ShowDice showDice = map.getShowDice();
+        ShowDice showDice = battle.getShowDice();
         showDice.setAttacker(this);
         showDice.setDefender(target);
         showDice.setTargetNumber(strikeNumber);

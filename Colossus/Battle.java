@@ -30,6 +30,7 @@ public class Battle
     private MasterHex masterHex;
     private BattleTurn turn;
     private SummonAngel summonAngel;
+    private ShowDice showDice;
 
     private int turnNumber = 1;
     private int phase = MOVE;
@@ -48,18 +49,20 @@ public class Battle
         MasterHex masterHex)
     {
         this.board = board;
-        this.attacker = attacker;
-        this.defender = defender;
-        activeLegion = defender;
         this.masterHex = masterHex;
+        this.defender = defender;
+        this.attacker = attacker;
+        activeLegion = defender;
 
         attacker.clearBattleTally();
         defender.clearBattleTally();
 
         map = new BattleMap(board, masterHex, this);
 
-        turn = map.getTurn();
+        turn = new BattleTurn(map, this);
         turn.setupMoveDialog();
+
+        showDice = new ShowDice(map);
     }
 
 
@@ -194,7 +197,7 @@ public class Battle
                             {
                                 attacker.removeLegion();
                             }
-                            map.cleanup();
+                            cleanup();
                         }
                         else
                         {
@@ -723,7 +726,7 @@ public class Battle
             // Make defender die first, to simplify turn advancing.
             defender.getPlayer().die(null, false);
             attacker.getPlayer().die(null, true);
-            map.cleanup();
+            cleanup();
         }
 
         // Check for single Titan elimination.
@@ -738,7 +741,7 @@ public class Battle
                 defender.addBattleTallyToPoints();
             }
             attacker.getPlayer().die(defender.getPlayer(), true);
-            map.cleanup();
+            cleanup();
         }
         else if (defender.getPlayer().isTitanEliminated())
         {
@@ -751,7 +754,7 @@ public class Battle
                 attacker.addBattleTallyToPoints();
             }
             defender.getPlayer().die(attacker.getPlayer(), true);
-            map.cleanup();
+            cleanup();
         }
 
         // Check for mutual legion elimination.
@@ -759,7 +762,7 @@ public class Battle
         {
             attacker.removeLegion();
             defender.removeLegion();
-            map.cleanup();
+            cleanup();
         }
 
         // Check for single legion elimination.
@@ -767,13 +770,13 @@ public class Battle
         {
             defender.addBattleTallyToPoints();
             attacker.removeLegion();
-            map.cleanup();
+            cleanup();
         }
         else if (defenderElim)
         {
             attacker.addBattleTallyToPoints();
             defender.removeLegion();
-            map.cleanup();
+            cleanup();
         }
     }
 
@@ -1533,6 +1536,162 @@ public class Battle
     public BattleTurn getTurn()
     {
         return turn;
+    }
+
+
+    public ShowDice getShowDice()
+    {
+        return showDice;
+    }
+
+
+    public void actOnCritter(Critter critter)
+    {
+        // Only the active player can move or strike.
+        if (critter != null && critter.getPlayer() == getActivePlayer())
+        {
+            setChitSelected(); 
+
+            // Put selected chit at the top of the Z-order.
+            moveToTop(critter);
+
+            switch (getPhase())
+            {
+                case Battle.MOVE:
+                    // Highlight all legal destinations for this chit.
+                    showMoves(critter);
+                    break;
+
+                case Battle.FIGHT:
+                case Battle.STRIKEBACK:
+                    // Highlight all legal strikes for this chit.
+                    highlightStrikes(critter);
+
+                    // Leave carry mode.
+                    clearAllCarries();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+
+    public void actOnHex(BattleHex hex)
+    {
+        switch (getPhase())
+        {
+            case Battle.MOVE:
+                if (isChitSelected())
+                {
+                    getCritter(0).moveToHex(hex);
+                    clearChitSelected();
+                }
+                highlightMovableChits();
+                break;
+
+            case Battle.FIGHT:
+            case Battle.STRIKEBACK:
+                if (getCarryDamage() > 0)
+                {
+                    applyCarries(hex.getCritter());
+                }
+                else if (isChitSelected())
+                {
+                    getCritter(0).strike(hex.getCritter());
+                    clearChitSelected();
+                }
+
+                if (getCarryDamage() == 0)
+                {
+                    highlightChitsWithTargets();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
+    public void actOnMisclick()
+    {
+        switch (getPhase())
+        {
+            case Battle.MOVE:
+                highlightMovableChits();
+                break;
+    
+            case Battle.FIGHT:
+            case Battle.STRIKEBACK:
+                highlightChitsWithTargets();
+                break;
+    
+            default:
+                break;
+       }
+    }
+
+
+    public void cleanup()
+    {
+        try
+        {
+            // Handle any after-battle angel summoning or recruiting.
+            if (masterHex.getNumLegions() == 1)
+            {
+                Legion legion = masterHex.getLegion(0);
+                if (legion == getAttacker())
+                {
+                    // Summon angel
+                    if (legion.canSummonAngel())
+                    {
+                        if (board != null)
+                        {
+                            // Make sure the MasterBoard is visible.
+                            board.deiconify();
+                            // And bring it to the front.
+                            board.show();
+        
+                            SummonAngel summonAngel = new SummonAngel(board,
+                                getAttacker());
+                            board.getGame().setSummonAngel(summonAngel);
+                        }
+                    }
+                }
+                else
+                {
+                    // Recruit reinforcement
+                    if (legion.canRecruit())
+                    {
+                        new PickRecruit(map, legion);
+                    }
+                }
+    
+                // Make all creatures in the victorious legion visible.
+                legion.revealAllCreatures();
+    
+                // Heal all creatures in the winning legion.
+                legion.healAllCreatures();
+            }
+    
+            if (turn != null)
+            {
+                turn.cleanup();
+            }
+    
+            map.dispose();
+    
+            masterHex.unselect();
+            masterHex.repaint();
+            board.getGame().finishBattle();
+        }
+        catch (NullPointerException e)
+        {
+            // Don't crash if we're testing battles with no MasterBoard.
+            e.printStackTrace();
+        }
     }
 
 

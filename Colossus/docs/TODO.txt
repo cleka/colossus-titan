@@ -1,5 +1,10 @@
 Split GUI classes from model classes.
 
+Move GUI/client classes and model/server classes into separate
+   packages.  Make all possible public classes package private.
+   Document remaining public classes, which are those that
+   need to be included in the network protocol.
+
 Add a window that displays all terrain types and recruits.
 
 Finish SetupBattle class, to allow setting up standalone battles.
@@ -9,7 +14,8 @@ Add server menu for save game, load game, new game, autosave, visible
    PickRecruits vs.  always reveal the biggest/smallest possible 
    recruiter.  Read option defaults from a config file.
 
-Improve savegame file.  XML?
+Improve savegame file.  XML?  Need the ability to save at any time
+   during a turn, not just at the end. 
 
 Fix concession timing.
 

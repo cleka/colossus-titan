@@ -15,9 +15,10 @@ public class BattleTurn extends Dialog implements ActionListener,
     private Battle battle;
 
 
-    public BattleTurn(Frame parentFrame, BattleMap map, Battle battle)
+    public BattleTurn(BattleMap map, Battle battle)
     {
-        super(parentFrame);
+        super(map, battle.getActivePlayer().getName() + " Turn " + 
+                battle.getTurnNumber());
 
         this.map = map;
         this.battle = battle;
