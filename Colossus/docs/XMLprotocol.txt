@@ -9,14 +9,14 @@ Everything is case sensitive, unless stated otherwise.
 
 [name]:         A string of up to 30 characters.
 [player]:       The name of a player currently in the game
-[colorname]:    One of "Black", "Brown", ...
+[colorName]:    One of "Black", "Brown", ...
 [legion]:       A marker id like "Bk01".
 [creature]:     A complete creature name like "Behemoth".
 [creatures]:    One or more of [creature].
 [land]:         A number of a masterboard hex, like "127".
 [number]:       A number like "3".
-[battlehex]:    A battle hex identifier like "C1"
-[entryside]:    "right", "left", or "bottom"
+[battleHex]:    A battle hex identifier like "C1"
+[entrySide]:    "right", "left", or "bottom"
 [bool]:         "true" or "false"
 
 
@@ -31,7 +31,7 @@ Requests (client to server)
 <observe name="[name]">
     Join as an observer.
 
-<color color=[colorname]>
+<color color="[colorName]">
     Choose a color.
 
 <start>
@@ -57,21 +57,21 @@ Requests (client to server)
 <mulligan />
     Re-roll movement.
 
-<move legion="[legion]" hex="[land]" {entryside="[entryside]" 
+<move legion="[legion]" hex="[land]" {entrySide="[entryside]" 
       teleport="[bool"]} />
     Move [legion] to masterboard hex [land] entering on side
     [entryside].  If [entryside] is omitted, the server picks.
     If the legion can both teleport and move without teleporting and 
     teleport is omitted, the server picks.
 
-<undomove legion="[legion]" />
+<undoMove legion="[legion]" />
     Move [legion] back to its previous location.
 
 <recruit legion="[legion]" recruit="[creature]" {recruiter="[creature]"}
     Muster a recruit using the right number of recruiter.  If recruiter 
     is not set then the server picks.
 
-<undorecruit legion="[legion]" />
+<undoRecruit legion="[legion]" />
     [legion] undoes its last recruit. 
 
 <engage hex="[land]" />
@@ -80,13 +80,13 @@ Requests (client to server)
 <flee legion="[legion]" />
     [legion] flees.
 
-<donotflee legion="[legion]" />
+<doNotFlee legion="[legion]" />
     [legion] does not flee.
 
 <concede legion="[legion]" />
     [legion] concedes the battle.
 
-<donotconcede legion="[legion]" />
+<doNotConcede legion="[legion]" />
     [legion] does not concede the battle.
 
 <negotiate hex="[land]" survivor="[legion]">
@@ -114,38 +114,38 @@ Requests (client to server)
 <fight hex="[land]" />
     Cease negotiations in [land] and fight a battle.
 
-<enter creature="[creature]" hex="[battlehex]" />
+<enter creature="[creature]" hex="[battleHex]" />
     Move creature from offboard to hex.
 
-<maneuver starthex="[battlehex]" endhex="[battlehex2]" />
-    Move creature in starthex to endhex.
+<maneuver startHex="[battleHex]" endHex="[battleHex]" />
+    Move creature in startHex to endHex.
 
-<undomaneuver hex="[battlehex]" />
+<undoManeuver hex="[battleHex]" />
     Move creature in hex back to its previous location.
 
-<donemaneuvering />
+<doneManeuvering />
     All battle moves are finished.  Move on to strike phase, or the
     opponent's battle turn, as appropriate.
 
-<strike strikerhex="[battlehex]" targethex="[battlehex]" 
+<strike strikerHex="[battleHex]" targetHex="[battleHex]" 
         dice="[number]" strike="[number]" />
     Creature in strikerhex strikes creature in targethex, rolling dice 
     against the given strike number.  The server will assign dice and 
     strike if missing.
 
-<carry targethex="[battlehex]" hits="[number]" />
-    Carry hits to the creature in targethex.
+<carry targetHex="[battleHex]" hits="[number]" />
+    Carry hits to the creature in targetHex.
 
-<donestriking />
+<doneStriking />
     All battle strikes are finished.  Move on to the opponent's phase.
 
-<summon summoner="[legion1]" donor="[legion2]" creature="[creature]" />
+<summon summoner="[legion]" donor="[legion]" creature="[creature]" />
     Summoner summons a creature from donor.
 
 <acquire legion="[legion]" creature="[creature]" />
     Legion acquires a creature.
 
-<nextturn />
+<nextTurn />
     Finish this player's entire game turn.
 
 <withdraw />
@@ -160,7 +160,7 @@ Requests (client to server)
 Messages (server to one or more clients)
 --------
 
-<formgame minplayers="[number]" maxplayers="[number]" >
+<formGame minPlayers="[number]" maxPlayers="[number]" >
     <option name="variant" value="Default" />
     <option name="balancedTowers" value="true" />
     <option name="allStacksVisible" value="false" />
@@ -172,7 +172,7 @@ Messages (server to one or more clients)
     <option name="towerToTowerTeleportOnly" value="false" />
     <option name="noTowerTeleport" value="false" />
     <option name="noTitanTeleport" value="false" />
-</formgame>
+</formGame>
     Form a new game with the listed options.
 
 <nak />
@@ -181,8 +181,8 @@ Messages (server to one or more clients)
 <join name="[name]" />
     A player with name [name] has connected.
 
-<color name="[name]" color=[colorname]>
-    Player has chosen color. 
+<color name="[name]" color="[colorname]" firstMarker="[marker]">
+    Player has chosen color and first marker.
 
 <tower name="[name]" hex="[land]" />
     Player has been assigned tower.
@@ -207,12 +207,12 @@ Messages (server to one or more clients)
 <mulligan />
     The active player took a mulligan.
 
-<move legion="[legion]" hex="[land]" entryside="[entryside]" 
+<move legion="[legion]" hex="[land]" entrySide="[entrySide]" 
       teleport="[bool"] />
     [legion] moved to masterboard hex [land] entering on side
     [entryside].  If teleport is "true" then this move was a teleport.
 
-<undomove legion="[legion]" />
+<undoMove legion="[legion]" />
     [legion] moved back to its previous location.
 
 <engage hex="[land]" />
@@ -220,6 +220,7 @@ Messages (server to one or more clients)
         <creature name="[creature1]">
         <creature name="[creatureN]">
     </creatures>
+</engage>
     Active player chose to resolve the engagement in [land].  The 
     opposing legion's creatures are revealed.
 
@@ -231,7 +232,7 @@ Messages (server to one or more clients)
 </flee>
     [legion] fled, losing creatures.
 
-<donotflee legion="[legion]" />
+<doNotFlee legion="[legion]" />
     [legion] did not flee.
 
 <concede legion="[legion]">
@@ -242,7 +243,7 @@ Messages (server to one or more clients)
 </concede>
     [legion] conceded the battle, losing creatures.
 
-<donotconcede legion="[legion]" />
+<doNotConcede legion="[legion]" />
     [legion] did not concede the battle.
 
 <negotiate hex="[land]" survivor="[legion]">
@@ -252,7 +253,7 @@ Messages (server to one or more clients)
     </creatures>
 </negotiate>
     An offer was made, with survivor (if any) winning and
-    keeping creatures.
+    keeping the listed creatures.
 
 <accept hex="[land]" survivor="[legion]">
     <losses legion="[legion]">
@@ -278,68 +279,70 @@ Messages (server to one or more clients)
 </fight>
     A battle will be fought.
 
-<enter creature="[creature]" hex="[battlehex]" />
+<enter creature="[creature]" hex="[battleHex]" />
     creature moved from offboard to hex.
 
-<maneuver starthex="[battlehex]" endhex="[battlehex2]" />
-    creature moved from starthex to endhex.
+<maneuver startHex="[battleHex]" endHex="[battlehex]" />
+    creature moved from startHex to endHex.
 
-<undomaneuver hex="[battlehex]" />
+<undoManeuver hex="[battleHex]" />
     creature in hex moved back to its previous location.
 
-<donemaneuvering />
+<doneManeuvering />
     All battle moves are finished.  Move on to strike phase, or the
     opponent's battle turn, as appropriate.
 
-<drift  [battlehex] />
+<drift hex="[battleHex]" />
     creature in [battlehex] took one point of drift damage.
 
-<strike strikerhex="[battlehex]" targethex="[battlehex]" dice="[number]" 
+<strike strikerHex="[battleHex]" targetHex="[battleHex]" dice="[number]" 
         strike="[number]" hits="[number]" carries="[number]">
     <rolls>
         [number1]
         [numberN]
     </rolls>
-    <carryhexes>
+    <carryHexes>
         [battlehex1]
         [battlehexN]
-    </carryhexes>
+    </carryHexes>
 </strike>
     Creature in strikerhex struck creature in targethex, rolling dice 
     against the given strike number.  Exact rolls, hits, carries, and 
     carry targets are given.
 
-<carry targethex="[battlehex]" hits="[number]" carries="[number]">
-    <carryhexes>
+<carry targetHex="[battleHex]" hits="[number]" carries="[number]">
+    <carryHexes>
         [battlehex1]
         [battlehexN]
-    </carryhexes>
+    </carryHexes>
 </carry>
-    Hits were carried to the creature in targethex.  If there are still 
+    Hits were carried to the creature in targetHex.  If there are still 
     carries and carry targets remaining, they are shown.
 
-<donestriking />
+<doneStriking />
     All battle strikes are finished for this phase.
 
-<summon summoner="[legion1]" donor="[legion2]" creature="[creature]" />
-    Summoner summoned a creature from donor.
+<summon summoner="[legion]" donor="[legion]" creature="[creature]" />
+    Summoner summoned creature from donor.
 
 <acquire legion="[legion]" creature="[creature]" />
     Legion acquired a creature.
 
 <points player="[player]" points="[number]" />
-    [player] receives [number] points
+    [player] receives [number] full points for a battle.
 
-<eliminateplayer loser="[player]" slayer="[player]" halfpoints="[number]" />
+<eliminatePlayer loser="[player]" slayer="[player]" halfPoints="[number]" />
     loser has been eliminated from the game by slayer (may be null).
+    If slayer is not null then he receives number points from half points.
 
-<gameover winner="[player]" />
+<gameOver winner="[player]" />
     The game is over.  If no winner is given, the game is a draw.
 
 <recruit legion="[legion]" recruit="[creature]" recruiter="[creature]" />
     Muster a recruit using the right number of recruiter.
+    Also used for reinforcements.
 
-<undorecruit legion="[legion]" />
+<undoRecruit legion="[legion]" />
     [legion] undoes its last recruit. 
 
 <turn player="[player]" number="[number]" />
