@@ -360,6 +360,7 @@ public final class Client implements IClient
         // Call here instead of from setupMove() for mulligans.
         if (isMyTurn() && getOption(Options.autoMasterMove) && !isGameOver())
         {
+            clearUndoStack();
             doAutoMoves();
         }
     }
@@ -1218,11 +1219,9 @@ public final class Client implements IClient
             point.y -= scale / 2;
             int offset = (num - ((size / 2) + 1));
             point.x += ((offset * scale) +
-                    ((size % 2 == 0 ? (scale / 2) : 0)))
-                    / size;
+                    ((size % 2 == 0 ? (scale / 2) : 0))) / size;
             point.y += ((offset * scale) +
-                    ((size % 2 == 0 ? (scale / 2) : 0)))
-                    / size;
+                    ((size % 2 == 0 ? (scale / 2) : 0))) / size;
             num--;
             chit.setLocation(point);
             recruitChits.add(chit);
@@ -2858,9 +2857,8 @@ public final class Client implements IClient
             {
                 Creature lesser = (Creature)liter.next();
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
-                                creature, terrain, hexLabel) <=
-                                info.numCreature(lesser))
-                        &&
+                        creature, terrain, hexLabel) <=
+                        info.numCreature(lesser)) &&
                         (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
