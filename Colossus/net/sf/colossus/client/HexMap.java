@@ -363,7 +363,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
         }
 
-        Log.error("Could not find hex " + label);
+        Log.error("Could not find GUIBattleHex " + label);
         return null;
     }
 

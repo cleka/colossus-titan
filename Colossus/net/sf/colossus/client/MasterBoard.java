@@ -1501,7 +1501,7 @@ public final class MasterBoard extends JPanel
                 return hex;
             }
         }
-        Log.error("Could not find hex " + label);
+        Log.error("Could not find MasterHex " + label);
         return null;
     }
 
@@ -1518,7 +1518,7 @@ public final class MasterBoard extends JPanel
                 return hex;
             }
         }
-        Log.error("Could not find hex " + label);
+        Log.error("Could not find GUIMasterHex " + label);
         return null;
     }
 

@@ -2032,6 +2032,7 @@ public final class Game
 
 Log.debug("in kickEngagements() summoning=" + summoning + " reinforcing=" + 
 reinforcing + " acquiring=" + acquiring); 
+Log.debug("" + findEngagements().size() + " engagements left");
         if (findEngagements().size() == 0 && !summoning &&
             !reinforcing && !acquiring)
         {

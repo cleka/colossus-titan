@@ -516,6 +516,8 @@ final class Battle
 
     private boolean setupMove()
     {
+        server.allSetupBattleMove();
+
         // If there are no legal moves, move on.
         if (findMobileCritters().size() < 1)
         {
@@ -523,7 +525,6 @@ final class Battle
         }
         else
         {
-            server.allSetupBattleMove();
             Player player = getActivePlayer();
             if (server.getClientOption(player.getName(),
                 Options.autoBattleMove))
@@ -536,6 +537,8 @@ final class Battle
 
     private boolean setupFight()
     {
+        server.allSetupBattleFight();
+
         applyDriftDamage();
 
         // If there are no possible strikes, move on.
@@ -566,8 +569,6 @@ final class Battle
                 commitStrikes();
                 return true;
             }
-
-            server.allSetupBattleFight();
         }
         return false;
     }

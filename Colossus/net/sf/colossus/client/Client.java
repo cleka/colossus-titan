@@ -552,7 +552,6 @@ public final class Client
     /** Called from BattleMap to leave carry mode. */
     void leaveCarryMode()
     {
-Log.debug("Client.leaveCarryMode()");
         server.leaveCarryMode();
     }
 
@@ -579,7 +578,6 @@ Log.debug("Client.leaveCarryMode()");
         if (playerName.equals(getBattleActivePlayerName()) &&
             getOption(Options.autoForcedStrike))
         {
-Log.debug("Client.makeForcedStrikes()");
             server.makeForcedStrikes(playerName, getOption(
                 Options.autoRangeSingle));
         }
@@ -1114,20 +1112,16 @@ Log.debug("called Client.acquireAngelCallback()");
 
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
     {
-Log.debug("Called Client.pickCarries() for " + playerName);
         if (!playerName.equals(getBattleActivePlayerName()))
         {
-Log.debug("Not active player");
             return;
         }
         if (getOption(Options.autoStrike))
         {
-Log.debug("AI");
             // AI carries are handled on server side.
             return;
         }
 
-Log.debug("Going forward with pickCarries() logic.");
         if (carryDamage < 1 || carryTargetDescriptions.isEmpty())
         {
             leaveCarryMode();
@@ -1142,7 +1136,6 @@ Log.debug("Going forward with pickCarries() logic.");
         }
         else
         {
-Log.debug("new PickCarry dialog"); 
             new PickCarry(map.getFrame(), this, carryDamage, 
                 carryTargetDescriptions);
         }
@@ -1198,7 +1191,7 @@ Log.debug("new PickCarry dialog");
         cleanupNegotiationDialogs();
 
         this.battleTurnNumber = battleTurnNumber;
-        this.battleActivePlayerName = battleActivePlayerName;
+        setBattleActivePlayerName(battleActivePlayerName);
         this.battlePhase = battlePhase;
 
         // Do not show map for AI players.
@@ -1292,7 +1285,6 @@ Log.debug("new PickCarry dialog");
      *  the reinforcing phase. */
     public void doReinforce(String markerId)
     {
-Log.debug("Called Client.reinforce for " + markerId);
         String hexLabel = getHexForLegion(markerId);
 
         java.util.List recruits = server.findEligibleRecruits(markerId, 
@@ -1443,7 +1435,7 @@ Log.debug("Called Client.reinforce for " + markerId);
         int battleTurnNumber)
     {
         this.battlePhase = Constants.SUMMON;
-        this.battleActivePlayerName = battleActivePlayerName;
+        setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
         if (map != null)
@@ -1460,7 +1452,7 @@ Log.debug("Called Client.reinforce for " + markerId);
         int battleTurnNumber)
     {
         this.battlePhase = Constants.RECRUIT;
-        this.battleActivePlayerName = battleActivePlayerName;
+        setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
 
         if (map != null)
@@ -1492,7 +1484,7 @@ Log.debug("Called Client.reinforce for " + markerId);
         String battleActivePlayerName)
     {
         this.battlePhase = battlePhase;
-        this.battleActivePlayerName = battleActivePlayerName;
+        setBattleActivePlayerName(battleActivePlayerName);
 
         if (map != null)
         {
@@ -1571,6 +1563,12 @@ Log.debug("Called Client.reinforce for " + markerId);
     {
         return battleActivePlayerName;
     }
+
+    void setBattleActivePlayerName(String name)
+    {
+        battleActivePlayerName = name;
+    }
+
     int getBattlePhase()
     {
         return battlePhase;
@@ -1606,7 +1604,6 @@ Log.debug("Called Client.reinforce for " + markerId);
     /** Attempt to apply carries to the critter in hexLabel. */
     void applyCarries(String hexLabel)
     {
-Log.debug("Client.applyCarries() for " + hexLabel);
         server.applyCarries(hexLabel);
         if (map != null)
         {

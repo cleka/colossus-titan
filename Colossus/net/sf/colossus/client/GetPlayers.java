@@ -180,12 +180,17 @@ public final class GetPlayers extends KDialog implements WindowListener,
         readmePane.setLayout(new GridLayout(0, 1));
         readme = new JTextArea("", 12, 60);
         readme.setEditable(false);
-        readmePane.add(new JScrollPane(readme));
+        JScrollPane scrollPane = new JScrollPane(readme);
+        readmePane.add(scrollPane);
         contentPane.add(readmePane);
 
         readme.setText(VariantSupport.loadVariant(variantArray[0] + ".var",
                                                   variantArray[0]));
         
+        // XXX Not working right.
+        JScrollBar vert = scrollPane.getVerticalScrollBar();
+        vert.setValue(vert.getMinimum());
+
         pack();
 
         centerOnScreen();
@@ -384,7 +389,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     public Dimension getMinimumSize()
     {
-        return new Dimension(500, 400);
+        return new Dimension(640, 480);
     }
 
     public Dimension getPreferredSize()
