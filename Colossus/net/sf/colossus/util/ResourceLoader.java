@@ -351,7 +351,8 @@ public final class ResourceLoader
                     {
                         tempImage[i] =
                             createPlainImage(basew,baseh,
-                                              colorFromFilename(filenames[i], "Plain-"));
+                                              colorFromFilename(filenames[i],
+                                                                "Plain-"));
                     }
                     if (filenames[i].startsWith("Power-"))
                     {
@@ -359,7 +360,8 @@ public final class ResourceLoader
                         String mapKey2 = getMapKey(filenames[i], directories);
                         tempImage[i] =
                             createNumberImage(basew,baseh,val,false,mapKey2,
-                                              colorFromFilename(filenames[i], "Power-"));
+                                              colorFromFilename(filenames[i],
+                                                                "Power-"));
                     }
                     if (filenames[i].startsWith("Skill-"))
                     {
@@ -367,7 +369,23 @@ public final class ResourceLoader
                         String mapKey2 = getMapKey(filenames[i], directories);
                         tempImage[i] =
                             createNumberImage(basew,baseh,val,true,mapKey2,
-                                              colorFromFilename(filenames[i], "Skill-"));
+                                              colorFromFilename(filenames[i],
+                                                                "Skill-"));
+                    }
+                    if (filenames[i].startsWith("Flying") ||
+                        filenames[i].startsWith("Rangestrike"))
+                    {
+                        int fly_ix = filenames[i].indexOf("Flying");
+                        int rgs_ix = filenames[i].indexOf("Rangestrike");
+                        String prefix = 
+                            (fly_ix != -1 ? "Flying" : "") +
+                            (rgs_ix != -1 ? "Rangestrike" : "");
+                        String color = colorNameFromFilename(filenames[i],
+                                                             prefix);
+                        String mapKey2 = getMapKey(filenames[i], directories);
+                        tempImage[i] =
+                            createColorizedImage(prefix + "Base",
+                                                 colorFromFilename(filenames[i], prefix), mapKey2, directories);
                     }
                     if (filenames[i].indexOf("-Name") != -1)
                     {
@@ -377,7 +395,8 @@ public final class ResourceLoader
                         String mapKey2 = getMapKey(filenames[i], directories);
                         tempImage[i] =
                             createNameImage(basew,baseh,name,mapKey2,
-                                            colorFromFilename(filenames[i], name + "-Name"));
+                                            colorFromFilename(filenames[i],
+                                                              name + "-Name"));
                     }
                     if (tempImage[i] == null)
                     {
@@ -476,11 +495,67 @@ public final class ResourceLoader
 
     private static Image createPlainImage(int width, int height, Color color)
     {
+        return createPlainImage(width, height, color, 0, 0, width, height);
+    }
+
+    private static Image createPlainImage(int width, int height, Color color,
+                                          int t_x, int t_y, int t_w, int t_h)
+    {
         BufferedImage bi = new BufferedImage(width, height,
                                              BufferedImage.TYPE_INT_ARGB);
         Graphics2D biContext = bi.createGraphics();
-        biContext.setColor(color);
+        biContext.setColor(new Color((float)1.,(float)1.,(float)1.,(float)0.));
         biContext.fillRect(0,0,width,height);
+        biContext.setColor(color);
+        biContext.fillRect(t_x,t_y,t_w,t_h);
+        return bi;
+    }
+
+    private static Image createColorizedImage(String filename, Color color, String mapKey, java.util.List directories)
+    {
+        Image temp = getImage(filename, directories);
+        ImageIcon tempIcon = new ImageIcon(temp);
+        while (tempIcon.getImageLoadStatus() == MediaTracker.LOADING)
+        {
+            Thread.yield();
+        }
+        int width = tempIcon.getIconWidth();
+        int height = tempIcon.getIconHeight();
+        
+        // the following look-up replace black with the
+        // required color, everything else is white.
+        // Alpha channel is preserved.
+        byte[][] lookup = new byte[4][256];
+        for (int i = 1; i < 255; i++)
+        {
+            lookup[0][i] = lookup[1][i] = lookup[2][i] = (byte)255;
+            lookup[3][i] = (byte)i;
+        }
+        lookup[0][0] = (byte)color.getRed();
+        lookup[1][0] = (byte)color.getGreen();
+        lookup[2][0] = (byte)color.getBlue();
+        lookup[3][0] = (byte)0;
+        lookup[0][255] = (byte)255;
+        lookup[1][255] = (byte)255;
+        lookup[2][255] = (byte)255;
+        lookup[3][255] = (byte)255;
+
+        LookupTable lt = new ByteLookupTable(0, lookup);
+        LookupOp lo = new LookupOp(lt, null);
+        BufferedImage bi2, bi = new BufferedImage(width, height,
+                                             BufferedImage.TYPE_INT_ARGB);
+        Graphics2D biContext = bi.createGraphics();
+        biContext.drawImage(temp,
+                            0, 0,
+                            width, height,
+                            null);
+        bi2 = lo.createCompatibleDestImage(bi, null);
+        bi = lo.filter(bi, bi2);
+        waitOnImage(bi);
+        synchronized (imageCache)
+        {
+            imageCache.put(mapKey, bi);
+        }
         return bi;
     }
 
@@ -497,7 +572,8 @@ public final class ResourceLoader
     {
         if (!(filename.startsWith(prefix)))
         {
-            System.err.println("Warning: " + prefix + " is not prefix of " + filename);
+            System.err.println("Warning: " + prefix +
+                               " is not prefix of " + filename);
             return 0;
         }
         int index = prefix.length();
@@ -536,18 +612,19 @@ public final class ResourceLoader
         return val;
     }
 
-    private static Color colorFromFilename(String filename, String prefix)
+    private static String colorNameFromFilename(String filename, String prefix)
     {
         if (!(filename.startsWith(prefix)))
         {
-            System.err.println("Warning: " + prefix + " is not prefix of " + filename);
-            return Color.black;
+            System.err.println("Warning: " + prefix +
+                               " is not prefix of " + filename);
+            return "black";
         }
         int index = prefix.length();
         int index2 = index;
         if (index2 >= filename.length())
         {
-            return Color.black;
+            return "black";
         }
         char c = filename.charAt(index2);
         if (c == '-')
@@ -572,9 +649,15 @@ public final class ResourceLoader
         }
         if (index2 >= filename.length())
         {
-            return Color.black;
+            return "black";
         }
         String sub = filename.substring(index2);
-        return HTMLColor.stringToColor(sub);
+        return sub;
+    }
+
+    private static Color colorFromFilename(String filename, String prefix)
+    {
+
+        return HTMLColor.stringToColor(colorNameFromFilename(filename, prefix));
     }
 }

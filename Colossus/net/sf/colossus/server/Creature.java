@@ -220,20 +220,20 @@ public class Creature implements Comparable
 
     public String[] getImagesNames()
     {
+        int specialIncrement = ((isFlier() || isRangestriker()) ? 1 : 0);
         String[] tempNames =
-            new String[4 +
-                       ((isFlier() || isRangestriker()) ? 1 : 0)];
+            new String[4 + specialIncrement];
         String colorSuffix = (baseColor == null ? "" : "-" + baseColor);
         tempNames[0] = name;
         tempNames[1] = "Power-" + getPower() + colorSuffix;
             
         tempNames[2] = "Skill-" + getSkill() + colorSuffix;
         tempNames[3] = name + "-Name" + colorSuffix;
-        if (isFlier() || isRangestriker())
+        if (specialIncrement > 0)
         {
             tempNames[4] =
                 (isFlier() ? "Flying" : "") +
-                (isRangestriker() ? "Rangestrike" : "");
+                (isRangestriker() ? "Rangestrike" : "") + colorSuffix;
         }
         return tempNames;
     }
