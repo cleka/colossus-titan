@@ -2500,7 +2500,7 @@ Log.debug("Setting for whatever color is left");
         // move fails, fall back to the critter's remaining moves.
 
         Battle battle = game.getBattle();
-        BattleMap map = battle.getBattleMap();
+        final char terrain = battle.getTerrain();
         Legion legion = battle.getActiveLegion();
 
         if (bestOrder != null)
@@ -2518,7 +2518,7 @@ Log.debug("Setting for whatever color is left");
                     Critter critter = legion.getCritterByTag(
                         fakeCritter.getTag());
 
-                    BattleHex hex = cm.getEndingHex(map);
+                    BattleHex hex = cm.getEndingHex(terrain);
                     Log.debug("applymove: try " + critter + " to " +
                         hex.getLabel());
                     if (battle.doMove(critter, hex))
@@ -2551,7 +2551,6 @@ Log.debug("Setting for whatever color is left");
         final Game game = realGame.AICopy();
 
         final Battle battle = game.getBattle();
-        final BattleMap map = battle.getBattleMap();
         final char terrain = battle.getTerrain();
         final Legion legion = battle.getActiveLegion();
         ArrayList critters = legion.getCritters();
@@ -2599,7 +2598,7 @@ Log.debug("Found " + moves.size() + " moves for " + critter.getDescription());
                 ArrayList moveList = (ArrayList)it2.next();
                 CritterMove cm = (CritterMove)moveList.get(0);
                 Critter critter2 = cm.getCritter();
-                critter2.moveToHex(cm.getEndingHex(map));
+                critter2.moveToHex(cm.getEndingHex(terrain));
             }
 
             // moveList is a list of CritterMoves for one critter.
@@ -2619,7 +2618,7 @@ Log.debug("Found " + moves.size() + " moves for " + critter.getDescription());
 
                 CritterMove cm = new CritterMove(critter,
                    currentHexLabel, hexLabel);
-                BattleHex hex = map.getHexByLabel(hexLabel);
+                BattleHex hex = HexMap.getHexByLabel(terrain, hexLabel);
 
                 // Need to move the critter to evaluate.
                 critter.moveToHex(hex);
@@ -2784,7 +2783,7 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
             ArrayList moveList = (ArrayList)it.next();
             CritterMove cm = (CritterMove)moveList.get(0);
             Critter critter = cm.getCritter();
-            BattleHex hex = cm.getEndingHex(battle.getBattleMap());
+            BattleHex hex = cm.getEndingHex(battle.getTerrain());
             if (battle.testMove(critter, hex))
             {
                 val += critter.getPointValue();
@@ -2826,11 +2825,12 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
 
     private static int evaluateCritterMove(Battle battle, Critter critter)
     {
-        char terrain = battle.getTerrain();
-        Legion legion = critter.getLegion();
-        Legion enemy = battle.getInactiveLegion();
-        int skill = critter.getSkill();
-        BattleHex hex = critter.getCurrentHex();
+        final char terrain = battle.getTerrain();
+        final String masterHexLabel = battle.getMasterHexLabel();
+        final Legion legion = critter.getLegion();
+        final Legion enemy = battle.getInactiveLegion();
+        final int skill = critter.getSkill();
+        final BattleHex hex = critter.getCurrentHex();
 
         int value = 0;
 
@@ -2987,7 +2987,8 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         int buddies = critter.numAdjacentAllies();
         value += 15 * buddies;
 
-        BattleHex entrance = battle.getBattleMap().getEntrance(legion);
+        BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
+            legion);
 
         // Reward titans sticking to the edges of the back row
         // surrounded by allies.  We need to relax this in the
@@ -3077,7 +3078,6 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
 
         public int compare(Object o1, Object o2)
         {
-            final BattleMap map = battle.getBattleMap();
             final char terrain = battle.getTerrain();
             final Legion legion = battle.getActiveLegion();
 
@@ -3087,8 +3087,8 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
             CritterMove cm2 = (CritterMove)moveList2.get(0);
             Critter critter1 = cm1.getCritter();
             Critter critter2 = cm2.getCritter();
-            BattleHex desiredHex1 = cm1.getEndingHex(map);
-            BattleHex desiredHex2 = cm2.getEndingHex(map);
+            BattleHex desiredHex1 = cm1.getEndingHex(terrain);
+            BattleHex desiredHex2 = cm2.getEndingHex(terrain);
 
             if (critter1.isFlier() && !critter2.isFlier())
             {
@@ -3204,14 +3204,14 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
             return endingHexLabel;
         }
 
-        public BattleHex getStartingHex(BattleMap map)
+        public BattleHex getStartingHex(char terrain)
         {
-            return map.getHexByLabel(startingHexLabel);
+            return HexMap.getHexByLabel(terrain, startingHexLabel);
         }
 
-        public BattleHex getEndingHex(BattleMap map)
+        public BattleHex getEndingHex(char terrain)
         {
-            return map.getHexByLabel(endingHexLabel);
+            return HexMap.getHexByLabel(terrain, endingHexLabel);
         }
     }
 }

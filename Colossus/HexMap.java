@@ -11,11 +11,20 @@ import javax.swing.*;
 
 public class HexMap extends JPanel implements MouseListener, WindowListener
 {
-    private GUIBattleHex [][] h = new GUIBattleHex[6][6];
-    private ArrayList hexes = new ArrayList(33);
     protected String masterHexLabel;
+    protected char terrain;
 
-    // ne, e, se, sw, w, nw
+    // GUI hexes need to be recreated for each object, since scale varies.
+    protected GUIBattleHex [][] h = new GUIBattleHex[6][6];
+    private ArrayList hexes = new ArrayList(33);
+
+    // The game state hexes can be set up once for each terrain type.
+    // XXX Also Need entrances in non-GUI maps.
+    private static HashMap terrainH = new HashMap();
+    protected static HashMap terrainHexes = new HashMap();
+
+
+    /** ne, e, se, sw, w, nw */
     protected GUIBattleHex [] entrances = new GUIBattleHex[6];
 
     private static final boolean[][] show =
@@ -28,15 +37,58 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         {false,true,true,true,true,false}
     };
 
-    // TODO Set up one static hexmap for each terrain type.
+
+
+    /** Set up a static non-GUI hex map for each terrain type. */
+    static
+    {
+        for (int t = 0; t < MasterHex.terrains.length; t++)
+        {
+            char terrain = MasterHex.terrains[t];
+
+            BattleHex [][] gameH = new BattleHex[6][6];
+            ArrayList gameHexes = new ArrayList();
+
+            // Initialize game state hex array.
+            for (int i = 0; i < gameH.length; i++)
+            {
+                for (int j = 0; j < gameH[0].length; j++)
+                {
+                    if (show[i][j])
+                    {
+                        BattleHex hex = new BattleHex(i, j);
+
+                        gameH[i][j] = hex;
+                        gameHexes.add(hex);
+                    }
+                }
+            }
+            setupHexesGameState(terrain, gameH);
+
+            // Initialize non-GUI entrances
+            BattleHex [] gameEntrances = new BattleHex[6];
+            for (int k = 0; k < 6; k++)
+            {
+                gameEntrances[k] = new BattleHex(-1, k);
+                gameHexes.add(gameEntrances[k]);
+            }
+            setupEntrancesGameState(gameEntrances, gameH);
+
+            // Add hexes to both the [][] and ArrayList hashmaps.
+            terrainH.put(new Character(terrain), gameH);
+            terrainHexes.put(new Character(terrain), gameHexes);
+        }
+    }
+
 
     public HexMap(String masterHexLabel)
     {
         this.masterHexLabel = masterHexLabel;
+        this.terrain = getMasterHex().getTerrain();
+
         setOpaque(true);
         setBackground(Color.white);
         setupHexes();
-        setupNeighbors();
     }
 
 
@@ -48,7 +100,13 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     protected void setupHexes()
     {
-        char terrain = getMasterHex().getTerrain();
+        setupHexesGUI();
+        setupHexesGameState(terrain, h);
+        setupNeighbors(h);
+    }
+
+    protected void setupHexesGUI()
+    {
         hexes.clear();
 
         int scale = 2 * Scale.get();
@@ -66,20 +124,21 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                         ((int) Math.round(cx + 3 * i * scale),
                         (int) Math.round(cy + (2 * j + (i & 1)) *
                         Hex.SQRT3 * scale), scale, this, i, j);
-                    hex.setXCoord(i);
-                    hex.setYCoord(j);
 
                     h[i][j] = hex;
                     hexes.add(hex);
                 }
             }
         }
+    }
 
 
-        // Add terrain, hexsides, elevation, and exits to hexes.
-        // Cliffs are bidirectional; other hexside obstacles are noted
-        // only on the high side, since they only interfere with
-        // uphill movement.
+    /** Add terrain, hexsides, elevation, and exits to hexes.
+     *  Cliffs are bidirectional; other hexside obstacles are noted
+     *  only on the high side, since they only interfere with
+     *  uphill movement. */
+    protected static void setupHexesGameState(char terrain, BattleHex [][] h)
+    {
         switch (terrain)
         {
             case 'P':
@@ -341,7 +400,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
 
     /** Add references to neighbor hexes. */
-    protected void setupNeighbors()
+    protected void setupNeighbors(BattleHex [][] h)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -386,6 +445,12 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     protected void setupEntrances()
     {
+        setupEntrancesGUI();
+        setupEntrancesGameState(entrances, h);
+    }
+
+    private void setupEntrancesGUI()
+    {
         int scale = 2 * Scale.get();
 
         int cx = 6 * scale;
@@ -411,7 +476,11 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         hexes.add(entrances[3]);
         hexes.add(entrances[4]);
         hexes.add(entrances[5]);
+    }
 
+    private static void setupEntrancesGameState(BattleHex [] entrances,
+        BattleHex [][] h)
+    {
         // Add neighbors to entrances.
         entrances[0].setNeighbor(3, h[3][0]);
         entrances[0].setNeighbor(4, h[4][1]);
@@ -514,7 +583,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-// TODO non-GUI version
+
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null. */
     public GUIBattleHex getGUIHexByLabel(String label)
@@ -523,6 +592,26 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         while (it.hasNext())
         {
             GUIBattleHex hex = (GUIBattleHex)it.next();
+            if (hex.getLabel().equals(label))
+            {
+                return hex;
+            }
+        }
+
+        Log.error("Could not find hex " + label);
+        return null;
+    }
+
+    /** Do a brute-force search through the this terrain's static non-GUI
+     *  hexes, looking for a match.  Return the hex, or null. */
+    public static BattleHex getHexByLabel(char terrain, String label)
+    {
+        ArrayList correctHexes = (ArrayList)terrainHexes.get(
+            new Character(terrain));
+        Iterator it = correctHexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
             if (hex.getLabel().equals(label))
             {
                 return hex;

@@ -62,15 +62,21 @@ public final class Battle
         this.activeLegionNum = activeLegionNum;
         this.turnNumber = turnNumber;
         this.phase = phase;
-// XXX
+
+// XXX Handle battle map on client side.
 //        map = new BattleMap(masterHexLabel, this);
 //        Client.setMap(map);
 //        map.getFrame().toFront();
 //        map.requestFocus();
+
         game.getServer().allInitBattleMap();
 
         terrain = getMasterHex().getTerrain();
         Client.clearUndoStack();
+
+        // Set defender's entry side opposite attacker's.
+        int side = getAttacker().getEntrySide(masterHexLabel);
+        getDefender().setEntrySide(masterHexLabel, (side + 3) % 6);
     }
 
 
@@ -113,7 +119,6 @@ public final class Battle
     {
         Battle newBattle = new Battle();
         newBattle.game = game;
-        newBattle.map = map.AICopy(newBattle);
 
         newBattle.masterHexLabel = masterHexLabel;
         newBattle.terrain = terrain;
@@ -391,14 +396,12 @@ public final class Battle
         {
             advancePhase();
         }
-
-        map.requestFocus();
     }
 
 
     private boolean setupSummon()
     {
-        map.setupSummonMenu();
+        game.getServer().allSetupBattleSummonMenu();
         boolean advance = true;
         if (summonState == Battle.FIRST_BLOOD)
         {
@@ -418,7 +421,7 @@ public final class Battle
 
     private boolean setupRecruit()
     {
-        map.setupRecruitMenu();
+        game.getServer().allSetupBattleRecruitMenu();
         return recruitReinforcement();
     }
 
@@ -431,7 +434,7 @@ public final class Battle
         }
         else
         {
-            map.setupMoveMenu();
+            game.getServer().allSetupBattleMoveMenu();
             Player player = getActivePlayer();
             if (game.getServer().getClientOption(player.getName(),
                 Options.autoBattleMove))
@@ -453,7 +456,7 @@ public final class Battle
         }
         else
         {
-            map.setupFightMenu();
+            game.getServer().allSetupBattleFightMenu();
 
             // Automatically perform forced strikes if applicable.
             Player player = getActivePlayer();
@@ -661,11 +664,13 @@ public final class Battle
         map.selectHexesByLabels(set);
     }
 
+    // XXX Push destination hex label instead of critter
     public void setLastCritterMoved(Critter critter)
     {
         Client.pushUndoStack(critter);
     }
 
+    // XXX Pop destination hex label instead of critter
     public void undoLastMove()
     {
         critterSelected = false;

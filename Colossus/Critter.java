@@ -20,7 +20,6 @@ public final class Critter extends Creature implements Comparable
     private int hits;
     /** Mark whether this critter is a legal carry target. */
     private boolean carryFlag;
-    private BattleChit chit;
     private Game game;
     /** Used to uniquely compare critters after an AICopy */
     private int tag = -1;
@@ -49,7 +48,6 @@ public final class Critter extends Creature implements Comparable
         newCritter.startingHexLabel = startingHexLabel;
         newCritter.hits = hits;
         newCritter.carryFlag = carryFlag;
-        newCritter.chit = chit;
         newCritter.tag = tag;
 
         return newCritter;
@@ -57,11 +55,10 @@ public final class Critter extends Creature implements Comparable
 
 
     public void addBattleInfo(String currentHexLabel, String startingHexLabel,
-        BattleChit chit, Battle battle, int tag)
+        Battle battle, int tag)
     {
         this.currentHexLabel = currentHexLabel;
         this.startingHexLabel = startingHexLabel;
-        this.chit = chit;
         this.battle = battle;
         this.tag = tag;
     }
@@ -104,11 +101,6 @@ public final class Critter extends Creature implements Comparable
     public Player getPlayer()
     {
         return game.getPlayerByMarkerId(markerId);
-    }
-
-    public BattleChit getChit()
-    {
-        return chit;
     }
 
     int getTag()
@@ -206,6 +198,8 @@ public final class Critter extends Creature implements Comparable
             // Update damage displayed on chit.
             // Chit.repaint() doesn't work right after a creature is killed
             // by carry damage, so paint the whole hex.
+            // XXX This won't work because we need a GUI hex.  Client
+            // will need to do the repaint.
             getCurrentHex().repaint();
         }
 
@@ -239,13 +233,13 @@ public final class Critter extends Creature implements Comparable
 
     public BattleHex getCurrentHex()
     {
-        return battle.getBattleMap().getHexByLabel(currentHexLabel);
+        return HexMap.getHexByLabel(battle.getTerrain(), currentHexLabel);
     }
 
 
     public BattleHex getStartingHex()
     {
-        return battle.getBattleMap().getHexByLabel(startingHexLabel);
+        return HexMap.getHexByLabel(battle.getTerrain(), startingHexLabel);
     }
 
 
@@ -883,7 +877,7 @@ public final class Critter extends Creature implements Comparable
         {
             game.getServer().allSetBattleDiceValues(getName(),
                 target.getName(), currentHexLabel, target.getCurrentHexLabel(),
-                strikeNumber, damage, carryDamage, rolls);
+                battle.getTerrain(), strikeNumber, damage, carryDamage, rolls);
         }
     }
 
@@ -912,7 +906,8 @@ public final class Critter extends Creature implements Comparable
         {
             hits = getPower();
         }
-        chit.setDead(dead);
+        // XXX Need to do this on client side.
+        getChit().setDead(dead);
     }
 
     /** Inconsistent with equals() */

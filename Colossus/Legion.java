@@ -340,7 +340,7 @@ public final class Legion implements Comparable
         {
             Critter critter = (Critter)it.next();
             critter.heal();
-            critter.addBattleInfo(null, null, null, null, -1);
+            critter.addBattleInfo(null, null, null, -1);
         }
     }
 
@@ -588,8 +588,10 @@ public final class Legion implements Comparable
             player.setTeleported(true);
         }
 
-        game.getServer().allAlignLegions(currentHexLabel);
-        game.getServer().allAlignLegions(startingHexLabel);
+        Set set = new HashSet();
+        set.add(currentHexLabel);
+        set.add(startingHexLabel);
+        game.getServer().allAlignLegions(set);
 
         Log.event("Legion " + getLongMarkerName() + " in " +
             getCurrentHexLabel() + (teleported ?
@@ -616,8 +618,10 @@ public final class Legion implements Comparable
             Log.event("Legion " + getLongMarkerName() +
                 " undoes its move");
 
-            game.getServer().allAlignLegions(currentHexLabel);
-            game.getServer().allAlignLegions(formerHexLabel);
+            Set set = new HashSet();
+            set.add(currentHexLabel);
+            set.add(formerHexLabel);
+            game.getServer().allAlignLegions(set);
         }
     }
 

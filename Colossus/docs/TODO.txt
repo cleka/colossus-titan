@@ -1,17 +1,3 @@
-Get per-player options working right through clients.  Currently all players
-   seem to be using first player's options.
-
-Stuff to move out of Game:
-   All direct references to GUI classes.  (Go through Server and Client.
-   Use static stuff at first for simplicity, and make it per-client later.)
-
-Try to split the non-GUI stuff out of map/board/*hex into separate classes.
-
-highlight* methods should move down to Client or MasterBoard/BattleMap.
-
-Move BattleChits to client side.
-
-
 Add UI for players to specify favorite colors.
 
 Get minimax masterboard moves working.

@@ -29,6 +29,8 @@ public final class Client
     private BattleMap map;
     public BattleDice battleDice;
 
+    private ArrayList battleChits = new ArrayList();
+
     // Moved here from Player.
     /** Stack of legion marker ids, to allow multiple levels of undo for
      *  splits, moves, and recruits.  Also used for critters in battle.
@@ -790,13 +792,14 @@ public final class Client
     }
 
     public void setBattleDiceValues(String attackerName, String defenderName,
-        String attackerHexId, String defenderHexId, int strikeNumber,
-        int damage, int carryDamage, int [] rolls)
+        String attackerHexId, String defenderHexId, char terrain,
+        int strikeNumber, int damage, int carryDamage, int [] rolls)
     {
         if (battleDice != null)
         {
             battleDice.setValues(attackerName, defenderName, attackerHexId,
-                defenderHexId, strikeNumber, damage, carryDamage, rolls);
+                defenderHexId, terrain, strikeNumber, damage, carryDamage,
+                rolls);
             battleDice.showRoll();
         }
     }
@@ -813,7 +816,7 @@ public final class Client
 
     public void initBattleMap()
     {
-        // TODO
+        //map = new BattleMap(this, masterHexLabel);
     }
 
     public static void main(String [] args)

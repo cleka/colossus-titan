@@ -11,10 +11,11 @@ public class MasterHex extends Hex
 {
     private MasterHex [] neighbors = new MasterHex[6];
 
-    // Terrain types are:
-    // B,D,H,J,m,M,P,S,T,t,W
-    // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
-    // Swamp, Tower, tundra, Woods
+    /** Terrain types are:
+     *  Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
+     *  Swamp, Tower, tundra, Woods */
+    public static final char [] terrains =
+        {'B', 'D', 'H', 'J', 'm', 'M', 'P', 'S', 'T', 't', 'W'};
 
     // Hex labels are:
     // Middle ring: 1-42

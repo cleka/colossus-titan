@@ -249,6 +249,47 @@ public final class Server
     }
 
 
+    public void allSetupBattleSummonMenu()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.getBattleMap().setupSummonMenu();
+        }
+    }
+
+    public void allSetupBattleRecruitMenu()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.getBattleMap().setupRecruitMenu();
+        }
+    }
+
+    public void allSetupBattleMoveMenu()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.getBattleMap().setupMoveMenu();
+        }
+    }
+
+    public void allSetupBattleFightMenu()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.getBattleMap().setupFightMenu();
+        }
+    }
+
+
     public void allAlignLegions(String hexLabel)
     {
         Iterator it = clients.iterator();
@@ -416,15 +457,16 @@ public final class Server
 
     public void allSetBattleDiceValues(String attackerName,
         String defenderName, String attackerHexId, String defenderHexId,
-        int strikeNumber, int damage, int carryDamage, int [] rolls)
+        char terrain, int strikeNumber, int damage, int carryDamage,
+        int [] rolls)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
             client.setBattleDiceValues(attackerName, defenderName,
-                attackerHexId, defenderHexId, strikeNumber, damage,
-                carryDamage, rolls);
+                attackerHexId, defenderHexId, terrain, strikeNumber,
+                damage, carryDamage, rolls);
         }
     }
 

@@ -25,6 +25,7 @@ public final class BattleDice extends JFrame implements WindowListener
     private int [] rolls;
     private int hits;
     private int carries;
+    private char terrain;
     private JLabel label1 = new JLabel();
     private JLabel label2 = new JLabel();
     private JLabel label3 = new JLabel();
@@ -58,13 +59,14 @@ public final class BattleDice extends JFrame implements WindowListener
 
 
     public void setValues(String attackerName, String defenderName,
-        String attackerHexId, String defenderHexId, int targetNumber,
-        int hits, int carries, int [] rolls)
+        String attackerHexId, String defenderHexId, char terrain,
+        int targetNumber, int hits, int carries, int [] rolls)
     {
         this.attackerName = attackerName;
         this.defenderName = defenderName;
         this.attackerHexId = attackerHexId;
         this.defenderHexId = defenderHexId;
+        this.terrain = terrain;
         this.targetNumber = targetNumber;
         this.hits = hits;
         this.carries = carries;
@@ -107,12 +109,10 @@ public final class BattleDice extends JFrame implements WindowListener
         Container contentPane = getContentPane();
         contentPane.removeAll();
 
-        BattleMap map = client.getBattleMap();
-
         label1.setText(attackerName + " in " +
-            map.getHexByLabel(attackerHexId).getDescription() + " attacks " +
-            defenderName + " in " +
-            map.getHexByLabel(defenderHexId).getDescription());
+            HexMap.getHexByLabel(terrain, attackerHexId).getDescription() +
+            " attacks " + defenderName + " in " +
+            HexMap.getHexByLabel(terrain, defenderHexId).getDescription());
         label1.setAlignmentX(Label.LEFT_ALIGNMENT);
         constraints.gridy = 0;
         constraints.gridwidth = 6;
