@@ -165,48 +165,6 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
     }
 
 
-    // Attempt to free resources to work around Java memory leaks.
-    private void cleanup()
-    {
-        setVisible(false);
-
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
-        if (imagesLoaded)
-        {
-            for (int i = 0; i < attacker.getHeight(); i++)
-            {
-                tracker.removeImage(attackerChits[i].getImage());
-                attackerChits[i].getImage().flush();
-            }
-            for (int i = 0; i < defender.getHeight(); i++)
-            {
-                tracker.removeImage(defenderChits[i].getImage());
-                defenderChits[i].getImage().flush();
-            }
-            tracker.removeImage(attackerMarker.getImage());
-            attackerMarker.getImage().flush();
-            tracker.removeImage(defenderMarker.getImage());
-            defenderMarker.getImage().flush();
-        }
-
-        dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
-    }
-
-
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();

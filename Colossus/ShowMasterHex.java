@@ -150,42 +150,9 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
     }
 
 
-    // Attempt to free resources to work around Java memory leaks.
-    private void cleanup()
-    {
-        setVisible(false);
-
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
-        if (imagesLoaded)
-        {
-            for (int i = 0; i < numChits; i++)
-            {
-                tracker.removeImage(chits[i].getImage());
-                chits[i].getImage().flush();
-            }
-        }
-
-        dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
-    }
-
-
     public void mouseClicked(MouseEvent e)
     {
-        cleanup();
+        dispose();
     }
 
 
@@ -196,19 +163,19 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 
     public void mouseExited(MouseEvent e)
     {
-        cleanup();
+        dispose();
     }
 
 
     public void mousePressed(MouseEvent e)
     {
-        cleanup();
+        dispose();
     }
 
 
     public void mouseReleased(MouseEvent e)
     {
-        cleanup();
+        dispose();
     }
 
 
@@ -224,7 +191,7 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        cleanup();
+        dispose();
     }
 
 
