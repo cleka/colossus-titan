@@ -24,7 +24,6 @@ public class StatusScreen extends JFrame implements WindowListener
 
     private Game game;
     
-    // XXX Need to make labels narrower. 
 
     public StatusScreen(Game game)
     {

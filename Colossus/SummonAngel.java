@@ -12,17 +12,17 @@ import javax.swing.*;
 public class SummonAngel extends JDialog implements MouseListener, 
     ActionListener, WindowListener
 {
-    private MediaTracker tracker;
     private Player player;
     private Legion legion;
     private MasterBoard board;
     private static final int scale = 60;
     private Chit angelChit;
     private Chit archangelChit;
-    private boolean imagesLoaded;
     private Legion donor;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
+    private JButton button1;
+    private JButton button2;
 
 
     public SummonAngel(MasterBoard board, Legion legion)
@@ -78,22 +78,8 @@ public class SummonAngel extends JDialog implements MouseListener,
         angelChit.setDead(true);
         archangelChit.setDead(true);
 
-        tracker = new MediaTracker(this);
-        tracker.addImage(angelChit.getImage(), 0);
-        tracker.addImage(archangelChit.getImage(), 0);
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(board, e.toString() +
-                " waitForAll was interrupted");
-        }
-        imagesLoaded = true;
-
-        JButton button1 = new JButton("Summon");
-        JButton button2 = new JButton("Cancel");
+        button1 = new JButton("Summon");
+        button2 = new JButton("Cancel");
         constraints.gridy = 1;
         gridbag.setConstraints(button1, constraints);
         contentPane.add(button1);
@@ -151,13 +137,6 @@ public class SummonAngel extends JDialog implements MouseListener,
 
     public void update(Graphics g)
     {
-        // XXX need to call super? 
-
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
         Dimension d = getSize();
 
         // Prevent repaint loop by only calling repaint if the
@@ -174,6 +153,9 @@ public class SummonAngel extends JDialog implements MouseListener,
             archangelChit.setDead(archangels == 0);
             archangelChit.repaint();
         }
+
+        button1.repaint();
+        button2.repaint();
     }
 
 
@@ -277,7 +259,8 @@ public class SummonAngel extends JDialog implements MouseListener,
 
             if (angels == 0 && archangels == 0)
             {
-                JOptionPane.showMessageDialog(board, "No angels are available.");
+                JOptionPane.showMessageDialog(board, 
+                    "No angels are available.");
                 return;
             }
 
@@ -294,7 +277,8 @@ public class SummonAngel extends JDialog implements MouseListener,
             else
             {
                 // If both are available, make the player click on one.
-                JOptionPane.showMessageDialog(board, "Select angel or archangel.");
+                JOptionPane.showMessageDialog(board, 
+                    "Select angel or archangel.");
             }
         }
 

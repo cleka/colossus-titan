@@ -123,34 +123,25 @@ public class Critter extends Creature
     }
 
 
-    // Purity note:
-    // File.separator does not work right in jar files.  A hardcoded 
-    // forward-slash does, and works in *x and Windows.  So I'm ignoring
-    // JavaPureCheck's opinion and using a forward slash.
     public String getImageName(boolean inverted)
     {
-        String myName;
-        if (getName().equals("Titan") && getPower() >= 6 && getPower() <= 20)
+        StringBuffer basename = new StringBuffer();
+        if (inverted)
+        {
+            basename.append(Chit.invertedPrefix);
+        }
+
+        basename.append(name);
+
+        if (name.equals("Titan") && getPower() >= 6 && getPower() <= 20)
         {
             // Use Titan14.gif for a 14-power titan, etc.  Use the generic
             // Titan.gif (with X-4) for ridiculously big titans, to avoid 
             // the need for an infinite number of images.
-            
-            myName = getName() + getPower();
-        }
-        else
-        {
-            myName = name;
+            basename.append(getPower());
         }
 
-        if (inverted)
-        {
-            return "images/i_" + myName + ".gif";
-        }
-        else
-        {
-            return "images/" + myName + ".gif";
-        }
+        return Chit.getImagePath(basename.toString());
     }
 
 
@@ -206,8 +197,8 @@ public class Critter extends Creature
             }
 
             // Update damage displayed on chit.
-            // XXX Chit.repaint() doesn't work right after a
-            // creature is killed by carry damage.
+            // Chit.repaint() doesn't work right after a creature is killed 
+            // by carry damage, so paint the whole hex.
             getCurrentHex().repaint();
         }
 

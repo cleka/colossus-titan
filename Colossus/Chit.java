@@ -11,8 +11,7 @@ import javax.swing.*;
 
 public class Chit extends Canvas // XXX JPanel
 {
-    // XXX Use an icon instead?
-    private Image image;
+    private ImageIcon icon;
     private Rectangle rect;
     private Container container;
 
@@ -25,6 +24,18 @@ public class Chit extends Canvas // XXX JPanel
     protected static boolean isApplet = false;
 
     private String id;
+
+    // Constants describing where to find image files.
+
+    // File.separator does not work right in jar files.  A hardcoded 
+    // forward-slash does, and works in *x and Windows.  So I'm ignoring
+    // JavaPureCheck's opinion and using a forward slash.  
+    // XXX Is there a way to detect whether a program is running from a 
+    // jar file?
+    public static final String pathSeparator = "/";
+    public static final String imageDirname = "images";
+    public static final String imageExtension = ".gif";
+    public static final String invertedPrefix = "i_";
 
 
     public Chit(int scale, String imageFilename, Container container)
@@ -51,8 +62,8 @@ public class Chit extends Canvas // XXX JPanel
                 int length = in.available();
                 thanksToNetscape = new byte[length];
                 in.read(thanksToNetscape);
-                image = Toolkit.getDefaultToolkit().createImage(
-                    thanksToNetscape);
+                // XXX Test this with browsers. 
+                icon = new ImageIcon(thanksToNetscape);
             }
             catch (Exception e)
             {
@@ -62,8 +73,7 @@ public class Chit extends Canvas // XXX JPanel
         }
         else
         {
-            image = Toolkit.getDefaultToolkit().getImage(
-                getClass().getResource(imageFilename));
+            icon = new ImageIcon(imageFilename);
         }
     }
 
@@ -100,7 +110,8 @@ public class Chit extends Canvas // XXX JPanel
 	//super.paintComponent(g);
 	super.paint(g);
 
-        g.drawImage(image, rect.x, rect.y, rect.width, rect.width, container);
+        g.drawImage(icon.getImage(), rect.x, rect.y, rect.width, 
+            rect.width, container);
         if (isDead())
         {
             // Draw a triple-wide red X.
@@ -154,12 +165,6 @@ public class Chit extends Canvas // XXX JPanel
     }
 
 
-    public Image getImage()
-    {
-        return image;
-    }
-
-
     public boolean isDead()
     {
         return dead;
@@ -176,4 +181,17 @@ public class Chit extends Canvas // XXX JPanel
     {
         dead = !dead;
     }
+
+
+    /** Return the full path to an image file, given its basename */
+    public static String getImagePath(String basename)
+    {
+        StringBuffer buf = new StringBuffer();
+        buf.append(imageDirname);
+        buf.append(pathSeparator);
+        buf.append(basename);
+        buf.append(imageExtension);
+        return buf.toString();
+    }
 }
+

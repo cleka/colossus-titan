@@ -14,8 +14,6 @@ public class PickRecruit extends JDialog implements MouseListener,
 {
     private int numEligible;
     private Creature [] recruits;
-    private MediaTracker tracker;
-    private boolean imagesLoaded;
     private Player player;
     private Legion legion;
     private Chit [] recruitChits;
@@ -110,29 +108,6 @@ public class PickRecruit extends JDialog implements MouseListener,
             gridbag.setConstraints(countLabel, constraints);
             contentPane.add(countLabel);
         }
-
-        tracker = new MediaTracker(this);
-
-        for (int i = 0; i < numEligible; i++)
-        {
-            tracker.addImage(recruitChits[i].getImage(), 0);
-        }
-        for (int i = 0; i < height; i++)
-        {
-            tracker.addImage(legionChits[i].getImage(), 0);
-        }
-        tracker.addImage(legionMarker.getImage(), 0);
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(parentFrame, e.toString() + 
-                " waitForAll was interrupted");
-        }
-        imagesLoaded = true;
 
         pack();
         

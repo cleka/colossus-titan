@@ -14,8 +14,6 @@ public class PickRecruiter extends JDialog implements MouseListener,
 {
     private int numEligible;
     private Critter [] recruiters;
-    private MediaTracker tracker;
-    private boolean imagesLoaded;
     private Player player;
     private Legion legion;
     private Chit [] recruiterChits;
@@ -94,30 +92,6 @@ public class PickRecruiter extends JDialog implements MouseListener,
             recruiterChits[i].addMouseListener(this);
         }
 
-
-        tracker = new MediaTracker(this);
-
-        tracker.addImage(legionMarker.getImage(), 0);
-        for (int i = 0; i < height; i++)
-        {
-            tracker.addImage(legionChits[i].getImage(), 0);
-        }
-        for (int i = 0; i < numEligible; i++)
-        {
-            tracker.addImage(recruiterChits[i].getImage(), 0);
-        }
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(parentFrame, e.toString() + 
-                " waitForAll was interrupted");
-        }
-        imagesLoaded = true;
-        
         pack();
         
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();

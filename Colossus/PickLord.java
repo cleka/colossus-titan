@@ -11,8 +11,6 @@ import javax.swing.*;
 
 public class PickLord extends JDialog implements MouseListener, WindowListener
 {
-    private MediaTracker tracker;
-    private boolean imagesLoaded;
     private Player player;
     private Legion legion;
     private Chit [] chits;
@@ -68,24 +66,6 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
             chits[i].addMouseListener(this);
         }
         
-        tracker = new MediaTracker(this);
-
-        for (int i = 0; i < chits.length; i++)
-        {
-            tracker.addImage(chits[i].getImage(), 0);
-        }
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(parentFrame, e.toString() +
-                " waitForAll was interrupted");
-        }
-
-        imagesLoaded = true;
         pack();
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();

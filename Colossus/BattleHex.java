@@ -377,6 +377,8 @@ public class BattleHex extends Hex
             point.x += chitScale / 4;
             point.y += chitScale / 4;
         }
+
+        repaint();
     }
 
 

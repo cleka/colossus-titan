@@ -11,10 +11,10 @@ import javax.swing.*;
 public class BattleTurn extends JDialog implements ActionListener,
     WindowListener
 {
-    private static BattleMap map;
-    private static Point location;
-    private static Battle battle;
-    private static Container contentPane;
+    private BattleMap map;
+    private Point location;
+    private Battle battle;
+    private Container contentPane;
 
 
     public BattleTurn(BattleMap map, Battle battle)

@@ -10,8 +10,6 @@ import javax.swing.*;
 
 public class Negotiate extends JDialog implements MouseListener, ActionListener
 {
-    private MediaTracker tracker;
-    private boolean imagesLoaded;
     private Legion attacker;
     private Legion defender;
     private Chit [] attackerChits;
@@ -86,31 +84,6 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
             contentPane.add(defenderChits[i]);
             defenderChits[i].addMouseListener(this);
         }
-
-
-        tracker = new MediaTracker(this);
-
-        for (int i = 0; i < attacker.getHeight(); i++)
-        {
-            tracker.addImage(attackerChits[i].getImage(), 0);
-        }
-        for (int i = 0; i < defender.getHeight(); i++)
-        {
-            tracker.addImage(defenderChits[i].getImage(), 0);
-        }
-        tracker.addImage(attackerMarker.getImage(), 0);
-        tracker.addImage(defenderMarker.getImage(), 0);
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(parentFrame, e.toString() +
-                " waitForAll was interrupted");
-        }
-        imagesLoaded = true;
 
         JButton button1 = new JButton("Agree");
         JButton button2 = new JButton("Fight");

@@ -251,6 +251,12 @@ public class Player implements Comparable
     }
 
 
+    public Collection getLegions()
+    {
+        return legions;
+    }
+
+
     public Game getGame()
     {
         return game;

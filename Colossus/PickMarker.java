@@ -13,8 +13,6 @@ import javax.swing.*;
 public class PickMarker extends JDialog implements MouseListener, WindowListener
 {
     private ArrayList markers = new ArrayList();
-    private MediaTracker tracker;
-    private boolean imagesLoaded;
     private Player player;
 
 
@@ -47,31 +45,18 @@ public class PickMarker extends JDialog implements MouseListener, WindowListener
             setResizable(false);
 
             Collection markerIds = player.getMarkersAvailable();
-            tracker = new MediaTracker(this);
             
             Iterator it = markerIds.iterator();
             while (it.hasNext())
             {
                 String markerId = (String)it.next();
-                Chit marker = new Chit(scale, "images/" + markerId + ".gif", 
+                Chit marker = new Chit(scale, Chit.getImagePath(markerId),
                     this);
                 marker.setId(markerId);    
                 markers.add(marker);
                 contentPane.add(marker);
                 marker.addMouseListener(this);
-                tracker.addImage(marker.getImage(), 0);
             }
-
-            try
-            {
-                tracker.waitForAll();
-            }
-            catch (InterruptedException e)
-            {
-                JOptionPane.showMessageDialog(parentFrame, e.toString() +
-                    " waitForAll was interrupted");
-            }
-            imagesLoaded = true;
 
             pack();
             

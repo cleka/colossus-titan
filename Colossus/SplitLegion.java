@@ -12,8 +12,6 @@ import javax.swing.*;
 public class SplitLegion extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
-    private MediaTracker tracker;
-    private boolean imagesLoaded;
     private Legion oldLegion;
     private Legion newLegion;
     private ArrayList oldChits = new ArrayList(8);
@@ -52,7 +50,7 @@ public class SplitLegion extends JDialog implements MouseListener,
         newLegion = new Legion(player.getSelectedMarker(), oldLegion,
             oldLegion.getCurrentHex(), null, null, null, null, null,
             null, null, null, player);
-        String imageName = "images/" + player.getSelectedMarker() + ".gif";
+        String imageName = Chit.getImagePath(player.getSelectedMarker());
         newMarker = new Marker(scale, imageName, this, null);
         newLegion.setMarker(newMarker);
 
@@ -93,26 +91,10 @@ public class SplitLegion extends JDialog implements MouseListener,
             gridbag.setConstraints(newMarker, constraints);
             contentPane.add(newMarker);
 
-            tracker = new MediaTracker(this);
-
             for (int i = 0; i < oldLegion.getHeight(); i++)
             {
                 Chit chit = (Chit)oldChits.get(i);
-                tracker.addImage(chit.getImage(), 0);
             }
-            tracker.addImage(oldMarker.getImage(), 0);
-            tracker.addImage(newMarker.getImage(), 0);
-
-            try
-            {
-                tracker.waitForAll();
-            }
-            catch (InterruptedException e)
-            {
-                JOptionPane.showMessageDialog(parentFrame, e.toString() +
-                    " waitForAll was interrupted");
-            }
-            imagesLoaded = true;
 
             JButton button1 = new JButton("Done");
             JButton button2 = new JButton("Cancel");
@@ -368,14 +350,14 @@ public class SplitLegion extends JDialog implements MouseListener,
         player.setColor("Red");
         player.initMarkersAvailable();
         player.selectMarker("Rd01");
-
-        Legion legion = new Legion(player.getSelectedMarker(), null, 
-            null, Creature.titan, Creature.angel, Creature.ogre,
-            Creature.ogre, Creature.centaur, Creature.centaur,
-            Creature.gargoyle, Creature.gargoyle, player);
-        Marker marker = new Marker(scale, "images/Rd02.gif", frame, null);
+        Legion legion = new Legion(player.getSelectedMarker(), null, null, 
+            Creature.titan, Creature.angel, Creature.ogre, Creature.ogre, 
+            Creature.centaur, Creature.centaur, Creature.gargoyle, 
+            Creature.gargoyle, player);
+        Marker marker = new Marker(scale, Chit.getImagePath(
+            player.getSelectedMarker()), frame, null);
         legion.setMarker(marker);
-
+        
         new SplitLegion(frame, legion, player);
     }
 }

@@ -12,9 +12,7 @@ import javax.swing.*;
 public class ShowDice extends JDialog implements WindowListener
 {
     private JFrame parentFrame;
-    private MediaTracker tracker;
     private static final int scale = 60;
-    private boolean imagesLoaded;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private Insets insets = new Insets(5, 5, 5, 5);
@@ -103,17 +101,18 @@ public class ShowDice extends JDialog implements WindowListener
 
     private String getDieImageName(int roll)
     {
-        String basename;
+        StringBuffer basename = new StringBuffer();
         if (roll >= targetNumber)
         {
-            basename = "Hit";
+            basename.append("Hit");
         }
         else
         {
-            basename = "Miss";
+            basename.append("Miss");
         }
+        basename.append(roll);
 
-        return "images/" + basename + roll + ".gif";
+        return Chit.getImagePath(basename.toString());
     }
 
 
@@ -154,7 +153,6 @@ public class ShowDice extends JDialog implements WindowListener
         gridbag.setConstraints(label2, constraints);
         contentPane.add(label2);
 
-        tracker = new MediaTracker(this);
         dice = new Chit[numDice];
         for (int i = 0; i < numDice; i++)
         {
@@ -166,18 +164,7 @@ public class ShowDice extends JDialog implements WindowListener
             constraints.insets = insets;
             gridbag.setConstraints(dice[i], constraints);
             contentPane.add(dice[i]);
-            tracker.addImage(dice[i].getImage(), 0);
         }
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(parentFrame, e.toString() +
-                " waitForAll was interrupted");
-        }
-        imagesLoaded = true;
 
         String hitString;
         if (hits == 1)

@@ -1,26 +1,16 @@
 Suspected Java bugs:
 
-Red Hat 6.1, Sun 1.2.2/1.3/1.3refresh, Blackdown 1.2.2RC4: 
+Linux, Sun 1.2.2/1.3beta/1.3betarefresh, Blackdown 1.2.2RC4: 
    ShowDice dialog sometimes moves from upper right corner to upper 
    left corner.  ShowLegion dialog sometimes pops up in upper left 
    corner instead of over mouse position.  These problems don't happen 
-   with ibmjdk118.
+   with ibmjdk118.  Try Linux JDK 1.3 final.
 
 Win98, JDK1.3: setLocation() to keep ShowLegion, ShowMasterHex
    dialogs from displaying past the bottom or right edge of the
    screen isn't working.  Problem with screen size detection in
-   Windows JDK, possibly only after screen resolution has been
-   changed.  Works fine on other JDKs.
-
-Win98, jdk1.3: Bad repaint onto potential carry target with no carries.
-
-Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle, 
-   usually around turn 15 of a 4-player game or turn 11 of a 6-player
-   game.  Looks like a HotSpot memory leak.
-   Things that don't help: System.gc() calls after every battle, -Xint,
-   -client, -server, -Xincgc options to Java.
-   Things to try: Manually removing event listeners, manually removing
-   more GUI elements as dialogs are dismissed, Linux jdk 1.3
+   Windows JDK. (Possibly only after screen resolution has been
+   changed?) Works fine on other JDKs.
 
 
 Current programming bugs:
@@ -41,13 +31,11 @@ Linux, ibmjdk118: Legion with angel in tower did not immediately
    have tower teleport moves highlighted, as if player had already
    teleported.  "Undo All Moves" fixed the problem.
    
-Linux, ibmjdk118: Got a NullPointerException in Concede.<init>
-
 Linux, ibmjdk118: Angel summoned into battle can move on top of
    any of its allies which has not moved yet, because their hexes 
    are highlighted.
 
-Linux, ibmjdk118; Win98, jdk1.3rc1: Tried to strike own creature!
+Win98, jdk1.3rc1: Tried to strike own creature!
 
 Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
    eliminates that chit's movement options.  "Undo last move" works.
@@ -56,9 +44,19 @@ Solaris, jdk1.3: Mutual elimination, with defender's titan killed.
    Got the message "Legion XXXX is eliminated" twice for the
    attacking legion, once for the defender.
 
-Square (red, black, or white) in NW corner of board and map.  
-   Partial marker?
+Solaris, jdk1.3: Square (red, black, or white) in NW corner of board 
+   and map.  Partial marker?  Doesn't appear on board when 
+   board.loadInitialMarkerImages() isn't called.  Doesn't appear
+   when Chit,paint() is commented out.  Is repainted when board is 
+   minimized and restored.  In battle, it sometimes looks like the 
+   color of the attacker's markers, but is sometimes two-toned, and 
+   sometimes changes color.
 
-In the second battle of a game, creatures can't move into some
-   hexes that they should be able to enter.  Problem with the
-   runOnce setup logic?
+Win98, jdk1.3: Bad repaint onto a potential carry target with no carries.
+Solaris, jdk1.3: Removed dead creature was half painted.  Went away 
+   after a minimize/restore.
+
+Solaris, jdk1.3: Ranger in bramble rangestrikes behemoth in bramble,
+   titan range 3.  Target number is 4.  Shouldn't it be 5?  (1 penalty
+   for each bramble)
+

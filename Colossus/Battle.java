@@ -29,7 +29,7 @@ public class Battle
     private Legion activeLegion;
     private MasterBoard board;
     private MasterHex masterHex;
-    private static BattleTurn turn;
+    private BattleTurn turn;
     private SummonAngel summonAngel;
     private ShowDice showDice;
 

@@ -173,19 +173,15 @@ public class Creature
     }
 
 
-    // File.separator does not work right in jar files.  A hardcoded 
-    // forward-slash does, and works in *x and Windows.  I have
-    // no idea if it works on the Mac, etc.
     public String getImageName(boolean inverted)
     {
+        StringBuffer basename = new StringBuffer();
         if (inverted)
         {
-            return "images/i_" + name + ".gif";
+            basename.append(Chit.invertedPrefix);
         }
-        else
-        {
-            return "images/" + name + ".gif";
-        }
+        basename.append(name);
+        return Chit.getImagePath(basename.toString());
     }
     
     

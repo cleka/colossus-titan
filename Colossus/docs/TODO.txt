@@ -1,10 +1,14 @@
-Take GUI info for Marker out of Legion constructor.
-
 Use splitFrom instead of legions(0) to determine parent legion
    in hex with a split.  
+Highlight selected legion better. 
 Differently-highlight hexes where a legion could move if
    a friendly stack were not already there.
-Highlight selected legion better. 
+
+Have BattleMap, PickEntrySide, ShowBattleMap extend JPanel
+   instead of JFrame.  Separate the map out into a HexMap class
+   that can be used in all three.
+Have MasterBoard extend JPanel instead of JFrame.  
+Have Chit extend JPanel instead of Canvas.
 
 Color code StatusScreen better.
 

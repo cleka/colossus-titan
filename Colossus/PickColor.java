@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 
 /**
@@ -42,10 +43,12 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
             colorTaken[i] = false;
         }
 
-        // XXX Use an iterator?
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        Collection players = game.getPlayers();
+        Iterator it = players.iterator();
+        int i = 0;
+        while (it.hasNext())
         {
-            Player currentPlayer = game.getPlayer(i);
+            Player currentPlayer = (Player)it.next();
             int tower = currentPlayer.getTower();
             contentPane.add(new JLabel(String.valueOf(100 * tower)));
             contentPane.add(new JLabel(currentPlayer.getName()));
@@ -72,6 +75,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
             }
 
             contentPane.add(colorLabel[i]);
+            i++;
         }
         
         Color [] background = { Color.black, Color.blue, new Color(180, 90, 0),
@@ -79,7 +83,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
         Color [] foreground = { Color.white, Color.white, Color.white, 
             Color.black, Color.black, Color.black };
 
-        for (int i = 0; i < 6; i++)
+        for (i = 0; i < 6; i++)
         {
             JButton button = new JButton();
             if (colorTaken[i])

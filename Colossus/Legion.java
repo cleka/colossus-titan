@@ -173,7 +173,7 @@ public class Legion
 
     public String getImageName()
     {
-        return "images/" + markerId + ".gif";
+        return Chit.getImagePath(markerId);
     }
 
 

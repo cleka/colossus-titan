@@ -10,8 +10,6 @@ import javax.swing.*;
 
 public class ShowLegion extends JDialog implements MouseListener, WindowListener
 {
-    private MediaTracker tracker;
-    private boolean imagesLoaded;
     private Legion legion;
     private Chit [] chits;
 
@@ -67,7 +65,7 @@ public class ShowLegion extends JDialog implements MouseListener, WindowListener
             String imageName;
             if (!allVisible && !critter.isVisible())
             {
-                imageName = "images/Question.gif"; 
+                imageName = Chit.getImagePath("Question");
             }
             else
             {
@@ -78,24 +76,6 @@ public class ShowLegion extends JDialog implements MouseListener, WindowListener
             contentPane.add(chits[i]);
             chits[i].addMouseListener(this);
         }
-
-        tracker = new MediaTracker(this);
-
-        for (int i = 0; i < legion.getHeight(); i++)
-        {
-            tracker.addImage(chits[i].getImage(), 0);
-        }
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(parentFrame, e.toString() +
-                " waitForAll was interrupted");
-        }
-        imagesLoaded = true;
 
         pack();
 

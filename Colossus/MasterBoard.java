@@ -28,8 +28,6 @@ public class MasterBoard extends JFrame implements MouseListener,
     private Image offImage;
     private Graphics offGraphics;
     private Dimension offDimension;
-    private MediaTracker tracker;
-    private boolean imagesLoaded;
     private static int scale;
     private static Game game;
     
@@ -66,8 +64,6 @@ public class MasterBoard extends JFrame implements MouseListener,
         addWindowListener(this);
         addMouseListener(this);
 
-        imagesLoaded = false;
-
         initializePopupMenu();
 
         SetupMasterHexes.setupHexes(h, this, hexes);
@@ -89,35 +85,23 @@ public class MasterBoard extends JFrame implements MouseListener,
                 
     public void loadInitialMarkerImages()
     {
-        tracker = new MediaTracker(this);
-
-        // XXX iterator
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        Collection players = game.getPlayers();
+        Iterator it = players.iterator();
+        while (it.hasNext())
         {
-            Player player = game.getPlayer(i);
-            for (int j = 0; j < player.getNumLegions(); j++)
+            Player player = (Player)it.next();
+            Collection legions = player.getLegions();
+            Iterator it2 = legions.iterator();
+            while (it2.hasNext())
             {
-                Legion legion = player.getLegion(j);
+                Legion legion = (Legion)it2.next();
                 Marker marker = new Marker(3 * scale, legion.getImageName(),
                     this, null);
                 legion.setMarker(marker);
-                tracker.addImage(marker.getImage(), 0);
                 MasterHex hex = legion.getCurrentHex();
                 hex.alignLegions();
             }
         }
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(this, e.toString() + 
-                " waitForAll was interrupted");
-        }
-
-        imagesLoaded = true;
     }
     
     
@@ -475,11 +459,6 @@ public class MasterBoard extends JFrame implements MouseListener,
 
     public void update(Graphics g)
     {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
         Dimension d = getSize();
 
         Rectangle rectClip = g.getClipBounds();

@@ -45,6 +45,11 @@ public class Game
     // from the command line.
     private int forcedMovementRoll;
 
+    // Constants for savegames
+    public static final String saveDirname = "saves";
+    public static final String saveExtension = ".sav";
+
+
     // XXX These should be added to the options menu.
     private static boolean autosaveEveryTurn = true;
     private static boolean allVisible;
@@ -69,7 +74,7 @@ public class Game
         assignTowers();
 
         // Renumber players in descending tower order.
-        sortPlayers();
+        Collections.sort(players);
 
         ListIterator lit = players.listIterator(players.size());
         while (lit.hasPrevious())
@@ -109,8 +114,8 @@ public class Game
         }
 
         board = new MasterBoard(this);
-        board.loadInitialMarkerImages();
         loadGame(filename);
+        board.loadInitialMarkerImages();
         statusScreen = new StatusScreen(this);
     }
 
@@ -208,28 +213,6 @@ public class Game
     }
 
 
-    // Sort player array by descending tower number, into the order
-    // in which they'll move.
-    private void sortPlayers()
-    {
-        /* XXX
-        for (int i = 0; i < numPlayers - 1; i++)
-        {
-            for (int j = i + 1; j < numPlayers; j++)
-            {
-                if (players[i].getTower() < players[j].getTower())
-                {
-                    Player tempPlayer = players[i];
-                    players[i] = players[j];
-                    players[j] = tempPlayer;
-                }
-            }
-        }
-        */
-        Collections.sort(players);
-    }
-
-
     public boolean getAllVisible()
     {
         return allVisible;
@@ -284,6 +267,12 @@ public class Game
     public Player getPlayer(int i)
     {
         return (Player)players.get(i);
+    }
+
+
+    public Collection getPlayers()
+    {
+        return players;
     }
 
 
@@ -427,7 +416,7 @@ public class Game
     {
         // XXX Need dialog to pick filename.
         Date date = new Date();
-        File savesDir = new File("saves");
+        File savesDir = new File(saveDirname);
         if (!savesDir.exists() || !savesDir.isDirectory())
         {
              if (!savesDir.mkdir())
@@ -437,7 +426,8 @@ public class Game
              }
         }
 
-        String filename = "saves/" + date.getTime() + ".sav";
+        String filename = saveDirname + File.separator + 
+            date.getTime() + saveExtension;
         FileWriter fileWriter;
         try
         {
@@ -512,7 +502,7 @@ public class Game
     {
         public boolean accept(File dir, String name)
         {
-            if (name.endsWith(".sav"))
+            if (name.endsWith(saveExtension))
             {
                 return true;
             }
@@ -535,7 +525,7 @@ public class Game
 
         if (filename.equals("--latest"))
         {
-            File dir = new File("saves");
+            File dir = new File(saveDirname);
             if (!dir.exists() || !dir.isDirectory())
             {
                 System.out.println("No saves directory");
@@ -547,15 +537,15 @@ public class Game
                 System.out.println("No savegames found in saves directory");
                 dispose();
             }
-            sortSaveFilenames(filenames);
-            file = new File("saves/" + filenames[0]);
+            file = new File(saveDirname + File.separator + 
+                latestSaveFilename(filenames));
         }
         else
         {
             file = new File(filename);
             if (!file.exists())
             {
-                file = new File("saves/" + filename);
+                file = new File(saveDirname + File.separator + filename);
             }
         }
 
@@ -563,7 +553,7 @@ public class Game
         {
             FileReader fileReader = new FileReader(file);
             BufferedReader in = new BufferedReader(fileReader);
-            String buf = new String();
+            String buf;
 
             buf = in.readLine();
             int numPlayers = Integer.parseInt(buf);
@@ -628,8 +618,6 @@ public class Game
 
                 buf = in.readLine();
                 int numLegions = Integer.parseInt(buf);
-                // Do not set numLegions in Player yet; let
-                // addLegion() do it.
 
                 for (int j = 0; j < numLegions; j++)
                 {
@@ -666,17 +654,6 @@ public class Game
                     }
 
                     player.addLegion(legion);
-                }
-            }
-
-            // XXX iterators
-            // Move all legions into their hexes.
-            for (int i = 0; i < getNumPlayers(); i++)
-            {
-                Player player = getPlayer(i);
-                for (int j = 0; j < player.getNumLegions(); j++)
-                {
-                    Legion legion = player.getLegion(j);
                     MasterHex hex = legion.getCurrentHex();
                     hex.addLegion(legion);
                 }
@@ -696,7 +673,7 @@ public class Game
     }
 
 
-    // Extract and return the numeric part of a filename.
+    /** Extract and return the numeric part of a filename. */
     private long numberValue(String filename)
     {
         StringBuffer numberPart = new StringBuffer();
@@ -719,22 +696,23 @@ public class Game
     }
 
 
-    // Sort filenames in descending numeric order.  (1000000000.sav
-    // comes before 999999999.sav)
-    private void sortSaveFilenames(String [] filenames)
+    /** Find the save filename with the highest numerical value. 
+        (1000000000.sav comes after 999999999.sav) */
+    private String latestSaveFilename(String [] filenames)
     {
-        for (int i = 0; i < filenames.length - 1; i++)
+        String bestFilename = "";
+        long bestNum = -1L;
+        for (int i = 0; i < filenames.length; i++)
         {
-            for (int j = i + 1; j < filenames.length; j++)
+            String filename = filenames[i];
+            long num = numberValue(filename);
+            if (num > bestNum)
             {
-                if (numberValue(filenames[i]) < numberValue(filenames[j]))
-                {
-                    String temp = filenames[i];
-                    filenames[i] = filenames[j];
-                    filenames[j] = temp;
-                }
+                bestNum = num;
+                bestFilename = filename;
             }
         }
+        return bestFilename;
     }
 
 
@@ -2077,7 +2055,8 @@ public class Game
                 // Need a legion marker to split.
                 if (player.getNumMarkersAvailable() == 0)
                 {
-                    JOptionPane.showMessageDialog(board, "No markers are available.");
+                    JOptionPane.showMessageDialog(board, 
+                        "No markers are available.");
                     return;
                 }
                 // Don't allow extra splits in turn 1.

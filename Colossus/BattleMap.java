@@ -13,30 +13,25 @@ public class BattleMap extends JFrame implements MouseListener,
     WindowListener
 {
     private static BattleHex[][] h = new BattleHex[6][6];
-    private static ArrayList hexes = new ArrayList(27);
+    private ArrayList hexes = new ArrayList(27);
 
     // ne, e, se, sw, w, nw
-    private static BattleHex [] entrances = new BattleHex[6];
+    private BattleHex [] entrances = new BattleHex[6];
 
-    private static Image offImage;
-    private static Graphics offGraphics;
-    private static Dimension offDimension;
+    private Image offImage;
+    private Graphics offGraphics;
+    private Dimension offDimension;
 
-    private static MediaTracker tracker;
-    private static boolean imagesLoaded;
-    private static boolean eraseFlag;
+    private boolean eraseFlag;
 
-    private static int scale;
-    private static int chitScale;
+    private int scale;
+    private int chitScale;
 
-    private static MasterBoard board;
-    private static MasterHex masterHex;
-    private static Battle battle;
+    private MasterBoard board;
+    private MasterHex masterHex;
+    private Battle battle;
 
     private static Point location;
-
-    private static boolean runOnce;
-
 
 
     public BattleMap(MasterBoard board, MasterHex masterHex, Battle battle)
@@ -77,32 +72,11 @@ public class BattleMap extends JFrame implements MouseListener,
 
         // Initialize the hexmap.
         SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), this, hexes);
-
-        // Neighbors and entrances only need to be set up once, since
-        // they're the same for all maps.
-        // XXX This is broken
-        //if (!runOnce)
-        {
-            SetupBattleHexes.setupNeighbors(h);
-            setupEntrances();
-            runOnce = true;
-        }
-
-        tracker = new MediaTracker(this);
+        SetupBattleHexes.setupNeighbors(h);
+        setupEntrances();
 
         placeLegion(attacker, false);
         placeLegion(defender, true);
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(this, e.toString() + 
-                " waitForAll was interrupted");
-        }
-        imagesLoaded = true;
 
         pack();
 
@@ -138,9 +112,6 @@ public class BattleMap extends JFrame implements MouseListener,
 
     public void placeNewChit(Legion legion)
     {
-        imagesLoaded = false;
-        tracker = new MediaTracker(this);
-
         BattleHex entrance = getEntrance(legion);
         int height = legion.getHeight();
         Critter critter = legion.getCritter(height - 1);
@@ -149,22 +120,10 @@ public class BattleMap extends JFrame implements MouseListener,
         BattleChit chit = new BattleChit(chitScale,
             critter.getImageName(legion == battle.getDefender()), this,
             critter);
-        tracker.addImage(chit.getImage(), 0);
         critter.addBattleInfo(entrance, this, chit, battle);
         entrance.addCritter(critter);
 
         entrance.alignChits();
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(this, e.toString() + 
-                " waitForAll was interrupted");
-        }
-        imagesLoaded = true;
 
         chit.repaint();
     }
@@ -179,7 +138,6 @@ public class BattleMap extends JFrame implements MouseListener,
             battle.addCritter(critter);
             BattleChit chit = new BattleChit(chitScale,
                 critter.getImageName(inverted), this, critter);
-            tracker.addImage(chit.getImage(), 0);
             critter.addBattleInfo(entrance, this, chit, battle);
             entrance.addCritter(critter);
         }
@@ -187,7 +145,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    public static void unselectAllHexes()
+    public void unselectAllHexes()
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -202,7 +160,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    public static void unselectHexByLabel(String label)
+    public void unselectHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -218,7 +176,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    public static void unselectHexesByLabels(Set labels)
+    public void unselectHexesByLabels(Set labels)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -233,7 +191,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    public static void selectHexByLabel(String label)
+    public void selectHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -249,7 +207,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    public static void selectHexesByLabels(Set labels)
+    public void selectHexesByLabels(Set labels)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -332,7 +290,7 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    public static BattleHex getEntrance(Legion legion)
+    public BattleHex getEntrance(Legion legion)
     {
         if (legion == battle.getAttacker())
         {
@@ -347,7 +305,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // Do a brute-force search through the hex array, looking for
     //    a match.  Return the hex, or null.
-    public static BattleHex getHexFromLabel(String label)
+    public BattleHex getHexFromLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -366,7 +324,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // Return the BattleHex that contains the given point, or
     //    null if none does.
-    private static BattleHex getHexContainingPoint(Point point)
+    private BattleHex getHexContainingPoint(Point point)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -495,7 +453,7 @@ public class BattleMap extends JFrame implements MouseListener,
 
 
     // This is used to fix artifacts from chits outside visible hexes.
-    public static void setEraseFlag()
+    public void setEraseFlag()
     {
         eraseFlag = true;
     }
@@ -503,11 +461,6 @@ public class BattleMap extends JFrame implements MouseListener,
 
     public void update(Graphics g)
     {
-        if (!imagesLoaded)
-        {
-            return;
-        }
-
         Rectangle rectClip = g.getClipBounds();
 
         // Abort if called too early.

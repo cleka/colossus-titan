@@ -10,8 +10,6 @@ import javax.swing.*;
 
 public class Concede extends JDialog implements ActionListener
 {
-    private MediaTracker tracker;
-    private boolean imagesLoaded;
     private static final int scale = 60;
     private JFrame parentFrame;
     private boolean flee;
@@ -83,30 +81,6 @@ public class Concede extends JDialog implements ActionListener
             gridbag.setConstraints(enemyChits[i], constraints);
             contentPane.add(enemyChits[i]);
         }
-
-        tracker = new MediaTracker(this);
-
-        for (int i = 0; i < ally.getHeight(); i++)
-        {
-            tracker.addImage(allyChits[i].getImage(), 0);
-        }
-        for (int i = 0; i < enemy.getHeight(); i++)
-        {
-            tracker.addImage(enemyChits[i].getImage(), 0);
-        }
-        tracker.addImage(allyMarker.getImage(), 0);
-        tracker.addImage(enemyMarker.getImage(), 0);
-
-        try
-        {
-            tracker.waitForAll();
-        }
-        catch (InterruptedException e)
-        {
-            JOptionPane.showMessageDialog(parentFrame, e.toString() +
-                " waitForAll was interrupted");
-        }
-        imagesLoaded = true;
 
         JButton button1 = new JButton(flee ? "Flee" : "Concede");
         JButton button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
