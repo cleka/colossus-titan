@@ -56,10 +56,8 @@ final class EngagementResults
     private JButton prevButton;
     private JButton nextButton;
     private JButton lastButton;
-	private JLabel turnLabel;
 	private JLabel summaryLabel;
 	private JLabel resultLabel;
-	private JLabel pointsLabel;
 	private JLabel attackerIdLabel;
 	private JLabel defenderIdLabel;
 	private JPanel panelCenter;
@@ -189,7 +187,7 @@ final class EngagementResults
 
         //    space for Labels
         JPanel panelNorth  = new JPanel();
-        panelNorth.setLayout(new GridLayout(4,1, 0,2));
+        panelNorth.setLayout(new GridLayout(2,1, 0,2));
         panelNorth.setBackground(Color.GRAY);
         contentPane.add(panelNorth,  BorderLayout.NORTH);
 
@@ -213,15 +211,11 @@ final class EngagementResults
         // add elements
         //
         //  north
-        this.turnLabel = new JLabel();
         this.summaryLabel = new JLabel();
         this.resultLabel = new JLabel();
-        this.pointsLabel = new JLabel();
 
-        panelNorth.add(this.turnLabel);
         panelNorth.add(this.summaryLabel);
         panelNorth.add(this.resultLabel);
-        panelNorth.add(this.pointsLabel);
 
         // west
         this.attackerIdLabel = new JLabel();
@@ -340,20 +334,8 @@ final class EngagementResults
             Engagement result = (Engagement) engagementLog.get(current);
             this.setTitle("Engagement " + (current + 1)
                 + " of " + engagementLog.size());
-            this.turnLabel.setText("Turn " + result.gameTurn);
-            this.summaryLabel.setText(result.attackerId + " attacked " + result.defenderId
-            		                  + " in "
-									  + MasterBoard.getHexByLabel(result.hexLabel).getDescription());
+            this.summaryLabel.setText(result.getSummary());
             this.resultLabel.setText(result.getResultText());                          
-            if(result.winnerId!=null)
-            {
-                this.pointsLabel.setText(result.winnerId + " earned "
-                    + result.points + " points");
-            }
-            else
-            {
-            	this.pointsLabel.setText("");
-            }
             this.attackerIdLabel.setText(result.attackerId);
             this.defenderIdLabel.setText(result.defenderId);
             
@@ -386,7 +368,7 @@ final class EngagementResults
         }
     }
 
-    void maybeShow()
+	void maybeShow()
     {
         if (options.getOption(Options.showEngagementResults) &&
                 engagementLog.size() != 0)
@@ -480,7 +462,14 @@ final class EngagementResults
             this.setWinnerAndLoserId();
 		}
 
-        private void setWinnerAndLoserId()
+        public String getSummary() {
+            return "In turn " + this.gameTurn + ", " 
+                    + this.attackerId + " attacked " + this.defenderId
+					+ " in "
+					+ MasterBoard.getHexByLabel(this.hexLabel).getDescription();
+		}
+
+		private void setWinnerAndLoserId()
         {
             this.loserId = null;
             if (this.winnerId != null)
@@ -505,17 +494,20 @@ final class EngagementResults
             String result = "bogus method";
             if (method.equals("flee"))
             {
-                result = winnerId + " won when " + loserId + " fled";
+                result = winnerId + " won when " + loserId + " fled and earned "
+                         + this.points + " points";
             }
             else if (method.equals("concede"))
             {
-                result = winnerId + " won when " + loserId + " conceded";
+                result = winnerId + " won when " + loserId + " conceded and earned "
+                         + this.points + " points";
             }
             else if (method.equals("negotiate"))
             {
                 if (winnerId != null)
                 {
-                    result = winnerId + " won a negotiated settlement";
+                    result = winnerId + " won a negotiated settlement and earned "
+                         + this.points + " points";
                 }
                 else
                 {
@@ -527,7 +519,8 @@ final class EngagementResults
                 if (winnerId != null)
                 {
                     result = winnerId + " won the battle in "
-                        + this.turns +  " turns";
+                         + this.turns +  " turns and earned "
+                         + this.points + " points";
                 }
                 else
                 {
