@@ -12,7 +12,7 @@
 
 \maketitle
 
-Sorry this is so longwinded; I'm trying to be thorough in case 
+Sorry this is so longwinded; we're trying to be thorough in case 
 someone who's not a Java programmer wants to make a small change.
 
 \section{Tools needed}
@@ -50,7 +50,7 @@ be useful for Colossus.
 
 \begin{itemize}
 \item[TODO:] More platforms. Please update this document if you use
-platforms that I don't.
+other platforms.
 \end{itemize}
 
 If your platform is not listed above, a starting point for finding a
@@ -108,6 +108,12 @@ cases yourself, it's somewhat user-hostile, and a lot of people already
 know it because it's been around forever. Please try to use Ant instead, 
 so that we can someday get rid of the Makefile and avoid double 
 maintainence.
+
+Javamake is a Java dependency checker from Sun Labs.  It allows us to
+recompile only the classes that need to be recompiled.
+\htmladdnormallink{http://www.experimentalstuff.com/Technologies/JavaMake/
+}{http://www.experimentalstuff.com/Technologies/JavaMake/}.
+
 
 \subsection{Parser tools}
 

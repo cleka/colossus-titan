@@ -9,7 +9,8 @@
         with corresponding optional.jar installed in $ANT_HOME/lib
      JavaCC 2.1    http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
         Environment var JAVACC_HOME pointing to JavaCC install root
-     Javamake      //http://www.experimentalstuff.com/Technologies/JavaMake/
+     Javamake      http://www.experimentalstuff.com/Technologies/JavaMake/
+        javamake.jar needs to be in your CLASSPATH.
      To sign jarfiles, you need a file called usernameKeystore,
         (substituting your username for "username")
         with an alias matching your username, and you need to put
@@ -117,7 +118,8 @@
 
 <taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake"/>
 
-<!-- Change "javamake" to "javac" in the task below if you want. -->
+<!-- If you don't have Javamake you can change "javamake" to "javac" --> 
+<!-- But get Javamake instead.  Good dependency checking helps a lot. --> 
 <target name="compile" depends="init,parsers"
         description = "Compile .java files to .class files using javamake">
         <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>

@@ -1,16 +1,25 @@
-Bug: SplitLegion still resizes slightly in Solaris/CDE/1.4.0
+Bug: Legion heights on masterboard not updated during battle.
 
-Bug: Winning legion's marker not aligned after winning engagement (by
-   battle or flee).
+Move game options to server side.
+Load ai delay option from server.cfg
+Sync board's game options display from server.
+Wrap common options functionality into Options 
 
-Send creature list, summonable list, recruit tree, etc. to client at load time.
+
+Add "no 2s or 5s" mulligan option.
+Add optional additional handicap mulligans that can be used after turn 1.
+Add balanced tower setup option.
+
+Remember GetPlayers settings in .cfg file.
+
+Remember window positions in .cfg file.
+
+Send creature list, summonable list, recruit tree, etc. to clients at startup.
 
 Put old, new web pages under CVS.
 Switch to new web page.
 
-Document Javadepend in build.tex
-
-Fix pic used for minimized icon.
+Fix pic used for minimized icon.  (Needs text.)
 Include an .ico file for Windows.  (ImageMagick can autogenerate one.)
 Maybe have a separate icons directory rather than reusing the ones
    in Default/images?
@@ -50,41 +59,23 @@ Add display of dead creatures / total creatures / creatures in play to
 
 Reveal all stacks at game end.
 
-Allow players to specify that they automatically refuse to negotiate.  
-   Check for this before showing negotiation dialog to opponent.
-
-Prompt player whether to continue game after last human player dies
-   if AIs remain.
-
-Remember window positions in .cfg file.
-Remember GetPlayers settings in .cfg file.
-
 Add UI for players to specify favorite colors.
-
-When a stack flees, make the winning stack visible, to the fleeing
-   legion's player's client only.  (Per-player rather than global
-   stack visibility.)
-
-Improve mapping of terrain types, creature nativity, and creature
-   recruiting potential so that the AI can easily take these into
-   account.
 
 Write more design docs.
 
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 
-Add a ShowLegionMarkers window that shows each player's remaining 
-   legion markers.
-
 Add SetupBattle dialog, to allow setting up standalone battles.  
    (terrain, entry side, creatures in attacking and defending legions,
    angel/archangel available to summon, recruits available for terrain
    type, player scores for titan power.)
 
-Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
-Add optional additional handicap mulligans that can be used after turn 1.
-Add balanced tower setup option.
+Add a ShowLegionMarkers window that shows each player's remaining 
+   legion markers.
+
+Allow players to specify that they automatically refuse to negotiate.  
+   Check for this before showing negotiation dialog to opponent.
 
 Show StatusScreen and ShowLegion info in the masterboard window, rather 
    than in separate windows.
@@ -94,3 +85,8 @@ Add movement and recruit animation.  Requires returning full paths for
 
 Special-case less fear of initial 8-high enemy legions, to make AI move
    both legions out of tower in turn 1.
+
+Improve mapping of terrain types, creature nativity, and creature
+   recruiting potential so that the AI can easily take these into
+   account.
+
