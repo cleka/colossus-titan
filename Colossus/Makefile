@@ -4,8 +4,8 @@
 #    it will continue to work portably.
 
 
-#JC = jikes -depend -g
-JC = javac -J-Djavac.pipe.output=true -g -deprecation
+JC = jikes -g -depend +P
+#JC = javac -J-Djavac.pipe.output=true -g -deprecation -Xdepend
 
 
 all: AcquireAngel.class \
@@ -25,6 +25,7 @@ all: AcquireAngel.class \
      PickEntrySide.class \
      PickMarker.class \
      PickRecruit.class \
+     PickRecruiter.class \
      Player.class \
      ShowLegion.class \
      ShowMasterHex.class \
@@ -82,6 +83,9 @@ PickMarker.class: PickMarker.java
 
 PickRecruit.class: PickRecruit.java
 	$(JC) PickRecruit.java
+
+PickRecruiter.class: PickRecruiter.java
+	$(JC) PickRecruiter.java
 
 Player.class: Player.java
 	$(JC) Player.java
