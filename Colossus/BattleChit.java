@@ -133,7 +133,7 @@ class BattleChit extends Chit
     int numInContact(boolean countDead)
     {
         // Offboard chits are not in contact.
-        if (currentHex.getXCoord() == -1)
+        if (currentHex.isEntrance())
         {
             return 0;
         }
