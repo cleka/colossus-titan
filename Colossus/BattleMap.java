@@ -52,6 +52,9 @@ public class BattleMap extends Frame implements MouseListener,
     private char terrain;
     private BattleTurn turn;
 
+    int attackerPoints = 0;
+    int defenderPoints = 0;
+
 
     public BattleMap(Legion attacker, Legion defender, char terrain, char side)
     {
@@ -97,7 +100,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale,
                 attacker.getCreature(i).getImageName(), this,
                 attacker.getCreature(i), entrance,
-                attacker.getPlayer(), false, this);
+                attacker, false, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -109,7 +112,7 @@ public class BattleMap extends Frame implements MouseListener,
             chits[i] = new BattleChit(0, 0, chitScale,
                 defender.getCreature(i - attackerHeight).getImageName(), this,
                 defender.getCreature(i - attackerHeight), entrance,
-                defender.getPlayer(), true, this);
+                defender, true, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
@@ -146,6 +149,43 @@ public class BattleMap extends Frame implements MouseListener,
                 }
             }
         }
+    }
+
+
+    int highlightMovableChits()
+    {
+        unselectAllHexes();
+
+        int count = 0;
+
+        Player player;
+        // This gets called from BattleTurn's constructor, so it cannot
+        // be assumed that turn is valid.
+        if (turn == null)
+        {
+            player = defender.getPlayer();
+        }
+        else
+        {
+            player = turn.getActivePlayer();
+        }
+
+        for (int i = 0; i < numChits; i++)
+        {
+            BattleChit chit = chits[i];
+            if (chit.getPlayer() == player)
+            {
+                if (!chit.hasMoved() && !chit.isEngaged())
+                {
+                    count++;
+                    Hex hex = chit.getCurrentHex();
+                    hex.select();
+                    hex.repaint();
+                }
+            }
+        }
+
+        return count;
     }
 
 
@@ -259,6 +299,8 @@ public class BattleMap extends Frame implements MouseListener,
 
     int highlightChitsWithTargets()
     {
+        unselectAllHexes();
+
         int count = 0;
         Player player = turn.getActivePlayer();
 
@@ -280,20 +322,27 @@ public class BattleMap extends Frame implements MouseListener,
         return count;
     }
 
-    
+
     // Count the number of targets that chit may strike.  If highlight
     //     is true, select their hexes.
-    private int countAndMaybeHighlightStrikes(BattleChit chit, boolean 
+    private int countAndMaybeHighlightStrikes(BattleChit chit, boolean
         highlight)
     {
         int count = 0;
-        Player player = chit.getPlayer();
-        Hex currentHex = chit.getCurrentHex();
 
         if (highlight)
         {
             unselectAllHexes();
         }
+
+        // Each chit may strike only once per turn.
+        if (chit.hasStruck())
+        {
+            return 0;
+        }
+
+        Player player = chit.getPlayer();
+        Hex currentHex = chit.getCurrentHex();
 
         // First mark and count normal strikes.
         for (int i = 0; i < 6; i++)
@@ -307,7 +356,7 @@ public class BattleMap extends Frame implements MouseListener,
                     if (hex.isOccupied())
                     {
                         BattleChit bogie = hex.getChit();
-                        if (bogie.getPlayer() != player)
+                        if (bogie.getPlayer() != player && !bogie.isDead())
                         {
                             if (highlight)
                             {
@@ -332,8 +381,8 @@ public class BattleMap extends Frame implements MouseListener,
 
         return count;
     }
-    
-    
+
+
     int countStrikes(BattleChit chit)
     {
         return countAndMaybeHighlightStrikes(chit, false);
@@ -363,6 +412,58 @@ public class BattleMap extends Frame implements MouseListener,
         }
 
         return false;
+    }
+
+
+    // Returns the range in hexes from hex1 to hex2.  Titan ranges are
+    // inclusive at both ends.
+    int getRange(Hex hex1, Hex hex2)
+    {
+        // XXX: Fix this.
+        return 0;
+    }
+
+
+    void commitStrikes()
+    {
+        for (int i = 0; i < numChits; i++)
+        {
+            chits[i].commitStrike();
+        }
+    }
+
+
+    // XXX: Need to handle Titans.
+    void removeDeadChits()
+    {
+        for (int i = numChits - 1; i >= 0; i--)
+        {
+            if (chits[i].isDead())
+            {
+                Legion legion = chits[i].getLegion();
+                Creature creature = chits[i].getCreature();
+                if (legion == attacker)
+                {
+                    defenderPoints += creature.getPointValue();
+                }
+                else
+                {
+                    attackerPoints += creature.getPointValue();
+                }
+
+                legion.removeCreature(creature);
+                Hex hex = chits[i].getCurrentHex();
+                hex.removeChit(chits[i]);
+                hex.repaint();
+
+                for (int j = i; j < numChits - 1; j++)
+                {
+                    chits[j] = chits[j + 1];
+                }
+                chits[numChits - 1] = null;
+                numChits--;
+            }
+        }
     }
 
 
@@ -808,6 +909,7 @@ public class BattleMap extends Frame implements MouseListener,
                         break;
 
                     case BattleTurn.FIGHT:
+                    case BattleTurn.STRIKEBACK:
                         // Highlight all legal strikes for this chit.
                         highlightStrikes(chits[0]);
                         break;
@@ -831,22 +933,40 @@ public class BattleMap extends Frame implements MouseListener,
                     {
                         case BattleTurn.MOVE:
                             chits[0].moveToHex(h[i][j]);
-                            unselectAllHexes();
-                            repaint();
-                            break;
+                            highlightMovableChits();
+                            return;
 
                         case BattleTurn.FIGHT:
-                            // XXX: Strike.
-                            break;
+                        case BattleTurn.STRIKEBACK:
+                            chits[0].strike(h[i][j].getChit());
+                            highlightChitsWithTargets();
+                            return;
 
                         default:
-                            break;
+                            return;
                     }
                 }
             }
         }
+
+        // No hits on selected hexes, so clean up.
+        switch (turn.getPhase())
+        {
+            case BattleTurn.MOVE:
+                highlightMovableChits();
+                break;
+
+            case BattleTurn.FIGHT:
+            case BattleTurn.STRIKEBACK:
+                highlightChitsWithTargets();
+                break;
+
+            default:
+                break;
+       }
     }
-    
+
+
     public void mouseDragged(MouseEvent e)
     {
     }
