@@ -8,127 +8,78 @@ import java.awt.event.*;
 import net.sf.colossus.*;
 import java.util.*;
 
-class LegionEditor extends JPanel
-{
-    static String[] strColorAbbrevs = 
-    {
-        "Bk",
-        "Br",
-        "Bu",
-        "Gd",
-        "Gr",
-        "Rd",
-    };
-
-    static String[] strLegionAbbrevs = 
-    {
-        "01",  
-        "02",  
-        "03",  
-        "04",  
-        "05",  
-        "06",  
-        "07",  
-        "08",  
-        "09",  
-        "10",  
-        "11",  
-        "12",  
-    };
-
-    class VectorListModel extends AbstractListModel
-    {
-        private Vector m_oVector = new Vector();
-        public int getSize() { return m_oVector.size(); }
-        public Object getElementAt(int n) 
-            { 
-                return m_oVector.elementAt(n);
-            }
-
-        public void add(Object o)
-            {
-                m_oVector.remove(strEmpty);
-                m_oVector.add(o);
-                fireContentsChanged(this, 0, getSize());
-            }
-        public void remove(Object o)
-            {
-                if(m_oVector.contains(o))
-                {
-                    m_oVector.remove(o);
-                    m_oVector.add("");
-                    fireContentsChanged(this, 0, getSize());
-                }
-            }
-
-    }
-
-    final static String strEmpty = "";
-
-    LegionEditor(String strCaption)
-    {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createTitledBorder(strCaption));
-        JComboBox oColorChoice = new JComboBox(strColorAbbrevs);
-        JComboBox oLegionChoice = new JComboBox(strLegionAbbrevs);
-
-
-        final VectorListModel oModel = new VectorListModel();
-        final JList oList = new JList(oModel);
-        oList.setVisibleRowCount(7);
-        for(int i = 0; i < 7; i++)
-            oModel.add(strEmpty);
-        final JComboBox oCharacterChoice = new JComboBox(CharacterArchetype.getCharactersArray());
-        JButton addButton = new JButton("+");
-        JButton removeButton = new JButton("-");
-        addButton.addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent evt)
-                    {
-                        if(oModel.getSize() <= 7)
-                        {
-                            oModel.add(oCharacterChoice.getSelectedItem());
-                        }
-                    }
-            });
-        removeButton.addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent evt)
-                    {
-                        oModel.remove(oCharacterChoice.getSelectedItem());
-                    }
-            });
-        
-        add(oColorChoice);
-        add(oLegionChoice);
-        add(oList);
-        add(oCharacterChoice);
-        add(addButton);
-        add(removeButton);
-    }
-}
-
 public class BattleEditor extends JFrame
 {
+    private String m_strFileName = "c:/Default.battle";
+    LegionEditor m_oFirstLegionEditor;
+    LegionEditor m_oSecondLegionEditor;
+    HexEditor m_oHexEditor;
+    
     private JPanel createControlPanel()
     {
         JPanel oControlPanel = new JPanel();
         oControlPanel.setLayout(new BoxLayout(oControlPanel, 
                                               BoxLayout.X_AXIS));
-        oControlPanel.add(new LegionEditor("Defender"));
-        oControlPanel.add(new LegionEditor("Attacker"));
+        m_oFirstLegionEditor = new LegionEditor("Defender");
+        oControlPanel.add(m_oFirstLegionEditor);
+        m_oSecondLegionEditor = new LegionEditor("Attacker");
+        oControlPanel.add(m_oSecondLegionEditor);
+        
+        m_oHexEditor = new HexEditor();
+        oControlPanel.add(m_oHexEditor);
+        
         return oControlPanel;
     }
+
+    private void restoreBattle()
+        {
+            BattleMemo oMemo = BattleMemo.readFromFile(m_strFileName);
+            if(oMemo != null)
+            {
+                LegionMemo oAttacker = oMemo.getAttacker();
+                LegionMemo oDefender = oMemo.getDefender();
+                m_oFirstLegionEditor.restoreLegion(oAttacker);
+                m_oSecondLegionEditor.restoreLegion(oDefender);
+                System.out.println("Restore battle " + m_strFileName);
+            }
+        }
+
+    private void saveBattle()
+        {
+            BattleMemo oMemo;
+            LegionMemo oFirstLegionMemo = m_oFirstLegionEditor.saveLegion(m_oHexEditor.getLabel());
+            LegionMemo oSecondLegionMemo = m_oSecondLegionEditor.saveLegion(m_oHexEditor.getLabel());
+            oMemo = new BattleMemo(oFirstLegionMemo,
+                                   oSecondLegionMemo,
+                                   false,
+                                   false,
+                                   m_oHexEditor.getTerrain(),
+                                   m_oHexEditor.getLabel(),
+                                   1);
+            BattleMemo.writeToFile(oMemo, m_strFileName);
+            System.out.println("Save battle " + m_strFileName);
+        }
+
     private JPanel createButtonPanel()
     {
         JPanel oButtonPanel = new JPanel();
+        JButton oSaveButton = new JButton("Save");
         oButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        oButtonPanel.add(new JButton("Save"));
+        oButtonPanel.add(oSaveButton);
+        oSaveButton.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent evt)
+                    {
+                        saveBattle();
+                    }
+            });
         return oButtonPanel;
     }
-    public BattleEditor()
+
+    public BattleEditor(String strFileName)
     {
         super("Battle Editor");
+        m_strFileName = strFileName;
 
         Container oContentPane = getContentPane();
 
@@ -149,7 +100,14 @@ public class BattleEditor extends JFrame
 
     public static void main(String[] strArgsArray)
     {
-        JFrame oFrame = new BattleEditor();
+        String strFileName;
+        if(strArgsArray.length == 1)
+            strFileName = strArgsArray[0];
+        else
+            strFileName = "c:/Default.battle";
+
+        BattleEditor oFrame = new BattleEditor(strFileName);
+        oFrame.restoreBattle();
         oFrame.pack();
         oFrame.show();
         System.out.println("Edit Battles!");
