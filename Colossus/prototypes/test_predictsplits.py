@@ -1258,5 +1258,120 @@ class PredictSplitsTestCase(unittest.TestCase):
                 Gd08 recruits Cen with Lio
         """
 
+
+    def testPredictSplits9(self):
+        print "\ntest 9 begins"
+        ps = PredictSplits("Gr", "Gr11", ['Titan', 'Angel', 'Gargoyle', 
+          'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        ps.getLeaf("Gr11").revealCreatures(['Titan', 'Angel', 'Gargoyle', 
+          'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        ps.printLeaves()
+
+        turn = 1
+        print "\nTurn", turn
+        ps.getLeaf("Gr11").split(4, "Gr02", turn)
+        ps.getLeaf("Gr02").revealCreatures(['Titan'])
+        ps.getLeaf("Gr02").revealCreatures(['Gargoyle', 'Gargoyle'])
+        ps.getLeaf("Gr02").addCreature("Cyclops")
+        ps.getLeaf("Gr11").revealCreatures(['Centaur'])
+        ps.getLeaf("Gr11").addCreature("Centaur")
+        assert(not ps.getLeaf("Gr02").allCertain())
+        assert(not ps.getLeaf("Gr11").allCertain())
+        ps.printLeaves()
+
+        turn = 2
+        print "\nTurn", turn
+        ps.getLeaf("Gr02").revealCreatures(['Titan'])
+        ps.getLeaf("Gr02").addCreature("Warlock")
+        ps.getLeaf("Gr11").revealCreatures(['Centaur'])
+        ps.getLeaf("Gr11").addCreature("Centaur")
+        assert(not ps.getLeaf("Gr02").allCertain())
+        assert(not ps.getLeaf("Gr11").allCertain())
+        ps.printLeaves()
+
+        turn = 3
+        print "\nTurn", turn
+        ps.getLeaf("Gr02").revealCreatures(['Cyclops'])
+        ps.getLeaf("Gr02").addCreature("Cyclops")
+        ps.getLeaf("Gr11").revealCreatures(['Centaur', 'Centaur'])
+        ps.getLeaf("Gr11").addCreature("Lion")
+        assert(not ps.getLeaf("Gr02").allCertain())
+        assert(not ps.getLeaf("Gr11").allCertain())
+        ps.printLeaves()
+
+        turn = 4
+        print "\nTurn", turn
+        ps.getLeaf("Gr02").split(2, "Gr10", turn)
+        ps.getLeaf("Gr11").split(3, "Gr03", turn)
+        ps.getLeaf("Gr11").merge(ps.getLeaf("Gr03"), turn)
+        assert(not ps.getLeaf("Gr02").allCertain())
+        assert(not ps.getLeaf("Gr10").allCertain())
+        assert(not ps.getLeaf("Gr11").allCertain())
+        ps.printLeaves()
+
+        turn = 5
+        print "\nTurn", turn
+        ps.getLeaf("Gr11").split(3, "Gr12", turn)
+        ps.getLeaf("Gr02").revealCreatures(['Warlock'])
+        ps.getLeaf("Gr02").addCreature("Warlock")
+        ps.getLeaf("Gr10").revealCreatures(['Gargoyle', 'Gargoyle'])
+        ps.getLeaf("Gr10").addCreature("Cyclops")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gr02").allCertain())
+        assert(ps.getLeaf("Gr10").allCertain())
+        assert(not ps.getLeaf("Gr11").allCertain())
+        assert(not ps.getLeaf("Gr12").allCertain())
+        ps.getLeaf("Gr12").revealCreatures(['Centaur', 'Centaur', 'Centaur'])
+        ps.getLeaf("Gr12").addCreature("Warbear")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gr02").allCertain())
+        assert(ps.getLeaf("Gr10").allCertain())
+        assert(not ps.getLeaf("Gr11").allCertain())
+        assert(ps.getLeaf("Gr12").allCertain())
+
+        ps.getLeaf("Gr10").revealCreatures(['Cyclops', 'Gargoyle', 'Gargoyle'])
+        ps.getLeaf("Gr10").removeCreature("Cyclops")
+        ps.getLeaf("Gr10").revealCreatures(['Gargoyle', 'Gargoyle'])
+        ps.getLeaf("Gr10").addCreature("Cyclops")
+        ps.getLeaf("Gr10").removeCreature("Cyclops")
+        ps.getLeaf("Gr10").removeCreature("Gargoyle")
+        ps.getLeaf("Gr10").removeCreature("Gargoyle")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gr02").allCertain())
+        assert(not ps.getLeaf("Gr11").allCertain())
+        assert(ps.getLeaf("Gr12").allCertain())
+
+        turn = 6
+        print "\nTurn", turn
+        ps.getLeaf("Gr02").revealCreatures(['Centaur'])
+        ps.getLeaf("Gr02").addCreature("Centaur")
+        ps.printLeaves()
+        ps.printNodes()
+        assert(ps.getLeaf("Gr02").allCertain())
+        assert(ps.getLeaf("Gr11").allCertain())
+        assert(ps.getLeaf("Gr12").allCertain())
+        print "\ntest 9 ends"
+
+        """
+        Start Gr11: Tit, Ang, Ogr, Ogr, Cen, Cen, Gar, Gar
+        Turn 1  Gr11 splits off Tit, Gar, Gar, Cen into Gr02
+                Gr02 teleports (Titan)
+                Gr02 recruits Cyc with 2xGar
+                Gr11 recruits Cen with Cen
+        Turn 2  Gr02 recruits Wlk with Tit
+                Gr11 recruits Cen with Cen
+        Turn 3  Gr02 recruits Cyc with Cyc
+                Gr11 recruits Lio with 2xCen
+        Turn 4  Gr02 splits off Gar, Gar into Gr10
+                Gr11 splits off Cen, Cen, Cen into Gr03
+                Gr03 merges back into Gr11
+        Turn 5  Gr11 splits off Cen, Cen, Cen into Gr12
+                Gr02 recruits Wlk with Wlk
+                Gr10 recruits Cyc with 2xGar
+                Gr12 recruits Wbe with 3xCen
+                Gr10 is attacked, revealed as Gar, Gar, Cyc, eliminated
+        Turn 6  Gr02 recruits Cen with Cen
+        """
+
 if __name__ == "__main__":
     unittest.main()
