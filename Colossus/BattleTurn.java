@@ -60,7 +60,6 @@ System.out.println("BattleTurn.toFront()");
 
     void setupRecruitDialog()
     {
-System.out.println("setupRecruitDialog");
         contentPane = getContentPane();
         contentPane.removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
@@ -69,7 +68,6 @@ System.out.println("setupRecruitDialog");
 
         if (turnNumber == 4 && defender.canRecruit())
         {
-System.out.println("recruiting time");
             // Allow recruiting a reinforcement.
             new PickRecruit(map, defender);
 
@@ -85,7 +83,6 @@ System.out.println("recruiting time");
     
     void setupSummonDialog()
     {
-System.out.println("setupSummonDialog");
         contentPane = getContentPane();
         contentPane.removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
@@ -93,14 +90,12 @@ System.out.println("setupSummonDialog");
         contentPane.add(new JLabel(getActivePlayer().getName() + " : Summon"));
 
         int summonState = map.getSummonState();
-System.out.println("summonState = " + summonState);
 
         if (summonState == BattleMap.FIRST_BLOOD)
         {
             if (attacker.getHeight() < 7 &&
                 attacker.getPlayer().canSummonAngel())
             {
-System.out.println("SummonAngel");
                 summoningAngel = true;
 
                 // Make sure the MasterBoard is visible.
@@ -119,15 +114,10 @@ System.out.println("map.getBoard().show()");
 
         if (!summoningAngel)
         {
-System.out.println("summoningAngel is false  phase = " + phase);
             if (phase == SUMMON)
             {
                 advancePhase();
             }
-        }
-        else
-        {
-System.out.println("summoningAngel is true");
         }
     }
 
@@ -135,10 +125,8 @@ System.out.println("summoningAngel is true");
     // This is called from MasterBoard after the SummonAngel finishes.
     void finishSummoningAngel()
     {
-System.out.println("BattleTurn.finishSummoningAngel");
         if (attacker.summoned())
         {
-System.out.println("placeNewChit");
             map.placeNewChit(attacker);
         }
 
@@ -157,11 +145,9 @@ System.out.println("map.show()");
 
     void setupMoveDialog()
     {
-System.out.println("setupMoveDialog");
         // If there are no legal moves, move on.
         if (map.highlightMovableChits() < 1)
         {
-System.out.println("No legal moves; advancing to strike phase");
             advancePhase();
         }
         else
@@ -198,7 +184,6 @@ System.out.println("No legal moves; advancing to strike phase");
 
     void setupFightDialog()
     {
-System.out.println("setupFightDialog");
         // Apply drift damage only once per player turn.
         if (phase == FIGHT)
         {
@@ -258,7 +243,6 @@ System.out.println("setupFightDialog");
 
     void advancePhase()
     {
-System.out.println("entering advancePhase() with phase " + phase);
         if (phase == SUMMON)
         {
             phase = MOVE;
@@ -294,7 +278,6 @@ System.out.println("entering advancePhase() with phase " + phase);
 
         else if (phase == STRIKEBACK)
         {
-System.out.println("Calling removeDeadChits");
             map.removeDeadChits();
 
             // Make sure the battle isn't over before continuing.
@@ -308,7 +291,6 @@ System.out.println("Calling removeDeadChits");
                 else
                 {
                     turnNumber++;
-System.out.println("Now turn " + turnNumber);
                     if (turnNumber > 7)
                     {
                         // Time loss.  Attacker is eliminated but defender
@@ -336,7 +318,6 @@ System.out.println("Now turn " + turnNumber);
                 }
             }
         }
-System.out.println("leaving advancePhase() with phase " + phase);
     }
 
 
@@ -368,7 +349,7 @@ System.out.println("leaving advancePhase() with phase " + phase);
         else if (e.getActionCommand() == "Done with Strikes")
         {
             // Advance only if there are no unresolved strikes.
-            if (map.forcedStrikesRemain() == false)
+            if (!map.forcedStrikesRemain())
             {
                 map.commitStrikes();
                 advancePhase();
