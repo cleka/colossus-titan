@@ -42,12 +42,13 @@ public final class Game
     // Negotiation
     private Set [] proposals = new HashSet[2];
     private static TerrainRecruitLoader trl;
+    private LinkedList colorPickOrder = new LinkedList();
+    private Set colorsLeft;
 
     Game()
     {
     }
 
-    // XXX Maybe this should be a static initializer?
     void initAndLoadData()
     {
         Creature.loadCreatures(); /* try to load creatures */
@@ -86,11 +87,10 @@ public final class Game
         {
             server.disposeAllClients();
         }
-        Iterator it = players.iterator();
-        while (it.hasNext())
+        for (int i = 0; i < getNumPlayers(); i++)
         {
-            Player player = (Player)it.next();
-            server.addClient(new Client(server, player.getName()));
+            Player player = (Player)players.get(i);
+            server.addClient(i, player.getName());
         }
     }
 
@@ -201,7 +201,6 @@ public final class Game
             server.setAllClientsOption(Options.showCaretaker, false);
         }
 
-        // XXX temp
         initAndLoadData();
         initServerAndClients();
 
@@ -226,47 +225,77 @@ public final class Game
 
         server.allInitBoard();
 
-        Set colorsLeft = new HashSet();
-        for (i = 0; i < Constants.colorNames.length; i++)
+        assignColors();
+    }
+
+    private void assignColors()
+    {
+        colorsLeft = new HashSet();
+        for (int i = 0; i < Constants.colorNames.length; i++)
         {
             colorsLeft.add(Constants.colorNames[i]);
         }
 
         // Let human players pick colors first, followed by AI players.
-        for (i = getNumPlayers() - 1; i >= 0; i--)
-        {
-            pickPlayerColor(i, "Human", colorsLeft);
-        }
-        for (i = getNumPlayers() - 1; i >= 0; i--)
-        {
-            pickPlayerColor(i, "AllAI", colorsLeft);
-        }
+        // Within each group, players pick colors in ascending tower order.
+        colorPickOrder.clear(); 
 
-        it = players.iterator();
-        while (it.hasNext())
+        for (int i = getNumPlayers() - 1; i >= 0; i--)
         {
-            Player player = (Player)it.next();
-            placeInitialLegion(player);
-            server.setupPlayerLabel(player.getName());
-            server.allUpdateStatusScreen();
+            Player player = (Player)players.get(i);
+            if (player.isHuman())
+            {
+            if (player.isHuman())
+                colorPickOrder.add(new Integer(i));
+            }
         }
-        server.allLoadInitialMarkerImages();
-
-        if (server.getClientOption(Options.autosave))
+        for (int i = getNumPlayers() - 1; i >= 0; i--)
         {
-            saveGame();
+            Player player = (Player)players.get(i);
+            if (player.isAI())
+            {
+                colorPickOrder.add(new Integer(i));
+            }
         }
 
-        setupPhase();
-
-        server.allUpdateStatusScreen();
-        server.allUpdateCaretakerDisplay();
-        // Reset the color of the player label now that it's known.
-        server.allSetupPlayerLabel();
+        nextPickColor();
     }
 
+    private void nextPickColor()
+    {
+        if (colorPickOrder.isEmpty())
+        {
+            // All players are done picking colors; continue.
+            newGame2();
+        }
+        else
+        {
+            Integer integer = (Integer)colorPickOrder.removeFirst();
+            int i = integer.intValue();
+            server.askPickColor(i, colorsLeft);
+        }
+    }
 
-    /** Let player i pick a color, only if type matches the player's type. */
+    /** playerNum chooses color */
+    void assignColor(int playerNum, String color)
+    {
+        // XXX Only let the player whose turn it is pick.
+
+        Player player = (Player)players.get(playerNum);
+        colorsLeft.remove(color);
+        player.setColor(color);
+        if (GetPlayers.byColor.equals(player.getName()))
+        {
+            player.setName(color);
+            server.setPlayerName(playerNum, color);
+        }
+        Log.event(player.getName() + " chooses color " + color);
+        player.initMarkersAvailable();
+
+        nextPickColor();
+    }
+
+/* XXX  Move to client side
     private void pickPlayerColor(int i, String type, Set colorsLeft)
     {
         Player player = (Player)players.get(i);
@@ -297,16 +326,36 @@ public final class Game
             }
         }
         while (color == null);
-        colorsLeft.remove(color);
-        player.setColor(color);
-        if (GetPlayers.byColor.equals(playerName))
-        {
-            player.setName(color);
-            server.setPlayerName(i, color);
-        }
-        Log.event(playerName + " chooses color " + color);
-        player.initMarkersAvailable();
     }
+*/
+
+    private void newGame2()
+    {
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            // XXX Need to let player pick first marker along with color.
+            placeInitialLegion(player, player.getFirstAvailableMarker());
+            server.setupPlayerLabel(player.getName());
+            server.allUpdateStatusScreen();
+        }
+        server.allLoadInitialMarkerImages();
+
+        if (server.getClientOption(Options.autosave))
+        {
+            saveGame();
+        }
+
+        setupPhase();
+
+        server.allUpdateStatusScreen();
+        server.allUpdateCaretakerDisplay();
+        // Reset the color of the player label now that it's known.
+        server.allSetupPlayerLabel();
+    }
+
+
 
 
     private static String getPhaseName(int phase)
@@ -870,7 +919,7 @@ public final class Game
             out.println(player.getPlayersElim());
             out.println(player.getNumMarkersAvailable());
 
-            Collection markerIds = player.getMarkersAvailable();
+            Set markerIds = player.getMarkersAvailable();
             Iterator it2 = markerIds.iterator();
             while (it2.hasNext())
             {
@@ -1697,11 +1746,10 @@ public final class Game
     }
 
 
-    private void placeInitialLegion(Player player)
+    private void placeInitialLegion(Player player, String markerId)
     {
         String name = player.getName();
-        String selectedMarkerId = player.pickMarker();
-        player.selectMarkerId(selectedMarkerId);
+        player.selectMarkerId(markerId);
         Log.event(name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
@@ -1717,8 +1765,8 @@ public final class Game
         caretaker.takeOne(startCre[1]);
         caretaker.takeOne(startCre[1]);
 
-        Legion legion = Legion.getStartingLegion(selectedMarkerId,
-            hexLabel, player.getName(), this);
+        Legion legion = Legion.getStartingLegion(markerId, hexLabel, 
+            player.getName(), this);
         player.addLegion(legion);
     }
 
@@ -2220,18 +2268,17 @@ Log.debug("calling doRecruit()");
 
 
 
-    /** Return the splitoffId, or null if the split failed. 
-        Only used for human players, not for auto splits. */
-    String doSplit(String markerId)
+    /** Return the childId, or null if the split failed. */
+    String doSplit(String parentId, String childId)
     {
-        Legion legion = getLegionByMarkerId(markerId);
+        Legion legion = getLegionByMarkerId(parentId);
         Player player = legion.getPlayer();
 
         // Need a legion marker to split.
-        if (player.getNumMarkersAvailable() == 0)
+        if (!player.isMarkerAvailable(childId))
         {
             server.showMessageDialog(player.getName(),
-                "No markers are available.");
+                "Marker " + childId + " is not available.");
             return null;
         }
         // Don't allow extra splits in turn 1.
@@ -2246,14 +2293,19 @@ Log.debug("calling doRecruit()");
 
         legion.sortCritters();
 
-        String selectedMarkerId = player.pickMarker();
         Legion newLegion = null;
 
-        String results = server.splitLegion(legion, selectedMarkerId);
+        String results = server.splitLegion(legion, childId);
         if (results != null)
         {
             java.util.List strings = Split.split(',', results);
             String newMarkerId = (String)strings.remove(0);
+            // XXX  Need this sanity check?
+            if (!newMarkerId.equals(childId))
+            {
+                Log.error("Game.doSplit() -- mismatched child ids");
+                return null;
+            }
 
             // Need to replace strings with creatures.
             java.util.List creatures = new ArrayList();
@@ -2264,7 +2316,7 @@ Log.debug("calling doRecruit()");
                 Creature creature = Creature.getCreatureByName(name);
                 creatures.add(creature);
             }
-            newLegion = legion.split(creatures, newMarkerId);
+            newLegion = legion.split(creatures, childId);
 
             // Hide all creatures in both legions.
             legion.hideAllCreatures();

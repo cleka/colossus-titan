@@ -1,5 +1,23 @@
-Add an optional dialog that shows the contents of a legion that flees
-   or concedes.
+Make these dialogs non-modal:
+   PickMarker, AcquireAngel, PickColor, PickLord, PickRecruit, 
+      PickRecruiter, SplitLegion
+Merge PickColor/PickMarker, PickMarker/SplitLegion, 
+   PickRecruit/PickRecruiter, chooseWhetherToTeleport/PickLord 
+   sequences on client side to simplify network traffic and callbacks.
+Move AI functions to client side where useful.
+
+If there is more than one human player, move the active player's
+   map/board to the front.
+Call toBack() on the map/board to move the other one to the front.
+   (Less obnoxious than toFront() when other applications are running.)
+
+Add display of dead creatures / total creatures / creatures in play to
+   CreatureCollectionView.
+Add total value of all a player's creatures to StatusScreen.
+
+Reveal all stacks at game end.
+
+Optionally show the contents of a legion that flees or concedes.
 
 Allow players to specify that they automatically refuse to negotiate.  
    Check for this before showing negotiation dialog to opponent.
@@ -9,11 +27,6 @@ Prompt player whether to continue game after last human player dies.
 Reduce imports between client and server packages.  Document remaining 
    public classes, which are those that need to be included in the 
    network protocol.
-
-Make more dialogs non-modal.  (Can't enforce GUI modality across a
-   network.)
-
-Add factories for remaining dialogs.
 
 Include an .ico file for Windows.
 
@@ -42,6 +55,7 @@ Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
 
 Add a ShowLegionMarkers window that shows each player's remaining 
    legion markers.
+
 Add SetupBattle dialog, to allow setting up standalone battles.  
    (terrain, entry side, creatures in attacking and defending legions,
    angel/archangel available to summon, recruits available for terrain

@@ -20,7 +20,6 @@ import net.sf.colossus.client.Proposal;
 
 public final class Server
 {
-    public static final int port = 1969;
     private Game game;
 
     // XXX How do we keep track of which client goes with which player?
@@ -44,9 +43,9 @@ public final class Server
 
 
     /** Temporary.  We will not use direct client refs later. */
-    void addClient(Client client)
+    void addClient(int playerNum, String playerName)
     {
-        clients.add(client);
+        clients.add(new Client(this, playerNum, playerName));
     }
 
 
@@ -189,7 +188,7 @@ public final class Server
     }
 
 
-    public boolean getClientOption(String playerName, String optname)
+    boolean getClientOption(String playerName, String optname)
     {
         Client client = getClient(playerName);
         if (client != null)
@@ -548,17 +547,6 @@ public final class Server
         }
     }
 
-
-    void allAlignBattleChits(String hexLabel)
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.alignBattleChits(hexLabel);
-        }
-    }
-
     void allAlignBattleChits(Set hexLabels)
     {
         Iterator it = clients.iterator();
@@ -622,7 +610,7 @@ public final class Server
     }
 
 
-    /** Find out if the player wants to acquire and angel or archangel. */
+    /** Find out if the player wants to acquire an angel or archangel. */
     String acquireAngel(String playerName, List recruits)
     {
         String angelType = null;
@@ -806,11 +794,11 @@ public final class Server
     public boolean tryToConcede(String markerId)
     {
         Battle battle = game.getBattle();
-        return game.getBattle().tryToConcede(markerId);
+        return game.getBattle().concede(markerId);
     }
 
 
-    public void twoNegotiate(Legion attacker, Legion defender)
+    void twoNegotiate(Legion attacker, Legion defender)
     {
         Client client1 = getClient(defender.getPlayerName());
         client1.askNegotiate(attacker.getLongMarkerName(), 
@@ -832,7 +820,6 @@ public final class Server
         game.makeProposal(playerName, proposal);
     }
 
-    // XXX Stringify the proposal.
     /** Tell playerName about proposal. */
     void tellProposal(String playerName, Proposal proposal)
     {
@@ -886,6 +873,7 @@ public final class Server
     }
 
 
+    // XXX Stringify the return value.
     public int [] getCritterTags(String hexLabel)
     {
         Battle battle = game.getBattle();
@@ -1267,6 +1255,7 @@ public final class Server
     }
 
 
+    // XXX Stringify the return value.
     public String [] getPlayerInfo()
     {
         String [] info = new String[game.getNumPlayers()];
@@ -1332,10 +1321,19 @@ public final class Server
         return game.getTurnNumber();
     }
 
-    /** Return the splitoffId. */
-    public String doSplit(String markerId)
+
+    // XXX Stringify.
+    /** Return the available legion markers for playerName. */
+    public Set getMarkersAvailable(String playerName)
     {
-        return game.doSplit(markerId);
+        Player player = game.getPlayer(playerName);
+        return player.getMarkersAvailable();
+    }
+
+    /** Return the splitoffId. */
+    public String doSplit(String parentId, String childId)
+    {
+        return game.doSplit(parentId, childId);
     }
 
     public boolean doMove(String markerId, String hexLabel, int entrySide,
@@ -1345,8 +1343,7 @@ public final class Server
     }
 
     /** Return a list of Creatures. */
-    public List findEligibleRecruits(String markerId, 
-        String hexLabel)
+    public List findEligibleRecruits(String markerId, String hexLabel)
     {
         return game.findEligibleRecruits(markerId, hexLabel);
     }
@@ -1439,23 +1436,21 @@ public final class Server
         game.saveGame(filename);
     }
 
-    // XXX Stringify the collection.
-    String pickMarker(String playerName, Collection markersAvailable)
-    {
-        Client client = getClient(playerName);
-        return client.pickMarker(markersAvailable);
-    }
 
-
-    void setPlayerName(int i, String name)
+    void setPlayerName(int playerNum, String name)
     {
-        Client client = getClient(i);
+        Client client = getClient(playerNum);
         client.setPlayerName(name);
     }
 
-    String pickColor(int i, Set colorsLeft)
+    void askPickColor(int playerNum, Set colorsLeft)
     {
-        Client client = getClient(i);
-        return client.pickColor(colorsLeft);
+        Client client = getClient(playerNum);
+        client.askPickColor(colorsLeft);
+    }
+
+    public void assignColor(int playerNum, String color)
+    {
+        game.assignColor(playerNum, color);
     }
 }

@@ -1,4 +1,5 @@
-Colossus alpha     December 31, 2001    Copyright 2001 David Ripton
+Colossus alpha     Copyright 2002 David Ripton
+$Id$
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
@@ -62,8 +63,7 @@ you unzipped the zip file, and try typing "java -jar Colossus.jar"
 
 Yet another option, in case the jar file is temporarily broken for some 
 reason, is to expand the whole game tree and run the Start class manually.  
-Unzip the zip file, make sure there is a file called "Start.class" in 
-the current directory, and try "java Start"
+Unzip the zip file and try "java net.sf.colossus.server.Start"
 
 
 

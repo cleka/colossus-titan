@@ -8,12 +8,16 @@
      Ant 1.4.1+    http://jakarta.apache.org/ant/
         with corresponding optional.jar installed in $ANT_HOME/lib
      JavaCC 2.1    http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
-        Environment var $JAVACC_HOME pointing to JavaCC install root
+        Environment var JAVACC_HOME pointing to JavaCC install root
      To sign jarfiles, you need a file called usernameKeystore,
 	(substituting your username for "username")
         with an alias matching your username, and you need to put
         the password for this key in environment var JARPASSWORD.
-	(Ant won't do keyboard input.)
+	(Ant won't do keyboard password input.)
+     To make a ChangeLog file from cvs history, you need cvs2cl.pl
+        http://www.red-bean.com/cvs2cl/  You also need perl in the path.
+        And you need to have ssh-agent set up so that you can do cvs
+        commands over ssh without password prompts.
 -->
 
 <project name="Colossus" default="jar" basedir=".">
@@ -95,7 +99,8 @@
 
 <target name="javadoc" depends="compile"
         description = "Make javadoc files">
-        <javadoc sourcepath="." destdir="./javadoc"
+        <mkdir dir="javadoc"/>
+        <javadoc sourcepath="." destdir="./javadoc" access="private"
                  packagenames="net.sf.colossus.*"
         />
 </target>
@@ -119,39 +124,6 @@
         <chmod file="Colossus.jar" perm="755"/>
 </target>
 
-
-<!-- TODO If jar is already signed, don't resign. -->
-<target name="sign" depends="jar"
-        description = "Sign jar file">
-        <signjar jar="Colossus.jar"
-                 alias="${user.name}"
-                 keystore="${user.name}Keystore"
-                 storepass="${env.JARPASSWORD}"
-        />
-</target>
-
-
-<target name="dist" depends="init,sign"
-        description = "Make zip file for user download">
-        <zip zipfile="${ZIPFILE}" basedir="."
-             excludes="**/*.sav,
-                 **/*.zip, 
-                 **/*javadoc*/*, 
-                 *Keystore*,
-                 *cfg,
-                 *properties*,
-                 .*"
-        />
-</target>
-
-
-<target name="inst" depends="init,sign,dist"
-        description = "Copy files into htdocs tree on SF"> 
-        <copy file="Colossus.jar" todir="${HTMLDIR}"/>
-        <copy file="docs/README.txt" todir="${HTMLDIR}"/>
-        <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
-        <copy file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
-</target>
 
 
 <!-- Be very careful modifying this.  It whacks whole directories easily. -->
@@ -201,6 +173,53 @@
         description = "Run the game">
         <java jar="Colossus.jar"
               fork="yes"/>
+</target>
+
+
+<!-- Tasks from here down are only needed for installation on the web site. -->
+
+<!-- TODO If jar is already signed, don't sign it again. -->
+<target name="sign" depends="jar"
+        description = "Sign jar file">
+        <signjar jar="Colossus.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+</target>
+
+
+<!-- TODO Get cvs+plink+pageant working in Windows, and then make a Windows
+     version of this task -->
+<target name="changelog" depends=""
+        description = "Create a ChangeLog file from cvs history">
+        <exec executable="cvs2cl.pl" os="Linux,SunOS"> 
+            <arg line="-S --no-wrap --utc"/>
+        </exec>
+</target>
+
+
+<target name="dist" depends="init,sign,changelog"
+        description = "Make zip file for user download">
+        <zip zipfile="${ZIPFILE}" basedir="."
+             excludes="**/*.sav,
+                 **/*.zip, 
+                 **/*javadoc*/*, 
+                 *Keystore*,
+                 *cfg,
+                 *properties*,
+                 .*"
+        />
+</target>
+
+
+<target name="inst" depends="init,sign,dist,changelog"
+        description = "Copy files into htdocs tree on SF"> 
+        <copy file="Colossus.jar" todir="${HTMLDIR}"/>
+        <copy file="docs/README.txt" todir="${HTMLDIR}"/>
+        <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
+        <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
+        <copy file="ChangeLog" todir="${HTMLDIR}"/>
 </target>
 
 

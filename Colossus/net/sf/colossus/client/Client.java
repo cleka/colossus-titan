@@ -9,14 +9,17 @@ import java.awt.event.*;
 import java.awt.*;
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Split;
 import net.sf.colossus.server.Server;
 import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.AI;
+import net.sf.colossus.server.SimpleAI;
 
 
 /**
- *  Class Client lives on the client side and handles all communication
+ *  Lives on the client side and handles all communication
  *  with the server.  It talks to the client classes locally, and to
  *  Server via the network protocol.  There is one client per player.
  *  @version $Id$
@@ -64,16 +67,27 @@ public final class Client
     private Properties options = new Properties();
 
     /** Player who owns this client. */
+    int playerNum;
+
+    /** Player who owns this client. */
     String playerName;
 
     /** Last movement roll for any player. */
     private int movementRoll = -1;
 
+    /** Sorted set of available legion markers for this player. */
+    private TreeSet markersAvailable;
+    private String parentId;
+
+    /** Gradually moving AI to client side. */
+    private AI ai = new SimpleAI();
+
 
     /** Temporary constructor. */
-    public Client(Server server, String playerName)
+    public Client(Server server, int playerNum, String playerName)
     {
         this.server = server;
+        this.playerNum = playerNum;
         this.playerName = playerName;
     }
 
@@ -740,6 +754,11 @@ public final class Client
         return playerName;
     }
 
+    public int getPlayerNum()
+    {
+        return playerNum;
+    }
+
     public void setPlayerName(String playerName)
     {
         this.playerName = playerName;
@@ -774,7 +793,6 @@ public final class Client
     }
 
 
-    /** Called from server. */
     public String pickRecruit(java.util.List recruits, 
         java.util.List imageNames, String hexDescription, String markerId)
     {
@@ -1052,6 +1070,7 @@ public final class Client
             battleDice = new BattleDice();
             frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
             frame.pack();
+            // XXX Does not seem to work.
             frame.toFront();
             map.requestFocus();
             frame.setVisible(true);
@@ -1107,6 +1126,9 @@ public final class Client
 
     public void setupSplitMenu()
     {
+        // XXX Should track this better.
+        initMarkersAvailable();
+
         if (board != null)
         {
             board.setupSplitMenu();
@@ -1395,15 +1417,6 @@ public final class Client
         return server.getTurnNumber();
     }
 
-    void doSplit(String markerId)
-    {
-        String splitoffId = server.doSplit(markerId);
-        if (splitoffId != null)
-        {
-            pushUndoStack(splitoffId);
-        }
-    }
-
     boolean doMove(String hexLabel)
     {
         if (moverId == null)
@@ -1671,14 +1684,83 @@ public final class Client
         return server.getMulligansLeft(playerName);
     }
 
-    public String pickMarker(Collection markersAvailable)
+    // XXX Stringify
+    /** Initialize this player's available legion markers from the server. */
+    void initMarkersAvailable()
     {
-        return PickMarker.pickMarker(board.getFrame(), playerName,
-            markersAvailable);
+        markersAvailable = new TreeSet(
+            MarkerComparator.getMarkerComparator(getShortColor()));
+        markersAvailable.addAll(server.getMarkersAvailable(playerName));
     }
 
-    public String pickColor(Set colorsLeft)
+    // XXX markersAvailable needs to be up to date before this is called.
+    void doSplit(String parentId)
     {
-        return PickColor.pickColor(board.getFrame(), playerName, colorsLeft);
+        this.parentId = parentId;
+
+        if (getOption(Options.autoPickMarker))
+        {
+            String childId = ai.pickMarker(markersAvailable);
+            if (childId == null)
+            {
+                showMessageDialog("No legion markers");
+                this.parentId = null;
+                return;
+            }
+            else
+            {
+                pickMarkerCallback(childId);
+            }
+        }
+        else
+        {
+            new PickMarker(board.getFrame(), playerName, markersAvailable, 
+                this);
+        }
+    }
+
+    /** Second part of doSplit, after the child marker is picked. */
+    void pickMarkerCallback(String childId)
+    {
+        if (parentId == null)
+        {
+            Log.error("Called client.pickMarkerCallback with no parentId");
+        }
+
+        // XXX Not quite right.
+        String splitoffId = server.doSplit(parentId, childId);
+        if (splitoffId != null)
+        {
+            pushUndoStack(splitoffId);
+            markersAvailable.remove(splitoffId);
+        }
+    }
+
+    public void askPickColor(Set colorsLeft)
+    {
+        String color = null;
+        if (getOption(Options.autoPickColor))
+        {
+            // Convert favorite colors from a comma-separated string to a list.
+            String favorites = getStringOption(Options.favoriteColors);
+            java.util.List favoriteColors = null;
+            if (favorites != null)
+            {
+                favoriteColors = Split.split(',', favorites);
+            }
+            else
+            {
+                favoriteColors = new ArrayList();
+            }
+            color = ai.pickColor(colorsLeft, favoriteColors);
+        }
+        else
+        {
+            color = PickColor.pickColor(board.getFrame(), playerName, 
+                colorsLeft);
+        }
+
+        server.assignColor(playerNum, color);
     }
 }
+

@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @version $Id$
  */
-interface AI
+public interface AI
 {
     /** make masterboard moves for current player in the Game */
     void masterMove(Game game);
@@ -57,5 +57,5 @@ interface AI
     String pickColor(Set colors, List favoriteColors);
 
     /** pick a legion marker */
-    String pickMarker(Collection markerIds);
+    String pickMarker(Set markerIds);
 }

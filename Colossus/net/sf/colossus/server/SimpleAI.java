@@ -24,7 +24,7 @@ import net.sf.colossus.client.Proposal;
  */
 
 
-class SimpleAI implements AI
+public class SimpleAI implements AI
 {
     public String pickColor(Set colors, List favoriteColors)
     {
@@ -46,8 +46,7 @@ class SimpleAI implements AI
         return null;
     }
 
-
-    public String pickMarker(Collection markerIds)
+    public String pickMarker(Set markerIds)
     {
         Iterator it = markerIds.iterator();
         if (it.hasNext())

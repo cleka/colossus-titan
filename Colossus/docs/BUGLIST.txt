@@ -176,16 +176,12 @@ Lost a legion marker somewhere?  Try to reproduce.  (Maybe with 1-high
 
 Carry cursor sometimes fails without an error message.  Race condition?
 
-Negotiation is broken and disabled.
-
 Red battle hex highlighting clashes with volcano.
 
 Save game in first turn's move phase, after rolling 6.  Load game, 
    movement roll shows up as -1 in title, no die shown, but works 
    as 6.  Need to fix movement phase initialization timing from 
    loadGame() path.
-
-7-high legion, moves, angel summoned out, can't recruit?  Try to reproduce.
 
 Turn 1, AI in tower 600 rolled 6, moved legions to 136 and 38.  One of those
    moves was illegal.
@@ -202,3 +198,11 @@ MinimaxAI's advancePhase() calls are broken?  8-high starting stack split,
 
 Need to reveal legion contents to each other during negotiation.
 
+Desert 128 got attacked from hills 32.  Defending the "top" (d6 e5 f4) edge.
+   (20020102 build)  Works for me -- build with outdated code?  
+   Try to reproduce.
+
+Can't play with more than one human player.  Does not allow first human to
+   split starting stack.  Works for me -- try to reproduce in Win98.
+
+LogWindow does not appear at start of game even if option is set in cfg file.

@@ -17,23 +17,28 @@ import javax.swing.*;
 final class PickMarker extends JDialog implements MouseListener, WindowListener
 {
     private java.util.List markers = new ArrayList();
-    private static String markerId;
+    private Client client;
 
 
-    private PickMarker(JFrame parentFrame, String name, Collection markerIds)
+    PickMarker(JFrame parentFrame, String name, Set markerIds, Client client)
     {
-        super(parentFrame, name + ": Pick Legion Marker", true);
+        super(parentFrame, name + ": Pick Legion Marker", false);
+
+        this.client = client;
+
+        if (markerIds.isEmpty())
+        {
+            cleanup(null);
+        }
 
         addMouseListener(this);
         addWindowListener(this);
-
         Container contentPane = getContentPane();
 
         int numAvailable = markerIds.size();
         contentPane.setLayout(new GridLayout(0, Math.min(numAvailable, 12)));
 
         pack();
-
         setBackground(Color.lightGray);
 
         Iterator it = markerIds.iterator();
@@ -56,20 +61,13 @@ final class PickMarker extends JDialog implements MouseListener, WindowListener
     }
 
 
-    /** Return the chosen marker id, or null if none are available or
+    /** Pass the chosen marker id, or null if none are available or
      *  the player aborts the selection. */
-    static String pickMarker(JFrame parentFrame, String name,
-        Collection markerIds)
+    private void cleanup(String markerId)
     {
-        if (markerIds.isEmpty())
-        {
-            return null;
-        }
-        markerId = null;
-        new PickMarker(parentFrame, name, markerIds);
-        return markerId;
+        dispose();
+        client.pickMarkerCallback(markerId);
     }
-
 
     public void mousePressed(MouseEvent e)
     {
@@ -78,8 +76,7 @@ final class PickMarker extends JDialog implements MouseListener, WindowListener
         if (i != -1)
         {
             Chit chit = (Chit)markers.get(i);
-            markerId = chit.getId();
-            dispose();
+            cleanup(chit.getId());
         }
     }
 
@@ -109,7 +106,7 @@ final class PickMarker extends JDialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        dispose();
+        cleanup(null);
     }
 
     public void windowDeactivated(WindowEvent e)

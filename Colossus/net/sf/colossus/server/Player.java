@@ -667,7 +667,7 @@ public final class Player implements Comparable
         return markersAvailable.size();
     }
 
-    Collection getMarkersAvailable()
+    Set getMarkersAvailable()
     {
         return markersAvailable;
     }
@@ -679,6 +679,11 @@ public final class Player implements Comparable
             return null;
         }
         return (String)markersAvailable.first();
+    }
+
+    boolean isMarkerAvailable(String markerId)
+    {
+        return markersAvailable.contains(markerId);
     }
 
     /** Removes the selected marker from the list of those available.
@@ -702,7 +707,7 @@ public final class Player implements Comparable
 
     void addLegionMarkers(Player player)
     {
-        Collection newMarkers = player.getMarkersAvailable();
+        Set newMarkers = player.getMarkersAvailable();
         markersAvailable.addAll(newMarkers);
     }
 
@@ -814,29 +819,6 @@ public final class Player implements Comparable
     }
 
 
-    String pickMarker()
-    {
-        String markerId = null;
-        if (game.getServer().getClientOption(name, Options.autoPickMarker))
-        {
-            markerId = aiPickMarker();
-        }
-        else
-        {
-            markerId = game.getServer().pickMarker(name,
-                getMarkersAvailable());
-        }
-        return markerId;
-    }
-
-    String aiPickMarker()
-    {
-        if (game.getServer().getClientOption(name, Options.autoPickMarker))
-        {
-            return ai.pickMarker(getMarkersAvailable());
-        }
-        return null;
-    }
 
     void aiSplit()
     {
@@ -971,6 +953,7 @@ public final class Player implements Comparable
         return null;
     }
 
+/* XXX Move to client side
     String aiPickColor(Set colors)
     {
         // Convert favorite colors from a comma-separated string to a list.
@@ -987,6 +970,7 @@ public final class Player implements Comparable
         }
         return ai.pickColor(colors, favoriteColors);
     }
+*/
 
     // XXX Need to not allow colons in player names.
     /** Return a colon:separated string with a bunch of info for

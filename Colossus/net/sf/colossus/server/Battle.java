@@ -792,12 +792,15 @@ final class Battle
     }
 
 
+
     /** Mark all of the conceding player's critters as dead. */
-    private void concede(String markerId)
+    boolean concede(String playerName)
     {
+        Legion legion = getLegionByPlayerName(playerName);
+        String markerId = legion.getMarkerId();
+        Log.event(markerId + " concedes the battle");
         conceded = true;
 
-        Legion legion = game.getLegionByMarkerId(markerId);
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
@@ -809,15 +812,6 @@ final class Battle
         {
             advancePhase();
         }
-    }
-
-    /** Here for when we eventually do correct concession timing. */
-    boolean tryToConcede(String playerName)
-    {
-        Legion legion = getLegionByPlayerName(playerName);
-        String markerId = legion.getMarkerId();
-        Log.event(markerId + " concedes the battle");
-        concede(markerId);
         return true;
     }
 
