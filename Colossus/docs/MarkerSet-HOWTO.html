@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>HOWTO Add A Marker Set to Colossus</title>
+  </head>
+  <body>
+  <h2>Introduction</h2>
+  This document explains how to add a new set of stack markers to Colossus. 
+  <h2>Requirements</h2>
+  To add a new set you&#39;ll need to supply: 
+  <ul>
+    <li>A new Color, preferably one that cannot be confused with any other, and
+    that cannot be confused with the Masterboard Hexes.</li>
+    <li>A two-letter identifier for the Color, that cannot be confused with any
+    other (see the file 
+    <b>net/sf/colossus/server/Constants.java</b>
+    , the two variables 
+    <b>colorNames</b>
+     and 
+    <b>shortColorNames</b>
+    ). It&#39;s better if it&#39;s meaningful, as it is displayed to the
+    player(s).</li>
+    <li>A single letter color mnemonic used for Color selection. Must be
+    unique. See again 
+    <b>net/sf/colossus/server/Constants.java</b>
+    , array 
+    <b>colorMnemonics</b>
+     .</li>
+    <li>Twelve 56x56 GIF or PNG files (see 
+    <b>Default/MarkersName</b>
+    ). Names must be the 2-letter color description followed by the marker
+    number (between 01 and 12), with the 
+    <b>.gif</b>
+     or 
+    <b>.png</b>
+     extension (lowercase) matching the image type.</li>
+  </ul>
+  <h2>Adding the set</h2>
+  <ul>
+    <li>Add the color to 
+    <b>net/sf/colossus/util/HTMLColor.java</b>
+     as a static member. The name must be the full color name with a 
+    <b>Colossus</b>
+     suffix.</li>
+    <li>Add the color name, short name and mnemonic to 
+    <b>net/sf/colossus/server/Constants.java</b>
+    , in the three relevant arrays (
+    <b>colorNames</b>
+    , 
+    <b>shortColorNames</b>
+     and 
+    <b>colorMnemonics</b>
+    ). Note that the order is important : the AI will choose the first 6 colors
+    before the others, and the order must be the same in all three arrays.</li>
+    <li>Add the image files to the 
+    <b>Default/images/</b>
+     directory.</li>
+    <li>Add the names in 
+    <b>Default/MarkersName</b>
+    ; each name must be associated to the corresponding short description
+    (2-letter + number).</li>
+    <li>Increment the 
+    <b>MAX_MAX_PLAYERS</b>
+     constants in 
+    <b>net/sf/colossus/server/Constants.java</b>
+    .</li>
+  </ul>
+  The Titan Chit is colored on the fly using the color specified in the 
+  <b>HTMLColor</b>
+   file, so you don&#39;t have to worry about it.</body>
+</html>
+
