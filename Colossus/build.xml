@@ -378,6 +378,7 @@
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
         <copy file="ChangeLog" todir="${HTML_DIR}"/>
         <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>
+        <copy todir="${LIBS_DIR}"> <fileset dir="libs"/></copy>
 </target>
 
 <!-- TODO Eliminate double maintenance -->
