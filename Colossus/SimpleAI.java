@@ -151,18 +151,43 @@ class SimpleAI implements AI
             {
                 recruit = Creature.getCreatureByName("Centaur");
                 // else if we have 1 of a tower creature, take a matching one
+		// if more than one tower creature is a possible recruit,
+		// take the one with the more higher-level creatures still available
             }
-            else if (legion.numCreature(Creature.getCreatureByName("Gargoyle")) == 1)
-            {
-                recruit = Creature.getCreatureByName("Gargoyle");
-            }
-            else if (legion.numCreature(Creature.getCreatureByName("Ogre")) == 1)
-            {
-                recruit = Creature.getCreatureByName("Ogre");
-            }
-            else if (legion.numCreature(Creature.getCreatureByName("Centaur")) == 1)
-            {
-                recruit = Creature.getCreatureByName("Centaur");
+            else if ((legion.numCreature(Creature.getCreatureByName("Gargoyle")) == 1) ||
+		     (legion.numCreature(Creature.getCreatureByName("Ogre")) == 1) ||
+		     (legion.numCreature(Creature.getCreatureByName("Centaur")) == 1))
+	    {
+		int cyclopsLeft = game.getCaretaker().getCount(
+		    Creature.getCreatureByName("Cyclops"));
+		int lionLeft = game.getCaretaker().getCount(
+		    Creature.getCreatureByName("Lion"));
+		int trollLeft = game.getCaretaker().getCount(
+                    Creature.getCreatureByName("Troll"));
+		if (legion.numCreature(Creature.getCreatureByName("Gargoyle")) != 1)
+		{ // don't take a gargoyle -> ignore cyclops
+		    cyclopsLeft = -1;
+		}
+		if (legion.numCreature(Creature.getCreatureByName("Ogre")) != 1)
+		{ // don't take an ogre -> ignore troll
+		    trollLeft = -1;
+		}
+		if (legion.numCreature(Creature.getCreatureByName("Centaur")) != 1)
+	        { // don't take a centaur -> ignore lion
+		    lionLeft = -1;
+		}
+		if ((cyclopsLeft >= trollLeft) && (cyclopsLeft >= lionLeft))
+		{
+		    recruit = Creature.getCreatureByName("Gargoyle");
+		}
+		else if ((trollLeft >= cyclopsLeft) && (trollLeft >= lionLeft))
+		{
+		    recruit = Creature.getCreatureByName("Ogre");
+		}
+		else if ((lionLeft >= trollLeft) && (lionLeft >= cyclopsLeft))
+		{
+		    recruit = Creature.getCreatureByName("Centaur");
+		}
                 // else if there's cyclops left and we don't have 2
                 // gargoyles, take a gargoyle
             }
