@@ -232,4 +232,10 @@ public abstract class Hex
                 return (6 + hexside) % 6;
         }
     }
+
+
+    public static void main(String [] args)
+    {
+        MasterHex.main(args);
+    }
 }

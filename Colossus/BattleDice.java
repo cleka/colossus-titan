@@ -203,7 +203,10 @@ public final class BattleDice extends JFrame implements WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        game.setShowDice(false);
+        if (game != null)
+        {
+            game.setShowDice(false);
+        }
     }
 
 
@@ -224,5 +227,42 @@ public final class BattleDice extends JFrame implements WindowListener
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    public static void main(String [] args)
+    {
+        BattleDice battleDice = new BattleDice(null);
+
+        Player player1 = new Player("Attacker", null);
+        player1.setScore(1400);
+        Legion attacker = new Legion("Rd01", null, null, null,
+            Creature.titan, Creature.colossus, Creature.serpent,
+            Creature.archangel, Creature.hydra, Creature.giant,
+            Creature.dragon, null, player1);
+
+        Player player2 = new Player("Defender", null);
+        player2.setScore(1000);
+        Legion defender = new Legion("Bk01", null, null, null,
+            Creature.titan, Creature.colossus, Creature.serpent,
+            Creature.angel, Creature.hydra, Creature.giant,
+            Creature.dragon, null, player2);
+
+        Critter serpent = attacker.getCritter(Creature.serpent);
+        BattleHex hex1 = new BattleHex(1, 1, 60, null, 1, 1);
+        serpent.addBattleInfo(hex1, hex1, null, null, null);
+
+        Critter angel = defender.getCritter(Creature.angel);
+        BattleHex hex2 = new BattleHex(2, 2, 60, null, 2, 2);
+        angel.addBattleInfo(hex2, hex2, null, null, null);
+
+        int targetNumber = 6;
+        int [] rolls = {1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6};
+        int hits = 3;
+        int carries = 0;
+
+        battleDice.setValues(serpent, angel, targetNumber, rolls, hits,
+            carries);
+        battleDice.setup();
     }
 }

@@ -1018,6 +1018,7 @@ public final class Game
     }
 
 
+    // XXX Enumerate possible Exception types
     public Legion readLegion(BufferedReader in, Player player,
         boolean inBattle) throws Exception
     {
@@ -1090,12 +1091,10 @@ public final class Game
         else
         {
             legion = new Legion(markerId, parentId,
-            MasterBoard.getHexFromLabel(currentHexLabel),
-            MasterBoard.getHexFromLabel(startingHexLabel),
-            critters[0], critters[1], critters[2], critters[3],
-            critters[4], critters[5], critters[6], critters[7],
-            player);
-
+                MasterBoard.getHexFromLabel(currentHexLabel),
+                MasterBoard.getHexFromLabel(startingHexLabel),
+                critters[0], critters[1], critters[2], critters[3],
+                critters[4], critters[5], critters[6], critters[7], player);
             player.addLegion(legion);
             MasterHex hex = legion.getCurrentHex();
             hex.addLegion(legion, false);
@@ -1183,6 +1182,7 @@ public final class Game
             String header = "Colossus config file version 1.0";
             options.store(out, header);
         }
+        // XXX Enumerate exception types
         catch (Exception e)
         {
             System.out.println("Couldn't write options to " + optionsPath);
@@ -1201,6 +1201,7 @@ public final class Game
             FileInputStream in = new FileInputStream(optionsPath);
             options.load(in);
         }
+        // XXX Enumerate exception types
         catch (Exception e)
         {
             System.out.println("Couldn't read options from " + optionsPath);

@@ -70,7 +70,10 @@ public final class MovementDie extends JFrame implements WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        game.setShowDice(false);
+        if (game != null)
+        {
+            game.setShowDice(false);
+        }
     }
 
 
@@ -91,5 +94,12 @@ public final class MovementDie extends JFrame implements WindowListener
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    public static void main(String [] args)
+    {
+        MovementDie movementDie = new MovementDie(null);
+        movementDie.showRoll(6);
     }
 }
