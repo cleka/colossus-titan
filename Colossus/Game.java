@@ -408,6 +408,12 @@ class Game extends Frame implements WindowListener, ActionListener
     }
 
 
+    MasterBoard getBoard()
+    {
+        return board;
+    }
+
+
     void advancePhase()
     {
         board.unselectAllHexes();
