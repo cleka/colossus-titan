@@ -813,7 +813,7 @@ Log.debug("Client.makeForcedStrikes() for " + playerName);
             if (chit.isDead())
             {
                 it.remove();
-                // TODO Also remove it from other places.
+                // TODO Also remove it from other places e.g. LegionInfo.
             }
         }
         if (map != null)
@@ -1473,6 +1473,10 @@ Log.debug("called Client.acquireAngelCallback()");
         String recruiterName, int numRecruiters)
     {
         String hexLabel = getHexForLegion(markerId);
+        if (hexLabel == null)
+        {
+            Log.error("Client.didRecruit() null hexLabel for " + markerId);
+        }
         possibleRecruitHexes.remove(hexLabel);
         if (isMyLegion(markerId))
         {
@@ -2271,18 +2275,44 @@ Log.debug("found " + set.size() + " hexes");
     String getPlayerNameByMarkerId(String markerId)
     {
         String shortColor = markerId.substring(0, 2);
+        return getPlayerNameForShortColor(shortColor);
+    }
+
+    String getPlayerNameForShortColor(String shortColor)
+    {
+        PlayerInfo info = null;
+
+        // Stage 1: See if the player who started with this color is alive.
         for (int i = 0; i < playerInfo.length; i++)
         {
-            PlayerInfo info = playerInfo[i];
-            if (!info.isDead() && 
-                (info.getPlayersElim().indexOf(shortColor) != -1 ||
-                shortColor.equals(Player.getShortColor(info.getColor()))))
+            info = playerInfo[i];
+            if (shortColor.equals(info.getShortColor()) && !info.isDead())
             {
                 return info.getName();
             }
         }
+
+        // Stage 2: He's dead.  Find who killed him and see if he's alive.
+
+        for (int i = 0; i < playerInfo.length; i++)
+        {
+            info = playerInfo[i];
+            if (info.getPlayersElim().indexOf(shortColor) != -1)
+            {
+                // We have the killer.
+                if (!info.isDead())
+                {
+                    return info.getName();
+                }
+                else
+                {
+                    return getPlayerNameForShortColor(info.getShortColor());
+                }
+            }
+        }
         return null;
     }
+
 
     boolean isMyLegion(String markerId)
     {

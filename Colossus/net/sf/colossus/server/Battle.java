@@ -935,6 +935,10 @@ Log.debug("Battle.setupSummon() advance will be " + advance);
         }
 
         server.allRemoveDeadBattleChits();
+
+        // XXX Remove these and let the client take care of this.
+        server.allRevealLegion(attacker);
+        server.allRevealLegion(defender);
     }
 
     private void removeDeadCreaturesFromLegion(Legion legion)

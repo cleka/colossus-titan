@@ -1857,8 +1857,8 @@ public class SimpleAI implements AI
                 continue;
             }
 
-            if (bestAngel == null ||
-                Creature.getCreatureByName(myAngel).getPointValue() > 
+            if (bestAngel == null || bestLegion == null ||
+                Creature.getCreatureByName(myAngel).getPointValue() >
                     Creature.getCreatureByName(bestAngel).getPointValue() ||
                 info.compareTo(bestLegion) > 0 &&
                     (Creature.getCreatureByName(myAngel).getPointValue() ==

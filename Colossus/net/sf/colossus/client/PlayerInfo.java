@@ -5,6 +5,7 @@ import java.util.*;
 
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Log;
+import net.sf.colossus.server.Player;
 
 
 /**
@@ -92,6 +93,11 @@ final class PlayerInfo
     String getColor()
     {
         return color;
+    }
+
+    String getShortColor()
+    {
+        return Player.getShortColor(getColor());
     }
 
     String getPlayersElim()

@@ -1,12 +1,7 @@
-Bug: Legion heights on masterboard not updated during battle.
-Bug: Enemy legion appeared 5 high, but changed to 6 high after
-   attacking it.  Summoned / acquired angel not updated?
-
-Update credits. 
+Add balanced tower setup option.
 
 Add "no 2s or 5s" mulligan option.
 Add optional additional handicap mulligans that can be used after turn 1.
-Add balanced tower setup option.
 
 Remember GetPlayers settings in server.cfg
 

@@ -354,13 +354,17 @@ public final class Game
         }
     }
 
+
     /** Randomize towers by rolling dice and rerolling ties. */
     private void assignTowers()
     {
+        boolean balanced = getOption(Options.balancedTowers);
+Log.debug("Called Game.assignTowers() with balanced = " + balanced);
+
         int numPlayers = getNumPlayers();
         String[] playerTower = new String[numPlayers];
         Set towerSet = MasterBoard.getTowerSet();
-        java.util.List towerList = new ArrayList();
+        ArrayList towerList = new ArrayList();
 
         Iterator it = towerSet.iterator();
         while (it.hasNext())
@@ -368,18 +372,15 @@ public final class Game
             towerList.add(it.next());
         }
 
+        // Make sure towers are ordered for balanced setup.
+        Collections.sort(towerList);
+
         int playersLeft = numPlayers - 1;
 
         while ((playersLeft >= 0) && (!towerList.isEmpty()))
         {
             int which = rollDie(towerList.size());
-            it = towerList.iterator();
-            for (int i = 1; i < which ; i++)
-            {
-                Object o = it.next();
-            }
-            playerTower[playersLeft] = (String)it.next();
-            it.remove();
+            playerTower[playersLeft] = (String)towerList.remove(which - 1);
             playersLeft--;
         }
 
@@ -1598,8 +1599,9 @@ public final class Game
      *  number algorithms, use an external dice server, etc. */
     static int rollDie()
     {
-        return random.nextInt(6) + 1;
+        return rollDie(6);
     }
+
     static int rollDie(int size)
     {
         return random.nextInt(size) + 1;

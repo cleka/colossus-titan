@@ -596,12 +596,13 @@ public final class MasterBoard extends JPanel
         // allow changing them.
         if (client.isPrimary())
         {
-            addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
             addCheckBox(gameMenu, Options.allStacksVisible, KeyEvent.VK_S);
+// TODO addCheckBox(gameMenu, Options.balancedTowers, KeyEvent.VK_B);
+            addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
+            addCheckBox(gameMenu, Options.autoQuit, KeyEvent.VK_Q);
             addCheckBox(gameMenu, Options.logDebug, KeyEvent.VK_L);
             mi = gameMenu.add(changeAIDelayAction);
             mi.setMnemonic(KeyEvent.VK_D);
-            addCheckBox(gameMenu, Options.autoQuit, KeyEvent.VK_Q);
         }
 
         // Then per-player options
@@ -1922,47 +1923,68 @@ public final class MasterBoard extends JPanel
     {
         super.paintComponent(g);
 
-        Rectangle rectClip = g.getClipBounds();
-
         // Abort if called too early.
-        if (rectClip == null)
+        if (g.getClipBounds() == null)
         {
             return;
         }
 
+        try
+        {
+            paintHexes(g);
+            paintMarkers(g);
+            paintRecruitChits(g);
+            paintMovementDie(g);
+        }
+        catch (ConcurrentModificationException ex)
+        {
+            // Don't worry about it -- we'll just paint again.
+        }
+    }
+
+    private void paintHexes(Graphics g)
+    {
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (rectClip.intersects(hex.getBounds()))
+            if (g.getClipBounds().intersects(hex.getBounds()))
             {
                 hex.paint(g);
             }
         }
+    }
 
-        // Paint markers in z-order.
-        it = client.getMarkers().iterator();
+    /** Paint markers in z-order. */
+    private void paintMarkers(Graphics g)
+    {
+        Iterator it = client.getMarkers().iterator();
         while (it.hasNext())
         {
             Marker marker = (Marker)it.next();
-            if (marker != null && rectClip.intersects(marker.getBounds()))
+            if (marker != null && 
+                g.getClipBounds().intersects(marker.getBounds()))
             {
                 marker.paintComponent(g);
             }
         }
+    }
 
-        // Paint recruitChits
-        it = client.getRecruitChits().iterator();
+    private void paintRecruitChits(Graphics g)
+    {
+        Iterator it = client.getRecruitChits().iterator();
         while (it.hasNext())
         {
             Chit chit = (Chit)it.next();
-            if (chit != null && rectClip.intersects(chit.getBounds()))
+            if (chit != null && g.getClipBounds().intersects(chit.getBounds()))
             {
                 chit.paintComponent(g);
             }
         }
+    }
 
-        // Paint MovementDie
+    private void paintMovementDie(Graphics g)
+    {
         if (client != null)
         {
             MovementDie die = client.getMovementDie();
@@ -2026,7 +2048,9 @@ public final class MasterBoard extends JPanel
         {
             Hex bh = (Hex)it.next();
             if (bh.getTerrain() == 'T')
+            {
                 towerSet.add(bh.getLabel());
+            }
         }
     }
 

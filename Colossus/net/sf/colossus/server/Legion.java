@@ -1007,6 +1007,13 @@ final class Legion implements Comparable
                 game.getCaretaker().takeOne(critter);
             }
         }
+
+        // TODO Join packet.
+        // Let the client know that the legions have recombined.
+        game.getServer().oneRevealLegion(legion, legion.getPlayerName());
+        // TODO Just update the one legion's height.
+        game.getServer().allFullyUpdateLegionHeights();   
+
         if (remove)
         {
             remove();

@@ -613,6 +613,7 @@ public final class Player implements Comparable
         game.getServer().allUpdatePlayerInfo();
         game.getServer().undidSplit(splitoffId);
         game.getServer().oneRevealLegion(parent, getName());
+        game.getServer().allFullyUpdateLegionHeights();
     }
 
 

@@ -35,6 +35,7 @@ public final class Options
     public static final String allStacksVisible = "All stacks visible";
     public static final String aiDelay = "AI delay";
     public static final String autoQuit = "Auto quit when game over";
+    public static final String balancedTowers = "Balanced towers";
 
 
     private static final String [] serverOptions = 
