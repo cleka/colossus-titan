@@ -4,7 +4,6 @@ package net.sf.colossus.server;
 import java.util.*;
 
 import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Minimax;
 import net.sf.colossus.util.Probs;
 import net.sf.colossus.util.Perms;
 import net.sf.colossus.client.MasterHex;
@@ -2937,7 +2936,7 @@ public class SimpleAI implements AI
     }
 
 
-    class CritterMove implements Minimax.Move
+    class CritterMove
     {
         private int value;
         private Critter critter;
