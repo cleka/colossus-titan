@@ -269,6 +269,7 @@ class Player
         commitMoves();
 
         // Clear old entry side and teleport information.
+System.out.println("game.getBoard().clearAllEntrySides()");
         game.getBoard().clearAllEntrySides();
 
         movementRoll = (int) Math.ceil(6 * Math.random());
