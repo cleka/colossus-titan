@@ -21,6 +21,11 @@ public class BattleMemo implements Serializable
     public String getMasterHex() { return m_strMasterHex; }
     public int getEntrySide() { return m_nEntrySide; }
 
+    public String toString()
+    {
+        return "BattleMemo[a: " + getAttacker().toString() + ", d: " + getDefender().toString() + "]";
+    }
+
     public BattleMemo(
         LegionMemo oAttacker,
         LegionMemo oDefender,
