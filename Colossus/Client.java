@@ -380,10 +380,7 @@ public final class Client
 
     private void disposeMovementDie()
     {
-        if (movementDie != null)
-        {
-            movementDie = null;
-        }
+        movementDie = null;
     }
 
     public MovementDie getMovementDie()
@@ -587,16 +584,17 @@ public final class Client
 
     public void initBattleDice()
     {
-        battleDice = new BattleDice(this);
+        battleDice = new BattleDice();
+        map.getFrame().getContentPane().add(battleDice, BorderLayout.SOUTH);
     }
 
     public void disposeBattleDice()
     {
-        if (battleDice != null)
+        if (map != null && battleDice != null)
         {
-            battleDice.dispose();
-            battleDice = null;
+            map.getFrame().remove(battleDice);
         }
+        battleDice = null;
     }
 
     public void disposeMasterBoard()

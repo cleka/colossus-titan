@@ -9,11 +9,8 @@ import javax.swing.*;
  */
 
 
-public final class BattleDice extends JFrame implements WindowListener
+public final class BattleDice extends JPanel
 {
-    private Client client;
-    private GridBagLayout gridbag = new GridBagLayout();
-    private GridBagConstraints constraints = new GridBagConstraints();
     private Insets insets = new Insets(5, 5, 5, 5);
     private static Point location;
     private String attackerName;
@@ -32,20 +29,12 @@ public final class BattleDice extends JFrame implements WindowListener
     private Chit [] dice;
 
 
-    public BattleDice(Client client)
+    public BattleDice()
     {
-        super("Battle Dice Rolls");
-
-        this.client = client;
         setVisible(false);
-        addWindowListener(this);
-        setupIcon();
-        Container contentPane = getContentPane();
-        contentPane.setLayout(gridbag);
-        pack();
+        setLayout(new FlowLayout());
 
         setBackground(Color.lightGray);
-        setResizable(false);
 
         // Move dialog to saved location, or middle right of screen.
         if (location == null)
@@ -106,45 +95,26 @@ public final class BattleDice extends JFrame implements WindowListener
         // Last row: label like "4 hits, 0 possible carries"
 
         setVisible(false);
-        Container contentPane = getContentPane();
-        contentPane.removeAll();
+        removeAll();
 
         label1.setText(attackerName + " in " +
             HexMap.getHexByLabel(terrain, attackerHexId).getDescription() +
             " attacks " + defenderName + " in " +
             HexMap.getHexByLabel(terrain, defenderHexId).getDescription());
         label1.setAlignmentX(Label.LEFT_ALIGNMENT);
-        constraints.gridy = 0;
-        constraints.gridwidth = 6;
-        constraints.ipadx = 0;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = insets;
-        gridbag.setConstraints(label1, constraints);
-        contentPane.add(label1);
+        add(label1);
 
         label2.setText("Rolling " + numDice + " dice with target number " +
             targetNumber);
         label3.setAlignmentX(Label.LEFT_ALIGNMENT);
-        constraints.gridy = 1;
-        constraints.gridwidth = 6;
-        constraints.ipadx = 0;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = insets;
-        gridbag.setConstraints(label2, constraints);
-        contentPane.add(label2);
+        add(label2);
 
         dice = new Chit[numDice];
         for (int i = 0; i < numDice; i++)
         {
-            dice[i] = new Chit(4 * Scale.get(), getDieImageName(rolls[i]),
+            dice[i] = new Chit(2 * Scale.get(), getDieImageName(rolls[i]),
                 this);
-            constraints.gridy = 2 + (i / 6);
-            constraints.gridwidth = 1;
-            constraints.ipadx = 5;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = insets;
-            gridbag.setConstraints(dice[i], constraints);
-            contentPane.add(dice[i]);
+            add(dice[i]);
         }
 
         String hitString;
@@ -167,15 +137,7 @@ public final class BattleDice extends JFrame implements WindowListener
         }
         label3.setText(hits + hitString + carries + carryString);
         label3.setAlignmentX(Label.LEFT_ALIGNMENT);
-        constraints.gridy = 3 + numDice / 6;
-        constraints.gridwidth = 6;
-        constraints.ipadx = 0;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = insets;
-        gridbag.setConstraints(label3, constraints);
-        contentPane.add(label3);
-
-        pack();
+        add(label3);
 
         // If the dialog is moving off the right edge of the screen,
         // move it left until it fits.
@@ -195,62 +157,5 @@ public final class BattleDice extends JFrame implements WindowListener
     public void rescale()
     {
         showRoll();
-    }
-
-
-    private void setupIcon()
-    {
-        try
-        {
-            setIconImage(Toolkit.getDefaultToolkit().getImage(
-                getClass().getResource(Chit.getImagePath(
-                Creature.colossus.getImageName()))));
-        }
-        catch (NullPointerException e)
-        {
-            Log.error(e.toString() + " Couldn't find " +
-                Creature.colossus.getImageName());
-            dispose();
-        }
-    }
-
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-        if (client != null)
-        {
-            client.setOption(Options.showDice, false);
-        }
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-    }
-
-
-    /** Never grab the keyboard focus. */
-    public boolean isFocusTraversable()
-    {
-        return false;
     }
 }
