@@ -301,7 +301,7 @@ public class TerrainRecruitLoader
     {
         String name = el.getAttribute("name").getValue();
         int points = el.getAttribute("points").getIntValue();
-        String terrain = el.getAttributeValue("name");
+        String terrain = el.getAttributeValue("terrain");
         acquirableData ad = new acquirableData(name, points);
         if (terrain != null)
         {
