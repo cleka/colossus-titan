@@ -114,7 +114,7 @@ public class MasterBoard extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            System.out.println("waitForAll was interrupted");
+            new MessageBox(this, "waitForAll was interrupted");
         }
 
         imagesLoaded = true;
@@ -122,8 +122,8 @@ public class MasterBoard extends Frame implements MouseListener,
         repaint();
 
         // XXX temporary test call
-        SplitLegion splitlegion = new SplitLegion(this, 
-            game.player[0].legions[0], game.player[0]);
+        //SplitLegion splitlegion = new SplitLegion(this, 
+        //    game.player[0].legions[0], game.player[0]);
     }
 
 
@@ -724,9 +724,7 @@ public class MasterBoard extends Frame implements MouseListener,
                     // Show info about this legion.
                     ShowLegion showlegion = new ShowLegion(this, 
                         game.player[i].legions[j], point);
-                    // XXX: Work around a bug in the windowing system
-                    // by reducing the clipping region to only what
-                    // was covered by that dialog?
+                    // XXX Excessive repaint here.
                     return;
                 }
             }
