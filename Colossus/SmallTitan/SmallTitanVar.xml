@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<variant name="SmallTitan">
+    <strategic_map filename="SmallTitanMap.xml" />
+    <creatures filename="DefaultCre.xml" />
+    <terrain_recruits filename="DefaultTer.xml" />
+    <max_players num="3" />
+    <hint classname="Default.DefaultHint" />
+</variant>

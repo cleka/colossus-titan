@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<variant name="Outlands">
+    <strategic_map filename="OutlandsMap.xml" />
+    <creatures filename="DefaultCre.xml" />
+    <terrain_recruits filename="DefaultTer.xml" />
+    <hint classname="Default.DefaultHint" />
+</variant>

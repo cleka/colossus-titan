@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<variant name="TG-SetII">
+    <strategic_map filename="DefaultMap.xml" />
+    <terrain_recruits filename="DefaultTer.xml" />
+    <creatures filename="DefaultCre.xml" />
+    <hint classname="Default.DefaultHint" />
+</variant>

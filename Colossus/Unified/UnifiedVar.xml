@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<variant name="Unified">
+    <strategic_map filename="UnifiedMap.xml" />
+    <creatures filename="UnifiedCre.xml" />
+    <terrain_recruits filename="UnifiedTer.xml" />
+    <hint classname="Default.DefaultHint" />
+    <depends>
+        <depend variant="Default" />
+        <depend variant="Abyssal6" />
+        <depend variant="Undead" />
+    </depends>
+</variant>

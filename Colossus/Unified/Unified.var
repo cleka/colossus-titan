@@ -1,5 +1,0 @@
-MAP:UnifiedMap.xml
-CRE:UnifiedCre.xml
-TER:UnifiedTer.xml
-HINT:Default.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin
-DEPEND:Default,Abyssal6,Undead

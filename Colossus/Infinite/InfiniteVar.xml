@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<variant name="Infinite">
+    <strategic_map filename="InfiniteMap.xml" />
+    <creatures filename="InfiniteCre.xml" />
+    <terrain_recruits filename="DefaultTer.xml" />
+    <hint filename="Default.DefaultHint" />
+</variant>

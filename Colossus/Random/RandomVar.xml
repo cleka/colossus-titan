@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<variant name="Random">
+    <strategic_map filename="RandomMap.xml" />
+    <terrain_recruits filename="RandomTer.xml" />
+    <hint classname="Default.DefaultHint" />
+</variant>
