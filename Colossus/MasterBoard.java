@@ -49,6 +49,7 @@ public class MasterBoard extends Frame implements MouseListener,
     private static int scale;
     private static Game game;
     private boolean eraseFlag = false;
+    private boolean summoningAngel = false;
 
 
     public MasterBoard(Game game)
@@ -380,6 +381,8 @@ public class MasterBoard extends Frame implements MouseListener,
         int count = 0;
         Player player = game.getActivePlayer();
 
+        unselectAllHexes();
+
         for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion legion = player.legions[i];
@@ -393,6 +396,47 @@ public class MasterBoard extends Frame implements MouseListener,
         }
 
         return count;
+    }
+
+    
+    // Returns number of legions with summonable angels.
+    int highlightSummonableAngels(Legion legion)
+    {
+        int count = 0;
+        Player player = legion.getPlayer();
+        player.unselectLegion();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion candidate = player.legions[i];
+            if (candidate != legion)
+            {
+                MasterHex hex = candidate.getCurrentHex();
+                if ((candidate.numCreature(Creature.angel) > 0 ||
+                    candidate.numCreature(Creature.archangel) > 0) &&
+                    !hex.isEngagement())
+                {
+                    
+                    count++; 
+                    hex.select();
+                    hex.repaint();
+                }
+            }
+        }
+
+        if (count > 0)
+        {
+            summoningAngel = true;
+        }
+
+        return count;
+    }
+
+
+    void finishSummoningAngel()
+    {
+        summoningAngel = false;
+        highlightEngagements();
     }
 
 
@@ -1082,8 +1126,7 @@ public class MasterBoard extends Frame implements MouseListener,
                                     if (legion.getHeight() < 7 && 
                                         legion.hasMoved())
                                     {
-                                        PickRecruit pickrecruit = new 
-                                            PickRecruit(this, legion);
+                                        new PickRecruit(this, legion);
                                     }
                                     // If we recruited, unselect this hex.
                                     if (legion.hasMoved() == false)
@@ -1132,9 +1175,16 @@ public class MasterBoard extends Frame implements MouseListener,
                             break;
 
                         // If we're fighting and there is an engagement here,
-                        // resolve it.
+                        // resolve it.  If an angel is being summoned, mark
+                        // the donor legion instead.
                         case Game.FIGHT:
-                            if (hex.isEngagement())
+                            if (summoningAngel)
+                            {
+                                Legion attacker =
+                                    hex.getFriendlyLegion(player);
+                                player.selectLegion(attacker);
+                            }
+                            else if (hex.isEngagement())
                             {
                                 Legion attacker = 
                                     hex.getFriendlyLegion(player);
@@ -1143,26 +1193,19 @@ public class MasterBoard extends Frame implements MouseListener,
 
                                 if (defender.canFlee()) 
                                 {
+                                    // Fleeing gives half points and denies the
+                                    // attacker the chance to summon an angel.
                                     new Concede(this, defender, attacker, 
                                         true);
                                 }
 
-                                if (hex.getNumEnemyLegions(player) > 0)
+                                if (hex.isEngagement())
                                 {
-                                    // Either player may concede.  Prompt the
-                                    // attacker.  Only bother to prompt the
-                                    // defender if he couldn't flee.
+                                    // The attacker may concede now without 
+                                    // allowing the defender a reinforcement.
 
                                     new Concede(this, attacker, defender, 
                                         false);
-                                    if (hex.isEngagement())
-                                    {
-                                        if (defender.canFlee() == false)
-                                        {
-                                            new Concede(this, defender, 
-                                                attacker, false);
-                                        }
-                                    }
 
                                     // The players may agree to a negotiated
                                     // settlement.
@@ -1172,16 +1215,24 @@ public class MasterBoard extends Frame implements MouseListener,
                                             defender);
                                     }
 
-                                    // If the defender won the battle by
-                                    // agreement, he may recruit.
-                                    if (hex.isEngagement() == false &&
-                                        hex.getLegion(0) == defender)
+                                    if (hex.isEngagement() == false)
                                     {
-                                        PickRecruit pickrecruit = new 
-                                            PickRecruit(this, defender);
+                                        if (hex.getLegion(0) == defender)
+                                        {
+                                            // If the defender won the battle 
+                                            // by agreement, he may recruit.
+                                            new PickRecruit(this, defender);
+                                        }
+                                        else 
+                                        {
+                                            // If the attacker won the battle 
+                                            // by agreement, he may summon 
+                                            // an angel.
+                                            new SummonAngel(this, attacker);
+                                        }
                                     }
 
-                                    // XXX: Add battle
+                                    // XXX: Add battle.
                                 }
                             }
                             break;
