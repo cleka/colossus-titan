@@ -1,3 +1,4 @@
 *.sav
 *.zip
 javacore.txt
+.*.swp
