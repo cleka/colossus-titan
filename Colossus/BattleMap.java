@@ -378,6 +378,19 @@ public class BattleMap extends JFrame implements MouseListener,
             }
         }
     }
+    
+    
+    // Mark all of the conceding player's chits as dead.
+    void concede(Player player)
+    {
+        for (int i = 0; i < numChits; i++)
+        {
+            if (chits[i].getPlayer() == player)
+            {
+                chits[i].setDead(true);
+            }
+        }
+    }
 
 
     void commitMoves()
