@@ -2207,12 +2207,9 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     }
 
 
-    // TODO Finish error checks.
-    /** Return true if the split is legal.  Each legion must have
-     *  height >= 2.  If this was an initial split, each legion
-     *  must have height == 4 and one lord. */
-    private boolean isSplitLegal(String parentId, String childId, 
-        String results)
+    /** Return true and call Server.didSplit() if the split succeeded. 
+     *  Return false if it failed. */
+    boolean doSplit(String parentId, String childId, String results)
     {
         Legion legion = getLegionByMarkerId(parentId);
         Player player = legion.getPlayer();
@@ -2233,9 +2230,39 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             return false;
         }
 
+        if (results == null)
+        {
+            return false;
+        }
+        java.util.List strings = Split.split(',', results);
+        java.util.List creatures = new ArrayList();
+        Iterator it = strings.iterator();
+        while (it.hasNext())
+        {
+            String name = (String)it.next();
+            Creature creature = Creature.getCreatureByName(name);
+            creatures.add(creature);
+        }
+
+
         // Each legion must have 2+ creatures after the split.
+        if (creatures.size() < 2 || legion.getHeight() - creatures.size() < 2)
+        {
+            return false;
+        }
 
         // All creatures in results must be in the legion.
+        java.util.List tempCreatures = (java.util.List)
+            (((ArrayList)legion.getCritters()).clone());
+        it = creatures.iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            if (!tempCreatures.remove(creature))
+            {
+                return false;
+            }
+        }
 
         if (getTurnNumber() == 1) 
         {
@@ -2246,43 +2273,29 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
                     "Cannot split twice on Turn 1.");
                 return false;
             }
-            // Each stack must contain exactly 4 characters.
+            // Each stack must contain exactly 4 creatures.
+            if (creatures.size() != 4)
+            {
+                return false;
+            }
             // Each stack must contain exactly 1 lord.
-        }
-        if (results == null)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-
-    /** Return true if the split succeeded. */
-    boolean doSplit(String parentId, String childId, String results)
-    {
-        if (!isSplitLegal(parentId, childId, results))
-        {
-            return false;
+            int numLords = 0;
+            it = creatures.iterator();
+            while (it.hasNext())
+            {
+                Creature creature = (Creature)it.next();
+                if (creature.isLord())
+                {
+                    numLords++;
+                }
+            }
+            if (numLords != 1)
+            {
+                return false;
+            }
         }
 
-        Legion legion = getLegionByMarkerId(parentId);
-        Player player = legion.getPlayer();
-        Legion newLegion = null;
-
-        java.util.List strings = Split.split(',', results);
-
-        // Replace strings with creatures.
-        java.util.List creatures = new ArrayList();
-        Iterator it = strings.iterator();
-        while (it.hasNext())
-        {
-            String name = (String)it.next();
-            Creature creature = Creature.getCreatureByName(name);
-            creatures.add(creature);
-        }
-        newLegion = legion.split(creatures, childId);
-
+        Legion newLegion = legion.split(creatures, childId);
         if (newLegion == null)
         {
             return false;

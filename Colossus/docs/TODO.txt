@@ -76,6 +76,21 @@ Bug: Got two "All humans eliminated" dialogs -- one for human and one
 
 Bug: LOSTest is failing.
 
+Bug: 1_LATEST_IS_date is broken in remote_inst.
+
+Have server send marker names.
+Let client pick starting marker along with color.
+
+Somewhat randomize AI marker selection. 
+
+Toolbar, or at least Done button.
+
+Make server enforce legal splits.
+
+Add failure packets for illegal splits, moves, strikes, etc.
+
+Change some JDialogs to JFrames to allow separate minimizing?
+
 When saving game explicitly (not with autosave), log the event
    and the full savegame path.
 
@@ -85,6 +100,8 @@ Should be able to move recruit chart behind board, map.
 
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 
+
+Wait cursor / progress indicator / waiting for X text
 
 Should be able to clear recruitChits in any phase.  Move to Graphics menu?
 
