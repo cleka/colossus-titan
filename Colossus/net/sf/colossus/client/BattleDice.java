@@ -144,8 +144,10 @@ final class BattleDice extends JPanel
 
         if (numDice > 0)
         {
-            hitBox.setVisible(true);
-            missBox.setVisible(true);
+            if (averageMiss < numDice)
+                hitBox.setVisible(true);
+            if (averageMiss > 0)
+                missBox.setVisible(true);
         }
 
         invalidate();
