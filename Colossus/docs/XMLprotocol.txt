@@ -266,7 +266,16 @@ Messages (server to one or more clients)
 </accept>
     An offer was accepted.  Each legion's losses are shown.
 
-<fight hex="[land]" />
+<fight hex="[land]">
+    <attacker name="[legion]">
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
+    </attacker>
+    <defender name="[legion]">
+        <creature name="[creature1]">
+        <creature name="[creatureN]">
+    </defender>
+</fight>
     A battle will be fought.
 
 <enter creature="[creature]" hex="[battlehex]" />
