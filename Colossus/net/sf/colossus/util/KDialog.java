@@ -12,18 +12,24 @@ import javax.swing.*;
 
 public class KDialog extends JDialog implements MouseListener, WindowListener
 {
+    JComponent newContentPane = null;
+
     /** Only support one of JDialog's many constructor forms. */    
     public KDialog (Frame owner, String title, boolean modal)
     {
         super(owner, title, modal);
 
-        Container cont = getContentPane();
+        Container cont = super.getContentPane();
+        
+        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
+        newContentPane = new JPanel();
+        cont.add(new JLabel(title));
+        cont.add(newContentPane);
+    }
 
-        if (cont instanceof JComponent)
-        {
-            ((JComponent)cont).setBorder(
-                 new javax.swing.border.TitledBorder(title));
-        }
+    public Container getContentPane()
+    {
+        return newContentPane;
     }
 
     /** Place dialog relative to parentFrame's origin, offset by 
