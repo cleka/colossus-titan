@@ -267,14 +267,11 @@ class Player
 
         for (int i = 0; i < getNumLegions(); i++)
         {
-            if (game.getBoard().showMoves(getLegion(i)) > 0)
+            if (game.getBoard().countMoves(getLegion(i)) > 0)
             {
                 count++;
             }
         }
-
-        // Re-highlight legions to clean up after showMoves()
-        game.getBoard().highlightUnmovedLegions();
 
         return count;
     }
@@ -374,8 +371,6 @@ class Player
         {
             legions[i].undoMove();
         }
-
-        allowTeleport();
     }
 
     

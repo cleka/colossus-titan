@@ -239,13 +239,13 @@ class MasterBoard extends Frame implements MouseListener,
 
     // Clear all entry side and teleport information from all hexes occupied
     // by one or fewer legions.
-    public void clearAllNonengagementEntrySides()
+    public void clearAllUnoccupiedEntrySides()
     {
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j] && h[i][j].getNumLegions() <= 1)
+                if (show[i][j] && h[i][j].getNumLegions() == 0)
                 {
                     h[i][j].clearAllEntrySides();
                     h[i][j].clearTeleported();
@@ -279,7 +279,7 @@ class MasterBoard extends Frame implements MouseListener,
     //    the direction you just came from.  Return the number of
     //    moves found.
     private int findMoves(MasterHex hex, Player player, Legion legion,
-        int roll, int block, int cameFrom)
+        int roll, int block, int cameFrom, boolean show)
     {
         int count = 0;
 
@@ -290,11 +290,15 @@ class MasterBoard extends Frame implements MouseListener,
         {
             if (hex.getNumFriendlyLegions(player) == 0)
             {
-                hex.select();
-                hex.repaint();
+                if (show)
+                {
+                    hex.select();
+                    hex.repaint();
+
+                    // Set the entry side relative to the hex label.
+                    hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
+                }
                 
-                // Set the entry side relative to the hex label.
-                hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
             }
             return count;
         }
@@ -312,12 +316,14 @@ class MasterBoard extends Frame implements MouseListener,
                     return count;
                 }
             }
-            hex.select();
-            hex.repaint();
-
-            // Need to set entry sides even if no possible engagement,
-            // for MasterHex.chooseWhetherToTeleport()
-            hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
+            if (show)
+            {
+                hex.select();
+                hex.repaint();
+                // Need to set entry sides even if no possible engagement,
+                // for MasterHex.chooseWhetherToTeleport()
+                hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
+            }
 
             count++;
             return count;
@@ -327,7 +333,7 @@ class MasterBoard extends Frame implements MouseListener,
         if (block >= 0)
         {
             count += findMoves(hex.getNeighbor(block), player, legion,
-                roll - 1, -2, (block + 3) % 6);
+                roll - 1, -2, (block + 3) % 6, show);
         }
         else if (block == -1)
         {
@@ -336,7 +342,7 @@ class MasterBoard extends Frame implements MouseListener,
                 if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
                 {
                     count += findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, -2, (i + 3) % 6);
+                        roll - 1, -2, (i + 3) % 6, show);
                 }
             }
         }
@@ -347,7 +353,7 @@ class MasterBoard extends Frame implements MouseListener,
                 if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
                 {
                     count += findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, -2, (i + 3) % 6);
+                        roll - 1, -2, (i + 3) % 6, show);
                 }
             }
         }
@@ -360,15 +366,18 @@ class MasterBoard extends Frame implements MouseListener,
     // all unoccupied hexes within 6 hexes.  Teleports to towers
     // are handled separately.  Do not double back.
     private void findTowerTeleportMoves(MasterHex hex, Player player,
-        Legion legion, int roll, int cameFrom)
+        Legion legion, int roll, int cameFrom, boolean show)
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
 
         if (!hex.isOccupied())
         {
-            hex.select();
-            hex.repaint();
+            if (show)
+            {
+                hex.select();
+                hex.repaint();
+            }
             // Mover can choose side of entry.
             hex.setTeleported();
         }
@@ -381,24 +390,41 @@ class MasterBoard extends Frame implements MouseListener,
                    hex.getEntranceType(i) != MasterHex.NONE))
                 {
                     findTowerTeleportMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, (i + 3) % 6);
+                        roll - 1, (i + 3) % 6, show);
                 }
             }
         }
     }
 
-
+    
+    // Return number of legal non-teleport moves.
+    public int countMoves(Legion legion)
+    {
+        return countAndMaybeShowMoves(legion, false);
+    }
+    
+    
     // Return number of legal non-teleport moves.
     public int showMoves(Legion legion)
     {
-        unselectAllHexes();
+        return countAndMaybeShowMoves(legion, true);
+    }
+
+
+    // Return number of legal non-teleport moves.
+    private int countAndMaybeShowMoves(Legion legion, boolean show)
+    {
+        if (show)
+        {
+            unselectAllHexes();
+        }
 
         if (legion.hasMoved())
         {
             return 0;
         }
 
-        clearAllNonengagementEntrySides();
+        clearAllUnoccupiedEntrySides();
 
         int count = 0;
 
@@ -420,7 +446,7 @@ class MasterBoard extends Frame implements MouseListener,
         Player player = legion.getPlayer();
 
         count += findMoves(hex, player, legion, player.getMovementRoll(),
-            block, -1);
+            block, -1, show);
 
         if (player.getMovementRoll() == 6)
         {
@@ -429,7 +455,7 @@ class MasterBoard extends Frame implements MouseListener,
                 player.canTeleport())
             {
                 // Mark every unoccupied hex within 6 hexes.
-                findTowerTeleportMoves(hex, player, legion, 6, -1);
+                findTowerTeleportMoves(hex, player, legion, 6, -1, show);
 
                 // Mark every unoccupied tower.
                 for (int tower = 100; tower <= 600; tower += 100)
@@ -437,10 +463,13 @@ class MasterBoard extends Frame implements MouseListener,
                     hex = getHexFromLabel(tower);
                     if (!hex.isOccupied())
                     {
-                        hex.select();
-                        hex.repaint();
-                        // Mover can choose side of entry.
-                        hex.setTeleported();
+                        if (show)
+                        {
+                            hex.select();
+                            hex.repaint();
+                            // Mover can choose side of entry.
+                            hex.setTeleported();
+                        }
                     }
                 }
             }
@@ -462,10 +491,13 @@ class MasterBoard extends Frame implements MouseListener,
                                 getCurrentHex();
                             if (!hex.isEngagement())
                             {
-                                hex.select();
-                                hex.repaint();
-                                // Mover can choose side of entry.
-                                hex.setTeleported();
+                                if (show)
+                                {
+                                    hex.select();
+                                    hex.repaint();
+                                    // Mover can choose side of entry.
+                                    hex.setTeleported();
+                                }
                             }
                         }
                     }
