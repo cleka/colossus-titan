@@ -79,7 +79,9 @@ public class SummonAngel extends JDialog implements MouseListener,
         archangelChit.setDead(true);
 
         button1 = new JButton("Summon");
+        button1.setMnemonic(KeyEvent.VK_S);
         button2 = new JButton("Cancel");
+        button2.setMnemonic(KeyEvent.VK_C);
         constraints.gridy = 1;
         gridbag.setConstraints(button1, constraints);
         contentPane.add(button1);
@@ -132,36 +134,6 @@ public class SummonAngel extends JDialog implements MouseListener,
 
         // Let the game know to leave the angel-summoning state.
         board.getGame().finishSummoningAngel();
-    }
-
-
-    public void update(Graphics g)
-    {
-        Dimension d = getSize();
-
-        // Prevent repaint loop by only calling repaint if the
-        // donor is new.
-        Legion oldDonor = donor;
-        donor = player.getSelectedLegion();
-        if (donor != null && donor != oldDonor)
-        {
-            int angels = donor.numCreature(Creature.angel);
-            angelChit.setDead(angels == 0);
-            angelChit.repaint();
-
-            int archangels = donor.numCreature(Creature.archangel);
-            archangelChit.setDead(archangels == 0);
-            archangelChit.repaint();
-        }
-
-        button1.repaint();
-        button2.repaint();
-    }
-
-
-    public void paint(Graphics g)
-    {
-        update(g);
     }
 
 
@@ -240,6 +212,23 @@ public class SummonAngel extends JDialog implements MouseListener,
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    /** Upstate state of angel and archangel chits to reflect donor */
+    public void updateChits()
+    {
+        donor = player.getSelectedLegion();
+        if (donor == null)
+        {
+            return;
+        }
+
+        int angels = donor.numCreature(Creature.angel);
+        int archangels = donor.numCreature(Creature.archangel);
+
+        angelChit.setDead(angels == 0);
+        archangelChit.setDead(archangels == 0);
     }
 
 

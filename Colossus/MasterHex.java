@@ -12,8 +12,9 @@ public class MasterHex extends Hex
     private boolean inverted;
     private ArrayList legions = new ArrayList(3);
     private MasterBoard board;
-    private static FontMetrics fontMetrics;
-    private static int halfFontHeight;
+    private FontMetrics fontMetrics;
+    private int halfFontHeight;
+    private String name;
 
     private MasterHex [] neighbors = new MasterHex[6];
 
@@ -116,8 +117,8 @@ public class MasterHex extends Hex
             fontMetrics = g.getFontMetrics();
             halfFontHeight = (fontMetrics.getMaxAscent() + 
                 fontMetrics.getLeading()) >> 1;
+            name = getTerrainName().toUpperCase();
         }
-        String name = getTerrainName().toUpperCase();
 
         switch (getLabelSide())
         {

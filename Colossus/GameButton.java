@@ -17,6 +17,7 @@ public class GameButton extends JButton implements ActionListener
     public GameButton(GameApplet applet)
     {
         super("Start");
+        setMnemonic(KeyEvent.VK_S);
         addActionListener(this);
         this.applet = applet;
     }

@@ -29,7 +29,6 @@ public class Battle
     private Legion activeLegion;
     private MasterBoard board;
     private MasterHex masterHex;
-    private BattleTurn turn;
     private SummonAngel summonAngel;
     private ShowDice showDice;
 
@@ -60,9 +59,9 @@ public class Battle
         defender.clearBattleTally();
 
         map = new BattleMap(board, masterHex, this);
-
-        turn = new BattleTurn(map, this);
-        turn.setupMoveDialog();
+        
+        // XXX Assumes that battles load at the beginning of a phase.
+        map.setupPhase();
 
         showDice = new ShowDice(map.getFrame());
     }
@@ -124,21 +123,21 @@ public class Battle
         {
             phase = MOVE;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            turn.setupMoveDialog();
+            map.setupMove();
         }
         
         else if (phase == RECRUIT)
         {
             phase = MOVE;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            turn.setupMoveDialog();
+            map.setupMove();
         }
 
         else if (phase == MOVE)
         {
             phase = FIGHT;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            turn.setupFightDialog();
+            map.setupFight();
         }
 
         else if (phase == FIGHT)
@@ -154,7 +153,7 @@ public class Battle
 
             phase = STRIKEBACK;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
-            turn.setupFightDialog();
+            map.setupFight();
         }
 
         else if (phase == STRIKEBACK)
@@ -170,7 +169,7 @@ public class Battle
                     phase = SUMMON;
                     Game.logEvent(getActivePlayer().getName() + 
                         "'s battle turn, number " + turnNumber);
-                    turn.setupSummonDialog();
+                    map.setupSummon();
                     startSummoningAngel();
                 }
                 else
@@ -184,7 +183,7 @@ public class Battle
                         if (attacker.numCreature(Creature.titan) != 0)
                         {
                             // This is the attacker's titan stack, so the 
-                            // defender gets his markers plus half points 
+                            // defender gets his markers plus half points
                             // for his unengaged legions.
                             Player player = attacker.getPlayer();
                             attacker.remove();
@@ -199,7 +198,7 @@ public class Battle
                     else
                     {
                         phase = RECRUIT;
-                        turn.setupRecruitDialog();
+                        map.setupRecruit();
                         Game.logEvent(getActivePlayer().getName() + 
                             "'s battle turn, number " + turnNumber);
                     }
@@ -230,8 +229,13 @@ public class Battle
                 summoningAngel = true;
 
                 // Make sure the MasterBoard is visible.
-                board.deiconify();
-                board.getFrame().show();
+                JFrame masterFrame = board.getFrame();
+                if (masterFrame.getState() == JFrame.ICONIFIED)
+                {
+                    masterFrame.setState(JFrame.NORMAL);
+                }
+                // XXX And bring it to the front.
+                masterFrame.show();
 
                 summonAngel = new SummonAngel(board, attacker);
                 board.getGame().setSummonAngel(summonAngel);
@@ -888,7 +892,8 @@ public class Battle
         if (isForcedStrikeRemaining())
         {
             highlightChitsWithTargets();
-            JOptionPane.showMessageDialog(map, "Engaged creatures must strike.");
+            JOptionPane.showMessageDialog(map,
+                "Engaged creatures must strike.");
         }
         else
         {
@@ -1575,12 +1580,6 @@ public class Battle
     }
 
 
-    public BattleTurn getTurn()
-    {
-        return turn;
-    }
-
-
     public ShowDice getShowDice()
     {
         return showDice;
@@ -1679,6 +1678,8 @@ public class Battle
 
     public void cleanup()
     {
+        map.dispose();
+
         // Handle any after-battle angel summoning or recruiting.
         if (masterHex.getNumLegions() == 1)
         {
@@ -1691,9 +1692,13 @@ public class Battle
                     if (board != null)
                     {
                         // Make sure the MasterBoard is visible.
-                        board.deiconify();
-                        // And bring it to the front.
-                        board.getFrame().show();
+                        JFrame masterFrame = board.getFrame();
+                        if (masterFrame.getState() == JFrame.ICONIFIED)
+                        {
+                            masterFrame.setState(JFrame.NORMAL);
+                        }
+                        // XXX And bring it to the front.
+                        //board.getFrame().show();
     
                         SummonAngel summonAngel = new SummonAngel(board,
                             getAttacker());
@@ -1706,7 +1711,7 @@ public class Battle
                 // Recruit reinforcement
                 if (legion.canRecruit())
                 {
-                    new PickRecruit(map.getFrame(), legion);
+                    new PickRecruit(board.getFrame(), legion);
                 }
             }
 
@@ -1716,13 +1721,6 @@ public class Battle
             // Heal all creatures in the winning legion.
             legion.healAllCreatures();
         }
-
-        if (turn != null)
-        {
-            turn.cleanup();
-        }
-
-        map.dispose();
 
         board.getGame().finishBattle();
     }

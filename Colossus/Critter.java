@@ -49,7 +49,7 @@ public class Critter extends Creature
 
         this.visible = visible;
         this.legion = legion;
-        if (getName().equals("Titan"))
+        if (name.equals("Titan"))
         {
             setPower(getPlayer().getTitanPower());
         }
@@ -150,7 +150,7 @@ public class Critter extends Creature
     public int getPower()
     {
         // Update Titan power if necessary.
-        if (getName().equals("Titan"))
+        if (name.equals("Titan"))
         {
             setPower(getPlayer().getTitanPower());
         }
@@ -284,7 +284,7 @@ public class Critter extends Creature
 
     public void moveToHex(BattleHex hex)
     {
-        Game.logEvent(getName() + " moves from " + currentHex.getLabel() +
+        Game.logEvent(name + " moves from " + currentHex.getLabel() +
             " to " + hex.getLabel());
 
         currentHex.removeCritter(this);
@@ -303,7 +303,7 @@ public class Critter extends Creature
         currentHex.addCritter(this);
         moved = false;
         battle.clearLastCritterMoved();
-        Game.logEvent(getName() + " undoes move and returns to " +
+        Game.logEvent(name + " undoes move and returns to " +
             startingHex.getLabel());
         map.repaint();
     }
@@ -323,7 +323,7 @@ public class Critter extends Creature
             dice /= 2;
 
             // Dragon rangestriking from volcano: +2
-            if (getName().equals("Dragon") &&
+            if (name.equals("Dragon") &&
                 currentHex.getTerrain() == 'v')
             {
                 dice += 2;
@@ -333,8 +333,7 @@ public class Critter extends Creature
         {
             // Dice can be modified by terrain.
             // Dragon striking from volcano: +2
-            if (getName().equals("Dragon") &&
-                currentHex.getTerrain() == 'v')
+            if (name.equals("Dragon") && currentHex.getTerrain() == 'v')
             {
                 dice += 2;
             }
@@ -410,7 +409,7 @@ public class Critter extends Creature
             }
 
         }
-        else if (!getName().equals("Warlock"))
+        else if (!name.equals("Warlock"))
         {
             // Range penalty
             if (battle.getRange(currentHex, targetHex) == 4)
@@ -471,7 +470,7 @@ public class Critter extends Creature
         if (targetHex.getTerrain() == 'r' &&
             target.isNativeBramble() &&
             !isNativeBramble() &&
-            !(rangestrike && getName().equals("Warlock")))
+            !(rangestrike && name.equals("Warlock")))
         {
             strikeNumber++;
         }
@@ -527,7 +526,7 @@ public class Critter extends Creature
         // Sanity check
         if (target.getPlayer() == getPlayer())
         {
-            System.out.println(getName() + " tried to strike allied " +
+            System.out.println(name + " tried to strike allied " +
                 target.getName());
             return;
         }
@@ -711,7 +710,7 @@ public class Critter extends Creature
         showDice.setCarries(carryDamage);
         showDice.setup();
 
-        Game.logEvent(getName() + " in " + currentHex.getLabel() +
+        Game.logEvent(name + " in " + currentHex.getLabel() +
             " strikes " + target.getName() + " in " +
             targetHex.getLabel() + " with strike number " +
             strikeNumber + " : " + rollString + ": " + damage +

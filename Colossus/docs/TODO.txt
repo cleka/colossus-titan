@@ -1,19 +1,26 @@
+Hook up remaining options in MasterBoard menu.
+Show movement die roll graphically.
+Add keyboard legion selection?
+Add toolbars?
+Add status bar to bottom of MasterBoard?
+
+Log carries.  Get out of carry mode when there are carries 
+   but no carry targets left.
+
 Copy entrySide and teleported from MasterHex to Legion.
 
 Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
-   undo moves.
+   undo moves.  "Done with Engagements" shouldn't be necessary.
 
-Have BattleMap, PickEntrySide, ShowBattleMap extend JPanel
-   instead of JFrame.  Separate the map out into a HexMap class
-   that can be used in all three.
-Have MasterBoard extend JPanel instead of JFrame.  
-Have Chit extend JPanel instead of Canvas.
-Add menus. They should duplicate the functionality of 
-   Turn/BattleTurn and add additional functions like
-   save/load/new game, options, etc.
-Add keyboard shortcuts to menus.
-Change Turn and BattleTurn into JToolBars?
+Add tooltips?
+
+
+Separate the battlemap out into a common HexMap class? 
+
+Allow dismissing StatusScreen and ShowDice.
+
+Finish XML savegame file.  Write saveGameXML and loadGameXML.
 
 Highlight selected legion better. 
 Differently-highlight hexes where a legion could move if
@@ -37,9 +44,6 @@ Add server menu for save game, load game, new game, autosave, visible
    stacks option, ability to create or dismiss status screen, 
    PickRecruits vs.  always reveal the biggest/smallest possible 
    recruiter.  Read option defaults from a config file.
-
-Improve savegame file.  XML?  Need the ability to save/load at any time
-   during a turn, not just at the end. 
 
 Fix concession timing.
 

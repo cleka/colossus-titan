@@ -44,7 +44,8 @@ Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
 Solaris, jdk1.3: Mutual elimination, with defender's titan killed.
    Got the message "Legion XXXX is eliminated" twice for the
    attacking legion, once for the defender.  OK when just attacking
-   titan is killed.
+   titan is killed.  For a mutual with no titans, the message appears
+   twice for each legion: A, D, A, D
 
 Solaris, jdk1.3: Square (red, black, or white) in NW corner of board 
    and map.  Partial marker?  Doesn't appear on board when 
@@ -61,4 +62,17 @@ Solaris, jdk1.3: Removed dead creature was half painted.  Went away
 Solaris, jdk1.3: Ranger in bramble rangestrikes behemoth in bramble,
    titan range 3.  Target number is 4.  Shouldn't it be 5?  (1 penalty
    for each bramble)  Check rules.
+
+Solaris, jdk1.3: Post-battle SummonAngel obscured by MasterBoard popping 
+   to front.  masterFrame.show() needed?
+NullPointer at Game.doFight (2501)  donor with no marker?
+Chits in SummonAngel do not lose the X when a valid donor is clicked.
+   Summon button works.  Clicking chit does not.  Fixed?
+
+Solaris, jdk1.3: BattleMap menu is not immediately active.  It takes a 
+   few seconds to wake up.
+
+Solaris, jdk1.3: JPopupMenu mnemonics don't work.
+
+Get out of carry mode when there are carries but no carry targets left.
 

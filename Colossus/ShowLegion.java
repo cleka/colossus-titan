@@ -26,7 +26,7 @@ public class ShowLegion extends JDialog implements MouseListener, WindowListener
         // Place dialog relative to parentFrame's origin, and fully on-screen.
         Point parentOrigin = parentFrame.getLocation();
         Point origin = new Point(point.x + parentOrigin.x - scale, point.y +
-            parentOrigin.y - scale);
+            parentOrigin.y);
         if (origin.x < 0)
         {
             origin.x = 0;

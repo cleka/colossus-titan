@@ -106,6 +106,10 @@ public class Legion
             player.addPoints(points);
 
             JFrame masterFrame = player.getGame().getBoard().getFrame();
+            if (masterFrame.getState() == JFrame.ICONIFIED)
+            {
+                masterFrame.setState(JFrame.NORMAL);
+            }
             int score = player.getScore();
             int tmpScore = score;
             boolean didArchangel = false;
@@ -687,6 +691,7 @@ public class Legion
             Critter critter = (Critter)it.next();
             if (critter.isLord())
             {
+                // Add Creatures rather than Critters to combine angels.
                 lords.add(critter.getCreature());
             }
         }

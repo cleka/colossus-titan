@@ -10,15 +10,11 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class PickEntrySide extends JDialog implements ActionListener,
+public class PickEntrySide extends JPanel implements ActionListener,
     WindowListener
 {
     private static BattleHex [][] h = new BattleHex[6][6];
     private static ArrayList hexes = new ArrayList(27);
-
-    private static Image offImage;
-    private static Graphics offGraphics;
-    private static Dimension offDimension;
 
     private static int scale;
 
@@ -31,10 +27,12 @@ public class PickEntrySide extends JDialog implements ActionListener,
     private static boolean laidOut;
     private static boolean hexesReady;
 
+    private JDialog dialog;
+
 
     public PickEntrySide(JFrame parentFrame, MasterHex masterHex)
     {
-        super(parentFrame, "Pick entry side", true);
+        dialog = new JDialog(parentFrame, "Pick entry side", true);
 
         // Reinitialize these every time, since they're static.
         laidOut = false;
@@ -42,7 +40,7 @@ public class PickEntrySide extends JDialog implements ActionListener,
 
         this.masterHex = masterHex;
 
-        Container contentPane = getContentPane();
+        Container contentPane = dialog.getContentPane();
 
         contentPane.setLayout(null);
 
@@ -52,6 +50,7 @@ public class PickEntrySide extends JDialog implements ActionListener,
         if (masterHex.canEnterViaSide(5))
         {
             button5 = new JButton("Left");
+            button5.setMnemonic(KeyEvent.VK_L); 
             contentPane.add(button5);
             button5.addActionListener(this);
         }
@@ -59,6 +58,7 @@ public class PickEntrySide extends JDialog implements ActionListener,
         if (masterHex.canEnterViaSide(3))
         {
             button3 = new JButton("Bottom");
+            button3.setMnemonic(KeyEvent.VK_B); 
             contentPane.add(button3);
             button3.addActionListener(this);
         }
@@ -66,28 +66,33 @@ public class PickEntrySide extends JDialog implements ActionListener,
         if (masterHex.canEnterViaSide(1))
         {
             button1 = new JButton("Right");
+            button1.setMnemonic(KeyEvent.VK_R); 
             contentPane.add(button1);
             button1.addActionListener(this);
         }
 
-        addWindowListener(this);
-
-        pack();
+        dialog.addWindowListener(this);
 
         setSize(getPreferredSize());
-        setResizable(false);
+        contentPane.add(this);
+        dialog.pack();
+
+        dialog.setSize(getPreferredSize());
+        dialog.setResizable(false);
         setBackground(Color.white);
+        dialog.setBackground(Color.white);
 
         SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), null, hexes);
         hexesReady = true;
 
-        setVisible(true);
-        repaint();
+        dialog.setVisible(true);
     }
     
 
-    public void update(Graphics g)
+    public void paintComponent(Graphics g)
     {
+        super.paintComponent(g);
+
         Dimension d = getSize();
 
         // Abort if called too early.
@@ -124,15 +129,6 @@ public class PickEntrySide extends JDialog implements ActionListener,
             laidOut = true;
         }
 
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(d.width, d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
@@ -140,12 +136,10 @@ public class PickEntrySide extends JDialog implements ActionListener,
             {
                 if (rectClip.intersects(hex.getBounds()))
                 {
-                    hex.paint(offGraphics);
+                    hex.paint(g);
                 }
             }
         }
-
-        g.drawImage(offImage, 0, 0, this);
 
         if (button1 != null)
         {
@@ -159,13 +153,6 @@ public class PickEntrySide extends JDialog implements ActionListener,
         {
             button5.repaint();
         }
-    }
-
-
-    /** Double-buffer everything. */
-    public void paint(Graphics g)
-    {
-        update(g);
     }
 
 
@@ -192,7 +179,7 @@ public class PickEntrySide extends JDialog implements ActionListener,
             masterHex.setEntrySide(side);
         }
 
-        dispose();
+        dialog.dispose();
     }
 
 

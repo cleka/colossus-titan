@@ -6,7 +6,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class Creature
+public class Creature implements Comparable
 {
     protected String name;
     protected String pluralName;
@@ -281,5 +281,20 @@ public class Creature
     public String toString()
     {
         return name;
+    }
+
+
+    /** Compare by name.  Inconsistent with equals. */
+    public int compareTo(Object object) throws ClassCastException
+    {
+        if (object instanceof Creature)
+        {
+            Creature other = (Creature)object;
+            return (name.compareTo(other.name));
+        }
+        else
+        {
+            throw new ClassCastException();
+        }
     }
 }

@@ -29,45 +29,44 @@ public class MasterBoard extends JPanel implements MouseListener,
     private static Game game;
 
     private JFrame masterFrame;
+    private JMenuItem mi;
+    private JMenuBar menuBar;
+    private JMenu fileMenu;
+    private JMenu phaseMenu;
+    private JMenu optionsMenu;
     private JPopupMenu popupMenu;
-    private JMenuItem menuItemRecruitInfo; 
-    private JMenuItem menuItemBattleMap;
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
+
     private Container contentPane;
 
-    private JMenuBar menuBar;
-    private JMenu fileMenu;
-    private JMenu actionMenu;
-    private JMenu optionsMenu;
+    static final String newGame = "New game";
+    static final String loadGame = "Load game";
+    static final String saveGame = "Save game";
+    static final String saveGameAs = "Save game as";
+    static final String concedeBattle = "Concede battle";
 
-    static final String newGame = "<html><b>N</b>ew game";
-    static final String openGame = "<html><b>O</b>pen game";
-    static final String saveGame = "<html><b>S</b>ave game";
-    static final String saveGameAs = "<html>Save game as";
-    static final String concedeBattle = "<html><b>C</b>oncede battle";
-    static final String autosave = "<html>Autosave";
-    static final String allStacksVisible = "<html>All stacks visible";
-    static final String autopickRecruiter = "<html>Autopick recruiter";
-    static final String showGameStatus = "<html>Show game status";
-    static final String showDice = "<html>Show dice";
+    static final String autosave = "Autosave";
+    static final String allStacksVisible = "All stacks visible";
+    static final String autopickRecruiter = "Autopick recruiter";
+    static final String showGameStatus = "Show game status";
+    static final String showDice = "Show dice";
 
-    static final String undoLastSplit = "<html>Undo <b>L</b>ast Split";
-    static final String undoAllSplits = "<html>Undo <b>A</b>ll Splits";
-    static final String withdrawFromGame = "<html><b>W</b>ithdraw from Game";
-    static final String doneWithSplits = "<html><b>D</b>one with Splits";
-    static final String undoLastMove = "<html>Undo <b>L</b>ast Move";
-    static final String undoAllMoves = "<html>Undo <b>A</b>ll Moves";
-    static final String takeMulligan = "<html>Take <b>M</b>ulligan";
-    static final String doneWithMoves = "<html><b>D</b>one with Moves";
-    static final String doneWithEngagements = 
-        "<html><b>D</b>one with Engagements";
-    static final String undoLastRecruit = "<html>Undo <b>L</b>ast Recruit";
-    static final String undoAllRecruits = "<html>Undo <b>A</b>ll Recruits";
-    static final String doneWithTurn = "<html><b>D</b>one with Turn";
-    static final String viewRecruitInfo = "<html>View Recruit Info";
-    static final String viewBattleMap = "<html>View Battle Map";
+    static final String undoLastSplit = "Undo Last Split";
+    static final String undoAllSplits = "Undo All Splits";
+    static final String withdrawFromGame = "Withdraw from Game";
+    static final String doneWithSplits = "Done with Splits";
+    static final String undoLastMove = "Undo Last Move";
+    static final String undoAllMoves = "Undo All Moves";
+    static final String takeMulligan = "Take Mulligan";
+    static final String doneWithMoves = "Done with Moves";
+    static final String doneWithEngagements = "Done with Engagements";
+    static final String undoLastRecruit = "Undo Last Recruit";
+    static final String undoAllRecruits = "Undo All Recruits";
+    static final String doneWithTurn = "Done with Turn";
+    static final String viewRecruitInfo = "View Recruit Info";
+    static final String viewBattleMap = "View Battle Map";
 
     AbstractAction undoLastSplitAction;
     AbstractAction undoAllSplitsAction;
@@ -83,6 +82,15 @@ public class MasterBoard extends JPanel implements MouseListener,
     AbstractAction withdrawFromGameAction;
     AbstractAction viewRecruitInfoAction;
     AbstractAction viewBattleMapAction;
+    AbstractAction newGameAction;
+    AbstractAction loadGameAction;
+    AbstractAction saveGameAction;
+    AbstractAction saveGameAsAction;
+    AbstractAction autosaveAction; 
+    AbstractAction allStacksVisibleAction;
+    AbstractAction autopickRecruiterAction;
+    AbstractAction showGameStatusAction;
+    AbstractAction showDiceAction;
 
 
     public MasterBoard(Game game)
@@ -104,13 +112,12 @@ public class MasterBoard extends JPanel implements MouseListener,
         addMouseListener(this);
 
         setupActions();
-        initializePopupMenu();
-        initializeTopMenu();
+        setupPopupMenu();
+        setupTopMenu();
 
         SetupMasterHexes.setupHexes(h, this, hexes);
         
         contentPane.add(this, BorderLayout.CENTER);
-        
         masterFrame.pack();
 
         masterFrame.setVisible(true);
@@ -185,7 +192,7 @@ public class MasterBoard extends JPanel implements MouseListener,
                 if (player.getMulligansLeft() == 0)
                 {
                     // Remove the Take Mulligan button, and reroll movement. 
-                    setupMoveDialog();
+                    setupPhase();
                 }
                 // Remove all moves from MasterBoard.
                 unselectAllHexes();
@@ -338,15 +345,347 @@ public class MasterBoard extends JPanel implements MouseListener,
                 }
             }
         };
+        
+        newGameAction = new AbstractAction(newGame)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            }
+        };
+        
+        loadGameAction = new AbstractAction(loadGame)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            }
+        };
+        
+        saveGameAction = new AbstractAction(saveGame)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            }
+        };
+        
+        saveGameAsAction = new AbstractAction(saveGameAs)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            }
+        };
+
+        autosaveAction = new AbstractAction(autosave)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            }
+        };
+
+        allStacksVisibleAction = new AbstractAction(allStacksVisible)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            }
+        };
+
+        autopickRecruiterAction = new AbstractAction(autopickRecruiter)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            }
+        };
+
+        showGameStatusAction = new AbstractAction(showGameStatus)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            }
+        };
+
+        showDiceAction = new AbstractAction(showDice)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            }
+        };
+    }
+    
+    
+    private void setupPopupMenu()
+    {
+        popupMenu = new JPopupMenu();
+        contentPane.add(popupMenu);
+
+        mi = popupMenu.add(viewRecruitInfoAction);
+        mi.setMnemonic(KeyEvent.VK_R);
+
+        mi = popupMenu.add(viewBattleMapAction);
+        mi.setMnemonic(KeyEvent.VK_B);
     }
 
 
-    // XXX temp
+    private void setupTopMenu()
+    {
+        menuBar = new JMenuBar();
+        masterFrame.setJMenuBar(menuBar);
+        
+        fileMenu = new JMenu("File");
+        fileMenu.setMnemonic(KeyEvent.VK_F);
+        menuBar.add(fileMenu);
+        mi = fileMenu.add(newGameAction);
+        mi.setMnemonic(KeyEvent.VK_N);
+        mi = fileMenu.add(loadGameAction);
+        mi.setMnemonic(KeyEvent.VK_L);
+        mi = fileMenu.add(saveGameAction);
+        mi.setMnemonic(KeyEvent.VK_S);
+        mi = fileMenu.add(saveGameAsAction);
+        mi.setMnemonic(KeyEvent.VK_A);
+
+        // Phase menu items change by phase and will be set up later.
+        phaseMenu = new JMenu("Phase");
+        phaseMenu.setMnemonic(KeyEvent.VK_P);
+        menuBar.add(phaseMenu);
+
+        optionsMenu = new JMenu("Options");
+        optionsMenu.setMnemonic(KeyEvent.VK_O);
+        menuBar.add(optionsMenu);
+
+        mi = new JCheckBoxMenuItem(autosave);
+        mi.setMnemonic(KeyEvent.VK_A);
+        optionsMenu.add(mi);
+        mi = new JCheckBoxMenuItem(allStacksVisible);
+        mi.setMnemonic(KeyEvent.VK_S);
+        optionsMenu.add(mi);
+        mi = new JCheckBoxMenuItem(autopickRecruiter);
+        mi.setMnemonic(KeyEvent.VK_P);
+        optionsMenu.add(mi);
+        mi = new JCheckBoxMenuItem(showGameStatus);
+        mi.setMnemonic(KeyEvent.VK_G);
+        optionsMenu.add(mi);
+        mi = new JCheckBoxMenuItem(showDice);
+        mi.setMnemonic(KeyEvent.VK_D);
+        optionsMenu.add(mi);
+    }
+
+
     private void advancePhase()
     {
+        game.advancePhase();
+        setupPhase();
     }
-    private void setupMoveDialog()
+
+
+    public void setupPhase()
     {
+        switch (game.getPhase())
+        {
+            case Game.SPLIT:
+                setupSplit();
+                break;
+            case Game.MOVE:
+                setupMove();
+                break;
+            case Game.FIGHT:
+                setupFight();
+                break;
+            case Game.MUSTER:
+                setupMuster();
+                break;
+            default:
+                System.out.println("Bogus phase");
+        }
+    }
+    
+    
+    private void setupPhaseMenu()
+    {
+        switch (game.getPhase())
+        {
+            case Game.SPLIT:
+                setupSplitMenu();
+                break;
+            case Game.MOVE:
+                setupMoveMenu();
+                break;
+            case Game.FIGHT:
+                setupFightMenu();
+                break;
+            case Game.MUSTER:
+                setupMusterMenu();
+                break;
+            default:
+                System.out.println("Bogus phase");
+        }
+    }
+
+
+    private void setupSplit()
+    {
+        Player player = game.getActivePlayer();
+
+        // If there are no markers available, skip forward to movement.
+        if (player.getNumMarkersAvailable() == 0)
+        {
+            advancePhase();
+        }
+        else
+        {
+            masterFrame.setTitle(player.getName() + " Turn " + 
+                game.getTurnNumber() + " : Split stacks");
+
+            setupSplitMenu();
+
+            // Highlight hexes with legions that are 7 high.
+            player.highlightTallLegions();  
+        }
+    }
+
+
+    private void setupSplitMenu()
+    {
+        phaseMenu.removeAll();
+
+        mi = phaseMenu.add(undoLastSplitAction);
+        mi.setMnemonic(KeyEvent.VK_U);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
+
+        mi = phaseMenu.add(undoAllSplitsAction);
+        mi.setMnemonic(KeyEvent.VK_A);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+
+        mi = phaseMenu.add(doneWithSplitsAction);
+        mi.setMnemonic(KeyEvent.VK_D);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(withdrawFromGameAction);
+        mi.setMnemonic(KeyEvent.VK_W);
+    }
+
+
+    private void setupMove()
+    {
+        Player player = game.getActivePlayer();
+        
+        player.rollMovement();
+        
+        masterFrame.setTitle(player.getName() + " Turn " + 
+            game.getTurnNumber() + " : Movement Roll: " + 
+            player.getMovementRoll() + " ");
+
+        setupMoveMenu();
+
+        // Highlight hexes with legions that can move.
+        game.highlightUnmovedLegions();
+    }
+    
+    
+    private void setupMoveMenu()
+    {
+        phaseMenu.removeAll();
+
+        mi = phaseMenu.add(undoLastMoveAction);
+        mi.setMnemonic(KeyEvent.VK_U);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
+
+        mi = phaseMenu.add(undoAllMovesAction);
+        mi.setMnemonic(KeyEvent.VK_A);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+
+        mi = phaseMenu.add(doneWithMovesAction);
+        mi.setMnemonic(KeyEvent.VK_D);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+        if (game.getActivePlayer().getMulligansLeft() > 0)
+        {
+            phaseMenu.addSeparator();
+            mi = phaseMenu.add(takeMulliganAction);
+            mi.setMnemonic(KeyEvent.VK_M);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
+        }
+
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(withdrawFromGameAction);
+        mi.setMnemonic(KeyEvent.VK_W);
+    }
+
+
+    private void setupFight()
+    {
+        // Highlight hexes with engagements.
+        // If there are no engagements, move forward to the muster phase.
+        if (game.highlightEngagements() < 1)
+        {
+            advancePhase();
+        }
+        else
+        {
+            String playerName = game.getActivePlayer().getName();
+            masterFrame.setTitle(playerName + " Turn " + 
+                game.getTurnNumber() + " : Resolve Engagements ");
+
+            setupFightMenu();
+        }
+    }
+    
+    
+    private void setupFightMenu()
+    {
+        phaseMenu.removeAll();
+
+        mi = phaseMenu.add(doneWithEngagementsAction);
+        mi.setMnemonic(KeyEvent.VK_D);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(withdrawFromGameAction);
+        mi.setMnemonic(KeyEvent.VK_W);
+    }
+
+
+    private void setupMuster()
+    {
+        Player player = game.getActivePlayer();
+        if (player.isDead())
+        {
+            advancePhase();
+        }
+        else
+        {
+            masterFrame.setTitle(player.getName() + " Turn " + 
+                game.getTurnNumber() + " : Muster Recruits ");;
+
+            setupMusterMenu();
+
+            // Highlight hexes with legions eligible to muster.
+            game.highlightPossibleRecruits();
+        }
+    }
+            
+
+    private void setupMusterMenu()
+    {
+        phaseMenu.removeAll();
+
+        mi = phaseMenu.add(undoLastRecruitAction);
+        mi.setMnemonic(KeyEvent.VK_U);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
+
+        mi = phaseMenu.add(undoAllRecruitsAction);
+        mi.setMnemonic(KeyEvent.VK_A);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+
+        mi = phaseMenu.add(doneWithTurnAction);
+        mi.setMnemonic(KeyEvent.VK_D);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+        phaseMenu.addSeparator();
+
+        mi = phaseMenu.add(withdrawFromGameAction);
+        mi.setMnemonic(KeyEvent.VK_W);
     }
 
 
@@ -356,65 +695,6 @@ public class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    private void initializePopupMenu()
-    {
-        popupMenu = new JPopupMenu();
-        menuItemRecruitInfo = popupMenu.add(viewRecruitInfoAction);
-        menuItemBattleMap = popupMenu.add(viewBattleMapAction);
-        contentPane.add(popupMenu);
-    }
-
-
-    private void initializeTopMenu()
-    {
-        JMenuItem mi;
-
-        menuBar = new JMenuBar();
-        masterFrame.setJMenuBar(menuBar);
-
-        fileMenu = new JMenu("File");
-        mi = new JMenuItem(newGame);
-        fileMenu.add(mi);
-        mi = new JMenuItem(openGame);
-        fileMenu.add(mi);
-        mi = new JMenuItem(saveGame);
-        fileMenu.add(mi);
-        mi = new JMenuItem(saveGameAs);
-        fileMenu.add(mi);
-        menuBar.add(fileMenu);
-
-        // XXX These change by phase.
-        actionMenu = new JMenu("Action");
-        mi = new JMenuItem(undoLastSplit);
-        actionMenu.add(mi);
-        mi = new JMenuItem(undoAllSplits);
-        actionMenu.add(mi);
-        mi = new JMenuItem(doneWithSplits);
-        actionMenu.add(mi);
-
-        mi = new JMenuItem(takeMulligan);
-        actionMenu.add(mi);
-        mi = new JMenuItem(concedeBattle);
-        actionMenu.add(mi);
-        mi = new JMenuItem(withdrawFromGame);
-        actionMenu.add(mi);
-        menuBar.add(actionMenu);
-
-        optionsMenu = new JMenu("Options");
-        mi = new JCheckBoxMenuItem(autosave);
-        optionsMenu.add(mi);
-        mi = new JCheckBoxMenuItem(allStacksVisible);
-        optionsMenu.add(mi);
-        mi = new JCheckBoxMenuItem(autopickRecruiter);
-        optionsMenu.add(mi);
-        mi = new JCheckBoxMenuItem(showGameStatus);
-        optionsMenu.add(mi);
-        mi = new JCheckBoxMenuItem(showDice);
-        optionsMenu.add(mi);
-        menuBar.add(optionsMenu);
-    }
-                
-                
     public void loadInitialMarkerImages()
     {
         Collection players = game.getPlayers();
@@ -645,12 +925,6 @@ public class MasterBoard extends JPanel implements MouseListener,
             hex.clearAllEntrySides();
             hex.setTeleported(false);
         }
-    }
-
-
-    public void deiconify()
-    {
-        masterFrame.setState(JFrame.NORMAL);
     }
 
 

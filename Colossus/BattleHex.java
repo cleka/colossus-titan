@@ -11,7 +11,6 @@ public class BattleHex extends Hex
 {
     private BattleMap map;
 
-    private static FontMetrics fontMetrics;
     private String name;
 
     /** Normal hexes hold only one creature, but entrances can hold up to 7. */
@@ -99,11 +98,12 @@ public class BattleHex extends Hex
         g.setColor(Color.black);
         g.drawPolygon(hexagon);
 
-        if (fontMetrics == null)
+        if (name == null)
         {
-            fontMetrics = g.getFontMetrics();
             name = getTerrainName().toUpperCase();
         }
+
+        FontMetrics fontMetrics = g.getFontMetrics();
 
         g.drawString(name, rectBound.x + ((rectBound.width -
             fontMetrics.stringWidth(name)) >> 1),

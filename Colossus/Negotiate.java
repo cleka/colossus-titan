@@ -91,7 +91,9 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         }
 
         JButton button1 = new JButton("Agree");
+        button1.setMnemonic(KeyEvent.VK_A);
         JButton button2 = new JButton("Fight");
+        button2.setMnemonic(KeyEvent.VK_F);
 
         // Attempt to center the buttons.
         int chitWidth = Math.max(attacker.getHeight(), 
@@ -340,5 +342,45 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
             // Exit this dialog.
             cleanup();
         }
+    }
+
+
+    public static void main(String [] args)
+    {
+        JFrame frame = new JFrame("testing Negotiate");
+        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        frame.pack();
+        frame.setVisible(true);
+
+        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setTerrain('B');
+
+        Player player = new Player("Attacker", null);
+        player.setScore(1400);
+        player.setTower(1);
+        player.setColor("Red");
+        player.initMarkersAvailable();
+        player.selectMarker("Rd01");
+        Legion attacker = new Legion(player.getSelectedMarker(), null, hex,
+            Creature.titan, Creature.colossus, Creature.serpent,
+            Creature.archangel, Creature.hydra, Creature.giant,
+            Creature.dragon, null, player);
+        Marker marker = new Marker(scale, player.getSelectedMarker(),
+            frame, null);
+        attacker.setMarker(marker);
+
+        player = new Player("Defender", null);
+        player.setTower(2);
+        player.setColor("Blue");
+        player.initMarkersAvailable();
+        player.selectMarker("Bl01");
+        Legion defender = new Legion(player.getSelectedMarker(), null, hex,
+            Creature.ogre, Creature.centaur, Creature.gargoyle,
+            null, null, null, null, null, player);
+        marker = new Marker(scale, player.getSelectedMarker(),
+            frame, null);
+        defender.setMarker(marker);
+
+        new Negotiate(frame, attacker, defender);
     }
 }

@@ -40,10 +40,12 @@ public class GetPlayers extends JDialog implements WindowListener,
             textFields.add(tf);
         }
 
-        JButton button1 = new JButton("OK");
+        JButton button1 = new JButton("Done");
+        button1.setMnemonic(KeyEvent.VK_D);
         contentPane.add(button1);
         button1.addActionListener(this);
         JButton button2 = new JButton("Quit");
+        button2.setMnemonic(KeyEvent.VK_Q);
         contentPane.add(button2);
         button2.addActionListener(this);
 
@@ -149,7 +151,7 @@ public class GetPlayers extends JDialog implements WindowListener,
             }
             dispose();
         }
-        else if (e.getActionCommand().equals("OK"))
+        else if (e.getActionCommand().equals("Done"))
         {
             validateInputs();
         }

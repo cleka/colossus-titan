@@ -9,52 +9,49 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class ShowBattleMap extends JDialog implements WindowListener,
+public class ShowBattleMap extends JPanel implements WindowListener,
     MouseListener
 {
-    // Singleton class, so make everything static.
-
     private BattleHex [][] h = new BattleHex[6][6];
     private ArrayList hexes = new ArrayList(27);
-
-    private Image offImage;
-    private Graphics offGraphics;
-    private Dimension offDimension;
 
     private static int scale;
 
     private MasterHex masterHex;
 
+    private JDialog dialog;
+
 
     public ShowBattleMap(JFrame parentFrame, MasterHex masterHex)
     {
-        super(parentFrame, "Battle Map for " + 
+        dialog = new JDialog(parentFrame, "Battle Map for " +
             masterHex.getTerrainName(), true);
 
         this.masterHex = masterHex;
 
-        getContentPane().setLayout(null);
+        Container contentPane = dialog.getContentPane();
+        contentPane.setLayout(new BorderLayout());
 
         scale = BattleMap.getScale();
 
         addMouseListener(this);
-        addWindowListener(this);
+        dialog.addWindowListener(this);
 
-        pack();
+        contentPane.add(this, BorderLayout.CENTER);
+        dialog.pack();
 
-        setSize(getPreferredSize());
-        setResizable(false);
+        dialog.setResizable(false);
         setBackground(Color.white);
 
         SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), null, hexes);
 
-        setVisible(true);
+        dialog.setVisible(true);
     }
 
     
-    public void update(Graphics g)
+    public void paintComponent(Graphics g)
     {
-        Dimension d = getSize();
+        super.paintComponent(g);
 
         // Abort if called too early.
         Rectangle rectClip = g.getClipBounds();
@@ -63,32 +60,15 @@ public class ShowBattleMap extends JDialog implements WindowListener,
             return;
         }
         
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(d.width, d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
             BattleHex hex = (BattleHex)it.next();
             if (rectClip.intersects(hex.getBounds()))
             {
-                hex.paint(offGraphics);
+                hex.paint(g);
             }
         }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-
-    public void paint(Graphics g)
-    {
-        update(g);
     }
 
 
@@ -106,7 +86,7 @@ public class ShowBattleMap extends JDialog implements WindowListener,
 
     public void mouseClicked(MouseEvent e)
     {
-        dispose();
+        dialog.dispose();
     }
 
 
@@ -122,13 +102,13 @@ public class ShowBattleMap extends JDialog implements WindowListener,
 
     public void mousePressed(MouseEvent e)
     {
-        dispose();
+        dialog.dispose();
     }
 
 
     public void mouseReleased(MouseEvent e)
     {
-        dispose();
+        dialog.dispose();
     }
 
 
@@ -149,7 +129,7 @@ public class ShowBattleMap extends JDialog implements WindowListener,
 
     public void windowClosing(WindowEvent e)
     {
-        dispose();
+        dialog.dispose();
     }
 
 

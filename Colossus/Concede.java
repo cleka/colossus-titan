@@ -82,7 +82,9 @@ public class Concede extends JDialog implements ActionListener
         }
 
         JButton button1 = new JButton(flee ? "Flee" : "Concede");
+        button1.setMnemonic(flee ? KeyEvent.VK_F : KeyEvent.VK_C);
         JButton button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
+        button2.setMnemonic(KeyEvent.VK_D);
 
         // Attempt to center the buttons.
         int chitWidth = Math.max(ally.getHeight(), enemy.getHeight()) + 1;
@@ -94,7 +96,7 @@ public class Concede extends JDialog implements ActionListener
         {
             constraints.gridwidth = 2;
         }
-        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2; 
+        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2;
         if (leadSpace < 0)
         {
             leadSpace = 0;
@@ -105,18 +107,18 @@ public class Concede extends JDialog implements ActionListener
         gridbag.setConstraints(button1, constraints);
         contentPane.add(button1);
         button1.addActionListener(this);
-        constraints.gridx = leadSpace + constraints.gridwidth; 
+        constraints.gridx = leadSpace + constraints.gridwidth;
         gridbag.setConstraints(button2, constraints);
         contentPane.add(button2);
         button2.addActionListener(this);
 
         pack();
-        
+
         // Initially, center the dialog on the screen.  Save the
         // location for future invocations.
         if (location == null)
         {
-            location = new Point(d.width / 2 - getSize().width / 2, 
+            location = new Point(d.width / 2 - getSize().width / 2,
                 d.height / 2 - getSize().height / 2);
         }
         setLocation(location);
@@ -147,7 +149,7 @@ public class Concede extends JDialog implements ActionListener
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand().equals("Flee") || 
+        if (e.getActionCommand().equals("Flee") ||
             e.getActionCommand().equals("Concede"))
         {
             // Figure how many points the victor receives.
@@ -155,12 +157,12 @@ public class Concede extends JDialog implements ActionListener
             if (flee)
             {
                 points /= 2;
-                Game.logEvent("Legion " + ally.getMarkerId() + 
+                Game.logEvent("Legion " + ally.getMarkerId() +
                     " flees from legion " + enemy.getMarkerId());
             }
             else
             {
-                Game.logEvent("Legion " + ally.getMarkerId() + 
+                Game.logEvent("Legion " + ally.getMarkerId() +
                     " concedes to legion " + enemy.getMarkerId());
             }
 
@@ -191,5 +193,46 @@ public class Concede extends JDialog implements ActionListener
         {
             cleanup();
         }
+    }
+
+
+    public static void main(String [] args)
+    {
+        JFrame frame = new JFrame("testing Concede");
+        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        frame.pack();
+        frame.setVisible(true);
+
+        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setTerrain('B');
+
+        Player player = new Player("Attacker", null);
+        player.setScore(1400);
+        player.setTower(1);
+        player.setColor("Red");
+        player.initMarkersAvailable();
+        player.selectMarker("Rd01");
+        Legion attacker = new Legion(player.getSelectedMarker(), null, hex,
+            Creature.titan, Creature.colossus, Creature.serpent,
+            Creature.archangel, Creature.hydra, Creature.giant,
+            Creature.dragon, null, player);
+        Marker marker = new Marker(scale, player.getSelectedMarker(),
+            frame, null);
+        attacker.setMarker(marker);
+
+        player = new Player("Defender", null);
+        player.setTower(2);
+        player.setColor("Blue");
+        player.initMarkersAvailable();
+        player.selectMarker("Bl01");
+        Legion defender = new Legion(player.getSelectedMarker(), null, hex,
+            Creature.ogre, Creature.centaur, Creature.gargoyle,
+            null, null, null, null, null, player);
+        marker = new Marker(scale, player.getSelectedMarker(),
+            frame, null);
+        defender.setMarker(marker);
+
+        new Concede(frame, defender, attacker, true);
+        new Concede(frame, attacker, defender, false);
     }
 }

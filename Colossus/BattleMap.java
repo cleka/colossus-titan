@@ -28,6 +28,21 @@ public class BattleMap extends JPanel implements MouseListener,
     private static Point location;
 
     private JFrame battleFrame;
+    private JMenuItem mi;
+    private JMenuBar menuBar;
+    private JMenu phaseMenu;
+
+    static final String undoLastMove = "Undo Last Move";
+    static final String undoAllMoves = "Undo All Moves";
+    static final String doneWithMoves = "Done with Moves";
+    static final String doneWithStrikes = "Done with Strikes";
+    static final String concedeBattle = "Concede Battle";
+
+    AbstractAction undoLastMoveAction;
+    AbstractAction undoAllMovesAction;
+    AbstractAction doneWithMovesAction;
+    AbstractAction doneWithStrikesAction;
+    AbstractAction concedeBattleAction;
 
 
     public BattleMap(MasterBoard board, MasterHex masterHex, Battle battle)
@@ -65,6 +80,9 @@ public class BattleMap extends JPanel implements MouseListener,
         battleFrame.addWindowListener(this);
         addMouseListener(this);
 
+        setupActions();
+        setupTopMenu();
+
         // Initialize the hexmap.
         SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), this, hexes);
         SetupBattleHexes.setupNeighbors(h);
@@ -80,14 +98,175 @@ public class BattleMap extends JPanel implements MouseListener,
         battleFrame.setLocation(location);
 
         contentPane.add(this, BorderLayout.CENTER);
-
         battleFrame.pack();
 
         battleFrame.setVisible(true);
-        battleFrame.repaint();
     }
 
 
+    public void setupActions()
+    {
+        undoLastMoveAction = new AbstractAction(undoLastMove)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                battle.undoLastMove();
+            }
+        };
+
+        undoAllMovesAction = new AbstractAction(undoAllMoves)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                battle.undoAllMoves();
+            }
+        };
+
+        doneWithMovesAction = new AbstractAction(doneWithMoves)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                battle.doneWithMoves();
+            }
+        };
+
+        doneWithStrikesAction = new AbstractAction(doneWithStrikes)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                battle.doneWithStrikes();
+            }
+        };
+
+        concedeBattleAction = new AbstractAction(concedeBattle)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                // XXX: Since the UI is shared between players for the
+                // hotseat game, we will assume that the active player
+                // is the one conceding.  This will change later.
+                battle.tryToConcede();
+            }
+        };
+    }
+
+
+    private void setupTopMenu()
+    {
+        menuBar = new JMenuBar();
+        battleFrame.setJMenuBar(menuBar);
+        
+        // Phase menu items change by phase and will be set up later.
+        phaseMenu = new JMenu("Phase");
+        phaseMenu.setMnemonic(KeyEvent.VK_P);
+        menuBar.add(phaseMenu);
+    }
+
+
+    public void setupPhase()
+    {
+        switch (battle.getPhase())
+        {
+            case Battle.SUMMON:
+                setupSummon();
+                break;
+            case Battle.RECRUIT:
+                setupRecruit();
+                break;
+            case Battle.MOVE:
+                setupMove();
+                break;
+            case Battle.FIGHT:
+            case Battle.STRIKEBACK:
+                setupFight();
+                break;
+            default:
+                System.out.println("Bogus phase");
+        }
+    }
+
+
+    public void setupSummon()
+    {
+        battleFrame.setTitle(battle.getActivePlayer().getName() + " Turn " +
+            battle.getTurnNumber() + " : Summon");
+    }
+
+
+    public void setupRecruit()
+    {
+        battleFrame.setTitle(battle.getActivePlayer().getName() + " Turn " +
+            battle.getTurnNumber() + " : Recruit");
+
+        battle.recruitReinforcement();
+    }
+    
+    
+    public void setupMove()
+    {
+        // If there are no legal moves, move on.
+        if (battle.highlightMovableChits() < 1)
+        {
+            battle.advancePhase();
+        }
+        else
+        {
+            battleFrame.setTitle(battle.getActivePlayer().getName() + 
+                " Turn " + battle.getTurnNumber() + " : Move");
+
+            phaseMenu.removeAll();
+
+            mi = phaseMenu.add(undoLastMoveAction);
+            mi.setMnemonic(KeyEvent.VK_U);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
+
+            mi = phaseMenu.add(undoAllMovesAction);
+            mi.setMnemonic(KeyEvent.VK_A);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+            
+            mi = phaseMenu.add(doneWithMovesAction);
+            mi.setMnemonic(KeyEvent.VK_D);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+            phaseMenu.addSeparator();
+            
+            mi = phaseMenu.add(concedeBattleAction);
+            mi.setMnemonic(KeyEvent.VK_C);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
+        }
+    }
+
+
+    public void setupFight()
+    {
+        battle.applyDriftDamage();
+
+        // If there are no possible strikes, move on.
+        if (battle.highlightChitsWithTargets() < 1)
+        {
+            battle.advancePhase();
+        }
+        else
+        {
+            battleFrame.setTitle(battle.getActivePlayer().getName() +
+                ((battle.getPhase() == Battle.FIGHT) ? 
+                " : Strike" : " : Strikeback"));
+
+            phaseMenu.removeAll();
+
+            mi = phaseMenu.add(doneWithStrikesAction);
+            mi.setMnemonic(KeyEvent.VK_D);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
+
+            phaseMenu.addSeparator();
+            
+            mi = phaseMenu.add(concedeBattleAction);
+            mi.setMnemonic(KeyEvent.VK_C);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
+        }
+    }
+    
+    
     public JFrame getFrame()
     {
         return battleFrame;

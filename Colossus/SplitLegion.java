@@ -94,7 +94,9 @@ public class SplitLegion extends JDialog implements MouseListener,
             contentPane.add(newMarker);
 
             JButton button1 = new JButton("Done");
+            button1.setMnemonic(KeyEvent.VK_D);
             JButton button2 = new JButton("Cancel");
+            button2.setMnemonic(KeyEvent.VK_C);
 
              // Attempt to center the buttons.
             int chitWidth = Math.max(oldLegion.getHeight(),

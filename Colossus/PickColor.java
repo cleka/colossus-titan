@@ -18,6 +18,9 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
     private Player player;
     private static final String [] colorNames = 
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
+    private static final int [] colorMnemonics = 
+        {KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O, KeyEvent.VK_G, 
+            KeyEvent.VK_E, KeyEvent.VK_R};
         
 
     public PickColor(JFrame parentFrame, Game game, Player player)
@@ -94,6 +97,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
             else
             {
                 button.setText(colorNames[i]);
+                button.setMnemonic(colorMnemonics[i]);
                 button.setBackground(background[i]);
                 button.setForeground(foreground[i]);
                 button.addActionListener(this);

@@ -18,7 +18,6 @@ public class Game
     private int activePlayerNum;
     private int turnNumber = 1;  // Advance when every player has a turn
     private StatusScreen statusScreen;
-    private Turn turn;
     private GameApplet applet;
     private boolean summoningAngel;
     private SummonAngel summonAngel;
@@ -103,8 +102,8 @@ public class Game
                 updateStatusScreen();
             }
             board.loadInitialMarkerImages();
+            board.setupPhase();
 
-            turn = new Turn(this, board);
             board.setVisible(true);
             board.repaint();
         }
@@ -126,6 +125,8 @@ public class Game
         loadGame(filename);
         board.loadInitialMarkerImages();
         statusScreen = new StatusScreen(this);
+        // XXX Assumes that we only load at the beginning of a phase.
+        board.setupPhase();
     }
 
 
@@ -891,7 +892,6 @@ public class Game
                 }
             }
 
-            turn = new Turn(this, board);
             board.setVisible(true);
             board.repaint();
         }
@@ -1939,7 +1939,6 @@ public class Game
             if (hex.getNumFriendlyLegions(player) == 0)
             {
                 set.add(hex.getLabel());
-                // XXX
                 // Set the entry side relative to the hex label.
                 hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
             }
@@ -1962,7 +1961,6 @@ public class Game
 
             set.add(hex.getLabel());
 
-            // XXX
             // Need to set entry sides even if no possible engagement,
             // for MasterHex.chooseWhetherToTeleport()
             hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
@@ -2018,7 +2016,6 @@ public class Game
         {
             set.add(hex.getLabel());
 
-            // XXX
             // Mover can choose side of entry.
             hex.setTeleported(true);
         }
@@ -2217,9 +2214,6 @@ public class Game
         }
         battle = null;
         map = null;
-
-        turn.setVisible(true);
-        turn.setEnabled(true);
 
         // Insert a blank line in the log file after each battle.
         logEvent("\n");
@@ -2494,6 +2488,7 @@ public class Game
             {
                 summonAngel = battle.getSummonAngel();
             }
+            summonAngel.updateChits();
             summonAngel.repaint();
             donor.getMarker().repaint();
         }
@@ -2553,10 +2548,6 @@ public class Game
                 // Battle
                 if (hex.isEngagement())
                 {
-                    // Hide turn to keep it out of the way.
-                    turn.setVisible(false);
-                    turn.setEnabled(false);
-
                     // Reveal both legions to all players.
                     attacker.revealAllCreatures();
                     defender.revealAllCreatures();
