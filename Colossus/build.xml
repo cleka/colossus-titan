@@ -122,11 +122,15 @@
 <target name="jar" depends="init,compile,version"
         description = "Make jar file">
         <jar jarfile = "Colossus.jar" basedir="."
-                manifest="META-INF/MANIFEST.MF"
-                includes="**/*.class,
-                    version,
-                    Default/*"
-        />
+             manifest="META-INF/MANIFEST.MF"
+             includes="**/*.class,
+             version,
+             Default/*,
+             TitanPlus/*,
+             ExtTitan/*,
+             Badlands/*,
+             Outlands/*"
+             />
         <chmod file="Colossus.jar" perm="755"/>
 </target>
 
@@ -191,13 +195,17 @@
 <target name="bbjar" depends="init,compile,version"
         description = "Make Battlelands Builder jar file">
         <jar jarfile = "BattlelandsBuilder.jar" basedir="."
-                manifest="META-INF/datatools/BattlelandsBuilder/MANIFEST.MF"
-                includes="net/sf/colossus/datatools/*.class,
-                          net/sf/colossus/client/*.class,
-                          net/sf/colossus/parser/*.class,
-                          net/sf/colossus/server/*.class,
-                          net/sf/colossus/util/*.class,
-                          Default"
+             manifest="META-INF/datatools/BattlelandsBuilder/MANIFEST.MF"
+             includes="net/sf/colossus/datatools/*.class,
+             net/sf/colossus/client/*.class,
+             net/sf/colossus/parser/*.class,
+             net/sf/colossus/server/*.class,
+             net/sf/colossus/util/*.class,
+             Default,
+             TitanPlus,
+             ExtTitan,
+             Badlands,
+             Outlands"
         />
         <chmod file="BattlelandsBuilder.jar" perm="755"/>
 </target>

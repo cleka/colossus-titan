@@ -1,6 +1,3 @@
-Put the variant in the savegame file, and automatically load it when
-   the game is loaded.
-
 Highlight appropriate engagement hex while engagement is being resolved.
    (Except during angel summoning.)
 

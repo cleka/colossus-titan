@@ -84,7 +84,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
         net/sf/colossus/client/*.class net/sf/colossus/server/*.class \
         net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \
-        Default
+        Default TitanPlus ExtTitan Badlands Outlands
 	chmod +x Colossus.jar
 
 # Sign jar file.  This target uses dripton's key; other developers can

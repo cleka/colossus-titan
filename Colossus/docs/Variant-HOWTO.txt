@@ -2,9 +2,14 @@ Subject:  How do I use and/or create Variant Pack for Colossus ?
 
 1) How do I use a Variant Pack ?
 
-Just use the 'Load Variant' button and open the
-VAR file inside the variant directory, then start
-a new game. That should be enough.
+Just use the 'Load External Variant' button and open the
+VAR file inside the variant directory, then start a new
+game. That should be enough.
+
+Alternatively, some variants are now supplied in the
+standard distribution ; simply use the pop-up menu
+to select which variant to play ('Default' is the
+Classic Titan ruleset).
 
 2) What's in a Variant Pack ?
 

@@ -19,6 +19,7 @@ import net.sf.colossus.client.VariantSupport;
  * Class GetPlayers is a dialog used to enter players' names.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 
@@ -29,7 +30,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     public static final String newGame = "New Game";
     public static final String loadGame = "Load Game";
-    public static final String loadVariant = "Load Variant";
+    public static final String loadVariant = "Load External Variant";
     public static final String quit = "Quit";
     public static final String none = "None";
     public static final String byColor = "<By color>";
@@ -52,6 +53,18 @@ public final class GetPlayers extends JDialog implements WindowListener,
     // XXX MinimaxAI is currently very broken.
     //private static String[] aiList = { "SimpleAI", "MinimaxAI" };
     private static String[] aiList = { "SimpleAI" };
+
+    /** list of available Variant */
+    private static String[] variantArray =
+    {
+        "Default",
+        "TitanPlus",
+        "ExtTitan", 
+        "Badlands",
+        "Outlands"
+    };
+    private JComboBox variantBox;
+    private java.util.List variantList;
 
     private GetPlayers(JFrame parentFrame)
     {
@@ -127,7 +140,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         Container gamePane = new Container();
         gamePane.setLayout(new GridLayout(0, 3));
         Container variantPane = new Container();
-        variantPane.setLayout(new GridLayout(0, 1));
+        variantPane.setLayout(new GridLayout(0, 2));
 
         contentPane.add(gamePane);
         contentPane.add(variantPane);
@@ -144,9 +157,18 @@ public final class GetPlayers extends JDialog implements WindowListener,
         button3.setMnemonic(KeyEvent.VK_Q);
         gamePane.add(button3);
         button3.addActionListener(this);
+        
+        variantBox = new JComboBox(variantArray);
+        variantBox.addActionListener(this);
+        variantBox.setSelectedItem(variantArray[0]);
+        variantList = new ArrayList();
+        for(int i = 0; i < variantArray.length; i++)
+        {
+            variantList.add(variantArray[i]);
+        }
+        variantPane.add(variantBox);
         JButton buttonVariant =
-            new JButton(loadVariant +
-                        " (" + VariantSupport.getVarName() + ")");
+            new JButton(loadVariant);
         variantPane.add(buttonVariant);
         buttonVariant.addActionListener(this);
 
@@ -312,16 +334,34 @@ public final class GetPlayers extends JDialog implements WindowListener,
         else if (e.getActionCommand().startsWith(loadVariant))
         {
             doLoadVariant();
-            ((JButton)e.getSource()).setText(loadVariant +
-                                             " (" +
-                                             VariantSupport.getVarName() +
-                                             ")");
+            String varName = VariantSupport.getVarName();
+            if (!(variantList.contains(varName)))
+            {
+                String buttonName =
+                    varName.substring(0,
+                                      varName.lastIndexOf(".var"));
+                variantBox.addItem(buttonName);
+                variantBox.setSelectedItem(buttonName);
+            }
         }
         else
         {
             // A combo box was changed.
             Object source = e.getSource();
-
+            if (source == variantBox)
+            {
+                String value = (String)variantBox.getSelectedItem();
+                if (VariantSupport.getVarName().equals(value + ".var"))
+                { // re-selecting the same ; do nothing
+                }
+                else
+                { // selecting different ; remove all non-included
+                    if (variantBox.getItemCount() > variantArray.length)
+                        variantBox.removeItemAt(variantArray.length);
+                    VariantSupport.loadVariant(value + ".var", value);
+                }
+            }
+            else
             for (int i = 0; i < 6; i++)
             {
                 JComboBox box = playerTypes[i];
