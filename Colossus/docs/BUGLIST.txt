@@ -31,11 +31,9 @@ Red Hat 6.1, Sun 1.2.2/1.3/1.3refresh, Blackdown 1.2.2RC4:
 
 Win98, JDK1.3: setLocation() to keep ShowLegion, ShowMasterHex
    dialogs from displaying past the bottom or right edge of the
-   screen isn't working.  Works fine on other JDKs.
-
-Win98, jdk1.3: Multiple fast right-clicks on a MasterHex do not succeed
-   in displaying ShowBattleMap.  They do result in a ShowMasterHex that
-   cannot be dismissed, except by left-clicking on a chit within it.
+   screen isn't working.  Problem with screen size detection in
+   Windows JDK, possibly only after screen resolution has been
+   changed.  Works fine on other JDKs.
 
 Win98, jdk1.3: Bad repaint onto potential carry target with no carries.
 
@@ -86,15 +84,11 @@ Linux, ibmjdk118: Numbers (sometimes overlapping) appear in the
    Stray legion heights?  They disappear in a repaint after a few 
    turns.
 
-Solaris, jdk1.3: Clicks on ShowMasterHex are ignored unless they're
-   on chits.
-
 Linux, ibmjdk118; Solaris, jdk1.3: Battle did not end once when a 
-   player died.  BattleTurn was not dismissed, and the game could 
-   not continue.  Happened multiple times -- see 968280760325.sav 
-   (movement 3), 970008244885.sav  Player.die() was called.
-   When the dying Titan ended the game, the following exception
-   was seen:
+   player (always the attacker?) died.  BattleTurn was not dismissed, 
+   and the game could not continue.  Happened multiple times. 
+   Player.die() was called.  When the dying Titan ended the game, 
+   the following exception was (only sometimes) seen:
 Exception occurred during event dispatching:
 java.lang.ArrayIndexOutOfBoundsException
         at Player.addLegionMarkers(Player.java:651)
@@ -112,8 +106,16 @@ java.lang.ArrayIndexOutOfBoundsException
         at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
         at java.awt.EventDispatchThread.run(EventDispatchThread.java:84)
 
-All: Losses per-side in a pre-battle agreement should be made public.
-
 Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
    eliminates that chit's movement options.  "Undo last move" works.
+
+Solaris, jdk1.3: Reinforcement chit in lower right corner showed up
+   with just the top edge visible.  Clicking on it made the rest
+   appear.  Probably need to call repaint() from placeNewChit()
+   Fixed?
+
+all: "1 hits"  Fixed?
+
+Solaris, jdk1.3: Rangestriker adjacent to a dead target can now
+   rangestrike.  Fixed?
 

@@ -338,15 +338,25 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
                         return;
                     }
                 }
+                
+                StringBuffer log = new StringBuffer("Winning legion ");
+                log.append(winner.getMarkerId());
+                log.append(" loses creatures ");
 
                 // Remove all dead creatures from the winning legion.
                 for (int i = winner.getHeight() - 1; i >= 0; i--)
                 {
                     if (winnerChits[i].isDead())
                     {
+                        log.append(winner.getCreature(i).getName());
+                        if (i > 0)
+                        {
+                            log.append(", ");
+                        }
                         winner.removeCreature(i);
                     }
                 }
+                Game.logEvent(log.toString());
 
                 int points = loser.getPointValue();
 

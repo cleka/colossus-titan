@@ -26,13 +26,11 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
             false);
 
         this.hex = hex;
-
         numChits = hex.getNumRecruitTypes();
 
         pack();
-
         setBackground(Color.lightGray);
-
+        setResizable(false);
         addWindowListener(this);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
@@ -62,8 +60,6 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
 
         setLayout(new GridLayout(0, 3));
         
-        addMouseListener(this);
-
         chits = new Chit[numChits];
         for (int i = 0; i < numChits; i++)
         {
@@ -80,11 +76,13 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
                 numToRecruitLabel.setText(Integer.toString(numToRecruit));
             }
             add(numToRecruitLabel);
+            numToRecruitLabel.addMouseListener(this);
 
             int count = creature.getCount();
             Label countLabel = new Label(Integer.toString(count), 
                 Label.CENTER);
             add(countLabel);
+            countLabel.addMouseListener(this);
         }
 
         tracker = new MediaTracker(this);
@@ -106,6 +104,8 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         imagesLoaded = true;
 
         pack();
+        
+        addMouseListener(this);
 
         setVisible(true);
         repaint();
@@ -183,7 +183,6 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
     {
         dispose();
     }
-
 
     public void windowDeactivated(WindowEvent e)
     {

@@ -10,9 +10,9 @@ import java.awt.event.*;
 public class BattleTurn extends Dialog implements ActionListener,
     WindowListener
 {
-    private BattleMap map;
+    private static BattleMap map;
     private static Point location;
-    private Battle battle;
+    private static Battle battle;
 
 
     public BattleTurn(BattleMap map, Battle battle)
@@ -28,12 +28,11 @@ public class BattleTurn extends Dialog implements ActionListener,
         
         pack();
 
-        // Place this window in the upper right corner, or at the saved
+        // Place this dialog on top of Turn dialog, or at the saved
         // location of the last BattleTurn.
         if (location == null)
         {
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            location = new Point(d.width - getSize().width, 0);
+            location = Turn.getSavedLocation();
         }
         setLocation(location);
 

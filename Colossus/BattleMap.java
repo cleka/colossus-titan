@@ -149,6 +149,9 @@ public class BattleMap extends Frame implements MouseListener,
             new MessageBox(this, e.toString() + "waitForAll was interrupted");
         }
         imagesLoaded = true;
+
+        // XXX Does this fix the problem of the chit not showing up?
+        chit.repaint();
     }
 
 

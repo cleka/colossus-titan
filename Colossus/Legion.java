@@ -159,6 +159,12 @@ public class Legion
     }
 
 
+    public String toString()
+    {
+        return markerId;
+    }
+
+
     public String getImageName()
     {
         return "images/" + markerId + ".gif";

@@ -523,6 +523,7 @@ public class Player
     }
 
 
+    /** Eliminate this legion */
     public void removeLegion(Legion legion)
     {
         for (int i = 0; i < numLegions; i++)
@@ -532,15 +533,27 @@ public class Player
                 // Remove the legion from its current hex.
                 legion.getCurrentHex().removeLegion(legion);
 
+                StringBuffer log = new StringBuffer("Legion ");
+                log.append(name);
+                log.append("(");
+
+                int height = legion.getHeight();
                 // Return lords and demi-lords to the stacks.
-                for (int j = 0; j < legion.getHeight(); j++)
+                for (int j = 0; j < height; j++)
                 {
                     Creature creature = legion.getCreature(j);
+                    log.append(creature.getName());
+                    if (j < height - 1)
+                    {
+                        log.append(", ");
+                    }
                     if (creature.isImmortal())
                     {
                         creature.putOneBack();
                     }
                 }
+                log.append(") is eliminated");
+                Game.logEvent(log.toString());
 
                 // Free up the legion marker.
                 markersAvailable[numMarkersAvailable] = legion.getMarkerId();
@@ -675,7 +688,9 @@ public class Player
         }
     }
 
-
+    
+    /** Add points to this player's score.  Update the status window
+     *  to reflect the addition. */
     public void addPoints(double points)
     {
         score += points;
@@ -688,7 +703,7 @@ public class Player
     }
 
 
-    // Remove half-points.
+    /** Remove half-points. */
     public void truncScore()
     {
         score = Math.floor(score);

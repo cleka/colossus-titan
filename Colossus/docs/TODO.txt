@@ -1,6 +1,13 @@
+Per-side losses in pre-battle negotiation should be made public.
+
+Differently-highlight hexes where a legion could move if
+   a friendly stack were not already there.
+
+Color code StatusScreen better.
+
 Have methods in Game and Battle return lists of hex labels, 
    rather than actually selecting and repainting hexes.  All
-   GUI methods calls need to be moved out of non-GUI classes.
+   GUI method calls need to be moved out of non-GUI classes.
 
 Add some keyboard shortcuts.  (Need Swing?)
 

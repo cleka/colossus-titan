@@ -268,4 +268,9 @@ public class Creature
         System.out.println("There is no creature called " + name);
         return null;
     }
+
+    public String toString()
+    {
+        return name;
+    }
 }

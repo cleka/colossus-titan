@@ -26,11 +26,8 @@ public class ShowLegion extends Dialog implements MouseListener, WindowListener
         int scale = 60;
 
         pack();
-
         setBackground(Color.lightGray);
-
         setResizable(false);
-
         addWindowListener(this);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.

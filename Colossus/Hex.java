@@ -91,4 +91,9 @@ public abstract class Hex
     {
         return getTerrainName() + " hex " + getLabel();
     }
+
+    public String toString()
+    {
+        return getDescription();
+    }
 }

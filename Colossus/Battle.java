@@ -466,7 +466,7 @@ public class Battle
     }
 
 
-    public void markLastCritterMoved(Critter critter)
+    public void setLastCritterMoved(Critter critter)
     {
         lastCritterMoved = critter;
     }
@@ -562,8 +562,8 @@ public class Battle
         return set;
     }
     
-    /** Selects all hexes containing critters eligible to move. 
-     *  Returns the number of hexes selected (not the number
+    /** Select all hexes containing critters eligible to move. 
+     *  Return the number of hexes selected (not the number
      *  of critters). */
     public int highlightMovableChits()
     {
@@ -915,6 +915,8 @@ public class Battle
         Player player = critter.getPlayer();
         BattleHex currentHex = critter.getCurrentHex();
 
+        boolean adjacentEnemy = false;
+
         // First mark and count normal strikes.
         for (int i = 0; i < 6; i++)
         {
@@ -926,9 +928,13 @@ public class Battle
                 if (targetHex != null && targetHex.isOccupied())
                 {
                     Critter target = targetHex.getCritter();
-                    if (target.getPlayer() != player && !target.isDead())
+                    if (target.getPlayer() != player)
                     {
-                        set.add(targetHex.getLabel());
+                        adjacentEnemy = true;
+                        if (!target.isDead())
+                        {
+                            set.add(targetHex.getLabel());
+                        }
                     }
                 }
             }
@@ -937,7 +943,7 @@ public class Battle
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
-        if (set.size() == 0 && critter.isRangestriker() &&
+        if (!adjacentEnemy && critter.isRangestriker() &&
             getPhase() != STRIKEBACK)
         {
             for (int i = 0; i < getNumCritters(); i++)
@@ -1019,8 +1025,8 @@ public class Battle
     }
 
 
-    // Returns the range in hexes from hex1 to hex2.  Titan ranges are
-    // inclusive at both ends.
+    /** Return the range in hexes from hex1 to hex2.  Titan ranges are
+     *  inclusive at both ends. */
     public int getRange(BattleHex hex1, BattleHex hex2)
     {
         int x1 = hex1.getXCoord();
@@ -1066,7 +1072,7 @@ public class Battle
     }
 
 
-    // Know that yDist != 0
+    /** Caller must ensure that yDist != 0 */
     private boolean toLeft(float xDist, float yDist)
     {
         float ratio = xDist / yDist;
@@ -1082,8 +1088,8 @@ public class Battle
     }
 
 
-    // Check LOS, going to the left of hexspines if argument left is true, or
-    // to the right if it is false.
+    /** Check LOS, going to the left of hexspines if argument left is true, or
+     *  to the right if it is false. */
     private boolean isLOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
         BattleHex finalHex, boolean left, int strikeElevation,
         boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle,
@@ -1235,9 +1241,9 @@ public class Battle
     }
 
 
-    // Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
-    // lies along a hexspine, check both and return true only if both are
-    // blocked.
+    /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
+     *  lies along a hexspine, check both and return true only if both are
+     *  blocked. */
     private boolean isLOSBlocked(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
@@ -1289,7 +1295,7 @@ public class Battle
     }
 
 
-    // Return true if the rangestrike is possible.
+    /** Return true if the rangestrike is possible. */
     private boolean isRangestrikePossible(Critter critter, Critter target)
     {
         BattleHex currentHex = critter.getCurrentHex();
@@ -1317,10 +1323,10 @@ public class Battle
     }
 
 
-    // Returns the hexside direction of the path from hex1 to hex2.
-    // Sometimes two directions are possible.  If the left parameter
-    // is set, the direction further left will be given.  Otherwise,
-    // the direction further right will be given.
+    /** Return the hexside direction of the path from hex1 to hex2.
+     *  Sometimes two directions are possible.  If the left parameter
+     *  is set, the direction further left will be given.  Otherwise,
+     *  the direction further right will be given. */
     public int getDirection(BattleHex hex1, BattleHex hex2, boolean left)
     {
         if (hex1 == hex2)
@@ -1464,9 +1470,9 @@ public class Battle
         return -1;
     }
 
-    // Return the number of intervening bramble hexes.  If LOS is along a
-    // hexspine, go left if argument left is true, right otherwise.  If
-    // LOS is blocked, return a large number.
+    /** Return the number of intervening bramble hexes.  If LOS is along a
+     *  hexspine, go left if argument left is true, right otherwise.  If
+     *  LOS is blocked, return a large number. */
     private int countBrambleHexesDir(BattleHex hex1, BattleHex hex2,
         boolean left, int previousCount)
     {
@@ -1672,60 +1678,52 @@ public class Battle
 
     public void cleanup()
     {
-        try
+        // Handle any after-battle angel summoning or recruiting.
+        if (masterHex.getNumLegions() == 1)
         {
-            // Handle any after-battle angel summoning or recruiting.
-            if (masterHex.getNumLegions() == 1)
+            Legion legion = masterHex.getLegion(0);
+            if (legion == getAttacker())
             {
-                Legion legion = masterHex.getLegion(0);
-                if (legion == getAttacker())
+                // Summon angel
+                if (legion.canSummonAngel())
                 {
-                    // Summon angel
-                    if (legion.canSummonAngel())
+                    if (board != null)
                     {
-                        if (board != null)
-                        {
-                            // Make sure the MasterBoard is visible.
-                            board.deiconify();
-                            // And bring it to the front.
-                            board.show();
-        
-                            SummonAngel summonAngel = new SummonAngel(board,
-                                getAttacker());
-                            board.getGame().setSummonAngel(summonAngel);
-                        }
+                        // Make sure the MasterBoard is visible.
+                        board.deiconify();
+                        // And bring it to the front.
+                        board.show();
+    
+                        SummonAngel summonAngel = new SummonAngel(board,
+                            getAttacker());
+                        board.getGame().setSummonAngel(summonAngel);
                     }
                 }
-                else
-                {
-                    // Recruit reinforcement
-                    if (legion.canRecruit())
-                    {
-                        new PickRecruit(map, legion);
-                    }
-                }
-    
-                // Make all creatures in the victorious legion visible.
-                legion.revealAllCreatures();
-    
-                // Heal all creatures in the winning legion.
-                legion.healAllCreatures();
             }
-    
-            if (turn != null)
+            else
             {
-                turn.cleanup();
+                // Recruit reinforcement
+                if (legion.canRecruit())
+                {
+                    new PickRecruit(map, legion);
+                }
             }
-    
-            map.dispose();
-    
-            board.getGame().finishBattle();
+
+            // Make all creatures in the victorious legion visible.
+            legion.revealAllCreatures();
+
+            // Heal all creatures in the winning legion.
+            legion.healAllCreatures();
         }
-        catch (NullPointerException e)
+
+        if (turn != null)
         {
-            // Don't crash if we're testing battles with no MasterBoard.
-            e.printStackTrace();
+            turn.cleanup();
         }
+
+        map.dispose();
+
+        board.getGame().finishBattle();
     }
 
 

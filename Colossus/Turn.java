@@ -10,8 +10,8 @@ import java.awt.event.*;
 public class Turn extends Dialog implements ActionListener, WindowListener
 {
     private static Game game;
-    private MasterBoard board;
-    private Point location;
+    private static MasterBoard board;
+    private static Point location;
 
 
     public Turn(Game game, MasterBoard board)
@@ -26,11 +26,11 @@ public class Turn extends Dialog implements ActionListener, WindowListener
 
         addWindowListener(this);
             
-        // Move dialog to saved location, or upper right corner of screen.
+        // Move dialog to saved location, or just to the right of board.
         if (location == null)
         {
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            location = new Point(d.width - getSize().width, 0);
+            location = board.getLocation();
+            location.x += board.getSize().getWidth();
         }
         setLocation(location);
 
@@ -41,6 +41,12 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         setResizable(false);
 
         setVisible(true);
+    }
+
+
+    public static Point getSavedLocation()
+    {
+        return location;
     }
 
     
@@ -273,6 +279,13 @@ public class Turn extends Dialog implements ActionListener, WindowListener
 
         else if (e.getActionCommand().equals("Done with Moves"))
         {
+            // XXX Save location before moving on to engagement phase,
+            // so that BattleTurns will end up in the right place.
+            // This is non-ideal; we really should save it after
+            // every move, or pass a reference to Turn into BattleTurn
+            // so it can call nonstatic getLocation() directly.
+            location = getLocation();
+
             // If any legions has a legal non-teleport move, then the 
             // player must move at least one legion.
             if (player.legionsMoved() == 0 && 

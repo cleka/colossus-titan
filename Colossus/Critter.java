@@ -18,10 +18,10 @@ public class Critter extends Creature
     private BattleHex currentHex;
     private BattleHex startingHex;
 
-    // Damage taken
+    /** Damage taken */
     private int hits;
 
-    // Mark whether this critter is a legal carry target.
+    /** Mark whether this critter is a legal carry target. */
     private boolean carryFlag;
 
     private BattleChit chit;
@@ -121,9 +121,10 @@ public class Critter extends Creature
     }
 
 
+    // Purity note:
     // File.separator does not work right in jar files.  A hardcoded 
-    // forward-slash does, and works in *x and Windows.  I have
-    // no idea if it works on the Mac, etc.
+    // forward-slash does, and works in *x and Windows.  So I'm ignoring
+    // JavaPureCheck's opinion and using a forward slash.
     public String getImageName(boolean inverted)
     {
         String myName;
@@ -181,9 +182,8 @@ public class Critter extends Creature
     }
 
 
-    // Apply damage to this critter.
-    // Returns the amount of excess damage done, which may 
-    // sometimes carry to another target. 
+    /** Apply damage to this critter.  Return the amount of excess damage 
+     *  done, which may sometimes carry to another target. */
     public int wound(int damage)
     {
         int excess = 0;
@@ -244,7 +244,7 @@ public class Critter extends Creature
     }
 
 
-    // Dead critters count as being in contact only if countDead is true.
+    /** Dead critters count as being in contact only if countDead is true. */
     public int numInContact(boolean countDead)
     {
         // Offboard creatures are not in contact.
@@ -280,7 +280,7 @@ public class Critter extends Creature
     }
 
 
-    // Dead critters count as being in contact only if countDead is true.
+    /** Dead critters count as being in contact only if countDead is true. */
     public boolean isInContact(boolean countDead)
     {
         return (numInContact(countDead) > 0);
@@ -296,7 +296,7 @@ public class Critter extends Creature
         currentHex = hex;
         currentHex.addCritter(this);
         moved = true;
-        battle.markLastCritterMoved(this);
+        battle.setLastCritterMoved(this);
         map.repaint();
     }
 
@@ -491,10 +491,10 @@ public class Critter extends Creature
     }
 
 
-    // Allow the player to choose whether to take a penalty
-    // (fewer dice or higher strike number) in order to be
-    // allowed to carry.  Return true if the penalty is taken,
-    // or false if it is not.
+    /** Allow the player to choose whether to take a penalty
+     *  (fewer dice or higher strike number) in order to be
+     *  allowed to carry.  Return true if the penalty is taken,
+     *  or false if it is not. */
     private boolean chooseStrikePenalty(Critter [] carryTargets)
     {
         StringBuffer prompt = new StringBuffer(
@@ -519,9 +519,9 @@ public class Critter extends Creature
     }
 
 
-    // Calculate number of dice and strike number needed to hit target,
-    // and whether any carries are possible.  Roll the dice and apply
-    // damage.  Highlight legal carry targets.
+    /** Calculate number of dice and strike number needed to hit target,
+     *  and whether any carries are possible.  Roll the dice and apply
+     *  damage.  Highlight legal carry targets. */
     public void strike(Critter target)
     {
         // Sanity check
@@ -718,7 +718,8 @@ public class Critter extends Creature
         Game.logEvent(getName() + " in " + currentHex.getLabel() + 
             " strikes " + target.getName() + " in " + 
             targetHex.getLabel() + " with strike number " +
-            strikeNumber + " : " + rollString + ": " + damage + " hits");
+            strikeNumber + " : " + rollString + ": " + damage + 
+            (damage == 1 ? " hit" : " hits"));
     }
 
 
