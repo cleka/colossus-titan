@@ -31,6 +31,7 @@ public class LOSTest extends TestCase
     Creature wyvern;
     Creature dragon;
     Creature minotaur;
+    Creature guardian;
 
 
     public LOSTest(String name)
@@ -62,6 +63,7 @@ public class LOSTest extends TestCase
         wyvern = Creature.getCreatureByName("Wyvern");
         dragon = Creature.getCreatureByName("Dragon");
         minotaur = Creature.getCreatureByName("Minotaur");
+        guardian = Creature.getCreatureByName("Guardian");
     }
 
     // Example 6 from Bruno Wolff's clarifications.
@@ -679,5 +681,39 @@ public class LOSTest extends TestCase
         assertTrue(ranger3.canStrike(minotaur1));
         assertTrue(!ranger3.canStrike(minotaur2));
         assertTrue(!ranger3.canStrike(minotaur3));
+    }
+
+    public void testLOS7()
+    {
+        Log.debug("testLOS7()");
+        String hexLabel = "40";  // Jungle
+
+        defender = new Legion("Gr03", "Gr01", hexLabel, null,
+            hydra, null, null, null, null, null, null, null,
+            "Green", game);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null,
+            hydra, guardian, null, null, null, null, null, null,
+            "Black", game);
+
+        game.getPlayer("Green").addLegion(defender);
+        game.getPlayer("Black").addLegion(attacker);
+
+        attacker.setEntrySide(5);
+
+        battle = new Battle(game, attacker.getMarkerId(), 
+            defender.getMarkerId(), Constants.ATTACKER, hexLabel,
+            1, Constants.FIGHT);
+
+        Critter hydra1 = defender.getCritter(0);
+        Critter hydra2 = attacker.getCritter(0);
+        Critter guardian1 = attacker.getCritter(1);
+
+        hydra1.setCurrentHexLabel("D5");
+        hydra2.setCurrentHexLabel("E3");
+        guardian1.setCurrentHexLabel("E4");
+
+        assertTrue(!battle.isLOSBlocked(hydra1.getCurrentHex(),
+            hydra2.getCurrentHex()));
+        assertEquals(hydra2.getStrikeNumber(hydra1), 5);
     }
 }
