@@ -9,13 +9,13 @@ from predictsplits import PredictSplits, CreatureInfo, Node, AllPredictSplits
 
 class PredictSplitsTestCase(unittest.TestCase):
 
-    starting_creatures = ["Titan", "Angel", "Ogre", "Ogre", "Centaur", "Centaur",
-                     "Gargoyle", "Gargoyle"]
+    starting_creatures = ["Titan", "Angel", "Ogre", "Ogre", "Centaur", 
+      "Centaur", "Gargoyle", "Gargoyle"]
 
     def testPredictSplits1(self):
         print "\ntest 1 begins"
 
-        ps = PredictSplits("dripton", "Rd01", self.starting_creatures)
+        ps = PredictSplits("Rd", "Rd01", self.starting_creatures)
         ps.printLeaves()
 
         turn = 1
@@ -225,7 +225,7 @@ class PredictSplitsTestCase(unittest.TestCase):
     def testPredictSplits2(self):
         print "\ntest 2 begins"
 
-        ps = PredictSplits("dripton", "Rd11", self.starting_creatures)
+        ps = PredictSplits("Rd", "Rd11", self.starting_creatures)
         ps.printLeaves()
 
         turn = 1
@@ -584,7 +584,7 @@ class PredictSplitsTestCase(unittest.TestCase):
     def testPredictSplits3(self):
         print "\ntest 3 begins"
 
-        ps = PredictSplits("Green", "Gr07", self.starting_creatures)
+        ps = PredictSplits("Gr", "Gr07", self.starting_creatures)
         ps.printLeaves()
 
         turn = 1
@@ -862,7 +862,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(ps.getLeaf("Gd07").allCertain())
         assert(ps.getLeaf("Gd09").allCertain())
         assert(not ps.getLeaf("Gd10").allCertain())
-        assert(not ps.getLeaf("Gd11").allCertain())   # XXX
+        assert(not ps.getLeaf("Gd11").allCertain())
         assert(not ps.getLeaf("Gd12").allCertain())
 
         turn = 17
