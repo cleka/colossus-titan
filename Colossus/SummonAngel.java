@@ -37,7 +37,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
 
         if (player.canSummonAngel() == false || legion.getHeight() > 6)
         {
-            dispose();
+            cleanup(false);
             return;
         }
 
@@ -45,7 +45,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         // board into a state where those legions can be selected.
         if (board.highlightSummonableAngels(legion) < 1)
         {
-            dispose();
+            cleanup(false);
             return;
         }
 
@@ -95,6 +95,21 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     }
 
 
+    void cleanup(boolean summoned)
+    {
+        if (summoned)
+        {
+            // Only one angel can be summoned per turn.
+            player.disallowSummoningAngel();
+            legion.markSummon();
+        }
+
+        board.finishSummoningAngel();
+
+        dispose();
+    }
+
+
     public void paint(Graphics g)
     {
         if (!imagesLoaded)
@@ -141,20 +156,14 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         {
             donor.removeCreature(Creature.angel);
             legion.addCreature(Creature.angel);
-            // Only one angel can be summoned per turn.
-            player.disallowSummoningAngel();
-            board.finishSummoningAngel();
-            dispose();
+            cleanup(true);
         }
         
         else if (archangelChit.select(point) && !archangelChit.isDead())
         {
             donor.removeCreature(Creature.archangel);
             legion.addCreature(Creature.archangel);
-            // Only one angel can be summoned per turn.
-            player.disallowSummoningAngel();
-            board.finishSummoningAngel();
-            dispose();
+            cleanup(true);
         }
     }
 
@@ -185,8 +194,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
 
     public void windowClosing(WindowEvent event)
     {
-        board.finishSummoningAngel();
-        dispose();
+        cleanup(false);
     }
 
     public void windowDeactivated(WindowEvent event)
@@ -245,16 +253,12 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
                 return;
             }
 
-            // Only one angel can be summoned per turn.
-            player.disallowSummoningAngel();
-            board.finishSummoningAngel();
-            dispose();
+            cleanup(true);
         }
 
         else if (e.getActionCommand() == "Cancel")
         {
-            board.finishSummoningAngel();
-            dispose();
+            cleanup(false);
         }
     }
 
