@@ -4,7 +4,7 @@
 <!-- $Id$ -->
 
 <!-- To use this you need:
-     Sun JDK 1.3+    http://java.sun.com  (currently recommend 1.4.0)
+     Sun JDK 1.4+    http://java.sun.com  (currently recommend 1.4.1)
      Ant 1.5+        http://jakarta.apache.org/ant/
      JavaCC 2.1      http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
         Environment var JAVACC_HOME pointing to JavaCC install root
