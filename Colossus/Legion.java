@@ -430,6 +430,36 @@ public final class Legion extends GameSource implements Comparable
     }
 
 
+    /** Return a list of imageNames for all critters in this legion.
+     *  Unless showAll is true, return "Unknown" for critters that
+     *  are not visible.  Put all the Unknowns at the end of the
+     *  list to avoid giving out too much information. */
+    public java.util.List getImageNames(boolean showAll)
+    {
+        sortCritters();
+        java.util.List imageNames = new ArrayList();
+        Iterator it = getCritters().iterator();
+        int unknowns = 0;
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (showAll || critter.isVisible())
+            {
+                imageNames.add(critter.getImageName(false));
+            }
+            else
+            {
+                unknowns++;
+            }
+        }
+        for (int i = 0; i < unknowns; i++)
+        {
+            imageNames.add("Unknown");
+        }
+        return imageNames;
+    }
+
+
     public String getImageName()
     {
         return markerId;
@@ -631,7 +661,7 @@ public final class Legion extends GameSource implements Comparable
         game.getServer().allAlignLegions(set);
 
         Log.event("Legion " + getLongMarkerName() + " in " +
-            getCurrentHexLabel() + (teleported ?
+            getStartingHexLabel() + (teleported ?
             (game.getNumEnemyLegions(hexLabel, game.getPlayer(playerName)) > 0
             ? " titan teleports "
             : " tower teleports (" + teleportingLord + ") " ) : " moves ") +
@@ -752,8 +782,8 @@ public final class Legion extends GameSource implements Comparable
         {
             Legion candidate = (Legion)it.next();
             if (candidate != this &&
-                (candidate.numCreature(Creature.getCreatureByName("Angel")) > 0) &&
-                !game.isEngagement(candidate.getCurrentHexLabel()))
+                (candidate.numCreature(Creature.getCreatureByName("Angel")) 
+                > 0) && !game.isEngagement(candidate.getCurrentHexLabel()))
             {
                 return true;
             }
@@ -772,7 +802,8 @@ public final class Legion extends GameSource implements Comparable
         {
             Legion candidate = (Legion)it.next();
             if (candidate != this &&
-                (candidate.numCreature(Creature.getCreatureByName("Archangel")) > 0) &&
+                (candidate.numCreature(
+                Creature.getCreatureByName("Archangel")) > 0) &&
                 !game.isEngagement(candidate.getCurrentHexLabel()))
             {
                 return true;

@@ -1,3 +1,5 @@
+Show just-recruited enemy critters on top of their stacks.
+
 Add a window that shows the recruiting tree.
 
 Version stamping, showing up in an About menu.

@@ -276,7 +276,15 @@ public final class Client
      *  connections when they want to quit in a hurry. */
     boolean withdrawFromGame()
     {
-        return false;
+        // XXX Right now the game breaks if a player quits outside his
+        // own turn.  But we need to support this, or players will
+        // just drop connections.
+        if (playerName != server.getActivePlayerName())
+        {
+            return false;
+        }
+        server.withdrawFromGame(playerName);
+        return true;
     }
 
 
@@ -934,10 +942,12 @@ public final class Client
     }
 
 
-    public String pickRecruit(Legion legion)
+    /** Called from server. */
+    public String pickRecruit(ArrayList recruits, java.util.List imageNames,
+        String hexDescription, String markerId)
     {
-        legion.sortCritters();
-        Creature recruit = PickRecruit.pickRecruit(board.getFrame(), legion);
+        Creature recruit = PickRecruit.pickRecruit(board.getFrame(), recruits,
+            imageNames, hexDescription, markerId, this);
         if (recruit != null)
         {
             return recruit.toString();
@@ -945,10 +955,11 @@ public final class Client
         return null;
     }
 
-    public String pickRecruiter(Legion legion, ArrayList recruiters)
+    public String pickRecruiter(ArrayList recruiters, 
+        java.util.List imageNames, String hexDescription, String markerId)
     {
         Creature recruiter = PickRecruiter.pickRecruiter(board.getFrame(),
-            legion, recruiters);
+            recruiters, imageNames, hexDescription, markerId, this);
         if (recruiter != null)
         {
             return recruiter.toString();
@@ -1198,26 +1209,9 @@ public final class Client
     }
 
     /** Used for human players only, not the AI. */
-    public void doMuster(String markerId)
+    void doMuster(String markerId)
     {
-        // XXX Remove direct legion reference
-        Legion legion = server.getGame().getLegionByMarkerId(markerId);
-        if (legion.hasMoved() && legion.canRecruit())
-        {
-            legion.sortCritters();
-            Creature recruit = PickRecruit.pickRecruit(board.getFrame(),
-                legion);
-            if (recruit != null)
-            {
-                server.doRecruit(recruit, legion);
-            }
-
-            if (!legion.canRecruit())
-            {
-                server.allUpdateStatusScreen();
-                server.allUnselectHexByLabel(legion.getCurrentHexLabel());
-            }
-        }
+        server.doMuster(markerId);
     }
 
 
@@ -1491,7 +1485,7 @@ public final class Client
 
     public String getActivePlayerName()
     {
-        return server.getGame().getActivePlayerName();
+        return server.getActivePlayerName();
     }
 
     public int getPhase()
@@ -1514,11 +1508,6 @@ public final class Client
         return server.getGame().doMove(markerId, hexLabel);
     }
 
-    public void advancePhase(int oldPhase)
-    {
-        server.getGame().advancePhase(oldPhase);
-    }
-
     /** Return a list of Creatures. */
     public ArrayList findEligibleRecruits(String markerId, String hexLabel)
     {
@@ -1535,12 +1524,6 @@ public final class Client
     public Set findSummonableAngels(String markerId)
     {
         return server.getGame().findSummonableAngels(markerId);
-    }
-
-    /** Return a set of hexLabels. */
-    public Set findEngagements()
-    {
-        return server.getGame().findEngagements();
     }
 
     /** Return a set of hexLabels. */
@@ -1588,6 +1571,11 @@ public final class Client
         return server.getGame().findTallLegionHexes();
     }
 
+    public Set findEngagements()
+    {
+        return server.getGame().findEngagements();
+    }
+
     public void newGame()
     {
         server.getGame().newGame();
@@ -1606,6 +1594,102 @@ public final class Client
     public void saveGame(String filename)
     {
         server.getGame().saveGame(filename);
+    }
+
+    public String getLongMarkerName(String markerId)
+    {
+        return server.getLongMarkerName(markerId);
+    }
+
+    /** Return a list of Strings. */
+    public java.util.List getLegionImageNames(String markerId)
+    {
+        return server.getLegionImageNames(markerId, playerName);
+    }
+
+    public void undoLastSplit()
+    {
+        server.undoLastSplit(playerName);
+    }
+
+    public void undoLastMove()
+    {
+        server.undoLastMove(playerName);
+    }
+
+    public void undoLastRecruit()
+    {
+        server.undoLastRecruit(playerName);
+    }
+
+    public void undoAllSplits()
+    {
+        server.undoAllSplits(playerName);
+    }
+
+    public void undoAllMoves()
+    {
+        server.undoAllMoves(playerName);
+    }
+
+    public void undoAllRecruits()
+    {
+        server.undoAllRecruits(playerName);
+    }
+
+
+    public void doneWithSplits()
+    {
+        if (!playerName.equals(server.getActivePlayerName()))
+        {
+            return;
+        }
+        if (!server.doneWithSplits(playerName))
+        {
+            showMessageDialog("Must split");
+        }
+    }
+
+    public void doneWithMoves()
+    {
+        if (!playerName.equals(server.getActivePlayerName()))
+        {
+            return;
+        }
+        String error = server.doneWithMoves(playerName);
+        if (!error.equals(""))
+        {
+            showMessageDialog(error);
+            clearRecruitChits();
+            board.highlightUnmovedLegions();
+        }
+    }
+
+    public void doneWithEngagements()
+    {
+        if (!playerName.equals(server.getActivePlayerName()))
+        {
+            return;
+        }
+        if (!server.doneWithEngagements(playerName))
+        {
+            showMessageDialog("Must resolve engagements");
+        }
+    }
+
+    public void doneWithRecruits()
+    {
+        if (!playerName.equals(server.getActivePlayerName()))
+        {
+            return;
+        }
+        server.doneWithRecruits(playerName);
+    }
+
+
+    public boolean isMyLegion(String markerId)
+    {
+        return (playerName.equals(server.getPlayerNameByMarkerId(markerId)));
     }
 
 

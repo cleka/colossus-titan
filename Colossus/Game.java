@@ -1587,6 +1587,7 @@ public final class Game extends GameSource
     }
 
 
+    /** Add recruit to legion. */
     public void doRecruit(Creature recruit, Legion legion)
     {
         // Pick the recruiter(s) if necessary.
@@ -2983,5 +2984,4 @@ public final class Game extends GameSource
         }
         return set;
     }
-
 }

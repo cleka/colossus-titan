@@ -617,28 +617,58 @@ public final class Server
     }
 
 
-    public String pickRecruit(Legion legion)
+    /** Called from Game. */
+    String pickRecruit(Legion legion)
+    {
+        legion.sortCritters();
+        Client client = getClient(legion.getPlayerName());
+        ArrayList recruits = game.findEligibleRecruits(legion.getMarkerId(),
+            legion.getCurrentHexLabel());
+        java.util.List imageNames = legion.getImageNames(true);
+        String hexDescription = legion.getCurrentHex().getDescription();
+
+        return client.pickRecruit(recruits, imageNames, hexDescription,
+            legion.getMarkerId());
+    }
+
+    /** Handle mustering for legion. */
+    public void doMuster(String markerId)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (legion != null && legion.hasMoved() && legion.canRecruit())
+        {
+            legion.sortCritters();
+            String recruitName = pickRecruit(legion);
+            Creature recruit = Creature.getCreatureByName(recruitName);
+            if (recruit != null)
+            {
+                game.doRecruit(recruit, legion);
+            }
+
+            if (!legion.canRecruit())
+            {
+                allUpdateStatusScreen();
+                allUnselectHexByLabel(legion.getCurrentHexLabel());
+            }
+        }
+    }
+
+
+
+    /** Called from Game. */
+    String pickRecruiter(Legion legion, ArrayList recruiters)
     {
         Client client = getClient(legion.getPlayerName());
-        return client.pickRecruit(legion);
+
+        java.util.List imageNames = legion.getImageNames(true);
+        String hexDescription = legion.getCurrentHex().getDescription();
+        return client.pickRecruiter(recruiters, imageNames, hexDescription,
+            legion.getMarkerId());
     }
 
 
-    /** Need to do error checking. */
-    public void doRecruit(Creature recruit, Legion legion)
-    {
-        game.doRecruit(recruit, legion);
-    }
-
-
-    public String pickRecruiter(Legion legion, ArrayList recruiters)
-    {
-        Client client = getClient(legion.getPlayerName());
-        return client.pickRecruiter(legion, recruiters);
-    }
-
-
-    public String splitLegion(Legion legion, String selectedMarkerId)
+    /** Called from Game. */
+    String splitLegion(Legion legion, String selectedMarkerId)
     {
         Client client = getClient(legion.getPlayerName());
         return client.splitLegion(legion, selectedMarkerId);
@@ -913,11 +943,203 @@ public final class Server
     /** Return the new die roll, or -1 on error. */
     public int mulligan(String playerName)
     {
-        if (!playerName.equals(game.getActivePlayerName()))
+        if (!playerName.equals(getActivePlayerName()))
         {
             return -1;
         }
         return game.mulligan();
+    }
+
+
+    public String getLongMarkerName(String markerId)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (legion != null)
+        {
+            return legion.getLongMarkerName();
+        }
+        else
+        {
+            return "Bogus legion";
+        }
+    }
+
+    public java.util.List getLegionImageNames(String markerId, 
+        String playerName)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (legion == null)
+        {
+            return new ArrayList();
+        }
+        boolean showAll = false;
+        if (playerName.equals(legion.getPlayerName()) ||
+            getClientOption(Options.allStacksVisible))
+        {
+            showAll = true;
+        }
+        return legion.getImageNames(showAll);
+    }
+
+    public void undoLastSplit(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return;
+        }
+        game.getPlayer(playerName).undoLastSplit();
+    }
+
+    public void undoLastMove(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return;
+        }
+        game.getPlayer(playerName).undoLastMove();
+    }
+
+    public void undoLastRecruit(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return;
+        }
+        game.getPlayer(playerName).undoLastRecruit();
+    }
+
+    public void undoAllSplits(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return;
+        }
+        game.getPlayer(playerName).undoAllSplits();
+    }
+
+    public void undoAllMoves(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return;
+        }
+        game.getPlayer(playerName).undoAllMoves();
+    }
+
+    public void undoAllRecruits(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return;
+        }
+        game.getPlayer(playerName).undoAllRecruits();
+    }
+
+    /** Return true if it's okay to advance to the next phase. */
+    public boolean doneWithSplits(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return false;
+        }
+        if (game.getTurnNumber() == 1 && 
+            game.getPlayer(playerName).getNumLegions() == 1)
+        {
+            return false;
+        }
+        game.advancePhase(Game.SPLIT);
+        return true;
+    }
+
+    /** Return an error message, or an empty string if okay. */
+    public String doneWithMoves(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return "Not this player's turn";
+        }
+
+        Player player = game.getPlayer(playerName);
+
+        // If any legion has a legal non-teleport move, then
+        // the player must move at least one legion.
+        if (player.legionsMoved() == 0 &&
+            player.countMobileLegions() > 0)
+        {
+            return "At least one legion must move.";
+        }
+        // If legions share a hex and have a legal
+        // non-teleport move, force one of them to take it.
+        else if (player.splitLegionHasForcedMove())
+        {
+            return "Split legions must be separated.";
+        }
+        // Otherwise, recombine all split legions still in
+        // the same hex, and move on to the next phase.
+        else
+        {
+            player.undoAllSplits();
+            game.advancePhase(Game.MOVE);
+            return "";
+        }
+    }
+
+    /** Return true if it's okay to advance to the next phase. */
+    public boolean doneWithEngagements(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return false;
+        }
+        // Advance only if there are no unresolved engagements.
+        if (game.findEngagements().size() == 0)
+        {
+            game.advancePhase(Game.FIGHT);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /** Return true if it's okay to advance to the next phase. */
+    public boolean doneWithRecruits(String playerName)
+    {
+        if (playerName != getActivePlayerName())
+        {
+            return false;
+        }
+        Player player = game.getPlayer(playerName);
+        player.commitMoves();
+        // Mulligans are only allowed on turn 1.
+        player.setMulligansLeft(0);
+        game.advancePhase(Game.MUSTER);
+        return true;
+    }
+
+    public String getActivePlayerName()
+    {
+        return game.getActivePlayerName();
+    }
+
+    public boolean withdrawFromGame(String playerName)
+    {
+        // XXX Need to support inactive players quitting.
+        if (!playerName.equals(getActivePlayerName()))
+        {
+            return false;
+        }
+        // XXX If player quits while engaged, might need to set slayer.
+        game.getPlayer(playerName).die(null, true);
+        game.advancePhase(game.getPhase());
+        return true;
+    }
+
+
+    public String getPlayerNameByMarkerId(String markerId)
+    {
+        return game.getPlayerByMarkerId(markerId).getName();
     }
 
 

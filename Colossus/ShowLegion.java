@@ -12,10 +12,10 @@ import java.util.*;
 public final class ShowLegion extends JDialog implements MouseListener,
     WindowListener
 {
-    public ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean
-        allStacksVisible)
+    public ShowLegion(JFrame parentFrame, String longMarkerName, 
+        java.util.List imageNames, Point point)
     {
-        super(parentFrame, "Legion " + legion.getLongMarkerName(), false);
+        super(parentFrame, "Legion " + longMarkerName, false);
 
         pack();
         setBackground(Color.lightGray);
@@ -52,21 +52,10 @@ public final class ShowLegion extends JDialog implements MouseListener,
 
         contentPane.setLayout(new FlowLayout());
 
-        Collection critters = legion.getCritters();
-        Iterator it = critters.iterator();
+        Iterator it = imageNames.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            String imageName;
-            if (!allStacksVisible && !critter.isVisible())
-            {
-                imageName = "Unknown";
-            }
-            else
-            {
-                imageName = critter.getImageName();
-            }
-
+            String imageName = (String)it.next();
             Chit chit = new Chit(scale, imageName, this);
             contentPane.add(chit);
             chit.addMouseListener(this);
@@ -132,29 +121,4 @@ public final class ShowLegion extends JDialog implements MouseListener,
     public void windowOpened(WindowEvent e)
     {
     }
-
-    /*
-    public static void main(String [] args)
-    {
-        JFrame frame = new JFrame("testing ShowLegion");
-        int scale = Scale.get();
-        frame.setSize(new Dimension(80 * scale, 80 * scale));
-        frame.pack();
-        frame.setVisible(true);
-
-        Game game = new Game();
-        game.addPlayer("Test");
-        game.initBoard();
-        MasterHex hex = MasterBoard.getHexByLabel("130");
-        Player player = game.getPlayer(0);
-        Legion legion = new Legion("Bk01", null, hex.getLabel(),
-            hex.getLabel(), Creature.titan, Creature.gargoyle,
-            Creature.gargoyle, Creature.cyclops, Creature.cyclops, null,
-            null, null, player.getName(), game);
-        player.addLegion(legion);
-        Point point = new Point(40 * scale, 40 * scale);
-
-        new ShowLegion(frame, legion, point, true);
-    }
-    */
 }

@@ -179,24 +179,18 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = client.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
-                {
-                    return;
-                }
-
                 int phase = client.getPhase();
                 switch(phase)
                 {
                     case Game.SPLIT:
-                        player.undoLastSplit();
+                        client.undoLastSplit();
                         alignAllLegions();
                         highlightTallLegions();
                         repaint();
                         break;
 
                     case Game.MOVE:
-                        player.undoLastMove();
+                        client.undoLastMove();
                         highlightUnmovedLegions();
                         break;
 
@@ -205,7 +199,7 @@ public final class MasterBoard extends JPanel
                         break;
 
                     case Game.MUSTER:
-                        player.undoLastRecruit();
+                        client.undoLastRecruit();
                         highlightPossibleRecruits();
                         break;
                 }
@@ -216,24 +210,18 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = client.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
-                {
-                    return;
-                }
-
                 int phase = client.getPhase();
                 switch(phase)
                 {
                     case Game.SPLIT:
-                        player.undoAllSplits();
+                        client.undoAllSplits();
                         alignAllLegions();
                         highlightTallLegions();
                         repaint();
                         break;
 
                     case Game.MOVE:
-                        player.undoAllMoves();
+                        client.undoAllMoves();
                         highlightUnmovedLegions();
                         break;
 
@@ -242,7 +230,7 @@ public final class MasterBoard extends JPanel
                         break;
 
                     case Game.MUSTER:
-                        player.undoAllRecruits();
+                        client.undoAllRecruits();
                         highlightPossibleRecruits();
                         break;
                 }
@@ -254,77 +242,23 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = client.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
-                {
-                    return;
-                }
-
                 int phase = client.getPhase();
                 switch(phase)
                 {
                     case Game.SPLIT:
-                        // Initial legions must be split.
-                        if (client.getTurnNumber() == 1 &&
-                            player.getNumLegions() == 1)
-                        {
-                            client.showMessageDialog("Must split.");
-                        }
-                        else
-                        {
-                            client.advancePhase(Game.SPLIT);
-                        }
+                        client.doneWithSplits();
                         break;
 
                     case Game.MOVE:
-                        // If any legion has a legal non-teleport move, then
-                        // the player must move at least one legion.
-                        if (player.legionsMoved() == 0 &&
-                            player.countMobileLegions() > 0)
-                        {
-                            highlightUnmovedLegions();
-                            client.showMessageDialog(
-                                "At least one legion must move.");
-                        }
-                        else
-                        {
-                            // If legions share a hex and have a legal
-                            // non-teleport move, force one of them to take it.
-                            if (player.splitLegionHasForcedMove())
-                            {
-                                highlightUnmovedLegions();
-                                client.showMessageDialog(
-                                    "Split legions must be separated.");
-                            }
-                            // Otherwise, recombine all split legions still in
-                            // the same hex, and move on to the next phase.
-                            else
-                            {
-                                player.undoAllSplits();
-                                client.clearRecruitChits();
-                                client.advancePhase(Game.MOVE);
-                            }
-                        }
+                        client.doneWithMoves();
                         break;
 
                     case Game.FIGHT:
-                        // Advance only if there are no unresolved engagements.
-                        if (client.findEngagements().size() == 0)
-                        {
-                            client.advancePhase(Game.FIGHT);
-                        }
-                        else
-                        {
-                            client.showMessageDialog(
-                                "Must Resolve Engagements.");
-                        }
+                        client.doneWithEngagements();
                         break;
 
                     case Game.MUSTER:
-                        player.commitMoves();
-                        // Mulligans are only allowed on turn 1.
-                        player.setMulligansLeft(0);
-                        client.advancePhase(Game.MUSTER);
+                        client.doneWithRecruits();
                         break;
                 }
             }
@@ -343,16 +277,10 @@ public final class MasterBoard extends JPanel
         };
 
 
-        // TODO Let inactive players withdraw from the game.
         withdrawFromGameAction = new AbstractAction(withdrawFromGame)
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = client.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
-                {
-                    return;
-                }
                 String [] options = new String[2];
                 options[0] = "Yes";
                 options[1] = "No";
@@ -364,8 +292,7 @@ public final class MasterBoard extends JPanel
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
-                   player.die(null, true);
-                   client.advancePhase(client.getPhase());
+                   client.withdrawFromGame();
                 }
             }
         };
@@ -1324,7 +1251,7 @@ public final class MasterBoard extends JPanel
         selectHexesByLabels(client.findTallLegionHexes());
     }
 
-    private void highlightUnmovedLegions()
+    public void highlightUnmovedLegions()
     {
         unselectAllHexes();
         Player player = client.getActivePlayer();
@@ -1641,9 +1568,6 @@ public final class MasterBoard extends JPanel
             if (marker != null)
             {
                 String markerId = marker.getId();
-                // XXX Remove direct legion reference
-                Legion legion = client.getLegionByMarkerId(markerId);
-                String playerName = legion.getPlayerName();
 
                 // Move the clicked-on marker to the top of the z-order.
                 client.setMarker(markerId, marker);
@@ -1654,23 +1578,15 @@ public final class MasterBoard extends JPanel
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                    // XXX We need a client-side legion class that doesn't
-                    // know the full contents of every enemy legion.
-                    legion.sortCritters();
-                    new ShowLegion(masterFrame, legion, point,
-                        client.getOption(Options.allStacksVisible) ||
-                        playerName == client.getPlayerName());
+                    new ShowLegion(masterFrame, 
+                        client.getLongMarkerName(markerId),
+                        client.getLegionImageNames(markerId), point);
                     return;
                 }
-                else
+                else if (client.isMyLegion(markerId))
                 {
-                    // Only the current player can manipulate his legions.
-                    if (playerName.equals(client.getPlayerName()) &&
-                        playerName.equals(client.getActivePlayerName()))
-                    {
-                        actOnLegion(markerId, hex.getLabel());
-                        return;
-                    }
+                    actOnLegion(markerId, hex.getLabel());
+                    return;
                 }
             }
 

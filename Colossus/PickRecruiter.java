@@ -14,8 +14,6 @@ public final class PickRecruiter extends JDialog implements MouseListener,
     WindowListener
 {
     private ArrayList recruiters;
-    private Player player;
-    private Legion legion;
     private ArrayList recruiterChits = new ArrayList();
     private Marker legionMarker;
     private int height;
@@ -25,47 +23,37 @@ public final class PickRecruiter extends JDialog implements MouseListener,
 
 
     /** recruiters is a list of Creatures */
-    private PickRecruiter(JFrame parentFrame, Legion legion,
-        ArrayList recruiters)
+    private PickRecruiter(JFrame parentFrame, ArrayList recruiters, 
+        java.util.List imageNames, String hexDescription, String markerId,
+        Client client)
     {
-        super(parentFrame, legion.getPlayerName() + ": Pick Recruiter in " +
-            legion.getCurrentHex().getDescription(), true);
+        super(parentFrame, client.getPlayerName() + ": Pick Recruiter in " +
+            hexDescription, true);
 
         recruiter = null;
-
-        this.legion = legion;
-        player = legion.getPlayer();
-
         this.recruiters = recruiters;
+        height = imageNames.size();
 
         addMouseListener(this);
         addWindowListener(this);
-
         Container contentPane = getContentPane();
-
         contentPane.setLayout(gridbag);
-
         pack();
-
         setBackground(Color.lightGray);
-
-        height = legion.getHeight();
-
         setResizable(false);
         int scale = 4 * Scale.get();
 
-        legionMarker = new Marker(scale, legion.getImageName(), this, null);
+        legionMarker = new Marker(scale, markerId, this, null);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         gridbag.setConstraints(legionMarker, constraints);
         contentPane.add(legionMarker);
 
-        Collection critters = legion.getCritters();
-        Iterator it = critters.iterator();
+        Iterator it = imageNames.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = new Chit(scale, critter.getImageName(), this);
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 0;
             gridbag.setConstraints(chit, constraints);
@@ -109,10 +97,12 @@ public final class PickRecruiter extends JDialog implements MouseListener,
     }
 
 
-    public static Creature pickRecruiter(JFrame parentFrame, Legion legion,
-        ArrayList recruiters)
+    public static Creature pickRecruiter(JFrame parentFrame, 
+        ArrayList recruiters, java.util.List imageNames, 
+        String hexDescription, String markerId, Client client)
     {
-        new PickRecruiter(parentFrame, legion, recruiters);
+        new PickRecruiter(parentFrame, recruiters, imageNames, 
+            hexDescription, markerId, client);
         return recruiter;
     }
 
@@ -185,36 +175,4 @@ public final class PickRecruiter extends JDialog implements MouseListener,
     public void windowOpened(WindowEvent e)
     {
     }
-
-    /*
-    public static void main(String [] args)
-    {
-        JFrame frame = new JFrame("testing PickRecruiter");
-        int scale = Scale.get();
-        frame.setSize(new Dimension(80 * scale, 80 * scale));
-        frame.pack();
-        frame.setVisible(true);
-
-        Game game = new Game();
-        game.initBoard();
-        MasterHex hex = MasterBoard.getHexByLabel("130");
-
-        game.addPlayer("Test");
-        Player player = game.getPlayer(0);
-        Legion legion = new Legion("Bk01", null, hex.getLabel(),
-            hex.getLabel(), Creature.titan, Creature.gargoyle,
-            Creature.gargoyle, Creature.cyclops, Creature.cyclops, null,
-            null, null, player.getName(), game);
-        player.addLegion(legion);
-
-        ArrayList recruiters = new ArrayList();
-        recruiters.add(Creature.gargoyle);
-        recruiters.add(Creature.cyclops);
-
-        Creature creature = PickRecruiter.pickRecruiter(frame, legion,
-            recruiters);
-        System.out.println("Picked " + creature);
-        System.exit(0);
-    }
-    */
 }

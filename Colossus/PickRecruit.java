@@ -13,8 +13,7 @@ import java.util.*;
 public final class PickRecruit extends JDialog implements MouseListener,
     WindowListener
 {
-    private ArrayList recruits = new ArrayList();
-    private Legion legion;
+    private ArrayList recruits; 
     private ArrayList recruitChits = new ArrayList();
     private Marker legionMarker;
     private ArrayList legionChits = new ArrayList();
@@ -25,59 +24,44 @@ public final class PickRecruit extends JDialog implements MouseListener,
     private static boolean active;
 
 
-    private PickRecruit(JFrame parentFrame, Legion legion)
+    private PickRecruit(JFrame parentFrame, ArrayList recruits, 
+        java.util.List imageNames, String hexDescription, String markerId,
+        Client client)
     {
-        super(parentFrame, legion.getPlayerName() +
-            ": Pick Recruit in " + legion.getCurrentHex().getDescription(),
-            true);
-
-        if (!legion.canRecruit())
-        {
-            dispose();
-            return;
-        }
+        super(parentFrame, client.getPlayerName() +
+            ": Pick Recruit in " + hexDescription, true);
 
         this.parentFrame = parentFrame;
-        this.legion = legion;
-        Game game = legion.getGame();
-
-        recruits = game.findEligibleRecruits(legion.getMarkerId(),
-            legion.getCurrentHexLabel());
+        this.recruits = recruits;
         int numEligible = recruits.size();
 
         addMouseListener(this);
         addWindowListener(this);
-
         Container contentPane = getContentPane();
-
         contentPane.setLayout(gridbag);
-
         pack();
-
         setBackground(Color.lightGray);
-
         setResizable(false);
         int scale = 4 * Scale.get();
 
-        legionMarker = new Marker(scale, legion.getImageName(), this, null);
+        legionMarker = new Marker(scale, markerId, this, null);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         gridbag.setConstraints(legionMarker, constraints);
         contentPane.add(legionMarker);
 
-        Collection critters = legion.getCritters();
-        Iterator it = critters.iterator();
+        Iterator it = imageNames.iterator();
         while (it.hasNext())
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = new Chit(scale, critter.getImageName(), this);
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
             legionChits.add(chit);
             constraints.gridy = 0;
             gridbag.setConstraints(chit, constraints);
             contentPane.add(chit);
         }
 
-        int height = critters.size();
+        int height = imageNames.size();
         // There are height + 1 chits in the top row.  There
         // are numEligible chits / labels to place beneath.
         // So we have (height + 1) - numEligible empty
@@ -101,7 +85,9 @@ public final class PickRecruit extends JDialog implements MouseListener,
             gridbag.setConstraints(chit, constraints);
             contentPane.add(chit);
             chit.addMouseListener(this);
-            int count = game.getCaretaker().getCount(recruit);
+
+            // XXX Remove direct caretaker reference.
+            int count = client.getCaretaker().getCount(recruit);
             JLabel countLabel = new JLabel(Integer.toString(count),
                 JLabel.CENTER);
             constraints.gridy = 2;
@@ -122,13 +108,16 @@ public final class PickRecruit extends JDialog implements MouseListener,
 
 
     /** Return the creature recruited, or null if none. */
-    public static Creature pickRecruit(JFrame parentFrame, Legion legion)
+    public static Creature pickRecruit(JFrame parentFrame, ArrayList recruits,
+        java.util.List imageNames, String hexDescription, String markerId,
+        Client client)
     {
         recruit = null;
         if (!active)
         {
             active = true;
-            new PickRecruit(parentFrame, legion);
+            new PickRecruit(parentFrame, recruits, imageNames,
+                hexDescription, markerId, client);
             active = false;
         }
         return recruit;
