@@ -91,7 +91,7 @@ public class MasterHex extends Hex
         rectBound = hexagon.getBounds();
         center = findCenter();
         offCenter = new Point((int)Math.round((xVertex[0] + xVertex[1]) / 2),
-            (int)Math.round(((yVertex[0] + yVertex[3]) / 2) + 
+            (int)Math.round(((yVertex[0] + yVertex[3]) / 2) +
             (inverted ? -(scale / 6.0) : (scale / 6.0))));
     }
 
@@ -166,7 +166,7 @@ public class MasterHex extends Hex
                 break;
         }
 
-        // The word "MOUNTAINS" needs to be printed in the wide part of 
+        // The word "MOUNTAINS" needs to be printed in the wide part of
         // the hex, with a smaller font.
         if (name.equals("MOUNTAINS"))
         {
@@ -467,6 +467,17 @@ public class MasterHex extends Hex
     }
 
 
+    public void moveToTop(Legion legion)
+    {
+        if (legions.indexOf(legion) > 0)
+        {
+            legions.remove(legion);
+            legions.add(0, legion);
+            alignLegions();
+        }
+    }
+
+
     public int getNumFriendlyLegions(Player player)
     {
         int count = 0;
@@ -607,11 +618,17 @@ public class MasterHex extends Hex
     }
 
 
-    public void addLegion(Legion legion)
+    public void addLegion(Legion legion, boolean top)
     {
         legions.add(legion);
-
-        // Reposition all legions within the hex.
+        if (top)
+        {
+            board.moveMarkerToTop(legion);
+        }
+        else
+        {
+            board.moveMarkerToBottom(legion);
+        }
         alignLegions();
     }
 
@@ -619,13 +636,9 @@ public class MasterHex extends Hex
     public void removeLegion(Legion legion)
     {
         legions.remove(legion);
-
-        // Write over the bounding area of the hex with the background
-        // color, to prevent artifacts from chits that used to hang outside
-        // the hex boundary.
+        board.removeMarker(legion);
         if (getNumLegions() >= 1)
         {
-            // Reposition all legions within the hex.
             alignLegions();
         }
     }
@@ -704,7 +717,7 @@ public class MasterHex extends Hex
     }
 
 
-    // Return the number of possible entry sides.
+    /** Return the number of possible entry sides. */
     public int getNumEntrySides()
     {
         return entrySides.size();

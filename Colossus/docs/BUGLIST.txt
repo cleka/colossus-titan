@@ -1,10 +1,9 @@
 Suspected Java bugs:
 
 Linux, Sun 1.2.2/1.3beta/1.3betarefresh, Blackdown 1.2.2RC4:
-   BattleDice dialog sometimes moves from upper right corner to upper
-   left corner.  ShowLegion dialog sometimes pops up in upper left
-   corner instead of over mouse position.  Seems to be fixed in Solaris 
-   and Linux 1.3 final.
+   BattleDice and ShowLegion dialogs sometimes appear in the upper 
+   left corner of the screen, instead of in the correct location. 
+   Seems to be fixed in Solaris and Linux 1.3 final.
 
 Win98, jdk1.3: setLocation() to keep ShowLegion, ShowMasterHex
    dialogs from displaying past the bottom or right edge of the
@@ -24,20 +23,6 @@ Concession timing.  If both players want to concede, the non-phasing
    aren't allowed in the middle of strikes.  Etc.
 Striking continues after concession, until the normal time to check for
    creature (and then player) death.
-
-Solaris, jdk1.3: Tried to strike allied <creature>
-
-Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
-   eliminates that chit's movement options.  "Undo last move" works.
-
-Solaris, jdk1.3; Win98, jdk1.3: Mutual elimination, with defender's
-   titan killed.  Got the message "Legion XXXX is eliminated" twice
-   for the attacking legion, once for the defender.  OK when just
-   attacking titan is killed.  For a mutual with no titans, the
-   message appears twice for each legion: A, D, A, D.
-Fixed this, but now we again have the problem where a dead 
-   defender's next turn happens.  ("Battle phase advances to Move,
-   Player's battle turn, number 5")
 
 Solaris, jdk1.3; Win98, jdk1.3: BattleMap menu is not immediately active.  
    It takes a few seconds to wake up.

@@ -302,7 +302,7 @@ public class Critter extends Creature
         currentHex = startingHex;
         currentHex.addCritter(this);
         moved = false;
-        battle.clearLastCritterMoved();
+        battle.setLastCritterMoved(null);
         Game.logEvent(name + " undoes move and returns to " +
             startingHex.getLabel());
         map.repaint();

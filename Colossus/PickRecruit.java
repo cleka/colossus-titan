@@ -24,6 +24,7 @@ public class PickRecruit extends JDialog implements MouseListener,
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private static Creature recruit;
+    private static boolean active;
 
 
     private PickRecruit(JFrame parentFrame, Legion legion)
@@ -31,8 +32,6 @@ public class PickRecruit extends JDialog implements MouseListener,
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruit in " + legion.getCurrentHex().getDescription(),
             true);
-
-        recruit = null;
 
         if (!legion.canRecruit())
         {
@@ -126,7 +125,13 @@ public class PickRecruit extends JDialog implements MouseListener,
     /** Return the creature recruited, or null if none. */
     public static Creature pickRecruit(JFrame parentFrame, Legion legion)
     {
-        new PickRecruit(parentFrame, legion);
+        recruit = null;
+        if (!active)
+        {
+            active = true;
+            new PickRecruit(parentFrame, legion);
+            active = false;
+        }
         return recruit;
     }
 

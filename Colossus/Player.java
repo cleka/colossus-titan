@@ -16,7 +16,7 @@ public class Player implements Comparable
     private String playersEliminated;  // RdBkGr
 
     private TreeSet markersAvailable = new TreeSet();
-    private String selectedMarker;
+    private String selectedMarkerId;
 
     private ArrayList legions = new ArrayList();
     private Legion selectedLegion = null;
@@ -388,13 +388,13 @@ public class Player implements Comparable
     }
 
 
-    public void markLastLegionMoved(Legion legion)
+    public void setLastLegionMoved(Legion legion)
     {
         lastLegionMoved = legion;
     }
 
 
-    public void markLastLegionSplitOff(Legion legion)
+    public void setLastLegionSplitOff(Legion legion)
     {
         lastLegionSplitOff = legion;
     }
@@ -453,15 +453,9 @@ public class Player implements Comparable
     }
 
 
-    public void markLastLegionRecruited(Legion legion)
+    public void setLastLegionRecruited(Legion legion)
     {
         lastLegionRecruited = legion;
-    }
-
-
-    public void clearLastLegionRecruited()
-    {
-        lastLegionRecruited = null;
     }
 
 
@@ -603,29 +597,23 @@ public class Player implements Comparable
     }
 
 
-    public String getSelectedMarker()
+    public String getSelectedMarkerId()
     {
-        return selectedMarker;
+        return selectedMarkerId;
     }
 
 
-    public void clearSelectedMarker()
-    {
-        selectedMarker = null;
-    }
-
-
-    public void selectMarker(String markerId)
+    public void selectMarkerId(String markerId)
     {
         // Remove the selected marker from the list of those available.
         boolean found = markersAvailable.remove(markerId);
         if (found)
         {
-            selectedMarker = markerId;
+            selectedMarkerId = markerId;
         }
         else
         {
-            selectedMarker = null;
+            selectedMarkerId = null;
         }
     }
 

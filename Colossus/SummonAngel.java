@@ -23,6 +23,7 @@ public class SummonAngel extends JDialog implements MouseListener,
     private GridBagConstraints constraints = new GridBagConstraints();
     private JButton button1;
     private JButton button2;
+    private boolean summoned;
 
 
     public SummonAngel(MasterBoard board, Legion legion)
@@ -107,14 +108,21 @@ public class SummonAngel extends JDialog implements MouseListener,
     }
 
 
+    public boolean getSummoned()
+    {
+        return summoned;
+    }
+
+
     private void cleanup(Creature creature)
     {
         // Sanity check, just in case this got called twice.
         if (creature != null && legion.canSummonAngel())
         {
+            summoned = true;
+
             // Only one angel can be summoned per turn.
             player.disallowSummoningAngel();
-            legion.markSummoned();
             player.setLastLegionSummonedFrom(donor);
 
             // Move the angel or archangel.

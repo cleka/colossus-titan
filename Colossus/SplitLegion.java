@@ -23,22 +23,23 @@ public class SplitLegion extends JDialog implements MouseListener,
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
+    private static boolean active;
 
 
-    public SplitLegion(JFrame parentFrame, Legion oldLegion, Player player)
+    private SplitLegion(JFrame parentFrame, Legion oldLegion, String name)
     {
-        super(parentFrame, player.getName() + ": Split Legion " +
+        super(parentFrame, name + ": Split Legion " +
             oldLegion.getMarkerId(), true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
 
         this.oldLegion = oldLegion;
-        this.player = player;
         this.parentFrame = parentFrame;
+        player = oldLegion.getPlayer();
 
         String selectedMarker = PickMarker.pickMarker(parentFrame,
-            player.getName(), player.getMarkersAvailable());
+            name, player.getMarkersAvailable());
 
         if (selectedMarker == null)
         {
@@ -47,15 +48,15 @@ public class SplitLegion extends JDialog implements MouseListener,
         }
         else
         {
-            player.selectMarker(selectedMarker);
+            player.selectMarkerId(selectedMarker);
         }
 
         pack();
 
-        newLegion = new Legion(player.getSelectedMarker(), oldLegion,
+        newLegion = new Legion(player.getSelectedMarkerId(), oldLegion,
             oldLegion.getCurrentHex(), null, null, null, null, null,
             null, null, null, player);
-        String imageName = player.getSelectedMarker();
+        String imageName = player.getSelectedMarkerId();
         newMarker = new Marker(scale, imageName, this, null);
         newLegion.setMarker(newMarker);
 
@@ -131,6 +132,18 @@ public class SplitLegion extends JDialog implements MouseListener,
 
         setVisible(true);
     }
+    
+    
+    public static void splitLegion(JFrame parentFrame, Legion oldLegion)
+    {
+        if (!active)
+        {
+            active = true;
+            new SplitLegion(parentFrame, oldLegion, 
+                oldLegion.getPlayer().getName());
+            active = false;
+        }
+    }
 
 
     private void cancel()
@@ -166,7 +179,6 @@ public class SplitLegion extends JDialog implements MouseListener,
         newMarker.repaint();
 
         pack();
-
         repaint();
     }
 
@@ -289,7 +301,7 @@ public class SplitLegion extends JDialog implements MouseListener,
             MasterHex hex = newLegion.getCurrentHex();
             if (hex != null)
             {
-                newLegion.getCurrentHex().addLegion(newLegion);
+                newLegion.getCurrentHex().addLegion(newLegion, false);
             }
 
             // Hide the contents of both legions.
@@ -299,7 +311,7 @@ public class SplitLegion extends JDialog implements MouseListener,
             // Mark the last legion split off.
             if (player != null)
             {
-                player.markLastLegionSplitOff(newLegion);
+                player.setLastLegionSplitOff(newLegion);
             }
 
             // Exit.
@@ -336,15 +348,15 @@ public class SplitLegion extends JDialog implements MouseListener,
         player.setTower(1);
         player.setColor("Red");
         player.initMarkersAvailable();
-        player.selectMarker("Rd01");
-        Legion legion = new Legion(player.getSelectedMarker(), null, null,
+        player.selectMarkerId("Rd01");
+        Legion legion = new Legion(player.getSelectedMarkerId(), null, null,
             Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
             Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);
-        Marker marker = new Marker(scale, player.getSelectedMarker(),
+        Marker marker = new Marker(scale, player.getSelectedMarkerId(),
             frame, null);
         legion.setMarker(marker);
 
-        new SplitLegion(frame, legion, player);
+        SplitLegion.splitLegion(frame, legion);
     }
 }

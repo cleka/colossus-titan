@@ -17,6 +17,7 @@ public class AcquireAngel extends JDialog implements MouseListener,
     private static final int scale = 60;
     private static String recruit;
     private ArrayList recruits;
+    private static boolean active;
 
 
     private AcquireAngel(JFrame parentFrame, String name, ArrayList recruits)
@@ -60,15 +61,17 @@ public class AcquireAngel extends JDialog implements MouseListener,
     public static String acquireAngel(JFrame parentFrame, String name,
         ArrayList recruits)
     {
+        recruit = null;
         if (recruits.isEmpty())
         {
             return null;
         }
-
-        recruit = null;
-
-        new AcquireAngel(parentFrame, name, recruits);
-
+        if (!active)
+        {
+            active = true;
+            new AcquireAngel(parentFrame, name, recruits);
+            active = false;
+        }
         return recruit;
     }
 

@@ -27,6 +27,12 @@ public class Marker extends Chit
     {
         this.legion = legion;
     }
+    
+    
+    public Legion getLegion()
+    {
+        return legion;
+    }
 
 
     /** Show the height of the legion. */

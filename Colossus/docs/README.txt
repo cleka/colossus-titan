@@ -236,5 +236,5 @@ Programming:  David Ripton  dripton@wizard.net
               David Barr
 Counter art:  Tchula Ripton
 Bug reports:  Anthony Kam, Bruce Sherrod, Augustin Ku, David Barr,
-              Sean McCulloch, Luca Ferraro
+              Sean McCulloch, Luca Ferraro, Jonathan Woodward
 

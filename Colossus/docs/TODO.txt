@@ -1,7 +1,5 @@
 Hook up remaining actions in MasterBoard menu.
 
-Pick better colors.
-
 Add antialiasing option.
 
 Write a minimal, complete Game.loadGame() that reuses existing 
@@ -19,12 +17,12 @@ Add chits and hexes to containers and use layout managers to place
    chits?  Difficulties with overlapping hexes, stacked chits.
 
 Change more modal dialogs to use a factory that returns a value,
-   rather than a public constructor and a call to a mutator.  This
-   should allow eliminating dialogLock in the callers, reduce
-   global access from dialogs to game objects, and allow dialog
-   results to be more easily replicated by network and computer
-   dialog replacements.  All parameters into the dialogs should
-   be read-only or clones.
+   rather than a public constructor and a call to a mutator.
+   This should reduce global access from dialogs to game objects, 
+   and allow dialog results to be more easily replicated by network 
+   and computer dialog replacements.  All parameters passed into 
+   the dialogs should eventually be read-only or clones, with all
+   changes to game state done by the caller.
 
 Add test main() to remaining dialogs.
 

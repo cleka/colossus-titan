@@ -16,18 +16,16 @@ public class PickEntrySide extends HexMap implements ActionListener,
     private static JButton button5;  // left
     private static JButton button3;  // bottom
     private static JButton button1;  // right
-
     private static boolean laidOut;
-
     private JDialog dialog;
+    private static int entrySide;
 
 
-    public PickEntrySide(JFrame parentFrame, MasterHex masterHex)
+    private PickEntrySide(JFrame parentFrame, MasterHex masterHex)
     {
         super(masterHex);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
 
-        // Reinitialize these every time, since they're static.
         laidOut = false;
 
         Container contentPane = dialog.getContentPane();
@@ -68,6 +66,14 @@ public class PickEntrySide extends HexMap implements ActionListener,
         dialog.setResizable(false);
         dialog.setBackground(Color.white);
         dialog.setVisible(true);
+    }
+
+
+    public static int pickEntrySide(JFrame parentFrame, MasterHex masterHex)
+    {
+        entrySide = -1;
+        new PickEntrySide(parentFrame, masterHex);
+        return entrySide;
     }
 
 
@@ -127,13 +133,7 @@ public class PickEntrySide extends HexMap implements ActionListener,
     // is -1, then do not set an entry side, which will abort the move.
     private void cleanup(int side)
     {
-        masterHex.clearAllEntrySides();
-
-        if (side == 1 || side == 3 || side == 5)
-        {
-            masterHex.setEntrySide(side);
-        }
-
+        entrySide = side;
         dialog.dispose();
     }
 
@@ -176,6 +176,7 @@ public class PickEntrySide extends HexMap implements ActionListener,
         hex.setEntrySide(1);
         hex.setEntrySide(3);
         hex.setEntrySide(5);
-        new PickEntrySide(frame, hex);
+        int side = PickEntrySide.pickEntrySide(frame, hex);
+        System.out.println("chose side " + side);
     }
 }

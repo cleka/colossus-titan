@@ -18,16 +18,10 @@ public class Game
     private int turnNumber = 1;  // Advance when every player has a turn
     private StatusScreen statusScreen;
     private GameApplet applet;
-    private boolean summoningAngel;
     private SummonAngel summonAngel;
     private Battle battle;
     private BattleMap map;
     private static Random random = new Random();
-
-    // Keep multiple quick clicks from popping up multiples
-    // of the same dialog.
-    private boolean dialogLock;
-    private boolean dialogLock2;
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -39,9 +33,11 @@ public class Game
     private boolean disposed;
     private JFrame masterFrame;
 
-    // For debugging, or if the game crashes after movement
-    // has been rolled, we can force the next movement roll
-    // from the command line.
+    private boolean engagementInProgress;
+
+    /** For debugging, or if the game crashes after movement
+     *  has been rolled, we can force the next movement roll
+     *  from the command line. */
     private int forcedMovementRoll;
 
     // Constants for savegames
@@ -1065,7 +1061,7 @@ public class Game
 
                     player.addLegion(legion);
                     MasterHex hex = legion.getCurrentHex();
-                    hex.addLegion(legion);
+                    hex.addLegion(legion, false);
                 }
             }
 
@@ -1115,7 +1111,7 @@ public class Game
     {
         class StringNumComparator implements Comparator
         {
-            public int compare(Object o1, Object o2) 
+            public int compare(Object o1, Object o2)
             {
                 if (!(o1 instanceof String) || !(o2 instanceof String))
                 {
@@ -1893,7 +1889,7 @@ public class Game
         // Pick the recruiter(s) if necessary.
         ArrayList recruiters = findEligibleRecruiters(legion, recruit);
         Creature recruiter;
-        
+
         Player player = legion.getPlayer();
 
         int numEligibleRecruiters = recruiters.size();
@@ -1939,14 +1935,14 @@ public class Game
             recruiter.getPluralName() : recruiter.getName())));
 
         // Recruits are one to a customer.
-        legion.markRecruited();
+        legion.setRecruited(true);
 
-        legion.getPlayer().markLastLegionRecruited(legion);
+        legion.getPlayer().setLastLegionRecruited(legion);
     }
 
 
     /** Return a list of names of angel types that can be acquired. */
-    public static ArrayList findEligibleAngels(Legion legion, 
+    public static ArrayList findEligibleAngels(Legion legion,
         boolean archangel)
     {
         if (legion.getHeight() >= 7)
@@ -2022,15 +2018,15 @@ public class Game
     public void pickInitialMarker(Player player)
     {
         String name = player.getName();
-        String selectedMarker;
+        String selectedMarkerId;
         do
         {
-            selectedMarker = PickMarker.pickMarker(masterFrame, 
+            selectedMarkerId = PickMarker.pickMarker(masterFrame,
                 name, player.getMarkersAvailable());
         }
-        while (selectedMarker == null);
+        while (selectedMarkerId == null);
 
-        player.selectMarker(selectedMarker);
+        player.selectMarkerId(selectedMarkerId);
         logEvent(name + " selected initial marker");
     }
 
@@ -2050,13 +2046,13 @@ public class Game
         Creature.gargoyle.takeOne();
         Creature.gargoyle.takeOne();
 
-        Legion legion = new Legion(player.getSelectedMarker(), null, hex,
+        Legion legion = new Legion(player.getSelectedMarkerId(), null, hex,
             Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
             Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);
 
         player.addLegion(legion);
-        hex.addLegion(legion);
+        hex.addLegion(legion, false);
     }
 
 
@@ -2376,17 +2372,11 @@ public class Game
     }
 
 
-    public SummonAngel getSummonAngel()
-    {
-        return summonAngel;
-    }
-
-
     public void finishBattle()
     {
         masterFrame.show();
 
-        if (summoningAngel && summonAngel != null)
+        if (summonAngel != null)
         {
             highlightSummonableAngels(summonAngel.getLegion());
             summonAngel.repaint();
@@ -2400,6 +2390,8 @@ public class Game
 
         // Insert a blank line in the log file after each battle.
         logEvent("\n");
+
+        engagementInProgress = false;
     }
 
 
@@ -2434,7 +2426,6 @@ public class Game
 
         if (count > 0)
         {
-            summoningAngel = true;
             board.selectHexesByLabels(set);
         }
 
@@ -2444,7 +2435,6 @@ public class Game
 
     public void finishSummoningAngel()
     {
-        summoningAngel = false;
         highlightEngagements();
         summonAngel = null;
         if (battle != null)
@@ -2454,8 +2444,7 @@ public class Game
     }
 
 
-    // Return number of legions that can recruit.
-    public int highlightPossibleRecruits()
+    public void highlightPossibleRecruits()
     {
         int count = 0;
         Player player = getActivePlayer();
@@ -2481,8 +2470,6 @@ public class Game
         {
             board.selectHexesByLabels(set);
         }
-
-        return count;
     }
 
 
@@ -2515,12 +2502,7 @@ public class Game
                     return;
                 }
 
-                if (!dialogLock)
-                {
-                    dialogLock = true;
-                    new SplitLegion(masterFrame, legion, player);
-                    dialogLock = false;
-                }
+                SplitLegion.splitLegion(masterFrame, legion);
 
                 // Update status window.
                 updateStatusScreen();
@@ -2535,6 +2517,9 @@ public class Game
             case Game.MOVE:
                 // Mark this legion as active.
                 player.selectLegion(legion);
+
+                // And move it to the top of the z-order.
+                board.moveMarkerToTop(legion);
 
                 // Highlight all legal destinations
                 // for this legion.
@@ -2608,12 +2593,12 @@ public class Game
                     // and there is more than one possibility.
                     if (hex.isOccupied() && hex.getNumEntrySides() > 1)
                     {
-                        // Only allow one PickEntrySide dialog.
-                        if (!dialogLock)
+                        int side = PickEntrySide.pickEntrySide(masterFrame,
+                            hex);
+                        hex.clearAllEntrySides();
+                        if (side == 1 || side == 3 || side == 5)
                         {
-                            dialogLock = true;
-                            new PickEntrySide(masterFrame, hex);
-                            dialogLock = false;
+                            hex.setEntrySide(side);
                         }
                     }
 
@@ -2662,18 +2647,14 @@ public class Game
     }
 
 
-    public void doFight(MasterHex hex, Player player)
+    private void doFight(MasterHex hex, Player player)
     {
-        if (summoningAngel)
+        if (summonAngel != null)
         {
             Legion donor = hex.getFriendlyLegion(player);
             if (donor != null)
             {
                 player.selectLegion(donor);
-                if (summonAngel == null)
-                {
-                    summonAngel = battle.getSummonAngel();
-                }
                 summonAngel.updateChits();
                 summonAngel.repaint();
                 donor.getMarker().repaint();
@@ -2682,9 +2663,9 @@ public class Game
 
         // Do not allow clicking on engagements if one is
         // already being resolved.
-        else if (hex.isEngagement() && !dialogLock)
+        else if (hex.isEngagement() && !engagementInProgress)
         {
-            dialogLock = true;
+            engagementInProgress = true;
             Legion attacker = hex.getFriendlyLegion(player);
             Legion defender = hex.getEnemyLegion(player);
 
@@ -2692,71 +2673,61 @@ public class Game
             {
                 // Fleeing gives half points and denies the
                 // attacker the chance to summon an angel.
-                boolean flees = Concede.flee(masterFrame, defender, 
+                boolean flees = Concede.flee(masterFrame, defender,
                     attacker);
                 if (flees)
                 {
                     handleConcession(defender, attacker, true);
+                    return;
                 }
             }
 
-            if (hex.isEngagement())
+            // The attacker may concede now without
+            // allowing the defender a reinforcement.
+            boolean concedes = Concede.concede(masterFrame, attacker,
+                defender);
+
+            if (concedes)
             {
-                // The attacker may concede now without
-                // allowing the defender a reinforcement.
-                boolean concedes = Concede.concede(masterFrame, attacker, 
-                    defender);
-
-                if (concedes)
-                {
-                    handleConcession(attacker, defender, false);
-                }
-
-                // The players may agree to a negotiated
-                // settlement.
-                if (hex.isEngagement())
-                {
-                    new Negotiate(masterFrame, attacker, defender);
-                }
-
-
-                if (!hex.isEngagement())
-                {
-                    if (hex.getLegion(0) == defender && defender.canRecruit())
-                    {
-                        // If the defender won the battle by agreement,
-                        // he may recruit.
-                        Creature recruit = PickRecruit.pickRecruit(
-                            masterFrame, defender);
-                        if (recruit != null)
-                        {
-                            doRecruit(recruit, defender, masterFrame);
-                        }
-                    }
-                    else if (hex.getLegion(0) == attacker &&
-                        attacker.getHeight() < 7 &&
-                        player.canSummonAngel())
-                    {
-                        // If the attacker won the battle by agreement,
-                        // he may summon an angel.
-                        summonAngel = new SummonAngel(board, attacker);
-                    }
-                }
-
-                // Battle
-                if (hex.isEngagement())
-                {
-                    // Reveal both legions to all players.
-                    attacker.revealAllCreatures();
-                    defender.revealAllCreatures();
-                    battle = new Battle(board, attacker, defender,
-                        hex);
-                    map = battle.getBattleMap();
-                }
+                handleConcession(attacker, defender, false);
+                return;
             }
 
-            highlightEngagements();
-            dialogLock = false;
+            // The players may agree to a negotiated settlement.
+            new Negotiate(masterFrame, attacker, defender);
+            if (!hex.isEngagement())
+            {
+                if (hex.getLegion(0) == defender && defender.canRecruit())
+                {
+                    // If the defender won the battle by agreement,
+                    // he may recruit.
+                    Creature recruit = PickRecruit.pickRecruit(
+                        masterFrame, defender);
+                    if (recruit != null)
+                    {
+                        doRecruit(recruit, defender, masterFrame);
+                    }
+                }
+                else if (hex.getLegion(0) == attacker &&
+                    attacker.getHeight() < 7 && player.canSummonAngel())
+                {
+                    // If the attacker won the battle by agreement,
+                    // he may summon an angel.
+                    summonAngel = new SummonAngel(board, attacker);
+                }
+                highlightEngagements();
+                engagementInProgress = false;
+            }
+
+            // Battle
+            else
+            {
+                // Reveal both legions to all players.
+                attacker.revealAllCreatures();
+                defender.revealAllCreatures();
+                battle = new Battle(board, attacker, defender, hex);
+                map = battle.getBattleMap();
+            }
         }
     }
 
@@ -2795,6 +2766,12 @@ public class Game
         // Unselect and repaint the hex.
         MasterHex hex = winner.getCurrentHex();
         MasterBoard.unselectHexByLabel(hex.getLabel());
+                
+        // No recruiting or angel summoning is allowed after the
+        // defender flees or the attacker concedes before entering
+        // the battle.
+        highlightEngagements();
+        engagementInProgress = false;
     }
 
 
@@ -2807,7 +2784,7 @@ public class Game
                 break;
 
             case Game.FIGHT:
-                if (summoningAngel && summonAngel != null)
+                if (battle != null && summonAngel != null)
                 {
                     highlightSummonableAngels(summonAngel.getLegion());
                     summonAngel.repaint();
@@ -2816,6 +2793,10 @@ public class Game
                 {
                     highlightEngagements();
                 }
+                break;
+
+            case Game.MUSTER:
+                highlightPossibleRecruits();
                 break;
 
             default:

@@ -36,7 +36,6 @@ public class Battle
     private int turnNumber = 1;
     private int phase = MOVE;
     private int summonState = NO_KILLS;
-    private boolean summoningAngel;
     private int carryDamage;
     private boolean chitSelected;
     private ArrayList critters = new ArrayList();
@@ -45,6 +44,9 @@ public class Battle
 
     private boolean attackerElim;
     private boolean defenderElim;
+
+    private boolean attackerEntered;
+    private boolean conceded;
 
 
     public Battle(MasterBoard board, Legion attacker, Legion defender,
@@ -150,6 +152,13 @@ public class Battle
 
         else if (phase == MOVE)
         {
+            // IF the attacker makes it to the end of his first movement
+            // phase without conceding, even if he left all legions
+            // off-board, the defender can recruit.
+            if (activeLegion == attacker && !conceded)
+            {
+                attackerEntered = true;
+            }
             phase = FIGHT;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
             map.setupFight();
@@ -242,15 +251,13 @@ public class Battle
         {
             if (attacker.canSummonAngel())
             {
-                summoningAngel = true;
-
                 // Make sure the MasterBoard is visible.
                 JFrame masterFrame = board.getFrame();
                 if (masterFrame.getState() == JFrame.ICONIFIED)
                 {
                     masterFrame.setState(JFrame.NORMAL);
                 }
-                // XXX And bring it to the front.
+                // And bring it to the front.
                 masterFrame.show();
 
                 summonAngel = new SummonAngel(board, attacker);
@@ -262,7 +269,7 @@ public class Battle
             summonState = Battle.TOO_LATE;
         }
 
-        if (!summoningAngel)
+        if (summonAngel == null)
         {
             if (phase == SUMMON)
             {
@@ -272,15 +279,14 @@ public class Battle
     }
 
 
-    // This is called from MasterBoard after the SummonAngel finishes.
+    // This is called from Game after the SummonAngel finishes.
     public void finishSummoningAngel()
     {
-        if (attacker.hasSummoned())
+        if (summonAngel.getSummoned())
         {
             map.placeNewChit(attacker);
         }
 
-        summoningAngel = false;
         summonAngel = null;
 
         if (phase == SUMMON)
@@ -324,24 +330,6 @@ public class Battle
     public void setCarryDamage(int carryDamage)
     {
         this.carryDamage = carryDamage;
-    }
-
-
-    public boolean isChitSelected()
-    {
-        return chitSelected;
-    }
-
-
-    public void setChitSelected()
-    {
-        chitSelected = true;
-    }
-
-
-    public void clearChitSelected()
-    {
-        chitSelected = false;
     }
 
 
@@ -479,15 +467,9 @@ public class Battle
     }
 
 
-    public void clearLastCritterMoved()
-    {
-        lastCritterMoved = null;
-    }
-
-
     public void undoLastMove()
     {
-        clearChitSelected();
+        chitSelected = false;
 
         if (lastCritterMoved != null)
         {
@@ -500,7 +482,7 @@ public class Battle
 
     public void undoAllMoves()
     {
-        clearChitSelected();
+        chitSelected = false;
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -516,9 +498,11 @@ public class Battle
     }
 
 
-     // Mark all of the conceding player's critters as dead.
+    /** Mark all of the conceding player's critters as dead. */
     private void concede(Player player)
     {
+        conceded = true;
+
         Iterator it = critters.iterator();
         while (it.hasNext())
         {
@@ -595,8 +579,8 @@ public class Battle
     }
 
 
-    // If any chits were left off-board, kill them.  If they were newly
-    //   summoned or recruited, unsummon or unrecruit them instead.
+    /** If any chits were left off-board, kill them.  If they were newly
+     *  summoned or recruited, unsummon or unrecruit them instead. */
     private void removeOffboardChits()
     {
         Player player = getActivePlayer();
@@ -615,7 +599,7 @@ public class Battle
 
     private void commitMoves()
     {
-        clearLastCritterMoved();
+        lastCritterMoved = null;
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -682,7 +666,7 @@ public class Battle
     /** Move the passed Critter to the top of the critters array. */
     public void moveToTop(Critter critter)
     {
-        if (critters.indexOf(critter) != 0)
+        if (critters.indexOf(critter) > 0)
         {
             critters.remove(critter);
             critters.add(0, critter);
@@ -717,12 +701,19 @@ public class Battle
                     if (critter.getName().equals("Angel") ||
                         critter.getName().equals("Archangel"))
                     {
-                        donor = legion.getPlayer().getLastLegionSummonedFrom();
+                        Player player = legion.getPlayer();
+                        donor = player.getLastLegionSummonedFrom();
                         donor.addCreature(critter, false);
+                        // This summon doesn't count; the player can
+                        // summon again later this turn.
+                        player.allowSummoningAngel();
                     }
                     else
                     {
+                        // Reinforcement.
                         critter.putOneBack();
+                        // This recruit doesn't count.
+                        legion.setRecruited(false);
                     }
                 }
 
@@ -1043,8 +1034,8 @@ public class Battle
         dealt -= carryDamage;
         target.setCarryFlag(false);
 
-        Game.logEvent(dealt + (dealt == 1 ? " hit carries to " : 
-            " hits carry to ") + target.getName() + " in " + 
+        Game.logEvent(dealt + (dealt == 1 ? " hit carries to " :
+            " hits carry to ") + target.getName() + " in " +
             target.getCurrentHex().getLabel());
 
         if (carryDamage <= 0 || findCarryTargets().isEmpty())
@@ -1655,9 +1646,9 @@ public class Battle
         // Only the active player can move or strike.
         if (critter != null && critter.getPlayer() == getActivePlayer())
         {
-            setChitSelected();
+            chitSelected = true;
 
-            // Put selected chit at the top of the Z-order.
+            // Put selected chit at the top of the z-order.
             moveToTop(critter);
 
             switch (getPhase())
@@ -1689,10 +1680,10 @@ public class Battle
         switch (getPhase())
         {
             case MOVE:
-                if (isChitSelected())
+                if (chitSelected)
                 {
                     getCritter(0).moveToHex(hex);
-                    clearChitSelected();
+                    chitSelected = false;
                 }
                 highlightMovableChits();
                 break;
@@ -1703,10 +1694,10 @@ public class Battle
                 {
                     applyCarries(hex.getCritter());
                 }
-                else if (isChitSelected())
+                else if (chitSelected)
                 {
                     getCritter(0).strike(hex.getCritter());
-                    clearChitSelected();
+                    chitSelected = false;
                 }
 
                 if (getCarryDamage() == 0)
@@ -1772,7 +1763,7 @@ public class Battle
             else
             {
                 // Recruit reinforcement
-                if (legion.canRecruit())
+                if (legion.canRecruit() && attackerEntered)
                 {
                     Creature recruit = PickRecruit.pickRecruit(
                         board.getFrame(), legion);

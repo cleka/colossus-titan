@@ -13,6 +13,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     WindowListener, ItemListener
 {
     private static ArrayList hexes = new ArrayList();
+    private static LinkedList markers = new LinkedList();
 
     public static final boolean[][] show =
     {
@@ -1426,6 +1427,7 @@ public class MasterBoard extends JPanel implements MouseListener,
                 legion.setMarker(marker);
                 MasterHex hex = legion.getCurrentHex();
                 hex.alignLegions();
+                moveMarkerToBottom(legion);
             }
         }
     }
@@ -1513,49 +1515,16 @@ public class MasterBoard extends JPanel implements MouseListener,
      *  or null if none does. */
     private Legion getLegionAtPoint(Point point)
     {
-        Legion legion;
-
-        // The active player's legion will be on top if there is an
-        // engagement, so check his legions first.
-        Player activePlayer = game.getActivePlayer();
-        legion = getLegionAtPoint(point, activePlayer);
-        if (legion != null)
-        {
-            return legion;
-        }
-
-        Collection players = game.getPlayers();
-        Iterator it = players.iterator();
+        Iterator it = markers.iterator();
         while (it.hasNext())
         {
-            Player player = (Player)it.next();
-            if (player != activePlayer)
-            {
-                legion = getLegionAtPoint(point, player); 
-                if (legion != null)
-                {
-                    return legion;
-                }
-            }
-        }
-
-        return null;
-    }
-
-
-    private Legion getLegionAtPoint(Point point, Player player)
-    {
-        Collection legions = player.getLegions();
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            Marker marker = legion.getMarker();
+            Marker marker = (Marker)it.next();
             if (marker != null && marker.contains(point))
             {
-                return legion;
+                return marker.getLegion();
             }
         }
+
         return null;
     }
 
@@ -1637,8 +1606,8 @@ public class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    /** Clear all entry side and teleport information from all hexes occupied
-     *  by one or fewer legions. */
+    /** Clear all entry side and teleport information from all hexes 
+     *  not occupied by a friendly legion. */
     public void clearAllNonFriendlyOccupiedEntrySides(Player player)
     {
         Iterator it = hexes.iterator();
@@ -1667,6 +1636,29 @@ public class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+    public void moveMarkerToTop(Legion legion)
+    {
+        Marker marker = legion.getMarker();
+        markers.remove(marker);
+        markers.add(0, marker);
+    }
+
+
+    public void moveMarkerToBottom(Legion legion)
+    {
+        Marker marker = legion.getMarker();
+        markers.remove(marker);
+        markers.add(marker);
+    }
+
+
+    public void removeMarker(Legion legion)
+    {
+        Marker marker = legion.getMarker();
+        markers.remove(marker);
+    }
+
+
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
@@ -1686,6 +1678,9 @@ public class MasterBoard extends JPanel implements MouseListener,
                 InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                 InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
             {
+                // Move the clicked-on legion to the top of the z-order.
+                moveMarkerToTop(legion);
+
                 new ShowLegion(masterFrame, legion, point,
                     game.getAllStacksVisible() ||
                     player == game.getActivePlayer());
@@ -1836,33 +1831,11 @@ public class MasterBoard extends JPanel implements MouseListener,
             }
         }
 
-        // Paint current player's legions last, to ensure that newly moved
-        // markers end up above enemy markers in the same hex.
-        Player activePlayer = game.getActivePlayer();
-        Collection players = game.getPlayers();
-        it = players.iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            if (player != activePlayer)
-            {
-                paintMarkers(g, rectClip, player);
-            }
-        }
-        paintMarkers(g, rectClip, activePlayer);
-    }
-
-
-    private void paintMarkers(Graphics g, Rectangle rectClip, Player player)
-    {
-        java.util.List legions = player.getLegions();
-
-        // Paint in reverse order to make visible z-order match clicks.
-        ListIterator lit = legions.listIterator(legions.size());
+        // Paint markers in reverse order.
+        ListIterator lit = markers.listIterator(markers.size());
         while (lit.hasPrevious())
         {
-            Legion legion = (Legion)lit.previous();
-            Marker marker = legion.getMarker();
+            Marker marker = (Marker)lit.previous();
             if (marker != null && rectClip.intersects(marker.getBounds()))
             {
                 marker.paintComponent(g);

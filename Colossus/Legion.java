@@ -18,7 +18,6 @@ public class Legion
     private MasterHex startingHex;
     private boolean moved;
     private boolean recruited;
-    private boolean summoned;
     private Player player;
     private int battleTally;
     private int entrySide;
@@ -333,9 +332,9 @@ public class Legion
                     critter.putOneBack();
                 }
             }
-            log.append(")");
+            log.append(") ");
         }
-        log.append(" is eliminated");
+        log.append("is eliminated");
         Game.logEvent(log.toString());
 
         // Free up the legion marker.
@@ -358,9 +357,9 @@ public class Legion
 
         currentHex.removeLegion(this);
         currentHex = hex;
-        currentHex.addLegion(this);
+        currentHex.addLegion(this, true);
         moved = true;
-        player.markLastLegionMoved(this);
+        player.setLastLegionMoved(this);
         // If we teleported, no more teleports are allowed this turn.
         if (teleported)
         {
@@ -379,7 +378,7 @@ public class Legion
         }
         currentHex.removeLegion(this);
         currentHex = startingHex;
-        currentHex.addLegion(this);
+        currentHex.addLegion(this, true);
         moved = false;
         Game.logEvent("Legion " + getMarkerId() + " undoes its move");
     }
@@ -390,7 +389,6 @@ public class Legion
         startingHex = currentHex;
         moved = false;
         recruited = false;
-        summoned = false;
     }
 
 
@@ -414,9 +412,9 @@ public class Legion
     }
 
 
-    public void markRecruited()
+    public void setRecruited(boolean recruited)
     {
-        recruited = true;
+        this.recruited = recruited;
     }
 
 
@@ -440,7 +438,7 @@ public class Legion
     // Return true if this legion can summon an angel or archangel.
     public boolean canSummonAngel()
     {
-        if (getHeight() >= 7 || summoned || !player.canSummonAngel())
+        if (getHeight() >= 7 || !player.canSummonAngel())
         {
             return false;
         }
@@ -460,18 +458,6 @@ public class Legion
         }
 
         return false;
-    }
-
-
-    public boolean hasSummoned()
-    {
-        return summoned;
-    }
-
-
-    public void markSummoned()
-    {
-        summoned = true;
     }
 
 
