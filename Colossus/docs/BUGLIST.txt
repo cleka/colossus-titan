@@ -41,11 +41,10 @@ Solaris, jdk1.2.2, jdk1.3: Popup menu text is invisible
    black-on-black.  There is no way to set the background and 
    foreground colors.
 
-Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle in 
-   turn 15 of a 4-player game.  Also during turn 45 of a 5-player game.
-   Also during movement phase of turn 14 of a 6-player game.
-   Image memory leak again?  Or somewhere else?  System.gc() calls don't
-   help.
+Win98, jdk1.3; Solaris, jdk1.3: OutOfMemoryException starting a battle, 
+   usually around turn 15 of a 4-player game.  Image memory leak again?  
+   Or somewhere else?  System.gc() calls don't help.  Happens even with 
+   -Xint option passed to java.
 
 
 Current programming bugs:

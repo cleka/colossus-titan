@@ -1644,15 +1644,19 @@ public class Game
         Player player = getActivePlayer();
         player.unselectLegion();
 
+        TreeSet set = new TreeSet();
+
         for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion legion = player.getLegion(i);
             if (!legion.hasMoved())
             {
                 MasterHex hex = legion.getCurrentHex();
-                hex.select();
+                set.add(hex.getLabel());
             }
         }
+
+        board.selectHexesByLabels(set);
 
         board.repaint();
     }
@@ -1904,7 +1908,7 @@ public class Game
     }
 
 
-    // Present a dialog allowing the player to enter via land or teleport.
+    /** Present a dialog allowing the player to enter via land or teleport. */
     private void chooseWhetherToTeleport(MasterHex hex)
     {
         new OptionDialog(board, "Teleport?", "Teleport?", "Teleport", 
@@ -1918,13 +1922,15 @@ public class Game
     }
     
     
-    // Returns number of engagements found.
+    /** Return number of engagements found. */
     public int highlightEngagements()
     {
         int count = 0;
         Player player = getActivePlayer();
 
         board.unselectAllHexes();
+
+        TreeSet set = new TreeSet();
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
@@ -1933,10 +1939,11 @@ public class Game
             if (hex.getNumEnemyLegions(player) > 0)
             {
                 count++;
-                hex.select();
-                hex.repaint();
+                set.add(hex.getLabel());
             }
         }
+
+        board.selectHexesByLabels(set);
 
         return count;
     }
@@ -1988,6 +1995,8 @@ public class Game
 
         int count = 0;
 
+        TreeSet set = new TreeSet();
+
         for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion candidate = player.getLegion(i);
@@ -2000,8 +2009,7 @@ public class Game
                 {
 
                     count++;
-                    hex.select();
-                    hex.repaint();
+                    set.add(hex.getLabel());
                 }
             }
         }
@@ -2009,6 +2017,7 @@ public class Game
         if (count > 0)
         {
             summoningAngel = true;
+            board.selectHexesByLabels(set);
         }
 
         return count;
@@ -2033,6 +2042,8 @@ public class Game
         int count = 0;
         Player player = getActivePlayer();
 
+        TreeSet set = new TreeSet();
+
         for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion legion = player.getLegion(i);
@@ -2042,11 +2053,15 @@ public class Game
                 if (findEligibleRecruits(legion, recruits) >= 1)
                 {
                     MasterHex hex = legion.getCurrentHex();
-                    hex.select();
-                    hex.repaint();
+                    set.add(hex.getLabel());
                     count++;
                 }
             }
+        }
+
+        if (count > 0)
+        {
+            board.selectHexesByLabels(set);
         }
 
         return count;
@@ -2086,8 +2101,7 @@ public class Game
                 if (legion.getHeight() < 7)
                 {
                     MasterHex hex = legion.getCurrentHex();
-                    hex.unselect();
-                    hex.repaint();
+                    board.unselectHexByLabel(hex.getLabel());
                 }
                 return;
 
@@ -2113,8 +2127,8 @@ public class Game
                         new PickRecruit(board, legion);
                         if (!legion.canRecruit())
                         {
-                            legion.getCurrentHex().unselect();
-                            legion.getCurrentHex().repaint();
+                            board.unselectHexByLabel(
+                                legion.getCurrentHex().getLabel());
 
                             updateStatusScreen();
                         }

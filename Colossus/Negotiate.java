@@ -382,8 +382,7 @@ public class Negotiate extends Dialog implements MouseListener, ActionListener
             cleanup();
 
             // Unselect and repaint the hex.
-            hex.unselect();
-            hex.repaint();
+            MasterBoard.unselectHexByLabel(hex.getLabel());
         }
 
         else if (e.getActionCommand().equals("Fight"))

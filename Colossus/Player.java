@@ -1,3 +1,5 @@
+import java.util.*;
+
 /**
  * Class Player holds the data for one player in a Titan game.
  * @version $Id$
@@ -435,16 +437,19 @@ public class Player
 
     public void highlightTallLegions()
     {
+        TreeSet set = new TreeSet();
+
         for (int i = 0; i < numLegions; i++)
         {
             Legion legion = legions[i];
             if (legion.getHeight() >= 7)
             {
                 MasterHex hex = legion.getCurrentHex();
-                hex.select();
-                hex.repaint();
+                set.add(hex.getLabel());
             }
         }
+
+        game.getBoard().selectHexesByLabels(set);
     }
     
     

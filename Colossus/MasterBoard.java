@@ -30,13 +30,15 @@ public class MasterBoard extends Frame implements MouseListener,
     private boolean imagesLoaded;
     private static int scale;
     private static Game game;
+    
+    /** Used to fix artifacts from legions hanging outside hexes. */
     private boolean eraseFlag;
 
     private PopupMenu popupMenu;
     private MenuItem menuItemHex; 
     private MenuItem menuItemMap;
 
-    // Last point clicked is needed for popup menus.
+    /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
 
 
@@ -147,8 +149,8 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    // Do a brute-force search through the hex array, looking for
-    //    a match.  Return the hex, or null if none is found.
+    /** Do a brute-force search through the hex array, looking for
+     *  a match.  Return the hex, or null if none is found. */
     public static MasterHex getHexFromLabel(int label)
     {
         for (int i = 0; i < h.length; i++)
@@ -168,8 +170,8 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    // Return the MasterHex that contains the given point, or
-    //    null if none does.
+    /** Return the MasterHex that contains the given point, or
+     *  null if none does. */
     private MasterHex getHexContainingPoint(Point point)
     {
         for (int i = 0; i < h.length; i++)
@@ -187,8 +189,8 @@ public class MasterBoard extends Frame implements MouseListener,
     }
     
     
-    // Return the Legion whose marker contains the given
-    //    point, or null if none does.
+    /** Return the Legion whose marker contains the given point, or null 
+     *  if none does. */
     private Legion getLegionWithMarkerContainingPoint(Point point)
     {
         for (int i = 0; i < game.getNumPlayers(); i++)
@@ -208,7 +210,7 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    public void unselectAllHexes()
+    public static void unselectAllHexes()
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -218,6 +220,28 @@ public class MasterBoard extends Frame implements MouseListener,
                 {
                     h[i][j].unselect();
                     h[i][j].repaint();
+                }
+            }
+        }
+    }
+
+
+    public static void unselectHexByLabel(String label)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (SetupMasterHexes.show[i][j])
+                {
+                    MasterHex hex = h[i][j];
+
+                    if (hex.isSelected() && label.equals(hex.getLabel()))
+                    {
+                        hex.unselect();
+                        hex.repaint();
+                        return;
+                    }
                 }
             }
         }
@@ -245,6 +269,28 @@ public class MasterBoard extends Frame implements MouseListener,
     }
     
     
+    public static void selectHexByLabel(String label)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (SetupMasterHexes.show[i][j])
+                {
+                    MasterHex hex = h[i][j];
+
+                    if (!hex.isSelected() && label.equals(hex.getLabel()))
+                    {
+                        hex.select();
+                        hex.repaint();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+
     public static void selectHexesByLabels(Set labels)
     {
         for (int i = 0; i < h.length; i++)
@@ -266,8 +312,8 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    // Clear all entry side and teleport information from all hexes occupied
-    // by one or fewer legions.
+    /** Clear all entry side and teleport information from all hexes occupied
+     *  by one or fewer legions. */
     public void clearAllNonFriendlyOccupiedEntrySides(Player player)
     {
         for (int i = 0; i < h.length; i++)
@@ -285,7 +331,7 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    // Clear all entry side and teleport information from all hexes.
+    /** Clear all entry side and teleport information from all hexes. */
     public void clearAllEntrySides()
     {
         for (int i = 0; i < h.length; i++)
@@ -302,7 +348,7 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    // Present a dialog allowing the player to enter via land or teleport.
+    /** Present a dialog allowing the player to enter via land or teleport. */
     private void chooseWhetherToTeleport(MasterHex hex)
     {
         new OptionDialog(this, "Teleport?", "Teleport?", "Teleport", 
@@ -457,14 +503,13 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    // Double-buffer everything.
+    /** Double-buffer everything. */
     public void paint(Graphics g)
     {
         update(g);
     }
 
 
-    // This is used to fix artifacts from legions hanging outside hexes.
     public void setEraseFlag()
     {
         eraseFlag = true;

@@ -240,8 +240,7 @@ public class Concede extends Dialog implements ActionListener
 
             // Unselect and repaint the hex.
             MasterHex hex = enemy.getCurrentHex();
-            hex.unselect();
-            hex.repaint();
+            MasterBoard.unselectHexByLabel(hex.getLabel());
         }
 
         else

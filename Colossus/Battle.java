@@ -486,6 +486,8 @@ public class Battle
         {
             lastCritterMoved.undoMove();
         }
+
+        highlightMovableChits();
     }
 
 
@@ -501,6 +503,8 @@ public class Battle
                 critter.undoMove();
             }
         }
+        
+        highlightMovableChits();
     }
 
 
@@ -1017,8 +1021,8 @@ public class Battle
         else
         {
             target.setCarryFlag(false);
-            target.getCurrentHex().unselect();
-
+            String label = target.getCurrentHex().getLabel();
+            map.unselectHexByLabel(label);
             showDice.setCarries(carryDamage);
             showDice.setup();
         }

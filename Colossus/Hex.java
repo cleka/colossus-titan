@@ -76,6 +76,12 @@ public abstract class Hex
     {
         return label;
     }
+
+
+    public String getName()
+    {
+        return label;
+    }
     
     
     public void setLabel(String label)

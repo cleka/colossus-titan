@@ -187,6 +187,28 @@ public class BattleMap extends Frame implements MouseListener,
         }
     }
 
+    
+    public static void unselectHexByLabel(String label)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (SetupBattleHexes.show[i][j])
+                {
+                    BattleHex hex = h[i][j];
+
+                    if (hex.isSelected() && label.equals(hex.getLabel()))
+                    {
+                        hex.unselect();
+                        hex.repaint();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
 
     public static void unselectHexesByLabels(Set labels)
     {
@@ -209,6 +231,28 @@ public class BattleMap extends Frame implements MouseListener,
     }
     
     
+    public static void selectHexByLabel(String label)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (SetupBattleHexes.show[i][j])
+                {
+                    BattleHex hex = h[i][j];
+
+                    if (!hex.isSelected() && label.equals(hex.getLabel()))
+                    {
+                        hex.select();
+                        hex.repaint();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+
     public static void selectHexesByLabels(Set labels)
     {
         for (int i = 0; i < h.length; i++)
