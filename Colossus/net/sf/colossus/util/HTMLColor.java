@@ -164,6 +164,7 @@ public final class HTMLColor
     public static final Color behemothGreen = new Color(2,129,2);
     public static final Color centaurGold = new Color(129,129,1);
     public static final Color colossusPink = new Color(207,6,207);
+    public static final Color giantBlue = new Color(3,3,213);
 
     // The Player Colors (based on Chit)
     public static final Color BlackColossus = HTMLColor.black;
