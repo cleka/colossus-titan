@@ -305,4 +305,8 @@ Other sizes \emph{may} work (they are resized on-the-fly), and odds are better i
 
 \end{itemize}
 
+\section{Miscellaneous stuff}
+
+A variant can customize the legion marker appearances and names. Legion markers are 56x56 \texttt{GIF} files that lives in ``images'' and are named with the marker short color name (see \htmladdnormallink{MarkerSet-HOWTO}{../MarkerSet-HOWTO/index.html}) followed by its number (between 01 and 12), i.e. the first marker of the black set is \texttt{Bk01.gif}. The short name is mapped to a long name in the file ``MarkersName'', a java property file. A variant can supply its own ``MarkersName'', either fully or partially redefining the marker's names (the default mapping is used for missing entries).
+
 \end{document}

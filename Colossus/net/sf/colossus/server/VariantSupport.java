@@ -30,7 +30,7 @@ public final class VariantSupport
     private static boolean loadedVariant = false;
     private static int maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
     private static AIHintLoader aihl = null;
-    private static java.util.Map markerNames;
+    private static java.util.Properties markerNames;
 
     /**
      * Load a Colossus Variant by name.
@@ -179,7 +179,7 @@ public final class VariantSupport
             Creature.loadCreatures();
             loadTerrainsAndRecruits();
             loadHints();
-            markerNames = loadMarkerNamesMap();
+            markerNames = loadMarkerNamesProperties();
         }
         else
         {
@@ -311,19 +311,19 @@ public final class VariantSupport
         }
     }
 
-    private static java.util.Map loadMarkerNamesMap()
+    private static java.util.Properties loadMarkerNamesProperties()
     {
-        java.util.Map allNames = new java.util.HashMap();
+        java.util.Properties allNames = new java.util.Properties();
         java.util.List directories = 
             VariantSupport.getVarDirectoriesList();
         /* unlike other, don't use file-level granularity ; 
            load all files in order, so that we get the
            default mapping at the end */
-        java.util.Iterator it = directories.iterator();
-        while (it.hasNext())
+        java.util.ListIterator it = directories.listIterator(directories.size());
+        while (it.hasPrevious())
         {
             java.util.List singleDirectory = new java.util.ArrayList();
-            singleDirectory.add(it.next());
+            singleDirectory.add(it.previous());
             try
             {
                 InputStream mmfIS =
@@ -331,16 +331,7 @@ public final class VariantSupport
                                                   singleDirectory);
                 if (mmfIS != null)
                 {
-                    java.util.Properties temporary =
-                        new java.util.Properties();
-                    temporary.load(mmfIS);
-                    java.util.Enumeration e = temporary.propertyNames();
-                    while (e.hasMoreElements())
-                    {
-                        String name = (String)e.nextElement();
-                        String longName = temporary.getProperty(name);
-                        allNames.put(name,longName);
-                    }
+                    allNames.load(mmfIS);
                 }
             }
             catch (Exception e)
@@ -351,7 +342,7 @@ public final class VariantSupport
         return allNames;
     }
 
-    public static java.util.Map getMarkerNamesMap()
+    public static java.util.Properties getMarkerNamesProperties()
     {
         return markerNames;
     }

@@ -278,7 +278,7 @@ public final class Legion implements Comparable
 
     public static String getMarkerName(String markerId)
     {
-        return (String)net.sf.colossus.server.VariantSupport.getMarkerNamesMap().get(markerId);
+        return net.sf.colossus.server.VariantSupport.getMarkerNamesProperties().getProperty(markerId);
     }
 
     public static String getLongMarkerName(String markerId)
