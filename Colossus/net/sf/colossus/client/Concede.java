@@ -13,7 +13,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-final class Concede extends JDialog implements ActionListener
+final class Concede extends JDialog implements ActionListener, WindowListener
 {
     private JFrame parentFrame;
     private boolean flee;
@@ -23,21 +23,26 @@ final class Concede extends JDialog implements ActionListener
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private static boolean answer;
+    private Client client;
+    private String allyMarkerId;
 
 
     private Concede(Client client, JFrame parentFrame, String longMarkerName,
-        String hexDescription, String allyImageName, java.util.List
-        allyImageNames, String enemyImageName, java.util.List enemyImageNames,
+        String hexDescription, String allyMarkerId, java.util.List
+        allyImageNames, String enemyMarkerId, java.util.List enemyImageNames,
         boolean flee)
     {
         super(parentFrame, (flee ? "Flee" : "Concede") + " with Legion " +
-            longMarkerName + " in " + hexDescription + "?", true);
+            longMarkerName + " in " + hexDescription + "?", false);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
+        addWindowListener(this);
 
         this.parentFrame = parentFrame;
         this.flee = flee;
+        this.client = client;
+        this.allyMarkerId = allyMarkerId;
 
         pack();
 
@@ -46,7 +51,7 @@ final class Concede extends JDialog implements ActionListener
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         int scale = 4 * Scale.get();
 
-        allyMarker = new Marker(scale, allyImageName, this, client);
+        allyMarker = new Marker(scale, allyMarkerId, this, client);
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         gridbag.setConstraints(allyMarker, constraints);
@@ -63,7 +68,7 @@ final class Concede extends JDialog implements ActionListener
             contentPane.add(chit);
         }
 
-        enemyMarker = new Marker(scale, enemyImageName, this, client);
+        enemyMarker = new Marker(scale, enemyMarkerId, this, client);
         constraints.gridy = 1;
         constraints.gridwidth = 1;
         gridbag.setConstraints(enemyMarker, constraints);
@@ -128,31 +133,27 @@ final class Concede extends JDialog implements ActionListener
     }
 
 
-    /** Return true if the player concedes. */
-    static boolean concede(Client client, JFrame parentFrame,
-        String longMarkerName, String hexDescription, String allyImageName, 
-        java.util.List allyImageNames, String enemyImageName, 
+    static void concede(Client client, JFrame parentFrame,
+        String longMarkerName, String hexDescription, String allyMarkerId, 
+        java.util.List allyImageNames, String enemyMarkerId, 
         java.util.List enemyImageNames)
     {
         answer = false;
         new Concede(client, parentFrame, longMarkerName, hexDescription,
-            allyImageName, allyImageNames, enemyImageName, enemyImageNames,
+            allyMarkerId, allyImageNames, enemyMarkerId, enemyImageNames,
             false);
-        return answer;
     }
 
 
-    /** Return true if the player flees. */
-    static boolean flee(Client client, JFrame parentFrame,
-        String longMarkerName, String hexDescription, String allyImageName, 
-        java.util.List allyImageNames, String enemyImageName, 
+    static void flee(Client client, JFrame parentFrame,
+        String longMarkerName, String hexDescription, String allyMarkerId, 
+        java.util.List allyImageNames, String enemyMarkerId, 
         java.util.List enemyImageNames)
     {
         answer = false;
         new Concede(client, parentFrame, longMarkerName, hexDescription,
-            allyImageName, allyImageNames, enemyImageName, enemyImageNames,
+            allyMarkerId, allyImageNames, enemyMarkerId, enemyImageNames,
             true);
-        return answer;
     }
 
 
@@ -172,6 +173,14 @@ final class Concede extends JDialog implements ActionListener
     {
         location = getLocation();
         dispose();
+        if (flee)
+        {
+            client.answerFlee(allyMarkerId, answer);
+        }
+        else
+        {
+            client.answerConcede(allyMarkerId, answer);
+        }
     }
 
 
@@ -188,4 +197,34 @@ final class Concede extends JDialog implements ActionListener
         }
         cleanup();
     }
+
+    public void windowClosed(WindowEvent e)
+    {
+    }
+
+    public void windowClosing(WindowEvent e)
+    {
+        cleanup();
+    }
+
+    public void windowActivated(WindowEvent e)
+    {
+    }
+
+    public void windowDeactivated(WindowEvent e)
+    {
+    }
+
+    public void windowDeiconified(WindowEvent e)
+    {
+    }
+
+    public void windowIconified(WindowEvent e)
+    {
+    }
+
+    public void windowOpened(WindowEvent e)
+    {
+    }
+
 }

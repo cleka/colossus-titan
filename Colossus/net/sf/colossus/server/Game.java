@@ -2352,8 +2352,6 @@ public final class Game
     }
 
 
-    // XXX Needs to be rewritten to allow non-modal flee / concede / negotiate
-    // dialogs.
     void engage(String hexLabel)
     {
         // Do not allow clicking on engagements if one is
@@ -2372,52 +2370,60 @@ public final class Game
             {
                 // Fleeing gives half points and denies the
                 // attacker the chance to summon an angel.
-
-                boolean flees;
-                if (server.getClientOption(defender.getPlayer().getName(),
-                    Options.autoFlee))
-                {
-                    flees = defender.getPlayer().aiFlee(defender, attacker);
-                }
-                else
-                {
-                    flees = server.askFlee(defender, attacker);
-                }
-                if (flees)
-                {
-                    handleConcession(defender, attacker, true);
-                    return;
-                }
-            }
-
-            // The attacker may concede now without
-            // allowing the defender a reinforcement.
-            boolean concedes = false;
-            if (server.getClientOption(attacker.getPlayer().getName(),
-                Options.autoFlee))
-            {
-                concedes = attacker.getPlayer().aiConcede(attacker, defender);
+                server.askFlee(defender, attacker);
             }
             else
             {
-                concedes = server.askConcede(attacker, defender);
+                engage2(hexLabel);
             }
-
-            if (concedes)
-            {
-                handleConcession(attacker, defender, false);
-                return;
-            }
-
-            offers[Constants.DEFENDER] = new HashSet();
-            offers[Constants.ATTACKER] = new HashSet();
-            // XXX Skip negotiation for now, and just do the fight.
-            // server.twoNegotiate(attacker, defender);
-            fight(hexLabel);
         }
     }
 
+    // Defender did not flee; attacker may concede early.
+    private void engage2(String hexLabel)
+    {
+        Player player = getActivePlayer();
+        Legion attacker = getFirstFriendlyLegion(hexLabel, player);
+        Legion defender = getFirstEnemyLegion(hexLabel, player);
+        server.askConcede(attacker, defender);
+    }
 
+
+    // XXX Make sure these methods are called at the right time by
+    // the right player.
+
+    void flee(String markerId)
+    {
+        Legion defender = getLegionByMarkerId(markerId);
+        String hexLabel = defender.getCurrentHexLabel();
+        Legion attacker = getFirstEnemyLegion(hexLabel, defender.getPlayer());
+        handleConcession(defender, attacker, true);
+    }
+
+    void concede(String markerId)
+    {
+        Legion attacker = getLegionByMarkerId(markerId);
+        String hexLabel = attacker.getCurrentHexLabel();
+        Legion defender = getFirstEnemyLegion(hexLabel, attacker.getPlayer());
+        handleConcession(defender, attacker, true);
+    }
+
+    void doNotFlee(String markerId)
+    {
+        Legion defender = getLegionByMarkerId(markerId);
+        String hexLabel = defender.getCurrentHexLabel();
+        engage2(hexLabel);
+    }
+
+    void doNotConcede(String markerId)
+    {
+        Legion attacker = getLegionByMarkerId(markerId);
+        String hexLabel = attacker.getCurrentHexLabel();
+        fight(hexLabel);
+    }
+
+
+/*
     void negotiate(String playerName, NegotiationResults offer)
     {
         // If it's too late to negotiate, just throw this away.
@@ -2459,6 +2465,7 @@ public final class Game
             // XXX Need to tell the other player about the offer.
         }
     }
+*/
 
 
     void fight(String hexLabel)

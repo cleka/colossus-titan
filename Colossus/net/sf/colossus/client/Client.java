@@ -889,22 +889,46 @@ public final class Client
     }
 
 
-    public boolean askConcede(String longMarkerName, String hexDescription,
-        String allyImageName, java.util.List allyImageNames, String
-        enemyImageName, java.util.List enemyImageNames)
+    public void askConcede(String longMarkerName, String hexDescription,
+        String allyMarkerId, java.util.List allyImageNames, String
+        enemyMarkerId, java.util.List enemyImageNames)
     {
-        return Concede.concede(this, board.getFrame(), longMarkerName,
-            hexDescription, allyImageName, allyImageNames,
-            enemyImageName, enemyImageNames);
+        Concede.concede(this, board.getFrame(), longMarkerName,
+            hexDescription, allyMarkerId, allyImageNames,
+            enemyMarkerId, enemyImageNames);
     }
 
-    public boolean askFlee(String longMarkerName, String hexDescription,
-        String allyImageName, java.util.List allyImageNames, String
-        enemyImageName, java.util.List enemyImageNames)
+    public void askFlee(String longMarkerName, String hexDescription,
+        String allyMarkerId, java.util.List allyImageNames, String
+        enemyMarkerId, java.util.List enemyImageNames)
     {
-        return Concede.flee(this, board.getFrame(), longMarkerName,
-            hexDescription, allyImageName, allyImageNames,
-            enemyImageName, enemyImageNames);
+        Concede.flee(this, board.getFrame(), longMarkerName,
+            hexDescription, allyMarkerId, allyImageNames,
+            enemyMarkerId, enemyImageNames);
+    }
+
+    void answerFlee(String markerId, boolean answer)
+    {
+        if (answer)
+        {
+            server.flee(markerId);
+        }
+        else
+        {
+            server.doNotFlee(markerId);
+        }
+    }
+
+    void answerConcede(String markerId, boolean answer)
+    {
+        if (answer)
+        {
+            server.concede(markerId);
+        }
+        else
+        {
+            server.doNotConcede(markerId);
+        }
     }
 
 

@@ -700,22 +700,72 @@ public final class Server
     }
 
 
-    boolean askConcede(Legion ally, Legion enemy)
+    /** Ask ally's player whether he wants to concede with ally. */
+    void askConcede(Legion ally, Legion enemy)
     {
-        Client client = getClient(ally.getPlayerName());
-        return client.askConcede(ally.getLongMarkerName(),
-            ally.getCurrentHex().getDescription(), ally.getMarkerId(),
-            ally.getImageNames(true), enemy.getMarkerId(), 
-            enemy.getImageNames(true));
+        if (getClientOption(ally.getPlayerName(), Options.autoFlee))
+        {
+            if (ally.getPlayer().aiConcede(ally, enemy))
+            {
+                concede(ally.getMarkerId());
+            }
+            else
+            {
+                doNotConcede(ally.getMarkerId());
+            }
+        }
+        else
+        {
+            Client client = getClient(ally.getPlayerName());
+            client.askConcede(ally.getLongMarkerName(),
+                ally.getCurrentHex().getDescription(), ally.getMarkerId(),
+                ally.getImageNames(true), enemy.getMarkerId(), 
+                enemy.getImageNames(true));
+        }
     }
 
-    boolean askFlee(Legion ally, Legion enemy)
+    public void concede(String markerId)
     {
-        Client client = getClient(ally.getPlayerName());
-        return client.askFlee(ally.getLongMarkerName(),
-            ally.getCurrentHex().getDescription(), ally.getMarkerId(),
-            ally.getImageNames(true), enemy.getMarkerId(), 
-            enemy.getImageNames(true));
+        game.concede(markerId);
+    }
+
+    public void doNotConcede(String markerId)
+    {
+        game.doNotConcede(markerId);
+    }
+
+    /** Ask ally's player whether he wants to flee with ally. */
+    void askFlee(Legion ally, Legion enemy)
+    {
+        if (getClientOption(ally.getPlayerName(), Options.autoFlee))
+        {
+            if (ally.getPlayer().aiFlee(ally, enemy))
+            {
+                flee(ally.getMarkerId());
+            }
+            else
+            {
+                doNotFlee(ally.getMarkerId());
+            }
+        }
+        else
+        {
+            Client client = getClient(ally.getPlayerName());
+            client.askFlee(ally.getLongMarkerName(),
+                ally.getCurrentHex().getDescription(), ally.getMarkerId(),
+                ally.getImageNames(true), enemy.getMarkerId(), 
+                enemy.getImageNames(true));
+        }
+    }
+
+    public void flee(String markerId)
+    {
+        game.flee(markerId);
+    }
+
+    public void doNotFlee(String markerId)
+    {
+        game.doNotFlee(markerId);
     }
 
 

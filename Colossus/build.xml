@@ -85,13 +85,6 @@
 </target>
 
 
-<!-- XXX Is this working? -->
-<target name="dep" 
-        description = "Remove out-of-date class files">
-        <depend srcdir="**"/>
-</target> 
-
-
 <target name="compile" depends="init,parsers"
         description = "Compile .java files to .class files">
         <javac debug="yes" deprecation="yes" target="1.2" srcdir="."
