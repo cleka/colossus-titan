@@ -1,3 +1,17 @@
+Big picture:
+1. Fix network bugs.
+2. Refactor client, adding a read-only Game etc., so AI can be moved to
+   client side without a full rewrite.
+3. Add split prediction so AI can play on client side.
+4. Move AI to client side. 
+5. Improve networking.  (Persistent servers, reporting game openings to web
+   page.)
+6. Improve AI.
+
+
+Allow players to specify that they automatically refuse to negotiate.
+   Check for this before showing negotiation dialog to opponent.
+
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
    Or make PickRecruit non-modal.
@@ -43,7 +57,6 @@ Add UI for players to specify favorite colors.
 
 Put old, new web pages under CVS.
 Switch to new web page.
-Add link to http://validator.w3.org/check/referer  Fix errors.
 
 Include a Colossus.ico file for Windows.
 
@@ -72,10 +85,6 @@ Add SetupBattle dialog, to allow setting up standalone battles.
 
 Add a ShowLegionMarkers window that shows each player's remaining 
    legion markers.
-
-Finish networked negotiation. 
-Allow players to specify that they automatically refuse to negotiate.
-   Check for this before showing negotiation dialog to opponent.
 
 Show StatusScreen and ShowLegion info in the masterboard window, rather 
    than in separate windows.

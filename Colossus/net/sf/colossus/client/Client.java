@@ -47,10 +47,6 @@ public final class Client implements IClient
     private BattleMap map;
     private BattleDice battleDice;
 
-    // XXX Will need more than one of each.
-    private Negotiate negotiate;
-    private ReplyToProposal replyToProposal;
-
     private java.util.List battleChits = new ArrayList();
 
     /** Stack of legion marker ids, to allow multiple levels of undo for
@@ -122,6 +118,14 @@ public final class Client implements IClient
 
     private boolean remote;
     private SocketClientThread sct; 
+
+    // For negotiation.
+    private String attackerId;
+    private String defenderId;
+    // XXX May need more than one of each.
+    private Negotiate negotiate;
+    private ReplyToProposal replyToProposal;
+
 
 
     public Client(String host, int port, String playerName, boolean remote)
@@ -221,9 +225,6 @@ public final class Client implements IClient
      *  connections when they want to quit in a hurry. */
     void withdrawFromGame()
     {
-        // XXX Right now the game breaks if a player quits outside his
-        // own turn.  But we need to support this, or players will
-        // just drop connections.
         server.withdrawFromGame();
     }
 
@@ -840,7 +841,7 @@ public final class Client implements IClient
 
     /** Return the full basename for a titan in legion markerId,
      *  first finding that legion's player, player color, and titan size.
-     *  Default to "Titan" if the info is not there. */
+     *  Default to Constants.titan if the info is not there. */
     String getTitanBasename(String markerId)
     {
         return getLegionInfo(markerId).getTitanBasename();
@@ -989,7 +990,7 @@ public final class Client implements IClient
         int tag, String hexLabel)
     {
         String imageName = bareImageName;
-        if (imageName.equals("Titan"))
+        if (imageName.equals(Constants.titan))
         {
             if (inverted)
             {
@@ -1043,7 +1044,7 @@ public final class Client implements IClient
     void clearRecruitChits()
     {
         recruitChits.clear();
-        // TODO Only repaint needed hexes.
+        // XXX Only repaint needed hexes.
         if (board != null)
         {
             board.repaint();
@@ -1322,44 +1323,45 @@ public final class Client implements IClient
 
     public void askNegotiate(String attackerId, String defenderId)
     {
-        Proposal proposal = null;
+        this.attackerId = attackerId;
+        this.defenderId = defenderId;
+
         if (getOption(Options.autoNegotiate))
         {
-            // TODO AI players just fight for now.
-            proposal = new Proposal(attackerId, defenderId, true, false,
-                null, null, getHexForLegion(attackerId));
+            // XXX AI players just fight for now.
+            Proposal proposal = new Proposal(attackerId, defenderId, true, 
+                false, null, null, getHexForLegion(attackerId));
             makeProposal(proposal);
         }
         else
         {
-        /* TODO Finish
             negotiate = new Negotiate(this, attackerId, defenderId);
-        */
         }
     }
 
-    void negotiateCallback(Proposal proposal)
+    /** Called from both Negotiate and ReplyToProposal. */
+    void negotiateCallback(Proposal proposal, boolean respawn)
     {
-        if (proposal == null)
-        {
-            // Just drop it.
-        }
-        else if (proposal.isFight())
+        if (proposal != null && proposal.isFight())
         {
             fight(proposal.getHexLabel());
+            return;
         }
-        else
+        else if (proposal != null)
         {
             makeProposal(proposal);
         }
-    }
 
+        if (respawn)
+        {
+            negotiate = new Negotiate(this, attackerId, defenderId);
+        }
+    }
 
     private void makeProposal(Proposal proposal)
     {
         server.makeProposal(proposal.toString());
     }
-
 
     /** Inform this player about the other player's proposal. */
     public void tellProposal(String proposalString)
@@ -1367,6 +1369,7 @@ public final class Client implements IClient
         Proposal proposal = Proposal.makeProposal(proposalString);
         new ReplyToProposal(this, proposal);
     }
+
 
     private String getBattleChitDescription(BattleChit chit)
     {
@@ -1695,6 +1698,8 @@ public final class Client implements IClient
     public void setupSplit(Set markersAvailable, String activePlayerName,
         int turnNumber)
     {
+        cleanupNegotiationDialogs();
+
         this.activePlayerName = activePlayerName;
         this.turnNumber = turnNumber;
         this.phase = Constants.SPLIT;
@@ -1742,6 +1747,8 @@ public final class Client implements IClient
 
     public void setupMuster()
     {
+        cleanupNegotiationDialogs();
+
         this.phase = Constants.MUSTER;
 
         if (board != null)
@@ -2170,9 +2177,9 @@ public final class Client implements IClient
                 return null;
             case 1:
                 String lordName = (String)lords.get(0);
-                if (lordName.startsWith("Titan"))
+                if (lordName.startsWith(Constants.titan))
                 {
-                    lordName = "Titan";
+                    lordName = Constants.titan;
                 }
                 return lordName;
             default:

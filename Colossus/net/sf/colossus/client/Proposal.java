@@ -35,7 +35,10 @@ public final class Proposal
         this.mutual = mutual;
         this.winnerId = winnerId;
         this.winnerLosses = winnerLosses;
-        Collections.sort(winnerLosses);
+        if (winnerLosses != null)
+        {
+            Collections.sort(winnerLosses);
+        }
         this.hexLabel = hexLabel;
     }
 
@@ -140,12 +143,15 @@ public final class Proposal
         sb.append(sep);
         sb.append(hexLabel);
         sb.append(sep);
-        Iterator it = winnerLosses.iterator();
-        while (it.hasNext())
+        if (winnerLosses != null)
         {
-            String creature = (String)it.next();
-            sb.append(creature);
-            sb.append(sep);
+            Iterator it = winnerLosses.iterator();
+            while (it.hasNext())
+            {
+                String creatureName = (String)it.next();
+                sb.append(creatureName);
+                sb.append(sep);
+            }
         }
         if (sb.toString().endsWith("~"))
         {

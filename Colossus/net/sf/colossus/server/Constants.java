@@ -140,6 +140,8 @@ public final class Constants
     public static final String username = System.getProperty("user.name",
         byColor);
 
+    public static final String titan = "Titan";
+
     // Network stuff
     public static final int defaultPort = 1969;
     public static final String localhost = "localhost";

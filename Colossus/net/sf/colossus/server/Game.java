@@ -2578,9 +2578,6 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     }
 
 
-    // XXX Make sure these methods are called at the right time by
-    // the right player.
-
     void flee(String markerId)
     {
         Legion defender = getLegionByMarkerId(markerId);
@@ -2760,7 +2757,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     private void handleNegotiation(Proposal results)
     {
         Legion attacker = getLegionByMarkerId(results.getAttackerId());
-        Legion defender = getLegionByMarkerId(results.getAttackerId());
+        Legion defender = getLegionByMarkerId(results.getDefenderId());
 
         if (results.isMutual())
         {
@@ -2815,15 +2812,20 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             Iterator it = winnerLosses.iterator();
             while (it.hasNext())
             {
-                Creature creature = (Creature)it.next();
-                log.append(creature.getName());
+                String creatureName = (String)it.next();
+                log.append(creatureName);
                 if (it.hasNext())
                 {
                     log.append(", ");
                 }
+                Creature creature = Creature.getCreatureByName(creatureName);
                 winner.removeCreature(creature, true, true);
             }
             Log.event(log.toString());
+
+            server.allFullyUpdateLegionHeights();
+            server.oneRevealLegion(winner, attacker.getPlayerName());
+            server.oneRevealLegion(winner, defender.getPlayerName());
 
             int points = loser.getPointValue();
 

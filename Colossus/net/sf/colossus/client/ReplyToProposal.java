@@ -6,7 +6,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
 
 
@@ -24,8 +23,6 @@ final class ReplyToProposal extends KDialog implements ActionListener
     private java.util.List defenderChits = new ArrayList();
     private Marker attackerMarker;
     private Marker defenderMarker;
-    private GridBagLayout gridbag = new GridBagLayout();
-    private GridBagConstraints constraints = new GridBagConstraints();
     private Client client;
     private Proposal proposal;
     private Point location;
@@ -34,7 +31,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
     ReplyToProposal(Client client, Proposal proposal)
     {
-        super(client.getBoard().getFrame(), "Reply to Proposal", false);
+        super(client.getBoard().getFrame(), client.getPlayerName() + 
+            ": Reply to Proposal", false);
 
         this.client = client;
         this.proposal = proposal;
@@ -43,19 +41,17 @@ final class ReplyToProposal extends KDialog implements ActionListener
         defenderId = proposal.getDefenderId();
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(gridbag);
-        pack();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+
         setBackground(Color.lightGray);
 
         int scale = 4 * Scale.get();
 
-        attackerMarker = new Marker(scale, attackerId,
-            this, client);
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        gridbag.setConstraints(attackerMarker, constraints);
-        contentPane.add(attackerMarker);
+        JPanel attackerPane = new JPanel();
+        contentPane.add(attackerPane);
+
+        attackerMarker = new Marker(scale, attackerId, this, client);
+        attackerPane.add(attackerMarker);
 
         java.util.List attackerImageNames = client.getLegionImageNames(
             attackerId);
@@ -65,20 +61,14 @@ final class ReplyToProposal extends KDialog implements ActionListener
             String imageName = (String)it.next();
             Chit chit = new Chit(scale, imageName, this);
             attackerChits.add(chit);
-            constraints.gridx = GridBagConstraints.RELATIVE;
-            constraints.gridy = 0;
-            constraints.gridwidth = 1;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
+            attackerPane.add(chit);
         }
 
-        defenderMarker = new Marker(scale, defenderId,
-            this, client);
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        gridbag.setConstraints(defenderMarker, constraints);
-        contentPane.add(defenderMarker);
+        JPanel defenderPane = new JPanel();
+        contentPane.add(defenderPane);
+
+        defenderMarker = new Marker(scale, defenderId, this, client);
+        defenderPane.add(defenderMarker);
 
         java.util.List defenderImageNames = client.getLegionImageNames(
             defenderId);
@@ -88,11 +78,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
             String imageName = (String)it.next();
             Chit chit = new Chit(scale, imageName, this);
             defenderChits.add(chit);
-            constraints.gridx = GridBagConstraints.RELATIVE;
-            constraints.gridy = 1;
-            constraints.gridwidth = 1;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
+            defenderPane.add(chit);
         }
 
         if (proposal.isMutual())
@@ -111,6 +97,9 @@ final class ReplyToProposal extends KDialog implements ActionListener
             markSomeDead(defenderId, proposal.getWinnerLosses());
         }
 
+        JPanel buttonPane = new JPanel();
+        contentPane.add(buttonPane);
+
         JButton button1 = new JButton("Accept");
         button1.setMnemonic(KeyEvent.VK_A);
         JButton button2 = new JButton("Decline");
@@ -118,31 +107,9 @@ final class ReplyToProposal extends KDialog implements ActionListener
         JButton button3 = new JButton("Fight");
         button3.setMnemonic(KeyEvent.VK_F);
 
-        // Attempt to center the buttons.
-        int chitWidth = 1 + Math.max(attackerImageNames.size(),
-            defenderImageNames.size());
-        if (chitWidth < 4)
-        {
-            constraints.gridwidth = 1;
-        }
-        else
-        {
-            constraints.gridwidth = 2;
-        }
-        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2;
-        if (leadSpace < 0)
-        {
-            leadSpace = 0;
-        }
-
-        constraints.gridy = 2;
-        constraints.gridx = leadSpace;
-        gridbag.setConstraints(button1, constraints);
-        contentPane.add(button1);
+        buttonPane.add(button1);
         button1.addActionListener(this);
-        constraints.gridx = leadSpace + constraints.gridwidth;
-        gridbag.setConstraints(button2, constraints);
-        contentPane.add(button2);
+        buttonPane.add(button2);
         button2.addActionListener(this);
 
         pack();
@@ -203,8 +170,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
             Iterator it2 = creatures.iterator();
             while (it2.hasNext())
             {
-                Creature creature = (Creature)it2.next();
-                if (creature.getName().equals(chit.getId()))
+                String creatureName = (String)it2.next();
+                if (creatureName.equals(chit.getId()))
                 {
                     chit.setDead(true);
                     it2.remove();
@@ -219,7 +186,7 @@ final class ReplyToProposal extends KDialog implements ActionListener
         location = getLocation();
         saveWindow.saveLocation(location);
         dispose();
-        client.negotiateCallback(proposal);
+        client.negotiateCallback(proposal, false);
     }
 
 

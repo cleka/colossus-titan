@@ -816,19 +816,11 @@ Log.debug("Called Server.reinforce()");
 
     void twoNegotiate(Legion attacker, Legion defender)
     {
-    /* TODO Put negotiation back in.
         IClient client1 = getClient(defender.getPlayerName());
-        client1.askNegotiate(attacker.getLongMarkerName(),
-            defender.getLongMarkerName(), attacker.getMarkerId(),
-            defender.getMarkerId(), attacker.getCurrentHexLabel());
+        client1.askNegotiate(attacker.getMarkerId(), defender.getMarkerId());
 
         IClient client2 = getClient(attacker.getPlayerName());
-        client2.askNegotiate(attacker.getLongMarkerName(),
-            defender.getLongMarkerName(), attacker.getMarkerId(),
-            defender.getMarkerId(), attacker.getCurrentHexLabel());
-    */
-
-        fight(attacker.getCurrentHexLabel());
+        client2.askNegotiate(attacker.getMarkerId(), defender.getMarkerId());
     }
 
     /** playerName makes a proposal. */
@@ -1185,12 +1177,19 @@ Log.debug("Called Server.reinforce()");
     }
 
 
-    // XXX Need to support inactive players quitting.
-    // XXX If player quits while engaged, might need to set slayer.
     // XXX Notify all players.
     public void withdrawFromGame()
     {
-        game.getPlayer(getPlayerName()).die(null, true);
+        Player player = getPlayer();
+        // If player quits while engaged, set slayer.
+        String slayerName = null;
+        Legion legion = player.getTitanLegion();
+        if (legion != null && game.isEngagement(legion.getCurrentHexLabel()))
+        {
+            slayerName = game.getFirstEnemyLegion(
+                legion.getCurrentHexLabel(), player).getPlayerName();
+        }
+        player.die(slayerName, true);
         game.advancePhase(game.getPhase(), getPlayerName());
     }
 

@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.server.Constants;
 
 /**
  * Class PickRecruiter allows a player to choose which creature(s) recruit.
@@ -81,6 +82,10 @@ final class PickRecruiter extends KDialog implements MouseListener,
         while (it.hasNext())
         {
             String recruiterName = (String)it.next();
+            if (recruiterName.equals(Constants.titan))
+            {
+                recruiterName = client.getTitanBasename(markerId);
+            }
             Chit chit = new Chit(scale, recruiterName, this);
             recruiterChits.add(chit);
             constraints.gridx = leadSpace + i;
@@ -114,6 +119,10 @@ final class PickRecruiter extends KDialog implements MouseListener,
         if (i != -1)
         {
             recruiterName = (String)recruiters.get(i);
+            if (recruiterName.startsWith(Constants.titan))
+            {
+                recruiterName = Constants.titan;
+            }
 
             // Then exit.
             dispose();

@@ -401,7 +401,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (client.isGameOver())
+                if (client.isGameOver() && client.isRemote())
                 {
                     System.exit(0);
                 }
@@ -416,7 +416,11 @@ public final class MasterBoard extends JPanel
                     null, options, options[1]);
                 if (answer == JOptionPane.YES_OPTION)
                 {
-                    System.exit(0);
+                    client.withdrawFromGame();
+                    if (client.isRemote())
+                    {
+                        System.exit(0);
+                    }
                 }
             }
         };
@@ -1768,7 +1772,7 @@ public final class MasterBoard extends JPanel
 
             if (answer == JOptionPane.YES_OPTION)
             {
-                System.exit(0);
+                client.withdrawFromGame();
             }
         }
     }

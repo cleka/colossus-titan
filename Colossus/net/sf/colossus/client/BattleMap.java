@@ -158,7 +158,6 @@ public final class BattleMap extends HexMap implements MouseListener,
                 switch (phase)
                 {
                     case Constants.MOVE:
-                        // TODO Check this locally rather than asking for help.
                         if (!client.getOption(Options.autoPlay) &&
                             client.anyOffboardCreatures() && 
                             !confirmLeavingCreaturesOffboard())
@@ -635,7 +634,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         if (answer == JOptionPane.YES_OPTION)
         {
-            System.exit(0);
+            client.withdrawFromGame();
         }
     }
 

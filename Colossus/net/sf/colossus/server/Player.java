@@ -368,6 +368,20 @@ Log.debug("Called Player.setType() for " + name + " " + type);
         return null;
     }
 
+    Legion getTitanLegion()
+    {
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (legion.hasTitan())
+            {
+                return legion;
+            }
+        }
+        return null;
+    }
+
     List getLegions()
     {
         return legions;

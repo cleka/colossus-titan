@@ -24,8 +24,6 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
     private java.util.List defenderChits = new ArrayList();
     private Marker attackerMarker;
     private Marker defenderMarker;
-    private GridBagLayout gridbag = new GridBagLayout();
-    private GridBagConstraints constraints = new GridBagConstraints();
     private Client client;
     private Proposal proposal;
     private String hexLabel;
@@ -33,13 +31,10 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
     private SaveWindow saveWindow;
 
 
-    Negotiate(Client client, String attackerLongMarkerName,
-        String defenderLongMarkerName, String attackerId,
-        String defenderId, java.util.List attackerImageNames,
-        java.util.List defenderImageNames, String hexLabel)
+    Negotiate(Client client, String attackerId, String defenderId)
     {
-        super(client.getBoard().getFrame(), attackerLongMarkerName +
-            " Negotiates with " + defenderLongMarkerName, false);
+        super(client.getBoard().getFrame(), client.getPlayerName() + ": " +
+            attackerId + " Negotiates with " + defenderId, false);
 
         this.client = client;
         this.attackerId = attackerId;
@@ -47,54 +42,42 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         this.hexLabel = hexLabel;
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(gridbag);
-        pack();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+
         setBackground(Color.lightGray);
         addMouseListener(this);
 
         int scale = 4 * Scale.get();
 
-        attackerMarker = new Marker(scale, attackerId,
-            this, client);
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        gridbag.setConstraints(attackerMarker, constraints);
-        contentPane.add(attackerMarker);
+        JPanel attackerPane = new JPanel();
+        contentPane.add(attackerPane);
 
-        Iterator it = attackerImageNames.iterator();
+        attackerMarker = new Marker(scale, attackerId, this, client);
+        attackerPane.add(attackerMarker);
+
+        Iterator it = client.getLegionImageNames(attackerId).iterator();
         while (it.hasNext())
         {
             String imageName = (String)it.next();
             Chit chit = new Chit(scale, imageName, this);
             attackerChits.add(chit);
-            constraints.gridx = GridBagConstraints.RELATIVE;
-            constraints.gridy = 0;
-            constraints.gridwidth = 1;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
+            attackerPane.add(chit);
             chit.addMouseListener(this);
         }
 
-        defenderMarker = new Marker(scale, defenderId,
-            this, client);
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        gridbag.setConstraints(defenderMarker, constraints);
-        contentPane.add(defenderMarker);
+        JPanel defenderPane = new JPanel();
+        contentPane.add(defenderPane);
 
-        it = defenderImageNames.iterator();
+        defenderMarker = new Marker(scale, defenderId, this, client);
+        defenderPane.add(defenderMarker);
+
+        it = client.getLegionImageNames(defenderId).iterator();
         while (it.hasNext())
         {
             String imageName = (String)it.next();
             Chit chit = new Chit(scale, imageName, this);
             defenderChits.add(chit);
-            constraints.gridx = GridBagConstraints.RELATIVE;
-            constraints.gridy = 1;
-            constraints.gridwidth = 1;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
+            defenderPane.add(chit);
             chit.addMouseListener(this);
         }
 
@@ -103,31 +86,11 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         JButton button2 = new JButton("Fight");
         button2.setMnemonic(KeyEvent.VK_F);
 
-        // Attempt to center the buttons.
-        int chitWidth = 1 + Math.max(attackerImageNames.size(),
-            defenderImageNames.size());
-        if (chitWidth < 4)
-        {
-            constraints.gridwidth = 1;
-        }
-        else
-        {
-            constraints.gridwidth = 2;
-        }
-        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2;
-        if (leadSpace < 0)
-        {
-            leadSpace = 0;
-        }
-
-        constraints.gridy = 2;
-        constraints.gridx = leadSpace;
-        gridbag.setConstraints(button1, constraints);
-        contentPane.add(button1);
+        JPanel buttonPane = new JPanel();
+        contentPane.add(buttonPane);
+        buttonPane.add(button1);
         button1.addActionListener(this);
-        constraints.gridx = leadSpace + constraints.gridwidth;
-        gridbag.setConstraints(button2, constraints);
-        contentPane.add(button2);
+        buttonPane.add(button2);
         button2.addActionListener(this);
 
         pack();
@@ -154,7 +117,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         location = getLocation();
         saveWindow.saveLocation(location);
         dispose();
-        client.negotiateCallback(proposal);
+        client.negotiateCallback(proposal, true);
     }
 
 
@@ -258,10 +221,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                         {
                             name = "Titan";
                         }
-                        // XXX bug   There can be more than one of the
-                        // same type of creature, so we need to track
-                        // quantity.
-                        winnerLosses.add(Creature.getCreatureByName(name));
+                        winnerLosses.add(name);
                     }
                 }
                 proposal = new Proposal(attackerId, defenderId, 

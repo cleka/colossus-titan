@@ -90,6 +90,7 @@ Log.debug("End of SocketClientThread while loop");
         {
             Log.error(ex.toString());
             ex.printStackTrace();
+            System.exit(1);
         }
         System.exit(0);
     }

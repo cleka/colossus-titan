@@ -63,11 +63,13 @@ final class SocketServerThread extends Thread implements IClient
                 parseLine(fromClient);
             }
             Log.debug("End of SocketServerThread while loop");
+            server.withdrawFromGame();
         }
         catch (IOException ex)
         {
             Log.error(ex.toString());
             ex.printStackTrace();
+            server.withdrawFromGame();
         }
 
         // Shut down the client.
