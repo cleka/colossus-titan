@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<variant name="ExtTitan">
+    <strategic_map filename="ExtTitanMap.xml" />
+    <terrain_recruits filename="ExtTitanTer.xml" />
+    <creatures filename="ExtTitanCre.xml" />
+    <hint classname="ExtTitan.ExtTitanHint" />
+    <max_players num="8" />
+</variant>
