@@ -286,8 +286,11 @@ final class Legion implements Comparable
         int tmpScore = score;
         int tmpPoints = points;
         
-        tmpScore = tmpScore - (tmpScore % value);
-        tmpPoints = tmpPoints - (tmpPoints % value);
+        // round Score down, and tmpPoints by the same amount.
+        // this allow to keep all points
+        int round = (tmpScore % value);
+        tmpScore -= round;
+        tmpPoints += round;
         
         List recruits;
         
