@@ -86,8 +86,10 @@ $(INST_README): docs/README.txt
 	cp docs/README.txt $(HTMLDIR)
 $(INST_DIST): dist
 	cp $(ZIPFILE) $(DOWNLOAD_DIR)
+$(INST_JNLP): dist
+	cp Colossus.jnlp $(HTMLDIR)
 
-inst: signjar $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST)
+inst: signjar $(INST_JARFILE) $(INST_HTML) $(INST_README) $(INST_DIST) $(INST_JNLP)
 
 # Clean up
 clean:

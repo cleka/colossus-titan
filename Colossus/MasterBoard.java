@@ -782,8 +782,9 @@ public final class MasterBoard extends JPanel
 
         try 
         {
+            ClassLoader cl = Game.class.getClassLoader();
             InputStream mapIS = 
-                java.lang.ClassLoader.getSystemResourceAsStream(mapName);
+                cl.getResourceAsStream(mapName);
             if (mapIS == null)
             {
                 mapIS = new FileInputStream(mapName);

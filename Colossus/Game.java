@@ -59,9 +59,9 @@ public final class Game extends GameSource
     {
         try 
         {
+            ClassLoader cl = Game.class.getClassLoader();
             InputStream terIS = 
-                java.lang.ClassLoader.getSystemResourceAsStream(
-                GetPlayers.recruitName);
+                cl.getResourceAsStream(GetPlayers.recruitName);
             if (terIS == null)
             {
                 terIS = new FileInputStream(GetPlayers.recruitName);
