@@ -1069,7 +1069,7 @@ public final class Client implements IClient
 
     java.util.List getBattleChits()
     {
-        return battleChits;
+        return Collections.unmodifiableList(battleChits);
     }
 
     java.util.List getBattleChits(String hexLabel)

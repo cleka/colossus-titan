@@ -1845,6 +1845,7 @@ public final class MasterBoard extends JPanel
         }
         catch (ConcurrentModificationException ex)
         {
+            Log.debug("harmless " + ex.toString());
             // Don't worry about it -- we'll just paint again.
         }
     }

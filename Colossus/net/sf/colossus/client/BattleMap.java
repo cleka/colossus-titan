@@ -634,15 +634,23 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        java.util.List battleChits = client.getBattleChits();
-        ListIterator lit = battleChits.listIterator(battleChits.size());
-        while (lit.hasPrevious())
+        try
         {
-            BattleChit chit = (BattleChit)lit.previous();
-            if (rectClip.intersects(chit.getBounds()))
+            java.util.List battleChits = client.getBattleChits();
+            ListIterator lit = battleChits.listIterator(battleChits.size());
+            while (lit.hasPrevious())
             {
-                chit.paintComponent(g);
+                BattleChit chit = (BattleChit)lit.previous();
+                if (rectClip.intersects(chit.getBounds()))
+                {
+                    chit.paintComponent(g);
+                }
             }
+        }
+        catch (ConcurrentModificationException ex)
+        {
+            // Let the next repaint clean up.
+            Log.debug("harmless " + ex.toString());
         }
     }
 
