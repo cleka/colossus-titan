@@ -175,6 +175,7 @@ class Legion
         currentHex = hex;
         currentHex.addLegion(this);
         moved = true;
+        player.markLastLegionMoved(this);
     }
 
 
