@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.*;
+import java.io.*;
 
 /**
  * Class Creature represents a Titan Character
@@ -140,7 +141,7 @@ class Creature
 
     String getImageName()
     {
-        return "images/" + name + ".gif";
+        return "images" + File.separator + name + ".gif";
     }
 
 

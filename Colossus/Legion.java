@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.*;
+import java.io.*;
 
 /**
  * Class Legion represents a Titan stack of Creatures and its
@@ -93,7 +94,7 @@ class Legion
 
     String getImageName()
     {
-        return "images/" + markerId + ".gif";
+        return "images" + File.separator + markerId + ".gif";
     }
 
 

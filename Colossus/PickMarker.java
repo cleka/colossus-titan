@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
 /**
  * Class PickMarker allows a player to pick a legion marker.
@@ -54,7 +55,8 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
             {
                 markers[i] = new Chit(cx + (i % 12) * (21 * scale / 20),
                     cy + (i / 12) * (21 * scale / 20), scale,
-                    "images/" + player.getMarker(i) + ".gif", this, false);
+                    "images" + File.separator + player.getMarker(i) + 
+                    ".gif", this, false);
             }
 
             imagesLoaded = false;
