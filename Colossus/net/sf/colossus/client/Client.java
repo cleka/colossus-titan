@@ -730,7 +730,7 @@ Log.debug("Client.makeForcedStrikes()");
         {
             Chit chit = (Chit)it.next();
             GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
-            if (hex.contains(chit.getCenter()))
+            if (hex != null && hex.contains(chit.getCenter()))
             {
                 it.remove();
                 return;
@@ -1079,8 +1079,6 @@ Log.debug("called Client.acquireAngelCallback()");
         {
             map.unselectAllHexes();
         }
-        // TODO Mark hits / dead on target BattleChit, and eliminate
-        // the extra server-side call.
 
         if (carryDamageLeft >= 1 && !carryTargetDescriptions.isEmpty())
         {
@@ -1116,17 +1114,20 @@ Log.debug("called Client.acquireAngelCallback()");
 
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
     {
+Log.debug("Called Client.pickCarries() for " + playerName);
         if (!playerName.equals(getBattleActivePlayerName()))
         {
+Log.debug("Not active player");
             return;
         }
         if (getOption(Options.autoStrike))
         {
+Log.debug("AI");
             // AI carries are handled on server side.
             return;
         }
 
-Log.debug("Client.pickCarries()");
+Log.debug("Going forward with pickCarries() logic.");
         if (carryDamage < 1 || carryTargetDescriptions.isEmpty())
         {
             leaveCarryMode();
@@ -1141,7 +1142,7 @@ Log.debug("Client.pickCarries()");
         }
         else
         {
-Log.debug("new PickCarry"); 
+Log.debug("new PickCarry dialog"); 
             new PickCarry(map.getFrame(), this, carryDamage, 
                 carryTargetDescriptions);
         }
