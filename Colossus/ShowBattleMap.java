@@ -59,20 +59,4 @@ public final class ShowBattleMap extends HexMap implements WindowListener,
     {
         dialog.dispose();
     }
-
-
-    public static void main(String [] args)
-    {
-        JFrame frame = new JFrame("testing ShowBattleMap");
-        int scale = Scale.get();
-        frame.setSize(new Dimension(40 * scale, 40 * scale));
-        frame.pack();
-        frame.setVisible(true);
-
-        Game game = new Game();
-        game.addPlayer("Test");
-        game.initBoard();
-        MasterHex hex = MasterBoard.getAnyHexWithTerrain('D');
-        new ShowBattleMap(frame, hex.getLabel());
-    }
 }

@@ -40,7 +40,6 @@ public final class SplitLegion extends JDialog implements MouseListener,
 
         this.oldLegion = oldLegion;
         this.client = client;
-        Game game = oldLegion.getGame();
 
         if (selectedMarkerId == null)
         {
@@ -309,31 +308,5 @@ public final class SplitLegion extends JDialog implements MouseListener,
         {
             cancel();
         }
-    }
-
-
-    public static void main(String [] args)
-    {
-        Game game = new Game();
-        game.addPlayer("Test");
-        Player player = game.getPlayer(0);
-        player.setTower(1);
-        player.setColor("Red");
-        player.initMarkersAvailable();
-        String selectedMarkerId = player.selectMarkerId("Rd01");
-        Legion legion = Legion.getStartingLegion(selectedMarkerId,
-            "130", player.getName(), game);
-        player.addLegion(legion);
-
-        game.initBoard();
-
-        selectedMarkerId = player.selectMarkerId("Rd02");
-
-        Client client = game.getServer().getClient(player.getName());
-        String retval = SplitLegion.splitLegion(client, legion,
-            selectedMarkerId);
-
-        System.out.println(retval);
-        System.exit(0);
     }
 }

@@ -26,21 +26,21 @@ public final class Server
     private ArrayList clients = new ArrayList();
 
 
-    public Server(Game game)
+    Server(Game game)
     {
         this.game = game;
     }
 
 
     /** Temporary.  We will not use direct client refs later. */
-    public void addClient(Client client)
+    void addClient(Client client)
     {
         clients.add(client);
     }
 
 
     /** temp */
-    public void disposeAllClients()
+    void disposeAllClients()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -69,7 +69,7 @@ public final class Server
     }
 
 
-    public void allUpdateStatusScreen()
+    void allUpdateStatusScreen()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -79,7 +79,7 @@ public final class Server
         }
     }
 
-    public void allUpdateCaretakerDisplay()
+    void allUpdateCaretakerDisplay()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -89,7 +89,7 @@ public final class Server
         }
     }
 
-    public void allShowMovementRoll(int roll)
+    void allShowMovementRoll(int roll)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -99,7 +99,7 @@ public final class Server
         }
     }
 
-    public void allClearCarries()
+    void allClearCarries()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -196,7 +196,7 @@ public final class Server
         return false;
     }
 
-    public boolean getClientOption(int playerNum, String optname)
+    boolean getClientOption(int playerNum, String optname)
     {
         Client client = getClient(playerNum);
         if (client != null)
@@ -223,7 +223,7 @@ public final class Server
 
     /** Get the option from the first human-controlled client.  If there are none,
      *  get the option from the first AI-controlled client. */
-    public boolean getClientOption(String optname)
+    boolean getClientOption(String optname)
     {
         int clientNum = getFirstHumanClientNum();
         if (clientNum == -1)
@@ -233,7 +233,7 @@ public final class Server
         return getClientOption(clientNum, optname);
     }
 
-    public String getClientStringOption(String playerName, String optname)
+    String getClientStringOption(String playerName, String optname)
     {
         Client client = getClient(playerName);
         if (client != null)
@@ -244,7 +244,7 @@ public final class Server
     }
 
     /** XXX temp */
-    public void setClientOption(String playerName, String optname,
+    void setClientOption(String playerName, String optname,
         boolean value)
     {
         Client client = getClient(playerName);
@@ -254,7 +254,7 @@ public final class Server
         }
     }
 
-    public void setClientOption(int playerNum, String optname,
+    void setClientOption(int playerNum, String optname,
         boolean value)
     {
         Client client = getClient(playerNum);
@@ -264,7 +264,7 @@ public final class Server
         }
     }
 
-    public void setAllClientsOption(String optname, boolean value)
+    void setAllClientsOption(String optname, boolean value)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -275,7 +275,7 @@ public final class Server
     }
 
     /** XXX temp */
-    public void allInitBoard()
+    void allInitBoard()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -285,7 +285,7 @@ public final class Server
         }
     }
 
-    public void allLoadInitialMarkerImages()
+    void allLoadInitialMarkerImages()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -295,7 +295,7 @@ public final class Server
         }
     }
 
-    public void allSetupPlayerLabel()
+    void allSetupPlayerLabel()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -311,7 +311,7 @@ public final class Server
         client.showMessageDialog(message);
     }
 
-    public void allShowMessageDialog(String message)
+    void allShowMessageDialog(String message)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -329,7 +329,7 @@ public final class Server
     }
 
 
-    public void allSetupSplitMenu()
+    void allSetupSplitMenu()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -339,7 +339,7 @@ public final class Server
         }
     }
 
-    public void allSetupMoveMenu()
+    void allSetupMoveMenu()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -349,7 +349,7 @@ public final class Server
         }
     }
 
-    public void allSetupFightMenu()
+    void allSetupFightMenu()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -359,7 +359,7 @@ public final class Server
         }
     }
 
-    public void allSetupMusterMenu()
+    void allSetupMusterMenu()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -370,7 +370,7 @@ public final class Server
     }
 
 
-    public void allSetupBattleSummonMenu()
+    void allSetupBattleSummonMenu()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -380,7 +380,7 @@ public final class Server
         }
     }
 
-    public void allSetupBattleRecruitMenu()
+    void allSetupBattleRecruitMenu()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -390,7 +390,7 @@ public final class Server
         }
     }
 
-    public void allSetupBattleMoveMenu()
+    void allSetupBattleMoveMenu()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -400,7 +400,7 @@ public final class Server
         }
     }
 
-    public void allSetupBattleFightMenu()
+    void allSetupBattleFightMenu()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -411,7 +411,7 @@ public final class Server
     }
 
 
-    public void allAlignLegions(String hexLabel)
+    void allAlignLegions(String hexLabel)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -421,7 +421,7 @@ public final class Server
         }
     }
 
-    public void allAlignLegions(Set hexLabels)
+    void allAlignLegions(Set hexLabels)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -432,7 +432,7 @@ public final class Server
     }
 
 
-    public void allDeiconifyBoard()
+    void allDeiconifyBoard()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -442,7 +442,7 @@ public final class Server
         }
     }
 
-    public void allAddMarker(String markerId)
+    void allAddMarker(String markerId)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -452,7 +452,7 @@ public final class Server
         }
     }
 
-    public void allRemoveMarker(String markerId)
+    void allRemoveMarker(String markerId)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -462,7 +462,7 @@ public final class Server
         }
     }
 
-    public void allUnselectHexByLabel(String hexLabel)
+    void allUnselectHexByLabel(String hexLabel)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -472,7 +472,7 @@ public final class Server
         }
     }
 
-    public void allUnselectAllHexes()
+    void allUnselectAllHexes()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -482,7 +482,7 @@ public final class Server
         }
     }
 
-    public void allRepaintHex(String hexLabel)
+    void allRepaintHex(String hexLabel)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -493,7 +493,7 @@ public final class Server
     }
 
 
-    public void allUnselectBattleHexByLabel(String hexLabel)
+    void allUnselectBattleHexByLabel(String hexLabel)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -503,7 +503,7 @@ public final class Server
         }
     }
 
-    public void allUnselectAllBattleHexes()
+    void allUnselectAllBattleHexes()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -513,7 +513,7 @@ public final class Server
         }
     }
 
-    public void allRepaintBattleHex(String hexLabel)
+    void allRepaintBattleHex(String hexLabel)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -524,7 +524,7 @@ public final class Server
     }
 
 
-    public void allAlignBattleChits(String hexLabel)
+    void allAlignBattleChits(String hexLabel)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -534,7 +534,7 @@ public final class Server
         }
     }
 
-    public void allAlignBattleChits(Set hexLabels)
+    void allAlignBattleChits(Set hexLabels)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -544,7 +544,7 @@ public final class Server
         }
     }
 
-    public void allPlaceNewChit(Critter critter, boolean inverted)
+    void allPlaceNewChit(Critter critter, boolean inverted)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -555,7 +555,7 @@ public final class Server
         }
     }
 
-    public void allSetBattleChitDead(int tag)
+    void allSetBattleChitDead(int tag)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -565,7 +565,7 @@ public final class Server
         }
     }
 
-    public void allSetBattleChitHits(int tag, int hits)
+    void allSetBattleChitHits(int tag, int hits)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -575,7 +575,7 @@ public final class Server
         }
     }
 
-    public void allRemoveBattleChit(int tag)
+    void allRemoveBattleChit(int tag)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -586,7 +586,7 @@ public final class Server
     }
 
 
-    public void allHighlightEngagements()
+    void allHighlightEngagements()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -639,10 +639,13 @@ public final class Server
         {
             legion.sortCritters();
             String recruitName = pickRecruit(legion);
-            Creature recruit = Creature.getCreatureByName(recruitName);
-            if (recruit != null)
+            if (recruitName != null)
             {
-                game.doRecruit(recruit, legion);
+                Creature recruit = Creature.getCreatureByName(recruitName);
+                if (recruit != null)
+                {
+                    game.doRecruit(recruit, legion);
+                }
             }
 
             if (!legion.canRecruit())
@@ -847,7 +850,7 @@ public final class Server
     }
 
 
-    public void allSetBattleDiceValues(String attackerName,
+    void allSetBattleDiceValues(String attackerName,
         String defenderName, String attackerHexId, String defenderHexId,
         char terrain, int strikeNumber, int damage, int carryDamage,
         int [] rolls)
@@ -862,7 +865,7 @@ public final class Server
         }
     }
 
-    public void allSetBattleDiceCarries(int carries)
+    void allSetBattleDiceCarries(int carries)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -872,7 +875,7 @@ public final class Server
         }
     }
 
-    public void allSetBattleWaitCursor()
+    void allSetBattleWaitCursor()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -882,7 +885,7 @@ public final class Server
         }
     }
 
-    public void allSetBattleDefaultCursor()
+    void allSetBattleDefaultCursor()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -899,7 +902,7 @@ public final class Server
     }
 
 
-    public void allInitBattleMap(String masterHexLabel)
+    void allInitBattleMap(String masterHexLabel)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -910,7 +913,7 @@ public final class Server
     }
 
 
-    public void allShowBattleMap()
+    void allShowBattleMap()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -921,7 +924,7 @@ public final class Server
     }
 
 
-    public void allDisposeBattleMap()
+    void allDisposeBattleMap()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -1143,8 +1146,8 @@ public final class Server
     }
 
 
-    public static void main(String [] args)
+    public Creature [] getStartingCreatures()
     {
-        System.out.println("Not implemented yet");
+        return game.getStartingCreatures();
     }
 }

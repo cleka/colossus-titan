@@ -97,7 +97,7 @@ public final class PickRecruiter extends JDialog implements MouseListener,
     }
 
 
-    public static Creature pickRecruiter(JFrame parentFrame, 
+    static Creature pickRecruiter(JFrame parentFrame, 
         ArrayList recruiters, java.util.List imageNames, 
         String hexDescription, String markerId, Client client)
     {

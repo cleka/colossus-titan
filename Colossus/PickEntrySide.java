@@ -162,35 +162,4 @@ public final class PickEntrySide extends HexMap implements ActionListener,
         // Abort the move.
         cleanup(-1);
     }
-
-    /*
-    public static void main(String [] args)
-    {
-        JFrame frame = new JFrame("testing PickEntrySide");
-        int scale = Scale.get();
-        frame.setSize(new Dimension(40 * scale, 40 * scale));
-        frame.pack();
-        frame.setVisible(true);
-
-        Game game = new Game();
-        game.initBoard();
-        MasterHex hex = MasterBoard.getAnyHexWithTerrain('D');
-        String hexLabel = hex.getLabel();
-        game.addPlayer("Test");
-        Player player = game.getPlayer(0);
-        Legion legion = new Legion("Bk01", null, hex.getLabel(),
-            hex.getLabel(), Creature.titan, Creature.gargoyle,
-            Creature.gargoyle, Creature.cyclops, Creature.cyclops, null,
-            null, null, player.getName(), game);
-        player.addLegion(legion);
-
-        legion.setEntrySide(hexLabel, 1);
-        legion.setEntrySide(hexLabel, 3);
-        legion.setEntrySide(hexLabel, 5);
-
-        int side = PickEntrySide.pickEntrySide(frame, hex.getLabel(), legion);
-        System.out.println("Chose side " + side);
-        System.exit(0);
-    }
-    */
 }

@@ -365,7 +365,7 @@ class MinimaxAI extends SimpleAI implements AI
 
     class MasterBoardPositionMove implements Minimax.Move
     {
-        protected MasterBoardPosition position;
+        MasterBoardPosition position;
         private int value;
 
         public void setValue(int value)

@@ -212,39 +212,4 @@ public final class Perms
             while (pg.getNext() != -1);
         }
     }
-
-
-    /** Unit test for Perms. */
-    /*
-    public static void main(String [] args)
-    {
-        ArrayList critters = new ArrayList(7);
-        // Use Creatures instead of Critters because they're easier.
-        critters.add(Creature.titan);
-        critters.add(Creature.angel);
-        critters.add(Creature.ranger);
-        critters.add(Creature.troll);
-        critters.add(Creature.lion);
-        critters.add(Creature.centaur);
-        critters.add(Creature.ogre);
-
-        int count = 0;
-
-        Perms perms = new Perms(critters);
-        Iterator it = perms.iterator();
-        while (it.hasNext())
-        {
-            System.out.print(++count + ": ");
-
-            ArrayList newCritters = (ArrayList)it.next();
-            Iterator it2 = newCritters.iterator();
-            while (it2.hasNext())
-            {
-                Creature creature = (Creature)it2.next();
-                System.out.print(creature.getName() + " ");
-            }
-            System.out.println();
-        }
-    }
-    */
 }

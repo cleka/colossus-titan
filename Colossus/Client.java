@@ -1693,8 +1693,8 @@ public final class Client
     }
 
 
-    public static void main(String [] args)
+    public Creature[] getStartingCreatures()
     {
-        System.out.println("Not implemented yet");
+        return server.getStartingCreatures();
     }
 }

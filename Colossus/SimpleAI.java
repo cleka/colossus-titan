@@ -81,7 +81,7 @@ class SimpleAI implements AI
     }
 
 
-    protected static Creature chooseRecruit(Game game, Legion legion,
+    static Creature chooseRecruit(Game game, Legion legion,
         MasterHex hex)
     {
         List recruits = game.findEligibleRecruits(legion.getMarkerId(), 
@@ -374,7 +374,7 @@ class SimpleAI implements AI
      * Decide how to split this legion, and return a list of
      * Creatures to remove.
      */
-    protected static List chooseCreaturesToSplitOut(Legion legion,
+    static List chooseCreaturesToSplitOut(Legion legion,
         int numPlayers)
     {
         //
@@ -453,7 +453,7 @@ class SimpleAI implements AI
     }
 
 
-    protected static List chooseCreaturesToSplitOut(Legion legion)
+    static List chooseCreaturesToSplitOut(Legion legion)
     {
         return chooseCreaturesToSplitOut(legion, 2);
     }
@@ -476,9 +476,9 @@ class SimpleAI implements AI
 
     /** Return a list of exactly four creatures (including one lord) to
      *  split out. */
-    protected static List doInitialGameSplit(String label, int numPlayers)
+    static List doInitialGameSplit(String label, int numPlayers)
     {
-	Creature[] startCre = Game.trl.getStartingCreatures();
+	Creature[] startCre = Game.getStartingCreatures();
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
         final boolean oddTower = "100".equals(label) || "300".equals(label)
@@ -524,7 +524,7 @@ class SimpleAI implements AI
     private static List CMUsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature)
     {
-	Creature[] startCre = Game.trl.getStartingCreatures();
+	Creature[] startCre = Game.getStartingCreatures();
         LinkedList splitoffs = new LinkedList();
 
         if (favorTitan)
@@ -577,7 +577,7 @@ class SimpleAI implements AI
     private static List MITsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature)
     {
-	Creature[] startCre = Game.trl.getStartingCreatures();
+	Creature[] startCre = Game.getStartingCreatures();
         LinkedList splitoffs = new LinkedList();
 
         if (favorTitan)
@@ -680,7 +680,7 @@ class SimpleAI implements AI
         }
     }
 
-    protected static void handleMulligans(Game game, Player player)
+    static void handleMulligans(Game game, Player player)
     {
         // TODO: This is really stupid.  Do something smart here.
         if (player.getMulligansLeft() > 0 && (player.getMovementRoll() == 2 ||
@@ -898,7 +898,7 @@ class SimpleAI implements AI
         }
     }
 
-    protected static HashMap[] buildEnemyAttackMap(Game game, Player player)
+    static HashMap[] buildEnemyAttackMap(Game game, Player player)
     {
         HashMap[] enemyMap = new HashMap[7];
 
@@ -977,7 +977,7 @@ class SimpleAI implements AI
     //
     // TODO: should be parameterized with weights
     //
-    protected static int evaluateMove(Game game, Legion legion, MasterHex hex,
+    static int evaluateMove(Game game, Legion legion, MasterHex hex,
         boolean canRecruitHere, HashMap[] enemyAttackMap)
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
@@ -2043,7 +2043,7 @@ class SimpleAI implements AI
     }
 
 
-    protected static int getKillValue(Creature creature, char terrain)
+    static int getKillValue(Creature creature, char terrain)
     {
         int val = creature.getPointValue();
         if (creature.isFlier())

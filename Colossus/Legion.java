@@ -208,19 +208,11 @@ public final class Legion extends GameSource implements Comparable
     public static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-	Creature[] startCre = Game.trl.getStartingCreatures();
+	Creature[] startCre = game.getStartingCreatures();
         Legion oLegion = 
             new Legion(markerId, null, hexLabel, hexLabel,
 		       Creature.getCreatureByName("Titan"),
                        Creature.getCreatureByName("Angel"),
-		       /*
-		       Creature.getCreatureByName("Ogre"),
-		       Creature.getCreatureByName("Ogre"),
-                       Creature.getCreatureByName("Centaur"),
-		       Creature.getCreatureByName("Centaur"),
-		       Creature.getCreatureByName("Gargoyle"),
-                       Creature.getCreatureByName("Gargoyle"),
-		       */
 		       startCre[2],
 		       startCre[2],
 		       startCre[0],

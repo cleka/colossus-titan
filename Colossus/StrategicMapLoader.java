@@ -60,7 +60,7 @@ public class StrategicMapLoader implements StrategicMapLoaderConstants {
         nPosX = posX-1;
         nPosY = (posY-1)/2;
         Log.debug("Adding case #" + p + " @(" + nPosX + "," + nPosY +
-            "), type " + Game.trl.getTerrainName(ter) + " with exit : " + s1 + ", " + s2 + ", " + s3);
+            "), type " + Game.getTerrainName(ter) + " with exit : " + s1 + ", " + s2 + ", " + s3);
         h[nPosX][nPosY].setTerrain(ter);
         h[nPosX][nPosY].setLabel(p);
         h[nPosX][nPosY].setXCoord(nPosX);

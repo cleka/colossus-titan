@@ -15,8 +15,6 @@ public final class PickColor extends JDialog implements WindowListener,
     ActionListener
 {
     private JLabel [] colorLabel = new JLabel[6];
-    private Game game;
-    private Player player;
 
     public static final String [] colorNames =
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
@@ -32,11 +30,10 @@ public final class PickColor extends JDialog implements WindowListener,
     private static String color;
 
 
-    private PickColor(JFrame parentFrame, Game game, Player player)
+    private PickColor(JFrame parentFrame, String playerName, 
+        Set colorsLeft)
     {
-        super(parentFrame, player.getName() + ", Pick a Color", true);
-        this.game = game;
-        this.player = player;
+        super(parentFrame, playerName + ", Pick a Color", true);
 
         color = null;
 
@@ -44,71 +41,22 @@ public final class PickColor extends JDialog implements WindowListener,
         pack();
 
         Container contentPane = getContentPane();
+        contentPane.setLayout(new FlowLayout());
 
-        contentPane.setLayout(new GridLayout(0, 3));
-
-        contentPane.add(new JLabel("Tower"));
-        contentPane.add(new JLabel("Name"));
-        contentPane.add(new JLabel("Color"));
-
-        boolean [] colorTaken = new boolean[6];
         for (int i = 0; i < 6; i++)
         {
-            colorTaken[i] = false;
-        }
-
-        Collection players = game.getPlayers();
-        Iterator it = players.iterator();
-        int i = 0;
-        while (it.hasNext())
-        {
-            Player currentPlayer = (Player)it.next();
-            int tower = currentPlayer.getTower();
-            contentPane.add(new JLabel(String.valueOf(100 * tower)));
-            contentPane.add(new JLabel(currentPlayer.getName()));
-            String color = currentPlayer.getColor();
-
-            if (color == null)
+            if (colorsLeft.contains(colorNames[i]))
             {
-                if (currentPlayer == player)
-                {
-                    colorLabel[i] = new JLabel("?");
-                }
-                else
-                {
-                    colorLabel[i] = new JLabel("");
-                }
-            }
-            else
-            {
-                colorLabel[i] = new JLabel(color);
-                if (colorNumber(color) != -1)
-                {
-                    colorTaken[colorNumber(color)] = true;
-                }
-            }
-
-            contentPane.add(colorLabel[i]);
-            i++;
-        }
-
-        for (i = 0; i < 6; i++)
-        {
-            JButton button = new JButton();
-            if (colorTaken[i])
-            {
-                button.setBackground(Color.lightGray);
-                button.setForeground(Color.black);
-            }
-            else
-            {
+                JButton button = new JButton();
+                int scale = Scale.get();
+                button.setPreferredSize(new Dimension(7 * scale, 4 * scale));
                 button.setText(colorNames[i]);
                 button.setMnemonic(colorMnemonics[i]);
                 button.setBackground(background[i]);
                 button.setForeground(foreground[i]);
                 button.addActionListener(this);
+                contentPane.add(button);
             }
-            contentPane.add(button);
         }
 
         pack();
@@ -123,10 +71,10 @@ public final class PickColor extends JDialog implements WindowListener,
     }
 
 
-    public static String pickColor(JFrame parentFrame, Game game,
-        Player player)
+    public static String pickColor(JFrame parentFrame, String playerName,
+        Set colorsLeft)
     {
-        new PickColor(parentFrame, game, player);
+        new PickColor(parentFrame, playerName, colorsLeft);
         return color;
     }
 
@@ -214,35 +162,17 @@ public final class PickColor extends JDialog implements WindowListener,
     }
 
 
-    public Dimension getMinimumSize()
-    {
-        return new Dimension(350, 350);
-    }
-
-    public Dimension getPreferredSize()
-    {
-        return getMinimumSize();
-    }
-
-
     public static void main(String [] args)
     {
-        Game game = new Game();
-        JFrame frame = new JFrame();
-
-        Player p0 = new Player("Bo", game);
-        Player p1 = new Player("Luke", game);
-        game.addPlayer(p0);
-        game.addPlayer(p1);
-
-        String answer = pickColor(frame, game, p0);
-        Log.event(p0.getName() + " chooses color " + answer);
-        p0.setColor(answer);
-
-        answer = pickColor(frame, game, p1);
-        Log.event(p1.getName() + " chooses color " + answer);
-        p1.setColor(answer);
-
+        Set colorsLeft = new HashSet();
+        colorsLeft.add("Black");
+        colorsLeft.add("Blue");
+        colorsLeft.add("Brown");
+        colorsLeft.add("Gold");
+        colorsLeft.add("Green");
+        colorsLeft.add("Red");
+        PickColor.pickColor(new JFrame(), "Test", colorsLeft);
+        System.out.println("Chose " + color);
         System.exit(0);
     }
 }

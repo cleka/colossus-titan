@@ -9,10 +9,10 @@ import java.util.*;
  * @author David Ripton
  */
 
-public final class ShowLegion extends JDialog implements MouseListener,
+final class ShowLegion extends JDialog implements MouseListener,
     WindowListener
 {
-    public ShowLegion(JFrame parentFrame, String longMarkerName, 
+    ShowLegion(JFrame parentFrame, String longMarkerName, 
         java.util.List imageNames, Point point)
     {
         super(parentFrame, "Legion " + longMarkerName, false);

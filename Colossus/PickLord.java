@@ -151,31 +151,4 @@ public final class PickLord extends JDialog implements MouseListener,
     public void windowOpened(WindowEvent e)
     {
     }
-
-    /*
-    public static void main(String [] args)
-    {
-        JFrame frame = new JFrame("testing PickLord");
-        int scale = Scale.get();
-        frame.setSize(new Dimension(80 * scale, 80 * scale));
-        frame.pack();
-        frame.setVisible(true);
-
-        Game game = new Game();
-        game.initBoard();
-        MasterHex hex = MasterBoard.getHexByLabel("130");
-
-        game.addPlayer("Test");
-        Player player = game.getPlayer(0);
-        Legion legion = new Legion("Bk01", null, hex.getLabel(),
-            hex.getLabel(), Creature.titan, Creature.archangel,
-            Creature.archangel, Creature.angel, Creature.angel,
-            Creature.warlock, Creature.guardian, null, player.getName(), game);
-        player.addLegion(legion);
-
-        Creature creature = PickLord.pickLord(frame, legion);
-        System.out.println("Chose " + creature);
-        System.exit(0);
-    }
-    */
 }

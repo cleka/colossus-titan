@@ -45,7 +45,6 @@ public final class Negotiate extends JDialog implements MouseListener,
 
         addMouseListener(this);
 
-        Game game = attacker.getGame();
         int scale = 4 * Scale.get();
 
         attackerMarker = new Marker(scale, attacker.getImageName(),
@@ -300,51 +299,4 @@ public final class Negotiate extends JDialog implements MouseListener,
             cleanup();
         }
     }
-
-    /*
-    public static void main(String [] args)
-    {
-        JFrame frame = new JFrame("testing Negotiate");
-        int scale = Scale.get();
-        frame.setSize(new Dimension(80 * scale, 80 * scale));
-        frame.pack();
-        frame.setVisible(true);
-
-        Game game = new Game();
-        game.addPlayer("Attacker");
-        game.addPlayer("Defender");
-        game.initBoard();
-        Client client = game.getServer().getClient(0);
-
-        MasterHex hex = MasterBoard.getHexByLabel("130");
-
-        Player player = game.getPlayer(0);
-        player.setScore(1400);
-        player.setTower(1);
-        player.setColor("Red");
-        player.initMarkersAvailable();
-        String selectedMarkerId = player.selectMarkerId("Rd01");
-        Legion attacker = new Legion(selectedMarkerId, null, hex.getLabel(),
-            hex.getLabel(), Creature.titan, Creature.colossus,
-            Creature.serpent, Creature.archangel, Creature.hydra,
-            Creature.giant, Creature.dragon, null, player.getName(), game);
-        player.addLegion(attacker);
-        client.addMarker(selectedMarkerId);
-
-        player = game.getPlayer(1);
-        player.setTower(2);
-        player.setColor("Blue");
-        player.initMarkersAvailable();
-        selectedMarkerId = player.selectMarkerId("Bu01");
-        Legion defender = new Legion(selectedMarkerId, null, hex.getLabel(),
-            hex.getLabel(), Creature.ogre, Creature.centaur,
-            Creature.gargoyle, null, null, null, null, null,
-            player.getName(), game);
-        player.addLegion(defender);
-        client.addMarker(selectedMarkerId);
-
-        Negotiate.negotiate(client, attacker, defender);
-        System.exit(0);
-    }
-    */
 }

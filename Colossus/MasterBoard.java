@@ -10,7 +10,7 @@ import java.io.*;
  * @author David Ripton
  */
 
-public final class MasterBoard extends JPanel
+final class MasterBoard extends JPanel
 {
     /** For easy of mapping to the GUI, hexes will be stored
      *  in a 15x8 array, with some empty elements. */
@@ -123,7 +123,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public MasterBoard(Client client)
+    MasterBoard(Client client)
     {
         this.client = client;
 
@@ -153,23 +153,17 @@ public final class MasterBoard extends JPanel
 
 
     // No-arg constructor for testing and AICopy(), without GUI stuff.
-    public MasterBoard()
+    MasterBoard()
     {
         setupHexes();
     }
 
 
-    public MasterBoard AICopy(Game game)
+    public MasterBoard AICopy()
     {
         MasterBoard newBoard = new MasterBoard();
         newBoard.setupActions();
         return newBoard;
-    }
-
-
-    public void setClient(Client client)
-    {
-        this.client = client;
     }
 
 
@@ -567,7 +561,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public void twiddleOption(String name, boolean enable)
+    void twiddleOption(String name, boolean enable)
     {
         JCheckBoxMenuItem cbmi = (JCheckBoxMenuItem)checkboxes.get(name);
         if (cbmi != null)
@@ -584,7 +578,7 @@ public final class MasterBoard extends JPanel
 
 
     /** Show which player owns this board. */
-    public void setupPlayerLabel()
+    void setupPlayerLabel()
     {
         String playerName = client.getPlayerName();
         if (playerLabel == null)
@@ -777,7 +771,7 @@ public final class MasterBoard extends JPanel
                 }
             }
         }
-        // Couldn' find better way (yet)
+        // XXX Couldn't find better way (yet)
         h[0][3].setLabelSide(2);
         h[0][4].setLabelSide(1);
         h[1][2].setLabelSide(2);
@@ -959,7 +953,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public void setupSplitMenu()
+    void setupSplitMenu()
     {
         unselectAllHexes();
         requestFocus();
@@ -997,7 +991,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public void setupMoveMenu()
+    void setupMoveMenu()
     {
         unselectAllHexes();
         requestFocus();
@@ -1043,7 +1037,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public void setupFightMenu()
+    void setupFightMenu()
     {
         unselectAllHexes();
         requestFocus();
@@ -1073,7 +1067,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public void setupMusterMenu()
+    void setupMusterMenu()
     {
         unselectAllHexes();
         requestFocus();
@@ -1111,14 +1105,14 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public JFrame getFrame()
+    JFrame getFrame()
     {
         return masterFrame;
     }
 
 
     /** Create markers for all existing legions. */
-    public void loadInitialMarkerImages()
+    void loadInitialMarkerImages()
     {
         Iterator it = client.getAllLegionIds().iterator();
         while (it.hasNext())
@@ -1132,7 +1126,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public void alignLegions(String hexLabel)
+    void alignLegions(String hexLabel)
     {
         GUIMasterHex hex = getGUIHexByLabel(hexLabel);
         if (hex == null)
@@ -1222,7 +1216,7 @@ public final class MasterBoard extends JPanel
         hex.repaint();
     }
 
-    public void alignLegions(Set hexLabels)
+    void alignLegions(Set hexLabels)
     {
         Iterator it = hexLabels.iterator();
         while (it.hasNext())
@@ -1233,7 +1227,7 @@ public final class MasterBoard extends JPanel
     }
 
     /** This is incredibly inefficient. */
-    public void alignAllLegions()
+    void alignAllLegions()
     {
         Iterator it = plainHexes.iterator();
         while (it.hasNext())
@@ -1249,7 +1243,7 @@ public final class MasterBoard extends JPanel
         selectHexesByLabels(client.findTallLegionHexes());
     }
 
-    public void highlightUnmovedLegions()
+    void highlightUnmovedLegions()
     {
         unselectAllHexes();
         Player player = client.getActivePlayer();
@@ -1287,7 +1281,7 @@ public final class MasterBoard extends JPanel
 
 
     /** Return number of engagements found. */
-    public void highlightEngagements()
+    void highlightEngagements()
     {
         Set set = client.findEngagements();
         unselectAllHexes();
@@ -1296,7 +1290,7 @@ public final class MasterBoard extends JPanel
 
 
     /** Return number of legions with summonable angels. */
-    public int highlightSummonableAngels(String markerId)
+    int highlightSummonableAngels(String markerId)
     {
         Set set = client.findSummonableAngels(markerId);
         unselectAllHexes();
@@ -1347,7 +1341,7 @@ public final class MasterBoard extends JPanel
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
-    public GUIMasterHex getGUIHexByLabel(String label)
+    GUIMasterHex getGUIHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1384,7 +1378,7 @@ public final class MasterBoard extends JPanel
     /** Do a brute-force search through the hex array, looking for
      *  a hex with the proper terrain type.  Return the hex, or null
      *  if none is found. */
-    public GUIMasterHex getAnyGUIHexWithTerrain(char terrain)
+    GUIMasterHex getAnyGUIHexWithTerrain(char terrain)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1437,7 +1431,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public void unselectAllHexes()
+    void unselectAllHexes()
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1451,7 +1445,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    public void unselectHexByLabel(String label)
+    void unselectHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1466,7 +1460,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    public void unselectHexesByLabels(Set labels)
+    void unselectHexesByLabels(Set labels)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1480,7 +1474,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    public void selectHexByLabel(String label)
+    void selectHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1495,7 +1489,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    public void selectHexesByLabels(Set labels)
+    void selectHexesByLabels(Set labels)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1510,7 +1504,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public void actOnMisclick()
+    void actOnMisclick()
     {
         switch (client.getPhase())
         {
@@ -1776,7 +1770,7 @@ public final class MasterBoard extends JPanel
         return getMinimumSize();
     }
 
-    public void rescale()
+    void rescale()
     {
         // XXX setupHexesGUI() should be sufficient but fails.
         setupHexes();
@@ -1784,7 +1778,7 @@ public final class MasterBoard extends JPanel
     }
 
 
-    public void deiconify()
+    void deiconify()
     {
         if (masterFrame.getState() == JFrame.ICONIFIED)
         {

@@ -14,10 +14,6 @@ public class MasterHex extends Hex
     /** Terrain types are:
      *  Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
      *  Swamp, Tower, tundra, Woods */
-    /*
-    public static final char [] terrains =
-        {'B', 'D', 'H', 'J', 'm', 'M', 'P', 'S', 'T', 't', 'W'};
-    */
 
     // Hex labels are:
     // Middle ring: 1-42
@@ -64,80 +60,22 @@ public class MasterHex extends Hex
 
     public static char[] getTerrainsArray()
     {
-	return Game.trl.terrains;
+	return Game.getTerrainsArray();
     }
 
     public String getTerrainName()
     {
-	return(Game.trl.getTerrainName(getTerrain()));
-	/*
-        switch (getTerrain())
-        {
-            case 'B':
-                return "Brush";
-            case 'D':
-                return "Desert";
-            case 'H':
-                return "Hills";
-            case 'J':
-                return "Jungle";
-            case 'm':
-                return "Mountains";
-            case 'M':
-                return "Marsh";
-            case 'P':
-                return "Plains";
-            case 'S':
-                return "Swamp";
-            case 'T':
-                return "Tower";
-            case 't':
-                return "Tundra";
-            case 'W':
-                return "Woods";
-            default:
-                return "?????";
-        }
-	*/
+	return (Game.getTerrainName(getTerrain()));
     }
 
     public static String getTerrainName(char t)
     {
-	return(Game.trl.getTerrainName(t));
+	return (Game.getTerrainName(t));
     }
 
     public Color getTerrainColor()
     {
-	return(Game.trl.getTerrainColor(getTerrain()));
-	/*
-        switch (getTerrain())
-        {
-            case 'B':
-                return Color.green;
-            case 'D':
-                return HTMLColor.orange;
-            case 'H':
-                return HTMLColor.saddleBrown;
-            case 'J':
-                return HTMLColor.darkGreen;
-            case 'm':
-                return Color.red;
-            case 'M':
-                return HTMLColor.sienna;
-            case 'P':
-                return Color.yellow;
-            case 'S':
-                return Color.blue;
-            case 'T':
-                return Color.gray;
-            case 't':
-                return HTMLColor.skyBlue;
-            case 'W':
-                return HTMLColor.olive;
-            default:
-                return Color.black;
-        }
-	*/
+	return (Game.getTerrainColor(getTerrain()));
     }
 
 

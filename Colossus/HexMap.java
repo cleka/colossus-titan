@@ -531,34 +531,4 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         int scale = Scale.get();
         return new Dimension(60 * scale, 60 * scale);
     }
-
-    /*
-    public static void main(String [] args)
-    {
-        char terrain;
-        if (args.length == 0)
-        {
-            terrain = 'D';
-        }
-        else
-        {
-            terrain = args[0].charAt(0);
-        }
-        Game game = new Game();
-        game.initBoard();
-        MasterHex hex = MasterBoard.getAnyHexWithTerrain(terrain);
-
-        JFrame frame = new JFrame("Hex Map for " + hex.getTerrainName());
-        Container contentPane = frame.getContentPane();
-        contentPane.setLayout(new BorderLayout());
-
-        HexMap hexMap = new HexMap(hex.getLabel());
-
-        contentPane.add(hexMap, BorderLayout.CENTER);
-        frame.pack();
-        frame.setResizable(false);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-    */
 }

@@ -2,6 +2,7 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.awt.*;
 
 import net.sf.colossus.protocol.*;
 
@@ -47,12 +48,13 @@ public final class Game extends GameSource
     public static final String configVersion =
         "Colossus config file version 2";
 
-    public static TerrainRecruitLoader trl;
+    private static TerrainRecruitLoader trl;
 
     public Game()
     {
     }
 
+    // XXX Maybe this should be a static initializer?
     public void initAndLoadData()
     {
         Creature.loadCreatures(); /* try to load creatures */
@@ -153,7 +155,7 @@ public final class Game extends GameSource
 
         // XXX Temporary hotseat startup code
         JFrame frame = new JFrame();
-        List playerInfo = GetPlayers.getPlayers(frame);
+        java.util.List playerInfo = GetPlayers.getPlayers(frame);
         if (playerInfo.isEmpty())
         {
             // User selected Quit.
@@ -231,7 +233,7 @@ public final class Game extends GameSource
 
         server.allInitBoard();
 
-        HashSet colorsLeft = new HashSet();
+        Set colorsLeft = new HashSet();
         for (i = 0; i < PickColor.colorNames.length; i++)
         {
             colorsLeft.add(PickColor.colorNames[i]);
@@ -272,7 +274,7 @@ public final class Game extends GameSource
 
 
     /** Let player i pick a color, only if type matches the player's type. */
-    private void pickPlayerColor(int i, String type, HashSet colorsLeft,
+    private void pickPlayerColor(int i, String type, Set colorsLeft,
         JFrame frame)
     {
         Player player = (Player)players.get(i);
@@ -288,6 +290,7 @@ public final class Game extends GameSource
         {
             return;
         }
+        String playerName = player.getName();
         String color;
         do
         {
@@ -297,18 +300,18 @@ public final class Game extends GameSource
             }
             else
             {
-                color = PickColor.pickColor(frame, this, player);
+                color = PickColor.pickColor(frame, playerName, colorsLeft);
             }
         }
         while (color == null);
         colorsLeft.remove(color);
         player.setColor(color);
-        if (GetPlayers.byColor.equals(player.getName()))
+        if (GetPlayers.byColor.equals(playerName))
         {
             player.setName(color);
             server.getClient(i).setPlayerName(color);
         }
-        Log.event(player.getName() + " chooses color " + color);
+        Log.event(playerName + " chooses color " + color);
         player.initMarkersAvailable();
     }
 
@@ -1611,7 +1614,11 @@ public final class Game extends GameSource
         }
         else
         {
-            String recruiterName = server.pickRecruiter(legion, recruiters);
+            String recruiterName = null;
+            while (recruiterName == null)
+            {
+                recruiterName = server.pickRecruiter(legion, recruiters);
+            }
             recruiter = Creature.getCreatureByName(recruiterName);
         }
 
@@ -1713,14 +1720,6 @@ public final class Game extends GameSource
         caretaker.takeOne(startCre[0]);
         caretaker.takeOne(startCre[1]);
         caretaker.takeOne(startCre[1]);
-        /*
-        caretaker.takeOne(Creature.getCreatureByName("Ogre"));
-        caretaker.takeOne(Creature.getCreatureByName("Ogre"));
-        caretaker.takeOne(Creature.getCreatureByName("Centaur"));
-        caretaker.takeOne(Creature.getCreatureByName("Centaur"));
-        caretaker.takeOne(Creature.getCreatureByName("Gargoyle"));
-        caretaker.takeOne(Creature.getCreatureByName("Gargoyle"));
-        */
 
         Legion legion = Legion.getStartingLegion(selectedMarkerId,
             hexLabel, player.getName(), this);
@@ -2200,7 +2199,7 @@ public final class Game extends GameSource
         String results = server.splitLegion(legion, selectedMarkerId);
         if (results != null)
         {
-            List strings = Utils.split(',', results);
+            java.util.List strings = Utils.split(',', results);
             String newMarkerId = (String)strings.remove(0);
 
             // Need to replace strings with creatures.
@@ -2673,9 +2672,9 @@ public final class Game extends GameSource
     }
 
     /** Return a list of all players' legions' marker ids. */
-    public List getAllLegionIds()
+    public java.util.List getAllLegionIds()
     {
-        List list = new ArrayList();
+        java.util.List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
@@ -2700,9 +2699,9 @@ public final class Game extends GameSource
     }
 
     /** Return a list of ids for all legions not belonging to player. */
-    public List getAllEnemyLegionIds(Player player)
+    public java.util.List getAllEnemyLegionIds(Player player)
     {
-        List list = new ArrayList();
+        java.util.List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player nextPlayer = (Player)it.next();
@@ -2980,5 +2979,29 @@ public final class Game extends GameSource
             }
         }
         return set;
+    }
+
+    // XXX Need to eliminate calls to the methods below that
+    // cross the future network interface.
+
+    /** Return an array of the 3 starting tower creatures. */
+    static Creature [] getStartingCreatures()
+    {
+        return trl.getStartingCreatures();
+    }
+
+    static char[] getTerrainsArray()
+    {
+	return trl.terrains;
+    }
+
+    static String getTerrainName(char t)
+    {
+	return trl.getTerrainName(t);
+    }
+
+    static Color getTerrainColor(char t)
+    {
+	return trl.getTerrainColor(t);
     }
 }
