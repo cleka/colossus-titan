@@ -49,7 +49,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
                      - getSize().height / 2));
-        
+
         contentPane = getContentPane();
         contentPane.setLayout(new GridLayout(0, 2));
 
@@ -60,7 +60,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
             tf[i] = new JTextField(20);
             contentPane.add(tf[i]);
         }
-        
+
         JButton button1 = new JButton("OK");
         contentPane.add(button1);
         button1.addActionListener(this);
@@ -73,7 +73,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    void validateInputs()
+    private void validateInputs()
     {
         boolean error = false;
         String [] s = new String[6];
@@ -104,7 +104,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
                 }
             }
         }
-        
+
         if (error || numPlayers == 0)
         {
             for (int i = 0; i < 6; i++)
@@ -126,14 +126,14 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    void assignTowers()
+    private void assignTowers()
     {
         int [] playerTower = new int[6];
 
-        // A random card-shuffling algorithm is cleaner than repeated 
+        // A random card-shuffling algorithm is cleaner than repeated
         //    die-rolling and checking for duplicates
 
-        for (int i = 0; i < 6 ; i++) 
+        for (int i = 0; i < 6 ; i++)
         {
             playerTower[i] = i + 1;
         }
@@ -156,7 +156,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    void chooseColors()
+    private void chooseColors()
     {
         contentPane = getContentPane();
         contentPane.removeAll();
@@ -235,7 +235,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    void processColorChoice(String color)
+    private void processColorChoice(String color)
     {
         // Turn off the button that was just used.
         int i = 0;
@@ -257,7 +257,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
                 colorLabel[j].setText(color);
             }
         }
-    
+
         for (i = currentColor + 1; i <= 6; i++)
         {
             for (int j = 0; j < numPlayers; j++)
@@ -272,8 +272,8 @@ public class Game extends JFrame implements WindowListener, ActionListener
         }
     }
 
-    
-    void initStatusScreen()
+
+    private void initStatusScreen()
     {
         contentPane = getContentPane();
         setVisible(false);
@@ -313,7 +313,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
             contentPane.add(new JLabel(String.valueOf(100 * players[i].getTower())));
             contentPane.add(new JLabel(players[i].getColor()));
             elimLabel[i] = new JLabel("");
-            contentPane.add(elimLabel[i]); 
+            contentPane.add(elimLabel[i]);
             legionsLabel[i] = new JLabel("");
             contentPane.add(legionsLabel[i]);
             markersLabel[i] = new JLabel("12");
@@ -328,7 +328,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
         // Move dialog to bottom right of screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width - getSize().width, 
+        setLocation(new Point(d.width - getSize().width,
             d.height - getSize().height));
 
         setVisible(true);
@@ -337,7 +337,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    void updateStatusScreen()
+    public void updateStatusScreen()
     {
         for (int i = 0; i < numPlayers; i++)
         {
@@ -361,9 +361,9 @@ public class Game extends JFrame implements WindowListener, ActionListener
         repaint();
     }
 
-    
+
     // Sort player array into turn order, by descending tower number.
-    void sortPlayers()
+    private void sortPlayers()
     {
         for (int i = 0; i < numPlayers - 1; i++)
         {
@@ -378,10 +378,10 @@ public class Game extends JFrame implements WindowListener, ActionListener
             }
         }
     }
-    
-    
+
+
     // Sort string array in reverse order
-    void sortStrings(String [] s)
+    private void sortStrings(String [] s)
     {
         for (int i = 0; i < s.length - 1; i++)
         {
@@ -398,13 +398,13 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    int getNumPlayers()
+    public int getNumPlayers()
     {
         return numPlayers;
     }
 
 
-    int getNumLivingPlayers()
+    public int getNumLivingPlayers()
     {
         int count = 0;
         for (int i = 0; i < numPlayers; i++)
@@ -418,25 +418,25 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    Player getActivePlayer()
+    public Player getActivePlayer()
     {
         return players[activePlayerNum];
     }
 
 
-    int getActivePlayerNum()
+    public int getActivePlayerNum()
     {
         return activePlayerNum;
     }
 
 
-    Player getPlayer(int i)
+    public Player getPlayer(int i)
     {
         return players[i];
     }
 
 
-    void checkForVictory()
+    public void checkForVictory()
     {
         int remaining = 0;
         int winner = -1;
@@ -455,13 +455,13 @@ public class Game extends JFrame implements WindowListener, ActionListener
             case 0:
                 JOptionPane.showMessageDialog(board, "draw");
                 System.exit(0);
-		break;
+                break;
 
             case 1:
-                JOptionPane.showMessageDialog(board, 
+                JOptionPane.showMessageDialog(board,
                     players[winner].getName() + " wins");
                 System.exit(0);
-		break;
+                break;
 
             default:
                 break;
@@ -469,26 +469,26 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    int getPhase()
+    public int getPhase()
     {
         return phase;
     }
 
 
-    MasterBoard getBoard()
+    public MasterBoard getBoard()
     {
         return board;
     }
 
 
-    void advancePhase()
+    public void advancePhase()
     {
         board.unselectAllHexes();
         phase++;
     }
 
 
-    void advanceTurn()
+    public void advanceTurn()
     {
         board.unselectAllHexes();
         activePlayerNum++;
@@ -507,7 +507,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    int getTurnNumber()
+    public int getTurnNumber()
     {
         return turnNumber;
     }
@@ -529,7 +529,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
     public void windowDeactivated(WindowEvent event)
     {
     }
-                                                            
+
     public void windowDeiconified(WindowEvent event)
     {
     }
@@ -567,7 +567,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
                 }
             }
 
-            // Change this window into a status screen, and then 
+            // Change this window into a status screen, and then
             //     move on to the first player's first turn.
             initStatusScreen();
         }
@@ -582,10 +582,11 @@ public class Game extends JFrame implements WindowListener, ActionListener
     public static void main(String args[])
     {
         // Use the system look and feel rather than the cross-platform one.
-        try 
+        try
         {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());        } 
-        catch (Exception ex_ignored) 
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (Exception ex_ignored)
         {
             System.out.println("Default l&f left in place");
         }
