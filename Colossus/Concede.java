@@ -11,7 +11,6 @@ import java.util.*;
 
 public final class Concede extends JDialog implements ActionListener
 {
-    private static final int scale = 60;
     private JFrame parentFrame;
     private boolean flee;
     private Legion ally;
@@ -45,6 +44,7 @@ public final class Concede extends JDialog implements ActionListener
         setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        int scale = 4 * Scale.get();
 
         Game game = ally.getGame();
         allyMarker = new Marker(scale, ally.getImageName(), this, game);
@@ -187,7 +187,8 @@ public final class Concede extends JDialog implements ActionListener
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing Concede");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
 

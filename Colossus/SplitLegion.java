@@ -19,7 +19,6 @@ public final class SplitLegion extends JDialog implements MouseListener,
     private Marker oldMarker;
     private Marker newMarker;
     private Player player;
-    private static final int scale = 60;
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
@@ -62,6 +61,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
         }
 
         pack();
+
+        int scale = 4 * Scale.get();
 
         newLegion = Legion.getEmptyLegion(selectedMarkerId,
             oldLegion.getMarkerId(), oldLegion.getCurrentHexLabel(),
@@ -347,7 +348,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing SplitLegion");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
 
@@ -363,7 +365,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         Legion legion = Legion.getStartingLegion(selectedMarkerId,
             hex.getLabel(), player.getName(), game);
         player.addLegion(legion);
-        Marker marker = new Marker(scale, selectedMarkerId, frame, game);
+        Marker marker = new Marker(4 * scale, selectedMarkerId, frame, game);
         legion.setMarker(marker);
 
         SplitLegion.splitLegion(frame, legion, false);

@@ -46,6 +46,14 @@ public class Chit extends JPanel
     {
         super();
         Point point = getLocation();
+
+        // Images are 60x60, so if scale is close to that, avoid
+        // rescaling.
+        if (scale > 50 && scale < 70)
+        {
+            scale = 60;
+        }
+
         rect = new Rectangle(point.x, point.y, scale, scale);
         setBounds(rect);
 
@@ -203,7 +211,6 @@ public class Chit extends JPanel
 
         JFrame frame = new JFrame("testing Chit");
         Container contentPane = frame.getContentPane();
-        int scale = 60;
 
         File dir = new File(imageDirName);
         if (!dir.exists() || !dir.isDirectory())
@@ -222,7 +229,7 @@ public class Chit extends JPanel
             {
                 String basename = filenames[i].substring(0,
                     filenames[i].length() - extLen);
-                Chit chit = new Chit(scale, basename, frame);
+                Chit chit = new Chit(4 * Scale.get(), basename, frame);
                 contentPane.add(chit);
             }
         }

@@ -14,7 +14,6 @@ public final class PickMarker extends JDialog implements MouseListener,
     WindowListener
 {
     private ArrayList markers = new ArrayList();
-    private static final int scale = 60;
     private static String markerId;
     private Game game;
 
@@ -43,7 +42,7 @@ public final class PickMarker extends JDialog implements MouseListener,
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-            Marker marker = new Marker(scale, markerId, this, game);
+            Marker marker = new Marker(4 * Scale.get(), markerId, this, game);
             markers.add(marker);
             contentPane.add(marker);
             marker.addMouseListener(this);
@@ -149,7 +148,8 @@ public final class PickMarker extends JDialog implements MouseListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing PickMarker");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
 

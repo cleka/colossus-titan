@@ -14,7 +14,6 @@ public final class AcquireAngel extends JDialog implements MouseListener,
     WindowListener
 {
     private ArrayList chits = new ArrayList();
-    private static final int scale = 60;
     private static String recruit;
     private ArrayList recruits;
     private static boolean active;
@@ -41,7 +40,8 @@ public final class AcquireAngel extends JDialog implements MouseListener,
         {
             String creatureName = (String)it.next();
             Creature recruit = Creature.getCreatureByName(creatureName);
-            Chit chit = new Chit(scale, recruit.getImageName(), this);
+            Chit chit = new Chit(4 * Scale.get(), recruit.getImageName(),
+                this);
             chits.add(chit);
             contentPane.add(chit);
             chit.addMouseListener(this);
@@ -149,7 +149,8 @@ public final class AcquireAngel extends JDialog implements MouseListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing AcquireAngel");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
 

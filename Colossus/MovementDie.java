@@ -12,7 +12,6 @@ import javax.swing.*;
 public final class MovementDie extends JFrame implements WindowListener
 {
     private Game game;
-    private static final int scale = 60;
     private static Point location;
 
 
@@ -49,7 +48,7 @@ public final class MovementDie extends JFrame implements WindowListener
     /** Initialize and layout the components, in response to new data. */
     public void showRoll(int roll)
     {
-        Chit die = new Chit(scale, getDieImageName(roll), this);
+        Chit die = new Chit(4 * Scale.get(), getDieImageName(roll), this);
         Container contentPane = getContentPane();
         contentPane.removeAll();
         contentPane.add(die);

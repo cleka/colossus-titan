@@ -262,7 +262,7 @@ public final class StatusScreen extends JFrame implements WindowListener
 
     public Dimension getMinimumSize()
     {
-        int scale = MasterBoard.findScale();
+        int scale = Scale.get();
         return new Dimension(25 * scale, 15 * scale);
     }
 

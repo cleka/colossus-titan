@@ -12,7 +12,6 @@ import javax.swing.*;
 public final class BattleDice extends JFrame implements WindowListener
 {
     private Game game;
-    private static final int scale = 60;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private Insets insets = new Insets(5, 5, 5, 5);
@@ -132,7 +131,8 @@ public final class BattleDice extends JFrame implements WindowListener
         dice = new Chit[numDice];
         for (int i = 0; i < numDice; i++)
         {
-            dice[i] = new Chit(scale, getDieImageName(rolls[i]), this);
+            dice[i] = new Chit(4 * Scale.get(), getDieImageName(rolls[i]),
+                this);
             constraints.gridy = 2 + (i / 6);
             constraints.gridwidth = 1;
             constraints.ipadx = 5;

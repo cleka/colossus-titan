@@ -18,7 +18,6 @@ public final class Negotiate extends JDialog implements MouseListener,
     private ArrayList defenderChits = new ArrayList();
     private Marker attackerMarker;
     private Marker defenderMarker;
-    private static final int scale = 60;
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
@@ -47,6 +46,7 @@ public final class Negotiate extends JDialog implements MouseListener,
         addMouseListener(this);
 
         Game game = attacker.getGame();
+        int scale = 4 * Scale.get();
 
         attackerMarker = new Marker(scale, attacker.getImageName(),
             this, game);
@@ -309,7 +309,8 @@ public final class Negotiate extends JDialog implements MouseListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing Negotiate");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
 
@@ -330,7 +331,7 @@ public final class Negotiate extends JDialog implements MouseListener,
             Creature.serpent, Creature.archangel, Creature.hydra,
             Creature.giant, Creature.dragon, null, player.getName(), game);
         player.addLegion(attacker);
-        Marker marker = new Marker(scale, selectedMarkerId, frame, game);
+        Marker marker = new Marker(4 * scale, selectedMarkerId, frame, game);
         attacker.setMarker(marker);
 
         game.addPlayer("Defender");
@@ -344,7 +345,7 @@ public final class Negotiate extends JDialog implements MouseListener,
             Creature.gargoyle, null, null, null, null, null,
             player.getName(), game);
         player.addLegion(defender);
-        marker = new Marker(scale, selectedMarkerId, frame, game);
+        marker = new Marker(4 * scale, selectedMarkerId, frame, game);
         defender.setMarker(marker);
 
         Negotiate.negotiate(frame, attacker, defender);

@@ -16,7 +16,6 @@ public final class SummonAngel extends JDialog implements MouseListener,
     private Legion legion;
     private MasterBoard board;
     private Game game;
-    private static final int scale = 60;
     private Chit angelChit;
     private Chit archangelChit;
     private GridBagLayout gridbag = new GridBagLayout();
@@ -62,6 +61,8 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
         setBackground(Color.lightGray);
         setResizable(false);
+
+        int scale = 4 * Scale.get();
 
         angelChit = new Chit(scale, Creature.angel.getImageName(), this);
         constraints.gridy = 0;

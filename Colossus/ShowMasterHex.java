@@ -12,8 +12,6 @@ import java.util.*;
 public final class ShowMasterHex extends JDialog implements MouseListener,
     WindowListener
 {
-    private static final int scale = 60;
-
     public ShowMasterHex(JFrame parentFrame, Game game, MasterHex hex,
         Point point)
     {
@@ -27,6 +25,7 @@ public final class ShowMasterHex extends JDialog implements MouseListener,
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
         Point parentOrigin = parentFrame.getLocation();
+        int scale = 4 * Scale.get();
         Point origin = new Point(point.x + parentOrigin.x - scale, point.y +
             parentOrigin.y - scale);
         if (origin.x < 0)
@@ -111,38 +110,31 @@ public final class ShowMasterHex extends JDialog implements MouseListener,
         dispose();
     }
 
-
     public void mouseEntered(MouseEvent e)
     {
     }
 
-
     public void mouseExited(MouseEvent e)
     {
     }
-
 
     public void mousePressed(MouseEvent e)
     {
         dispose();
     }
 
-
     public void mouseReleased(MouseEvent e)
     {
         dispose();
     }
 
-
     public void windowClosed(WindowEvent e)
     {
     }
 
-
     public void windowActivated(WindowEvent e)
     {
     }
-
 
     public void windowClosing(WindowEvent e)
     {
@@ -153,16 +145,13 @@ public final class ShowMasterHex extends JDialog implements MouseListener,
     {
     }
 
-
     public void windowDeiconified(WindowEvent e)
     {
     }
 
-
     public void windowIconified(WindowEvent e)
     {
     }
-
 
     public void windowOpened(WindowEvent e)
     {

@@ -65,7 +65,8 @@ public final class ShowBattleMap extends HexMap implements WindowListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing ShowBattleMap");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(40 * scale, 40 * scale));
         frame.pack();
         frame.setVisible(true);
 

@@ -48,7 +48,6 @@ public final class BattleHex extends Hex
         this.map = map;
         this.xCoord = xCoord;
         this.yCoord = yCoord;
-        this.scale = scale;
         len = scale / 3.0;
 
         xVertex[0] = cx;

@@ -12,9 +12,6 @@ import java.util.*;
 public final class ShowLegion extends JDialog implements MouseListener,
     WindowListener
 {
-    private static final int scale = 60;
-
-
     public ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean
         allStacksVisible)
     {
@@ -26,6 +23,7 @@ public final class ShowLegion extends JDialog implements MouseListener,
         addWindowListener(this);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
+        int scale = 4 * Scale.get();
         Point parentOrigin = parentFrame.getLocation();
         Point origin = new Point(point.x + parentOrigin.x - scale, point.y +
             parentOrigin.y);
@@ -88,59 +86,48 @@ public final class ShowLegion extends JDialog implements MouseListener,
         dispose();
     }
 
-
     public void mouseEntered(MouseEvent e)
     {
     }
 
-
     public void mouseExited(MouseEvent e)
     {
     }
-
 
     public void mousePressed(MouseEvent e)
     {
         dispose();
     }
 
-
     public void mouseReleased(MouseEvent e)
     {
         dispose();
     }
 
-
     public void windowClosed(WindowEvent e)
     {
     }
 
-
     public void windowActivated(WindowEvent e)
     {
     }
-
 
     public void windowClosing(WindowEvent e)
     {
         dispose();
     }
 
-
     public void windowDeactivated(WindowEvent e)
     {
     }
-
 
     public void windowDeiconified(WindowEvent e)
     {
     }
 
-
     public void windowIconified(WindowEvent e)
     {
     }
-
 
     public void windowOpened(WindowEvent e)
     {
@@ -150,10 +137,10 @@ public final class ShowLegion extends JDialog implements MouseListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing ShowLegion");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
-
 
         Game game = new Game();
         game.initBoard();
@@ -165,7 +152,7 @@ public final class ShowLegion extends JDialog implements MouseListener,
             Creature.gargoyle, Creature.cyclops, Creature.cyclops, null,
             null, null, player.getName(), game);
         player.addLegion(legion);
-        Point point = new Point(10 * scale, 10 * scale);
+        Point point = new Point(40 * scale, 40 * scale);
 
         new ShowLegion(frame, legion, point, true);
     }

@@ -16,7 +16,6 @@ public final class PickLord extends JDialog implements MouseListener,
     private Player player;
     private Legion legion;
     private ArrayList chits = new ArrayList();
-    private static final int scale = 60;
     private ArrayList lords = new ArrayList();
     private static Creature lord;
 
@@ -62,7 +61,8 @@ public final class PickLord extends JDialog implements MouseListener,
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            Chit chit = new Chit(scale, critter.getImageName(), this);
+            Chit chit = new Chit(4 * Scale.get(), critter.getImageName(),
+                this);
             chits.add(chit);
             contentPane.add(chit);
             chit.addMouseListener(this);
@@ -156,7 +156,8 @@ public final class PickLord extends JDialog implements MouseListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing PickLord");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
 

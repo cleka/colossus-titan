@@ -13,8 +13,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 {
     private BattleHex [][] h = new BattleHex[6][6];
     private ArrayList hexes = new ArrayList(33);
-    protected static int scale;
-    protected static int chitScale;
     protected String masterHexLabel;
     protected MasterBoard board;
 
@@ -36,44 +34,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         this.masterHexLabel = masterHexLabel;
         this.board = board;
-        findScale();
-        findChitScale();
         setOpaque(true);
         setBackground(Color.white);
         setupHexes();
         setupNeighbors();
-    }
-
-
-    private static void findScale()
-    {
-        // Make sure the map fits on the screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        if (d.height < 1000)
-        {
-            scale = 30 * d.height / 1000;
-        }
-        else
-        {
-            scale = 30;
-        }
-    }
-
-
-    private static void findChitScale()
-    {
-        chitScale = 2 * scale;
-        // Avoid scaling chits at all if possible.
-        if (chitScale >= 50 && chitScale <= 70)
-        {
-            chitScale = 60;
-        }
-    }
-
-
-    public int getChitScale()
-    {
-        return chitScale;
     }
 
 
@@ -86,6 +50,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private void setupHexes()
     {
         char terrain = getMasterHex().getTerrain();
+
+        int scale = 2 * Scale.get();
 
         int cx = 6 * scale;
         int cy = 3 * scale;
@@ -421,6 +387,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     protected void setupEntrances()
     {
+        int scale = 2 * Scale.get();
+
         int cx = 6 * scale;
         int cy = 3 * scale;
 
@@ -688,7 +656,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(30 * scale, 30 * scale);
+        int scale = Scale.get();
+        return new Dimension(60 * scale, 60 * scale);
     }
 
 

@@ -23,6 +23,7 @@ public final class Options
     public static final String showStatusScreen = "Show game status";
     public static final String showDice = "Show dice";
     public static final String antialias = "Antialias";
+    public static final String scale = "Scale";
 
     // AI options (player)
     public static final String autoPickColor = "Auto pick color";

@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import java.io.*;
 
 /**
@@ -34,8 +35,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {false, false, false, true, true, false, false, false}
     };
 
-    private static int scale;
-
     private Game game;
 
     private static JFrame masterFrame;
@@ -46,6 +45,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     /** Last point clicked is needed for popup menus. */
     private static Point lastPoint;
+
+    private static JSlider slider;
 
     private static Container contentPane;
 
@@ -70,6 +71,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public static final String doneWithTurn = "Done with Turn";
     public static final String viewRecruitInfo = "View Recruit Info";
     public static final String viewBattleMap = "View Battle Map";
+    public static final String changeScale = "Change Scale";
 
     private AbstractAction undoLastSplitAction;
     private AbstractAction undoAllSplitsAction;
@@ -91,6 +93,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private AbstractAction saveGameAsAction;
     private AbstractAction saveOptionsAction;
     private AbstractAction quitGameAction;
+    private AbstractAction changeScaleAction;
 
 
     public MasterBoard(Game game)
@@ -100,7 +103,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
         masterFrame = new JFrame("MasterBoard");
         contentPane = masterFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
-        scale = findScale();
         setOpaque(true);
         setupIcon();
         setBackground(Color.black);
@@ -463,6 +465,25 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
         };
 
+        changeScaleAction = new AbstractAction(changeScale)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                final int scale = Scale.get();
+                if (slider == null)
+                {
+                    slider = new JSlider(JSlider.HORIZONTAL, 5, 25, scale);
+                    slider.setMajorTickSpacing(5);
+                    slider.setMinorTickSpacing(1);
+                    slider.setPaintTicks(true);
+                    slider.setPaintLabels(true);
+                    // TODO Position the slider somewhere reasonable.
+                    contentPane.add(slider);
+                    slider.addChangeListener(new SliderListener());
+                }
+            }
+        };
+
         // If running as an applet, disable all file-related actions.
         if (game.isApplet())
         {
@@ -471,6 +492,24 @@ public final class MasterBoard extends JPanel implements MouseListener,
             saveGameAction.setEnabled(false);
             saveGameAsAction.setEnabled(false);
             saveOptionsAction.setEnabled(false);
+        }
+    }
+
+
+    class SliderListener implements ChangeListener
+    {
+        public void stateChanged(ChangeEvent e)
+        {
+            JSlider source = (JSlider)e.getSource();
+            if (!source.getValueIsAdjusting())
+            {
+                int newScale = (int)source.getValue();
+                if (newScale != Scale.get())
+                {
+                    Scale.set(newScale);
+                    game.repaintAllWindows();
+                }
+            }
         }
     }
 
@@ -579,6 +618,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
         addCheckBox(graphicsMenu, Options.showDice, KeyEvent.VK_D);
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
+        /* TODO In progress.
+        mi = graphicsMenu.add(changeScaleAction);
+        mi.setMnemonic(KeyEvent.VK_S);
+        */
 
         // Debug menu
         JMenu debugMenu = new JMenu("Debug");
@@ -588,8 +631,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
         addCheckBox(debugMenu, Options.chooseMovement, KeyEvent.VK_M);
         addCheckBox(debugMenu, Options.chooseHits, KeyEvent.VK_H);
         addCheckBox(debugMenu, Options.chooseTowers, KeyEvent.VK_T);
-
-        // XXX Allow changing creature types
     }
 
 
@@ -628,6 +669,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
         // in a 15x8 array, with some empty elements.
 
         MasterHex[][] h = new MasterHex[15][8];
+
+        int scale = Scale.get();
 
         int cx = 3 * scale;
         int cy = 0 * scale;
@@ -1426,12 +1469,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            int chitScale = 3 * scale;
-            // Avoid scaling chits at all if possible.
-            if (chitScale >= 50 && chitScale <= 70)
-            {
-                chitScale = 60;
-            }
+            int chitScale = 3 * Scale.get();
             Marker marker = new Marker(chitScale, legion.getImageName(),
                 this, game);
             legion.setMarker(marker);
@@ -1549,22 +1587,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 game.dispose();
             }
         }
-    }
-
-
-    public static int findScale()
-    {
-        // XXX 15 is a bit small, but divides nicely into 30 and 60.
-        int scale = 16;
-
-        // Make sure that the board fits on the screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        if (d.height < 1000)
-        {
-            scale = scale * d.height / 1000;
-        }
-
-        return scale;
     }
 
 
@@ -1917,8 +1939,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+
+
     public Dimension getMinimumSize()
     {
+        int scale = Scale.get();
         return new Dimension(64 * scale, 56 * scale);
     }
 

@@ -5,7 +5,7 @@ Add UI for players to specify favorite colors.
 
 Get minimax masterboard moves working.
 
-Rewrite SplitLegion to use Legion.split()
+Rewrite SplitLegion to use Legion.split()  (Integrate Tom's code.)
 
 Add a configurable AI move delay to make it easier to follow what the
    AI is doing.
@@ -27,13 +27,21 @@ Movement die should be displayed immediately when enabled, rather than
    waiting until the next turn, unless no movement die has been rolled
    yet.  Same for battledice.
 
+Separate the GUI parts of MasterBoard/MasterHex/BattleMap/BattleHex
+   from the game state parts.
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 
-Add a way to show each player's remaining legion markers outside PickMarker.
+Add a ShowLegionMarkers window that shows each player's remaining 
+   legion markers.
+Add a ShowAllRecruits window that displays all recruits by terrain type.
+Add SetupBattle dialog, to allow setting up standalone battles.  
+   (terrain, entry side, creatures in attacking and defending legions,
+   angel/archangel available to summon, recruits available for terrain
+   type, player scores for titan power.)
 
-Centralize scale handling.  Add a global rescale option.
-Scale should change when windows are resized.
+Add a global rescale option.  Really need higher-res images and numbers 
+   done with scalable fonts for this to look good.
 
 Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
@@ -70,8 +78,7 @@ Differently-highlight hexes where a legion could move if
 Color code StatusScreen better.
 
 Add the ability to change the creature type of a creature in a legion,
-   and to specify "unknown" as a creature type, for tracking PBEM
-   games.
+   and to specify "unknown" as a creature type, for tracking PBEM games.
 
 All GUI method calls need to be moved out of non-GUI classes.
 Split GUI classes from model classes.
@@ -80,11 +87,6 @@ Move GUI/client classes and model/server classes into separate
    packages.  Make all possible public classes package private.
    Document remaining public classes, which are those that
    need to be included in the network protocol.
-
-Add a ShowAllRecruits window that displays all recruits by terrain
-   type.
-
-Add SetupBattle class, to allow setting up standalone battles.
 
 Fix concession timing.
 

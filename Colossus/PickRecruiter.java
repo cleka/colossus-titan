@@ -18,7 +18,6 @@ public final class PickRecruiter extends JDialog implements MouseListener,
     private Legion legion;
     private ArrayList recruiterChits = new ArrayList();
     private Marker legionMarker;
-    private static int scale = 60;
     private int height;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
@@ -53,6 +52,7 @@ public final class PickRecruiter extends JDialog implements MouseListener,
         height = legion.getHeight();
 
         setResizable(false);
+        int scale = 4 * Scale.get();
 
         legionMarker = new Marker(scale, legion.getImageName(), this, null);
         constraints.gridx = GridBagConstraints.RELATIVE;
@@ -190,7 +190,8 @@ public final class PickRecruiter extends JDialog implements MouseListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing PickRecruiter");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
 

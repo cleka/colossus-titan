@@ -65,7 +65,6 @@ public final class MasterHex extends Hex
     {
         this.inverted = inverted;
         this.board = board;
-        this.scale = scale;
         len = scale / 3.0;
         if (inverted)
         {

@@ -32,7 +32,6 @@ public abstract class Hex
     protected Rectangle rectBound;
     private boolean selected;
     private char terrain;
-    protected int scale;
     protected double len;
     protected String label = "";  // Avoid null pointer in stringWidth()
     private int xCoord = -1;

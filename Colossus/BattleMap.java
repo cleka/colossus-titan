@@ -68,7 +68,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         if (location == null)
         {
-            location = new Point(0, 2 * scale);
+            location = new Point(0, 4 * Scale.get());
         }
         battleFrame.setLocation(location);
 
@@ -276,7 +276,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         int height = legion.getHeight();
         Critter critter = legion.getCritter(height - 1);
 
-        BattleChit chit = new BattleChit(chitScale,
+        BattleChit chit = new BattleChit(4 * Scale.get(),
             critter.getImageName(legion == battle.getDefender()), this,
             critter);
         critter.addBattleInfo(entrance.getLabel(), entrance.getLabel(),
@@ -293,7 +293,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            BattleChit chit = new BattleChit(chitScale,
+            BattleChit chit = new BattleChit(4 * Scale.get(),
                 critter.getImageName(inverted), this, critter);
 
             String currentHexLabel = critter.getCurrentHexLabel();
@@ -366,8 +366,8 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
 
         // Cascade chits diagonally.
-        int chitScale4 = chitScale / 4;
-        int offset = (chitScale * (1 + (numCritters))) / 4;
+        int chitScale4 = Scale.get();
+        int offset = (4 * Scale.get() * (1 + (numCritters))) / 4;
         point.x -= offset;
         point.y -= offset;
 

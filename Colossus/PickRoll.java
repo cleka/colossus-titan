@@ -15,7 +15,6 @@ public final class PickRoll extends JDialog implements MouseListener,
 {
     private Chit [] dice = new Chit[6];
     private Chit question;
-    private static int scale = 60;
     private static int roll;
 
 
@@ -32,6 +31,8 @@ public final class PickRoll extends JDialog implements MouseListener,
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new FlowLayout());
+
+        int scale = 4 * Scale.get();
 
         for (int i = 0; i < 6; i++)
         {
@@ -178,7 +179,8 @@ public final class PickRoll extends JDialog implements MouseListener,
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing PickRoll");
-        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        int scale = Scale.get();
+        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
 
