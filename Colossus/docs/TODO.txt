@@ -1,6 +1,3 @@
-Add callbacks for various phase advances, client caching of this info.
-   Make attempts to advance phase void, and handle errors in callbacks.
-
 Copy various new docs to web page from inst.  tex -> html first when possible.
 Put old, new web pages under CVS.
 ant inst all html stuff to web site.
@@ -89,6 +86,3 @@ Show StatusScreen and ShowLegion info in the masterboard window, rather
 
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
-
-Bug: Some extraneous carry dialogs are popping up.  For the AI?  Or
-   for autocarrysingle?

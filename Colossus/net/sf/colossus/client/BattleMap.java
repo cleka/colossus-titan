@@ -162,12 +162,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
                     case Constants.FIGHT:
                     case Constants.STRIKEBACK:
-                        if (!client.doneWithStrikes())
-                        {
-                            highlightCrittersWithTargets();
-                            client.showMessageDialog(
-                                "Engaged creatures must strike.");
-                        }
+                        client.doneWithStrikes();
                         break;
                 }
             }

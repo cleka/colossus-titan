@@ -129,7 +129,6 @@ public final class Client
     /** Cease negotiations and fight a battle in land. */
     void fight(String land)
     {
-        clearUndoStack();
         server.fight(land);
     }
 
@@ -569,11 +568,10 @@ Log.debug("Client.leaveCarryMode()");
         return server.anyOffboardCreatures();
     }
 
-    // TODO void and callback
-    /** Returns true if okay, or false if forced strikes remain. */
-    boolean doneWithStrikes()
+
+    void doneWithStrikes()
     {
-        return server.doneWithStrikes();
+        server.doneWithStrikes(playerName);
     }
 
     private void makeForcedStrikes()
@@ -1402,6 +1400,7 @@ Log.debug("Called Client.reinforce for " + markerId);
     public void setupMove()
     {
         this.phase = Constants.MOVE;
+        clearUndoStack();
         if (board != null)
         {
             board.setupMoveMenu();
@@ -1965,11 +1964,7 @@ Log.debug("Client.applyCarries() for " + hexLabel);
         {
             return;
         }
-        if (!server.doneWithSplits(playerName))
-        {
-            showMessageDialog("Must split");
-            return;
-        }
+        server.doneWithSplits(playerName);
         clearUndoStack();
         clearRecruitChits();
     }
@@ -1981,16 +1976,8 @@ Log.debug("Client.applyCarries() for " + hexLabel);
             return;
         }
         clearRecruitChits();
-        String error = server.doneWithMoves(playerName);
-        if (error.equals(""))
-        {
-            clearUndoStack();
-        }
-        else
-        {
-            showMessageDialog(error);
-            board.highlightUnmovedLegions();
-        }
+        server.doneWithMoves(playerName);
+        clearUndoStack();
     }
 
     void doneWithEngagements()
@@ -1999,10 +1986,7 @@ Log.debug("Client.applyCarries() for " + hexLabel);
         {
             return;
         }
-        if (!server.doneWithEngagements(playerName))
-        {
-            showMessageDialog("Must resolve engagements");
-        }
+        server.doneWithEngagements(playerName);
         clearUndoStack();
     }
 

@@ -118,10 +118,18 @@ public final class Server
         return battle.anyOffboardCreatures();
     }
 
-    public boolean doneWithStrikes()
+    public void doneWithStrikes(String playerName)
     {
         Battle battle = game.getBattle();
-        return battle.doneWithStrikes();
+        if (!playerName.equals(battle.getActivePlayerName()))
+        {
+            Log.error(playerName + "illegally called doneWithStrikes()"); 
+            return;
+        }
+        if (!battle.doneWithStrikes())
+        {
+            showMessageDialog(playerName, "Must take forced strikes");
+        }
     }
 
 
@@ -821,6 +829,18 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         if (striker == null || target == null || rolls == null)
         {
             Log.error("Called allTellCarryResults() without setup.");
+            if (striker == null)
+            {
+                Log.error("null striker");
+            }
+            if (target == null)
+            {
+                Log.error("null target");
+            }
+            if (rolls == null)
+            {
+                Log.error("null rolls");
+            }
             return;
         }
         Iterator it = clients.iterator();
@@ -919,8 +939,9 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     public void mulligan(String playerName)
     {
-        if (!playerName.equals(getActivePlayerName()))
+        if (!playerName.equals(game.getActivePlayerName()))
         {
+            Log.error(playerName + "illegally called mulligan()"); 
             return;
         }
         int roll = game.mulligan();
@@ -950,7 +971,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     public void undoSplit(String playerName, String splitoffId)
     {
-        if (playerName != getActivePlayerName())
+        if (playerName != game.getActivePlayerName())
         {
             return;
         }
@@ -971,7 +992,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     public void undoMove(String playerName, String markerId)
     {
-        if (playerName != getActivePlayerName())
+        if (playerName != game.getActivePlayerName())
         {
             return;
         }
@@ -990,7 +1011,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
     public void undoRecruit(String playerName, String markerId)
     {
-        if (playerName != getActivePlayerName())
+        if (playerName != game.getActivePlayerName())
         {
             return;
         }
@@ -998,30 +1019,28 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     }
 
 
-    // TODO void and callback
-    /** Return true if it's okay to advance to the next phase. */
-    public boolean doneWithSplits(String playerName)
+    public void doneWithSplits(String playerName)
     {
-        if (playerName != getActivePlayerName())
+        if (playerName != game.getActivePlayerName())
         {
-            return false;
+            Log.error(playerName + "illegally called doneWithSplits()"); 
+            return;
         }
         if (game.getTurnNumber() == 1 && 
             game.getPlayer(playerName).getNumLegions() == 1)
         {
-            return false;
+            showMessageDialog(playerName, "Must split initial legion");
+            return;
         }
         game.advancePhase(Constants.SPLIT, playerName);
-        return true;
     }
 
-    // TODO void and callback
-    /** Return an error message, or an empty string if okay. */
-    public String doneWithMoves(String playerName)
+    public void doneWithMoves(String playerName)
     {
-        if (playerName != getActivePlayerName())
+        if (playerName != game.getActivePlayerName())
         {
-            return "Not this player's turn";
+            Log.error(playerName + "illegally called doneWithMoves()"); 
+            return;
         }
 
         Player player = game.getPlayer(playerName);
@@ -1031,13 +1050,15 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         if (player.legionsMoved() == 0 &&
             player.countMobileLegions() > 0)
         {
-            return "At least one legion must move.";
+            showMessageDialog(playerName, "At least one legion must move.");
+            return;
         }
         // If legions share a hex and have a legal
         // non-teleport move, force one of them to take it.
         else if (player.splitLegionHasForcedMove())
         {
-            return "Split legions must be separated.";
+            showMessageDialog(playerName, "Split legions must be separated.");
+            return;
         }
         // Otherwise, recombine all split legions still in
         // the same hex, and move on to the next phase.
@@ -1045,37 +1066,31 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         {
             player.recombineIllegalSplits();
             game.advancePhase(Constants.MOVE, playerName);
-            return "";
         }
     }
 
-    // TODO void and callback
-    /** Return true if it's okay to advance to the next phase. */
-    public boolean doneWithEngagements(String playerName)
+    public void doneWithEngagements(String playerName)
     {
-        if (playerName != getActivePlayerName())
+        if (playerName != game.getActivePlayerName())
         {
-            return false;
+            Log.error(playerName + "illegally called doneWithEngagements()"); 
+            return;
         }
         // Advance only if there are no unresolved engagements.
-        if (game.findEngagements().size() == 0)
+        if (game.findEngagements().size() > 0)
         {
-            game.advancePhase(Constants.FIGHT, playerName);
-            return true;
+            showMessageDialog(playerName, "Must resolve engagements");
+            return;
         }
-        else
-        {
-            return false;
-        }
+        game.advancePhase(Constants.FIGHT, playerName);
     }
 
-    // TODO void and callback
-    /** Return true if it's okay to advance to the next phase. */
-    public boolean doneWithRecruits(String playerName)
+    public void doneWithRecruits(String playerName)
     {
-        if (playerName != getActivePlayerName())
+        if (playerName != game.getActivePlayerName())
         {
-            return false;
+            Log.error(playerName + "illegally called doneWithRecruits()"); 
+            return;
         }
         Player player = game.getPlayer(playerName);
         player.commitMoves();
@@ -1084,13 +1099,8 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         player.setMulligansLeft(0);
 
         game.advancePhase(Constants.MUSTER, playerName);
-        return true;
     }
 
-    public String getActivePlayerName()
-    {
-        return game.getActivePlayerName();
-    }
 
     // XXX Need to support inactive players quitting.
     // XXX If player quits while engaged, might need to set slayer.
@@ -1138,6 +1148,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         }
     }
 
+    // TODO Move logic to client side once legion contents are tracked.
     public boolean donorHas(String playerName, String name)
     {
         Player player = game.getPlayer(playerName);
