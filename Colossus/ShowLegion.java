@@ -19,7 +19,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
     private Image offImage;
 
 
-    ShowLegion(JFrame parentFrame, Legion legion, Point point)
+    ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean allVisible)
     {
         super(parentFrame, "Contents of Legion " + legion.getMarkerId(), false);
 
@@ -60,11 +60,23 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         this.legion = legion;
 
         chits = new Chit[legion.getHeight()];
-        for (int i = 0; i < legion.getHeight(); i++)
+        if (allVisible)
         {
-            chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale,
-                legion.getCreature(i).getImageName(), this);
+            for (int i = 0; i < legion.getHeight(); i++)
+            {
+                chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale,
+                    legion.getCreature(i).getImageName(), this);
+            }
         }
+        else
+        {
+            for (int i = 0; i < legion.getHeight(); i++)
+            {
+                chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale,
+                    legion.getVisibleCreatureImageName(i), this);
+            }
+        }
+
 
         tracker = new MediaTracker(this);
 
@@ -147,6 +159,14 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
 
         dispose();
         System.gc();
+        try
+        {
+            finalize();
+        }
+        catch (Throwable e)
+        {
+            System.out.println("caught " + e.toString());
+        }
     }
 
 
