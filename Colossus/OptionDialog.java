@@ -27,7 +27,7 @@ class OptionDialog extends Dialog implements ActionListener
         this.yesString = yesString;
         this.noString = noString;
 
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
 
         setLayout(new GridLayout(0, 3));
 

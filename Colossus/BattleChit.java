@@ -560,13 +560,13 @@ class BattleChit extends Chit
             int fontWidth = fontMetrics.stringWidth(sHits);
 
             // Provide a high-contrast background for the number.
-            g.setColor(java.awt.Color.white);
+            g.setColor(Color.white);
             g.fillRect(rect.x + (rect.width - fontWidth) / 2,
                 rect.y + (rect.height - fontHeight) / 2,
                 fontWidth, fontHeight);
 
             // Show number of hits taken in red.
-            g.setColor(java.awt.Color.red);
+            g.setColor(Color.red);
 
             g.drawString(sHits, rect.x + (rect.width - fontWidth) / 2,
                 rect.y + (rect.height + fontHeight) / 2);

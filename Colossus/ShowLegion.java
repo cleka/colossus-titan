@@ -28,7 +28,7 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
 
         pack();
 
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
         setSize(2 * scale / 5 + scale * legion.getHeight(), 8 * scale / 5);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.

@@ -86,7 +86,7 @@ class PickEntrySide extends Dialog implements ActionListener,
 
         setSize(getPreferredSize());
         setResizable(false);
-        setBackground(java.awt.Color.white);
+        setBackground(Color.white);
 
         setupHexes();
 

@@ -39,7 +39,7 @@ class PickLord extends Dialog implements MouseListener, WindowListener
 
         pack();
 
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
 
         setSize(5 * scale, 3 * scale);
 

@@ -42,7 +42,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
 
             pack();
 
-            setBackground(java.awt.Color.lightGray);
+            setBackground(Color.lightGray);
             setSize((21 * scale / 20) * (Math.min(12,
                 player.getNumMarkersAvailable()) + 1), (21 * scale / 20) *
                 ((player.getNumMarkersAvailable() - 1) / 12 + 2));

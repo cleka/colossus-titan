@@ -45,7 +45,7 @@ class Concede extends Dialog implements ActionListener
 
         pack();
 
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
         setSize(getPreferredSize());
         setResizable(false);
 

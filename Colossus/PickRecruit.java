@@ -57,7 +57,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
 
         pack();
 
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
 
         height = legion.getHeight();
 

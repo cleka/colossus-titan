@@ -39,7 +39,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         this.parentFrame = parentFrame;
 
         pack();
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
         setSize(getPreferredSize());
         setResizable(false);
 

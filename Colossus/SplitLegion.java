@@ -55,7 +55,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
 
         pack();
 
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
         setSize(getPreferredSize());
         setResizable(false);
 

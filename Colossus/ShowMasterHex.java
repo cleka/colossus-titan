@@ -31,7 +31,7 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
 
         pack();
 
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
         setSize(3 * scale, numChits * scale + 3 * scale / 4);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.

@@ -42,7 +42,7 @@ class Marker extends Chit
         int fontWidth = fontMetrics.stringWidth(sHeight);
 
         // Show height in white.
-        g.setColor(java.awt.Color.white);
+        g.setColor(Color.white);
 
         g.drawString(sHeight, rect.x + rect.width * 3 / 4  - fontWidth / 2,
             rect.y + rect.height * 2 / 3 + fontHeight / 2);

@@ -23,7 +23,7 @@ class Turn extends Dialog implements ActionListener, WindowListener
         this.game = game;
         this.board = board;
 
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
             
         // Place this window in the upper left corner.
         setLocation(new Point(0, 0));

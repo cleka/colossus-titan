@@ -47,7 +47,7 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
         }
 
         pack();
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
         setSize(scale * (numEligible + 1), (21 * scale / 10));
         setResizable(false);
 

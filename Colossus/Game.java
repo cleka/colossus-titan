@@ -41,7 +41,7 @@ public class Game extends Frame implements WindowListener, ActionListener
     public Game()
     {
         super("Player Setup");
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
         pack();
         setSize(300, 250);
         try
@@ -87,7 +87,7 @@ public class Game extends Frame implements WindowListener, ActionListener
     public Game(String filename)
     {
         super("Player Setup");
-        setBackground(java.awt.Color.lightGray);
+        setBackground(Color.lightGray);
         pack();
         try
         {

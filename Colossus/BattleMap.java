@@ -117,7 +117,7 @@ public class BattleMap extends Frame implements MouseListener,
             System.exit(1);
         }
 
-        setBackground(java.awt.Color.white);
+        setBackground(Color.white);
         addWindowListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);

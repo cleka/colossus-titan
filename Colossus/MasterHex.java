@@ -138,7 +138,7 @@ class MasterHex extends Hex
     {
         if (isSelected())
         {
-            g.setColor(java.awt.Color.white);
+            g.setColor(Color.white);
         }
         else
         {
@@ -146,7 +146,7 @@ class MasterHex extends Hex
         }
 
         g.fillPolygon(hexagon);
-        g.setColor(java.awt.Color.black);
+        g.setColor(Color.black);
         g.drawPolygon(hexagon);
 
         FontMetrics fontMetrics = g.getFontMetrics();
@@ -246,9 +246,9 @@ class MasterHex extends Hex
                 x[3] = (int) Math.round(x1 - len * Math.sin(theta));
                 y[3] = (int) Math.round(y1 + len * Math.cos(theta));
 
-                g.setColor(java.awt.Color.white);
+                g.setColor(Color.white);
                 g.fillPolygon(x, y, 4);
-                g.setColor(java.awt.Color.black);
+                g.setColor(Color.black);
                 g.drawPolyline(x, y, 4);
                 break;
 
@@ -270,12 +270,12 @@ class MasterHex extends Hex
                 rect.width = (int) (2 * Math.round(len));
                 rect.height = (int) (2 * Math.round(len));
                 
-                g.setColor(java.awt.Color.white);
+                g.setColor(Color.white);
                 // Draw a bit more than a semicircle, to clean edge.
                 g.fillArc(rect.x, rect.y, rect.width, rect.height,
                     (int) Math.round((2 * Math.PI - theta) * 
                     RAD_TO_DEG - 10), 200);
-                g.setColor(java.awt.Color.black);
+                g.setColor(Color.black);
                 g.drawArc(rect.x, rect.y, rect.width, rect.height,
                     (int) Math.round((2 * Math.PI - theta) * RAD_TO_DEG), 
                     180);
@@ -288,9 +288,9 @@ class MasterHex extends Hex
                 y[1] = y[3];
                 x[3] = x0;
                 y[3] = y0;
-                g.setColor(java.awt.Color.white);
+                g.setColor(Color.white);
                 g.fillPolygon(x, y, 4);
-                g.setColor(java.awt.Color.black);
+                g.setColor(Color.black);
                 g.drawLine(x1, y1, x[1], y[1]);
                 g.drawLine(x[2], y[2], x0, y0);
                 break;
@@ -305,9 +305,9 @@ class MasterHex extends Hex
                 x[2] = (int) Math.round(x1 - len * Math.sin(theta));
                 y[2] = (int) Math.round(y1 + len * Math.cos(theta));
 
-                g.setColor(java.awt.Color.white);
+                g.setColor(Color.white);
                 g.fillPolygon(x, y, 3);
-                g.setColor(java.awt.Color.black);
+                g.setColor(Color.black);
                 g.drawPolyline(x, y, 3);
                 break;
 
@@ -329,9 +329,9 @@ class MasterHex extends Hex
                     x[2] = (int) Math.round(x1 - len * Math.sin(theta));
                     y[2] = (int) Math.round(y1 + len * Math.cos(theta));
     
-                    g.setColor(java.awt.Color.white);
+                    g.setColor(Color.white);
                     g.fillPolygon(x, y, 3);
-                    g.setColor(java.awt.Color.black);
+                    g.setColor(Color.black);
                     g.drawPolyline(x, y, 3);
                 }
                 break;
@@ -376,29 +376,29 @@ class MasterHex extends Hex
         switch (getTerrain())
         {
             case 'B':
-                return java.awt.Color.green;
+                return Color.green;
             case 'D':
-                return java.awt.Color.orange;
+                return Color.orange;
             case 'H':
                 return new Color(128, 64, 0);
             case 'J':
                 return new Color(0, 128, 0);
             case 'm':
-                return java.awt.Color.red;
+                return Color.red;
             case 'M':
                 return new Color(180, 90, 0);
             case 'P':
-                return java.awt.Color.yellow;
+                return Color.yellow;
             case 'S':
-                return java.awt.Color.blue;
+                return Color.blue;
             case 'T':
-                return java.awt.Color.gray;
+                return Color.gray;
             case 't':
                 return new Color(128, 170, 255);
             case 'W':
                 return new Color(128, 128, 0);
             default:
-                return java.awt.Color.black;
+                return Color.black;
         }
     }
 

@@ -106,7 +106,7 @@ class BattleHex extends Hex
     {
         if (isSelected())
         {
-            g.setColor(java.awt.Color.white);
+            g.setColor(Color.white);
         }
         else
         {
@@ -114,7 +114,7 @@ class BattleHex extends Hex
         }
 
         g.fillPolygon(hexagon);
-        g.setColor(java.awt.Color.black);
+        g.setColor(Color.black);
         g.drawPolygon(hexagon);
 
         FontMetrics fontMetrics = g.getFontMetrics();
@@ -205,9 +205,9 @@ class BattleHex extends Hex
                     x[2] = (int) Math.round(x1 - len * Math.sin(theta));
                     y[2] = (int) Math.round(y1 + len * Math.cos(theta));
                     
-                    g.setColor(java.awt.Color.white);
+                    g.setColor(Color.white);
                     g.fillPolygon(x, y, 3);
-                    g.setColor(java.awt.Color.black);
+                    g.setColor(Color.black);
                     g.drawPolyline(x, y, 3);
                 }
                 break;
@@ -237,12 +237,12 @@ class BattleHex extends Hex
                     rect.width = (int) (2 * Math.round(len));
                     rect.height = (int) (2 * Math.round(len));
 
-                    g.setColor(java.awt.Color.white);
+                    g.setColor(Color.white);
                     // Draw a bit more than a semicircle, to clean edge.
                     g.fillArc(rect.x, rect.y, rect.width, rect.height,
                         (int) Math.round((2 * Math.PI - theta) *
                         RAD_TO_DEG - 10), 200);
-                    g.setColor(java.awt.Color.black);
+                    g.setColor(Color.black);
                     g.drawArc(rect.x, rect.y, rect.width, rect.height,
                         (int) Math.round((2 * Math.PI - theta) * RAD_TO_DEG),
                         180);
@@ -267,7 +267,7 @@ class BattleHex extends Hex
                     x[3] = (int) Math.round(x1 - len / 3 * Math.sin(theta));
                     y[3] = (int) Math.round(y1 + len / 3 * Math.cos(theta));
                     
-                    g.setColor(java.awt.Color.black);
+                    g.setColor(Color.black);
                     g.drawLine(x[0], y[0], x[1], y[1]);
                     g.drawLine(x[2], y[2], x[3], y[3]);
                 }
@@ -290,9 +290,9 @@ class BattleHex extends Hex
                     x[3] = (int) Math.round(x1 - len * Math.sin(theta));
                     y[3] = (int) Math.round(y1 + len * Math.cos(theta));
                     
-                    g.setColor(java.awt.Color.white);
+                    g.setColor(Color.white);
                     g.fillPolygon(x, y, 4);
-                    g.setColor(java.awt.Color.black);
+                    g.setColor(Color.black);
                     g.drawPolyline(x, y, 4);
                 }
                 break;
@@ -452,22 +452,22 @@ class BattleHex extends Hex
                     case 1:
                         return new Color(200, 200, 0);
                     case 2:
-                        return java.awt.Color.yellow;
+                        return Color.yellow;
                 }
             case 'r':  // bramble
-                return java.awt.Color.green;
+                return Color.green;
             case 's':  // sand
-                return java.awt.Color.orange;
+                return Color.orange;
             case 't':  // tree
                 return new Color(180, 90, 0);
             case 'o':  // bog
-                return java.awt.Color.gray;
+                return Color.gray;
             case 'v':  // volcano
-                return java.awt.Color.red;
+                return Color.red;
             case 'd':  // drift
-                return java.awt.Color.blue;
+                return Color.blue;
             default:
-                return java.awt.Color.black;
+                return Color.black;
         }
     }
 

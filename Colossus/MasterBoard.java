@@ -83,7 +83,7 @@ class MasterBoard extends Frame implements MouseListener,
             System.exit(1);
         }
 
-        setBackground(java.awt.Color.black);
+        setBackground(Color.black);
 
         addWindowListener(this);
         addMouseListener(this);

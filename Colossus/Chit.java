@@ -49,7 +49,7 @@ class Chit
         if (dead)
         {
             // Draw a triple-wide red X.
-            g.setColor(java.awt.Color.red);
+            g.setColor(Color.red);
 
             g.drawLine(rect.x, rect.y, rect.x + rect.width,
                 rect.y + rect.height);
