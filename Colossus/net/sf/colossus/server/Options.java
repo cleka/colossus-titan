@@ -47,6 +47,8 @@ public final class Options
     public static final String autoPickEngagement = "Auto pick engagements";
     public static final String autoBattleMove = "Auto battle move";
     public static final String autoForcedStrike = "Auto forced strike";
+    public static final String autoCarrySingle = "Auto carry single";
+    public static final String autoRangeSingle = "Auto rangestrike single";
     public static final String autoStrike = "Auto strike";
     public static final String autoSummonAngels = "Auto summon angels";
     public static final String autoAcquireAngels = "Auto acquire angels";

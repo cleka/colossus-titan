@@ -101,13 +101,15 @@ public final class Server
         }
     }
 
-    void allSetCarries(int carryDamage, Set carryTargets)
+    void allTellCarryResults(int carryDamageDone, int carryDamageLeft, 
+        Set carryTargets)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setCarries(carryDamage, carryTargets);
+            client.tellCarryResults(carryDamageDone, carryDamageLeft, 
+                carryTargets);
         }
     }
 
@@ -728,7 +730,7 @@ public final class Server
             battle.getCritter(hexLabel));
     }
 
-
+    // TODO Error checks.
     public void applyCarries(String hexLabel)
     {
         Battle battle = game.getBattle();
@@ -820,18 +822,18 @@ public final class Server
     }
 
 
-    void allSetBattleValues(String attackerName, String defenderName, 
+    void allTellStrikeResults(String attackerName, String defenderName, 
         String attackerHexId, String defenderHexId, char terrain, 
         int strikeNumber, int damage, int carryDamage, int [] rolls, 
-        Set carryTargets)
+        Set carryTargetDescriptions)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.setBattleValues(attackerName, defenderName,
+            client.tellStrikeResults(attackerName, defenderName,
                 attackerHexId, defenderHexId, terrain, strikeNumber,
-                damage, carryDamage, rolls, carryTargets);
+                damage, carryDamage, rolls, carryTargetDescriptions);
         }
     }
 

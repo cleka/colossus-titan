@@ -555,7 +555,9 @@ final class Battle
             else if (server.getClientOption(player.getName(),
                 Options.autoForcedStrike))
             {
-                makeForcedStrikes(false);
+                boolean rangestrike = server.getClientOption(player.getName(),
+                    Options.autoRangeSingle);
+                makeForcedStrikes(rangestrike);
             }
 
             // If there are no possible strikes left, move on.
@@ -1304,6 +1306,19 @@ final class Battle
         return Collections.unmodifiableSet(carryTargets);
     }
 
+    Set getCarryTargetDescriptions()
+    {
+        Set set = new HashSet();
+        Iterator it = getCarryTargets().iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            Critter critter = getCritter(hexLabel);    
+            set.add(critter.getDescription());
+        }
+        return set;
+    }
+
     void clearCarryTargets()
     {
         carryTargets.clear();
@@ -1330,7 +1345,7 @@ final class Battle
 Log.debug("called Battle.applyCarries() for " + target.getDescription());
         if (!carryTargets.contains(target.getCurrentHexLabel()))
         {
-            Log.warn("ILLEGAL CARRY ATTEMPT!");
+            Log.warn("Tried illegal carry to " + target.getDescription());
             return;
         }
         int dealt = carryDamage;
@@ -1347,10 +1362,10 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         }
         else
         {
-            server.allSetCarries(carryDamage, getCarryTargets());
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
         }
+        server.allTellCarryResults(dealt, carryDamage, getCarryTargets());
     }
 
 

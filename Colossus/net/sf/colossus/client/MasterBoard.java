@@ -545,6 +545,8 @@ public final class MasterBoard extends JPanel
         addCheckBox(playerMenu, Options.autoPickEngagement, KeyEvent.VK_N);
         addCheckBox(playerMenu, Options.autoBattleMove, KeyEvent.VK_B);
         addCheckBox(playerMenu, Options.autoForcedStrike, KeyEvent.VK_K);
+        addCheckBox(playerMenu, Options.autoCarrySingle, KeyEvent.VK_Y);
+        addCheckBox(playerMenu, Options.autoRangeSingle, KeyEvent.VK_G);
         addCheckBox(playerMenu, Options.autoStrike, KeyEvent.VK_T);
         addCheckBox(playerMenu, Options.autoSummonAngels, KeyEvent.VK_O);
         addCheckBox(playerMenu, Options.autoAcquireAngels, KeyEvent.VK_A);

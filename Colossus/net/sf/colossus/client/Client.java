@@ -501,7 +501,7 @@ public final class Client
     {
         if (map != null)
         {
-            map.clearCarries();
+            map.unselectAllHexes();
         }
         makeForcedStrikes();
     }
@@ -535,7 +535,8 @@ public final class Client
     {
         if (playerName.equals(getBattleActivePlayerName()))
         {
-            server.makeForcedStrikes(playerName, false);
+            server.makeForcedStrikes(playerName, getOption(
+                Options.autoRangeSingle));
         }
     }
 
@@ -984,10 +985,10 @@ public final class Client
 
 
     // TODO Use this method to mark chits as wounded / dead.
-    public void setBattleValues(String attackerName, String defenderName,
+    public void tellStrikeResults(String attackerName, String defenderName,
         String attackerHexId, String defenderHexId, char terrain,
         int strikeNumber, int damage, int carryDamage, int [] rolls,
-        Set carryTargets)
+        Set carryTargetDescriptions)
     {
         if (battleDice != null)
         {
@@ -995,29 +996,69 @@ public final class Client
                 defenderHexId, terrain, strikeNumber, damage, carryDamage,
                 rolls);
             battleDice.showRoll();
-            if (carryDamage > 0)
+        }
+        if (map != null)
+        {
+            map.unselectAllHexes();
+        }
+        if (carryDamage >= 1 && !carryTargetDescriptions.isEmpty())
+        {
+            pickCarries(carryDamage, carryTargetDescriptions);
+        }
+        else
+        {
+            makeForcedStrikes();
+            if (map != null)
             {
-                map.highlightCarries(carryDamage, carryTargets);
-            }
-            else
-            {
-                makeForcedStrikes();
                 map.highlightCrittersWithTargets();
-                // XXX Needed?
-                map.repaint();
             }
         }
     }
 
-    public void setCarries(int carryDamage, Set carryTargets)
+    /** The current target took carryDamageDealt points.  There are
+     *  carryDamageLeft points left to distribute. */ 
+    public void tellCarryResults(int carryDamageDealt, int carryDamageLeft, 
+        Set carryTargetDescriptions)
     {
         if (battleDice != null)
         {
-            battleDice.setCarries(carryDamage);
+            battleDice.setCarries(carryDamageDealt);
         }
-        if (map != null && carryDamage > 0)
+        if (carryDamageLeft >= 1 && !carryTargetDescriptions.isEmpty())
         {
-            map.highlightCarries(carryDamage, carryTargets);
+            pickCarries(carryDamageLeft, carryTargetDescriptions);
+        }
+    }
+
+    private void pickCarries(int carryDamage, Set carryTargetDescriptions)
+    {
+        if (!playerName.equals(getBattleActivePlayerName()))
+        {
+            return;
+        }
+        if (getOption(Options.autoStrike))
+        {
+            // AI carries are handled on server side.
+            return;
+        }
+
+        if (carryDamage < 1 || carryTargetDescriptions.isEmpty())
+        {
+            leaveCarryMode();
+        }
+        else if (carryTargetDescriptions.size() == 1 &&
+            getOption(Options.autoCarrySingle))
+        {
+            Iterator it = carryTargetDescriptions.iterator();
+            String desc = (String)it.next();
+            String targetHex = desc.substring(desc.length() - 2);
+            applyCarries(targetHex);
+        }
+        else
+        {
+Log.debug("new PickCarry"); 
+            new PickCarry(map.getFrame(), this, carryDamage, 
+                carryTargetDescriptions);
         }
     }
 
@@ -1195,6 +1236,8 @@ Log.debug("Called Client.reinforce for " + markerId);
         if (board != null)
         {
             board.highlightPossibleRecruits();
+            // TODO Repaint only markerId's hex.
+            board.repaint();
         }
     }
 
@@ -1419,13 +1462,16 @@ Log.debug("Called Client.reinforce for " + markerId);
         server.strike(tag, hexLabel);
     }
 
-
     /** Attempt to apply carries to the critter in hexLabel. */
     void applyCarries(String hexLabel)
     {
         server.applyCarries(hexLabel);
+        if (map != null)
+        {
+            map.unselectHexByLabel(hexLabel);
+            map.repaint();
+        }
     }
-
 
     int getCarryDamage()
     {

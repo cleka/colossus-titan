@@ -472,65 +472,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         selectHexesByLabels(set);
     }
 
-    /** carryTargets is a Set of hexLabels */
-    void highlightCarries(int carryDamage, Set carryTargets)
-    {
-        unselectAllHexes();
-        selectHexesByLabels(carryTargets);
-        setupCarryCursor(carryDamage);
-    }
-
-    void clearCarries()
-    {
-        unselectAllHexes();
-        setupCarryCursor(0);
-    }
-
-
-    private void setupCarryCursor(int numCarries)
-    {
-        Cursor cursor = null;
-        if (numCarries == 0)
-        {
-            setDefaultCursor();
-        }
-        else
-        {
-            try
-            {
-                Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(
-                    2 * Scale.get(), 2 * Scale.get());
-Log.debug("Best cursor size is "  + d.width + "x" + d.height);
-
-                // Use a special image for unlikely huge carries.
-                String basename;
-                if (numCarries > 15)
-                {
-                    basename = "carry";
-                }
-                else
-                {
-                    basename = "carry" + numCarries;
-                }
-                String imageFilename = Chit.getImagePath(basename);
-
-                ImageIcon icon = Chit.getImageIcon(imageFilename);
-                Image image = icon.getImage();
-                if (image != null)
-                {
-                    cursor = Toolkit.getDefaultToolkit().createCustomCursor(
-                        image, new Point(0, 0), basename);
-                    battleFrame.setCursor(cursor);
-                }
-            }
-            catch (Exception e)
-            {
-                // If it fails, just use the default cursor.
-                Log.error("Problem creating custom cursor: " + e);
-                return;
-            }
-        }
-    }
 
     void setDefaultCursor()
     {
@@ -600,6 +541,7 @@ Log.debug("Best cursor size is "  + d.width + "x" + d.height);
 
             case Constants.FIGHT:
             case Constants.STRIKEBACK:
+                // XXX Change
                 if (client.getCarryDamage() > 0)
                 {
                     client.applyCarries(hexLabel);

@@ -835,10 +835,10 @@ Log.debug("new penalty option: " + po.toString());
 
         if (game != null)
         {
-            game.getServer().allSetBattleValues(getName(), target.getName(), 
+            game.getServer().allTellStrikeResults(getName(), target.getName(), 
                 currentHexLabel, target.getCurrentHexLabel(), 
                 battle.getTerrain(), strikeNumber, damage, carryDamage, rolls,
-                battle.getCarryTargets());
+                battle.getCarryTargetDescriptions());
         }
     }
 
