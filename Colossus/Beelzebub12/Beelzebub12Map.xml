@@ -1,0 +1,858 @@
+<?xml version="1.0"?>
+<board width="23" height="12" >
+<!--  Beelzebub12 Masterboard by Chris Byler 20 Oct 2003 -->
+<!--  Width Height -->
+<!--  Num       Terrain         Dest1   Sign1           Dest2   Sign2           Dest3   Sign3           X       Y -->
+<!--  Top ring -->
+    <hex label="101" terrain="Tundra" xpos="11" ypos="6">
+        <exit type="ARROW" label="102" />
+        <exit type="ARROW" label="106" />
+        <exit type="BLOCK" label="201" />
+    </hex>
+    <hex label="102" terrain="Mountains" xpos="12" ypos="6">
+        <exit type="ARROW" label="103" />
+        <exit type="ARROW" label="101" />
+        <exit type="BLOCK" label="216" />
+    </hex>
+    <hex label="103" terrain="Tundra" xpos="12" ypos="5">
+        <exit type="ARROW" label="104" />
+        <exit type="ARROW" label="102" />
+        <exit type="BLOCK" label="213" />
+    </hex>
+    <hex label="104" terrain="Mountains" xpos="11" ypos="5">
+        <exit type="ARROW" label="105" />
+        <exit type="ARROW" label="103" />
+        <exit type="BLOCK" label="210" />
+    </hex>
+    <hex label="105" terrain="Tundra" xpos="10" ypos="5">
+        <exit type="ARROW" label="106" />
+        <exit type="ARROW" label="104" />
+        <exit type="BLOCK" label="207" />
+    </hex>
+    <hex label="106" terrain="Mountains" xpos="10" ypos="6">
+        <exit type="ARROW" label="101" />
+        <exit type="ARROW" label="105" />
+        <exit type="BLOCK" label="204" />
+    </hex>
+<!--  Near-top ring -->
+    <hex label="201" terrain="Tombs" xpos="11" ypos="7">
+        <exit type="ARROWS" label="202" />
+        <exit type="ARCH" label="101" />
+    </hex>
+    <hex label="202" terrain="Marsh" xpos="10" ypos="7">
+        <exit type="ARROWS" label="203" />
+        <exit type="ARCH" label="378" />
+    </hex>
+    <hex label="203" terrain="Desert" xpos="9" ypos="7">
+        <exit type="ARROWS" label="204" />
+        <exit type="ARCH" label="367" />
+    </hex>
+    <hex label="204" terrain="Ruins" xpos="9" ypos="6">
+        <exit type="ARROWS" label="205" />
+        <exit type="ARCH" label="106" />
+    </hex>
+    <hex label="205" terrain="Plains" xpos="8" ypos="6">
+        <exit type="ARROWS" label="206" />
+        <exit type="ARCH" label="365" />
+    </hex>
+    <hex label="206" terrain="Swamp" xpos="8" ypos="5">
+        <exit type="ARROWS" label="207" />
+        <exit type="ARCH" label="354" />
+    </hex>
+    <hex label="207" terrain="Tombs" xpos="9" ypos="5">
+        <exit type="ARROWS" label="208" />
+        <exit type="ARCH" label="105" />
+    </hex>
+    <hex label="208" terrain="Marsh" xpos="9" ypos="4">
+        <exit type="ARROWS" label="209" />
+        <exit type="ARCH" label="352" />
+    </hex>
+    <hex label="209" terrain="Desert" xpos="10" ypos="4">
+        <exit type="ARROWS" label="210" />
+        <exit type="ARCH" label="341" />
+    </hex>
+    <hex label="210" terrain="Ruins" xpos="11" ypos="4">
+        <exit type="ARROWS" label="211" />
+        <exit type="ARCH" label="104" />
+    </hex>
+    <hex label="211" terrain="Plains" xpos="12" ypos="4">
+        <exit type="ARROWS" label="212" />
+        <exit type="ARCH" label="339" />
+    </hex>
+    <hex label="212" terrain="Swamp" xpos="13" ypos="4">
+        <exit type="ARROWS" label="213" />
+        <exit type="ARCH" label="328" />
+    </hex>
+    <hex label="213" terrain="Tombs" xpos="13" ypos="5">
+        <exit type="ARROWS" label="214" />
+        <exit type="ARCH" label="103" />
+    </hex>
+    <hex label="214" terrain="Marsh" xpos="14" ypos="5">
+        <exit type="ARROWS" label="215" />
+        <exit type="ARCH" label="326" />
+    </hex>
+    <hex label="215" terrain="Desert" xpos="14" ypos="6">
+        <exit type="ARROWS" label="216" />
+        <exit type="ARCH" label="315" />
+    </hex>
+    <hex label="216" terrain="Ruins" xpos="13" ypos="6">
+        <exit type="ARROWS" label="217" />
+        <exit type="ARCH" label="102" />
+    </hex>
+    <hex label="217" terrain="Plains" xpos="13" ypos="7">
+        <exit type="ARROWS" label="218" />
+        <exit type="ARCH" label="313" />
+    </hex>
+    <hex label="218" terrain="Swamp" xpos="12" ypos="7">
+        <exit type="ARROWS" label="201" />
+        <exit type="ARCH" label="302" />
+    </hex>
+<!--  Snake -->
+    <hex label="301" terrain="Plains" xpos="11" ypos="8">
+        <exit type="ARROWS" label="302" />
+        <exit type="ARCH" label="401" />
+    </hex>
+    <hex label="302" terrain="Ruins" xpos="12" ypos="8">
+        <exit type="ARROWS" label="303" />
+        <exit type="ARCH" label="218" />
+    </hex>
+    <hex label="303" terrain="Tombs" xpos="13" ypos="8">
+        <exit type="ARROWS" label="304" />
+        <exit type="ARCH" label="312" />
+    </hex>
+    <hex label="304" terrain="Marsh" xpos="13" ypos="9">
+        <exit type="ARROWS" label="305" />
+        <exit type="ARCH" label="406" />
+    </hex>
+    <hex label="305" terrain="Plains" xpos="14" ypos="9">
+        <exit type="ARROWS" label="306" />
+        <exit type="ARCH" label="310" />
+    </hex>
+    <hex label="306" terrain="Tombs" xpos="14" ypos="10">
+        <exit type="ARROWS" label="307" />
+        <exit type="ARCH" label="502" />
+    </hex>
+    <hex label="307" terrain="Hellmouth" xpos="15" ypos="10">
+        <exit type="ARROWS" label="308" />
+        <exit type="BLOCK" label="663" />
+    </hex>
+    <hex label="308" terrain="Circle" xpos="16" ypos="10">
+        <exit type="ARROWS" label="309" />
+        <exit type="BLOCK" label="660" />
+    </hex>
+    <hex label="309" terrain="Plains" xpos="16" ypos="9">
+        <exit type="ARROWS" label="310" />
+        <exit type="ARCH" label="503" />
+    </hex>
+    <hex label="310" terrain="Swamp" xpos="15" ypos="9">
+        <exit type="ARROWS" label="311" />
+        <exit type="ARCH" label="305" />
+    </hex>
+    <hex label="311" terrain="Marsh" xpos="15" ypos="8">
+        <exit type="ARROWS" label="312" />
+        <exit type="ARCH" label="408" />
+    </hex>
+    <hex label="312" terrain="Woods" xpos="14" ypos="8">
+        <exit type="ARROWS" label="313" />
+        <exit type="ARCH" label="303" />
+    </hex>
+    <hex label="313" terrain="Ruins" xpos="14" ypos="7">
+        <exit type="ARROWS" label="314" />
+        <exit type="ARCH" label="217" />
+    </hex>
+    <hex label="314" terrain="Marsh" xpos="15" ypos="7">
+        <exit type="ARROWS" label="315" />
+        <exit type="ARCH" label="407" />
+    </hex>
+    <hex label="315" terrain="Tombs" xpos="15" ypos="6">
+        <exit type="ARROWS" label="316" />
+        <exit type="ARCH" label="215" />
+    </hex>
+    <hex label="316" terrain="Ruins" xpos="16" ypos="6">
+        <exit type="ARROWS" label="317" />
+        <exit type="ARCH" label="325" />
+    </hex>
+    <hex label="317" terrain="Plains" xpos="17" ypos="6">
+        <exit type="ARROWS" label="318" />
+        <exit type="ARCH" label="412" />
+    </hex>
+    <hex label="318" terrain="Marsh" xpos="18" ypos="6">
+        <exit type="ARROWS" label="319" />
+        <exit type="ARCH" label="323" />
+    </hex>
+    <hex label="319" terrain="Ruins" xpos="19" ypos="6">
+        <exit type="ARROWS" label="320" />
+        <exit type="ARCH" label="504" />
+    </hex>
+    <hex label="320" terrain="Hellmouth" xpos="20" ypos="6">
+        <exit type="ARROWS" label="321" />
+        <exit type="BLOCK" label="652" />
+    </hex>
+    <hex label="321" terrain="Circle" xpos="20" ypos="5">
+        <exit type="ARROWS" label="322" />
+        <exit type="BLOCK" label="649" />
+    </hex>
+    <hex label="322" terrain="Marsh" xpos="19" ypos="5">
+        <exit type="ARROWS" label="323" />
+        <exit type="ARCH" label="505" />
+    </hex>
+    <hex label="323" terrain="Desert" xpos="18" ypos="5">
+        <exit type="ARROWS" label="324" />
+        <exit type="ARCH" label="318" />
+    </hex>
+    <hex label="324" terrain="Plains" xpos="17" ypos="5">
+        <exit type="ARROWS" label="325" />
+        <exit type="ARCH" label="414" />
+    </hex>
+    <hex label="325" terrain="Hills" xpos="16" ypos="5">
+        <exit type="ARROWS" label="326" />
+        <exit type="ARCH" label="316" />
+    </hex>
+    <hex label="326" terrain="Tombs" xpos="15" ypos="5">
+        <exit type="ARROWS" label="327" />
+        <exit type="ARCH" label="214" />
+    </hex>
+    <hex label="327" terrain="Plains" xpos="15" ypos="4">
+        <exit type="ARROWS" label="328" />
+        <exit type="ARCH" label="413" />
+    </hex>
+    <hex label="328" terrain="Ruins" xpos="14" ypos="4">
+        <exit type="ARROWS" label="329" />
+        <exit type="ARCH" label="212" />
+    </hex>
+    <hex label="329" terrain="Tombs" xpos="14" ypos="3">
+        <exit type="ARROWS" label="330" />
+        <exit type="ARCH" label="338" />
+    </hex>
+    <hex label="330" terrain="Marsh" xpos="15" ypos="3">
+        <exit type="ARROWS" label="331" />
+        <exit type="ARCH" label="418" />
+    </hex>
+    <hex label="331" terrain="Plains" xpos="15" ypos="2">
+        <exit type="ARROWS" label="332" />
+        <exit type="ARCH" label="336" />
+    </hex>
+    <hex label="332" terrain="Tombs" xpos="16" ypos="2">
+        <exit type="ARROWS" label="333" />
+        <exit type="ARCH" label="506" />
+    </hex>
+    <hex label="333" terrain="Hellmouth" xpos="16" ypos="1">
+        <exit type="ARROWS" label="334" />
+        <exit type="BLOCK" label="641" />
+    </hex>
+    <hex label="334" terrain="Circle" xpos="15" ypos="1">
+        <exit type="ARROWS" label="335" />
+        <exit type="BLOCK" label="638" />
+    </hex>
+    <hex label="335" terrain="Plains" xpos="14" ypos="1">
+        <exit type="ARROWS" label="336" />
+        <exit type="ARCH" label="507" />
+    </hex>
+    <hex label="336" terrain="Swamp" xpos="14" ypos="2">
+        <exit type="ARROWS" label="337" />
+        <exit type="ARCH" label="331" />
+    </hex>
+    <hex label="337" terrain="Marsh" xpos="13" ypos="2">
+        <exit type="ARROWS" label="338" />
+        <exit type="ARCH" label="420" />
+    </hex>
+    <hex label="338" terrain="Woods" xpos="13" ypos="3">
+        <exit type="ARROWS" label="339" />
+        <exit type="ARCH" label="329" />
+    </hex>
+    <hex label="339" terrain="Ruins" xpos="12" ypos="3">
+        <exit type="ARROWS" label="340" />
+        <exit type="ARCH" label="211" />
+    </hex>
+    <hex label="340" terrain="Marsh" xpos="11" ypos="3">
+        <exit type="ARROWS" label="341" />
+        <exit type="ARCH" label="419" />
+    </hex>
+    <hex label="341" terrain="Tombs" xpos="10" ypos="3">
+        <exit type="ARROWS" label="342" />
+        <exit type="ARCH" label="209" />
+    </hex>
+    <hex label="342" terrain="Ruins" xpos="9" ypos="3">
+        <exit type="ARROWS" label="343" />
+        <exit type="ARCH" label="351" />
+    </hex>
+    <hex label="343" terrain="Plains" xpos="9" ypos="2">
+        <exit type="ARROWS" label="344" />
+        <exit type="ARCH" label="424" />
+    </hex>
+    <hex label="344" terrain="Marsh" xpos="8" ypos="2">
+        <exit type="ARROWS" label="345" />
+        <exit type="ARCH" label="349" />
+    </hex>
+    <hex label="345" terrain="Ruins" xpos="8" ypos="1">
+        <exit type="ARROWS" label="346" />
+        <exit type="ARCH" label="508" />
+    </hex>
+    <hex label="346" terrain="Hellmouth" xpos="7" ypos="1">
+        <exit type="ARROWS" label="347" />
+        <exit type="BLOCK" label="630" />
+    </hex>
+    <hex label="347" terrain="Circle" xpos="6" ypos="1">
+        <exit type="ARROWS" label="348" />
+        <exit type="BLOCK" label="627" />
+    </hex>
+    <hex label="348" terrain="Marsh" xpos="6" ypos="2">
+        <exit type="ARROWS" label="349" />
+        <exit type="ARCH" label="509" />
+    </hex>
+    <hex label="349" terrain="Desert" xpos="7" ypos="2">
+        <exit type="ARROWS" label="350" />
+        <exit type="ARCH" label="344" />
+    </hex>
+    <hex label="350" terrain="Plains" xpos="7" ypos="3">
+        <exit type="ARROWS" label="351" />
+        <exit type="ARCH" label="426" />
+    </hex>
+    <hex label="351" terrain="Hills" xpos="8" ypos="3">
+        <exit type="ARROWS" label="352" />
+        <exit type="ARCH" label="342" />
+    </hex>
+    <hex label="352" terrain="Tombs" xpos="8" ypos="4">
+        <exit type="ARROWS" label="353" />
+        <exit type="ARCH" label="208" />
+    </hex>
+    <hex label="353" terrain="Plains" xpos="7" ypos="4">
+        <exit type="ARROWS" label="354" />
+        <exit type="ARCH" label="425" />
+    </hex>
+    <hex label="354" terrain="Ruins" xpos="7" ypos="5">
+        <exit type="ARROWS" label="355" />
+        <exit type="ARCH" label="206" />
+    </hex>
+    <hex label="355" terrain="Tombs" xpos="6" ypos="5">
+        <exit type="ARROWS" label="356" />
+        <exit type="ARCH" label="364" />
+    </hex>
+    <hex label="356" terrain="Marsh" xpos="5" ypos="5">
+        <exit type="ARROWS" label="357" />
+        <exit type="ARCH" label="430" />
+    </hex>
+    <hex label="357" terrain="Plains" xpos="4" ypos="5">
+        <exit type="ARROWS" label="358" />
+        <exit type="ARCH" label="362" />
+    </hex>
+    <hex label="358" terrain="Tombs" xpos="3" ypos="5">
+        <exit type="ARROWS" label="359" />
+        <exit type="ARCH" label="510" />
+    </hex>
+    <hex label="359" terrain="Hellmouth" xpos="2" ypos="5">
+        <exit type="ARROWS" label="360" />
+        <exit type="BLOCK" label="619" />
+    </hex>
+    <hex label="360" terrain="Circle" xpos="2" ypos="6">
+        <exit type="ARROWS" label="361" />
+        <exit type="BLOCK" label="616" />
+    </hex>
+    <hex label="361" terrain="Plains" xpos="3" ypos="6">
+        <exit type="ARROWS" label="362" />
+        <exit type="ARCH" label="511" />
+    </hex>
+    <hex label="362" terrain="Swamp" xpos="4" ypos="6">
+        <exit type="ARROWS" label="363" />
+        <exit type="ARCH" label="357" />
+    </hex>
+    <hex label="363" terrain="Marsh" xpos="5" ypos="6">
+        <exit type="ARROWS" label="364" />
+        <exit type="ARCH" label="432" />
+    </hex>
+    <hex label="364" terrain="Woods" xpos="6" ypos="6">
+        <exit type="ARROWS" label="365" />
+        <exit type="ARCH" label="355" />
+    </hex>
+    <hex label="365" terrain="Ruins" xpos="7" ypos="6">
+        <exit type="ARROWS" label="366" />
+        <exit type="ARCH" label="205" />
+    </hex>
+    <hex label="366" terrain="Marsh" xpos="7" ypos="7">
+        <exit type="ARROWS" label="367" />
+        <exit type="ARCH" label="431" />
+    </hex>
+    <hex label="367" terrain="Tombs" xpos="8" ypos="7">
+        <exit type="ARROWS" label="368" />
+        <exit type="ARCH" label="203" />
+    </hex>
+    <hex label="368" terrain="Ruins" xpos="8" ypos="8">
+        <exit type="ARROWS" label="369" />
+        <exit type="ARCH" label="377" />
+    </hex>
+    <hex label="369" terrain="Plains" xpos="7" ypos="8">
+        <exit type="ARROWS" label="370" />
+        <exit type="ARCH" label="436" />
+    </hex>
+    <hex label="370" terrain="Marsh" xpos="7" ypos="9">
+        <exit type="ARROWS" label="371" />
+        <exit type="ARCH" label="375" />
+    </hex>
+    <hex label="371" terrain="Ruins" xpos="6" ypos="9">
+        <exit type="ARROWS" label="372" />
+        <exit type="ARCH" label="512" />
+    </hex>
+    <hex label="372" terrain="Hellmouth" xpos="6" ypos="10">
+        <exit type="ARROWS" label="373" />
+        <exit type="BLOCK" label="608" />
+    </hex>
+    <hex label="373" terrain="Circle" xpos="7" ypos="10">
+        <exit type="ARROWS" label="374" />
+        <exit type="BLOCK" label="605" />
+    </hex>
+    <hex label="374" terrain="Marsh" xpos="8" ypos="10">
+        <exit type="ARROWS" label="375" />
+        <exit type="ARCH" label="501" />
+    </hex>
+    <hex label="375" terrain="Desert" xpos="8" ypos="9">
+        <exit type="ARROWS" label="376" />
+        <exit type="ARCH" label="370" />
+    </hex>
+    <hex label="376" terrain="Plains" xpos="9" ypos="9">
+        <exit type="ARROWS" label="377" />
+        <exit type="ARCH" label="402" />
+    </hex>
+    <hex label="377" terrain="Hills" xpos="9" ypos="8">
+        <exit type="ARROWS" label="378" />
+        <exit type="ARCH" label="368" />
+    </hex>
+    <hex label="378" terrain="Tombs" xpos="10" ypos="8">
+        <exit type="ARROWS" label="301" />
+        <exit type="ARCH" label="202" />
+    </hex>
+<!--  Rings -->
+    <hex label="401" terrain="Woods" xpos="11" ypos="9">
+        <exit type="ARROWS" label="402" />
+        <exit type="ARCH" label="301" />
+    </hex>
+    <hex label="402" terrain="Hellmouth" xpos="10" ypos="9">
+        <exit type="ARROWS" label="403" />
+        <exit type="BLOCK" label="376" />
+    </hex>
+    <hex label="403" terrain="Ruins" xpos="10" ypos="10">
+        <exit type="ARROWS" label="404" />
+        <exit type="ARCH" label="501" />
+    </hex>
+    <hex label="404" terrain="Mountains" xpos="11" ypos="10">
+        <exit type="ARROWS" label="405" />
+        <exit type="BLOCK" label="601" />
+    </hex>
+    <hex label="405" terrain="Marsh" xpos="12" ypos="10">
+        <exit type="ARROWS" label="406" />
+        <exit type="ARCH" label="502" />
+    </hex>
+    <hex label="406" terrain="Circle" xpos="12" ypos="9">
+        <exit type="ARROWS" label="401" />
+        <exit type="BLOCK" label="304" />
+    </hex>
+    <hex label="407" terrain="Hills" xpos="16" ypos="7">
+        <exit type="ARROWS" label="408" />
+        <exit type="ARCH" label="314" />
+    </hex>
+    <hex label="408" terrain="Hellmouth" xpos="16" ypos="8">
+        <exit type="ARROWS" label="409" />
+        <exit type="BLOCK" label="311" />
+    </hex>
+    <hex label="409" terrain="Tombs" xpos="17" ypos="8">
+        <exit type="ARROWS" label="410" />
+        <exit type="ARCH" label="503" />
+    </hex>
+    <hex label="410" terrain="Tundra" xpos="18" ypos="8">
+        <exit type="ARROWS" label="411" />
+        <exit type="BLOCK" label="656" />
+    </hex>
+    <hex label="411" terrain="Plains" xpos="18" ypos="7">
+        <exit type="ARROWS" label="412" />
+        <exit type="ARCH" label="504" />
+    </hex>
+    <hex label="412" terrain="Circle" xpos="17" ypos="7">
+        <exit type="ARROWS" label="407" />
+        <exit type="BLOCK" label="317" />
+    </hex>
+    <hex label="413" terrain="Woods" xpos="16" ypos="4">
+        <exit type="ARROWS" label="414" />
+        <exit type="ARCH" label="327" />
+    </hex>
+    <hex label="414" terrain="Hellmouth" xpos="17" ypos="4">
+        <exit type="ARROWS" label="415" />
+        <exit type="BLOCK" label="324" />
+    </hex>
+    <hex label="415" terrain="Ruins" xpos="18" ypos="4">
+        <exit type="ARROWS" label="416" />
+        <exit type="ARCH" label="505" />
+    </hex>
+    <hex label="416" terrain="Mountains" xpos="18" ypos="3">
+        <exit type="ARROWS" label="417" />
+        <exit type="BLOCK" label="645" />
+    </hex>
+    <hex label="417" terrain="Marsh" xpos="17" ypos="3">
+        <exit type="ARROWS" label="418" />
+        <exit type="ARCH" label="506" />
+    </hex>
+    <hex label="418" terrain="Circle" xpos="16" ypos="3">
+        <exit type="ARROWS" label="413" />
+        <exit type="BLOCK" label="330" />
+    </hex>
+    <hex label="419" terrain="Hills" xpos="11" ypos="2">
+        <exit type="ARROWS" label="420" />
+        <exit type="ARCH" label="340" />
+    </hex>
+    <hex label="420" terrain="Hellmouth" xpos="12" ypos="2">
+        <exit type="ARROWS" label="421" />
+        <exit type="BLOCK" label="337" />
+    </hex>
+    <hex label="421" terrain="Tombs" xpos="12" ypos="1">
+        <exit type="ARROWS" label="422" />
+        <exit type="ARCH" label="507" />
+    </hex>
+    <hex label="422" terrain="Tundra" xpos="11" ypos="1">
+        <exit type="ARROWS" label="423" />
+        <exit type="BLOCK" label="634" />
+    </hex>
+    <hex label="423" terrain="Plains" xpos="10" ypos="1">
+        <exit type="ARROWS" label="424" />
+        <exit type="ARCH" label="508" />
+    </hex>
+    <hex label="424" terrain="Circle" xpos="10" ypos="2">
+        <exit type="ARROWS" label="419" />
+        <exit type="BLOCK" label="343" />
+    </hex>
+    <hex label="425" terrain="Woods" xpos="6" ypos="4">
+        <exit type="ARROWS" label="426" />
+        <exit type="ARCH" label="353" />
+    </hex>
+    <hex label="426" terrain="Hellmouth" xpos="6" ypos="3">
+        <exit type="ARROWS" label="427" />
+        <exit type="BLOCK" label="350" />
+    </hex>
+    <hex label="427" terrain="Ruins" xpos="5" ypos="3">
+        <exit type="ARROWS" label="428" />
+        <exit type="ARCH" label="509" />
+    </hex>
+    <hex label="428" terrain="Mountains" xpos="4" ypos="3">
+        <exit type="ARROWS" label="429" />
+        <exit type="BLOCK" label="623" />
+    </hex>
+    <hex label="429" terrain="Marsh" xpos="4" ypos="4">
+        <exit type="ARROWS" label="430" />
+        <exit type="ARCH" label="510" />
+    </hex>
+    <hex label="430" terrain="Circle" xpos="5" ypos="4">
+        <exit type="ARROWS" label="425" />
+        <exit type="BLOCK" label="356" />
+    </hex>
+    <hex label="431" terrain="Hills" xpos="6" ypos="7">
+        <exit type="ARROWS" label="432" />
+        <exit type="ARCH" label="366" />
+    </hex>
+    <hex label="432" terrain="Hellmouth" xpos="5" ypos="7">
+        <exit type="ARROWS" label="433" />
+        <exit type="BLOCK" label="363" />
+    </hex>
+    <hex label="433" terrain="Tombs" xpos="4" ypos="7">
+        <exit type="ARROWS" label="434" />
+        <exit type="ARCH" label="511" />
+    </hex>
+    <hex label="434" terrain="Tundra" xpos="4" ypos="8">
+        <exit type="ARROWS" label="435" />
+        <exit type="BLOCK" label="612" />
+    </hex>
+    <hex label="435" terrain="Plains" xpos="5" ypos="8">
+        <exit type="ARROWS" label="436" />
+        <exit type="ARCH" label="512" />
+    </hex>
+    <hex label="436" terrain="Circle" xpos="6" ypos="8">
+        <exit type="ARROWS" label="431" />
+        <exit type="BLOCK" label="369" />
+    </hex>
+<!--  Towers -->
+    <hex label="501" terrain="Tower" xpos="9" ypos="10">
+        <exit type="ARROW" label="374" />
+        <exit type="ARROW" label="403" />
+        <exit type="ARROW" label="603" />
+    </hex>
+    <hex label="502" terrain="Tower" xpos="13" ypos="10">
+        <exit type="ARROW" label="405" />
+        <exit type="ARROW" label="306" />
+        <exit type="ARROW" label="665" />
+    </hex>
+    <hex label="503" terrain="Tower" xpos="17" ypos="9">
+        <exit type="ARROW" label="309" />
+        <exit type="ARROW" label="409" />
+        <exit type="ARROW" label="658" />
+    </hex>
+    <hex label="504" terrain="Tower" xpos="19" ypos="7">
+        <exit type="ARROW" label="411" />
+        <exit type="ARROW" label="319" />
+        <exit type="ARROW" label="654" />
+    </hex>
+    <hex label="505" terrain="Tower" xpos="19" ypos="4">
+        <exit type="ARROW" label="322" />
+        <exit type="ARROW" label="415" />
+        <exit type="ARROW" label="647" />
+    </hex>
+    <hex label="506" terrain="Tower" xpos="17" ypos="2">
+        <exit type="ARROW" label="417" />
+        <exit type="ARROW" label="332" />
+        <exit type="ARROW" label="643" />
+    </hex>
+    <hex label="507" terrain="Tower" xpos="13" ypos="1">
+        <exit type="ARROW" label="335" />
+        <exit type="ARROW" label="421" />
+        <exit type="ARROW" label="636" />
+    </hex>
+    <hex label="508" terrain="Tower" xpos="9" ypos="1">
+        <exit type="ARROW" label="423" />
+        <exit type="ARROW" label="345" />
+        <exit type="ARROW" label="632" />
+    </hex>
+    <hex label="509" terrain="Tower" xpos="5" ypos="2">
+        <exit type="ARROW" label="348" />
+        <exit type="ARROW" label="427" />
+        <exit type="ARROW" label="625" />
+    </hex>
+    <hex label="510" terrain="Tower" xpos="3" ypos="4">
+        <exit type="ARROW" label="429" />
+        <exit type="ARROW" label="358" />
+        <exit type="ARROW" label="621" />
+    </hex>
+    <hex label="511" terrain="Tower" xpos="3" ypos="7">
+        <exit type="ARROW" label="361" />
+        <exit type="ARROW" label="433" />
+        <exit type="ARROW" label="614" />
+    </hex>
+    <hex label="512" terrain="Tower" xpos="5" ypos="9">
+        <exit type="ARROW" label="435" />
+        <exit type="ARROW" label="371" />
+        <exit type="ARROW" label="610" />
+    </hex>
+<!--  Outer ring (Bus) -->
+    <hex label="601" terrain="Ruins" xpos="11" ypos="11">
+        <exit type="ARROWS" label="602" />
+        <exit type="ARCH" label="404" />
+    </hex>
+    <hex label="602" terrain="Tombs" xpos="10" ypos="11">
+        <exit type="ARROWS" label="603" />
+    </hex>
+    <hex label="603" terrain="Plains" xpos="9" ypos="11">
+        <exit type="ARROWS" label="604" />
+        <exit type="ARCH" label="501" />
+    </hex>
+    <hex label="604" terrain="Woods" xpos="8" ypos="11">
+        <exit type="ARROWS" label="605" />
+    </hex>
+    <hex label="605" terrain="Marsh" xpos="7" ypos="11">
+        <exit type="ARROWS" label="606" />
+        <exit type="ARCH" label="373" />
+    </hex>
+    <hex label="606" terrain="Hills" xpos="6" ypos="11">
+        <exit type="ARROWS" label="607" />
+    </hex>
+    <hex label="607" terrain="Tombs" xpos="5" ypos="11">
+        <exit type="ARROWS" label="608" />
+    </hex>
+    <hex label="608" terrain="Ruins" xpos="5" ypos="10">
+        <exit type="ARROWS" label="609" />
+        <exit type="ARCH" label="372" />
+    </hex>
+    <hex label="609" terrain="Desert" xpos="4" ypos="10">
+        <exit type="ARROWS" label="610" />
+    </hex>
+    <hex label="610" terrain="Marsh" xpos="4" ypos="9">
+        <exit type="ARROWS" label="611" />
+        <exit type="ARCH" label="512" />
+    </hex>
+    <hex label="611" terrain="Swamp" xpos="3" ypos="9">
+        <exit type="ARROWS" label="612" />
+    </hex>
+    <hex label="612" terrain="Tombs" xpos="3" ypos="8">
+        <exit type="ARROWS" label="613" />
+        <exit type="ARCH" label="434" />
+    </hex>
+    <hex label="613" terrain="Ruins" xpos="2" ypos="8">
+        <exit type="ARROWS" label="614" />
+    </hex>
+    <hex label="614" terrain="Marsh" xpos="2" ypos="7">
+        <exit type="ARROWS" label="615" />
+        <exit type="ARCH" label="511" />
+    </hex>
+    <hex label="615" terrain="Hills" xpos="1" ypos="7">
+        <exit type="ARROWS" label="616" />
+    </hex>
+    <hex label="616" terrain="Plains" xpos="1" ypos="6">
+        <exit type="ARROWS" label="617" />
+        <exit type="ARCH" label="360" />
+    </hex>
+    <hex label="617" terrain="Woods" xpos="0" ypos="6">
+        <exit type="ARROWS" label="618" />
+    </hex>
+    <hex label="618" terrain="Ruins" xpos="0" ypos="5">
+        <exit type="ARROWS" label="619" />
+    </hex>
+    <hex label="619" terrain="Tombs" xpos="1" ypos="5">
+        <exit type="ARROWS" label="620" />
+        <exit type="ARCH" label="359" />
+    </hex>
+    <hex label="620" terrain="Swamp" xpos="1" ypos="4">
+        <exit type="ARROWS" label="621" />
+    </hex>
+    <hex label="621" terrain="Plains" xpos="2" ypos="4">
+        <exit type="ARROWS" label="622" />
+        <exit type="ARCH" label="510" />
+    </hex>
+    <hex label="622" terrain="Desert" xpos="2" ypos="3">
+        <exit type="ARROWS" label="623" />
+    </hex>
+    <hex label="623" terrain="Ruins" xpos="3" ypos="3">
+        <exit type="ARROWS" label="624" />
+        <exit type="ARCH" label="428" />
+    </hex>
+    <hex label="624" terrain="Tombs" xpos="3" ypos="2">
+        <exit type="ARROWS" label="625" />
+    </hex>
+    <hex label="625" terrain="Plains" xpos="4" ypos="2">
+        <exit type="ARROWS" label="626" />
+        <exit type="ARCH" label="509" />
+    </hex>
+    <hex label="626" terrain="Woods" xpos="4" ypos="1">
+        <exit type="ARROWS" label="627" />
+    </hex>
+    <hex label="627" terrain="Marsh" xpos="5" ypos="1">
+        <exit type="ARROWS" label="628" />
+        <exit type="ARCH" label="347" />
+    </hex>
+    <hex label="628" terrain="Hills" xpos="5" ypos="0">
+        <exit type="ARROWS" label="629" />
+    </hex>
+    <hex label="629" terrain="Tombs" xpos="6" ypos="0">
+        <exit type="ARROWS" label="630" />
+    </hex>
+    <hex label="630" terrain="Ruins" xpos="7" ypos="0">
+        <exit type="ARROWS" label="631" />
+        <exit type="ARCH" label="346" />
+    </hex>
+    <hex label="631" terrain="Desert" xpos="8" ypos="0">
+        <exit type="ARROWS" label="632" />
+    </hex>
+    <hex label="632" terrain="Marsh" xpos="9" ypos="0">
+        <exit type="ARROWS" label="633" />
+        <exit type="ARCH" label="508" />
+    </hex>
+    <hex label="633" terrain="Swamp" xpos="10" ypos="0">
+        <exit type="ARROWS" label="634" />
+    </hex>
+    <hex label="634" terrain="Tombs" xpos="11" ypos="0">
+        <exit type="ARROWS" label="635" />
+        <exit type="ARCH" label="422" />
+    </hex>
+    <hex label="635" terrain="Ruins" xpos="12" ypos="0">
+        <exit type="ARROWS" label="636" />
+    </hex>
+    <hex label="636" terrain="Marsh" xpos="13" ypos="0">
+        <exit type="ARROWS" label="637" />
+        <exit type="ARCH" label="507" />
+    </hex>
+    <hex label="637" terrain="Hills" xpos="14" ypos="0">
+        <exit type="ARROWS" label="638" />
+    </hex>
+    <hex label="638" terrain="Plains" xpos="15" ypos="0">
+        <exit type="ARROWS" label="639" />
+        <exit type="ARCH" label="334" />
+    </hex>
+    <hex label="639" terrain="Woods" xpos="16" ypos="0">
+        <exit type="ARROWS" label="640" />
+    </hex>
+    <hex label="640" terrain="Ruins" xpos="17" ypos="0">
+        <exit type="ARROWS" label="641" />
+    </hex>
+    <hex label="641" terrain="Tombs" xpos="17" ypos="1">
+        <exit type="ARROWS" label="642" />
+        <exit type="ARCH" label="333" />
+    </hex>
+    <hex label="642" terrain="Swamp" xpos="18" ypos="1">
+        <exit type="ARROWS" label="643" />
+    </hex>
+    <hex label="643" terrain="Plains" xpos="18" ypos="2">
+        <exit type="ARROWS" label="644" />
+        <exit type="ARCH" label="506" />
+    </hex>
+    <hex label="644" terrain="Desert" xpos="19" ypos="2">
+        <exit type="ARROWS" label="645" />
+    </hex>
+    <hex label="645" terrain="Ruins" xpos="19" ypos="3">
+        <exit type="ARROWS" label="646" />
+        <exit type="ARCH" label="416" />
+    </hex>
+    <hex label="646" terrain="Tombs" xpos="20" ypos="3">
+        <exit type="ARROWS" label="647" />
+    </hex>
+    <hex label="647" terrain="Plains" xpos="20" ypos="4">
+        <exit type="ARROWS" label="648" />
+        <exit type="ARCH" label="505" />
+    </hex>
+    <hex label="648" terrain="Woods" xpos="21" ypos="4">
+        <exit type="ARROWS" label="649" />
+    </hex>
+    <hex label="649" terrain="Marsh" xpos="21" ypos="5">
+        <exit type="ARROWS" label="650" />
+        <exit type="ARCH" label="321" />
+    </hex>
+    <hex label="650" terrain="Hills" xpos="22" ypos="5">
+        <exit type="ARROWS" label="651" />
+    </hex>
+    <hex label="651" terrain="Tombs" xpos="22" ypos="6">
+        <exit type="ARROWS" label="652" />
+    </hex>
+    <hex label="652" terrain="Ruins" xpos="21" ypos="6">
+        <exit type="ARROWS" label="653" />
+        <exit type="ARCH" label="320" />
+    </hex>
+    <hex label="653" terrain="Desert" xpos="21" ypos="7">
+        <exit type="ARROWS" label="654" />
+    </hex>
+    <hex label="654" terrain="Marsh" xpos="20" ypos="7">
+        <exit type="ARROWS" label="655" />
+        <exit type="ARCH" label="504" />
+    </hex>
+    <hex label="655" terrain="Swamp" xpos="20" ypos="8">
+        <exit type="ARROWS" label="656" />
+    </hex>
+    <hex label="656" terrain="Tombs" xpos="19" ypos="8">
+        <exit type="ARROWS" label="657" />
+        <exit type="ARCH" label="410" />
+    </hex>
+    <hex label="657" terrain="Ruins" xpos="19" ypos="9">
+        <exit type="ARROWS" label="658" />
+    </hex>
+    <hex label="658" terrain="Marsh" xpos="18" ypos="9">
+        <exit type="ARROWS" label="659" />
+        <exit type="ARCH" label="503" />
+    </hex>
+    <hex label="659" terrain="Hills" xpos="18" ypos="10">
+        <exit type="ARROWS" label="660" />
+    </hex>
+    <hex label="660" terrain="Plains" xpos="17" ypos="10">
+        <exit type="ARROWS" label="661" />
+        <exit type="ARCH" label="308" />
+    </hex>
+    <hex label="661" terrain="Woods" xpos="17" ypos="11">
+        <exit type="ARROWS" label="662" />
+    </hex>
+    <hex label="662" terrain="Ruins" xpos="16" ypos="11">
+        <exit type="ARROWS" label="663" />
+    </hex>
+    <hex label="663" terrain="Tombs" xpos="15" ypos="11">
+        <exit type="ARROWS" label="664" />
+        <exit type="ARCH" label="307" />
+    </hex>
+    <hex label="664" terrain="Swamp" xpos="14" ypos="11">
+        <exit type="ARROWS" label="665" />
+    </hex>
+    <hex label="665" terrain="Plains" xpos="13" ypos="11">
+        <exit type="ARROWS" label="666" />
+        <exit type="ARCH" label="502" />
+    </hex>
+    <hex label="666" terrain="Desert" xpos="12" ypos="11">
+        <exit type="ARROWS" label="601" />
+    </hex>
+</board>

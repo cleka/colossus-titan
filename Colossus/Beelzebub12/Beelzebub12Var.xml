@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<variant name="Beelzebub12">
+<!--  Beelzebub12 - a variant by Chris Byler and Jay Delanoy -->
+    <creatures filename="Beelzebub12Cre.xml" />
+    <strategic_map filename="Beelzebub12Map.xml" />
+    <terrain_recruits filename="BeelzebubTer.xml" />
+    <hint classname="Beelzebub12.Beelzebub12Hint" />
+    <depends>
+        <depend variant="Beelzebub" />
+    </depends>
+    <max_players num="12" />
+</variant>
