@@ -69,8 +69,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         int i = 0;
         while (it.hasNext())
         {
-            JPanel vertPane = new JPanel();
-            vertPane.setLayout(new BoxLayout(vertPane, BoxLayout.Y_AXIS));
+            Box vertPane = new Box(BoxLayout.Y_AXIS);
             vertPane.setAlignmentY(0);
             recruitPane.add(vertPane);
 

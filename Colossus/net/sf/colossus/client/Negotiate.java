@@ -87,8 +87,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 
     private void showLegion(String markerId, java.util.List chits)
     {
-        JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
+        Box pane = new Box(BoxLayout.X_AXIS);
         pane.setAlignmentX(0);
         getContentPane().add(pane);
 

@@ -16,7 +16,7 @@ import net.sf.colossus.util.HTMLColor;
  */
 
 
-final class BattleDice extends JPanel
+final class BattleDice extends Box
 {
     private String strikerDesc = "";
     private String targetDesc = "";
@@ -33,8 +33,8 @@ final class BattleDice extends JPanel
 
     BattleDice()
     {
+        super(BoxLayout.Y_AXIS);
         setVisible(false);
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(Color.lightGray);
 
         diceBox = new JPanel();

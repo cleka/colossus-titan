@@ -87,8 +87,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
     private void showLegion(String markerId)
     {
-        JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
+        Box pane = new Box(BoxLayout.X_AXIS);
         pane.setAlignmentX(0);
         getContentPane().add(pane);
 

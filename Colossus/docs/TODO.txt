@@ -127,7 +127,6 @@ Add movement and recruit animation.  Requires returning full paths for
 
 JDK 1.4 changes:
    JSpinner
-   Boxes, not JPanels with BoxLayouts
    New focus model
    JProgressBar setIndeterminate()
    JFormattedTextField for some inputs?

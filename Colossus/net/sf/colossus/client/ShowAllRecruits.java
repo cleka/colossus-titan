@@ -67,8 +67,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
 
     void doOneTerrain(String terrain, String hexLabel)
     {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        Box panel = new Box(BoxLayout.Y_AXIS);
         panel.setAlignmentY(0);
         panel.setBorder(BorderFactory.createLineBorder(Color.black));
         panel.setBackground(TerrainRecruitLoader.getTerrainColor(terrain));

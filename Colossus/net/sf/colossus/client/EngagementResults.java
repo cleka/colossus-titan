@@ -158,8 +158,7 @@ final class EngagementResults extends KDialog implements ActionListener,
             " contents of " + markerId);
         contentPane.add(label);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        Box panel = new Box(BoxLayout.X_AXIS);
         contentPane.add(panel);
 
         int scale = 4 * Scale.get();

@@ -61,9 +61,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         setBackground(Color.lightGray);
         pack();
 
-        Container mainPane = new JPanel();
-        BoxLayout baseLayout = new BoxLayout(mainPane, BoxLayout.Y_AXIS);
-        mainPane.setLayout(baseLayout);
+        Container mainPane = new Box(BoxLayout.Y_AXIS);
 
         JScrollPane mainScrollPane = new JScrollPane(mainPane, 
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -86,11 +84,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
             Log.error(ex.toString());
         }
 
-        JPanel allPlayersPane = new JPanel();
+        Box allPlayersPane = new Box(BoxLayout.Y_AXIS);
         allPlayersPane.setBorder(new TitledBorder("Players"));
-        BoxLayout allPlayersLayout = new BoxLayout(allPlayersPane, 
-            BoxLayout.Y_AXIS);
-        allPlayersPane.setLayout(allPlayersLayout);
         mainPane.add(allPlayersPane);
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {

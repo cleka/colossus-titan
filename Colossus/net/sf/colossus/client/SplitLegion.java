@@ -32,11 +32,9 @@ final class SplitLegion extends KDialog implements MouseListener,
     /** new marker id,creature1,creature2... */
     private static String results;
 
-    // XXX Using Boxes here caused invisible chits in 1.3.1 but worked
-    // in 1.4.0.  JPanels with BoxLayouts work.
-    private JPanel oldBox;
-    private JPanel newBox;
-    private JPanel buttonBox;
+    private Box oldBox;
+    private Box newBox;
+    private Box buttonBox;
 
     private JButton button1;
     private JButton button2;
@@ -70,16 +68,13 @@ final class SplitLegion extends KDialog implements MouseListener,
         scale = 4 * Scale.get();
 
 
-        oldBox = new JPanel();
-        oldBox.setLayout(new BoxLayout(oldBox, BoxLayout.X_AXIS));
+        oldBox = new Box(BoxLayout.X_AXIS);
         contentPane.add(oldBox);
 
-        newBox = new JPanel();
-        newBox.setLayout(new BoxLayout(newBox, BoxLayout.X_AXIS));
+        newBox = new Box(BoxLayout.X_AXIS);
         contentPane.add(newBox);
 
-        buttonBox = new JPanel();
-        buttonBox.setLayout(new BoxLayout(buttonBox, BoxLayout.X_AXIS));
+        buttonBox = new Box(BoxLayout.X_AXIS);
         contentPane.add(buttonBox);
 
 
