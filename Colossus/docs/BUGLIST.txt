@@ -111,3 +111,37 @@ AI does not recruit post-battle reinforcements.
 
 AI defender in battle left reinforcement cyclops off board, when it 
    had room to enter.
+
+Battle AI needs to attack enemy titans more.
+
+Attacking AI guardian stayed 2 hexes away from defending angel for
+   several turns and took time loss.  If it had approached angel,
+   would have probably been a mutual instead.
+Considered 26 moves for Angel in D2: D2 E2 F2 C1 D1 B1 E1 F3 C2 F1 A1 B2 F4 A3 A2 B4 E5 B3 C5 D6 D3 E3 E4 C3 D5 C4
+perfect score is : 0
+Done with battleMove
+Battle phase advances to Fight
+Battle phase advances to Strikeback
+Gold's battle turn, number 7
+Battle phase advances to Move
+Called battleMove()
+Found 18 moves for Guardian in Plains hex D4
+EVAL Guardian move to Plains hex D5 = -20
+EVAL Guardian stay in Plains hex D4 = -15
+EVAL Guardian move to Plains hex D3 = -269
+EVAL Guardian move to Plains hex B4 = -25
+EVAL Guardian move to Plains hex E5 = -25
+EVAL Guardian move to Plains hex B3 = -20
+EVAL Guardian move to Plains hex E4 = -20
+EVAL Guardian move to Plains hex B2 = -15
+EVAL Guardian move to Plains hex E3 = -15
+EVAL Guardian move to Plains hex E2 = -269
+EVAL Guardian move to Plains hex C5 = -25
+EVAL Guardian move to Plains hex C4 = -20
+EVAL Guardian move to Plains hex C3 = -15
+EVAL Guardian move to Plains hex F4 = -25
+EVAL Guardian move to Plains hex C2 = -269
+EVAL Guardian move to Plains hex F3 = -20
+EVAL Guardian move to Plains hex F2 = -15
+EVAL Guardian move to Plains hex D6 = -25
+Considered 18 moves for Guardian in D4: D4 B2 E3 C3 F2 D5 B3 E4 C4 F3 B4 E5 C5 F4 D6 D3 E2 C2

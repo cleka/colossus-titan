@@ -2835,7 +2835,8 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         return buf.toString();
     }
 
-    // TODO Pull out all the constants for easier tuning.
+
+    // TODO Account for buddies.
     private static int evaluateCritterMove(Battle battle, Critter critter)
     {
         final char terrain = battle.getTerrain();
@@ -2846,6 +2847,30 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         final BattleHex hex = critter.getCurrentHex();
         final int turn = battle.getTurnNumber();
 
+        // Weight constants.
+        final int OFFBOARD_DEATH_SCALE_FACTOR = -10;
+        final int NATIVE_BONUS_TERRAIN = 5;
+        final int NATIVE_BOG = 2;
+        final int NON_NATIVE_PENALTY_TERRAIN = -10;
+        final int FIRST_RANGESTRIKE_TARGET = 30;
+        final int EXTRA_RANGESTRIKE_TARGET = 10;
+        final int RANGESTRIKE_TITAN = 10;
+        final int RANGESTRIKE_WITHOUT_PENALTY = 10;
+        final int ATTACKER_ADJACENT_TO_ENEMY = 40;
+        final int DEFENDER_ADJACENT_TO_ENEMY = -2;
+        final int ADJACENT_TO_TITAN = 50;
+        final int ADJACENT_TO_RANGESTRIKER = 50;
+        final int KILL_SCALE_FACTOR = 8;
+        final int KILLABLE_TARGETS_SCALE_FACTOR = 1;
+        final int GET_KILLED_SCALE_FACTOR = -20;
+        final int GET_HIT_SCALE_FACTOR = -6;
+        final int TITAN_TOWER_HEIGHT_BONUS = 100;
+        final int TITAN_FORWARD_EARLY_PENALTY = -30;
+        final int TITAN_BY_EDGE_OR_TREE_BONUS = 40;
+        final int DEFENDER_TOWER_HEIGHT_BONUS = 8;
+        final int DEFENDER_FORWARD_EARLY_PENALTY = -6;
+        final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -5;
+
         int value = 0;
 
         // Add for sitting in favorable terrain.
@@ -2853,28 +2878,28 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         if (hex.isEntrance())
         {
             // Staying offboard to die is really bad.
-            value -= 10 * getCombatValue(critter, terrain);
+            value += OFFBOARD_DEATH_SCALE_FACTOR *
+                getCombatValue(critter, terrain);
         }
         else if (MasterHex.isNativeCombatBonus(critter, terrain))
         {
             if (hex.isNativeBonusTerrain())
             {
-                value += 5;
+                value += NATIVE_BONUS_TERRAIN;
             }
-            // Hack: We want marsh natives to slightly prefer
-            // moving to bog hexes, even though there's no
-            // real bonus there, to leave other hexes clear
-            // for non-native allies.
+            // We want marsh natives to slightly prefer moving to bog hexes,
+            // even though there's no real bonus there, to leave other hexes
+            // clear for non-native allies.
             else if (hex.getTerrain() == 'o')
             {
-                value += 2;
+                value += NATIVE_BOG;
             }
         }
-        else
+        else  // Critter is not native.
         {
             if (hex.isNonNativePenaltyTerrain())
             {
-                value -= 10;
+                value += NON_NATIVE_PENALTY_TERRAIN;
             }
         }
 
@@ -2889,20 +2914,20 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
             if (!critter.isInContact(true))
             {
                 // Rangestrikes.
-                value += 30;
+                value += FIRST_RANGESTRIKE_TARGET;
 
                 // Having multiple targets is good, in case someone else
                 // kills one.
                 if (numTargets >= 2)
                 {
-                    value += 10;
+                    value += EXTRA_RANGESTRIKE_TARGET;
                 }
 
                 // Non-warlock skill 4 rangestrikers should slightly prefer
                 // range 3 to range 4.  Non-brush rangestrikers should
                 // prefer strikes not through bramble.  Warlocks should
                 // try to rangestrike titans.
-                boolean bonus = false;
+                boolean penalty = true;
                 Iterator it = targetHexLabels.iterator();
                 while (it.hasNext())
                 {
@@ -2910,18 +2935,17 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
                     Critter target = battle.getCritter(hexLabel);
                     if (target.isTitan())
                     {
-                        value += 10;
+                        value += RANGESTRIKE_TITAN;
                     }
                     int strikeNum = critter.getStrikeNumber(target);
-                    if (strikeNum == 4 - skill + target.getSkill())
+                    if (strikeNum <= 4 - skill + target.getSkill())
                     {
-                        // No penality.
-                        bonus = true;
+                        penalty = false;
                     }
                 }
-                if (bonus)
+                if (!penalty)
                 {
-                    value += 10;
+                    value += RANGESTRIKE_WITHOUT_PENALTY;
                 }
             }
             else
@@ -2932,12 +2956,12 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
                 // Reward being adjacent to an enemy if attacking.
                 if (legion == battle.getAttacker())
                 {
-                    value += 40;
+                    value += ATTACKER_ADJACENT_TO_ENEMY;
                 }
                 // Slightly penalize being adjacent to an enemy if defending.
                 else
                 {
-                    value -= 2;
+                    value += DEFENDER_ADJACENT_TO_ENEMY;
                 }
 
                 int killValue = 0;
@@ -2953,14 +2977,14 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
                     // Reward being next to enemy titans.  (Banzai!)
                     if (target.isTitan())
                     {
-                        value += 50;
+                        value += ADJACENT_TO_TITAN;
                     }
 
                     // Reward being next to a rangestriker, so it can't hang
                     // back and plink us.
                     if (target.isRangestriker() && !critter.isRangestriker())
                     {
-                        value += 50;
+                        value += ADJACENT_TO_RANGESTRIKER;
                     }
 
                     // Reward being next to an enemy that we can probably
@@ -2981,29 +3005,23 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
                     hitsExpected += Probs.meanHits(dice, strikeNum);
                 }
 
-                value += 8 * killValue + numKillableTargets;
+                value += KILL_SCALE_FACTOR * killValue +
+                    KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets;
 
                 int power = critter.getPower();
                 int hits = critter.getHits();
                 if (hitsExpected + hits >= power)
                 {
-                    value -= 20 * getKillValue(critter, terrain);
+                    value += GET_KILLED_SCALE_FACTOR *
+                        getKillValue(critter, terrain);
                 }
                 else
                 {
-                    value -= 6 * getKillValue(critter, terrain) *
-                        hitsExpected / power;
+                    value += GET_HIT_SCALE_FACTOR *
+                        getKillValue(critter, terrain) * hitsExpected / power;
                 }
             }
         }
-
-        // Reward adjacent friendly creatures.
-        // XXX Completely broken.  We need to better simulate the game
-        // state so that allied moves count and aren't so order-dependent.
-
-        int buddies = critter.numAdjacentAllies();
-
-        value += 15 * buddies;
 
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
             legion);
@@ -3014,24 +3032,23 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         // don't just sit back and wait for a time loss.
         if (critter.isTitan())
         {
-            value += 40 * buddies;
-
             if (terrain == 'T')
             {
                 // Stick to the center of the tower.
-                value += 100 * hex.getElevation();
+                value += TITAN_TOWER_HEIGHT_BONUS * hex.getElevation();
             }
             else
             {
                 if (turn <= 4)
                 {
-                    value -= 30 * battle.getRange(hex, entrance, true);
+                    value += TITAN_FORWARD_EARLY_PENALTY *
+                        battle.getRange(hex, entrance, true);
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
                         if (neighbor == null || neighbor.getTerrain() == 't')
                         {
-                            value += 40;
+                            value += TITAN_BY_EDGE_OR_TREE_BONUS;
                         }
                     }
                 }
@@ -3045,7 +3062,7 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
             if (terrain == 'T')
             {
                 // Stick to the center of the tower.
-                value += 8 * hex.getElevation();
+                value += DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation();
             }
             else
             {
@@ -3062,14 +3079,17 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
                 }
                 if (range != preferredRange)
                 {
-                    value -= 6 * Math.abs(range - preferredRange);
+                    value += DEFENDER_FORWARD_EARLY_PENALTY *
+                        Math.abs(range - preferredRange);
                 }
             }
         }
+
         else  // Attacker, non-titan
         {
-            // Head for enemy creatures, not board edges.
-            value -= 5 * battle.minRangeToEnemy(critter);
+            // Head for enemy creatures.
+            value += ATTACKER_DISTANCE_FROM_ENEMY_PENALTY *
+                battle.minRangeToEnemy(critter);
         }
 
         Log.debug("EVAL " + critter.getName() +
