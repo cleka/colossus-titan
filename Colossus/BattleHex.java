@@ -64,7 +64,7 @@ class Hex
         p = new Polygon(xVertex, yVertex, 6);
         // Add 1 to width and height because Java rectangles come up
         // one pixel short.
-        rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] - 
+        rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] -
                         xVertex[5] + 1, yVertex[3] - yVertex[0] + 1);
 
         for (int i = 0; i < 6; i++)
@@ -73,7 +73,7 @@ class Hex
         }
     }
 
-    
+
     void rescale(int cx, int cy, int scale)
     {
         xVertex[0] = cx;
@@ -106,18 +106,27 @@ class Hex
     {
         if (selected)
         {
-            g.setColor(java.awt.Color.red);
-            g.fillPolygon(p);
-            g.setColor(java.awt.Color.black);
-            g.drawPolygon(p);
+            g.setColor(java.awt.Color.white);
         }
         else
         {
-            g.setColor(java.awt.Color.white);
-            g.fillPolygon(p);
-            g.setColor(java.awt.Color.black);
-            g.drawPolygon(p);
+            g.setColor(getTerrainColor());
         }
+
+        g.fillPolygon(p);
+        g.setColor(java.awt.Color.black);
+        g.drawPolygon(p);
+
+        FontMetrics fontMetrics = g.getFontMetrics();
+        String name = getTerrainName();
+        int fontHeight = fontMetrics.getMaxAscent() +
+            fontMetrics.getLeading();
+
+        g.drawString(name, rectBound.x + (rectBound.width -
+            fontMetrics.stringWidth(name)) / 2,
+            rectBound.y + (fontMetrics.getHeight() + rectBound.height) / 2);
+
+        // XXX: Draw hexside features.
     }
 
 
@@ -142,7 +151,7 @@ class Hex
     {
         selected = true;
     }
-    
+
     void unselect()
     {
         selected = false;
@@ -163,7 +172,7 @@ class Hex
 
     Point getCenter()
     {
-        return new Point((xVertex[0] + xVertex[3]) / 2, 
+        return new Point((xVertex[0] + xVertex[3]) / 2,
             (yVertex[0] + yVertex[3]) / 2);
     }
 
@@ -201,8 +210,8 @@ class Hex
             alignChits();
         }
     }
-    
-    
+
+
     void removeChit(int i)
     {
         if (i >= 0 && i < numChits)
@@ -294,6 +303,69 @@ class Hex
         return terrain;
     }
 
+    String getTerrainName()
+    {
+        switch (terrain)
+        {
+            case 'p':
+                switch (elevation)
+                {
+                    case 0:
+                        return "PLAINS";
+                    case 1:
+                        return "PLAINS (1)";
+                    case 2:
+                        return "PLAINS (2)";
+                }
+            case 'r':
+                return "BRAMBLE";
+            case 's':
+                return "SAND";
+            case 't':
+                return "TREE";
+            case 'o':
+                return "BOG";
+            case 'v':
+                return "VOLCANO";
+            case 'd':
+                return "DRIFT";
+            default:
+                return "?????";
+        }
+
+    }
+
+    Color getTerrainColor()
+    {
+        switch (terrain)
+        {
+            case 'p':  // plain
+                switch (elevation)
+                {
+                    case 0:
+                        return java.awt.Color.yellow;
+                    case 1:
+                        return new Color(200, 200, 0);
+                    case 2:
+                        return new Color(150, 150, 0);
+                }
+            case 'r':  // bramble
+                return java.awt.Color.green;
+            case 's':  // sand
+                return java.awt.Color.orange;
+            case 't':  // tree
+                return new Color(180, 90, 0);
+            case 'o':  // bog
+                return java.awt.Color.gray;
+            case 'v':  // volcano
+                return java.awt.Color.red;
+            case 'd':  // drift
+                return java.awt.Color.blue;
+            default:
+                return java.awt.Color.black;
+        }
+    }
+
 
     void setHexside(int i, char hexside)
     {
@@ -353,8 +425,8 @@ class Hex
     {
         return xCoord;
     }
-    
-    
+
+
     int getYCoord()
     {
         return yCoord;
@@ -383,11 +455,11 @@ class Hex
         }
 
         // Check for a slowing hexside.
-        if ((hexside == 'w' || (hexside == 's' && !creature.isNativeSlope())) 
-            && !creature.flies() && 
+        if ((hexside == 'w' || (hexside == 's' && !creature.isNativeSlope()))
+            && !creature.flies() &&
             elevation > getNeighbor(cameFrom).getElevation())
         {
-            // All hexes where this applies happen to have no 
+            // All hexes where this applies happen to have no
             // additional movement costs.
             return 2;
         }
