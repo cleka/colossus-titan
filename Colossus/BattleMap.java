@@ -150,7 +150,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = 0; i < chits.length; i++)
         {
-            tracker.addImage(chits[i].image, 0);
+            tracker.addImage(chits[i].getImage(), 0);
         }
 
         try
