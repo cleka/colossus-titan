@@ -16,18 +16,6 @@
          <jar href="Colossus.jar"/>
          <jar href="libs/werken.opt.jar"/>
          <jar href="libs/jdom.jar"/>
-         <jar href="libs/batik-awt-util.jar"/>
-         <jar href="libs/batik-bridge.jar"/>
-         <jar href="libs/batik-css.jar"/>
-         <jar href="libs/batik-dom.jar"/>
-         <jar href="libs/batik-ext.jar"/>
-         <jar href="libs/batik-gvt.jar"/>
-         <jar href="libs/batik-parser.jar"/>
-         <jar href="libs/batik-script.jar"/>
-         <jar href="libs/batik-svg-dom.jar"/>
-         <jar href="libs/batik-transcoder.jar"/>
-         <jar href="libs/batik-util.jar"/>
-         <jar href="libs/batik-xml.jar"/>
          <j2se version="1.4+" max-heap-size="128M"/>
        </resources>
        <security>
