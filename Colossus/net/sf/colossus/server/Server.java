@@ -336,7 +336,7 @@ public final class Server implements IServer
             Log.error(getPlayerName() +
                     " illegally called doneWithBattleMoves()");
             getClient(getPlayerName()).nak(Constants.doneWithBattleMoves,
-                    "illegal attempt to end phase");
+                    "Illegal attempt to end phase");
             return;
         }
         Battle battle = game.getBattle();
@@ -350,17 +350,17 @@ public final class Server implements IServer
         {
             Log.error(getPlayerName() + " illegally called doneWithStrikes()");
             getClient(getPlayerName()).nak(Constants.doneWithStrikes,
-                    "wrong player");
+                    "Wrong player");
         }
         else if (battle.getPhase() < Constants.FIGHT)
         {
             getClient(getPlayerName()).nak(Constants.doneWithStrikes,
-                    "wrong phase");
+                    "Wrong phase");
         }
         else if (!battle.doneWithStrikes())
         {
             getClient(getPlayerName()).nak(Constants.doneWithStrikes,
-                    "forced strikes remain");
+                    "Forced strikes remain");
         }
     }
 
@@ -672,7 +672,7 @@ public final class Server implements IServer
         if (!getPlayerName().equals(legion.getPlayerName()))
         {
             Log.error(getPlayerName() + " illegally called doRecruit()");
-            client.nak(Constants.doRecruit, "wrong player");
+            client.nak(Constants.doRecruit, "Wrong player");
             return;
         }
 
@@ -877,14 +877,14 @@ public final class Server implements IServer
         if (!isBattleActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doBattleMove()");
-            client.nak(Constants.doBattleMove, "wrong player");
+            client.nak(Constants.doBattleMove, "Wrong player");
             return;
         }
         boolean moved = game.getBattle().doMove(tag, hexLabel);
         if (!moved)
         {
             Log.error("Battle move failed");
-            client.nak(Constants.doBattleMove, "illegal move");
+            client.nak(Constants.doBattleMove, "Illegal move");
         }
     }
 
@@ -905,48 +905,48 @@ public final class Server implements IServer
         if (!isBattleActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called strike()");
-            client.nak(Constants.strike, "wrong player");
+            client.nak(Constants.strike, "Wrong player");
             return;
         }
         Battle battle = game.getBattle();
         if (battle == null)
         {
             Log.error("null battle in Server.strike()");
-            client.nak(Constants.strike, "no battle");
+            client.nak(Constants.strike, "No battle");
             return;
         }
         Legion legion = battle.getActiveLegion();
         if (legion == null)
         {
             Log.error("null active legion in Server.strike()");
-            client.nak(Constants.strike, "no active legion");
+            client.nak(Constants.strike, "No active legion");
             return;
         }
         Critter critter = legion.getCritterByTag(tag);
         if (critter == null)
         {
             Log.error("No critter with tag " + tag + " in Server.strike()");
-            client.nak(Constants.strike, "no critter with that tag");
+            client.nak(Constants.strike, "No critter with that tag");
             return;
         }
         Critter target = battle.getCritter(hexLabel);
         if (target == null)
         {
             Log.error("No target in hex " + hexLabel + " in Server.strike()");
-            client.nak(Constants.strike, "no target in that hex");
+            client.nak(Constants.strike, "No target in that hex");
             return;
         }
         if (target.getPlayer() == critter.getPlayer())
         {
             Log.error(critter.getDescription() + " tried to strike allied " +
                 target.getDescription());
-            client.nak(Constants.strike, "target is friendly");
+            client.nak(Constants.strike, "Target is friendly");
             return;
         }
         if (critter.hasStruck())
         {
             Log.error(critter.getDescription() + " tried to strike twice");
-            client.nak(Constants.strike, "critter already struck");
+            client.nak(Constants.strike, "Critter already struck");
             return;
         }
         critter.strike(target);
@@ -1063,14 +1063,14 @@ public final class Server implements IServer
             Log.error(getPlayerName() +
                     " illegally called assignStrikePenalty()");
             getClient(getPlayerName()).nak(Constants.assignStrikePenalty,
-                    "wrong player");
+                    "Wrong player");
         } 
         else if (striker.hasStruck())
         {
             Log.error(getPlayerName() +
                     " assignStrikePenalty -- already struck");
             getClient(getPlayerName()).nak(Constants.assignStrikePenalty,
-                    "critter already struck");
+                    "Critter already struck");
         }
         else
         {
@@ -1170,13 +1170,13 @@ public final class Server implements IServer
         {
             Log.error(getPlayerName() + " illegally called doneWithSplits()");
             getClient(getPlayerName()).nak(Constants.doneWithSplits,
-                    "wrong player");
+                    "Wrong player");
         }
         else if (game.getTurnNumber() == 1 &&
                 game.getActivePlayer().getNumLegions() == 1)
         {
             getClient(getPlayerName()).nak(Constants.doneWithSplits,
-                    "must split on first turn");
+                    "Must split on first turn");
         }
         else
         {
@@ -1191,7 +1191,7 @@ public final class Server implements IServer
         {
             Log.error(getPlayerName() + " illegally called doneWithMoves()");
             getClient(getPlayerName()).nak(Constants.doneWithMoves,
-                    "wrong player");
+                    "Wrong player");
         }
         // If any legion has a legal non-teleport move, then
         // the player must move at least one legion.
@@ -1200,7 +1200,7 @@ public final class Server implements IServer
         {
             Log.debug("At least one legion must move.");
             getClient(getPlayerName()).nak(Constants.doneWithMoves,
-                    "must move at least one legion");
+                    "Must move at least one legion");
         }
         // If legions share a hex and have a legal
         // non-teleport move, force one of them to take it.
@@ -1208,7 +1208,7 @@ public final class Server implements IServer
         {
             Log.debug("Split legions must be separated.");
             getClient(getPlayerName()).nak(Constants.doneWithMoves,
-                    "must separate split legions");
+                    "Must separate split legions");
         }
         // Otherwise, recombine all split legions still in
         // the same hex, and move on to the next phase.
@@ -1226,13 +1226,13 @@ public final class Server implements IServer
             Log.error(getPlayerName() +
                     " illegally called doneWithEngagements()");
             getClient(getPlayerName()).nak(Constants.doneWithEngagements,
-                    "wrong player");
+                    "Wrong player");
         }
         // Advance only if there are no unresolved engagements.
         else if (game.findEngagements().size() > 0)
         {
             getClient(getPlayerName()).nak(Constants.doneWithEngagements,
-                    "must resolve engagements");
+                    "Must resolve engagements");
         }
         else
         {
@@ -1247,7 +1247,7 @@ public final class Server implements IServer
             Log.error(getPlayerName() +
                     " illegally called doneWithRecruits()");
             getClient(getPlayerName()).nak(Constants.doneWithRecruits,
-                    "wrong player");
+                    "Wrong player");
         }
         else
         {
@@ -1319,13 +1319,13 @@ public final class Server implements IServer
         if (!isActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doSplit()");
-            client.nak(Constants.doSplit, "wrong player");
+            client.nak(Constants.doSplit, "Wrong player");
             return;
         }
         if (!game.doSplit(parentId, childId, results))
         {
             Log.error("split failed for " + parentId);
-            client.nak(Constants.doSplit, "illegal split");
+            client.nak(Constants.doSplit, "Illegal split");
         }
     }
 
@@ -1395,14 +1395,14 @@ public final class Server implements IServer
         if (!isActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doMove()");
-            client.nak(Constants.doMove, "wrong player");
+            client.nak(Constants.doMove, "Wrong player");
             return;
         }
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion == null)
         {
             Log.error("Legion not found");
-            client.nak(Constants.doMove, "no such legion");
+            client.nak(Constants.doMove, "No such legion");
             return;
         }
 
@@ -1416,7 +1416,7 @@ public final class Server implements IServer
         else
         {
             Log.error("Move failed");
-            client.nak(Constants.doMove, "illegal move");
+            client.nak(Constants.doMove, "Illegal move");
         }
     }
 
