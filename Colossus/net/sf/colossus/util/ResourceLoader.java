@@ -577,7 +577,7 @@ public final class ResourceLoader
         if (icon.getImageLoadStatus() != MediaTracker.COMPLETE)
         {
             System.err.println("Image loading failed (" +
-                               tempIcon.getImageLoadStatus() + ")");
+                               icon.getImageLoadStatus() + ")");
         }
     }
 
