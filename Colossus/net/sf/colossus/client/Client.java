@@ -1025,7 +1025,7 @@ public final class Client implements IClient
     }
 
 
-    String getPlayerName()
+    public String getPlayerName()
     {
         return playerName;
     }
@@ -2038,7 +2038,12 @@ public final class Client implements IClient
             case 0:
                 return null;
             case 1:
-                return (String)lords.get(0);
+                String lordName = (String)lords.get(0);
+                if (lordName.startsWith("Titan"))
+                {
+                    lordName = "Titan";
+                }
+                return lordName;
             default:
                 return PickLord.pickLord(board.getFrame(), lords);
         }
@@ -2063,7 +2068,7 @@ public final class Client implements IClient
             if (other != null && !playerName.equals(other.getPlayerName()) &&
                 info.hasTitan())
             {
-                lords.add("Titan");
+                lords.add(info.getTitanBasename());
             }
         }
 
@@ -2077,7 +2082,11 @@ public final class Client implements IClient
                 Creature creature = Creature.getCreatureByName(name);
                 if (creature != null && creature.isLord())
                 {
-                    if (!lords.contains(name))
+                    if (creature.isTitan())
+                    {
+                        lords.add(info.getTitanBasename());
+                    }
+                    else
                     {
                         lords.add(name);
                     }

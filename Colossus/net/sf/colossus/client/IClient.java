@@ -11,6 +11,9 @@ import java.util.*;
  */
 public interface IClient
 {
+    // Not in network protocol
+    public String getPlayerName();
+
     public void tellMovementRoll(int roll);
 
     public void setOption(String optname, String value);

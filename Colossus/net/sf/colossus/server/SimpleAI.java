@@ -2177,7 +2177,7 @@ public class SimpleAI implements AI
 
     static int getKillValue(Creature creature, char terrain)
     {
-        int val = creature.getPointValue();
+        int val = 2 * creature.getPointValue();
         if (creature.isFlier())
         {
             val++;

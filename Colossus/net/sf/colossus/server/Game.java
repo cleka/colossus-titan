@@ -40,6 +40,7 @@ public final class Game
     private boolean reinforcing;
     private boolean acquiring;
     private boolean pendingAdvancePhase;
+    private boolean loadingGame;
     private boolean gameOver;
     private Battle battle;
     private static Random random = new Random();
@@ -123,6 +124,7 @@ Log.debug("Called Game.initServer()");
         acquiring = false;
         pendingAdvancePhase = false;
         gameOver = false;
+        loadingGame = false;
     }
 
 
@@ -311,15 +313,31 @@ Log.debug("Called Game.newGame2()");
     }
 
 
-    int findOpenNetworkSlot()
+    /** Return the index of the correct player for a new remote client.
+     *  If loading a game, this is the network player with a matching
+     *  player name.  If a new game, it's the first network player whose
+     *  name is still set to <By client> */
+    int findNetworkSlot(final String playerName)
     {
         for (int i = 0; i < getNumPlayers(); i++)
         {
             Player player = (Player)players.get(i);
-            if (player.getType().endsWith(Constants.network) &&
-                player.getName().startsWith(Constants.byClient))
+            if (player.getType().endsWith(Constants.network))
             {
-                return i;
+                if (isLoadingGame())
+                {
+                   if (playerName.equals(player.getName()))
+                   {
+                       return i;
+                   }
+                }
+                else
+                {
+                   if (player.getName().startsWith(Constants.byClient))
+                   {
+                       return i;
+                   }
+                }
             }
         }
         return -1;
@@ -742,6 +760,12 @@ Log.debug("Called Game.newGame2()");
     }
 
 
+    boolean isLoadingGame()
+    {
+        return loadingGame;
+    }
+
+
     int getPhase()
     {
         return phase;
@@ -922,6 +946,8 @@ Log.debug("Called Game.newGame2()");
      *  JDK 1.3.x users to install a parser.
      *  Format:
      *     Savegame version string
+     *     Variant filename
+     *     Variant name
      *     Number of players
      *     Turn number
      *     Whose turn
@@ -930,6 +956,7 @@ Log.debug("Called Game.newGame2()");
 
      *     Player 1:
      *         Name
+     *         Type
      *         Color
      *         Starting tower
      *         Score
@@ -1193,6 +1220,7 @@ Log.debug("Called Game.newGame2()");
 
             // Reset flags that are not in the savegame file.
             clearFlags();
+            loadingGame = true;
             
             VariantSupport.loadVariant(in.readLine(), in.readLine());
 
@@ -1380,6 +1408,7 @@ Log.debug("Called Game.newGame2()");
             e.printStackTrace();
             dispose();
         }
+        loadingGame = false;
     }
 
     Legion readLegion(BufferedReader in, Player player,

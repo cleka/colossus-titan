@@ -4,6 +4,7 @@ package net.sf.colossus.server;
 import java.util.*;
 import java.net.*;
 import javax.swing.*;
+import java.io.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.IClient;
@@ -43,30 +44,84 @@ public final class Server implements IServer
     private int port;
 
     // Cached strike information.
-    Critter striker;
-    Critter target;
-    int strikeNumber;
-    int damage;
-    List rolls;
+    private Critter striker;
+    private Critter target;
+    private int strikeNumber;
+    private int damage;
+    private List rolls;
 
+    // Enforce color picking
+    private String colorPickingPlayerName;
+    private Set colorsLeft;
+
+    // Network stuff
+    private ServerSocket serverSocket;
+    private Socket [] clientSockets = new Socket[Constants.MAX_PLAYERS];
+    private int numClients;
+    private int maxClients;
 
 
     Server(Game game, int port)
     {
         this.game = game;
         this.port = port;
-        waitingForClients = game.getNumPlayers();
+        waitingForClients = game.getNumLivingPlayers();
     }
 
-    void initSocketServer() 
+    void initSocketServer()
     {
-        new SocketServer(this, port, game.getNumPlayers());
+        numClients = 0;
+        maxClients = game.getNumLivingPlayers();
+Log.debug("new SocketServer maxClients = " + maxClients);
+
+        try
+        {
+            serverSocket = new ServerSocket(port);
+        }
+        catch (IOException ex)
+        {
+            Log.error(ex.toString());
+            return;
+        }
+
+        addLocalClients();
+
+        while (numClients < maxClients)
+        {
+            waitForConnection();
+        }
     }
+
+
+    private void waitForConnection()
+    {
+        Socket clientSocket = null;
+        try
+        {
+            clientSocket = serverSocket.accept();
+Log.debug("Got client connection");
+            clientSockets[numClients] = clientSocket;
+            numClients++;
+        }
+        catch (IOException ex)
+        {
+            Log.error(ex.toString());
+            return;
+        }
+
+        new SocketServerThread(this, clientSocket).start();
+    }
+
 
     /** Each server thread's name is set to its player's name. */
     private String getPlayerName()
     {
         return Thread.currentThread().getName();
+    }
+
+    private Player getPlayer()
+    {
+        return game.getPlayer(getPlayerName());
     }
 
     private boolean isActivePlayer()
@@ -81,21 +136,21 @@ public final class Server implements IServer
     }
 
 
-    void addLocalClients()
+    private void addLocalClients()
     {
 Log.debug("Called Server.addLocalClients()");
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             Player player = game.getPlayer(i);
-            if (!player.getType().endsWith(Constants.network))
+            if (!player.isDead() &&
+                !player.getType().endsWith(Constants.network))
             {
                 addLocalClient(player.getName());
             }
         }
     }
 
-
-    void addLocalClient(String playerName)
+    private void addLocalClient(String playerName)
     {
 Log.debug("Called Server.addLocalClient() for " + playerName);
 
@@ -105,7 +160,7 @@ Log.debug("Called Server.addLocalClient() for " + playerName);
         clientMap.put(playerName, client);
         waitingForClients--;
 Log.debug("Decremented waitingForClients to " + waitingForClients);
-        if (waitingForClients <= 0)
+        if (waitingForClients <= 0 && !game.isLoadingGame())
         {
             game.newGame2();
         }
@@ -117,7 +172,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     {
 Log.debug("Called Server.addRemoteClient() for " + playerName);
 
-        int slot = game.findOpenNetworkSlot();
+        int slot = game.findNetworkSlot(playerName);
 Log.debug("Network slot " + slot);
         if (slot == -1)
         {
@@ -129,7 +184,12 @@ Log.debug("Network slot " + slot);
         clients.add(client);
         remoteClients.add(client);
 
-        String name = game.getUniqueName(playerName);
+        String name = playerName;
+        if (!game.isLoadingGame())
+        {
+            name = game.getUniqueName(playerName);
+        }
+
 Log.debug("Adding client with unique name " + name);
         clientMap.put(name, client);
 
@@ -139,7 +199,7 @@ Log.debug("Adding client with unique name " + name);
         setPlayerName(name, name);
         waitingForClients--;
 Log.debug("Decremented waitingForClients to " + waitingForClients);
-        if (waitingForClients <= 0)
+        if (waitingForClients <= 0 && !game.isLoadingGame())
         {
             game.newGame2();
         }
@@ -356,8 +416,11 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         {
             Player player = (Player)it.next();
             IClient client = getClient(player.getName());
-            client.setupSplit(player.getMarkersAvailable(),
-                game.getActivePlayerName(), game.getTurnNumber());
+            if (client != null)
+            {
+                client.setupSplit(player.getMarkersAvailable(),
+                    game.getActivePlayerName(), game.getTurnNumber());
+            }
         }
         allUpdatePlayerInfo();
     }
@@ -1156,8 +1219,6 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            IClient client = getClient(player.getName());
-
             Iterator it2 = player.getLegions().iterator();
             while (it2.hasNext())
             {
@@ -1217,18 +1278,29 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         clientMap.put(newName, client);
     }
 
-    void askPickColor(String playerName, Set colorsLeft)
+    void askPickColor(String playerName, final Set colorsLeft)
     {
+        this.colorsLeft = colorsLeft;
+        this.colorPickingPlayerName = playerName;
         IClient client = getClient(playerName);
-        client.askPickColor(colorsLeft);
+        if (client != null)
+        {
+            client.askPickColor(colorsLeft);
+        }
     }
 
     public void assignColor(String color)
     {
-        game.assignColor(getPlayerName(), color);
+        if (getPlayerName().equals(colorPickingPlayerName) &&
+            colorsLeft.contains(color) && getPlayer().getColor() == null)
+        {
+            game.assignColor(getPlayerName(), color);
+            colorPickingPlayerName = null;
+            colorsLeft = null;
+        }
     }
 
-    // XXX Hack to set color on load game.
+    /** Hack to set color on load game. */
     void allSetColor()
     {
         Iterator it = game.getPlayers().iterator();
@@ -1238,7 +1310,10 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
             String name = player.getName();
             String color = player.getColor();
             IClient client = getClient(name);
-            client.setColor(color);
+            if (client != null)
+            {
+                client.setColor(color);
+            }
         }
     }
 
@@ -1254,7 +1329,10 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     void oneSetOption(String playerName, String optname, String value)
     {
         IClient client = getClient(playerName);
-        client.setOption(optname, value);
+        if (client != null)
+        {
+            client.setOption(optname, value);
+        }
     }
 
     void oneSetOption(String playerName, String optname, boolean value)

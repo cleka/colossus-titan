@@ -300,6 +300,11 @@ final class SocketServerThread extends Thread implements IClient
 
     // IClient methods to sent requests to client over socket.
 
+    public String getPlayerName()
+    {
+        return playerName;
+    }
+
     public void tellMovementRoll(int roll)
     {
         out.println(Constants.tellMovementRoll + sep + roll);
