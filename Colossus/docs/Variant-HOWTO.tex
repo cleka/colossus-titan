@@ -1,0 +1,87 @@
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage{html}
+
+\begin{document}
+
+% $Header$
+
+\title{Colossus Variant HOWTO}
+
+\author{Romain Dolbeau}
+
+\maketitle
+
+\section{The Variant Pack}
+
+\subsection{How do I use a Variant Pack ?}
+
+Just use the ``Load External Variant'' button and open the
+\texttt{VAR} file inside the variant directory, then start a new
+game. That should be enough.
+
+Alternatively, some variants are now supplied in the
+standard distribution ; simply use the pop-up menu
+to select which variant to play (``Default'' is the
+Classic Titan ruleset).
+
+\subsection{What's in a Variant Pack ?}
+
+A Variant Pack should be a directory (Folder for
+MacOS user) containing:
+
+\begin{itemize}
+\item a \texttt{VAR} file, that describe the other files;
+\item a \texttt{CRE}, \texttt{TER} and \texttt{MAP} files that describe the variant;
+\item a ``Battlelands'' subdirectory that contain the new and/or changed Battlelands;
+\item an ``images'' subidirectory that contain the new and/or changed pictures.
+\end{itemize}
+
+The various files are described in details inside the \htmladdnormallink{Files Formats}{../FileFormat/index.html} document.
+
+\subsection{How do I create a Variant Pack ?}
+
+Well, there's no ``user-friendly'' way yet. The easiest way is
+to build the directory and copy the default files in it,
+then you can change them with any text editor. The contents
+of the files are described in ``docs/FileFormat/txt''. You can
+also use other Variants as examples.
+
+Warning: almost no sanity check is performed, and some
+combinations might give strange and/or unexpected result,
+particurly in Battlelands (slope next to a tree, or
+cliff between two bogs...). Also, ensuring consistency
+between the files is up to the Variant author.
+
+Battlelands can also be created using the graphical
+tool ``BattlelandsBuilder''. See inside the ``docs/datatools''
+directory for additional informations.
+
+There may be an easier (read: graphical) way later for
+\texttt{CRE}, \texttt{TER} and \texttt{MAP} files, but don't hold your breath, nobody
+is working on it (yet).
+
+\section{Frequently Asked Questions}
+
+\begin{enumerate}
+
+\item My creature won't load !
+\item My creature is displayed as a dull grey square !
+
+Creature's name (the first column of a \texttt{CRE} file) should not
+contain space or other non-alphabetical character (you
+can't use digits yet). So, don't create ``Killer Rabbit 2''
+but create ``KillerRabbitTwo'' instead.
+
+The creature's name is also used as the base name
+of the pictures. So a ``KillerRabbitTwo'' will use
+the file ``KillerRabbitTwo.gif'' in the subdirectory
+``images''.
+
+You should be able to re-use an existing name, as
+the ``images'' subdirectory is accessed before the default
+\texttt{GIF} files.
+
+\end{enumerate}
+
+\end{document}
