@@ -17,7 +17,7 @@ class PickMarker extends Dialog implements MouseListener
 
     PickMarker(Frame parentFrame, Player player)
     {
-        super(parentFrame, "Pick Legion Marker", true);
+        super(parentFrame, player.name + ": Pick Legion Marker", true);
         
         this.player = player;
         markers = new Chit[player.numMarkersAvailable];
@@ -27,7 +27,7 @@ class PickMarker extends Dialog implements MouseListener
 
         if (player.numMarkersAvailable == 0)
         {
-            System.out.println("No markers available");
+            new MessageBox(parentFrame, "No markers available");
         }
         else
         {
@@ -40,8 +40,8 @@ class PickMarker extends Dialog implements MouseListener
                 ((player.numMarkersAvailable - 1) / 12 + 2));
             
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
-                - getSize().height / 2));
+            setLocation(new Point(d.width / 2 - getSize().width / 2, 
+                d.height / 2 - getSize().height / 2));
 
             int cx = scale / 2;
             int cy = scale * 2 / 3;
@@ -67,7 +67,7 @@ class PickMarker extends Dialog implements MouseListener
             }
             catch (InterruptedException e)
             {
-                System.out.println("waitForAll was interrupted");
+                new MessageBox(parentFrame, "waitForAll was interrupted");
             }
         }
 
