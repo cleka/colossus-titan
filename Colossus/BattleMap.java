@@ -95,6 +95,8 @@ public class BattleMap extends JFrame implements MouseListener,
         preferredSize = new Dimension(30 * scale, 30 * scale);
         pack();
         setSize(preferredSize);
+        setIconImage(Toolkit.getDefaultToolkit().getImage(
+            Creature.colossus.getImageName()));
 
         setResizable(false);
         setBackground(java.awt.Color.white);
