@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<variant name="Badlands">
+    <terrain_recruits filename="BadlandsTer.xml" />
+    <strategic_map filename="BadlandsMap.xml" />
+    <creatures filename="DefaultCre.xml" />
+    <hint classname="Badlands.BadlandsHint" />
+</variant>
