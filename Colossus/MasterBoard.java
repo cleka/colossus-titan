@@ -7,7 +7,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-public class MasterBoard extends Frame implements MouseListener,
+class MasterBoard extends Frame implements MouseListener,
     MouseMotionListener, WindowListener
 {
     // There are a total of 96 hexes
@@ -148,7 +148,7 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j] && h[i][j].label == label)
+                if (show[i][j] && h[i][j].getLabel() == label)
                 {
                     return h[i][j];
                 }
@@ -222,16 +222,16 @@ public class MasterBoard extends Frame implements MouseListener,
 
         if (block >= 0)
         {
-            count += findMoves(hex.neighbor[block], player, legion, roll - 1, 
-                -2, (block + 3) % 6);
+            count += findMoves(hex.getNeighbor(block), player, legion, 
+                roll - 1, -2, (block + 3) % 6);
         }
         else if (block == -1)
         {
             for (int i = 0; i < 6; i++)
             {
-                if (hex.exitType[i] >= MasterHex.ARCH && i != cameFrom)
+                if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
                 {
-                    count += findMoves(hex.neighbor[i], player, legion, 
+                    count += findMoves(hex.getNeighbor(i), player, legion, 
                         roll - 1, -2, (i + 3) % 6);
                 }
             }
@@ -240,9 +240,9 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             for (int i = 0; i < 6; i++)
             {
-                if (hex.exitType[i] >= MasterHex.ARROW && i != cameFrom)
+                if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
                 {
-                    count += findMoves(hex.neighbor[i], player, legion, 
+                    count += findMoves(hex.getNeighbor(i), player, legion, 
                         roll - 1, -2, (i + 3) % 6);
                 }
             }
@@ -271,10 +271,10 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             for (int i = 0; i < 6; i++)
             {
-                if ((hex.exitType[i] != MasterHex.NONE ||
-                   hex.entranceType[i] != MasterHex.NONE) && (i != cameFrom))
+                if ((hex.getExitType(i) != MasterHex.NONE ||
+                   hex.getEntranceType(i) != MasterHex.NONE) && (i != cameFrom))
                 {
-                    findTowerTeleportMoves(hex.neighbor[i], player, legion, 
+                    findTowerTeleportMoves(hex.getNeighbor(i), player, legion, 
                         roll - 1, (i + 3) % 6);
                 }
             }
@@ -283,7 +283,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
 
     // Return number of legal non-teleport moves.
-    int showMoves(Legion legion, Player player)
+    int showMoves(Legion legion)
     {
         int count = 0;
 
@@ -302,12 +302,14 @@ public class MasterBoard extends Frame implements MouseListener,
         int block = -1;
         for (int j = 0; j < 6; j++)
         {
-            if (hex.exitType[j] == MasterHex.BLOCK)
+            if (hex.getExitType(j) == MasterHex.BLOCK)
             {
                 // Only this path is allowed. 
                 block = j;
             }
         }
+
+        Player player = legion.getPlayer();
 
         count += findMoves(hex, player, legion, player.getMovementRoll(), 
             block, -1);
@@ -315,7 +317,7 @@ public class MasterBoard extends Frame implements MouseListener,
         if (player.getMovementRoll() == 6)
         {
             // Tower teleport
-            if (hex.terrain == 'T' && legion.numLords() > 0)
+            if (hex.getTerrain() == 'T' && legion.numLords() > 0)
             {
                 // Mark every unoccupied hex within 6 hexes.
                 findTowerTeleportMoves(hex, player, legion, 6, -1);
@@ -470,473 +472,473 @@ public class MasterBoard extends Frame implements MouseListener,
 
 
         // Add terrain types, id labels, and exits to hexes.
-        h[0][3].terrain='S';
-        h[0][3].label=132;
-        h[0][3].exitType[1]=4;
-
-        h[0][4].terrain='P';
-        h[0][4].label=133;
-        h[0][4].exitType[0]=4;
-
-        h[1][2].terrain='B';
-        h[1][2].label=130;
-        h[1][2].exitType[1]=4;
-
-        h[1][3].terrain='M';
-        h[1][3].label=131;
-        h[1][3].exitType[0]=4;
-        h[1][3].exitType[2]=2;
-
-        h[1][4].terrain='B';
-        h[1][4].label=134;
-        h[1][4].exitType[1]=2;
-        h[1][4].exitType[5]=4;
-
-        h[1][5].terrain='J';
-        h[1][5].label=135;
-        h[1][5].exitType[0]=4;
-
-        h[2][1].terrain='D';
-        h[2][1].label=128;
-        h[2][1].exitType[1]=4;
-
-        h[2][2].terrain='P';
-        h[2][2].label=129;
-        h[2][2].exitType[0]=4;
-        h[2][2].exitType[2]=2;
-
-        h[2][3].terrain='H';
-        h[2][3].label=32;
-        h[2][3].exitType[3]=4;
-        h[2][3].exitType[5]=1;
-
-        h[2][4].terrain='J';
-        h[2][4].label=33;
-        h[2][4].exitType[2]=4;
-        h[2][4].exitType[4]=1;
-
-        h[2][5].terrain='M';
-        h[2][5].label=136;
-        h[2][5].exitType[1]=2;
-        h[2][5].exitType[5]=4;
-
-        h[2][6].terrain='B';
-        h[2][6].label=137;
-        h[2][6].exitType[0]=4;
-
-        h[3][0].terrain='M';
-        h[3][0].label=126;
-        h[3][0].exitType[1]=4;
-
-        h[3][1].terrain='B';
-        h[3][1].label=127;
-        h[3][1].exitType[0]=4;
-        h[3][1].exitType[2]=2;
-
-        h[3][2].terrain='T';
-        h[3][2].label=500;
-        h[3][2].exitType[1]=3;
-        h[3][2].exitType[3]=3;
-        h[3][2].exitType[5]=3;
-
-        h[3][3].terrain='B';
-        h[3][3].label=31;
-        h[3][3].exitType[0]=2;
-        h[3][3].exitType[4]=4;
-
-        h[3][4].terrain='P';
-        h[3][4].label=34;
-        h[3][4].exitType[1]=4;
-        h[3][4].exitType[3]=2;
-
-        h[3][5].terrain='T';
-        h[3][5].label=600;
-        h[3][5].exitType[0]=3;
-        h[3][5].exitType[2]=3;
-        h[3][5].exitType[4]=3;
-
-        h[3][6].terrain='P';
-        h[3][6].label=138;
-        h[3][6].exitType[1]=2;
-        h[3][6].exitType[5]=4;
-
-        h[3][7].terrain='D';
-        h[3][7].label=139;
-        h[3][7].exitType[0]=4;
-
-        h[4][0].terrain='J';
-        h[4][0].label=125;
-        h[4][0].exitType[2]=4;
-
-        h[4][1].terrain='J';
-        h[4][1].label=26;
-        h[4][1].exitType[3]=4;
-        h[4][1].exitType[5]=1;
-
-        h[4][2].terrain='M';
-        h[4][2].label=27;
-        h[4][2].exitType[2]=4;
-        h[4][2].exitType[4]=2;
-
-        h[4][3].terrain='W';
-        h[4][3].label=30;
-        h[4][3].exitType[3]=2;
-        h[4][3].exitType[5]=4;
-
-        h[4][4].terrain='D';
-        h[4][4].label=35;
-        h[4][4].exitType[0]=2;
-        h[4][4].exitType[2]=4;
-
-        h[4][5].terrain='B';
-        h[4][5].label=38;
-        h[4][5].exitType[3]=4;
-        h[4][5].exitType[5]=2;
-
-        h[4][6].terrain='W';
-        h[4][6].label=39;
-        h[4][6].exitType[2]=4;
-        h[4][6].exitType[4]=1;
-
-        h[4][7].terrain='M';
-        h[4][7].label=140;
-        h[4][7].exitType[5]=4;
-
-        h[5][0].terrain='P';
-        h[5][0].label=124;
-        h[5][0].exitType[1]=4;
-        h[5][0].exitType[3]=2;
-
-        h[5][1].terrain='W';
-        h[5][1].label=25;
-        h[5][1].exitType[0]=1;
-        h[5][1].exitType[4]=4;
-
-        h[5][2].terrain='S';
-        h[5][2].label=28;
-        h[5][2].exitType[1]=2;
-        h[5][2].exitType[3]=4;
-
-        h[5][3].terrain='P';
-        h[5][3].label=29;
-        h[5][3].exitType[2]=2;
-        h[5][3].exitType[4]=4;
-
-        h[5][4].terrain='M';
-        h[5][4].label=36;
-        h[5][4].exitType[1]=2;
-        h[5][4].exitType[3]=4;
-
-        h[5][5].terrain='H';
-        h[5][5].label=37;
-        h[5][5].exitType[2]=2;
-        h[5][5].exitType[4]=4;
-
-        h[5][6].terrain='J';
-        h[5][6].label=40;
-        h[5][6].exitType[1]=4;
-        h[5][6].exitType[3]=1;
-
-        h[5][7].terrain='B';
-        h[5][7].label=141;
-        h[5][7].exitType[0]=2;
-        h[5][7].exitType[4]=4;
-
-        h[6][0].terrain='B';
-        h[6][0].label=123;
-        h[6][0].exitType[2]=4;
-
-        h[6][1].terrain='B';
-        h[6][1].label=24;
-        h[6][1].exitType[1]=2;
-        h[6][1].exitType[5]=4;
-
-        h[6][2].terrain='H';
-        h[6][2].label=23;
-        h[6][2].exitType[0]=4;
-        h[6][2].exitType[4]=2;
-
-        h[6][3].terrain='m';
-        h[6][3].label=5000;
-        h[6][3].exitType[1]=3;
-        h[6][3].exitType[3]=3;
-        h[6][3].exitType[5]=1;
-
-        h[6][4].terrain='t';
-        h[6][4].label=6000;
-        h[6][4].exitType[0]=3;
-        h[6][4].exitType[2]=3;
-        h[6][4].exitType[4]=1;
-
-        h[6][5].terrain='S';
-        h[6][5].label=42;
-        h[6][5].exitType[1]=4;
-        h[6][5].exitType[5]=2;
-
-        h[6][6].terrain='M';
-        h[6][6].label=41;
-        h[6][6].exitType[0]=4;
-        h[6][6].exitType[2]=2;
-
-        h[6][7].terrain='S';
-        h[6][7].label=142;
-        h[6][7].exitType[5]=4;
-
-        h[7][0].terrain='M';
-        h[7][0].label=122;
-        h[7][0].exitType[1]=4;
-        h[7][0].exitType[3]=2;
-
-        h[7][1].terrain='T';
-        h[7][1].label=400;
-        h[7][1].exitType[0]=3;
-        h[7][1].exitType[2]=3;
-        h[7][1].exitType[4]=3;
-
-        h[7][2].terrain='M';
-        h[7][2].label=22;
-        h[7][2].exitType[3]=2;
-        h[7][2].exitType[5]=4;
-
-        h[7][3].terrain='t';
-        h[7][3].label=4000;
-        h[7][3].exitType[0]=1;
-        h[7][3].exitType[2]=3;
-        h[7][3].exitType[4]=3;
-
-        h[7][4].terrain='m';
-        h[7][4].label=1000;
-        h[7][4].exitType[1]=3;
-        h[7][4].exitType[3]=1;
-        h[7][4].exitType[5]=3;
-
-        h[7][5].terrain='P';
-        h[7][5].label=1;
-        h[7][5].exitType[0]=2;
-        h[7][5].exitType[2]=4;
-
-        h[7][6].terrain='T';
-        h[7][6].label=100;
-        h[7][6].exitType[1]=3;
-        h[7][6].exitType[3]=3;
-        h[7][6].exitType[5]=3;
-
-        h[7][7].terrain='P';
-        h[7][7].label=101;
-        h[7][7].exitType[0]=2;
-        h[7][7].exitType[4]=4;
-
-        h[8][0].terrain='S';
-        h[8][0].label=121;
-        h[8][0].exitType[2]=4;
-
-        h[8][1].terrain='P';
-        h[8][1].label=20;
-        h[8][1].exitType[3]=4;
-        h[8][1].exitType[5]=2;
-
-        h[8][2].terrain='D';
-        h[8][2].label=21;
-        h[8][2].exitType[2]=2;
-        h[8][2].exitType[4]=4;
-
-        h[8][3].terrain='m';
-        h[8][3].label=3000;
-        h[8][3].exitType[1]=1;
-        h[8][3].exitType[3]=3;
-        h[8][3].exitType[5]=3;
-
-        h[8][4].terrain='t';
-        h[8][4].label=2000;
-        h[8][4].exitType[0]=3;
-        h[8][4].exitType[2]=1;
-        h[8][4].exitType[4]=3;
-
-        h[8][5].terrain='W';
-        h[8][5].label=2;
-        h[8][5].exitType[1]=2;
-        h[8][5].exitType[3]=4;
-
-        h[8][6].terrain='B';
-        h[8][6].label=3;
-        h[8][6].exitType[2]=4;
-        h[8][6].exitType[4]=2;
-
-        h[8][7].terrain='B';
-        h[8][7].label=102;
-        h[8][7].exitType[5]=4;
-
-        h[9][0].terrain='B';
-        h[9][0].label=120;
-        h[9][0].exitType[1]=4;
-        h[9][0].exitType[3]=2;
-
-        h[9][1].terrain='J';
-        h[9][1].label=19;
-        h[9][1].exitType[0]=1;
-        h[9][1].exitType[4]=4;
-
-        h[9][2].terrain='W';
-        h[9][2].label=16;
-        h[9][2].exitType[1]=4;
-        h[9][2].exitType[5]=2;
-
-        h[9][3].terrain='P';
-        h[9][3].label=15;
-        h[9][3].exitType[0]=4;
-        h[9][3].exitType[4]=2;
-
-        h[9][4].terrain='M';
-        h[9][4].label=8;
-        h[9][4].exitType[1]=4;
-        h[9][4].exitType[5]=2;
-
-        h[9][5].terrain='D';
-        h[9][5].label=7;
-        h[9][5].exitType[0]=4;
-        h[9][5].exitType[4]=2;
-
-        h[9][6].terrain='H';
-        h[9][6].label=4;
-        h[9][6].exitType[1]=4;
-        h[9][6].exitType[3]=1;
-
-        h[9][7].terrain='M';
-        h[9][7].label=103;
-        h[9][7].exitType[0]=2;
-        h[9][7].exitType[4]=4;
-
-        h[10][0].terrain='P';
-        h[10][0].label=119;
-        h[10][0].exitType[2]=4;
-
-        h[10][1].terrain='H';
-        h[10][1].label=18;
-        h[10][1].exitType[1]=1;
-        h[10][1].exitType[5]=4;
-
-        h[10][2].terrain='B';
-        h[10][2].label=17;
-        h[10][2].exitType[0]=4;
-        h[10][2].exitType[2]=2;
-
-        h[10][3].terrain='S';
-        h[10][3].label=14;
-        h[10][3].exitType[3]=2;
-        h[10][3].exitType[5]=4;
-
-        h[10][4].terrain='H';
-        h[10][4].label=9;
-        h[10][4].exitType[0]=2;
-        h[10][4].exitType[2]=4;
-
-        h[10][5].terrain='P';
-        h[10][5].label=6;
-        h[10][5].exitType[1]=2;
-        h[10][5].exitType[5]=4;
-
-        h[10][6].terrain='J';
-        h[10][6].label=5;
-        h[10][6].exitType[0]=4;
-        h[10][6].exitType[2]=1;
-
-        h[10][7].terrain='J';
-        h[10][7].label=104;
-        h[10][7].exitType[5]=4;
-
-        h[11][0].terrain='D';
-        h[11][0].label=118;
-        h[11][0].exitType[3]=4;
-
-        h[11][1].terrain='M';
-        h[11][1].label=117;
-        h[11][1].exitType[2]=4;
-        h[11][1].exitType[4]=2;
-
-        h[11][2].terrain='T';
-        h[11][2].label=300;
-        h[11][2].exitType[1]=3;
-        h[11][2].exitType[3]=3;
-        h[11][2].exitType[5]=3;
-
-        h[11][3].terrain='M';
-        h[11][3].label=13;
-        h[11][3].exitType[0]=2;
-        h[11][3].exitType[4]=4;
-
-        h[11][4].terrain='B';
-        h[11][4].label=10;
-        h[11][4].exitType[1]=4;
-        h[11][4].exitType[3]=2;
-
-        h[11][5].terrain='T';
-        h[11][5].label=200;
-        h[11][5].exitType[0]=3;
-        h[11][5].exitType[2]=3;
-        h[11][5].exitType[4]=3;
-
-        h[11][6].terrain='B';
-        h[11][6].label=106;
-        h[11][6].exitType[3]=4;
-        h[11][6].exitType[5]=2;
-
-        h[11][7].terrain='P';
-        h[11][7].label=105;
-        h[11][7].exitType[4]=4;
-
-        h[12][1].terrain='B';
-        h[12][1].label=116;
-        h[12][1].exitType[3]=4;
-
-        h[12][2].terrain='P';
-        h[12][2].label=115;
-        h[12][2].exitType[2]=4;
-        h[12][2].exitType[4]=2;
-
-        h[12][3].terrain='J';
-        h[12][3].label=12;
-        h[12][3].exitType[1]=1;
-        h[12][3].exitType[5]=4;
-
-        h[12][4].terrain='W';
-        h[12][4].label=11;
-        h[12][4].exitType[0]=4;
-        h[12][4].exitType[2]=1;
-
-        h[12][5].terrain='M';
-        h[12][5].label=108;
-        h[12][5].exitType[3]=4;
-        h[12][5].exitType[5]=2;
-
-        h[12][6].terrain='D';
-        h[12][6].label=107;
-        h[12][6].exitType[4]=4;
-
-        h[13][2].terrain='J';
-        h[13][2].label=114;
-        h[13][2].exitType[3]=4;
-
-        h[13][3].terrain='B';
-        h[13][3].label=113;
-        h[13][3].exitType[2]=4;
-        h[13][3].exitType[4]=2;
-
-        h[13][4].terrain='P';
-        h[13][4].label=110;
-        h[13][4].exitType[3]=4;
-        h[13][4].exitType[5]=2;
-
-        h[13][5].terrain='B';
-        h[13][5].label=109;
-        h[13][5].exitType[4]=4;
-
-        h[14][3].terrain='M';
-        h[14][3].label=112;
-        h[14][3].exitType[3]=4;
-
-        h[14][4].terrain='S';
-        h[14][4].label=111;
-        h[14][4].exitType[4]=4;
+        h[0][3].setTerrain('S');
+        h[0][3].setLabel(132);
+        h[0][3].setExitType(1, 4);
+
+        h[0][4].setTerrain('P');
+        h[0][4].setLabel(133);
+        h[0][4].setExitType(0, 4);
+
+        h[1][2].setTerrain('B');
+        h[1][2].setLabel(130);
+        h[1][2].setExitType(1, 4);
+
+        h[1][3].setTerrain('M');
+        h[1][3].setLabel(131);
+        h[1][3].setExitType(0, 4);
+        h[1][3].setExitType(2, 2);
+
+        h[1][4].setTerrain('B');
+        h[1][4].setLabel(134);
+        h[1][4].setExitType(1, 2);
+        h[1][4].setExitType(5, 4);
+
+        h[1][5].setTerrain('J');
+        h[1][5].setLabel(135);
+        h[1][5].setExitType(0, 4);
+
+        h[2][1].setTerrain('D');
+        h[2][1].setLabel(128);
+        h[2][1].setExitType(1, 4);
+
+        h[2][2].setTerrain('P');
+        h[2][2].setLabel(129);
+        h[2][2].setExitType(0, 4);
+        h[2][2].setExitType(2, 2);
+
+        h[2][3].setTerrain('H');
+        h[2][3].setLabel(32);
+        h[2][3].setExitType(3, 4);
+        h[2][3].setExitType(5, 1);
+
+        h[2][4].setTerrain('J');
+        h[2][4].setLabel(33);
+        h[2][4].setExitType(2, 4);
+        h[2][4].setExitType(4, 1);
+
+        h[2][5].setTerrain('M');
+        h[2][5].setLabel(136);
+        h[2][5].setExitType(1, 2);
+        h[2][5].setExitType(5, 4);
+
+        h[2][6].setTerrain('B');
+        h[2][6].setLabel(137);
+        h[2][6].setExitType(0, 4);
+
+        h[3][0].setTerrain('M');
+        h[3][0].setLabel(126);
+        h[3][0].setExitType(1, 4);
+
+        h[3][1].setTerrain('B');
+        h[3][1].setLabel(127);
+        h[3][1].setExitType(0, 4);
+        h[3][1].setExitType(2, 2);
+
+        h[3][2].setTerrain('T');
+        h[3][2].setLabel(500);
+        h[3][2].setExitType(1, 3);
+        h[3][2].setExitType(3, 3);
+        h[3][2].setExitType(5, 3);
+
+        h[3][3].setTerrain('B');
+        h[3][3].setLabel(31);
+        h[3][3].setExitType(0, 2);
+        h[3][3].setExitType(4, 4);
+
+        h[3][4].setTerrain('P');
+        h[3][4].setLabel(34);
+        h[3][4].setExitType(1, 4);
+        h[3][4].setExitType(3, 2);
+
+        h[3][5].setTerrain('T');
+        h[3][5].setLabel(600);
+        h[3][5].setExitType(0, 3);
+        h[3][5].setExitType(2, 3);
+        h[3][5].setExitType(4, 3);
+
+        h[3][6].setTerrain('P');
+        h[3][6].setLabel(138);
+        h[3][6].setExitType(1, 2);
+        h[3][6].setExitType(5, 4);
+
+        h[3][7].setTerrain('D');
+        h[3][7].setLabel(139);
+        h[3][7].setExitType(0, 4);
+
+        h[4][0].setTerrain('J');
+        h[4][0].setLabel(125);
+        h[4][0].setExitType(2, 4);
+
+        h[4][1].setTerrain('J');
+        h[4][1].setLabel(26);
+        h[4][1].setExitType(3, 4);
+        h[4][1].setExitType(5, 1);
+
+        h[4][2].setTerrain('M');
+        h[4][2].setLabel(27);
+        h[4][2].setExitType(2, 4);
+        h[4][2].setExitType(4, 2);
+
+        h[4][3].setTerrain('W');
+        h[4][3].setLabel(30);
+        h[4][3].setExitType(3, 2);
+        h[4][3].setExitType(5, 4);
+
+        h[4][4].setTerrain('D');
+        h[4][4].setLabel(35);
+        h[4][4].setExitType(0, 2);
+        h[4][4].setExitType(2, 4);
+
+        h[4][5].setTerrain('B');
+        h[4][5].setLabel(38);
+        h[4][5].setExitType(3, 4);
+        h[4][5].setExitType(5, 2);
+
+        h[4][6].setTerrain('W');
+        h[4][6].setLabel(39);
+        h[4][6].setExitType(2, 4);
+        h[4][6].setExitType(4, 1);
+
+        h[4][7].setTerrain('M');
+        h[4][7].setLabel(140);
+        h[4][7].setExitType(5, 4);
+
+        h[5][0].setTerrain('P');
+        h[5][0].setLabel(124);
+        h[5][0].setExitType(1, 4);
+        h[5][0].setExitType(3, 2);
+
+        h[5][1].setTerrain('W');
+        h[5][1].setLabel(25);
+        h[5][1].setExitType(0, 1);
+        h[5][1].setExitType(4, 4);
+
+        h[5][2].setTerrain('S');
+        h[5][2].setLabel(28);
+        h[5][2].setExitType(1, 2);
+        h[5][2].setExitType(3, 4);
+
+        h[5][3].setTerrain('P');
+        h[5][3].setLabel(29);
+        h[5][3].setExitType(2, 2);
+        h[5][3].setExitType(4, 4);
+
+        h[5][4].setTerrain('M');
+        h[5][4].setLabel(36);
+        h[5][4].setExitType(1, 2);
+        h[5][4].setExitType(3, 4);
+
+        h[5][5].setTerrain('H');
+        h[5][5].setLabel(37);
+        h[5][5].setExitType(2, 2);
+        h[5][5].setExitType(4, 4);
+
+        h[5][6].setTerrain('J');
+        h[5][6].setLabel(40);
+        h[5][6].setExitType(1, 4);
+        h[5][6].setExitType(3, 1);
+
+        h[5][7].setTerrain('B');
+        h[5][7].setLabel(141);
+        h[5][7].setExitType(0, 2);
+        h[5][7].setExitType(4, 4);
+
+        h[6][0].setTerrain('B');
+        h[6][0].setLabel(123);
+        h[6][0].setExitType(2, 4);
+
+        h[6][1].setTerrain('B');
+        h[6][1].setLabel(24);
+        h[6][1].setExitType(1, 2);
+        h[6][1].setExitType(5, 4);
+
+        h[6][2].setTerrain('H');
+        h[6][2].setLabel(23);
+        h[6][2].setExitType(0, 4);
+        h[6][2].setExitType(4, 2);
+
+        h[6][3].setTerrain('m');
+        h[6][3].setLabel(5000);
+        h[6][3].setExitType(1, 3);
+        h[6][3].setExitType(3, 3);
+        h[6][3].setExitType(5, 1);
+
+        h[6][4].setTerrain('t');
+        h[6][4].setLabel(6000);
+        h[6][4].setExitType(0, 3);
+        h[6][4].setExitType(2, 3);
+        h[6][4].setExitType(4, 1);
+
+        h[6][5].setTerrain('S');
+        h[6][5].setLabel(42);
+        h[6][5].setExitType(1, 4);
+        h[6][5].setExitType(5, 2);
+
+        h[6][6].setTerrain('M');
+        h[6][6].setLabel(41);
+        h[6][6].setExitType(0, 4);
+        h[6][6].setExitType(2, 2);
+
+        h[6][7].setTerrain('S');
+        h[6][7].setLabel(142);
+        h[6][7].setExitType(5, 4);
+
+        h[7][0].setTerrain('M');
+        h[7][0].setLabel(122);
+        h[7][0].setExitType(1, 4);
+        h[7][0].setExitType(3, 2);
+
+        h[7][1].setTerrain('T');
+        h[7][1].setLabel(400);
+        h[7][1].setExitType(0, 3);
+        h[7][1].setExitType(2, 3);
+        h[7][1].setExitType(4, 3);
+
+        h[7][2].setTerrain('M');
+        h[7][2].setLabel(22);
+        h[7][2].setExitType(3, 2);
+        h[7][2].setExitType(5, 4);
+
+        h[7][3].setTerrain('t');
+        h[7][3].setLabel(4000);
+        h[7][3].setExitType(0, 1);
+        h[7][3].setExitType(2, 3);
+        h[7][3].setExitType(4, 3);
+
+        h[7][4].setTerrain('m');
+        h[7][4].setLabel(1000);
+        h[7][4].setExitType(1, 3);
+        h[7][4].setExitType(3, 1);
+        h[7][4].setExitType(5, 3);
+
+        h[7][5].setTerrain('P');
+        h[7][5].setLabel(1);
+        h[7][5].setExitType(0, 2);
+        h[7][5].setExitType(2, 4);
+
+        h[7][6].setTerrain('T');
+        h[7][6].setLabel(100);
+        h[7][6].setExitType(1, 3);
+        h[7][6].setExitType(3, 3);
+        h[7][6].setExitType(5, 3);
+
+        h[7][7].setTerrain('P');
+        h[7][7].setLabel(101);
+        h[7][7].setExitType(0, 2);
+        h[7][7].setExitType(4, 4);
+
+        h[8][0].setTerrain('S');
+        h[8][0].setLabel(121);
+        h[8][0].setExitType(2, 4);
+
+        h[8][1].setTerrain('P');
+        h[8][1].setLabel(20);
+        h[8][1].setExitType(3, 4);
+        h[8][1].setExitType(5, 2);
+
+        h[8][2].setTerrain('D');
+        h[8][2].setLabel(21);
+        h[8][2].setExitType(2, 2);
+        h[8][2].setExitType(4, 4);
+
+        h[8][3].setTerrain('m');
+        h[8][3].setLabel(3000);
+        h[8][3].setExitType(1, 1);
+        h[8][3].setExitType(3, 3);
+        h[8][3].setExitType(5, 3);
+
+        h[8][4].setTerrain('t');
+        h[8][4].setLabel(2000);
+        h[8][4].setExitType(0, 3);
+        h[8][4].setExitType(2, 1);
+        h[8][4].setExitType(4, 3);
+
+        h[8][5].setTerrain('W');
+        h[8][5].setLabel(2);
+        h[8][5].setExitType(1, 2);
+        h[8][5].setExitType(3, 4);
+
+        h[8][6].setTerrain('B');
+        h[8][6].setLabel(3);
+        h[8][6].setExitType(2, 4);
+        h[8][6].setExitType(4, 2);
+
+        h[8][7].setTerrain('B');
+        h[8][7].setLabel(102);
+        h[8][7].setExitType(5, 4);
+
+        h[9][0].setTerrain('B');
+        h[9][0].setLabel(120);
+        h[9][0].setExitType(1, 4);
+        h[9][0].setExitType(3, 2);
+
+        h[9][1].setTerrain('J');
+        h[9][1].setLabel(19);
+        h[9][1].setExitType(0, 1);
+        h[9][1].setExitType(4, 4);
+
+        h[9][2].setTerrain('W');
+        h[9][2].setLabel(16);
+        h[9][2].setExitType(1, 4);
+        h[9][2].setExitType(5, 2);
+
+        h[9][3].setTerrain('P');
+        h[9][3].setLabel(15);
+        h[9][3].setExitType(0, 4);
+        h[9][3].setExitType(4, 2);
+
+        h[9][4].setTerrain('M');
+        h[9][4].setLabel(8);
+        h[9][4].setExitType(1, 4);
+        h[9][4].setExitType(5, 2);
+
+        h[9][5].setTerrain('D');
+        h[9][5].setLabel(7);
+        h[9][5].setExitType(0, 4);
+        h[9][5].setExitType(4, 2);
+
+        h[9][6].setTerrain('H');
+        h[9][6].setLabel(4);
+        h[9][6].setExitType(1, 4);
+        h[9][6].setExitType(3, 1);
+
+        h[9][7].setTerrain('M');
+        h[9][7].setLabel(103);
+        h[9][7].setExitType(0, 2);
+        h[9][7].setExitType(4, 4);
+
+        h[10][0].setTerrain('P');
+        h[10][0].setLabel(119);
+        h[10][0].setExitType(2, 4);
+
+        h[10][1].setTerrain('H');
+        h[10][1].setLabel(18);
+        h[10][1].setExitType(1, 1);
+        h[10][1].setExitType(5, 4);
+
+        h[10][2].setTerrain('B');
+        h[10][2].setLabel(17);
+        h[10][2].setExitType(0, 4);
+        h[10][2].setExitType(2, 2);
+
+        h[10][3].setTerrain('S');
+        h[10][3].setLabel(14);
+        h[10][3].setExitType(3, 2);
+        h[10][3].setExitType(5, 4);
+
+        h[10][4].setTerrain('H');
+        h[10][4].setLabel(9);
+        h[10][4].setExitType(0, 2);
+        h[10][4].setExitType(2, 4);
+
+        h[10][5].setTerrain('P');
+        h[10][5].setLabel(6);
+        h[10][5].setExitType(1, 2);
+        h[10][5].setExitType(5, 4);
+
+        h[10][6].setTerrain('J');
+        h[10][6].setLabel(5);
+        h[10][6].setExitType(0, 4);
+        h[10][6].setExitType(2, 1);
+
+        h[10][7].setTerrain('J');
+        h[10][7].setLabel(104);
+        h[10][7].setExitType(5, 4);
+
+        h[11][0].setTerrain('D');
+        h[11][0].setLabel(118);
+        h[11][0].setExitType(3, 4);
+
+        h[11][1].setTerrain('M');
+        h[11][1].setLabel(117);
+        h[11][1].setExitType(2, 4);
+        h[11][1].setExitType(4, 2);
+
+        h[11][2].setTerrain('T');
+        h[11][2].setLabel(300);
+        h[11][2].setExitType(1, 3);
+        h[11][2].setExitType(3, 3);
+        h[11][2].setExitType(5, 3);
+
+        h[11][3].setTerrain('M');
+        h[11][3].setLabel(13);
+        h[11][3].setExitType(0, 2);
+        h[11][3].setExitType(4, 4);
+
+        h[11][4].setTerrain('B');
+        h[11][4].setLabel(10);
+        h[11][4].setExitType(1, 4);
+        h[11][4].setExitType(3, 2);
+
+        h[11][5].setTerrain('T');
+        h[11][5].setLabel(200);
+        h[11][5].setExitType(0, 3);
+        h[11][5].setExitType(2, 3);
+        h[11][5].setExitType(4, 3);
+
+        h[11][6].setTerrain('B');
+        h[11][6].setLabel(106);
+        h[11][6].setExitType(3, 4);
+        h[11][6].setExitType(5, 2);
+
+        h[11][7].setTerrain('P');
+        h[11][7].setLabel(105);
+        h[11][7].setExitType(4, 4);
+
+        h[12][1].setTerrain('B');
+        h[12][1].setLabel(116);
+        h[12][1].setExitType(3, 4);
+
+        h[12][2].setTerrain('P');
+        h[12][2].setLabel(115);
+        h[12][2].setExitType(2, 4);
+        h[12][2].setExitType(4, 2);
+
+        h[12][3].setTerrain('J');
+        h[12][3].setLabel(12);
+        h[12][3].setExitType(1, 1);
+        h[12][3].setExitType(5, 4);
+
+        h[12][4].setTerrain('W');
+        h[12][4].setLabel(11);
+        h[12][4].setExitType(0, 4);
+        h[12][4].setExitType(2, 1);
+
+        h[12][5].setTerrain('M');
+        h[12][5].setLabel(108);
+        h[12][5].setExitType(3, 4);
+        h[12][5].setExitType(5, 2);
+
+        h[12][6].setTerrain('D');
+        h[12][6].setLabel(107);
+        h[12][6].setExitType(4, 4);
+
+        h[13][2].setTerrain('J');
+        h[13][2].setLabel(114);
+        h[13][2].setExitType(3, 4);
+
+        h[13][3].setTerrain('B');
+        h[13][3].setLabel(113);
+        h[13][3].setExitType(2, 4);
+        h[13][3].setExitType(4, 2);
+
+        h[13][4].setTerrain('P');
+        h[13][4].setLabel(110);
+        h[13][4].setExitType(3, 4);
+        h[13][4].setExitType(5, 2);
+
+        h[13][5].setTerrain('B');
+        h[13][5].setLabel(109);
+        h[13][5].setExitType(4, 4);
+
+        h[14][3].setTerrain('M');
+        h[14][3].setLabel(112);
+        h[14][3].setExitType(3, 4);
+
+        h[14][4].setTerrain('S');
+        h[14][4].setLabel(111);
+        h[14][4].setExitType(4, 4);
 
         // Derive entrances from exits.
         for (int i = 0; i < h.length; i++)
@@ -947,28 +949,28 @@ public class MasterBoard extends Frame implements MouseListener,
                 {
                     for (int k = 0; k < 6; k++)
                     {
-                        int gateType = h[i][j].exitType[k];
+                        int gateType = h[i][j].getExitType(k);
                         if (gateType != 0)
                         {
                             switch(k)
                             {
                                 case 0:
-                                    h[i][j - 1].entranceType[3] = gateType;
+                                    h[i][j - 1].setEntranceType(3, gateType);
                                     break;
                                 case 1:
-                                    h[i + 1][j].entranceType[4] = gateType;
+                                    h[i + 1][j].setEntranceType(4, gateType);
                                     break;
                                 case 2:
-                                    h[i + 1][j].entranceType[5] = gateType;
+                                    h[i + 1][j].setEntranceType(5, gateType);
                                     break;
                                 case 3:
-                                    h[i][j + 1].entranceType[0] = gateType;
+                                    h[i][j + 1].setEntranceType(0, gateType);
                                     break;
                                 case 4:
-                                    h[i - 1][j].entranceType[1] = gateType;
+                                    h[i - 1][j].setEntranceType(1, gateType);
                                     break;
                                 case 5:
-                                    h[i - 1][j].entranceType[2] = gateType;
+                                    h[i - 1][j].setEntranceType(2, gateType);
                                 break;
                             }
                         }
@@ -984,35 +986,35 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 if (show[i][j])
                 {
-                    if (h[i][j].exitType[0] != MasterHex.NONE ||
-                        h[i][j].entranceType[0] != MasterHex.NONE)
+                    if (h[i][j].getExitType(0) != MasterHex.NONE ||
+                        h[i][j].getEntranceType(0) != MasterHex.NONE)
                     {
-                        h[i][j].neighbor[0] = h[i][j - 1];
+                        h[i][j].setNeighbor(0, h[i][j - 1]);
                     }
-                    if (h[i][j].exitType[1] != MasterHex.NONE ||
-                        h[i][j].entranceType[1] != MasterHex.NONE)
+                    if (h[i][j].getExitType(1) != MasterHex.NONE ||
+                        h[i][j].getEntranceType(1) != MasterHex.NONE)
                     {
-                        h[i][j].neighbor[1] = h[i + 1][j];
+                        h[i][j].setNeighbor(1, h[i + 1][j]);
                     }
-                    if (h[i][j].exitType[2] != MasterHex.NONE ||
-                        h[i][j].entranceType[2] != MasterHex.NONE)
+                    if (h[i][j].getExitType(2) != MasterHex.NONE ||
+                        h[i][j].getEntranceType(2) != MasterHex.NONE)
                     {
-                        h[i][j].neighbor[2] = h[i + 1][j];
+                        h[i][j].setNeighbor(2, h[i + 1][j]);
                     }
-                    if (h[i][j].exitType[3] != MasterHex.NONE ||
-                        h[i][j].entranceType[3] != MasterHex.NONE)
+                    if (h[i][j].getExitType(3) != MasterHex.NONE ||
+                        h[i][j].getEntranceType(3) != MasterHex.NONE)
                     {
-                        h[i][j].neighbor[3] = h[i][j + 1];
+                        h[i][j].setNeighbor(3, h[i][j + 1]);
                     }
-                    if (h[i][j].exitType[4] != MasterHex.NONE ||
-                        h[i][j].entranceType[4] != MasterHex.NONE)
+                    if (h[i][j].getExitType(4) != MasterHex.NONE ||
+                        h[i][j].getEntranceType(4) != MasterHex.NONE)
                     {
-                        h[i][j].neighbor[4] = h[i - 1][j];
+                        h[i][j].setNeighbor(4, h[i - 1][j]);
                     }
-                    if (h[i][j].exitType[5] != MasterHex.NONE ||
-                        h[i][j].entranceType[5] != MasterHex.NONE)
+                    if (h[i][j].getExitType(5) != MasterHex.NONE ||
+                        h[i][j].getEntranceType(5) != MasterHex.NONE)
                     {
-                        h[i][j].neighbor[5] = h[i - 1][j];
+                        h[i][j].setNeighbor(5, h[i - 1][j]);
                     }
                 }
             }
@@ -1119,7 +1121,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
                                     // Highlight all legal destinations 
                                     // for this legion.
-                                    showMoves(legion, player);
+                                    showMoves(legion);
                                     return;
 
                                 case Game.FIGHT:
