@@ -602,7 +602,12 @@ public class BattleMap extends JFrame implements MouseListener,
     {
         for (int i = 0; i < numChits; i++)
         {
-            chits[i].setCarryFlag(false);
+            if (chits[i].getCarryFlag()) 
+            {
+                chits[i].setCarryFlag(false);
+                chits[i].getCurrentHex().unselect();
+                chits[i].getCurrentHex().repaint();
+            }
         }
         setCarryDamage(0);
     }
