@@ -43,7 +43,8 @@ class Chit extends JPanel
 
     private String id;
 
-    private static BasicStroke threeWide = new BasicStroke(3);
+    static BasicStroke oneWide = new BasicStroke(1);
+    static BasicStroke threeWide = new BasicStroke(3);
 
     Chit(int scale, String id, Container container)
     {
@@ -168,7 +169,7 @@ class Chit extends JPanel
         return tempIcon;
     }
 
-    static ImageIcon getImageIcon(String imageFilenames[], int scale)
+    static ImageIcon getImageIcon(String[] imageFilenames, int scale)
     {
         java.util.List directories = VariantSupport.getImagesDirectoriesList();
         Image composite = ResourceLoader.getCompositeImage(imageFilenames,
@@ -242,6 +243,7 @@ class Chit extends JPanel
                     rect.y + rect.height);
             g2.drawLine(rect.x + rect.width, rect.y, rect.x,
                     rect.y + rect.height);
+            g2.setStroke(oneWide);
         }
 
         if (border)
