@@ -1342,7 +1342,10 @@ public class SimpleAI implements AI
 
                 Creature nextRecruit =
                     (Creature)nextRecruits.get(nextRecruits.size() - 1);
-                int val = nextRecruit.getSkill() * nextRecruit.getPower();
+                // Reduced val by 5 to make current turn recruits more
+                // valuable than next turn's recruits
+                int val = nextRecruit.getSkill() * nextRecruit.getPower()
+                          - 5;
 
                 if (val > bestRecruitVal)
                 {
@@ -1404,7 +1407,9 @@ public class SimpleAI implements AI
                 }
             }
 
-            if (roll < 7)
+            // Ignore all fear of attack on turn 1.  Not perfect,
+            // but a pretty good rule of thumb.
+            if (roll < 7 && game.getTurnNumber() > 1)
             {
                 final double chanceToAttack = (7.0 - roll) / 6.0;
                 final double risk;
