@@ -72,21 +72,23 @@ public class DevRandom extends Random
     
     protected int next(int bits)
     {
+        int nbits = bits;
+
         if (randStream == null)
         {
-            //Log.debug("Error in the random source(s), falling back on the PRNG");
             return super.next(bits);
         }
-        if (bits > 32)
+        if (nbits > 32)
         {
-            bits = 32;
+            nbits = 32;
         }
-        if (bits < 1)
+        if (nbits < 1)
         {
-            bits = 1;
+            nbits = 1;
         }
-        int size = (bits + 7) / 8;
-        int mask = (1 << bits) - 1;
+        int size = (nbits + 7) >> 3;
+        // works even in nbits == 32
+        int mask = (1 << nbits) - 1;
         byte [] bytes = new byte[size];
         try
         {
@@ -94,14 +96,22 @@ public class DevRandom extends Random
         }
         catch (IOException ex)
         {
-            Log.error("Problem reading from random source");
+            Log.error("Problem reading from random source " + source);
             return super.next(bits);
         }
         int result = 0;
         for (int i = 0; i < size ; i++)
         {
-            result |= ((long)(bytes[i])) << (i * 8);
+            result |= (((int)(bytes[i])) & 0x000000FF) << (i << 3);
         }
-        return (result & mask);
+
+        result = (result & mask);
+        /*
+          String toto = "";
+          for (int i = 0; i < size; i++) toto = toto + "|" + bytes[i]; 
+          Log.debug("For " + source + ", array is " + toto + "|, result is " +
+                    result + ", bits is " + bits + ", mask is " + mask);
+        */
+        return (result);
     }
 }
