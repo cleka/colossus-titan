@@ -657,7 +657,7 @@ class Node implements Comparable
             {
                 CreatureInfo ci = (CreatureInfo)it2.next();
                 Creature creature = Creature.getCreatureByName(ci.getName());
-                totalKillValue += SimpleAI.getKillValue(creature);
+                totalKillValue += creature.getKillValue();
             }
             if ((bestKillValue == -1) ||
                     (!maximize && totalKillValue < bestKillValue) ||

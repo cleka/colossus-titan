@@ -79,6 +79,8 @@ Real whole-legion battle eval function, including gang hits.
 
 Refactor to eliminate duplicate code.  (Especially Movement, BattleMovement, 
    Strike, Creature/Critter/CreatureInfo)
+Add interfaces like MovementOracle and LegionOracle to replace existing 
+   hardcoded Client or Game references where possible.
 Fix the Titan Creature/Critter problem.
 
 Machine learning to tweak AI constants.
@@ -151,6 +153,7 @@ Make split prediction optional.
 
 SVG chits.  Maybe SVG board and map, after we have SVG chits.  (No point
    before then -- just drags in Batik without giving infinite rescaling.)
+Remove SVG code until we have the chits.
 
 Place SummonAngel so that it doesn't overlap any of the player's markers
    with summonable angels.
@@ -162,3 +165,9 @@ Use creature-only images without chit background, and scale onto chits,
 Try PMD (lint tool).
 
 Dead players' markers should be zero in StatusScreen.
+
+PickRecruiter should allow clicking on the top row (if applicable),
+   not just the bottom.
+
+Try some Law of Demeter refactorings.
+

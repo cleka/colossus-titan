@@ -2405,17 +2405,18 @@ public class SimpleAI implements AI
         return val;
     }
 
-    static int getKillValue(final Creature creature)
+    private static int getKillValue(final Creature creature)
     {
         return getKillValue(creature, null);
     }
 
-    static int getKillValue(final BattleChit chit, final String terrain)
+    private static int getKillValue(final BattleChit chit, 
+            final String terrain)
     {
         return getKillValue(chit.getCreature(), terrain);
     }
 
-    static int getKillValue(final Creature creature, String terrain)
+    private static int getKillValue(final Creature creature, String terrain)
     {
         int val;
         if (creature == null)

@@ -3451,18 +3451,18 @@ public class RationalAI implements AI
         return powerskills;
     }
 
-    static int getKillValue(Creature creature)
+    private static int getKillValue(Creature creature)
     {
         return getKillValue(creature, null);
     }
 
     // XXX titan power
-    static int getKillValue(BattleChit chit, String terrain)
+    private static int getKillValue(BattleChit chit, String terrain)
     {
         return getKillValue(chit.getCreature(), terrain);
     }
 
-    static int getKillValue(Creature creature, String terrain)
+    private static int getKillValue(Creature creature, String terrain)
     {
         int val = 10 * creature.getPointValue();
 

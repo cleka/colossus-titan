@@ -459,7 +459,7 @@ public final class LegionInfo
             }
             Creature c1 = Creature.getCreatureByName(s1);
             Creature c2 = Creature.getCreatureByName(s2);
-            return SimpleAI.getKillValue(c2) - SimpleAI.getKillValue(c1);
+            return c2.getKillValue() - c1.getKillValue();
         }
     }
 }

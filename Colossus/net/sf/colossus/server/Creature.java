@@ -595,7 +595,7 @@ implements
      *  
      * towi: Note that you have to take special care for creatures that
      * might change their attributes -- like the Power of titans.
-     * since this modifies the getKillValue1() return value.
+     * since this modifies the return value.
      * on the other hand... since titans have a killValue>1000 anyway, 
      * this might not matter at all. 
      */

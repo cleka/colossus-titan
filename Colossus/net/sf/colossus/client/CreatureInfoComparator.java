@@ -16,8 +16,7 @@ final class CreatureInfoComparator implements Comparator
         CreatureInfo info2 = (CreatureInfo)o2;
         Creature creature1 = Creature.getCreatureByName(info1.getName());
         Creature creature2 = Creature.getCreatureByName(info2.getName());
-        int diff = SimpleAI.getKillValue(creature2) -
-                SimpleAI.getKillValue(creature1);
+        int diff = creature2.getKillValue() - creature1.getKillValue();
         if (diff != 0)
         {
             return diff;
