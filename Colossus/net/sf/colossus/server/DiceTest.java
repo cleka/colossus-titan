@@ -1,7 +1,5 @@
 package net.sf.colossus.server;
 
-import net.sf.colossus.util.SpecialFunction;
-
 import java.util.*;
 import junit.framework.*;
 
@@ -88,15 +86,38 @@ public class DiceTest extends TestCase
 
     void runAllTests(int [] rolls, boolean random)
     {
+        chiSquareTest(rolls, random);
         mTest(rolls, random);
         signTest(rolls, random);
         mannKendallTest(rolls, random);
         runsTest(rolls, random);
     }
 
-
     // Most tests at http://www.stat.unc.edu/faculty/rs/s102/lec17a.pdf
     // Runs test http://www2.sunysuffolk.edu/wrightj/MA24/Misc/RunsTest.pdf
+
+
+    void chiSquareTest(int [] rolls, boolean random)
+    {
+        // We know our non-random dice will ace this test, so use them
+        // to find expected mean and variance.
+        int divisibleBy6 = 6 * trials / 6;
+        int [] fixedRolls = new int[divisibleBy6];
+        for (int i = 0; i < fixedRolls.length; i++)
+        {
+            fixedRolls[i] = Dice.rollDieNonRandom();
+        }
+        final double meanDieRoll = 3.5;
+        double expVariance = findExpectedVariance(fixedRolls, meanDieRoll);
+        double expMean = findChiSquare(fixedRolls, meanDieRoll) / 
+            fixedRolls.length;
+
+        double chisquare = findChiSquare(rolls, meanDieRoll) / rolls.length;
+        System.out.println("chi-square test: chi-square=" + chisquare + 
+            " mean=" + expMean + " var=" + expVariance);
+        failIfAbnormal(chisquare, expMean, expVariance, random); 
+    }
+
 
     /** Recode each sample as 0 if <= sample median, 1 if > sample median
         M is number of runs of consecutive 0s and 1s.
@@ -142,8 +163,8 @@ public class DiceTest extends TestCase
         int m = trimmed.length;
         int pos = countPositiveDiffs(trimmed);
         int neg = m - pos;
-        double R = pos;
-        double meanR = 1.0 + (2 * pos * neg) / (pos + neg);
+        double R = 0. + pos;
+        double meanR = 1. + (2 * pos * neg) / (pos + neg);
         double varianceR = ((2.0 * pos * neg) * (2 * pos * neg - pos - neg)) /
                 ((pos + neg) * (pos + neg) * (pos + neg - 1));
         System.out.println("Runs test: R=" + R + " m=" + m + " mean=" + 
@@ -165,7 +186,7 @@ public class DiceTest extends TestCase
         }
         double meanS = 0.;
         double varianceS = (n / 18.) * (n - 1.) * (2. * n + 5.);
-        System.out.println("M-K test: S=" + S + " mean=" + meanS + 
+        System.out.println("Mann-Kendall test: S=" + S + " mean=" + meanS + 
             " var=" + varianceS);
         failIfAbnormal(S, meanS, varianceS, random); 
     }
@@ -310,6 +331,30 @@ public class DiceTest extends TestCase
     }
 
 
+    double findChiSquare(int [] rolls, double mean)
+    {
+        double sum = 0.;
+        for (int i = 0; i < rolls.length; i++)
+        {
+            double diff = rolls[i] - mean;
+            sum += diff * diff;
+        }
+        return sum / mean;
+    }
+
+    double findExpectedVariance(int [] rolls, double mean)
+    {
+        double sum = 0.;
+        int n = rolls.length;
+        for (int i = 0; i < n; i++)
+        {
+            int x = rolls[i];
+            sum += Math.pow(x - mean, 2);
+        }
+        return sum / n;
+    }
+
+
     /** Fail if an expected random result is outside the normal range. */
     void failIfAbnormal(double val, double mean, double variance, 
         boolean random)
@@ -324,18 +369,21 @@ public class DiceTest extends TestCase
         }
         else
         {
-            sd = Math.sqrt(variance);
+            sd = Math.sqrt(Math.abs(variance));
             z = (val - mean) / sd;
         }
         System.out.print("sd=" + sd + " z=" + z);
-        if (random && (Math.abs(z) > 3))
+        if (Math.abs(z) > 3)
         {
-            System.out.println(" (FAILURE)");
-            fail();
-        }
-        else if (!random && ((Math.abs(z) > 3)))
-        {
-            System.out.println(" (expected failure)");
+            if (random)
+            {
+                System.out.println(" (FAILURE)");
+                fail();
+            }
+            else
+            {
+                System.out.println(" (expected failure)");
+            }
         }
         else
         {
