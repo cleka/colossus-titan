@@ -98,10 +98,11 @@ System.out.println("SummonAngel");
                 map.getBoard().show();
 
                 summonAngel = new SummonAngel(map.getBoard(), attacker);
-                // This is the last chance to summon an angel until the
-                // battle is over.
-                map.setSummonState(map.TOO_LATE);
             }
+
+            // This is the last chance to summon an angel until the
+            // battle is over.
+            map.setSummonState(map.TOO_LATE);
         }
 
         if (!summoningAngel)
