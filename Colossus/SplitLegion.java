@@ -26,7 +26,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
     SplitLegion(Frame parentFrame, Legion oldLegion, Player player)
     {
         super(parentFrame, player.getName() + ": Split Legion " + 
-            oldLegion.markerId, true);
+            oldLegion.getMarkerId(), true);
 
         setResizable(false);
         setLayout(null);
@@ -46,7 +46,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
         }
 
         newLegion = new Legion(scale / 5, 2 * scale, scale,
-            player.getSelectedMarker(), oldLegion.markerId, this, 0, 
+            player.getSelectedMarker(), oldLegion.getMarkerId(), this, 0, 
             oldLegion.getCurrentHex(), null, null, null, null, null, null, 
             null, null, player);
 
@@ -75,16 +75,16 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             newChits = new Chit[oldLegion.getHeight()];
             
             oldMarker = new Chit(scale / 5, scale / 2, scale, 
-                "images/" + oldLegion.markerId + ".gif", this);
+                "images/" + oldLegion.getMarkerId() + ".gif", this);
 
             tracker = new MediaTracker(this);
 
             for (int i = 0; i < oldLegion.getHeight(); i++)
             {
-                tracker.addImage(oldChits[i].image, 0);
+                tracker.addImage(oldChits[i].getImage(), 0);
             }
-            tracker.addImage(oldMarker.image, 0);
-            tracker.addImage(newLegion.chit.image, 0);
+            tracker.addImage(oldMarker.getImage(), 0);
+            tracker.addImage(newLegion.chit.getImage(), 0);
 
             try
             {
@@ -136,9 +136,9 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             Insets insets = getInsets(); 
             Dimension d = getSize();
             button1.setBounds(insets.left + d.width / 8, 7 * d.height / 8 - 
-                insets.bottom, d.width / 8, d.height / 8);
-            button2.setBounds(3 * d.width / 4 - insets.right, 
-                7 * d.height / 8 - insets.bottom, d.width / 8, d.height / 8);
+                insets.bottom, d.width / 4, d.height / 8);
+            button2.setBounds(5 * d.width / 8 - insets.right, 
+                7 * d.height / 8 - insets.bottom, d.width / 4, d.height / 8);
         }
 
     }
