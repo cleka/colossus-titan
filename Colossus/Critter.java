@@ -135,23 +135,17 @@ public final class Critter extends Creature
     /** Return only the base part of the image name for this critter. */
     public String getImageName(boolean inverted)
     {
-        StringBuffer basename = new StringBuffer();
-        if (inverted)
-        {
-            basename.append(Chit.invertedPrefix);
-        }
-
-        basename.append(name);
+        String basename = super.getImageName(inverted);
 
         if (name.equals("Titan") && getPower() >= 6 && getPower() <= 20)
         {
             // Use Titan14.gif for a 14-power titan, etc.  Use the generic
             // Titan.gif (with X-4) for ridiculously big titans, to avoid
             // the need for an infinite number of images.
-            basename.append(getPower());
+            basename = basename + getPower();
         }
 
-        return basename.toString();
+        return basename;
     }
 
 
@@ -720,7 +714,8 @@ System.out.println("DENIED CARRY UP DUNE HEXSIDE");
         int [] rolls = new int[dice];
         StringBuffer rollString = new StringBuffer(36);
 
-        if (battle.getGame().getChooseHits())
+        Game game = battle.getGame();
+        if (game != null && game.getChooseHits())
         {
             do
             {

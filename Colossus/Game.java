@@ -30,7 +30,6 @@ public final class Game
     private int phase = SPLIT;
 
     private boolean isApplet;
-    private boolean disposed;
     private JFrame masterFrame;
 
     private boolean engagementInProgress;
@@ -40,7 +39,7 @@ public final class Game
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
-        "Colossus savegame version 4";
+        "Colossus savegame version 5";
 
     public static final String configVersion =
         "Colossus config file version 2";
@@ -131,17 +130,17 @@ public final class Game
         JFrame frame = new JFrame();
 
         TreeSet playerNames = GetPlayers.getPlayers(frame);
+        if (playerNames.isEmpty())
+        {
+            dispose();
+            return;
+        }
         Iterator it = playerNames.iterator();
         while (it.hasNext())
         {
             String name = (String)it.next();
             addPlayer(name);
             logEvent("Add player " + name);
-        }
-
-        if (disposed)
-        {
-            return;
         }
 
         if (board == null)
@@ -2095,7 +2094,7 @@ public final class Game
             }
         }
 
-        logEvent("Legion " + legion.getMarkerId() + " in " +
+        logEvent("Legion " + legion.getLongMarkerName() + " in " +
             legion.getCurrentHex().getDescription() +
             " recruits " + recruit.getName() + " with " +
             (numRecruiters == 0 ? "nothing" :
@@ -2125,8 +2124,8 @@ public final class Game
                 Creature recruit = (Creature)recruits.get(recruits.size() - 1);
 
                 // Recruit a third cyclops instead of a gorgon.
-                if (recruit == Creature.gorgon && 
-                    recruits.contains(Creature.cyclops) && 
+                if (recruit == Creature.gorgon &&
+                    recruits.contains(Creature.cyclops) &&
                     legion.numCreature(Creature.cyclops) == 2)
                 {
                     recruit = Creature.cyclops;
@@ -2169,8 +2168,6 @@ public final class Game
 
     public void dispose()
     {
-        disposed = true;
-
         if (isApplet)
         {
             if (board != null)
@@ -2955,13 +2952,13 @@ public final class Game
         if (fled)
         {
             points /= 2;
-            Game.logEvent("Legion " + loser.getMarkerId() +
-                " flees from legion " + winner.getMarkerId());
+            Game.logEvent("Legion " + loser.getLongMarkerName() +
+                " flees from legion " + winner.getLongMarkerName());
         }
         else
         {
-            Game.logEvent("Legion " + loser.getMarkerId() +
-                " concedes to legion " + winner.getMarkerId());
+            Game.logEvent("Legion " + loser.getLongMarkerName() +
+                " concedes to legion " + winner.getLongMarkerName());
         }
 
         // Remove the dead legion.

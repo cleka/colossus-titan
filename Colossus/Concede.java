@@ -28,7 +28,7 @@ public final class Concede extends JDialog implements ActionListener
         boolean flee)
     {
         super(parentFrame, ally.getPlayer().getName() + ": " + (flee ?
-            "Flee" : "Concede") + " with Legion "  + ally.getMarkerId() +
+            "Flee" : "Concede") + " with Legion "  + ally.getLongMarkerName() +
             " in " + ally.getCurrentHex().getDescription() + "?", true);
 
         Container contentPane = getContentPane();

@@ -30,7 +30,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
     private SummonAngel(MasterBoard board, Legion legion)
     {
         super(board.getFrame(), legion.getPlayer().getName() +
-            ": Summon Angel into Legion " + legion.getMarkerId(), false);
+            ": Summon Angel into Legion " + legion.getLongMarkerName(), false);
 
         this.legion = legion;
         player = legion.getPlayer();
@@ -146,8 +146,8 @@ public final class SummonAngel extends JDialog implements MouseListener,
             legion.getCurrentHex().repaint();
 
             Game.logEvent("An " + creature.getName() +
-                " is summoned from legion " + donor.getMarkerId() +
-                " into legion " + legion.getMarkerId());
+                " is summoned from legion " + donor.getLongMarkerName() +
+                " into legion " + legion.getLongMarkerName());
         }
 
         dispose();

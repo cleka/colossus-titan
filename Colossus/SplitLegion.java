@@ -30,7 +30,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         boolean autoPickMarker)
     {
         super(parentFrame, name + ": Split Legion " +
-            oldLegion.getMarkerId(), true);
+            oldLegion.getLongMarkerName(), true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
@@ -330,8 +330,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
 
             Game.logEvent(newLegion.getHeight() +
                 " creatures are split off from legion " +
-                oldLegion.getMarkerId() +
-                " into new legion " + newLegion.getMarkerId());
+                oldLegion.getLongMarkerName() +
+                " into new legion " + newLegion.getLongMarkerName());
 
             // This is needed for splits where the hex was not
             // highlighted because the legion was not 7+ high.

@@ -27,8 +27,8 @@ public final class Negotiate extends JDialog implements MouseListener,
 
     private Negotiate(JFrame parentFrame, Legion attacker, Legion defender)
     {
-        super(parentFrame, attacker.getMarkerId() + " Negotiates with " +
-            defender.getMarkerId(), true);
+        super(parentFrame, attacker.getLongMarkerName() + " Negotiates with " +
+            defender.getLongMarkerName(), true);
 
         Container contentPane = getContentPane();
 
@@ -236,8 +236,8 @@ public final class Negotiate extends JDialog implements MouseListener,
                 attacker.remove();
                 defender.remove();
 
-                Game.logEvent(attacker.getMarkerId() + " and " +
-                    defender.getMarkerId() +
+                Game.logEvent(attacker.getLongMarkerName() + " and " +
+                    defender.getLongMarkerName() +
                     " agree to mutual elimination");
 
                 // If both Titans died, eliminate both players.
@@ -298,7 +298,7 @@ public final class Negotiate extends JDialog implements MouseListener,
                 }
 
                 StringBuffer log = new StringBuffer("Winning legion ");
-                log.append(winner.getMarkerId());
+                log.append(winner.getLongMarkerName());
                 log.append(" loses creatures ");
 
                 // Remove all dead creatures from the winning legion.
@@ -332,8 +332,8 @@ public final class Negotiate extends JDialog implements MouseListener,
                 // Add points, and angels if necessary.
                 winner.addPoints(points);
 
-                Game.logEvent("Legion " + loser.getMarkerId() +
-                   " is eliminated by legion " + winner.getMarkerId() +
+                Game.logEvent("Legion " + loser.getLongMarkerName() +
+                   " is eliminated by legion " + winner.getLongMarkerName() +
                    " via negotiation");
 
                 // If this was the titan stack, its owner dies and gives half
@@ -386,13 +386,14 @@ public final class Negotiate extends JDialog implements MouseListener,
         player.setTower(2);
         player.setColor("Blue");
         player.initMarkersAvailable();
-        selectedMarkerId = player.selectMarkerId("Bl01");
+        selectedMarkerId = player.selectMarkerId("Bu01");
         Legion defender = new Legion(selectedMarkerId, null, hex, hex,
             Creature.ogre, Creature.centaur, Creature.gargoyle,
             null, null, null, null, null, player);
         marker = new Marker(scale, selectedMarkerId, frame, null);
         defender.setMarker(marker);
 
-        new Negotiate(frame, attacker, defender);
+        Negotiate.negotiate(frame, attacker, defender);
+        System.exit(0);
     }
 }

@@ -58,7 +58,9 @@ public final class Marker extends Chit
             font = new Font(name, style, (3 * size) >> 1);
             g.setFont(font);
             FontMetrics fontMetrics = g.getFontMetrics();
-            fontHeight = fontMetrics.getAscent();
+            // XXX getAscent() seems to return too large a number
+            // Test this 80% fudge factor on multiple platforms.
+            fontHeight = 4 * fontMetrics.getAscent() / 5;
             fontWidth = fontMetrics.stringWidth(height);
         }
         else
@@ -66,12 +68,16 @@ public final class Marker extends Chit
             g.setFont(font);
         }
 
-        // Show height in white.
-        g.setColor(Color.white);
+        int x = rect.x + ((rect.width * 3) >> 2) - (fontWidth >> 1);
+        int y = rect.y + rect.height * 2 / 3 + fontHeight / 2;
 
-        g.drawString(height, rect.x + ((rect.width * 3) >> 2)  -
-            (fontWidth >> 1), rect.y + rect.height * 2 / 3 +
-            (fontHeight / 2));
+        // Provide a high-contrast background for the number.
+        g.setColor(Color.white);
+        g.fillRect(x, y - fontHeight, fontWidth, fontHeight);
+
+        // Show height in black.
+        g.setColor(Color.black);
+        g.drawString(height, x, y);
 
         // Restore the font.
         g.setFont(oldFont);

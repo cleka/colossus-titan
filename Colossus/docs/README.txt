@@ -1,7 +1,6 @@
-Colossus alpha     November 27, 2000    Copyright 2000 David Ripton
+Colossus alpha     January 16, 2001    Copyright 2001 David Ripton
 
-This is Colossus.  It's an attempt at a Java clone of Avalon Hill's
-Titan(tm) boardgame.
+Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
 It's not done yet.  Right now it only allows hotseat play.  I'll do client /
 server network play next, after getting bored fixing bugs in the hotseat game.
@@ -13,8 +12,7 @@ This program is freeware, distributed under the GNU public license, which
 is included in the file COPYING.GPL.  This means that you have the right to
 make and distribute changes, as long as you always include the source code
 so that others can do the same.  If you fix any bugs or add any features,
-please send me a copy so that I can fold them into the master code.  (Please
-don't add anything that would be a copyright violation.)
+please send me a copy so that I can fold them into the master code.
 
 
 Running the game requires the following:
@@ -226,15 +224,14 @@ in the saves/ subdirectory every turn.  If you start a new game with
 "java -jar Colossus.jar filename.sav" instead of just "java -jar Colossus" 
 then the save file will be loaded.  "java -jar Colossus.jar --latest" will 
 load the most recent save game in the saves/ subdirectory.  You'll want to 
-manually delete all those save files from time to time.  I'll add a better 
-user interface for this soon.
+manually delete all those save files from time to time.
 
 
 Credits:
 
 Programming:  David Ripton  dripton@wizard.net
               David Barr
-Counter art:  Tchula Ripton
+Counter art:  Tchula Ripton, David Lum
 Bug reports:  Anthony Kam, Bruce Sherrod, Augustin Ku, David Barr,
               Sean McCulloch, Luca Ferraro, Jonathan Woodward
 

@@ -1609,7 +1609,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
             while (it2.hasNext())
             {
                 Legion legion = (Legion)it2.next();
-                Marker marker = new Marker(3 * scale, legion.getImageName(),
+                int chitScale = 3 * scale;
+                Marker marker = new Marker(chitScale, legion.getImageName(),
                     this, null);
                 legion.setMarker(marker);
                 MasterHex hex = legion.getCurrentHex();

@@ -1,40 +1,39 @@
-Scale Theodore S. Hetke's chits down to 60x60.  Change code to
-   only use one Titan.gif, and to invert chits in realtime rather
-   than using i_*.gif?
+Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
+   bolts.
 
-Scale David Lum's markers up to 60x60.  Figure out a way to show
-   legion height in a readable fashion.  (Contrasting color, 
-   centered?)
+Scale David Lum's legion markers up to 60x60.  Change white borders to black.
 
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 
-Centralize scale handling.  Add a rescale option.
-
-Paint all chit names and numbers using fonts, to allow for
-   better scaling?
+Centralize scale handling.  Add a global rescale option.
 
 Allow an arbitrary number of undo operations, rather than just one.
+   Allow redo?
 
 Add an option to show information about MasterBoard hexes when a
    mover is selected, such as whether that legion can recruit
    there, and how many die rolls from that hex would let the
    legion recruit next turn.
 
-Add allow the ability to replace any creature in a legion with a 
+Add allow the ability to replace any creature in a legion with a
    different creature type or "unknown," for PBEM and debug.
 
 Add per-player option menu, with results saved to playername.cfg
 
 Change more modal dialogs to use a factory that returns a value,
    rather than a public constructor and a call to a mutator.
-   This should reduce global access from dialogs to game objects, 
-   and allow dialog results to be more easily replicated by network 
-   and computer dialog replacements.  All parameters passed into 
+   This should reduce global access from dialogs to game objects,
+   and allow dialog results to be more easily replicated by network
+   and computer dialog replacements.  All parameters passed into
    the dialogs should eventually be read-only or clones, with all
    changes to game state done by the caller.
 
 Add test main() to remaining dialogs.
+
+Test optimizations (strength reduction of divides, and substitution
+   of method calls for mod 6) to see if they actually make a
+   measurable difference.  Get rid of them if they don't.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 Add auto-forced-strike option.
@@ -58,7 +57,7 @@ Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
    undo moves.  "Done with Engagements" shouldn't be necessary.
 
-Highlight selected legion better. 
+Highlight selected legion better.
 Highlight teleport and normal moves differently.
 Differently-highlight hexes where a legion could move if
    a friendly stack were not already there?
@@ -80,7 +79,7 @@ Move GUI/client classes and model/server classes into separate
    Document remaining public classes, which are those that
    need to be included in the network protocol.
 
-Add a ShowAllRecruits window that displays all recruits by terrain 
+Add a ShowAllRecruits window that displays all recruits by terrain
    type.
 
 Allow setting Look and Feel from a menu.
@@ -91,7 +90,7 @@ Fix concession timing.
 
 Client-server networking.
 
-Add client config file to store default name, favorite colors, 
+Add client config file to store default name, favorite colors,
    favorite servers, etc.
 
 Chat window.

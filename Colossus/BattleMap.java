@@ -41,19 +41,16 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         super(masterHex);
 
-        battleFrame = new JFrame(battle.getAttacker().getMarkerId() +
-            " (" + battle.getAttacker().getPlayer().getName() +
-            ") attacks " + battle.getDefender().getMarkerId() + " (" +
-            battle.getDefender().getPlayer().getName() + ")" + " in " +
-            masterHex.getDescription());
+        battleFrame = new JFrame();
 
         Legion attacker = battle.getAttacker();
         Legion defender = battle.getDefender();
 
-        Game.logEvent("\n" + attacker.getMarkerId() + " (" +
+        Game.logEvent("\n" + attacker.getLongMarkerName() + " (" +
             attacker.getPlayer().getName() + ") attacks " +
-            defender.getMarkerId() + " (" + defender.getPlayer().getName() +
-            ")" + " in " + masterHex.getDescription());
+            defender.getLongMarkerName() + " (" +
+            defender.getPlayer().getName() + ")" + " in " +
+            masterHex.getDescription());
 
         this.board = board;
         this.battle = battle;

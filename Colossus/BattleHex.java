@@ -352,8 +352,10 @@ public final class BattleHex extends Hex
         Point point = new Point(center);
 
         // Cascade chits diagonally.
-        point.x -= chitScale * (1 + (critters.size())) >> 2;
-        point.y -= chitScale * (1 + (critters.size())) >> 2;
+        int chitScale4 = chitScale >> 2;
+        int offset = (chitScale * (1 + (critters.size()))) >> 2;
+        point.x -= offset;
+        point.y -= offset;
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -361,8 +363,8 @@ public final class BattleHex extends Hex
             Critter critter = (Critter)it.next();
             BattleChit chit = critter.getChit();
             chit.setLocation(point);
-            point.x += chitScale >> 2;
-            point.y += chitScale >> 2;
+            point.x += chitScale4;
+            point.y += chitScale4;
         }
 
         repaint();

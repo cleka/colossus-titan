@@ -2,10 +2,11 @@ import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
+import java.awt.geom.*;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
- * either a monster or a legion.
+ * either a character or a legion.
  * @version $Id$
  * @author David Ripton
  */
@@ -38,6 +39,8 @@ public class Chit extends JPanel
     public static final String imageExtension = ".gif";
     public static final String invertedPrefix = "i_";
 
+    private static BasicStroke threeWide = new BasicStroke(3);
+
 
     public Chit(int scale, String id, Container container)
     {
@@ -59,16 +62,12 @@ public class Chit extends JPanel
 
         if (isApplet)
         {
-            InputStream in;
-            byte[] thanksToNetscape = null;
-
             try
             {
-                in = getClass().getResourceAsStream(imageFilename);
+                InputStream in = getClass().getResourceAsStream(imageFilename);
                 int length = in.available();
-                thanksToNetscape = new byte[length];
+                byte [] thanksToNetscape = new byte[length];
                 in.read(thanksToNetscape);
-                // XXX Test this with browsers.
                 icon = new ImageIcon(thanksToNetscape);
             }
             catch (Exception e)
@@ -110,27 +109,20 @@ public class Chit extends JPanel
 
     public void paintComponent(Graphics g)
     {
-	super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D)g;
+        super.paintComponent(g2);
 
-        g.drawImage(icon.getImage(), rect.x, rect.y, rect.width,
-            rect.width, container);
+        g2.drawImage(icon.getImage(), rect.x, rect.y, rect.width,
+            rect.height, container);
+
         if (isDead())
         {
             // Draw a triple-wide red X.
-            g.setColor(Color.red);
-
-            g.drawLine(rect.x, rect.y, rect.x + rect.width,
+            g2.setStroke(threeWide);
+            g2.setColor(Color.red);
+            g2.drawLine(rect.x, rect.y, rect.x + rect.width,
                 rect.y + rect.height);
-            g.drawLine(rect.x, rect.y - 1, rect.x + rect.width - 1,
-                rect.y + rect.height);
-            g.drawLine(rect.x + 1, rect.y, rect.x + rect.width,
-                rect.y + rect.height - 1);
-
-            g.drawLine(rect.x + rect.width, rect.y, rect.x,
-                rect.y + rect.height);
-            g.drawLine(rect.x + rect.width - 1, rect.y, rect.x,
-                rect.y + rect.height - 1);
-            g.drawLine(rect.x + rect.width, rect.y + 1, rect.x + 1,
+            g2.drawLine(rect.x + rect.width, rect.y, rect.x,
                 rect.y + rect.height);
         }
     }

@@ -23,6 +23,88 @@ public final class Legion
     private int entrySide;
     private boolean teleported;
     private Creature teleportingLord;
+    private static HashMap markerNames = new HashMap();
+
+    static
+    {
+        markerNames.put("Bk01", "Axes");
+        markerNames.put("Bk02", "Eye");
+        markerNames.put("Bk03", "Die");
+        markerNames.put("Bk04", "Feather");
+        markerNames.put("Bk05", "Hand");
+        markerNames.put("Bk06", "Lightning");
+        markerNames.put("Bk07", "Pumpkin");
+        markerNames.put("Bk08", "Rose");
+        markerNames.put("Bk09", "Scorpion");
+        markerNames.put("Bk10", "Skull");
+        markerNames.put("Bk11", "Spearhead");
+        markerNames.put("Bk12", "Tombstone");
+
+        markerNames.put("Br01", "Antlers");
+        markerNames.put("Br02", "Bell");
+        markerNames.put("Br03", "Chest");
+        markerNames.put("Br04", "Figurehead");
+        markerNames.put("Br05", "Hook");
+        markerNames.put("Br06", "Hourglass");
+        markerNames.put("Br07", "Paw");
+        markerNames.put("Br08", "Ram");
+        markerNames.put("Br09", "Scroll");
+        markerNames.put("Br10", "Spider");
+        markerNames.put("Br11", "Tankard");
+        markerNames.put("Br12", "Wheel");
+
+        markerNames.put("Bu01", "Anchor");
+        markerNames.put("Bu02", "Bat");
+        markerNames.put("Bu03", "Candle");
+        markerNames.put("Bu04", "Cloud");
+        markerNames.put("Bu05", "Egg");
+        markerNames.put("Bu06", "Foot");
+        markerNames.put("Bu07", "Fountain");
+        markerNames.put("Bu08", "Moon");
+        markerNames.put("Bu09", "Octopus");
+        markerNames.put("Bu10", "Padlock");
+        markerNames.put("Bu11", "Tornado");
+        markerNames.put("Bu12", "Trident");
+
+        markerNames.put("Gd01", "Caduceus");
+        markerNames.put("Gd02", "Claw");
+        markerNames.put("Gd03", "Coins");
+        markerNames.put("Gd04", "Crown");
+        markerNames.put("Gd05", "Horn");
+        markerNames.put("Gd06", "Lamp");
+        markerNames.put("Gd07", "Pyramid");
+        markerNames.put("Gd08", "Rings");
+        markerNames.put("Gd09", "Scarab");
+        markerNames.put("Gd10", "Scimitars");
+        markerNames.put("Gd11", "Sun");
+        markerNames.put("Gd12", "Wheat");
+
+        markerNames.put("Gr01", "Cauldron");
+        markerNames.put("Gr02", "Dagger");
+        markerNames.put("Gr03", "Diamond");
+        markerNames.put("Gr04", "Fish");
+        markerNames.put("Gr05", "Fleur");
+        markerNames.put("Gr06", "Frog");
+        markerNames.put("Gr07", "Grapple");
+        markerNames.put("Gr08", "Harp");
+        markerNames.put("Gr09", "Lobster");
+        markerNames.put("Gr10", "Olive");
+        markerNames.put("Gr11", "Scales");
+        markerNames.put("Gr12", "Snake");
+
+        markerNames.put("Rd01", "Cross");
+        markerNames.put("Rd02", "Eagle");
+        markerNames.put("Rd03", "Fist");
+        markerNames.put("Rd04", "Gong");
+        markerNames.put("Rd05", "Heart");
+        markerNames.put("Rd06", "Jester");
+        markerNames.put("Rd07", "Salamander");
+        markerNames.put("Rd08", "Shield");
+        markerNames.put("Rd09", "Spiral");
+        markerNames.put("Rd10", "Star");
+        markerNames.put("Rd11", "Sword");
+        markerNames.put("Rd12", "Torch");
+    }
 
 
     public Legion(String markerId, String parentId, MasterHex currentHex,
@@ -104,7 +186,12 @@ public final class Legion
         {
             player.addPoints(points);
 
-            JFrame masterFrame = player.getGame().getBoard().getFrame();
+            Game game = player.getGame();
+            if (game == null)
+            {
+                return;
+            }
+            JFrame masterFrame = game.getBoard().getFrame();
             if (masterFrame.getState() == JFrame.ICONIFIED)
             {
                 masterFrame.setState(JFrame.NORMAL);
@@ -131,7 +218,7 @@ public final class Legion
                     if (angel != null)
                     {
                         addCreature(angel, true);
-                        Game.logEvent("Legion " + getMarkerId() +
+                        Game.logEvent("Legion " + getLongMarkerName() +
                             " acquires an " + type);
                         if (type.equals("Archangel"))
                         {
@@ -178,6 +265,22 @@ public final class Legion
     public String getMarkerId()
     {
         return markerId;
+    }
+
+
+    public String getMarkerName()
+    {
+        return (String)markerNames.get(markerId);
+    }
+
+
+    public String getLongMarkerName()
+    {
+        StringBuffer sb = new StringBuffer(markerId);
+        sb.append(" (");
+        sb.append(getMarkerName());
+        sb.append(")");
+        return sb.toString();
     }
 
 
@@ -345,7 +448,7 @@ public final class Legion
         teleported = hex.getTeleported();
         entrySide = hex.getEntrySide();
 
-        Game.logEvent("Legion " + getMarkerId() + " in " +
+        Game.logEvent("Legion " + getLongMarkerName() + " in " +
             currentHex.getDescription() +
             (teleported ?
                 (hex.isOccupied() ? " titan teleports " :
@@ -374,7 +477,8 @@ public final class Legion
             currentHex = startingHex;
             currentHex.addLegion(this, true);
             moved = false;
-            Game.logEvent("Legion " + getMarkerId() + " undoes its move");
+            Game.logEvent("Legion " + getLongMarkerName() +
+                " undoes its move");
 
             // If this legion teleported, allow teleporting again.
             if (teleported)
@@ -432,7 +536,8 @@ public final class Legion
 
             recruited = false;
 
-            Game.logEvent("Legion " + getMarkerId() + " undoes its recruit");
+            Game.logEvent("Legion " + getLongMarkerName() +
+                " undoes its recruit");
         }
     }
 
@@ -623,8 +728,8 @@ public final class Legion
             prepareToRemove();
         }
 
-        Game.logEvent("Legion " + getMarkerId() +
-            " recombined into legion " + legion.getMarkerId());
+        Game.logEvent("Legion " + getLongMarkerName() +
+            " recombined into legion " + legion.getLongMarkerName());
     }
 
 

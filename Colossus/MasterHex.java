@@ -429,14 +429,12 @@ public final class MasterHex extends Hex
             case 'D':
                 return HTMLColor.orange;
             case 'H':
-                // was 128, 64, 0
                 return HTMLColor.saddleBrown;
             case 'J':
                 return HTMLColor.darkGreen;
             case 'm':
                 return Color.red;
             case 'M':
-                // was 180, 90, 0
                 return HTMLColor.sienna;
             case 'P':
                 return Color.yellow;
@@ -587,25 +585,27 @@ public final class MasterHex extends Hex
         if (numLegions == 1)
         {
             // Place legion in the center of the hex.
-            point.x -= chitScale >> 1;
-            point.y -= chitScale >> 1;
+            int chitScale2 = chitScale >> 1;
+            point.x -= chitScale2;
+            point.y -= chitScale2;
             marker.setLocation(point);
         }
         else if (numLegions == 2)
         {
             // Place legions in NW and SE corners.
-            point.x -= 3 * chitScale >> 2;
-            point.y -= 3 * chitScale >> 2;
+            int chitScale4 = chitScale >> 2;
+            point.x -= 3 * chitScale4;
+            point.y -= 3 * chitScale4;
             marker.setLocation(point);
 
             point = new Point(startingPoint);
-            point.x -= chitScale >> 2;
-            point.y -= chitScale >> 2;
+            point.x -= chitScale4;
+            point.y -= chitScale4;
             Legion legion1 = (Legion)legions.get(1);
             marker = legion1.getMarker();
             if (marker != null)
             {
-                // XXX Second marker can be null when loading during
+                // Second marker can be null when loading during
                 // the engagement phase.
                 marker.setLocation(point);
             }
@@ -613,19 +613,20 @@ public final class MasterHex extends Hex
         else if (numLegions == 3)
         {
             // Place legions in NW, SE, NE corners.
-            point.x -= 3 * chitScale >> 2;
-            point.y -= 3 * chitScale >> 2;
+            int chitScale4 = chitScale >> 2;
+            point.x -= 3 * chitScale4;
+            point.y -= 3 * chitScale4;
             marker.setLocation(point);
 
             point = new Point(startingPoint);
-            point.x -= chitScale >> 2;
-            point.y -= chitScale >> 2;
+            point.x -= chitScale4;
+            point.y -= chitScale4;
             Legion legion1 = (Legion)legions.get(1);
             marker = legion1.getMarker();
             marker.setLocation(point);
 
             point = new Point(startingPoint);
-            point.x -= chitScale >> 2;
+            point.x -= chitScale4;
             point.y -= chitScale;
             Legion legion2 = (Legion)legions.get(2);
             marker = legion2.getMarker();
@@ -654,7 +655,10 @@ public final class MasterHex extends Hex
     public void removeLegion(Legion legion)
     {
         legions.remove(legion);
-        board.removeMarker(legion);
+        if (board != null)
+        {
+            board.removeMarker(legion);
+        }
         if (getNumLegions() >= 1)
         {
             alignLegions();
