@@ -22,6 +22,7 @@ class Legion
     private boolean recruited = false;
     private boolean summoned = false;
     private Player player;
+    private int entrySide;
 
 
     Legion(int cx, int cy, int scale, String markerId, Legion splitFrom,
@@ -68,14 +69,16 @@ class Legion
 
             int score = player.getScore();
             int tmpScore = score;
+            boolean didArchangel = false;
 
             while (height < 7 && tmpScore / 100 > (score - points) / 100)
             {
-                if (tmpScore / 500 > (score - points) / 500)
+                if (tmpScore / 500 > (score - points) / 500 && !didArchangel)
                 {
                     // Allow Archangel.
                     new AcquireAngel(player.getGame().getBoard(), this, true);
                     tmpScore -= 100;
+                    didArchangel = true;
                 }
                 else
                 {
@@ -184,11 +187,22 @@ class Legion
         currentHex.addLegion(this);
         moved = true;
         player.markLastLegionMoved(this);
+        setEntrySide(hex.getEntrySide());
+        // If we teleported, no more teleports are allowed this turn.
+        if (getEntrySide() == -1)
+        {
+            player.disallowTeleport();
+        }
     }
 
 
     void undoMove()
     {
+        // If this legion teleported, allow teleporting again.
+        if (currentHex.getEntrySide() == -1)
+        {
+            player.allowTeleport();
+        }
         currentHex.removeLegion(this);
         currentHex = startingHex;
         currentHex.addLegion(this);
@@ -202,6 +216,18 @@ class Legion
         moved = false;
         recruited = false;
         summoned = false;
+    }
+
+
+    int getEntrySide()
+    {
+        return entrySide;
+    }
+    
+    
+    void setEntrySide(int side)
+    {
+        entrySide = side;
     }
 
 
