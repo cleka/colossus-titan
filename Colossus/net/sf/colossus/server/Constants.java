@@ -79,17 +79,27 @@ public final class Constants
     public static final String left = "Left";
 
     /** Default directory for datafiles */
-    public static String defaultDirName = "Default";
+    public static final String defaultDirName = "Default";
     /** Images subdirectory name */
-    public static String imagesDirName = "images";
+    public static final String imagesDirName = "images";
     /** Battlelands subdirectory name */
-    public static String battlelandsDirName = "Battlelands";
+    public static final String battlelandsDirName = "Battlelands";
     /** Default CRE file */
-    public static String defaultCREFile = "Default.cre";
+    public static final String defaultCREFile = "Default.cre";
     /** Default MAP file */
-    public static String defaultMAPFile = "Default.map";
+    public static final String defaultMAPFile = "Default.map";
     /** Default TER file */
-    public static String defaultTERFile = "Default.ter";
+    public static final String defaultTERFile = "Default.ter";
     /** Default VAR file */
-    public static String defaultVARFile = "Default.var";
+    public static final String defaultVARFile = "Default.var";
+
+    /* icon setup */
+    public static final String masterboardIconImage = "Colossus";
+    public static final String masterboardIconText = "Colossus";
+    public static final String masterboardIconTextColor = "black";
+    public static final String masterboardIconSubscript = "Main";
+    public static final String battlemapIconImage = "Colossus";
+    public static final String battlemapIconText = "Colossus";
+    public static final String battlemapIconTextColor = "black";
+    public static final String battlemapIconSubscript = "Battle";
 }

@@ -1541,7 +1541,13 @@ public final class MasterBoard extends JPanel
                         ResourceLoader.getPathSeparator() +
                         Constants.imagesDirName);
 
-        String[] iconNames = { "Colossus", "Colossus-Name-black"};
+        String[] iconNames = { Constants.masterboardIconImage,
+                               Constants.masterboardIconText +
+                               "-Name-" +
+                               Constants.masterboardIconTextColor,
+                               Constants.masterboardIconSubscript +
+                               "-Subscript-" +
+                               Constants.masterboardIconTextColor };
         
         Image image =
             ResourceLoader.getCompositeImage(iconNames,

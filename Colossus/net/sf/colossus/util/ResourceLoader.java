@@ -496,10 +496,21 @@ public final class ResourceLoader
 		filename.substring(0,
 				   filename.indexOf("-Name"));
 	    tempImage =
-		createNameImage(basew,baseh,name,
+		createNameImage(basew,baseh,name,false,
 				colorFromFilename(filename,
 						  name + "-Name"));
 	}
+	if (filename.indexOf("-Subscript") != -1)
+	{
+	    String name =
+		filename.substring(0,
+				   filename.indexOf("-Subscript"));
+	    tempImage =
+		createNameImage(basew,baseh,name,true,
+				colorFromFilename(filename,
+						  name + "-Subscript"));
+	}
+
 	if (tempImage == null)
 	{
 	    System.err.println("Error: creation failed for " +
@@ -549,7 +560,7 @@ public final class ResourceLoader
     }
 
 
-    private static Image createNameImage(int width, int height, String name, Color color)
+    private static Image createNameImage(int width, int height, String name, boolean down, Color color)
     {
         BufferedImage bi = new BufferedImage(width, height,
                                              BufferedImage.TYPE_INT_ARGB);
@@ -575,7 +586,8 @@ public final class ResourceLoader
             sh = (int)sb.getHeight();
         }
         int offset = (width - sw) / 2;
-        biContext.drawString(name, offset, 1 + fm.getMaxAscent());
+        biContext.drawString(name, offset,
+                             (down ? (height - 2) : (1 + fm.getMaxAscent())));
 	waitOnImage(bi);
 
         return bi;
