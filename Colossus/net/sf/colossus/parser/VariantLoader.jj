@@ -55,6 +55,12 @@ TOKEN :
 
 TOKEN :
 {
+    < NUMBER : (<DIGIT>)+ >
+|   < #DIGIT: ["0" - "9"] >
+}
+
+TOKEN :
+{
     < CHAINE : (<CAR>)+ >
 |   < #CAR : ["a"-"z","A"-"Z","0"-"9","_","-",".",","] >
 }
@@ -104,18 +110,6 @@ void v_depend(String[] ls) :
     { ls[DEPEND_INDEX] = fn; }
 }
 
-TOKEN :
-{
-    < NUMBER : (<DIGIT>)+ >
-|   < #DIGIT: ["0" - "9"] >
-}
-
-TOKEN :
-{
-    < MAXPLAYERS: "MAXPLAYERS" >
-}
-
-
 int v_number() :
 {}
 {
@@ -130,7 +124,7 @@ int v_maxplayers() :
     int temp;
 }
 {
-    <MAXPLAYERS> (temp = v_number())
+    "MAXPLAYERS:" (temp = v_number())
     {
         return temp;
     }
@@ -161,6 +155,7 @@ int oneLine(String[] ls) :
 |   (mp = v_maxplayers()) 
     {
         maxPlayers = mp;
+        return(0);
     }
 |   <EOL>
     {

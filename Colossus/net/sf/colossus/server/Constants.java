@@ -129,7 +129,7 @@ public final class Constants
 
     public static final int DEFAULT_MAX_PLAYERS = 6;
     /* number of available colours/markers */
-    public static final int MAX_MAX_PLAYERS = 9;
+    public static final int MAX_MAX_PLAYERS = 6;
 
     // Player types
     public static final String human = "Human";

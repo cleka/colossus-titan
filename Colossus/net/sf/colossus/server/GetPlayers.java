@@ -33,8 +33,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private JFrame parentFrame;
 
     private Vector typeChoices = new Vector();
-    private JComboBox [] playerTypes = new JComboBox[6];
-    private JComboBox [] playerNames = new JComboBox[6];
+    private JComboBox [] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
+    private JComboBox [] playerNames = new JComboBox[Constants.MAX_MAX_PLAYERS];
     private JEditorPane readme = new JEditorPane();
     private JScrollPane scrollPane = null;
 
@@ -74,7 +74,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             Log.error(ex.toString());
         }
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             doOnePlayer(i);
         }
@@ -159,6 +159,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         readme.setDocument(doc);
         options.setOption(Options.variant,variantName);
 
+        enablePlayers();
+
         pack();
         
         centerOnScreen();
@@ -207,6 +209,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         playerPane.add(playerType);
         playerType.addActionListener(this);
+        playerType.setEnabled(false);
         playerTypes[i] = playerType;
 
         String name = options.getStringOption(Options.playerName + i);
@@ -238,9 +241,19 @@ public final class GetPlayers extends KDialog implements WindowListener,
         playerName.setEditable(true);
         playerPane.add(playerName);
         playerName.addActionListener(this);
+        playerName.setEnabled(false);
         playerNames[i] = playerName;
     }
 
+    private void enablePlayers()
+    {
+        int maxPlayers = VariantSupport.getMaxPlayers();
+        for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
+        {
+            playerTypes[i].setEnabled(i < maxPlayers);
+            playerNames[i].setEnabled(i < maxPlayers);
+        }
+    }
 
     private void addCheckbox(String optname, Container pane)
     {
@@ -259,7 +272,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         java.util.List names = new ArrayList();
         java.util.List types = new ArrayList();
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             String name = (String)(playerNames[i].getSelectedItem());
             String type = (String)(playerTypes[i].getSelectedItem());
@@ -363,6 +376,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private void doLoadVariant()
     {
+        int maxPlayers = VariantSupport.getMaxPlayers();
         javax.swing.JFileChooser varChooser = 
             new JFileChooser(Constants.gameDataPath);
         varChooser.setFileFilter(new varFileFilter());
@@ -382,6 +396,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
                 readme.setContentType((String)doc.getProperty(
                            ResourceLoader.keyContentType));
                 readme.setDocument(doc);
+                if (maxPlayers != VariantSupport.getMaxPlayers())
+                    enablePlayers();
             }
         }
     }
@@ -441,6 +457,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             Object source = e.getSource();
             if (source == variantBox)
             {
+                int maxPlayers = VariantSupport.getMaxPlayers();
                 String value = (String)variantBox.getSelectedItem();
                 if (VariantSupport.getVarName().equals(value + ".var"))
                 { // re-selecting the same ; do nothing
@@ -457,11 +474,13 @@ public final class GetPlayers extends KDialog implements WindowListener,
                            ResourceLoader.keyContentType);
                     readme.setContentType(prop);
                     readme.setDocument(doc);
+                    if (maxPlayers != VariantSupport.getMaxPlayers())
+                        enablePlayers();
                 }
             }
             else
             {
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
                 {
                     JComboBox box = playerTypes[i];
                     if (box == source)

@@ -97,6 +97,14 @@ public final class VariantSupport
                 {
                     maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
                 }
+                if (maxPlayers > Constants.MAX_MAX_PLAYERS)
+                {
+                    Log.error("Can't use more than " +
+                              Constants.MAX_MAX_PLAYERS +
+                              " players, while variant require " +
+                              maxPlayers);
+                    maxPlayers = Constants.MAX_MAX_PLAYERS;
+                }
                 varDirectory = tempVarDirectory;
                 variantName = tempVarName;
                 if (data[VariantLoader.MAP_INDEX] != null)

@@ -1,3 +1,5 @@
 MAP:ExtTitan.map
 TER:ExtTitan.ter
 CRE:ExtTitan.cre
+MAXPLAYERS: 8
+
