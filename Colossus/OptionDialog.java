@@ -29,18 +29,18 @@ class OptionDialog extends Dialog implements ActionListener
 
         setBackground(Color.lightGray);
 
-        setLayout(new GridLayout(0, 3));
+        setLayout(new BorderLayout());
 
         setResizable(false);
 
-        add(new Label(question));
+        add(new Label(question), BorderLayout.NORTH);
 
         Button button1 = new Button(yesString);
-        add(button1);
+        add(button1, BorderLayout.WEST);
         button1.addActionListener(this);
 
         Button button2 = new Button(noString);
-        add(button2);
+        add(button2, BorderLayout.EAST);
         button2.addActionListener(this);
 
         pack();
