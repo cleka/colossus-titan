@@ -35,6 +35,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static Map terrainHexes = new HashMap();
     private static Map entrancesHex = new HashMap();
     private static Map towerStartListMap = new HashMap();
+    private static Map subtitleMap = new HashMap();
 
     /** ne, e, se, sw, w, nw */
     private GUIBattleHex [] entrances = new GUIBattleHex[6];
@@ -168,6 +169,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 towerStartListMap.put(new Character(terrain),
                                       tempTowerStartList);
             }
+            subtitleMap.put(new Character(terrain), bl.getSubtitle());
         }
         catch (Exception e) 
         {
@@ -523,6 +525,31 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 hex.paint(g);
             }
         }
+
+
+        Font oldFont = g.getFont();
+        FontMetrics fm;
+        String dn = getMasterHex().getTerrainDisplayName();
+        String bn = getMasterHex().getTerrainName();
+        String sub = (String)subtitleMap.get(new Character(terrain));
+
+        if (sub == null)
+            sub = (dn.equals(bn) ? null : bn);
+        
+        g.setFont(ResourceLoader.defaultFont.deriveFont((float)48));
+        fm = g.getFontMetrics();
+        int tma = fm.getMaxAscent();
+        g.drawString(dn, 4, 4 + tma);
+        
+        if (sub != null)
+        {
+            g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
+            fm = g.getFontMetrics();
+            int tma2 = fm.getMaxAscent();
+            g.drawString(sub, 4, 4 + tma + 8 + tma2);
+        }
+        
+        g.setFont(oldFont);
     }
 
 

@@ -43,9 +43,17 @@ public class BattlelandLoader
     /** hold the list of label for the Tower startlist */
     private java.util.List startlist = null;
 
+    /** optional subtitle for the Battlelands */
+    private String subtitle = null;
+
     public java.util.List getStartList()
     {
         return startlist;
+    }
+
+    public String getSubtitle()
+    {
+        return subtitle;
     }
 }
 
@@ -95,6 +103,11 @@ TOKEN :
 |   < CASELABEL : ["A"-"F","a"-"f"]["1"-"6"] >
 }
 
+TOKEN :
+{
+    < SUBTITLE: "SUBTITLE" >
+}
+
 String b_hexlabel() :
 {}
 {
@@ -130,6 +143,40 @@ void b_startlist() :
         if (temp.size() < 7)
             return;
         startlist = temp;
+    }
+}
+
+TOKEN :
+{
+    < CHAINE : (<CAR>)+ >
+|   < QUOTEDCHAINE : "\"" (<QUOTEDCAR>)+ "\"" >
+|   < #CAR : ["a"-"z","A"-"Z"] >
+|   < #QUOTEDCAR : ["a"-"z","A"-"Z","0"-"9"," ","_"] >
+}
+
+String b_chaine() :
+{}
+{
+    <CHAINE>
+    {
+        return(new String(token.image));
+    }
+|   <QUOTEDCHAINE>
+    {
+        String tok = new String(token.image);
+        String cha = tok.substring(1, tok.length() - 1);
+        return(cha);
+    }
+}
+
+void b_subtitle() :
+{
+    String temp;
+}
+{
+    <SUBTITLE> (temp = b_chaine())
+    {
+        subtitle = temp;
     }
 }
 
@@ -213,6 +260,10 @@ int oneBattlelandCase(BattleHex [][] h) :
         return(-1);
     }
 |   b_startlist()
+    {
+        return(0);
+    }
+|   b_subtitle()
     {
         return(0);
     }
