@@ -773,7 +773,8 @@ public final class ResourceLoader
             java.util.List directories, int width, int height)
     {
         BufferedImage bi;
-        String mapKey = getMapKey(filenames, directories);
+        String mapKey = getMapKey(filenames, directories) +
+                "(" + width + "," + height + ")";
         Object cached = imageCache.get(mapKey);
 
         if ((cached != null) && (cached instanceof Image))
@@ -1296,7 +1297,6 @@ public final class ResourceLoader
             java.util.List directories,
             Object[] parameter)
     {
-
         Class theClass = null;
         try
         {
