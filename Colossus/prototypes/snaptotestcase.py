@@ -163,15 +163,15 @@ class snapHandler(DefaultHandler):
                 self.printLeaves()
                 print '        turn = %s' % (self.turn,)
                 print '        print "\\nTurn", turn'
-            print '        aps.getLeaf("%s").split(%s, "%s", %s)' % (
-                self.parentId, numSplitoffs, self.childId, self.turn)
+            print '        aps.getLeaf("%s").split(%s, "%s", turn)' % (
+                self.parentId, numSplitoffs, self.childId)
         else:
             if self.printTurn():
                 self.printLeaves()
                 print '        turn = %s;' % (self.turn,)
                 print '        Log.debug("Turn " + turn);'
-            print '        aps.getLeaf("%s").split(%s, "%s", %s);' % (
-                self.parentId, numSplitoffs, self.childId, self.turn)
+            print '        aps.getLeaf("%s").split(%s, "%s", turn);' % (
+                self.parentId, numSplitoffs, self.childId)
         self.doneTurn[self.turn] = 1
             
 

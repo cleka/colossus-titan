@@ -292,7 +292,6 @@ class Node:
                 dupe.remove(ci)
             else:
                 count += 1
-        print "count is", count, "height is", self.getHeight()
 
         if count > self.getHeight():
             err = ("Certainty error in Node.revealCreatures() count=%d "
@@ -335,6 +334,7 @@ class Node:
         print "end revealCreatures()", self
         if self.parent is not None:
             self.parent.tellChildContents(self)
+
 
     def childCreaturesMatch(self):
         """Return True if creatures in children are consistent with self."""
@@ -403,14 +403,21 @@ class Node:
         """Decide how to split this legion, and return a list of Creatures to
         remove.  Return null on error."""
         print "chooseCreaturesToSplitOut() for", self, pos
-        minKillValue = 99999
+        maximize = False
+        if 2 * len(pos[0]) > self.getHeight():
+            # The splitoff is the bigger legion, so split off the best creatures. 
+            maximize = True
+
+        bestKillValue = None
         creaturesToRemove = []
         for li in pos:
             totalKillValue = 0
             for creature in li:
                 totalKillValue += killValue[creature.name]
-            if totalKillValue < minKillValue:
-                minKillValue = totalKillValue
+            if ((bestKillValue is None) or 
+                    (maximize and totalKillValue > bestKillValue) or
+                    (not maximize and totalKillValue < bestKillValue)):
+                bestKillValue = totalKillValue
                 creaturesToRemove = li
         return creaturesToRemove
 
@@ -435,7 +442,6 @@ class Node:
                     self.child2.removed)
 
         pos = self.findAllPossibleSplits(childSize, knownKeep, knownSplit)
-        print "pos is", pos
         splitoffCreatures = self.chooseCreaturesToSplitOut(pos)
         print "splitoffCreatures is", splitoffCreatures
 
@@ -494,13 +500,8 @@ class Node:
             removed1 = self.child1.removed
             removed2 = self.child2.removed
 
-        # Assume that the bigger stack got the better creatures.
-        if 2 * childSize > self.getHeight():
-            marker1 = otherMarkerId
-            marker2 = self.markerId
-        else:
-            marker1 = self.markerId
-            marker2 = otherMarkerId
+        marker1 = self.markerId
+        marker2 = otherMarkerId
 
         li1 = strongList + afterSplit1
         for ci in removed1:
@@ -531,6 +532,8 @@ class Node:
         remain."""
         print "merge() for", self, other
         parent = self.parent
+        print "parent:", parent
+        print "other.parent:", other.parent
         assert parent == other.parent
         if (parent.markerId == self.markerId or
                 parent.markerId == other.markerId):
@@ -553,7 +556,7 @@ class Node:
         childCertainAtSplit = child.getCertainAtSplitCreatures()
         self.revealCreatures(getCreatureNames(childCertainAtSplit))
 
-        # Resplitting "too often" fixes some certainty issues.
+        # XXX Resplitting "too often" fixes some certainty issues.
         self.split(self.childSize2, self.getOtherChildMarkerId())
 
 
@@ -3912,21 +3915,35 @@ class PredictSplitsTestCase(unittest.TestCase):
         aps.getLeaf("Gd11").revealCreatures(['Troll'])
         aps.getLeaf("Gd11").addCreature("Troll")
         aps.printLeaves()
+
         turn = 11
         print "\nTurn", turn
         aps.getLeaf("Gr01").split(2, "Gr04", 11)
+        aps.getLeaf("Gr01").merge(aps.getLeaf("Gr04"), turn)
+        aps.getLeaf("Gr01").split(5, "Gr04", 11)
+
+        aps.getLeaf("Gr11").split(5, "Gr08", 11)
+        aps.getLeaf("Gr08").merge(aps.getLeaf("Gr11"), turn)
+        aps.getLeaf("Gr11").split(3, "Gr08", 11)
+        aps.getLeaf("Gr11").merge(aps.getLeaf("Gr08"), turn)
+        aps.getLeaf("Gr11").split(5, "Gr08", 11)
+        aps.getLeaf("Gr11").merge(aps.getLeaf("Gr08"), turn)
         aps.getLeaf("Gr11").split(2, "Gr08", 11)
-        aps.getLeaf("Gr01").revealCreatures(['Troll', 'Troll'])
-        aps.getLeaf("Gr01").addCreature("Warbear")
+
+        aps.getLeaf("Gr04").revealCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Gr04").addCreature("Warbear")
         aps.getLeaf("Gr11").revealCreatures(['Centaur'])
         aps.getLeaf("Gr11").addCreature("Centaur")
+
         aps.getLeaf("Bu10").revealCreatures(['Behemoth'])
         aps.getLeaf("Bu10").addCreature("Behemoth")
         aps.getLeaf("Gd11").split(2, "Gd09", 11)
+
         aps.getLeaf("Gr08").revealCreatures(['Gargoyle', 'Gargoyle'])
         aps.getLeaf("Gr08").addCreature("Cyclops")
         aps.getLeaf("Gr09").revealCreatures(['Lion'])
         aps.getLeaf("Gr09").addCreature("Lion")
+
         aps.getLeaf("Br04").revealCreatures(['Lion', 'Lion'])
         aps.getLeaf("Br04").addCreature("Ranger")
         aps.getLeaf("Rd04").revealCreatures(['Cyclops', 'Cyclops'])
