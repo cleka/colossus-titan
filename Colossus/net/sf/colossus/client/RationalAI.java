@@ -1400,7 +1400,8 @@ public class RationalAI implements AI
 
                 if (!hasEmptyHexMove)
                 {
-                    if (!occupiedHexes.contains(hex) || lm.noMove)
+                    if (!occupiedHexes.contains(hex) || 
+                    (lm.fromHex == lm.toHex && !lm.noMove))
                     {
                         hasEmptyHexMove = true;
                     }
@@ -1600,8 +1601,6 @@ public class RationalAI implements AI
         final int WIN_GAME = Integer.MAX_VALUE / 10;
         final int LOSE_GAME = Integer.MIN_VALUE / 10;
 
-        final int NO_ATTACK_BEFORE_TURN = 3;
-
         final int defenderPointValue = defender.getPointValue();
         final int attackerPointValue = attacker.getPointValue();
         final BattleResults result = estimateBattleResults(attacker, defender,
@@ -1609,11 +1608,13 @@ public class RationalAI implements AI
 
         int value = (int)result.getExpectedValue();
 
-        if (client.getTurnNumber() < NO_ATTACK_BEFORE_TURN)
+        // apply penalty to attacks if we have few legions
+        int attackerLegions = attacker.getPlayerInfo().getNumLegions();
+        if (attackerLegions < 5)
         {
-            return value - (int)5 * result.getAttackerDead();
-        } // apply penalty to early attacks
-
+            return value - (7 -attackerLegions) * result.getAttackerDead();
+        }
+        
         boolean defenderTitan = defender.hasTitan();
 
         if (result.getExpectedValue() > 0)
