@@ -2883,7 +2883,7 @@ public final class Client implements IClient
     /** Return a list of creature name strings. */
     java.util.List findEligibleRecruiters(String markerId, String recruitName)
     {
-        java.util.List recruiters;
+        java.util.Set recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
         if (recruit == null)
         {
@@ -2895,8 +2895,9 @@ public final class Client implements IClient
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
 
-        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
-                hexLabel);
+        recruiters =
+                new HashSet(TerrainRecruitLoader.getPossibleRecruiters(terrain,
+                hexLabel));
         Iterator it = recruiters.iterator();
         while (it.hasNext())
         {
