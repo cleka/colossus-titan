@@ -45,8 +45,7 @@ final class SocketClientThread extends Thread implements IServer
             return;
         }
 
-        out.println(Constants.signOn + sep + client.getPlayerName() + sep +
-            client.isRemote());
+        signOn();
     }
 
 
@@ -430,7 +429,6 @@ Log.debug("End of SocketClientThread while loop");
             Log.error("Bogus packet");
         }
     }
-
 
 
     // Setup method

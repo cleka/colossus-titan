@@ -112,6 +112,17 @@ final class SocketServerThread extends Thread implements IClient
                 server.addRemoteClient(this, playerName);
             }
         }
+        else if (method.equals(Constants.fixName))
+        {
+            if (playerName.equals(Constants.byColor) || 
+                playerName.equals(Constants.byClient))
+            {
+                String playerName = (String)args.remove(0);
+                // Do not use setPlayerName() and feedback to client.
+                this.playerName = playerName;
+                setName(playerName);
+            }
+        }
         else if (method.equals(Constants.leaveCarryMode))
         {
             server.leaveCarryMode();
@@ -391,7 +402,6 @@ final class SocketServerThread extends Thread implements IClient
     public void setPlayerName(String playerName)
     {
         this.playerName = playerName;
-        // The thread is named after its player.
         setName(playerName);
 
         out.println(Constants.setPlayerName + sep + playerName);

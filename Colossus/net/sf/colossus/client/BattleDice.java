@@ -43,7 +43,14 @@ final class BattleDice extends JPanel
         this.targetNumber = targetNumber;
         this.hits = hits;
         this.rolls = rolls;
-        numDice = rolls.size();
+        if (rolls == null)
+        {
+            numDice = 0;
+        }
+        else
+        {
+            numDice = rolls.size();
+        }
     }
 
 

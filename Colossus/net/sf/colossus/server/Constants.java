@@ -140,7 +140,8 @@ public final class Constants
 
     // Network stuff
     public static final int defaultPort = 1969;
-    public static final String localhost = "localhost";
+    /** Windows doesn't always know about "localhost" so use IP. */
+    public static final String localhost = "127.0.0.1";
 
     // Game actions used in several places.
     public static final String newGame = "New game";
@@ -189,6 +190,7 @@ public final class Constants
 
     // From client to server
     public static final String signOn = "signOn";
+    public static final String fixName = "fixName";
 
     public static final String leaveCarryMode = "leaveCarryMode";
     public static final String doneWithBattleMoves = "doneWithBattleMoves";

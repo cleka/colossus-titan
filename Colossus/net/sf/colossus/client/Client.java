@@ -567,6 +567,16 @@ public final class Client implements IClient
         return null;
     }
 
+    java.util.List getPlayerNames()
+    {
+        java.util.List names = new ArrayList();
+        for (int i = 0; i < playerInfo.length; i++)
+        {
+            names.add(playerInfo[i].getName());
+        }
+        return names;
+    }
+
 
     public void setColor(String color)
     {
@@ -1036,6 +1046,7 @@ public final class Client implements IClient
 
     public void setPlayerName(String playerName)
     {
+Log.debug("Client.setPlayerName() from " + this.playerName + " to " + playerName);
         this.playerName = playerName;
         sct.setName("Client " + playerName);
     }

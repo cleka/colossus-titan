@@ -1,14 +1,24 @@
 Bug: Non-warlock rangestrikers fail to attack legions of all lords.
      They move into rangestriking position even though they can't.
+
 Bug: Log window text sometimes appears over board, map.
-Bug: Occasional "Error: java.net.SocketException: Connection reset by peer: 
+
+Bug: Occasional "Error: java.net.SocketException: Connection reset by peer:
      Connection reset by peer" for no known reason, which drops the client
      and kills the game.  Happens with local clients.  Also remote?
 
-Add Client.jnlp file.
+Bug: Human (local) player named byColor never has SocketServerThread name reset:
+    From client <By color>1: doneWithSplits
+    Error: <By color>1 illegally called doneWithSplits()
+
+Bug: Socket problems on Win2K.  "localhost" not portable?  Changed to 127.0.0.1
+
+Show battle hex id, legion ids in BattleMap title.
 
 Authenticate all remote calls to ensure that they come from the correct
    client.  (By socket, using the thread name, set to player name.)
+
+Do not ask player to pick a color if only one remains.
 
 Chat window.
 
@@ -18,10 +28,6 @@ Sometimes refuse remote newGame/loadGame/saveGame calls?
 
 Cleanup network shutdown -- when game over or player eliminated, don't
    whine if its client drops.
-
-When changing player type to AI in GetPlayers, change name to <By color>
-When changing it to remote, change name to <By client>
-If local player is named <By client> treat as <By color>
 
 Colorize StatusScreen.
 

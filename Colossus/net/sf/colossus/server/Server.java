@@ -101,7 +101,8 @@ Log.debug("initSocketServer maxClients = " + maxClients);
         try
         {
             clientSocket = serverSocket.accept();
-Log.debug("Got client connection");
+            Log.event("Got client connection from " + 
+                clientSocket.getInetAddress().toString());
             clientSockets[numClients] = clientSocket;
             numClients++;
         }
@@ -1300,6 +1301,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     /** Used to change a player name after color is assigned. */
     void setPlayerName(String playerName, String newName)
     {
+Log.debug("Server.setPlayerName() from " + playerName + " to " + newName);
         IClient client = getClient(playerName);
         client.setPlayerName(newName);
         clientMap.remove(playerName);
@@ -1318,7 +1320,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     // XXX Verify that it's this player's turn.
     public synchronized void assignColor(String color)
     {
-        if (getPlayer().getColor() == null)
+        if (getPlayer() == null || getPlayer().getColor() == null)
         {
             game.assignColor(getPlayerName(), color);
         }

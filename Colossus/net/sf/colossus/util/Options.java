@@ -50,6 +50,7 @@ public final class Options
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";
     public static final String showLogWindow = "Show log window";
+    public static final String showChat = "Show chat";
     public static final String useOverlay = "Use Graphical Overlay";
     public static final String noBaseColor = "Use black overlay on Chits";
     public static final String antialias = "Antialias";
@@ -95,13 +96,17 @@ public final class Options
             Constants.optionsExtension;
     }
 
+
     public void loadOptions()
     {
-        loadOptions(getOptionsFilename());
-    }
+        // Don't load from temporary player names.
+        if (owner.equals(Constants.byColor) || 
+            owner.equals(Constants.byClient))
+        {
+            return;
+        }
 
-    public void loadOptions(String optionsFile)
-    {
+        String optionsFile = getOptionsFilename();
         Log.event("Trying to read options from " + optionsFile);
         try
         {
@@ -118,6 +123,12 @@ public final class Options
     
     public void saveOptions()
     {
+        // Don't save from temporary player names.
+        if (owner.equals(Constants.byColor) || 
+            owner.equals(Constants.byClient))
+        {
+            return;
+        }
         String optionsFile = getOptionsFilename();
         Log.event("Trying to save options to " + optionsFile);
 

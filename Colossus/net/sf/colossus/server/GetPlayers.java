@@ -8,10 +8,12 @@ import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
 import java.util.*;
+import java.net.*;
 
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
+import net.sf.colossus.util.Log;
 import net.sf.colossus.client.VariantSupport;
 import net.sf.colossus.client.PickIntValue;
 
@@ -57,6 +59,20 @@ public final class GetPlayers extends KDialog implements WindowListener,
         Container contentPane = getContentPane();
         BoxLayout baseLayout = new BoxLayout(contentPane, BoxLayout.Y_AXIS);
         contentPane.setLayout(baseLayout);
+
+        try
+        {
+            InetAddress ia = InetAddress.getLocalHost();
+            JLabel iaLabel = new JLabel("Running on " + ia.toString());
+            Container iaPane = new Container();
+            iaPane.setLayout(new GridLayout(0, 1));
+            contentPane.add(iaPane);
+            iaPane.add(iaLabel);
+        }
+        catch (UnknownHostException ex)
+        {
+            Log.error(ex.toString());
+        }
 
         for (int i = 0; i < 6; i++)
         {
@@ -250,7 +266,18 @@ public final class GetPlayers extends KDialog implements WindowListener,
             if (name.length() > 0 && !name.equals(Constants.none) && 
                 !type.equals(Constants.none))
             {
-                // Make byColor names unique by appending row number.
+                // Force all network players to byClient.
+                if (type.equals(Constants.network))
+                {
+                    name = Constants.byClient;
+                }
+                // Don't allow local players to be called byClient.
+                else if (name.startsWith(Constants.byClient))
+                {
+                    name = Constants.byColor;
+                }
+
+                // Make by* names unique by appending row number.
                 if (name.equals(Constants.byColor) || 
                     name.equals(Constants.byClient))
                 {
@@ -449,6 +476,14 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         else if (value.equals(Constants.network))
                         {
                             playerNames[i].setSelectedItem(Constants.byClient);
+                        }
+                        else if (value.endsWith(Constants.ai))
+                        {
+                            playerNames[i].setSelectedItem(Constants.byColor);
+                        }
+                        else if (value.endsWith(Constants.human))
+                        {
+                            playerNames[i].setSelectedItem(Constants.username);
                         }
                         // If player type was changed away from none, also 
                         // change player name to something else.
