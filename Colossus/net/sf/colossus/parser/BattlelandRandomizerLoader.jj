@@ -34,8 +34,13 @@ public class BattlelandRandomizerLoader
     };
     private static final Random rand = new Random();
 
+    private List leftover;
+    private List usedup;
+
     Hashtable labels = new Hashtable();
 
+    /* code executed just before the constructor call */
+    /* used to add the predefined labels to the Hashtable */
     {
         int i,j;
         List al;
@@ -231,15 +236,18 @@ public class BattlelandRandomizerLoader
             hex.setElevation(1);
         if (result > (t.e_prob[0] + t.e_prob[1]))
             hex.setElevation(2);
+        usedup.add(a);
     }
     private void resolveAll(BattleHex[][] h, List al, List tl)
     {
+        usedup = new ArrayList();
         Iterator it = tl.iterator();
         while (it.hasNext())
         {
             randomTerrain rt = (randomTerrain)it.next();
             resolveOne(h, al, rt);
         }
+        leftover = al;
     }
 }
 
@@ -274,6 +282,8 @@ TOKEN :
 |   < TERRAINS : "TERRAINS" >
 |   < KEYLABEL : "LABEL" >
 |   < SOMEOF : "SOMEOF" >
+|   < LEFTOVER : "leftover" >
+|   < USEDUP : "usedup" >
 }
 
 TOKEN :
@@ -407,6 +417,26 @@ List z_listAddress() :
             ad = (address)al2.remove(rand.nextInt(al2.size()));
             al.add(ad);
             x--;
+        }
+        return al;
+    }
+|   <OPENPAR> <LEFTOVER> <CLOSEPAR> (al = z_listAddress())
+    {
+        if (leftover != null)
+        {
+            Iterator it = leftover.iterator();
+            while (it.hasNext())
+                al.add(it.next());
+        }
+        return al;
+    }
+|   <OPENPAR> <USEDUP> <CLOSEPAR> (al = z_listAddress())
+    {
+        if (usedup != null)
+        {
+            Iterator it = usedup.iterator();
+            while (it.hasNext())
+                al.add(it.next());
         }
         return al;
     }

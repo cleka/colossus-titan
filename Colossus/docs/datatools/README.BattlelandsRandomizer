@@ -49,6 +49,10 @@ where
        the 3 lines of 3 hexagons representing the defense entry lines
        (left, upper-right, and lower-right respectively).
     # "anywhere" representing the whole Battlelands.
+    # "leftover" : special label representing all hexes that were in
+      the most recent AREA statement, but didn't receive a Hazard.
+    # "usedup" : special label representing all hexes that were in
+      the most recent AREA statement, and did receive a Hazard.
     
     SOMEOF is a literal string ; result is a list of <number> hexes taken
     randomly from the <list_of_hex> in parameter.

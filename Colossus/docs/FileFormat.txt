@@ -228,12 +228,7 @@ mentioning "Default" as a dependency is not required.
 # Chit (i.e. images representing a Creature) should be non-transparent
 GIF file, size 60 * 60 (other size may work but won't look as nice). 
 They should be named after the Creature they represent, with a '.gif'
-extension. If the files doesn't exist, troubles may occur.
-
-Two version of the file should be supplied, one with and one without
-the '_i' postfix to the name (i.e 'MyCreature.gif' and 'MyCreature_i.gif').
-The first is used for upside-up Creature, the second for upside-down
-Creature.
+extension. If the file doesn't exist, troubles may occur.
 
 # Graphical Overlay for the Hexes on the Masterboard should be
 transparent GIF file, of size whatever-you-want (they are resized
@@ -253,5 +248,8 @@ Hazard) should be transparent GIF file, of size 216x188
 for the interior of the hexes (Bog, Sand...), and size 248x220
 for the hexsides (Cliff, Slope...). The filename should the name
 of the hazard followed by '_Hazard', followed by the extension
-'.gif' (for instance "MySea_Hazard.gif"). Omly one version
+'.gif' (for instance "MySea_Hazard.gif"). Only one version
 is needed.
+
+Other sizes _may_ work (they are resized on-the-fly), and odds are
+better if the aspect ratio is the same.
