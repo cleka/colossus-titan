@@ -15,17 +15,21 @@ class Legion
     String markerId;    // Bk03, Rd12, etc.
     String splitFrom;   // Bk03, Rd12, etc. or null
     Creature [] creatures = new Creature[8];  // 8 before initial splits
+    int currentHex;
+    int startingHex;
 
     Legion(int cx, int cy, int scale, String markerId, String splitFrom,
-        Container container, int height, Creature creature0,
-        Creature creature1, Creature creature2, Creature creature3, 
-        Creature creature4, Creature creature5, 
+        Container container, int height, int currentHex, 
+        Creature creature0, Creature creature1, Creature creature2, 
+        Creature creature3, Creature creature4, Creature creature5, 
         Creature creature6, Creature creature7)
     {
         this.markerId = markerId;
         String imageFilename = "images/" + markerId + ".gif";
         this.chit = new Chit(cx, cy, scale, imageFilename, container);
         this.height = height;
+        this.currentHex = currentHex;
+        this.startingHex = currentHex;
         creatures[0] = creature0;
         creatures[1] = creature1;
         creatures[2] = creature2;
@@ -58,5 +62,19 @@ class Legion
             }
         }
         return true;
+    }
+
+
+    int numCreature(Creature creature)
+    {
+        int count = 0;
+        for (int i = 0; i < height; i++)
+        {
+            if (creatures[i] == creature)
+            {
+                count++;
+            }
+        }
+        return count;
     }
 }
