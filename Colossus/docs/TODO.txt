@@ -9,7 +9,8 @@ Do not ask player to pick a color if only one remains.
 Colorize chat window.
 Colorize StatusScreen.
 
-Sort creatures so that clopses and warbears aren't mixed.
+Sort creatures so that clopses/warbears, angels/guardiants, etc. 
+   aren't mixed.
 
 Observer clients.
 

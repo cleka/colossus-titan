@@ -162,6 +162,7 @@ public final class Constants
         "Undead",
         "TG-SetII",
         "TG-ConceptI",
+        "TG-ConceptII",
         "TG-ConceptIII"
     };
 
