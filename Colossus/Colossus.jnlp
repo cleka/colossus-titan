@@ -19,5 +19,4 @@
        <security>
            <all-permissions/>
        </security>
-       <initial-heap-size>
      </jnlp>
