@@ -6,15 +6,15 @@ H saddleBrown Hills     true  1 Troglodyte 2 Magog    2 Unicorn   2 Behemoth
 
 J darkGreen   Tombs     true  1 Skeleton   2 Zombie   3 Wraith    2 Vampire     2 BoneDragon
 
-M sienna      Marsh     true  1 Troglodyte 2 Ogre     2 Pegasus   3 GoldDragon
+M sienna      Marsh     true  1 Troglodyte 2 Orc      2 Pegasus   3 GoldDragon
 
 m red         Mountains true  1 Naga       2 Magog    2 Manticore 2 RedDragon   2 Colossus
 
 P yellow      Plains    true  1 Paladin    2 Naga     2 Pegasus   3 GoldDragon
 
-S blue        Swamp     true  1 Ogre       3 Wyvern   2 Hydra     2 BlackDragon
+S blue        Swamp     true  1 Orc        3 Wyvern   2 Hydra     2 BlackDragon
 
-t skyBlue     Tundra    true  1 Ogre       2 Basilisk 2 Hydra     2 Giant       2 Colossus
+t skyBlue     Tundra    true  1 Orc        2 Basilisk 2 Hydra     2 Giant       2 Colossus
 
 W olive       Woods     true  1 Paladin    2 Basilisk 2 Dendroid  2 Behemoth
 
