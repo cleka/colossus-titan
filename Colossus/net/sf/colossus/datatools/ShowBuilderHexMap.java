@@ -68,6 +68,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     new net.sf.colossus.parser.BattlelandRandomizerLoader(inputFile);
                 try {
                     while (parser.oneArea(h) >= 0) {}
+                    parser.resolveAllHexsides(h);
                 } catch (Exception e) { System.err.println(e); }
             }
         }

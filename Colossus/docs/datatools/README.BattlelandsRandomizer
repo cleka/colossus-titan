@@ -20,12 +20,12 @@ are generated yet (such as slope, ...).
 
 Properties are line of one of the two forms:
 
-AREA <list_of_hex> TERRAINS <list_of_hazards>
+AREA <list_of_hex> HAZARDS <list_of_hazards>
 LABEL <label> = <list_of_hex>
 
 where
 
-* AREA, TERRAINS and LABEL are the strings literals ; = is the character literal '='.
+* AREA, HAZARDS and LABEL are the strings literals ; = is the character literal '='.
 
 * <list_of_hex> is a list of hex from the following available forms:
 
@@ -72,7 +72,7 @@ where
     percentile of chance of the hazard being present (a numerical point
     _must_ be present for all probability), <elevation> is a hard-coded
     elevation (integer between 0 and 2), and the three
-    <probability_elevation_X> are the odds of the terrain being at elevation
+    <probability_elevation_X> are the odds of the hazard being at elevation
     0, 1 and 2 respectively (it's better is the sum is 100., but they will
     be normalized to percentile values).
 

@@ -5,11 +5,11 @@ LABEL areaone=B3 C4 D5
 LABEL areatwo=B2 C2 D2
 LABEL areathree=E2 E3 E4
 LABEL allarea=(areaone)(areatwo)(areathree)
-AREA (areaone) TERRAINS t,1
-AREA (areatwo) TERRAINS t,1
-AREA (areathree) TERRAINS t,1
-AREA (allarea) TERRAINS t,90.,1 t,5.,1 t,5.,1
-AREA (upperdefenseentry) TERRAINS t,25.,1
-AREA (lowerdefenseentry) TERRAINS t,25.,1
-AREA (leftdefenseentry) TERRAINS t,25.,1
-AREA (anywhere) TERRAINS t,25.,1
+AREA (areaone) HAZARDS t,1
+AREA (areatwo) HAZARDS t,1
+AREA (areathree) HAZARDS t,1
+AREA (allarea) HAZARDS t,90.,1 t,5.,1 t,5.,1
+AREA (upperdefenseentry) HAZARDS t,25.,1
+AREA (lowerdefenseentry) HAZARDS t,25.,1
+AREA (leftdefenseentry) HAZARDS t,25.,1
+AREA (anywhere) HAZARDS t,25.,1

@@ -86,7 +86,7 @@ public class BattlelandRandomizerLoader
         labels.put("anywhere", al);
     }
 
-    private class randomTerrain implements Comparable
+    private class randomHazard implements Comparable
     {
         private final char terrain;
         private final double prob;
@@ -104,7 +104,7 @@ public class BattlelandRandomizerLoader
         {
             return ((val * 100.) / sum);
         }
-        randomTerrain(char t)
+        randomHazard(char t)
         {
             terrain = t;
             prob = 100.;
@@ -112,27 +112,7 @@ public class BattlelandRandomizerLoader
             e_prob[1] = 0.;
             e_prob[2] = 0.;
         }
-        randomTerrain(char t, double p)
-        {
-            terrain = t;
-            prob = percent(p);
-            e_prob[0] = 100.;
-            e_prob[1] = 0.;
-            e_prob[2] = 0.;
-        }
-        randomTerrain(char t, int e)
-        {
-            terrain = t;
-            prob = 100.;
-            e_prob[0] = 0.;
-            e_prob[1] = 0.;
-            e_prob[2] = 0.;
-            if ((e < 1) || (e > 2))
-                e_prob[0] = 100.;
-            else
-                e_prob[e] = 100.;
-        }
-        randomTerrain(char t, double p, int e)
+        randomHazard(char t, double p, int e)
         {
             terrain = t;
             prob = percent(p);
@@ -144,18 +124,9 @@ public class BattlelandRandomizerLoader
             else
                 e_prob[e] = 100.;
         }
-        randomTerrain(char t, double p1, double p2, double p3)
+        randomHazard(char t, double p, double p1, double p2, double p3)
         {
-            double sum = p1+p2+p3;
-            terrain = t;
-            prob = 100.;
-            e_prob[0] = percent(p1,sum);
-            e_prob[1] = percent(p2,sum);
-            e_prob[2] = percent(p3,sum);
-        }
-        randomTerrain(char t, double p, double p1, double p2, double p3)
-        {
-            double sum = p1+p2+p3;
+            double sum = percent(p1)+percent(p2)+percent(p3);
             terrain = t;
             prob = percent(p);
             e_prob[0] = percent(p1,sum);
@@ -164,7 +135,7 @@ public class BattlelandRandomizerLoader
         }
         public String toString()
         {
-            String s =  "Terrain '" + terrain + "'";
+            String s =  "Hazard '" + terrain + "'";
             if (prob < 100.)
                 s = s + " (" + prob + "%)";
             s = s + " [" + e_prob[0] + "/" + e_prob[1] + "/" + e_prob[2] + "]";
@@ -172,7 +143,7 @@ public class BattlelandRandomizerLoader
         }
         public int compareTo(Object o)
         {
-            randomTerrain other = (randomTerrain)o;
+            randomHazard other = (randomHazard)o;
             if (other.prob != prob)
             {
                 return (prob > other.prob ? -1 : 1);
@@ -230,7 +201,7 @@ public class BattlelandRandomizerLoader
             min = mi; max = ma;
         }
     }
-    private void resolveOne(BattleHex[][] h, List al, randomTerrain t)
+    private void resolveOne(BattleHex[][] h, List al, randomHazard t)
     {
         if (al.isEmpty())
             return;
@@ -255,10 +226,153 @@ public class BattlelandRandomizerLoader
         Iterator it = tl.iterator();
         while (it.hasNext())
         {
-            randomTerrain rt = (randomTerrain)it.next();
+            randomHazard rt = (randomHazard)it.next();
             resolveOne(h, al, rt);
         }
         leftover = al;
+    }
+
+    Hashtable hexsideRandomness = new Hashtable();
+    private class hazardPair
+    {
+        final char hs;
+        final int  es;
+        final char hd;
+        final int  ed;
+        hazardPair(char hs, int es, char hd, int ed)
+        {
+            this.hs = hs;
+            this.es = es;
+            this.hd = hd;
+            this.ed = ed;
+        }
+        public boolean equals(Object o)
+        {
+System.out.print("toto");
+            if (o == null)
+                return false;
+            if (!(o instanceof hazardPair))
+                return false;
+            hazardPair h = (hazardPair)o;
+            return ((hs == h.hs) &&
+                    (hd == h.hd) &&
+                    (es == h.es) &&
+                    (ed == h.ed));
+        }
+        boolean match(hazardPair h)
+        {
+            boolean eq = ((hs == h.hs) && (hd == h.hd));
+            if ((es != -1) && (h.es != -1))
+                eq = eq && (es == h.es);
+            if ((ed != -1) && (h.ed != -1))
+                eq = eq && (ed == h.ed);
+            return eq;
+        }
+        public String toString()
+        {
+            return("Pair: " + hs + "/" + (es == -1 ? "*" : ""+es) + " to " +
+                              hd + "/" + (ed == -1 ? "*" : ""+ed));
+        }
+    }
+    private class randomHexside
+    {
+        private final char hexside;
+        private final double prob;
+        private double percent(double val)
+        {
+            if (val < 0.)
+                return 0.;
+            if (val > 100.)
+                return 100.;
+            return val;
+        }
+        randomHexside(char h, double p)
+        {
+            hexside = h;
+            prob = percent(p);
+        }
+        char getHexside()
+        {
+            return hexside;
+        }
+        double getProb()
+        {
+            return prob;
+        }
+        public String toString()
+        {
+            return("Hexside " + hexside + " " + (prob < 100. ?
+                                                 prob + " %" :
+                                                 ""));
+        }
+    }
+    private List findHazardPairBestMatch(hazardPair p)
+    {
+        hazardPair p2;
+        List al;
+        p2 = p;
+System.out.println("Matching (1): " + p2);
+        al = (List)hexsideRandomness.get(p2);
+        if (al != null) // exact match
+            return al;
+        p2 = new hazardPair(p.hs, p.es, p.hd, -1);
+System.out.println("Matching (2): " + p2);
+        al = (List)hexsideRandomness.get(p2);
+        if (al != null)
+            return al;
+        p2 = new hazardPair(p.hs, -1, p.hd, p.ed);
+System.out.println("Matching (3): " + p2);
+        al = (List)hexsideRandomness.get(p2);
+        if (al != null)
+            return al;
+        p2 = new hazardPair(p.hs, -1, p.hd, -1);
+System.out.println("Matching (4): " + p2);
+        al = (List)hexsideRandomness.get(p2);
+        if (al != null)
+            return al;
+        return null;
+    }
+    public void resolveAllHexsides(BattleHex h[][])
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                if (show[i][j])
+                {
+                    for (int k = 0; k < 6; k++)
+                    {
+                        BattleHex hd = h[i][j].getNeighbor(k);
+                        if (hd != null)
+                        {
+                            char ts = h[i][j].getTerrain();
+                            int  es = h[i][j].getElevation();
+                            char td = hd.getTerrain();
+                            int  ed = hd.getElevation();
+                            hazardPair hp = new hazardPair(ts,es,td,ed);
+                            List hsl = findHazardPairBestMatch(hp);
+System.out.println("Found " + hsl + " for h[" + i + "][" + j + "] / " + k);
+System.out.println(" this is " + hp);
+                            if (hsl != null)
+                            {
+                                boolean attributed = false;
+                                Iterator it = hsl.iterator();
+                                while (!attributed && it.hasNext())
+                                {
+                                    randomHexside rhs = (randomHexside)it.next();
+                                    if ((rand.nextDouble() * 100.) <
+                                        rhs.getProb())
+                                    {
+                                        attributed = true;
+                                        h[i][j].setHexside(k,rhs.getHexside());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -290,10 +404,12 @@ TOKEN :
 {
     < EOL: "\n" >
 |   < AREA : "AREA" >
-|   < TERRAINS : "TERRAINS" >
+|   < HAZARDS : "HAZARDS" >
 |   < KEYLABEL : "LABEL" >
 |   < SOMEOF : "SOMEOF" >
 |   < SURROUNDINGSOF : "SURROUNDINGSOF" >
+|   < PAIR : "PAIR" >
+|   < HEXSIDES : "HEXSIDES" >
 |   < LEFTOVER : "leftover" >
 |   < USEDUP : "usedup" >
 }
@@ -309,12 +425,13 @@ TOKEN :
 |   < CLOSEPAR : ")" >
 |   < CARET : "-" >
 |   < EQUAL : "=" >
+|   < STAR : "*" >
 }
 
 TOKEN :
 {
-    < LABEL : ["A"-"F","a"-"f"]["1"-"6"] >
-|   < TERRAIN : ["a"-"z","A"-"Z"] >
+    < CASELABEL : ["A"-"F","a"-"f"]["1"-"6"] >
+|   < HAZARD : ["a"-"z","A"-"Z"] >
 
 }
 
@@ -333,7 +450,7 @@ String z_label() :
 char z_terrain() :
 {}
 {
-    <TERRAIN>
+    <HAZARD>
     { return(token.image.charAt(0)); }
 }
 
@@ -342,6 +459,8 @@ int z_number() :
 {
     <NUMBER>
     { return(Integer.parseInt(token.image)); }
+|   <STAR>
+    { return((int)-1); }
 }
 
 double z_fpnumber() :
@@ -349,6 +468,8 @@ double z_fpnumber() :
 {
     <FPNUMBER>
     { return(Double.parseDouble(token.image)); }
+|   <STAR>
+    { return((double)-1); }
 }
 
 address z_address() :
@@ -361,7 +482,7 @@ address z_address() :
     {
         return new address(x,y);
     }
-|   <LABEL>
+|   <CASELABEL>
     {
         switch (token.image.charAt(0))
         {
@@ -543,52 +664,58 @@ List z_listAddress() :
     { return new ArrayList(); }
 }
 
-List z_listTerrain() :
+List z_listHazard() :
 {
     char t;
-    int e;
+    int e = 0;
     List tl;
-    double p,p1,p2,p3;
+    double p = 100.0,p1,p2,p3;
 }
 {
-    (t = z_terrain()) <COMMA> (p = z_fpnumber()) <COMMA> (p1 = z_fpnumber()) <COMMA> (p2 = z_fpnumber()) <COMMA> (p3 = z_fpnumber()) (tl = z_listTerrain())
+    (t = z_terrain()) (<COMMA> (p = z_fpnumber()))? <COMMA> (p1 = z_fpnumber()) <COMMA> (p2 = z_fpnumber()) <COMMA> (p3 = z_fpnumber()) (tl = z_listHazard())
     {
-        randomTerrain rt = new randomTerrain(t, p, p1, p2, p3);
+        randomHazard rt = new randomHazard(t, p, p1, p2, p3);
         tl.add(rt);
         return tl;
     }
-|   (t = z_terrain()) <COMMA> (p1 = z_fpnumber()) <COMMA> (p2 = z_fpnumber()) <COMMA> (p3 = z_fpnumber()) (tl = z_listTerrain())
+|   (t = z_terrain()) (<COMMA> (p = z_fpnumber()))? (<COMMA> (e = z_number()))? (tl = z_listHazard())
     {
-        randomTerrain rt = new randomTerrain(t, p1, p2, p3);
-        tl.add(rt);
-        return tl;
-    }
-|   (t = z_terrain()) <COMMA> (p = z_fpnumber()) <COMMA> (e = z_number()) (tl = z_listTerrain())
-    {
-        randomTerrain rt = new randomTerrain(t, p, e);
-        tl.add(rt);
-        return tl;
-    }
-|   (t = z_terrain()) <COMMA> (p = z_fpnumber()) (tl = z_listTerrain())
-    {
-        randomTerrain rt = new randomTerrain(t, p);
-        tl.add(rt);
-        return tl;
-    }
-|   (t = z_terrain()) <COMMA> (e = z_number()) (tl = z_listTerrain())
-    {
-        randomTerrain rt = new randomTerrain(t, e);
-        tl.add(rt);
-        return tl;
-    }
-|   (t = z_terrain()) (tl = z_listTerrain())
-    {
-        randomTerrain rt = new randomTerrain(t);
+        randomHazard rt = new randomHazard(t, p, e);
         tl.add(rt);
         return tl;
     }
 |   /* empty */
     { return new ArrayList(); }
+}
+
+List z_listHexside() :
+{
+    char t;
+    int e = 0;
+    List hl;
+    double p = 100.0,p1,p2,p3;
+}
+{
+    (t = z_terrain()) (<COMMA> (p = z_fpnumber()))? (hl = z_listHexside())
+    {
+        randomHexside rh = new randomHexside(t, p);
+        hl.add(rh);
+        return hl;
+    }
+|   /* empty */
+    { return new ArrayList(); }
+}
+
+hazardPair z_hazardPair() :
+{
+    char ts, td;
+    int  es, ed;
+}
+{
+    <OPENPAR> (ts = z_terrain()) <COMMA> (es = z_number()) <CLOSEPAR> <OPENPAR> (td = z_terrain()) <COMMA> (ed = z_number()) <CLOSEPAR>
+    {
+        return new hazardPair(ts,es,td,ed);
+    }
 }
 
 int oneArea(BattleHex h[][]) :
@@ -597,9 +724,10 @@ int oneArea(BattleHex h[][]) :
     List tl;
     String s;
     hexes = h;
+    hazardPair hp;
 }
 {
-    <AREA> (al = z_listAddress()) <TERRAINS> (tl = z_listTerrain())
+    <AREA> (al = z_listAddress()) <HAZARDS> (tl = z_listHazard())
     {
         Collections.sort(al);
         //System.err.println("Using area: " + al + ", terrains: " + tl);
@@ -611,6 +739,13 @@ int oneArea(BattleHex h[][]) :
 |   <KEYLABEL> (s = z_label()) <EQUAL> (al = z_listAddress())
     {
         labels.put(s, al);
+        return(0);
+    }
+|   <PAIR> (hp = z_hazardPair()) <HEXSIDES> (tl = z_listHexside())
+    {
+System.out.println("For " + hp + " we'll use " + tl);
+        hexsideRandomness.put(hp,tl);
+System.out.println("NOW: " + hexsideRandomness);
         return(0);
     }
 |   <EOL>

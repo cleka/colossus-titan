@@ -9,13 +9,13 @@ LABEL areathree=E2 E3 E4
 LABEL heart=C3 D3 D4
 
 # let's put fair obstacle
-AREA (areaone) TERRAINS t,90.,1 r,50.
-AREA (areatwo) TERRAINS t,90.,1 r,50.
-AREA (areathree) TERRAINS t,90.,1 r,50.
-AREA (heart) TERRAINS t,5.,1 r,50.
-AREA (upperdefenseentry) TERRAINS r,50.
-AREA (lowerdefenseentry) TERRAINS r,50.
-AREA (leftdefenseentry) TERRAINS r,50.
+AREA (areaone) HAZARDS t,90.,1 r,50.
+AREA (areatwo) HAZARDS t,90.,1 r,50.
+AREA (areathree) HAZARDS t,90.,1 r,50.
+AREA (heart) HAZARDS t,5.,1 r,50.
+AREA (upperdefenseentry) HAZARDS r,50.
+AREA (lowerdefenseentry) HAZARDS r,50.
+AREA (leftdefenseentry) HAZARDS r,50.
 
 # add a bit of randomness
-AREA (areaone)(areatwo)(areathree)(heart) TERRAINS r,50. t,5.,1
+AREA (areaone)(areatwo)(areathree)(heart) HAZARDS r,50. t,5.,1

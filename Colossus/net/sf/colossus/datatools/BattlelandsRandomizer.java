@@ -46,6 +46,7 @@ public class BattlelandsRandomizer
         BattleHex[][] h = bhm.getBattleHexArray();
         try {
             while (parser.oneArea(h) >= 0) {}
+            parser.resolveAllHexsides(h);
         } catch (Exception e) { System.err.println(e); }
 
         System.out.println(bhm.dumpAsString());
