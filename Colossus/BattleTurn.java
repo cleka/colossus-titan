@@ -346,7 +346,12 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
         else if (e.getActionCommand().equals("Done with Strikes"))
         {
             // Advance only if there are no unresolved strikes.
-            if (!map.forcedStrikesRemain())
+            if (map.forcedStrikesRemain())
+            {
+                map.highlightChitsWithTargets();
+                new MessageBox(parentFrame, "Engaged creatures must strike.");
+            }
+            else
             {
                 map.commitStrikes();
                 advancePhase();
