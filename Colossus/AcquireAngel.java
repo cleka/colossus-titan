@@ -29,8 +29,6 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
         super(parentFrame, legion.getPlayer().getName() + 
             ": Acquire Angel", true);
         
-        setResizable(false);
-
         this.legion = legion;
         player = legion.getPlayer();
 
@@ -54,6 +52,7 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
         pack();
         setBackground(java.awt.Color.lightGray);
         setSize(scale * (numEligible + 1), (21 * scale / 10));
+        setResizable(false);
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, 
