@@ -69,7 +69,6 @@ public final class Server implements IServer
         numClients = 0;
         maxClients = game.getNumLivingPlayers();
 Log.debug("initSocketServer maxClients = " + maxClients);
-
 Log.debug("About to create server socket on port " + port);
         try
         {
@@ -158,8 +157,7 @@ Log.debug("Called Server.createLocalClients()");
 
     private void createLocalClient(String playerName)
     {
-Log.debug("Called Server.addLocalClient() for " + playerName);
-
+Log.debug("Called Server.createLocalClient() for " + playerName);
         IClient client = new Client(Constants.localhost, port, playerName, 
             false);
     }
@@ -606,6 +604,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
 
     void reinforce(Legion legion)
     {
+Log.debug("Called Server.reinforce()");
         if (legion.getPlayer().isAI())
         {
             legion.getPlayer().aiReinforce(legion);

@@ -161,9 +161,11 @@ public final class Constants
         "Outlands",
         "Undead",
         "TG-SetII",
+        "TG-SetIII",
         "TG-ConceptI",
         "TG-ConceptII",
-        "TG-ConceptIII"
+        "TG-ConceptIII",
+        "TG-Wild"
     };
 
     public static final int numVariants = variantArray.length;

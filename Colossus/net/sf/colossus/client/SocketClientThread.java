@@ -21,6 +21,8 @@ import net.sf.colossus.server.IServer;
 final class SocketClientThread extends Thread implements IServer
 {
     private Client client;
+    private String host;
+    private int port;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -32,26 +34,29 @@ final class SocketClientThread extends Thread implements IServer
     {
         super("Client " + client.getPlayerName());
         this.client = client;
+        this.host = host;
+        this.port = port;
+    }
 
+
+    public void run()
+    {
 Log.debug("About to connect client socket to " + host + ":" + port);       
         try
         {
             socket = new Socket(host, port);
             out = new PrintWriter(socket.getOutputStream(), true);
         }
-        catch (Exception ex)
+        // UnknownHostException, IOException, IllegalBlockingModeException
+        catch (Exception ex)   
         {
             Log.error(ex.toString());
             ex.printStackTrace();
-            return;
+            System.exit(1);
         }
 
         signOn();
-    }
 
-
-    public void run()
-    {
         try
         {
             in = new BufferedReader(new InputStreamReader(

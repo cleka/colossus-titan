@@ -590,6 +590,7 @@ final class Battle
         Legion defender = getDefender();
         if (turnNumber == 4 && defender.canRecruit())
         {
+Log.debug("Calling Game.reinforce() from Battle.recruitReinforcement()");
             game.reinforce(defender);
             return false;
         }
@@ -599,6 +600,7 @@ final class Battle
     /** Needs to be called when reinforcement is done. */
     void doneReinforcing()
     {
+Log.debug("Called Battle.doneReinforcing()");
         Legion defender = getDefender();
         if (defender.hasRecruited())
         {

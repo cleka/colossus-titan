@@ -390,6 +390,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
     public void windowClosing(WindowEvent e)
     {
-        dialog.dispose();
+        System.exit(0);
     }
 }

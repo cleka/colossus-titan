@@ -820,6 +820,7 @@ Log.debug("Called Game.newGame2()");
 
         void advanceTurn()
         {
+            clearFlags();
             activePlayerNum++;
             if (activePlayerNum == getNumPlayers())
             {
@@ -1628,11 +1629,56 @@ Log.debug("Called Game.newGame2()");
         return recruiters;
     }
 
+    /** Return true if every single creature in legion is eligible
+     *  to recruit this recruit in this terrain.  XXX We really should
+     *  explicitly check for "Anything" instead. */
+    private boolean allCanRecruit(Legion legion, Creature recruit)
+    {
+        java.util.List recruiters = findEligibleRecruiters(
+            legion.getMarkerId(), recruit.getName());
+        Iterator it = legion.getCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            Creature creature = critter.getCreature();
+            if (!recruiters.contains(creature))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /** Add recruit to legion. */
     void doRecruit(Legion legion, Creature recruit, Creature recruiter)
     {
-        // XXX TODO Check for recruiter legality.
+        // Check for recruiter legality.
+        java.util.List recruiters = findEligibleRecruiters(
+            legion.getMarkerId(), recruit.getName());
+        if (recruit == null)
+        {
+            Log.error("null recruit in Game.doRecruit()");
+            return;
+        }
+        if (recruiter == null)
+        {
+            // If anything can recruit here, then this is okay.
+            if (!allCanRecruit(legion, recruit))
+            {
+                Log.error("null recruiter in Game.doRecruit()");
+                // XXX Let it go for now  Should return later
+            }
+            else
+            {
+                Log.debug("null recruiter okay");
+            }
+        }
+        else if (!recruiters.contains(recruiter))
+        {
+            Log.error("Illegal recruiter " + recruiter.getName() + 
+                " for recruit " + recruit.getName());
+            return;
+        }
 
         legion.addCreature(recruit, true);
         MasterHex hex = legion.getCurrentHex();
@@ -2165,6 +2211,11 @@ Log.debug("Called Game.newGame2()");
         server.reinforce(legion);
     }
 
+    void doneReinforcing()
+    {
+        reinforcing = false;
+    }
+
     // Called by both human and AI.
     void doSummon(Legion legion, Legion donor, Creature angel)
     {
@@ -2256,6 +2307,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && legion.canRecruit())
                 {
+Log.debug("Calling Game.reinforce() from Game.finishBattle()");
                     reinforce(legion);
                 }
             }

@@ -100,8 +100,8 @@ public final class Options
     public void loadOptions()
     {
         // Don't load from temporary player names.
-        if (owner.equals(Constants.byColor) || 
-            owner.equals(Constants.byClient))
+        if (owner.startsWith(Constants.byColor) || 
+            owner.startsWith(Constants.byClient))
         {
             return;
         }

@@ -1,3 +1,14 @@
+Bug: Enemy stack said it was 4-high, but when I jumped on it it became
+   5-high.  Missed a height updated somewhere.  (Summoned angel or
+   recruit?)
+
+Bug: Lost battle with titan stack, game stuck in my engagement phase.
+   Hit 'd' but then it got stuck in next player's engagement phase.
+   kickEngagements() summoning=false, reinforcing=true, acquiring=false
+   Looks like AI post-battle reinforcing is broken.  Added logging,
+   and called Game.clearFlags() from advanceTurn().  AI reinforcement
+   during battles appears to work.  Fixed?
+
 Show battle hex id, legion ids in BattleMap frame title.  (Trying to 
    set it, but it's not showing up.)
 
