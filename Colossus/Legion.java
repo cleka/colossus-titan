@@ -60,10 +60,11 @@ class Legion
         player.addPoints(points);        
 
         int score = player.getScore();
+        int tmpScore = score;
 
-        while (height < 7 && score / 100 > (score - points) / 100)
+        while (height < 7 && tmpScore / 100 > (score - points) / 100)
         {
-            if (score / 500 > (score - points) / 500)
+            if (tmpScore / 500 > (score - points) / 500)
             {
                 // XXX Need archangel / angel dialog
                 if (Creature.archangel.getCount() > 0)
@@ -76,7 +77,7 @@ class Legion
                     Creature.angel.takeOne();
                     addCreature(Creature.angel);
                 }
-                score -= 100;
+                tmpScore -= 100;
             }
             else
             {
@@ -85,7 +86,7 @@ class Legion
                     Creature.angel.takeOne();
                     addCreature(Creature.angel);
                 }
-                score -= 100;
+                tmpScore -= 100;
             }
         }
     }
