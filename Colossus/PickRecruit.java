@@ -902,10 +902,9 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
                     // Select that marker.
                     legion.addCreature(recruit);
 
-                    // Mark the recruit and recruiter(s) as visible.
-                    legion.revealCreatures(recruit, 1);
-                    int numRecruiters = numberOfRecruiterNeeded(recruiter, recruit,
-                        legion.getCurrentHex().getTerrain());
+                    // Mark the recruiter(s) as visible.
+                    int numRecruiters = numberOfRecruiterNeeded(recruiter, 
+                        recruit, legion.getCurrentHex().getTerrain());
                     if (numRecruiters >= 1)
                     {
                         legion.revealCreatures(recruiter, numRecruiters);
