@@ -44,11 +44,8 @@ class MinimaxAI extends SimpleAI implements AI
             Map.Entry entry = (Map.Entry)it.next();
             Legion legion = (Legion)entry.getKey();
             MasterHex hex = (MasterHex)entry.getValue();
-            // XXX Need to figure entrySide and teleport
-            int entrySide = -1;
-            boolean  teleport = false;
-            game.doMove(legion.getMarkerId(), hex.getLabel(), entrySide,
-                teleport);
+
+            game.doMove(legion.getMarkerId(), hex.getLabel());
         }
     }
 
@@ -288,11 +285,7 @@ class MinimaxAI extends SimpleAI implements AI
 
                     Log.debug("applymove: try " + legion + " to " + hex);
 
-                    // XXX Need to figure entrySide and teleport
-                    int entrySide = -1;
-                    boolean  teleport = false;
-                    game.doMove(legion.getMarkerId(), hex.getLabel(),
-                        entrySide, teleport);
+                    game.doMove(legion.getMarkerId(), hex.getLabel());
                 }
 
                 // advance phases until we reach the next move phase

@@ -14,6 +14,7 @@ import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.GetPlayers;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
@@ -31,7 +32,9 @@ public final class Game
     private int turnNumber;    // Advance when every player has a turn
     private boolean engagementInProgress;
     private boolean battleInProgress;
-    private boolean summoningAngel;
+    private boolean summoning;
+    private boolean reinforcing;
+    private boolean acquiring;
     private boolean pendingAdvancePhase;
     private boolean gameOver;
     private Battle battle;
@@ -44,6 +47,7 @@ public final class Game
     private static TerrainRecruitLoader trl;
     private LinkedList colorPickOrder = new LinkedList();
     private Set colorsLeft;
+    private PhaseAdvancer phaseAdvancer = new PhaseAdvancer();
 
     Game()
     {
@@ -128,22 +132,30 @@ public final class Game
         newGame.phase = phase;
         newGame.engagementInProgress = engagementInProgress;
         newGame.battleInProgress = battleInProgress;
-        newGame.summoningAngel = summoningAngel;
+        newGame.summoning = summoning;
+        newGame.reinforcing = reinforcing;
+        newGame.acquiring = acquiring;
         newGame.server = server;
 
         return newGame;
     }
 
+    private void clearFlags()
+    {
+        engagementInProgress = false;
+        battleInProgress = false;
+        summoning = false;
+        reinforcing = false;
+        acquiring = false;
+        pendingAdvancePhase = false;
+        gameOver = false;
+    }
 
     void newGame()
     {
+        clearFlags();
         turnNumber = 1;
         phase = Constants.SPLIT;
-        engagementInProgress = false;
-        battleInProgress = false;
-        summoningAngel = false;
-        pendingAdvancePhase = false;
-        gameOver = false;
         caretaker.resetAllCounts();
         players.clear();
 
@@ -309,10 +321,7 @@ public final class Game
         }
         server.allLoadInitialMarkerImages();
 
-        if (server.getClientOption(Options.autosave))
-        {
-            saveGame();
-        }
+        autoSave();
 
         setupPhase();
 
@@ -590,64 +599,103 @@ public final class Game
         return phase;
     }
 
-
-    /** Advance to the next phase, only if the passed oldPhase is current. */
-    void advancePhase(int oldPhase, String playerName)
+    /** Advance to the next phase, only if the passed oldPhase and playerName
+     *  are current. */
+    void advancePhase(final int oldPhase, final String playerName)
     {
-        if (oldPhase != phase || !playerName.equals(getActivePlayerName()) || 
-            pendingAdvancePhase)
-        {
-            Log.error("Called advancePhase illegally");
-            return;
-        }
+        phaseAdvancer.advancePhase(oldPhase, playerName);
+    }
 
-        pendingAdvancePhase = true;
+    /** Wrap the complexity of phase advancing. */
+    class PhaseAdvancer
+    {
+        // java.util.Timer is not present in JDK 1.2
+        private javax.swing.Timer timer;
 
-        ActionListener phaseAdvancer = new ActionListener()
+        class AdvancePhaseListener implements ActionListener
         {
             public void actionPerformed(ActionEvent e)
             {
                 advancePhaseInternal();
             }
-        };
-
-        int delay = server.getClientIntOption(Options.aiDelay);
-        if (getActivePlayer().isHuman() || delay < 0) 
-        {
-            delay = 0;
-        }
-        if (delay > 5000)
-        {
-            delay = 5000;
         }
 
-        // java.util.Timer is not present in JDK 1.2, so use the Swing
-        // timer for compatibility.
-        javax.swing.Timer timer = new javax.swing.Timer(delay, phaseAdvancer);
-        timer.setRepeats(false);
-        // Restart rather than start, to throw away excess advances.
-        timer.restart();
-    }
-
-
-    /** Advance to the next phase, with no error checking.  Do not
-     *  call this directly -- it should only be called from advancePhase(). */
-    private void advancePhaseInternal()
-    {
-        phase++;
-
-        if (phase > Constants.MUSTER ||
-            (getActivePlayer().isDead() && getNumLivingPlayers() > 0))
+        private int getDelay()
         {
-            advanceTurn();
+            int delay = Constants.MIN_DELAY;
+            if (server != null)
+            {
+                delay = server.getClientIntOption(Options.aiDelay);
+            }
+            if (getActivePlayer().isHuman() || delay < Constants.MIN_DELAY)
+            {
+                delay = Constants.MIN_DELAY;
+            }
+            if (delay > Constants.MAX_DELAY)
+            {
+                delay = Constants.MAX_DELAY;
+            }
+            return delay;
         }
-        else
-        {
-            Log.event("Phase advances to " + getPhaseName(phase));
-        }
-        pendingAdvancePhase = false;
 
-        setupPhase();
+        /** Advance to the next phase, only if the passed oldPhase and 
+         *  playerName are current. */
+        private void advancePhase(final int oldPhase, final String playerName)
+        {
+            if (oldPhase != phase || pendingAdvancePhase ||
+                !playerName.equals(getActivePlayerName()))
+            {
+                Log.error("Called advancePhase illegally");
+            }
+            else
+            {
+                pendingAdvancePhase = true;
+                // Need a new timer object each time.
+                timer = new javax.swing.Timer(getDelay(), 
+                    new AdvancePhaseListener());
+                timer.setRepeats(false);
+                timer.start();
+            }
+        }
+
+        /** Advance to the next phase, with no error checking. */
+        private void advancePhaseInternal()
+        {
+            phase++;
+            if (phase > Constants.MUSTER ||
+                (getActivePlayer().isDead() && getNumLivingPlayers() > 0))
+            {
+                advanceTurn();
+            }
+            else
+            {
+                Log.event("Phase advances to " + getPhaseName(phase));
+            }
+            pendingAdvancePhase = false;
+            setupPhase();
+        }
+
+        private void advanceTurn()
+        {
+            activePlayerNum++;
+            if (activePlayerNum == getNumPlayers())
+            {
+                activePlayerNum = 0;
+                turnNumber++;
+            }
+            phase = Constants.SPLIT;
+            if (getActivePlayer().isDead() && getNumLivingPlayers() > 0)
+            {
+                advanceTurn();
+            }
+            else
+            {
+                Log.event(getActivePlayerName() + "'s turn, number " + 
+                    turnNumber);
+                server.allUpdateStatusScreen();
+                autoSave();
+            }
+        }
     }
 
 
@@ -705,14 +753,15 @@ public final class Game
     private void setupFight()
     {
         // If there are no engagements, move forward to the muster phase.
-        if (!summoningAngel && findEngagements().size() == 0)
+        if (!summoning && !reinforcing && !acquiring &&
+            findEngagements().size() == 0)
         {
             advancePhase(Constants.FIGHT, getActivePlayerName());
         }
         else
         {
             server.allSetupFightMenu();
-            aiSetupEngagements();
+            kickEngagements();
         }
     }
 
@@ -736,32 +785,6 @@ public final class Game
         }
     }
 
-
-    private void advanceTurn()
-    {
-        activePlayerNum++;
-        if (activePlayerNum == getNumPlayers())
-        {
-            activePlayerNum = 0;
-            turnNumber++;
-        }
-        phase = Constants.SPLIT;
-        if (getActivePlayer().isDead() && getNumLivingPlayers() > 0)
-        {
-            advanceTurn();
-        }
-        else
-        {
-            Player player = getActivePlayer();
-            Log.event(player.getName() + "'s turn, number " + turnNumber);
-
-            server.allUpdateStatusScreen();
-            if (server.getClientOption(Options.autosave))
-            {
-                saveGame();
-            }
-        }
-    }
 
 
     int getTurnNumber()
@@ -940,7 +963,6 @@ public final class Game
         }
     }
 
-
     private void dumpLegion(PrintWriter out, Legion legion, boolean inBattle)
     {
         out.println(legion.getMarkerId());
@@ -969,7 +991,6 @@ public final class Game
         }
     }
 
-
     /** Create a text file describing this game's state, in
      *  file <saveDirName>/<time>.sav */
     void saveGame()
@@ -989,6 +1010,14 @@ public final class Game
             date.getTime() + Constants.saveExtension;
 
         saveGame(filename);
+    }
+
+    void autoSave()
+    {            
+        if (server.getClientOption(Options.autosave))
+        {
+            saveGame();
+        }
     }
 
 
@@ -1035,9 +1064,7 @@ public final class Game
 
 
             // Reset flags that are not in the savegame file.
-            pendingAdvancePhase = false;
-            summoningAngel = false;
-            gameOver = false;
+            clearFlags();
 
             initAndLoadData(); // _before_ Creatures get read
 
@@ -1238,7 +1265,6 @@ public final class Game
         }
     }
 
-
     Legion readLegion(BufferedReader in, Player player,
         boolean inBattle) throws IOException
     {
@@ -1250,7 +1276,7 @@ public final class Game
         boolean moved = Boolean.valueOf(buf).booleanValue();
 
         buf = in.readLine();
-        int entrySide = Integer.parseInt(buf);
+        int entrySide = Integer.valueOf(buf).intValue();
 
         String parentId = in.readLine();
 
@@ -1324,7 +1350,6 @@ public final class Game
         return legion;
     }
 
-
     /** Extract and return the numeric part of a filename. */
     private long numberValue(String filename)
     {
@@ -1350,7 +1375,6 @@ public final class Game
             return -1L;
         }
     }
-
 
     /** Find the save filename with the highest numerical value.
         (1000000000.sav comes after 999999999.sav) */
@@ -1512,11 +1536,15 @@ public final class Game
         return recruits;
     }
 
-    /** Return a list of eligible recruiters. Use Critters instead
-     *  of Creatures so that Titan power is shown properly. */
-    java.util.List findEligibleRecruiters(String markerId, Creature recruit)
+    /** Return a list of eligible recruiter creatures. */
+    java.util.List findEligibleRecruiters(String markerId, String recruitName)
     {
         java.util.List recruiters = new ArrayList(4);
+        Creature recruit = Creature.getCreatureByName(recruitName);
+        if (recruit == null)
+        {
+            return recruiters;
+        }
 
         Legion legion = getLegionByMarkerId(markerId);
         String hexLabel = legion.getCurrentHexLabel();
@@ -1535,12 +1563,11 @@ public final class Game
                 if (legion.numCreature(Creature.getCreatureByName("Titan")) 
                     >= 1)
                 {
-                    recruiters.add(legion.getCritter(
-                        Creature.getCreatureByName("Titan")));
+                    recruiters.add(Creature.getCreatureByName("Titan"));
                 }
                 if (legion.numCreature(warlockOrNot) >= 1)
                 {
-                    recruiters.add(legion.getCritter(warlockOrNot));
+                    recruiters.add(warlockOrNot);
                 }
             }
             else if (recruit.getName().equals(guardianOrNot.getName()))
@@ -1553,12 +1580,12 @@ public final class Game
                     if (creature.getName().equals(guardianOrNot.getName()) &&
                         (legion.numCreature(creature) >= 1))
                     {
-                        recruiters.add(legion.getCritter(creature));
+                        recruiters.add(creature);
                     }
                     else if (!creature.isImmortal() &&
                              legion.numCreature(creature) >= 3)
                     {
-                        recruiters.add(legion.getCritter(creature));
+                        recruiters.add(creature);
                     }
                 }
             }
@@ -1584,73 +1611,11 @@ public final class Game
         return recruiters;
     }
 
-    /** Return true if all members of legion who are in recruiters are
-     *  already visible. */
-    private boolean allRecruitersVisible(Legion legion, 
-        java.util.List recruiters)
-    {
-        if (server.getClientOption(Options.allStacksVisible))
-        {
-            return true;
-        }
-
-        Collection critters = legion.getCritters();
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (!critter.isVisible())
-            {
-                Iterator it2 = recruiters.iterator();
-                while (it2.hasNext())
-                {
-                    Creature recruiter = (Creature)it2.next();
-                    if (recruiter.getName().equals(critter.getName()))
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
 
     /** Add recruit to legion. */
-    void doRecruit(Creature recruit, Legion legion)
+    void doRecruit(Legion legion, Creature recruit, Creature recruiter)
     {
-        // Pick the recruiter(s) if necessary.
-        java.util.List recruiters = findEligibleRecruiters(
-            legion.getMarkerId(), recruit);
-        Creature recruiter;
-        Player player = legion.getPlayer();
-
-        int numEligibleRecruiters = recruiters.size();
-        if (numEligibleRecruiters == 0)
-        {
-            // A warm body recruits in a tower.
-            recruiter = null;
-        }
-        else if (server.getClientOption(player.getName(),
-            Options.autoPickRecruiter) || numEligibleRecruiters == 1 ||
-            allRecruitersVisible(legion, recruiters))
-        {
-            // If there's only one possible recruiter, or if all
-            // possible recruiters are already visible, or if
-            // the user has chosen the autoPickRecruiter option,
-            // then just reveal the first possible recruiter.
-            recruiter = (Creature)recruiters.get(0);
-        }
-        else
-        {
-            String recruiterName = null;
-            while (recruiterName == null)
-            {
-                recruiterName = server.pickRecruiter(legion, recruiters);
-            }
-            recruiter = Creature.getCreatureByName(recruiterName);
-        }
+        // TODO Check for recruiter legality.
 
         legion.addCreature(recruit, true);
         MasterHex hex = legion.getCurrentHex();
@@ -1674,6 +1639,7 @@ public final class Game
 
         // Recruits are one to a customer.
         legion.setRecruitName(recruit.getName());
+        // XXX Handle repaints on client side.
         server.allRepaintHex(legion.getCurrentHexLabel());
     }
 
@@ -1688,12 +1654,12 @@ public final class Game
         java.util.List recruits = new ArrayList(2);
         if (caretaker.getCount(Creature.getCreatureByName("Angel")) >= 1)
         {
-            recruits.add(Creature.getCreatureByName("Angel").toString());
+            recruits.add("Angel");
         }
         if (archangel && caretaker.getCount(
             Creature.getCreatureByName("Archangel")) >= 1)
         {
-            recruits.add(Creature.getCreatureByName("Archangel").toString());
+            recruits.add("Archangel");
         }
         return recruits;
     }
@@ -1738,8 +1704,6 @@ public final class Game
     }
 
 
-
-
     /** Recursively find conventional moves from this hex.  
      *  If block >= 0, go only that way.  If block == -1, use arches and 
      *  arrows.  If block == -2, use only arrows.  Do not double back in
@@ -1762,7 +1726,8 @@ public final class Game
                 if (cameFrom != -1)
                 {
                     int entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
-                    set.add(hexLabel + ":" + entrySide);
+                    set.add(hexLabel + ":" + BattleMap.entrySideName(
+                        entrySide));
                 }
             }
             return set;
@@ -1787,7 +1752,7 @@ public final class Game
             if (cameFrom != -1)
             {
                 int entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
-                set.add(hexLabel + ":" + entrySide);
+                set.add(hexLabel + ":" + BattleMap.entrySideName(entrySide));
                 return set;
             }
         }
@@ -1969,12 +1934,13 @@ public final class Game
         return set;
     }
 
-    /** Return the sum of all possible entry sides for this legion and hex,
-     *  or -1 if there are none.  If the hex is unoccupied, just return 
+    /** Return a Set of Strings "Left" "Right" or "Bottom" describing
+     *  possible entry sides.  If the hex is unoccupied, just return 
      *  one entry side since it doesn't matter. */
-    int getPossibleEntrySides(String markerId, String targetHexLabel, 
+    Set getPossibleEntrySides(String markerId, String targetHexLabel,
         boolean teleport)
     {
+        Set entrySides = new HashSet();
         Legion legion = getLegionByMarkerId(markerId);
         Player player = legion.getPlayer();
         int movementRoll = player.getMovementRoll();
@@ -1992,21 +1958,24 @@ public final class Game
                     targetHex.getTerrain() == 'T')
                     
                 {
-                    return 3;  
+                    entrySides.add("Bottom");  
+                    return entrySides;
                 }
                 else
                 {
-                    return 5 + 3 + 1;  // Always get to choose.
+                    entrySides.add("Bottom");  
+                    entrySides.add("Left");  
+                    entrySides.add("Right");  
+                    return entrySides;
                 }
             }
             else
             {
-                return -1;
+                return entrySides;
             }
         }
 
         // Normal moves.
-        int entrySides = 0;
         Set tuples = findNormalMoves(currentHex, player, legion, movementRoll, 
             findBlock(currentHex), Constants.NOWHERE, false);
         Iterator it = tuples.iterator();
@@ -2018,7 +1987,7 @@ public final class Game
             if (hl.equals(targetHexLabel))
             {
                 String buf = (String)parts.get(1);
-                entrySides += Integer.parseInt(buf);
+                entrySides.add(buf);
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHexLabel))
                 {
@@ -2076,6 +2045,7 @@ public final class Game
         Player player = getActivePlayer();
         if (server.getClientOption(player.getName(), Options.autoSummonAngels))
         {
+            // TODO Move to client side
             String typeColonDonor = player.aiSummonAngel(attacker);
             int split = typeColonDonor.indexOf(':');
             String angelType = typeColonDonor.substring(0, split);
@@ -2089,9 +2059,16 @@ public final class Game
         }
         else
         {
-            summoningAngel = true;
+            summoning = true;
             server.createSummonAngel(attacker);
         }
+    }
+
+    /** Called locally and from Battle. */
+    void reinforce(Legion legion)
+    {
+        reinforcing = true;
+        server.reinforce(legion);
     }
 
     void doSummon(Legion legion, Legion donor, Creature angel)
@@ -2117,7 +2094,7 @@ public final class Game
         {
             battle.finishSummoningAngel(player.hasSummoned());
         }
-        summoningAngel = false;
+        summoning = false;
     }
 
 
@@ -2128,7 +2105,7 @@ public final class Game
     }
 
 
-    private void aiSetupEngagements()
+    private void kickEngagements()
     {
         Player player = getActivePlayer();
         String engagementHexLabel = player.aiPickEngagement();
@@ -2137,7 +2114,10 @@ public final class Game
             server.engage(engagementHexLabel);
         }
 
-        if (findEngagements().size() == 0 && !summoningAngel)
+Log.debug("in kickEngagements() summoning=" + summoning + " reinforcing=" + 
+reinforcing + " acquiring=" + acquiring); 
+        if (findEngagements().size() == 0 && !summoning &&
+            !reinforcing && !acquiring)
         {
             advancePhase(Constants.FIGHT, player.getName());
         }
@@ -2160,53 +2140,29 @@ public final class Game
 
             if (legion.getPlayer() == getActivePlayer())
             {
-Log.debug("testing for post-battle angel summoning");
                 // Attacker won, so possibly summon angel.
                 if (legion.canSummonAngel())
                 {
-Log.debug("legion can summon angel");
                     createSummonAngel(legion);
                 }
             }
             else
             {
-Log.debug("testing for post-battle recruit");
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && legion.canRecruit())
                 {
-Log.debug("can recruit");
-                    Creature recruit = null;
-                    Player player = legion.getPlayer();
-                    if (server.getClientOption(player.getName(),
-                        Options.autoRecruit))
-                    {
-                        recruit = player.aiReinforce(legion);
-Log.debug("recruit is " + recruit);
-                    }
-                    else
-                    {
-                        String recruitName = server.pickRecruit(legion);
-                        if (recruitName != null)
-                        {
-                            recruit = Creature.getCreatureByName(recruitName);
-                        }
-                    }
-                    if (recruit != null)
-                    {
-Log.debug("calling doRecruit()");
-                        doRecruit(recruit, legion);
-                    }
+                    reinforce(legion);
                 }
             }
         }
         engagementInProgress = false;
         battleInProgress = false;
         server.allUpdateStatusScreen();
-        if (!summoningAngel)
+        if (!summoning && !reinforcing && !acquiring)
         {
             server.allHighlightEngagements();
+            kickEngagements();
         }
-        aiSetupEngagements();
     }
 
     /** Return a set of hexLabels. */
@@ -2235,8 +2191,8 @@ Log.debug("calling doRecruit()");
 
 
 
-    /** Return the childId, or null if the split failed. */
-    String doSplit(String parentId, String childId)
+    /** Return true if the split succeeded. */
+    boolean doSplit(String parentId, String childId, String results)
     {
         Legion legion = getLegionByMarkerId(parentId);
         Player player = legion.getPlayer();
@@ -2246,70 +2202,56 @@ Log.debug("calling doRecruit()");
         {
             server.showMessageDialog(player.getName(),
                 "Marker " + childId + " is not available.");
-            return null;
+            return false;
         }
         // Don't allow extra splits in turn 1.
         if (getTurnNumber() == 1 && player.getNumLegions() > 1)
         {
             server.showMessageDialog(player.getName(),
                 "Cannot split twice on Turn 1.");
-            return null;
+            return false;
         }
-
-        int oldHeight = legion.getHeight();
-
-        legion.sortCritters();
+        if (results == null)
+        {
+            return false;
+        }
 
         Legion newLegion = null;
 
-        String results = server.splitLegion(legion, childId);
-        if (results != null)
+        java.util.List strings = Split.split(',', results);
+        String newMarkerId = (String)strings.remove(0);
+
+        // Need to replace strings with creatures.
+        java.util.List creatures = new ArrayList();
+        Iterator it = strings.iterator();
+        while (it.hasNext())
         {
-            java.util.List strings = Split.split(',', results);
-            String newMarkerId = (String)strings.remove(0);
-            // XXX  Need this sanity check?
-            if (!newMarkerId.equals(childId))
-            {
-                Log.error("Game.doSplit() -- mismatched child ids");
-                return null;
-            }
+            String name = (String)it.next();
+            Creature creature = Creature.getCreatureByName(name);
+            creatures.add(creature);
+        }
+        newLegion = legion.split(creatures, childId);
 
-            // Need to replace strings with creatures.
-            java.util.List creatures = new ArrayList();
-            Iterator it = strings.iterator();
-            while (it.hasNext())
-            {
-                String name = (String)it.next();
-                Creature creature = Creature.getCreatureByName(name);
-                creatures.add(creature);
-            }
-            newLegion = legion.split(creatures, childId);
+        // Hide all creatures in both legions.
+        legion.hideAllCreatures();
+        newLegion.hideAllCreatures();
 
-            // Hide all creatures in both legions.
-            legion.hideAllCreatures();
-            newLegion.hideAllCreatures();
+        if (newLegion == null)
+        {
+            return false;
         }
 
-        // If we split, unselect this hex.
-        if (newLegion != null)
-        {
-            MasterHex hex = legion.getCurrentHex();
-            server.allUpdateStatusScreen();
-            server.allUnselectHexByLabel(hex.getLabel());
-            server.allAlignLegions(hex.getLabel());
-            return newLegion.getMarkerId();
-        }
-        else
-        {
-            return null;
-        }
+        String hexLabel = legion.getCurrentHexLabel();
+        server.didSplit(hexLabel, parentId, childId, newLegion.getHeight());
+
+        return true;
     }
 
 
     /** Move the legion to the hex if legal.  Return true if the
      *  legion was moved or false if the move was illegal. */
-    boolean doMove(String markerId, String hexLabel, int entrySide, 
-        boolean teleport)
+    boolean doMove(String markerId, String hexLabel, String entrySide,
+        boolean teleport, String teleportingLord)
     {
         Legion legion = getLegionByMarkerId(markerId);
         if (legion == null)
@@ -2338,64 +2280,69 @@ Log.debug("calling doRecruit()");
         }
 
         // Verify that the entry side is legal.
-        // XXX This logic needs to be moved somewhere else.
-        int sides = getPossibleEntrySides(markerId, hexLabel, teleport);
-        boolean left = false;
-        boolean bottom = false;
-        boolean right = false;
-        if (sides >= 5)
-        {
-            left = true;
-            sides -= 5;
-        }
-        if (sides >= 3)
-        {
-            bottom = true;
-            sides -= 3;
-        }
-        if (sides >= 1)
-        {
-            right = true;
-            sides -= 1;
-        }
-        if (entrySide == 1 && !right || entrySide == 3 && !bottom ||
-            entrySide == 5 && !left)
+        Set legalSides = getPossibleEntrySides(markerId, hexLabel, teleport);
+        if (!legalSides.contains(entrySide))
         {
             return false;
         }
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         // If this is a tower hex, the only entry side is the bottom.
-        if (hex.getTerrain() == 'T' && entrySide != 3)
+        if (hex.getTerrain() == 'T' && !entrySide.equals("bottom")) 
         {
             Log.warn("Tried to enter invalid side of tower");
-            entrySide = 3;
+            entrySide = "bottom";
         }
 
         // If the legion teleported, reveal a lord.
         if (teleport)
         {
-            // If it was a Titan teleport, that
-            // lord must be the titan.
-            if (isOccupied(hexLabel))
-            {
-                legion.revealCreatures(
-                    Creature.getCreatureByName("Titan"), 1);
-            }
-            else
-            {
-                String playerName = player.getName();
-                legion.revealTeleportingLord(
-                    server.getClientOption(playerName,
-                    Options.autoPlay) || server.getClientOption(
-                        playerName, Options.allStacksVisible));
-            }
+            // TODO Make sure teleportingLord is legal
+            legion.revealCreatures(
+                Creature.getCreatureByName(teleportingLord), 1);
         }
 
         legion.moveToHex(hex, entrySide, teleport);
+        // XXX Handle repaints on client side.
         server.allRepaintHex(legion.getStartingHexLabel());
         server.allRepaintHex(hexLabel);
         return true;
+    }
+
+
+    /** Simplified version for AIs and clients that really don't care about
+     *  teleport versus ground or entry sides or teleporting lords. */
+    boolean doMove(String markerId, String hexLabel)
+    {
+        Legion legion = getLegionByMarkerId(markerId);
+        if (legion == null)
+        {
+            return false;
+        }
+        Player player = legion.getPlayer();
+        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+
+        // Teleport only if it's the only option.
+        boolean teleport = !(listNormalMoves(legion, hex, 
+            player.getMovementRoll(), false).contains(hexLabel)) &&
+            (listTeleportMoves(legion, hex, player.getMovementRoll(), 
+            false).contains(hexLabel));
+
+        String teleportingLord = "";
+        if (teleport)
+        {
+            teleportingLord = (String)(legion.listTeleportingLords(
+                hexLabel).get(0));
+        }
+        Set sides = getPossibleEntrySides(markerId, hexLabel, teleport);
+        String entrySide = "";
+        if (!sides.isEmpty())
+        {
+            entrySide = (String)(sides.iterator().next());
+        }
+
+        return doMove(markerId, hexLabel, entrySide, teleport, 
+            teleportingLord);
     }
 
 
@@ -2615,7 +2562,10 @@ Log.debug("calling doRecruit()");
         engagementInProgress = false;
         server.allUpdateStatusScreen();
         server.allHighlightEngagements();
-        aiSetupEngagements();
+        if (!acquiring)
+        {
+            kickEngagements();
+        }
     }
 
 
@@ -2712,22 +2662,7 @@ Log.debug("calling doRecruit()");
                 {
                     // If the defender won the battle by agreement,
                     // he may recruit.
-                    Creature recruit;
-                    Player player = defender.getPlayer();
-                    if (server.getClientOption(player.getName(),
-                        Options.autoRecruit))
-                    {
-                        recruit = player.aiReinforce(defender);
-                    }
-                    else
-                    {
-                        String recruitName = server.pickRecruit(defender);
-                        recruit = Creature.getCreatureByName(recruitName);
-                    }
-                    if (recruit != null)
-                    {
-                        doRecruit(recruit, defender);
-                    }
+                    reinforce(defender);
                 }
             }
             else
@@ -2743,11 +2678,30 @@ Log.debug("calling doRecruit()");
         }
         engagementInProgress = false;
         server.allUpdateStatusScreen();
-        if (!summoningAngel)
+        if (!summoning && !reinforcing && !acquiring)
         {
             server.allHighlightEngagements();
         }
-        aiSetupEngagements();
+        kickEngagements();
+    }
+
+
+    void askAcquireAngel(String playerName, String markerId,
+        java.util.List recruits)
+    {
+        acquiring = true;
+        server.askAcquireAngel(playerName, markerId, recruits);
+    }
+
+    void doneAcquiringAngels()
+    {
+Log.debug("called Game.doneAcquiringAngels()");
+        acquiring = false;
+        if (!summoning && !reinforcing)
+        {
+Log.debug("called kickEngagements() from doneAcquiringAngels()");
+            kickEngagements();
+        }
     }
 
 

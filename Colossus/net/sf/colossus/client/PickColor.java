@@ -162,19 +162,4 @@ final class PickColor extends JDialog implements WindowListener, ActionListener
         color = e.getActionCommand();
         dispose();
     }
-
-
-    public static void main(String [] args)
-    {
-        Set colorsLeft = new HashSet();
-        colorsLeft.add("Black");
-        colorsLeft.add("Blue");
-        colorsLeft.add("Brown");
-        colorsLeft.add("Gold");
-        colorsLeft.add("Green");
-        colorsLeft.add("Red");
-        PickColor.pickColor(new JFrame(), "Test", colorsLeft);
-        System.out.println("Chose " + color);
-        System.exit(0);
-    }
 }

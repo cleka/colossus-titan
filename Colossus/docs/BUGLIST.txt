@@ -1,4 +1,4 @@
-Suspected Java bugs:
+SUSPECTED JAVA BUGS:
 
 Linux and Solaris 1.2.2 - 1.3.1:
    BattleDice and ShowLegion dialogs sometimes appear in the upper
@@ -30,7 +30,7 @@ Linux, 1.3.1, fvwm2: Problems with dialog resizing.  Doesn't seem to
 
 
 
-AI bugs:
+AI BUGS:
 
 AI Legions sometimes miss the risk of staying in their current hex.  
    For example, 2-high titan legion in H4 saw no risk from enemy 
@@ -106,10 +106,10 @@ Consider recruit scarcity (last gargoyle possibly more valuable than
    native terrain.  Get scrub snacks out of nearby opponents' good 
    recruiting terrain and into blocking positions.
 
-AI doesn't titan teleport?  Check.
+AI is not titan teleporting anymore.
 
 
-Programming bugs:
+PROGRAMMING BUGS:
 
 Concession timing.  If both players want to concede, the non-phasing
    player (usually?) has the right to concede first.  Concessions
@@ -196,13 +196,26 @@ First recruit of each game is very slow.  So is first SummonAngel if no
 MinimaxAI's advancePhase() calls are broken?  8-high starting stack split,
    rolled 6, processed a bunch, and illegally recombined.
 
-Need to reveal legion contents to each other during negotiation.
+Need to reveal legion contents to each other during negotiation.  Requires
+   per-client memory of enemy stacks.
 
 Desert 128 got attacked from hills 32.  Defending the "top" (d6 e5 f4) edge.
-   (20020102 build)  Works for me -- build with outdated code?  
-   Try to reproduce.
+   (20020102 build)  AI entry side problem.  Fixed?
 
 Can't play with more than one human player.  Does not allow first human to
    split starting stack.  Works for me -- try to reproduce in Win98.
 
 LogWindow does not appear at start of game even if option is set in cfg file.
+LogDebugMessages option does not work when set in cfg file.  They work okay
+   if twiddled off and back on, so this is just lack of initialization.
+
+Did file/new game while game was being set up.  Got comodification exception.
+
+When run from JWS in Windows, cfg files for AI players are created on desktop.
+
+AI teleports are still failing.
+
+Summoned angel after battle, then acquired angel.  Backwards?
+
+If PickEntrySide is aborted, PickLord is still shown.
+

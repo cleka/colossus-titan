@@ -30,8 +30,7 @@ public interface AI
     boolean concede(Legion legion, Legion enemy, Game game);
 
     /** make battle strikes for legion */
-    void strike(Legion legion, Battle battle, Game game,
-        boolean fakeDice);
+    void strike(Legion legion, Battle battle, Game game, boolean fakeDice);
 
     /** choose whether to take a penalty in order to possibly carry */
     boolean chooseStrikePenalty(Critter critter, Critter target,
@@ -48,7 +47,7 @@ public interface AI
     String pickEngagement(Game game);
 
     /** choose whether to acquire an angel or archangel */
-    String acquireAngel(Legion legion, List recruits, Game game);
+    String acquireAngel(String markerId, List recruits);
 
     /** choose whether to summon an angel or archangel */
     String summonAngel(Legion legion, Game game);

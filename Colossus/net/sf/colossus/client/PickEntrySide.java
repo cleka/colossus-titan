@@ -17,16 +17,15 @@ import java.util.*;
 final class PickEntrySide extends HexMap implements ActionListener,
     WindowListener
 {
-    private static JButton button5;  // left
-    private static JButton button3;  // bottom
-    private static JButton button1;  // right
+    private static JButton leftButton;
+    private static JButton bottomButton;
+    private static JButton rightButton;
     private static boolean laidOut;
     private JDialog dialog;
-    private static int entrySide;
+    private static String entrySide = "";
 
 
-    private PickEntrySide(JFrame parentFrame, String masterHexLabel,
-        boolean left, boolean bottom, boolean right)
+    private PickEntrySide(JFrame parentFrame, String masterHexLabel, Set sides)
     {
         super(masterHexLabel);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
@@ -34,28 +33,28 @@ final class PickEntrySide extends HexMap implements ActionListener,
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(null);
 
-        if (left)
+        if (sides.contains("Left"))
         {
-            button5 = new JButton("Left");
-            button5.setMnemonic(KeyEvent.VK_L);
-            contentPane.add(button5);
-            button5.addActionListener(this);
+            leftButton = new JButton("Left");
+            leftButton.setMnemonic(KeyEvent.VK_L);
+            contentPane.add(leftButton);
+            leftButton.addActionListener(this);
         }
 
-        if (bottom)
+        if (sides.contains("Bottom"))
         {
-            button3 = new JButton("Bottom");
-            button3.setMnemonic(KeyEvent.VK_B);
-            contentPane.add(button3);
-            button3.addActionListener(this);
+            bottomButton = new JButton("Bottom");
+            bottomButton.setMnemonic(KeyEvent.VK_B);
+            contentPane.add(bottomButton);
+            bottomButton.addActionListener(this);
         }
 
-        if (right)
+        if (sides.contains("Right"))
         {
-            button1 = new JButton("Right");
-            button1.setMnemonic(KeyEvent.VK_R);
-            contentPane.add(button1);
-            button1.addActionListener(this);
+            rightButton = new JButton("Right");
+            rightButton.setMnemonic(KeyEvent.VK_R);
+            contentPane.add(rightButton);
+            rightButton.addActionListener(this);
         }
 
         dialog.addWindowListener(this);
@@ -70,38 +69,21 @@ final class PickEntrySide extends HexMap implements ActionListener,
     }
 
 
-    /** sides is all the possible entry sides added together. */
-    static int pickEntrySide(JFrame parentFrame, String masterHexLabel,
-        int sides)
+    static String pickEntrySide(JFrame parentFrame, String masterHexLabel,
+        Set sides)
     {
-        entrySide = sides;
-
-        boolean left = false;
-        boolean bottom = false;
-        boolean right = false;
-
-        if (sides >= 5)
+        if (sides.size() >= 2)
         {
-            left = true;
-            sides -= 5;
+            new PickEntrySide(parentFrame, masterHexLabel, sides);
         }
-        if (sides >= 3)
+        else
         {
-            bottom = true;
-            sides -= 3;
+            Iterator it = sides.iterator();
+            if (it.hasNext())
+            {
+                entrySide = (String)it.next();
+            }
         }
-        if (sides >= 1)
-        {
-            right = true;
-            sides -= 1;
-        }
-
-        if (left && bottom || left && right || bottom && right)
-        {
-            new PickEntrySide(parentFrame, masterHexLabel, left, bottom, 
-                right);
-        }
-
         return entrySide;
     }
 
@@ -122,43 +104,43 @@ final class PickEntrySide extends HexMap implements ActionListener,
 
         if (!laidOut)
         {
-            if (button5 != null)
+            if (leftButton != null)
             {
-                button5.setBounds(cx + 1 * scale, cy + 1 * scale,
+                leftButton.setBounds(cx + 1 * scale, cy + 1 * scale,
                     d.width / 7, d.height / 16);
             }
-            if (button3 != null)
+            if (bottomButton != null)
             {
-                button3.setBounds(cx + 1 * scale, cy + 21 * scale,
+                bottomButton.setBounds(cx + 1 * scale, cy + 21 * scale,
                     d.width / 7, d.height / 16);
             }
-            if (button1 != null)
+            if (rightButton != null)
             {
-                button1.setBounds(cx + 19 * scale, cy + 11 * scale,
+                rightButton.setBounds(cx + 19 * scale, cy + 11 * scale,
                     d.width / 7, d.height / 16);
             }
 
             laidOut = true;
         }
 
-        if (button1 != null)
+        if (rightButton != null)
         {
-            button1.repaint();
+            rightButton.repaint();
         }
-        if (button3 != null)
+        if (bottomButton != null)
         {
-            button3.repaint();
+            bottomButton.repaint();
         }
-        if (button5 != null)
+        if (leftButton != null)
         {
-            button5.repaint();
+            leftButton.repaint();
         }
     }
 
 
     // Set hex's entry side to side, and then exit the dialog.  If side
     // is -1, then do not set an entry side, which will abort the move.
-    private void cleanup(int side)
+    private void cleanup(String side)
     {
         entrySide = side;
         dialog.dispose();
@@ -167,26 +149,13 @@ final class PickEntrySide extends HexMap implements ActionListener,
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand().equals("Left"))
-        {
-            cleanup(5);
-        }
-
-        else if (e.getActionCommand().equals("Right"))
-        {
-            cleanup(1);
-        }
-
-        else if (e.getActionCommand().equals("Bottom"))
-        {
-            cleanup(3);
-        }
+        cleanup(e.getActionCommand());
     }
 
 
     public void windowClosing(WindowEvent e)
     {
         // Abort the move.
-        cleanup(-1);
+        cleanup("");
     }
 }

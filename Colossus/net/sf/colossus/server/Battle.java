@@ -43,8 +43,8 @@ final class Battle
     private boolean driftDamageApplied;
     /** Set of hexLabels for valid carry targets */
     private Set carryTargets = new HashSet();
-
     private final int BIGNUM = 99;
+    private BattlePhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
 
 
     Battle(Game game, String attackerId, String defenderId,
@@ -68,9 +68,8 @@ final class Battle
         if (side != 1 && side != 3 && side != 5)
         {
             Log.warn("Fixing bogus entry side: " + side);
-            // XXX If invalid, default to 3, which is always valid.
-            side = 3;
-            attacker.setEntrySide(side);
+            // If invalid, default to bottom, which is always valid.
+            attacker.setEntrySide(3);
         }
         Legion defender = getDefender();
         defender.setEntrySide((side + 3) % 6);
@@ -353,136 +352,166 @@ final class Battle
     }
 
 
-    /** Advance to the next battle phase. */
     private void advancePhase()
     {
-        ActionListener phaseAdvancer = new ActionListener()
+        phaseAdvancer.advancePhase();
+    }
+
+    // TODO Try to merge duplicate code with Game.PhaseAdvancer.
+    class BattlePhaseAdvancer
+    {
+        private boolean again = false;
+    
+        // java.util.Timer is not present in JDK 1.2
+        private javax.swing.Timer timer;
+
+        class AdvancePhaseListener implements ActionListener
         {
             public void actionPerformed(ActionEvent e)
             {
                 advancePhaseInternal();
             }
-        };
-        int delay = game.getServer().getClientIntOption(Options.aiDelay);
-        if (getActivePlayer().isHuman() || delay < 0)
-        {
-            delay = 0;
-        }
-        if (delay > 5000)
-        {
-            delay = 5000;
         }
 
-        javax.swing.Timer timer = new javax.swing.Timer(delay, phaseAdvancer);
-        timer.setRepeats(false);
-        timer.start();
-    }
-
-
-    /** Advance to the next phase, with no error checking.  Do not call
-     *  this directly -- it should only be called from advancePhase(). */
-    private void advancePhaseInternal()
-    {
-        boolean again = false;
-
-        if (phase == Constants.SUMMON)
+        private int getDelay()
         {
-            phase = Constants.MOVE;
-            Log.event("Battle phase advances to " + getPhaseName(phase));
-            again = setupMove();
-        }
-
-        else if (phase == Constants.RECRUIT)
-        {
-            phase = Constants.MOVE;
-            Log.event("Battle phase advances to " + getPhaseName(phase));
-            again = setupMove();
-        }
-
-        else if (phase == Constants.MOVE)
-        {
-            // IF the attacker makes it to the end of his first movement
-            // phase without conceding, even if he left all legions
-            // off-board, the defender can recruit.
-            if (activeLegionNum == Constants.ATTACKER && !conceded)
+            int delay = Constants.MIN_DELAY;
+            if (game.getServer() != null)
             {
-                attackerEntered = true;
+                delay = game.getServer().getClientIntOption(Options.aiDelay);
             }
-            phase = Constants.FIGHT;
-            Log.event("Battle phase advances to " + getPhaseName(phase));
-            again = setupFight();
-        }
-
-        else if (phase == Constants.FIGHT)
-        {
-            // We switch the active legion between the fight and strikeback
-            // phases, not at the end of the player turn.
-            activeLegionNum = (activeLegionNum + 1) & 1;
-            driftDamageApplied = false;
-            phase = Constants.STRIKEBACK;
-            Log.event("Battle phase advances to " + getPhaseName(phase));
-            again = setupFight();
-        }
-
-        else if (phase == Constants.STRIKEBACK)
-        {
-            removeDeadCreatures();
-            checkForElimination();
-
-            // Make sure the battle isn't over before continuing.
-            if (!battleOver)
+            if (getActivePlayer().isHuman() || delay < Constants.MIN_DELAY)
             {
-                // Active legion is the one that was striking back.
-                if (activeLegionNum == Constants.ATTACKER)
+                delay = Constants.MIN_DELAY;
+            }
+            if (delay > Constants.MAX_DELAY)
+            {
+                delay = Constants.MAX_DELAY;
+            }
+            return delay;
+        }
+
+        /** Advance to the next battle phase. */
+        private void advancePhase()
+        {
+            if (!isOver())
+            {
+                // Need a new timer object each time.
+                timer = new javax.swing.Timer(getDelay(), 
+                    new AdvancePhaseListener());
+                timer.setRepeats(false);
+                timer.start();
+            }
+        }
+    
+        private void advancePhaseInternal()
+        {
+            if (phase == Constants.SUMMON)
+            {
+                phase = Constants.MOVE;
+                Log.event("Battle phase advances to " + getPhaseName(phase));
+                again = setupMove();
+            }
+    
+            else if (phase == Constants.RECRUIT)
+            {
+                phase = Constants.MOVE;
+                Log.event("Battle phase advances to " + getPhaseName(phase));
+                again = setupMove();
+            }
+    
+            else if (phase == Constants.MOVE)
+            {
+                // IF the attacker makes it to the end of his first movement
+                // phase without conceding, even if he left all legions
+                // off-board, the defender can recruit.
+                if (activeLegionNum == Constants.ATTACKER && !conceded)
                 {
-                    phase = Constants.SUMMON;
-                    Log.event(getActivePlayerName() +
-                        "'s battle turn, number " + turnNumber);
-                    again = setupSummon();
+                    attackerEntered = true;
+                }
+                phase = Constants.FIGHT;
+                Log.event("Battle phase advances to " + getPhaseName(phase));
+                again = setupFight();
+            }
+    
+            else if (phase == Constants.FIGHT)
+            {
+                // We switch the active legion between the fight and strikeback
+                // phases, not at the end of the player turn.
+                activeLegionNum = (activeLegionNum + 1) & 1;
+                driftDamageApplied = false;
+                phase = Constants.STRIKEBACK;
+                Log.event("Battle phase advances to " + getPhaseName(phase));
+                again = setupFight();
+            }
+    
+            else if (phase == Constants.STRIKEBACK)
+            {
+                removeDeadCreatures();
+                checkForElimination();
+                advanceTurn();
+            }
+    
+            if (again) 
+            {
+                advancePhase();
+            }
+        }
+
+        private void advanceTurn()
+        {
+            if (isOver())
+            {
+                return;
+            }
+
+            // Active legion is the one that was striking back.
+            if (activeLegionNum == Constants.ATTACKER)
+            {
+                phase = Constants.SUMMON;
+                Log.event(getActivePlayerName() + "'s battle turn, number " +
+                    turnNumber);
+                again = setupSummon();
+            }
+            else
+            {
+                turnNumber++;
+                if (turnNumber > 7)
+                {
+                    timeLoss();
                 }
                 else
                 {
-                    turnNumber++;
-                    if (turnNumber > 7)
+                    phase = Constants.RECRUIT;
+                    again = setupRecruit();
+                    if (getActivePlayer() != null)
                     {
-                        Log.event("Time loss");
-                        Legion attacker = getAttacker();
-                        // Time loss.  Attacker is eliminated but defender
-                        //    gets no points.
-                        if (attacker.hasTitan())
-                        {
-                            // This is the attacker's titan stack, so the
-                            // defender gets his markers plus half points
-                            // for his unengaged legions.
-                            Player player = attacker.getPlayer();
-                            attacker.remove();
-                            player.die(getDefender().getPlayerName(), true);
-                        }
-                        else
-                        {
-                            attacker.remove();
-                        }
-                        cleanup();
-                        again = false;
-                    }
-                    else
-                    {
-                        phase = Constants.RECRUIT;
-                        again = setupRecruit();
-                        Player player = getActivePlayer();
-                        if (player != null)
-                        {
-                            Log.event(player.getName() +
+                        Log.event(getActivePlayerName() +
                             "'s battle turn, number " + turnNumber);
-                        }
                     }
                 }
             }
         }
 
-        if (again && !battleOver)
+        private void timeLoss()
         {
-            advancePhase();
+            Log.event("Time loss");
+            Legion attacker = getAttacker();
+            // Time loss.  Attacker is eliminated but defender gets no points.
+            if (attacker.hasTitan())
+            {
+                // This is the attacker's titan stack, so the defender gets 
+                // his markers plus half points for his unengaged legions.
+                Player player = attacker.getPlayer();
+                attacker.remove();
+                player.die(getDefender().getPlayerName(), true);
+            }
+            else
+            {
+                attacker.remove();
+            }
+            cleanup();
+            again = false;
         }
     }
 
@@ -505,7 +534,6 @@ final class Battle
         }
         return advance;
     }
-
 
     private boolean setupRecruit()
     {
@@ -605,39 +633,25 @@ final class Battle
         {
             // Allow recruiting a reinforcement.
             Creature recruit = null;
-            Player player = defender.getPlayer();
-            if (game.getServer().getClientOption(player.getName(),
-                Options.autoRecruit))
-            {
-                recruit = player.aiReinforce(defender);
-            }
-            else
-            {
-                String recruitString = game.getServer().pickRecruit(defender);
-                if (recruitString != null)
-                {
-                    recruit = Creature.getCreatureByName(recruitString);
-                }
-            }
-            if (recruit != null)
-            {
-                game.doRecruit(recruit, defender);
-            }
 
-            if (defender.hasRecruited())
-            {
-                Critter newCritter = defender.getCritter(
-                    defender.getHeight() - 1);
-                placeCritter(newCritter);
-                game.getServer().allPlaceNewChit(newCritter, true);
-            }
+            game.reinforce(defender);
+            return false;
         }
-
-        // Always returns true, because we always want to advance to
-        // the next phase.  (Unless we decide to support undo?)
         return true;
     }
 
+    /** Needs to be called when reinforcement is done. */
+    void reinforceCallback()
+    {
+        Legion defender = getDefender();
+        if (defender.hasRecruited())
+        {
+            Critter newCritter = defender.getCritter(defender.getHeight() - 1);
+            placeCritter(newCritter);
+            game.getServer().allPlaceNewChit(newCritter, true);
+        }
+        advancePhase();
+    }
 
     int getCarryDamage()
     {

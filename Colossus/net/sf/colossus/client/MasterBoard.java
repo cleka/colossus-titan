@@ -772,67 +772,64 @@ public final class MasterBoard extends JPanel
                     {
                         if (h[i][j].getBaseExitType(k) != Constants.NONE) 
                         {
-                            MasterHex dh = hexByLabel(h, 
-                                h[i][j].getBaseExitLabel(k));
-                            if (dh == null) 
-                            {
-                                Log.error("null pointer ; i="+i+", j="+j+
-                                    ", k="+k);
-                                System.exit(1);
-                            }
-                            if (dh.getXCoord() == i) 
-                            {
-                                if (dh.getYCoord() == (j - 1)) 
-                                {
-                                    h[i][j].setExitType(0, 
-                                        h[i][j].getBaseExitType(k));
-                                } 
-                                else if (dh.getYCoord() == (j + 1)) 
-                                {
-                                    h[i][j].setExitType(3, 
-                                        h[i][j].getBaseExitType(k));
-                                } 
-                                else 
-                                {
-                                    Log.warn("bad exit ; i="+i+", j="+j+ 
-                                        ", k="+k);
-                                }
-                            } 
-                            else if (dh.getXCoord() == (i + 1)) 
-                            {
-                                if (dh.getYCoord() == j) 
-                                {
-                                    h[i][j].setExitType(2 - ((i + j) % 2), 
-                                        h[i][j].getBaseExitType(k));
-                                } 
-                                else 
-                                {
-                                    Log.warn("bad exit ; i="+i+", j="+j+ 
-                                        ", k="+k);
-                                }
-                            } 
-                            else if (dh.getXCoord() == (i - 1)) 
-                            {
-                                if (dh.getYCoord() == j) 
-                                {
-                                    h[i][j].setExitType(4 + ((i + j) % 2), 
-                                        h[i][j].getBaseExitType(k));
-                                } 
-                                else 
-                                {
-                                    Log.warn("bad exit ; i="+i+", j="+j+ 
-                                        ", k="+k);
-                                }
-                            } 
-                            else 
-                            {
-                                Log.warn("bad exit ; i="+i+", j="+j+ 
-                                    ", k="+k);
-                            }
+                            setupOneExit(h, i, j, k);
                         }
                     }
                 }
             }
+        }
+    }
+
+    private static void setupOneExit(MasterHex [][] h, int i, int j, int k)
+    {
+        MasterHex dh = hexByLabel(h, h[i][j].getBaseExitLabel(k));
+        if (dh == null) 
+        {
+            Log.error("null pointer ; i=" + i + ", j=" + j + ", k=" + k);
+            System.exit(1);
+        }
+        if (dh.getXCoord() == i) 
+        {
+            if (dh.getYCoord() == (j - 1)) 
+            {
+                h[i][j].setExitType(0, h[i][j].getBaseExitType(k));
+            } 
+            else if (dh.getYCoord() == (j + 1)) 
+            {
+                h[i][j].setExitType(3, h[i][j].getBaseExitType(k));
+            } 
+            else 
+            {
+                Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+            }
+        } 
+        else if (dh.getXCoord() == (i + 1)) 
+        {
+            if (dh.getYCoord() == j) 
+            {
+                h[i][j].setExitType(2 - ((i + j) & 1),
+                    h[i][j].getBaseExitType(k));
+            } 
+            else 
+            {
+                Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+            }
+        } 
+        else if (dh.getXCoord() == (i - 1)) 
+        {
+            if (dh.getYCoord() == j) 
+            {
+                h[i][j].setExitType(4 + ((i + j) & 1), 
+                    h[i][j].getBaseExitType(k));
+            } 
+            else 
+            {
+                Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
+            }
+        } 
+        else 
+        {
+            Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
         }
     }
 
@@ -1715,14 +1712,8 @@ public final class MasterBoard extends JPanel
             // destination, move the legion here.
             case Constants.MOVE:
                 client.clearRecruitChits();
-                if (client.doMove(hexLabel))
-                {
-                    highlightUnmovedLegions();
-                }
-                else
-                {
-                    actOnMisclick();
-                }
+                client.doMove(hexLabel);
+                actOnMisclick();   // Yes, even if the move was good.
                 break;
 
             // If we're fighting and there is an engagement here,

@@ -839,7 +839,11 @@ public final class Player implements Comparable
         {
             ai.masterMove(game);
             recombineIllegalSplits();
-            game.advancePhase(Constants.MOVE, getName());
+            // Keep the AI from continuing to play after winning.
+            if (!game.isOver())
+            {
+                game.advancePhase(Constants.MOVE, getName());
+            }
         }
     }
 
@@ -856,6 +860,7 @@ public final class Player implements Comparable
         }
     }
 
+
     Creature aiReinforce(Legion legion)
     {
         if (game.getServer().getClientOption(name, Options.autoRecruit))
@@ -864,6 +869,7 @@ public final class Player implements Comparable
         }
         return null;
     }
+
 
     boolean aiFlee(Legion legion, Legion enemy)
     {
@@ -933,14 +939,6 @@ public final class Player implements Comparable
         return null;
     }
 
-    String aiAcquireAngel(Legion legion, List recruits, Game game)
-    {
-        if (game.getServer().getClientOption(name, Options.autoAcquireAngels))
-        {
-            return ai.acquireAngel(legion, recruits, game);
-        }
-        return null;
-    }
 
     /** Return a String of form "Angeltype:donorId", or null if no
       * angel is to be summoned. */

@@ -759,4 +759,35 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
         alignChits(getAllHexLabels());
     }
+
+    public static String entrySideName(int side)
+    {
+        switch (side)
+        {
+            case 1: return "Right";
+            case 3: return "Bottom";
+            case 5: return "Left";
+            default: return "";
+        }
+    }
+
+    public static int entrySideNum(String side)
+    {
+        if (side.equalsIgnoreCase("Right"))
+        {
+            return 1;
+        }
+        else if (side.equalsIgnoreCase("Bottom"))
+        {
+            return 3;
+        }
+        else if (side.equalsIgnoreCase("Left"))
+        {
+            return 5;
+        }
+        else
+        {
+            return -1;
+        }
+    }
 }

@@ -60,6 +60,7 @@ public class SimpleAI implements AI
     public void muster(Game game)
     {
         // Do not recruit if this legion is a scooby snack.
+        boolean recruited = false;
         double scoobySnackFactor = 0.15;
         int minimumSizeToRecruit = (int)(scoobySnackFactor *
             game.getAverageLegionPointValue());
@@ -79,13 +80,23 @@ public class SimpleAI implements AI
 
                 if (recruit != null)
                 {
-                    game.doRecruit(recruit, legion);
+                    java.util.List recruiters = game.findEligibleRecruiters(
+                        legion.getMarkerId(), recruit.getName());
+                    if (!recruiters.isEmpty())
+                    {
+                        // Just take the first one.
+                        Creature recruiter = (Creature)recruiters.get(0);
+                        game.doRecruit(legion, recruit, recruiter);
+                        recruited = true;
+                    }
                 }
             }
         }
-
         game.getServer().allUnselectAllHexes();
-        game.getServer().allUpdateStatusScreen();
+        if (recruited)
+        {
+            game.getServer().allUpdateStatusScreen();
+        }
     }
 
 
@@ -95,7 +106,8 @@ public class SimpleAI implements AI
     }
 
 
-    static Creature chooseRecruit(Game game, Legion legion, MasterHex hex)
+    private static Creature chooseRecruit(Game game, Legion legion, 
+        MasterHex hex)
     {
         List recruits = game.findEligibleRecruits(legion.getMarkerId(), 
             hex.getLabel());
@@ -126,12 +138,6 @@ public class SimpleAI implements AI
             && legion.numCreature(Creature.getCreatureByName("Gargoyle")) == 0)
         {
             recruit = Creature.getCreatureByName("Cyclops");
-        }
-        // prefer warlock over guardian (should be built in now)
-        else if (recruits.contains(Creature.getCreatureByName("Guardian"))
-            && recruits.contains(Creature.getCreatureByName("Warlock")))
-        {
-            recruit = Creature.getCreatureByName("Warlock");
         }
         // take a third lion/troll if we've got at least 1 way to desert/swamp
         // from here and we're not about to be attacked
@@ -248,7 +254,7 @@ public class SimpleAI implements AI
     {
         Player player = game.getActivePlayer();
 
-        // XXX Using a for loop instead of a ListIterator to get around
+        // Using a for loop instead of a ListIterator to get around
         // a pesky ConcurrentModificationException.
         outer: for (int i = player.getNumLegions() - 1; i >= 0; i--)
         {
@@ -796,20 +802,12 @@ public class SimpleAI implements AI
                 // if we found a move that's better than sitting still, move
                 if (bestValue > sitStillMove.value)
                 {
-                    // XXX Need to track entrySide and teleport
-                    int entrySide = -1;
-                    boolean teleport = false;
-                    if (game.doMove(legion.getMarkerId(), bestHex.getLabel(),
-                        entrySide, teleport))
+                    if (game.doMove(legion.getMarkerId(), bestHex.getLabel()))
                     {
                         moved = true;
                         // Break out of the move loop and start over with
                         // the highest-priority unmoved legion.
                         break;
-                    }
-                    else
-                    {
-                        Log.debug("game.doMove() failed!");
                     }
                 }
             }
@@ -870,16 +868,16 @@ public class SimpleAI implements AI
                     {
                         continue;       // skip the sitStill moves
                     }
-                    Log.debug("forced to move split legion " + move.legion
-                            + " to " + move.hex + " taking penalty "
-                            + move.difference
-                            + " in order to handle illegal legion " + legion);
+                    Log.debug("forced to move split legion " + move.legion + 
+                        " to " + move.hex + " taking penalty " + 
+                        move.difference + 
+                        " in order to handle illegal legion " + legion);
 
-                    // XXX Need to track entrySide and teleport
-                    int entrySide = -1;
-                    boolean teleport = false;
-                    game.doMove(move.legion.getMarkerId(),
-                        move.hex.getLabel(), entrySide, teleport);
+                    if (!game.doMove(move.legion.getMarkerId(), 
+                        move.hex.getLabel()))
+                    {
+                        Log.debug("Move failed");
+                    }
 
                     // check again if this legion is ok; if so, break
                     friendlyLegions = game.getFriendlyLegions(hexLabel,
@@ -898,9 +896,7 @@ public class SimpleAI implements AI
         }
     }
 
-    /** Return true if something was moved. */
-    private void handleForcedSingleMove(Game game, Player player,
-        Map moveMap)
+    private void handleForcedSingleMove(Game game, Player player, Map moveMap)
     {
         Log.debug("Ack! forced to move someone");
 
@@ -918,7 +914,6 @@ public class SimpleAI implements AI
         {
             Legion friendlyLegion = (Legion)friendlyLegionIt.next();
             List moves = (List)moveMap.get(friendlyLegion);
-
             allmoves.addAll(moves);
         }
 
@@ -936,8 +931,8 @@ public class SimpleAI implements AI
         // now, one at a time, try applying moves until we
         // have moved a legion
         Iterator moveIt = allmoves.iterator();
-        while (moveIt.hasNext() && player.legionsMoved() == 0
-               && player.countMobileLegions() > 0)
+        while (moveIt.hasNext() && player.legionsMoved() == 0 && 
+            player.countMobileLegions() > 0)
         {
             MoveInfo move = (MoveInfo)moveIt.next();
 
@@ -950,12 +945,7 @@ public class SimpleAI implements AI
                     + " taking penalty " + move.difference
                     + " in order to handle illegal legion " + move.legion);
 
-            // XXX Need to track entrySide and teleport
-            int entrySide = -1;
-            boolean teleport = false;
-
-            game.doMove(move.legion.getMarkerId(), move.hex.getLabel(),
-                entrySide, teleport);
+            game.doMove(move.legion.getMarkerId(), move.hex.getLabel());
         }
     }
 
@@ -1784,9 +1774,8 @@ public class SimpleAI implements AI
     }
 
 
-    public String acquireAngel(Legion legion, List recruits, Game game)
+    public String acquireAngel(String markerId, List recruits)
     {
-        // This is a dumb placeholder.
         // TODO If the legion is 6 high and can recruit something better,
         // or if the legion is a tiny scooby snack that's about to get
         // smooshed, turn down the angel.

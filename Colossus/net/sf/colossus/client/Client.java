@@ -78,6 +78,7 @@ public final class Client
     /** Sorted set of available legion markers for this player. */
     private TreeSet markersAvailable;
     private String parentId;
+    private int numSplitsThisTurn;
 
     /** Gradually moving AI to client side. */
     private AI ai = new SimpleAI();
@@ -139,6 +140,8 @@ public final class Client
         board.repaint();
         summonAngel = null;
         board.highlightEngagements();
+        // XXX Repaint just the two legions' hexes.
+        board.repaint();
     }
 
 
@@ -773,8 +776,7 @@ public final class Client
     public void createSummonAngel(String markerId, String longMarkerName)
     {
         board.deiconify();
-        summonAngel = SummonAngel.summonAngel(this, markerId,
-            longMarkerName);
+        summonAngel = SummonAngel.summonAngel(this, markerId, longMarkerName);
     }
 
     String getDonorId()
@@ -793,40 +795,29 @@ public final class Client
     }
 
 
-    public String pickRecruit(java.util.List recruits, 
-        java.util.List imageNames, String hexDescription, String markerId)
+    public void askAcquireAngel(String markerId, java.util.List recruits)
     {
-        return PickRecruit.pickRecruit(board.getFrame(), recruits,
-            imageNames, hexDescription, markerId, this);
-    }
-
-    public String pickRecruiter(java.util.List recruiters, 
-        java.util.List imageNames, String hexDescription, String markerId)
-    {
-        Creature recruiter = PickRecruiter.pickRecruiter(board.getFrame(),
-            recruiters, imageNames, hexDescription, markerId, this);
-        if (recruiter != null)
+        if (getOption(Options.autoAcquireAngels))
         {
-            return recruiter.toString();
+            acquireAngelCallback(markerId, ai.acquireAngel( markerId,
+                recruits));
         }
-        return null;
+        else
+        {
+            board.deiconify();
+            new AcquireAngel(board.getFrame(), this, markerId, recruits);
+        }
     }
 
-
-    public String splitLegion(String markerId, String longMarkerName,
-        String selectedMarkerId, java.util.List imageNames)
+    void acquireAngelCallback(String markerId, String angelType)
     {
-        return SplitLegion.splitLegion(this, markerId, longMarkerName,
-            selectedMarkerId, imageNames);
-    }
-
-
-
-    public String acquireAngel(java.util.List recruits)
-    {
-        board.deiconify();
-        return AcquireAngel.acquireAngel(board.getFrame(), playerName,
-            recruits);
+Log.debug("Client.acquireAngelCallback: " + markerId + " " + angelType);
+        server.acquireAngel(markerId, angelType);
+        // XXX repaint just the one hex.
+        if (board != null)
+        {
+            board.repaint();
+        }
     }
 
 
@@ -881,14 +872,6 @@ public final class Client
         {
             JOptionPane.showMessageDialog(frame, message);
         }
-    }
-
-
-    /** Assumes this is not an AI client and board is not null. */
-    public String pickLord(java.util.List imageNames)
-    {
-        String lord = PickLord.pickLord(board.getFrame(), imageNames);
-        return lord;
     }
 
 
@@ -1114,13 +1097,77 @@ public final class Client
         }
     }
 
-    /** Used for human players only, not the AI. */
-    void doMuster(String markerId)
+    /** Currently used for human players only. */
+    public void doMuster(String markerId)
     {
-        if (server.doMuster(markerId))
+        if (!server.canRecruit(markerId))
+        {
+            return;
+        }
+        // TODO Cache this on the client side.
+        String hexLabel = server.getHexForLegion(markerId);
+
+        java.util.List recruits = server.findEligibleRecruits(markerId, 
+            hexLabel);
+        java.util.List imageNames = getLegionImageNames(markerId);
+        String hexDescription =
+            MasterBoard.getHexByLabel(hexLabel).getDescription();
+
+        String recruitName = PickRecruit.pickRecruit(board.getFrame(), 
+            recruits, imageNames, hexDescription, markerId, this);
+
+        if (recruitName == null)
+        {
+            return;
+        }
+
+        String recruiterName = findRecruiterName(hexLabel, markerId,
+            recruitName, imageNames, hexDescription);
+        if (recruiterName == null)
+        {
+            return;
+        }
+
+        server.doMuster(markerId, recruitName, recruiterName);
+    }
+
+    public void didMuster(String markerId)
+    {
+        if (isMyLegion(markerId))
         {
             pushUndoStack(markerId);
         }
+    }
+
+    /** null means cancel.  "none" means no recruiter (tower creature). */
+    private String findRecruiterName(String hexLabel, String markerId, String
+        recruitName, java.util.List imageNames, String hexDescription)
+    {
+        String recruiterName = null;
+
+        java.util.List recruiters = server.findEligibleRecruiters(
+            markerId, recruitName);
+
+        int numEligibleRecruiters = recruiters.size();
+        if (numEligibleRecruiters == 0)
+        {
+            // A warm body recruits in a tower.
+            recruiterName = "none";
+        }
+        else if (getOption(Options.autoPickRecruiter) || 
+            numEligibleRecruiters == 1)
+        {
+            // If there's only one possible recruiter, or if
+            // the user has chosen the autoPickRecruiter option,
+            // then just reveal the first possible recruiter.
+            recruiterName = (String)recruiters.get(0);
+        }
+        else
+        {
+            recruiterName = PickRecruiter.pickRecruiter(board.getFrame(),
+                recruiters, imageNames, hexDescription, markerId, this);
+        }
+        return recruiterName;
     }
 
 
@@ -1128,6 +1175,8 @@ public final class Client
     {
         // XXX Should track this better.
         initMarkersAvailable();
+
+        numSplitsThisTurn = 0;
 
         if (board != null)
         {
@@ -1417,11 +1466,26 @@ public final class Client
         return server.getTurnNumber();
     }
 
-    boolean doMove(String hexLabel)
+
+    private String figureTeleportingLord(String hexLabel)
+    {
+        java.util.List lords = server.listTeleportingLords(moverId, hexLabel);
+        switch (lords.size()) 
+        {
+            case 0:
+                return null;
+            case 1:
+                return (String)lords.get(0);
+            default:
+                return PickLord.pickLord(board.getFrame(), lords);
+        }
+    }
+
+    void doMove(String hexLabel)
     {
         if (moverId == null)
         {
-            return false;
+            return;
         }
 
         boolean teleport = false;
@@ -1442,27 +1506,34 @@ public final class Client
         }
         else
         {
-            return false;
+            return;
         }
 
-        int entrySides = server.getPossibleEntrySides(moverId, hexLabel, 
+        Set entrySides = server.getPossibleEntrySides(moverId, hexLabel, 
             teleport);
 
-        int entrySide = PickEntrySide.pickEntrySide(board.getFrame(),
+        String entrySide = PickEntrySide.pickEntrySide(board.getFrame(),
             hexLabel, entrySides);
 
-        boolean moved = server.doMove(moverId, hexLabel, entrySide, teleport);
-        if (moved)
+        String teleportingLord = null;
+        if (teleport)
         {
-            pushUndoStack(moverId);
-            setMoverId(null);
+            teleportingLord = figureTeleportingLord(hexLabel);
         }
-        return moved;
+
+        server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
+    }
+
+    public void didMove(String markerId)
+    {
+        if (isMyLegion(markerId))
+        {
+            pushUndoStack(markerId);
+        }
     }
 
     /** Return a list of Creatures. */
-    java.util.List findEligibleRecruits(String markerId,
-        String hexLabel)
+    java.util.List findEligibleRecruits(String markerId, String hexLabel)
     {
         return server.findEligibleRecruits(markerId, hexLabel);
     }
@@ -1566,6 +1637,7 @@ public final class Client
         {
             String splitoffId = (String)popUndoStack();
             server.undoSplit(playerName, splitoffId);
+            numSplitsThisTurn--;
         }
     }
 
@@ -1696,25 +1768,42 @@ public final class Client
     // XXX markersAvailable needs to be up to date before this is called.
     void doSplit(String parentId)
     {
+        this.parentId = null;
+
+        // Need a legion marker to split.
+        if (markersAvailable.size() < 1)
+        {
+            showMessageDialog("No legion markers");
+            return;
+        }
+        // Can't split other players' legions.
+        if (!isMyLegion(parentId))
+        {
+            return;
+        }
+        // Legion must be tall enough to split.
+        if (getLegionHeight(parentId) < 4)
+        {
+            showMessageDialog("Legion is too short to split");
+            return;
+        }
+        // Enforce only one split on turn 1.
+        if (getTurnNumber() == 1 && numSplitsThisTurn > 0)
+        {
+            showMessageDialog("Can only split once on the first turn");
+            return;
+        }
+
         this.parentId = parentId;
 
         if (getOption(Options.autoPickMarker))
         {
             String childId = ai.pickMarker(markersAvailable);
-            if (childId == null)
-            {
-                showMessageDialog("No legion markers");
-                this.parentId = null;
-                return;
-            }
-            else
-            {
-                pickMarkerCallback(childId);
-            }
+            pickMarkerCallback(childId);
         }
         else
         {
-            new PickMarker(board.getFrame(), playerName, markersAvailable, 
+            new PickMarker(board.getFrame(), playerName, markersAvailable,
                 this);
         }
     }
@@ -1722,19 +1811,33 @@ public final class Client
     /** Second part of doSplit, after the child marker is picked. */
     void pickMarkerCallback(String childId)
     {
-        if (parentId == null)
+        if (parentId == null || childId == null)
         {
-            Log.error("Called client.pickMarkerCallback with no parentId");
+            Log.warn("Called Client.pickMarkerCallback with null markerId");
+            return;
         }
 
-        // XXX Not quite right.
-        String splitoffId = server.doSplit(parentId, childId);
-        if (splitoffId != null)
+        String results = SplitLegion.splitLegion(this, parentId,
+            getLongMarkerName(parentId), childId,
+            getLegionImageNames(parentId));
+
+        if (results != null)
         {
-            pushUndoStack(splitoffId);
-            markersAvailable.remove(splitoffId);
+            server.doSplit(parentId, childId, results);
         }
     }
+
+    /** Callback from server after any successful split. */
+    public void didSplit(String childId)
+    {
+        if (isMyLegion(childId))
+        {
+            pushUndoStack(childId);
+            markersAvailable.remove(childId);
+        }
+        numSplitsThisTurn++;
+    }
+
 
     public void askPickColor(Set colorsLeft)
     {
@@ -1754,11 +1857,12 @@ public final class Client
             }
             color = ai.pickColor(colorsLeft, favoriteColors);
         }
-        else
+        else do
         {
             color = PickColor.pickColor(board.getFrame(), playerName, 
                 colorsLeft);
         }
+        while (color == null);
 
         server.assignColor(playerNum, color);
     }

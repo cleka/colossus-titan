@@ -1,10 +1,4 @@
-Make these dialogs non-modal:
-   PickMarker, AcquireAngel, PickColor, PickLord, PickRecruit, 
-      PickRecruiter, SplitLegion
-Merge PickColor/PickMarker, PickMarker/SplitLegion, 
-   PickRecruit/PickRecruiter, chooseWhetherToTeleport/PickLord 
-   sequences on client side to simplify network traffic and callbacks.
-Move AI functions to client side where useful.
+Always show the current turn, player, and phase in a panel somewhere.
 
 If there is more than one human player, move the active player's
    map/board to the front.

@@ -611,15 +611,22 @@ public final class Server
 
 
     /** Find out if the player wants to acquire an angel or archangel. */
-    String acquireAngel(String playerName, List recruits)
+    void askAcquireAngel(String playerName, String markerId, List recruits)
     {
-        String angelType = null;
         Client client = getClient(playerName);
         if (client != null)
         {
-            angelType = client.acquireAngel(recruits);
+            client.askAcquireAngel(markerId, recruits);
         }
-        return angelType;
+    }
+
+    public void acquireAngel(String markerId, String angelType)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (legion != null)
+        {
+            legion.addAngel(angelType);
+        }
     }
 
 
@@ -628,6 +635,33 @@ public final class Server
         Client client = getClient(legion.getPlayerName());
         client.createSummonAngel(legion.getMarkerId(), 
             legion.getLongMarkerName());
+    }
+
+    void reinforce(Legion legion)
+    {
+        Client client = getClient(legion.getPlayerName());
+        if (getClientOption(legion.getPlayerName(), Options.autoRecruit))
+        {
+            Creature recruit = legion.getPlayer().aiReinforce(legion);
+            if (recruit != null)
+            {
+                java.util.List recruiters = game.findEligibleRecruiters(
+                    legion.getMarkerId(), recruit.getName());
+                if (!recruiters.isEmpty())
+                {
+                    Creature recruiter = (Creature)recruiters.get(0);
+                    game.doRecruit(legion, recruit, recruiter);
+                }
+            }
+            if (game.getBattle() != null)
+            {
+                game.getBattle().reinforceCallback();
+            }
+        }
+        else
+        {
+            client.doMuster(legion.getMarkerId());
+        }
     }
 
     public void doSummon(String markerId, String donorId, String angel)
@@ -643,76 +677,70 @@ public final class Server
     }
 
 
-    /** Called from Game. */
-    String pickRecruit(Legion legion)
+    /** Return true if the legion has moved and can recruit. */
+    public boolean canRecruit(String markerId)
     {
-        legion.sortCritters();
-        Client client = getClient(legion.getPlayerName());
-        List recruits = game.findEligibleRecruits(
-            legion.getMarkerId(), legion.getCurrentHexLabel());
-        List imageNames = legion.getImageNames(true);
-        String hexDescription = legion.getCurrentHex().getDescription();
+        Legion legion = game.getLegionByMarkerId(markerId);
+        return legion != null && legion.hasMoved() && legion.canRecruit();
+    }
 
-        return client.pickRecruit(recruits, imageNames, hexDescription,
-            legion.getMarkerId());
+    /** Return a list of creature name strings. */
+    public java.util.List findEligibleRecruiters(String markerId,
+        String recruitName)
+    {
+        java.util.List creatures = 
+            game.findEligibleRecruiters(markerId, recruitName);
+        java.util.List strings = new ArrayList();
+        Iterator it = creatures.iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            strings.add(creature.getName());
+        }
+        return strings;
     }
 
     /** Handle mustering for legion.  Return true if the legion 
      *  mustered something. */
-    public boolean doMuster(String markerId)
+    public void doMuster(String markerId, String recruitName,
+        String recruiterName)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion != null && legion.hasMoved() && legion.canRecruit())
         {
             legion.sortCritters();
-            String recruitName = pickRecruit(legion);
             if (recruitName != null)
             {
                 Creature recruit = Creature.getCreatureByName(recruitName);
+                // XXX Make sure this works correctly with null, "none"
+                Creature recruiter = Creature.getCreatureByName(recruiterName);
                 if (recruit != null)
                 {
-                    game.doRecruit(recruit, legion);
+                    game.doRecruit(legion, recruit, recruiter);
                 }
             }
 
             if (!legion.canRecruit())
             {
-                allUpdateStatusScreen();
-                allUnselectHexByLabel(legion.getCurrentHexLabel());
-                return true;
+                didMuster(legion);
+                if (game.getPhase() == Constants.FIGHT)
+                {
+                    game.getBattle().reinforceCallback();
+                }
             }
         }
-        return false;
     }
 
-
-
-    /** Called from Game. */
-    String pickRecruiter(Legion legion, List recruiters)
+    void didMuster(Legion legion)
     {
-        Client client = getClient(legion.getPlayerName());
-
-        List imageNames = legion.getImageNames(true);
-        String hexDescription = legion.getCurrentHex().getDescription();
-        return client.pickRecruiter(recruiters, imageNames, hexDescription,
-            legion.getMarkerId());
-    }
-
-
-    /** Called from Game. */
-    String splitLegion(Legion legion, String selectedMarkerId)
-    {
-        Client client = getClient(legion.getPlayerName());
-        return client.splitLegion(legion.getMarkerId(), 
-            legion.getLongMarkerName(), selectedMarkerId, 
-            legion.getImageNames(true));
-    }
-
-
-    String pickLord(Legion legion)
-    {
-        Client client = getClient(legion.getPlayerName());
-        return client.pickLord(legion.getUniqueLordImageNames());
+        allUpdateStatusScreen();
+        allUnselectHexByLabel(legion.getCurrentHexLabel());
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.didMuster(legion.getMarkerId());
+        }
     }
 
 
@@ -1330,16 +1358,41 @@ public final class Server
         return player.getMarkersAvailable();
     }
 
-    /** Return the splitoffId. */
-    public String doSplit(String parentId, String childId)
+    public void doSplit(String parentId, String childId, String results)
     {
-        return game.doSplit(parentId, childId);
+        game.doSplit(parentId, childId, results);
     }
 
-    public boolean doMove(String markerId, String hexLabel, int entrySide,
-        boolean teleport)
+    /** Callback from game after this legion was split off. */
+    void didSplit(String hexLabel, String parentId, String childId, int height)
     {
-        return game.doMove(markerId, hexLabel, entrySide, teleport);
+        allUpdateStatusScreen();
+        allUnselectHexByLabel(hexLabel);
+        allAlignLegions(hexLabel);
+
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.didSplit(childId);
+        }
+    }
+
+    public void doMove(String markerId, String hexLabel, String entrySide,
+        boolean teleport, String teleportingLord)
+    {
+        boolean moved = game.doMove(markerId, hexLabel, entrySide, teleport,
+            teleportingLord);
+
+        if (moved)
+        {
+            Iterator it = clients.iterator();
+            while (it.hasNext())
+            {
+                Client client = (Client)it.next();
+                client.didMove(markerId);
+            }
+        }
     }
 
     /** Return a list of Creatures. */
@@ -1376,10 +1429,17 @@ public final class Server
             legion.getPlayer().getMovementRoll(), false);
     }
 
+    /** Return a list of creature name strings. */
+    public List listTeleportingLords(String markerId, String hexLabel)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        return legion.listTeleportingLords(hexLabel);
+    }
+
 
     /** Return an int which is all possible entry sides (1, 3, 5)
      *  added together. */
-    public int getPossibleEntrySides(String markerId, String hexLabel,
+    public Set getPossibleEntrySides(String markerId, String hexLabel,
         boolean teleport)
     {
         return game.getPossibleEntrySides(markerId, hexLabel, teleport);
@@ -1452,5 +1512,15 @@ public final class Server
     public void assignColor(int playerNum, String color)
     {
         game.assignColor(playerNum, color);
+    }
+
+    public String getHexForLegion(String markerId)
+    {
+        Legion legion = game.getLegionByMarkerId(markerId);
+        if (legion != null)
+        {
+            return legion.getCurrentHexLabel();
+        }
+        return null;
     }
 }

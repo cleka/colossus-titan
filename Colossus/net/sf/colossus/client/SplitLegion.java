@@ -124,6 +124,7 @@ final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
+    /** Return childMarkerId,splitCreature1,splitCreature2,etc. */
     static String splitLegion(Client client, String oldMarkerId,
         String longMarkerName, String selectedMarkerId, 
         java.util.List imageNames)

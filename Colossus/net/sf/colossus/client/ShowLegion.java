@@ -21,6 +21,12 @@ final class ShowLegion extends JDialog implements MouseListener,
     {
         super(parentFrame, "Legion " + longMarkerName, false);
 
+        if (imageNames.isEmpty())
+        {
+            dispose();
+            return;
+        }
+
         pack();
         setBackground(Color.lightGray);
         addWindowListener(this);

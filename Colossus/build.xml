@@ -10,10 +10,10 @@
      JavaCC 2.1    http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
         Environment var JAVACC_HOME pointing to JavaCC install root
      To sign jarfiles, you need a file called usernameKeystore,
-	(substituting your username for "username")
+        (substituting your username for "username")
         with an alias matching your username, and you need to put
         the password for this key in environment var JARPASSWORD.
-	(Ant won't do keyboard password input.)
+        (Ant won't do keyboard password input.)
      To make a ChangeLog file from cvs history, you need cvs2cl.pl
         http://www.red-bean.com/cvs2cl/  You also need perl in the path.
         And you need to have ssh-agent set up so that you can do cvs
@@ -88,9 +88,20 @@
         />
 </target>
 
+<!-- Ant's depend task is broken, so just delete all class files. -->
+<target name="dep"
+        description = "Delete dependant class files"> 
+        <delete verbose="yes" quiet = "yes"> 
+                <fileset dir="." 
+                 includes = 
+                         "**/*.class"
+                />
+        </delete>
+</target>
 
 <target name="compile" depends="init,parsers"
         description = "Compile .java files to .class files">
+        <delete verbose="yes" quiet = "yes" file = "Colossus.jar"/>
         <javac debug="yes" deprecation="yes" target="1.2" srcdir="."
                 includes="**/*.java"
         />
@@ -130,7 +141,7 @@
 <!-- XXX Files like .#Colossus.jar.1.203 are not being deleted.  Ant bug? -->
 <target name="clean"
         description = "Delete most derived files"> 
-        <delete verbose="yes" includeemptydirs="yes"> 
+        <delete verbose="yes" quiet = "yes" includeemptydirs="yes"> 
                 <fileset dir="." 
                  includes = 
                         "version,
@@ -150,7 +161,7 @@
 
 <target name="fullyclean" depends="clean"
         description = "Delete all derived files and savegames"> 
-        <delete verbose="yes" includeemptydirs="yes">
+        <delete verbose="yes" quiet = "yes" includeemptydirs="yes">
                 <fileset dir="." 
                  includes = 
                          "net/sf/colossus/parser/*.java,
@@ -196,6 +207,7 @@
         <exec executable="cvs2cl.pl" os="Linux,SunOS"> 
             <arg line="-S --no-wrap --utc"/>
         </exec>
+        <delete verbose="yes" file = "ChangeLog.bak"/>
 </target>
 
 

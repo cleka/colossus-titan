@@ -7,6 +7,7 @@ import java.util.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
+import net.sf.colossus.client.BattleMap;
 
 
 /**
@@ -32,6 +33,8 @@ final class Legion implements Comparable
     private Creature teleportingLord;
     private static Map markerNames = new HashMap();
     private Game game;
+    private int angelsToAcquire;
+    private boolean canAcquireArchangel;
 
     static
     {
@@ -291,44 +294,49 @@ final class Legion implements Comparable
 
         while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
         {
-            recruits = game.findEligibleAngels(this, tmpScore / 500 >
-                (score - points) / 500 && !didArchangel);
-            String angelType = acquireAngel(recruits);
-            tmpScore -= 100;
-            if (angelType != null && recruits.contains(angelType))
+            angelsToAcquire++;
+            boolean archangel = !didArchangel && (tmpScore / 500 >
+                (score - points) / 500);
+            if (archangel)
             {
-                Creature angel = Creature.getCreatureByName(angelType);
-                if (angel != null)
-                {
-                    addCreature(angel, true);
-                    Log.event("Legion " + getLongMarkerName() +
-                        " acquires an " + angelType);
-                    if (angelType.equals("Archangel"))
-                    {
-                        didArchangel = true;
-                    }
-                }
+                canAcquireArchangel = true;
+                didArchangel = true;
             }
+            recruits = game.findEligibleAngels(this, archangel);
+            if (!recruits.isEmpty())
+            {
+                game.askAcquireAngel(getPlayerName(), getMarkerId(), recruits);
+            }
+            tmpScore -= 100;
         }
     }
 
-
-    /** recruits holds the types of angels can can acquire. */
-    private String acquireAngel(List recruits)
+    void addAngel(String angelType)
     {
-        Player player = getPlayer();
-        String angelType = null;
-        if (game.getServer().getClientOption(player.getName(),
-            Options.autoAcquireAngels))
+        if (angelsToAcquire <= 0 || angelType == null)
         {
-            angelType = player.aiAcquireAngel(this, recruits, game);
+            return;
         }
-        else
+        if (angelType.equals("Archangel") && !canAcquireArchangel)
         {
-            angelType = game.getServer().acquireAngel(player.getName(),
-                recruits);
+            return;
         }
-        return angelType;
+        Creature angel = Creature.getCreatureByName(angelType);
+        if (angel != null)
+        {
+            addCreature(angel, true);
+            Log.event("Legion " + getLongMarkerName() + " acquires an " + 
+                angelType);
+            angelsToAcquire--;
+            if (angelType.equals("Archangel"))
+            {
+                canAcquireArchangel = false;
+            }
+        }
+        if (angelsToAcquire == 0)
+        {
+            game.doneAcquiringAngels();
+        }
     }
 
 
@@ -608,9 +616,6 @@ final class Legion implements Comparable
         log.append(" ");
         if (getHeight() > 0)
         {
-            // I think this belongs here
-            // if we are putting creatures back in the Caretakers stack
-
             log.append("[");
             // Return lords and demi-lords to the stacks.
             Iterator it = critters.iterator();
@@ -639,7 +644,7 @@ final class Legion implements Comparable
     }
 
 
-    void moveToHex(MasterHex hex, int entrySide, boolean teleported)
+    void moveToHex(MasterHex hex, String entrySide, boolean teleported)
     {
         Player player = getPlayer();
         String hexLabel = hex.getLabel();
@@ -666,7 +671,7 @@ final class Legion implements Comparable
             (game.getNumEnemyLegions(hexLabel, game.getPlayer(playerName)) > 0
             ? " titan teleports "
             : " tower teleports (" + teleportingLord + ") " ) : " moves ") +
-            "to " + hex.getDescription());
+            "to " + hex.getDescription() + " entering on " + entrySide);
     }
 
 
@@ -731,8 +736,8 @@ final class Legion implements Comparable
     boolean canRecruit()
     {
         if (recruitName != null || getHeight() > 6 || getPlayer().isDead() ||
-            game.findEligibleRecruits(getMarkerId(), 
-            getCurrentHexLabel()).isEmpty())
+            game.findEligibleRecruits(
+                getMarkerId(), getCurrentHexLabel()).isEmpty())
         {
             return false;
         }
@@ -833,6 +838,11 @@ final class Legion implements Comparable
     void setEntrySide(int entrySide)
     {
         this.entrySide = entrySide;
+    }
+
+    void setEntrySide(String entrySide)
+    {
+        this.entrySide = BattleMap.entrySideNum(entrySide);
     }
 
     int getEntrySide()
@@ -1192,12 +1202,13 @@ final class Legion implements Comparable
         }
     }
 
-    /** Reveal the lord who tower teleported the legion.  Pick one if
-     *  necessary. */
-    void revealTeleportingLord(boolean autoPick)
+    /** List the lords eligible to teleport this legion to hexLabel,
+     *  as strings. */
+    List listTeleportingLords(String hexLabel)
     {
-        teleportingLord = null;
-        TreeSet lords = new TreeSet();
+        // Needs to be a List not a Set so that it can be passed as
+        // an imageList.
+        List lords = new ArrayList();
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -1205,33 +1216,15 @@ final class Legion implements Comparable
             Critter critter = (Critter)it.next();
             if (critter.isLord())
             {
-                // Add Creatures rather than Critters to combine angels.
-                lords.add(critter.getCreature());
+                String name = critter.getName();
+                if (!lords.contains(name))
+                {
+                    lords.add(name);
+                }
             }
         }
 
-        int lordTypes = lords.size();
-        if (lordTypes == 1)
-        {
-            teleportingLord = (Creature)lords.first();
-        }
-        else
-        {
-            if (autoPick)
-            {
-                teleportingLord = (Creature)lords.first();
-            }
-            else
-            {
-                String lordName = game.getServer().pickLord(this);
-                teleportingLord = Creature.getCreatureByName(lordName);
-            }
-        }
-
-        if (teleportingLord != null)
-        {
-            revealCreatures(teleportingLord, 1);
-        }
+        return lords;
     }
 
 

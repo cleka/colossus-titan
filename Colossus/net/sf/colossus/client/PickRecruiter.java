@@ -6,8 +6,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
-import net.sf.colossus.server.Creature;
-
 
 /**
  * Class PickRecruiter allows a player to choose which creature(s) recruit.
@@ -25,10 +23,10 @@ final class PickRecruiter extends JDialog implements MouseListener,
     private int height;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
-    private static Creature recruiter;
+    private static String recruiterName;
 
 
-    /** recruiters is a list of Creatures */
+    /** recruiters is a list of creature name strings */
     private PickRecruiter(JFrame parentFrame, java.util.List recruiters, 
         java.util.List imageNames, String hexDescription, String markerId,
         Client client)
@@ -36,7 +34,7 @@ final class PickRecruiter extends JDialog implements MouseListener,
         super(parentFrame, client.getPlayerName() + ": Pick Recruiter in " +
             hexDescription, true);
 
-        recruiter = null;
+        recruiterName = null;
         this.recruiters = recruiters;
         height = imageNames.size();
 
@@ -80,8 +78,8 @@ final class PickRecruiter extends JDialog implements MouseListener,
         it = recruiters.iterator();
         while (it.hasNext())
         {
-            Creature recruiter = (Creature)it.next();
-            Chit chit = new Chit(scale, recruiter.getImageName(), this);
+            String recruiterName = (String)it.next();
+            Chit chit = new Chit(scale, recruiterName, this);
             recruiterChits.add(chit);
             constraints.gridx = leadSpace + i;
             constraints.gridy = 1;
@@ -102,13 +100,13 @@ final class PickRecruiter extends JDialog implements MouseListener,
     }
 
 
-    static Creature pickRecruiter(JFrame parentFrame, 
+    static String pickRecruiter(JFrame parentFrame, 
         java.util.List recruiters, java.util.List imageNames, 
         String hexDescription, String markerId, Client client)
     {
         new PickRecruiter(parentFrame, recruiters, imageNames, 
             hexDescription, markerId, client);
-        return recruiter;
+        return recruiterName;
     }
 
 
@@ -118,7 +116,7 @@ final class PickRecruiter extends JDialog implements MouseListener,
         int i = recruiterChits.indexOf(source);
         if (i != -1)
         {
-            recruiter = (Creature)recruiters.get(i);
+            recruiterName = (String)recruiters.get(i);
 
             // Then exit.
             dispose();

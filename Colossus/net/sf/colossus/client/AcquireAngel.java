@@ -18,16 +18,20 @@ final class AcquireAngel extends JDialog implements MouseListener,
     WindowListener
 {
     private java.util.List chits = new ArrayList();
-    private static String recruit;
     private java.util.List recruits;
     private static boolean active;
+    private Client client;
+    private String markerId;
 
 
-    private AcquireAngel(JFrame parentFrame, String name, 
+    AcquireAngel(JFrame parentFrame, Client client, String markerId, 
         java.util.List recruits)
     {
-        super(parentFrame, name + ": Acquire Angel", true);
+        super(parentFrame, client.getPlayerName() + 
+            ": Acquire Angel in legion " + markerId, false);
 
+        this.client = client;
+        this.markerId = markerId;
         this.recruits = recruits;
 
         addMouseListener(this);
@@ -60,21 +64,9 @@ final class AcquireAngel extends JDialog implements MouseListener,
     }
 
 
-    static String acquireAngel(JFrame parentFrame, String name,
-        java.util.List recruits)
+    void cleanup(String angelType)
     {
-        recruit = null;
-        if (recruits.isEmpty())
-        {
-            return null;
-        }
-        if (!active)
-        {
-            active = true;
-            new AcquireAngel(parentFrame, name, recruits);
-            active = false;
-        }
-        return recruit;
+        client.acquireAngelCallback(markerId, angelType);
     }
 
 
@@ -84,7 +76,7 @@ final class AcquireAngel extends JDialog implements MouseListener,
         int i = chits.indexOf(source);
         if (i != -1)
         {
-            recruit = (String)recruits.get(i);
+            cleanup((String)recruits.get(i));
 
             // Then exit.
             dispose();
@@ -117,7 +109,7 @@ final class AcquireAngel extends JDialog implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
-        dispose();
+        cleanup(null);
     }
 
     public void windowDeactivated(WindowEvent e)
