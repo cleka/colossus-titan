@@ -20,6 +20,8 @@ final class FileServerThread extends Thread
     private java.util.List activeSocketList;
     private static final String sep = Constants.protocolTermSeparator;
 
+    private boolean keepGoingOn = true;
+
     FileServerThread(java.util.List activeSocketList)
     {
         super();
@@ -37,10 +39,15 @@ final class FileServerThread extends Thread
             System.exit(1);
         }
     }
+
+    public void stopGoingOn()
+    {
+        keepGoingOn = false;
+    }
     
     public void run()
     {
-        while (true)
+        while (keepGoingOn)
         {
             try
             {
@@ -93,6 +100,17 @@ final class FileServerThread extends Thread
             {
                 Log.warn("FileServerThread : " + e);
             } 
+        }
+        
+        Log.debug("FileServerThread is done");
+        
+        try
+        {
+            fileServer.close();
+        }
+        catch (Exception e)
+        {
+            Log.warn("FileServerThread : " + e + " while closing socket");
         }
     }
 }

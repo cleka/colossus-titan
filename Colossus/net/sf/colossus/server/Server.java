@@ -54,6 +54,8 @@ public final class Server implements IServer
     private int numClients;
     private int maxClients;
 
+    private static Thread fileServerThread = null; /* static so that new instance of Server can destroy a previously allocated FileServerThread */
+
     Server(Game game, int port)
     {
         this.game = game;
@@ -109,9 +111,28 @@ Log.debug("About to create server socket on port " + port);
         // this may induce a race condition
         // if the client ask for a file *before*
         // the file server is up.
+
+        Log.debug("Initializing the FileServerThread ");
+
+        if (fileServerThread != null)
+        {
+            try {
+                Log.debug("Stopping the FileServerThread ");
+                ((FileServerThread)fileServerThread).stopGoingOn();
+                fileServerThread.interrupt();
+                fileServerThread.join();
+            }
+            catch (Exception e)
+            {
+                Log.debug("Oups couldn't stop the FileServerThread " + e);
+            }
+            fileServerThread = null;
+        }
+        
         if (!activeSocketList.isEmpty())
         {
-            new FileServerThread(activeSocketList).start();
+            fileServerThread = new FileServerThread(activeSocketList);
+            fileServerThread.start();
         }
         else
         {
