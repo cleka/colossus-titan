@@ -240,7 +240,6 @@ public final class Client implements IClient
                unless rescale()ed... so we call rescale instead
                of repaint. */
             caretakerDisplay.rescale();
-            // caretakerDisplay.repaint();
         }
         if (board != null)
         {
@@ -551,8 +550,9 @@ public final class Client implements IClient
             this.statusScreen = null;
         }
 
-        // Side effects
+        // XXX Should be called somewhere else, just once.
         setupPlayerLabel();
+        updateChat();
     }
 
     private void updateChat()
@@ -564,7 +564,7 @@ public final class Client implements IClient
         }
         if (getOption(Options.showChat))
         {
-            if (chat == null)
+            if (chat == null && board != null)
             {
                 chat = new Chat(this);
             }
@@ -735,6 +735,11 @@ public final class Client implements IClient
 
     private void makeForcedStrikes()
     {
+        if (getOption(Options.autoPlay))
+        {
+            // AI forced strikes are handled on server side.
+            return;
+        }
         if (playerName.equals(getBattleActivePlayerName()) &&
             getOption(Options.autoForcedStrike))
         {
@@ -1096,6 +1101,7 @@ Log.debug("Client.setPlayerName() from " + this.playerName + " to " + playerName
         if (getOption(Options.autoSummonAngels))
         {
             String typeColonDonor = ai.summonAngel(markerId, this);
+Log.debug("ai.summonAngel returned " + typeColonDonor);
             java.util.List parts = Split.split(':', typeColonDonor);
             String unit = (String)parts.get(0);
             String donor = (String)parts.get(1);
@@ -2954,5 +2960,40 @@ Log.debug("Client.setPlayerName() from " + this.playerName + " to " + playerName
     public void log(String message)
     {
         Log.event(message);
+    }
+
+    void sendChatMessage(String target, String text)
+    {
+        server.relayChatMessage(target, text);
+    }
+
+    public void showChatMessage(String from, String text)
+    {
+        if (chat != null)
+        {
+            chat.append(from + ": " + text);
+        }
+        else if (board != null)  // Only log chats for human players.
+        {
+            Log.debug("Chat " +  from + ": " + text);
+        }
+    }
+
+    public static String getVersion()
+    {
+        byte [] bytes = new byte[8];  // length of an ISO date
+        String version = "unknown";
+        try
+        {
+            ClassLoader cl = Client.class.getClassLoader();
+            InputStream is = cl.getResourceAsStream("version");
+            is.read(bytes);
+            version = new String(bytes, 0, bytes.length); 
+        }
+        catch (Exception ex)
+        {
+            Log.error("Problem reading version file " + ex);
+        }
+        return version;
     }
 }

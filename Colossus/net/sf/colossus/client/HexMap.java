@@ -54,6 +54,17 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     int cy = 2 * scale;
 
 
+    HexMap(String masterHexLabel)
+    {
+        this.masterHexLabel = masterHexLabel;
+        this.terrain = getMasterHex().getTerrain();
+
+        setOpaque(true);
+        setBackground(Color.white);
+        setupHexes();
+    }
+
+
     /** Set up a static non-GUI hex map for each terrain type. */
     static void staticBattlelandsInit()
     {
@@ -102,17 +113,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             terrainH.put(new Character(terrain), gameH);
             terrainHexes.put(new Character(terrain), gameHexes);
         }
-    }
-
-
-    HexMap(String masterHexLabel)
-    {
-        this.masterHexLabel = masterHexLabel;
-        this.terrain = getMasterHex().getTerrain();
-
-        setOpaque(true);
-        setBackground(Color.white);
-        setupHexes();
     }
 
 

@@ -73,7 +73,8 @@ Log.debug("About to connect client socket to " + host + ":" + port);
                 {
                     if (!fromServer.startsWith(Constants.log))
                     {
-                        System.out.println("From server: " + fromServer);
+                        System.out.println("From server to " + 
+                            client.getPlayerName() + ": " + fromServer);
                     }
                     parseLine(fromServer);
                 }
@@ -240,18 +241,7 @@ Log.debug("End of SocketClientThread while loop");
             int strikerTag = Integer.parseInt((String)args.remove(0));
             int targetTag = Integer.parseInt((String)args.remove(0));
             int strikeNumber = Integer.parseInt((String)args.remove(0));
-
-            List rollStrings = Split.split(Glob.sep, (String)args.remove(0));
-            // Convert from list of Strings to list of Integers.
-            List rolls = new ArrayList();
-            Iterator it = rollStrings.iterator();
-            while (it.hasNext())
-            {
-                String s = (String)it.next();
-                Integer i = new Integer(s);
-                rolls.add(i);
-            }
-
+            List rolls = Split.split(Glob.sep, (String)args.remove(0));
             int damage = Integer.parseInt((String)args.remove(0));
             boolean killed = 
                 Boolean.valueOf((String)args.remove(0)).booleanValue();
@@ -425,6 +415,12 @@ Log.debug("End of SocketClientThread while loop");
                 client.log(message);
             }
         }
+        else if (method.equals(Constants.showChatMessage))
+        {
+            String from = (String)args.remove(0);
+            String text = (String)args.remove(0);
+            client.showChatMessage(from, text);
+        }
         else
         {
             Log.error("Bogus packet");
@@ -466,7 +462,7 @@ Log.debug("End of SocketClientThread while loop");
         out.println(Constants.doneWithStrikes);
     }
 
-    public void makeForcedStrikes(boolean rangestrike)
+    public synchronized void makeForcedStrikes(boolean rangestrike)
     {
         out.println(Constants.makeForcedStrikes + sep + rangestrike);
     }
@@ -529,12 +525,12 @@ Log.debug("End of SocketClientThread while loop");
         out.println(Constants.doBattleMove + sep + tag + sep + hexLabel);
     }
 
-    public void strike(int tag, String hexLabel) 
+    public synchronized void strike(int tag, String hexLabel) 
     {
         out.println(Constants.strike + sep + tag + sep + hexLabel);
     }
 
-    public void applyCarries(String hexLabel) 
+    public synchronized void applyCarries(String hexLabel) 
     {
         out.println(Constants.applyCarries + sep + hexLabel);
     }
@@ -615,6 +611,11 @@ Log.debug("End of SocketClientThread while loop");
     public void assignColor(String color)
     {
         out.println(Constants.assignColor + sep + color);
+    }
+
+    public void relayChatMessage(String target, String text)
+    {
+        out.println(Constants.relayChatMessage + sep + target + sep + text);
     }
 
     // XXX Disallow the following methods in network games

@@ -565,7 +565,7 @@ final class Critter extends Creature implements Comparable
     /** Calculate number of dice and strike number needed to hit target,
      *  and whether any carries and strike penalties are possible.  The
      *  actual striking is now deferred to strike2(). */
-    void strike(Critter target)
+    synchronized void strike(Critter target)
     {
         // Sanity check
         if (target.getPlayer() == getPlayer())
@@ -826,7 +826,7 @@ Log.debug("new penalty option: " + po.toString());
         for (int i = 0; i < dice; i++)
         {
             int roll = Game.rollDie();
-            rolls.add(new Integer(roll));
+            rolls.add("" + roll);
             rollString.append(roll);
 
             if (roll >= strikeNumber)

@@ -2049,7 +2049,7 @@ public class SimpleAI implements AI
     }
 
     /** Simple one-ply group strike algorithm. */
-    private void doOneStrike(Legion legion, Battle battle)
+    private synchronized void doOneStrike(Legion legion, Battle battle)
     {
         // First make forced strikes, including rangestrikes for
         // rangestrikers with only one target.

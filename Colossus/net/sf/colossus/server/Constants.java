@@ -141,8 +141,7 @@ public final class Constants
 
     // Network stuff
     public static final int defaultPort = 1969;
-    /** Windows doesn't always know about "localhost" so use IP. */
-    public static final String localhost = "127.0.0.1";
+    public static final String localhost = "localhost";
 
     // Game actions used in several places.
     public static final String newGame = "New game";
@@ -225,6 +224,7 @@ public final class Constants
     public static final String doSplit = "doSplit";
     public static final String doMove = "doMove";
     public static final String assignColor = "assignColor";
+    public static final String relayChatMessage = "relayChatMessage";
     //public static final String newGame = "newGame";
     //public static final String loadGame = "loadGame";
     //public static final String saveGame = "saveGame";
@@ -280,4 +280,5 @@ public final class Constants
     public static final String didSplit = "didSplit";
     public static final String askPickColor = "askPickColor";
     public static final String log = "log";
+    public static final String showChatMessage = "showChatMessage";
 }

@@ -80,6 +80,8 @@ public interface IServer
 
     public void assignColor(String color);
 
+    public void relayChatMessage(String target, String text);
+
     // XXX Disallow the following methods in network games
     public void newGame();
 

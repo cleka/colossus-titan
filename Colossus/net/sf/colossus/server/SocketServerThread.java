@@ -107,10 +107,7 @@ final class SocketServerThread extends Thread implements IClient
             boolean remote = 
                 Boolean.valueOf((String)args.remove(0)).booleanValue();
             setPlayerName(playerName);
-            if (remote)
-            {
-                server.addRemoteClient(this, playerName);
-            }
+            server.addClient(this, playerName, remote);
         }
         else if (method.equals(Constants.fixName))
         {
@@ -288,6 +285,12 @@ Log.debug("Got fixName new:" + newName + " old:" + playerName);
         {
             String color = (String)args.remove(0);
             server.assignColor(color);
+        }
+        else if (method.equals(Constants.relayChatMessage))
+        {
+            String target = (String)args.remove(0);
+            String text = (String)args.remove(0);
+            server.relayChatMessage(target, text);
         }
         else if (method.equals(Constants.newGame))
         {
@@ -604,5 +607,10 @@ Log.debug("Called SocketServerThread.setPlayerName() old:" + this.playerName + "
     public void log(String message)
     {
         out.println(Constants.log + sep + message);
+    }
+
+    public void showChatMessage(String from, String text)
+    {
+        out.println(Constants.showChatMessage + sep + from + sep + text);
     }
 }

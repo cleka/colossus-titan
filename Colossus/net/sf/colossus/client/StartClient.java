@@ -152,6 +152,8 @@ public class StartClient extends KDialog implements WindowListener,
 
     public static void main(String [] args)
     {
+        Log.event("StartClient for Colossus version " + Client.getVersion());
+
         // This is a werken Options, not a util Options.
         Options opts = new Options();
         CommandLine cl = null;

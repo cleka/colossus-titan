@@ -87,7 +87,7 @@ Log.debug("About to create server socket on port " + port);
             return;
         }
 
-        addLocalClients();
+        createLocalClients();
 
         while (numClients < maxClients)
         {
@@ -141,28 +141,44 @@ Log.debug("About to create server socket on port " + port);
     }
 
 
-    private void addLocalClients()
+    private void createLocalClients()
     {
-Log.debug("Called Server.addLocalClients()");
+Log.debug("Called Server.createLocalClients()");
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             Player player = game.getPlayer(i);
             if (!player.isDead() &&
                 !player.getType().endsWith(Constants.network))
             {
-                addLocalClient(player.getName());
+                createLocalClient(player.getName());
             }
         }
     }
 
-    private void addLocalClient(String playerName)
+    private void createLocalClient(String playerName)
     {
 Log.debug("Called Server.addLocalClient() for " + playerName);
 
         IClient client = new Client(Constants.localhost, port, playerName, 
             false);
+    }
+
+
+    void addClient(final IClient client, final String playerName, 
+        final boolean remote)
+    {
+Log.debug("Called Server.addClient() for " + playerName);
         clients.add(client);
-        clientMap.put(playerName, client);
+
+        if (remote)
+        {
+            addRemoteClient(client, playerName);
+        }
+        else
+        {
+            addLocalClient(client, playerName);
+        }
+
         waitingForClients--;
 Log.debug("Decremented waitingForClients to " + waitingForClients);
         if (waitingForClients <= 0 && !game.isLoadingGame())
@@ -171,14 +187,15 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         }
     }
 
-
-    /** The IClient will actually be a SocketServerThread. */
-    void addRemoteClient(final IClient client, final String playerName)
+    private void addLocalClient(final IClient client, final String playerName)
     {
-Log.debug("Called Server.addRemoteClient() for " + playerName);
+        clientMap.put(playerName, client);
+    }
 
+    private void addRemoteClient(final IClient client, final String playerName)
+    {
+        String name = playerName;
         int slot = game.findNetworkSlot(playerName);
-Log.debug("Network slot " + slot);
         if (slot == -1)
         {
             return;
@@ -186,28 +203,18 @@ Log.debug("Network slot " + slot);
 
         Log.setServer(this);
         Log.setToRemote(true);
-        clients.add(client);
         remoteClients.add(client);
 
-        String name = playerName;
         if (!game.isLoadingGame())
         {
             name = game.getUniqueName(playerName);
         }
 
-Log.debug("Adding client with unique name " + name);
         clientMap.put(name, client);
-
         Player player = game.getPlayer(slot);
         player.setName(name);
         // In case we had to change a duplicate name.
         setPlayerName(name, name);
-        waitingForClients--;
-Log.debug("Decremented waitingForClients to " + waitingForClients);
-        if (waitingForClients <= 0 && !game.isLoadingGame())
-        {
-            game.newGame2();
-        }
     }
 
 
@@ -295,7 +302,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     }
 
 
-    public void makeForcedStrikes(boolean rangestrike)
+    public synchronized void makeForcedStrikes(boolean rangestrike)
     {
         if (isBattleActivePlayer())
         {
@@ -684,7 +691,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     }
 
 
-    public void engage(String hexLabel)
+    public synchronized void engage(String hexLabel)
     {
         game.engage(hexLabel);
     }
@@ -812,7 +819,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     }
 
 
-    public void strike(int tag, String hexLabel)
+    public synchronized void strike(int tag, String hexLabel)
     {
         Battle battle = game.getBattle();
         battle.getActiveLegion().getCritterByTag(tag).strike(
@@ -820,7 +827,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     }
 
     // XXX Error checks.
-    public void applyCarries(String hexLabel)
+    public synchronized void applyCarries(String hexLabel)
     {
         Battle battle = game.getBattle();
         Critter target = battle.getCritter(hexLabel);
@@ -834,7 +841,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     }
 
 
-    void allTellStrikeResults(Critter striker, Critter target,
+    synchronized void allTellStrikeResults(Critter striker, Critter target,
         int strikeNumber, List rolls, int damage, int carryDamageLeft,
         Set carryTargetDescriptions)
     {
@@ -855,8 +862,8 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         }
     }
 
-    void allTellCarryResults(Critter carryTarget, int carryDamageDone, 
-        int carryDamageLeft, Set carryTargetDescriptions)
+    synchronized void allTellCarryResults(Critter carryTarget, 
+        int carryDamageDone, int carryDamageLeft, Set carryTargetDescriptions)
     {
         if (striker == null || target == null || rolls == null)
         {
@@ -886,7 +893,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     }
 
     
-    void allTellDriftDamageResults(Critter target, int damage)
+    synchronized void allTellDriftDamageResults(Critter target, int damage)
     {
         this.target = target;
         this.damage = damage;
@@ -1395,6 +1402,33 @@ Log.debug("Server.setPlayerName() from " + playerName + " to " + newName);
         {
             IClient client = (IClient)it.next();
             client.log(message);
+        }
+    }
+
+    public void relayChatMessage(String target, String text)
+    {
+        String from = getPlayerName();
+        if (target.equals(Constants.all))
+        {
+            Iterator it = clients.iterator();
+            while (it.hasNext())
+            {
+                IClient client = (IClient)it.next();
+                client.showChatMessage(from, text);
+            }
+        }
+        else
+        {
+            IClient client = getClient(target);
+            if (client != null)
+            {
+                client.showChatMessage(from, text);
+            }
+            client = getClient(from);
+            if (client != null)
+            {
+                client.showChatMessage(from, text);
+            }
         }
     }
 }

@@ -125,4 +125,6 @@ public interface IClient
     public void askPickColor(Set colorsLeft);
 
     public void log(String message);
+
+    public void showChatMessage(String from, String text);
 }

@@ -1016,7 +1016,7 @@ Log.debug("Called Game.newGame2()");
     void saveGame(final String filename)
     {
         String fn = null; 
-        if (filename == null)
+        if (filename == null || filename.equals("null"))
         {
             Date date = new Date();
             File savesDir = new File(Constants.saveDirname);
@@ -2188,8 +2188,13 @@ Log.debug("Called Game.newGame2()");
         if (battle != null)
         {
             battle.finishSummoningAngel(player.hasSummoned());
+            summoning = false;
         }
-        summoning = false;
+        else
+        {
+            summoning = false;
+            kickEngagements();
+        }
     }
 
 
@@ -2200,7 +2205,7 @@ Log.debug("Called Game.newGame2()");
     }
 
 
-    private void kickEngagements()
+    private synchronized void kickEngagements()
     {
         Player player = getActivePlayer();
         String engagementHexLabel = player.aiPickEngagement();
@@ -2208,12 +2213,12 @@ Log.debug("Called Game.newGame2()");
         {
             server.engage(engagementHexLabel);
         }
-
-Log.debug("in kickEngagements() summoning=" + summoning + " reinforcing=" + 
+Log.debug("in kickEngagements() summoning=" + summoning + " reinforcing=" +
 reinforcing + " acquiring=" + acquiring); 
 Log.debug("" + findEngagements().size() + " engagements left");
-        if (findEngagements().size() == 0 && !summoning &&
-            !reinforcing && !acquiring)
+
+        if (findEngagements().size() == 0 && !summoning && !reinforcing && 
+            !acquiring)
         {
             advancePhase(Constants.FIGHT, player.getName());
         }
@@ -2462,7 +2467,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
     }
 
 
-    void engage(String hexLabel)
+    synchronized void engage(String hexLabel)
     {
         // Do not allow clicking on engagements if one is
         // already being resolved.
@@ -2817,7 +2822,7 @@ Log.debug("" + findEngagements().size() + " engagements left");
         server.askAcquireAngel(playerName, markerId, recruits);
     }
 
-    void doneAcquiringAngels()
+    synchronized void doneAcquiringAngels()
     {
         acquiring = false;
         if (!summoning && !reinforcing)

@@ -442,21 +442,8 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                byte [] bytes = new byte[8];  // length of an ISO date
-                String version = "unknown";
-                try
-                {
-                    ClassLoader cl = Client.class.getClassLoader();
-                    InputStream is = cl.getResourceAsStream("version");
-                    is.read(bytes);
-                    version = new String(bytes, 0, bytes.length); 
-                }
-                catch (Exception ex)
-                {
-                    Log.error("Problem reading version file " + ex);
-                }
-
-                client.showMessageDialog("Colossus build: " + version);
+                client.showMessageDialog("Colossus build: " + 
+                    Client.getVersion());
             }
         };
     }

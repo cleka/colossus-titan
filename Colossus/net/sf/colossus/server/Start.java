@@ -8,6 +8,7 @@ import com.werken.opt.Options;
 import com.werken.opt.Option;
 import com.werken.opt.CommandLine;
 import net.sf.colossus.util.Log;
+import net.sf.colossus.client.Client;
 
 
 /**
@@ -32,6 +33,8 @@ public final class Start
 
     public static void main(String [] args)
     {
+        Log.event("Start for Colossus version " + Client.getVersion());
+
         // This is a werken Options, not a util Options.
         Options opts = new Options();
         CommandLine cl = null;

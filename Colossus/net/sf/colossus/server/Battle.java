@@ -911,10 +911,6 @@ final class Battle
         }
 
         server.allRemoveDeadBattleChits();
-
-        // XXX Remove these and let the client take care of this.
-        // server.allRevealLegion(attacker);
-        // server.allRevealLegion(defender);
     }
 
     private void removeDeadCreaturesFromLegion(Legion legion)
@@ -1134,7 +1130,7 @@ final class Battle
      *  rangestrike is true, also perform rangestrikes for
      *  creatures with only one target, even though they're not
      *  technically forced. */
-    void makeForcedStrikes(boolean rangestrike)
+    synchronized void makeForcedStrikes(boolean rangestrike)
     {
         Legion legion = getActiveLegion();
         boolean repeat;
