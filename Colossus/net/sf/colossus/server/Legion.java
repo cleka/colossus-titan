@@ -463,11 +463,7 @@ public final class Legion implements Comparable
     /** Do the cleanup required before this legion can be removed. */
     void prepareToRemove(boolean returnCrittersToStacks)
     {
-        // XXX Use critters.toString() rather than doing it manually.
-        StringBuffer log = new StringBuffer("Legion ");
-        log.append(critters.toString());
-        log.append(" is eliminated");
-        Log.event(log.toString());
+        Log.event("Legion " + critters.toString() + " is eliminated");
         if (getHeight() > 0)
         {
             // Return immortals to the stacks, others to the Graveyard
@@ -752,6 +748,7 @@ public final class Legion implements Comparable
         {
             game.getCaretaker().putDeadOne(critter.getCreature());
         }
+        game.history.removeCreatureEvent(getMarkerId(), critter.getName());
     }
 
 

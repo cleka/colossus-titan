@@ -941,9 +941,6 @@ Log.debug("Called Battle.doneReinforcing()");
         // the stack, then don't put it back on the stack.
         legion.prepareToRemoveCritter(critter, donor == null); 
 
-        game.history.removeCreatureEvent(legion.getMarkerId(), 
-            critter.getName());
-
         if (critter.isTitan())
         {
             legion.getPlayer().eliminateTitan();
