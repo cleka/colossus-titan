@@ -8,7 +8,8 @@ import java.awt.event.*;
  */
 
 
-class PickRecruit extends Dialog implements MouseListener, WindowListener
+public class PickRecruit extends Dialog implements MouseListener,
+    WindowListener
 {
     private int numEligible;
     private Creature [] recruits;
@@ -29,11 +30,12 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     private boolean dialogLock = false;
 
 
-    PickRecruit(Frame parentFrame, Legion legion)
+    public PickRecruit(Frame parentFrame, Legion legion)
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruit in " + 
-            legion.getCurrentHex().getTerrainName(), true);
+            legion.getCurrentHex().getTerrainName() + " hex " +
+            legion.getCurrentHex().getLabel(), true);
 
         if (!legion.canRecruit())
         {

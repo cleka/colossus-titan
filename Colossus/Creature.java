@@ -4,7 +4,7 @@
  * @author David Ripton
  */
 
-class Creature
+public class Creature
 {
     protected String name;
     protected String pluralName;
@@ -23,63 +23,87 @@ class Creature
 
 
     // Add various Creature archetypes as class members
-    static Creature angel = new Creature("Angel", 6, 4, false, true, false,
-        false, false, false, false, true, false, 18, "Angels");
-    static Creature archangel = new Creature("Archangel", 9, 4, false, true,
-        false, false, false, false, false, true, false, 6, "Archngels");
-    static Creature behemoth = new Creature("Behemoth", 8, 3, false, false,
-        true, false, false, false, false, false, false, 18, "Behemoths");
-    static Creature centaur = new Creature("Centaur", 3, 4, false, false,
-        false, false, false, false, false, false, false, 25, "Centaurs");
-    static Creature colossus = new Creature("Colossus", 10, 4, false, false,
-        false, true, false, false, true, false, false, 10, "Colossi");
-    static Creature cyclops = new Creature("Cyclops", 9, 2, false, false, true,
-        false, false, false, false, false, false, 28, "Cyclopes");
-    static Creature dragon = new Creature("Dragon", 9, 3, true, true, false,
-        false, false, false, true, false, false, 18, "Dragons");
-    static Creature gargoyle = new Creature("Gargoyle", 4, 3, false, true,
-        true, false, false, false, false, false, false, 21, "Gargoyles");
-    static Creature giant = new Creature("Giant", 7, 4, true, false, false,
-        true, false, false, false, false, false, 18, "Giants");
-    static Creature gorgon = new Creature("Gorgon", 6, 3, true, true, true,
-        false, false, false, false, false, false, 25, "Gorgons");
-    static Creature griffon = new Creature("Griffon", 5, 4, false, true, false,
-        false, false, true, false, false, false, 18, "Griffons");
-    static Creature guardian = new Creature("Guardian", 12, 2, false, true,
-        false, false, false, false, false, false, true, 6, "Guardians");
-    static Creature hydra = new Creature("Hydra", 10, 3, true, false, false,
-        false, true, true, false, false, false, 10, "Hydras");
-    static Creature lion = new Creature("Lion", 5, 3, false, false, false,
-        false, false, true, true, false, false, 28, "Lions");
-    static Creature minotaur = new Creature("Minotaur", 4, 4, true, false,
-        false, false, false, false, true, false, false, 21, "Minotaurs");
-    static Creature ogre = new Creature("Ogre", 6, 2, false, false, false,
-        false, true, false, true, false, false, 25, "Ogres");
-    static Creature ranger = new Creature("Ranger", 4, 4, true, true, false,
-        false, true, false, false, false, false, 28, "Rangers");
-    static Creature serpent = new Creature("Serpent", 18, 2, false, false,
-        true, false, false, false, false, false, false, 10, "Serpents");
-    static Creature titan = new Creature("Titan", -1, 4, false, false, false,
-        false, false, false, false, true, false, 6, "Titans");
-    static Creature troll = new Creature("Troll", 8, 2, false, false, false,
-        true, true, false, false, false, false, 28, "Trolls");
-    static Creature unicorn = new Creature("Unicorn", 6, 4, false, false,
-        false, false, false, false, true, false, false, 12, "Unicorns");
-    static Creature warbear = new Creature("Warbear", 6, 3, false, false,
-        false, true, false, false, false, false, false, 21, "Warbears");
-    static Creature warlock = new Creature("Warlock", 5, 4, true, false, false,
-        false, false, false, false, false, true, 6, "Warlocks");
-    static Creature wyvern = new Creature("Wyvern", 7, 3, false, true, false,
-        false, true, false, false, false, false, 18, "Wyverns");
+    public static Creature angel = new Creature("Angel", 6, 4, 
+        false, true, false, false, false, false, false, true, false, 
+        18, "Angels");
+    public static Creature archangel = new Creature("Archangel", 9, 4, 
+        false, true, false, false, false, false, false, true, false, 
+        6, "Archngels");
+    public static Creature behemoth = new Creature("Behemoth", 8, 3, 
+        false, false, true, false, false, false, false, false, false, 
+        18, "Behemoths");
+    public static Creature centaur = new Creature("Centaur", 3, 4, 
+        false, false, false, false, false, false, false, false, false, 
+        25, "Centaurs");
+    public static Creature colossus = new Creature("Colossus", 10, 4, 
+        false, false, false, true, false, false, true, false, false, 
+        10, "Colossi");
+    public static Creature cyclops = new Creature("Cyclops", 9, 2, 
+        false, false, true, false, false, false, false, false, false, 
+        28, "Cyclopes");
+    public static Creature dragon = new Creature("Dragon", 9, 3, 
+        true, true, false, false, false, false, true, false, false, 
+        18, "Dragons");
+    public static Creature gargoyle = new Creature("Gargoyle", 4, 3, 
+        false, true, true, false, false, false, false, false, false, 
+        21, "Gargoyles");
+    public static Creature giant = new Creature("Giant", 7, 4, 
+        true, false, false, true, false, false, false, false, false, 
+        18, "Giants");
+    public static Creature gorgon = new Creature("Gorgon", 6, 3, 
+        true, true, true, false, false, false, false, false, false, 
+        25, "Gorgons");
+    public static Creature griffon = new Creature("Griffon", 5, 4, 
+        false, true, false, false, false, true, false, false, false, 
+        18, "Griffons");
+    public static Creature guardian = new Creature("Guardian", 12, 2, 
+        false, true, false, false, false, false, false, false, true, 
+        6, "Guardians");
+    public static Creature hydra = new Creature("Hydra", 10, 3, 
+        true, false, false, false, true, true, false, false, false, 
+        10, "Hydras");
+    public static Creature lion = new Creature("Lion", 5, 3, 
+        false, false, false, false, false, true, true, false, false, 
+        28, "Lions");
+    public static Creature minotaur = new Creature("Minotaur", 4, 4, 
+        true, false, false, false, false, false, true, false, false, 
+        21, "Minotaurs");
+    public static Creature ogre = new Creature("Ogre", 6, 2, 
+        false, false, false, false, true, false, true, false, false, 
+        25, "Ogres");
+    public static Creature ranger = new Creature("Ranger", 4, 4, 
+        true, true, false, false, true, false, false, false, false, 
+        28, "Rangers");
+    public static Creature serpent = new Creature("Serpent", 18, 2, 
+        false, false, true, false, false, false, false, false, false, 
+        10, "Serpents");
+    public static Creature titan = new Creature("Titan", -1, 4, 
+        false, false, false, false, false, false, false, true, false, 
+        6, "Titans");
+    public static Creature troll = new Creature("Troll", 8, 2, 
+        false, false, false, true, true, false, false, false, false, 
+        28, "Trolls");
+    public static Creature unicorn = new Creature("Unicorn", 6, 4, 
+        false, false, false, false, false, false, true, false, false, 
+        12, "Unicorns");
+    public static Creature warbear = new Creature("Warbear", 6, 3, 
+        false, false, false, true, false, false, false, false, false, 
+        21, "Warbears");
+    public static Creature warlock = new Creature("Warlock", 5, 4, 
+        true, false, false, false, false, false, false, false, true, 
+        6, "Warlocks");
+    public static Creature wyvern = new Creature("Wyvern", 7, 3, 
+        false, true, false, false, true, false, false, false, false, 
+        18, "Wyverns");
 
     // Sometimes we need to iterate through all creature types.
-    static Creature [] creatures = {angel, archangel, behemoth,
+    public static Creature [] creatures = {angel, archangel, behemoth,
         centaur, colossus, cyclops, dragon, gargoyle, giant, gorgon,
         griffon, guardian, hydra, lion, minotaur, ogre, ranger, 
         serpent, titan, troll, unicorn, warbear, warlock, wyvern};
 
 
-    Creature(String name, int power, int skill, boolean rangeStrikes,
+    public Creature(String name, int power, int skill, boolean rangeStrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
         boolean lord, boolean demilord, int count, String pluralName)

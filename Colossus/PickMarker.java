@@ -8,7 +8,7 @@ import java.awt.event.*;
  */
 
 
-class PickMarker extends Dialog implements MouseListener, WindowListener
+public class PickMarker extends Dialog implements MouseListener, WindowListener
 {
     private Chit [] markers;
     private MediaTracker tracker;
@@ -19,7 +19,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
     private Image offImage;
 
 
-    PickMarker(Frame parentFrame, Player player)
+    public PickMarker(Frame parentFrame, Player player)
     {
         super(parentFrame, player.getName() + ": Pick Legion Marker", true);
 

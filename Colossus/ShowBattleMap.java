@@ -7,7 +7,8 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class ShowBattleMap extends Dialog implements WindowListener, MouseListener
+public class ShowBattleMap extends Dialog implements WindowListener,
+    MouseListener
 {
     private BattleHex [][] h = new BattleHex[6][6];
 
@@ -68,7 +69,7 @@ class ShowBattleMap extends Dialog implements WindowListener, MouseListener
     }
 
     
-    void setupHexes()
+    private void setupHexes()
     {
         int cx = 6 * scale;
         int cy = 3 * scale;

@@ -7,7 +7,8 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class BattleTurn extends Dialog implements ActionListener, WindowListener
+public class BattleTurn extends Dialog implements ActionListener,
+    WindowListener
 {
     // Phases of a battle turn
     public static final int SUMMON = 0;
@@ -28,7 +29,7 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
     private static Point location;
 
 
-    BattleTurn(Frame parentFrame, BattleMap map, Legion attacker, Legion
+    public BattleTurn(Frame parentFrame, BattleMap map, Legion attacker, Legion
         defender)
     {
         super(parentFrame, defender.getPlayer().getName() + " Turn 1");
@@ -77,7 +78,7 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
     }
 
 
-    void setupRecruitDialog()
+    public void setupRecruitDialog()
     {
         removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
@@ -99,7 +100,7 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
     }
     
     
-    void setupSummonDialog()
+    public void setupSummonDialog()
     {
         removeAll();
         setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
@@ -138,7 +139,7 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
 
 
     // This is called from MasterBoard after the SummonAngel finishes.
-    void finishSummoningAngel()
+    public void finishSummoningAngel()
     {
         if (attacker.summoned())
         {
@@ -157,7 +158,7 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
     }
 
 
-    void setupMoveDialog()
+    public void setupMoveDialog()
     {
         // If there are no legal moves, move on.
         if (map.highlightMovableChits() < 1)
@@ -193,7 +194,7 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
     }
 
 
-    void setupFightDialog()
+    public void setupFightDialog()
     {
         // Apply drift damage only once per player turn.
         if (phase == FIGHT)
@@ -227,31 +228,31 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
     }
 
 
-    Legion getActiveLegion()
+    public Legion getActiveLegion()
     {
         return activeLegion;
     }
 
 
-    Player getActivePlayer()
+    public Player getActivePlayer()
     {
         return activeLegion.getPlayer();
     }
 
 
-    int getPhase()
+    public int getPhase()
     {
         return phase;
     }
 
 
-    int getTurnNumber()
+    public int getTurnNumber()
     {
         return turnNumber;
     }
 
 
-    void advancePhase()
+    public void advancePhase()
     {
         if (phase == SUMMON)
         {
@@ -345,7 +346,7 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
     }
 
 
-    SummonAngel getSummonAngel()
+    public SummonAngel getSummonAngel()
     {
         return summonAngel;
     }

@@ -7,12 +7,12 @@ import java.awt.*;
  * @author David Barr
  */
 
-class GameButton extends Button implements ActionListener 
+public class GameButton extends Button implements ActionListener 
 {
-    Game game;
+    private Game game;
 
 
-    GameButton() 
+    public GameButton() 
     {
         super("Start");
         addActionListener(this);

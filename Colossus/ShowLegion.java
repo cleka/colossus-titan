@@ -7,7 +7,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class ShowLegion extends Dialog implements MouseListener, WindowListener
+public class ShowLegion extends Dialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
@@ -18,7 +18,7 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
     private Image offImage;
 
 
-    ShowLegion(Frame parentFrame, Legion legion, Point point, boolean 
+    public ShowLegion(Frame parentFrame, Legion legion, Point point, boolean
         allVisible)
     {
         super(parentFrame, "Contents of Legion " + legion.getMarkerId(), false);

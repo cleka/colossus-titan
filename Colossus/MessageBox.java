@@ -7,12 +7,12 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class MessageBox extends Dialog implements ActionListener
+public class MessageBox extends Dialog implements ActionListener
 {
     private static boolean standalone = false;
 
 
-    MessageBox(Frame parentFrame, String message)
+    public MessageBox(Frame parentFrame, String message)
     {
         super(parentFrame, "Message", true);
 

@@ -20,7 +20,7 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
     private Image offImage;
 
 
-    ShowMasterHex(Frame parentFrame, MasterHex hex, Point point)
+    public ShowMasterHex(Frame parentFrame, MasterHex hex, Point point)
     {
         super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(),
             false);

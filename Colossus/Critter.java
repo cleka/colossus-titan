@@ -4,7 +4,7 @@
  * @author David Ripton
  */
 
-class Critter extends Creature
+public class Critter extends Creature
 {
     private boolean visible;
     private Creature creature;
@@ -26,7 +26,7 @@ class Critter extends Creature
     private BattleChit chit;
 
 
-    Critter(Creature creature, boolean visible, Legion legion)
+    public Critter(Creature creature, boolean visible, Legion legion)
     {
         super(creature.name, creature.power, creature.skill, 
             creature.rangeStrikes, creature.flies, creature.nativeBramble, 

@@ -6,7 +6,7 @@ import java.awt.*;
  * @author David Ripton
  */
 
-class MasterHex extends Hex
+public class MasterHex extends Hex
 {
     private boolean inverted;
     private int numLegions = 0;
@@ -42,7 +42,8 @@ class MasterHex extends Hex
     public static final int ARROWS = 4;
 
 
-    MasterHex(int cx, int cy, int scale, boolean inverted, MasterBoard board)
+    public MasterHex(int cx, int cy, int scale, boolean inverted, 
+        MasterBoard board)
     {
         this.inverted = inverted;
         this.board = board;

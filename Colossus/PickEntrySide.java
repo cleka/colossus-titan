@@ -8,7 +8,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class PickEntrySide extends Dialog implements ActionListener, 
+public class PickEntrySide extends Dialog implements ActionListener,
     WindowListener
 {
     private BattleHex [][] h = new BattleHex[6][6];
@@ -95,7 +95,7 @@ class PickEntrySide extends Dialog implements ActionListener,
     }
 
     
-    void setupHexes()
+    private void setupHexes()
     {
         int cx = 6 * scale;
         int cy = 3 * scale;

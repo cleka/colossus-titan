@@ -6,7 +6,7 @@ import java.awt.*;
  * @author David Ripton
  */
 
-class Hex
+public class Hex
 {
     public static final double SQRT3 = Math.sqrt(3.0);
     public static final double RAD_TO_DEG = 180 / Math.PI;
@@ -76,13 +76,13 @@ class Hex
     }  
 
 
-    char getTerrain()
+    public char getTerrain()
     {
         return terrain;
     }
 
 
-    void setTerrain(char terrain)
+    public void setTerrain(char terrain)
     {
         this.terrain = terrain;
     }        

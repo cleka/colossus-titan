@@ -62,7 +62,7 @@ public class BattleMap extends Frame implements MouseListener,
     public static final int FIRST_BLOOD = 1;
     public static final int TOO_LATE = 2;
     private int summonState = NO_KILLS;
-    Legion donor = null;
+    private Legion donor = null;
     private static Point location;
 
 
@@ -322,6 +322,27 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    private void highlightUnoccupiedTowerHexes()
+    {
+        if (!h[3][1].isOccupied())
+        {
+            h[3][1].select();
+            h[3][1].repaint();
+        }
+        for (int i = 2; i <= 4; i++)
+        {
+            for (int j = 2; j <= 3; j++)
+            {
+                if (!h[i][j].isOccupied())
+                {
+                    h[i][j].select();
+                    h[i][j].repaint();
+                }
+            }
+        }
+    }
+
+
     // Find all legal moves for this chit.
     public void showMoves(Critter critter)
     {
@@ -332,23 +353,7 @@ public class BattleMap extends Frame implements MouseListener,
             if (terrain == 'T' && turn.getTurnNumber() == 1 &&
                 turn.getActivePlayer() == defender.getPlayer())
             {
-                // Mark all unoccupied tower hexes.
-                if (!h[3][1].isOccupied())
-                {
-                    h[3][1].select();
-                    h[3][1].repaint();
-                }
-                for (int i = 2; i <= 4; i++)
-                {
-                    for (int j = 2; j <= 3; j++)
-                    {
-                        if (!h[i][j].isOccupied())
-                        {
-                            h[i][j].select();
-                            h[i][j].repaint();
-                        }
-                    }
-                }
+                highlightUnoccupiedTowerHexes();
             }
             else
             {
@@ -513,16 +518,16 @@ public class BattleMap extends Frame implements MouseListener,
             if (currentHex.getHexside(i) != 'c' &&
                 currentHex.getOppositeHexside(i) != 'c')
             {
-                BattleHex hex = currentHex.getNeighbor(i);
-                if (hex != null && hex.isOccupied())
+                BattleHex targetHex = currentHex.getNeighbor(i);
+                if (targetHex != null && targetHex.isOccupied())
                 {
-                    Critter bogie = hex.getCritter();
-                    if (bogie.getPlayer() != player && !bogie.isDead())
+                    Critter target = targetHex.getCritter();
+                    if (target.getPlayer() != player && !target.isDead())
                     {
                         if (highlight)
                         {
-                            hex.select();
-                            hex.repaint();
+                            targetHex.select();
+                            targetHex.repaint();
                         }
                         count++;
                     }
@@ -537,20 +542,20 @@ public class BattleMap extends Frame implements MouseListener,
         {
             for (int i = 0; i < numCritters; i++)
             {
-                Critter bogie = chits[i].getCritter();
-                if (bogie.getPlayer() != player && !bogie.isDead())
+                Critter target = chits[i].getCritter();
+                if (target.getPlayer() != player && !target.isDead())
                 {
-                    BattleHex hex = bogie.getCurrentHex();
+                    BattleHex targetHex = target.getCurrentHex();
 
                     // Can't rangestrike if it can be struck normally.
-                    if (!hex.isSelected())
+                    if (!targetHex.isSelected())
                     {
-                        if (rangestrikePossible(critter, bogie))
+                        if (rangestrikePossible(critter, target))
                         {
                             if (highlight)
                             {
-                                hex.select();
-                                hex.repaint();
+                                targetHex.select();
+                                targetHex.repaint();
                             }
                             count++;
                         }

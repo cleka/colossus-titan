@@ -68,3 +68,8 @@ clean:
 dist:
 	zip -pr Colossus.`date +%Y%m%d`.zip * -x *.sav *.zip
 
+
+# Make javadoc docs
+javadoc:
+	javadoc -d javadoc/ -version -author -private *.java
+

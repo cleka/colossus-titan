@@ -6,12 +6,12 @@ import java.awt.*;
  * @author David Ripton
  */
 
-class BattleHex extends Hex
+public class BattleHex extends Hex
 {
     private BattleMap map;
 
     // Normal hexes hold only one creature, but entrances can hold up to 7.
-    int numCritters = 0;
+    private int numCritters = 0;
     private Critter [] critters = new Critter[7];
 
     // Valid elevations are 0, 1, and 2.
@@ -34,7 +34,8 @@ class BattleHex extends Hex
     private String label;
 
 
-    BattleHex(int cx, int cy, int scale, BattleMap map, int xCoord, int yCoord)
+    public BattleHex(int cx, int cy, int scale, BattleMap map, int xCoord, 
+        int yCoord)
     {
         this.map = map;
         this.xCoord = xCoord;
@@ -71,7 +72,7 @@ class BattleHex extends Hex
     }
 
 
-    void rescale(int cx, int cy, int scale)
+    public void rescale(int cx, int cy, int scale)
     {
         this.scale = scale;
         len = scale / 3.0;
@@ -155,7 +156,7 @@ class BattleHex extends Hex
     }
 
 
-    void repaint()
+    public void repaint()
     {
         // If an entrance needs repainting, paint the whole map.
         if (isEntrance())
@@ -170,7 +171,7 @@ class BattleHex extends Hex
     }
 
 
-    void drawHexside(Graphics g, int vx1, int vy1, int vx2, int vy2, char
+    public void drawHexside(Graphics g, int vx1, int vy1, int vx2, int vy2, char
         hexsideType)
     {
         int x0;                  // first focus point
@@ -305,13 +306,13 @@ class BattleHex extends Hex
     }
 
 
-    boolean isOccupied()
+    public boolean isOccupied()
     {
         return (numCritters > 0);
     }
 
 
-    void addCritter(Critter critter)
+    public void addCritter(Critter critter)
     {
         if (numCritters < 7)
         {
@@ -322,7 +323,7 @@ class BattleHex extends Hex
     }
 
 
-    void removeCritter(int i)
+    public void removeCritter(int i)
     {
         if (i >= 0 && i < numCritters)
         {
@@ -345,7 +346,7 @@ class BattleHex extends Hex
     }
 
 
-    void removeCritter(Critter critter)
+    public void removeCritter(Critter critter)
     {
         for (int i = 0; i < numCritters; i++)
         {
@@ -357,7 +358,7 @@ class BattleHex extends Hex
     }
 
 
-    Critter getCritter()
+    public Critter getCritter()
     {
         if (numCritters > 0)
         {
@@ -370,7 +371,7 @@ class BattleHex extends Hex
     }
 
 
-    Critter getCritter(int i)
+    public Critter getCritter(int i)
     {
         if (i >= 0 && i < numCritters)
         {
@@ -383,7 +384,7 @@ class BattleHex extends Hex
     }
 
 
-    void alignChits()
+    public void alignChits()
     {
         if (numCritters == 0)
         {
@@ -407,7 +408,7 @@ class BattleHex extends Hex
     }
 
 
-    String getTerrainName()
+    public String getTerrainName()
     {
         switch (getTerrain())
         {
@@ -436,11 +437,10 @@ class BattleHex extends Hex
             default:
                 return "?????";
         }
-
     }
 
 
-    Color getTerrainColor()
+    public Color getTerrainColor()
     {
         switch (getTerrain())
         {
@@ -475,7 +475,7 @@ class BattleHex extends Hex
     // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.  
     // Letters increase left to right; numbers increase
     // bottom to top.
-    String getLabel()
+    public String getLabel()
     {
         return label;
     }
@@ -519,13 +519,13 @@ class BattleHex extends Hex
     }
 
 
-    void setHexside(int i, char hexside)
+    public void setHexside(int i, char hexside)
     {
         this.hexsides[i] = hexside;
     }
 
 
-    char getHexside(int i)
+    public char getHexside(int i)
     {
         if (i < 0 || i > 5)
         {
@@ -539,7 +539,7 @@ class BattleHex extends Hex
 
 
     // Return the flip side of hexside i.
-    char getOppositeHexside(int i)
+    public char getOppositeHexside(int i)
     {
         char hexside = ' ';
 
@@ -553,19 +553,19 @@ class BattleHex extends Hex
     }
 
 
-    void setElevation (int elevation)
+    public void setElevation (int elevation)
     {
         this.elevation = elevation;
     }
 
 
-    int getElevation()
+    public int getElevation()
     {
         return elevation;
     }
 
 
-    void setNeighbor(int i, BattleHex hex)
+    public void setNeighbor(int i, BattleHex hex)
     {
         if (i >= 0 && i < 6)
         {
@@ -574,7 +574,7 @@ class BattleHex extends Hex
     }
 
 
-    BattleHex getNeighbor(int i)
+    public BattleHex getNeighbor(int i)
     {
         if (i < 0 || i > 6)
         {
@@ -587,19 +587,19 @@ class BattleHex extends Hex
     }
 
 
-    int getXCoord()
+    public int getXCoord()
     {
         return xCoord;
     }
 
 
-    int getYCoord()
+    public int getYCoord()
     {
         return yCoord;
     }
 
 
-    boolean isEntrance()
+    public boolean isEntrance()
     {
         return (xCoord == -1);
     }
@@ -609,7 +609,7 @@ class BattleHex extends Hex
     // For fliers, this is the cost to land in this hex, not fly over it.
     // If entry is illegal, just return a cost greater than the maximum
     // possible number of movement points.
-    int getEntryCost(Creature creature, int cameFrom)
+    public int getEntryCost(Creature creature, int cameFrom)
     {
         char terrain = getTerrain();
 

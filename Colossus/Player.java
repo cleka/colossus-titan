@@ -4,7 +4,7 @@
  * @author David Ripton
  */
 
-class Player
+public class Player
 {
     private String name;
     private String color;       // Black, Blue, Brown, Gold, Green, Red
@@ -144,7 +144,7 @@ class Player
     }
     
     
-    void setPlayersElim(String playersEliminated)
+    public void setPlayersElim(String playersEliminated)
     {
         this.playersEliminated = new String(playersEliminated);
     }

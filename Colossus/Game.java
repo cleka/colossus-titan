@@ -581,7 +581,7 @@ public class Game
 
 
     // Extract and return the numeric part of a filename.
-    long numberValue(String filename)
+    private long numberValue(String filename)
     {
         StringBuffer numberPart = new StringBuffer();
         for (int i = 0; i < filename.length(); i++)
@@ -605,7 +605,7 @@ public class Game
 
     // Sort filenames in descending numeric order.  (1000000000.sav
     // comes before 999999999.sav)
-    void sortSaveFilenames(String [] filenames)
+    private void sortSaveFilenames(String [] filenames)
     {
         for (int i = 0; i < filenames.length - 1; i++)
         {
@@ -1316,7 +1316,7 @@ public class Game
 
 
     // Returns the number of types of angels that can be acquired.
-    static int findEligibleAngels(Legion legion, Creature [] recruits,
+    public static int findEligibleAngels(Legion legion, Creature [] recruits,
         boolean archangel)
     {
         if (legion.getHeight() > 6)

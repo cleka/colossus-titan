@@ -5,14 +5,14 @@
  * @author David Ripton
  */
 
-class PenaltyOption
+public class PenaltyOption
 {
     private Critter critter;
     private int dice;
     private int strikeNumber;
 
 
-    PenaltyOption(Critter critter, int dice, int strikeNumber)
+    public PenaltyOption(Critter critter, int dice, int strikeNumber)
     {
         this.critter = critter;
         this.dice = dice;

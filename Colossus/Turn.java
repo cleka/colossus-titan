@@ -7,7 +7,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class Turn extends Dialog implements ActionListener, WindowListener
+public class Turn extends Dialog implements ActionListener, WindowListener
 {
     private static Game game;
     private Frame parentFrame;

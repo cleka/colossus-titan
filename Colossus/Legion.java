@@ -7,7 +7,7 @@ import java.awt.*;
  * @author David Ripton
  */
 
-class Legion
+public class Legion
 {
     private Marker marker;
     private int height;
@@ -23,7 +23,7 @@ class Legion
     private int battleTally = 0;
 
 
-    Legion(int scale, String markerId, Legion splitFrom,
+    public Legion(int scale, String markerId, Legion splitFrom,
         Container container, int height, MasterHex hex,
         Creature creature0, Creature creature1, Creature creature2,
         Creature creature3, Creature creature4, Creature creature5,

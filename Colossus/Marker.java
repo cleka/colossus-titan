@@ -6,12 +6,13 @@ import java.awt.*;
  * @author David Ripton
  */
 
-class Marker extends Chit
+public class Marker extends Chit
 {
-    Legion legion;
+    private Legion legion;
 
 
-    Marker(int scale, String imageFilename, Container container, Legion legion)
+    public Marker(int scale, String imageFilename, Container container, 
+        Legion legion)
     {
         super(scale, imageFilename, container);
 

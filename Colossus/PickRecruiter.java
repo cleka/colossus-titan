@@ -8,7 +8,8 @@ import java.awt.event.*;
  */
 
 
-class PickRecruiter extends Dialog implements MouseListener, WindowListener
+public class PickRecruiter extends Dialog implements MouseListener,
+    WindowListener
 {
     private int numEligible;
     private Critter [] recruiters;
@@ -28,7 +29,7 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    PickRecruiter(Frame parentFrame, Legion legion, int numEligible, 
+    public PickRecruiter(Frame parentFrame, Legion legion, int numEligible,
         Critter [] recruiters)
     {
         super(parentFrame, legion.getPlayer().getName() +

@@ -8,8 +8,8 @@ import java.awt.event.*;
  */
 
 
-class SummonAngel extends Dialog implements MouseListener, ActionListener,
-    WindowListener
+public class SummonAngel extends Dialog implements MouseListener, 
+    ActionListener, WindowListener
 {
     private MediaTracker tracker;
     private Player player;
@@ -27,7 +27,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    SummonAngel(MasterBoard board, Legion legion)
+    public SummonAngel(MasterBoard board, Legion legion)
     {
         super(board, legion.getPlayer().getName() +
             ": Summon Angel into Legion " + legion.getMarkerId(), false);
@@ -113,7 +113,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     }
 
 
-    Legion getLegion()
+    public Legion getLegion()
     {
         return legion;
     }

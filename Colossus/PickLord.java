@@ -8,7 +8,7 @@ import java.awt.event.*;
  */
 
 
-class PickLord extends Dialog implements MouseListener, WindowListener
+public class PickLord extends Dialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
@@ -22,7 +22,7 @@ class PickLord extends Dialog implements MouseListener, WindowListener
     private Creature [] lords;
 
 
-    PickLord(Frame parentFrame, Legion legion)
+    public PickLord(Frame parentFrame, Legion legion)
     {
         super(parentFrame, "Reveal Which Lord?", true);
 

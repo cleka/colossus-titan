@@ -1,12 +1,13 @@
 import java.awt.*;
 import java.awt.event.*;
 
-/** Class OptionDialog presents a configurable modal yes/no dialog box.
+/** 
+ *  Class OptionDialog presents a configurable modal yes/no dialog box.
  *  @version $Id$
  *  @author David Ripton
  */
 
-class OptionDialog extends Dialog implements ActionListener
+public class OptionDialog extends Dialog implements ActionListener
 {
     public static final int YES_OPTION = 1;
     public static final int NO_OPTION = 0;

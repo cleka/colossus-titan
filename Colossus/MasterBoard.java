@@ -7,7 +7,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class MasterBoard extends Frame implements MouseListener,
+public class MasterBoard extends Frame implements MouseListener,
     WindowListener
 {
     // There are a total of 96 hexes
@@ -168,7 +168,7 @@ class MasterBoard extends Frame implements MouseListener,
     }
         
     
-    void setupIcon()
+    private void setupIcon()
     {
         if (!game.isApplet())
         {

@@ -7,7 +7,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class Concede extends Dialog implements ActionListener
+public class Concede extends Dialog implements ActionListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
@@ -28,11 +28,12 @@ class Concede extends Dialog implements ActionListener
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    Concede(Frame parentFrame, Legion ally, Legion enemy, boolean flee)
+    public Concede(Frame parentFrame, Legion ally, Legion enemy, boolean flee)
     {
         super(parentFrame, ally.getPlayer().getName() + ": " + (flee ?
             "Flee" : "Concede") + " with Legion "  + ally.getMarkerId() +
-            " in " + ally.getCurrentHex().getTerrainName() + "?", true);
+            " in " + ally.getCurrentHex().getTerrainName() + " hex " +
+            ally.getCurrentHex().getLabel() + "?", true);
 
         setLayout(gridbag);
 

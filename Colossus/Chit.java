@@ -8,7 +8,7 @@ import java.io.*;
  * @author David Ripton
  */
 
-class Chit extends Canvas
+public class Chit extends Canvas
 {
     private Image image;
     private Rectangle rect;
@@ -23,7 +23,7 @@ class Chit extends Canvas
     protected static boolean isApplet = false;
 
 
-    Chit(int scale, String imageFilename, Container container)
+    public Chit(int scale, String imageFilename, Container container)
     {
         Point point = getLocation();
         rect = new Rectangle(point.x, point.y, scale, scale);
@@ -69,7 +69,7 @@ class Chit extends Canvas
     }
     
 
-    void rescale(int scale)
+    public void rescale(int scale)
     {
         rect.width = scale;
         rect.height = scale;
@@ -109,14 +109,14 @@ class Chit extends Canvas
     }
 
 
-    void setLocationAbs(Point point)
+    public void setLocationAbs(Point point)
     {
         rect.setLocation(point);
         setBounds(rect);
     }
 
 
-    boolean select(Point point)
+    public boolean select(Point point)
     {
         if (rect.contains(point))
         {
@@ -127,7 +127,6 @@ class Chit extends Canvas
             return false;
         }
     }
-
 
 
     public Rectangle getBounds()

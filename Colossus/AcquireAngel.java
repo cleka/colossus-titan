@@ -8,7 +8,8 @@ import java.awt.event.*;
  */
 
 
-class AcquireAngel extends Dialog implements MouseListener, WindowListener
+public class AcquireAngel extends Dialog implements MouseListener,
+    WindowListener
 {
     private int numEligible = 0;
     private Creature [] recruits;
@@ -22,7 +23,7 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
     private Image offImage;
 
 
-    AcquireAngel(Frame parentFrame, Legion legion, boolean archangel)
+    public AcquireAngel(Frame parentFrame, Legion legion, boolean archangel)
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Acquire Angel", true);

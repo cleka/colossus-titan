@@ -7,8 +7,8 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class SplitLegion extends Dialog implements MouseListener, ActionListener,
-    WindowListener
+public class SplitLegion extends Dialog implements MouseListener,
+    ActionListener, WindowListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
@@ -28,7 +28,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    SplitLegion(Frame parentFrame, Legion oldLegion, Player player)
+    public SplitLegion(Frame parentFrame, Legion oldLegion, Player player)
     {
         super(parentFrame, player.getName() + ": Split Legion " +
             oldLegion.getMarkerId(), true);
@@ -183,7 +183,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
     }
 
 
-    void cancel()
+    private void cancel()
     {
         player.addSelectedMarker();
 

@@ -7,7 +7,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class Negotiate extends Dialog implements MouseListener, ActionListener
+public class Negotiate extends Dialog implements MouseListener, ActionListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
@@ -26,7 +26,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    Negotiate(Frame parentFrame, Legion attacker, Legion defender)
+    public Negotiate(Frame parentFrame, Legion attacker, Legion defender)
     {
         super(parentFrame, attacker.getMarkerId() + " Negotiates with " +
             defender.getMarkerId(), true);

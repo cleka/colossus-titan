@@ -7,12 +7,12 @@ import java.awt.*;
  * @author David Ripton
  */
 
-class BattleChit extends Chit
+public class BattleChit extends Chit
 {
     private Critter critter;
 
 
-    BattleChit(int scale, String imageFilename, Container container, 
+    public BattleChit(int scale, String imageFilename, Container container, 
         Critter critter)
     {
         super(scale, imageFilename, container);
