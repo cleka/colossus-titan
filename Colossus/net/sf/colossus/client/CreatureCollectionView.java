@@ -94,8 +94,10 @@ class CreatureCollectionView extends KDialog implements WindowListener
             super(new BorderLayout());
                                 
             setBorder(BorderFactory.createLineBorder(Color.black));
-
-            chit = new Chit(4 * Scale.get(), name, this);
+            if (!(name.equals("Titan")))
+                chit = new Chit(4 * Scale.get(), name, this);
+            else
+                chit = new Chit(4 * Scale.get(), "Titan-6-Black", this);
             label = new JLabel(baseString, SwingConstants.CENTER);
             topLabel =
                 new JLabel(htmlizeOnly(
