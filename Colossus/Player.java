@@ -6,8 +6,8 @@
 
 class Player
 {
-    String name;
-    String color;       // Black, Blue, Brown, Gold, Green, Red 
+    private String name;
+    private String color;       // Black, Blue, Brown, Gold, Green, Red 
     int startingTower;  // 1-6
     int score = 0;
     int angels = 1;     // number of angels + archangels in legions
@@ -29,21 +29,28 @@ class Player
     }
 
 
+    String getColor()
+    {
+        return color;
+    }
+
+
     void setColor(String color)
     {
         this.color = color;
         for (int i = 0; i <= 8; i++)
         {
-            markersAvailable[i] = shortColor() + '0' + Integer.toString(i + 1);
+            markersAvailable[i] = getShortColor() + '0' + 
+                Integer.toString(i + 1);
         }
         for (int i = 9; i <= 11; i++)
         {
-            markersAvailable[i] = shortColor() + Integer.toString(i + 1);
+            markersAvailable[i] = getShortColor() + Integer.toString(i + 1);
         }
     }
 
 
-    String shortColor()
+    String getShortColor()
     {
         if (color == "Black") 
         {
@@ -107,4 +114,33 @@ class Player
 
         return total;
     }
+
+    String getName()
+    {
+        return name;
+    }
+
+
+    void undoAllMoves()
+    {
+        for (int i = 0; i < numLegions; i++)
+        {
+            legions[i].undoMove();
+        }
+    }
+
+
+    int getMaxLegionHeight()
+    {
+        int height = 0;
+        for (int i = 0; i < numLegions; i++)
+        {
+            if (legions[i].getHeight() > height)
+            {
+                height = legions[i].getHeight();
+            }
+        }
+        return height;
+    }
+
 }
