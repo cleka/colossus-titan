@@ -13,7 +13,7 @@
 #    the -depend/-Xdepend option from javac in JDK 1.3, so be careful.
 # kjc comes with kaffe.  I like its --warning option.
 
-JCC = jikes -g -depend +P
+JCC = jikes -g -depend -deprecation +P
 #JCC = javac -J-Djavac.pipe.output=true -g -deprecation
 #JCC = kjc -g --deprecation --warning
 

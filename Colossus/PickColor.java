@@ -93,7 +93,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
             }
             else
             {
-                button.setLabel(colorNames[i]);
+                button.setText(colorNames[i]);
                 button.setBackground(background[i]);
                 button.setForeground(foreground[i]);
                 button.addActionListener(this);

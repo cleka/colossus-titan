@@ -35,7 +35,7 @@ public class GetPlayers extends JDialog implements WindowListener,
         {
             String s = "Player " + (i + 1) + " Name";
             contentPane.add(new JLabel(s));
-            TextField tf = new TextField(20);
+            JTextField tf = new JTextField(20);
             contentPane.add(tf);
             textFields.add(tf);
         }
@@ -68,7 +68,7 @@ public class GetPlayers extends JDialog implements WindowListener,
         Iterator it = textFields.iterator();
         while (it.hasNext())
         {
-            TextField tf = (TextField)it.next();
+            JTextField tf = (JTextField)it.next();
             String text = tf.getText();
             if (text.length() > 0)
             {
@@ -84,7 +84,7 @@ public class GetPlayers extends JDialog implements WindowListener,
             it = textFields.iterator();
             while (it.hasNext())
             {
-                TextField tf = (TextField)it.next();
+                JTextField tf = (JTextField)it.next();
                 tf.setText("");
             }
             return;
