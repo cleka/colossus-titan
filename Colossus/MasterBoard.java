@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.

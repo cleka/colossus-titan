@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class BattleTurn gets and holds chronological and sequence data for a battle.
