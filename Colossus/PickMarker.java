@@ -9,38 +9,36 @@ import java.awt.event.*;
 
 
 class PickMarker extends Dialog implements MouseListener
-//class PickMarker extends Frame implements MouseListener
 {
     Chit [] markers;
-    int scale;
     MediaTracker tracker;
     boolean imagesLoaded;
     Player player;
 
     PickMarker(Frame parentFrame, Player player)
     {
-        // Make the dialog modal
         super(parentFrame, "Pick Legion Marker", true);
-        //super("Pick Legion Marker");
 
-        this.player = player;
+        int scale = 60;
+        setLocation(new Point(scale, 4 * scale));
+        setSize((scale + 3) * (Math.max(12, player.numMarkersAvailable) + 1),
+            (scale + 3) * (player.numMarkersAvailable / 12 + 1));
 
-        scale = 17;
-        int cx = 5 * scale;
-        int cy = 5 * scale;
+        setLayout(null);
+        int cx = scale / 2;
+        int cy = scale * 2 / 3;
 
         pack();
-        setSize((scale + 3) * Math.max(12, player.numMarkersAvailable),
-            (scale + 3) * (player.numMarkersAvailable / 12) + 1);
-        setVisible(true);
         addMouseListener(this);
+
+        this.player = player;
 
         markers = new Chit[player.numMarkersAvailable];
         for (int i = 0; i < player.numMarkersAvailable; i++)
         {
             markers[i] = new Chit(cx + (i % 12) * (scale + 3),
                 cy + (i / 12) * (scale + 3), scale, 
-                player.markersAvailable[i], this);
+                "images/" + player.markersAvailable[i] + ".gif", this);
         }
 
         imagesLoaded = false;
@@ -61,7 +59,27 @@ class PickMarker extends Dialog implements MouseListener
         }
 
         imagesLoaded = true;
+        setVisible(true);
         repaint();
+    }
+
+
+    public void paint(Graphics g)
+    {
+        if (!imagesLoaded)
+        {
+            return;
+        }
+
+        Rectangle rectClip = g.getClipBounds();
+
+        for (int i = markers.length - 1; i >= 0; i--)
+        {
+            if (rectClip.intersects(markers[i].getBounds()))
+            {
+                markers[i].paint(g);
+            }
+        }
     }
 
 
@@ -72,22 +90,21 @@ class PickMarker extends Dialog implements MouseListener
         {
             if (markers[i].select(point))
             {
-                // Got a hit.
-                // Send that info back by putting it in player.markerSelected.
+                // Got a hit.  Send that info back by putting it in 
+                //     player.markerSelected.
                 player.markerSelected = new String(player.markersAvailable[i]);
 
                 // Then adjust player to show that this marker is taken.
                 for (int j = i; j < player.numMarkersAvailable - 1; j++)
                 {
-                    player.markersAvailable[j] = 
-                        new String(player.markersAvailable[j + 1]);
+                    player.markersAvailable[j] = new 
+                        String(player.markersAvailable[j + 1]);
                 }
-                player.markersAvailable[player.numMarkersAvailable - 1] =
-                    new String("");
+                player.markersAvailable[player.numMarkersAvailable - 1] = new 
+                    String("");
                 player.numMarkersAvailable--;
 
                 // Then exit.
-                // XXX Is this the right way for a modal dialog to exit?
                 dispose();
             }
         }
