@@ -126,7 +126,6 @@ Add optional additional handicap mulligans that can be used after turn 1.
 Add UI for players to specify favorite colors.
 
 Put old, new web pages under CVS.
-Switch to new XWeb web page.
 Use SF project releases.
 
 ShowLegion on mouseover, not click, with permanent dialog.
@@ -151,6 +150,8 @@ Add a ShowLegionMarkers window that shows each player's remaining
    markers.
 
 Add a window that shows all players' units
+
+Add a window that shows all game options.
 
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
