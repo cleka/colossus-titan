@@ -825,6 +825,8 @@ public final class Game
         PrintWriter out = new PrintWriter(fileWriter);
 
         out.println(Constants.saveGameVersion);
+        out.println(VariantSupport.getVarName());
+        out.println(VariantSupport.getVarDirectory());
         out.println(getNumPlayers());
         out.println(getTurnNumber());
         out.println(getActivePlayerNum());
@@ -1010,6 +1012,8 @@ public final class Game
 
             // Reset flags that are not in the savegame file.
             clearFlags();
+            
+            VariantSupport.loadVariant(in.readLine(), in.readLine());
 
             initAndLoadData(); // _before_ Creatures get read
 

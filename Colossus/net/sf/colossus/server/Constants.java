@@ -27,7 +27,7 @@ public final class Constants
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
-        "Colossus savegame version 9";
+        "Colossus savegame version 10";
 
     public static final String configVersion =
         "Colossus config file version 2";
