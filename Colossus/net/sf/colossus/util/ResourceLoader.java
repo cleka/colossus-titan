@@ -167,7 +167,8 @@ public final class ResourceLoader
                     }
                 }
             }
-            while (icon.getImageLoadStatus() == MediaTracker.LOADING)
+            while (icon != null && 
+                   icon.getImageLoadStatus() == MediaTracker.LOADING)
             { // no need for CPU time
                 Thread.yield();
             }
