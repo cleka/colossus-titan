@@ -69,6 +69,7 @@ public final class Start
     {
         net.sf.colossus.util.Options options = game.getOptions();
         options.loadOptions();
+        options.setOption(Constants.runClient, false);
         String loadFilename = options.getStringOption(Constants.loadGame);
         new GetPlayers(new JFrame(), options);
 

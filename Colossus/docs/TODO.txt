@@ -92,6 +92,9 @@ Bug: Saw 8-high enemy legion 3xUni, Chi, 3xGri, Ran.  Height shows up
    as 7 on marker.  Savegame shows no ranger.  Should be fixed by
    stack prediction code.
 
+Bug: Got two "All humans eliminated" dialogs -- one for human and one
+   for last AI.  (With stop when all humans eliminated option set.)
+
 Auto-redirect output to file lastlog in Colossus directory
 
 Add link from client to LogWindow; advance scroll thumb at end of various

@@ -323,7 +323,7 @@
 <!-- TODO Make a Windows version of this task. -->
 <target name="changelog" depends=""
         description = "Create a ChangeLog file from cvs history">
-        <exec executable="cvs2cl.pl" os="Linux,SunOS"> 
+        <exec executable="cvs2cl.pl" os="Linux,SunOS">
             <arg line="-S --no-wrap --utc"/>
         </exec>
         <delete verbose="yes" file = "ChangeLog.bak"/>
@@ -336,7 +336,7 @@
         </exec>
 </target>
 
-<target name="dist" depends="init,sign,tools"
+<target name="dist" depends="init,sign,changelog,tools"
         description = "Make zip file for user download">
         <zip zipfile="${ZIPFILE}" basedir="."
              excludes="**/*.sav,
@@ -361,12 +361,12 @@
 </target>
 
 
-<target name="inst" depends="init,sign,dist"
-        description = "Locally Copy files into htdocs tree on SF"> 
+<target name="inst" depends="init,sign,dist,changelog,docs"
+        description = "Locally copy files into htdocs tree on SF"> 
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
-        <!-- XXX removed copy file="ChangeLog" todir="${HTMLDIR}"/-->
+        <copy file="ChangeLog" todir="${HTMLDIR}"/-->
         <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>
         <delete> 
                 <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/> 
@@ -375,17 +375,31 @@
 </target>
 
 <!-- TODO Eliminate double maintenance -->
-<target name="remote-inst" depends="init,sign,dist"
+<!-- This requires a good ssh-agent setup. -->
+<target name="remote-inst" depends="init,sign,dist,changelog,docs"
         description = "scp files into htdocs tree on SF"> 
-        <exec command="scp Colossus.jar ${SERVER}:${HTMLDIR}"/>
-        <exec command="scp Colossus.jnlp ${SERVER}:${HTMLDIR}"/>
-        <exec command="scp ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
-        <exec command="scp -pr docs/* ${SERVER}:${DOCS_DIR}"/>
+        <exec executable="scp">
+            <arg line="Colossus.jar ${SERVER}:${HTMLDIR}"/>
+        </exec>
+        <exec executable="scp">
+            <arg line="Colossus.jnlp ${SERVER}:${HTMLDIR}"/>
+        </exec>
+        <exec executable="scp">
+            <arg line="${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
+        </exec>
+        <exec executable="scp">
+            <arg line="-pr docs/* ${SERVER}:${DOCS_DIR}"/>
+        </exec>
         <delete> 
                 <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/> 
         </delete>
+        <exec executable="ssh">
+            <arg line="${SERVER} rm ${DOWNLOAD_DIR}/1_LATEST_IS_*"/>
+        </exec>
         <touch file="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP}"/>
-        <exec command="scp ${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP} ${SERVER}:${DOWNLOAD_DIR}"/>
+        <exec executable="scp"> 
+            <arg line="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP} ${SERVER}:${DOWNLOAD_DIR}"/>
+        </exec>
 </target>
 
 
