@@ -2,3 +2,5 @@
 *.zip
 javacore.txt
 .*.swp
+*.class
+*.jar
