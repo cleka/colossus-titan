@@ -32,7 +32,7 @@ public class StrategicMapLoader
      * Initialize the loader, in particular the text-to-constant mapping.
      * @see #stringToWay
      */
-    public void StrategicMapLoaderInit()
+    static
     {
         stringToWay = new Hashtable(4);
         stringToWay.put("ARROW", new Integer(Constants.ARROW));

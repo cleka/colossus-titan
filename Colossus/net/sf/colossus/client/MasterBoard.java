@@ -708,7 +708,6 @@ Log.debug("Called MasterBoard constructor");
         }
 Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
         sml = new StrategicMapLoader(mapIS);
-        sml.StrategicMapLoaderInit();
         int[] size = sml.getHexArraySize();
         if ((horizSize == 0) && (vertSize == 0))
         {
