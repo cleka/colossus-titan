@@ -76,8 +76,6 @@ Bug: 1_LATEST_IS_date is broken in remote_inst.  Can't delete previous
 Have server send marker names.
 Let client pick starting marker along with color.
 
-Somewhat randomize AI marker selection.
-
 Toolbar, or at least Done button.
 
 Change some JDialogs to JFrames to allow separate minimizing?

@@ -31,7 +31,7 @@ public class SimpleAI implements AI
     };
     private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
     private boolean timeIsUp;
-    private Random random = new Random();
+    private Random random = new net.sf.colossus.util.DevRandom();
 
     public SimpleAI(Client client)
     {
@@ -63,19 +63,38 @@ public class SimpleAI implements AI
     {
         Iterator it = markerIds.iterator();
         String markerId = null;
+        List myMarkerIds = new ArrayList();
+        List otherMarkerIds = new ArrayList();
+        // split between own / other
         while (it.hasNext())
         {
             markerId = (String)it.next();
-            // Prefer own marker color.
             if (preferredShortColor != null && 
                 markerId.startsWith(preferredShortColor))
             {
-                return markerId;
+                myMarkerIds.add(markerId);
+            }
+            else
+            {
+                otherMarkerIds.add(markerId);
             }
         }
-        // Could not find one of own color -- return whatever we
-        // could find.  Will be null if no markers are available.
-        return markerId;
+
+        if (!(myMarkerIds.isEmpty()))
+        {
+            Collections.shuffle(myMarkerIds, random);
+            
+            return (String)(myMarkerIds.get(0));
+        }
+        
+        if (!(otherMarkerIds.isEmpty()))
+        {
+            Collections.shuffle(otherMarkerIds, random);
+            
+            return (String)(otherMarkerIds.get(0));
+        }
+        
+        return null;
     }
 
 
