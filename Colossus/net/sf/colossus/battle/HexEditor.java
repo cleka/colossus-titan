@@ -6,8 +6,10 @@ import java.awt.*;
 import java.awt.event.*;
 
 import net.sf.colossus.*;
-import net.sf.colossus.masterboard.*;
 import java.util.*;
+
+import MasterBoard;
+import MasterHex;
 
 
 class HexEditor extends JPanel
@@ -66,8 +68,7 @@ class HexEditor extends JPanel
     {
         String strTerrain = m_oTerrainChoice.getSelectedItem().toString();
         char chTerrain = s_oTerrainHash.get(strTerrain).toString().charAt(0);
-        // HERE -- must have some way to get to the labels
-        MasterHexFixed oHex = MasterBoardFixed.getAnyHexWithTerrain(chTerrain);
+        MasterHex oHex = MasterBoard.getAnyHexWithTerrain(chTerrain);
         String strHexLabel = oHex.getLabel();
         setLabel(strHexLabel);
     }

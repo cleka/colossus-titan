@@ -231,7 +231,8 @@ public final class Legion extends GameSource implements Comparable
     {
         Legion oLegion =
             new Legion(markerId, parentId, hexLabel, hexLabel, null,
-                       null, null, null, null, null, null, null, playerName, game);
+                       null, null, null, null, null, null, null, 
+                       playerName, game);
         // Probably not the right place to be adding this
         oLegion.addGameListener(game.getListener());
         return oLegion;

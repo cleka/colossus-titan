@@ -10,7 +10,7 @@ import java.io.*;
  * @author David Ripton
  */
 
-final class MasterBoard extends JPanel
+public final class MasterBoard extends JPanel
 {
     /** For easy of mapping to the GUI, hexes will be stored
      *  in a 15x8 array, with some empty elements. */
