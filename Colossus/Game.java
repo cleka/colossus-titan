@@ -47,14 +47,8 @@ public class Game extends Frame implements WindowListener, ActionListener
         Chit.setApplet(isApplet);
         setBackground(Color.lightGray);
         pack();
-        setSize(300, 250);
 
         setupIcon();
-
-        // Center dialog on screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
-                     - getSize().height / 2));
 
         setLayout(new GridLayout(0, 2));
 
@@ -72,6 +66,13 @@ public class Game extends Frame implements WindowListener, ActionListener
         Button button2 = new Button("Quit");
         add(button2);
         button2.addActionListener(this);
+
+        pack();
+        
+        // Center dialog on screen.
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
+                     - getSize().height / 2));
 
         addWindowListener(this);
         setVisible(true);
@@ -774,7 +775,7 @@ public class Game extends Frame implements WindowListener, ActionListener
                         visibles[k] = Boolean.valueOf(buf).booleanValue();
                     }
 
-                    Legion legion = new Legion(0, 0, 3 * board.getScale(), 
+                    Legion legion = new Legion(3 * board.getScale(), 
                         markerId, null, board, height, 
                         board.getHexFromLabel(hexLabel), creatures[0], 
                         creatures[1], creatures[2], creatures[3], creatures[4],
