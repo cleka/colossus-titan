@@ -661,20 +661,24 @@ class Player
         // Engaged legions give half points to the player they're
         // engaged with.  All others give half points to player,
         // if non-null.
+
         for (int i = 0; i < numLegions; i++)
         {
-            MasterHex hex = legions[i].getCurrentHex();
-            Legion legion = hex.getEnemyLegion(this);
-            if (legion != null)
+            Legion legion = legions[i];
+            MasterHex hex = legion.getCurrentHex();
+            Legion enemyLegion = hex.getEnemyLegion(this);
+            double halfPoints = legion.getPointValue() / 2.0;
+
+            if (enemyLegion != null)
             {
-                Player enemy = legion.getPlayer();
-                enemy.addPoints(legions[i].getPointValue() / 2.0);
+                Player engagedPlayer = enemyLegion.getPlayer();
+                engagedPlayer.addPoints(halfPoints);
             }
             else
             {
                 if (player != null)
                 {
-                    player.addPoints(legions[i].getPointValue() / 2.0);
+                    player.addPoints(halfPoints);
                 }
             }
         }
