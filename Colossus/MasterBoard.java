@@ -60,7 +60,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
         scale = 17;
 
-        pack();
+        setLayout(null);
         setSize(getPreferredSize());
         setBackground(java.awt.Color.black);
         addWindowListener(this);
@@ -90,7 +90,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
             game.player[i].legions[0] = new Legion(point.x - (3 * scale / 2), 
                 point.y - (3 * scale / 2), 3 * scale, 
-                game.player[i].markerSelected, 
+                game.player[i].markerSelected, null,
                 this, 8, Creature.titan, Creature.angel, Creature.ogre, 
                 Creature.ogre, Creature.centaur, Creature.centaur, 
                 Creature.gargoyle, Creature.gargoyle);
@@ -120,6 +120,10 @@ public class MasterBoard extends Frame implements MouseListener,
         imagesLoaded = true;
         setVisible(true);
         repaint();
+
+        // XXX temporary test call
+        SplitLegion splitlegion = new SplitLegion(this, 
+            game.player[0].legions[0], game.player[0]);
     }
 
 
@@ -720,6 +724,9 @@ public class MasterBoard extends Frame implements MouseListener,
                     // Show info about this legion.
                     ShowLegion showlegion = new ShowLegion(this, 
                         game.player[i].legions[j], point);
+                    // XXX: Work around a bug in the windowing system
+                    // by reducing the clipping region to only what
+                    // was covered by that dialog?
                     return;
                 }
             }
