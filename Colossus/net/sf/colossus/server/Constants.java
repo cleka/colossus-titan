@@ -164,7 +164,8 @@ public final class Constants
     public static final String anyAI = "A Random AI";
     public static final String defaultAI = anyAI;
     public static final String[] aiArray = { "SimpleAI",
-        "CowardSimpleAI"};
+        "CowardSimpleAI", "RationalAI", "HumanHaterRationalAI"};
+
     public static final int numAITypes = aiArray.length;
     public static final String all = "All";
     public static final String aiPackage = "net.sf.colossus.client.";

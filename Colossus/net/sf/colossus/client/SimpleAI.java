@@ -785,6 +785,15 @@ public class SimpleAI implements AI
             while (moveIterator.hasNext())
             {
                 final String hexLabel = (String)moveIterator.next();
+                // XXX
+                // Do not consider moves onto hexes where we already have a 
+                // legion. This is sub-optimal since the legion in this hex 
+                // may be able to move and "get out of the way"
+                if (client.getNumFriendlyLegions(hexLabel, player.getName()) >
+                        0)
+                {
+                    continue;
+                }
                 final MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
                 final int value = evaluateMove(legion, hex, true,
                         enemyAttackMap);

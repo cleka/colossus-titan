@@ -518,4 +518,44 @@ public class RecruitGraph
         }
         return best;
     }
+
+    /**
+     * Determine if a creature given by 'lesser' could potentially
+     * summon the higher valued creature given by 'greater' within N steps.  
+     * This is used to determine if 'lesser' is redundant for mustering purposes
+     * if we have 'greater'
+     * Here we limit the search to 'distance' (typically 2) recruit steps 
+     * since otherwise every creature
+     * is 'reachable' via a downmuster at the tower and starting all over which
+     * is not what we are interested in.
+     * @param lesser Name of the recruiting creature.
+     * @param greater Name of the recruit we are trying to get to
+     * @distance number of steps to consider
+     */
+    public boolean isRecruitDistanceLessThan(String lesser, String greater,
+            int distance)
+    {
+        List all = traverse(lesser, null);
+        Iterator it = all.iterator();
+        // Log.debug("isReachable('" + lesser + "', '" + greater + "')");
+        int steps = 0;
+        // distance including self - i.e. distance + 1
+        while (it.hasNext() && steps < distance + 1)
+        {
+            RecruitVertex v2 = (RecruitVertex)it.next();
+            String name = v2.getCreatureName();
+            // Log.debug("isReachable: '" + name + "'");
+            if (name.compareTo(greater) == 0)
+            {
+                // Log.debug("Matched");
+                return true;
+            }
+            else
+            {
+                // Log.debug("Unmatched");
+            }
+            steps++;
+        }
+        return false;
+    }
 }

@@ -106,8 +106,16 @@ public final class LegionInfo
     /** Return an immutable copy of the legion's contents, in sorted order. */
     public List getContents()
     {
-        return Collections.unmodifiableList(
-                getNode().getCreatures().getCreatureNames());
+        try
+        {
+            return Collections.unmodifiableList(
+                    getNode().getCreatures().getCreatureNames());
+        }
+        catch (NullPointerException e)
+        {
+            Log.debug("NullPointerException in getContents(). Return empty set of creatures.");
+            return new ArrayList();
+        }
     }
 
     boolean contains(String creatureName)
