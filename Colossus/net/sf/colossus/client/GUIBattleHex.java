@@ -21,6 +21,9 @@ final class GUIBattleHex extends BattleHex
     // Hex terrain types are:
     // p, r, s, t, o, v, d
     // plain, bramble, sand, tree, bog, volcano, drift
+    // also
+    // l
+    // lake
 
     // Hexside terrain types are:
     // d, c, s, w, space
