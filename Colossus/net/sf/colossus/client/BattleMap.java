@@ -379,13 +379,17 @@ public final class BattleMap extends HexMap implements MouseListener,
      *  or null if none does. */
     private BattleChit getBattleChitAtPoint(Point point)
     {
-        Iterator it = client.getBattleChits().iterator();
-        while (it.hasNext())
+        java.util.List battleChits = client.getBattleChits();
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)it.next();
-            if (chit.contains(point))
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
             {
-                return chit;
+                BattleChit chit = (BattleChit)it.next();
+                if (chit.contains(point))
+                {
+                    return chit;
+                }
             }
         }
         return null;
@@ -640,13 +644,16 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
 
         java.util.List battleChits = client.getBattleChits();
-        ListIterator lit = battleChits.listIterator(battleChits.size());
-        while (lit.hasPrevious())
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)lit.previous();
-            if (rectClip.intersects(chit.getBounds()))
+            ListIterator lit = battleChits.listIterator(battleChits.size());
+            while (lit.hasPrevious())
             {
-                chit.paintComponent(g);
+                BattleChit chit = (BattleChit)lit.previous();
+                if (rectClip.intersects(chit.getBounds()))
+                {
+                    chit.paintComponent(g);
+                }
             }
         }
     }
@@ -670,11 +677,15 @@ public final class BattleMap extends HexMap implements MouseListener,
         setupEntrances();
 
         int chitScale = 4 * Scale.get();
-        Iterator it = client.getBattleChits().iterator();
-        while (it.hasNext())
+        java.util.List battleChits = client.getBattleChits();
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)it.next();
-            chit.rescale(chitScale);
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
+            {
+                BattleChit chit = (BattleChit)it.next();
+                chit.rescale(chitScale);
+            }
         }
         alignChits(getAllHexLabels());
         setSize(getPreferredSize());

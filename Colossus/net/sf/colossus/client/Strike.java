@@ -52,14 +52,18 @@ final class Strike
 
     boolean isForcedStrikeRemaining()
     {
-        Iterator it = client.getBattleChits().iterator();
-        while (it.hasNext())
+        java.util.List battleChits = client.getBattleChits();
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)it.next();
-            if (client.isActive(chit) && !chit.hasStruck() && 
-                client.isInContact(chit, false))
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
             {
-                return true;
+                BattleChit chit = (BattleChit)it.next();
+                if (client.isActive(chit) && !chit.hasStruck() && 
+                    client.isInContact(chit, false))
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -299,22 +303,26 @@ final class Strike
         BattleHex hex = client.getBattleHex(chit);
         int min = Constants.OUT_OF_RANGE;
 
-        Iterator it = client.getBattleChits().iterator();
-        while (it.hasNext())
+        java.util.List battleChits = client.getBattleChits();
+        synchronized (battleChits)
         {
-            BattleChit target = (BattleChit)it.next();
-            if (chit.isInverted() != target.isInverted())
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
             {
-                BattleHex targetHex = client.getBattleHex(target);
-                int range = getRange(hex, targetHex, false);
-                // Exit early if adjacent.
-                if (range == 2)
+                BattleChit target = (BattleChit)it.next();
+                if (chit.isInverted() != target.isInverted())
                 {
-                    return range;
-                }
-                else if (range < min)
-                {
-                    min = range;
+                    BattleHex targetHex = client.getBattleHex(target);
+                    int range = getRange(hex, targetHex, false);
+                    // Exit early if adjacent.
+                    if (range == 2)
+                    {
+                        return range;
+                    }
+                    else if (range < min)
+                    {
+                        min = range;
+                    }
                 }
             }
         }

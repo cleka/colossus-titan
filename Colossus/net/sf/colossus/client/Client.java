@@ -48,7 +48,8 @@ public final class Client implements IClient
     private BattleMap map;
     private BattleDice battleDice;
 
-    private java.util.List battleChits = new ArrayList();
+    private java.util.List battleChits =
+        Collections.synchronizedList(new ArrayList());
 
     /** Stack of legion marker ids, to allow multiple levels of undo for
      *  splits, moves, and recruits. */
@@ -820,14 +821,17 @@ public final class Client implements IClient
     java.util.List getActiveBattleChits()
     {
         java.util.List chits = new ArrayList();
-        Iterator it = getBattleChits().iterator();
-        while (it.hasNext())
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)it.next();
-            if (getBattleActivePlayerName().equals(getPlayerNameByTag(
-                chit.getTag())))
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
             {
-                chits.add(chit);
+                BattleChit chit = (BattleChit)it.next();
+                if (getBattleActivePlayerName().equals(getPlayerNameByTag(
+                    chit.getTag())))
+                {
+                    chits.add(chit);
+                }
             }
         }
         return chits;
@@ -836,14 +840,17 @@ public final class Client implements IClient
     java.util.List getInactiveBattleChits()
     {
         java.util.List chits = new ArrayList();
-        Iterator it = getBattleChits().iterator();
-        while (it.hasNext())
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)it.next();
-            if (!getBattleActivePlayerName().equals(getPlayerNameByTag(
-                chit.getTag())))
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
             {
-                chits.add(chit);
+                BattleChit chit = (BattleChit)it.next();
+                if (!getBattleActivePlayerName().equals(getPlayerNameByTag(
+                                                        chit.getTag())))
+                {
+                    chits.add(chit);
+                }
             }
         }
         return chits;
@@ -1058,18 +1065,21 @@ public final class Client implements IClient
     {
         java.util.List chits = new ArrayList();
 
-        Iterator it = getBattleChits().iterator();
-        while (it.hasNext())
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)it.next();
-            if (hexLabel.equals(chit.getCurrentHexLabel()))
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
             {
-                chits.add(chit);
+                BattleChit chit = (BattleChit)it.next();
+                if (hexLabel.equals(chit.getCurrentHexLabel()))
+                {
+                    chits.add(chit);
+                }
             }
         }
         return chits;
     }
-
+    
     BattleChit getBattleChit(String hexLabel)
     {
         java.util.List chits = getBattleChits(hexLabel);
@@ -1084,13 +1094,16 @@ public final class Client implements IClient
     /** Get the BattleChit with this tag. */
     BattleChit getBattleChit(int tag)
     {
-        Iterator it = getBattleChits().iterator();
-        while (it.hasNext())
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)it.next();
-            if (chit.getTag() == tag)
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
             {
-                return chit;
+                BattleChit chit = (BattleChit)it.next();
+                if (chit.getTag() == tag)
+                {
+                    return chit;
+                }
             }
         }
         return null;
@@ -1100,23 +1113,26 @@ public final class Client implements IClient
     // XXX Does this need to be public?
     public void removeDeadBattleChits()
     {
-        Iterator it = getBattleChits().iterator();
-        while (it.hasNext())
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)it.next();
-            if (chit.isDead())
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
             {
-                it.remove();
-
-                // Also remove it from LegionInfo.
-                String name = chit.getId();
-                if (chit.isInverted())
+                BattleChit chit = (BattleChit)it.next();
+                if (chit.isDead())
                 {
-                    getLegionInfo(defenderMarkerId).removeCreature(name);
-                }
-                else
-                {
-                    getLegionInfo(attackerMarkerId).removeCreature(name);
+                    it.remove();
+                    
+                    // Also remove it from LegionInfo.
+                    String name = chit.getId();
+                    if (chit.isInverted())
+                    {
+                        getLegionInfo(defenderMarkerId).removeCreature(name);
+                    }
+                    else
+                    {
+                        getLegionInfo(attackerMarkerId).removeCreature(name);
+                    }
                 }
             }
         }
@@ -1156,7 +1172,10 @@ public final class Client implements IClient
         }
         BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
             map, inverted, tag, hexLabel);
-        battleChits.add(chit);
+        synchronized (battleChits)
+        {
+            battleChits.add(chit);
+        }
     }
 
 
@@ -1721,7 +1740,10 @@ Log.debug(playerName + " Client.cleanupBattle()");
             map.dispose();
             map = null;
         }
-        getBattleChits().clear();
+        synchronized (battleChits)
+        {
+            battleChits.clear();
+        }
         battleTurnNumber = -1;
         battlePhase = -1;
         battleActivePlayerName = null;
@@ -2055,12 +2077,15 @@ Log.debug(playerName + " Client.setupBattleRecruit()");
 
     private void resetAllBattleMoves()
     {
-        Iterator it = getBattleChits().iterator();
-        while (it.hasNext())
+        synchronized (battleChits)
         {
-            BattleChit chit = (BattleChit)it.next();
-            chit.setMoved(false);
-            chit.setStruck(false);
+            Iterator it = battleChits.iterator();
+            while (it.hasNext())
+            {
+                BattleChit chit = (BattleChit)it.next();
+                chit.setMoved(false);
+                chit.setStruck(false);
+            }
         }
     }
 
