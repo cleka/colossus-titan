@@ -326,7 +326,7 @@ public final class LegionInfo
             if (name.startsWith(Constants.titan))
             {
                 PlayerInfo info = client.getPlayerInfo(playerName);
-                // Tian skill is changed by variants.
+                // Titan skill is changed by variants.
                 sum += info.getTitanPower() *
                     Creature.getCreatureByName("Titan").getSkill();
             }

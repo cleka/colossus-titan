@@ -630,17 +630,17 @@ public final class Game
         switch (remaining)
         {
             case 0:
-                setGameOver(true);
                 Log.event("Game over -- Draw at " + new Date().getTime());
+                setGameOver(true);
                 server.allTellGameOver("Draw");
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
 
-                setGameOver(true);
                 Log.event("Game over -- " + winnerName + " wins at " +
                     new Date().getTime());
+                setGameOver(true);
                 server.allTellGameOver(winnerName + " wins");
                 break;
 
@@ -649,12 +649,12 @@ public final class Game
         }
     }
 
-    boolean isOver()
+    synchronized boolean isOver()
     {
         return gameOver;
     }
 
-    private void setGameOver(boolean gameOver)
+    private synchronized void setGameOver(boolean gameOver)
     {
         this.gameOver = gameOver;
         if (gameOver && getOption(Options.autoQuit))
@@ -699,7 +699,8 @@ public final class Game
         if (getOption(Options.autoStop) && getNumHumansRemaining() < 1)
         {
             Log.event("Not advancing because no humans remain");
-            // XXX buggy?  server.allTellGameOver("All humans eliminated");
+            // XXX buggy?  
+            server.allTellGameOver("All humans eliminated");
             setGameOver(true);
             return;
         }
@@ -1060,7 +1061,7 @@ public final class Game
         return leg;
     }
 
-    void autoSave()
+    synchronized void autoSave()
     {
         if (getOption(Options.autosave) && !isOver())
         {

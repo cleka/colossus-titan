@@ -78,27 +78,32 @@ public class CreatureTitan extends Creature
 
     public String[] getImageNames()
     {
-        Log.warn("Calling getImageNames() for Titan, this is broken.");
+        Log.warn("Calling getImageNames() for Titan");
         return super.getImageNames();
     }
     
     public int getPointValue()
     {
-        Log.warn("Calling getPointValue() on Titan Creature (should only be called on Titan Critter)");
-        return super.getPointValue();
+        Log.warn("Calling getPointValue() on Titan Creature"); 
+        // XXX This is wrong, but 24 is better than -4.
+        int val = 6 * getSkill();
+        Log.debug("getPointValue() is " + val);
+        return val;
     }
 
     public int getHintedRecruitmentValue()
     {
-        Log.warn("Calling getHintedRecruitmentValue() on Titan Creature (should only be called on Titan Critter)");
-        return super.getHintedRecruitmentValue();
+        Log.warn("Calling getHintedRecruitmentValue() on CreatureTitan"); 
+        int val = super.getHintedRecruitmentValue();
+        Log.debug("getHintedRecruitmentValue() is " + val);
+        return val;
     }
 
     public int getHintedRecruitmentValue(String[] section)
     {
-        Log.warn("Calling getHintedRecruitmentValue(String[]) on Titan Creature (should only be called on Titan Critter)");
-        return super.getHintedRecruitmentValue(section);
+        Log.warn("Calling getHintedRecruitmentValue([]) on CreatureTitan");
+        int val = super.getHintedRecruitmentValue(section);
+        Log.debug("getHintedRecruitmentValue() is " + val);
+        return val;
     }
-
-    
 }

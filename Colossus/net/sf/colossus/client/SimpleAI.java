@@ -15,12 +15,10 @@ import net.sf.colossus.server.VariantSupport;
 
 /**
  * Simple implementation of a Titan AI
- * @version $Id$
+ * @version $Id$ 
  * @author Bruce Sherrod, David Ripton
  * @author Romain Dolbeau
  */
-
-
 public class SimpleAI implements AI
 {
     Client client;
@@ -352,9 +350,9 @@ public class SimpleAI implements AI
         if (!recruits.isEmpty())
         {
             Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
-            if (bestRecruit != null && bestRecruit.getHintedRecruitmentValue(
-                hintSectionUsed) >
-                weakest.getHintedRecruitmentValue(hintSectionUsed))
+            if (bestRecruit != null && 
+                ghrv(bestRecruit, legion, hintSectionUsed) >
+                ghrv(weakest, legion, hintSectionUsed))
             {
                 return true;
             }
@@ -387,10 +385,8 @@ public class SimpleAI implements AI
                     Creature tempRecruit =
                         Creature.getCreatureByName((String)it.next());
                     if ((bestRecruit == null) ||
-                        (tempRecruit.getHintedRecruitmentValue(
-                            hintSectionUsed) >=
-                         bestRecruit.getHintedRecruitmentValue(
-                             hintSectionUsed)))
+                        (ghrv(tempRecruit, legion, hintSectionUsed) >=
+                             ghrv(bestRecruit, legion, hintSectionUsed)))
                     {
                         bestRecruit = tempRecruit;
                     }
@@ -399,8 +395,8 @@ public class SimpleAI implements AI
             }
 
             if (bestRecruit != null && 
-                bestRecruit.getHintedRecruitmentValue(hintSectionUsed) >
-                weakest.getHintedRecruitmentValue(hintSectionUsed))
+                ghrv(bestRecruit, legion, hintSectionUsed) >
+                    ghrv(weakest, legion, hintSectionUsed))
             {
                 return true;
             }
@@ -460,20 +456,20 @@ public class SimpleAI implements AI
             {
                 weakest2 = critter;
             }
-            else if (critter.getHintedRecruitmentValue(hintSectionUsed) < 
-                weakest1.getHintedRecruitmentValue(hintSectionUsed))
+            else if (ghrv(critter, legion, hintSectionUsed) < 
+                ghrv(weakest1, legion, hintSectionUsed))
             {
                 weakest1 = critter;
             }
-            else if (critter.getHintedRecruitmentValue(hintSectionUsed) < 
-                weakest2.getHintedRecruitmentValue(hintSectionUsed))
+            else if (ghrv(critter, legion, hintSectionUsed) < 
+                ghrv(weakest2, legion, hintSectionUsed))
             {
                 weakest2 = critter;
             }
-            else if (critter.getHintedRecruitmentValue(hintSectionUsed) == 
-                weakest1.getHintedRecruitmentValue(hintSectionUsed)
-                && critter.getHintedRecruitmentValue(hintSectionUsed) == 
-                weakest2.getHintedRecruitmentValue(hintSectionUsed))
+            else if (ghrv(critter, legion, hintSectionUsed) == 
+                ghrv(weakest1, legion, hintSectionUsed)
+                && ghrv(critter, legion, hintSectionUsed) == 
+                    ghrv(weakest2, legion, hintSectionUsed))
             {
                 if (critter.getName().equals(weakest1.getName()))
                 {
@@ -1114,7 +1110,7 @@ public class SimpleAI implements AI
                         getPointValue() * enemyPointValue) /
                         TerrainRecruitLoader.getAcquirableRecruitmentsValue();
                     // plus a fraction of a titan strength
-// XXX Should be by variant
+                    // XXX Should be by variant
                     value += (6 * enemyPointValue) /
                         TerrainRecruitLoader.getTitanImprovementValue();
                     // plus some more for killing a group (this is arbitrary)
@@ -1259,8 +1255,7 @@ public class SimpleAI implements AI
 
                 if (legion.getHeight() < 6)
                 {
-                    value += recruit.getHintedRecruitmentValue(
-                        hintSectionUsed);
+                    value += ghrv(recruit, legion, hintSectionUsed);
                 }
                 else
                 {
@@ -1298,28 +1293,20 @@ public class SimpleAI implements AI
                         {
                             weakest2 = critter;
                         }
-                        else if (critter.getHintedRecruitmentValue(
-                            hintSectionUsed) < 
-                            weakest1.getHintedRecruitmentValue(
-                            hintSectionUsed))
+                        else if (ghrv(critter, legion, hintSectionUsed) < 
+                            ghrv(weakest1, legion, hintSectionUsed))
                         {
                             weakest1 = critter;
                         }
-                        else if (critter.getHintedRecruitmentValue(
-                            hintSectionUsed) < 
-                            weakest2.getHintedRecruitmentValue(
-                            hintSectionUsed))
+                        else if (ghrv(critter, legion, hintSectionUsed) < 
+                            ghrv(weakest2, legion, hintSectionUsed))
                         {
                             weakest2 = critter;
                         }
-                        else if (critter.getHintedRecruitmentValue(
-                            hintSectionUsed) == 
-                            weakest1.getHintedRecruitmentValue(
-                                hintSectionUsed) && 
-                            critter.getHintedRecruitmentValue(
-                                hintSectionUsed) == 
-                            weakest2.getHintedRecruitmentValue(
-                                hintSectionUsed))
+                        else if (ghrv(critter, legion, hintSectionUsed) == 
+                            ghrv(weakest1, legion, hintSectionUsed) && 
+                            ghrv(critter, legion, hintSectionUsed) == 
+                            ghrv(weakest2, legion, hintSectionUsed))
                         {
                             if (critter.getName().equals(weakest1.getName()))
                             {
@@ -1334,23 +1321,23 @@ public class SimpleAI implements AI
                     }
 
                     int minCreaturePV = Math.min(
-                        weakest1.getHintedRecruitmentValue(hintSectionUsed),
-                        weakest2.getHintedRecruitmentValue(hintSectionUsed));
+                        ghrv(weakest1, legion, hintSectionUsed),
+                        ghrv(weakest2, legion, hintSectionUsed));
                     int maxCreaturePV = Math.max(
-                        weakest1.getHintedRecruitmentValue(hintSectionUsed),
-                        weakest2.getHintedRecruitmentValue(hintSectionUsed));
+                        ghrv(weakest1, legion, hintSectionUsed),
+                        ghrv(weakest2, legion, hintSectionUsed));
                     // point value of my best 5 pieces right now
                     int oldPV = legion.getPointValue() - minCreaturePV;
                     // point value of my best 5 pieces after adding this
                     // recruit and then splitting off my 2 weakest
                     int newPV = legion.getPointValue()
-                        - weakest1.getHintedRecruitmentValue(hintSectionUsed)
-                        - weakest2.getHintedRecruitmentValue(hintSectionUsed)
+                        - ghrv(weakest1, legion, hintSectionUsed)
+                        - ghrv(weakest2, legion, hintSectionUsed)
                         + Math.max(maxCreaturePV, 
-                          recruit.getHintedRecruitmentValue(hintSectionUsed));
+                          ghrv(recruit, legion, hintSectionUsed));
 
                     value += (newPV - oldPV) + 
-                        recruit.getHintedRecruitmentValue(hintSectionUsed);
+                        ghrv(recruit, legion, hintSectionUsed);
                 }
 
                 Log.debug("--- if " + legion + " moves to " + hex
@@ -1639,9 +1626,7 @@ public class SimpleAI implements AI
                         // the after-next stage (i.e. it will try to take
                         // a third Cyclops over a Gorgon even if we have a
                         // Serpent, as long as we don't have a Behemoth)
-                        int pv = cdest.getHintedRecruitmentValue(
-                            hintSectionUsed);
-                        
+                        int pv = ghrv(cdest, legion, hintSectionUsed);
                         if (pv > maxPV)
                         {
                             maxPV = pv;
@@ -1670,7 +1655,7 @@ public class SimpleAI implements AI
         // say the best we can do ATM is either what we can recruit next 
         // turn, or the value of the recruit itself;
         int maxPV = ((r[0] == (1 + legion.numCreature(recruit))) ? r[1] : 
-            recruit.getHintedRecruitmentValue(hintSectionUsed));
+            ghrv(recruit, legion, hintSectionUsed));
 
         Iterator it = recruits.iterator();
         
@@ -1725,8 +1710,8 @@ public class SimpleAI implements AI
             String temp = TerrainRecruitLoader.getRecruitGraph().
                 getBestPossibleRecruitEver(recruit.getName(), legion);
 
-            int vp = (Creature.getCreatureByName(temp)).
-                getHintedRecruitmentValue(hintSectionUsed);
+            int vp = ghrv(Creature.getCreatureByName(temp), legion, 
+                hintSectionUsed);
 
             if (vp > maxVP)
             {
@@ -1882,7 +1867,7 @@ public class SimpleAI implements AI
                         client.getPlayerInfo(client.getPlayerName()));
             }
             int worst = 0;
-            for (int i = 1; i < 6 ; i++)
+            for (int i = 1; i < 6; i++)
             {
                 List enemyList = (List)enemyAttackMap[i].get(
                     legion.getHexLabel());
@@ -2238,7 +2223,9 @@ public class SimpleAI implements AI
             Creature tc = Creature.getCreatureByName(name);
             if (recruits.contains(name) &&
                 ((c == null) || (tc.getPointValue() > c.getPointValue())))
+            {
                 c = tc;
+            }
         }
 
         return (c == null ? null : c.getName());
@@ -2505,7 +2492,8 @@ Log.debug("Best target is null, aborting");
         if (creature.isTitan())
         {
             // Don't know the power, so just estimate.
-            return 24;
+            Log.warn("Called SimpleAI.getCombatValue() for Titan");
+            return 6 * Creature.getCreatureByName("Titan").getSkill();
         }
 
         int val = creature.getPointValue();
@@ -2694,7 +2682,7 @@ Log.debug("Best target is null, aborting");
                 Log.debug("Moving " + critter.getDescription() + " to " +
                     cm2.getEndingHexLabel() + " (startingHexLabel was " +
                           startingHexLabel + ")");
-                critter.moveToHex(cm2.getEndingHexLabel());
+                client.tryBattleMove(cm2);
             }
         }
     }
@@ -2849,7 +2837,6 @@ Log.debug("Called findBattleMoves()");
         // has room to enter.
 
         // The caller is responsible for actually making the moves.
-
 
         // allCritterMoves is an ArrayList (for clone()) of moveLists.
         final ArrayList allCritterMoves = new ArrayList();
@@ -3516,6 +3503,34 @@ Log.debug("Called findBattleMoves()");
 
         return sum;
     }
+
+
+    private int ghrv(Creature creature, LegionInfo legion)
+    {
+        if (!creature.isTitan())
+        {
+            return creature.getHintedRecruitmentValue();
+        }
+        PlayerInfo player = client.getPlayerInfo(legion.getPlayerName());
+        int power = player.getTitanPower();
+        int skill = creature.getSkill();
+        return power * skill * VariantSupport.getHintedRecruitmentValueOffset(
+            creature.getName());
+    }
+
+    private int ghrv(Creature creature, LegionInfo legion, String[] section)
+    {
+        if (!creature.isTitan())
+        {
+            return creature.getHintedRecruitmentValue(section);
+        }
+        PlayerInfo player = client.getPlayerInfo(legion.getPlayerName());
+        int power = player.getTitanPower();
+        int skill = creature.getSkill();
+        return power * skill * VariantSupport.getHintedRecruitmentValueOffset(
+            creature.getName(), section);
+    }
+
 
 
     /** MoveList is an ArrayList of CritterMoves */

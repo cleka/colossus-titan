@@ -2157,7 +2157,7 @@ Log.error("Got nak for recruit with " + markerId);
         }
     }
 
-    private void tryBattleMove(CritterMove cm)
+    void tryBattleMove(CritterMove cm)
     {
         BattleChit critter = cm.getCritter();
         String hexLabel = cm.getEndingHexLabel();
@@ -2397,7 +2397,7 @@ Log.error("Got nak for recruit with " + markerId);
 
     public void nakBattleMove(int tag)
     {
-Log.error("Got nak for move of " + tag);
+        Log.error("Got nak for move of " + tag);
     }
 
 
