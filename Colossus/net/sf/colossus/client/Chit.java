@@ -83,7 +83,8 @@ class Chit extends JPanel
                 filenames[0] = "Plain" + color;
                 filenames[1] = "TitanMask";
                 filenames[2] = "Power-" + power + color;
-                filenames[3] = "Skill-4" + color;
+                int skill = Creature.getCreatureByName("Titan").getSkill();
+                filenames[3] = "Skill-" + skill + "" + color;
                    
                 icon = getImageIcon(filenames);
             }
