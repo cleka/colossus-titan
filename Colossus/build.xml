@@ -6,8 +6,6 @@
 <!-- To use this you need:
      Sun JDK 1.4+    http://java.sun.com  (currently recommend 1.4.1)
      Ant 1.5+        http://jakarta.apache.org/ant/
-     JavaCC 2.1      http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
-        Environment var JAVACC_HOME pointing to JavaCC install root
      Javamake 1.2.8+ http://www.experimentalstuff.com/Technologies/JavaMake/
         javamake.jar needs to be in your CLASSPATH.
      JUnit 3.8.1+      http://junit.org
@@ -38,7 +36,6 @@
         <property name="build.compiler" value="modern"/>
 
 
-
         <property name="HTML_DIR" value="/home/groups/c/co/colossus/htdocs"/>
         <property name="DOWNLOAD_DIR" value="${HTML_DIR}/download"/>
         <property name="DOCS_DIR" value="${HTML_DIR}/docs"/>
@@ -52,26 +49,6 @@
 <target name="version" depends="init"
         description="Create a timestamp file">
         <echo file="./version" message="${DSTAMP}&#10;"
-        />
-</target>
-
-
-<!-- The javacc target does not support multiple .jj files in one target. -->
-<target name="parsers"
-        depends="BattlelandLoader,
-                 BattlelandRandomizerLoader"
-        description = "Create .java files from .jj files with javacc">
-</target>
-
-<target name="BattlelandLoader">
-        <javacc target="net/sf/colossus/parser/BattlelandLoader.jj"
-                javacchome="${env.JAVACC_HOME}"
-        />
-</target>
-
-<target name="BattlelandRandomizerLoader">
-        <javacc target="net/sf/colossus/parser/BattlelandRandomizerLoader.jj"
-                javacchome="${env.JAVACC_HOME}"
         />
 </target>
 
@@ -92,11 +69,12 @@
 
 <!-- If you don't have Javamake you can change "javamake" to "javac" -->
 <!-- But get Javamake instead.  Good dependency checking helps a lot. -->
-<target name="compile" depends="init,parsers"
+<target name="compile" depends="init"
         description = "Compile most .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
                 includes="**/*.java"
-                excludes="**/*Test.java">
+                excludes="**/*Test.java,
+                          **/datatools/*.java">
             <classpath>
                 <pathelement location="libs/batik-transcoder.jar"/>
                 <pathelement location="libs/batik-util.jar"/>
@@ -108,7 +86,7 @@
 
 <!-- If you don't have Javamake you can change "javamake" to "javac" -->
 <!-- But get Javamake instead.  Good dependency checking helps a lot. -->
-<target name="compileAll" depends="init,parsers"
+<target name="compileAll" depends="init"
         description = "Compile all .java files to .class files using javamake">
         <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
                 includes="**/*.java">
@@ -357,7 +335,7 @@
         <delete verbose="yes" file = "ChangeLog.bak"/>
 </target>
 
-<target name="dist" depends="init,sign,changelog,tools"
+<target name="dist" depends="init,sign,changelog"
         description = "Make zip file for user download">
         <zip zipfile="${ZIPFILE}" basedir="."
              excludes="**/*.sav,

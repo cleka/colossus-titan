@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.swing.JPanel;
 
 import net.sf.colossus.xmlparser.BattlelandLoader;
-import net.sf.colossus.parser.BattlelandRandomizerLoader;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.util.Log;
@@ -197,82 +196,85 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
             else
             { // random Battlelands
-                Log.debug("Randomizing " + terrain + " with " + rndSourceName);
-                InputStream brlIS =
-                        ResourceLoader.getInputStream(rndSourceName,
-                        directories);
-                BattlelandRandomizerLoader brl =
-                        new BattlelandRandomizerLoader(brlIS);
-                while (brl.oneArea(h) >= 0)
-                {
-                }
-                brl.resolveAllHexsides(h);
-                List tempTowerStartList = brl.getStartList();
-                if (tempTowerStartList != null)
-                {
-                    startlistMap.put(terrain, tempTowerStartList);
-                }
-                towerStatusMap.put(terrain, new Boolean(brl.isTower()));
-                subtitleMap.put(terrain, null);
-                StringBuffer buf = new StringBuffer();
-                for (int i = 0; i < 6; i++)
-                {
-                    for (int j = 0; j < 6; j++)
-                    {
-                        if (show[i][j])
-                        {
-                            boolean doDumpSides = false;
-                            String haz = h[i][j].getTerrain();
-                            int e = h[i][j].getElevation();
-                            for (int k = 0; k < 6; k++)
-                            {
-                                char s = h[i][j].getHexside(k);
-                                if (s != ' ')
-                                {
-                                    doDumpSides = true;
-                                }
-                            }
-                            if (doDumpSides ||
-                                    (!haz.equals("Plains")) ||
-                                    (e != 0))
-                            {
-                                buf.append(i + " " + j + " ");
-                                buf.append(h[i][j].getTerrain());
-                                buf.append(" ");
-                                buf.append(h[i][j].getElevation());
-                                if (doDumpSides)
-                                {
-                                    for (int k = 0; k < 6; k++)
-                                    {
-                                        if (h[i][j].getHexside(k) != ' ')
-                                        {
-                                            buf.append(" " + k + " ");
-                                            buf.append(h[i][j].getHexside(k));
-                                        }
-                                    }
-                                }
-                                buf.append("\n");
-                            }
-                        }
-                    }
-                }
-                if (brl.isTower())
-                {
-                    buf.append("TOWER\n");
-                }
-                if (tempTowerStartList != null)
-                {
-                    buf.append("STARTLIST");
-                    Iterator it = tempTowerStartList.iterator();
-                    while (it.hasNext())
-                    {
-                        String label = (String)it.next();
-                        buf.append(" " + label);
-                    }
-                    buf.append("\n");
-                }
-                ResourceLoader.putIntoFileCache(terrain, directories,
-                        (new String(buf)).getBytes());
+
+                /*  Commented out until ported to XML
+                 Log.debug("Randomizing " + terrain + " with " + rndSourceName);
+                 InputStream brlIS =
+                 ResourceLoader.getInputStream(rndSourceName,
+                 directories);
+                 BattlelandRandomizerLoader brl =
+                 new BattlelandRandomizerLoader(brlIS);
+                 while (brl.oneArea(h) >= 0)
+                 {
+                 }
+                 brl.resolveAllHexsides(h);
+                 List tempTowerStartList = brl.getStartList();
+                 if (tempTowerStartList != null)
+                 {
+                 startlistMap.put(terrain, tempTowerStartList);
+                 }
+                 towerStatusMap.put(terrain, new Boolean(brl.isTower()));
+                 subtitleMap.put(terrain, null);
+                 StringBuffer buf = new StringBuffer();
+                 for (int i = 0; i < 6; i++)
+                 {
+                 for (int j = 0; j < 6; j++)
+                 {
+                 if (show[i][j])
+                 {
+                 boolean doDumpSides = false;
+                 String haz = h[i][j].getTerrain();
+                 int e = h[i][j].getElevation();
+                 for (int k = 0; k < 6; k++)
+                 {
+                 char s = h[i][j].getHexside(k);
+                 if (s != ' ')
+                 {
+                 doDumpSides = true;
+                 }
+                 }
+                 if (doDumpSides ||
+                 (!haz.equals("Plains")) ||
+                 (e != 0))
+                 {
+                 buf.append(i + " " + j + " ");
+                 buf.append(h[i][j].getTerrain());
+                 buf.append(" ");
+                 buf.append(h[i][j].getElevation());
+                 if (doDumpSides)
+                 {
+                 for (int k = 0; k < 6; k++)
+                 {
+                 if (h[i][j].getHexside(k) != ' ')
+                 {
+                 buf.append(" " + k + " ");
+                 buf.append(h[i][j].getHexside(k));
+                 }
+                 }
+                 }
+                 buf.append("\n");
+                 }
+                 }
+                 }
+                 }
+                 if (brl.isTower())
+                 {
+                 buf.append("TOWER\n");
+                 }
+                 if (tempTowerStartList != null)
+                 {
+                 buf.append("STARTLIST");
+                 Iterator it = tempTowerStartList.iterator();
+                 while (it.hasNext())
+                 {
+                 String label = (String)it.next();
+                 buf.append(" " + label);
+                 }
+                 buf.append("\n");
+                 }
+                 ResourceLoader.putIntoFileCache(terrain, directories,
+                 (new String(buf)).getBytes());
+                 */
             }
 
             /* count all hazards & hazard sides */
