@@ -53,6 +53,10 @@ final class AcquireAngel extends KDialog implements MouseListener,
             chit.addMouseListener(this);
         }
 
+        JButton acquireButton = new JButton("Acquire");
+        contentPane.add(acquireButton);
+        acquireButton.addActionListener(this);
+
         JButton cancelButton = new JButton("Cancel");
         contentPane.add(cancelButton);
         cancelButton.addActionListener(this);
@@ -89,7 +93,20 @@ final class AcquireAngel extends KDialog implements MouseListener,
 
     public void actionPerformed(ActionEvent e)
     {
-        // Only button is cancel.
-        cleanup(null);
+        if (e.getActionCommand().equals("Cancel"))
+        {
+            cleanup(null);
+        }
+        else if (e.getActionCommand().equals("Acquire"))
+        {
+            if (recruits.size() == 1)
+            {
+                cleanup((String)recruits.get(0));
+            }
+            else
+            {
+                client.showMessageDialog("Acquire which type?");
+            }
+        }
     }
 }

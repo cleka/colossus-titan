@@ -1,6 +1,6 @@
-Bug: Zero-high stack hangs around forever after summoning angel from it.
-
-Implement auto stop when all human players dead.
+Need to bring active player's frame to front before muster phase, in case 
+   other player's was in front during engagement.  Do it after each 
+   engagement is resolved.
 
 Add some full board repaints, including frame, to fix menu corruption.
 

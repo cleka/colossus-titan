@@ -1975,6 +1975,63 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         return hexLabels;
     }
 
+    private boolean towerTeleportAllowed()
+    {
+        if (options.getOption(Options.noTowerTeleport))
+        {
+            return false;
+        }
+        if (getTurnNumber() == 1 &&
+            options.getOption(Options.noFirstTurnTeleport))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean towerToTowerTeleportAllowed()
+    {
+        if (!towerTeleportAllowed())
+        {
+            return false;
+        }
+        if (getTurnNumber() == 1 &&
+            options.getOption(Options.noFirstTurnT2TTeleport))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean towerToNonTowerTeleportAllowed()
+    {
+        if (!towerTeleportAllowed())
+        {
+            return false;
+        }
+        if (options.getOption(Options.towerToTowerTeleportOnly))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    
+    private boolean titanTeleportAllowed()
+    {
+        if (options.getOption(Options.noTitanTeleport))
+        {
+            return false;
+        }
+        if (getTurnNumber() == 1 &&
+            options.getOption(Options.noFirstTurnTeleport))
+        {
+            return false;
+        }
+        return true;
+    }
+
+
     /** Return set of hexLabels describing where this legion can teleport.
      *  Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
@@ -1991,45 +2048,50 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
 
         // Tower teleport
         if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0 &&
-            !player.hasTeleported() &&
-            !options.getOption(Options.noTowerTeleport) &&
-            !(options.getOption(Options.noFirstTurnTeleport) &&
-              (turnNumber == 1)))
+            !player.hasTeleported() && towerTeleportAllowed())
         {
             // Mark every unoccupied hex within 6 hexes.
-            if (!options.getOption(Options.towerToTowerTeleportOnly))
+            if (towerToNonTowerTeleportAllowed())
             {
                 set.addAll(findNearbyUnoccupiedHexes(hex, player, legion, 6,
                     Constants.NOWHERE, ignoreFriends));
             }
 
-            if (!(options.getOption(Options.noFirstTurnT2TTeleport) &&
-                  (turnNumber == 1)))
+            if (towerToTowerTeleportAllowed())
             {
-            // Mark every unoccupied tower.
-            Set towerSet = MasterBoard.getTowerSet();
-            Iterator it = towerSet.iterator();
-            while (it.hasNext())
-            {
-                String hexLabel = (String)it.next();
-                if (MasterBoard.getHexByLabel(hexLabel) != null)
+                // Mark every unoccupied tower.
+                Set towerSet = MasterBoard.getTowerSet();
+                Iterator it = towerSet.iterator();
+                while (it.hasNext())
                 {
-                    if ((!isOccupied(hexLabel) || (ignoreFriends && 
-                        getNumEnemyLegions(hexLabel, player) == 0))
-                        && (!(hexLabel.equals(hex.getLabel()))))
+                    String hexLabel = (String)it.next();
+                    if (MasterBoard.getHexByLabel(hexLabel) != null)
                     {
-                        set.add(hexLabel);
+                        if ((!isOccupied(hexLabel) || (ignoreFriends &&
+                            getNumEnemyLegions(hexLabel, player) == 0))
+                            && (!(hexLabel.equals(hex.getLabel()))))
+                        {
+                            set.add(hexLabel);
+                        }
                     }
                 }
             }
+            else
+            {
+                // Remove nearby towers from set.
+                Set towerSet = MasterBoard.getTowerSet();
+                Iterator it = towerSet.iterator();
+                while (it.hasNext())
+                {
+                    String hexLabel = (String)it.next();
+                    set.remove(hexLabel);
+                }
             }
         }
 
         // Titan teleport
         if (player.canTitanTeleport() && legion.hasTitan() &&
-            !options.getOption(Options.noTitanTeleport) &&
-            !(options.getOption(Options.noFirstTurnTeleport) &&
-              (turnNumber == 1)))
+            titanTeleportAllowed())
         {
             // Mark every hex containing an enemy stack that does not
             // already contain a friendly stack.
@@ -2048,6 +2110,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         }
         return set;
     }
+
 
     /** Return a Set of Strings "Left" "Right" or "Bottom" describing
      *  possible entry sides.  If the hex is unoccupied, just return 
