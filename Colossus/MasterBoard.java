@@ -553,16 +553,17 @@ public final class MasterBoard extends JPanel implements MouseListener,
         playerMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(playerMenu);
 
+        addCheckBox(playerMenu, Options.autoPickMarker, KeyEvent.VK_M);
+        addCheckBox(playerMenu, Options.autoSplit, KeyEvent.VK_S);
+        addCheckBox(playerMenu, Options.autoMasterMove, KeyEvent.VK_A);
+        addCheckBox(playerMenu, Options.autoPickEntrySide, KeyEvent.VK_E);
+        addCheckBox(playerMenu, Options.autoFlee, KeyEvent.VK_F);
+        addCheckBox(playerMenu, Options.autoPickEngagement, KeyEvent.VK_N);
+        addCheckBox(playerMenu, Options.autoBattleMove, KeyEvent.VK_B);
+        addCheckBox(playerMenu, Options.autoForcedStrike, KeyEvent.VK_K);
+        addCheckBox(playerMenu, Options.autoStrike, KeyEvent.VK_T);
         addCheckBox(playerMenu, Options.autoRecruit, KeyEvent.VK_R);
         addCheckBox(playerMenu, Options.autoPickRecruiter, KeyEvent.VK_P);
-        addCheckBox(playerMenu, Options.autoPickMarker, KeyEvent.VK_M);
-        addCheckBox(playerMenu, Options.autoPickEntrySide, KeyEvent.VK_E);
-        addCheckBox(playerMenu, Options.autoForcedStrike, KeyEvent.VK_K);
-        addCheckBox(playerMenu, Options.autoMasterMove, KeyEvent.VK_A);
-        addCheckBox(playerMenu, Options.autoSplit, KeyEvent.VK_S);
-        addCheckBox(playerMenu, Options.autoFlee, KeyEvent.VK_F);
-        addCheckBox(playerMenu, Options.autoStrike, KeyEvent.VK_T);
-        addCheckBox(playerMenu, Options.autoBattleMove, KeyEvent.VK_B);
         playerMenu.addSeparator();
         addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_U);
 

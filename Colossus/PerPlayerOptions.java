@@ -11,17 +11,19 @@ public final class PerPlayerOptions
 
     static
     {
-        set.add(Options.autoRecruit);
-        set.add(Options.autoPickRecruiter);
         set.add(Options.autoPickMarker);
-        set.add(Options.autoPickEntrySide);
-        set.add(Options.autoForcedStrike);
         set.add(Options.autoSplit);
         set.add(Options.autoMasterMove);
+        set.add(Options.autoPickEntrySide);
+        set.add(Options.autoPickEngagement);
         set.add(Options.autoFlee);
-        set.add(Options.autoPlay);
-        set.add(Options.autoStrike);
         set.add(Options.autoBattleMove);
+        set.add(Options.autoForcedStrike);
+        set.add(Options.autoStrike);
+        set.add(Options.autoRecruit);
+        set.add(Options.autoPickRecruiter);
+
+        set.add(Options.autoPlay);
     }
 
 

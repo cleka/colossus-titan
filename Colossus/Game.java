@@ -2694,30 +2694,41 @@ public final class Game
     }
 
 
-    /** Return number of engagements found. */
-    public int highlightEngagements()
+    /** Return set of hexLabels for engagements found. */
+    public Set findEngagements()
     {
-        int count = 0;
+        HashSet set = new HashSet();
         Player player = getActivePlayer();
 
-        board.unselectAllHexes();
-
-        HashSet set = new HashSet();
-
-        for (int i = 0; i < player.getNumLegions(); i++)
+        Iterator it = player.getLegions().iterator();
+        while (it.hasNext())
         {
-            Legion legion = player.getLegion(i);
+            Legion legion = (Legion)it.next();
             String hexLabel = legion.getCurrentHexLabel();
             if (getNumEnemyLegions(hexLabel, player) > 0)
             {
-                count++;
                 set.add(hexLabel);
             }
         }
+        return set;
+    }
 
+    /** Return number of engagements found. */
+    public int highlightEngagements()
+    {
+        Set set = findEngagements();
+        board.unselectAllHexes();
         board.selectHexesByLabels(set);
 
-        return count;
+            // XXX Doesn't really belong here -- just testing.
+            Player player = getActivePlayer();
+            String engagementHexLabel = player.aiPickEngagement();
+            if (engagementHexLabel != null)
+            {
+                doFight(engagementHexLabel, player);
+            }
+
+        return set.size();
     }
 
 
@@ -2792,11 +2803,6 @@ public final class Game
                 }
             }
         }
-
-        if (summonAngel == null)
-        {
-            highlightEngagements();
-        }
         battle = null;
         engagementInProgress = false;
 
@@ -2805,6 +2811,11 @@ public final class Game
         // Performance is a bit slow after battles, so try to
         // force the system to clean up.
         System.gc();
+
+        if (summonAngel == null)
+        {
+            highlightEngagements();
+        }
     }
 
 
@@ -2848,12 +2859,13 @@ public final class Game
 
     public void finishSummoningAngel()
     {
-        highlightEngagements();
         if (battle != null)
         {
             battle.finishSummoningAngel(summonAngel.getSummoned());
         }
         summonAngel = null;
+
+        highlightEngagements();
     }
 
 
@@ -3225,8 +3237,8 @@ public final class Game
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering
         // the battle.
-        highlightEngagements();
         engagementInProgress = false;
+        highlightEngagements();
     }
 
 
@@ -3340,9 +3352,8 @@ public final class Game
                 }
             }
         }
-
-        highlightEngagements();
         engagementInProgress = false;
+        highlightEngagements();
     }
 
 

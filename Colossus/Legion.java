@@ -506,6 +506,20 @@ public final class Legion implements Comparable
         return false;
     }
 
+    public boolean hasAngel()
+    {
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (critter.isAngel())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public int getHeight()
     {

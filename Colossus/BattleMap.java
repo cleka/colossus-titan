@@ -357,24 +357,25 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         BattleHex hex = getHexByLabel(hexLabel);
         ArrayList critters = battle.getCritters(hexLabel);
-        if (critters.isEmpty())
-        {
-            hex.repaint();
-            return;
-        }
-
+        int numCritters = critters.size();
         Point point = new Point(hex.findCenter());
+
+        if (!hex.isEntrance() && numCritters > 1)
+        {
+            // The AI sometimes pretends two critters share a hex
+            // for a while.  Don't paint that.
+            numCritters = 1;
+        }
 
         // Cascade chits diagonally.
         int chitScale4 = chitScale / 4;
-        int offset = (chitScale * (1 + (critters.size()))) / 4;
+        int offset = (chitScale * (1 + (numCritters))) / 4;
         point.x -= offset;
         point.y -= offset;
 
-        Iterator it = critters.iterator();
-        while (it.hasNext())
+        for (int i = 0; i < numCritters; i++)
         {
-            Critter critter = (Critter)it.next();
+            Critter critter = (Critter)critters.get(i);
             BattleChit chit = critter.getChit();
             chit.setLocation(point);
             point.x += chitScale4;

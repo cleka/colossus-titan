@@ -1,4 +1,21 @@
-Teach the AI how to pick the next engagement to resolve.
+Eliminate Legion.hexInfoMap and just recompute and store the info for
+   one hex when the legion moves?  Or have listMoves return a set of
+   HexInfo objects instead of just hexLabels, so that we do the same
+   computation but hold the results in locals instead of member
+   variables during the Move phase?  We still need to hold entry side 
+   and teleport info for the one hex that legion actually moved to in 
+   members.
+
+Get minimax masterboard moves working.
+
+Teach the AI how to summon angels.
+
+Teach the AI how to acquire angels.
+
+Consider all permutations of creatures' ideal destination hexes when 
+   trying to move creatures in battle, rather than relying on 
+   MoveOrderComparator to try to figure out the best order to move
+   creatures.  7! is only 5040.
 
 Rewrite SplitLegion to use Legion.split()
 
@@ -91,4 +108,3 @@ Fix concession timing.
 Client-server networking.
 
 Chat window.
-

@@ -36,4 +36,7 @@ public interface AI
 
     /** pick an entry side */
     int pickEntrySide(String hexLabel, Legion legion, Game game);
+
+    /** pick an engagement to resolve */
+    String pickEngagement(Game game);
 }

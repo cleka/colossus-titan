@@ -1033,6 +1033,15 @@ public final class Player implements Comparable
         return -1;
     }
 
+    public String aiPickEngagement()
+    {
+        if (getOption(Options.autoPickEngagement))
+        {
+            return ai.pickEngagement(game);
+        }
+        return null;
+    }
+
 
     /** Comparator that forces this player's legion markers to come
      *  before captured markers in sort order. */

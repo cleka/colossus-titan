@@ -524,7 +524,7 @@ class SimpleAI implements AI
 
     public void masterMove(Game game)
     {
-        if (true)
+        if (false)
         {
             simpleMove(game);
         }
@@ -532,13 +532,14 @@ class SimpleAI implements AI
         {
             // Need to handle mulligans somehow; just use the existing
             // simple hack for now.
+            // TODO Extend the DiceMove concept to deal with mulligans.
             handleMulligans(game, game.getActivePlayer());
             PlayerMove playermove = (PlayerMove)minimax.search(
                 new MasterBoardPosition(game, game.getActivePlayerNum()), 1);
 
             // apply the PlayerMove
-            for (Iterator it = playermove.moves.entrySet().iterator();
-                 it.hasNext(); )
+            Iterator it = playermove.moves.entrySet().iterator();
+            while (it.hasNext())
             {
                 Map.Entry entry = (Map.Entry)it.next();
                 Legion legion = (Legion)entry.getKey();
@@ -1284,23 +1285,21 @@ class SimpleAI implements AI
     private static final int LOSE = 4;
 
     private static int estimateBattleResults(Legion attacker, Legion defender,
-            MasterHex hex)
+        MasterHex hex)
     {
         return estimateBattleResults(attacker, false, defender, hex, null);
     }
 
-
     private static int estimateBattleResults(Legion attacker,
-            boolean attackerSplitsBeforeBattle, Legion defender, MasterHex hex)
+        boolean attackerSplitsBeforeBattle, Legion defender, MasterHex hex)
     {
         return estimateBattleResults(attacker, attackerSplitsBeforeBattle,
                 defender, hex, null);
     }
 
-
     private static int estimateBattleResults(Legion attacker,
-            boolean attackerSplitsBeforeBattle, Legion defender,
-            MasterHex hex, Creature recruit)
+        boolean attackerSplitsBeforeBattle, Legion defender,
+        MasterHex hex, Creature recruit)
     {
         char terrain = hex.getTerrain();
         double attackerPointValue = getCombatValue(attacker, terrain);
@@ -1336,6 +1335,7 @@ class SimpleAI implements AI
         }
 
         // TODO: adjust for entry side
+
         // really dumb estimator
         double ratio = (double)attackerPointValue / (double)defenderPointValue;
 
@@ -1495,26 +1495,140 @@ class SimpleAI implements AI
         return -1;
     }
 
+    public String pickEngagement(Game game)
+    {
+        Set hexLabels = game.findEngagements();
+
+        // Bail out early if we have no real choice.
+        int numChoices = hexLabels.size();
+        if (numChoices == 0)
+        {
+            return null;
+        }
+        if (numChoices == 1)
+        {
+            return (String)hexLabels.iterator().next();
+        }
+
+        String bestChoice = null;
+        int bestScore = Integer.MIN_VALUE;
+
+        Iterator it = hexLabels.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            int score = evaluateEngagement(hexLabel, game);
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestChoice = hexLabel;
+            }
+        }
+        return bestChoice;
+    }
+
+    private int evaluateEngagement(String hexLabel, Game game)
+    {
+        // Fight losing battles last, so that we don't give away
+        //    points while they may be used against us this turn.
+        // Fight battles with angels first, so that those angels
+        //    can be summoned out.
+        // Try not to lose potential angels and recruits by having
+        //    scooby snacks flee to 7-high stacks (or 6-high stacks
+        //    that could recruit later this turn) and push them
+        //    over 100-point boundaries.
+
+        Player player = game.getActivePlayer();
+        Legion attacker = game.getFirstFriendlyLegion(hexLabel, player);
+        Legion defender = game.getFirstEnemyLegion(hexLabel, player);
+        MasterHex hex = game.getBoard().getHexByLabel(hexLabel);
+        int value = 0;
+
+        final int result = estimateBattleResults(attacker, defender, hex);
+
+        // The worse we expect to do, the more we want to put off this
+        // engagement, either to avoid strengthening an enemy titan that
+        // we may fight later this turn, or to increase our chances of
+        // being able to call an angel.
+        value -= result;
+
+        // Avoid losing angels and recruits.
+        boolean wouldFlee = flee(defender, attacker, game);
+        if (wouldFlee)
+        {
+            int currentScore = player.getScore();
+            int fleeValue = defender.getPointValue() / 2;
+            if ((currentScore + fleeValue) / 100 > currentScore / 100)
+            {
+                if (attacker.getHeight() == 7 || attacker.getHeight() == 6 &&
+                    attacker.canRecruit())
+                {
+                    value -= 10;
+                }
+                else
+                {
+                    // Angels go best in Titan legions.
+                    if (attacker.hasTitan())
+                    {
+                        value += 6;
+                    }
+                    else
+                    {
+                        // A bird in the hand...
+                        value += 2;
+                    }
+                }
+            }
+        }
+
+        // Fight early with angel legions, so that others can summon.
+        if (result <= WIN_WITH_HEAVY_LOSSES && attacker.hasAngel())
+        {
+            value += 5;
+        }
+
+        return value;
+    }
+
+
     public boolean flee(Legion legion, Legion enemy, Game game)
     {
         // TODO Make this smarter.
         char terrain = legion.getCurrentHex().getTerrain();
-
-        if (getCombatValue(legion, terrain)
-            < 0.7 * getCombatValue(enemy, terrain))
+        if (getCombatValue(legion, terrain) < 0.7 * getCombatValue(enemy,
+            terrain))
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
 
     public boolean concede(Legion legion, Legion enemy, Game game)
     {
-        // TODO Make this smarter.
+        // Wimpy legions should concede if it costs the enemy an
+        // angel or good recruit.
+        char terrain = legion.getCurrentHex().getTerrain();
+        int height = enemy.getHeight();
+        if (getCombatValue(legion, terrain) < 0.5 * getCombatValue(enemy,
+            terrain) && height >= 6)
+        {
+            int currentScore = enemy.getPlayer().getScore();
+            int pointValue = legion.getPointValue();
+            boolean canAcquireAngel = ((currentScore + pointValue) / 100 >
+                currentScore / 100);
+            // Can't use Legion.getRecruit() because it checks for
+            // 7-high legions.
+            boolean canRecruit = !game.findEligibleRecruits(enemy).isEmpty();
+            if (height == 7 && (canAcquireAngel || canRecruit))
+            {
+                return true;
+            }
+            if (canAcquireAngel && canRecruit) // know height == 6
+            {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -1944,7 +2058,6 @@ class SimpleAI implements AI
             }
 
             // enumerate moves for player i
-            debugln("hack! not considering all moves..");
 
             // HACK: consider all moves for first legion only.
             // (this is just for testing)
@@ -2157,15 +2270,21 @@ class SimpleAI implements AI
      probably unwise, so we need to hack in some extra caution for
      titans.
 
-     When finding all possible moves, we need to take into account
-     that friendly creatures can block one another's moves.
-
      There are 27 hexes on each battle map.  A fast creature starting
      near the middle of the map can move to all of them, terrain and
      other creatures permitting.  So the possible number of different
      positions after one move is huge.  So we can't really iterate over
      all possible moves.  We need to consider one creature at a time.
+     But we also need to use team tactics.
+
+     When finding all possible moves, we need to take into account
+     that friendly creatures can block one another's moves.  That
+     gets really complex, so instead assume that they don't when
+     computing all possible moves, and then try to ensure that
+     less important creatures get out of the way of more important
+     ones.
      */
+
 
 
     // XXX This method needs to be broken up.
