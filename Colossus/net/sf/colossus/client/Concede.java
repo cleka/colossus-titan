@@ -20,11 +20,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 {
     private JFrame parentFrame;
     private boolean flee;
-    private Chit allyMarker;
-    private Chit enemyMarker;
     private Point location;
-    private GridBagLayout gridbag = new GridBagLayout();
-    private GridBagConstraints constraints = new GridBagConstraints();
     private Client client;
     private String allyMarkerId;
     private SaveWindow saveWindow;
@@ -37,10 +33,11 @@ final class Concede extends KDialog implements ActionListener, WindowListener
             Legion.getLongMarkerName(allyMarkerId) + " in " + 
             MasterBoard.getHexByLabel(
                 client.getHexForLegion(allyMarkerId)).getDescription() + "?", 
-            false);
+                false);
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(gridbag);
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+
         addWindowListener(this);
 
         this.parentFrame = parentFrame;
@@ -48,80 +45,25 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         this.client = client;
         this.allyMarkerId = allyMarkerId;
 
-        pack();
-
         setBackground(Color.lightGray);
 
-        int scale = 4 * Scale.get();
+        int relativeHeight = client.getLegionHeight(allyMarkerId) - 
+            client.getLegionHeight(enemyMarkerId);
 
-        allyMarker = new Marker(scale, allyMarkerId, this, client);
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        gridbag.setConstraints(allyMarker, constraints);
-        contentPane.add(allyMarker);
+        showLegion(allyMarkerId, -relativeHeight);
+        showLegion(enemyMarkerId, relativeHeight);
 
-        java.util.List allyImageNames = client.getLegionImageNames(
-            allyMarkerId);
-        Iterator it = allyImageNames.iterator();
-        while (it.hasNext())
-        {
-            String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
-            constraints.gridy = 0;
-            constraints.gridwidth = 1;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
-        }
-
-        enemyMarker = new Marker(scale, enemyMarkerId, this, client);
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        gridbag.setConstraints(enemyMarker, constraints);
-        contentPane.add(enemyMarker);
-
-        java.util.List enemyImageNames = client.getLegionImageNames(
-            enemyMarkerId);
-        it = enemyImageNames.iterator();
-        while (it.hasNext())
-        {
-            String imageName = (String)it.next();
-            Chit chit = new Chit(scale, imageName, this);
-            constraints.gridy = 1;
-            constraints.gridwidth = 1;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
-        }
+        JPanel buttonPane = new JPanel();
+        contentPane.add(buttonPane);
 
         JButton button1 = new JButton(flee ? "Flee" : "Concede");
         button1.setMnemonic(flee ? KeyEvent.VK_F : KeyEvent.VK_C);
+        buttonPane.add(button1);
+        button1.addActionListener(this);
+
         JButton button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
         button2.setMnemonic(KeyEvent.VK_D);
-
-        // Attempt to center the buttons.
-        int chitWidth = 1 + Math.max(allyImageNames.size(), 
-            enemyImageNames.size());
-        if (chitWidth < 4)
-        {
-            constraints.gridwidth = 1;
-        }
-        else
-        {
-            constraints.gridwidth = 2;
-        }
-        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2;
-        if (leadSpace < 0)
-        {
-            leadSpace = 0;
-        }
-
-        constraints.gridy = 2;
-        constraints.gridx = leadSpace;
-        gridbag.setConstraints(button1, constraints);
-        contentPane.add(button1);
-        button1.addActionListener(this);
-        constraints.gridx = leadSpace + constraints.gridwidth;
-        gridbag.setConstraints(button2, constraints);
-        contentPane.add(button2);
+        buttonPane.add(button2);
         button2.addActionListener(this);
 
         pack();
@@ -143,6 +85,35 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         }
         setVisible(true);
         repaint();
+    }
+
+
+    private void showLegion(String markerId, int spacers)
+    {
+        JPanel pane = new JPanel();
+        pane.setAlignmentX(0);
+        getContentPane().add(pane);
+
+        int scale = 4 * Scale.get();
+
+        Marker marker = new Marker(scale, markerId, this, client);
+        pane.add(marker);
+        pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
+
+        java.util.List imageNames = client.getLegionImageNames(markerId);
+        Iterator it = imageNames.iterator();
+        while (it.hasNext())
+        {
+            String imageName = (String)it.next();
+            Chit chit = new Chit(scale, imageName, this);
+            pane.add(chit);
+        }
+
+        // XXX Add chit-sized invisible spacers.
+        for (int i = 0; i < spacers; i++)
+        {
+            pane.add(Box.createRigidArea(new Dimension(scale, scale)));
+        }
     }
 
 

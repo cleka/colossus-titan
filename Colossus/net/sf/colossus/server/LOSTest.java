@@ -29,6 +29,8 @@ public class LOSTest extends TestCase
     Creature colossus;
     Creature gargoyle;
     Creature wyvern;
+    Creature dragon;
+    Creature minotaur;
 
 
     public LOSTest(String name)
@@ -56,6 +58,8 @@ public class LOSTest extends TestCase
         colossus = Creature.getCreatureByName("Colossus");
         gargoyle = Creature.getCreatureByName("Gargoyle");
         wyvern = Creature.getCreatureByName("Wyvern");
+        dragon = Creature.getCreatureByName("Dragon");
+        minotaur = Creature.getCreatureByName("Minotaur");
     }
 
     public void testLOS()
@@ -291,5 +295,96 @@ public class LOSTest extends TestCase
         assertTrue(!ranger3.canStrike(troll3));
         assertTrue(!ranger3.canStrike(troll4));
         assertTrue(ranger3.canStrike(wyvern1));
+    }
+
+    public void testLOS3()
+    {
+        VariantSupport.loadVariant("Badlands-JDG");
+        String hexLabel = "1000";  // Mountains
+
+        defender = new Legion("Gr03", "Gr01", hexLabel, null,
+            dragon, dragon, minotaur, minotaur, minotaur, null, null, null,
+            "Green", game);
+        attacker = new Legion("Bk03", "Bk01", hexLabel, null,
+            ranger, ranger, ranger, null, null, null, null, null,
+            "Black", game);
+
+        game.getPlayer("Green").addLegion(defender);
+        game.getPlayer("Black").addLegion(attacker);
+
+        attacker.setEntrySide(5);
+
+        battle = new Battle(game, attacker.getMarkerId(), 
+            defender.getMarkerId(), Constants.ATTACKER, hexLabel,
+            2, Constants.FIGHT);
+
+        Critter dragon1 = defender.getCritter(0);
+        Critter dragon2 = defender.getCritter(1);
+        Critter minotaur1 = defender.getCritter(2);
+        Critter minotaur2 = defender.getCritter(3);
+        Critter minotaur3 = defender.getCritter(4);
+
+        Critter ranger1 = attacker.getCritter(0);
+        Critter ranger2 = attacker.getCritter(1);
+        Critter ranger3 = attacker.getCritter(2);
+
+        dragon1.setCurrentHexLabel("D3");
+        dragon2.setCurrentHexLabel("C3");
+        minotaur1.setCurrentHexLabel("E4");
+        minotaur2.setCurrentHexLabel("B2");
+        minotaur3.setCurrentHexLabel("A1");
+
+        ranger1.setCurrentHexLabel("E2");
+        ranger2.setCurrentHexLabel("C2");
+        ranger3.setCurrentHexLabel("E5");
+
+
+        assertTrue(!battle.isLOSBlocked(ranger1.getCurrentHex(),
+            dragon1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger1.getCurrentHex(),
+            dragon2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger1.getCurrentHex(),
+            minotaur1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger1.getCurrentHex(),
+            minotaur2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger1.getCurrentHex(),
+            minotaur3.getCurrentHex()));
+        assertTrue(ranger1.canStrike(dragon1));
+        assertTrue(!ranger1.canStrike(dragon2));
+        assertTrue(!ranger1.canStrike(minotaur1));
+        assertTrue(!ranger1.canStrike(minotaur2));
+        assertTrue(!ranger1.canStrike(minotaur3));
+
+        assertTrue(!battle.isLOSBlocked(ranger2.getCurrentHex(),
+            dragon1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger2.getCurrentHex(),
+            dragon2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger2.getCurrentHex(),
+            minotaur1.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger2.getCurrentHex(),
+            minotaur2.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger2.getCurrentHex(),
+            minotaur3.getCurrentHex()));
+        assertTrue(ranger2.canStrike(dragon1));
+        assertTrue(!ranger2.canStrike(dragon2));
+        assertTrue(!ranger2.canStrike(minotaur1));
+        assertTrue(ranger2.canStrike(minotaur2));
+        assertTrue(ranger2.canStrike(minotaur3));
+
+        assertTrue(battle.isLOSBlocked(ranger3.getCurrentHex(),
+            dragon1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger3.getCurrentHex(),
+            dragon2.getCurrentHex()));
+        assertTrue(!battle.isLOSBlocked(ranger3.getCurrentHex(),
+            minotaur1.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger3.getCurrentHex(),
+            minotaur2.getCurrentHex()));
+        assertTrue(battle.isLOSBlocked(ranger3.getCurrentHex(),
+            minotaur3.getCurrentHex()));
+        assertTrue(!ranger3.canStrike(dragon1));
+        assertTrue(!ranger3.canStrike(dragon2));
+        assertTrue(ranger3.canStrike(minotaur1));
+        assertTrue(!ranger3.canStrike(minotaur2));
+        assertTrue(!ranger3.canStrike(minotaur3));
     }
 }

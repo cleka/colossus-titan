@@ -25,8 +25,6 @@ final class PickRecruit extends KDialog implements MouseListener,
     private Marker legionMarker;
     private java.util.List legionChits = new ArrayList();
     private JFrame parentFrame;
-    private GridBagLayout gridbag = new GridBagLayout();
-    private GridBagConstraints constraints = new GridBagConstraints();
     private static String recruit;
     private static boolean active;
 
@@ -44,16 +42,15 @@ final class PickRecruit extends KDialog implements MouseListener,
         addMouseListener(this);
         addWindowListener(this);
         Container contentPane = getContentPane();
-        contentPane.setLayout(gridbag);
-        pack();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         setBackground(Color.lightGray);
         int scale = 4 * Scale.get();
 
+        JPanel legionPane = new JPanel();
+        contentPane.add(legionPane);
+
         legionMarker = new Marker(scale, markerId, this, null);
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = 0;
-        gridbag.setConstraints(legionMarker, constraints);
-        contentPane.add(legionMarker);
+        legionPane.add(legionMarker);
 
         java.util.List imageNames = client.getLegionImageNames(markerId);
         Iterator it = imageNames.iterator();
@@ -62,43 +59,33 @@ final class PickRecruit extends KDialog implements MouseListener,
             String imageName = (String)it.next();
             Chit chit = new Chit(scale, imageName, this);
             legionChits.add(chit);
-            constraints.gridy = 0;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
+            legionPane.add(chit);
         }
 
-        int height = imageNames.size();
-        // There are height + 1 chits in the top row.  There
-        // are numEligible chits / labels to place beneath.
-        // So we have (height + 1) - numEligible empty
-        // columns, half of which we'll put in front.
-        int leadSpace = ((height + 1) - numEligible) / 2;
-        if (leadSpace < 0)
-        {
-            leadSpace = 0;
-        }
+        JPanel recruitPane = new JPanel();
+        contentPane.add(recruitPane);
 
         it = recruits.iterator();
         int i = 0;
         while (it.hasNext())
         {
+            JPanel vertPane = new JPanel();
+            vertPane.setLayout(new BoxLayout(vertPane, BoxLayout.Y_AXIS));
+            vertPane.setAlignmentY(0);
+            recruitPane.add(vertPane);
+
             Creature recruit = (Creature)it.next();
             String recruitName = recruit.getName();
             Chit chit = new Chit(scale, recruitName, this);
             recruitChits.add(chit);
 
-            constraints.gridx = leadSpace + i;
-            constraints.gridy = 1;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
+            vertPane.add(chit);
             chit.addMouseListener(this);
 
             int count = client.getCreatureCount(recruitName);
-            JLabel countLabel = new JLabel(Integer.toString(count),
-                JLabel.CENTER);
-            constraints.gridy = 2;
-            gridbag.setConstraints(countLabel, constraints);
-            contentPane.add(countLabel);
+            JLabel countLabel = new JLabel(Integer.toString(count));
+            countLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            vertPane.add(countLabel);
             i++;
         }
 

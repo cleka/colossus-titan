@@ -23,8 +23,6 @@ final class PickRecruiter extends KDialog implements MouseListener,
     private java.util.List recruiterChits = new ArrayList();
     private Marker legionMarker;
     private int height;
-    private GridBagLayout gridbag = new GridBagLayout();
-    private GridBagConstraints constraints = new GridBagConstraints();
     private static String recruiterName;
 
 
@@ -41,16 +39,15 @@ final class PickRecruiter extends KDialog implements MouseListener,
         addMouseListener(this);
         addWindowListener(this);
         Container contentPane = getContentPane();
-        contentPane.setLayout(gridbag);
-        pack();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         setBackground(Color.lightGray);
         int scale = 4 * Scale.get();
 
+        JPanel legionPane = new JPanel();
+        contentPane.add(legionPane);
+
         legionMarker = new Marker(scale, markerId, this, null);
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = 0;
-        gridbag.setConstraints(legionMarker, constraints);
-        contentPane.add(legionMarker);
+        legionPane.add(legionMarker);
 
         java.util.List imageNames = client.getLegionImageNames(markerId);
         Iterator it = imageNames.iterator();
@@ -58,24 +55,11 @@ final class PickRecruiter extends KDialog implements MouseListener,
         {
             String imageName = (String)it.next();
             Chit chit = new Chit(scale, imageName, this);
-            constraints.gridx = GridBagConstraints.RELATIVE;
-            constraints.gridy = 0;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
+            legionPane.add(chit);
         }
 
-        height = imageNames.size();
-
-        // There are height + 1 chits in the top row.  There
-        // are numEligible chits to place beneath.
-        // So we have (height + 1) - numEligible empty
-        // columns, half of which we'll put in front.
-        int numEligible = recruiters.size();
-        int leadSpace = ((height + 1) - numEligible) / 2;
-        if (leadSpace < 0)
-        {
-            leadSpace = 0;
-        }
+        JPanel recruiterPane = new JPanel();
+        contentPane.add(recruiterPane);
 
         int i = 0;
         it = recruiters.iterator();
@@ -88,10 +72,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
             }
             Chit chit = new Chit(scale, recruiterName, this);
             recruiterChits.add(chit);
-            constraints.gridx = leadSpace + i;
-            constraints.gridy = 1;
-            gridbag.setConstraints(chit, constraints);
-            contentPane.add(chit);
+            recruiterPane.add(chit);
             chit.addMouseListener(this);
             i++;
         }

@@ -8,6 +8,8 @@ Big picture:
    page.)
 6. Improve AI.
 
+Bug: Failing LOSTest -- problems with slopes and cliffs.
+Bug: Auto forced strike is taking strikes when there's > 1 target.
 
 Allow players to specify that they automatically refuse to negotiate.
    Check for this before showing negotiation dialog to opponent.

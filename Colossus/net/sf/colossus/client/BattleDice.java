@@ -92,7 +92,7 @@ final class BattleDice extends JPanel
         {
             label1.setText(strikerDesc + " attacks " + targetDesc); 
         }
-        label1.setAlignmentX(Label.CENTER_ALIGNMENT);
+        label1.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(label1);
 
         JPanel diceBox = new JPanel();

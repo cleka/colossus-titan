@@ -55,7 +55,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
         panel.setBackground(TerrainRecruitLoader.getTerrainColor(terrain));
 
         JLabel terrainLabel = new JLabel(MasterHex.getTerrainName(terrain));
-        terrainLabel.setAlignmentX(Label.CENTER_ALIGNMENT);
+        terrainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(terrainLabel);
 
         java.util.List creatures = 
@@ -80,11 +80,11 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
                     prevCreature, creature, terrain);
             }
     
-            JLabel numToRecruitLabel = new JLabel("", JLabel.CENTER);
+            JLabel numToRecruitLabel = new JLabel("");
             if (numToRecruit > 0 && numToRecruit < 99)
             {
                 numToRecruitLabel.setText(Integer.toString(numToRecruit));
-                numToRecruitLabel.setAlignmentX(Label.CENTER_ALIGNMENT);
+                numToRecruitLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             }
     
             panel.add(numToRecruitLabel);
