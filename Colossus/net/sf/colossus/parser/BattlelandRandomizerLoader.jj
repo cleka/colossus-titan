@@ -517,12 +517,7 @@ address z_address() :
             throw new ParseException("Hex " + token.image + "doesn't exist");
         }
         y = 6 - Integer.parseInt(new String(token.image.substring(1)));
-        int i = 5;
-        while (!show[x][i])
-        {
-            y--;
-            i--;
-        }
+        y = y - (int)Math.abs(((x - 3) / 2));
         return new address(x,y);
     }
 }
