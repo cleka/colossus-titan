@@ -165,7 +165,7 @@ public class Concede extends Dialog implements ActionListener
     }
 
 
-    public void cleanup()
+    private void cleanup()
     {
         location = getLocation();
         dispose();

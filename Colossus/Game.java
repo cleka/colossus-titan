@@ -19,6 +19,7 @@ public class Game
     private int activePlayerNum;
     private int turnNumber = 1;  // Advance when every player has a turn
     private StatusScreen statusScreen;
+    private GameApplet applet;
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -27,15 +28,21 @@ public class Game
     private int phase = SPLIT;
 
     private boolean isApplet; 
+    private boolean disposed;
 
-    // XXX This should be added to the options menu.
+    // XXX These should be added to the options menu.
     private boolean autosaveEveryTurn = true;
+    private boolean allVisible;
     
 
-    public Game(boolean isApplet)
+    public Game(boolean isApplet, GameApplet applet)
     {
         this.isApplet = isApplet;
         Chit.setApplet(isApplet);
+        if (applet != null)
+        {
+            this.applet = applet;
+        }
 
         Frame frame = new Frame();
 
@@ -60,16 +67,23 @@ public class Game
             players[i].initMarkersAvailable();
         }
 
-        statusScreen = new StatusScreen(this);
-        board = new MasterBoard(this, true);
+        if (!disposed)
+        {
+            statusScreen = new StatusScreen(this);
+            board = new MasterBoard(this, true);
+        }
     }
     
     
     // Load a saved game.
-    public Game(boolean isApplet, String filename)
+    public Game(boolean isApplet, GameApplet applet, String filename)
     {
         this.isApplet = isApplet;
         Chit.setApplet(isApplet);
+        if (applet != null)
+        {
+            this.applet = applet;
+        }
 
         board = new MasterBoard(this, false);
         loadGame(filename);
@@ -167,6 +181,11 @@ public class Game
         }
     }
 
+    
+    public boolean getAllVisible()
+    {
+        return allVisible;
+    }
 
     public int getNumPlayers()
     {
@@ -195,7 +214,7 @@ public class Game
         int count = 0;
         for (int i = 0; i < numPlayers; i++)
         {
-            if (players[i].isAlive())
+            if (!players[i].isDead())
             {
                 count++;
             }
@@ -229,7 +248,7 @@ public class Game
 
         for (int i = 0; i < numPlayers; i++)
         {
-            if (players[i].isAlive())
+            if (!players[i].isDead())
             {
                 remaining++;
                 winner = i;
@@ -270,13 +289,22 @@ public class Game
 
     public void advancePhase()
     {
-        board.unselectAllHexes();
         phase++;
-        Game.logEvent("Phase advances to " + Game.getPhaseName(phase));
+
+        if (phase > MUSTER ||
+            (getActivePlayer().isDead() && getNumLivingPlayers() > 0))
+        {
+            advanceTurn();
+        }
+        else
+        {
+            board.unselectAllHexes();
+            Game.logEvent("Phase advances to " + Game.getPhaseName(phase));
+        }
     }
 
 
-    public void advanceTurn()
+    private void advanceTurn()
     {
         board.unselectAllHexes();
         activePlayerNum++;
@@ -286,7 +314,7 @@ public class Game
             turnNumber++;
         }
         phase = SPLIT;
-        if (!getActivePlayer().isAlive() && getNumLivingPlayers() > 0)
+        if (getActivePlayer().isDead() && getNumLivingPlayers() > 0)
         {
             advanceTurn();
         }
@@ -294,13 +322,13 @@ public class Game
         {
             Game.logEvent("\n" + getActivePlayer().getName() + 
                 "'s turn, number " + turnNumber);
-        }
 
-        updateStatusScreen();
+            updateStatusScreen();
 
-        if (!isApplet && autosaveEveryTurn)
-        {
-            saveGame();
+            if (!isApplet && autosaveEveryTurn)
+            {
+                saveGame();
+            }
         }
     }
 
@@ -390,7 +418,8 @@ public class Game
             out.println(player.getColor());
             out.println(player.getTower());
             out.println(player.getScore());
-            out.println(player.isAlive());
+            // Check if the player is alive.
+            out.println(!player.isDead());
             out.println(player.getMulligansLeft());
             out.println(player.getPlayersElim());
             out.println(player.getNumMarkersAvailable());
@@ -518,7 +547,9 @@ public class Game
                 players[i].setScore(score);
                 
                 buf = in.readLine();
-                players[i].setAlive(Boolean.valueOf(buf).booleanValue());
+
+                // Output whether the player is alive. 
+                players[i].setDead(!Boolean.valueOf(buf).booleanValue());
 
                 buf = in.readLine();
                 int mulligansLeft = Integer.parseInt(buf);
@@ -1331,6 +1362,68 @@ public class Game
     }
 
 
+    public static void doRecruit(Creature recruit, Legion legion,
+        Frame parentFrame)
+    {
+        // Pick the recruiter(s) if necessary.
+        Critter [] recruiters = new Critter[4];
+        Critter recruiter;
+
+        int numEligibleRecruiters = Game.findEligibleRecruiters(legion,
+            recruit, recruiters);
+
+        if (numEligibleRecruiters == 1)
+        {
+            recruiter = recruiters[0];
+        }
+        else if (numEligibleRecruiters == 0)
+        {
+            // A warm body recruits in a tower.
+            recruiter = null;
+        }
+        else if (Game.allRecruitersVisible(legion, recruiters))
+        {
+            // If all possible recruiters are already visible, don't
+            // bother picking which ones to reveal.
+            recruiter = recruiters[0];
+        }
+        else
+        {
+            new PickRecruiter(parentFrame, legion, 
+                numEligibleRecruiters, recruiters);
+            recruiter = recruiters[0];
+        }
+
+        if (recruit != null && (recruiter != null ||
+            numEligibleRecruiters == 0))
+        {
+            // Select that marker.
+            legion.addCreature(recruit);
+
+            // Mark the recruiter(s) as visible.
+            int numRecruiters = Game.numberOfRecruiterNeeded(recruiter,
+                recruit, legion.getCurrentHex().getTerrain());
+            if (numRecruiters >= 1)
+            {
+                legion.revealCreatures(recruiter, numRecruiters);
+            }
+
+            Game.logEvent("Legion " + legion.getMarkerId() + " in " +
+                legion.getCurrentHex().getDescription() +
+                " recruits " + recruit.getName() + " with " +
+                (numRecruiters == 0 ? "nothing" :
+                numRecruiters + " " + (numRecruiters > 1 ? 
+                recruiter.getPluralName() : recruiter.getName())));
+
+            // Recruits are one to a customer.
+            legion.markRecruited();
+
+            legion.getPlayer().markLastLegionRecruited(legion);
+        }
+
+    }
+
+
     // Returns the number of types of angels that can be acquired.
     public static int findEligibleAngels(Legion legion, Creature [] recruits,
         boolean archangel)
@@ -1382,6 +1475,8 @@ public class Game
 
     public void dispose()
     {
+        disposed = true;
+
         if (isApplet)
         {
             if (board != null)
@@ -1391,6 +1486,10 @@ public class Game
             if (statusScreen != null)
             {
                 statusScreen.dispose();
+            }
+            if (applet != null)
+            {
+                applet.destroy();
             }
         }
         else
@@ -1425,11 +1524,11 @@ public class Game
     {
         if (args.length == 0)
         {
-            new Game(false);
+            new Game(false, null);
         }
         else
         {
-            new Game(false, args[0]);
+            new Game(false, null, args[0]);
         }
     }
 }

@@ -111,7 +111,7 @@ public class GetPlayers extends Dialog implements WindowListener, ActionListener
 
 
     // Sort string array in reverse order
-    private void sortStrings(String [] s)
+    private static void sortStrings(String [] s)
     {
         for (int i = 0; i < s.length - 1; i++)
         {
@@ -181,11 +181,11 @@ public class GetPlayers extends Dialog implements WindowListener, ActionListener
 
     public void dispose()
     {
-        super.dispose();
         if (game == null)
         {
             System.exit(0);
         }
+        super.dispose();
     }
 
 

@@ -10,7 +10,6 @@ import java.awt.event.*;
 public class BattleTurn extends Dialog implements ActionListener,
     WindowListener
 {
-    private Frame parentFrame;
     private BattleMap map;
     private static Point location;
     private Battle battle;
@@ -20,7 +19,6 @@ public class BattleTurn extends Dialog implements ActionListener,
     {
         super(parentFrame);
 
-        this.parentFrame = parentFrame;
         this.map = map;
         this.battle = battle;
         
@@ -46,18 +44,7 @@ public class BattleTurn extends Dialog implements ActionListener,
         setLayout(new GridLayout(0, 1));
         add(new Label(battle.getActivePlayer().getName() + " : Recruit"));
 
-        if (battle.getTurnNumber() == 4 && battle.getDefender().canRecruit())
-        {
-            // Allow recruiting a reinforcement.
-            new PickRecruit(map, battle.getDefender());
-
-            if (battle.getDefender().hasRecruited())
-            {
-                map.placeNewChit(battle.getDefender());
-            }
-        }
-            
-        battle.advancePhase();
+        battle.recruitReinforcement();
     }
     
     
@@ -112,11 +99,7 @@ public class BattleTurn extends Dialog implements ActionListener,
 
     public void setupFightDialog()
     {
-        // Apply drift damage only once per player turn.
-        if (battle.getPhase() == Battle.FIGHT)
-        {
-            battle.applyDriftDamage();
-        }
+        battle.applyDriftDamage();
 
         // If there are no possible strikes, move on.
         if (battle.highlightChitsWithTargets() < 1)
@@ -166,37 +149,20 @@ public class BattleTurn extends Dialog implements ActionListener,
 
         else if (e.getActionCommand().equals("Done with Moves"))
         {
-            battle.removeOffboardChits();
-            battle.commitMoves();
-            battle.advancePhase();
+            battle.doneWithMoves();
         }
 
         else if (e.getActionCommand().equals("Done with Strikes"))
         {
-            // Advance only if there are no unresolved strikes.
-            if (battle.isForcedStrikeRemaining())
-            {
-                battle.highlightChitsWithTargets();
-                new MessageBox(parentFrame, "Engaged creatures must strike.");
-            }
-            else
-            {
-                battle.commitStrikes();
-                battle.advancePhase();
-            }
+            battle.doneWithStrikes();
         }
 
         else if (e.getActionCommand().equals("Concede Battle"))
         {
-            // XXX: Concession timing is tricky.
-            new OptionDialog(parentFrame, "Confirm Concession",
-                "Are you sure you want to concede the battle?",
-                "Yes", "No");
-            if (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION)
-            {
-                battle.concede(battle.getActivePlayer());
-            }
-            battle.advancePhase();
+            // XXX: Since the UI is shared between players for the
+            // hotseat game, we will assume that the active player
+            // is the one conceding.  This will change later.
+            battle.tryToConcede();
         }
     }
 

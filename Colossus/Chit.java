@@ -109,7 +109,7 @@ public class Chit extends Canvas
     }
 
 
-    public void setLocationAbs(Point point)
+    public void setLocation(Point point)
     {
         rect.setLocation(point);
         setBounds(rect);

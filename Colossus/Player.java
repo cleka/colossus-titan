@@ -18,7 +18,7 @@ public class Player
     private int numLegions; 
     private Legion [] legions = new Legion[72];
     private Legion selectedLegion = null;
-    private boolean alive = true;
+    private boolean dead;
     private int mulligansLeft = 1;
     private int movementRoll;
     private Game game;
@@ -37,15 +37,15 @@ public class Player
     }
 
 
-    public boolean isAlive()
+    public boolean isDead()
     {
-        return alive;
+        return dead;
     }
-
-
-    public void setAlive(boolean alive)
+    
+    
+    public void setDead(boolean dead)
     {
-        this.alive = alive;
+        this.dead = dead;
     }
 
 
@@ -723,7 +723,7 @@ public class Player
         }
 
         // Mark this player as dead.
-        setAlive(false);
+        dead = true;
 
         // Mark the slayer and give him this player's legion markers.
         if (slayer != null)

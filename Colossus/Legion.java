@@ -282,7 +282,7 @@ public class Legion
     {
         startingHex = currentHex;
         moved = false;
-        clearRecruited();
+        recruited = false;
         summoned = false;
     }
 
@@ -297,7 +297,7 @@ public class Legion
     // battle as well as during the muster phase.
     public boolean canRecruit()
     {
-        if (recruited || height > 6 || !getPlayer().isAlive() ||
+        if (recruited || height > 6 || getPlayer().isDead() ||
             Game.findEligibleRecruits(this, new Creature[5]) == 0)
         {
             return false;
@@ -310,12 +310,6 @@ public class Legion
     public void markRecruited()
     {
         recruited = true;
-    }
-
-
-    public void clearRecruited()
-    {
-        recruited = false;
     }
 
 
@@ -333,7 +327,7 @@ public class Legion
             }
             removeCreature(height - 1);
 
-            clearRecruited();
+            recruited = false;
 
             Game.logEvent("Legion " + getMarkerId() + " undoes its recruit");
         }

@@ -10,12 +10,14 @@ import java.awt.*;
 public class GameButton extends Button implements ActionListener 
 {
     private Game game;
+    private GameApplet applet;
 
 
-    public GameButton() 
+    public GameButton(GameApplet applet)
     {
         super("Start");
         addActionListener(this);
+        this.applet = applet;
     }
 
     public void actionPerformed(ActionEvent e) 
@@ -23,7 +25,7 @@ public class GameButton extends Button implements ActionListener
         // Don't allow multiple clicks to start multiple simultaneous games.
         if (game == null)
         {
-            game = new Game(true);
+            game = new Game(true, applet);
         }
     }
 }

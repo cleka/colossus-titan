@@ -155,12 +155,6 @@ public class Creature
     }
     
     
-    public boolean isDemiLord()
-    {
-        return demilord;
-    }
-
-
     public boolean isImmortal()
     {
         return (lord || demilord);

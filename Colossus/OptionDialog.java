@@ -15,7 +15,6 @@ public class OptionDialog extends Dialog implements ActionListener
     // Will be set to YES_OPTION or NO_OPTION
     private static int lastAnswer = NO_OPTION;
 
-    // XXX Ensure that yesString and noString are different.
     private String yesString;
     private String noString;
 

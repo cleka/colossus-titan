@@ -374,7 +374,7 @@ public class BattleHex extends Hex
         for (int i = 0; i < numCritters; i++)
         {
             BattleChit chit = critters[i].getChit();
-            chit.setLocationAbs(point);
+            chit.setLocation(point);
             point.x += chitScale / 4;
             point.y += chitScale / 4;
         }

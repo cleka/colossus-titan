@@ -151,13 +151,6 @@ public class Critter extends Creature
     }
 
 
-    public String getImageName()
-    {
-        return getImageName(false);
-    }
-
-
-
     public int getPower()
     {
         // Update Titan power if necessary.

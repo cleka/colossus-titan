@@ -42,8 +42,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         // If there are no markers available, skip forward to movement.
         if (player.getNumMarkersAvailable() == 0)
         {
-            game.advancePhase();
-            setupMoveDialog();
+            advancePhase();
         }
         else
         {
@@ -66,7 +65,6 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             button4.addActionListener(this);
 
             pack();
-
 
             // Highlight hexes with legions that are 7 high.
             player.highlightTallLegions();  
@@ -128,8 +126,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         // If there are no engagements, move forward to the muster phase.
         if (board.highlightEngagements() < 1)
         {
-            game.advancePhase();
-            setupMusterDialog();
+            advancePhase();
         }
         else
         {
@@ -149,10 +146,9 @@ public class Turn extends Dialog implements ActionListener, WindowListener
 
     private void setupMusterDialog()
     {
-        if (!game.getActivePlayer().isAlive())
+        if (game.getActivePlayer().isDead())
         {
-            game.advanceTurn();
-            setupSplitDialog();
+            advancePhase();
         }
         else
         {
@@ -180,6 +176,35 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             board.highlightPossibleRecruits();
         }
     }
+
+
+    private void setupPhaseDialog()
+    {
+        switch (game.getPhase())
+        {
+            case Game.SPLIT:
+                setupSplitDialog();
+                break;
+            case Game.MOVE:
+                setupMoveDialog();
+                break;
+            case Game.FIGHT:
+                setupFightDialog();
+                break;
+            case Game.MUSTER:
+                setupMusterDialog();
+                break;
+            default:
+                System.out.println("Bogus phase");
+        }
+    }
+
+
+    private void advancePhase()
+    {
+        game.advancePhase();
+        setupPhaseDialog();
+    }
     
 
     public void actionPerformed(ActionEvent e)
@@ -205,9 +230,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
                 new MessageBox(parentFrame, "Must split.");
                 return;
             }
-            game.advancePhase();
-
-            setupMoveDialog();
+            advancePhase();
         }
 
         else if (e.getActionCommand().equals("Undo Last Move"))
@@ -285,9 +308,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
                     }
                 }
 
-                game.advancePhase();
-
-                setupFightDialog();
+                advancePhase();
             }
         }
 
@@ -296,9 +317,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             // Advance only if there are no unresolved engagements.
             if (board.highlightEngagements() == 0)
             {
-                game.advancePhase();
-
-                setupMusterDialog();
+                advancePhase();
             }
             else
             {
@@ -328,9 +347,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             // Mulligans are only allowed on turn 1.
             player.setMulligansLeft(0);
 
-            game.advanceTurn();
-
-            setupSplitDialog();
+            advancePhase();
         }
 
         else if (e.getActionCommand().equals("Withdraw from Game"))
@@ -342,9 +359,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             {
                game.getActivePlayer().die(null, true);
 
-               game.advanceTurn();
-
-               setupSplitDialog();
+               advancePhase();
             }
         }
     }

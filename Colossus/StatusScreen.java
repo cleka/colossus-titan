@@ -147,7 +147,7 @@ public class StatusScreen extends Frame implements WindowListener
             {
                 color = Color.yellow;
             }
-            else if (!game.getPlayer(i).isAlive())
+            else if (game.getPlayer(i).isDead())
             {
                 color = Color.red;
             }

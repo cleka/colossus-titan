@@ -278,6 +278,23 @@ public class Battle
     }
 
 
+    public void recruitReinforcement()
+    {
+        if (turnNumber == 4 && defender.canRecruit())
+        {
+            // Allow recruiting a reinforcement.
+            new PickRecruit(map, defender);
+
+            if (defender.hasRecruited())
+            {
+                map.placeNewChit(defender);
+            }
+        }
+
+        advancePhase();
+    }
+
+
     public int getCarryDamage()
     {
         return carryDamage;
@@ -442,7 +459,7 @@ public class Battle
 
 
      // Mark all of the conceding player's critters as dead.
-    public void concede(Player player)
+    private void concede(Player player)
     {
         for (int i = 0; i < numCritters; i++)
         {
@@ -455,20 +472,24 @@ public class Battle
     }
 
 
-    // If any chits were left off-board, kill them.  If they were newly
-    //   summoned or recruited, unsummon or unrecruit them instead.
-    public void removeOffboardChits()
+    private void tryToConcede(Player player)
     {
-        Player player = getActivePlayer();
-        for (int i = 0; i < numCritters; i++)
+        // XXX: Concession timing is tricky.
+        new OptionDialog(map, "Confirm Concession",
+            "Are you sure you want to concede the battle?",
+            "Yes", "No");
+        if (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION)
         {
-            Critter critter = critters[i];
-            if (critter.getCurrentHex().isEntrance() &&
-                critter.getPlayer() == player)
-            {
-                critter.setDead(true);
-            }
+            Game.logEvent(player.getName() + " concedes the battle");
+            concede(player);
+            advancePhase();
         }
+    }
+    
+    
+    public void tryToConcede()
+    {
+        tryToConcede(getActivePlayer());
     }
 
 
@@ -499,7 +520,24 @@ public class Battle
     }
 
 
-    public void commitMoves()
+    // If any chits were left off-board, kill them.  If they were newly
+    //   summoned or recruited, unsummon or unrecruit them instead.
+    private void removeOffboardChits()
+    {
+        Player player = getActivePlayer();
+        for (int i = 0; i < numCritters; i++)
+        {
+            Critter critter = critters[i];
+            if (critter.getCurrentHex().isEntrance() &&
+                critter.getPlayer() == player)
+            {
+                critter.setDead(true);
+            }
+        }
+    }
+
+
+    private void commitMoves()
     {
         clearLastCritterMoved();
 
@@ -509,12 +547,22 @@ public class Battle
             critter.commitMove();
         }
     }
+    
+    
+    public void doneWithMoves()
+    {
+        removeOffboardChits();
+        commitMoves();
+        advancePhase();
+    }
 
 
     public void applyDriftDamage()
     {
         // Drift hexes are only found on the tundra map.
-        if (masterHex.getTerrain() == 't')
+        // Drift damage is applied only once per player turn,
+        //    during the strike phase. 
+        if (masterHex.getTerrain() == 't' && phase == FIGHT)
         {
             for (int i = 0; i < numCritters; i++)
             {
@@ -543,26 +591,6 @@ public class Battle
             }
         }
         carryDamage = 0;
-    }
-
-
-    public boolean isForcedStrikeRemaining()
-    {
-        Player player = getActivePlayer();
-
-        for (int i = 0; i < numCritters; i++)
-        {
-            Critter critter = critters[i];
-            if (critter.getPlayer() == player)
-            {
-                if (critter.isInContact(false) && !critter.hasStruck())
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
 
@@ -750,7 +778,7 @@ public class Battle
     }
 
 
-    public void commitStrikes()
+    private void commitStrikes()
     {
         for (int i = 0; i < numCritters; i++)
         {
@@ -782,6 +810,42 @@ public class Battle
         }
 
         return count;
+    }
+
+
+    private boolean isForcedStrikeRemaining()
+    {
+        Player player = getActivePlayer();
+
+        for (int i = 0; i < numCritters; i++)
+        {
+            Critter critter = critters[i];
+            if (critter.getPlayer() == player)
+            {
+                if (critter.isInContact(false) && !critter.hasStruck())
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    public void doneWithStrikes()
+    {
+        // Advance only if there are no unresolved strikes.
+        if (isForcedStrikeRemaining())
+        {
+            highlightChitsWithTargets();
+            new MessageBox(map, "Engaged creatures must strike.");
+        }
+        else
+        {
+            commitStrikes();
+            advancePhase();
+        }
     }
 
 

@@ -13,11 +13,12 @@ public class GameApplet extends Applet
     public void init() 
     {
         setLayout(new BorderLayout());
-        add(new GameButton(), BorderLayout.CENTER);
+        add(new GameButton(this), BorderLayout.CENTER);
     }
 
     public void destroy() 
     {
+        stop();
         removeAll();
     }
 }

@@ -184,64 +184,8 @@ public class PickRecruit extends Dialog implements MouseListener,
                 // Prevent multiple clicks from yielding multiple recruits.
                 dialogLock = true;
 
-                Creature recruit = recruits[i];
-
-                // Pick the recruiter(s) if necessary.
-                Critter [] recruiters = new Critter[4];
-                Critter recruiter;
-
-                int numEligibleRecruiters = Game.findEligibleRecruiters(legion,
-                    recruit, recruiters);
-
-                if (numEligibleRecruiters == 1)
-                {
-                    recruiter = recruiters[0];
-                }
-                else if (numEligibleRecruiters == 0)
-                {
-                    // A warm body recruits in a tower.
-                    recruiter = null;
-                }
-                else if (Game.allRecruitersVisible(legion, recruiters))
-                {
-                    // If all possible recruiters are already visible, don't
-                    // bother picking which ones to reveal.
-                    recruiter = recruiters[0];
-                }
-                else
-                {
-                    new PickRecruiter(parentFrame, legion, 
-                        numEligibleRecruiters, recruiters);
-                    recruiter = recruiters[0];
-                }
-
-                if (recruit != null && (recruiter != null ||
-                    numEligibleRecruiters == 0))
-                {
-                    // Select that marker.
-                    legion.addCreature(recruit);
-
-                    // Mark the recruiter(s) as visible.
-                    int numRecruiters = Game.numberOfRecruiterNeeded(recruiter,
-                        recruit, legion.getCurrentHex().getTerrain());
-                    if (numRecruiters >= 1)
-                    {
-                        legion.revealCreatures(recruiter, numRecruiters);
-                    }
-
-                    Game.logEvent("Legion " + legion.getMarkerId() +
-                        " in " +  
-                        legion.getCurrentHex().getDescription() +
-                        " recruits " + recruit.getName() + " with " +
-                        (numRecruiters == 0 ? "nothing" :
-                        numRecruiters + " " + (numRecruiters > 1 ? 
-                        recruiter.getPluralName() : recruiter.getName())));
-
-                    // Recruits are one to a customer.
-                    legion.markRecruited();
-
-                    player.markLastLegionRecruited(legion);
-                }
+                // Recruit the chosen creature.
+                Game.doRecruit(recruits[i], legion, parentFrame);
 
                 // Then exit.
                 dispose();
