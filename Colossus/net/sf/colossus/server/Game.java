@@ -193,12 +193,12 @@ public final class Game
         }
         if (cl.optIsSet('u'))
         {
-            String buf = cl.getOptValue('v');
+            String buf = cl.getOptValue('u');
             numHumans = Integer.parseInt(buf);
         }
         if (cl.optIsSet('i'))
         {
-            String buf = cl.getOptValue('v');
+            String buf = cl.getOptValue('i');
             numAIs = Integer.parseInt(buf);
         }
         // Try to coerce bogus values into legality. 
@@ -260,6 +260,7 @@ public final class Game
         if (!cl.optIsSet('s'))
         {
             JFrame frame = new JFrame();
+            // TODO Push option settings into GetPlayers
             playerStuff = GetPlayers.getPlayers(frame);
         }
 
