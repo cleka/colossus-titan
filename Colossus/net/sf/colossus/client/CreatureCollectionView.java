@@ -109,7 +109,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
             if (!(name.equals("Titan")))
                 chit = new Chit(4 * Scale.get(), name, this);
             else
-                chit = new Chit(4 * Scale.get(), "Titan-6-Black", this);
+                chit = new Chit(4 * Scale.get(), "Titan-0-Black", this);
             label = new JLabel(baseString, SwingConstants.CENTER);
             topLabel =
                 new JLabel(htmlizeOnly(
