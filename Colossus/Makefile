@@ -1,6 +1,3 @@
-# Makefile for Colossus
-# $Id$
-
 # Make sure to save this file in Unix rather than DOS endline format, so that
 #    it will continue to work portably.  GNU make has hard-to-diagnose 
 #    problems with spurious ^M characters.
@@ -43,7 +40,9 @@ all: jar
 
 # Find target files
 
-sources = $(wildcard *.java) $(wildcard net/sf/colossus/*.java) $(wildcard net/sf/colossus/protocol/*.java)
+sources = $(wildcard *.java) $(wildcard net/sf/colossus/*.java) \
+	$(wildcard net/sf/colossus/protocol/*.java) \
+	$(wildcard net/sf/colossus/battle/*.java) 
 
 CLASS_FILES = $(sources:%.java=%.class)
 
