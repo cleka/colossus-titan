@@ -17,33 +17,21 @@ final class Marker extends Chit
     private int fontHeight;
     private int fontWidth;
 
-
     Marker(int scale, String id, Container container, Client client)
     {
         super(scale, id, container);
         setBackground(Color.black);
         this.client = client;
+        if (getId().startsWith("Bk"))
+        {
+            setBorderColor(Color.white);
+        }
     }
-
 
     /** Show the height of the legion. */
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
-
-        // Draw a one-pixel-wide border around the outside
-        // edge of the marker.  Use black, unless the marker
-        // is black, in which case use white.
-        if (getId().startsWith("Bk"))
-        {
-            g.setColor(Color.white);
-        }
-        else
-        {
-            g.setColor(Color.black);
-        }
-        Rectangle rect = getBounds();
-        g.drawRect(rect.x, rect.y, rect.width, rect.height);
 
         if (client == null)
         {

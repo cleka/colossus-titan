@@ -35,7 +35,8 @@ class Chit extends JPanel
     private boolean dead;
 
     /** Flag to paint a border around the chit. */
-    private boolean border;
+    boolean border = true;
+    Color borderColor = Color.black;
 
     /** Flag to paint the chit upside-down. */
     private boolean inverted = false;
@@ -245,9 +246,9 @@ class Chit extends JPanel
 
         if (border)
         {
-            g2.setColor(Color.black);
+            g2.setColor(borderColor);
             Rectangle rect = getBounds();
-            g.drawRect(rect.x, rect.y, rect.width, rect.height);
+            g.drawRect(rect.x, rect.y, rect.width - 1, rect.height - 1);
         }
     }
 
@@ -306,6 +307,11 @@ class Chit extends JPanel
     void setBorder(boolean border)
     {
         this.border = border;
+    }
+
+    void setBorderColor(Color borderColor)
+    {
+        this.borderColor = borderColor;
     }
 
     boolean isInverted()

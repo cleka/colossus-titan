@@ -33,6 +33,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 
 public final class Client implements IClient
 {
+
     /** This will eventually be a network interface rather than a
      *  direct reference.  So don't share this reference. */
     private IServer server;
@@ -51,7 +52,7 @@ public final class Client implements IClient
 
     // XXX synch all iteration
     private java.util.List battleChits =
-        Collections.synchronizedList(new ArrayList());
+            Collections.synchronizedList(new ArrayList());
 
     /** Stack of legion marker ids, to allow multiple levels of undo for
      *  splits, moves, and recruits. */
@@ -104,10 +105,10 @@ public final class Client implements IClient
     private boolean gameOver;
 
     /** One per player. */
-    private PlayerInfo [] playerInfo;
+    private PlayerInfo[] playerInfo;
 
     /** One per player. */
-    private PredictSplits [] predictSplits;
+    private PredictSplits[] predictSplits;
 
     /** One LegionInfo per legion, keyed by markerId.  Never null. */
     private SortedMap legionInfo = new TreeMap();
@@ -121,7 +122,7 @@ public final class Client implements IClient
     private Strike strike = new Strike(this);
 
     private boolean remote;
-    private SocketClientThread sct; 
+    private SocketClientThread sct;
 
     // For negotiation.  (And AI battle.)
     private Negotiate negotiate;
@@ -137,7 +138,6 @@ public final class Client implements IClient
 
     // XXX Make private and wrap consistently.
     boolean showAllRecruitChits = false;
-
 
     public Client(String host, int port, String playerName, boolean remote)
     {
@@ -161,19 +161,18 @@ public final class Client implements IClient
         {
             net.sf.colossus.util.ResourceLoader.setDataServer(null, 0);
         }
-        
+
         sct.start();
 
         TerrainRecruitLoader.setCaretakerInfo(caretakerInfo);
         net.sf.colossus.server.CustomRecruitBase.addCaretakerInfo(
-            caretakerInfo);
+                caretakerInfo);
     }
 
     boolean isRemote()
     {
         return remote;
     }
-
 
     /** Take a mulligan. */
     void mulligan()
@@ -191,7 +190,6 @@ public final class Client implements IClient
     {
         return tookMulligan;
     }
-
 
     /** Resolve engagement in land. */
     void engage(String land)
@@ -228,16 +226,14 @@ public final class Client implements IClient
         server.doNotConcede(markerId);
     }
 
-
     /** Cease negotiations and fight a battle in land. */
     void fight(String land)
     {
         server.fight(land);
     }
 
-
-    public void tellEngagement(String hexLabel, String attackerId, 
-        String defenderId)
+    public void tellEngagement(String hexLabel, String attackerId,
+            String defenderId)
     {
         this.battleSite = hexLabel;
         this.attackerMarkerId = attackerId;
@@ -245,7 +241,6 @@ public final class Client implements IClient
 
         highlightBattleSite();
     }
-
 
     void highlightBattleSite()
     {
@@ -256,9 +251,8 @@ public final class Client implements IClient
         }
     }
 
-
     public void tellEngagementResults(String winnerId, String method,
-        int points)
+            int points)
     {
         JFrame frame = getMapOrBoardFrame();
         if (frame == null)
@@ -278,7 +272,6 @@ public final class Client implements IClient
         }
     }
 
-
     /** Legion summoner summons unit from legion donor. */
     void doSummon(String summoner, String donor, String unit)
     {
@@ -294,7 +287,6 @@ public final class Client implements IClient
         }
     }
 
-
     /** This player quits the whole game. The server needs to always honor
      *  this request, because if it doesn't players will just drop
      *  connections when they want to quit in a hurry. */
@@ -305,7 +297,6 @@ public final class Client implements IClient
             server.withdrawFromGame();
         }
     }
-
 
     private void repaintAllWindows()
     {
@@ -383,14 +374,13 @@ public final class Client implements IClient
         }
     }
 
-
     private void initMovementDie(int roll)
     {
         movementRoll = roll;
         if (board != null)
         {
             movementDie = new MovementDie(4 * Scale.get(),
-                MovementDie.getDieImageName(roll), board);
+                    MovementDie.getDieImageName(roll), board);
         }
     }
 
@@ -423,7 +413,7 @@ public final class Client implements IClient
     }
 
     /** Return -1 if the option's value has not been set.  
-        public for LogWindow */
+     public for LogWindow */
     public int getIntOption(String optname)
     {
         return options.getIntOption(optname);
@@ -456,7 +446,6 @@ public final class Client implements IClient
     {
         setOption(optname, String.valueOf(value));
     }
-
 
     /** Fully sync the board state by running all option triggers. */
     private void runAllOptionTriggers()
@@ -585,7 +574,6 @@ public final class Client implements IClient
         }
     }
 
-
     int getNumPlayers()
     {
         return numPlayers;
@@ -604,7 +592,6 @@ public final class Client implements IClient
         }
         return total;
     }
-
 
     public void updatePlayerInfo(java.util.List infoStrings)
     {
@@ -641,8 +628,8 @@ public final class Client implements IClient
             {
                 if (board != null)
                 {
-                    statusScreen = new StatusScreen((secondaryParent == null ? 
-                        board.getFrame() : secondaryParent), this);
+                    statusScreen = new StatusScreen((secondaryParent == null ?
+                            board.getFrame() : secondaryParent), this);
                 }
             }
         }
@@ -662,7 +649,6 @@ public final class Client implements IClient
         // XXX Should be called somewhere else, just once.
         setupPlayerLabel();
     }
-
 
     PlayerInfo getPlayerInfo(int playerNum)
     {
@@ -708,7 +694,6 @@ public final class Client implements IClient
         return -1;
     }
 
-
     /** Return the average point value of all legions in the game. */
     int getAverageLegionPointValue()
     {
@@ -725,15 +710,13 @@ public final class Client implements IClient
         return (int)(Math.round((double)totalValue / totalLegions));
     }
 
-
     public void setColor(String color)
     {
         this.color = color;
     }
 
-
-    public void updateCreatureCount(String creatureName, int count, 
-        int deadCount)
+    public void updateCreatureCount(String creatureName, int count,
+            int deadCount)
     {
         caretakerInfo.updateCount(creatureName, count, deadCount);
         updateCreatureCountDisplay();
@@ -748,7 +731,7 @@ public final class Client implements IClient
                 if (board != null)
                 {
                     caretakerDisplay = new CreatureCollectionView(
-                        (secondaryParent == null ? board.getFrame() : 
+                            (secondaryParent == null ? board.getFrame() :
                             secondaryParent), this);
                     caretakerDisplay.addWindowListener(new WindowAdapter()
                     {
@@ -756,7 +739,8 @@ public final class Client implements IClient
                         {
                             setOption(Options.showCaretaker, false);
                         }
-                    });
+                    }
+                    );
                 }
             }
             else
@@ -778,7 +762,6 @@ public final class Client implements IClient
         }
     }
 
-
     private void disposeMasterBoard()
     {
         if (board != null)
@@ -797,7 +780,6 @@ public final class Client implements IClient
         }
     }
 
-
     public void dispose()
     {
         cleanupBattle();
@@ -810,14 +792,12 @@ public final class Client implements IClient
         }
     }
 
-
     /** Called from BattleMap to leave carry mode. */
     void leaveCarryMode()
     {
         server.leaveCarryMode();
-        doAutoStrikes(); 
+        doAutoStrikes();
     }
-
 
     synchronized void doneWithBattleMoves()
     {
@@ -848,7 +828,7 @@ public final class Client implements IClient
         {
             BattleChit chit = (BattleChit)it.next();
             if (getBattleActivePlayerName().equals(getPlayerNameByTag(
-                chit.getTag())))
+                    chit.getTag())))
             {
                 chits.add(chit);
             }
@@ -864,7 +844,7 @@ public final class Client implements IClient
         {
             BattleChit chit = (BattleChit)it.next();
             if (!getBattleActivePlayerName().equals(getPlayerNameByTag(
-                                                    chit.getTag())))
+                    chit.getTag())))
             {
                 chits.add(chit);
             }
@@ -886,7 +866,6 @@ public final class Client implements IClient
         }
     }
 
-
     synchronized void doneWithStrikes()
     {
         aiPause();
@@ -899,7 +878,7 @@ public final class Client implements IClient
         if (isMyBattlePhase() && getOption(Options.autoForcedStrike))
         {
             return strike.makeForcedStrikes(getOption(
-                Options.autoRangeSingle));
+                    Options.autoRangeSingle));
         }
         return false;
     }
@@ -907,7 +886,7 @@ public final class Client implements IClient
     /** Handle both forced strikes and AI strikes. */
     synchronized void doAutoStrikes()
     {
-        if (isMyBattlePhase()) 
+        if (isMyBattlePhase())
         {
             if (getOption(Options.autoPlay))
             {
@@ -916,7 +895,7 @@ public final class Client implements IClient
                 if (!struck)
                 {
                     struck = ai.strike(getLegionInfo(
-                        getBattleActiveMarkerId()));
+                            getBattleActiveMarkerId()));
                 }
                 if (!struck)
                 {
@@ -938,12 +917,10 @@ public final class Client implements IClient
         }
     }
 
-
     java.util.List getMarkers()
     {
         return Collections.unmodifiableList(markers);
     }
-
 
     /** Get this legion's info.  Create it first if necessary. */
     LegionInfo getLegionInfo(String markerId)
@@ -964,14 +941,13 @@ public final class Client implements IClient
     }
 
     /** Add the marker to the end of the list and to the LegionInfo.
-        If it's already in the list, remove the earlier entry. */
+     If it's already in the list, remove the earlier entry. */
     void setMarker(String id, Marker marker)
     {
         markers.remove(marker);
         markers.add(marker);
         getLegionInfo(id).setMarker(marker);
     }
-
 
     /** Remove this eliminated legion, and clean up related stuff. */
     public synchronized void removeLegion(String id)
@@ -998,15 +974,14 @@ public final class Client implements IClient
         }
     }
 
-
     int getLegionHeight(String markerId)
     {
         return getLegionInfo(markerId).getHeight();
     }
 
     /** Needed after loadGame() outside split phase. */
-    public void setLegionStatus(String markerId, boolean moved, 
-        boolean teleported, int entrySide, String lastRecruit)
+    public void setLegionStatus(String markerId, boolean moved,
+            boolean teleported, int entrySide, String lastRecruit)
     {
         LegionInfo info = getLegionInfo(markerId);
         info.setMoved(moved);
@@ -1014,7 +989,6 @@ public final class Client implements IClient
         info.setEntrySide(entrySide);
         info.setLastRecruit(lastRecruit);
     }
-
 
     /** Return the full basename for a titan in legion markerId,
      *  first finding that legion's player, player color, and titan size.
@@ -1036,7 +1010,6 @@ public final class Client implements IClient
     {
         return getLegionInfo(markerId).getCertainties();
     }
-
 
     /** Add a new creature to this legion. */
     public synchronized void addCreature(String markerId, String name)
@@ -1068,8 +1041,8 @@ public final class Client implements IClient
     }
 
     /** Reveal creatures in this legion, some of which already may be known. */
-    public synchronized void revealCreatures(String markerId, 
-        final java.util.List names)
+    public synchronized void revealCreatures(String markerId,
+            final java.util.List names)
     {
         String pName = getPlayerNameByMarkerId(markerId);
         if (predictSplits == null || getPredictSplits(pName) == null)
@@ -1078,7 +1051,6 @@ public final class Client implements IClient
         }
         getLegionInfo(markerId).revealCreatures(names);
     }
-
 
     java.util.List getBattleChits()
     {
@@ -1100,7 +1072,7 @@ public final class Client implements IClient
         }
         return chits;
     }
-    
+
     BattleChit getBattleChit(String hexLabel)
     {
         java.util.List chits = getBattleChits(hexLabel);
@@ -1110,7 +1082,6 @@ public final class Client implements IClient
         }
         return (BattleChit)chits.get(0);
     }
-
 
     /** Get the BattleChit with this tag. */
     BattleChit getBattleChit(int tag)
@@ -1126,7 +1097,6 @@ public final class Client implements IClient
         }
         return null;
     }
-
 
     public synchronized void removeDeadBattleChits()
     {
@@ -1156,8 +1126,8 @@ public final class Client implements IClient
         }
     }
 
-    public synchronized void placeNewChit(String imageName, boolean inverted, 
-        int tag, String hexLabel)
+    public synchronized void placeNewChit(String imageName, boolean inverted,
+            int tag, String hexLabel)
     {
         addBattleChit(imageName, inverted, tag, hexLabel);
         if (map != null)
@@ -1169,8 +1139,8 @@ public final class Client implements IClient
     }
 
     /** Create a new BattleChit and add it to the end of the list. */
-    private void addBattleChit(final String bareImageName, 
-        boolean inverted, int tag, String hexLabel)
+    private void addBattleChit(final String bareImageName,
+            boolean inverted, int tag, String hexLabel)
     {
         String imageName = bareImageName;
         if (imageName.equals(Constants.titan))
@@ -1194,10 +1164,9 @@ public final class Client implements IClient
             colorName = getColorByMarkerId(attackerMarkerId);
         }
         BattleChit chit = new BattleChit((int)(5 * Scale.get()), imageName,
-            map, inverted, tag, hexLabel, colorName, this);
+                map, inverted, tag, hexLabel, colorName, this);
         battleChits.add(chit);
     }
-
 
     java.util.List getRecruitChits()
     {
@@ -1214,7 +1183,6 @@ public final class Client implements IClient
         point.x -= scale / 2;
         point.y -= scale / 2;
         chit.setLocation(point);
-        chit.setBorder(true);
         recruitChits.add(chit);
     }
 
@@ -1231,10 +1199,12 @@ public final class Client implements IClient
             if (o instanceof String)
             {
                 imageName = (String)o;
-            } else if (o instanceof Creature)
+            }
+            else if (o instanceof Creature)
             {
                 imageName = ((Creature)o).getName();
-            } else
+            }
+            else
             {
                 Log.error("Only String or Creature in addRecruitChit() !");
                 return;
@@ -1248,14 +1218,13 @@ public final class Client implements IClient
             point.y -= scale / 2;
             int offset = (num - ((size / 2) + 1));
             point.x += ((offset * scale) +
-                        ((size % 2 == 0 ? (scale / 2) : 0)))
-                        / size;
+                    ((size % 2 == 0 ? (scale / 2) : 0)))
+                    / size;
             point.y += ((offset * scale) +
-                        ((size % 2 == 0 ? (scale / 2) : 0)))
-                        / size;
+                    ((size % 2 == 0 ? (scale / 2) : 0)))
+                    / size;
             num--;
             chit.setLocation(point);
-            chit.setBorder(true);
             recruitChits.add(chit);
         }
     }
@@ -1285,7 +1254,6 @@ public final class Client implements IClient
         }
     }
 
-
     private void clearUndoStack()
     {
         undoStack.clear();
@@ -1307,7 +1275,6 @@ public final class Client implements IClient
         return undoStack.isEmpty();
     }
 
-
     String getMoverId()
     {
         return moverId;
@@ -1318,7 +1285,6 @@ public final class Client implements IClient
         this.moverId = moverId;
     }
 
-
     MasterBoard getBoard()
     {
         return board;
@@ -1326,11 +1292,11 @@ public final class Client implements IClient
 
     public synchronized void initBoard()
     {
-Log.debug(playerName + " Client.initBoard()");
+        Log.debug(playerName + " Client.initBoard()");
         if (isRemote())
         {
             VariantSupport.loadVariant(options.getStringOption(
-                Options.variant), false);
+                    Options.variant), false);
         }
 
         if (!getOption(Options.autoPlay))
@@ -1342,7 +1308,6 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-
     BattleMap getBattleMap()
     {
         return map;
@@ -1352,7 +1317,6 @@ Log.debug(playerName + " Client.initBoard()");
     {
         this.map = map;
     }
-
 
     public String getPlayerName()
     {
@@ -1364,7 +1328,6 @@ Log.debug(playerName + " Client.initBoard()");
         this.playerName = playerName;
         sct.fixName(playerName);
     }
-
 
     SummonAngel getSummonAngel()
     {
@@ -1404,13 +1367,12 @@ Log.debug(playerName + " Client.initBoard()");
         return info.getContents().contains(name);
     }
 
-
     public void askAcquireAngel(String markerId, java.util.List recruits)
     {
         if (getOption(Options.autoAcquireAngels))
         {
             acquireAngelCallback(markerId, ai.acquireAngel(markerId,
-                recruits));
+                    recruits));
         }
         else
         {
@@ -1423,7 +1385,6 @@ Log.debug(playerName + " Client.initBoard()");
     {
         server.acquireAngel(markerId, angelType);
     }
-
 
     /** Present a dialog allowing the player to enter via land or teleport.
      *  Return true if the player chooses to teleport. */
@@ -1439,17 +1400,15 @@ Log.debug(playerName + " Client.initBoard()");
             return false;
         }
 
-        String [] options = new String[2];
+        String[] options = new String[2];
         options[0] = "Teleport";
         options[1] = "Move Normally";
         int answer = JOptionPane.showOptionDialog(board, "Teleport?",
-            "Teleport?", JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+                "Teleport?", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
         return (answer == JOptionPane.YES_OPTION);
     }
-
-
 
     /** Allow the player to choose whether to take a penalty (fewer dice
      *  or higher strike number) in order to be allowed to carry.
@@ -1479,7 +1438,6 @@ Log.debug(playerName + " Client.initBoard()");
         server.assignStrikePenalty(prompt);
     }
 
-
     private JFrame getMapOrBoardFrame()
     {
         JFrame frame = null;
@@ -1493,7 +1451,6 @@ Log.debug(playerName + " Client.initBoard()");
         }
         return frame;
     }
-
 
     public void showMessageDialog(String message)
     {
@@ -1514,7 +1471,7 @@ Log.debug(playerName + " Client.initBoard()");
     public void tellPlayerElim(String playerName, String slayerName)
     {
         Log.debug(this.playerName + " tellPlayerElim(" + playerName +
-            ", " + slayerName + ")");
+                ", " + slayerName + ")");
         PlayerInfo info = getPlayerInfo(playerName);
 
         // TODO Merge these
@@ -1537,8 +1494,6 @@ Log.debug(playerName + " Client.initBoard()");
     {
         return gameOver;
     }
-
-
 
     void doFight(String hexLabel)
     {
@@ -1573,12 +1528,12 @@ Log.debug(playerName + " Client.initBoard()");
         if (getOption(Options.autoConcede))
         {
             answerConcede(allyMarkerId, ai.concede(getLegionInfo(
-                allyMarkerId), getLegionInfo(enemyMarkerId)));
+                    allyMarkerId), getLegionInfo(enemyMarkerId)));
         }
         else
         {
-            Concede.concede(this, board.getFrame(), allyMarkerId, 
-                enemyMarkerId);
+            Concede.concede(this, board.getFrame(), allyMarkerId,
+                    enemyMarkerId);
         }
     }
 
@@ -1587,7 +1542,7 @@ Log.debug(playerName + " Client.initBoard()");
         if (getOption(Options.autoFlee))
         {
             answerFlee(allyMarkerId, ai.flee(getLegionInfo(allyMarkerId),
-                getLegionInfo(enemyMarkerId)));
+                    getLegionInfo(enemyMarkerId)));
         }
         else
         {
@@ -1619,7 +1574,6 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-    
     public void askNegotiate(String attackerId, String defenderId)
     {
         this.attackerMarkerId = attackerId;
@@ -1628,8 +1582,8 @@ Log.debug(playerName + " Client.initBoard()");
         if (getOption(Options.autoNegotiate))
         {
             // XXX AI players just fight for now.
-            Proposal proposal = new Proposal(attackerId, defenderId, true, 
-                false, null, null, getHexForLegion(attackerId));
+            Proposal proposal = new Proposal(attackerId, defenderId, true,
+                    false, null, null, getHexForLegion(attackerId));
             makeProposal(proposal);
         }
         else
@@ -1653,8 +1607,8 @@ Log.debug(playerName + " Client.initBoard()");
 
         if (respawn)
         {
-            negotiate = new Negotiate(this, attackerMarkerId, 
-                defenderMarkerId);
+            negotiate = new Negotiate(this, attackerMarkerId,
+                    defenderMarkerId);
         }
     }
 
@@ -1670,24 +1624,22 @@ Log.debug(playerName + " Client.initBoard()");
         new ReplyToProposal(this, proposal);
     }
 
-
     BattleHex getBattleHex(BattleChit chit)
     {
-        return HexMap.getHexByLabel(getBattleTerrain(), 
-            chit.getCurrentHexLabel());
+        return HexMap.getHexByLabel(getBattleTerrain(),
+                chit.getCurrentHexLabel());
     }
 
     BattleHex getStartingBattleHex(BattleChit chit)
     {
-        return HexMap.getHexByLabel(getBattleTerrain(), 
-            chit.getStartingHexLabel());
+        return HexMap.getHexByLabel(getBattleTerrain(),
+                chit.getStartingHexLabel());
     }
 
     boolean isOccupied(BattleHex hex)
     {
         return !getBattleChits(hex.getLabel()).isEmpty();
     }
-
 
     private String getBattleChitDescription(BattleChit chit)
     {
@@ -1700,8 +1652,8 @@ Log.debug(playerName + " Client.initBoard()");
     }
 
     public void tellStrikeResults(int strikerTag, int targetTag,
-        int strikeNumber, java.util.List rolls, int damage, boolean killed, 
-        boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
+            int strikeNumber, java.util.List rolls, int damage, boolean killed,
+            boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
         BattleChit chit = getBattleChit(strikerTag);
         if (chit != null)
@@ -1712,9 +1664,9 @@ Log.debug(playerName + " Client.initBoard()");
         BattleChit targetChit = getBattleChit(targetTag);
         if (battleDice != null)
         {
-            battleDice.setValues(getBattleChitDescription(chit), 
-                getBattleChitDescription(targetChit), strikeNumber,
-                damage, rolls);
+            battleDice.setValues(getBattleChitDescription(chit),
+                    getBattleChitDescription(targetChit), strikeNumber,
+                    damage, rolls);
             battleDice.showRoll();
         }
         if (map != null)
@@ -1768,7 +1720,7 @@ Log.debug(playerName + " Client.initBoard()");
             leaveCarryMode();
         }
         else if (carryTargetDescriptions.size() == 1 &&
-            getOption(Options.autoCarrySingle))
+                getOption(Options.autoCarrySingle))
         {
             Iterator it = carryTargetDescriptions.iterator();
             String desc = (String)it.next();
@@ -1785,11 +1737,10 @@ Log.debug(playerName + " Client.initBoard()");
             else
             {
                 new PickCarry(map.getFrame(), this, carryDamage,
-                    carryTargetDescriptions);
+                        carryTargetDescriptions);
             }
         }
     }
-
 
     void cleanupNegotiationDialogs()
     {
@@ -1805,10 +1756,9 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        String battleActivePlayerName, int battlePhase,
-        String attackerMarkerId, String defenderMarkerId)
+            String battleActivePlayerName, int battlePhase,
+            String attackerMarkerId, String defenderMarkerId)
     {
         cleanupNegotiationDialogs();
 
@@ -1820,12 +1770,12 @@ Log.debug(playerName + " Client.initBoard()");
         this.battleSite = masterHexLabel;
 
         getLegionInfo(defenderMarkerId).setEntrySide((getLegionInfo(
-            attackerMarkerId).getEntrySide() + 3) % 6);
+                attackerMarkerId).getEntrySide() + 3) % 6);
 
         if (board != null)
         {
             map = new BattleMap(this, masterHexLabel, attackerMarkerId,
-                defenderMarkerId);
+                    defenderMarkerId);
             JFrame frame = map.getFrame();
             battleDice = new BattleDice();
             frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
@@ -1834,7 +1784,6 @@ Log.debug(playerName + " Client.initBoard()");
             focusMap();
         }
     }
-
 
     public synchronized void cleanupBattle()
     {
@@ -1865,7 +1814,7 @@ Log.debug(playerName + " Client.initBoard()");
 
     public void nextEngagement()
     {
-        if (isMyTurn()) 
+        if (isMyTurn())
         {
             if (getOption(Options.autoPickEngagements))
             {
@@ -1887,13 +1836,12 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-
     /** Used for human players only.  */
     void doRecruit(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
-        if (info == null || !info.canRecruit() || !isMyTurn() || 
-            !isMyLegion(markerId))
+        if (info == null || !info.canRecruit() || !isMyTurn() ||
+                !isMyLegion(markerId))
         {
             return;
         }
@@ -1901,10 +1849,10 @@ Log.debug(playerName + " Client.initBoard()");
         String hexLabel = getHexForLegion(markerId);
         java.util.List recruits = findEligibleRecruits(markerId, hexLabel);
         String hexDescription =
-            MasterBoard.getHexByLabel(hexLabel).getDescription();
+                MasterBoard.getHexByLabel(hexLabel).getDescription();
 
         String recruitName = PickRecruit.pickRecruit(board.getFrame(),
-            recruits, hexDescription, markerId, this);
+                recruits, hexDescription, markerId, this);
 
         if (recruitName == null)
         {
@@ -1912,7 +1860,7 @@ Log.debug(playerName + " Client.initBoard()");
         }
 
         String recruiterName = findRecruiterName(hexLabel, markerId,
-            recruitName, hexDescription);
+                recruitName, hexDescription);
         if (recruiterName == null)
         {
             return;
@@ -1928,7 +1876,6 @@ Log.debug(playerName + " Client.initBoard()");
         server.doRecruit(markerId, recruitName, recruiterName);
     }
 
-
     /** Always needs to call server.doRecruit(), even if no recruit is 
      *  wanted, to get past the reinforcing phase. */
     public void doReinforce(String markerId)
@@ -1943,23 +1890,23 @@ Log.debug(playerName + " Client.initBoard()");
 
             java.util.List recruits = findEligibleRecruits(markerId, hexLabel);
             String hexDescription =
-                MasterBoard.getHexByLabel(hexLabel).getDescription();
+                    MasterBoard.getHexByLabel(hexLabel).getDescription();
 
             String recruitName = PickRecruit.pickRecruit(board.getFrame(),
-                recruits, hexDescription, markerId, this);
+                    recruits, hexDescription, markerId, this);
 
             String recruiterName = null;
             if (recruitName != null)
             {
-                recruiterName = findRecruiterName(hexLabel, markerId, 
-                    recruitName, hexDescription);
+                recruiterName = findRecruiterName(hexLabel, markerId,
+                        recruitName, hexDescription);
             }
             doRecruit(markerId, recruitName, recruiterName);
         }
     }
 
     public void didRecruit(String markerId, String recruitName,
-        String recruiterName, int numRecruiters)
+            String recruiterName, int numRecruiters)
     {
         String hexLabel = getHexForLegion(markerId);
         if (hexLabel == null)
@@ -2009,12 +1956,12 @@ Log.debug(playerName + " Client.initBoard()");
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
     private String findRecruiterName(String hexLabel, String markerId, String
-        recruitName, String hexDescription)
+            recruitName, String hexDescription)
     {
         String recruiterName = null;
 
         java.util.List recruiters = findEligibleRecruiters(markerId,
-            recruitName);
+                recruitName);
 
         int numEligibleRecruiters = recruiters.size();
         if (numEligibleRecruiters == 0)
@@ -2023,7 +1970,7 @@ Log.debug(playerName + " Client.initBoard()");
             recruiterName = "none";
         }
         else if (getOption(Options.autoPickRecruiter) ||
-            numEligibleRecruiters == 1)
+                numEligibleRecruiters == 1)
         {
             // If there's only one possible recruiter, or if
             // the user has chosen the autoPickRecruiter option,
@@ -2033,7 +1980,7 @@ Log.debug(playerName + " Client.initBoard()");
         else
         {
             recruiterName = PickRecruiter.pickRecruiter(board.getFrame(),
-                recruiters, hexDescription, markerId, this);
+                    recruiters, hexDescription, markerId, this);
         }
         return recruiterName;
     }
@@ -2074,9 +2021,8 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-
-    public synchronized void setupSplit(String activePlayerName, 
-        int turnNumber)
+    public synchronized void setupSplit(String activePlayerName,
+            int turnNumber)
     {
         clearUndoStack();
         cleanupNegotiationDialogs();
@@ -2173,9 +2119,8 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-
     public synchronized void setupBattleSummon(String battleActivePlayerName,
-        int battleTurnNumber)
+            int battleTurnNumber)
     {
         this.battlePhase = Constants.SUMMON;
         setBattleActivePlayerName(battleActivePlayerName);
@@ -2198,7 +2143,7 @@ Log.debug(playerName + " Client.initBoard()");
     }
 
     public synchronized void setupBattleRecruit(String battleActivePlayerName,
-        int battleTurnNumber)
+            int battleTurnNumber)
     {
         this.battlePhase = Constants.RECRUIT;
         setBattleActivePlayerName(battleActivePlayerName);
@@ -2227,7 +2172,7 @@ Log.debug(playerName + " Client.initBoard()");
     }
 
     public synchronized void setupBattleMove(String battleActivePlayerName,
-        int battleTurnNumber)
+            int battleTurnNumber)
     {
         setBattleActivePlayerName(battleActivePlayerName);
         this.battleTurnNumber = battleTurnNumber;
@@ -2281,10 +2226,9 @@ Log.debug(playerName + " Client.initBoard()");
         ai.retryFailedBattleMoves(bestMoveOrder);
     }
 
-
     /** Used for both strike and strikeback. */
     public synchronized void setupBattleFight(int battlePhase,
-        String battleActivePlayerName)
+            String battleActivePlayerName)
     {
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
@@ -2311,7 +2255,6 @@ Log.debug(playerName + " Client.initBoard()");
         doAutoStrikes();
     }
 
-
     /** Create marker if necessary, and place it in hexLabel. */
     public void tellLegionLocation(String markerId, String hexLabel)
     {
@@ -2321,7 +2264,7 @@ Log.debug(playerName + " Client.initBoard()");
         if (board != null)
         {
             Marker marker = new Marker(3 * Scale.get(), markerId,
-                board.getFrame(), this);
+                    board.getFrame(), this);
             setMarker(markerId, marker);
             info.setMarker(marker);
             board.alignLegions(hexLabel);
@@ -2341,13 +2284,12 @@ Log.debug(playerName + " Client.initBoard()");
             String markerId = info.getMarkerId();
             String hexLabel = info.getHexLabel();
             Marker marker = new Marker(3 * Scale.get(), markerId,
-                board.getFrame(), this);
+                    board.getFrame(), this);
             info.setMarker(marker);
             markers.add(marker);
             board.alignLegions(hexLabel);
         }
     }
-
 
     private void setupPlayerLabel()
     {
@@ -2366,7 +2308,6 @@ Log.debug(playerName + " Client.initBoard()");
     {
         return Player.getShortColor(getColor());
     }
-
 
     String getBattleActivePlayerName()
     {
@@ -2422,7 +2363,7 @@ Log.debug(playerName + " Client.initBoard()");
     String getBattlePhaseName()
     {
         if (phase == Constants.FIGHT && battlePhase >= Constants.SUMMON &&
-            battlePhase <= Constants.STRIKEBACK)
+                battlePhase <= Constants.STRIKEBACK)
         {
             return Constants.getBattlePhaseName(battlePhase);
         }
@@ -2446,16 +2387,14 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-
     void doBattleMove(int tag, String hexLabel)
     {
         server.doBattleMove(tag, hexLabel);
     }
 
-
     /** synchronized to prevent concurrent mod on bestMoveOrder */
-    private synchronized void markBattleMoveSuccessful(int tag, 
-        String endingHexLabel)
+    private synchronized void markBattleMoveSuccessful(int tag,
+            String endingHexLabel)
     {
         if (bestMoveOrder != null)
         {
@@ -2463,8 +2402,8 @@ Log.debug(playerName + " Client.initBoard()");
             while (it.hasNext())
             {
                 CritterMove cm = (CritterMove)it.next();
-                if (tag == cm.getTag() && 
-                    endingHexLabel.equals(cm.getEndingHexLabel()))
+                if (tag == cm.getTag() &&
+                        endingHexLabel.equals(cm.getEndingHexLabel()))
                 {
                     // Remove this CritterMove from the list to show
                     // that it doesn't need to be retried.
@@ -2475,7 +2414,7 @@ Log.debug(playerName + " Client.initBoard()");
     }
 
     public void tellBattleMove(int tag, String startingHexLabel,
-        String endingHexLabel, boolean undo)
+            String endingHexLabel, boolean undo)
     {
         if (isMyCritter(tag) && !undo)
         {
@@ -2516,7 +2455,6 @@ Log.debug(playerName + " Client.initBoard()");
             map.repaint();
         }
     }
-
 
     void undoLastBattleMove()
     {
@@ -2568,8 +2506,8 @@ Log.debug(playerName + " Client.initBoard()");
                 {
                     BattleChit other = getBattleChit(neighbor.getLabel());
                     if (other != null &&
-                        (other.isInverted() != chit.isInverted()) &&
-                        (countDead || !other.isDead()))
+                            (other.isInverted() != chit.isInverted()) &&
+                            (countDead || !other.isDead()))
                     {
                         return true;
                     }
@@ -2583,9 +2521,8 @@ Log.debug(playerName + " Client.initBoard()");
     boolean isActive(BattleChit chit)
     {
         return battleActivePlayerName.equals(getPlayerNameByTag(
-            chit.getTag()));
+                chit.getTag()));
     }
-
 
     /** Return a set of hexLabels. */
     Set findMobileCritterHexes()
@@ -2636,7 +2573,6 @@ Log.debug(playerName + " Client.initBoard()");
     {
         return strike.findStrikes(tag);
     }
-
 
     String getPlayerNameByTag(int tag)
     {
@@ -2692,7 +2628,6 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-
     private String figureTeleportingLord(String moverId, String hexLabel)
     {
         java.util.List lords = listTeleportingLords(moverId, hexLabel);
@@ -2701,6 +2636,7 @@ Log.debug(playerName + " Client.initBoard()");
         {
             case 0:
                 return null;
+
             case 1:
                 lordName = (String)lords.get(0);
                 if (lordName.startsWith(Constants.titan))
@@ -2708,6 +2644,7 @@ Log.debug(playerName + " Client.initBoard()");
                     lordName = Constants.titan;
                 }
                 return lordName;
+
             default:
                 if (getOption(options.autoPickLord))
                 {
@@ -2728,7 +2665,7 @@ Log.debug(playerName + " Client.initBoard()");
     /** List the lords eligible to teleport this legion to hexLabel,
      *  as strings. */
     private java.util.List listTeleportingLords(String moverId,
-        String hexLabel)
+            String hexLabel)
     {
         // Needs to be a List not a Set so that it can be passed as
         // an imageList.
@@ -2755,8 +2692,8 @@ Log.debug(playerName + " Client.initBoard()");
             {
                 String name = (String)it.next();
                 Creature creature = Creature.getCreatureByName(name);
-                if (creature != null && creature.isLord() && 
-                    !lords.contains(name))
+                if (creature != null && creature.isLord() &&
+                        !lords.contains(name))
                 {
                     if (creature.isTitan())
                     {
@@ -2772,7 +2709,6 @@ Log.debug(playerName + " Client.initBoard()");
         return lords;
     }
 
-   
     boolean doMove(String hexLabel)
     {
         return doMove(moverId, hexLabel);
@@ -2817,7 +2753,7 @@ Log.debug(playerName + " Client.initBoard()");
         else
         {
             entrySide = PickEntrySide.pickEntrySide(board.getFrame(),
-                hexLabel, entrySides);
+                    hexLabel, entrySides);
         }
 
         if (!goodEntrySide(entrySide))
@@ -2838,12 +2774,12 @@ Log.debug(playerName + " Client.initBoard()");
     private boolean goodEntrySide(String entrySide)
     {
         return (entrySide != null && (entrySide.equals(Constants.left) ||
-            entrySide.equals(Constants.bottom) ||
-            entrySide.equals(Constants.right)));
+                entrySide.equals(Constants.bottom) ||
+                entrySide.equals(Constants.right)));
     }
 
     public void didMove(String markerId, String startingHexLabel,
-        String currentHexLabel, String entrySide, boolean teleport)
+            String currentHexLabel, String entrySide, boolean teleport)
     {
         removeRecruitChit(startingHexLabel);
         if (isMyLegion(markerId))
@@ -2853,7 +2789,7 @@ Log.debug(playerName + " Client.initBoard()");
         getLegionInfo(markerId).setHexLabel(currentHexLabel);
         getLegionInfo(markerId).setMoved(true);
         getLegionInfo(markerId).setEntrySide(
-            BattleMap.entrySideNum(entrySide));
+                BattleMap.entrySideNum(entrySide));
         if (teleport)
         {
             getLegionInfo(markerId).setTeleported(true);
@@ -2873,7 +2809,7 @@ Log.debug(playerName + " Client.initBoard()");
     }
 
     public void undidMove(String markerId, String formerHexLabel,
-        String currentHexLabel)
+            String currentHexLabel)
     {
         removeRecruitChit(formerHexLabel);
         removeRecruitChit(currentHexLabel);
@@ -2909,9 +2845,9 @@ Log.debug(playerName + " Client.initBoard()");
         String terrain = hex.getTerrain();
 
         java.util.List tempRecruits =
-            TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
+                TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
         java.util.List recruiters =
-            TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
+                TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
 
         Iterator lit = tempRecruits.iterator();
         while (lit.hasNext())
@@ -2922,8 +2858,10 @@ Log.debug(playerName + " Client.initBoard()");
             {
                 Creature lesser = (Creature)liter.next();
                 if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser,
-                    creature, terrain, hexLabel) <= info.numCreature(lesser)) 
-                    && (recruits.indexOf(creature) == -1))
+                                creature, terrain, hexLabel) <=
+                                info.numCreature(lesser))
+                        &&
+                        (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
                 }
@@ -2959,14 +2897,14 @@ Log.debug(playerName + " Client.initBoard()");
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         String terrain = hex.getTerrain();
 
-        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain, 
-            hexLabel);
+        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain,
+                hexLabel);
         Iterator it = recruiters.iterator();
         while (it.hasNext())
         {
             Creature possibleRecruiter = (Creature)it.next();
             int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                possibleRecruiter, recruit, terrain, hexLabel);
+                    possibleRecruiter, recruit, terrain, hexLabel);
             if (needed < 1 || needed > info.numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.
@@ -2984,7 +2922,6 @@ Log.debug(playerName + " Client.initBoard()");
         return strings;
     }
 
-
     /** Return a set of hexLabels. */
     Set getPossibleRecruitHexes()
     {
@@ -2995,14 +2932,13 @@ Log.debug(playerName + " Client.initBoard()");
         {
             LegionInfo info = (LegionInfo)it.next();
             if (activePlayerName.equals(info.getPlayerName()) &&
-                info.canRecruit())
+                    info.canRecruit())
             {
                 set.add(info.getHexLabel());
             }
         }
         return set;
     }
-
 
     /** Return a set of hexLabels for all other unengaged legions of
      *  markerId's player that have summonables.
@@ -3055,11 +2991,10 @@ Log.debug(playerName + " Client.initBoard()");
     }
 
     Set listPossibleEntrySides(String moverId, String hexLabel,
-        boolean teleport)
+            boolean teleport)
     {
         return movement.listPossibleEntrySides(moverId, hexLabel, teleport);
     }
-
 
     int getCreatureCount(String creatureName)
     {
@@ -3101,7 +3036,7 @@ Log.debug(playerName + " Client.initBoard()");
             Map.Entry entry = (Map.Entry)it.next();
             LegionInfo info = (LegionInfo)entry.getValue();
             if (info != null && info.getHexLabel() != null &&
-                hexLabel != null && hexLabel.equals(info.getHexLabel()))
+                    hexLabel != null && hexLabel.equals(info.getHexLabel()))
             {
                 markerIds.add(info.getMarkerId());
             }
@@ -3134,8 +3069,8 @@ Log.debug(playerName + " Client.initBoard()");
         while (it.hasNext())
         {
             LegionInfo info = (LegionInfo)it.next();
-            if (!info.hasMoved() && 
-                getActivePlayerName().equals(info.getPlayerName()))
+            if (!info.hasMoved() &&
+                    getActivePlayerName().equals(info.getPlayerName()))
             {
                 set.add(info.getHexLabel());
             }
@@ -3156,7 +3091,7 @@ Log.debug(playerName + " Client.initBoard()");
             Map.Entry entry = (Map.Entry)it.next();
             LegionInfo info = (LegionInfo)entry.getValue();
             if (info.getHeight() >= 7 &&
-                activePlayerName.equals(info.getPlayerName()))
+                    activePlayerName.equals(info.getPlayerName()))
             {
                 set.add(info.getHexLabel());
             }
@@ -3257,7 +3192,6 @@ Log.debug(playerName + " Client.initBoard()");
         return (String)markerIds.get(0);
     }
 
-
     int getNumEnemyLegions(String hexLabel, String pName)
     {
         return getEnemyLegions(hexLabel, pName).size();
@@ -3310,7 +3244,6 @@ Log.debug(playerName + " Client.initBoard()");
         return getFriendlyLegions(hexLabel, pName).size();
     }
 
-
     void newGame()
     {
         clearUndoStack();
@@ -3323,12 +3256,10 @@ Log.debug(playerName + " Client.initBoard()");
         server.loadGame(filename);
     }
 
-
     void saveGame(String filename)
     {
         server.saveGame(filename);
     }
-
 
     void undoLastSplit()
     {
@@ -3352,7 +3283,7 @@ Log.debug(playerName + " Client.initBoard()");
     }
 
     public synchronized void undidSplit(String splitoffId, String survivorId,
-        int turn)
+            int turn)
     {
         LegionInfo info = getLegionInfo(survivorId);
         info.merge(splitoffId, turn);
@@ -3397,7 +3328,6 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-
     synchronized void doneWithSplits()
     {
         if (!isMyTurn())
@@ -3439,7 +3369,6 @@ Log.debug(playerName + " Client.initBoard()");
         aiPause();
         server.doneWithRecruits();
     }
-
 
     String getPlayerNameByMarkerId(String markerId)
     {
@@ -3492,7 +3421,6 @@ Log.debug(playerName + " Client.initBoard()");
         return info.getColor();
     }
 
-
     boolean isMyLegion(String markerId)
     {
         return (playerName.equals(getPlayerNameByMarkerId(markerId)));
@@ -3518,7 +3446,6 @@ Log.debug(playerName + " Client.initBoard()");
         PlayerInfo info = getPlayerInfo(playerName);
         return info.getMulligansLeft();
     }
-
 
     synchronized void doSplit(String parentId)
     {
@@ -3563,7 +3490,7 @@ Log.debug(playerName + " Client.initBoard()");
         else
         {
             new PickMarker(board.getFrame(), playerName, markersAvailable,
-                this);
+                    this);
         }
     }
 
@@ -3594,8 +3521,8 @@ Log.debug(playerName + " Client.initBoard()");
     }
 
     /** Callback from server after any successful split. */
-    public synchronized void didSplit(String hexLabel, String parentId, 
-        String childId, int childHeight, java.util.List splitoffs, int turn)
+    public synchronized void didSplit(String hexLabel, String parentId,
+            String childId, int childHeight, java.util.List splitoffs, int turn)
     {
         LegionInfo childInfo = getLegionInfo(childId);
         childInfo.setHexLabel(hexLabel);
@@ -3618,7 +3545,6 @@ Log.debug(playerName + " Client.initBoard()");
             board.highlightTallLegions();
         }
     }
-
 
     public void askPickColor(java.util.List colorsLeft)
     {
@@ -3643,7 +3569,7 @@ Log.debug(playerName + " Client.initBoard()");
             do
             {
                 color = PickColor.pickColor(board.getFrame(), playerName,
-                    colorsLeft);
+                        colorsLeft);
             }
             while (color == null);
         }
@@ -3664,7 +3590,7 @@ Log.debug(playerName + " Client.initBoard()");
         else
         {
             new PickMarker(board.getFrame(), playerName, markersAvailable,
-                this);
+                    this);
         }
     }
 
@@ -3679,16 +3605,18 @@ Log.debug(playerName + " Client.initBoard()");
         {
             UIManager.setLookAndFeel(lfName);
             UIManager.LookAndFeelInfo[] lfInfo =
-                UIManager.getInstalledLookAndFeels();
+                    UIManager.getInstalledLookAndFeels();
             boolean exist = false;
-            for (int i = 0; i < lfInfo.length ; i++)
+            for (int i = 0; i < lfInfo.length; i++)
             {
                 exist = exist || lfInfo[i].getClassName().equals(lfName);
             }
             if (!exist)
+            {
                 UIManager.installLookAndFeel(
-                    new UIManager.LookAndFeelInfo(
+                        new UIManager.LookAndFeelInfo(
                         UIManager.getLookAndFeel().getName(), lfName));
+            }
             updateEverything();
             Log.debug("Switched to Look & Feel: " + lfName);
             setOption(Options.favoriteLookFeel, lfName);
@@ -3727,14 +3655,14 @@ Log.debug(playerName + " Client.initBoard()");
 
     public static String getVersion()
     {
-        byte [] bytes = new byte[8];  // length of an ISO date
+        byte[] bytes = new byte[8];  // length of an ISO date
         String version = "unknown";
         try
         {
             ClassLoader cl = Client.class.getClassLoader();
             InputStream is = cl.getResourceAsStream("version");
             is.read(bytes);
-            version = new String(bytes, 0, bytes.length); 
+            version = new String(bytes, 0, bytes.length);
         }
         catch (Exception ex)
         {
@@ -3742,7 +3670,6 @@ Log.debug(playerName + " Client.initBoard()");
         }
         return version;
     }
-
 
     boolean testBattleMove(BattleChit chit, String hexLabel)
     {
@@ -3771,21 +3698,21 @@ Log.debug(playerName + " Client.initBoard()");
             if (!(ai.getClass().getName().equals(type)))
             {
                 Log.event("Changing client " + playerName + " from " +
-                    ai.getClass().getName() + " to " + type);
-                try 
+                        ai.getClass().getName() + " to " + type);
+                try
                 {
-                    Class [] classArray = new Class[1];
+                    Class[] classArray = new Class[1];
                     classArray[0] = Class.forName(
-                        "net.sf.colossus.client.Client");
-                    Object [] objArray = new Object[1];
+                            "net.sf.colossus.client.Client");
+                    Object[] objArray = new Object[1];
                     objArray[0] = this;
                     ai = (AI)Class.forName(type).getDeclaredConstructor(
-                        classArray).newInstance(objArray);
-                } 
+                            classArray).newInstance(objArray);
+                }
                 catch (Exception ex)
                 {
                     Log.error("Failed to change client " + playerName +
-                        " from " + ai.getClass().getName() + " to " + type);
+                            " from " + ai.getClass().getName() + " to " + type);
                     ex.printStackTrace();
                 }
             }
@@ -3813,7 +3740,7 @@ Log.debug(playerName + " Client.initBoard()");
     private void setupDelay()
     {
         delay = getIntOption(Options.aiDelay);
-        if (!getOption(Options.autoPlay) || delay < Constants.MIN_AI_DELAY) 
+        if (!getOption(Options.autoPlay) || delay < Constants.MIN_AI_DELAY)
         {
             delay = Constants.MIN_AI_DELAY;
         }
@@ -3831,12 +3758,13 @@ Log.debug(playerName + " Client.initBoard()");
             disposeStatusScreen();
             updateStatusScreen();
             if (caretakerDisplay != null)
+            {
                 caretakerDisplay.dispose();
+            }
             caretakerDisplay = null;
             updateCreatureCountDisplay();
         }
     }
-
 
     private void focusMap()
     {
@@ -3854,9 +3782,8 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-
     private void initPredictSplits(String pName, String rootMarkerId,
-        java.util.List creatureNames)
+            java.util.List creatureNames)
     {
         if (predictSplits == null)
         {
@@ -3864,7 +3791,7 @@ Log.debug(playerName + " Client.initBoard()");
         }
         int playerNum = getPlayerNum(pName);
         predictSplits[playerNum] = new PredictSplits(pName, rootMarkerId,
-            creatureNames);
+                creatureNames);
     }
 
     PredictSplits getPredictSplits(String pName)
@@ -3878,7 +3805,6 @@ Log.debug(playerName + " Client.initBoard()");
             return null;
         }
     }
-
 
     class MarkerComparator implements Comparator
     {
@@ -3907,6 +3833,7 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
+
     /** Timer-based callback for battle moves. */
     class FinishAIBattleMove extends TimerTask
     {
@@ -3916,6 +3843,7 @@ Log.debug(playerName + " Client.initBoard()");
             doneWithBattleMoves();
         }
     }
+
 
     /** Timer-based callback for ending split phase. */
     class FinishSplits extends TimerTask
