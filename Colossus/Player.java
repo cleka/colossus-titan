@@ -341,6 +341,9 @@ class Player
             lastLegionRecruited.undoRecruit();
             lastLegionRecruited = null;
         }
+
+        // Update number of creatures in status window. 
+        game.updateStatusScreen();
     }
 
 
@@ -362,6 +365,9 @@ class Player
         {
             legions[i].undoRecruit();
         }
+        
+        // Update number of creatures in status window. 
+        game.updateStatusScreen();
     }
 
 
@@ -411,6 +417,17 @@ class Player
             }
         }
         return height;
+    }
+    
+    
+    public int getNumCreatures()
+    {
+        int total = 0;
+        for (int i = 0; i < numLegions; i++)
+        {
+            total += legions[i].getHeight();
+        }
+        return total;
     }
 
 
