@@ -530,7 +530,7 @@ class MasterBoard extends JFrame implements MouseListener,
         for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion legion = player.getLegion(i);
-            if (legion.canRecruit())
+            if (legion.hasMoved() && legion.canRecruit())
             {
                 Creature [] recruits = new Creature[5];
                 if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
@@ -1266,7 +1266,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                     break;
 
                                 case Game.MUSTER:
-                                    if (legion.canRecruit())
+                                    if (legion.hasMoved() && legion.canRecruit())
                                     {
                                         new PickRecruit(this, legion);
                                     }
