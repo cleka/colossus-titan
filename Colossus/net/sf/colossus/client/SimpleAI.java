@@ -2656,20 +2656,6 @@ Log.debug("Best target is null, aborting");
         {
             ArrayList order = (ArrayList)it.next();
 
-            // On turn 1, all moving critters of the same creature type are
-            // identical (since all come from the same entrance and none
-            // are wounded), so we should be able to skip testing any
-            // permutations that are effectively identical.
-
-            // TODO Generate and save all permutations, then sort, so that
-            // we can eliminate all duplicates, not just consecutive ones.
-
-            if (turn == 1 && creatureNames(order).equals(creatureNames(
-                lastOrder)))
-            {
-                continue;
-            }
-
             count++;
 
             int score = testMoveOrder(order);
