@@ -20,8 +20,6 @@ public class MasterBoard extends Frame implements MouseListener,
     // For easy of mapping to the GUI, they'll be stored
     // in a 15x8 array, with some empty elements.
 
-    public static final double SQRT3 = Math.sqrt(3.0);
-
     private static MasterHex[][] h = new MasterHex[15][8];
 
     final static private boolean[][] show =
@@ -49,7 +47,7 @@ public class MasterBoard extends Frame implements MouseListener,
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private static int scale;
-    static Game game;
+    private static Game game;
 
 
     public MasterBoard(Game game)
@@ -79,7 +77,7 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 PickMarker pickmarker = new PickMarker(this, game.player[i]);
             }
-            while (game.player[i].markerSelected == null);
+            while (game.player[i].getSelectedMarker() == null);
             // Update status window to reflect marker taken.
             game.updateStatusScreen();
         }
@@ -88,17 +86,18 @@ public class MasterBoard extends Frame implements MouseListener,
         // Place initial legions.
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            // Lookup coords for chit starting from player[i].startingTower
-            Point point = getHexFromLabel(100 * game.player[i].startingTower).
-                getOffCenter();
+            // Lookup coords for chit starting from player[i].getTower()
+            MasterHex hex = getHexFromLabel(100 * game.player[i].getTower());
 
-            game.player[i].legions[0] = new Legion(point.x - 2 * scale, 
-                point.y - 2 * scale, 3 * scale, game.player[i].markerSelected, 
-                null, this, 8, 100 * game.player[i].startingTower, Creature.titan, 
-                Creature.angel, Creature.ogre, Creature.ogre, Creature.centaur, 
-                Creature.centaur, Creature.gargoyle, Creature.gargoyle);
+            Legion legion = new Legion(0, 0, 3 * scale, 
+                game.player[i].getSelectedMarker(), null, this, 8, 
+                100 * game.player[i].getTower(), Creature.titan, 
+                Creature.angel, Creature.ogre, Creature.ogre, 
+                Creature.centaur, Creature.centaur, Creature.gargoyle, 
+                Creature.gargoyle, game.player[i]);
 
-            game.player[i].numLegions = 1;
+            game.player[i].addLegion(legion);
+            hex.addLegion(legion);
         }
 
         // Update status window to reflect new legions.
@@ -168,27 +167,19 @@ public class MasterBoard extends Frame implements MouseListener,
     // Recursively find conventional moves from this hex.  Select
     //    all legal final destinations.  If block >= 0, go only
     //    that way.  If block == -1, use arches and arrows.  If
-    //    block == -2, use only arrows.
+    //    block == -2, use only arrows.  Do not double back in
+    //    the direction you just came from.
     void findMoves(MasterHex hex, Player player, Legion legion, 
-        int roll, int block)
+        int roll, int block, int cameFrom)
     {
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        if (hex.getNumEnemyLegions(player) > 0)
         {
-            if (game.player[i] != player)
-            {
-                for (int j = 0; j < game.player[i].getNumLegions(); j++)
-                {
-                    if (game.player[i].legions[j].getCurrentHex() == hex.label)
-                    {
-                        // XXX Mark an engagement.
+            // XXX Mark an engagement.
 
-                        hex.selected = true;
-                        return;
-                    }
-                }
-            }
+            hex.selected = true;
+            return;
         }
 
         if (roll == 0)
@@ -211,15 +202,17 @@ public class MasterBoard extends Frame implements MouseListener,
 
         if (block >= 0)
         {
-            findMoves(hex.neighbor[block], player, legion, roll - 1, -2);
+            findMoves(hex.neighbor[block], player, legion, roll - 1, -2,
+                (block + 3) % 6);
         }
         else if (block == -1)
         {
             for (int i = 0; i < 6; i++)
             {
-                if (hex.exitType[i] >= MasterHex.ARCH)
+                if (hex.exitType[i] >= MasterHex.ARCH && i != cameFrom)
                 {
-                    findMoves(hex.neighbor[i], player, legion, roll - 1, -2);
+                    findMoves(hex.neighbor[i], player, legion, roll - 1, -2,
+                        (i + 3) % 6);
                 }
             }
         }
@@ -227,9 +220,10 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             for (int i = 0; i < 6; i++)
             {
-                if (hex.exitType[i] >= MasterHex.ARROW)
+                if (hex.exitType[i] >= MasterHex.ARROW && i != cameFrom)
                 {
-                    findMoves(hex.neighbor[i], player, legion, roll - 1, -2);
+                    findMoves(hex.neighbor[i], player, legion, roll - 1, -2,
+                        (i + 3) % 6);
                 }
             }
         }
@@ -238,25 +232,14 @@ public class MasterBoard extends Frame implements MouseListener,
     
     // Recursively find tower teleport moves from this hex.  That's
     // all unoccupied towers except this one, plus all unoccupied
-    // hexes within 6 hexes. 
+    // hexes within 6 hexes.  Do not double back.
     void findTowerTeleportMoves(MasterHex hex, Player player, Legion legion,
-        int roll)
+        int roll, int cameFrom)
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
 
-        boolean occupied = false;
-        for (int i = 0; i < game.getNumPlayers(); i++)
-        {
-            for (int j = 0; j < game.player[i].getNumLegions(); j++)
-            {
-                if (game.player[i].legions[j].getCurrentHex() == hex.label)
-                {
-                    occupied = true;
-                }
-            }
-        }
-        if (occupied == false)
+        if (hex.getNumLegions() == 0)
         {
             hex.selected = true;
         }
@@ -265,11 +248,11 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             for (int i = 0; i < 6; i++)
             {
-                if (hex.exitType[i] != MasterHex.NONE ||
-                    hex.entranceType[i] != MasterHex.NONE)
+                if ((hex.exitType[i] != MasterHex.NONE ||
+                   hex.entranceType[i] != MasterHex.NONE) && (i != cameFrom))
                 {
                     findTowerTeleportMoves(hex.neighbor[i], player, legion, 
-                        roll - 1);
+                        roll - 1, (i + 3) % 6);
                 }
             }
         }
@@ -280,7 +263,7 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         unselectAllHexes();
 
-        if (legion.moved)
+        if (legion.hasMoved())
         {
             return;
         }
@@ -300,9 +283,9 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 
-        findMoves(hex, player, legion, player.movementRoll, block);
+        findMoves(hex, player, legion, player.getMovementRoll(), block, -1);
 
-        if (player.movementRoll == 6)
+        if (player.getMovementRoll() == 6)
         {
             // Tower teleport
             if (hex.terrain == 'T' && (legion.numCreature(Creature.titan) > 0 ||
@@ -310,7 +293,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 legion.numCreature(Creature.archangel) > 0))
             {
                 // Mark every unoccupied hex within 6 hexes.
-                findTowerTeleportMoves(hex, player, legion, 6);
+                findTowerTeleportMoves(hex, player, legion, 6, -1);
 
                 // Mark every unoccupied tower.
                 for (int tower = 100; tower <= 600; tower += 100)
@@ -364,7 +347,7 @@ public class MasterBoard extends Frame implements MouseListener,
                         (cx + 4 * i * scale,
                         (int) Math.round(cy + (3 * j + (i & 1) *
                         (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 * ((j + 1) / 2))
-                        * SQRT3 * scale), scale, ((i + j) & 1) == 0);
+                        * MasterHex.SQRT3 * scale), scale, ((i + j) & 1) == 0);
                 }
             }
         }
@@ -959,9 +942,11 @@ public class MasterBoard extends Frame implements MouseListener,
 
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            for (int j = 0; j < game.player[i].getNumLegions(); j++)
+            Player player = game.player[i];
+            for (int j = 0; j < player.getNumLegions(); j++)
             {
-                if (game.player[i].legions[j].chit.select(point))
+                Legion legion = player.legions[j];
+                if (legion.chit.select(point))
                 {
                     // What to do depends on which mouse button was used
                     // and the current phase of the turn.
@@ -972,8 +957,8 @@ public class MasterBoard extends Frame implements MouseListener,
                         InputEvent.BUTTON2_MASK) || ((e.getModifiers() & 
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
-                        ShowLegion showlegion = new ShowLegion(this, 
-                            game.player[i].legions[j], point);
+                        ShowLegion showlegion = new ShowLegion(this, legion, 
+                            point);
                         return;
                     }
                     else
@@ -981,36 +966,42 @@ public class MasterBoard extends Frame implements MouseListener,
                         // Only the current player can manipulate his legions.
                         if (i == game.getActivePlayerNum())
                         {
-                            if (game.phase == game.SPLIT)
+                            switch(game.getPhase())
                             {
-                                SplitLegion splitlegion = new SplitLegion(this, 
-                                    game.player[i].legions[j], game.player[i]);
-                                // Update status window to reflect marker taken.
-                                game.updateStatusScreen();
-                                repaint();
-                                return;
-                            }
+                                case Game.SPLIT:
+                                    // Don't allow extra splits in turn 1.
+                                    if (game.getTurnNumber() == 1 &&
+                                        player.getNumLegions() > 1)
+                                    {
+                                        return;
+                                    }
+                                    SplitLegion splitlegion = new 
+                                        SplitLegion(this, legion, player);
+                                    // Update status window.
+                                    game.updateStatusScreen();
+                                    repaint();
+                                    return;
 
-                            else if (game.phase == game.MOVE)
-                            {
-                                // Mark this legion as active.
-                                game.player[i].selectedLegion = j; 
+                                case Game.MOVE:
+                                    // Mark this legion as active.
+                                    player.selectLegion(j);
 
-                                // Find all legal destinations for this legion 
-                                // and highlight them.
-                                showMoves(game.player[i].legions[j], 
-                                    game.player[i]);
-                                return;
-                            }
+                                    // Find all legal destinations for this 
+                                    // legion and highlight them.
+                                    showMoves(legion, player);
+                                    return;
 
-                            else if (game.phase == game.FIGHT)
-                            {
-                                return;
-                            }
+                                case Game.FIGHT:
+                                    return;
 
-                            else if (game.phase == game.MUSTER)
-                            {
-                                return;
+                                case Game.MUSTER:
+                                    if (legion.getHeight() < 7 && 
+                                        legion.hasMoved())
+                                    {
+                                        PickRecruit pickrecruit = new 
+                                            PickRecruit(this, legion);
+                                    }
+                                    return;
                             }
                         }
                     }
@@ -1027,33 +1018,34 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 if (show[i][j] && h[i][j].contains(point))
                 {
-                    // If we're moving, and have selected a legion which has
-                    // not yet moved, and this hex is a legal destination, 
-                    // move the legion here.
-                    if (game.phase == game.MOVE)
+                    switch(game.getPhase())
                     {
-                        if (player.selectedLegion != -1 && h[i][j].selected 
-                            == true) 
-                        {
-                            Legion legion = player.legions[
-                                player.selectedLegion];
-                            legion.moveToHex(h[i][j]);
-                            unselectAllHexes();
-                            // XXX Repaint only affected hexes and chits?
-                            repaint();
-                        }
-                    }
+                        // If we're moving, and have selected a legion which 
+                        // has not yet moved, and this hex is a legal 
+                        // destination, move the legion here.
+                        case Game.MOVE:
+                            Legion legion = player.getSelectedLegion();
+                            if (legion != null && h[i][j].selected == true)
+                            {
+                                legion.moveToHex(h[i][j]);
+                                unselectAllHexes();
+                                // XXX Repaint only affected hexes and chits?
+                                repaint();
+                            }
+                            break;
 
-                    // If we're fighting and there is an engagement here,
-                    // resolve it.
-                    else if (game.phase == game.FIGHT)
-                    {
-                    }
+                        // If we're fighting and there is an engagement here,
+                        // resolve it.
+                        case Game.FIGHT:
+                            break;
 
-                    // If we're mustering and there is a legion here that is
-                    // eligible to muster a recruit, do so. 
-                    else if (game.phase == game.MUSTER)
-                    {
+                        // If we're mustering and there is a legion here that 
+                        // is eligible to muster a recruit, do so. 
+                        case Game.MUSTER:
+                            break;
+
+                        default:
+                            break;
                     }
 
                     Rectangle clip = new Rectangle(h[i][j].getBounds());
