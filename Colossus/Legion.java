@@ -21,6 +21,7 @@ class Legion
     private boolean recruited = false;
     private boolean summoned = false;
     private Player player;
+    private int battleTally = 0;
 
 
     Legion(int cx, int cy, int scale, String markerId, Legion splitFrom,
@@ -123,6 +124,25 @@ class Legion
                 }
             }
         }
+    }
+
+
+    public void clearBattleTally()
+    {
+        battleTally = 0;
+    }
+
+
+    public void addToBattleTally(int points)
+    {
+        battleTally += points;
+    }
+
+
+    public void addBattleTallyToPoints()
+    {
+        addPoints(battleTally);
+        clearBattleTally();
     }
 
 
