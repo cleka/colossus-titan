@@ -10,7 +10,7 @@ import javax.swing.*;
  */
 
 
-public class PickMarker extends JDialog implements MouseListener, 
+public final class PickMarker extends JDialog implements MouseListener,
     WindowListener
 {
     private ArrayList markers = new ArrayList();
@@ -18,7 +18,7 @@ public class PickMarker extends JDialog implements MouseListener,
     private static String markerId;
 
 
-    private PickMarker(JFrame parentFrame, String name, 
+    private PickMarker(JFrame parentFrame, String name,
         Collection markerIds)
     {
         super(parentFrame, name + ": Pick Legion Marker", true);
@@ -47,7 +47,7 @@ public class PickMarker extends JDialog implements MouseListener,
         }
 
         pack();
-        
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
@@ -58,7 +58,7 @@ public class PickMarker extends JDialog implements MouseListener,
 
     /** Return the chosen marker id, or null if none are available or
      *  the player aborts the selection. */
-    public static String pickMarker(JFrame parentFrame, String name, 
+    public static String pickMarker(JFrame parentFrame, String name,
         Collection markerIds)
     {
         if (markerIds.isEmpty())

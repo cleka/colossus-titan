@@ -10,7 +10,7 @@ import java.util.*;
  */
 
 
-public class AcquireAngel extends JDialog implements MouseListener,
+public final class AcquireAngel extends JDialog implements MouseListener,
     WindowListener
 {
     private ArrayList chits = new ArrayList();
@@ -48,7 +48,7 @@ public class AcquireAngel extends JDialog implements MouseListener,
         }
 
         pack();
-        
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));

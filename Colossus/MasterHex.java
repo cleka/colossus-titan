@@ -8,7 +8,7 @@ import java.awt.geom.*;
  * @author David Ripton
  */
 
-public class MasterHex extends Hex
+public final class MasterHex extends Hex
 {
     private boolean inverted;
     private ArrayList legions = new ArrayList(3);
@@ -122,11 +122,11 @@ public class MasterHex extends Hex
         g2.fill(hexagon);
         g2.setColor(Color.black);
         g2.draw(hexagon);
-        
+
         // Draw exits and entrances
         for (int i = inverted ? 0 : 1; i < 6; i += 2)
         {
-            int n = (i + 1) % 6;
+            int n = nextHexsideNum(i);
 
             // Draw exits
             // There are up to 3 gates to draw.  Each is 1/6 of a hexside
@@ -153,7 +153,7 @@ public class MasterHex extends Hex
                                 entranceType[i]);
             }
         }
-            
+
         // Do not anti-alias text.
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_OFF);

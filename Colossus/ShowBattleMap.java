@@ -9,7 +9,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class ShowBattleMap extends HexMap implements WindowListener,
+public final class ShowBattleMap extends HexMap implements WindowListener,
     MouseListener
 {
     private JDialog dialog;

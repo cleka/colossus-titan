@@ -6,7 +6,7 @@ import java.awt.*;
  *  @author David Ripton
  */
 
-public class HTMLColor
+public final class HTMLColor
 {
     // Colors defined in the standard.
     public static final Color aliceBlue = new Color(240, 248, 255);

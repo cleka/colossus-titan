@@ -6,7 +6,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class Player implements Comparable
+public final class Player implements Comparable
 {
     private Game game;
     private String name;
@@ -235,8 +235,8 @@ public class Player implements Comparable
     {
         return (Legion)legions.get(i);
     }
-    
-    
+
+
     public Legion getLegionByMarkerId(String markerId)
     {
         Iterator it = legions.iterator();
@@ -328,8 +328,8 @@ public class Player implements Comparable
     {
         return movementRoll;
     }
-    
-    
+
+
     public void setMovementRoll(int movementRoll)
     {
         this.movementRoll = movementRoll;
@@ -593,8 +593,8 @@ public class Player implements Comparable
     {
         return donor;
     }
-    
-    
+
+
     public void setMover(Legion mover)
     {
         this.mover = mover;

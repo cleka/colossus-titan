@@ -32,8 +32,8 @@ Linux, Solaris, jdk1.3: Dialogs sometimes beep for no good reason.
    to be the main culprits.  Also AcquireAngel.  Doesn't seem to happen
    in Win98.
 
-Serpent has 2 targets, angel and archangel, both up cliff hexsides
-   with same penalty.  Was not allowed to carry.  Check rules.
+Serpent has 2 targets, angel and archangel, both up dune hexsides
+   with same penalty.  Was not allowed to carry.  Should have been.
 
 Post-battle angel summoning is broken.  Donor hexes are selected, but
    clicking on them brings up a SummonAngel dialog with both angel

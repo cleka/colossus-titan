@@ -6,12 +6,12 @@ import java.awt.*;
  * @author David Ripton
  */
 
-public class Marker extends Chit
+public final class Marker extends Chit
 {
     private Legion legion;
     private static Font font;
     private static Font oldFont;
-    private static int fontHeight; 
+    private static int fontHeight;
     private static int fontWidth;
 
 
@@ -27,8 +27,8 @@ public class Marker extends Chit
     {
         this.legion = legion;
     }
-    
-    
+
+
     public Legion getLegion()
     {
         return legion;

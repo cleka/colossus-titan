@@ -9,7 +9,7 @@ import javax.swing.*;
  */
 
 
-public class MovementDie extends JFrame implements WindowListener
+public final class MovementDie extends JFrame implements WindowListener
 {
     private Game game;
     private static final int scale = 60;

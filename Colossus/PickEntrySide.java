@@ -10,7 +10,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class PickEntrySide extends HexMap implements ActionListener,
+public final class PickEntrySide extends HexMap implements ActionListener,
     WindowListener
 {
     private static JButton button5;  // left

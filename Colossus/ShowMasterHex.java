@@ -9,7 +9,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class ShowMasterHex extends JDialog implements MouseListener,
+public final class ShowMasterHex extends JDialog implements MouseListener,
     WindowListener
 {
     private static final int scale = 60;
@@ -53,11 +53,11 @@ public class ShowMasterHex extends JDialog implements MouseListener,
         Container contentPane = getContentPane();
 
         contentPane.setLayout(new GridLayout(0, 3));
-        
+
         char terrain = hex.getTerrain();
         ArrayList creatures = Game.getPossibleRecruits(terrain);
         Iterator it = creatures.iterator();
-        boolean firstTime = true; 
+        boolean firstTime = true;
         Creature prevCreature = Creature.titan;
         while (it.hasNext())
         {
@@ -89,7 +89,7 @@ public class ShowMasterHex extends JDialog implements MouseListener,
             numToRecruitLabel.addMouseListener(this);
 
             int count = creature.getCount();
-            JLabel countLabel = new JLabel(Integer.toString(count), 
+            JLabel countLabel = new JLabel(Integer.toString(count),
                 JLabel.CENTER);
             contentPane.add(countLabel);
             countLabel.addMouseListener(this);
@@ -98,7 +98,7 @@ public class ShowMasterHex extends JDialog implements MouseListener,
         }
 
         pack();
-        
+
         addMouseListener(this);
 
         setVisible(true);

@@ -8,7 +8,7 @@ import java.awt.geom.*;
  * @author David Ripton
  */
 
-public class BattleHex extends Hex
+public final class BattleHex extends Hex
 {
     private HexMap map;
 
@@ -120,7 +120,7 @@ public class BattleHex extends Hex
             int n;
             if (hexside != ' ')
             {
-                n = (i + 1) % 6;
+                n = nextHexsideNum(i);
                 drawHexside(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
                     hexside);
             }
@@ -129,13 +129,13 @@ public class BattleHex extends Hex
             hexside = getOppositeHexside(i);
             if (hexside != ' ')
             {
-                n = (i + 1) % 6;
+                n = nextHexsideNum(i);
                 drawHexside(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
                     hexside);
             }
         }
-        
-        // Do not anti-alias text. 
+
+        // Do not anti-alias text.
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_OFF);
         if (name == null)
@@ -479,7 +479,7 @@ public class BattleHex extends Hex
     }
 
 
-    // Return the flip side of hexside i.
+    /** Return the flip side of hexside i. */
     public char getOppositeHexside(int i)
     {
         char hexside = ' ';
@@ -487,7 +487,7 @@ public class BattleHex extends Hex
         BattleHex neighbor = getNeighbor(i);
         if (neighbor != null)
         {
-            hexside = neighbor.getHexside((i + 3) % 6);
+            hexside = neighbor.getHexside(oppositeHexsideNum(i));
         }
 
         return hexside;
@@ -546,10 +546,23 @@ public class BattleHex extends Hex
     }
 
 
-    // Return the number of movement points it costs to enter this hex.
-    // For fliers, this is the cost to land in this hex, not fly over it.
-    // If entry is illegal, just return a cost greater than the maximum
-    // possible number of movement points.
+    public boolean hasWall()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (hexsides[i] == 'w')
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /** Return the number of movement points it costs to enter this hex.
+     *  For fliers, this is the cost to land in this hex, not fly over it.
+     *  If entry is illegal, just return a cost greater than the maximum
+     *  possible number of movement points. */
     public int getEntryCost(Creature creature, int cameFrom)
     {
         char terrain = getTerrain();

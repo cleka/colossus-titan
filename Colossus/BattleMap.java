@@ -9,15 +9,14 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class BattleMap extends HexMap implements MouseListener,
+public final class BattleMap extends HexMap implements MouseListener,
     WindowListener
 {
     private int chitScale;
+    private static Point location;
 
     private MasterBoard board;
     private Battle battle;
-
-    private static Point location;
 
     private JFrame battleFrame;
     private JMenuItem mi;
@@ -30,11 +29,11 @@ public class BattleMap extends HexMap implements MouseListener,
     static final String doneWithStrikes = "Done with Strikes";
     static final String concedeBattle = "Concede Battle";
 
-    AbstractAction undoLastMoveAction;
-    AbstractAction undoAllMovesAction;
-    AbstractAction doneWithMovesAction;
-    AbstractAction doneWithStrikesAction;
-    AbstractAction concedeBattleAction;
+    private AbstractAction undoLastMoveAction;
+    private AbstractAction undoAllMovesAction;
+    private AbstractAction doneWithMovesAction;
+    private AbstractAction doneWithStrikesAction;
+    private AbstractAction concedeBattleAction;
 
 
     public BattleMap(MasterBoard board, MasterHex masterHex, Battle battle)
@@ -324,14 +323,14 @@ public class BattleMap extends HexMap implements MouseListener,
         }
         else
         {
-            return entrances[(attacker.getEntrySide() + 3) % 6];
+            return entrances[Hex.oppositeHexsideNum(attacker.getEntrySide())];
         }
     }
 
 
     /** Return the Critter whose chit contains the given point,
      *  or null if none does. */
-    private Critter getCritterWithChitContainingPoint(Point point)
+    private Critter getCritterAtPoint(Point point)
     {
         Collection critters = battle.getCritters();
         Iterator it = critters.iterator();
@@ -352,7 +351,7 @@ public class BattleMap extends HexMap implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
-        Critter critter = getCritterWithChitContainingPoint(point);
+        Critter critter = getCritterAtPoint(point);
         BattleHex hex = getHexContainingPoint(point);
 
         // Only the active player can move or strike.

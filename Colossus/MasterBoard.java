@@ -10,7 +10,7 @@ import java.io.*;
  * @author David Ripton
  */
 
-public class MasterBoard extends JPanel implements MouseListener,
+public final class MasterBoard extends JPanel implements MouseListener,
     WindowListener, ItemListener
 {
     private static ArrayList hexes = new ArrayList();
@@ -60,48 +60,48 @@ public class MasterBoard extends JPanel implements MouseListener,
 
     private Container contentPane;
 
-    static final String newGame = "New game";
-    static final String loadGame = "Load game";
-    static final String saveGame = "Save game";
-    static final String saveGameAs = "Save game as";
-    static final String quitGame = "Quit game";
-    static final String concedeBattle = "Concede battle";
-    static final String saveOptions = "Save options";
-    static final String undoLastSplit = "Undo Last Split";
-    static final String undoAllSplits = "Undo All Splits";
-    static final String withdrawFromGame = "Withdraw from Game";
-    static final String doneWithSplits = "Done with Splits";
-    static final String undoLastMove = "Undo Last Move";
-    static final String undoAllMoves = "Undo All Moves";
-    static final String takeMulligan = "Take Mulligan";
-    static final String doneWithMoves = "Done with Moves";
-    static final String doneWithEngagements = "Done with Engagements";
-    static final String undoLastRecruit = "Undo Last Recruit";
-    static final String undoAllRecruits = "Undo All Recruits";
-    static final String doneWithTurn = "Done with Turn";
-    static final String viewRecruitInfo = "View Recruit Info";
-    static final String viewBattleMap = "View Battle Map";
+    public static final String newGame = "New game";
+    public static final String loadGame = "Load game";
+    public static final String saveGame = "Save game";
+    public static final String saveGameAs = "Save game as";
+    public static final String quitGame = "Quit game";
+    public static final String concedeBattle = "Concede battle";
+    public static final String saveOptions = "Save options";
+    public static final String undoLastSplit = "Undo Last Split";
+    public static final String undoAllSplits = "Undo All Splits";
+    public static final String withdrawFromGame = "Withdraw from Game";
+    public static final String doneWithSplits = "Done with Splits";
+    public static final String undoLastMove = "Undo Last Move";
+    public static final String undoAllMoves = "Undo All Moves";
+    public static final String takeMulligan = "Take Mulligan";
+    public static final String doneWithMoves = "Done with Moves";
+    public static final String doneWithEngagements = "Done with Engagements";
+    public static final String undoLastRecruit = "Undo Last Recruit";
+    public static final String undoAllRecruits = "Undo All Recruits";
+    public static final String doneWithTurn = "Done with Turn";
+    public static final String viewRecruitInfo = "View Recruit Info";
+    public static final String viewBattleMap = "View Battle Map";
 
-    AbstractAction undoLastSplitAction;
-    AbstractAction undoAllSplitsAction;
-    AbstractAction doneWithSplitsAction;
-    AbstractAction undoLastMoveAction;
-    AbstractAction undoAllMovesAction;
-    AbstractAction takeMulliganAction;
-    AbstractAction doneWithMovesAction;
-    AbstractAction doneWithEngagementsAction;
-    AbstractAction undoLastRecruitAction;
-    AbstractAction undoAllRecruitsAction;
-    AbstractAction doneWithTurnAction;
-    AbstractAction withdrawFromGameAction;
-    AbstractAction viewRecruitInfoAction;
-    AbstractAction viewBattleMapAction;
-    AbstractAction newGameAction;
-    AbstractAction loadGameAction;
-    AbstractAction saveGameAction;
-    AbstractAction saveGameAsAction;
-    AbstractAction saveOptionsAction;
-    AbstractAction quitGameAction;
+    private AbstractAction undoLastSplitAction;
+    private AbstractAction undoAllSplitsAction;
+    private AbstractAction doneWithSplitsAction;
+    private AbstractAction undoLastMoveAction;
+    private AbstractAction undoAllMovesAction;
+    private AbstractAction takeMulliganAction;
+    private AbstractAction doneWithMovesAction;
+    private AbstractAction doneWithEngagementsAction;
+    private AbstractAction undoLastRecruitAction;
+    private AbstractAction undoAllRecruitsAction;
+    private AbstractAction doneWithTurnAction;
+    private AbstractAction withdrawFromGameAction;
+    private AbstractAction viewRecruitInfoAction;
+    private AbstractAction viewBattleMapAction;
+    private AbstractAction newGameAction;
+    private AbstractAction loadGameAction;
+    private AbstractAction saveGameAction;
+    private AbstractAction saveGameAsAction;
+    private AbstractAction saveOptionsAction;
+    private AbstractAction quitGameAction;
 
 
     public MasterBoard(Game game)
@@ -518,7 +518,7 @@ public class MasterBoard extends JPanel implements MouseListener,
 
         optionsMenu.addSeparator();
         // Then per-player options
-        
+
         miAutoRecruit = new JCheckBoxMenuItem(Game.sAutoRecruit);
         miAutoRecruit.setMnemonic(KeyEvent.VK_R);
         miAutoRecruit.setSelected(game.getAutoRecruit());
@@ -545,7 +545,7 @@ public class MasterBoard extends JPanel implements MouseListener,
         miShowDice.setSelected(game.getShowDice());
         miShowDice.addItemListener(this);
         optionsMenu.add(miShowDice);
-        
+
         miAntialias = new JCheckBoxMenuItem(Game.sAntialias);
         miAntialias.setMnemonic(KeyEvent.VK_N);
         miAntialias.setSelected(game.getAntialias());
@@ -570,7 +570,7 @@ public class MasterBoard extends JPanel implements MouseListener,
         miAllStacksVisible.setSelected(enable);
     }
 
-    
+
     public void twiddleAutoRecruit(boolean enable)
     {
         miAutoRecruit.setSelected(enable);
@@ -1438,7 +1438,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     {
         // Highlight hexes with engagements.
         // If there are no engagements, move forward to the muster phase.
-        if (game.highlightEngagements() < 1)
+        if (game.highlightEngagements() == 0)
         {
             advancePhase();
         }

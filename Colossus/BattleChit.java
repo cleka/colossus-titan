@@ -7,7 +7,7 @@ import java.awt.*;
  * @author David Ripton
  */
 
-public class BattleChit extends Chit
+public final class BattleChit extends Chit
 {
     private Critter critter;
     private static Font font;
@@ -15,7 +15,7 @@ public class BattleChit extends Chit
     private static int fontHeight;
 
 
-    public BattleChit(int scale, String id, Container container, 
+    public BattleChit(int scale, String id, Container container,
         Critter critter)
     {
         super(scale, id, container);
@@ -45,7 +45,7 @@ public class BattleChit extends Chit
         {
             String hitString = Integer.toString(critter.getHits());
             Rectangle rect = getBounds();
-            FontMetrics fontMetrics; 
+            FontMetrics fontMetrics;
 
             // Construct a font 3 times the size of the current font.
             if (font == null)

@@ -4,7 +4,7 @@ import java.io.*;
  * Class SaveGameFilter implements a FilenameFilter for savegames.
  */
 
-public class SaveGameFilter extends javax.swing.filechooser.FileFilter 
+public final class SaveGameFilter extends javax.swing.filechooser.FileFilter
     implements FilenameFilter
 {
     public static final String description = "savegames";
@@ -21,8 +21,8 @@ public class SaveGameFilter extends javax.swing.filechooser.FileFilter
             return false;
         }
     }
-    
-    
+
+
     public boolean accept(File f)
     {
         String name = f.getName();

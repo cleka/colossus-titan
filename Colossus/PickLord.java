@@ -10,7 +10,8 @@ import java.util.*;
  */
 
 
-public class PickLord extends JDialog implements MouseListener, WindowListener
+public final class PickLord extends JDialog implements MouseListener,
+    WindowListener
 {
     private Player player;
     private Legion legion;
@@ -54,7 +55,7 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
         {
             lords.add(legion.getCritter(Creature.angel));
         }
-        
+
         setResizable(false);
 
         Iterator it = lords.iterator();
@@ -66,7 +67,7 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
             contentPane.add(chit);
             chit.addMouseListener(this);
         }
-        
+
         pack();
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();

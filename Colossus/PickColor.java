@@ -6,23 +6,24 @@ import java.util.*;
 
 /**
  * Class PickColor lets a player choose a color of legion markers.
- * @version $Id$ 
+ * @version $Id$
  * @author David Ripton
  */
 
 
-public class PickColor extends JDialog implements WindowListener, ActionListener
+public final class PickColor extends JDialog implements WindowListener,
+    ActionListener
 {
     private JLabel [] colorLabel = new JLabel[6];
     private Game game;
     private Player player;
-    private static final String [] colorNames = 
+    private static final String [] colorNames =
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
-    private static final int [] colorMnemonics = 
-        {KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O, KeyEvent.VK_G, 
+    private static final int [] colorMnemonics =
+        {KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O, KeyEvent.VK_G,
             KeyEvent.VK_E, KeyEvent.VK_R};
     private static String color;
-        
+
 
     private PickColor(JFrame parentFrame, Game game, Player player)
     {
@@ -31,7 +32,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
         this.player = player;
 
         color = null;
-    
+
         setBackground(Color.lightGray);
         pack();
 
@@ -42,7 +43,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
         contentPane.add(new JLabel("Tower"));
         contentPane.add(new JLabel("Name"));
         contentPane.add(new JLabel("Color"));
-        
+
         boolean [] colorTaken = new boolean[6];
         for (int i = 0; i < 6; i++)
         {
@@ -58,7 +59,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
             int tower = currentPlayer.getTower();
             contentPane.add(new JLabel(String.valueOf(100 * tower)));
             contentPane.add(new JLabel(currentPlayer.getName()));
-            String color = currentPlayer.getColor(); 
+            String color = currentPlayer.getColor();
 
             if (color == null)
             {
@@ -83,10 +84,10 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
             contentPane.add(colorLabel[i]);
             i++;
         }
-        
+
         Color [] background = { Color.black, Color.blue, HTMLColor.brown,
             Color.yellow, Color.green, Color.red };
-        Color [] foreground = { Color.white, Color.white, Color.white, 
+        Color [] foreground = { Color.white, Color.white, Color.white,
             Color.black, Color.black, Color.black };
 
         for (i = 0; i < 6; i++)
@@ -118,8 +119,8 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
         addWindowListener(this);
         setVisible(true);
     }
-    
-    
+
+
     public static String pickColor(JFrame parentFrame, Game game,
         Player player)
     {
@@ -128,7 +129,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
     }
 
 
-    private int colorNumber(String colorName) 
+    private int colorNumber(String colorName)
     {
         for (int i = 0; i < 6; i++)
         {
@@ -181,7 +182,7 @@ public class PickColor extends JDialog implements WindowListener, ActionListener
     {
         return new Dimension(250, 250);
     }
-    
+
     public Dimension getPreferredSize()
     {
         return getMinimumSize();

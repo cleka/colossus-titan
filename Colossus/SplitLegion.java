@@ -9,7 +9,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class SplitLegion extends JDialog implements MouseListener,
+public final class SplitLegion extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
     private Legion oldLegion;
@@ -133,14 +133,14 @@ public class SplitLegion extends JDialog implements MouseListener,
 
         setVisible(true);
     }
-    
-    
+
+
     public static void splitLegion(JFrame parentFrame, Legion oldLegion)
     {
         if (!active)
         {
             active = true;
-            new SplitLegion(parentFrame, oldLegion, 
+            new SplitLegion(parentFrame, oldLegion,
                 oldLegion.getPlayer().getName());
             active = false;
         }

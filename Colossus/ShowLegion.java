@@ -9,7 +9,8 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class ShowLegion extends JDialog implements MouseListener, WindowListener
+public final class ShowLegion extends JDialog implements MouseListener,
+    WindowListener
 {
     public ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean
         allStacksVisible)

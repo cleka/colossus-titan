@@ -9,7 +9,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class Concede extends JDialog implements ActionListener
+public final class Concede extends JDialog implements ActionListener
 {
     private static final int scale = 60;
     private JFrame parentFrame;

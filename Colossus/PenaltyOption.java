@@ -1,11 +1,11 @@
 /**
- * Class PenaltyOption holds the information needed to decide whether to take 
+ * Class PenaltyOption holds the information needed to decide whether to take
  * a strike penalty, for one chit.
  * @version $Id$
  * @author David Ripton
  */
 
-public class PenaltyOption implements Comparable
+public final class PenaltyOption implements Comparable
 {
     private Critter critter;
     private int dice;
@@ -24,14 +24,14 @@ public class PenaltyOption implements Comparable
     {
         return critter;
     }
-    
-    
+
+
     public int getDice()
     {
         return dice;
     }
-    
-    
+
+
     public int getStrikeNumber()
     {
         return strikeNumber;
@@ -43,7 +43,7 @@ public class PenaltyOption implements Comparable
     public int compareTo(Object object)
     {
         PenaltyOption other;
-        if (object instanceof PenaltyOption) 
+        if (object instanceof PenaltyOption)
         {
             other = (PenaltyOption)object;
         }

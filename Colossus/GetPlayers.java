@@ -6,12 +6,12 @@ import java.util.*;
 
 /**
  * Class GetPlayers is a dialog used to enter players' names.
- * @version $Id$ 
+ * @version $Id$
  * @author David Ripton
  */
 
 
-public class GetPlayers extends JDialog implements WindowListener,
+public final class GetPlayers extends JDialog implements WindowListener,
     ActionListener
 {
     private ArrayList textFields = new ArrayList();
@@ -48,7 +48,7 @@ public class GetPlayers extends JDialog implements WindowListener,
         button2.addActionListener(this);
 
         pack();
-        
+
         // Center dialog on screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
@@ -64,11 +64,11 @@ public class GetPlayers extends JDialog implements WindowListener,
         new GetPlayers(parentFrame);
         return playerNames;
     }
-    
-    
+
+
     private void validateInputs()
     {
-        playerNames.clear(); 
+        playerNames.clear();
         int numPlayers = 0;
 
         Iterator it = textFields.iterator();
@@ -146,7 +146,7 @@ public class GetPlayers extends JDialog implements WindowListener,
     {
         return new Dimension(300, 300);
     }
-    
+
     public Dimension getPreferredSize()
     {
         return getMinimumSize();

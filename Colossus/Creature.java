@@ -99,14 +99,14 @@ public class Creature implements Comparable
         18, "Wyverns");
 
     // Sometimes we need to iterate through all creature types.
-    private static final Creature [] creaturesArray = {angel, archangel, 
-        behemoth, centaur, colossus, cyclops, dragon, gargoyle, giant, 
+    private static final Creature [] creaturesArray = {angel, archangel,
+        behemoth, centaur, colossus, cyclops, dragon, gargoyle, giant,
         gorgon, griffon, guardian, hydra, lion, minotaur, ogre, ranger,
         serpent, titan, troll, unicorn, warbear, warlock, wyvern};
 
     private static final List creatures = Arrays.asList(creaturesArray);
 
-    
+
     public Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,

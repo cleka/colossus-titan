@@ -10,7 +10,7 @@ import javax.swing.*;
  */
 
 
-public class Game
+public final class Game
 {
     private ArrayList players = new ArrayList(6);
     private MasterBoard board;
@@ -44,6 +44,8 @@ public class Game
     // Constants for savegames
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
+    public static final String saveGameVersion =
+        "Colossus savegame version 1";
 
     // Options names
     public static final String sAutosave = "Autosave";
@@ -585,12 +587,17 @@ public class Game
     /** Create a text file describing this game's state, in
      *  file filename.
      *  Format:
-     *     XXX Add a magic number or version string to the top of the file.
+     *     Savegame version string
      *     Number of players
      *     Turn number
      *     Whose turn
      *     Current phase
      *     Creature counts
+
+     // XXX in progress
+     *     Engagement hex
+
+
      *     Player 1:
      *         Name
      *         Color
@@ -606,15 +613,20 @@ public class Game
      *         Number of Legions
      *         Legion 1:
      *             Marker id
-     *             Hex label
+     *             Current hex label
      *             Starting hex label
+     *             Entry side
      *             Parent
-     *             Moved?
      *             Recruited?
      *             Height
      *             Creature 1:
      *                 Creature type
      *                 Visible?
+     *                 Hits
+     *                 Current hex
+     *                 Starting hex
+     *                 Struck?
+     *                 Carry flag
      *             ...
      *         ...
      *     ...
@@ -680,8 +692,8 @@ public class Game
                 out.println(legion.getMarkerId());
                 out.println(legion.getCurrentHex().getLabel());
                 out.println(legion.getStartingHex().getLabel());
+                out.println(legion.getEntrySide());
                 out.println(legion.getParentId());
-                out.println(legion.hasMoved());
                 out.println(legion.hasRecruited());
 
                 out.println(legion.getHeight());
@@ -693,6 +705,11 @@ public class Game
                     Critter critter = (Critter)it3.next();
                     out.println(critter.getName());
                     out.println(critter.isVisible());
+                    out.println(critter.getHits());
+                    out.println(critter.getCurrentHex().getLabel());
+                    out.println(critter.getStartingHex().getLabel());
+                    out.println(critter.hasStruck());
+                    out.println(critter.getCarryFlag());
                 }
             }
         }
@@ -771,6 +788,14 @@ public class Game
             FileReader fileReader = new FileReader(file);
             BufferedReader in = new BufferedReader(fileReader);
             String buf;
+            String buf2;
+
+            buf = in.readLine();
+            if (!buf.equals(saveGameVersion))
+            {
+                System.out.println("Can't load this savegame version.");
+                dispose();
+            }
 
             buf = in.readLine();
             int numPlayers = Integer.parseInt(buf);
@@ -856,10 +881,10 @@ public class Game
                     String startingHexLabel = buf;
 
                     buf = in.readLine();
-                    String parentId = buf;
+                    int entrySide = Integer.parseInt(buf);
 
                     buf = in.readLine();
-                    boolean moved = Boolean.valueOf(buf).booleanValue();
+                    String parentId = buf;
 
                     buf = in.readLine();
                     boolean recruited = Boolean.valueOf(buf).booleanValue();
@@ -867,15 +892,44 @@ public class Game
                     buf = in.readLine();
                     int height = Integer.parseInt(buf);
 
-                    Creature [] critters = new Creature[8];
-                    boolean [] visibles = new boolean[height];
+                    Critter [] critters = new Critter[8];
 
                     for (int k = 0; k < height; k++)
                     {
                         buf = in.readLine();
-                        critters[k] = Creature.getCreatureFromName(buf);
+                        Critter critter = new Critter(
+                            Creature.getCreatureFromName(buf), false, null);
+
                         buf = in.readLine();
-                        visibles[k] = Boolean.valueOf(buf).booleanValue();
+                        boolean visible = Boolean.valueOf(buf).booleanValue();
+                        critter.setVisible(visible);
+
+                        buf = in.readLine();
+                        int hits = Integer.parseInt(buf);
+                        critter.setHits(hits);
+
+                        // Placeholder.  map must be initialized above.
+                        BattleMap map = null;
+
+                        buf = in.readLine();
+                        buf2 = in.readLine();
+                        if (map != null)
+                        {
+                            BattleHex hex = map.getHexFromLabel(buf);
+                            critter.setCurrentHex(hex);
+                            hex = map.getHexFromLabel(buf2);
+                            critter.setStartingHex(hex);
+                        }
+
+                        buf = in.readLine();
+                        boolean struck = Boolean.valueOf(buf).booleanValue();
+                        critter.setStruck(struck);
+
+                        buf = in.readLine();
+                        boolean carry = Boolean.valueOf(buf).booleanValue();
+                        critter.setCarryFlag(carry);
+
+                        critters[k] = critter;
                     }
 
                     Legion legion = new Legion(markerId, parentId,
@@ -885,17 +939,8 @@ public class Game
                         critters[4], critters[5], critters[6], critters[7],
                         player);
 
-                    legion.setMoved(moved);
                     legion.setRecruited(recruited);
-
-                    for (int k = 0; k < height; k++)
-                    {
-                        if (visibles[k])
-                        {
-                            legion.revealCreature(k);
-                        }
-                    }
-
+                    legion.setEntrySide(entrySide);
                     player.addLegion(legion);
                     MasterHex hex = legion.getCurrentHex();
                     hex.addLegion(legion, false);
@@ -961,7 +1006,7 @@ public class Game
         (1000000000.sav comes after 999999999.sav) */
     private String latestSaveFilename(String [] filenames)
     {
-        class StringNumComparator implements Comparator
+        final class StringNumComparator implements Comparator
         {
             public int compare(Object o1, Object o2)
             {
@@ -978,8 +1023,8 @@ public class Game
         return (String)Collections.max(Arrays.asList(filenames), new
             StringNumComparator());
     }
-    
-    
+
+
     // XXX Use separate files and methods for client and server options.
 
     /** Save game options to a file.  The current format is standard
@@ -2040,7 +2085,8 @@ public class Game
             {
                 set.add(hex.getLabel());
                 // Set the entry side relative to the hex label.
-                hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
+                hex.setEntrySide(Hex.hexsideNum(cameFrom -
+                    hex.getLabelSide()));
             }
             return set;
         }
@@ -2063,7 +2109,7 @@ public class Game
 
             // Need to set entry sides even if no possible engagement,
             // for MasterHex.chooseWhetherToTeleport()
-            hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
+            hex.setEntrySide(Hex.hexsideNum(cameFrom - hex.getLabelSide()));
 
             return set;
         }
@@ -2072,7 +2118,7 @@ public class Game
         if (block >= 0)
         {
             set.addAll(findMoves(hex.getNeighbor(block), player, legion,
-                roll - 1, ARROWS_ONLY, (block + 3) % 6));
+                roll - 1, ARROWS_ONLY, Hex.oppositeHexsideNum(block)));
         }
         else if (block == ARCHES_AND_ARROWS)
         {
@@ -2081,7 +2127,7 @@ public class Game
                 if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
                 {
                     set.addAll(findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, ARROWS_ONLY, (i + 3) % 6));
+                        roll - 1, ARROWS_ONLY, Hex.oppositeHexsideNum(i)));
                 }
             }
         }
@@ -2092,7 +2138,7 @@ public class Game
                 if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
                 {
                     set.addAll(findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, ARROWS_ONLY, (i + 3) % 6));
+                        roll - 1, ARROWS_ONLY, Hex.oppositeHexsideNum(i)));
                 }
             }
         }
@@ -2128,7 +2174,7 @@ public class Game
                    hex.getEntranceType(i) != MasterHex.NONE))
                 {
                     set.addAll(findTowerTeleportMoves(hex.getNeighbor(i),
-                        player, legion, roll - 1, (i + 3) % 6));
+                        player, legion, roll - 1, Hex.oppositeHexsideNum(i)));
                 }
             }
         }
@@ -2303,7 +2349,7 @@ public class Game
         // And bring it to the front.
         masterFrame.show();
 
-        summonAngel = new SummonAngel(board, attacker);
+        summonAngel = SummonAngel.summonAngel(board, attacker);
     }
 
 
@@ -2322,11 +2368,10 @@ public class Game
         }
         battle = null;
         map = null;
+        engagementInProgress = false;
 
         // Insert a blank line in the log file after each battle.
         logEvent("\n");
-
-        engagementInProgress = false;
     }
 
 
@@ -2628,9 +2673,10 @@ public class Game
             }
 
             // The players may agree to a negotiated settlement.
-            new Negotiate(masterFrame, attacker, defender);
+            Negotiate.negotiate(masterFrame, attacker, defender);
             if (!hex.isEngagement())
             {
+                // Negotiated settlement.
                 if (hex.getLegion(0) == defender && defender.canRecruit())
                 {
                     // If the defender won the battle by agreement,
@@ -2652,10 +2698,9 @@ public class Game
                 highlightEngagements();
                 engagementInProgress = false;
             }
-
-            // Battle
             else
             {
+                // Battle
                 // Reveal both legions to all players.
                 attacker.revealAllCreatures();
                 defender.revealAllCreatures();

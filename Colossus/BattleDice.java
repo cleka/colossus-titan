@@ -9,7 +9,7 @@ import javax.swing.*;
  */
 
 
-public class BattleDice extends JFrame implements WindowListener
+public final class BattleDice extends JFrame implements WindowListener
 {
     private Game game;
     private static final int scale = 60;
@@ -52,14 +52,14 @@ public class BattleDice extends JFrame implements WindowListener
         if (location == null)
         {
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            location = new Point(d.width - getSize().width, 
+            location = new Point(d.width - getSize().width,
                 (d.height - getSize().height) / 2);
         }
         setLocation(location);
     }
 
 
-    public void setValues(Critter attacker, Critter defender, 
+    public void setValues(Critter attacker, Critter defender,
         int targetNumber, int [] rolls, int hits, int carries)
     {
         this.attacker = attacker;
@@ -70,8 +70,8 @@ public class BattleDice extends JFrame implements WindowListener
         this.hits = hits;
         this.carries = carries;
     }
-    
-    
+
+
     public void setCarries(int carries)
     {
         this.carries = carries;
@@ -108,10 +108,10 @@ public class BattleDice extends JFrame implements WindowListener
         Container contentPane = getContentPane();
         contentPane.removeAll();
 
-        label1.setText(attacker.getName() + " in " + 
-            attacker.getCurrentHex().getDescription() + " attacks " + 
-            defender.getName() + " in " + 
-            defender.getCurrentHex().getDescription()); 
+        label1.setText(attacker.getName() + " in " +
+            attacker.getCurrentHex().getDescription() + " attacks " +
+            defender.getName() + " in " +
+            defender.getCurrentHex().getDescription());
         label1.setAlignmentX(Label.LEFT_ALIGNMENT);
         constraints.gridy = 0;
         constraints.gridwidth = 6;
@@ -136,7 +136,7 @@ public class BattleDice extends JFrame implements WindowListener
         for (int i = 0; i < numDice; i++)
         {
             dice[i] = new Chit(scale, getDieImageName(rolls[i]), this);
-            constraints.gridy = 2 + (i / 6); 
+            constraints.gridy = 2 + (i / 6);
             constraints.gridwidth = 1;
             constraints.ipadx = 5;
             constraints.anchor = GridBagConstraints.WEST;

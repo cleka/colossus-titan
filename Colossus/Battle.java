@@ -8,7 +8,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class Battle
+public final class Battle
 {
     // Phases of a battle turn
     public static final int SUMMON = 0;
@@ -21,6 +21,9 @@ public class Battle
     public static final int NO_KILLS = 0;
     public static final int FIRST_BLOOD = 1;
     public static final int TOO_LATE = 2;
+
+    // A big number
+    public static final int BIGNUM = 99;
 
 
     private Game game;
@@ -353,7 +356,7 @@ public class Battle
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    int reverseDir = (i + 3) % 6;
+                    int reverseDir = Hex.oppositeHexsideNum(i);
 
                     int entryCost = neighbor.getEntryCost(creature,
                         reverseDir);
@@ -822,7 +825,7 @@ public class Battle
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            critter.commitStrike();
+            critter.setStruck(false);
         }
     }
 
@@ -1040,12 +1043,12 @@ public class Battle
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
-    public int getRange(BattleHex hex1, BattleHex hex2)
+    public static int getRange(BattleHex hex1, BattleHex hex2)
     {
         int x1 = hex1.getXCoord();
-        float y1 = hex1.getYCoord();
+        double y1 = hex1.getYCoord();
         int x2 = hex2.getXCoord();
-        float y2 = hex2.getYCoord();
+        double y2 = hex2.getYCoord();
 
         // Hexes with odd X coordinates are pushed down half a hex.
         if ((x1 & 1) == 1)
@@ -1057,13 +1060,13 @@ public class Battle
             y2 += 0.5;
         }
 
-        float xDist = Math.abs(x2 - x1);
-        float yDist = Math.abs(y2 - y1);
+        double xDist = Math.abs(x2 - x1);
+        double yDist = Math.abs(y2 - y1);
 
         // Offboard creatures are out of range.
         if (x1 == -1 || x2 == -1)
         {
-            xDist = 10;
+            xDist = BIGNUM;
         }
 
         if (xDist >= 2 * yDist)
@@ -1086,9 +1089,9 @@ public class Battle
 
 
     /** Caller must ensure that yDist != 0 */
-    private boolean toLeft(float xDist, float yDist)
+    private static boolean toLeft(double xDist, double yDist)
     {
-        float ratio = xDist / yDist;
+        double ratio = xDist / yDist;
         if (ratio >= 1.5 || (ratio >= 0 && ratio <= .75) ||
             (ratio >= -1.5 && ratio <= -.75))
         {
@@ -1265,9 +1268,9 @@ public class Battle
         }
 
         int x1 = hex1.getXCoord();
-        float y1 = hex1.getYCoord();
+        double y1 = hex1.getYCoord();
         int x2 = hex2.getXCoord();
-        float y2 = hex2.getYCoord();
+        double y2 = hex2.getYCoord();
 
         // Offboard hexes are not allowed.
         if (x1 == -1 || x2 == -1)
@@ -1285,10 +1288,10 @@ public class Battle
             y2 += 0.5;
         }
 
-        float xDist = x2 - x1;
-        float yDist = y2 - y1;
+        double xDist = x2 - x1;
+        double yDist = y2 - y1;
 
-        // Chits below the level of the strike do not block LOS.
+        // Creatures below the level of the strike do not block LOS.
         int strikeElevation = Math.min(hex1.getElevation(),
             hex2.getElevation());
 
@@ -1314,14 +1317,12 @@ public class Battle
         BattleHex currentHex = critter.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
-        boolean clear = true;
-
         int range = getRange(currentHex, targetHex);
         int skill = critter.getSkill();
 
         if (range > skill)
         {
-            clear = false;
+            return false;
         }
 
         // Only warlocks can rangestrike at range 2, rangestrike Lords,
@@ -1329,10 +1330,10 @@ public class Battle
         else if (!critter.getName().equals("Warlock") && (range < 3 ||
             target.isLord() || isLOSBlocked(currentHex, targetHex)))
         {
-            clear = false;
+            return false;
         }
 
-        return clear;
+        return true;
     }
 
 
@@ -1340,7 +1341,8 @@ public class Battle
      *  Sometimes two directions are possible.  If the left parameter
      *  is set, the direction further left will be given.  Otherwise,
      *  the direction further right will be given. */
-    public int getDirection(BattleHex hex1, BattleHex hex2, boolean left)
+    public static int getDirection(BattleHex hex1, BattleHex hex2,
+        boolean left)
     {
         if (hex1 == hex2)
         {
@@ -1348,16 +1350,15 @@ public class Battle
         }
 
         int x1 = hex1.getXCoord();
-        float y1 = hex1.getYCoord();
+        double y1 = hex1.getYCoord();
         int x2 = hex2.getXCoord();
-        float y2 = hex2.getYCoord();
+        double y2 = hex2.getYCoord();
 
         // Offboard chits are not allowed.
         if (x1 == -1 || x2 == -1)
         {
             return -1;
         }
-
 
         // Hexes with odd X coordinates are pushed down half a hex.
         if ((x1 & 1) == 1)
@@ -1369,17 +1370,17 @@ public class Battle
             y2 += 0.5;
         }
 
-        float xDist = x2 - x1;
-        float yDist = y2 - y1;
-
+        int xDist = x2 - x1;
+        double yDist = y2 - y1;
+        double xDistAndAHalf = 1.5 * xDist;
 
         if (xDist >= 0)
         {
-            if (yDist > 1.5 * xDist)
+            if (yDist > xDistAndAHalf)
             {
                 return 3;
             }
-            if (yDist == 1.5 * xDist)
+            else if (yDist == xDistAndAHalf)
             {
                 if (left)
                 {
@@ -1390,11 +1391,11 @@ public class Battle
                     return 3;
                 }
             }
-            if (yDist < -1.5 * xDist)
+            else if (yDist < -xDistAndAHalf)
             {
                 return 0;
             }
-            if (yDist == -1.5 * xDist)
+            else if (yDist == -xDistAndAHalf)
             {
                 if (left)
                 {
@@ -1405,15 +1406,15 @@ public class Battle
                     return 1;
                 }
             }
-            if (yDist > 0)
+            else if (yDist > 0)
             {
                 return 2;
             }
-            if (yDist < 0)
+            else if (yDist < 0)
             {
                 return 1;
             }
-            if (yDist == 0)
+            else  // yDist == 0
             {
                 if (left)
                 {
@@ -1425,14 +1426,13 @@ public class Battle
                 }
             }
         }
-
-        if (xDist < 0)
+        else  // xDist < 0
         {
-            if (yDist < 1.5 * xDist)
+            if (yDist < xDistAndAHalf)
             {
                 return 0;
             }
-            if (yDist == 1.5 * xDist)
+            else if (yDist == xDistAndAHalf)
             {
                 if (left)
                 {
@@ -1443,11 +1443,11 @@ public class Battle
                     return 0;
                 }
             }
-            if (yDist > -1.5 * xDist)
+            else if (yDist > -xDistAndAHalf)
             {
                 return 3;
             }
-            if (yDist == -1.5 * xDist)
+            else if (yDist == -xDistAndAHalf)
             {
                 if (left)
                 {
@@ -1458,15 +1458,15 @@ public class Battle
                     return 4;
                 }
             }
-            if (yDist > 0)
+            else if (yDist > 0)
             {
                 return 4;
             }
-            if (yDist < 0)
+            else if (yDist < 0)
             {
                 return 5;
             }
-            if (yDist == 0)
+            else  // yDist == 0
             {
                 if (left)
                 {
@@ -1478,9 +1478,6 @@ public class Battle
                 }
             }
         }
-
-        // Shouldn't be reached.
-        return -1;
     }
 
     /** Return the number of intervening bramble hexes.  If LOS is along a
@@ -1494,7 +1491,7 @@ public class Battle
         // Offboard hexes are not allowed.
         if (hex1.getXCoord() == -1 || hex2.getXCoord() == -1)
         {
-            return 10;
+            return BIGNUM;
         }
 
         int direction = getDirection(hex1, hex2, left);
@@ -1502,7 +1499,7 @@ public class Battle
         BattleHex nextHex = hex1.getNeighbor(direction);
         if (nextHex == null)
         {
-            return 10;
+            return BIGNUM;
         }
 
         if (nextHex == hex2)
@@ -1514,14 +1511,14 @@ public class Battle
         // Trees block LOS.
         if (nextHex.getTerrain() == 't')
         {
-            return 10;
+            return BIGNUM;
         }
 
         // All chits block LOS.  (There are no height differences on maps
         //    with bramble.)
         if (nextHex.isOccupied())
         {
-            return 10;
+            return BIGNUM;
         }
 
         // Add one if it's bramble.
@@ -1543,14 +1540,14 @@ public class Battle
         }
 
         int x1 = hex1.getXCoord();
-        float y1 = hex1.getYCoord();
+        double y1 = hex1.getYCoord();
         int x2 = hex2.getXCoord();
-        float y2 = hex2.getYCoord();
+        double y2 = hex2.getYCoord();
 
         // Offboard hexes are not allowed.
         if (x1 == -1 || x2 == -1)
         {
-            return 10;
+            return BIGNUM;
         }
 
         // Hexes with odd X coordinates are pushed down half a hex.
@@ -1563,8 +1560,8 @@ public class Battle
             y2 += 0.5;
         }
 
-        float xDist = x2 - x1;
-        float yDist = y2 - y1;
+        double xDist = x2 - x1;
+        double yDist = y2 - y1;
 
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
@@ -1766,7 +1763,6 @@ public class Battle
         Player player2 = new Player("Defender", null);
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('D');
-        hex.setEntrySide(5);
         Legion attacker = new Legion("Bk01", null, hex, hex,
             Creature.archangel, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
@@ -1775,6 +1771,7 @@ public class Battle
             Creature.serpent, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian,
             Creature.minotaur, null, player2);
+        attacker.setEntrySide(5);
 
         new Battle(null, attacker, defender, hex);
     }

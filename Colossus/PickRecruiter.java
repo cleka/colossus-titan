@@ -10,7 +10,7 @@ import java.util.*;
  */
 
 
-public class PickRecruiter extends JDialog implements MouseListener,
+public final class PickRecruiter extends JDialog implements MouseListener,
     WindowListener
 {
     private ArrayList recruiters;
@@ -20,7 +20,7 @@ public class PickRecruiter extends JDialog implements MouseListener,
     private Marker legionMarker;
     private int scale = 60;
     private int height;
-    private GridBagLayout gridbag = new GridBagLayout(); 
+    private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private static Creature recruiter;
 
@@ -59,7 +59,7 @@ public class PickRecruiter extends JDialog implements MouseListener,
         constraints.gridy = 0;
         gridbag.setConstraints(legionMarker, constraints);
         contentPane.add(legionMarker);
-        
+
         Collection critters = legion.getCritters();
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -74,7 +74,7 @@ public class PickRecruiter extends JDialog implements MouseListener,
 
         // There are height + 1 chits in the top row.  There
         // are numEligible chits to place beneath.
-        // So we have (height + 1) - numEligible empty 
+        // So we have (height + 1) - numEligible empty
         // columns, half of which we'll put in front.
         int numEligible = recruiters.size();
         int leadSpace = ((height + 1) - numEligible) / 2;
@@ -99,7 +99,7 @@ public class PickRecruiter extends JDialog implements MouseListener,
         }
 
         pack();
-        
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
@@ -107,8 +107,8 @@ public class PickRecruiter extends JDialog implements MouseListener,
         setVisible(true);
         repaint();
     }
-    
-    
+
+
     public static Creature pickRecruiter(JFrame parentFrame, Legion legion,
         ArrayList recruiters)
     {
@@ -123,7 +123,7 @@ public class PickRecruiter extends JDialog implements MouseListener,
         int i = recruiterChits.indexOf(source);
         if (i != -1)
         {
-            recruiter = (Creature)recruiters.get(i); 
+            recruiter = (Creature)recruiters.get(i);
 
             // Then exit.
             dispose();

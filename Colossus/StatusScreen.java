@@ -10,7 +10,7 @@ import javax.swing.*;
  */
 
 
-public class StatusScreen extends JFrame implements WindowListener
+public final class StatusScreen extends JFrame implements WindowListener
 {
     private JLabel [] nameLabel;
     private JLabel [] towerLabel;
@@ -26,7 +26,7 @@ public class StatusScreen extends JFrame implements WindowListener
 
     private static Point location;
     private static Dimension size;
-    
+
 
     public StatusScreen(Game game)
     {
@@ -53,7 +53,7 @@ public class StatusScreen extends JFrame implements WindowListener
         creaturesLabel = new JLabel[numPlayers];
         titanLabel = new JLabel[numPlayers];
         scoreLabel = new JLabel[numPlayers];
-        
+
 
         contentPane.add(new JLabel("Player"));
         for (int i = 0; i < numPlayers; i++)
@@ -147,8 +147,8 @@ public class StatusScreen extends JFrame implements WindowListener
 
         setVisible(true);
     }
-    
-    
+
+
     private void setupIcon()
     {
         if (!game.isApplet())
@@ -161,7 +161,7 @@ public class StatusScreen extends JFrame implements WindowListener
             }
             catch (NullPointerException e)
             {
-                System.out.println(e.toString() + " Could not find " + 
+                System.out.println(e.toString() + " Could not find " +
                     Creature.colossus.getImageName());
                 dispose();
             }
@@ -207,7 +207,7 @@ public class StatusScreen extends JFrame implements WindowListener
             setPlayerLabelBackground(i, color);
 
             nameLabel[i].setText(player.getName());
-            towerLabel[i].setText(String.valueOf(100 * 
+            towerLabel[i].setText(String.valueOf(100 *
                 player.getTower()));
             colorLabel[i].setText(player.getColor());
             elimLabel[i].setText(player.getPlayersElim());

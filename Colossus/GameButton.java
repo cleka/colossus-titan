@@ -7,7 +7,7 @@ import javax.swing.*;
  * @author David Barr
  */
 
-public class GameButton extends JButton implements ActionListener 
+public final class GameButton extends JButton implements ActionListener
 {
     private Game game;
     private GameApplet applet;
@@ -21,7 +21,7 @@ public class GameButton extends JButton implements ActionListener
         this.applet = applet;
     }
 
-    public void actionPerformed(ActionEvent e) 
+    public void actionPerformed(ActionEvent e)
     {
         // Don't allow multiple clicks to start multiple simultaneous games.
         if (game == null)

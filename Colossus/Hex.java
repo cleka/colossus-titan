@@ -65,7 +65,7 @@ public abstract class Hex
     public void setTerrain(char terrain)
     {
         this.terrain = terrain;
-    }        
+    }
 
 
     public String getLabel()
@@ -78,8 +78,8 @@ public abstract class Hex
     {
         return label;
     }
-    
-    
+
+
     public void setLabel(String label)
     {
         this.label = label;
@@ -103,20 +103,20 @@ public abstract class Hex
     {
         this.xCoord = xCoord;
     }
-    
+
     public int getXCoord()
     {
-        return xCoord; 
+        return xCoord;
     }
-    
+
     public void setYCoord(int yCoord)
     {
         this.yCoord = yCoord;
     }
-    
+
     public int getYCoord()
     {
-        return yCoord; 
+        return yCoord;
     }
 
 
@@ -140,12 +140,96 @@ public abstract class Hex
 
         return polygon;
     }
-    
+
 
     /** Return the Point closest to the center of the passed polygon */
     protected Point findCenter()
     {
         return new Point((int)Math.round((xVertex[0] + xVertex[3]) / 2),
             (int)Math.round((yVertex[0] + yVertex[3]) / 2));
-    }  
+    }
+
+
+    /** Return the next hexside number in a clockwise direction, or -1 if
+     *  the given hexside is outside the valid range 0-5. */
+    public static int nextHexsideNum(int hexside)
+    {
+        switch (hexside)
+        {
+            case 0:
+                return 1;
+            case 1:
+                return 2;
+            case 2:
+                return 3;
+            case 3:
+                return 4;
+            case 4:
+                return 5;
+            case 5:
+                return 0;
+            default:
+                return -1;
+        }
+    }
+
+
+    /** Return the opposite hexside number, or -1 if the given hexside
+     *  is outside the valid range 0-5. */
+    public static int oppositeHexsideNum(int hexside)
+    {
+        switch (hexside)
+        {
+            case 0:
+                return 3;
+            case 1:
+                return 4;
+            case 2:
+                return 5;
+            case 3:
+                return 0;
+            case 4:
+                return 1;
+            case 5:
+                return 2;
+            default:
+                return -1;
+        }
+    }
+
+
+    /** Coerce the given number into the valid hexside range 0-5,
+        without using an expensive mod if possible. */
+    public static int hexsideNum(int hexside)
+    {
+        switch (hexside)
+        {
+            case -6:
+            case 0:
+            case 6:
+                return 0;
+            case -5:
+            case 1:
+            case 7:
+                return 1;
+            case -4:
+            case 2:
+            case 8:
+                return 2;
+            case -3:
+            case 3:
+            case 9:
+                return 3;
+            case -2:
+            case 4:
+            case 10:
+                return 4;
+            case -1:
+            case 5:
+            case 11:
+                return 5;
+            default:
+                return (6 + hexside) % 6;
+        }
+    }
 }

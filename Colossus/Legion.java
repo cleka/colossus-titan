@@ -8,7 +8,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class Legion
+public final class Legion
 {
     private Marker marker;
     private String markerId;    // Bk03, Rd12, etc.
@@ -16,7 +16,6 @@ public class Legion
     private ArrayList critters = new ArrayList();
     private MasterHex currentHex;
     private MasterHex startingHex;
-    private boolean moved;
     private boolean recruited;
     private Player player;
     private int battleTally;
@@ -26,9 +25,9 @@ public class Legion
 
 
     public Legion(String markerId, String parentId, MasterHex currentHex,
-        MasterHex startingHex, Creature creature0, Creature creature1, 
-        Creature creature2, Creature creature3, Creature creature4, 
-        Creature creature5, Creature creature6, Creature creature7, 
+        MasterHex startingHex, Creature creature0, Creature creature1,
+        Creature creature2, Creature creature3, Creature creature4,
+        Creature creature5, Creature creature6, Creature creature7,
         Player player)
     {
         this.markerId = markerId;
@@ -194,8 +193,8 @@ public class Legion
     {
         return markerId;
     }
-    
-    
+
+
     public String getParentId()
     {
         return parentId;
@@ -300,13 +299,7 @@ public class Legion
 
     public boolean hasMoved()
     {
-        return moved;
-    }
-
-
-    public void setMoved(boolean moved)
-    {
-        this.moved = moved;
+        return (currentHex != startingHex);
     }
 
 
@@ -371,7 +364,6 @@ public class Legion
         currentHex.removeLegion(this);
         currentHex = hex;
         currentHex.addLegion(this, true);
-        moved = true;
         player.setLastLegionMoved();
         // If we teleported, no more teleports are allowed this turn.
         if (teleported)
@@ -388,7 +380,6 @@ public class Legion
             currentHex.removeLegion(this);
             currentHex = startingHex;
             currentHex.addLegion(this, true);
-            moved = false;
             Game.logEvent("Legion " + getMarkerId() + " undoes its move");
 
             // If this legion teleported, allow teleporting again.
@@ -404,7 +395,6 @@ public class Legion
     public void commitMove()
     {
         startingHex = currentHex;
-        moved = false;
         recruited = false;
     }
 
@@ -413,8 +403,8 @@ public class Legion
     {
         return recruited;
     }
-    
-    
+
+
     public void setRecruited(boolean recruited)
     {
         this.recruited = recruited;
@@ -493,6 +483,12 @@ public class Legion
     public int getEntrySide()
     {
         return entrySide;
+    }
+
+
+    public void setEntrySide(int entrySide)
+    {
+        this.entrySide = entrySide;
     }
 
 

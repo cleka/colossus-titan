@@ -10,7 +10,7 @@ import java.util.*;
  */
 
 
-public class PickRecruit extends JDialog implements MouseListener,
+public final class PickRecruit extends JDialog implements MouseListener,
     WindowListener
 {
     private ArrayList recruits = new ArrayList();
@@ -77,11 +77,11 @@ public class PickRecruit extends JDialog implements MouseListener,
             gridbag.setConstraints(chit, constraints);
             contentPane.add(chit);
         }
-        
+
         int height = critters.size();
         // There are height + 1 chits in the top row.  There
         // are numEligible chits / labels to place beneath.
-        // So we have (height + 1) - numEligible empty 
+        // So we have (height + 1) - numEligible empty
         // columns, half of which we'll put in front.
         int leadSpace = ((height + 1) - numEligible) / 2;
         if (leadSpace < 0)
@@ -103,7 +103,7 @@ public class PickRecruit extends JDialog implements MouseListener,
             contentPane.add(chit);
             chit.addMouseListener(this);
             int count = recruit.getCount();
-            JLabel countLabel = new JLabel(Integer.toString(count), 
+            JLabel countLabel = new JLabel(Integer.toString(count),
                 JLabel.CENTER);
             constraints.gridy = 2;
             gridbag.setConstraints(countLabel, constraints);
@@ -112,7 +112,7 @@ public class PickRecruit extends JDialog implements MouseListener,
         }
 
         pack();
-        
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
@@ -217,10 +217,10 @@ public class PickRecruit extends JDialog implements MouseListener,
 
         Player player = new Player("Test", null);
         Legion legion = new Legion("Bk01", null, hex, hex,
-            Creature.titan, Creature.gargoyle, Creature.gargoyle, 
-            Creature.cyclops, Creature.cyclops, null, 
+            Creature.titan, Creature.gargoyle, Creature.gargoyle,
+            Creature.cyclops, Creature.cyclops, null,
             null, null, player);
-        
+
         Creature creature = PickRecruit.pickRecruit(frame, legion);
         System.out.println("recruited " + creature);
     }

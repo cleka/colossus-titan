@@ -9,7 +9,7 @@ import javax.swing.*;
  */
 
 
-public class SummonAngel extends JDialog implements MouseListener, 
+public final class SummonAngel extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
     private Player player;
@@ -24,9 +24,10 @@ public class SummonAngel extends JDialog implements MouseListener,
     private JButton button1;
     private JButton button2;
     private boolean summoned;
+    private static boolean active;
 
 
-    public SummonAngel(MasterBoard board, Legion legion)
+    private SummonAngel(MasterBoard board, Legion legion)
     {
         super(board.getFrame(), legion.getPlayer().getName() +
             ": Summon Angel into Legion " + legion.getMarkerId(), false);
@@ -92,13 +93,24 @@ public class SummonAngel extends JDialog implements MouseListener,
         button2.addActionListener(this);
 
         pack();
-        
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2,
             d.height / 2 - getSize().height / 2));
 
         setVisible(true);
         repaint();
+    }
+
+
+    public static SummonAngel summonAngel(MasterBoard board, Legion legion)
+    {
+        if (!active)
+        {
+            active = true;
+            return new SummonAngel(board, legion);
+        }
+        return null;
     }
 
 
@@ -132,8 +144,8 @@ public class SummonAngel extends JDialog implements MouseListener,
             // Update the number of creatures displayed in both stacks.
             donor.getCurrentHex().repaint();
             legion.getCurrentHex().repaint();
-        
-            Game.logEvent("An " + creature.getName() + 
+
+            Game.logEvent("An " + creature.getName() +
                 " was summoned from legion " + donor.getMarkerId() +
                 " into legion " + legion.getMarkerId());
         }
@@ -142,6 +154,7 @@ public class SummonAngel extends JDialog implements MouseListener,
 
         // Let the game know to leave the angel-summoning state.
         board.getGame().finishSummoningAngel();
+        active = false;
     }
 
 
@@ -256,7 +269,7 @@ public class SummonAngel extends JDialog implements MouseListener,
 
             if (angels == 0 && archangels == 0)
             {
-                JOptionPane.showMessageDialog(board, 
+                JOptionPane.showMessageDialog(board,
                     "No angels are available.");
                 return;
             }
@@ -274,7 +287,7 @@ public class SummonAngel extends JDialog implements MouseListener,
             else
             {
                 // If both are available, make the player click on one.
-                JOptionPane.showMessageDialog(board, 
+                JOptionPane.showMessageDialog(board,
                     "Select angel or archangel.");
             }
         }

@@ -9,7 +9,8 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class Negotiate extends JDialog implements MouseListener, ActionListener
+public final class Negotiate extends JDialog implements MouseListener,
+    ActionListener
 {
     private Legion attacker;
     private Legion defender;
@@ -21,9 +22,10 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
+    private static boolean active;
 
 
-    public Negotiate(JFrame parentFrame, Legion attacker, Legion defender)
+    private Negotiate(JFrame parentFrame, Legion attacker, Legion defender)
     {
         super(parentFrame, attacker.getMarkerId() + " Negotiates with " +
             defender.getMarkerId(), true);
@@ -44,7 +46,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
 
         addMouseListener(this);
 
-        attackerMarker = new Marker(scale, attacker.getImageName(), 
+        attackerMarker = new Marker(scale, attacker.getImageName(),
             this, attacker);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
@@ -66,8 +68,8 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
             contentPane.add(chit);
             chit.addMouseListener(this);
         }
-        
-        defenderMarker = new Marker(scale, defender.getImageName(), this, 
+
+        defenderMarker = new Marker(scale, defender.getImageName(), this,
             defender);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 1;
@@ -96,7 +98,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         button2.setMnemonic(KeyEvent.VK_F);
 
         // Attempt to center the buttons.
-        int chitWidth = Math.max(attacker.getHeight(), 
+        int chitWidth = Math.max(attacker.getHeight(),
             defender.getHeight()) + 1;
         if (chitWidth < 4)
         {
@@ -106,7 +108,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         {
             constraints.gridwidth = 2;
         }
-        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2; 
+        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2;
         if (leadSpace < 0)
         {
             leadSpace = 0;
@@ -123,7 +125,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         button2.addActionListener(this);
 
         pack();
-        
+
         // Use the same location as the preceding Concede dialog.
         Point location = Concede.returnLocation();
         if (location == null)
@@ -136,8 +138,20 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         setVisible(true);
         repaint();
     }
-    
-    
+
+
+    public static void negotiate(JFrame parentFrame, Legion attacker,
+        Legion defender)
+    {
+        if (!active)
+        {
+            active = true;
+            new Negotiate(parentFrame, attacker, defender);
+            active = false;
+        }
+    }
+
+
     public void cleanup()
     {
         Concede.saveLocation(getLocation());
@@ -208,7 +222,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
             // Ensure that at least one legion is completely eliminated.
             if (attackersLeft > 0 && defendersLeft > 0)
             {
-                JOptionPane.showMessageDialog(parentFrame, 
+                JOptionPane.showMessageDialog(parentFrame,
                     "At least one legion must be eliminated.");
                 return;
             }
@@ -221,10 +235,10 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
             {
                 attacker.remove();
                 defender.remove();
-                
+
                 Game.logEvent(attacker.getMarkerId() + " and " +
-                    defender.getMarkerId() + 
-                    " agree to mutual elimination"); 
+                    defender.getMarkerId() +
+                    " agree to mutual elimination");
 
                 // If both Titans died, eliminate both players.
                 if (attacker.numCreature(Creature.titan) == 1 &&
@@ -282,7 +296,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
                         return;
                     }
                 }
-                
+
                 StringBuffer log = new StringBuffer("Winning legion ");
                 log.append(winner.getMarkerId());
                 log.append(" loses creatures ");
@@ -317,8 +331,8 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
 
                 // Add points, and angels if necessary.
                 winner.addPoints(points);
-                
-                Game.logEvent("Legion " + loser.getMarkerId() + 
+
+                Game.logEvent("Legion " + loser.getMarkerId() +
                    " is eliminated by legion " + winner.getMarkerId() +
                    " via negotiation");
 
