@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.util.*;
-import javax.swing.*;
 
 /**
  * Class BattleChit implements the GUI for a Titan chit representing
@@ -372,18 +371,14 @@ class BattleChit extends Chit
     // or false if it is not.
     private boolean chooseStrikePenalty(BattleChit carryTarget)
     {
-        String yesString = "Take Penalty";
-        String noString = "Do Not Take Penalty";
         String promptString = "Take strike penalty to allow carrying to " +
             carryTarget.getCreature().getName() + " in " +
             carryTarget.getCurrentHex().getTerrainName().toLowerCase() + "?";
 
-        Object[] options = {yesString, noString};
-        int optval = JOptionPane.showOptionDialog(map, promptString,
-            "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, options, noString);
+        new OptionDialog(map, "Take Strike Penalty?", promptString, 
+            "Take Penalty", "Do Not Take Penalty");
 
-        return (optval == JOptionPane.YES_OPTION);
+        return (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION);
     }
 
 
