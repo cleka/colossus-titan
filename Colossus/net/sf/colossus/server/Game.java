@@ -693,9 +693,9 @@ public final class Game
             !playerName.equals(getActivePlayerName()))
         {
             Log.error("Called advancePhase illegally (reason: " +
-                (oldPhase != phase ? "oldPhase != phase, " +
-                    Constants.getBattlePhaseName(oldPhase) + " != " +
-                    Constants.getBattlePhaseName(phase) :
+                (oldPhase != phase ? "oldPhase (" +
+                    Constants.getBattlePhaseName(oldPhase) + ") != phase (" +
+                    Constants.getBattlePhaseName(phase) + ")" :
                     (pendingAdvancePhase ? "pendingAdvancePhase is true " :
                         (!playerName.equals(getActivePlayerName()) ?
                             "wrong player [" + playerName +
