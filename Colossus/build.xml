@@ -59,26 +59,12 @@
 <!-- The javacc target does not support multiple .jj files in one target. -->
 <target name="parsers"
         depends="BattlelandLoader,
-                 VariantLoader,
-                 AIHintLoader,
                  BattlelandRandomizerLoader"
         description = "Create .java files from .jj files with javacc">
 </target>
 
 <target name="BattlelandLoader">
         <javacc target="net/sf/colossus/parser/BattlelandLoader.jj"
-                javacchome="${env.JAVACC_HOME}"
-        />
-</target>
-
-<target name="VariantLoader">
-        <javacc target="net/sf/colossus/parser/VariantLoader.jj"
-                javacchome="${env.JAVACC_HOME}"
-        />
-</target>
-
-<target name="AIHintLoader">
-        <javacc target="net/sf/colossus/parser/AIHintLoader.jj"
                 javacchome="${env.JAVACC_HOME}"
         />
 </target>
