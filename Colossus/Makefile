@@ -17,7 +17,7 @@
 # kjc comes with kaffe.  I like its --warning option.
 
 #JCC = jikes -g -depend -deprecation +P
-JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.3
+JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.4
 #JCC = kjc -g --deprecation --warning
 
 
@@ -64,11 +64,8 @@ testsources= $(wildcard *Test.java) \
 	$(wildcard com/werken/opt/*Test.java)
 variantsources=$(wildcard */*.java)
 xmlsources=\
-	$(wildcard com/bluecast/*/*.java) \
 	$(wildcard org/jdom/*.java) \
-	$(wildcard org/jdom/*/*.java) \
-	$(wildcard org/xml/sax/*.java) \
-	$(wildcard org/xml/sax/*/*.java)
+	$(wildcard org/jdom/*/*.java)
 allsources=$(basesources) $(variantsources) $(xmlsources)
 sources=$(filter-out $(testsources), $(allsources) )
 
@@ -98,12 +95,9 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
 	net/sf/colossus/*/*.class \
 	com/werken/opt/*.class \
-	com/bluecast/*/*.class \
 	org/jdom/*.class \
 	org/jdom/*/*.class \
-	org/xml/sax/*.class \
-	org/xml/sax/*/*.class \
-        Default TitanPlus ExtTitan Badlands Outlands Undead \
+	Default TitanPlus ExtTitan Badlands Outlands Undead \
 	Abyssal6 Abyssal9 \
 	TG-ConceptI TG-ConceptII TG-ConceptIII TG-SetII TG-SetIII TG-Wild \
 	Badlands-JDG SmallTitan Balrog Random version
