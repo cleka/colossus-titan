@@ -801,6 +801,7 @@ public final class Game
         }
         player.resetTurnState();
         server.allFullyUpdateOwnLegionContents();  // XXX Bug workaround
+        server.allFullyUpdateLegionHeights();      // XXX Bug workaround
         server.allSetupSplit();
 
         // XXX Is this causing double advances?

@@ -28,14 +28,6 @@ EVAL Gd01 move to Plains hex 105 = 0
 
 Bug: Hang in battle, with two players.  Dev code vs. out-of-sync old code.
 
-Bug: Saw 8-high enemy legion 3xUni, Chi, 3xGri, Ran.  Height shows up
-   as 7 on marker.  Savegame shows no ranger.  Should be fixed by
-   stack prediction code.
-Bug: 7-high AI stack appeared 8-high to client.  Had correct 7 creatures
-   plus one '?'  Did not get corrected on later turns.  Later appeared
-   to split 6-2.  When I attacked the 6-high stack it was shown to be 5.
-   Linux, 1.4.1.01
-
 Bug: 1_LATEST_IS_date is broken in remote_inst.  Can't delete previous
    1_LATEST_IS file  Works from RH 7.3 box.
 

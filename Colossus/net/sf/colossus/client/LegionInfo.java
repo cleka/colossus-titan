@@ -58,6 +58,11 @@ public final class LegionInfo
     void setHeight(int height)
     {
         this.height = height;
+        if (contents.size() > height)
+        {
+            Log.warn("LegionInfo.contents.size() > height!");
+            contents.clear();
+        }
     }
 
     public int getHeight()
