@@ -16,10 +16,16 @@ import net.sf.colossus.util.Log;
  */
 public class DevRandom extends Random
 {
+    final static String hwrandomFilename = "/dev/hwrandom";
+    final static String hrandomFilename = "/dev/hrandom";
     final static String urandomFilename = "/dev/urandom";
     final static String randomFilename = "/dev/random";
+    final static String[] sourceOrder = { hwrandomFilename,
+                                          hrandomFilename,
+                                          urandomFilename,
+                                          randomFilename };
     final static String PRNG = "PRNG";
-    private String source = urandomFilename;
+    private String source = null;
     private File randomSource = null;
     private FileInputStream randStream = null;
     
@@ -35,25 +41,37 @@ public class DevRandom extends Random
         source = sourcename;
         init();
     }
+
+    private boolean tryOneSource(String src) {
+        if (src == null)
+            return false;
+
+        source = src;
+        randomSource = new File(source);
+
+        if ((randomSource == null) || (!randomSource.exists())) {
+            System.err.println("cannot access " + src);
+            return false;
+        }
+
+        return true;
+    }
     
     private void init()
     {
-        if (source.equals(PRNG))
+        if ((source != null) && (source.equals(PRNG)))
         {
             // Don't try other sources.
             return;
         }
-        randomSource = new File(source);
-        if ((randomSource == null) || (!randomSource.exists()))
-        {
-            source = urandomFilename;
-            randomSource = new File(source);
+        if (!tryOneSource(source)) {
+            int i = 0;
+            while ((i < sourceOrder.length) &&
+                   (!tryOneSource(sourceOrder[i]))) {
+                i++;
+            }
         }
-        if ((randomSource == null) || (!randomSource.exists()))
-        {
-            source = randomFilename;
-            randomSource = new File(source);
-        }
+        
         if ((randomSource != null) && (randomSource.exists()))
         {
             try
