@@ -1,10 +1,20 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowListener;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.sf.colossus.util.KDialog;
 
@@ -28,9 +38,6 @@ public final class PickIntValue extends KDialog implements WindowListener,
             int min, int max, int step)
     {
         super(parentFrame, title, true);
-
-        this.oldValue = oldValue;
-        this.newValue = oldValue;
 
         setBackground(Color.lightGray);
 

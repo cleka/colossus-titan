@@ -1,7 +1,6 @@
 package net.sf.colossus.server;
 
 
-import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.Log;
@@ -520,7 +519,6 @@ public final class Legion implements Comparable
                 getPlayer().setTeleported(false);
             }
 
-            String formerHexLabel = currentHexLabel;
             currentHexLabel = startingHexLabel;
 
             moved = false;
@@ -926,27 +924,6 @@ public final class Legion implements Comparable
         }
 
         return lords;
-    }
-
-    private String[] convertCritterListToStringArray(List oCritterList)
-    {
-        int nSize = oCritterList.size();
-        String[] strArray = new String[nSize];
-        int i = 0;
-        Iterator it = oCritterList.iterator();
-        while (it.hasNext())
-        {
-            Critter oCritter = (Critter)it.next();
-            String strName = oCritter.getName();
-            strArray[i++] = strName;
-        }
-
-        return strArray;
-    }
-
-    private static Creature getCreatureByName(String strName)
-    {
-        return strName != null ? Creature.getCreatureByName(strName) : null;
     }
 
     /** Legions are sorted in descending order of total point value,

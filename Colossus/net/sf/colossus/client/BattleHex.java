@@ -1,13 +1,12 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.util.*;
-import java.awt.geom.*;
+import java.awt.Color;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.Log;
+
 
 /**
  * Class BattleHex holds game state for battle hex.
@@ -18,6 +17,7 @@ import net.sf.colossus.util.Log;
 
 public class BattleHex extends Hex
 {
+
     /** Valid elevations are 0, 1, and 2.  Also 3 for JDG Badlands. */
     private int elevation;
 
@@ -33,10 +33,10 @@ public class BattleHex extends Hex
      */
     //private static final char[] allTerrains =
     //{ 'p', 'w', 'r', 's', 't', 'o', 'v', 'd', 'l', 'n' };
-    private static final String[] allTerrains = 
-    { "Plains", "Tower", "Brambles", "Sand", "Tree", "Bog", "Volcano", "Drift",
-      "Lake", "Stone"};
-    
+    private static final String[] allTerrains = { "Plains", "Tower", "Brambles",
+        "Sand", "Tree", "Bog", "Volcano", "Drift",
+        "Lake", "Stone"};
+
     // Hexside terrain types are:
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
@@ -46,8 +46,7 @@ public class BattleHex extends Hex
     /**
      * The array of all the valid terrain type for a BattleHex Side.
      */
-    private static final char[] allHexsides =
-    { ' ', 'd', 'c', 's', 'w', 'r' };
+    private static final char[] allHexsides = { ' ', 'd', 'c', 's', 'w', 'r' };
     //private static final String[] allHexsides =
     //{ "Nothing", "Dune", "Cliff", "Slope", "Wall", "River"};
 
@@ -55,14 +54,14 @@ public class BattleHex extends Hex
      * Hold the type of the six side of the BattleHex.
      * The hexside is marked only in the higher hex.
      */
-    private char [] hexsides = new char[6];
+    private char[] hexsides = new char[6];
 
     /**
      * Links to the neighbors of the BattleHex.
      * Neighbors have one hex side in common.
      * Non-existant neighbor are marked with <b>null</b>.
      */
-    private BattleHex [] neighbors = new BattleHex[6];
+    private BattleHex[] neighbors = new BattleHex[6];
 
     private int xCoord;
     private int yCoord;
@@ -76,7 +75,6 @@ public class BattleHex extends Hex
     private static final int SLOW_COST = 2;
     private static final int NORMAL_COST = 1;
     private static final int SLOW_INCREMENT_COST = SLOW_COST - NORMAL_COST;
-
 
     BattleHex(int xCoord, int yCoord)
     {
@@ -92,15 +90,17 @@ public class BattleHex extends Hex
         assignLabel();
     }
 
-
     public String getTerrainName()
     {
         if (elevation == 0)
+        {
             return(getTerrain());
+        }
         else
+        {
             return(getTerrain() + " (" + elevation + ")");
+        }
     }
-    
 
     Color getTerrainColor()
     {
@@ -108,73 +108,93 @@ public class BattleHex extends Hex
         {
             switch (elevation)
             {
-            case 0:
-                return HTMLColor.lightOlive;
-            case 1:
-                return HTMLColor.darkYellow;
-            case 2:
-                return Color.yellow;
-            default:
-            case 3:
-                return HTMLColor.lightYellow;
+                case 0:
+                    return HTMLColor.lightOlive;
+
+                case 1:
+                    return HTMLColor.darkYellow;
+
+                case 2:
+                    return Color.yellow;
+
+                default:
+                case 3:
+                    return HTMLColor.lightYellow;
             }
-        } else if (getTerrain().equals("Tower"))
+        }
+        else if (getTerrain().equals("Tower"))
         {
             switch (elevation)
             {
-            case 0:
-                return HTMLColor.dimGray;
-            case 1:
-                return HTMLColor.darkGray;
-            case 2:
-                return Color.gray;
-            default:
-            case 3:
-                return HTMLColor.lightGray;
+                case 0:
+                    return HTMLColor.dimGray;
+
+                case 1:
+                    return HTMLColor.darkGray;
+
+                case 2:
+                    return Color.gray;
+
+                default:
+                case 3:
+                    return HTMLColor.lightGray;
             }
-        } else if (getTerrain().equals("Brambles"))
+        }
+        else if (getTerrain().equals("Brambles"))
         {
             switch (elevation)
             {
-            case 0:
-                return Color.green;
-            case 1:
-                return HTMLColor.brambleGreen1;
-            case 2:
-                return HTMLColor.brambleGreen2;
-            default:
-            case 3:
-                return HTMLColor.darkGreen;
+                case 0:
+                    return Color.green;
+
+                case 1:
+                    return HTMLColor.brambleGreen1;
+
+                case 2:
+                    return HTMLColor.brambleGreen2;
+
+                default:
+                case 3:
+                    return HTMLColor.darkGreen;
             }
-        } else if (getTerrain().equals("Sand"))
+        }
+        else if (getTerrain().equals("Sand"))
         {
             return Color.orange;
-        } else if (getTerrain().equals("Tree"))
+        }
+        else if (getTerrain().equals("Tree"))
         {
             return HTMLColor.brown;
-        } else if (getTerrain().equals("Bog"))
+        }
+        else if (getTerrain().equals("Bog"))
         {
             return Color.gray;
-        } else if (getTerrain().equals("Volcano"))
+        }
+        else if (getTerrain().equals("Volcano"))
         {
             switch (elevation)
             {
-            case 3:
-                return Color.red;
-            default:
-            case 2:
-                return HTMLColor.darkRed;
+                case 3:
+                    return Color.red;
+
+                default:
+                case 2:
+                    return HTMLColor.darkRed;
             }
-        } else if (getTerrain().equals("Drift"))
+        }
+        else if (getTerrain().equals("Drift"))
         {
             return Color.blue;
-        } else if (getTerrain().equals("Lake"))
+        }
+        else if (getTerrain().equals("Lake"))
         {
             return HTMLColor.skyBlue;
-        } else if (getTerrain().equals("Stone"))
+        }
+        else if (getTerrain().equals("Stone"))
         {
             return HTMLColor.dimGray;
-        } else
+        }
+        else
         {
             return Color.black;
         }
@@ -183,13 +203,13 @@ public class BattleHex extends Hex
     public static boolean isNativeBonusHazard(String name)
     {
         if (name.equals("Brambles") ||
-            name.equals("Volcano"))
+                name.equals("Volcano"))
         {
             return true;
         }
         return false;
     }
-    
+
     public static boolean isNativeBonusHexside(char h)
     {
         if (h == 'w' || h == 's' || h == 'd')
@@ -203,7 +223,7 @@ public class BattleHex extends Hex
     {
         boolean result;
         result = isNativeBonusHazard(getTerrain());
-        
+
         for (int i = 0; i < 6; i++)
         {
             char h = getHexside(i);
@@ -211,11 +231,11 @@ public class BattleHex extends Hex
         }
         return result;
     }
-    
+
     public static boolean isNonNativePenaltyHazard(String name)
     {
         if (name.equals("Brambles") ||
-            name.equals("Drift"))
+                name.equals("Drift"))
         {
             return true;
         }
@@ -230,7 +250,7 @@ public class BattleHex extends Hex
         }
         return false;
     }
-    
+
     public boolean isNonNativePenaltyTerrain()
     {
         boolean result;
@@ -250,33 +270,39 @@ public class BattleHex extends Hex
         if (xCoord == -1)
         {
             label = "X" + yCoord;
-            
+
         }
         else
         {
             char xLabel;
             switch (xCoord)
             {
-            case 0:
-                xLabel = 'A';
-                break;
-            case 1:
-                xLabel = 'B';
-                break;
-            case 2:
-                xLabel = 'C';
-                break;
-            case 3:
-                xLabel = 'D';
-                break;
-            case 4:
-                xLabel = 'E';
-                break;
-            case 5:
-                xLabel = 'F';
-                break;
-            default:
-                xLabel = '?';
+                case 0:
+                    xLabel = 'A';
+                    break;
+
+                case 1:
+                    xLabel = 'B';
+                    break;
+
+                case 2:
+                    xLabel = 'C';
+                    break;
+
+                case 3:
+                    xLabel = 'D';
+                    break;
+
+                case 4:
+                    xLabel = 'E';
+                    break;
+
+                case 5:
+                    xLabel = 'F';
+                    break;
+
+                default:
+                    xLabel = '?';
             }
 
             int yLabel = 6 - yCoord - (int)Math.abs(((xCoord - 3) / 2));
@@ -289,7 +315,6 @@ public class BattleHex extends Hex
     {
         this.hexsides[i] = hexside;
     }
-
 
     public char getHexside(int i)
     {
@@ -306,21 +331,26 @@ public class BattleHex extends Hex
 
     public String getHexsideName(int i)
     {
-        switch(hexsides[i])
+        switch (hexsides[i])
         {
-        default:
-        case ' ':
-            return("Nothing");
-        case 'd':
-            return("Dune");
-        case 'c':
-            return("Cliff");
-        case 's':
-            return("Slope");
-        case 'w':
-            return("Wall");
-        case 'r':
-            return("River");
+            default:
+            case ' ':
+                return("Nothing");
+
+            case 'd':
+                return("Dune");
+
+            case 'c':
+                return("Cliff");
+
+            case 's':
+                return("Slope");
+
+            case 'w':
+                return("Wall");
+
+            case 'r':
+                return("River");
         }
     }
 
@@ -338,17 +368,15 @@ public class BattleHex extends Hex
         return hexside;
     }
 
-
     public int getElevation()
     {
         return elevation;
     }
 
-    public void setElevation (int elevation)
+    public void setElevation(int elevation)
     {
         this.elevation = elevation;
     }
-
 
     public BattleHex getNeighbor(int i)
     {
@@ -370,7 +398,6 @@ public class BattleHex extends Hex
         }
     }
 
-
     public int getXCoord()
     {
         return xCoord;
@@ -381,12 +408,10 @@ public class BattleHex extends Hex
         return yCoord;
     }
 
-
     public boolean isEntrance()
     {
         return (xCoord == -1);
     }
-
 
     public boolean hasWall()
     {
@@ -417,16 +442,15 @@ public class BattleHex extends Hex
      */
     public int getEntryCost(Creature creature, int cameFrom, boolean cumul)
     {
-        String terrain = getTerrain();
-
         int cost = NORMAL_COST;
 
         // Check to see if the hex is occupied or totally impassable.
         if ((getTerrain().equals("Lake") && (!creature.isWaterDwelling())) ||
-            (getTerrain().equals("Tree") && (!creature.isNativeTree())) ||
-            (getTerrain().equals("Stone") && (!creature.isNativeStone())) ||
-            (getTerrain().equals("Volcano") && (!creature.isNativeVolcano()))||
-            (getTerrain().equals("Bog") && (!creature.isNativeBog())))
+                (getTerrain().equals("Tree") && (!creature.isNativeTree())) ||
+                (getTerrain().equals("Stone") && (!creature.isNativeStone())) ||
+                (getTerrain().equals("Volcano") &&
+                (!creature.isNativeVolcano())) ||
+                (getTerrain().equals("Bog") && (!creature.isNativeBog())))
         {
             cost += IMPASSIBLE_COST;
         }
@@ -435,24 +459,24 @@ public class BattleHex extends Hex
 
         // Non-fliers may not cross cliffs.
         if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') &&
-            !creature.isFlier())
+                !creature.isFlier())
         {
             cost += IMPASSIBLE_COST;
         }
 
         // river slows both way, except native & water dwellers
         if ((hexside == 'r' || getOppositeHexside(cameFrom) == 'r') &&
-            !creature.isFlier() && !creature.isWaterDwelling()
-            && !creature.isNativeRiver())
+                !creature.isFlier() && !creature.isWaterDwelling() &&
+                !creature.isNativeRiver())
         {
             cost += SLOW_INCREMENT_COST;
         }
 
         // Check for a slowing hexside.
         if ((hexside == 'w' ||
-             (hexside == 's' && !creature.isNativeSlope()))
-            && !creature.isFlier() &&
-            elevation > getNeighbor(cameFrom).getElevation())
+                (hexside == 's' && !creature.isNativeSlope())) &&
+                !creature.isFlier() &&
+                elevation > getNeighbor(cameFrom).getElevation())
         {
             cost += SLOW_INCREMENT_COST;
         }
@@ -460,23 +484,23 @@ public class BattleHex extends Hex
         // Bramble, drift, and sand slow non-natives, except that sand
         //     doesn't slow fliers.
         if ((getTerrain().equals("Brambles") && !creature.isNativeBramble()) ||
-            (getTerrain().equals("Drift") && !creature.isNativeDrift()) ||
-            (getTerrain().equals("Sand") && !creature.isNativeSandDune() &&
-            !creature.isFlier()))
+                (getTerrain().equals("Drift") && !creature.isNativeDrift()) ||
+                (getTerrain().equals("Sand") && !creature.isNativeSandDune() &&
+                !creature.isFlier()))
         {
             cost += SLOW_INCREMENT_COST;
         }
-        
+
         if (cost > IMPASSIBLE_COST)
         { // max out impassible at IMPASSIBLE_COST
             cost = IMPASSIBLE_COST;
         }
-        
+
         if ((cost < IMPASSIBLE_COST) && (cost > SLOW_COST) && (!cumul))
         { // don't cumul Slow
             cost = SLOW_COST;
         }
-        
+
         return cost;
     }
 
@@ -524,8 +548,8 @@ public class BattleHex extends Hex
 
     public boolean isCliff(int hexside)
     {
-        return getHexside(hexside) == 'c' || 
-            getOppositeHexside(hexside) == 'c';
+        return getHexside(hexside) == 'c' ||
+                getOppositeHexside(hexside) == 'c';
     }
 
     public static String[] getTerrains()

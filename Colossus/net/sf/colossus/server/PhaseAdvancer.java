@@ -1,24 +1,17 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-
-import net.sf.colossus.util.Options;
-
-
 /**
  * Advances to the next phase.
  * @version $Id$
  * @author David Ripton
  */
 
-public abstract class PhaseAdvancer
+public interface PhaseAdvancer
 {
-    private boolean isHuman;
+    void advancePhase();
 
-    abstract void advancePhase();
+    void advancePhaseInternal();
 
-    abstract void advancePhaseInternal();
-
-    abstract void advanceTurn();
+    void advanceTurn();
 }

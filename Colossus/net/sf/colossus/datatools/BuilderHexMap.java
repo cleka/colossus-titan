@@ -1,15 +1,19 @@
 
 package net.sf.colossus.datatools;
 
+
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
+
 import javax.swing.*;
 import net.sf.colossus.parser.BattlelandLoader;
 import net.sf.colossus.client.Hex;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.GUIBattleHex;
+
 
 /**
  * Class BuilderHexMap displays a basic battle map.
@@ -21,23 +25,19 @@ import net.sf.colossus.client.GUIBattleHex;
 public class BuilderHexMap extends JPanel implements MouseListener, WindowListener
 {
     String filename = null;
-    
+
     // GUI hexes need to be recreated for each object, since scale varies.
-    private GUIBattleHex [][] h = new GUIBattleHex[6][6];
-    private java.util.List hexes = new ArrayList(33);
+    private GUIBattleHex[][] h = new GUIBattleHex[6][6];
+    private List hexes = new ArrayList(33);
 
     /** ne, e, se, sw, w, nw */
-    private GUIBattleHex [] entrances = new GUIBattleHex[6];
+    private GUIBattleHex[] entrances = new GUIBattleHex[6];
 
-    private static final boolean[][] show =
-    {
-        {false,false,true,true,true,false},
-        {false,true,true,true,true,false},
-        {false,true,true,true,true,true},
-        {true,true,true,true,true,true},
-        {false,true,true,true,true,true},
-        {false,true,true,true,true,false}
-    };
+    private static final boolean[][] show = { {false, false, true, true, true,
+            false}, {false, true, true, true, true, false}, {false, true, true,
+            true, true, true}, {true, true, true, true, true, true}, {false,
+            true, true, true, true, true}, {false, true, true, true, true,
+            false} };
 
     protected boolean isTower = false;
 
@@ -78,9 +78,9 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
                 if (show[i][j])
                 {
                     GUIBattleHex hex = new GUIBattleHex
-                        ((int) Math.round(cx + 3 * i * scale),
-                        (int) Math.round(cy + (2 * j + (i & 1)) *
-                        Hex.SQRT3 * scale), scale, this, i, j);
+                            ((int)Math.round(cx + 3 * i * scale),
+                            (int)Math.round(cy + (2 * j + (i & 1)) *
+                            Hex.SQRT3 * scale), scale, this, i, j);
 
                     h[i][j] = hex;
                     hexes.add(hex);
@@ -89,40 +89,40 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         }
     }
 
-
     /** Add terrain, hexsides, elevation, and exits to hexes.
      *  Cliffs are bidirectional; other hexside obstacles are noted
      *  only on the high side, since they only interfere with
      *  uphill movement. */
-    private synchronized void setupHexesGameState(BattleHex [][] h)
+    private synchronized void setupHexesGameState(BattleHex[][] h)
     {
         if (filename != null)
         {
             InputStream terIS = null;
-        
+
             try
             {
                 terIS = new FileInputStream(filename);
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 System.out.println("Battlelands loading failed : " + e);
             }
             try
             {
                 BattlelandLoader bl = new BattlelandLoader(terIS);
-                while (bl.oneBattlelandCase(h) >= 0) {}
+                while (bl.oneBattlelandCase(h) >= 0)
+                {
+                }
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 System.out.println("Battlelands loading failed : " + e);
             }
         }
     }
 
-
     /** Add references to neighbor hexes. */
-    private void setupNeighbors(BattleHex [][] h)
+    private void setupNeighbors(BattleHex[][] h)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -164,7 +164,6 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         }
     }
 
-
     void setupEntrances()
     {
         setupEntrancesGUI();
@@ -175,17 +174,17 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
     {
         // Initialize entrances.
         entrances[0] = new GUIBattleHex(cx + 15 * scale,
-            (int) Math.round(cy + 1 * scale), scale, this, -1, 0);
+                (int)Math.round(cy + 1 * scale), scale, this, -1, 0);
         entrances[1] = new GUIBattleHex(cx + 21 * scale,
-            (int) Math.round(cy + 10 * scale), scale, this, -1, 1);
+                (int)Math.round(cy + 10 * scale), scale, this, -1, 1);
         entrances[2] = new GUIBattleHex(cx + 17 * scale,
-            (int) Math.round(cy + 22 * scale), scale, this, -1, 2);
+                (int)Math.round(cy + 22 * scale), scale, this, -1, 2);
         entrances[3] = new GUIBattleHex(cx + 2 * scale,
-            (int) Math.round(cy + 21 * scale), scale, this, -1, 3);
+                (int)Math.round(cy + 21 * scale), scale, this, -1, 3);
         entrances[4] = new GUIBattleHex(cx - 3 * scale,
-            (int) Math.round(cy + 10 * scale), scale, this, -1, 4);
+                (int)Math.round(cy + 10 * scale), scale, this, -1, 4);
         entrances[5] = new GUIBattleHex(cx + 1 * scale,
-            (int) Math.round(cy + 1 * scale), scale, this, -1, 5);
+                (int)Math.round(cy + 1 * scale), scale, this, -1, 5);
 
         hexes.add(entrances[0]);
         hexes.add(entrances[1]);
@@ -195,8 +194,8 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         hexes.add(entrances[5]);
     }
 
-    private void setupEntrancesGameState(BattleHex [] entrances,
-        BattleHex [][] h)
+    private void setupEntrancesGameState(BattleHex[] entrances,
+            BattleHex[][] h)
     {
         // Add neighbors to entrances.
         entrances[0].setNeighbor(3, h[3][0]);
@@ -226,7 +225,6 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         entrances[5].setNeighbor(3, h[2][1]);
         entrances[5].setNeighbor(4, h[3][0]);
     }
-
 
     void unselectAllHexes()
     {
@@ -299,7 +297,6 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
             }
         }
     }
-
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null. */
@@ -396,7 +393,6 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
     {
     }
 
-
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
@@ -419,7 +415,6 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         }
     }
 
-
     public Dimension getMinimumSize()
     {
         return getPreferredSize();
@@ -436,15 +431,15 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         String terrain;
         char s;
         int e;
-        java.util.List localStartList = new ArrayList();
+        List localStartList = new ArrayList();
 
         buf.append("# Battlelands generated by BattlelandsBuilder\n");
         buf.append("# You can uncomment the line below to give this Battlelands a subtitle\n");
         buf.append("#SUBTITLE <put_your_subtitle_here>\n");
-        
+
         for (int i = 0; i < 6; i++)
         {
-            for (int j = 0 ; j < 6 ; j++)
+            for (int j = 0; j < 6; j++)
             {
                 if (show[i][j])
                 {
@@ -463,26 +458,42 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
                     {
                         s = h[i][j].getHexside(k);
                         if (s != ' ')
+                        {
                             doDumpSides = true;
+                        }
                         if (s == 's')
+                        {
                             hasSlope = true;
+                        }
                         if (s == 'w')
+                        {
                             hasWall = true;
+                        }
                     }
                     if (doDumpSides ||
-                        (!terrain.equals("Plains")) ||
-                        (e != 0))
+                            (!terrain.equals("Plains")) ||
+                            (e != 0))
                     {
                         if ((e < 1) && hasSlope)
+                        {
                             buf.append("# WARNING: slope on less-than-1 elevation Hex\n");
+                        }
                         if ((!terrain.equals("Tower")) && hasWall)
+                        {
                             buf.append("# WARNING: wall on non-Tower Hex\n");
+                        }
                         if ((e < 1) && hasWall)
+                        {
                             buf.append("# WARNING: wall on less-than-1 elevation Hex\n");
+                        }
                         if ((terrain.equals("Lake")) && doDumpSides)
+                        {
                             buf.append("# WARNING: non-default sides on Lake\n");
+                        }
                         if ((terrain.equals("Tree")) && doDumpSides)
+                        {
                             buf.append("# WARNING: non-default sides on Tree\n");
+                        }
                         buf.append(i);
                         buf.append(" ");
                         buf.append(j);
@@ -508,7 +519,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
                 }
             }
         }
-        
+
         if (isTower)
         {
             buf.append("# This is a Tower\nTOWER\n");
@@ -537,7 +548,9 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
             hex.setTerrain("Plains");
             hex.setElevation(0);
             for (int i = 0; i < 6; i++)
-                hex.setHexside(i,' ');
+            {
+                hex.setHexside(i, ' ');
+            }
         }
     }
 }

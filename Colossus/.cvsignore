@@ -3,3 +3,5 @@ ChangeLog
 version
 javamake.pdb
 TEST*.txt
+.project
+.classpath

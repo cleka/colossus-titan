@@ -1,9 +1,9 @@
 package net.sf.colossus.client;
 
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 
 import net.sf.colossus.util.Options;
 
@@ -17,9 +17,8 @@ public final class SaveWindow
 {
     private Client client;
     private String name;
-    private final Dimension screen = 
-        Toolkit.getDefaultToolkit().getScreenSize();
-
+    private final Dimension screen =
+            Toolkit.getDefaultToolkit().getScreenSize();
 
     public SaveWindow(Client client, String name)
     {

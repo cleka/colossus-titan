@@ -1,8 +1,10 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 
 
 /**
@@ -35,8 +37,10 @@ public abstract class Hex
     double len;
     GeneralPath hexagon;
     Rectangle rectBound;
+
     /** Globally turns antialiasing on or off for all hexes. */
     static boolean antialias;
+
     /** Globally turns overlay on or off for all hexes */
     static boolean useOverlay;
 
@@ -111,7 +115,6 @@ public abstract class Hex
         this.yCoord = yCoord;
     }
 
-
     public void select()
     {
         selected = true;
@@ -131,7 +134,6 @@ public abstract class Hex
     {
         return selected;
     }
-
 
     static boolean getAntialias()
     {
@@ -153,15 +155,14 @@ public abstract class Hex
         useOverlay = enabled;
     }
 
-
     /** Return a GeneralPath polygon, with the passed number of sides,
      *  and the passed x and y coordinates.  Close the polygon if the
      *  argument closed is true. */
-    static GeneralPath makePolygon(int sides, double [] x, double [] y,
-        boolean closed)
+    static GeneralPath makePolygon(int sides, double[] x, double[] y,
+            boolean closed)
     {
         GeneralPath polygon = new GeneralPath(GeneralPath.WIND_EVEN_ODD,
-            sides);
+                sides);
         polygon.moveTo((float)x[0], (float)y[0]);
         for (int i = 1; i < sides; i++)
         {
@@ -174,18 +175,17 @@ public abstract class Hex
         return polygon;
     }
 
-
     /** Return the Point closest to the center of the polygon. */
     public Point findCenter()
     {
         return new Point((int)Math.round((xVertex[2] + xVertex[5]) / 2),
-            (int)Math.round((yVertex[0] + yVertex[3]) / 2));
+                (int)Math.round((yVertex[0] + yVertex[3]) / 2));
     }
 
     /** Return the Point2D.Double at the center of the polygon. */
     Point2D.Double findCenter2D()
     {
         return new Point2D.Double((xVertex[2] + xVertex[5]) / 2.0,
-            (yVertex[0] + yVertex[3]) / 2.0);
+                (yVertex[0] + yVertex[3]) / 2.0);
     }
 }

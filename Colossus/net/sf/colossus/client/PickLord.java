@@ -1,13 +1,21 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import net.sf.colossus.util.KDialog;
+import javax.swing.JFrame;
+
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.util.KDialog;
+
 
 /**
  * Class PickLord allows a player to choose which lord tower teleports.
@@ -18,12 +26,11 @@ import net.sf.colossus.server.Constants;
 
 final class PickLord extends KDialog implements MouseListener, WindowListener
 {
-    private java.util.List chits = new ArrayList();
+    private List chits = new ArrayList();
     private static String lordType;
-    private java.util.List imageNames;
+    private List imageNames;
 
-
-    private PickLord(JFrame parentFrame, java.util.List imageNames)
+    private PickLord(JFrame parentFrame, List imageNames)
     {
         super(parentFrame, "Reveal Which Lord?", true);
 
@@ -54,13 +61,11 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         repaint();
     }
 
-
-    static String pickLord(JFrame parentFrame, java.util.List imageNames)
+    static String pickLord(JFrame parentFrame, List imageNames)
     {
         new PickLord(parentFrame, imageNames);
         return lordType;
     }
-
 
     public void mousePressed(MouseEvent e)
     {

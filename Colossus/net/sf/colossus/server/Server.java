@@ -3,7 +3,6 @@ package net.sf.colossus.server;
 
 import java.util.*;
 import java.net.*;
-import javax.swing.*;
 import java.io.*;
 
 import net.sf.colossus.util.Log;
@@ -51,7 +50,7 @@ public final class Server implements IServer
     // Network stuff
     private ServerSocket serverSocket;
     // list of Socket that are currently active
-    private java.util.List activeSocketList =
+    private List activeSocketList =
             Collections.synchronizedList(new ArrayList());
     private int numClients;
     private int maxClients;
@@ -196,7 +195,7 @@ public final class Server implements IServer
     private void createLocalClient(String playerName)
     {
         Log.debug("Called Server.createLocalClient() for " + playerName);
-        IClient client = new Client("127.0.0.1", port, playerName, false);
+        new Client("127.0.0.1", port, playerName, false);
     }
 
     synchronized void addClient(final IClient client, final String playerName,
@@ -363,21 +362,6 @@ public final class Server implements IServer
         {
             return null;
         }
-    }
-
-    /** Return the name of the first human-controlled client, or null if
-     *  all clients are AI-controlled. */
-    private String getFirstHumanClientName()
-    {
-        for (int i = 0; i < game.getNumPlayers(); i++)
-        {
-            Player player = game.getPlayer(i);
-            if (player.isHuman())
-            {
-                return player.getName();
-            }
-        }
-        return null;
     }
 
     synchronized void allInitBoard()
@@ -1592,7 +1576,7 @@ public final class Server implements IServer
     }
 
     synchronized void askPickColor(String playerName,
-            final java.util.List colorsLeft)
+            final List colorsLeft)
     {
         IClient client = getClient(playerName);
         if (client != null)
@@ -1616,7 +1600,6 @@ public final class Server implements IServer
 
     void askPickFirstMarker(String playerName)
     {
-        Player player = game.getPlayer(playerName);
         IClient client = getClient(playerName);
         if (client != null)
         {

@@ -2,10 +2,9 @@ package net.sf.colossus.datatools;
 
 
 import java.awt.*;
-import java.awt.geom.*;
 import java.awt.event.*;
 import java.awt.print.*;
-import java.util.*;
+import java.util.List;
 import javax.swing.*;
 
 import net.sf.colossus.client.BattleHex;
@@ -20,7 +19,7 @@ import net.sf.colossus.client.GUIBattleHex;
  */
 
 final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
-        MouseListener, Printable
+            MouseListener, Printable
 {
     private JDialog dialog;
     private JPopupMenu popupMenuTerrain;
@@ -66,7 +65,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             java.io.File rndFile = rndChooser.getSelectedFile();
             String tempRndName = rndFile.getName();
             String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
-            java.util.List directories = new java.util.ArrayList();
+            List directories = new java.util.ArrayList();
             directories.add(tempRndDirectory);
             java.io.InputStream inputFile =
                     net.sf.colossus.util.ResourceLoader.getInputStream(tempRndName,
@@ -82,7 +81,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     }
                     parser.resolveAllHexsides(h);
                     towerItem.setState(parser.isTower());
-                    java.util.List startList = parser.getStartList();
+                    List startList = parser.getStartList();
                     if (startList != null)
                     {
                         selectHexesByLabels(new java.util.HashSet(startList));
@@ -107,7 +106,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             java.io.File rndFile = rndChooser.getSelectedFile();
             String tempRndName = rndFile.getName();
             String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
-            java.util.List directories = new java.util.ArrayList();
+            List directories = new java.util.ArrayList();
             directories.add(tempRndDirectory);
             java.io.InputStream inputFile =
                     net.sf.colossus.util.ResourceLoader.getInputStream(tempRndName,
@@ -123,7 +122,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     }
                     towerItem.setState(parser.isTower());
                     isTower = parser.isTower();
-                    java.util.List startList = parser.getStartList();
+                    List startList = parser.getStartList();
                     if (startList != null)
                     {
                         selectHexesByLabels(new java.util.HashSet(startList));
@@ -148,7 +147,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             java.io.File rndFile = rndChooser.getSelectedFile();
             String tempRndName = rndFile.getName();
             String tempRndDirectory = rndFile.getParentFile().getAbsolutePath();
-            java.util.List directories = new java.util.ArrayList();
+            List directories = new java.util.ArrayList();
             directories.add(tempRndDirectory);
             java.io.OutputStream outputFile =
                     net.sf.colossus.util.ResourceLoader.getOutputStream(tempRndName,

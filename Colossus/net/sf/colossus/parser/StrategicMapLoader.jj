@@ -129,7 +129,7 @@ int c_way() :
  * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
  * @see net.sf.colossus.client.MasterHex
  */
-int oneCase(MasterHex [][] array, java.util.List list, boolean [][] show) :
+int oneCase(MasterHex [][] array, boolean [][] show) :
 {
     String s;
     String ter;
@@ -150,7 +150,6 @@ int oneCase(MasterHex [][] array, java.util.List list, boolean [][] show) :
     {
         array[posX][posY] = new MasterHex();
         show[posX][posY] = true;
-        list.add(array[posX][posY]);
 
         array[posX][posY].setTerrain(ter);
         array[posX][posY].setLabel(p);

@@ -1,11 +1,13 @@
 package net.sf.colossus.client;
 
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import net.sf.colossus.util.Log;
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Dice;
-import net.sf.colossus.server.Constants;
+
 
 /**
  *  A specialized list of creature info, for split prediction.
@@ -65,8 +67,8 @@ class CreatureInfoList extends ArrayList
         while (it.hasNext())
         {
             CreatureInfo ci = (CreatureInfo)it.next();
-            if (numCreature(ci.getName()) < 
-                other.numCreature(ci.getName()))
+            if (numCreature(ci.getName()) <
+                    other.numCreature(ci.getName()))
             {
                 return false;
             }

@@ -1,5 +1,6 @@
 package net.sf.colossus.server;
 
+
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
@@ -9,7 +10,11 @@ import net.sf.colossus.parser.AIHintLoader;
 import net.sf.colossus.client.HexMap;
 
 import java.io.*;
+import java.util.List;
+import java.util.ListIterator;
+
 import javax.swing.text.*;
+
 
 /**
  * Class VariantSupport hold the members and functions required to support Variants in Colossus
@@ -26,12 +31,11 @@ public final class VariantSupport
     private static String hintName = "";
     private static String creaturesName = "";
     private static Document varREADME = null;
-    private static java.util.List dependUpon = null;
+    private static List dependUpon = null;
     private static boolean loadedVariant = false;
     private static int maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
     private static HintInterface aihl = null;
     private static java.util.Properties markerNames;
-
 
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
@@ -41,7 +45,7 @@ public final class VariantSupport
     {
         freshenVariant(variantName + ".var", variantName);
     }
-    
+
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
      * @param varFile Soon-to-be-loaded variant File.
@@ -52,23 +56,23 @@ public final class VariantSupport
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
         freshenVariant(tempVarName, tempVarDirectory);
     }
-    
+
     /**
      * Clean-up the ResourceLoader caches to make room for a variant.
      * @param tempVarName The name of the file holding the soon-to-be-loaded Variant definition.
      * @param tempVarDirectory The path to the directory holding the soon-to-be-loaded Variant.
      */
-    public static void freshenVariant(String tempVarName, 
-                                  String tempVarDirectory)
+    public static void freshenVariant(String tempVarName,
+            String tempVarDirectory)
     {
         if (!(loadedVariant && variantName.equals(tempVarName) &&
-              varDirectory.equals(tempVarDirectory)))
+                varDirectory.equals(tempVarDirectory)))
         {
             ResourceLoader.purgeImageCache();
             ResourceLoader.purgeFileCache();
         }
     }
-    
+
     /**
      * Load a Colossus Variant by name.
      * @param variantName The name of the variant.
@@ -76,10 +80,10 @@ public final class VariantSupport
      * @return A Document describing the variant.
      */
     public static Document loadVariant(String variantName,
-                                       boolean serverSide)
+            boolean serverSide)
     {
         return loadVariant(variantName + ".var", variantName,
-                           serverSide);
+                serverSide);
     }
 
     /**
@@ -89,7 +93,7 @@ public final class VariantSupport
      * @return A Document describing the variant.
      */
     public static Document loadVariant(java.io.File varFile,
-                                       boolean serverSide)
+            boolean serverSide)
     {
         String tempVarName = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
@@ -103,12 +107,12 @@ public final class VariantSupport
      * @param serverSide We're loading on a server.
      * @return A Document describing the variant.
      */
-    public static Document loadVariant(String tempVarName, 
-                                       String tempVarDirectory,
-                                       boolean serverSide)
+    public static Document loadVariant(String tempVarName,
+            String tempVarDirectory,
+            boolean serverSide)
     {
         if (loadedVariant && variantName.equals(tempVarName) &&
-            varDirectory.equals(tempVarDirectory))
+                varDirectory.equals(tempVarDirectory))
         {
             return varREADME;
         }
@@ -118,20 +122,21 @@ public final class VariantSupport
             ResourceLoader.purgeImageCache();
             ResourceLoader.purgeFileCache();
         }
-        
+
         loadedVariant = false;
 
         Log.debug("Loading variant " + tempVarName +
-                  ", data files in " + tempVarDirectory);
+                ", data files in " + tempVarDirectory);
         try
         {
+
             /* Can't use getVarDirectoriesList yet ! */
-            java.util.List directories = new java.util.ArrayList();
+            List directories = new java.util.ArrayList();
             directories.add(tempVarDirectory);
             directories.add(Constants.defaultDirName);
             InputStream varIS = ResourceLoader.getInputStream(
-                                               tempVarName,
-                                               directories);
+                    tempVarName,
+                    directories);
             if (varIS == null)
             {
                 throw new FileNotFoundException(tempVarName);
@@ -141,7 +146,9 @@ public final class VariantSupport
                 VariantLoader vl = new VariantLoader(varIS);
                 String[] data = new String[VariantLoader.TOTAL_INDEX];
                 data[0] = data[1] = data[2] = data[3] = null;
-                while (vl.oneLine(data) >= 0) {}
+                while (vl.oneLine(data) >= 0)
+                {
+                }
                 if (vl.maxPlayers > 0)
                 {
                     maxPlayers = vl.maxPlayers;
@@ -153,9 +160,9 @@ public final class VariantSupport
                 if (maxPlayers > Constants.MAX_MAX_PLAYERS)
                 {
                     Log.error("Can't use more than " +
-                              Constants.MAX_MAX_PLAYERS +
-                              " players, while variant requires " +
-                              maxPlayers);
+                            Constants.MAX_MAX_PLAYERS +
+                            " players, while variant requires " +
+                            maxPlayers);
                     maxPlayers = Constants.MAX_MAX_PLAYERS;
                 }
                 varDirectory = tempVarDirectory;
@@ -197,8 +204,8 @@ public final class VariantSupport
                 Log.debug("Variant using TER " + recruitName);
                 if (data[VariantLoader.DEPEND_INDEX] != null)
                 {
-                    dependUpon = Split.split(',', 
-                        data[VariantLoader.DEPEND_INDEX]);
+                    dependUpon = Split.split(',',
+                            data[VariantLoader.DEPEND_INDEX]);
                     Log.debug("Variant depending upon " + dependUpon);
                 }
                 else
@@ -242,8 +249,8 @@ public final class VariantSupport
             {
                 Log.debug("Trying to load Default instead...");
                 varREADME = loadVariant(Constants.defaultVARFile,
-                                        Constants.defaultDirName,
-                                        serverSide);
+                        Constants.defaultDirName,
+                        serverSide);
             }
         }
 
@@ -264,7 +271,7 @@ public final class VariantSupport
     {
         return mapName;
     }
- 
+
     public static String getRecruitName()
     {
         return recruitName;
@@ -280,9 +287,9 @@ public final class VariantSupport
         return creaturesName;
     }
 
-    public static java.util.List getVarDirectoriesList()
+    public static List getVarDirectoriesList()
     {
-        java.util.List directories = new java.util.ArrayList();
+        List directories = new java.util.ArrayList();
         if (!(varDirectory.equals(Constants.defaultDirName)))
         {
             directories.add(varDirectory);
@@ -299,33 +306,33 @@ public final class VariantSupport
         return directories;
     }
 
-    public static java.util.List getVarDirectoriesList(String suffixPath)
+    public static List getVarDirectoriesList(String suffixPath)
     {
-        java.util.List directories = getVarDirectoriesList();
-        java.util.List suffixedDirs = new java.util.ArrayList();
+        List directories = getVarDirectoriesList();
+        List suffixedDirs = new java.util.ArrayList();
         java.util.Iterator it = directories.iterator();
         while (it.hasNext())
         {
             String dir = (String)it.next();
             suffixedDirs.add(dir +
-                             ResourceLoader.getPathSeparator() +
-                             suffixPath);
+                    ResourceLoader.getPathSeparator() +
+                    suffixPath);
         }
         return suffixedDirs;
     }
 
-    public static java.util.List getImagesDirectoriesList()
+    public static List getImagesDirectoriesList()
     {
         return getVarDirectoriesList(Constants.imagesDirName);
     }
 
-    public static java.util.List getBattlelandsDirectoriesList()
+    public static List getBattlelandsDirectoriesList()
     {
         return getVarDirectoriesList(Constants.battlelandsDirName);
     }
 
     /** TerrainRecruitLoader is needed by many classes, so load it
-     *  immediately after loading the variant. */ 
+     *  immediately after loading the variant. */
     public synchronized static void loadTerrainsAndRecruits(boolean serverSide)
     {
         // remove all old stuff in the custom recruitments system
@@ -333,21 +340,24 @@ public final class VariantSupport
 
         try
         {
-            java.util.List directories = 
-                getVarDirectoriesList();
+            List directories =
+                    getVarDirectoriesList();
             InputStream terIS = ResourceLoader.getInputStream(
-                getRecruitName(), directories);
-            if (terIS == null) 
+                    getRecruitName(), directories);
+            if (terIS == null)
             {
                 throw new FileNotFoundException(
-                    getRecruitName());
+                        getRecruitName());
             }
             TerrainRecruitLoader trl = new TerrainRecruitLoader(terIS);
-            while (trl.oneTerrain() >= 0) {}
+            while (trl.oneTerrain() >= 0)
+            {
+            }
+
             /* now initialize the static bits of the Battlelands */
             HexMap.staticBattlelandsInit(serverSide);
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             Log.error("Recruit-per-terrain loading failed : " + e);
             System.exit(1);
@@ -367,21 +377,22 @@ public final class VariantSupport
     private static java.util.Properties loadMarkerNamesProperties()
     {
         java.util.Properties allNames = new java.util.Properties();
-        java.util.List directories = 
-            getVarDirectoriesList();
+        List directories =
+                getVarDirectoriesList();
+
         /* unlike other, don't use file-level granularity ; 
-           load all files in order, so that we get the
-           default mapping at the end */
-        java.util.ListIterator it = directories.listIterator(directories.size());
+         load all files in order, so that we get the
+         default mapping at the end */
+        ListIterator it = directories.listIterator(directories.size());
         while (it.hasPrevious())
         {
-            java.util.List singleDirectory = new java.util.ArrayList();
+            List singleDirectory = new java.util.ArrayList();
             singleDirectory.add(it.previous());
             try
             {
                 InputStream mmfIS =
-                    ResourceLoader.getInputStream(Constants.markersNameFile,
-                                                  singleDirectory);
+                        ResourceLoader.getInputStream(Constants.markersNameFile,
+                        singleDirectory);
                 if (mmfIS != null)
                 {
                     allNames.load(mmfIS);
@@ -407,16 +418,17 @@ public final class VariantSupport
         { // first if it's a .hin, use the AIHintLoader on one or more .hin files.
             try
             {
-                java.util.List directories = getVarDirectoriesList();
-                java.util.List allHintsFiles = net.sf.colossus.util.Split.split(",", getHintName());
+                List directories = getVarDirectoriesList();
+                List allHintsFiles = net.sf.colossus.util.Split.split(",",
+                        getHintName());
                 java.util.Iterator it = allHintsFiles.iterator();
                 while (it.hasNext())
                 {
                     String currHintsFileName = (String)it.next();
                     InputStream aihlIS = ResourceLoader.getInputStream(
-                                             currHintsFileName,
-                                             directories);
-                    if (aihlIS == null) 
+                            currHintsFileName,
+                            directories);
+                    if (aihlIS == null)
                     {
                         throw new FileNotFoundException(currHintsFileName);
                     }
@@ -442,10 +454,11 @@ public final class VariantSupport
                             totalHints += result;
                         }
                     }
-                    Log.debug("Found " + totalHints + " hints in " + currHintsFileName);
+                    Log.debug("Found " + totalHints + " hints in " +
+                            currHintsFileName);
                 }
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 Log.error("Hints loading failed : " + e);
                 System.exit(1);
@@ -455,11 +468,12 @@ public final class VariantSupport
         {
             // let's assume this is a class name, implementing HintInterface
             Object o = ResourceLoader.getNewObject(getHintName(),
-                                                   getVarDirectoriesList());
+                    getVarDirectoriesList());
             if ((o != null) && (o instanceof HintInterface))
             {
                 aihl = (HintInterface)o;
-                Log.debug("Using class " + getHintName() + " to supply hints to the AIs.");
+                Log.debug("Using class " + getHintName() +
+                        " to supply hints to the AIs.");
             }
             else
             {
@@ -480,10 +494,10 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(
-        String terrain,
-        net.sf.colossus.client.LegionInfo legion,
-        java.util.List recruits,
-        net.sf.colossus.server.HintOracleInterface oracle)
+            String terrain,
+            net.sf.colossus.client.LegionInfo legion,
+            List recruits,
+            net.sf.colossus.server.HintOracleInterface oracle)
     {
         String[] section = new String[1];
         section[0] = AIHintLoader.sectionAllAI;
@@ -491,15 +505,16 @@ public final class VariantSupport
     }
 
     public synchronized static String getRecruitHint(
-        String terrain,
-        net.sf.colossus.client.LegionInfo legion,
-        java.util.List recruits,
-        net.sf.colossus.server.HintOracleInterface oracle,
-        String[] section)
+            String terrain,
+            net.sf.colossus.client.LegionInfo legion,
+            List recruits,
+            net.sf.colossus.server.HintOracleInterface oracle,
+            String[] section)
     {
         if (aihl != null)
         {
-            return aihl.getRecruitHint(terrain,legion,recruits,oracle, section);
+            return aihl.getRecruitHint(terrain, legion, recruits, oracle,
+                    section);
         }
         else
         {
@@ -508,14 +523,15 @@ public final class VariantSupport
         return null;
     }
 
-    public synchronized static java.util.List getInitialSplitHint(String label)
+    public synchronized static List getInitialSplitHint(String label)
     {
         String[] section = new String[1];
         section[0] = AIHintLoader.sectionAllAI;
         return getInitialSplitHint(label, section);
     }
-    public synchronized static java.util.List getInitialSplitHint(String label,
-                                                                  String[] section)
+
+    public synchronized static List getInitialSplitHint(String label,
+            String[] section)
     {
         if (aihl != null)
         {
@@ -532,11 +548,11 @@ public final class VariantSupport
     }
 
     public synchronized static int getHintedRecruitmentValueOffset(String name,
-                                                                  String[] section)
+            String[] section)
     {
         return aihl.getHintedRecruitmentValueOffset(name, section);
     }
-    
+
     /** get maximum number of players in that variant */
     public static int getMaxPlayers()
     {

@@ -1,5 +1,6 @@
 package net.sf.colossus.server;
 
+
 import java.util.*;
 import java.net.*;
 import java.io.*;
@@ -7,6 +8,7 @@ import java.io.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.ResourceLoader;
+
 
 /**
  * Thread handling the distribution of files to clients.
@@ -17,7 +19,7 @@ import net.sf.colossus.util.ResourceLoader;
 final class FileServerThread extends Thread
 {
     private ServerSocket fileServer;
-    private java.util.List activeSocketList;
+    private List activeSocketList;
     private static final String sep = Constants.protocolTermSeparator;
 
     private boolean keepGoingOn = true;
@@ -30,8 +32,8 @@ final class FileServerThread extends Thread
         try
         {
             fileServer =
-                new ServerSocket(port,
-                                 Constants.MAX_MAX_PLAYERS);
+                    new ServerSocket(port,
+                    Constants.MAX_MAX_PLAYERS);
         }
         catch (Exception e)
         {
@@ -44,7 +46,7 @@ final class FileServerThread extends Thread
     {
         keepGoingOn = false;
     }
-    
+
     public void run()
     {
         while (keepGoingOn)
@@ -66,26 +68,27 @@ final class FileServerThread extends Thread
                         knownIP = requester.equals(cIP);
                     }
                 }
-                
+
                 if (knownIP)
                 {
                     InputStream is = fileClient.getInputStream();
-                    
+
                     BufferedReader in =
-                        new BufferedReader(new InputStreamReader(is));
-                    
+                            new BufferedReader(new InputStreamReader(is));
+
                     String request = in.readLine();
-                    
+
                     OutputStream os = fileClient.getOutputStream();
-                    
+
                     Log.debug("Serving request " + request +
-                              " from " + fileClient);
+                            " from " + fileClient);
 
                     List li = Split.split(sep, request);
-                
+
                     String filename = (String)li.remove(0);
 
-                    byte[] data = ResourceLoader.getBytesFromFile(filename, li, true);
+                    byte[] data = ResourceLoader.getBytesFromFile(filename, li,
+                            true);
 
                     os.write(data);
                 }
@@ -99,11 +102,11 @@ final class FileServerThread extends Thread
             catch (Exception e)
             {
                 Log.warn("FileServerThread : " + e);
-            } 
+            }
         }
-        
+
         Log.debug("FileServerThread is done");
-        
+
         try
         {
             fileServer.close();

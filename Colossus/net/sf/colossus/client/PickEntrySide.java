@@ -1,10 +1,22 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 import net.sf.colossus.server.Constants;
 
@@ -17,7 +29,7 @@ import net.sf.colossus.server.Constants;
  */
 
 final class PickEntrySide extends HexMap implements ActionListener,
-    WindowListener
+            WindowListener
 {
     private static JButton leftButton;
     private static JButton bottomButton;
@@ -25,7 +37,6 @@ final class PickEntrySide extends HexMap implements ActionListener,
     private static boolean laidOut;
     private JDialog dialog;
     private static String entrySide = "";
-
 
     private PickEntrySide(JFrame parentFrame, String masterHexLabel, Set sides)
     {
@@ -70,9 +81,8 @@ final class PickEntrySide extends HexMap implements ActionListener,
         dialog.setVisible(true);
     }
 
-
     static String pickEntrySide(JFrame parentFrame, String masterHexLabel,
-        Set sides)
+            Set sides)
     {
         if (sides.size() >= 2)
         {
@@ -88,7 +98,6 @@ final class PickEntrySide extends HexMap implements ActionListener,
         }
         return entrySide;
     }
-
 
     public void paintComponent(Graphics g)
     {
@@ -109,17 +118,17 @@ final class PickEntrySide extends HexMap implements ActionListener,
             if (leftButton != null)
             {
                 leftButton.setBounds(cx + 1 * scale, cy + 1 * scale,
-                    d.width / 7, d.height / 16);
+                        d.width / 7, d.height / 16);
             }
             if (bottomButton != null)
             {
                 bottomButton.setBounds(cx + 1 * scale, cy + 21 * scale,
-                    d.width / 7, d.height / 16);
+                        d.width / 7, d.height / 16);
             }
             if (rightButton != null)
             {
                 rightButton.setBounds(cx + 19 * scale, cy + 11 * scale,
-                    d.width / 7, d.height / 16);
+                        d.width / 7, d.height / 16);
             }
 
             laidOut = true;
@@ -139,7 +148,6 @@ final class PickEntrySide extends HexMap implements ActionListener,
         }
     }
 
-
     // Set hex's entry side to side, and then exit the dialog.  If side
     // is -1, then do not set an entry side, which will abort the move.
     private void cleanup(String side)
@@ -148,12 +156,10 @@ final class PickEntrySide extends HexMap implements ActionListener,
         dialog.dispose();
     }
 
-
     public void actionPerformed(ActionEvent e)
     {
         cleanup(e.getActionCommand());
     }
-
 
     public void windowClosing(WindowEvent e)
     {

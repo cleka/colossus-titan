@@ -2,16 +2,26 @@ package net.sf.colossus.client;
 
 
 import java.awt.*;
-import java.awt.image.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.net.*;
-import javax.swing.*;
-import java.io.*;
-import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.util.Log;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.Log;
+import net.sf.colossus.util.ResourceLoader;
 
 
 /**
@@ -24,15 +34,13 @@ import net.sf.colossus.server.VariantSupport;
 public final class GUIMasterHex extends MasterHex
 {
     private boolean inverted;
-    private Font oldFont;
     private FontMetrics fontMetrics;
     private int halfFontHeight;
     private Point offCenter;
     private MasterBoard board;
 
     /** Terrain display name in upper case. */
-    private String name;
-    private GeneralPath innerHexagon;
+    private GeneralPath highlightBorder;
     private Color selectColor = Color.white;
 
     // The hex vertexes are numbered like this:
@@ -132,16 +140,18 @@ public final class GUIMasterHex extends MasterHex
         final double innerScale = 0.8;
         AffineTransform at = AffineTransform.getScaleInstance(innerScale,
                 innerScale);
-        innerHexagon = (GeneralPath)hexagon.createTransformedShape(at);
+        highlightBorder = (GeneralPath)hexagon.createTransformedShape(at);
 
         // Translate innerHexagon to make it concentric.
-        Rectangle2D innerBounds = innerHexagon.getBounds2D();
+        Rectangle2D innerBounds = highlightBorder.getBounds2D();
         Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX() +
                 innerBounds.getWidth() / 2.0, innerBounds.getY() +
                 innerBounds.getHeight() / 2.0);
         at = AffineTransform.getTranslateInstance(center.getX() -
                 innerCenter.getX(), center.getY() - innerCenter.getY());
-        innerHexagon.transform(at);
+        highlightBorder.transform(at);
+
+        highlightBorder.append(hexagon, false);
     }
 
     public void paint(Graphics g)
@@ -152,6 +162,13 @@ public final class GUIMasterHex extends MasterHex
         }
 
         Graphics2D g2 = (Graphics2D)g;
+        Font oldFont = g2.getFont();
+
+        g2.setFont(oldFont.deriveFont(oldFont.getSize2D() * 0.9f));
+        fontMetrics = g2.getFontMetrics();
+        halfFontHeight = (fontMetrics.getMaxAscent() +
+                fontMetrics.getLeading()) / 2;
+
         if (getAntialias())
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -163,25 +180,8 @@ public final class GUIMasterHex extends MasterHex
                     RenderingHints.VALUE_ANTIALIAS_OFF);
         }
 
-        if (isSelected())
-        {
-            g2.setColor(selectColor);
-            g2.fill(hexagon);
-
-            // Fill inscribed hexagon with the terrain color.
-            g2.setColor(getTerrainColor());
-            g2.fill(innerHexagon);
-
-            // And give it a border.
-            g2.setColor(Color.black);
-            g2.draw(innerHexagon);
-        }
-        else
-        {
-            g2.setColor(getTerrainColor());
-            g2.fill(hexagon);
-        }
-
+        g2.setColor(getTerrainColor());
+        g2.fill(hexagon);
         g2.setColor(Color.black);
         g2.draw(hexagon);
 
@@ -221,26 +221,16 @@ public final class GUIMasterHex extends MasterHex
         {
             paintTerrainName(g2);
         }
-    }
-
-    private void shrinkFont(Graphics2D g2)
-    {
-        oldFont = g2.getFont();
-        String fontName = oldFont.getName();
-        int size = oldFont.getSize();
-        int style = oldFont.getStyle();
-
-        Font font = new Font(fontName, style, 9 * size / 10);
-        g2.setFont(font);
-        fontMetrics = g2.getFontMetrics();
-        halfFontHeight = (fontMetrics.getMaxAscent() +
-                fontMetrics.getLeading()) / 2;
-        name = getTerrainDisplayName().toUpperCase();
-    }
-
-    private void restoreFont(Graphics2D g2)
-    {
         g2.setFont(oldFont);
+    }
+
+    public void paintHighlightIfNeeded(Graphics2D g2)
+    {
+        if (isSelected())
+        {
+            g2.setColor(this.selectColor);
+            g2.fill(highlightBorder);
+        }
     }
 
     private int stringWidth(String s, Graphics2D g2)
@@ -252,7 +242,6 @@ public final class GUIMasterHex extends MasterHex
     {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);
-        shrinkFont(g2);
 
         switch (getLabelSide())
         {
@@ -292,8 +281,6 @@ public final class GUIMasterHex extends MasterHex
                         halfFontHeight + rectBound.height / 8);
                 break;
         }
-
-        restoreFont(g2);
     }
 
     private void paintTerrainName(Graphics2D g2)
@@ -306,15 +293,15 @@ public final class GUIMasterHex extends MasterHex
             fontMetrics = g2.getFontMetrics();
             halfFontHeight = (fontMetrics.getMaxAscent() +
                     fontMetrics.getLeading()) / 2;
-            name = getTerrainDisplayName().toUpperCase();
         }
-
-        shrinkFont(g2);
+        fontMetrics = g2.getFontMetrics();
+        halfFontHeight = (fontMetrics.getMaxAscent() +
+                fontMetrics.getLeading()) / 2;
+        String name = getTerrainDisplayName().toUpperCase();
         g2.drawString(name,
                 rectBound.x + ((rectBound.width - stringWidth(name, g2)) / 2),
                 rectBound.y + halfFontHeight + rectBound.height *
                 (isInverted() ? 1 : 2) / 3);
-        restoreFont(g2);
     }
 
     public void repaint()
@@ -493,42 +480,11 @@ public final class GUIMasterHex extends MasterHex
     private Image getOverlayImage()
     {
         Image overlay = null;
-        java.util.List directories =
-                VariantSupport.getImagesDirectoriesList();
         overlay = ResourceLoader.getImage(getTerrainDisplayName() +
                 (!inverted ? invertedPostfix : ""),
-                directories,
+                VariantSupport.getImagesDirectoriesList(),
                 rectBound.width,
                 rectBound.height);
-
-        /* DISABLED
-         // code to use if we want rotate the overlay,
-         // to look more like the 'regular' Titan Masterboard
-         // need to give theta the proper value,
-         // depending where on the masterboard we are.
-         // Disabled, as not only the theta is computed wrong,
-         // But it looks ugly (the destination rectangle is wrong too)
-
-         int width = overlay.getWidth(board);
-         int height = overlay.getHeight(board);
-         BufferedImage bi = new BufferedImage(width, height,
-         BufferedImage.TYPE_INT_ARGB);
-         Graphics2D biContext = bi.createGraphics();
-         biContext.drawImage(overlay, 0, 0, null);
-         double theta =
-         theta = ((getLabelSide() + (isInverted() ? 3 : 0)) % 6) *
-         Math.PI / 3.;
-         
-         AffineTransform at = AffineTransform.getRotateInstance(theta,
-         width / 2,
-         height / 2);
-         AffineTransformOp ato = new AffineTransformOp(at,
-         AffineTransformOp.TYPE_BILINEAR);
-         BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
-         bi2 = ato.filter(bi, bi2);
-         overlay = bi2;
-         */
-
         return overlay;
     }
 
@@ -541,13 +497,15 @@ public final class GUIMasterHex extends MasterHex
             return false;
         }
 
+        Composite oldComp = g.getComposite();
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
         g.drawImage(overlay,
                 rectBound.x,
                 rectBound.y,
                 rectBound.width,
                 rectBound.height,
                 board);
-
+        g.setComposite(oldComp);
         return true;
     }
 }

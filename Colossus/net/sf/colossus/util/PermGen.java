@@ -1,9 +1,6 @@
 package net.sf.colossus.util;
 
 
-import java.util.*;
-
-
 /**
  * This class is a permutation generator. The permutations are generated
  * using Dershowitz's method, meaning that a permutation only differs
@@ -16,11 +13,11 @@ import java.util.*;
  */
 class PermGen
 {
-    int[]    m_p; // permutation
-    int[]    m_l; // location
-    int[]    m_t; // linked list
-    int[]    m_d; // direction
-    int      m_size;
+    int[] m_p; // permutation
+    int[] m_l; // location
+    int[] m_t; // linked list
+    int[] m_d; // direction
+    int m_size;
 
     PermGen(int size)
     {
@@ -44,10 +41,10 @@ class PermGen
     }
 
     /** generates the next permutation. If the function returns n, then
-        the elements at position n and n + 1 in the previous permutation
-        were interchanged to get the new permutation.
-        @return the index of the lower element which was interchanged or
-        - 1 if the last permutation has been reached.  */
+     the elements at position n and n + 1 in the previous permutation
+     were interchanged to get the new permutation.
+     @return the index of the lower element which was interchanged or
+     - 1 if the last permutation has been reached.  */
     public int getNext()
     {
         int cur, neig, curpos, neigpos, neigpos2;
@@ -85,7 +82,6 @@ class PermGen
         return (curpos < neigpos) ? curpos : neigpos;
     }
 
-
     /** get the current permutation */
     public int[] getCurrent()
     {
@@ -94,7 +90,7 @@ class PermGen
 
     // TODO JUnit
     /** Unit test for PermGen. */
-    public static void main(String [] args)
+    public static void main(String[] args)
     {
         if (args.length == 0)
         {
@@ -102,7 +98,7 @@ class PermGen
             return;
         }
         int size = Integer.parseInt(args[0]);
-        int [] perm = new int[size];
+        int[] perm = new int[size];
         int count = 0;
         PermGen pg = new PermGen(size);
         do

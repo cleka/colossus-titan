@@ -1,16 +1,27 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.Iterator;
+import java.util.List;
 
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.KDialog;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+
 import net.sf.colossus.parser.TerrainRecruitLoader;
-import net.sf.colossus.util.Log;
+import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
+import net.sf.colossus.util.KDialog;
 
 
 /**
@@ -20,15 +31,14 @@ import net.sf.colossus.util.Log;
  */
 
 final class ShowAllRecruits extends KDialog implements MouseListener,
-    WindowListener
+            WindowListener
 {
     private boolean allTerrains = false;
     // Avoid showing multiple allTerrains displays.
     private static boolean allTerrainsDisplayActive = false;
 
-
     ShowAllRecruits(JFrame parentFrame, String[] terrains, Point point,
-                    String singleTerrainHexLabel, JScrollPane pane)
+            String singleTerrainHexLabel, JScrollPane pane)
     {
         super(parentFrame, "Recruits", false);
 
@@ -45,8 +55,8 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
 
         setBackground(Color.lightGray);
         addWindowListener(this);
-        getContentPane().setLayout(new BoxLayout(getContentPane(), 
-            BoxLayout.X_AXIS));
+        getContentPane().setLayout(new BoxLayout(getContentPane(),
+                BoxLayout.X_AXIS));
 
         for (int i = 0; i < terrains.length; i++)
         {
@@ -76,8 +86,8 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
         terrainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(terrainLabel);
 
-        java.util.List creatures = 
-            TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
+        List creatures =
+                TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
         Iterator it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
@@ -85,7 +95,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
-    
+
             int numToRecruit;
             if (firstTime)
             {
@@ -95,30 +105,29 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
             else
             {
                 numToRecruit = TerrainRecruitLoader.numberOfRecruiterNeeded(
-                    prevCreature, creature, terrain, hexLabel);
+                        prevCreature, creature, terrain, hexLabel);
             }
-    
+
             JLabel numToRecruitLabel = new JLabel("");
             if (numToRecruit > 0 && numToRecruit < 99)
             {
                 numToRecruitLabel.setText(Integer.toString(numToRecruit));
                 numToRecruitLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             }
-    
+
             panel.add(numToRecruitLabel);
             numToRecruitLabel.addMouseListener(this);
-            
+
             Chit chit = new Chit(scale, creature.getName(), this);
             panel.add(chit);
             chit.addMouseListener(this);
 
             chit.repaint();
-    
+
             prevCreature = creature;
         }
         getContentPane().add(panel);
     }
-
 
     public void mouseClicked(MouseEvent e)
     {

@@ -1,14 +1,21 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
-import net.sf.colossus.util.Split;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Options;
 
 
@@ -21,17 +28,17 @@ import net.sf.colossus.util.Options;
 
 final class StatusScreen extends KDialog implements WindowListener
 {
-    private int numPlayers; 
+    private int numPlayers;
 
-    private JLabel [] nameLabel;
-    private JLabel [] towerLabel;
-    private JLabel [] colorLabel;
-    private JLabel [] elimLabel;
-    private JLabel [] legionsLabel;
-    private JLabel [] markersLabel;
-    private JLabel [] creaturesLabel;
-    private JLabel [] titanLabel;
-    private JLabel [] scoreLabel;
+    private JLabel[] nameLabel;
+    private JLabel[] towerLabel;
+    private JLabel[] colorLabel;
+    private JLabel[] elimLabel;
+    private JLabel[] legionsLabel;
+    private JLabel[] markersLabel;
+    private JLabel[] creaturesLabel;
+    private JLabel[] titanLabel;
+    private JLabel[] scoreLabel;
 
     private JLabel activePlayerLabel;
     private JLabel turnLabel;
@@ -45,7 +52,6 @@ final class StatusScreen extends KDialog implements WindowListener
     private Point location;
     private Dimension size;
     private SaveWindow saveWindow;
-
 
     StatusScreen(JFrame frame, Client client)
     {
@@ -208,7 +214,6 @@ final class StatusScreen extends KDialog implements WindowListener
         setVisible(true);
     }
 
-
     private void setPlayerLabelBackground(int i, Color color)
     {
         if (nameLabel[i].getBackground() != color)
@@ -224,7 +229,6 @@ final class StatusScreen extends KDialog implements WindowListener
             scoreLabel[i].setBackground(color);
         }
     }
-
 
     void updateStatusScreen()
     {
@@ -276,12 +280,10 @@ final class StatusScreen extends KDialog implements WindowListener
         saveWindow.saveLocation(location);
     }
 
-
     public void windowClosing(WindowEvent e)
     {
         client.setOption(Options.showStatusScreen, false);
     }
-
 
     public Dimension getMinimumSize()
     {
@@ -296,7 +298,6 @@ final class StatusScreen extends KDialog implements WindowListener
 
     void rescale()
     {
-        int scale = Scale.get();
         setSize(getPreferredSize());
         pack();
     }

@@ -1,13 +1,21 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.util.Log;
 
 
 /**
@@ -20,8 +28,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
 {
     private String attackerId;
     private String defenderId;
-    private java.util.List attackerChits = new ArrayList();
-    private java.util.List defenderChits = new ArrayList();
+    private List attackerChits = new ArrayList();
+    private List defenderChits = new ArrayList();
     private Marker attackerMarker;
     private Marker defenderMarker;
     private Client client;
@@ -29,11 +37,10 @@ final class ReplyToProposal extends KDialog implements ActionListener
     private Point location;
     private SaveWindow saveWindow;
 
-
     ReplyToProposal(Client client, Proposal proposal)
     {
-        super(client.getBoard().getFrame(), client.getPlayerName() + 
-            ": Reply to Proposal", false);
+        super(client.getBoard().getFrame(), client.getPlayerName() +
+                ": Reply to Proposal", false);
 
         this.client = client;
         this.proposal = proposal;
@@ -54,8 +61,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
         attackerMarker = new Marker(scale, attackerId, this, client);
         attackerPane.add(attackerMarker);
 
-        java.util.List attackerImageNames = client.getLegionImageNames(
-            attackerId);
+        List attackerImageNames = client.getLegionImageNames(
+                attackerId);
         Iterator it = attackerImageNames.iterator();
         while (it.hasNext())
         {
@@ -71,8 +78,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
         defenderMarker = new Marker(scale, defenderId, this, client);
         defenderPane.add(defenderMarker);
 
-        java.util.List defenderImageNames = client.getLegionImageNames(
-            defenderId);
+        List defenderImageNames = client.getLegionImageNames(
+                defenderId);
         it = defenderImageNames.iterator();
         while (it.hasNext())
         {
@@ -131,7 +138,6 @@ final class ReplyToProposal extends KDialog implements ActionListener
         repaint();
     }
 
-
     private void markAllDead(String markerId)
     {
         Iterator it = null;
@@ -150,10 +156,10 @@ final class ReplyToProposal extends KDialog implements ActionListener
         }
     }
 
-    private void markSomeDead(String markerId, java.util.List losses)
+    private void markSomeDead(String markerId, List losses)
     {
         // Don't mess with the original list.
-        java.util.List creatures = new ArrayList(losses);
+        List creatures = new ArrayList(losses);
 
         Iterator it = null;
         if (markerId.equals(attackerId))
@@ -182,7 +188,6 @@ final class ReplyToProposal extends KDialog implements ActionListener
         }
     }
 
-
     private void cleanup()
     {
         location = getLocation();
@@ -190,7 +195,6 @@ final class ReplyToProposal extends KDialog implements ActionListener
         dispose();
         client.negotiateCallback(proposal, false);
     }
-
 
     public void actionPerformed(ActionEvent e)
     {
@@ -208,9 +212,8 @@ final class ReplyToProposal extends KDialog implements ActionListener
 
         else if (e.getActionCommand().equals("Fight"))
         {
-            String hexLabel = proposal.getHexLabel();
             proposal = new Proposal(attackerId, defenderId, true,
-                false, null, null, hexLabel);
+                    false, null, null);
 
             // Exit this dialog.
             cleanup();

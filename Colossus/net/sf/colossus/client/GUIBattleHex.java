@@ -2,15 +2,18 @@ package net.sf.colossus.client;
 
 
 import java.awt.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.net.*;
-import javax.swing.*;
-import java.io.*;
-import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.util.Log;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
+
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.Log;
+import net.sf.colossus.util.ResourceLoader;
 
 
 /**
@@ -346,40 +349,12 @@ public class GUIBattleHex extends BattleHex
     private static Image loadOneOverlay(String name, int width, int height)
     {
         Image overlay = null;
-        java.util.List directories = VariantSupport.getImagesDirectoriesList();
+        List directories = VariantSupport.getImagesDirectoriesList();
         overlay = ResourceLoader.getImage(name + imagePostfix, directories,
                 width, height);
         return overlay;
     }
 
-    /*
-     public static void loadOverlay()
-     {
-     hexOverlay = new HashMap();
-     hexsideOverlay = new HashMap();
-     BattleHex tempHex = new BattleHex(0,0);
-     for (int i = 0; i < getTerrains().length ; i++)
-     {
-     tempHex.setTerrain(getTerrains()[i]);
-     Image temp = loadOneOverlay(tempHex.getTerrainName(),
-     216, 188);
-     if (temp != null)
-     {
-     hexOverlay.put(getTerrains()[i], temp);
-     }
-     }
-     for (int i = 0; i < getHexsides().length ; i++)
-     {
-     tempHex.setHexside(0, getHexsides()[i]);
-     Image temp = loadOneOverlay(tempHex.getHexsideName(0),
-     248, 220);
-     if (temp != null)
-     {
-     hexsideOverlay.put(new Character(getHexsides()[i]), temp);
-     }
-     }
-     }
-     */
     public boolean paintOverlay(Graphics2D g)
     {
         Image overlay = loadOneOverlay(getTerrain(),
@@ -406,9 +381,6 @@ public class GUIBattleHex extends BattleHex
             {
                 BattleHex neighbor = getNeighbor(i);
 
-                int firstVertex = i;
-                int secondVertex = (i + 1) % 6;
-                Rectangle neighborBound = neighbor.getBounds();
                 int dx1 = 0, dx2 = 0, dy1 = 0, dy2 = 0;
 
                 final float xm, ym;
@@ -433,7 +405,7 @@ public class GUIBattleHex extends BattleHex
                 dy2 = (int)yi;
 
                 Image sideOverlay = loadOneOverlay(neighbor.getHexsideName((i +
-                                3) %
+                        3) %
                         6),
                         dx2 - dx1, dy2 - dy1);
 

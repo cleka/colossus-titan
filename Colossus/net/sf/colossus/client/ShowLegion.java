@@ -1,10 +1,21 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 
 import net.sf.colossus.util.KDialog;
 
@@ -16,10 +27,10 @@ import net.sf.colossus.util.KDialog;
  */
 
 final class ShowLegion extends KDialog implements MouseListener,
-    WindowListener
+            WindowListener
 {
-    ShowLegion(JFrame parentFrame, String markerId, java.util.List imageNames, 
-        java.util.List certain, Point point, JScrollPane pane)
+    ShowLegion(JFrame parentFrame, String markerId, List imageNames,
+            List certain, Point point, JScrollPane pane)
     {
         super(parentFrame, "Legion " + markerId, false);
 
@@ -32,10 +43,9 @@ final class ShowLegion extends KDialog implements MouseListener,
         pack();
         setBackground(Color.lightGray);
         addWindowListener(this);
-        
+
         placeRelative(parentFrame, point, pane);
 
-        
         Container contentPane = getContentPane();
         contentPane.setLayout(new FlowLayout());
 
@@ -63,7 +73,6 @@ final class ShowLegion extends KDialog implements MouseListener,
         setVisible(true);
         repaint();
     }
-
 
     public void mouseClicked(MouseEvent e)
     {

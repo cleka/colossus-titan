@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
 import java.util.*;
+import java.util.List;
 import java.net.*;
 
 import net.sf.colossus.util.ResourceLoader;
@@ -15,6 +16,7 @@ import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.PickIntValue;
+
 
 /**
  * Class GetPlayers is a dialog used to enter players' names, types, variant, etc. 
@@ -25,7 +27,7 @@ import net.sf.colossus.client.PickIntValue;
 
 
 public final class GetPlayers extends KDialog implements WindowListener,
-    ActionListener, ItemListener
+            ActionListener, ItemListener
 {
     public static final String loadVariant = "Load External Variant";
 
@@ -46,8 +48,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private int oldLimit;
     private JLabel timeLimitLabel;
 
-
-
     /** Clear options to abort */
     public GetPlayers(JFrame parentFrame, Options options)
     {
@@ -63,9 +63,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         Container mainPane = new Box(BoxLayout.Y_AXIS);
 
-        JScrollPane mainScrollPane = new JScrollPane(mainPane, 
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane mainScrollPane = new JScrollPane(mainPane,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(mainScrollPane, BorderLayout.CENTER);
@@ -96,7 +96,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         gamePane.setBorder(new TitledBorder("Game Startup"));
         gamePane.setLayout(new GridLayout(0, 4));
         mainPane.add(gamePane);
-        
+
         JButton button1 = new JButton(Constants.newGame);
         button1.setMnemonic(KeyEvent.VK_N);
         gamePane.add(button1);
@@ -120,7 +120,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         JPanel checkboxPane = new JPanel(new GridLayout(0, 3));
         checkboxPane.setBorder(new TitledBorder("General Options"));
         mainPane.add(checkboxPane);
-        
+
         addCheckbox(Options.autosave, checkboxPane);
         addCheckbox(Options.logDebug, checkboxPane);
         addCheckbox(Options.balancedTowers, checkboxPane);
@@ -151,8 +151,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         mainPane.add(aiTimePane);
 
         oldDelay = options.getIntOption(Options.aiDelay);
-        if (oldDelay < Constants.MIN_AI_DELAY || 
-            oldDelay > Constants.MAX_AI_DELAY)
+        if (oldDelay < Constants.MIN_AI_DELAY ||
+                oldDelay > Constants.MAX_AI_DELAY)
         {
             oldDelay = Constants.DEFAULT_AI_DELAY;
         }
@@ -164,8 +164,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         aiTimePane.add(delayButton);
 
         oldLimit = options.getIntOption(Options.aiTimeLimit);
-        if (oldLimit < Constants.MIN_AI_TIME_LIMIT || 
-            oldLimit > Constants.MAX_AI_TIME_LIMIT)
+        if (oldLimit < Constants.MIN_AI_TIME_LIMIT ||
+                oldLimit > Constants.MAX_AI_TIME_LIMIT)
         {
             oldLimit = Constants.DEFAULT_AI_TIME_LIMIT;
         }
@@ -175,7 +175,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
         JButton timeLimitButton = new JButton(Options.aiTimeLimit);
         timeLimitButton.addActionListener(this);
         aiTimePane.add(timeLimitButton);
-
 
         JPanel variantPane = new JPanel();
         variantPane.setBorder(new TitledBorder("Variant"));
@@ -210,20 +209,19 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         Document doc = VariantSupport.loadVariant(variantName, true);
         readme.setContentType((String)doc.getProperty(
-            ResourceLoader.keyContentType));
+                ResourceLoader.keyContentType));
         readme.setDocument(doc);
-        options.setOption(Options.variant,variantName);
+        options.setOption(Options.variant, variantName);
 
         enablePlayers();
 
         pack();
-        
+
         centerOnScreen();
 
         addWindowListener(this);
         setVisible(true);
     }
-
 
     private void setDelayLabel(int delay)
     {
@@ -235,13 +233,12 @@ public final class GetPlayers extends KDialog implements WindowListener,
         timeLimitLabel.setText("  Current AI time limit: " + limit + " s  ");
     }
 
-
     private void setupTypeChoices()
     {
         typeChoices.clear();
         typeChoices.add(Constants.human);
         typeChoices.add(Constants.network);
-        for (int i = 0 ; i < Constants.numAITypes; i++) 
+        for (int i = 0; i < Constants.numAITypes; i++)
         {
             if (!(Constants.aiArray[i].equals("")))
             {
@@ -261,12 +258,12 @@ public final class GetPlayers extends KDialog implements WindowListener,
         JPanel onePlayerPane = new JPanel();
         onePlayerPane.setLayout(new GridLayout(0, 3));
         allPlayersPane.add(onePlayerPane);
-        
+
         String s = "Player " + (i + 1);
         onePlayerPane.add(new JLabel(s));
-        
+
         JComboBox playerType = new JComboBox(typeChoices);
-        
+
         String type = options.getStringOption(Options.playerType + i);
         if (type == null || type.length() == 0)
         {
@@ -336,15 +333,15 @@ public final class GetPlayers extends KDialog implements WindowListener,
         options.clearPlayerInfo();
 
         int numPlayers = 0;
-        java.util.List names = new ArrayList();
-        java.util.List types = new ArrayList();
+        List names = new ArrayList();
+        List types = new ArrayList();
 
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             String name = (String)(playerNames[i].getSelectedItem());
             String type = (String)(playerTypes[i].getSelectedItem());
-            if (name.length() > 0 && !name.equals(Constants.none) && 
-                !type.equals(Constants.none))
+            if (name.length() > 0 && !name.equals(Constants.none) &&
+                    !type.equals(Constants.none))
             {
                 // Force all network players to byClient.
                 if (type.equals(Constants.network))
@@ -358,8 +355,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
                 }
 
                 // Make by* names unique by appending row number.
-                if (name.equals(Constants.byColor) || 
-                    name.equals(Constants.byClient))
+                if (name.equals(Constants.byColor) ||
+                        name.equals(Constants.byClient))
                 {
                     name = name + i;
                 }
@@ -396,7 +393,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
         dispose();
     }
 
-
     private void doLoadGame()
     {
         JFileChooser chooser = new JFileChooser(Constants.saveDirname);
@@ -406,12 +402,11 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             options.clearPlayerInfo();
             // Set key to "load game" and value to savegame filename.
-            options.setOption(Constants.loadGame, 
-                chooser.getSelectedFile().getPath());
+            options.setOption(Constants.loadGame,
+                    chooser.getSelectedFile().getPath());
             dispose();
         }
     }
-
 
     private void doRunClient()
     {
@@ -420,30 +415,28 @@ public final class GetPlayers extends KDialog implements WindowListener,
         dispose();
     }
 
-
     public void windowClosing(WindowEvent e)
     {
         dispose();
         System.exit(0);
     }
 
-
-    static class varFileFilter extends javax.swing.filechooser.FileFilter 
+    static class varFileFilter extends javax.swing.filechooser.FileFilter
     {
-        public boolean accept(File f) 
+        public boolean accept(File f)
         {
-            if (f.isDirectory()) 
+            if (f.isDirectory())
             {
                 return(true);
             }
-            if (f.getName().endsWith(".var")) 
+            if (f.getName().endsWith(".var"))
             {
                 return(true);
             }
             return(false);
         }
 
-        public String getDescription() 
+        public String getDescription()
         {
             return("Colossus VARiant file");
         }
@@ -452,13 +445,12 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private void doLoadVariant()
     {
         int maxPlayers = VariantSupport.getMaxPlayers();
-        javax.swing.JFileChooser varChooser = 
-            new JFileChooser(Constants.gameDataPath);
+        javax.swing.JFileChooser varChooser =
+                new JFileChooser(Constants.gameDataPath);
         varChooser.setFileFilter(new varFileFilter());
         varChooser.setDialogTitle(
-            "Choose your variant (or cancel for default game)");
+                "Choose your variant (or cancel for default game)");
         int returnVal = varChooser.showOpenDialog(varChooser);
-        String varName = Constants.defaultVARFile;
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File varFile = varChooser.getSelectedFile().getAbsoluteFile();
@@ -469,7 +461,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
                 name = name.substring(0, name.lastIndexOf(".var"));
                 options.setOption(Options.variant, name);
                 readme.setContentType((String)doc.getProperty(
-                           ResourceLoader.keyContentType));
+                        ResourceLoader.keyContentType));
                 readme.setDocument(doc);
                 if (maxPlayers != VariantSupport.getMaxPlayers())
                 {
@@ -502,8 +494,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         else if (e.getActionCommand().equals(Options.aiDelay))
         {
             final int newDelay = PickIntValue.pickIntValue(parentFrame,
-                oldDelay, "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY, 
-                Constants.MAX_AI_DELAY, 100);
+                    oldDelay, "Pick AI Delay (in ms)", Constants.MIN_AI_DELAY,
+                    Constants.MAX_AI_DELAY, 100);
             if (newDelay != oldDelay)
             {
                 options.setOption(Options.aiDelay, newDelay);
@@ -513,8 +505,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         else if (e.getActionCommand().equals(Options.aiTimeLimit))
         {
             final int newLimit = PickIntValue.pickIntValue(parentFrame,
-                oldLimit, "Pick AI Time Limit (in s)", 
-                Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT, 1);
+                    oldLimit, "Pick AI Time Limit (in s)",
+                    Constants.MIN_AI_TIME_LIMIT, Constants.MAX_AI_TIME_LIMIT, 1);
             if (newLimit != oldLimit)
             {
                 options.setOption(Options.aiTimeLimit, newLimit);
@@ -527,8 +519,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
             String varName = VariantSupport.getVarName();
             if (!(Constants.getVariantList().contains(varName)))
             {
-                String buttonName = varName.substring(0, 
-                    varName.lastIndexOf(".var"));
+                String buttonName = varName.substring(0,
+                        varName.lastIndexOf(".var"));
                 if (variantBox.getItemCount() > Constants.numVariants)
                 {
                     variantBox.removeItemAt(Constants.numVariants);
@@ -557,7 +549,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
                     Document doc = VariantSupport.loadVariant(value, true);
                     options.setOption(Options.variant, value);
                     String prop = (String)doc.getProperty(
-                           ResourceLoader.keyContentType);
+                            ResourceLoader.keyContentType);
                     readme.setContentType(prop);
                     readme.setDocument(doc);
                     if (maxPlayers != VariantSupport.getMaxPlayers())
@@ -595,12 +587,12 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         // If player type was changed away from none, also 
                         // change player name to something else.
                         else if (playerNames[i].getSelectedItem().equals(
-                            Constants.none))
+                                Constants.none))
                         {
                             playerNames[i].setSelectedItem(Constants.byColor);
                         }
                     }
-    
+
                     box = playerNames[i];
                     if (box == source)
                     {
@@ -614,7 +606,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         // If player type was changed away from none, also 
                         // change player name to something else.
                         else if (playerTypes[i].getSelectedItem().equals(
-                            Constants.none))
+                                Constants.none))
                         {
                             playerTypes[i].setSelectedItem(Constants.anyAI);
                         }
@@ -623,7 +615,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
             }
         }
     }
-
 
     public Dimension getMinimumSize()
     {
@@ -634,7 +625,6 @@ public final class GetPlayers extends KDialog implements WindowListener,
     {
         return new Dimension(640, 768);
     }
-
 
     public void itemStateChanged(ItemEvent e)
     {

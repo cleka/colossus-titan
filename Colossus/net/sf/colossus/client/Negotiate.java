@@ -1,15 +1,26 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import net.sf.colossus.server.Creature;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.util.Log;
 
 
 /**
@@ -22,34 +33,27 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
 {
     private String attackerId;
     private String defenderId;
-    private java.util.List attackerChits = new ArrayList();
-    private java.util.List defenderChits = new ArrayList();
-    private Marker attackerMarker;
-    private Marker defenderMarker;
+    private List attackerChits = new ArrayList();
+    private List defenderChits = new ArrayList();
     private Client client;
     private Proposal proposal;
-    private String hexLabel;
     private Point location;
     private SaveWindow saveWindow;
-
 
     Negotiate(Client client, String attackerId, String defenderId)
     {
         super(client.getBoard().getFrame(), client.getPlayerName() + ": " +
-            attackerId + " Negotiates with " + defenderId, false);
+                attackerId + " Negotiates with " + defenderId, false);
 
         this.client = client;
         this.attackerId = attackerId;
         this.defenderId = defenderId;
-        this.hexLabel = hexLabel;
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
         setBackground(Color.lightGray);
         addMouseListener(this);
-
-        int scale = 4 * Scale.get();
 
         showLegion(attackerId, attackerChits);
         showLegion(defenderId, defenderChits);
@@ -84,8 +88,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         repaint();
     }
 
-
-    private void showLegion(String markerId, java.util.List chits)
+    private void showLegion(String markerId, List chits)
     {
         Box pane = new Box(BoxLayout.X_AXIS);
         pane.setAlignmentX(0);
@@ -97,7 +100,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         pane.add(marker);
         pane.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
 
-        java.util.List imageNames = client.getLegionImageNames(markerId);
+        List imageNames = client.getLegionImageNames(markerId);
         Iterator it = imageNames.iterator();
         while (it.hasNext())
         {
@@ -109,7 +112,6 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         }
     }
 
-
     void cleanup()
     {
         location = getLocation();
@@ -117,7 +119,6 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         dispose();
         client.negotiateCallback(proposal, true);
     }
-
 
     public void mousePressed(MouseEvent e)
     {
@@ -163,32 +164,29 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
             if (attackersLeft && defendersLeft)
             {
                 client.showMessageDialog(
-                    "At least one legion must be eliminated.");
+                        "At least one legion must be eliminated.");
                 return;
             }
 
             if (!attackersLeft && !defendersLeft)
             {
                 // Mutual destruction.
-                proposal = new Proposal(attackerId, defenderId, 
-                    false, true, null, null, hexLabel);
+                proposal = new Proposal(attackerId, defenderId,
+                        false, true, null, null);
             }
             else
             {
                 String winnerMarkerId;
-                String loserMarkerId;
                 java.util.List winnerChits;
 
                 if (!defendersLeft)
                 {
                     winnerMarkerId = attackerId;
-                    loserMarkerId = defenderId;
                     winnerChits = attackerChits;
                 }
                 else
                 {
                     winnerMarkerId = defenderId;
-                    loserMarkerId = attackerId;
                     winnerChits = defenderChits;
                 }
 
@@ -199,10 +197,10 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                 {
                     Chit chit = (Chit)it.next();
                     if (chit.isDead() && chit.getId().startsWith(
-                        Constants.titan))
+                            Constants.titan))
                     {
                         client.showMessageDialog(
-                            "Titan cannot die unless his whole stack dies.");
+                                "Titan cannot die unless his whole stack dies.");
                         return;
                     }
                 }
@@ -223,8 +221,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                         winnerLosses.add(name);
                     }
                 }
-                proposal = new Proposal(attackerId, defenderId, 
-                    false, false, winnerMarkerId, winnerLosses, hexLabel);
+                proposal = new Proposal(attackerId, defenderId,
+                        false, false, winnerMarkerId, winnerLosses);
             }
 
             // Exit this dialog.
@@ -234,7 +232,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         else if (e.getActionCommand().equals("Fight"))
         {
             proposal = new Proposal(attackerId, defenderId, true,
-                false, null, null, hexLabel);
+                    false, null, null);
 
             // Exit this dialog.
             cleanup();

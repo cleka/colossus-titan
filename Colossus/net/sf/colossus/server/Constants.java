@@ -1,11 +1,8 @@
 package net.sf.colossus.server;
 
 
-import java.io.*;
 import java.util.*;
-import javax.swing.*;
 import java.awt.event.*;
-import java.awt.*;
 
 
 /**
@@ -220,7 +217,7 @@ public final class Constants
 
     public static final int numVariants = variantArray.length;
 
-    private static final java.util.List variantList = new ArrayList();
+    private static final List variantList = new ArrayList();
 
     // static initializer
     {
@@ -230,7 +227,7 @@ public final class Constants
         }
     }
 
-    public static java.util.List getVariantList()
+    public static List getVariantList()
     {
         return Collections.unmodifiableList(variantList);
     }

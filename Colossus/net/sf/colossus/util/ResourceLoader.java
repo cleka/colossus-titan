@@ -10,6 +10,7 @@ import java.awt.image.*;
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.lang.reflect.*;
 import net.sf.colossus.server.Constants;
 
@@ -37,7 +38,7 @@ public final class ResourceLoader
      */
     private static class ColossusClassLoader extends ClassLoader
     {
-        java.util.List directories = null;
+        List directories = null;
 
         ColossusClassLoader(ClassLoader parent)
         {
@@ -83,7 +84,7 @@ public final class ResourceLoader
             }
         }
 
-        void setDirectories(java.util.List d)
+        void setDirectories(List d)
         {
             directories = d;
         }
@@ -100,7 +101,6 @@ public final class ResourceLoader
     private static final String pathSeparator = "/";
     private static final String[] imageExtension = { ".png", ".gif" };
     private static final String[] svgExtension = { ".svg" };
-    private static final int trackedId = 1;
     private static final ClassLoader baseCL =
             net.sf.colossus.util.ResourceLoader.class.getClassLoader();
     private static final ColossusClassLoader cl =
@@ -118,7 +118,7 @@ public final class ResourceLoader
     {
         try
         {
-            Class theClass = baseCL.loadClass(
+            baseCL.loadClass(
                     "org.apache.batik.transcoder.image.ImageTranscoder");
             hasBatik = true;
             // Use Crimson, not Xerces
@@ -171,7 +171,7 @@ public final class ResourceLoader
      * @return The Image, or null if it was not found.
      */
     public synchronized static Image getImage(String filename,
-            java.util.List directories, int width, int height)
+            List directories, int width, int height)
     {
         Image image = null;
         String mapKey = getMapKey(filename, directories);
@@ -241,7 +241,7 @@ public final class ResourceLoader
      * @return The ImageIcon, or null if it was not found.
      */
     public synchronized static ImageIcon getImageIcon(String filename,
-            java.util.List directories, int width, int height)
+            List directories, int width, int height)
     {
         ImageIcon icon = null;
         String mapKey = getMapKey(filename, directories);
@@ -402,7 +402,7 @@ public final class ResourceLoader
      * @return The InputStream, or null if it was not found.
      */
     public static InputStream getInputStream(String filename,
-            java.util.List directories)
+            List directories)
     {
         return getInputStream(filename, directories, server != null, false);
     }
@@ -415,7 +415,7 @@ public final class ResourceLoader
      * @return The InputStream, or null if it was not found.
      */
     public static InputStream getInputStream(String filename,
-            java.util.List directories, boolean remote, boolean cachedOnly)
+            List directories, boolean remote, boolean cachedOnly)
     {
         String mapKey = getMapKey(filename, directories);
         Object cached = fileCache.get(mapKey);
@@ -532,7 +532,7 @@ public final class ResourceLoader
      * @return An array of byte representing the content of the file, or null if it fails.
      */
     public static byte[] getBytesFromFile(String filename,
-            java.util.List directories,
+            List directories,
             boolean cachedOnly)
     {
         InputStream is = getInputStream(filename, directories,
@@ -555,8 +555,6 @@ public final class ResourceLoader
      */
     private static byte[] getBytesFromInputStream(InputStream is)
     {
-        StringBuffer sb = new StringBuffer();
-
         byte[] all = new byte[0];
 
         try
@@ -586,22 +584,6 @@ public final class ResourceLoader
     }
 
     /**
-     * Return the content of the specified String as an InputStream.
-     * @param data The String to convert.
-     * @return An InputStream whose content is the data String.
-     */
-    private static InputStream getInputStreamFromString(String data)
-    {
-        if (data == null)
-        {
-            Log.warn("getInputStreamFromString:: " +
-                    " Can't create InputStream from null String");
-            return null;
-        }
-        return new ByteArrayInputStream(data.getBytes());
-    }
-
-    /**
      * Return the content of the specified byte array as an InputStream.
      * @param data The byte array to convert.
      * @return An InputStream whose content is the data byte array.
@@ -624,7 +606,7 @@ public final class ResourceLoader
      * @return The OutputStream, or null if it was not found.
      */
     public static OutputStream getOutputStream(String filename,
-            java.util.List directories)
+            List directories)
     {
         OutputStream stream = null;
         java.util.Iterator it = directories.iterator();
@@ -657,7 +639,7 @@ public final class ResourceLoader
      * @return The Document, or null if it was not found.
      */
     public static Document getDocument(String filename,
-            java.util.List directories)
+            List directories)
     {
         InputStream htmlIS = getInputStream(filename + ".html", directories);
         if (htmlIS != null)
@@ -724,7 +706,7 @@ public final class ResourceLoader
      * @return A String to use as a key when storing/loading in a cache the specified file from the specified list of directories.
      */
     private static String getMapKey(String filename,
-            java.util.List directories)
+            List directories)
     {
         String[] filenames = new String[1];
         filenames[0] = filename;
@@ -738,7 +720,7 @@ public final class ResourceLoader
      * @return A String to use as a key when storing/loading in a cache the specified array of name of files from the specified list of directories.
      */
     private static String getMapKey(String[] filenames,
-            java.util.List directories)
+            List directories)
     {
         StringBuffer buf = new StringBuffer(filenames[0]);
         for (int i = 1; i < filenames.length; i++)
@@ -766,7 +748,7 @@ public final class ResourceLoader
      * @return The compisite Image, or null if any part was not found.
      */
     public synchronized static Image getCompositeImage(String[] filenames,
-            java.util.List directories, int width, int height)
+            List directories, int width, int height)
     {
         BufferedImage bi;
         String mapKey = getMapKey(filenames, directories);
@@ -786,10 +768,6 @@ public final class ResourceLoader
         {
             tempImage[i] =
                     getImage(filenames[i], directories, width, height);
-            if ((i == 0) && (tempImage[i] != null))
-            {
-                ImageIcon tempicon = new ImageIcon(tempImage[i]);
-            }
             if (tempImage[i] == null)
             {
                 tempImage[i] = tryBuildingNonexistentImage(filenames[i],
@@ -823,7 +801,7 @@ public final class ResourceLoader
 
     /**
      * Try to build an image when there is no source file to create it. Includes generation of some dynamic layers of images for composite image building.
-     * @see #getCompositeImage(String[], java.util.List)
+     * @see #getCompositeImage(String[], List)
      * @param filename The name of the missing file.
      * @param width Width of the image to create.
      * @param height Height of the image to create.
@@ -831,7 +809,7 @@ public final class ResourceLoader
      * @return The generated Image.
      */
     private synchronized static Image tryBuildingNonexistentImage(
-            String filename, int width, int height, java.util.List directories)
+            String filename, int width, int height, List directories)
     {
         Image tempImage = null;
 
@@ -928,7 +906,6 @@ public final class ResourceLoader
         FontMetrics fm = biContext.getFontMetrics();
         Rectangle2D sb = fm.getStringBounds("" + value, biContext);
         int sw = (int)sb.getWidth();
-        int sh = (int)sb.getHeight();
         String valueTxt = (value > 0 ? "" + value : "X");
 
         if (right)
@@ -973,7 +950,6 @@ public final class ResourceLoader
         FontMetrics fm = biContext.getFontMetrics();
         Rectangle2D sb = fm.getStringBounds(name, biContext);
         int sw = (int)sb.getWidth();
-        int sh = (int)sb.getHeight();
         while ((sw >= width) && (size > 1))
         {
             size--;
@@ -981,7 +957,6 @@ public final class ResourceLoader
             fm = biContext.getFontMetrics();
             sb = fm.getStringBounds(name, biContext);
             sw = (int)sb.getWidth();
-            sh = (int)sb.getHeight();
         }
         int offset = (width - sw) / 2;
         biContext.drawString(name, offset,
@@ -1061,7 +1036,7 @@ public final class ResourceLoader
      * @return An Image composed of the content of the file, with the transparent part filled the the given color.
      */
     private static Image createColorizedImage(String filename, Color color,
-            java.util.List directories, int width, int height)
+            List directories, int width, int height)
     {
         Image temp = getImage(filename, directories, width, height);
         ImageIcon tempIcon = new ImageIcon(temp);
@@ -1278,7 +1253,7 @@ public final class ResourceLoader
      * @return A new object, instance from the given class.
      */
     public static Object getNewObject(String className,
-            java.util.List directories)
+            List directories)
     {
         return getNewObject(className, directories, null);
     }
@@ -1291,7 +1266,7 @@ public final class ResourceLoader
      * @return A new object, instance from the given class.
      */
     public static Object getNewObject(String className,
-            java.util.List directories,
+            List directories,
             Object[] parameter)
     {
         Class theClass = null;
@@ -1353,7 +1328,7 @@ public final class ResourceLoader
      * @param data File content to add.
      */
     public static void putIntoFileCache(String filename,
-            java.util.List directories, byte[] data)
+            List directories, byte[] data)
     {
         String mapKey = getMapKey(filename, directories);
         fileCache.put(mapKey, data);
@@ -1362,8 +1337,8 @@ public final class ResourceLoader
     /**
      * Force adding the given data as belonging to the given key
      * in the file cache.
-     * @see #getMapKey(String, java.util.List)
-     * @see #getMapKey(String[], java.util.List)
+     * @see #getMapKey(String, List)
+     * @see #getMapKey(String[], List)
      * @param mapKey Key to use in the cache.
      * @param data File content to add.
      */
@@ -1377,9 +1352,9 @@ public final class ResourceLoader
      * Dump the filecache as a List of XML "DataFile" Element, with the file key as attribute "DataFileKey", and the file data as a CDATA content.
      * @return A list of XML Element.
      */
-    public static java.util.List getFileCacheDump()
+    public static List getFileCacheDump()
     {
-        java.util.List allElement = new ArrayList();
+        List allElement = new ArrayList();
         Set allKeys = fileCache.keySet();
         Iterator it = allKeys.iterator();
         while (it.hasNext())

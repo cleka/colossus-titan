@@ -1,24 +1,40 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.*;
-import javax.swing.*;
-import java.io.*;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.HTMLColor;
-import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.Options;
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.XMLSnapshotFilter;
-import net.sf.colossus.server.ConfigFileFilter;
-import net.sf.colossus.server.VariantSupport;
+import javax.swing.*;
+
 import net.sf.colossus.parser.StrategicMapLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
-import net.sf.colossus.parser.ParseException;
+import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.server.XMLSnapshotFilter;
+import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Options;
+import net.sf.colossus.util.ResourceLoader;
 
 
 /**
@@ -30,6 +46,7 @@ import net.sf.colossus.parser.ParseException;
 
 public final class MasterBoard extends JPanel
 {
+    private Image offScreenBuffer;
     private static int horizSize = 0;
     private static int vertSize = 0;
 
@@ -37,9 +54,7 @@ public final class MasterBoard extends JPanel
     private static int boardParity = 0;
 
     private GUIMasterHex[][] guiHexArray = null;
-    private java.util.List guiHexList = null;
     private static MasterHex[][] plainHexArray = null;
-    private static java.util.List plainHexList = null;
 
     /** The hexes in the horizSize*vertSize array that actually exist are
      *  represented by true. */
@@ -115,6 +130,63 @@ public final class MasterBoard extends JPanel
 
     private JMenu lfMenu;
 
+    private static interface MasterHexVisitor
+    {
+
+        /** Returns true iff the Hex matches **/
+        boolean visitHex(MasterHex hex);
+    }
+
+
+    private static interface GUIMasterHexVisitor
+    {
+
+        /** Returns true iff the Hex matches **/
+        boolean visitHex(GUIMasterHex hex);
+    }
+
+    private static MasterHex visitMasterHexes(MasterHexVisitor visitor)
+    {
+        for (int i = 0; i < plainHexArray.length; i++)
+        {
+            for (int j = 0; j < plainHexArray[i].length; j++)
+            {
+                MasterHex hex = plainHexArray[i][j];
+                if (hex == null)
+                {
+                    continue;
+                }
+                boolean hexFound = visitor.visitHex(hex);
+                if (hexFound)
+                {
+                    return hex;
+                }
+            }
+        }
+        return null;
+    }
+
+    private GUIMasterHex visitGUIMasterHexes(GUIMasterHexVisitor visitor)
+    {
+        for (int i = 0; i < guiHexArray.length; i++)
+        {
+            for (int j = 0; j < guiHexArray[i].length; j++)
+            {
+                GUIMasterHex hex = guiHexArray[i][j];
+                if (hex == null)
+                {
+                    continue;
+                }
+                boolean hexFound = visitor.visitHex(hex);
+                if (hexFound)
+                {
+                    return hex;
+                }
+            }
+        }
+        return null;
+    }
+
     /** Must ensure that variant is loaded before referencing this class,
      *  since readMapData() needs it. */
     public synchronized static void staticMasterboardInit()
@@ -124,7 +196,6 @@ public final class MasterBoard extends JPanel
         vertSize = 0;
         boardParity = 0;
         plainHexArray = null;
-        plainHexList = null;
         show = null;
         towerSet = null;
         sml = null;
@@ -468,7 +539,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                ChooseScreen cs = new ChooseScreen(getFrame(), client);
+                new ChooseScreen(getFrame(), client);
             }
         };
 
@@ -679,7 +750,6 @@ public final class MasterBoard extends JPanel
     private void setupGUIHexes()
     {
         guiHexArray = new GUIMasterHex[horizSize][vertSize];
-        guiHexList = new ArrayList(plainHexList.size());
 
         int scale = Scale.get();
         int cx = 3 * scale;
@@ -695,17 +765,16 @@ public final class MasterBoard extends JPanel
                     hex.init(
                             cx + 4 * i * scale,
                             (int)Math.round(cy +
-                                    (3 * j +
-                                    ((i + boardParity) & 1) * (1 + 2 * (j / 2)) +
-                                    ((i + 1 + boardParity) & 1) * 2 *
-                                    ((j + 1) / 2)) *
+                            (3 * j +
+                            ((i + boardParity) & 1) * (1 + 2 * (j / 2)) +
+                            ((i + 1 + boardParity) & 1) * 2 *
+                            ((j + 1) / 2)) *
                             Hex.SQRT3 *
                             scale),
                             scale,
                             isHexInverted(i, j),
                             this);
                     guiHexArray[i][j] = hex;
-                    guiHexList.add(hex);
                 }
             }
         }
@@ -739,7 +808,7 @@ public final class MasterBoard extends JPanel
     private static void readMapData()
         throws Exception
     {
-        java.util.List directories = VariantSupport.getVarDirectoriesList();
+        List directories = VariantSupport.getVarDirectoriesList();
         InputStream mapIS = ResourceLoader.getInputStream(
                 VariantSupport.getMapName(), directories);
         if (mapIS == null)
@@ -758,7 +827,6 @@ public final class MasterBoard extends JPanel
     private static synchronized void setupPlainHexes()
     {
         plainHexArray = new MasterHex[horizSize][vertSize];
-        plainHexList = new ArrayList(horizSize * vertSize);
         for (int i = 0; i < show.length; i++)
         {
             for (int j = 0; j < show[i].length; j++)
@@ -768,7 +836,7 @@ public final class MasterBoard extends JPanel
         }
         try
         {
-            while (sml.oneCase(plainHexArray, plainHexList, show) >= 0)
+            while (sml.oneCase(plainHexArray, show) >= 0)
             {
             }
         }
@@ -1275,7 +1343,7 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        java.util.List markerIds = client.getLegionsByHex(hexLabel);
+        List markerIds = client.getLegionsByHex(hexLabel);
 
         int numLegions = markerIds.size();
         if (numLegions == 0)
@@ -1363,12 +1431,15 @@ public final class MasterBoard extends JPanel
     /** This is incredibly inefficient. */
     void alignAllLegions()
     {
-        Iterator it = plainHexList.iterator();
-        while (it.hasNext())
+        visitMasterHexes(new MasterHexVisitor()
         {
-            MasterHex hex = (MasterHex)it.next();
-            alignLegions(hex.getLabel());
+            public boolean visitHex(MasterHex hex)
+            {
+                alignLegions(hex.getLabel());
+                return false;
+            }
         }
+        );
     }
 
     void highlightTallLegions()
@@ -1409,7 +1480,7 @@ public final class MasterBoard extends JPanel
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            java.util.List recruits = client.findEligibleRecruits(markerId,
+            List recruits = client.findEligibleRecruits(markerId,
                     hexLabel);
             if (recruits != null && recruits.size() > 0)
             {
@@ -1447,7 +1518,7 @@ public final class MasterBoard extends JPanel
 
     private void setupIcon()
     {
-        java.util.List directories = new java.util.ArrayList();
+        List directories = new ArrayList();
         directories.add(Constants.defaultDirName +
                 ResourceLoader.getPathSeparator() +
                 Constants.imagesDirName);
@@ -1478,58 +1549,55 @@ public final class MasterBoard extends JPanel
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
-    public static MasterHex getHexByLabel(String label)
+    public static MasterHex getHexByLabel(final String label)
     {
-        Iterator it = plainHexList.iterator();
-        while (it.hasNext())
+        return visitMasterHexes(new MasterHexVisitor()
         {
-            MasterHex hex = (MasterHex)it.next();
-            if (hex.getLabel().equals(label))
+            public boolean visitHex(MasterHex hex)
             {
-                return hex;
+                if (hex.getLabel().equals(label))
+                {
+                    return true;
+                }
+                return false;
             }
         }
-        return null;
+        );
     }
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
-    GUIMasterHex getGUIHexByLabel(String label)
+    GUIMasterHex getGUIHexByLabel(final String label)
     {
-        Iterator it = guiHexList.iterator();
-        while (it.hasNext())
+        return visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (hex.getLabel().equals(label))
+            public boolean visitHex(GUIMasterHex hex)
             {
-                return hex;
+                return hex.getLabel().equals(label);
             }
         }
-        return null;
+        );
     }
 
     /** Return the MasterHex that contains the given point, or
      *  null if none does. */
-    private GUIMasterHex getHexContainingPoint(Point point)
+    private GUIMasterHex getHexContainingPoint(final Point point)
     {
-        // XXX This is completely inefficient.
-        Iterator it = guiHexList.iterator();
-        while (it.hasNext())
+        return visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (hex.contains(point))
+            public boolean visitHex(GUIMasterHex hex)
             {
-                return hex;
+                return hex.contains(point);
             }
         }
-        return null;
+        );
     }
 
     /** Return the topmost Marker that contains the given point, or
      *  null if none does. */
     private Marker getMarkerAtPoint(Point point)
     {
-        java.util.List markers = client.getMarkers();
+        List markers = client.getMarkers();
         ListIterator lit = markers.listIterator(markers.size());
         while (lit.hasPrevious())
         {
@@ -1544,89 +1612,106 @@ public final class MasterBoard extends JPanel
 
     void unselectAllHexes()
     {
-        Iterator it = guiHexList.iterator();
-        while (it.hasNext())
+        visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (hex.isSelected())
+            public boolean visitHex(GUIMasterHex hex)
             {
-                hex.unselect();
-                hex.repaint();
+                if (hex.isSelected())
+                {
+                    hex.unselect();
+                    hex.repaint();
+                }
+                return false; //keep going
             }
         }
+        );
     }
 
-    void unselectHexByLabel(String label)
+    void unselectHexByLabel(final String label)
     {
-        Iterator it = guiHexList.iterator();
-        while (it.hasNext())
+        visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (hex.isSelected() && label.equals(hex.getLabel()))
+            public boolean visitHex(GUIMasterHex hex)
             {
-                hex.unselect();
-                hex.repaint();
-                return;
+                if (hex.isSelected() && label.equals(hex.getLabel()))
+                {
+                    hex.unselect();
+                    hex.repaint();
+                    return true;
+                }
+                return false; //keep going
             }
         }
+        );
     }
 
-    void unselectHexesByLabels(Set labels)
+    void unselectHexesByLabels(final Set labels)
     {
-        Iterator it = guiHexList.iterator();
-        while (it.hasNext())
+        visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (hex.isSelected() && labels.contains(hex.getLabel()))
+            public boolean visitHex(GUIMasterHex hex)
             {
-                hex.unselect();
-                hex.repaint();
+                if (hex.isSelected() && labels.contains(hex.getLabel()))
+                {
+                    hex.unselect();
+                    hex.repaint();
+                }
+                return false; //keep going
             }
         }
+        );
     }
 
-    void selectHexByLabel(String label)
+    void selectHexByLabel(final String label)
     {
-        Iterator it = guiHexList.iterator();
-        while (it.hasNext())
+        visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (!hex.isSelected() && label.equals(hex.getLabel()))
+            public boolean visitHex(GUIMasterHex hex)
             {
-                hex.select();
-                hex.repaint();
-                return;
+                if (!hex.isSelected() && label.equals(hex.getLabel()))
+                {
+                    hex.select();
+                    hex.repaint();
+                }
+                return false; //keep going
             }
         }
+        );
     }
 
-    void selectHexesByLabels(Set labels)
+    void selectHexesByLabels(final Set labels)
     {
-        Iterator it = guiHexList.iterator();
-        while (it.hasNext())
+        visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (!hex.isSelected() && labels.contains(hex.getLabel()))
+            public boolean visitHex(GUIMasterHex hex)
             {
-                hex.select();
-                hex.repaint();
+                if (!hex.isSelected() && labels.contains(hex.getLabel()))
+                {
+                    hex.select();
+                    hex.repaint();
+                }
+                return false; //keep going
             }
         }
+        );
     }
 
-    void selectHexesByLabels(Set labels, Color color)
+    void selectHexesByLabels(final Set labels, final Color color)
     {
-        Iterator it = guiHexList.iterator();
-        while (it.hasNext())
+        visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (labels.contains(hex.getLabel()))
+            public boolean visitHex(GUIMasterHex hex)
             {
-                hex.select();
-                hex.setSelectColor(color);
-                hex.repaint();
+                if (labels.contains(hex.getLabel()))
+                {
+                    hex.select();
+                    hex.setSelectColor(color);
+                    hex.repaint();
+                }
+                return false; // keep going
             }
         }
+        );
     }
 
     void actOnMisclick()
@@ -1856,17 +1941,36 @@ public final class MasterBoard extends JPanel
 
     public void paintComponent(Graphics g)
     {
-        super.paintComponent(g);
-
         // Abort if called too early.
         if (g.getClipBounds() == null)
         {
             return;
         }
 
+        if (offScreenBuffer == null ||
+                (!(offScreenBuffer.getWidth(this) == this.size().width &&
+                offScreenBuffer.getHeight(this) == this.size().height)))
+        {
+            offScreenBuffer = this.createImage(this.getWidth(),
+                    this.getHeight());
+            Graphics g_im = offScreenBuffer.getGraphics();
+            super.paintComponent(g_im);
+
+            try
+            {
+                paintHexes(g_im);
+            }
+            catch (ConcurrentModificationException ex)
+            {
+                Log.debug("harmless " + ex.toString());
+                // Don't worry about it -- we'll just paint again.
+            }
+        }
+
+        g.drawImage(offScreenBuffer, 0, 0, this);
         try
         {
-            paintHexes(g);
+            paintHighlights((Graphics2D)g);
             paintMarkers(g);
             paintRecruitChits(g);
             paintMovementDie(g);
@@ -1878,17 +1982,30 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private void paintHexes(Graphics g)
+    private void paintHexes(final Graphics g)
     {
-        Iterator it = guiHexList.iterator();
-        while (it.hasNext())
+        visitGUIMasterHexes(new GUIMasterHexVisitor()
         {
-            GUIMasterHex hex = (GUIMasterHex)it.next();
-            if (g.getClipBounds().intersects(hex.getBounds()))
+            public boolean visitHex(GUIMasterHex hex)
             {
                 hex.paint(g);
+                return false; // keep going
             }
         }
+        );
+    }
+
+    private void paintHighlights(final Graphics2D g)
+    {
+        visitGUIMasterHexes(new GUIMasterHexVisitor()
+        {
+            public boolean visitHex(GUIMasterHex hex)
+            {
+                hex.paintHighlightIfNeeded(g);
+                return false; // keep going
+            }
+        }
+        );
     }
 
     /** Paint markers in z-order. */
@@ -1984,15 +2101,18 @@ public final class MasterBoard extends JPanel
     private static void setupTowerSet()
     {
         towerSet = new HashSet();
-        Iterator it = plainHexList.iterator();
-        while (it.hasNext())
+        visitMasterHexes(new MasterHexVisitor()
         {
-            Hex bh = (Hex)it.next();
-            if (HexMap.terrainIsTower(bh.getTerrain()))
+            public boolean visitHex(MasterHex hex)
             {
-                towerSet.add(bh.getLabel());
+                if (HexMap.terrainIsTower(hex.getTerrain()))
+                {
+                    towerSet.add(hex.getLabel());
+                }
+                return false;
             }
         }
+        );
     }
 
     JScrollPane getScrollPane()
@@ -2003,13 +2123,16 @@ public final class MasterBoard extends JPanel
     /** Return a set of all hex labels. */
     static Set getAllHexLabels()
     {
-        Set set = new HashSet();
-        Iterator it = plainHexList.iterator();
-        while (it.hasNext())
+        final Set set = new HashSet();
+        visitMasterHexes(new MasterHexVisitor()
         {
-            MasterHex hex = (MasterHex)it.next();
-            set.add(hex.getLabel());
+            public boolean visitHex(MasterHex hex)
+            {
+                set.add(hex.getLabel());
+                return false;
+            }
         }
+        );
         return set;
     }
 

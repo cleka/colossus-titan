@@ -1,6 +1,13 @@
 package net.sf.colossus.datatools;
 
+
+import java.io.InputStream;
+import java.util.List;
+
 import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.parser.BattlelandRandomizerLoader;
+import net.sf.colossus.util.ResourceLoader;
+
 
 /**
  * Class BattlelandsRandomizer
@@ -9,16 +16,6 @@ import net.sf.colossus.client.BattleHex;
  */
 public class BattlelandsRandomizer
 {
-    private static final boolean[][] show =
-    {
-        {false,false,true,true,true,false},
-        {false,true,true,true,true,false},
-        {false,true,true,true,true,true},
-        {true,true,true,true,true,true},
-        {false,true,true,true,true,true},
-        {false,true,true,true,true,false}
-    };
-
     public static void main(String[] arg)
     {
         String file = null;
@@ -33,21 +30,27 @@ public class BattlelandsRandomizer
             System.err.println("Must supply an input file on command-line");
             System.exit(0);
         }
-        
+
         BuilderHexMap bhm = new BuilderHexMap(null);
 
-        java.util.List directories = new java.util.ArrayList();
+        List directories = new java.util.ArrayList();
         directories.add(".");
         directories.add("");
-        java.io.InputStream inputFile = net.sf.colossus.util.ResourceLoader.getInputStream(file, directories);
-        net.sf.colossus.parser.BattlelandRandomizerLoader parser = 
-            new net.sf.colossus.parser.BattlelandRandomizerLoader(inputFile);
+        InputStream inputFile = ResourceLoader.getInputStream(file, directories);
+        BattlelandRandomizerLoader parser = new BattlelandRandomizerLoader(inputFile);
 
         BattleHex[][] h = bhm.getBattleHexArray();
-        try {
-            while (parser.oneArea(h) >= 0) {}
+        try
+        {
+            while (parser.oneArea(h) >= 0)
+            {
+            }
             parser.resolveAllHexsides(h);
-        } catch (Exception e) { System.err.println(e); }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e);
+        }
 
         System.out.println(bhm.dumpAsString());
 

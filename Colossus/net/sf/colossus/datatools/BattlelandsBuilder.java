@@ -1,6 +1,8 @@
 package net.sf.colossus.datatools;
 
+
 import net.sf.colossus.client.Hex;
+
 
 /**
  * Class BattlelandsBuilder
@@ -21,6 +23,6 @@ public class BattlelandsBuilder
 
         Hex.setOverlay(true);
 
-        ShowBuilderHexMap bhm = new ShowBuilderHexMap(file);
+        new ShowBuilderHexMap(file);
     }
 }

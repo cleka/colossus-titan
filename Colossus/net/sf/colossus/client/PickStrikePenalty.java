@@ -1,10 +1,15 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
 
 import net.sf.colossus.util.KDialog;
 
@@ -17,9 +22,8 @@ final class PickStrikePenalty extends KDialog implements ActionListener
 {
     private Client client;
 
-
-    PickStrikePenalty(JFrame parentFrame, Client client, 
-        java.util.List choices)
+    PickStrikePenalty(JFrame parentFrame, Client client,
+            List choices)
     {
         super(parentFrame, "Take strike penalty to carry?", true);
 
@@ -36,7 +40,10 @@ final class PickStrikePenalty extends KDialog implements ActionListener
         }
 
         // Don't allow exiting without making a choice, or the game will hang.
-        addWindowListener(new WindowAdapter() {} );
+        addWindowListener(new WindowAdapter()
+        {
+        }
+        );
 
         pack();
         centerOnScreen();

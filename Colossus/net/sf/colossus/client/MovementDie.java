@@ -1,9 +1,7 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Container;
 
 
 /**
@@ -17,12 +15,10 @@ final class MovementDie extends Chit
 {
     private int lastRoll = 0;
 
-
     MovementDie(int scale, String id, Container container)
     {
         super(scale, id, container);
     }
-
 
     static String getDieImageName(int roll)
     {
@@ -31,7 +27,6 @@ final class MovementDie extends Chit
 
         return basename.toString();
     }
-
 
     int getLastRoll()
     {

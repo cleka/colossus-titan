@@ -1,18 +1,28 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.io.*;
-import javax.swing.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.net.*;
-import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Options;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.util.List;
+
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Options;
+import net.sf.colossus.util.ResourceLoader;
 
 
 /**
@@ -157,7 +167,7 @@ class Chit extends JPanel
     static ImageIcon getImageIcon(String imageFilename, int scale)
     {
         ImageIcon tempIcon = null;
-        java.util.List directories = VariantSupport.getImagesDirectoriesList();
+        List directories = VariantSupport.getImagesDirectoriesList();
         tempIcon = ResourceLoader.getImageIcon(imageFilename, directories,
                 scale, scale);
         if (tempIcon == null)

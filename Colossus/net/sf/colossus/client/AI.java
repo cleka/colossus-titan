@@ -1,7 +1,8 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -13,6 +14,7 @@ import java.util.*;
  */
 public interface AI
 {
+
     /** make masterboard moves for current player in the Game */
     boolean masterMove();
 
@@ -35,10 +37,10 @@ public interface AI
     boolean strike(LegionInfo legion);
 
     /** return a list of battle moves for the active legion */
-    java.util.List battleMove();
+    List battleMove();
 
     /** Try another move for creatures whose moves failed. */
-    void retryFailedBattleMoves(java.util.List bestMoveOrder);
+    void retryFailedBattleMoves(List bestMoveOrder);
 
     /** pick an entry side */
     String pickEntrySide(String hexLabel, String markerId, Set entrySides);
@@ -53,7 +55,7 @@ public interface AI
     String summonAngel(String summonerId);
 
     /** pick a color of legion markers */
-    String pickColor(java.util.List colors, List favoriteColors);
+    String pickColor(List colors, List favoriteColors);
 
     /** pick a legion marker */
     String pickMarker(Set markerIds, String preferredShortColor);

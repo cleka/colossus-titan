@@ -1,15 +1,40 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.util.Options;
+import javax.swing.AbstractAction;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Options;
+import net.sf.colossus.util.ResourceLoader;
 
 
 /**
@@ -19,7 +44,7 @@ import net.sf.colossus.server.Constants;
  */
 
 public final class BattleMap extends HexMap implements MouseListener,
-        WindowListener
+            WindowListener
 {
     private Point location;
     private JFrame battleFrame;
@@ -307,7 +332,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     private void setupIcon()
     {
-        java.util.List directories = new java.util.ArrayList();
+        List directories = new java.util.ArrayList();
         directories.add(Constants.defaultDirName +
                 ResourceLoader.getPathSeparator() +
                 Constants.imagesDirName);
@@ -364,7 +389,7 @@ public final class BattleMap extends HexMap implements MouseListener,
      *  or null if none does. */
     private BattleChit getBattleChitAtPoint(Point point)
     {
-        java.util.List battleChits = client.getBattleChits();
+        List battleChits = client.getBattleChits();
         Iterator it = battleChits.iterator();
         while (it.hasNext())
         {
@@ -380,7 +405,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     void alignChits(String hexLabel)
     {
         GUIBattleHex hex = getGUIHexByLabel(hexLabel);
-        java.util.List chits = client.getBattleChits(hexLabel);
+        List chits = client.getBattleChits(hexLabel);
         int numChits = chits.size();
         if (numChits < 1)
         {

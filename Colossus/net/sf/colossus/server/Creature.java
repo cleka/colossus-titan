@@ -7,7 +7,7 @@ import java.io.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.parser.CreatureLoader;
-import net.sf.colossus.parser.TerrainRecruitLoader;
+
 
 /**
  * Class Creature represents the CONSTANT information about a
@@ -49,22 +49,21 @@ public class Creature implements Comparable
     private static boolean noBaseColor = false;
 
     public static final Creature unknown = new Creature("Unknown", 1, 1,
-        false, false, false, false, false, false, false, false,
-        false, false, false, false, false, false, false, false,
-        1, "Unknown", null);
+            false, false, false, false, false, false, false, false,
+            false, false, false, false, false, false, false, false,
+            1, "Unknown", null);
 
     /** Sometimes we need to iterate through all creature types. */
-    private static java.util.List creatures = new ArrayList();
-    private static java.util.List summonableCreatures = new ArrayList();
-
+    private static List creatures = new ArrayList();
+    private static List summonableCreatures = new ArrayList();
 
     public Creature(String name, int power, int skill, boolean rangestrikes,
-        boolean flies, boolean nativeBramble, boolean nativeDrift,
-        boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
-        boolean nativeVolcano, boolean nativeRiver, boolean nativeStone,
-        boolean nativeTree, boolean waterDwelling, boolean magicMissile, 
-        boolean summonable, boolean lord, boolean demilord, int maxCount, 
-        String pluralName, String baseColor)
+            boolean flies, boolean nativeBramble, boolean nativeDrift,
+            boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
+            boolean nativeVolcano, boolean nativeRiver, boolean nativeStone,
+            boolean nativeTree, boolean waterDwelling, boolean magicMissile,
+            boolean summonable, boolean lord, boolean demilord, int maxCount,
+            String pluralName, String baseColor)
     {
         this.name = name;
         this.power = power;
@@ -92,8 +91,8 @@ public class Creature implements Comparable
         /* warn about likely inapropriate combinations */
         if (waterDwelling && nativeSandDune)
         {
-            Log.warn("Creature " + name + 
-                " is both a Water Dweller and native to Sand and Dune.");
+            Log.warn("Creature " + name +
+                    " is both a Water Dweller and native to Sand and Dune.");
         }
     }
 
@@ -121,27 +120,29 @@ public class Creature implements Comparable
         this.maxCount = creature.maxCount;
         this.pluralName = creature.pluralName;
         this.baseColor = creature.baseColor;
-    }         
+    }
 
     /** Call immediately after loading variant, before using creatures. */
     public static void loadCreatures()
     {
-        try 
+        try
         {
             creatures.clear();
-            java.util.List directories = 
-                VariantSupport.getVarDirectoriesList();
+            List directories =
+                    VariantSupport.getVarDirectoriesList();
             InputStream creIS = ResourceLoader.getInputStream(
-                VariantSupport.getCreaturesName(), directories);
-            if (creIS == null) 
+                    VariantSupport.getCreaturesName(), directories);
+            if (creIS == null)
             {
                 throw new FileNotFoundException(
-                    VariantSupport.getCreaturesName());
+                        VariantSupport.getCreaturesName());
             }
             CreatureLoader creatureLoader = new CreatureLoader(creIS);
-            while (creatureLoader.oneCreature(creatures) >= 0) {}
+            while (creatureLoader.oneCreature(creatures) >= 0)
+            {
+            }
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             Log.error("Creatures def. loading failed : " + e);
             System.exit(1);
@@ -159,12 +160,12 @@ public class Creature implements Comparable
         Collections.sort(creatures);
     }
 
-    public static java.util.List getCreatures()
+    public static List getCreatures()
     {
         return java.util.Collections.unmodifiableList(creatures);
     }
 
-    public static java.util.List getSummonableCreatures()
+    public static List getSummonableCreatures()
     {
         return java.util.Collections.unmodifiableList(summonableCreatures);
     }
@@ -206,7 +207,7 @@ public class Creature implements Comparable
     }
 
     /* The name is an unique identifier and must not be changed,
-       so this function is final */
+     so this function is final */
     public final String getName()
     {
         return name;
@@ -234,18 +235,18 @@ public class Creature implements Comparable
         {
             int specialIncrement = ((isFlier() || isRangestriker()) ? 1 : 0);
             tempNames =
-                new String[4 + specialIncrement];
-            String colorSuffix =  "-" + (noBaseColor ? "black" : baseColor);
+                    new String[4 + specialIncrement];
+            String colorSuffix = "-" + (noBaseColor ? "black" : baseColor);
             tempNames[0] = getImageName();
             tempNames[1] = "Power-" + getPower() + colorSuffix;
-            
+
             tempNames[2] = "Skill-" + getSkill() + colorSuffix;
             tempNames[3] = getDisplayName() + "-Name" + colorSuffix;
             if (specialIncrement > 0)
             {
                 tempNames[4] =
-                    (isFlier() ? "Flying" : "") +
-                    (isRangestriker() ? "Rangestrike" : "") + colorSuffix;
+                        (isFlier() ? "Flying" : "") +
+                        (isRangestriker() ? "Rangestrike" : "") + colorSuffix;
             }
         }
         else
@@ -270,24 +271,24 @@ public class Creature implements Comparable
     { // this function is replicated in Critter
         return getPower() * getSkill();
     }
-    
+
     public int getHintedRecruitmentValue()
     { // this function is replicated in Critter
         return getPointValue() +
-            VariantSupport.getHintedRecruitmentValueOffset(name);
+                VariantSupport.getHintedRecruitmentValueOffset(name);
     }
-    
+
     public int getHintedRecruitmentValue(String[] section)
     { // this function is replicated in Critter
         return getPointValue() +
-            VariantSupport.getHintedRecruitmentValueOffset(name, section);
+                VariantSupport.getHintedRecruitmentValueOffset(name, section);
     }
-    
+
     public boolean isRangestriker()
     {
         return rangestrikes;
     }
-    
+
     public boolean isFlier()
     {
         return flies;
@@ -298,34 +299,44 @@ public class Creature implements Comparable
         if (t.equals("Plains"))
         { /* undefined */
             return false;
-        } else if (t.equals("Tower"))
+        }
+        else if (t.equals("Tower"))
         { /* undefined, beneficial for everyone */
             return true;
-        } else if (t.equals("Brambles"))
+        }
+        else if (t.equals("Brambles"))
         {
             return isNativeBramble();
-        } else if (t.equals("Sand"))
+        }
+        else if (t.equals("Sand"))
         {
             return isNativeSandDune();
-        } else if (t.equals("Tree"))
+        }
+        else if (t.equals("Tree"))
         {
             return isNativeTree();
-        } else if (t.equals("Bog"))
+        }
+        else if (t.equals("Bog"))
         {
             return isNativeBog();
-        } else if (t.equals("Volcano"))
+        }
+        else if (t.equals("Volcano"))
         {
             return isNativeVolcano();
-        } else if (t.equals("Drift"))
+        }
+        else if (t.equals("Drift"))
         {
             return isNativeDrift();
-        } else if (t.equals("Lake"))
+        }
+        else if (t.equals("Lake"))
         {
             return isWaterDwelling();
-        } else if (t.equals("Stone"))
+        }
+        else if (t.equals("Stone"))
         {
             return isNativeStone();
-        } else
+        }
+        else
         {
             return false;
         }
@@ -333,22 +344,28 @@ public class Creature implements Comparable
 
     public boolean isNativeHexside(char h)
     {
-        switch(h)
+        switch (h)
         {
-        default:
-            return false;
-        case ' ': /* undefined */
-            return false;
-        case 'd':
-            return isNativeSandDune();
-        case 'c': /* undefined */
-            return false;
-        case 's':
-            return isNativeSlope();
-        case 'w': /* undefined, beneficial for everyone */
-            return true;
-        case 'r':
-            return isNativeRiver();
+            default:
+                return false;
+
+            case ' ': /* undefined */
+                return false;
+
+            case 'd':
+                return isNativeSandDune();
+
+            case 'c': /* undefined */
+                return false;
+
+            case 's':
+                return isNativeSlope();
+
+            case 'w': /* undefined, beneficial for everyone */
+                return true;
+
+            case 'r':
+                return isNativeRiver();
         }
     }
 
@@ -436,7 +453,7 @@ public class Creature implements Comparable
         }
         return null;
     }
-    
+
     public static boolean isCreature(String name)
     {
         Iterator it = creatures.iterator();
@@ -455,7 +472,7 @@ public class Creature implements Comparable
     {
         return name;
     }
-    
+
     /**
      * Compare by name.
      * overloaded in Critter w/ a different semantic
@@ -472,7 +489,6 @@ public class Creature implements Comparable
             throw new ClassCastException();
         }
     }
-
 
     /** Compare by name. */
     public final boolean equals(Object object)
@@ -498,8 +514,12 @@ public class Creature implements Comparable
     public String getBaseColor()
     {
         if (baseColor != null)
+        {
             return baseColor;
+        }
         else
+        {
             return "";
+        }
     }
 }

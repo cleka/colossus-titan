@@ -1,10 +1,15 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 
 /**
@@ -14,10 +19,9 @@ import javax.swing.*;
  */
 
 final class ShowBattleMap extends HexMap implements WindowListener,
-    MouseListener
+            MouseListener
 {
     private JDialog dialog;
-
 
     ShowBattleMap(JFrame parentFrame, String masterHexLabel)
     {
@@ -25,7 +29,7 @@ final class ShowBattleMap extends HexMap implements WindowListener,
 
         MasterHex hex = MasterBoard.getHexByLabel(masterHexLabel);
         dialog = new JDialog(parentFrame, "Battle Map for " +
-            hex.getTerrainName(), true);
+                hex.getTerrainName(), true);
 
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -38,24 +42,20 @@ final class ShowBattleMap extends HexMap implements WindowListener,
         dialog.setVisible(true);
     }
 
-
     public void mouseClicked(MouseEvent e)
     {
         dialog.dispose();
     }
-
 
     public void mousePressed(MouseEvent e)
     {
         dialog.dispose();
     }
 
-
     public void mouseReleased(MouseEvent e)
     {
         dialog.dispose();
     }
-
 
     public void windowClosing(WindowEvent e)
     {

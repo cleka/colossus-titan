@@ -1,10 +1,12 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Glob;
+import net.sf.colossus.util.Split;
 
 
 /**
@@ -21,13 +23,11 @@ public final class Proposal
     private boolean mutual;
     private String winnerId;
     private List winnerLosses;
-    private String hexLabel;
 
     private static final String sep = Glob.sep;
 
-
     Proposal(String attackerId, String defenderId, boolean fight,
-        boolean mutual, String winnerId, List winnerLosses, String hexLabel)
+            boolean mutual, String winnerId, List winnerLosses)
     {
         this.attackerId = attackerId;
         this.defenderId = defenderId;
@@ -39,9 +39,7 @@ public final class Proposal
         {
             Collections.sort(winnerLosses);
         }
-        this.hexLabel = hexLabel;
     }
-
 
     public String getAttackerId()
     {
@@ -51,11 +49,6 @@ public final class Proposal
     public String getDefenderId()
     {
         return defenderId;
-    }
-
-    public String getHexLabel()
-    {
-        return hexLabel;
     }
 
     public boolean isFight()
@@ -141,7 +134,6 @@ public final class Proposal
         sb.append(sep);
         sb.append(winnerId);
         sb.append(sep);
-        sb.append(hexLabel);
         sb.append(sep);
         if (winnerLosses != null)
         {
@@ -170,10 +162,9 @@ public final class Proposal
         String attackerId = (String)li.remove(0);
         String defenderId = (String)li.remove(0);
         String winnerId = (String)li.remove(0);
-        String hexLabel = (String)li.remove(0);
         List winnerLosses = li;
 
         return new Proposal(attackerId, defenderId, fight, mutual, winnerId,
-            winnerLosses, hexLabel);
+                winnerLosses);
     }
 }

@@ -1,5 +1,9 @@
 package net.sf.colossus.server;
 
+
+import java.util.List;
+
+
 /**
  * Interface for an Oracle used for AI Hints.
  * @version $Id$
@@ -8,7 +12,7 @@ package net.sf.colossus.server;
 public interface HintOracleInterface
 {
     public boolean hasCreature(String name); // in the Stack/Legion
-    public boolean otherFriendlyStackHasCreature(java.util.List allNames); // in a different Stack/Legion
+    public boolean otherFriendlyStackHasCreature(List allNames); // in a different Stack/Legion
     public boolean canRecruit(String name); // name could be recruited
     public boolean canReach(String terrain); // terrain can be reached by the Stack/Legion
 

@@ -1,7 +1,8 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.Comparator;
+
 
 /**
  *  Compare markers.

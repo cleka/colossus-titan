@@ -2,13 +2,10 @@ package net.sf.colossus.server;
 
 
 import java.util.*;
-import java.io.*;
 
 import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Glob;
 import net.sf.colossus.parser.TerrainRecruitLoader;
-
 
 
 /**
@@ -37,14 +34,12 @@ public final class Player implements Comparable
     private String type;               // "Human" or ".*AI"
     private String firstMarker;
 
-
     Player(String name, Game game)
     {
         this.name = name;
         this.game = game;
         type = "Human";
     }
-
 
     boolean isHuman()
     {
@@ -87,7 +82,6 @@ public final class Player implements Comparable
         this.type = type;
     }
 
-
     boolean isDead()
     {
         return dead;
@@ -98,7 +92,6 @@ public final class Player implements Comparable
         this.dead = dead;
     }
 
-
     String getColor()
     {
         return color;
@@ -108,7 +101,6 @@ public final class Player implements Comparable
     {
         this.color = color;
     }
-
 
     void initMarkersAvailable()
     {
@@ -154,7 +146,6 @@ public final class Player implements Comparable
         }
     }
 
-
     void setFirstMarker(String firstMarker)
     {
         this.firstMarker = firstMarker;
@@ -164,7 +155,6 @@ public final class Player implements Comparable
     {
         return firstMarker;
     }
-
 
     String getShortColor()
     {
@@ -183,7 +173,6 @@ public final class Player implements Comparable
         }
     }
 
-
     void setTower(String startingTower)
     {
         this.startingTower = startingTower;
@@ -194,9 +183,8 @@ public final class Player implements Comparable
         return startingTower;
     }
 
-
     /** Players are sorted in order of decreasing starting tower.
-        This is inconsistent with equals(). */
+     This is inconsistent with equals(). */
     public int compareTo(Object object)
     {
         if (object instanceof Player)
@@ -210,42 +198,35 @@ public final class Player implements Comparable
         }
     }
 
-
     int getScore()
     {
-        return (int) score;
+        return (int)score;
     }
-
 
     void setScore(int score)
     {
         this.score = score;
     }
 
-
     String getPlayersElim()
     {
         return playersEliminated;
     }
-
 
     void setPlayersElim(String playersEliminated)
     {
         this.playersEliminated = playersEliminated;
     }
 
-
     void addPlayerElim(Player player)
     {
         playersEliminated = playersEliminated + player.getShortColor();
     }
 
-
     boolean canTitanTeleport()
     {
         return (score >= TerrainRecruitLoader.getTitanTeleportValue());
     }
-
 
     boolean hasTeleported()
     {
@@ -256,7 +237,6 @@ public final class Player implements Comparable
     {
         this.teleported = teleported;
     }
-
 
     boolean hasSummoned()
     {
@@ -291,7 +271,7 @@ public final class Player implements Comparable
     /** Remove all of this player's zero-height legions. */
     synchronized void removeEmptyLegions()
     {
-        Iterator it = legions.iterator(); 
+        Iterator it = legions.iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
@@ -307,13 +287,11 @@ public final class Player implements Comparable
         }
     }
 
-
     int getTitanPower()
     {
-        return (int)(6 + (getScore() / 
-                          TerrainRecruitLoader.getTitanImprovementValue()));
+        return (int)(6 + (getScore() /
+                TerrainRecruitLoader.getTitanImprovementValue()));
     }
-
 
     synchronized int getNumLegions()
     {
@@ -391,7 +369,6 @@ public final class Player implements Comparable
         return max;
     }
 
-
     /** Return the number of this player's legions that have moved. */
     synchronized int legionsMoved()
     {
@@ -409,9 +386,8 @@ public final class Player implements Comparable
         return count;
     }
 
-
     /** Return the number of this player's legions that have legal
-        non-teleport moves remaining. */
+     non-teleport moves remaining. */
     synchronized int countMobileLegions()
     {
         int count = 0;
@@ -427,7 +403,6 @@ public final class Player implements Comparable
         return count;
     }
 
-
     synchronized void commitMoves()
     {
         Iterator it = legions.iterator();
@@ -437,7 +412,6 @@ public final class Player implements Comparable
             legion.commitMove();
         }
     }
-
 
     String getName()
     {
@@ -454,7 +428,6 @@ public final class Player implements Comparable
         return name;
     }
 
-
     int getMovementRoll()
     {
         return movementRoll;
@@ -465,7 +438,6 @@ public final class Player implements Comparable
         this.movementRoll = movementRoll;
     }
 
-
     int getMulligansLeft()
     {
         return mulligansLeft;
@@ -475,7 +447,6 @@ public final class Player implements Comparable
     {
         mulligansLeft = number;
     }
-
 
     void resetTurnState()
     {
@@ -489,7 +460,6 @@ public final class Player implements Comparable
         commitMoves();
     }
 
-
     void rollMovement()
     {
         // Only roll if it hasn't already been done.
@@ -500,12 +470,11 @@ public final class Player implements Comparable
         else
         {
             movementRoll = Dice.rollDie();
-            Log.event(getName() + " rolls a " + movementRoll + 
-                " for movement");
+            Log.event(getName() + " rolls a " + movementRoll +
+                    " for movement");
         }
         game.getServer().allTellMovementRoll(movementRoll);
     }
-
 
     void takeMulligan()
     {
@@ -517,7 +486,6 @@ public final class Player implements Comparable
             movementRoll = 0;
         }
     }
-
 
     void undoMove(String markerId)
     {
@@ -538,7 +506,6 @@ public final class Player implements Comparable
         }
     }
 
-
     /** Return true if two or more of this player's legions share
      *  a hex and they have a legal non-teleport move. */
     synchronized boolean splitLegionHasForcedMove()
@@ -549,14 +516,13 @@ public final class Player implements Comparable
             Legion legion = (Legion)it.next();
             String hexLabel = legion.getCurrentHexLabel();
             if (game.getNumFriendlyLegions(hexLabel, this) > 1 &&
-                legion.hasConventionalMove())
+                    legion.hasConventionalMove())
             {
                 return true;
             }
         }
         return false;
     }
-
 
     /** Return true if any legion can recruit. */
     synchronized boolean canRecruit()
@@ -573,7 +539,6 @@ public final class Player implements Comparable
         return false;
     }
 
-
     void undoRecruit(String markerId)
     {
         Legion legion = getLegionByMarkerId(markerId);
@@ -585,7 +550,6 @@ public final class Player implements Comparable
         game.getServer().undidRecruit(legion, recruitName);
     }
 
-
     void undoSplit(String splitoffId)
     {
         Legion splitoff = getLegionByMarkerId(splitoffId);
@@ -594,7 +558,6 @@ public final class Player implements Comparable
         game.getServer().allUpdatePlayerInfo();
         game.getServer().undidSplit(splitoffId, parent.getMarkerId());
     }
-
 
     synchronized void recombineIllegalSplits()
     {
@@ -605,18 +568,17 @@ public final class Player implements Comparable
             // Don't use the legion's real parent, as there could have been
             // a 3-way split and the parent could be gone.
             Legion parent = game.getFirstFriendlyLegion(
-                legion.getCurrentHexLabel(), this);
+                    legion.getCurrentHexLabel(), this);
             if (legion != parent)
             {
                 game.getServer().undidSplit(legion.getMarkerId(),
-                    parent.getMarkerId());
+                        parent.getMarkerId());
                 legion.recombine(parent, false);
                 it.remove();
             }
         }
         game.getServer().allUpdatePlayerInfo();
     }
-
 
     synchronized int getNumCreatures()
     {
@@ -630,12 +592,10 @@ public final class Player implements Comparable
         return count;
     }
 
-
     synchronized void addLegion(Legion legion)
     {
         legions.add(legion);
     }
-
 
     int getNumMarkersAvailable()
     {
@@ -686,7 +646,6 @@ public final class Player implements Comparable
         victim.markersAvailable.clear();
     }
 
-
     /** Add points to this player's score.  Update the status window
      *  to reflect the addition. */
     void addPoints(double points)
@@ -703,13 +662,11 @@ public final class Player implements Comparable
         }
     }
 
-
     /** Remove half-points. */
     void truncScore()
     {
         score = Math.floor(score);
     }
-
 
     synchronized void die(String slayerName, boolean checkForVictory)
     {
@@ -756,22 +713,22 @@ public final class Player implements Comparable
             Player player = (Player)it.next();
             player.truncScore();
         }
-            
+
         // Mark this player as dead.
         setDead(true);
-            
+
         // Record the slayer and give him this player's legion markers.
         if (slayer != null)
         {
             slayer.addPlayerElim(this);
             slayer.takeLegionMarkers(this);
         }
-            
+
         game.getServer().allUpdatePlayerInfo();
 
         Log.event(getName() + " dies");
         game.getServer().allTellPlayerElim(name, slayerName, true);
-            
+
         // See if the game is over.
         if (checkForVictory)
         {
@@ -779,19 +736,15 @@ public final class Player implements Comparable
         }
     }
 
-
     void eliminateTitan()
     {
         titanEliminated = true;
     }
 
-
     boolean isTitanEliminated()
     {
         return titanEliminated;
     }
-
-
 
     /** Return a colon-separated string with a bunch of info for
      *  the status screen. */

@@ -1,15 +1,22 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Split;
-import net.sf.colossus.util.Glob;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.IServer;
+import net.sf.colossus.util.Glob;
+import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Split;
+
 
 /**
  *  Thread to handle server connection on client side.
@@ -29,7 +36,6 @@ final class SocketClientThread extends Thread implements IServer
 
     private final static String sep = Constants.protocolTermSeparator;
 
-
     SocketClientThread(Client client, String host, int port)
     {
         super("Client " + client.getPlayerName());
@@ -38,17 +44,16 @@ final class SocketClientThread extends Thread implements IServer
         this.port = port;
     }
 
-
     public void run()
     {
-Log.debug("About to connect client socket to " + host + ":" + port);       
+        Log.debug("About to connect client socket to " + host + ":" + port);
         try
         {
             socket = new Socket(host, port);
             out = new PrintWriter(socket.getOutputStream(), true);
         }
         // UnknownHostException, IOException, IllegalBlockingModeException
-        catch (Exception ex)   
+        catch (Exception ex)
         {
             Log.error(ex.toString());
             ex.printStackTrace();
@@ -60,7 +65,7 @@ Log.debug("About to connect client socket to " + host + ":" + port);
         try
         {
             in = new BufferedReader(new InputStreamReader(
-                socket.getInputStream()));
+                    socket.getInputStream()));
         }
         catch (IOException ex)
         {
@@ -76,17 +81,18 @@ Log.debug("About to connect client socket to " + host + ":" + port);
             {
                 if (fromServer.length() > 0)
                 {
-                /*
-                    if (!fromServer.startsWith(Constants.log))
-                    {
-                        System.out.println("From server to " + 
-                            client.getPlayerName() + ": " + fromServer);
-                    }
-                */
+
+                    /*
+                     if (!fromServer.startsWith(Constants.log))
+                     {
+                     System.out.println("From server to " + 
+                     client.getPlayerName() + ": " + fromServer);
+                     }
+                     */
                     parseLine(fromServer);
                 }
             }
-Log.debug("End of SocketClientThread while loop");
+            Log.debug("End of SocketClientThread while loop");
         }
         catch (IOException ex)
         {
@@ -96,7 +102,6 @@ Log.debug("End of SocketClientThread while loop");
         }
         System.exit(0);
     }
-
 
     private synchronized void parseLine(String s)
     {
@@ -147,14 +152,14 @@ Log.debug("End of SocketClientThread while loop");
         else if (method.equals(Constants.setLegionStatus))
         {
             String markerId = (String)args.remove(0);
-            boolean moved = 
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
-            boolean teleported = 
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean moved =
+                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean teleported =
+                    Boolean.valueOf((String)args.remove(0)).booleanValue();
             int entrySide = Integer.parseInt((String)args.remove(0));
             String lastRecruit = (String)args.remove(0);
             client.setLegionStatus(markerId, moved, teleported, entrySide,
-                lastRecruit);
+                    lastRecruit);
         }
         else if (method.equals(Constants.addCreature))
         {
@@ -181,8 +186,8 @@ Log.debug("End of SocketClientThread while loop");
         else if (method.equals(Constants.placeNewChit))
         {
             String imageName = (String)args.remove(0);
-            boolean inverted = 
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean inverted =
+                    Boolean.valueOf((String)args.remove(0)).booleanValue();
             int tag = Integer.parseInt((String)args.remove(0));
             String hexLabel = (String)args.remove(0);
             client.placeNewChit(imageName, inverted, tag, hexLabel);
@@ -258,10 +263,10 @@ Log.debug("End of SocketClientThread while loop");
             int strikeNumber = Integer.parseInt((String)args.remove(0));
             List rolls = Split.split(Glob.sep, (String)args.remove(0));
             int damage = Integer.parseInt((String)args.remove(0));
-            boolean killed = 
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
-            boolean wasCarry = 
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean killed =
+                    Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean wasCarry =
+                    Boolean.valueOf((String)args.remove(0)).booleanValue();
             int carryDamageLeft = Integer.parseInt((String)args.remove(0));
 
             Set carryTargetDescriptions = new HashSet();
@@ -276,8 +281,8 @@ Log.debug("End of SocketClientThread while loop");
             }
 
             client.tellStrikeResults(strikerTag, targetTag, strikeNumber,
-                rolls, damage, killed, wasCarry, carryDamageLeft,
-                carryTargetDescriptions);
+                    rolls, damage, killed, wasCarry, carryDamageLeft,
+                    carryTargetDescriptions);
         }
         else if (method.equals(Constants.initBattle))
         {
@@ -288,8 +293,8 @@ Log.debug("End of SocketClientThread while loop");
             String attackerMarkerId = (String)args.remove(0);
             String defenderMarkerId = (String)args.remove(0);
             client.initBattle(masterHexLabel, battleTurnNumber,
-                battleActivePlayerName, battlePhase, attackerMarkerId,
-                defenderMarkerId);
+                    battleActivePlayerName, battlePhase, attackerMarkerId,
+                    defenderMarkerId);
         }
         else if (method.equals(Constants.cleanupBattle))
         {
@@ -314,8 +319,8 @@ Log.debug("End of SocketClientThread while loop");
             String recruitName = (String)args.remove(0);
             String recruiterName = (String)args.remove(0);
             int numRecruiters = Integer.parseInt((String)args.remove(0));
-            client.didRecruit(markerId, recruitName, recruiterName, 
-                numRecruiters);
+            client.didRecruit(markerId, recruitName, recruiterName,
+                    numRecruiters);
         }
         else if (method.equals(Constants.undidRecruit))
         {
@@ -357,15 +362,15 @@ Log.debug("End of SocketClientThread while loop");
         {
             String battleActivePlayerName = (String)args.remove(0);
             int battleTurnNumber = Integer.parseInt((String)args.remove(0));
-            client.setupBattleRecruit(battleActivePlayerName, 
-                battleTurnNumber);
+            client.setupBattleRecruit(battleActivePlayerName,
+                    battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleMove))
         {
             String battleActivePlayerName = (String)args.remove(0);
             int battleTurnNumber = Integer.parseInt((String)args.remove(0));
-            client.setupBattleMove(battleActivePlayerName, 
-                battleTurnNumber);
+            client.setupBattleMove(battleActivePlayerName,
+                    battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleFight))
         {
@@ -384,8 +389,8 @@ Log.debug("End of SocketClientThread while loop");
             int tag = Integer.parseInt((String)args.remove(0));
             String startingHexLabel = (String)args.remove(0);
             String endingHexLabel = (String)args.remove(0);
-            boolean undo = 
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean undo =
+                    Boolean.valueOf((String)args.remove(0)).booleanValue();
             client.tellBattleMove(tag, startingHexLabel, endingHexLabel, undo);
         }
         else if (method.equals(Constants.didMove))
@@ -394,10 +399,10 @@ Log.debug("End of SocketClientThread while loop");
             String startingHexLabel = (String)args.remove(0);
             String currentHexLabel = (String)args.remove(0);
             String entrySide = (String)args.remove(0);
-            boolean teleport = 
-                Boolean.valueOf((String)args.remove(0)).booleanValue();
+            boolean teleport =
+                    Boolean.valueOf((String)args.remove(0)).booleanValue();
             client.didMove(markerId, startingHexLabel, currentHexLabel,
-                entrySide, teleport);
+                    entrySide, teleport);
         }
         else if (method.equals(Constants.undidMove))
         {
@@ -419,20 +424,20 @@ Log.debug("End of SocketClientThread while loop");
             String parentId = (String)args.remove(0);
             String childId = (String)args.remove(0);
             int childHeight = Integer.parseInt((String)args.remove(0));
-            java.util.List splitoffs = new ArrayList();
+            List splitoffs = new ArrayList();
             if (!args.isEmpty())
             {
                 List soList = Split.split(Glob.sep, (String)args.remove(0));
                 splitoffs.addAll(soList);
             }
             int turn = Integer.parseInt((String)args.remove(0));
-            client.didSplit(hexLabel, parentId, childId, childHeight, 
-                splitoffs, turn);
+            client.didSplit(hexLabel, parentId, childId, childHeight,
+                    splitoffs, turn);
         }
         else if (method.equals(Constants.askPickColor))
         {
             List clList = Split.split(Glob.sep, (String)args.remove(0));
-            java.util.List colorsLeft = new ArrayList();
+            List colorsLeft = new ArrayList();
             colorsLeft.addAll(clList);
             client.askPickColor(colorsLeft);
         }
@@ -455,8 +460,8 @@ Log.debug("End of SocketClientThread while loop");
         else if (method.equals(Constants.tellEngagement))
         {
             client.tellEngagement((String)args.remove(0),
-                                  (String)args.remove(0),
-                                  (String)args.remove(0));
+                    (String)args.remove(0),
+                    (String)args.remove(0));
         }
         else if (method.equals(Constants.tellEngagementResults))
         {
@@ -468,16 +473,15 @@ Log.debug("End of SocketClientThread while loop");
         else
         {
             Log.error("Bogus packet (Client, method: " +
-                      method + ", args: " + args + ")");
+                    method + ", args: " + args + ")");
         }
     }
 
-
     // Setup method
-    private void signOn() 
+    private void signOn()
     {
         out.println(Constants.signOn + sep + client.getPlayerName() + sep +
-            client.isRemote());
+                client.isRemote());
     }
 
     /** Set the thread name to playerName, and tell the server so we
@@ -488,21 +492,20 @@ Log.debug("End of SocketClientThread while loop");
         out.println(Constants.fixName + sep + playerName);
     }
 
-
     // IServer methods, called from client and sent over the
     // socket to the server.
 
-    public void leaveCarryMode() 
+    public void leaveCarryMode()
     {
         out.println(Constants.leaveCarryMode);
     }
 
-    public void doneWithBattleMoves() 
+    public void doneWithBattleMoves()
     {
         out.println(Constants.doneWithBattleMoves);
     }
 
-    public void doneWithStrikes() 
+    public void doneWithStrikes()
     {
         out.println(Constants.doneWithStrikes);
     }
@@ -514,38 +517,38 @@ Log.debug("End of SocketClientThread while loop");
 
     public void doSummon(String markerId, String donorId, String angel)
     {
-        out.println(Constants.doSummon + sep + markerId + sep + donorId + 
-            sep + angel);
+        out.println(Constants.doSummon + sep + markerId + sep + donorId +
+                sep + angel);
     }
 
     public void doRecruit(String markerId, String recruitName,
-        String recruiterName) 
+            String recruiterName)
     {
         out.println(Constants.doRecruit + sep + markerId + sep + recruitName +
-            sep + recruiterName);
+                sep + recruiterName);
     }
 
-    public void engage(String hexLabel) 
+    public void engage(String hexLabel)
     {
         out.println(Constants.engage + sep + hexLabel);
     }
 
-    public void concede(String markerId) 
+    public void concede(String markerId)
     {
         out.println(Constants.concede + sep + markerId);
     }
 
-    public void doNotConcede(String markerId) 
+    public void doNotConcede(String markerId)
     {
         out.println(Constants.doNotConcede + sep + markerId);
     }
 
-    public void flee(String markerId) 
+    public void flee(String markerId)
     {
         out.println(Constants.flee + sep + markerId);
     }
 
-    public void doNotFlee(String markerId) 
+    public void doNotFlee(String markerId)
     {
         out.println(Constants.doNotFlee + sep + markerId);
     }
@@ -555,27 +558,27 @@ Log.debug("End of SocketClientThread while loop");
         out.println(Constants.makeProposal + sep + proposalString);
     }
 
-    public void fight(String hexLabel) 
+    public void fight(String hexLabel)
     {
         out.println(Constants.fight + sep + hexLabel);
     }
 
-    public void doBattleMove(int tag, String hexLabel) 
+    public void doBattleMove(int tag, String hexLabel)
     {
         out.println(Constants.doBattleMove + sep + tag + sep + hexLabel);
     }
 
-    public synchronized void strike(int tag, String hexLabel) 
+    public synchronized void strike(int tag, String hexLabel)
     {
         out.println(Constants.strike + sep + tag + sep + hexLabel);
     }
 
-    public synchronized void applyCarries(String hexLabel) 
+    public synchronized void applyCarries(String hexLabel)
     {
         out.println(Constants.applyCarries + sep + hexLabel);
     }
 
-    public void undoBattleMove(String hexLabel) 
+    public void undoBattleMove(String hexLabel)
     {
         out.println(Constants.undoBattleMove + sep + hexLabel);
     }
@@ -585,7 +588,7 @@ Log.debug("End of SocketClientThread while loop");
         out.println(Constants.assignStrikePenalty + sep + prompt);
     }
 
-    public void mulligan() 
+    public void mulligan()
     {
         out.println(Constants.mulligan);
     }
@@ -605,32 +608,32 @@ Log.debug("End of SocketClientThread while loop");
         out.println(Constants.undoRecruit + sep + markerId);
     }
 
-    public void doneWithSplits() 
+    public void doneWithSplits()
     {
         out.println(Constants.doneWithSplits);
     }
 
-    public void doneWithMoves() 
+    public void doneWithMoves()
     {
         out.println(Constants.doneWithMoves);
     }
 
-    public void doneWithEngagements() 
+    public void doneWithEngagements()
     {
         out.println(Constants.doneWithEngagements);
     }
 
-    public void doneWithRecruits() 
+    public void doneWithRecruits()
     {
         out.println(Constants.doneWithRecruits);
     }
 
-    public void withdrawFromGame() 
+    public void withdrawFromGame()
     {
         out.println(Constants.withdrawFromGame);
     }
 
-    public void setDonor(String markerId) 
+    public void setDonor(String markerId)
     {
         out.println(Constants.setDonor + sep + markerId);
     }
@@ -638,14 +641,14 @@ Log.debug("End of SocketClientThread while loop");
     public void doSplit(String parentId, String childId, String results)
     {
         out.println(Constants.doSplit + sep + parentId + sep + childId + sep +
-            results);
+                results);
     }
 
     public void doMove(String markerId, String hexLabel, String entrySide,
-        boolean teleport, String teleportingLord) 
+            boolean teleport, String teleportingLord)
     {
         out.println(Constants.doMove + sep + markerId + sep + hexLabel + sep +
-            entrySide + sep + teleport + sep + teleportingLord);
+                entrySide + sep + teleport + sep + teleportingLord);
     }
 
     public void assignColor(String color)
@@ -659,17 +662,17 @@ Log.debug("End of SocketClientThread while loop");
     }
 
     // XXX Disallow the following methods in network games
-    public void newGame() 
+    public void newGame()
     {
         out.println(Constants.newGame);
     }
 
-    public void loadGame(String filename) 
+    public void loadGame(String filename)
     {
         out.println(Constants.loadGame + sep + filename);
     }
 
-    public void saveGame(String filename) 
+    public void saveGame(String filename)
     {
         out.println(Constants.saveGame + sep + filename);
     }

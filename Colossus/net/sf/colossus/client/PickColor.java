@@ -1,14 +1,22 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowListener;
+import java.util.Arrays;
+import java.util.List;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.server.Constants;
 
 
 /**
@@ -20,10 +28,8 @@ import net.sf.colossus.server.Constants;
 
 final class PickColor extends KDialog implements WindowListener, ActionListener
 {
-    private JLabel [] colorLabel = new JLabel[Constants.MAX_MAX_PLAYERS];
-
-    private static final Color [] background;
-    private static final Color [] foreground;
+    private static final Color[] background;
+    private static final Color[] foreground;
 
     private static String color;
 
@@ -31,21 +37,21 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
     {
         background = new Color[Constants.MAX_MAX_PLAYERS];
         foreground = new Color[Constants.MAX_MAX_PLAYERS];
-        
+
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             background[i] = HTMLColor.stringToColor(Constants.colorNames[i] +
-                                                    "Colossus");
+                    "Colossus");
             int sum =
-                background[i].getRed() +
-                background[i].getGreen() +
-                background[i].getBlue();
+                    background[i].getRed() +
+                    background[i].getGreen() +
+                    background[i].getBlue();
             foreground[i] = (sum > 200 ? Color.black : Color.white);
         }
     }
 
-    private PickColor(JFrame parentFrame, String playerName, 
-        java.util.List colorsLeft)
+    private PickColor(JFrame parentFrame, String playerName,
+            List colorsLeft)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 
@@ -79,14 +85,12 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
         setVisible(true);
     }
 
-
     static String pickColor(JFrame parentFrame, String playerName,
-        java.util.List colorsLeft)
+            List colorsLeft)
     {
         new PickColor(parentFrame, playerName, colorsLeft);
         return color;
     }
-
 
     static String getColorName(int i)
     {
@@ -121,31 +125,15 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
         return null;
     }
 
-
-    private int colorNumber(String colorName)
-    {
-        for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
-        {
-            if (colorName.equals(Constants.colorNames[i]))
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-
     public void actionPerformed(ActionEvent e)
     {
         color = e.getActionCommand();
         dispose();
     }
 
-
-    public static void main(String [] args)
+    public static void main(String[] args)
     {
-        java.util.List colorsLeft = Arrays.asList(Constants.colorNames);
+        List colorsLeft = Arrays.asList(Constants.colorNames);
         String color = pickColor(new JFrame(), "Player", colorsLeft);
         System.out.println("Picked " + color);
         System.exit(0);

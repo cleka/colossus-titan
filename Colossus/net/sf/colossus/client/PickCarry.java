@@ -1,10 +1,15 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
 
 import net.sf.colossus.util.KDialog;
 
@@ -18,13 +23,12 @@ final class PickCarry extends KDialog implements ActionListener
     private Client client;
     private static final String cancel = "Decline carry";
 
-
     /** Each choice is a String of form "Warbear in Plains Hex G3" */
-    PickCarry(JFrame parentFrame, Client client, int carryDamage, 
-        Set choices)
+    PickCarry(JFrame parentFrame, Client client, int carryDamage,
+            Set choices)
     {
-        super(parentFrame, "Apply " + carryDamage + 
-            (carryDamage == 1 ? "carry to:" : " carries to:"), false);
+        super(parentFrame, "Apply " + carryDamage +
+                (carryDamage == 1 ? "carry to:" : " carries to:"), false);
 
         this.client = client;
 
@@ -40,7 +44,10 @@ final class PickCarry extends KDialog implements ActionListener
         }
 
         // Don't allow exiting without making a choice, or the game will hang.
-        addWindowListener(new WindowAdapter() {} );
+        addWindowListener(new WindowAdapter()
+        {
+        }
+        );
 
         pack();
         centerOnScreen();

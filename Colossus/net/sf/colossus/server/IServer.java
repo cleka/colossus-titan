@@ -1,10 +1,6 @@
 package net.sf.colossus.server;
 
 
-import java.util.*;
-
-import net.sf.colossus.client.IClient;
-
 /**
  *  IServer is an interface for the client-accessible parts of Server.
  *  @version $Id$
@@ -23,7 +19,7 @@ public interface IServer
     public void doSummon(String markerId, String donorId, String angel);
 
     public void doRecruit(String markerId, String recruitName,
-        String recruiterName);
+            String recruiterName);
 
     public void engage(String hexLabel);
 
@@ -72,7 +68,7 @@ public interface IServer
     public void doSplit(String parentId, String childId, String results);
 
     public void doMove(String markerId, String hexLabel, String entrySide,
-        boolean teleport, String teleportingLord);
+            boolean teleport, String teleportingLord);
 
     public void assignColor(String color);
 

@@ -1,13 +1,17 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import net.sf.colossus.util.Split;
-import net.sf.colossus.util.Glob;
-import net.sf.colossus.util.Log;
-import net.sf.colossus.server.Player;
 import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.server.Player;
+import net.sf.colossus.util.Split;
 
 
 /**
@@ -35,7 +39,6 @@ public final class PlayerInfo
     /** Sorted set of available legion markers for this player. */
     private SortedSet markersAvailable = null;
 
-
     /** Two-stage initialization. */
     PlayerInfo(Client client)
     {
@@ -43,13 +46,12 @@ public final class PlayerInfo
         net.sf.colossus.server.CustomRecruitBase.addPlayerInfo(this);
     }
 
-
     /** Takes a colon-separated string of form
      *  dead:name:tower:color:elim:legions:markers:creatures:value:titan:score
      */
     void update(String infoString)
     {
-        java.util.List data = Split.split(":", infoString);
+        List data = Split.split(":", infoString);
         String buf;
 
         buf = (String)data.remove(0);
@@ -83,12 +85,11 @@ public final class PlayerInfo
             if (markersAvailable == null)
             {
                 markersAvailable = new TreeSet(new MarkerComparator(
-                    getShortColor()));
+                        getShortColor()));
             }
             setMarkersAvailable(data);
         }
     }
-
 
     void setDead(boolean dead)
     {
@@ -232,7 +233,7 @@ public final class PlayerInfo
     {
         return mulligansLeft;
     }
-    
+
     boolean hasTeleported()
     {
         Iterator it = getLegionIds().iterator();

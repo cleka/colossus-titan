@@ -1,12 +1,24 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
 
 import net.sf.colossus.util.KDialog;
+
 
 /**
  * Class AcquireAngel allows a player to acquire an angel or archangel.
@@ -16,22 +28,21 @@ import net.sf.colossus.util.KDialog;
 
 
 final class AcquireAngel extends KDialog implements MouseListener,
-    WindowListener, ActionListener
+            WindowListener, ActionListener
 {
-    private java.util.List chits = new ArrayList();
-    private java.util.List recruits;
-    private static boolean active;
+    private List chits = new ArrayList();
+    private List recruits;
     private Client client;
     private String markerId;
     private static int numberOpen = 0;
     private static final int basicXOffset = 16;
     private static final int basicYOffset = 32;
 
-    AcquireAngel(JFrame parentFrame, Client client, String markerId, 
-        java.util.List recruits)
+    AcquireAngel(JFrame parentFrame, Client client, String markerId,
+            List recruits)
     {
-        super(parentFrame, client.getPlayerName() + 
-            ": Acquire Angel in legion " + markerId, false);
+        super(parentFrame, client.getPlayerName() +
+                ": Acquire Angel in legion " + markerId, false);
 
         this.client = client;
         this.markerId = markerId;
@@ -66,11 +77,10 @@ final class AcquireAngel extends KDialog implements MouseListener,
         pack();
         numberOpen++;
         centerOnScreen(basicXOffset * numberOpen,
-                       basicYOffset * numberOpen);
+                basicYOffset * numberOpen);
         setVisible(true);
         repaint();
     }
-
 
     void cleanup(String angelType)
     {
@@ -78,7 +88,6 @@ final class AcquireAngel extends KDialog implements MouseListener,
         numberOpen--;
         dispose();
     }
-
 
     public void mousePressed(MouseEvent e)
     {
@@ -89,7 +98,6 @@ final class AcquireAngel extends KDialog implements MouseListener,
             cleanup((String)recruits.get(i));
         }
     }
-
 
     public void windowClosing(WindowEvent e)
     {

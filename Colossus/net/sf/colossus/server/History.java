@@ -4,17 +4,16 @@ package net.sf.colossus.server;
 import java.util.*;
 
 import org.jdom.*;
-import org.jdom.output.*;
-import org.jdom.input.*;
 
 import net.sf.colossus.util.Log;
+
 
 /**
  * Stores game history as XML.
  * @version $Id$
  * @author David Ripton
  */
-public class History 
+public class History
 {
     private Element root = new Element("History");
 
@@ -67,8 +66,8 @@ public class History
         root.addContent(event);
     }
 
-    void revealEvent(boolean allPlayers, List playerNames, String markerId, 
-        List creatureNames, boolean whole)
+    void revealEvent(boolean allPlayers, List playerNames, String markerId,
+            List creatureNames, boolean whole)
     {
         if (creatureNames.isEmpty())
         {

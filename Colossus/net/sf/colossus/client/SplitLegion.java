@@ -1,14 +1,28 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import net.sf.colossus.util.KDialog;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+
 import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.util.KDialog;
+
 
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
@@ -17,17 +31,16 @@ import net.sf.colossus.server.Constants;
  */
 
 final class SplitLegion extends KDialog implements MouseListener,
-    ActionListener, WindowListener
+            ActionListener, WindowListener
 {
-    private java.util.List oldChits = new ArrayList(8);
-    private java.util.List newChits = new ArrayList(8);
+    private List oldChits = new ArrayList(8);
+    private List newChits = new ArrayList(8);
 
     private Marker oldMarker;
     private Marker newMarker;
 
     private Client client;
     private static boolean active;
-    private String selectedMarkerId;
 
     /** new marker id,creature1,creature2... */
     private static String results;
@@ -42,12 +55,11 @@ final class SplitLegion extends KDialog implements MouseListener,
     private int totalChits;
     private int scale;
 
-
     private SplitLegion(Client client, String parentId,
-        String selectedMarkerId)
+            String selectedMarkerId)
     {
-        super(client.getBoard().getFrame(), client.getPlayerName() + 
-            ": Split Legion " + parentId, true);
+        super(client.getBoard().getFrame(), client.getPlayerName() +
+                ": Split Legion " + parentId, true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -67,7 +79,6 @@ final class SplitLegion extends KDialog implements MouseListener,
 
         scale = 4 * Scale.get();
 
-
         oldBox = new Box(BoxLayout.X_AXIS);
         contentPane.add(oldBox);
 
@@ -77,13 +88,12 @@ final class SplitLegion extends KDialog implements MouseListener,
         buttonBox = new Box(BoxLayout.X_AXIS);
         contentPane.add(buttonBox);
 
-
         oldMarker = new Marker(scale, parentId, this, null);
         oldBox.add(oldMarker);
         oldBox.add(Box.createRigidArea(new Dimension(scale / 4, 0)));
         oldBox.add(Box.createHorizontalGlue());
 
-        java.util.List imageNames = client.getLegionImageNames(parentId);
+        List imageNames = client.getLegionImageNames(parentId);
         totalChits = imageNames.size();
 
         Iterator it = imageNames.iterator();
@@ -95,7 +105,6 @@ final class SplitLegion extends KDialog implements MouseListener,
             oldBox.add(chit);
             chit.addMouseListener(this);
         }
-
 
         newMarker = new Marker(scale, selectedMarkerId, this, null);
         newBox.add(newMarker);
@@ -124,10 +133,9 @@ final class SplitLegion extends KDialog implements MouseListener,
         setVisible(true);
     }
 
-
     /** Return childMarkerId,splitCreature1,splitCreature2,etc. */
     static String splitLegion(Client client, String parentId,
-        String selectedMarkerId)
+            String selectedMarkerId)
     {
         if (!active)
         {
@@ -139,10 +147,9 @@ final class SplitLegion extends KDialog implements MouseListener,
         return null;
     }
 
-
-    /** Move a chit to the end of the other line. */ 
-    private void moveChitToOtherLine(java.util.List fromChits, java.util.List
-        toChits, Container fromBox, Container toBox, int oldPosition)
+    /** Move a chit to the end of the other line. */
+    private void moveChitToOtherLine(List fromChits, List
+            toChits, Container fromBox, Container toBox, int oldPosition)
     {
         Chit chit = (Chit)fromChits.remove(oldPosition);
         fromBox.remove(chit);
@@ -158,7 +165,6 @@ final class SplitLegion extends KDialog implements MouseListener,
         pack();
         repaint();
     }
-
 
     /** Return true if the split is legal.  Each legion must have
      *  height >= 2.  If this was an initial split, each legion
@@ -191,7 +197,7 @@ final class SplitLegion extends KDialog implements MouseListener,
                 Chit chit = (Chit)it.next();
                 String id = chit.getId();
                 if (id.startsWith(Constants.titan) ||
-                    id.equals(TerrainRecruitLoader.getPrimaryAcquirable()))
+                        id.equals(TerrainRecruitLoader.getPrimaryAcquirable()))
                 {
                     numLords++;
                 }
@@ -208,13 +214,11 @@ final class SplitLegion extends KDialog implements MouseListener,
         return true;
     }
 
-
     private void cancel()
     {
         results = null;
         dispose();
     }
-
 
     private void returnSplitResults()
     {
@@ -237,7 +241,6 @@ final class SplitLegion extends KDialog implements MouseListener,
         results = buf.toString();
         dispose();
     }
-
 
     public void mousePressed(MouseEvent e)
     {

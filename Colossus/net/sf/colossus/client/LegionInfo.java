@@ -1,11 +1,15 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -18,10 +22,10 @@ import net.sf.colossus.server.Constants;
 public final class LegionInfo
 {
     private Client client;
-    private PredictSplits ps;
 
     /** immutable */
     private String markerId;
+
     /** immutable */
     private String playerName;
 
@@ -32,7 +36,6 @@ public final class LegionInfo
     private boolean teleported;
     private int entrySide;
     private boolean recruited;
-
 
     LegionInfo(String markerId, Client client)
     {
@@ -52,7 +55,6 @@ public final class LegionInfo
     {
         return getNode(this.markerId);
     }
-
 
     void setMarker(Marker marker)
     {
@@ -83,37 +85,34 @@ public final class LegionInfo
 
     public String getHexLabel()
     {
-        return hexLabel; 
+        return hexLabel;
     }
 
     public MasterHex getCurrentHex()
     {
-        return MasterBoard.getHexByLabel(getHexLabel()); 
+        return MasterBoard.getHexByLabel(getHexLabel());
     }
-
 
     public String getPlayerName()
     {
         return playerName;
     }
 
-
     public String getMarkerId()
     {
         return markerId;
     }
 
-
     /** Return an immutable copy of the legion's contents, in sorted order. */
     public List getContents()
     {
         return Collections.unmodifiableList(
-            getNode().getCreatures().getCreatureNames());
+                getNode().getCreatures().getCreatureNames());
     }
 
     boolean contains(String creatureName)
     {
-       return getContents().contains(creatureName);
+        return getContents().contains(creatureName);
     }
 
     public int numCreature(String creatureName)
@@ -153,9 +152,9 @@ public final class LegionInfo
 
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
-    java.util.List getImageNames()
+    List getImageNames()
     {
-        java.util.List names = new ArrayList();
+        List names = new ArrayList();
         names.addAll(getContents());
         int j = names.indexOf(Constants.titan);
         if (j != -1)
@@ -166,9 +165,9 @@ public final class LegionInfo
     }
 
     /** Return a list of Booleans. */
-    java.util.List getCertainties()
+    List getCertainties()
     {
-        java.util.List booleans = new ArrayList();
+        List booleans = new ArrayList();
         List cil = getNode().getCreatures();
         Iterator it = cil.iterator();
         while (it.hasNext())
@@ -179,12 +178,10 @@ public final class LegionInfo
         return booleans;
     }
 
-
     public PlayerInfo getPlayerInfo()
     {
         return client.getPlayerInfo(playerName);
     }
-
 
     /** Return the full basename for a titan in legion markerId,
      *  first finding that legion's player, player color, and titan size.
@@ -203,7 +200,6 @@ public final class LegionInfo
             return Constants.titan;
         }
     }
-
 
     /** Add a new creature to this legion. */
     void addCreature(String name)
@@ -229,11 +225,10 @@ public final class LegionInfo
 
     void merge(String splitoffId, int turn)
     {
-Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
+        Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
         Node splitoff = getNode(splitoffId);
         getNode().merge(splitoff, turn);
     }
-
 
     public boolean hasTitan()
     {
@@ -264,7 +259,6 @@ Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
         return count;
     }
 
-
     public String bestSummonable()
     {
         Creature best = null;
@@ -276,8 +270,8 @@ Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
             Creature creature = Creature.getCreatureByName(name);
             if (creature.isSummonable())
             {
-                if (best == null || creature.getPointValue() > 
-                    best.getPointValue())
+                if (best == null || creature.getPointValue() >
+                        best.getPointValue())
                 {
                     best = creature;
                 }
@@ -309,7 +303,7 @@ Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
                 PlayerInfo info = client.getPlayerInfo(playerName);
                 // Titan skill is changed by variants.
                 sum += info.getTitanPower() *
-                    Creature.getCreatureByName("Titan").getSkill();
+                        Creature.getCreatureByName("Titan").getSkill();
             }
             else
             {
@@ -320,8 +314,8 @@ Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
     }
 
     /** Legions are sorted in descending order of known total point value,
-        with the titan legion always coming first.  This is inconsistent
-        with equals().  Really only useful for comparing own legions. */
+     with the titan legion always coming first.  This is inconsistent
+     with equals().  Really only useful for comparing own legions. */
     public int compareTo(Object object)
     {
         if (object instanceof LegionInfo)
@@ -353,7 +347,6 @@ Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
         return (numInHex == 2);
     }
 
-
     void setLastRecruit(String lastRecruit)
     {
         if (lastRecruit == null || lastRecruit.equals("null"))
@@ -372,7 +365,6 @@ Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
     {
         return lastRecruit;
     }
-
 
     public void setMoved(boolean moved)
     {
@@ -404,7 +396,6 @@ Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
         return entrySide;
     }
 
-
     void setRecruited(boolean recruited)
     {
         this.recruited = recruited;
@@ -419,8 +410,8 @@ Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
     public boolean canRecruit()
     {
         return hasMoved() && getHeight() < 7 &&
-            !hasRecruited() && !getPlayerInfo().isDead() &&
-            !client.findEligibleRecruits(getMarkerId(), 
+                !hasRecruited() && !getPlayerInfo().isDead() &&
+                !client.findEligibleRecruits(getMarkerId(),
                 getHexLabel()).isEmpty();
     }
 
@@ -428,7 +419,6 @@ Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
     {
         return markerId;
     }
-
 
     /** Sorts Titans first, then decreasing order of kill value, then
      *  Unknowns last */

@@ -1,7 +1,8 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
 
 /**

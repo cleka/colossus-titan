@@ -1,10 +1,13 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Options;
+
 
 /**
  * Class BattleMovement does client-side battle move calculations.
@@ -21,17 +24,15 @@ final class BattleMovement
 {
     private Client client;
 
-
     BattleMovement(Client client)
     {
         this.client = client;
     }
 
-
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back.  */
     private Set findMoves(BattleHex hex, Creature creature, boolean flies,
-        int movesLeft, int cameFrom, boolean first)
+            int movesLeft, int cameFrom, boolean first)
     {
         Set set = new HashSet();
         for (int i = 0; i < 6; i++)
@@ -46,11 +47,11 @@ final class BattleMovement
                     int entryCost;
 
                     BattleChit bogey = client.getBattleChit(
-                        neighbor.getLabel());
+                            neighbor.getLabel());
                     if (bogey == null)
                     {
                         entryCost =
-                            neighbor.getEntryCost(
+                                neighbor.getEntryCost(
                                 creature,
                                 reverseDir,
                                 client.getOption(Options.cumulativeSlow));
@@ -61,30 +62,30 @@ final class BattleMovement
                     }
 
                     if ((entryCost != BattleHex.IMPASSIBLE_COST) &&
-                        ((entryCost <= movesLeft) ||
-                         (first && client.getOption(Options.oneHexAllowed))))
+                            ((entryCost <= movesLeft) ||
+                            (first && client.getOption(Options.oneHexAllowed))))
                     {
                         // Mark that hex as a legal move.
                         set.add(neighbor.getLabel());
-                        
+
                         // If there are movement points remaining, continue
                         // checking moves from there.  Fliers skip this
                         // because flying is more efficient.
                         if (!flies && movesLeft > entryCost)
                         {
                             set.addAll(findMoves(neighbor, creature, flies,
-                                movesLeft - entryCost, reverseDir, false));
+                                    movesLeft - entryCost, reverseDir, false));
                         }
                     }
 
                     // Fliers can fly over any hex for 1 movement point,
                     // but some Hex cannot be flown over by some creatures.
                     if (flies &&
-                        movesLeft > 1 &&
-                        neighbor.canBeFlownOverBy(creature))
+                            movesLeft > 1 &&
+                            neighbor.canBeFlownOverBy(creature))
                     {
                         set.addAll(findMoves(neighbor, creature, flies,
-                            movesLeft - 1, reverseDir, false));
+                                movesLeft - 1, reverseDir, false));
                     }
                 }
             }
@@ -119,7 +120,6 @@ final class BattleMovement
         return !client.getBattleChits(hexLabel).isEmpty();
     }
 
-
     Set showMoves(int tag)
     {
         BattleChit chit = client.getBattleChit(tag);
@@ -134,8 +134,8 @@ final class BattleMovement
         if (!chit.hasMoved() && !client.isInContact(chit, false))
         {
             if (HexMap.terrainHasStartlist(client.getBattleTerrain()) && (
-                client.getBattleTurnNumber() == 1) &&
-                client.getBattleActiveMarkerId().equals(
+                    client.getBattleTurnNumber() == 1) &&
+                    client.getBattleActiveMarkerId().equals(
                     client.getDefenderMarkerId()))
             {
                 set = findUnoccupiedStartlistHexes();
@@ -143,10 +143,10 @@ final class BattleMovement
             else
             {
                 Creature creature = Creature.getCreatureByName(
-                    chit.getCreatureName());
+                        chit.getCreatureName());
                 BattleHex hex = client.getBattleHex(chit);
-                set = findMoves(hex, creature, creature.isFlier(), 
-                                creature.getSkill(), -1, true);
+                set = findMoves(hex, creature, creature.isFlier(),
+                        creature.getSkill(), -1, true);
             }
         }
         return set;

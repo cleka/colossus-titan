@@ -1,24 +1,31 @@
 package net.sf.colossus.client;
 
 
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.GraphicsDevice;
+import java.awt.Point;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.InputStream;
 import java.util.*;
-import java.net.*;
-import javax.swing.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.*;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Split;
-import net.sf.colossus.server.IServer;
-import net.sf.colossus.util.Options;
-import net.sf.colossus.server.Player;
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Dice;
-import net.sf.colossus.server.VariantSupport;
-import net.sf.colossus.util.ResourceLoader;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.Dice;
+import net.sf.colossus.server.IServer;
+import net.sf.colossus.server.Player;
+import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Options;
+import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.Split;
 
 
 /**
@@ -51,7 +58,7 @@ public final class Client implements IClient
     private BattleDice battleDice;
 
     // XXX synch all iteration
-    private java.util.List battleChits =
+    private List battleChits =
             Collections.synchronizedList(new ArrayList());
 
     /** Stack of legion marker ids, to allow multiple levels of undo for
@@ -62,9 +69,9 @@ public final class Client implements IClient
     private String moverId;
 
     /** The end of the list is on top in the z-order. */
-    private java.util.List markers = new ArrayList();
+    private List markers = new ArrayList();
 
-    private java.util.List recruitChits = new ArrayList();
+    private List recruitChits = new ArrayList();
 
     // Per-client and per-player options.
     private Options options;
@@ -134,7 +141,7 @@ public final class Client implements IClient
     private int delay = -1;
 
     /** For battle AI. */
-    private java.util.List bestMoveOrder = null;
+    private List bestMoveOrder = null;
 
     // XXX Make private and wrap consistently.
     boolean showAllRecruitChits = false;
@@ -598,7 +605,7 @@ public final class Client implements IClient
         return total;
     }
 
-    public void updatePlayerInfo(java.util.List infoStrings)
+    public void updatePlayerInfo(List infoStrings)
     {
         numPlayers = infoStrings.size();
         if (playerInfo == null)
@@ -677,9 +684,9 @@ public final class Client implements IClient
         return getPlayerInfo(playerName);
     }
 
-    java.util.List getPlayerNames()
+    List getPlayerNames()
     {
-        java.util.List names = new ArrayList();
+        List names = new ArrayList();
         for (int i = 0; i < playerInfo.length; i++)
         {
             names.add(playerInfo[i].getName());
@@ -825,9 +832,9 @@ public final class Client implements IClient
         return false;
     }
 
-    java.util.List getActiveBattleChits()
+    List getActiveBattleChits()
     {
-        java.util.List chits = new ArrayList();
+        List chits = new ArrayList();
         Iterator it = battleChits.iterator();
         while (it.hasNext())
         {
@@ -841,9 +848,9 @@ public final class Client implements IClient
         return chits;
     }
 
-    java.util.List getInactiveBattleChits()
+    List getInactiveBattleChits()
     {
-        java.util.List chits = new ArrayList();
+        List chits = new ArrayList();
         Iterator it = battleChits.iterator();
         while (it.hasNext())
         {
@@ -922,7 +929,7 @@ public final class Client implements IClient
         }
     }
 
-    java.util.List getMarkers()
+    List getMarkers()
     {
         return Collections.unmodifiableList(markers);
     }
@@ -1005,13 +1012,13 @@ public final class Client implements IClient
 
     /** Return a list of Strings.  Use the proper string for titans and
      *  unknown creatures. */
-    java.util.List getLegionImageNames(String markerId)
+    List getLegionImageNames(String markerId)
     {
         return getLegionInfo(markerId).getImageNames();
     }
 
     /** Return a list of Booleans */
-    java.util.List getLegionCreatureCertainties(String markerId)
+    List getLegionCreatureCertainties(String markerId)
     {
         return getLegionInfo(markerId).getCertainties();
     }
@@ -1047,7 +1054,7 @@ public final class Client implements IClient
 
     /** Reveal creatures in this legion, some of which already may be known. */
     public synchronized void revealCreatures(String markerId,
-            final java.util.List names)
+            final List names)
     {
         String pName = getPlayerNameByMarkerId(markerId);
         if (predictSplits == null || getPredictSplits(pName) == null)
@@ -1057,14 +1064,14 @@ public final class Client implements IClient
         getLegionInfo(markerId).revealCreatures(names);
     }
 
-    java.util.List getBattleChits()
+    List getBattleChits()
     {
         return Collections.unmodifiableList(battleChits);
     }
 
-    java.util.List getBattleChits(String hexLabel)
+    List getBattleChits(String hexLabel)
     {
-        java.util.List chits = new ArrayList();
+        List chits = new ArrayList();
 
         Iterator it = battleChits.iterator();
         while (it.hasNext())
@@ -1080,7 +1087,7 @@ public final class Client implements IClient
 
     BattleChit getBattleChit(String hexLabel)
     {
-        java.util.List chits = getBattleChits(hexLabel);
+        List chits = getBattleChits(hexLabel);
         if (chits.isEmpty())
         {
             return null;
@@ -1173,7 +1180,7 @@ public final class Client implements IClient
         battleChits.add(chit);
     }
 
-    java.util.List getRecruitChits()
+    List getRecruitChits()
     {
         return Collections.unmodifiableList(recruitChits);
     }
@@ -1191,7 +1198,7 @@ public final class Client implements IClient
         recruitChits.add(chit);
     }
 
-    void addRecruitChit(java.util.List imageNameList, String hexLabel)
+    void addRecruitChit(List imageNameList, String hexLabel)
     {
         Iterator it = imageNameList.iterator();
         int size = imageNameList.size();
@@ -1342,7 +1349,7 @@ public final class Client implements IClient
         if (getOption(Options.autoSummonAngels))
         {
             String typeColonDonor = ai.summonAngel(markerId);
-            java.util.List parts = Split.split(':', typeColonDonor);
+            List parts = Split.split(':', typeColonDonor);
             String unit = (String)parts.get(0);
             String donor = (String)parts.get(1);
             doSummon(markerId, donor, unit);
@@ -1370,7 +1377,7 @@ public final class Client implements IClient
         return info.getContents().contains(name);
     }
 
-    public void askAcquireAngel(String markerId, java.util.List recruits)
+    public void askAcquireAngel(String markerId, List recruits)
     {
         if (getOption(Options.autoAcquireAngels))
         {
@@ -1416,7 +1423,7 @@ public final class Client implements IClient
     /** Allow the player to choose whether to take a penalty (fewer dice
      *  or higher strike number) in order to be allowed to carry.
      *  Used by human players only. */
-    public void askChooseStrikePenalty(java.util.List choices)
+    public void askChooseStrikePenalty(List choices)
     {
         if (choices == null || choices.isEmpty())
         {
@@ -1506,7 +1513,7 @@ public final class Client implements IClient
         }
         if (summonAngel != null)
         {
-            java.util.List legions = getLegionsByHex(hexLabel);
+            List legions = getLegionsByHex(hexLabel);
             if (legions.size() != 1)
             {
                 Log.error("Not exactly one legion in donor hex");
@@ -1586,7 +1593,7 @@ public final class Client implements IClient
         {
             // XXX AI players just fight for now.
             Proposal proposal = new Proposal(attackerId, defenderId, true,
-                    false, null, null, getHexForLegion(attackerId));
+                    false, null, null);
             makeProposal(proposal);
         }
         else
@@ -1655,7 +1662,7 @@ public final class Client implements IClient
     }
 
     public void tellStrikeResults(int strikerTag, int targetTag,
-            int strikeNumber, java.util.List rolls, int damage, boolean killed,
+            int strikeNumber, List rolls, int damage, boolean killed,
             boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
         BattleChit chit = getBattleChit(strikerTag);
@@ -1850,7 +1857,7 @@ public final class Client implements IClient
         }
 
         String hexLabel = getHexForLegion(markerId);
-        java.util.List recruits = findEligibleRecruits(markerId, hexLabel);
+        List recruits = findEligibleRecruits(markerId, hexLabel);
         String hexDescription =
                 MasterBoard.getHexByLabel(hexLabel).getDescription();
 
@@ -1891,7 +1898,7 @@ public final class Client implements IClient
         {
             String hexLabel = getHexForLegion(markerId);
 
-            java.util.List recruits = findEligibleRecruits(markerId, hexLabel);
+            List recruits = findEligibleRecruits(markerId, hexLabel);
             String hexDescription =
                     MasterBoard.getHexByLabel(hexLabel).getDescription();
 
@@ -1923,7 +1930,7 @@ public final class Client implements IClient
 
         if (numRecruiters >= 1 && recruiterName != null)
         {
-            java.util.List recruiters = new ArrayList();
+            List recruiters = new ArrayList();
             for (int i = 0; i < numRecruiters; i++)
             {
                 recruiters.add(recruiterName);
@@ -1963,7 +1970,7 @@ public final class Client implements IClient
     {
         String recruiterName = null;
 
-        java.util.List recruiters = findEligibleRecruiters(markerId,
+        List recruiters = findEligibleRecruiters(markerId,
                 recruitName);
 
         int numEligibleRecruiters = recruiters.size();
@@ -2633,7 +2640,7 @@ public final class Client implements IClient
 
     private String figureTeleportingLord(String moverId, String hexLabel)
     {
-        java.util.List lords = listTeleportingLords(moverId, hexLabel);
+        List lords = listTeleportingLords(moverId, hexLabel);
         String lordName = null;
         switch (lords.size())
         {
@@ -2649,7 +2656,7 @@ public final class Client implements IClient
                 return lordName;
 
             default:
-                if (getOption(options.autoPickLord))
+                if (getOption(Options.autoPickLord))
                 {
                     lordName = (String)lords.get(0);
                     if (lordName.startsWith(Constants.titan))
@@ -2667,17 +2674,17 @@ public final class Client implements IClient
 
     /** List the lords eligible to teleport this legion to hexLabel,
      *  as strings. */
-    private java.util.List listTeleportingLords(String moverId,
+    private List listTeleportingLords(String moverId,
             String hexLabel)
     {
         // Needs to be a List not a Set so that it can be passed as
         // an imageList.
-        java.util.List lords = new ArrayList();
+        List lords = new ArrayList();
 
         LegionInfo info = getLegionInfo(moverId);
 
         // Titan teleport
-        java.util.List legions = getLegionsByHex(hexLabel);
+        List legions = getLegionsByHex(hexLabel);
         if (!legions.isEmpty())
         {
             String markerId = (String)legions.get(0);
@@ -2828,9 +2835,9 @@ public final class Client implements IClient
     }
 
     /** Return a list of Creatures. */
-    java.util.List findEligibleRecruits(String markerId, String hexLabel)
+    List findEligibleRecruits(String markerId, String hexLabel)
     {
-        java.util.List recruits = new ArrayList();
+        List recruits = new ArrayList();
 
         LegionInfo info = getLegionInfo(markerId);
         if (info == null)
@@ -2847,9 +2854,9 @@ public final class Client implements IClient
         }
         String terrain = hex.getTerrain();
 
-        java.util.List tempRecruits =
+        List tempRecruits =
                 TerrainRecruitLoader.getPossibleRecruits(terrain, hexLabel);
-        java.util.List recruiters =
+        List recruiters =
                 TerrainRecruitLoader.getPossibleRecruiters(terrain, hexLabel);
 
         Iterator lit = tempRecruits.iterator();
@@ -2885,7 +2892,7 @@ public final class Client implements IClient
     }
 
     /** Return a list of creature name strings. */
-    java.util.List findEligibleRecruiters(String markerId, String recruitName)
+    List findEligibleRecruiters(String markerId, String recruitName)
     {
         java.util.Set recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
@@ -2915,7 +2922,7 @@ public final class Client implements IClient
             }
         }
 
-        java.util.List strings = new ArrayList();
+        List strings = new ArrayList();
         it = recruiters.iterator();
         while (it.hasNext())
         {
@@ -3030,9 +3037,9 @@ public final class Client implements IClient
     }
 
     /** Returns a list of markerIds. */
-    java.util.List getLegionsByHex(String hexLabel)
+    List getLegionsByHex(String hexLabel)
     {
-        java.util.List markerIds = new ArrayList();
+        List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
         while (it.hasNext())
         {
@@ -3048,9 +3055,9 @@ public final class Client implements IClient
     }
 
     /** Returns a list of markerIds. */
-    synchronized java.util.List getLegionsByPlayer(String name)
+    synchronized List getLegionsByPlayer(String name)
     {
-        java.util.List markerIds = new ArrayList();
+        List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
         while (it.hasNext())
         {
@@ -3110,7 +3117,7 @@ public final class Client implements IClient
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            java.util.List markerIds = getLegionsByHex(hexLabel);
+            List markerIds = getLegionsByHex(hexLabel);
             if (markerIds.size() == 2)
             {
                 String marker0 = (String)markerIds.get(0);
@@ -3137,7 +3144,7 @@ public final class Client implements IClient
 
     boolean isEngagement(String hexLabel)
     {
-        java.util.List markerIds = getLegionsByHex(hexLabel);
+        List markerIds = getLegionsByHex(hexLabel);
         if (markerIds.size() == 2)
         {
             String marker0 = (String)markerIds.get(0);
@@ -3153,9 +3160,9 @@ public final class Client implements IClient
         return false;
     }
 
-    java.util.List getEnemyLegions(String pName)
+    List getEnemyLegions(String pName)
     {
-        java.util.List markerIds = new ArrayList();
+        List markerIds = new ArrayList();
         Iterator it = legionInfo.values().iterator();
         while (it.hasNext())
         {
@@ -3169,10 +3176,10 @@ public final class Client implements IClient
         return markerIds;
     }
 
-    java.util.List getEnemyLegions(String hexLabel, String pName)
+    List getEnemyLegions(String hexLabel, String pName)
     {
-        java.util.List markerIds = new ArrayList();
-        java.util.List legions = getLegionsByHex(hexLabel);
+        List markerIds = new ArrayList();
+        List legions = getLegionsByHex(hexLabel);
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -3187,7 +3194,7 @@ public final class Client implements IClient
 
     String getFirstEnemyLegion(String hexLabel, String pName)
     {
-        java.util.List markerIds = getEnemyLegions(hexLabel, pName);
+        List markerIds = getEnemyLegions(hexLabel, pName);
         if (markerIds.isEmpty())
         {
             return null;
@@ -3200,9 +3207,9 @@ public final class Client implements IClient
         return getEnemyLegions(hexLabel, pName).size();
     }
 
-    java.util.List getFriendlyLegions(String pName)
+    List getFriendlyLegions(String pName)
     {
-        java.util.List markerIds = new ArrayList();
+        List markerIds = new ArrayList();
         Iterator it = legionInfo.values().iterator();
         while (it.hasNext())
         {
@@ -3216,10 +3223,10 @@ public final class Client implements IClient
         return markerIds;
     }
 
-    java.util.List getFriendlyLegions(String hexLabel, String pName)
+    List getFriendlyLegions(String hexLabel, String pName)
     {
-        java.util.List markerIds = new ArrayList();
-        java.util.List legions = getLegionsByHex(hexLabel);
+        List markerIds = new ArrayList();
+        List legions = getLegionsByHex(hexLabel);
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -3234,7 +3241,7 @@ public final class Client implements IClient
 
     String getFirstFriendlyLegion(String hexLabel, String pName)
     {
-        java.util.List markerIds = getFriendlyLegions(hexLabel, pName);
+        List markerIds = getFriendlyLegions(hexLabel, pName);
         if (markerIds.isEmpty())
         {
             return null;
@@ -3525,7 +3532,7 @@ public final class Client implements IClient
 
     /** Callback from server after any successful split. */
     public synchronized void didSplit(String hexLabel, String parentId,
-            String childId, int childHeight, java.util.List splitoffs, int turn)
+            String childId, int childHeight, List splitoffs, int turn)
     {
         LegionInfo childInfo = getLegionInfo(childId);
         childInfo.setHexLabel(hexLabel);
@@ -3549,14 +3556,14 @@ public final class Client implements IClient
         }
     }
 
-    public void askPickColor(java.util.List colorsLeft)
+    public void askPickColor(List colorsLeft)
     {
         String color = null;
         if (getOption(Options.autoPickColor))
         {
             // Convert favorite colors from a comma-separated string to a list.
             String favorites = getStringOption(Options.favoriteColors);
-            java.util.List favoriteColors = null;
+            List favoriteColors = null;
             if (favorites != null)
             {
                 favoriteColors = Split.split(',', favorites);
@@ -3786,7 +3793,7 @@ public final class Client implements IClient
     }
 
     private void initPredictSplits(String pName, String rootMarkerId,
-            java.util.List creatureNames)
+            List creatureNames)
     {
         if (predictSplits == null)
         {

@@ -1,11 +1,18 @@
 package net.sf.colossus.client;
 
-import java.util.*;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.server.Creature;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
+
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Combos;
+import net.sf.colossus.util.Log;
+
 
 /**
  *  Predicts splits for one enemy player, and adjusts predictions as 
@@ -17,13 +24,11 @@ import net.sf.colossus.util.Combos;
 
 public final class PredictSplits
 {
-    private String playerName;
     private Node root;           // All contents of root must be known.
     private NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
 
-
-    PredictSplits(String playerName, String rootId, 
-        List creatureNames)
+    PredictSplits(String playerName, String rootId,
+            List creatureNames)
     {
         CreatureInfoList infoList = new CreatureInfoList();
         Iterator it = creatureNames.iterator();
@@ -36,11 +41,10 @@ public final class PredictSplits
         root = new Node(rootId, 0, infoList, null);
     }
 
-
     /** Return all non-empty childless nodes in subtree starting from node. */
-    java.util.List getLeaves(Node node)
+    List getLeaves(Node node)
     {
-        java.util.List leaves = new ArrayList();
+        List leaves = new ArrayList();
         if (node.getChild1() == null)
         {
             if (!node.getCreatures().isEmpty())
@@ -61,7 +65,7 @@ public final class PredictSplits
         {
             for (int j = 0; j < leaves.size(); j++)
             {
-                if (i != j) 
+                if (i != j)
                 {
                     Node leaf1 = (Node)leaves.get(i);
                     Node leaf2 = (Node)leaves.get(j);
@@ -70,10 +74,10 @@ public final class PredictSplits
                         if (leaf1.getTurnCreated() == leaf2.getTurnCreated())
                         {
                             throw new PredictSplitsException(
-                                "Two leaf nodes with same markerId and turn");
+                                    "Two leaf nodes with same markerId and turn");
                         }
-                        else if (leaf1.getTurnCreated() < 
-                                 leaf2.getTurnCreated())
+                        else if (leaf1.getTurnCreated() <
+                                leaf2.getTurnCreated())
                         {
                             prunes.add(new Integer(i));
                         }
@@ -97,9 +101,9 @@ public final class PredictSplits
     }
 
     /** Return all non-empty nodes in subtree starting from node. */
-    java.util.List getNodes(Node node)
+    List getNodes(Node node)
     {
-        java.util.List nodes = new ArrayList();
+        List nodes = new ArrayList();
         if (!node.getCreatures().isEmpty())
         {
             nodes.add(node);
@@ -128,7 +132,7 @@ public final class PredictSplits
     void printLeaves()
     {
         Log.debug("*** leaves ***");
-        java.util.List leaves = getLeaves(root);
+        List leaves = getLeaves(root);
         Collections.sort(leaves);
         Iterator it = leaves.iterator();
         while (it.hasNext())
@@ -143,7 +147,7 @@ public final class PredictSplits
     void printNodes()
     {
         Log.debug("*** nodes ***");
-        java.util.List nodes = getNodes(root);
+        List nodes = getNodes(root);
         Collections.sort(nodes, nodeTurnComparator);
         Iterator it = nodes.iterator();
         while (it.hasNext())
@@ -157,7 +161,7 @@ public final class PredictSplits
     /** Return the leaf node with matching markerId. */
     Node getLeaf(String markerId)
     {
-        java.util.List leaves = getLeaves(root);
+        List leaves = getLeaves(root);
         Iterator it = leaves.iterator();
         while (it.hasNext())
         {
@@ -179,7 +183,7 @@ class Node implements Comparable
     private CreatureInfoList creatures = new CreatureInfoList();
 
     // only if atSplit
-    private CreatureInfoList removed = new CreatureInfoList(); 
+    private CreatureInfoList removed = new CreatureInfoList();
 
     private final Node parent;
     private int childSize1;          // At the time this node was split.
@@ -364,7 +368,6 @@ class Node implements Comparable
         return list;
     }
 
-
     Node getOtherChild(Node child)
     {
         Node otherChild = null;
@@ -379,7 +382,7 @@ class Node implements Comparable
         else
         {
             throw new PredictSplitsException(
-                "Node.tellChildContents() Not my child");
+                    "Node.tellChildContents() Not my child");
         }
         return otherChild;
     }
@@ -396,12 +399,10 @@ class Node implements Comparable
         }
     }
 
-
     int getHeight()
     {
         return creatures.size();
     }
-
 
     void revealCreatures(List cnl)
     {
@@ -438,8 +439,8 @@ class Node implements Comparable
         if (count > getHeight())
         {
             throw new PredictSplitsException(
-                "Certainty error in revealCreatures -- count is " +
-                count + " height is " + getHeight());
+                    "Certainty error in revealCreatures -- count is " +
+                    count + " height is " + getHeight());
         }
 
         // Mark passed creatures as certain and then communicate this to
@@ -459,8 +460,8 @@ class Node implements Comparable
             CreatureInfo ci = (CreatureInfo)it.next();
             ci.setCertain(true);
             ci.setAtSplit(true); // If not atSpilt, then would be certain.
-            if (creatures.numCreature(ci.getName()) < 
-                dupe.numCreature(ci.getName()))
+            if (creatures.numCreature(ci.getName()) <
+                    dupe.numCreature(ci.getName()))
             {
                 creatures.add(ci);
                 count++;
@@ -507,7 +508,6 @@ class Node implements Comparable
         }
     }
 
-
     /** Return true if creatures in children are consistent with self. */
     boolean childCreaturesMatch()
     {
@@ -527,7 +527,7 @@ class Node implements Comparable
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (allCreatures.numCreature(ci.getName()) !=
-                creatures.numCreature(ci.getName()))
+                    creatures.numCreature(ci.getName()))
             {
                 return false;
             }
@@ -557,14 +557,14 @@ class Node implements Comparable
     }
 
     /** Return a list of all legal combinations of splitoffs. */
-    CreatureInfoList findAllPossibleSplits(int childSize, 
-        CreatureInfoList knownKeep, CreatureInfoList knownSplit)
+    CreatureInfoList findAllPossibleSplits(int childSize,
+            CreatureInfoList knownKeep, CreatureInfoList knownSplit)
     {
         // Sanity checks
         if (knownSplit.size() > childSize)
         {
             throw new PredictSplitsException(
-                "More known splitoffs than splitoffs");
+                    "More known splitoffs than splitoffs");
         }
         if (creatures.size() > 8)
         {
@@ -631,7 +631,6 @@ class Node implements Comparable
         return possibleSplits;
     }
 
-
     // TODO Use SimpleAI version?
     /** Decide how to split this legion, and return a list of Creatures to 
      *  remove.  Return null on error. */
@@ -654,8 +653,8 @@ class Node implements Comparable
                 totalKillValue += SimpleAI.getKillValue(creature);
             }
             if ((bestKillValue == -1) ||
-                (!maximize && totalKillValue < bestKillValue) ||
-                (maximize && totalKillValue > bestKillValue))
+                    (!maximize && totalKillValue < bestKillValue) ||
+                    (maximize && totalKillValue > bestKillValue))
             {
                 bestKillValue = totalKillValue;
                 creaturesToRemove = li;
@@ -663,7 +662,6 @@ class Node implements Comparable
         }
         return creaturesToRemove;
     }
-
 
     final int REUSE_EXISTING_TURN = -1;
 
@@ -674,8 +672,8 @@ class Node implements Comparable
 
     void split(int childSize, String otherMarkerId, int turn, List splitoffs)
     {
-        Log.debug("split() for " + this + " " + childSize + " " + 
-            otherMarkerId + " " + turn);
+        Log.debug("split() for " + this + " " + childSize + " " +
+                otherMarkerId + " " + turn);
         if (childSize == 0)
         {
             Log.warn("childSize is 0; aborting");
@@ -706,7 +704,7 @@ class Node implements Comparable
         }
 
         CreatureInfoList pos = findAllPossibleSplits(childSize, knownKeep,
-            knownSplit);
+                knownSplit);
         CreatureInfoList splitoffCreatures = chooseCreaturesToSplitOut(pos);
         List splitoffNames = splitoffCreatures.getCreatureNames();
 
@@ -853,7 +851,7 @@ class Node implements Comparable
             return;
         }
         if (getMarkerId().equals(parent.getMarkerId()) ||
-            other.getMarkerId().equals(parent.getMarkerId()))
+                other.getMarkerId().equals(parent.getMarkerId()))
         {
             // Cancel split.
             parent.clearChildren();
@@ -872,12 +870,11 @@ class Node implements Comparable
     void tellChildContents(Node child)
     {
         Log.debug("tellChildContents() for node " + this + " from " + child);
-        CreatureInfoList childCertainAtSplit = 
-            child.getCertainAtSplitCreatures();
+        CreatureInfoList childCertainAtSplit =
+                child.getCertainAtSplitCreatures();
         revealCreatures(childCertainAtSplit.getCreatureNames());
         split(childSize2, getOtherChildMarkerId(), REUSE_EXISTING_TURN);
     }
-
 
     void addCreature(String creatureName)
     {
@@ -904,7 +901,7 @@ class Node implements Comparable
         if (getHeight() <= 0)
         {
             throw new PredictSplitsException(
-                "Tried removing from 0-high legion");
+                    "Tried removing from 0-high legion");
         }
         List cnl = new ArrayList();
         cnl.add(creatureName);
@@ -914,7 +911,7 @@ class Node implements Comparable
         if (ci == null)
         {
             throw new PredictSplitsException(
-                "Tried to remove nonexistant creature");
+                    "Tried to remove nonexistant creature");
         }
 
         // Only need to track the removed creature for future parent split
@@ -949,7 +946,6 @@ class Node implements Comparable
         }
     }
 
-
     static List subtractLists(List big, List little)
     {
         ArrayList li = new ArrayList();
@@ -980,7 +976,7 @@ class Node implements Comparable
     }
 
     /** lili is a list of lists.  Return the minimum number of times name
-        appears in any of the lists contained in lili. */
+     appears in any of the lists contained in lili. */
     static int minCount(List lili, String name)
     {
         int min = Integer.MAX_VALUE;
@@ -1008,6 +1004,7 @@ class PredictSplitsException extends RuntimeException
     }
 }
 
+
 class NodeTurnComparator implements Comparator
 {
     public int compare(Object o1, Object o2)
@@ -1022,7 +1019,7 @@ class NodeTurnComparator implements Comparator
                 return diff;
             }
             diff = n1.getParent().toString().compareTo(
-                n2.getParent().toString());
+                    n2.getParent().toString());
             if (diff != 0)
             {
                 return diff;

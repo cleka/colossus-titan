@@ -2,8 +2,6 @@ package net.sf.colossus.server;
 
 
 import java.util.*;
-import javax.swing.*;
-import java.awt.event.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.MasterBoard;
@@ -12,6 +10,7 @@ import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.util.Options;
+
 
 /**
  * Class Battle holds data about a Titan battle. It has utility functions
@@ -29,7 +28,7 @@ public final class Battle
     private Server server;
     private String attackerId;
     private String defenderId;
-    private String [] legions = new String[2];
+    private String[] legions = new String[2];
     private int activeLegionNum;
     private String masterHexLabel;
     private String terrain;
@@ -43,14 +42,14 @@ public final class Battle
     private boolean attackerEntered;
     private boolean conceded;
     private boolean driftDamageApplied = false;
+
     /** Set of hexLabels for valid carry targets */
     private Set carryTargets = new HashSet();
     private PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
     private int pointsScored = 0;
 
-
     Battle(Game game, String attackerId, String defenderId,
-        int activeLegionNum, String masterHexLabel, int turnNumber, int phase)
+            int activeLegionNum, String masterHexLabel, int turnNumber, int phase)
     {
         this.game = game;
         server = game.getServer();
@@ -80,20 +79,19 @@ public final class Battle
         defender.setRecruitName(null);
 
         Log.event(attacker.getLongMarkerName() + " (" +
-            attacker.getPlayerName() + ") attacks " +
-            defender.getLongMarkerName() + " (" +
-            defender.getPlayerName() + ")" + " in " +
-            MasterBoard.getHexByLabel(masterHexLabel).getDescription());
+                attacker.getPlayerName() + ") attacks " +
+                defender.getLongMarkerName() + " (" +
+                defender.getPlayerName() + ")" + " in " +
+                MasterBoard.getHexByLabel(masterHexLabel).getDescription());
 
         placeLegion(attacker);
         placeLegion(defender);
     }
 
-
     private void placeLegion(Legion legion)
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
-            legion.getEntrySide());
+                legion.getEntrySide());
         String entranceLabel = entrance.getLabel();
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
@@ -112,19 +110,18 @@ public final class Battle
             }
 
             critter.addBattleInfo(currentHexLabel, startingHexLabel,
-                this);
+                    this);
         }
     }
 
     private void placeCritter(Critter critter)
     {
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
-            critter.getLegion().getEntrySide());
+                critter.getLegion().getEntrySide());
         String entranceLabel = entrance.getLabel();
         critter.addBattleInfo(entranceLabel, entranceLabel, this);
         server.allPlaceNewChit(critter);
     }
-
 
     private synchronized void initBattleChits(Legion legion)
     {
@@ -135,7 +132,6 @@ public final class Battle
             server.allPlaceNewChit(critter);
         }
     }
-
 
     /** We need to do two-stage construction so that game.battle
      *  is non-null earlier. */
@@ -151,16 +147,20 @@ public final class Battle
             case Constants.SUMMON:
                 advance = setupSummon();
                 break;
+
             case Constants.RECRUIT:
                 advance = setupRecruit();
                 break;
+
             case Constants.MOVE:
                 advance = setupMove();
                 break;
+
             case Constants.FIGHT:
             case Constants.STRIKEBACK:
                 advance = setupFight();
                 break;
+
             default:
                 Log.error("Bogus phase");
         }
@@ -170,12 +170,10 @@ public final class Battle
         }
     }
 
-
     Game getGame()
     {
         return game;
     }
-
 
     private Player getActivePlayer()
     {
@@ -211,18 +209,15 @@ public final class Battle
         return game.getLegionByMarkerId(defenderId);
     }
 
-
     Legion getActiveLegion()
     {
         return getLegion(activeLegionNum);
     }
 
-
     private Legion getInactiveLegion()
     {
         return getLegion((activeLegionNum + 1) & 1);
     }
-
 
     private Legion getLegion(int legionNum)
     {
@@ -240,24 +235,22 @@ public final class Battle
         }
     }
 
-
     private Legion getLegionByPlayerName(String playerName)
     {
         Legion attacker = getAttacker();
         if (attacker != null && attacker.getPlayerName().equals(
-            playerName))
+                playerName))
         {
             return attacker;
         }
         Legion defender = getDefender();
         if (defender != null && defender.getPlayerName().equals(
-            playerName))
+                playerName))
         {
             return defender;
         }
         return null;
     }
-
 
     String getMasterHexLabel()
     {
@@ -269,12 +262,10 @@ public final class Battle
         return MasterBoard.getHexByLabel(masterHexLabel);
     }
 
-
     String getTerrain()
     {
         return terrain;
     }
-
 
     int getPhase()
     {
@@ -286,50 +277,47 @@ public final class Battle
         return turnNumber;
     }
 
-
     private boolean isOver()
     {
         return battleOver;
     }
-
 
     private void advancePhase()
     {
         phaseAdvancer.advancePhase();
     }
 
-    class BattlePhaseAdvancer extends PhaseAdvancer
+    private class BattlePhaseAdvancer implements PhaseAdvancer
     {
         private boolean again = false;
-    
 
         /** Advance to the next battle phase. */
-        void advancePhase()
+        public void advancePhase()
         {
             if (!isOver())
             {
                 advancePhaseInternal();
             }
         }
-    
-        void advancePhaseInternal()
+
+        public void advancePhaseInternal()
         {
             if (phase == Constants.SUMMON)
             {
                 phase = Constants.MOVE;
-                Log.event("Battle phase advances to " + 
-                    Constants.getBattlePhaseName(phase));
+                Log.event("Battle phase advances to " +
+                        Constants.getBattlePhaseName(phase));
                 again = setupMove();
             }
-    
+
             else if (phase == Constants.RECRUIT)
             {
                 phase = Constants.MOVE;
-                Log.event("Battle phase advances to " + 
-                    Constants.getBattlePhaseName(phase));
+                Log.event("Battle phase advances to " +
+                        Constants.getBattlePhaseName(phase));
                 again = setupMove();
             }
-    
+
             else if (phase == Constants.MOVE)
             {
                 // IF the attacker makes it to the end of his first movement
@@ -340,11 +328,11 @@ public final class Battle
                     attackerEntered = true;
                 }
                 phase = Constants.FIGHT;
-                Log.event("Battle phase advances to " + 
-                    Constants.getBattlePhaseName(phase));
+                Log.event("Battle phase advances to " +
+                        Constants.getBattlePhaseName(phase));
                 again = setupFight();
             }
-    
+
             else if (phase == Constants.FIGHT)
             {
                 // We switch the active legion between the fight and strikeback
@@ -352,25 +340,25 @@ public final class Battle
                 activeLegionNum = (activeLegionNum + 1) & 1;
                 driftDamageApplied = false;
                 phase = Constants.STRIKEBACK;
-                Log.event("Battle phase advances to " + 
-                    Constants.getBattlePhaseName(phase));
+                Log.event("Battle phase advances to " +
+                        Constants.getBattlePhaseName(phase));
                 again = setupFight();
             }
-    
+
             else if (phase == Constants.STRIKEBACK)
             {
                 removeDeadCreatures();
                 checkForElimination();
                 advanceTurn();
             }
-    
-            if (again) 
+
+            if (again)
             {
                 advancePhase();
             }
         }
 
-        void advanceTurn()
+        public void advanceTurn()
         {
             if (isOver())
             {
@@ -382,7 +370,7 @@ public final class Battle
             {
                 phase = Constants.SUMMON;
                 Log.event(getActivePlayerName() + "'s battle turn, number " +
-                    turnNumber);
+                        turnNumber);
                 again = setupSummon();
             }
             else
@@ -399,7 +387,7 @@ public final class Battle
                     if (getActivePlayer() != null)
                     {
                         Log.event(getActivePlayerName() +
-                            "'s battle turn, number " + turnNumber);
+                                "'s battle turn, number " + turnNumber);
                     }
                 }
             }
@@ -426,7 +414,6 @@ public final class Battle
             again = false;
         }
     }
-
 
     private boolean setupSummon()
     {
@@ -466,7 +453,6 @@ public final class Battle
         return false;
     }
 
-
     int getSummonState()
     {
         return summonState;
@@ -476,7 +462,6 @@ public final class Battle
     {
         this.summonState = summonState;
     }
-
 
     /** Called from Game after the SummonAngel finishes. */
     void finishSummoningAngel(boolean placeNewChit)
@@ -493,13 +478,12 @@ public final class Battle
         }
     }
 
-
     private boolean recruitReinforcement()
     {
         Legion defender = getDefender();
         if (turnNumber == 4 && defender.canRecruit())
         {
-Log.debug("Calling Game.reinforce() from Battle.recruitReinforcement()");
+            Log.debug("Calling Game.reinforce() from Battle.recruitReinforcement()");
             game.reinforce(defender);
             return false;
         }
@@ -509,7 +493,7 @@ Log.debug("Calling Game.reinforce() from Battle.recruitReinforcement()");
     /** Needs to be called when reinforcement is done. */
     void doneReinforcing()
     {
-Log.debug("Called Battle.doneReinforcing()");
+        Log.debug("Called Battle.doneReinforcing()");
         Legion defender = getDefender();
         if (defender.hasRecruited())
         {
@@ -530,13 +514,12 @@ Log.debug("Called Battle.doneReinforcing()");
         this.carryDamage = carryDamage;
     }
 
-
     /** Recursively find moves from this hex.  Return an array of hex IDs for
      *  all legal destinations.  Do not double back.  If ignoreMobileAllies
      *  is true, pretend that allied creatures that can move out of the
      *  way are not there. */
     private Set findMoves(BattleHex hex, Critter critter, boolean flies,
-        int movesLeft, int cameFrom, boolean ignoreMobileAllies, boolean first)
+            int movesLeft, int cameFrom, boolean ignoreMobileAllies, boolean first)
     {
         Set set = new HashSet();
         for (int i = 0; i < 6; i++)
@@ -551,12 +534,13 @@ Log.debug("Called Battle.doneReinforcing()");
                     int entryCost;
 
                     Critter bogey = getCritter(neighbor);
-                    if (bogey == null || (ignoreMobileAllies &&
-                        bogey.getMarkerId().equals(critter.getMarkerId())
-                        && !bogey.isInContact(false)))
+                    if (bogey == null ||
+                            (ignoreMobileAllies &&
+                            bogey.getMarkerId().equals(critter.getMarkerId()) &&
+                            !bogey.isInContact(false)))
                     {
                         entryCost =
-                            neighbor.getEntryCost(
+                                neighbor.getEntryCost(
                                 critter.getCreature(),
                                 reverseDir,
                                 game.getOption(Options.cumulativeSlow));
@@ -567,8 +551,8 @@ Log.debug("Called Battle.doneReinforcing()");
                     }
 
                     if ((entryCost != BattleHex.IMPASSIBLE_COST) &&
-                        ((entryCost <= movesLeft) ||
-                         (first && game.getOption(Options.oneHexAllowed))))
+                            ((entryCost <= movesLeft) ||
+                            (first && game.getOption(Options.oneHexAllowed))))
                     {
                         // Mark that hex as a legal move.
                         set.add(neighbor.getLabel());
@@ -579,20 +563,20 @@ Log.debug("Called Battle.doneReinforcing()");
                         if (!flies && movesLeft > entryCost)
                         {
                             set.addAll(findMoves(neighbor, critter, flies,
-                                movesLeft - entryCost, reverseDir,
-                                ignoreMobileAllies, false));
+                                    movesLeft - entryCost, reverseDir,
+                                    ignoreMobileAllies, false));
                         }
                     }
 
                     // Fliers can fly over any hex for 1 movement point,
                     // but some Hex cannot be flown over by some creatures.
                     if (flies &&
-                        movesLeft > 1 &&
-                        neighbor.canBeFlownOverBy(critter.getCreature()))
+                            movesLeft > 1 &&
+                            neighbor.canBeFlownOverBy(critter.getCreature()))
                     {
                         set.addAll(findMoves(neighbor, critter, flies,
-                                             movesLeft - 1, reverseDir,
-                                             ignoreMobileAllies, false));
+                                movesLeft - 1, reverseDir,
+                                ignoreMobileAllies, false));
                     }
                 }
             }
@@ -605,8 +589,8 @@ Log.debug("Called Battle.doneReinforcing()");
      *  so we know that there are no enemies on board, and all allies
      *  are mobile.
      */
-    private Set findUnoccupiedStartlistHexes(boolean ignoreMobileAllies, 
-                                             String terrain)
+    private Set findUnoccupiedStartlistHexes(boolean ignoreMobileAllies,
+            String terrain)
     {
         Set set = new HashSet();
         Iterator it = HexMap.getTowerStartList(terrain).iterator();
@@ -621,13 +605,6 @@ Log.debug("Called Battle.doneReinforcing()");
         return set;
     }
 
-
-    private Set showMoves(int tag)
-    {
-        Critter critter = getActiveLegion().getCritterByTag(tag);
-        return showMoves(critter, false);
-    }
-
     /** Find all legal moves for this critter. The returned list
      *  contains hex IDs, not hexes. */
     private Set showMoves(Critter critter, boolean ignoreMobileAllies)
@@ -636,21 +613,21 @@ Log.debug("Called Battle.doneReinforcing()");
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
             if (HexMap.terrainHasStartlist(terrain) && (turnNumber == 1) &&
-                activeLegionNum == Constants.DEFENDER)
+                    activeLegionNum == Constants.DEFENDER)
             {
                 set =
-                    findUnoccupiedStartlistHexes(ignoreMobileAllies, terrain);
+                        findUnoccupiedStartlistHexes(ignoreMobileAllies,
+                        terrain);
             }
             else
             {
                 set = findMoves(critter.getCurrentHex(), critter,
-                    critter.isFlier(), critter.getSkill(), -1,
-                    ignoreMobileAllies, true);
+                        critter.isFlier(), critter.getSkill(), -1,
+                        ignoreMobileAllies, true);
             }
         }
         return set;
     }
-
 
     void undoMove(String hexLabel)
     {
@@ -664,7 +641,6 @@ Log.debug("Called Battle.doneReinforcing()");
             Log.error("Undo move error: no critter in " + hexLabel);
         }
     }
-
 
     /** Mark all of the conceding player's critters as dead. */
     void concede(String playerName)
@@ -687,7 +663,6 @@ Log.debug("Called Battle.doneReinforcing()");
         }
     }
 
-
     /** If any creatures were left off-board, kill them.  If they were newly
      *  summoned or recruited, unsummon or unrecruit them instead. */
     private void removeOffboardCreatures()
@@ -704,7 +679,6 @@ Log.debug("Called Battle.doneReinforcing()");
         }
         removeDeadCreatures();
     }
-
 
     private void commitMoves()
     {
@@ -723,7 +697,6 @@ Log.debug("Called Battle.doneReinforcing()");
         advancePhase();
     }
 
-
     private void applyDriftDamage()
     {
         // Drift damage is applied only once per player turn,
@@ -736,7 +709,7 @@ Log.debug("Called Battle.doneReinforcing()");
             {
                 Critter critter = (Critter)it.next();
                 int dam = critter.getCurrentHex().damageToCreature(
-                    critter.getCreature());
+                        critter.getCreature());
                 if (dam > 0)
                 {
                     critter.wound(dam);
@@ -747,7 +720,6 @@ Log.debug("Called Battle.doneReinforcing()");
         }
     }
 
-
     boolean isDriftDamageApplied()
     {
         return driftDamageApplied;
@@ -757,7 +729,6 @@ Log.debug("Called Battle.doneReinforcing()");
     {
         this.driftDamageApplied = driftDamageApplied;
     }
-
 
     void leaveCarryMode()
     {
@@ -784,13 +755,13 @@ Log.debug("Called Battle.doneReinforcing()");
         removeDeadCreaturesFromLegion(defender);
         removeDeadCreaturesFromLegion(attacker);
 
-        if (attacker.getPlayer() == null || 
-            attacker.getPlayer().isTitanEliminated())
+        if (attacker.getPlayer() == null ||
+                attacker.getPlayer().isTitanEliminated())
         {
             attackerElim = true;
         }
-        if (defender.getPlayer() == null || 
-            defender.getPlayer().isTitanEliminated())
+        if (defender.getPlayer() == null ||
+                defender.getPlayer().isTitanEliminated())
         {
             defenderElim = true;
         }
@@ -848,8 +819,8 @@ Log.debug("Called Battle.doneReinforcing()");
                 if (donor != null)
                 {
                     donor.addCreature(critter.getCreature(), false);
-                    server.allTellAddCreature(donor.getMarkerId(), 
-                        critter.getName(), true);
+                    server.allTellAddCreature(donor.getMarkerId(),
+                            critter.getName(), true);
                     // This summon doesn't count; the player can
                     // summon again later this turn.
                     player.setSummoned(false);
@@ -877,7 +848,7 @@ Log.debug("Called Battle.doneReinforcing()");
             // Creatures left offboard do not trigger angel
             // summoning.
             if (summonState == Constants.NO_KILLS &&
-                !critter.getCurrentHex().isEntrance())
+                    !critter.getCurrentHex().isEntrance())
             {
                 summonState = Constants.FIRST_BLOOD;
             }
@@ -885,14 +856,13 @@ Log.debug("Called Battle.doneReinforcing()");
 
         // If an angel or archangel was returned to its donor instead of 
         // the stack, then don't put it back on the stack.
-        legion.prepareToRemoveCritter(critter, donor == null); 
+        legion.prepareToRemoveCritter(critter, donor == null);
 
         if (critter.isTitan())
         {
             legion.getPlayer().eliminateTitan();
         }
     }
-
 
     private void checkForElimination()
     {
@@ -971,7 +941,6 @@ Log.debug("Called Battle.doneReinforcing()");
         }
     }
 
-
     private void commitStrikes()
     {
         Legion legion = getActiveLegion();
@@ -985,7 +954,6 @@ Log.debug("Called Battle.doneReinforcing()");
             }
         }
     }
-
 
     private boolean isForcedStrikeRemaining()
     {
@@ -1011,8 +979,8 @@ Log.debug("Called Battle.doneReinforcing()");
         // Advance only if there are no unresolved strikes.
         if (getPhase() < Constants.FIGHT || isForcedStrikeRemaining())
         {
-            Log.error(server.getPlayerName() + 
-                " called battle.doneWithStrikes() illegally");
+            Log.error(server.getPlayerName() +
+                    " called battle.doneWithStrikes() illegally");
             return false;
         }
         else
@@ -1022,7 +990,6 @@ Log.debug("Called Battle.doneReinforcing()");
             return true;
         }
     }
-
 
     /** Return a set of hex labels for hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
@@ -1068,8 +1035,8 @@ Log.debug("Called Battle.doneReinforcing()");
         // if the creature can strike normally, so only look for them if
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && critter.isRangestriker() &&
-            getPhase() != Constants.STRIKEBACK &&
-            critter.getLegion() == getActiveLegion())
+                getPhase() != Constants.STRIKEBACK &&
+                critter.getLegion() == getActiveLegion())
         {
             Iterator it = getInactiveLegion().getCritters().iterator();
             while (it.hasNext())
@@ -1088,7 +1055,6 @@ Log.debug("Called Battle.doneReinforcing()");
         return set;
     }
 
-
     /** Return the set of hex labels for hexes with valid carry targets. */
     Set getCarryTargets()
     {
@@ -1102,7 +1068,7 @@ Log.debug("Called Battle.doneReinforcing()");
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            Critter critter = getCritter(hexLabel);    
+            Critter critter = getCritter(hexLabel);
             set.add(critter.getDescription());
         }
         return set;
@@ -1137,7 +1103,7 @@ Log.debug("Called Battle.doneReinforcing()");
         carryTargets.remove(target.getCurrentHexLabel());
 
         Log.event(dealt + (dealt == 1 ? " hit carries to " :
-            " hits carry to ") + target.getDescription());
+                " hits carry to ") + target.getDescription());
 
         if (carryDamage <= 0 || getCarryTargets().isEmpty())
         {
@@ -1146,12 +1112,11 @@ Log.debug("Called Battle.doneReinforcing()");
         else
         {
             Log.event(carryDamage + (carryDamage == 1 ?
-                " carry available" : " carries available"));
+                    " carry available" : " carries available"));
         }
-        server.allTellCarryResults(target, dealt, carryDamage, 
-            getCarryTargets());
+        server.allTellCarryResults(target, dealt, carryDamage,
+                getCarryTargets());
     }
-
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
@@ -1204,19 +1169,19 @@ Log.debug("Called Battle.doneReinforcing()");
 
         if (xDist >= 2 * yDist)
         {
-            return (int) Math.ceil(xDist + 1);
+            return (int)Math.ceil(xDist + 1);
         }
         else if (xDist >= yDist)
         {
-            return (int) Math.floor(xDist + 2);
+            return (int)Math.floor(xDist + 2);
         }
         else if (yDist >= 2 * xDist)
         {
-            return (int) Math.ceil(yDist + 1);
+            return (int)Math.ceil(yDist + 1);
         }
         else
         {
-            return (int) Math.floor(yDist + 2);
+            return (int)Math.floor(yDist + 2);
         }
     }
 
@@ -1239,13 +1204,12 @@ Log.debug("Called Battle.doneReinforcing()");
         return min;
     }
 
-
     /** Caller must ensure that yDist != 0 */
     private static boolean toLeft(double xDist, double yDist)
     {
         double ratio = xDist / yDist;
         if (ratio >= 1.5 || (ratio >= 0 && ratio <= .75) ||
-            (ratio >= -1.5 && ratio <= -.75))
+                (ratio >= -1.5 && ratio <= -.75))
         {
             return true;
         }
@@ -1263,9 +1227,9 @@ Log.debug("Called Battle.doneReinforcing()");
     /** Check LOS, going to the left of hexspines if argument left is true, or
      *  to the right if it is false. */
     private boolean isLOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
-        BattleHex finalHex, boolean left, int strikeElevation,
-        boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle,
-        boolean midCliff, boolean midChit, int totalObstacles)
+            BattleHex finalHex, boolean left, int strikeElevation,
+            boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle,
+            boolean midCliff, boolean midChit, int totalObstacles)
     {
         boolean targetAtop = false;
         boolean targetAtopCliff = false;
@@ -1295,7 +1259,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
         if (currentHex == initialHex)
         {
-            if (isObstacle(hexside)) 
+            if (isObstacle(hexside))
             {
                 strikerAtop = true;
                 totalObstacles++;
@@ -1365,7 +1329,7 @@ Log.debug("Called Battle.doneReinforcing()");
             // If there are three slopes, striker and target must each
             //     be atop one.
             if (totalObstacles >= 3 && (!strikerAtop || !targetAtop) &&
-                (!strikerAtopCliff && !targetAtopCliff))
+                    (!strikerAtopCliff && !targetAtopCliff))
             {
                 return true;
             }
@@ -1402,15 +1366,15 @@ Log.debug("Called Battle.doneReinforcing()");
         // Creatures block LOS, unless both striker and target are at higher
         //     elevation than the creature, or unless the creature is at
         //     the base of a cliff and the striker or target is atop it.
-        if (isOccupied(nextHex) && nextHex.getElevation() >= strikeElevation
-            && (!strikerAtopCliff || currentHex != initialHex))
+        if (isOccupied(nextHex) && nextHex.getElevation() >= strikeElevation &&
+                (!strikerAtopCliff || currentHex != initialHex))
         {
             midChit = true;
         }
 
         return isLOSBlockedDir(initialHex, nextHex, finalHex, left,
-            strikeElevation, strikerAtop, strikerAtopCliff,
-            midObstacle, midCliff, midChit, totalObstacles);
+                strikeElevation, strikerAtop, strikerAtopCliff,
+                midObstacle, midCliff, midChit, totalObstacles);
     }
 
     /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
@@ -1449,20 +1413,20 @@ Log.debug("Called Battle.doneReinforcing()");
 
         // Creatures below the level of the strike do not block LOS.
         int strikeElevation = Math.min(hex1.getElevation(),
-            hex2.getElevation());
+                hex2.getElevation());
 
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
             // Hexspine; try both sides.
             return (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, 0) &&
-                isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                false, false, false, false, false, 0));
+                    false, false, false, false, false, 0) &&
+                    isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
+                    false, false, false, false, false, 0));
         }
         else
         {
             return isLOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
-                strikeElevation, false, false, false, false, false, 0);
+                    strikeElevation, false, false, false, false, false, 0);
         }
     }
 
@@ -1483,7 +1447,7 @@ Log.debug("Called Battle.doneReinforcing()");
         // Only magicMissile can rangestrike at range 2, rangestrike Lords,
         // or rangestrike without LOS.
         else if (!critter.useMagicMissile() && (range < 3 ||
-            target.isLord() || isLOSBlocked(currentHex, targetHex)))
+                target.isLord() || isLOSBlocked(currentHex, targetHex)))
         {
             return false;
         }
@@ -1637,7 +1601,7 @@ Log.debug("Called Battle.doneReinforcing()");
      *  hexspine, go left if argument left is true, right otherwise.  If
      *  LOS is blocked, return a large number. */
     private int countBrambleHexesDir(BattleHex hex1, BattleHex hex2,
-        boolean left, int previousCount)
+            boolean left, int previousCount)
     {
         int count = previousCount;
 
@@ -1705,23 +1669,23 @@ Log.debug("Called Battle.doneReinforcing()");
 
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
-            int strikeElevation = Math.min(hex1.getElevation(), 
-                hex2.getElevation());
+            int strikeElevation = Math.min(hex1.getElevation(),
+                    hex2.getElevation());
             // Hexspine; try unblocked side(s)
             if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, 0))
+                    false, false, false, false, false, 0))
             {
                 return countBrambleHexesDir(hex1, hex2, false, 0);
             }
             else if (isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                false, false, false, false, false, 0))
+                    false, false, false, false, false, 0))
             {
                 return countBrambleHexesDir(hex1, hex2, true, 0);
             }
             else
             {
                 return Math.min(countBrambleHexesDir(hex1, hex2, true, 0),
-                    countBrambleHexesDir(hex1, hex2, false, 0));
+                        countBrambleHexesDir(hex1, hex2, false, 0));
             }
         }
         else
@@ -1729,7 +1693,6 @@ Log.debug("Called Battle.doneReinforcing()");
             return countBrambleHexesDir(hex1, hex2, toLeft(xDist, yDist), 0);
         }
     }
-
 
     /** If legal, move critter to hex and return true. Else return false. */
     boolean doMove(int tag, String hexLabel)
@@ -1751,26 +1714,24 @@ Log.debug("Called Battle.doneReinforcing()");
         else if (showMoves(critter, false).contains(hexLabel))
         {
             Log.event(critter.getName() + " moves from " +
-                critter.getCurrentHexLabel() + " to " + hexLabel);
+                    critter.getCurrentHexLabel() + " to " + hexLabel);
             critter.moveToHex(hexLabel, true);
             return true;
         }
         else
         {
             Log.warn(critter.getName() + " in " +
-                critter.getCurrentHexLabel() +
-                " tried to illegally move to " + hexLabel);
+                    critter.getCurrentHexLabel() +
+                    " tried to illegally move to " + hexLabel);
             return false;
         }
     }
-
 
     private void cleanup()
     {
         battleOver = true;
         game.finishBattle(masterHexLabel, attackerEntered, pointsScored);
     }
-
 
     /** Return a list of all critters in the battle. */
     private List getAllCritters()
@@ -1788,7 +1749,6 @@ Log.debug("Called Battle.doneReinforcing()");
         }
         return critters;
     }
-
 
     private boolean isOccupied(String hexLabel)
     {

@@ -1,11 +1,5 @@
 package net.sf.colossus.client;
 
-import java.util.*;
-
-import net.sf.colossus.util.Log;
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Dice;
-import net.sf.colossus.server.Constants;
 
 /**
  *  Basic information about one creature, for split prediction.
@@ -15,12 +9,12 @@ import net.sf.colossus.server.Constants;
 class CreatureInfo implements Cloneable
 {
     private final String name;
-    
+
     // Are we sure this creature is in this legion?
-    private boolean certain; 
+    private boolean certain;
 
     // Was the creature here when this legion was split off?
-    private boolean atSplit; 
+    private boolean atSplit;
 
     CreatureInfo(String name, boolean certain, boolean atSplit)
     {
@@ -32,7 +26,6 @@ class CreatureInfo implements Cloneable
         this.certain = certain;
         this.atSplit = atSplit;
     }
-
 
     String getName()
     {
@@ -58,7 +51,6 @@ class CreatureInfo implements Cloneable
     {
         return atSplit;
     }
-
 
     public Object clone()
     {

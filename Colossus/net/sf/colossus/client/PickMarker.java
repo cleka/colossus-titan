@@ -1,10 +1,19 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.JFrame;
 
 import net.sf.colossus.util.KDialog;
 
@@ -18,9 +27,8 @@ import net.sf.colossus.util.KDialog;
 
 final class PickMarker extends KDialog implements MouseListener, WindowListener
 {
-    private java.util.List markers = new ArrayList();
+    private List markers = new ArrayList();
     private Client client;
-
 
     PickMarker(JFrame parentFrame, String name, Set markerIds, Client client)
     {
@@ -57,7 +65,6 @@ final class PickMarker extends KDialog implements MouseListener, WindowListener
         centerOnScreen();
         setVisible(true);
     }
-
 
     /** Pass the chosen marker id, or null if none are available or
      *  the player aborts the selection. */

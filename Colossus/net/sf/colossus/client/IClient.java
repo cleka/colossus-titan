@@ -1,7 +1,8 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -11,11 +12,11 @@ import java.util.*;
  */
 public interface IClient
 {
-    public void tellEngagement(String hexLabel, String attackerId, 
-        String defenderId);
+    public void tellEngagement(String hexLabel, String attackerId,
+            String defenderId);
 
     public void tellEngagementResults(String winnerId, String method,
-        int points);
+            int points);
 
     public void tellMovementRoll(int roll);
 
@@ -25,15 +26,15 @@ public interface IClient
 
     public void setColor(String color);
 
-    public void updateCreatureCount(String creatureName, int count, 
-        int deadCount);
+    public void updateCreatureCount(String creatureName, int count,
+            int deadCount);
 
     public void dispose();
 
     public void removeLegion(String id);
 
-    public void setLegionStatus(String markerId, boolean moved, 
-        boolean teleported, int entrySide, String lastRecruit);
+    public void setLegionStatus(String markerId, boolean moved,
+            boolean teleported, int entrySide, String lastRecruit);
 
     public void addCreature(String markerId, String name);
 
@@ -44,7 +45,7 @@ public interface IClient
     public void removeDeadBattleChits();
 
     public void placeNewChit(String imageName, boolean inverted, int tag,
-        String hexLabel);
+            String hexLabel);
 
     public void initBoard();
 
@@ -70,13 +71,13 @@ public interface IClient
 
     public void tellProposal(String proposalString);
 
-    public void tellStrikeResults(int strikerTag, int targetTag, 
-        int strikeNumber, List rolls, int damage, boolean killed, 
-        boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions);
+    public void tellStrikeResults(int strikerTag, int targetTag,
+            int strikeNumber, List rolls, int damage, boolean killed,
+            boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions);
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        String battleActivePlayerName, int battlePhase,
-        String attackerMarkerId, String defenderMarkerId);
+            String battleActivePlayerName, int battlePhase,
+            String attackerMarkerId, String defenderMarkerId);
 
     public void cleanupBattle();
 
@@ -87,7 +88,7 @@ public interface IClient
     public void doReinforce(String markerId);
 
     public void didRecruit(String markerId, String recruitName,
-        String recruiterName, int numRecruiters);
+            String recruiterName, int numRecruiters);
 
     public void undidRecruit(String markerId, String recruitName);
 
@@ -102,34 +103,34 @@ public interface IClient
     public void setupMuster();
 
     public void setupBattleSummon(String battleActivePlayerName,
-        int battleTurnNumber);
+            int battleTurnNumber);
 
     public void setupBattleRecruit(String battleActivePlayerName,
-        int battleTurnNumber);
+            int battleTurnNumber);
 
     public void setupBattleMove(String battleActivePlayerName,
-        int battleTurnNumber);
+            int battleTurnNumber);
 
     public void setupBattleFight(int battlePhase,
-        String battleActivePlayerName);
+            String battleActivePlayerName);
 
     public void tellLegionLocation(String markerId, String hexLabel);
 
     public void tellBattleMove(int tag, String startingHexLabel,
-        String endingHexLabel, boolean undo);
+            String endingHexLabel, boolean undo);
 
     public void didMove(String markerId, String startingHexLabel,
-        String currentHexLabel, String entrySide, boolean teleport);
+            String currentHexLabel, String entrySide, boolean teleport);
 
     public void undidMove(String markerId, String formerHexLabel,
-        String currentHexLabel);
+            String currentHexLabel);
 
     public void undidSplit(String splitoffId, String survivorId, int turn);
 
     public void didSplit(String hexLabel, String parentId, String childId,
-        int childHeight, List splitoffs, int turn);
+            int childHeight, List splitoffs, int turn);
 
-    public void askPickColor(java.util.List colorsLeft);
+    public void askPickColor(List colorsLeft);
 
     public void askPickFirstMarker();
 

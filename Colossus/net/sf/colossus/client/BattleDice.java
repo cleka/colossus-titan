@@ -1,12 +1,21 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+
 import net.sf.colossus.util.HTMLColor;
+
 
 /**
  * Class BattleDice displays dice rolls during a battle.
@@ -22,10 +31,9 @@ final class BattleDice extends Box
     private String targetDesc = "";
     private int numDice = 0;
     private int targetNumber = 0;
-    private java.util.List rolls = new ArrayList();
+    private List rolls = new ArrayList();
     private int hits = 0;
-    private JLabel label1 = new JLabel();
-    private Chit [] dice;
+    private Chit[] dice;
     private int averageMiss = -1;
 
     private JPanel diceBox, missBox, hitBox;
@@ -43,7 +51,7 @@ final class BattleDice extends Box
         diceBoxTitledBorder.setTitleJustification(TitledBorder.CENTER);
         diceBox.setBorder(diceBoxTitledBorder);
         add(diceBox);
-        
+
         missBox = new JPanel();
         hitBox = new JPanel();
         missBox.setLayout(new FlowLayout());
@@ -56,9 +64,8 @@ final class BattleDice extends Box
         showRoll();
     }
 
-
-    void setValues(String strikerDesc, String targetDesc, int targetNumber, 
-        int hits, java.util.List rolls)
+    void setValues(String strikerDesc, String targetDesc, int targetNumber,
+            int hits, List rolls)
     {
         this.strikerDesc = strikerDesc;
         this.targetDesc = targetDesc;
@@ -104,7 +111,6 @@ final class BattleDice extends Box
         return basename.toString();
     }
 
-
     /** Initialize and layout the components, in response to new data. */
     void showRoll()
     {
@@ -121,16 +127,16 @@ final class BattleDice extends Box
         else
         {
             diceBoxTitledBorder.setTitle(strikerDesc +
-                                         " attacks " +
-                                         targetDesc +
-                                         " (target number is " +
-                                         targetNumber + ")");
+                    " attacks " +
+                    targetDesc +
+                    " (target number is " +
+                    targetNumber + ")");
         }
 
         if (numDice > 0)
         {
             dice = new Chit[numDice];
-            
+
             for (int i = 0; i < numDice; i++)
             {
                 String imageName = getDieImageName((String)rolls.get(i));
@@ -138,22 +144,30 @@ final class BattleDice extends Box
                 {
                     dice[i] = new Chit(2 * Scale.get(), imageName, this);
                     if (averageMiss > i)
+                    {
                         missBox.add(dice[i]);
+                    }
                     else
+                    {
                         hitBox.add(dice[i]);
+                    }
                 }
             }
-            
+
             if (averageMiss < numDice)
+            {
                 hitBox.setVisible(true);
+            }
             if (averageMiss > 0)
+            {
                 missBox.setVisible(true);
+            }
         }
         else
         {
             dice = null;
         }
-        
+
         invalidate();
         setVisible(true);
         repaint();
@@ -163,7 +177,6 @@ final class BattleDice extends Box
     {
         showRoll();
     }
-
 
     public Dimension getMinimumSize()
     {

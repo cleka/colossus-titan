@@ -1,12 +1,10 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
-import java.awt.*;
+import java.awt.Color;
 
-import net.sf.colossus.client.BattleHex;
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.server.Creature;
 
 
 /**
@@ -18,7 +16,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 
 public class MasterHex extends Hex
 {
-    private MasterHex [] neighbors = new MasterHex[6];
+    private MasterHex[] neighbors = new MasterHex[6];
 
     /** Terrain types are:
      *  Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
@@ -36,7 +34,6 @@ public class MasterHex extends Hex
     private int[] baseExitType = new int[3];
     private int[] baseExitLabel = new int[3];
     private int[] entranceType = new int[6];
-
 
     // The hex vertexes are numbered like this:
     //
@@ -70,64 +67,60 @@ public class MasterHex extends Hex
     {
         return (TerrainRecruitLoader.getTerrainDisplayName(getTerrain()));
     }
-    
+
     public Color getTerrainColor()
     {
         return (TerrainRecruitLoader.getTerrainColor(getTerrain()));
     }
 
-
     public static boolean isNativeCombatBonus(Creature creature, String terrain)
     {
         int bonusHazardCount = 0;
         int bonusHazardSideCount = 0;
-        
+
         String[] hazard = BattleHex.getTerrains();
 
-        for (int i = 0; i < hazard.length ; i++)
+        for (int i = 0; i < hazard.length; i++)
         {
-            int count =
-              net.sf.colossus.client.HexMap.getHazardCountInTerrain(
-                   hazard[i],
-                   terrain);
+            int count = HexMap.getHazardCountInTerrain(hazard[i], terrain);
             if (BattleHex.isNativeBonusHazard(hazard[i]) &&
-                creature.isNativeTerrain(hazard[i]))
+                    creature.isNativeTerrain(hazard[i]))
             {
                 bonusHazardCount += count;
             }
             else
             {
                 if (BattleHex.isNonNativePenaltyHazard(hazard[i]) &&
-                    !creature.isNativeTerrain(hazard[i]))
+                        !creature.isNativeTerrain(hazard[i]))
                 {
                     bonusHazardCount -= count;
                 }
             }
         }
         char[] hazardSide = BattleHex.getHexsides();
-        
-        for (int i = 0; i < hazardSide.length ; i++)
+
+        for (int i = 0; i < hazardSide.length; i++)
         {
             int count =
-                net.sf.colossus.client.HexMap.getHazardSideCountInTerrain(
-                     hazardSide[i],
-                     terrain);
+                    net.sf.colossus.client.HexMap.getHazardSideCountInTerrain(
+                    hazardSide[i],
+                    terrain);
             if (BattleHex.isNativeBonusHexside(hazardSide[i]) &&
-                creature.isNativeHexside(hazardSide[i]))
+                    creature.isNativeHexside(hazardSide[i]))
             {
                 bonusHazardSideCount += count;
             }
             else
             {
                 if (BattleHex.isNonNativePenaltyHexside(hazardSide[i]) &&
-                    !creature.isNativeHexside(hazardSide[i]))
+                        !creature.isNativeHexside(hazardSide[i]))
                 {
                     bonusHazardSideCount -= count;
                 }
             }
         }
-        if (((bonusHazardCount + bonusHazardSideCount) > 0)
-            && ((bonusHazardCount >= 3) || (bonusHazardSideCount >= 5)))
+        if (((bonusHazardCount + bonusHazardSideCount) > 0) &&
+                ((bonusHazardCount >= 3) || (bonusHazardSideCount >= 5)))
         {
             return true;
         }
@@ -165,7 +158,6 @@ public class MasterHex extends Hex
     {
         this.labelSide = labelSide;
     }
-
 
     public int getExitType(int i)
     {

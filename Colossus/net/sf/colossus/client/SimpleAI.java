@@ -3,16 +3,16 @@ package net.sf.colossus.client;
 
 import java.util.*;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Probs;
-import net.sf.colossus.util.Perms;
-import net.sf.colossus.util.Options;
-import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.parser.TerrainRecruitLoader;
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Dice;
 import net.sf.colossus.server.VariantSupport;
+import net.sf.colossus.util.DevRandom;
+import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Options;
+import net.sf.colossus.util.Perms;
+import net.sf.colossus.util.Probs;
 
 
 /**
@@ -35,7 +35,7 @@ public class SimpleAI implements AI
         this.client = client;
     }
 
-    public String pickColor(java.util.List colors, List favoriteColors)
+    public String pickColor(List colors, List favoriteColors)
     {
         Iterator it = favoriteColors.iterator();
         while (it.hasNext())
@@ -331,7 +331,7 @@ public class SimpleAI implements AI
             Creature bestRecruit = null;
             while ((currentScore + pointValue) >= nextScore)
             {
-                java.util.List ral =
+                List ral =
                         TerrainRecruitLoader.getRecruitableAcquirableList(
                         terrain, nextScore);
                 java.util.Iterator it = ral.iterator();
@@ -463,7 +463,7 @@ public class SimpleAI implements AI
      *  split out. */
     List doInitialGameSplit(String label)
     {
-        java.util.List hintSuggestedSplit = getInitialSplitHint(label);
+        List hintSuggestedSplit = getInitialSplitHint(label);
 
         /* Log.debug("HINT: suggest splitting " + hintSuggestedSplit +
          " in " + label); */
@@ -1040,7 +1040,6 @@ public class SimpleAI implements AI
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
         final int WIN_GAME = Integer.MAX_VALUE / 2;
-        final int LOSE_GAME = Integer.MIN_VALUE / 2;
         final int LOSE_LEGION = -10000;
 
         int value = 0;
@@ -1337,7 +1336,6 @@ public class SimpleAI implements AI
             // XXX Should ignore friends.
             Set moves = client.getMovement().listAllMoves(legion, hex, roll);
             int bestRecruitVal = 0;
-            Creature bestRecruit = null;
 
             Iterator nextMoveIt = moves.iterator();
             while (nextMoveIt.hasNext())
@@ -1383,7 +1381,6 @@ public class SimpleAI implements AI
                 if (val > bestRecruitVal)
                 {
                     bestRecruitVal = val;
-                    bestRecruit = nextRecruit;
                 }
             }
 
@@ -1568,189 +1565,6 @@ public class SimpleAI implements AI
         }
     }
 
-    private int[] getNumberAndPVForBestNextTurnRecruitment(LegionInfo legion,
-            MasterHex hex,
-            Creature base)
-    {
-        int mun = TerrainRecruitLoader.getRecruitGraph().getMaximumUsefulNumber(
-                base.getName());
-        int already = legion.numCreature(base);
-        int maxPV = -1;
-        int num = 0;
-
-        for (int i = 1; i <= mun; i++)
-        {
-            List all = TerrainRecruitLoader.getRecruitGraph().getAllTerrainsWhereThisNumberOfCreatureRecruit(
-                    base.getName(), i);
-
-            Iterator it = all.iterator();
-            while (it.hasNext())
-            {
-                String terrain = (String)it.next();
-
-                String dest = TerrainRecruitLoader.getRecruitGraph().getRecruitFromRecruiterTerrainNumber(base.getName(),
-                        terrain, i);
-
-                if ((dest != null) &&
-                        (getNumberOfWaysToTerrain(legion, hex, terrain) > 0))
-                {
-                    Creature cdest = Creature.getCreatureByName(dest);
-
-                    if (legion.numCreature(cdest) == 0)
-                    {
-                        // don't bother if we already have next stage
-                        // this will not catch if we already have
-                        // the after-next stage (i.e. it will try to take
-                        // a third Cyclops over a Gorgon even if we have a
-                        // Serpent, as long as we don't have a Behemoth)
-                        int pv = ghrv(cdest, legion, hintSectionUsed);
-                        if (pv > maxPV)
-                        {
-                            maxPV = pv;
-                            num = i;
-                        }
-                    }
-                }
-            }
-        }
-
-        int[] r = new int[2];
-
-        r[0] = num;
-        r[1] = maxPV;
-
-        return r;
-    }
-
-    private Creature getBestRecruitmentOneTurnAhead(LegionInfo legion,
-            MasterHex hex,
-            List recruits)
-    {
-        Creature recruit = (Creature)recruits.get(recruits.size() - 1);
-        String basic = recruit.getName();
-        int[] r = getNumberAndPVForBestNextTurnRecruitment(legion, hex, recruit);
-
-        // say the best we can do ATM is either what we can recruit next
-        // turn, or the value of the recruit itself;
-        int maxPV = ((r[0] == (1 + legion.numCreature(recruit))) ? r[1] :
-                ghrv(recruit, legion, hintSectionUsed));
-
-        Iterator it = recruits.iterator();
-
-        while (it.hasNext())
-        {
-            Creature base = (Creature)it.next();
-
-            r = getNumberAndPVForBestNextTurnRecruitment(legion, hex, base);
-
-            if ((r[0] == (1 + legion.numCreature(base))) &&
-                    (r[1] > maxPV) &&
-                    (base != recruit))
-            {
-                // by recruiting one more "base", we could have a better
-                // recruit next turn than what our best this turn could do.
-                // So we recruit. Example: instead of recruiting a 18pts
-                // Gorgon we'll get a third Cyclops if the 24pts Behemoth
-                // is in range. Ditto for the third Lion/Troll if we can
-                // reach a Griffon/Wywern (20/21pts) instead of a 16pts
-                // ranger. OTOH, in a variant were the ranger can recruit,
-                // we might take the ranger anyway (it its recruit is
-                // better than a Griffon or Wywern).
-                recruit = base;
-                maxPV = r[1];
-            }
-        }
-
-        if (!(basic.equals(recruit.getName())))
-        {
-            Log.debug("GRAPH: (" + hex.getLabel() +
-                    ") OneTurnAhead suggest recruiting " +
-                    recruit.getName() + " instead of " + basic +
-                    " because we can get better next turn");
-        }
-
-        return recruit;
-    }
-
-    private Creature getBestRecruitmentInfinityAhead(LegionInfo legion,
-            MasterHex hex,
-            List recruits)
-    {
-        ListIterator it = recruits.listIterator(recruits.size());
-        Creature best = null;
-        String basic = ((Creature)recruits.get(recruits.size() - 1)).getName();
-        int maxVP = -1;
-
-        while (it.hasPrevious())
-        {
-            Creature recruit = (Creature)it.previous();
-
-            String temp = TerrainRecruitLoader.getRecruitGraph().getBestPossibleRecruitEver(
-                    recruit.getName(), legion);
-
-            int vp = ghrv(Creature.getCreatureByName(temp), legion,
-                    hintSectionUsed);
-
-            if (vp > maxVP)
-            {
-                maxVP = vp; /* vp of recruit */
-                best = recruit; /* best is recruit_er_ */
-            }
-        }
-
-        if (!(basic.equals(best.getName())))
-        {
-            Log.debug("GRAPH: (" + hex.getLabel() +
-                    ") InfinityAhead suggest recruiting " +
-                    best.getName() + " instead of " + basic +
-                    " because it has the best creature in its tree");
-        }
-
-        return best;
-    }
-
-    /* this next one is fairly dumb, as a single hex will be counted
-     multiple times if there's an enemy stack on it - so it will
-     suggest taking an Ogre over a Troll if there's someone sitting
-     on a nearby Hills... */
-    private Creature getBestRecruitmentPlacesNextTurn(LegionInfo legion,
-            MasterHex hex,
-            List recruits)
-    {
-        ListIterator it = recruits.listIterator(recruits.size());
-        Creature best = null;
-        String basic = ((Creature)recruits.get(recruits.size() - 1)).getName();
-        int maxwnum = 0;
-
-        while (it.hasPrevious())
-        {
-            Creature recruit = (Creature)it.previous();
-
-            int rnum = legion.numCreature(recruit);
-            java.util.List tl = TerrainRecruitLoader.getRecruitGraph().getAllTerrainsWhereThisNumberOfCreatureRecruit(
-                    recruit.getName(), rnum + 1);
-            int wnum = getNumberOfWaysToTerrains(legion, hex, tl);
-            if (wnum > maxwnum)
-            {
-                best = recruit;
-                maxwnum = wnum;
-            }
-        }
-        if (best == null)
-        {
-            best = (Creature)recruits.get(recruits.size() - 1);
-        }
-        if (!(basic.equals(best.getName())))
-        {
-            Log.debug("GRAPH: (" + hex.getLabel() +
-                    ") PlacesNextTurn suggest recruiting " +
-                    best.getName() + " instead of " + basic +
-                    " because it recruits in the greater number of places (" +
-                    maxwnum + ")");
-        }
-        return best;
-    }
-
     private class SimpleAIOracle implements
                 net.sf.colossus.server.HintOracleInterface
     {
@@ -1782,9 +1596,9 @@ public class SimpleAI implements AI
             return count;
         }
 
-        public boolean otherFriendlyStackHasCreature(java.util.List allNames)
+        public boolean otherFriendlyStackHasCreature(List allNames)
         {
-            java.util.List all = client.getFriendlyLegions(
+            List all = client.getFriendlyLegions(
                     client.getPlayerName());
 
             Iterator it = all.iterator();
@@ -1887,7 +1701,6 @@ public class SimpleAI implements AI
         }
 
         Creature recruit = Creature.getCreatureByName(recruitName);
-        String basic = ((Creature)recruits.get(recruits.size() - 1)).getName();
 
         if (!(recruits.contains(recruit)))
         {
@@ -1920,22 +1733,6 @@ public class SimpleAI implements AI
                 total++;
             }
         }
-        return total;
-    }
-
-    private int getNumberOfWaysToTerrains(LegionInfo legion,
-            MasterHex hex, java.util.List tl)
-    {
-        Iterator it = tl.iterator();
-        int total = 0;
-
-        while (it.hasNext())
-        {
-            String terrain = (String)it.next();
-
-            total += getNumberOfWaysToTerrain(legion, hex, terrain);
-        }
-
         return total;
     }
 
@@ -2119,7 +1916,7 @@ public class SimpleAI implements AI
                 }
                 if (enemy.getHeight() == 7)
                 {
-                    java.util.List recruits =
+                    List recruits =
                             client.findEligibleRecruits(enemy.getMarkerId(),
                             legion.getCurrentHex().getLabel());
                     if (recruits.size() > 0)
@@ -2380,8 +2177,6 @@ public class SimpleAI implements AI
     // TODO Have this actually find the best one, not the first one.
     private BattleChit findBestAttacker(BattleChit target)
     {
-        BattleChit bestAttacker = null;
-
         Iterator it = client.getActiveBattleChits().iterator();
         while (it.hasNext())
         {
@@ -2653,7 +2448,7 @@ public class SimpleAI implements AI
 
 
     /** Return a list of critter moves, in best move order. */
-    public java.util.List battleMove()
+    public List battleMove()
     {
         Log.debug("Called battleMove()");
 
@@ -2689,7 +2484,6 @@ public class SimpleAI implements AI
             CritterMove cm = (CritterMove)it.next();
             BattleChit critter = cm.getCritter();
             String startingHexLabel = cm.getStartingHexLabel();
-            String endingHexLabel = cm.getEndingHexLabel();
 
             Log.debug(critter.getDescription() + " failed to move");
             List moveList = findBattleMovesOneCritter(critter);
@@ -2703,8 +2497,6 @@ public class SimpleAI implements AI
             }
         }
     }
-
-    private static final int MAX_MOVE_ORDER_PERMUTATIONS = 10000;
 
     List findMoveOrder(LegionMove lm)
     {
@@ -2746,10 +2538,8 @@ public class SimpleAI implements AI
         // order, until we find an order that lets every creature reach
         // its preferred hex.  If none does, take the best we can find.
 
-        int turn = client.getBattleTurnNumber();
         int bestScore = 0;
         List bestOrder = null;
-        List lastOrder = null;
         int count = 0;
 
         setupTimer();
@@ -2771,7 +2561,6 @@ public class SimpleAI implements AI
                     break;
                 }
             }
-            lastOrder = (List)order.clone();
 
             // Bail out early
             if (timeIsUp)
@@ -3019,7 +2808,6 @@ public class SimpleAI implements AI
 
         // Now that the list is as small as possible, start finding combos.
         List legionMoves = new ArrayList();
-        final int limit = getCreatureMoveLimit();
         int[] indexes = new int[critterMoves.size()];
 
         nestForLoop(indexes, indexes.length - 1, critterMoves, legionMoves);
@@ -3111,7 +2899,6 @@ public class SimpleAI implements AI
             {
                 // This critter is not mobile, and its hex is taken.
                 CritterMove cm = (CritterMove)moveList.get(0);
-                BattleChit critter2 = cm.getCritter();
                 takenHexLabels.add(cm.getStartingHexLabel());
                 it.remove();
                 changed = true;
@@ -3136,25 +2923,6 @@ public class SimpleAI implements AI
         }
 
         return changed;
-    }
-
-    /** For an List of CritterMoves, concatenate all the creature names
-     *  in order.  If the list is null or empty, return an empty String. */
-    private String creatureNames(List list)
-    {
-        if (list == null)
-        {
-            return "";
-        }
-        StringBuffer buf = new StringBuffer("");
-        Iterator it = list.iterator();
-        while (it.hasNext())
-        {
-            CritterMove cm = (CritterMove)it.next();
-            BattleChit critter = cm.getCritter();
-            buf.append(critter.getCreatureName());
-        }
-        return buf.toString();
     }
 
     BattleEvalConstants bec = new BattleEvalConstants();
@@ -3226,8 +2994,6 @@ public class SimpleAI implements AI
         final String masterHexLabel = client.getBattleSite();
         final LegionInfo legion = client.getLegionInfo(
                 client.getMyEngagedMarkerId());
-        final LegionInfo enemy = client.getLegionInfo(
-                client.getBattleInactiveMarkerId());
         final int skill = critter.getSkill();
         final BattleHex hex = client.getBattleHex(critter);
         final int turn = client.getBattleTurnNumber();
@@ -3564,19 +3330,6 @@ public class SimpleAI implements AI
         }
 
         return sum;
-    }
-
-    private int ghrv(Creature creature, LegionInfo legion)
-    {
-        if (!creature.isTitan())
-        {
-            return creature.getHintedRecruitmentValue();
-        }
-        PlayerInfo player = legion.getPlayerInfo();
-        int power = player.getTitanPower();
-        int skill = creature.getSkill();
-        return power * skill * VariantSupport.getHintedRecruitmentValueOffset(
-                creature.getName());
     }
 
     private int ghrv(Creature creature, LegionInfo legion, String[] section)

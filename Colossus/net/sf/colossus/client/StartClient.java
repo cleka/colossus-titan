@@ -1,18 +1,28 @@
 package net.sf.colossus.client;
 
 
-import java.util.*;
-import java.net.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Vector;
 
-import com.werken.opt.Option;
-import com.werken.opt.CommandLine;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.util.Log;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -23,25 +33,24 @@ import net.sf.colossus.util.KDialog;
 
 
 public class StartClient extends KDialog implements WindowListener,
-    ActionListener
+            ActionListener
 {
     static String playerName;
     static String hostname;
     int port;
     static net.sf.colossus.util.Options clientOptions;
 
-    JComboBox nameBox; 
-    JComboBox hostBox; 
-    JComboBox portBox; 
-
+    JComboBox nameBox;
+    JComboBox hostBox;
+    JComboBox portBox;
 
     public StartClient(String playerName, String hostname, int port)
     {
         super(new JFrame(), "Client startup options", false);
         getContentPane().setLayout(new GridLayout(0, 2));
 
-        this.playerName = playerName;
-        this.hostname = hostname;
+        StartClient.playerName = playerName;
+        StartClient.hostname = hostname;
         this.port = port;
 
         getContentPane().add(new JLabel("Player name"));
@@ -69,7 +78,7 @@ public class StartClient extends KDialog implements WindowListener,
         for (int i = 0; i < Constants.numSavedServerNames; i++)
         {
             String serverName = clientOptions.getStringOption(
-                net.sf.colossus.util.Options.serverName + i);
+                    net.sf.colossus.util.Options.serverName + i);
             if (serverName != null)
             {
                 hostChoices.add(serverName);
@@ -113,7 +122,6 @@ public class StartClient extends KDialog implements WindowListener,
         return getMinimumSize();
     }
 
-
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals(Constants.quit))
@@ -151,7 +159,6 @@ public class StartClient extends KDialog implements WindowListener,
         System.exit(0);
     }
 
-
     public static void connect(String playerName, String hostname, int port)
     {
         saveHostname();
@@ -168,12 +175,12 @@ public class StartClient extends KDialog implements WindowListener,
     private static void saveHostname()
     {
         int highestNum = -1;
-        java.util.List names = new ArrayList();
+        List names = new ArrayList();
         names.add(hostname);
         for (int i = 0; i < Constants.numSavedServerNames; i++)
         {
             String serverName = clientOptions.getStringOption(
-                net.sf.colossus.util.Options.serverName + i);
+                    net.sf.colossus.util.Options.serverName + i);
             if (serverName != null)
             {
                 if (!serverName.equals(hostname))
@@ -186,8 +193,8 @@ public class StartClient extends KDialog implements WindowListener,
         }
         for (int i = 0; i <= highestNum; i++)
         {
-            clientOptions.setOption(net.sf.colossus.util.Options.serverName + 
-                i, (String)names.get(i));
+            clientOptions.setOption(net.sf.colossus.util.Options.serverName +
+                    i, (String)names.get(i));
         }
         clientOptions.saveOptions();
     }

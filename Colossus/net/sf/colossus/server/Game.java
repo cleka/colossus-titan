@@ -3,14 +3,10 @@ package net.sf.colossus.server;
 
 import java.io.*;
 import java.util.*;
-import javax.swing.*;
-import java.awt.event.*;
-import java.awt.*;
 
 import org.jdom.*;
 import org.jdom.output.*;
 import org.jdom.input.*;
-import com.werken.opt.CommandLine;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
@@ -22,7 +18,6 @@ import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.client.HexMap;
-import net.sf.colossus.client.StartClient;
 
 
 /**
@@ -35,7 +30,7 @@ import net.sf.colossus.client.StartClient;
 
 public final class Game
 {
-    private java.util.List players = new ArrayList(6);
+    private List players = new ArrayList(6);
     private int activePlayerNum;
     private int turnNumber;    // Advance when every player has a turn
     private boolean engagementInProgress;
@@ -715,19 +710,19 @@ public final class Game
     }
 
     /** Wrap the complexity of phase advancing. */
-    class GamePhaseAdvancer extends PhaseAdvancer
+    class GamePhaseAdvancer implements PhaseAdvancer
     {
 
         /** Advance to the next phase, only if the passed oldPhase and 
          *  playerName are current. */
-        void advancePhase()
+        public void advancePhase()
         {
             pendingAdvancePhase = true;
             advancePhaseInternal();
         }
 
         /** Advance to the next phase, with no error checking. */
-        void advancePhaseInternal()
+        public void advancePhaseInternal()
         {
             phase++;
             if (phase > Constants.MUSTER ||
@@ -744,7 +739,7 @@ public final class Game
             setupPhase();
         }
 
-        void advanceTurn()
+        public void advanceTurn()
         {
             clearFlags();
             activePlayerNum++;
@@ -1294,7 +1289,6 @@ public final class Game
                         attackingPlayer);
                 Legion defender = getFirstEnemyLegion(engagementHexLabel,
                         attackingPlayer);
-                Player defendingPlayer = defender.getPlayer();
 
                 int activeLegionNum;
                 if (battleActivePlayerName.equals(attackingPlayer.getName()))
@@ -3089,7 +3083,6 @@ public final class Game
 
     int getNumEnemyLegions(String hexLabel, Player player)
     {
-        String playerName = player.getName();
         int count = 0;
         Iterator it = getAllEnemyLegions(player).iterator();
         while (it.hasNext())

@@ -1,6 +1,5 @@
 package net.sf.colossus.client;
 
-import java.util.*;
 
 /**
  * One battle move for one critter.
@@ -17,7 +16,7 @@ class CritterMove
     private String endingHexLabel;
 
     CritterMove(BattleChit critter, String startingHexLabel,
-        String endingHexLabel)
+            String endingHexLabel)
     {
         super();
         this.critter = critter;

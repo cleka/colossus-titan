@@ -1,13 +1,23 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import net.sf.colossus.util.KDialog;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.util.KDialog;
+
 
 /**
  * Class PickRecruiter allows a player to choose which creature(s) recruit.
@@ -17,21 +27,19 @@ import net.sf.colossus.server.Constants;
 
 
 final class PickRecruiter extends KDialog implements MouseListener,
-    WindowListener
+            WindowListener
 {
-    private java.util.List recruiters;
-    private java.util.List recruiterChits = new ArrayList();
+    private List recruiters;
+    private List recruiterChits = new ArrayList();
     private Marker legionMarker;
-    private int height;
     private static String recruiterName;
 
-
     /** recruiters is a list of creature name strings */
-    private PickRecruiter(JFrame parentFrame, java.util.List recruiters, 
-        String hexDescription, String markerId, Client client)
+    private PickRecruiter(JFrame parentFrame, List recruiters,
+            String hexDescription, String markerId, Client client)
     {
         super(parentFrame, client.getPlayerName() + ": Pick Recruiter in " +
-            hexDescription, true);
+                hexDescription, true);
 
         recruiterName = null;
         this.recruiters = recruiters;
@@ -49,7 +57,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
         legionMarker = new Marker(scale, markerId, this, null);
         legionPane.add(legionMarker);
 
-        java.util.List imageNames = client.getLegionImageNames(markerId);
+        List imageNames = client.getLegionImageNames(markerId);
         Iterator it = imageNames.iterator();
         while (it.hasNext())
         {
@@ -83,15 +91,13 @@ final class PickRecruiter extends KDialog implements MouseListener,
         repaint();
     }
 
-
-    static String pickRecruiter(JFrame parentFrame, java.util.List recruiters, 
-        String hexDescription, String markerId, Client client)
+    static String pickRecruiter(JFrame parentFrame, List recruiters,
+            String hexDescription, String markerId, Client client)
     {
-        new PickRecruiter(parentFrame, recruiters, hexDescription, markerId, 
-            client);
+        new PickRecruiter(parentFrame, recruiters, hexDescription, markerId,
+                client);
         return recruiterName;
     }
-
 
     public void mousePressed(MouseEvent e)
     {
@@ -109,7 +115,6 @@ final class PickRecruiter extends KDialog implements MouseListener,
             dispose();
         }
     }
-
 
     public void windowClosing(WindowEvent e)
     {

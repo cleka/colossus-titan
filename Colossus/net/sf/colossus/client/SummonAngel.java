@@ -1,15 +1,29 @@
 package net.sf.colossus.client;
 
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JButton;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Legion;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Log;
+
 
 /**
  * Allows a player to summon an angel or archangel.
@@ -20,27 +34,27 @@ import net.sf.colossus.util.Log;
 
 
 final class SummonAngel extends KDialog implements MouseListener,
-    ActionListener, WindowListener
+            ActionListener, WindowListener
 {
     private String markerId;
-    private java.util.List sumChitList = new ArrayList();
+    private List sumChitList = new ArrayList();
     private JButton cancelButton;
     private static boolean active;
     private Client client;
     private static final String baseSummonString =
-        ": Summon Angel into Legion ";
-    private static final String sourceSummonString = 
-        "<p>Selected Legion is ";
+            ": Summon Angel into Legion ";
+    private static final String sourceSummonString =
+            "<p>Selected Legion is ";
     private static final String noSourceSummonString =
-        "<p>No selected Legion";
+            "<p>No selected Legion";
 
     private SummonAngel(Client client, String markerId)
     {
         super(client.getBoard().getFrame(),
-              "<html>" + client.getPlayerName() +
-              baseSummonString + Legion.getLongMarkerName(markerId) +
-              noSourceSummonString + "</html>",
-              false);
+                "<html>" + client.getPlayerName() +
+                baseSummonString + Legion.getLongMarkerName(markerId) +
+                noSourceSummonString + "</html>",
+                false);
 
         this.client = client;
         this.markerId = markerId;
@@ -65,7 +79,7 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
-        java.util.List summonableList = Creature.getSummonableCreatures();
+        List summonableList = Creature.getSummonableCreatures();
         java.util.Iterator it = summonableList.iterator();
         sumChitList.clear();
         while (it.hasNext())
@@ -75,7 +89,7 @@ final class SummonAngel extends KDialog implements MouseListener,
             tempChit = new Chit(scale, c.getName(), this);
             contentPane.add(tempChit);
             tempChit.addMouseListener(this);
-            
+
             // X out chits since no legion is selected.
             tempChit.setDead(true);
 
@@ -91,7 +105,7 @@ final class SummonAngel extends KDialog implements MouseListener,
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
+                d.height / 2 - getSize().height / 2));
 
         setVisible(true);
         repaint();
@@ -99,16 +113,15 @@ final class SummonAngel extends KDialog implements MouseListener,
 
     static SummonAngel summonAngel(Client client, String markerId)
     {
-Log.debug("called summonAngel for " + markerId);
+        Log.debug("called summonAngel for " + markerId);
         if (!active)
         {
             active = true;
-Log.debug("returning new SummonAngel dialog for " + markerId);
+            Log.debug("returning new SummonAngel dialog for " + markerId);
             return new SummonAngel(client, markerId);
         }
         return null;
     }
-
 
     String getMarkerId()
     {
@@ -121,7 +134,6 @@ Log.debug("returning new SummonAngel dialog for " + markerId);
         dispose();
         active = false;
     }
-
 
     public void mousePressed(MouseEvent e)
     {
@@ -149,7 +161,7 @@ Log.debug("returning new SummonAngel dialog for " + markerId);
     {
         cleanup(null, null);
     }
-    
+
     /** Upstate state of angel and archangel chits to reflect donor */
     void updateChits()
     {
@@ -157,18 +169,18 @@ Log.debug("returning new SummonAngel dialog for " + markerId);
         if (donorId == null)
         {
             label.setText("<html>" + client.getPlayerName() +
-                          baseSummonString +
-                          Legion.getLongMarkerName(markerId) +
-                          noSourceSummonString + "</html>");
+                    baseSummonString +
+                    Legion.getLongMarkerName(markerId) +
+                    noSourceSummonString + "</html>");
             return;
         }
         else
         {
             label.setText("<html>" + client.getPlayerName() +
-                          baseSummonString +
-                          Legion.getLongMarkerName(markerId) +
-                          sourceSummonString +
-                          Legion.getLongMarkerName(donorId) + "</html>");
+                    baseSummonString +
+                    Legion.getLongMarkerName(markerId) +
+                    sourceSummonString +
+                    Legion.getLongMarkerName(donorId) + "</html>");
         }
         java.util.Iterator it = sumChitList.iterator();
         while (it.hasNext())
@@ -177,7 +189,7 @@ Log.debug("returning new SummonAngel dialog for " + markerId);
             c.setDead(!client.donorHas(c.getId()));
         }
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals("Cancel"))

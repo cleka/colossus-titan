@@ -1,14 +1,28 @@
 package net.sf.colossus.client;
 
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Log;
 
 
@@ -27,18 +41,20 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
     /** hash by creature name to the label that displays the bottom counts */
     Map countMap = new HashMap();
+
     /** hash by creature name to the label that displays the top count */
     Map topCountMap = new HashMap();
+
     /** hash by creature name to the Chit (so we can cross away the dead) */
     Map chitMap = new HashMap();
     private SaveWindow saveWindow;
     private final static Font countFont =
-        new Font("Monospaced", Font.PLAIN, 12);
+            new Font("Monospaced", Font.PLAIN, 12);
     private final static String baseString = "--/--/--";
     private final static JLabel baseLabel =
-        new JLabel(baseString, SwingConstants.CENTER);
+            new JLabel(baseString, SwingConstants.CENTER);
     private final static JLabel legendLabel =
-        new JLabel(htmlizeOnly(
+            new JLabel(htmlizeOnly(
             htmlColorizeOnly("Values are: ", "black") +
             htmlColorizeOnly("Total", "blue") +
             htmlColorizeOnly("/", "black") +
@@ -47,7 +63,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
             htmlColorizeOnly("In Game", "green") +
             htmlColorizeOnly("/", "black") +
             htmlColorizeOnly("Dead", "red")));
-    
+
     static
     {
         baseLabel.setFont(countFont);
@@ -110,7 +126,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
         CreatureCount(String name)
         {
             super(new BorderLayout());
-                                
+
             setBorder(BorderFactory.createLineBorder(Color.black));
             if (!(name.equals("Titan")))
             {
@@ -123,16 +139,16 @@ class CreatureCollectionView extends KDialog implements WindowListener
             chitMap.put(name, chit);
             label = new JLabel(baseString, SwingConstants.CENTER);
             topLabel =
-                new JLabel(htmlizeOnly(
-                             htmlColorizeOnly(
-                               Integer.toString(
-                                 client.getCreatureMaxCount(name)), "blue")),
-                           SwingConstants.CENTER);
+                    new JLabel(htmlizeOnly(
+                    htmlColorizeOnly(
+                    Integer.toString(
+                    client.getCreatureMaxCount(name)), "blue")),
+                    SwingConstants.CENTER);
             label.setFont(countFont);
             topLabel.setFont(countFont);
             countMap.put(name, label);
             topCountMap.put(name, topLabel);
-            
+
             // jikes whines because add is defined in both JPanel and JDialog.
             this.add(topLabel, BorderLayout.NORTH);
             this.add(chit, BorderLayout.CENTER);
@@ -155,16 +171,16 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
     private JPanel makeCreaturePanel()
     {
-        java.util.List creatures = Creature.getCreatures();
-        JPanel creaturePanel = 
-            new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
+        List creatures = Creature.getCreatures();
+        JPanel creaturePanel =
+                new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
             creaturePanel.add(new CreatureCount(creature.getName()));
         }
-                        
+
         return creaturePanel;
     }
 
@@ -187,15 +203,15 @@ class CreatureCollectionView extends KDialog implements WindowListener
                 if ((inGameCount < 0) || (inGameCount > maxcount))
                 {
                     Log.error("Something went wrong:" +
-                              " discrepancy between total (" + maxcount + 
-                              "), remaining (" + count + 
-                              ") and dead (" + deadCount +
-                              ") count for creature " + name);
+                            " discrepancy between total (" + maxcount +
+                            "), remaining (" + count +
+                            ") and dead (" + deadCount +
+                            ") count for creature " + name);
                     return;
                 }
-                
-                boolean immortal = 
-                    Creature.getCreatureByName(name).isImmortal();
+
+                boolean immortal =
+                        Creature.getCreatureByName(name).isImmortal();
                 String color;
                 if (count == 0)
                 {
@@ -220,31 +236,27 @@ class CreatureCollectionView extends KDialog implements WindowListener
                     }
                 }
                 String htmlCount =
-                    htmlColorizeOnly((count < 10 ? "0" : "") + 
-                                     Integer.toString(count), color);
-                String htmlTotalCount =
-                    htmlColorizeOnly((maxcount < 10 ? "0" : "") + 
-                                     Integer.toString(maxcount),
-                                     "blue");
+                        htmlColorizeOnly((count < 10 ? "0" : "") +
+                        Integer.toString(count), color);
                 String htmlDeadCount =
-                    htmlColorizeOnly(
-                                     immortal && deadCount == 0 ?
-                                     "--" :
-                                     (deadCount < 10 ? "0" : "") + 
-                                     Integer.toString(deadCount), "red");
+                        htmlColorizeOnly(
+                        immortal && deadCount == 0 ?
+                        "--" :
+                        (deadCount < 10 ? "0" : "") +
+                        Integer.toString(deadCount), "red");
                 String htmlInGameCount =
-                    htmlColorizeOnly((inGameCount < 10 ? "0" : "") + 
-                                     Integer.toString(inGameCount),
-                                     "green");
+                        htmlColorizeOnly((inGameCount < 10 ? "0" : "") +
+                        Integer.toString(inGameCount),
+                        "green");
                 String htmlSlash = htmlColorizeOnly("/", "black");
                 label.setText(htmlizeOnly(htmlCount + htmlSlash +
-                                          htmlInGameCount + htmlSlash +
-                                          htmlDeadCount));
+                        htmlInGameCount + htmlSlash +
+                        htmlDeadCount));
                 JLabel topLabel = (JLabel)topCountMap.get(name);
                 topLabel.setText(htmlizeOnly(htmlColorizeOnly(
-                    Integer.toString(maxcount), "blue")));
+                        Integer.toString(maxcount), "blue")));
             }
-    
+
             repaint();
         }
         catch (NullPointerException ex)
@@ -272,12 +284,6 @@ class CreatureCollectionView extends KDialog implements WindowListener
         return sb.toString();
     }
 
-    /** Wrap the input string with html font color tags. */
-    private static String htmlColorize(String input, String color)
-    {
-        return htmlizeOnly(htmlColorizeOnly(input, color));
-    }
-
     public void dispose()
     {
         super.dispose();
@@ -296,7 +302,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
     {
         java.util.List creatures = Creature.getCreatures();
         // default : 5 creatures wide 
-        
+
         int minSingleX = fixedChitSize + 8;
         if (minSingleX < (int)baseLabel.getPreferredSize().getWidth() + 8)
         {
@@ -305,9 +311,9 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
         int minX = minSingleX * 5;
         int minY = ((fixedChitSize + 8 +
-                     (2 * (int)baseLabel.getPreferredSize().getHeight())) *
-                    ((creatures.size() + 4 ) / 5)) + fixedChitSize;
-        
+                (2 * (int)baseLabel.getPreferredSize().getHeight())) *
+                ((creatures.size() + 4) / 5)) + fixedChitSize;
+
         return new Dimension(minX, minY);
     }
 
