@@ -1636,7 +1636,7 @@ Log.debug("Called Battle.doneReinforcing()");
     /** Return the number of intervening bramble hexes.  If LOS is along a
      *  hexspine, go left if argument left is true, right otherwise.  If
      *  LOS is blocked, return a large number. */
-    private static int countBrambleHexesDir(BattleHex hex1, BattleHex hex2,
+    private int countBrambleHexesDir(BattleHex hex1, BattleHex hex2,
         boolean left, int previousCount)
     {
         int count = previousCount;
@@ -1671,8 +1671,8 @@ Log.debug("Called Battle.doneReinforcing()");
     }
 
     // Return the number of intervening bramble hexes.  If LOS is along a
-    // hexspine and there are two choices, pick the lower one.
-    static int countBrambleHexes(BattleHex hex1, BattleHex hex2)
+    // hexspine and there are two unblocked choices, pick the lower one.
+    int countBrambleHexes(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {
@@ -1705,9 +1705,24 @@ Log.debug("Called Battle.doneReinforcing()");
 
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
-            // Hexspine; try both sides.
-            return Math.min(countBrambleHexesDir(hex1, hex2, true, 0),
-                countBrambleHexesDir(hex1, hex2, false, 0));
+            int strikeElevation = Math.min(hex1.getElevation(), 
+                hex2.getElevation());
+            // Hexspine; try unblocked side(s)
+            if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
+                false, false, false, false, false, 0))
+            {
+                return countBrambleHexesDir(hex1, hex2, false, 0);
+            }
+            else if (isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
+                false, false, false, false, false, 0))
+            {
+                return countBrambleHexesDir(hex1, hex2, true, 0);
+            }
+            else
+            {
+                return Math.min(countBrambleHexesDir(hex1, hex2, true, 0),
+                    countBrambleHexesDir(hex1, hex2, false, 0));
+            }
         }
         else
         {

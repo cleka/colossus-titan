@@ -729,19 +729,6 @@ final class Strike
             return count;
         }
 
-        // Trees block LOS.
-        if (nextHex.getTerrain().equals("Tree"))
-        {
-            return Constants.BIGNUM;
-        }
-
-        // All creatures block LOS.  (There are no height differences on
-        // maps with bramble.)
-        if (client.isOccupied(nextHex))
-        {
-            return Constants.BIGNUM;
-        }
-
         // Add one if it's bramble.
         if (nextHex.getTerrain().equals("Brambles"))
         {
@@ -786,9 +773,24 @@ final class Strike
 
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
-            // Hexspine; try both sides.
-            return Math.min(countBrambleHexesDir(hex1, hex2, true, 0),
-                countBrambleHexesDir(hex1, hex2, false, 0));
+            int strikeElevation = Math.min(hex1.getElevation(), 
+                hex2.getElevation());
+            // Hexspine; try unblocked side(s).
+            if (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
+                false, false, false, false, false, 0))
+            {
+                return countBrambleHexesDir(hex1, hex2, false, 0);
+            }
+            else if (isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
+                false, false, false, false, false, 0))
+            {
+                return countBrambleHexesDir(hex1, hex2, true, 0);
+            }
+            else
+            {
+                return Math.min(countBrambleHexesDir(hex1, hex2, true, 0),
+                    countBrambleHexesDir(hex1, hex2, false, 0));
+            }
         }
         else
         {
