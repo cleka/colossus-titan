@@ -13,6 +13,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
+
 /**
  *  Class Server lives on the server side and handles all communcation with
  *  the clients.  It talks to the server classes locally, and to the Clients
@@ -51,7 +52,7 @@ public final class Server implements IServer
     private ServerSocket serverSocket;
     // list of Socket that are currently active
     private java.util.List activeSocketList =
-        Collections.synchronizedList(new ArrayList());
+            Collections.synchronizedList(new ArrayList());
     private int numClients;
     private int maxClients;
 
@@ -106,7 +107,8 @@ public final class Server implements IServer
 
         if (fileServerThread != null)
         {
-            try {
+            try
+            {
                 Log.debug("Stopping the FileServerThread ");
                 ((FileServerThread)fileServerThread).stopGoingOn();
                 fileServerThread.interrupt();
@@ -118,11 +120,11 @@ public final class Server implements IServer
             }
             fileServerThread = null;
         }
-        
+
         if (!activeSocketList.isEmpty())
         {
             fileServerThread = new FileServerThread(activeSocketList,
-                                                    port + 1);
+                    port + 1);
             fileServerThread.start();
         }
         else
@@ -130,7 +132,7 @@ public final class Server implements IServer
             Log.debug("No active remote client, not lauching the file server.");
         }
     }
-    
+
     private void waitForConnection()
     {
         Socket clientSocket = null;
@@ -138,7 +140,7 @@ public final class Server implements IServer
         {
             clientSocket = serverSocket.accept();
             Log.event("Got client connection from " +
-                clientSocket.getInetAddress().toString());
+                    clientSocket.getInetAddress().toString());
             synchronized (activeSocketList)
             {
                 activeSocketList.add(clientSocket);
@@ -154,7 +156,6 @@ public final class Server implements IServer
 
         new SocketServerThread(this, clientSocket, activeSocketList).start();
     }
-
 
     /** Each server thread's name is set to its player's name. */
     String getPlayerName()
@@ -175,10 +176,9 @@ public final class Server implements IServer
     private boolean isBattleActivePlayer()
     {
         return game.getBattle() != null &&
-            game.getBattle().getActivePlayerName() != null &&
-            getPlayerName().equals(game.getBattle().getActivePlayerName());
+                game.getBattle().getActivePlayerName() != null &&
+                getPlayerName().equals(game.getBattle().getActivePlayerName());
     }
-
 
     private void createLocalClients()
     {
@@ -186,7 +186,7 @@ public final class Server implements IServer
         {
             Player player = game.getPlayer(i);
             if (!player.isDead() &&
-                !player.getType().endsWith(Constants.network))
+                    !player.getType().endsWith(Constants.network))
             {
                 createLocalClient(player.getName());
             }
@@ -199,9 +199,8 @@ public final class Server implements IServer
         IClient client = new Client("127.0.0.1", port, playerName, false);
     }
 
-
     synchronized void addClient(final IClient client, final String playerName,
-        final boolean remote)
+            final boolean remote)
     {
         Log.debug("Called Server.addClient() for " + playerName);
         clients.add(client);
@@ -260,7 +259,6 @@ public final class Server implements IServer
         setPlayerName(name, name);
     }
 
-
     void disposeAllClients()
     {
         Iterator it = clients.iterator();
@@ -282,7 +280,6 @@ public final class Server implements IServer
             }
         }
     }
-
 
     void allUpdatePlayerInfo(boolean treatDeadAsAlive)
     {
@@ -309,7 +306,6 @@ public final class Server implements IServer
         }
     }
 
-
     void allTellMovementRoll(int roll)
     {
         Iterator it = clients.iterator();
@@ -319,7 +315,6 @@ public final class Server implements IServer
             client.tellMovementRoll(roll);
         }
     }
-
 
     public void leaveCarryMode()
     {
@@ -332,19 +327,17 @@ public final class Server implements IServer
         battle.leaveCarryMode();
     }
 
-
     public void doneWithBattleMoves()
     {
         if (!isBattleActivePlayer())
         {
-            Log.error(getPlayerName() + 
-                " illegally called doneWithBattleMoves()");
+            Log.error(getPlayerName() +
+                    " illegally called doneWithBattleMoves()");
             return;
         }
         Battle battle = game.getBattle();
         battle.doneWithMoves();
     }
-
 
     public synchronized void doneWithStrikes()
     {
@@ -360,7 +353,6 @@ public final class Server implements IServer
         }
     }
 
-
     private IClient getClient(String playerName)
     {
         if (clientMap.containsKey(playerName))
@@ -372,7 +364,6 @@ public final class Server implements IServer
             return null;
         }
     }
-
 
     /** Return the name of the first human-controlled client, or null if
      *  all clients are AI-controlled. */
@@ -388,7 +379,6 @@ public final class Server implements IServer
         }
         return null;
     }
-
 
     synchronized void allInitBoard()
     {
@@ -406,7 +396,6 @@ public final class Server implements IServer
             }
         }
     }
-
 
     synchronized void allTellAllLegionLocations()
     {
@@ -442,7 +431,6 @@ public final class Server implements IServer
         }
     }
 
-
     private void showMessageDialog(final String message)
     {
         showMessageDialog(getPlayerName(), message);
@@ -465,7 +453,7 @@ public final class Server implements IServer
     }
 
     void allTellPlayerElim(String playerName, String slayerName,
-        boolean updateHistory)
+            boolean updateHistory)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -489,7 +477,6 @@ public final class Server implements IServer
         }
     }
 
-
     /** Needed if loading game outside the split phase. */
     synchronized void allSetupTurnState()
     {
@@ -498,7 +485,7 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.setupTurnState(game.getActivePlayerName(),
-                game.getTurnNumber());
+                    game.getTurnNumber());
         }
     }
 
@@ -511,13 +498,12 @@ public final class Server implements IServer
             IClient client = getClient(player.getName());
             if (client != null)
             {
-                client.setupSplit(game.getActivePlayerName(), 
-                    game.getTurnNumber());
+                client.setupSplit(game.getActivePlayerName(),
+                        game.getTurnNumber());
             }
         }
         allUpdatePlayerInfo();
     }
-
 
     void allSetupMove()
     {
@@ -549,7 +535,6 @@ public final class Server implements IServer
         }
     }
 
-
     void allSetupBattleSummon()
     {
         Battle battle = game.getBattle();
@@ -558,7 +543,7 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.setupBattleSummon(battle.getActivePlayerName(),
-                battle.getTurnNumber());
+                    battle.getTurnNumber());
         }
     }
 
@@ -570,7 +555,7 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.setupBattleRecruit(battle.getActivePlayerName(),
-                battle.getTurnNumber());
+                    battle.getTurnNumber());
         }
     }
 
@@ -582,7 +567,7 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.setupBattleMove(battle.getActivePlayerName(),
-                battle.getTurnNumber());
+                    battle.getTurnNumber());
         }
     }
 
@@ -596,11 +581,10 @@ public final class Server implements IServer
             if (battle != null)
             {
                 client.setupBattleFight(battle.getPhase(),
-                    battle.getActivePlayerName());
+                        battle.getActivePlayerName());
             }
         }
     }
-
 
     synchronized void allPlaceNewChit(Critter critter)
     {
@@ -609,11 +593,10 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.placeNewChit(critter.getName(),
-                critter.getMarkerId().equals(game.getBattle().getDefenderId()),
-                critter.getTag(), critter.getCurrentHexLabel());
+                    critter.getMarkerId().equals(game.getBattle().getDefenderId()),
+                    critter.getTag(), critter.getCurrentHexLabel());
         }
     }
-
 
     void allRemoveDeadBattleChits()
     {
@@ -625,7 +608,6 @@ public final class Server implements IServer
         }
     }
 
-
     void allHighlightEngagements()
     {
         Iterator it = clients.iterator();
@@ -635,7 +617,6 @@ public final class Server implements IServer
             client.highlightEngagements();
         }
     }
-
 
     void allTellEngagementResults(String winnerId, String method, int points)
     {
@@ -653,10 +634,9 @@ public final class Server implements IServer
         client.nextEngagement();
     }
 
-
     /** Find out if the player wants to acquire an angel or archangel. */
-    synchronized void askAcquireAngel(String playerName, String markerId, 
-        List recruits)
+    synchronized void askAcquireAngel(String playerName, String markerId,
+            List recruits)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion.getHeight() < 7)
@@ -683,7 +663,6 @@ public final class Server implements IServer
             legion.addAngel(angelType);
         }
     }
-
 
     void createSummonAngel(Legion legion)
     {
@@ -714,14 +693,13 @@ public final class Server implements IServer
         game.doSummon(legion, donor, creature);
     }
 
-
     /**
      * Handle mustering for legion.
      * if recruiting with nothing, recruiterName is a non-null String
      * that contains "null".
      */
     public void doRecruit(String markerId, String recruitName,
-        String recruiterName)
+            String recruiterName)
     {
         IClient client = getClient(getPlayerName());
 
@@ -734,7 +712,7 @@ public final class Server implements IServer
         }
 
         if (legion != null && (legion.hasMoved() || game.getPhase() ==
-            Constants.FIGHT) && legion.canRecruit())
+                Constants.FIGHT) && legion.canRecruit())
         {
             legion.sortCritters();
             Creature recruit = null;
@@ -783,9 +761,9 @@ public final class Server implements IServer
         allUpdatePlayerInfo();
 
         int numRecruiters = (recruiter == null ? 0 :
-             TerrainRecruitLoader.numberOfRecruiterNeeded(
-             recruiter, recruit, legion.getCurrentHex().getTerrain(),
-             legion.getCurrentHex().getLabel()));
+                TerrainRecruitLoader.numberOfRecruiterNeeded(
+                recruiter, recruit, legion.getCurrentHex().getTerrain(),
+                legion.getCurrentHex().getLabel()));
         String recruiterName = null;
         if (recruiter != null)
         {
@@ -797,7 +775,7 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.didRecruit(legion.getMarkerId(), recruit.getName(),
-                recruiterName, numRecruiters);
+                    recruiterName, numRecruiters);
         }
 
         List recruiterNames = new ArrayList();
@@ -805,8 +783,8 @@ public final class Server implements IServer
         {
             recruiterNames.add(recruiterName);
         }
-        game.history.revealEvent(true, null, legion.getMarkerId(), 
-            recruiterNames, false);
+        game.history.revealEvent(true, null, legion.getMarkerId(),
+                recruiterNames, false);
         game.history.addCreatureEvent(legion.getMarkerId(), recruit.getName());
     }
 
@@ -821,7 +799,6 @@ public final class Server implements IServer
         }
         game.history.removeCreatureEvent(legion.getMarkerId(), recruitName);
     }
-
 
     public synchronized void engage(String hexLabel)
     {
@@ -840,11 +817,10 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.tellEngagement(hexLabel, attacker.getMarkerId(), 
-                defender.getMarkerId());
+            client.tellEngagement(hexLabel, attacker.getMarkerId(),
+                    defender.getMarkerId());
         }
     }
-
 
     /** Ask ally's player whether he wants to concede with ally. */
     void askConcede(Legion ally, Legion enemy)
@@ -904,7 +880,6 @@ public final class Server implements IServer
         game.doNotFlee(markerId);
     }
 
-
     void twoNegotiate(Legion attacker, Legion defender)
     {
         IClient client1 = getClient(defender.getPlayerName());
@@ -934,7 +909,6 @@ public final class Server implements IServer
         game.fight(hexLabel);
     }
 
-
     public void doBattleMove(int tag, String hexLabel)
     {
         IClient client = getClient(getPlayerName());
@@ -951,8 +925,8 @@ public final class Server implements IServer
         }
     }
 
-    void allTellBattleMove(int tag, String startingHex, String endingHex, 
-        boolean undo)
+    void allTellBattleMove(int tag, String startingHex, String endingHex,
+            boolean undo)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -961,7 +935,6 @@ public final class Server implements IServer
             client.tellBattleMove(tag, startingHex, endingHex, undo);
         }
     }
-
 
     public synchronized void strike(int tag, String hexLabel)
     {
@@ -1016,7 +989,6 @@ public final class Server implements IServer
         battle.applyCarries(target);
     }
 
-
     public void undoBattleMove(String hexLabel)
     {
         if (!isBattleActivePlayer())
@@ -1027,10 +999,9 @@ public final class Server implements IServer
         game.getBattle().undoMove(hexLabel);
     }
 
-
     synchronized void allTellStrikeResults(Critter striker, Critter target,
-        int strikeNumber, List rolls, int damage, int carryDamageLeft,
-        Set carryTargetDescriptions)
+            int strikeNumber, List rolls, int damage, int carryDamageLeft,
+            Set carryTargetDescriptions)
     {
         // Save strike info so that it can be reused for carries.
         this.striker = striker;
@@ -1044,13 +1015,13 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.tellStrikeResults(striker.getTag(), target.getTag(),
-                strikeNumber, rolls, damage, target.isDead(), false,
-                carryDamageLeft, carryTargetDescriptions);
+                    strikeNumber, rolls, damage, target.isDead(), false,
+                    carryDamageLeft, carryTargetDescriptions);
         }
     }
 
-    synchronized void allTellCarryResults(Critter carryTarget, 
-        int carryDamageDone, int carryDamageLeft, Set carryTargetDescriptions)
+    synchronized void allTellCarryResults(Critter carryTarget,
+            int carryDamageDone, int carryDamageLeft, Set carryTargetDescriptions)
     {
         if (striker == null || target == null || rolls == null)
         {
@@ -1073,13 +1044,12 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.tellStrikeResults(striker.getTag(), carryTarget.getTag(), 
-                strikeNumber, rolls, carryDamageDone, carryTarget.isDead(), 
-                true, carryDamageLeft, carryTargetDescriptions);
+            client.tellStrikeResults(striker.getTag(), carryTarget.getTag(),
+                    strikeNumber, rolls, carryDamageDone, carryTarget.isDead(),
+                    true, carryDamageLeft, carryTargetDescriptions);
         }
     }
 
-    
     synchronized void allTellHexDamageResults(Critter target, int damage)
     {
         this.target = target;
@@ -1089,11 +1059,10 @@ public final class Server implements IServer
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.tellStrikeResults(Constants.hexDamage, target.getTag(), 
-                0, null, damage, target.isDead(), false, 0, null);
+            client.tellStrikeResults(Constants.hexDamage, target.getTag(),
+                    0, null, damage, target.isDead(), false, 0, null);
         }
     }
-
 
     /** Takes a Set of PenaltyOptions. */
     void askChooseStrikePenalty(SortedSet penaltyOptions)
@@ -1115,8 +1084,8 @@ public final class Server implements IServer
     {
         if (!isBattleActivePlayer())
         {
-            Log.error(getPlayerName() + 
-                " illegally called assignStrikePenalty()");
+            Log.error(getPlayerName() +
+                    " illegally called assignStrikePenalty()");
             return;
         }
         striker.assignStrikePenalty(prompt);
@@ -1130,11 +1099,10 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.initBattle(masterHexLabel, battle.getTurnNumber(),
-                battle.getActivePlayerName(), battle.getPhase(),
-                battle.getAttackerId(), battle.getDefenderId());
+                    battle.getActivePlayerName(), battle.getPhase(),
+                    battle.getAttackerId(), battle.getDefenderId());
         }
     }
-
 
     void allCleanupBattle()
     {
@@ -1146,7 +1114,6 @@ public final class Server implements IServer
         }
     }
 
-
     public void mulligan()
     {
         if (!isActivePlayer())
@@ -1156,12 +1123,7 @@ public final class Server implements IServer
         }
         int roll = game.mulligan();
         Log.event(getPlayerName() + " takes a mulligan and rolls " + roll);
-        if (roll != -1)
-        {
-            allTellMovementRoll(roll);
-        }
     }
-
 
     public void undoSplit(String splitoffId)
     {
@@ -1172,9 +1134,8 @@ public final class Server implements IServer
         game.getActivePlayer().undoSplit(splitoffId);
     }
 
-
-    void undidSplit(String splitoffId, String survivorId, 
-        boolean updateHistory, int turn)
+    void undidSplit(String splitoffId, String survivorId,
+            boolean updateHistory, int turn)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -1184,8 +1145,8 @@ public final class Server implements IServer
         }
         if (updateHistory)
         {
-            game.history.mergeEvent(splitoffId, survivorId, 
-                game.getTurnNumber());
+            game.history.mergeEvent(splitoffId, survivorId,
+                    game.getTurnNumber());
         }
     }
 
@@ -1193,7 +1154,6 @@ public final class Server implements IServer
     {
         undidSplit(splitoffId, survivorId, true, game.getTurnNumber());
     }
-
 
     public void undoMove(String markerId)
     {
@@ -1213,7 +1173,6 @@ public final class Server implements IServer
         }
     }
 
-
     public void undoRecruit(String markerId)
     {
         if (!isActivePlayer())
@@ -1223,7 +1182,6 @@ public final class Server implements IServer
         game.getActivePlayer().undoRecruit(markerId);
     }
 
-
     public void doneWithSplits()
     {
         if (!isActivePlayer())
@@ -1232,7 +1190,7 @@ public final class Server implements IServer
             return;
         }
         if (game.getTurnNumber() == 1 &&
-            game.getActivePlayer().getNumLegions() == 1)
+                game.getActivePlayer().getNumLegions() == 1)
         {
             showMessageDialog("Must split initial legion");
             return;
@@ -1253,7 +1211,7 @@ public final class Server implements IServer
         // If any legion has a legal non-teleport move, then
         // the player must move at least one legion.
         if (player.legionsMoved() == 0 &&
-            player.countMobileLegions() > 0)
+                player.countMobileLegions() > 0)
         {
             Log.debug("At least one legion must move.");
             showMessageDialog("At least one legion must move.");
@@ -1280,8 +1238,8 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            Log.error(getPlayerName() + 
-                " illegally called doneWithEngagements()");
+            Log.error(getPlayerName() +
+                    " illegally called doneWithEngagements()");
             return;
         }
         // Advance only if there are no unresolved engagements.
@@ -1297,8 +1255,8 @@ public final class Server implements IServer
     {
         if (!isActivePlayer())
         {
-            Log.error(getPlayerName() + 
-                " illegally called doneWithRecruits()");
+            Log.error(getPlayerName() +
+                    " illegally called doneWithRecruits()");
             return;
         }
         Player player = game.getActivePlayer();
@@ -1310,7 +1268,6 @@ public final class Server implements IServer
         game.advancePhase(Constants.MUSTER, getPlayerName());
     }
 
-
     // XXX Notify all players.
     public void withdrawFromGame()
     {
@@ -1321,7 +1278,7 @@ public final class Server implements IServer
         if (legion != null && game.isEngagement(legion.getCurrentHexLabel()))
         {
             slayerName = game.getFirstEnemyLegion(
-                legion.getCurrentHexLabel(), player).getPlayerName();
+                    legion.getCurrentHexLabel(), player).getPlayerName();
         }
         player.die(slayerName, true);
         if (player == game.getActivePlayer())
@@ -1329,7 +1286,6 @@ public final class Server implements IServer
             game.advancePhase(game.getPhase(), getPlayerName());
         }
     }
-
 
     public void setDonor(String markerId)
     {
@@ -1350,7 +1306,6 @@ public final class Server implements IServer
         }
     }
 
-
     private List getPlayerInfo(boolean treatDeadAsAlive)
     {
         List info = new ArrayList(game.getNumPlayers());
@@ -1362,7 +1317,6 @@ public final class Server implements IServer
         }
         return info;
     }
-
 
     public void doSplit(String parentId, String childId, String results)
     {
@@ -1389,10 +1343,10 @@ public final class Server implements IServer
         Legion child = game.getLegionByMarkerId(childId);
         List splitoffs = child.getImageNames();
         activeClient.didSplit(hexLabel, parentId, childId, height, splitoffs,
-            game.getTurnNumber());
+                game.getTurnNumber());
 
-        game.history.splitEvent(parentId, childId, splitoffs, 
-            game.getTurnNumber());
+        game.history.splitEvent(parentId, childId, splitoffs,
+                game.getTurnNumber());
 
         if (!game.getOption(Options.allStacksVisible))
         {
@@ -1405,8 +1359,8 @@ public final class Server implements IServer
             IClient client = (IClient)it.next();
             if (client != activeClient)
             {
-                client.didSplit(hexLabel, parentId, childId, height, 
-                    splitoffs, game.getTurnNumber());
+                client.didSplit(hexLabel, parentId, childId, height,
+                        splitoffs, game.getTurnNumber());
             }
         }
     }
@@ -1416,8 +1370,8 @@ public final class Server implements IServer
     {
         IClient activeClient = getClient(game.getActivePlayerName());
         int childSize = splitoffs.size();
-        activeClient.didSplit(null, parentId, childId, childSize, splitoffs, 
-            turn);
+        activeClient.didSplit(null, parentId, childId, childSize, splitoffs,
+                turn);
 
         if (!game.getOption(Options.allStacksVisible))
         {
@@ -1430,15 +1384,14 @@ public final class Server implements IServer
             IClient client = (IClient)it.next();
             if (client != activeClient)
             {
-                client.didSplit(null, parentId, childId, childSize, splitoffs, 
-                    turn);
+                client.didSplit(null, parentId, childId, childSize, splitoffs,
+                        turn);
             }
         }
     }
 
-
     public void doMove(String markerId, String hexLabel, String entrySide,
-        boolean teleport, String teleportingLord)
+            boolean teleport, String teleportingLord)
     {
         IClient client = getClient(getPlayerName());
         if (!isActivePlayer())
@@ -1451,10 +1404,10 @@ public final class Server implements IServer
         String startingHexLabel = legion.getCurrentHexLabel();
 
         if (game.doMove(markerId, hexLabel, entrySide, teleport,
-            teleportingLord))
+                teleportingLord))
         {
             allTellDidMove(markerId, startingHexLabel, hexLabel, entrySide,
-                teleport);
+                    teleport);
         }
         else
         {
@@ -1463,20 +1416,19 @@ public final class Server implements IServer
     }
 
     void allTellDidMove(String markerId, String startingHexLabel,
-        String endingHexLabel, String entrySide, boolean teleport)
+            String endingHexLabel, String entrySide, boolean teleport)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
             client.didMove(markerId, startingHexLabel, endingHexLabel,
-                entrySide, teleport);
+                    entrySide, teleport);
         }
     }
 
-
-    void allTellAddCreature(String markerId, String creatureName, 
-        boolean updateHistory)
+    void allTellAddCreature(String markerId, String creatureName,
+            boolean updateHistory)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -1490,8 +1442,8 @@ public final class Server implements IServer
         }
     }
 
-    void allTellRemoveCreature(String markerId, String creatureName, 
-        boolean updateHistory)
+    void allTellRemoveCreature(String markerId, String creatureName,
+            boolean updateHistory)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -1512,10 +1464,10 @@ public final class Server implements IServer
         {
             IClient client = (IClient)it.next();
             client.revealCreatures(legion.getMarkerId(),
-                legion.getImageNames());
+                    legion.getImageNames());
         }
-        game.history.revealEvent(true, null, legion.getMarkerId(), 
-            legion.getImageNames(), true);
+        game.history.revealEvent(true, null, legion.getMarkerId(),
+                legion.getImageNames(), true);
     }
 
     /** Call from History during load game only */
@@ -1534,13 +1486,13 @@ public final class Server implements IServer
         IClient client = getClient(playerName);
         if (client != null)
         {
-            client.revealCreatures(legion.getMarkerId(), 
-                legion.getImageNames());
+            client.revealCreatures(legion.getMarkerId(),
+                    legion.getImageNames());
         }
         List li = new ArrayList();
         li.add(playerName);
-        game.history.revealEvent(false, li, legion.getMarkerId(), 
-            legion.getImageNames(), true);
+        game.history.revealEvent(false, li, legion.getMarkerId(),
+                legion.getImageNames(), true);
     }
 
     /** Call from History during load game only */
@@ -1555,7 +1507,6 @@ public final class Server implements IServer
         li.add(playerName);
     }
 
-
     void allFullyUpdateLegionStatus()
     {
         Iterator it = clients.iterator();
@@ -1568,9 +1519,9 @@ public final class Server implements IServer
                 while (it2.hasNext())
                 {
                     Legion legion = (Legion)it2.next();
-                    client.setLegionStatus(legion.getMarkerId(), 
-                        legion.hasMoved(), legion.hasTeleported(),
-                        legion.getEntrySide(), legion.getRecruitName());
+                    client.setLegionStatus(legion.getMarkerId(),
+                            legion.hasMoved(), legion.hasTeleported(),
+                            legion.getEntrySide(), legion.getRecruitName());
                 }
             }
         }
@@ -1597,7 +1548,7 @@ public final class Server implements IServer
             client.revealCreatures(legion.getMarkerId(), creatureNames);
         }
         game.history.revealEvent(true, null, legion.getMarkerId(),
-            creatureNames, false);
+                creatureNames, false);
     }
 
     /** Call from History during load game only */
@@ -1612,7 +1563,6 @@ public final class Server implements IServer
             client.revealCreatures(markerId, creatureNames);
         }
     }
-
 
     // XXX Disallow these in network games?
     public void newGame()
@@ -1633,8 +1583,8 @@ public final class Server implements IServer
     /** Used to change a player name after color is assigned. */
     void setPlayerName(String playerName, String newName)
     {
-        Log.debug("Server.setPlayerName() from " + playerName + " to " + 
-            newName);
+        Log.debug("Server.setPlayerName() from " + playerName + " to " +
+                newName);
         IClient client = getClient(playerName);
         client.setPlayerName(newName);
         clientMap.remove(playerName);
@@ -1642,7 +1592,7 @@ public final class Server implements IServer
     }
 
     synchronized void askPickColor(String playerName,
-                                   final java.util.List colorsLeft)
+            final java.util.List colorsLeft)
     {
         IClient client = getClient(playerName);
         if (client != null)
@@ -1679,8 +1629,8 @@ public final class Server implements IServer
         Player player = game.getPlayer(getPlayerName());
         if (!player.getMarkersAvailable().contains(markerId))
         {
-            Log.error(getPlayerName() + 
-                " illegally called assignFirstMarker()");
+            Log.error(getPlayerName() +
+                    " illegally called assignFirstMarker()");
             return;
         }
         player.setFirstMarker(markerId);
@@ -1704,14 +1654,12 @@ public final class Server implements IServer
         }
     }
 
-
     // XXX We use Server as a hook for PhaseAdvancer to get to options,
     // but this is ugly.
     int getIntOption(String optname)
     {
         return game.getIntOption(optname);
     }
-
 
     void oneSetOption(String playerName, String optname, String value)
     {
