@@ -39,7 +39,8 @@ public class TerrainRecruitLoader
      */
     private static Hashtable carToColor = new Hashtable();
     /**
-     * Map a character (representing a terrain) to a boolean, telling if a Creature can recruit in the usual way or not.
+     * Map a character (representing a terrain) to a boolean,
+     * telling if a Creature can recruit in the usual way or not.
      */
     private static Hashtable carToBelow = new Hashtable();
     /**
@@ -51,17 +52,28 @@ public class TerrainRecruitLoader
      * @see net.sf.colossus.parser.TerrainRecruitLoader.acquirableData
      */
     private static List acquirableList = null;
-
-    /* make sure that all static elements are null or empty when creating a new TerrainRecruitLoader object... */
+    /**
+     * Mapping between a creature's name and the maximum useful number
+     * of said creature (except "Any")
+     */
+    private static Hashtable nameToMUN = new Hashtable();
+    
+    /* make sure that all static elements are null or empty when creating a
+     * new TerrainRecruitLoader object...
+     */
     {
         if (acquirableList != null)
         {
-            Log.debug("TerrainRecruitLoader: Destroying previous ``acquirableList'' ; this should never happen during a game...");
+            Log.debug("TerrainRecruitLoader: Destroying previous " +
+                      "``acquirableList'' ; this should never happen " +
+                      "during a game...");
             acquirableList = null;
         }
         if (terrains != null)
         {
-            Log.debug("TerrainRecruitLoader: Destroying previous ``terrains'' ; this should never happen during a game...");
+            Log.debug("TerrainRecruitLoader: Destroying previous " +
+                      "``terrains'' ; this should never happen during " +
+                      "a game...");
             terrains = null;
         }
         carToRecruits.clear();
@@ -69,6 +81,7 @@ public class TerrainRecruitLoader
         carToDisplayName.clear();
         carToColor.clear();
         carToBelow.clear();
+        nameToMUN.clear();
     }
 
     /**
@@ -81,7 +94,8 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Used internally to associate a creature name and the number of creatures needed to recruit it.
+     * Used internally to associate a creature name and the number of
+     * creatures needed to recruit it.
      * @author Romain Dolbeau
      * @version $Id$
      */
@@ -97,7 +111,8 @@ public class TerrainRecruitLoader
         private final int number;
         /**
          * @param n Name of the creature
-         * @param i Number of creatures needed to recruit it in the terrain considered.
+         * @param i Number of creatures needed to recruit it in the
+         * terrain considered.
          */
         public recruitNumber(String n, int i)
         {
@@ -121,7 +136,8 @@ public class TerrainRecruitLoader
         }
     }
     /**
-     * Give an array of the starting creatures, those available in the first turn and in the Tower.
+     * Give an array of the starting creatures, those available in the first
+     * turn and in the Tower.
      * @return an array of Creature representing the starting creatures.
      * @see net.sf.colossus.server.Creature
      */
@@ -130,7 +146,8 @@ public class TerrainRecruitLoader
         return getStartingCreatures('T');
     }
     /**
-     * Give an array of the starting creatures, those available in the first turn and in a particular kind of Tower.
+     * Give an array of the starting creatures, those available in the first
+     * turn and in a particular kind of Tower.
      * @param terrain The kind of Tower considered.
      * @return an array of Creature representing the starting creatures.
      * @see net.sf.colossus.server.Creature
@@ -246,9 +263,11 @@ public class TerrainRecruitLoader
         return(re);
     }
     /**
-     * Give a modifiable list of all the possible recruiters in a terrain, including the 'Fake' ones.
+     * Give a modifiable list of all the possible recruiters in a terrain,
+     * including the 'Fake' ones.
      * @param terrain Character representing a terrain.
-     * @return List of Creatures that can recruit in the terrain, including the 'Fake' ones.
+     * @return List of Creatures that can recruit in the terrain, including
+     * the 'Fake' ones.
      * @see net.sf.colossus.server.Creature
      */
     private static java.util.List getPossibleFakeRecruiters(char terrain)
@@ -274,10 +293,12 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Give the number of a given recruiters needed to recruit a given Creature.
+     * Give the number of a given recruiters needed to recruit a given
+     * Creature.
      * @param recruiter The Creature that wish to recruit.
      * @param recruit The Creature that is to be recruited.
-     * @param terrain Character representing a terrain, in which the recruiting occurs.
+     * @param terrain Character representing a terrain, in which the
+     * recruiting occurs.
      * @return Number of recruiter needed.
      * @see net.sf.colossus.server.Creature
      */
@@ -311,7 +332,8 @@ public class TerrainRecruitLoader
                 return 0;
         }
         if ((iReer > iRe) && regularRecruit)
-        { // only one to recruit below if possible, except if it is a 0-type recruit.
+        { // only one to recruit below if possible,
+          // except if it is a 0-type recruit.
             int num = (((recruitNumber)al.get(iReFake)).getNumber());
             if (num > 0)
                 return 1;
@@ -351,7 +373,8 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Used internally to record the Acquirable name, points needed for recruitment, and the list of terrains in which the Acquirable dwells.
+     * Used internally to record the Acquirable name, points needed for
+     * recruitment, and the list of terrains in which the Acquirable dwells.
      * @author Romain Dolbeau
      * @version $Id$
      */
@@ -381,7 +404,8 @@ public class TerrainRecruitLoader
         /**
          * Tell if the Acquirable can be Acquired in the terrain.
          * @param t The terrain in which the Acquirements occurs.
-         * @return True if the Acquirable can be acquired here, false otherwise.
+         * @return True if the Acquirable can be acquired here,
+         * false otherwise.
          */
         boolean isAvailable(char t)
         {
@@ -457,10 +481,13 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * To obtain all the Creature that can be acquired at the given amount of points in the given terrain.
+     * To obtain all the Creature that can be acquired at the given amount of
+     * points in the given terrain.
      * @param t The Terrain in which the recruitment occurs.
-     * @param value The number of points at which the recruitment occurs. Valid values are constrained.
-     * @return The list of name (as String) that can be acquired in this terrain, for this amount of points.
+     * @param value The number of points at which the recruitment occurs.
+     * Valid values are constrained.
+     * @return The list of name (as String) that can be acquired in this
+     * terrain, for this amount of points.
      * @see #getAcquirableRecruitmentsValue()
      */
     public static List getRecruitableAcquirableList(char t, int value)
@@ -483,7 +510,8 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Check if the Creature whose name is in parameter is an Acquirable creature or not.
+     * Check if the Creature whose name is in parameter is an Acquirable
+     * creature or not.
      * @param name The name of the Creature inquired.
      * @return If the creature is Acquirable.
      */
@@ -538,6 +566,64 @@ public class TerrainRecruitLoader
     public static int getTitanTeleportValue()
     {
         return titanTeleport;
+    }
+
+    /**
+     * What is the maximum "useful" number of a given creature for
+     * recruitment purpose (excluding "Any" or "AnyNonLord").
+     * return value of -1 or 0 means the Creature cannot recruit except itself.
+     * @param name Name of the creature considered.
+     * @return The higher number of creatures needed to recruit something.
+     */
+    public static int getMaximumUsefulNumber(String name)
+    {
+        char terrains[] = getTerrains();
+        int mun = -1;
+
+        Object munO = nameToMUN.get(name);
+
+        if (munO == null)
+        {
+            for (int i = 0; i < terrains.length ; i++)
+            {
+                ArrayList al =
+                    (ArrayList)carToRecruits.get(new Character(terrains[i]));
+                Iterator it = al.iterator();
+                boolean remember = false;
+                while (it.hasNext())
+                {
+                    recruitNumber tr = (recruitNumber)it.next();
+                    if (remember)
+                    {
+                        if (tr.getNumber() > mun)
+                            mun = tr.getNumber();
+                        remember = false;
+                    }
+                    if (name.equals(tr.getName()))
+                    {
+                        remember = true;
+                    }
+                }
+            }
+            nameToMUN.put(name, new Integer(mun));
+        }
+        else
+        {
+            mun = ((Integer)munO).intValue();
+        }
+        return mun;
+    }
+
+    /**
+     * What is the maximum "useful" number of a given creature for
+     * recruitment purpose (excluding "Any" or "AnyNonLord").
+     * return value of -1 or 0 means the Creature cannot recruit except itself.
+     * @param namecreature Creature considered.
+     * @return The higher number of creatures needed to recruit something.
+     */
+    public static int getMaximumUsefulNumber(Creature creature)
+    {
+        return getMaximumUsefulNumber(creature.getName());
     }
 }
 
