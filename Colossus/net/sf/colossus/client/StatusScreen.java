@@ -91,7 +91,7 @@ final class StatusScreen extends KDialog implements WindowListener
 
         JPanel gridPane = new JPanel();
         contentPane.add(gridPane);
-        gridPane.setLayout(new GridLayout(10, 0));
+        gridPane.setLayout(new GridLayout(9, 0));
         gridPane.setBorder(BorderFactory.createEtchedBorder());
 
         nameLabel = new JLabel[numPlayers];

@@ -71,9 +71,6 @@ public final class PlayerInfo
         setNumCreatures(Integer.parseInt(buf));
 
         buf = (String)data.remove(0);
-        setCreatureValue(Integer.parseInt(buf));
-
-        buf = (String)data.remove(0);
         setTitanPower(Integer.parseInt(buf));
 
         buf = (String)data.remove(0);

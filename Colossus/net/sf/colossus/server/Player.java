@@ -814,7 +814,6 @@ public final class Player implements Comparable
         li.add("" + getNumCreatures());
         li.add("" + getTitanPower());
         li.add("" + getScore());
-        li.add("" + getTotalPointValue());
         li.add("" + getMulligansLeft());
         li.add(Glob.glob(":", getMarkersAvailable()));
 
