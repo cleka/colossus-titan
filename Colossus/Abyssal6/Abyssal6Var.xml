@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<variant name="Abyssal6">
+    <strategic_map filename="Abyssal6Map.xml" />
+    <creatures filename="Abyssal6Cre.xml" />
+    <terrain_recruits filename="Abyssal6Ter.xml" />
+    <depends>
+        <depend variant="ExtTitan" />
+    </depends>
+    <hint classname="Abyssal6.Abyssal6Hint" />
+</variant>
