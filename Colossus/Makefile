@@ -63,7 +63,13 @@ testsources= $(wildcard *Test.java) \
 	$(wildcard net/sf/colossus/parser/*Test.java) \
 	$(wildcard com/werken/opt/*Test.java)
 variantsources=$(wildcard */*.java)
-allsources=$(basesources) $(variantsources)
+xmlsources=\
+	$(wildcard com/bluecast/*/*.java) \
+	$(wildcard org/jdom/*.java) \
+	$(wildcard org/jdom/*/*.java) \
+	$(wildcard org/xml/sax/*.java) \
+	$(wildcard org/xml/sax/*/*.java)
+allsources=$(basesources) $(variantsources) $(xmlsources)
 sources=$(filter-out $(testsources), $(allsources) )
 
 CLASS_FILES = $(sources:%.java=%.class)
@@ -89,9 +95,13 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	net/sf/colossus/parser/AIHintLoader.java \
 	$(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF version 
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
-        net/sf/colossus/client/*.class net/sf/colossus/server/*.class \
-        net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \
-        com/werken/opt/*.class \
+	net/sf/colossus/*/*.class \
+	com/werken/opt/*.class \
+	com/bluecast/*/*.class \
+	org/jdom/*.class \
+	org/jdom/*/*.class \
+	org/xml/sax/*.class \
+	org/xml/sax/*/*.class \
         Default TitanPlus ExtTitan Badlands Outlands Undead \
 	Abyssal6 Abyssal9 \
 	TG-ConceptI TG-ConceptII TG-ConceptIII TG-SetII TG-SetIII TG-Wild \
