@@ -16,6 +16,8 @@ import net.sf.colossus.server.Creature;
  * @author Romain Dolbeau
  */
 
+// XXX Massive code duplication.
+
 final class Strike
 {
     private Client client;
@@ -67,7 +69,9 @@ final class Strike
      *  generate carries, since there's only one target. If
      *  rangestrike is true, also perform rangestrikes for
      *  creatures with only one target, even though they're not
-     *  technically forced. */
+     *  technically forced.
+     *  XXX This method does stuff, rather than just returning 
+     *  information, unlike the rest of the Strike class. */
     synchronized void makeForcedStrikes(boolean rangestrike)
     {
         if (client.getBattlePhase() != Constants.FIGHT && 

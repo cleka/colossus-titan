@@ -917,7 +917,7 @@ Log.debug("Called Player.setType() for " + name + " " + type);
     {
         if (forced || isAI())
         {
-            ai.strike(legion, battle, game);
+            ai.strike(legion, battle);
         }
     }
 

@@ -34,7 +34,7 @@ public interface AI
     boolean concede(Legion legion, Legion enemy, Game game);
 
     /** make battle strikes for legion */
-    void strike(Legion legion, Battle battle, Game game);
+    void strike(Legion legion, Battle battle);
 
     /** choose whether to take a penalty in order to possibly carry */
     PenaltyOption chooseStrikePenalty(SortedSet penaltyOptions);

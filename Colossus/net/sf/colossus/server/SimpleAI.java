@@ -30,6 +30,7 @@ public class SimpleAI implements AI
     }
 
 
+    /** Runs on client side. */
     public String pickColor(Set colors, List favoriteColors)
     {
         Iterator it = favoriteColors.iterator();
@@ -50,6 +51,7 @@ public class SimpleAI implements AI
         return null;
     }
 
+    /** Runs on client side. */
     public String pickMarker(Set markerIds, String preferredShortColor)
     {
         Iterator it = markerIds.iterator();
@@ -649,7 +651,6 @@ Log.debug("recruiters.size() is " + recruiters.size());
 
         return splitoffs;
     }
-
 
     // Split the gargoyles.
     private static List MITsplit(boolean favorTitan, Creature splitCreature,
@@ -1453,18 +1454,18 @@ Log.debug("recruiters.size() is " + recruiters.size());
         return value;
     }
 
-    protected static final int WIN_WITH_MINIMAL_LOSSES = 0;
-    protected static final int WIN_WITH_HEAVY_LOSSES = 1;
-    protected static final int DRAW = 2;
-    protected static final int LOSE_BUT_INFLICT_HEAVY_LOSSES = 3;
-    protected static final int LOSE = 4;
+    static final int WIN_WITH_MINIMAL_LOSSES = 0;
+    static final int WIN_WITH_HEAVY_LOSSES = 1;
+    static final int DRAW = 2;
+    static final int LOSE_BUT_INFLICT_HEAVY_LOSSES = 3;
+    static final int LOSE = 4;
 
     /* can be overloaded by subclass -> not final */
 
-    protected static double RATIO_WIN_MINIMAL_LOSS = 1.30;
-    protected static double RATIO_WIN_HEAVY_LOSS = 1.15;
-    protected static double RATIO_DRAW = 0.85;
-    protected static double RATIO_LOSE_HEAVY_LOSS = 0.70;
+    static double RATIO_WIN_MINIMAL_LOSS = 1.30;
+    static double RATIO_WIN_HEAVY_LOSS = 1.15;
+    static double RATIO_DRAW = 0.85;
+    static double RATIO_LOSE_HEAVY_LOSS = 0.70;
 
     private static int estimateBattleResults(Legion attacker, Legion defender,
         MasterHex hex)
@@ -1833,6 +1834,7 @@ Log.debug("recruiters.size() is " + recruiters.size());
     }
 
 
+    /** Runs on client side. */
     public String acquireAngel(String markerId, List recruits)
     {
         // TODO If the legion is 6 high and can recruit something better,
@@ -1850,8 +1852,8 @@ Log.debug("recruiters.size() is " + recruiters.size());
     }
 
 
-    // Runs on client side.
-    /** Return a string of form angeltype:donorId, or null. */
+    /** Return a string of form angeltype:donorId, or null.
+     *  Runs on client side. */
     public String summonAngel(String summonerId, Client client)
     {
         // Always summon the biggest possible angel, from the least
@@ -1898,7 +1900,7 @@ Log.debug("recruiters.size() is " + recruiters.size());
     }
 
 
-    public void strike(Legion legion, Battle battle, Game game)
+    public void strike(Legion legion, Battle battle)
     {
         // Repeat until no attackers with valid targets remain.
         while (!battle.isOver() && battle.findCrittersWithTargets().size() > 0)
@@ -2613,22 +2615,24 @@ Log.debug("recruiters.size() is " + recruiters.size());
         final int NON_NATIVE_PENALTY_TERRAIN = -10;
         final int FIRST_RANGESTRIKE_TARGET = 30;
         final int EXTRA_RANGESTRIKE_TARGET = 10;
-        final int RANGESTRIKE_TITAN = 10;
+        final int RANGESTRIKE_TITAN = 50;
         final int RANGESTRIKE_WITHOUT_PENALTY = 10;
         final int ATTACKER_ADJACENT_TO_ENEMY = 40;
         final int DEFENDER_ADJACENT_TO_ENEMY = -2;
-        final int ADJACENT_TO_TITAN = 50;
+        final int ADJACENT_TO_TITAN = 130;
         final int ADJACENT_TO_RANGESTRIKER = 50;
-        final int KILL_SCALE_FACTOR = 8;
+        final int KILL_SCALE_FACTOR = 10;
         final int KILLABLE_TARGETS_SCALE_FACTOR = 1;
-        final int GET_KILLED_SCALE_FACTOR = -20;
-        final int GET_HIT_SCALE_FACTOR = -6;
+        final int ATTACKER_GET_KILLED_SCALE_FACTOR = -4;
+        final int DEFENDER_GET_KILLED_SCALE_FACTOR = -13;
+        final int ATTACKER_GET_HIT_SCALE_FACTOR = -2;
+        final int DEFENDER_GET_HIT_SCALE_FACTOR = -4;
         final int TITAN_TOWER_HEIGHT_BONUS = 100;
         final int TITAN_FORWARD_EARLY_PENALTY = -30;
         final int TITAN_BY_EDGE_OR_TREE_BONUS = 40;
         final int DEFENDER_TOWER_HEIGHT_BONUS = 8;
         final int DEFENDER_FORWARD_EARLY_PENALTY = -6;
-        final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -5;
+        final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -10;
 
         int value = 0;
 
@@ -2758,10 +2762,12 @@ Log.debug("recruiters.size() is " + recruiters.size());
                         killValue = Math.max(targetValue, killValue);
                     }
 
-                    // Penalize damage that we can take this turn.
-                    dice = target.getDice(critter);
-                    strikeNum = target.getStrikeNumber(critter);
-                    hitsExpected += Probs.meanHits(dice, strikeNum);
+                    // Penalize damage that we can take this turn,
+                    {
+                        dice = target.getDice(critter);
+                        strikeNum = target.getStrikeNumber(critter);
+                        hitsExpected += Probs.meanHits(dice, strikeNum);
+                    }
                 }
 
                 value += KILL_SCALE_FACTOR * killValue +
@@ -2769,15 +2775,36 @@ Log.debug("recruiters.size() is " + recruiters.size());
 
                 int power = critter.getPower();
                 int hits = critter.getHits();
-                if (hitsExpected + hits >= power)
+
+                // XXX Attacking legions late in battle ignore damage.
+                if (legion == battle.getDefender() || turn <= 4)
                 {
-                    value += GET_KILLED_SCALE_FACTOR *
-                        getKillValue(critter, terrain);
-                }
-                else
-                {
-                    value += GET_HIT_SCALE_FACTOR *
-                        getKillValue(critter, terrain) * hitsExpected / power;
+                    if (hitsExpected + hits >= power)
+                    {
+                        if (legion == battle.getAttacker())
+                        {
+                            value += ATTACKER_GET_KILLED_SCALE_FACTOR * 
+                                getKillValue(critter, terrain);
+                        }
+                        else
+                        {
+                            value += DEFENDER_GET_KILLED_SCALE_FACTOR * 
+                                getKillValue(critter, terrain);
+                        }
+                    }
+                    else
+                    {
+                        if (legion == battle.getAttacker())
+                        {
+                            value += ATTACKER_GET_HIT_SCALE_FACTOR * 
+                                getKillValue(critter, terrain);
+                        }
+                        else
+                        {
+                            value += DEFENDER_GET_HIT_SCALE_FACTOR * 
+                                getKillValue(critter, terrain);
+                        }
+                    }
                 }
             }
         }
@@ -2832,7 +2859,7 @@ Log.debug("recruiters.size() is " + recruiters.size());
                 // exception is small legions early in the battle,
                 // when trying to survive long enough to recruit.
                 int preferredRange = 3;
-                if (legion.getHeight() <= 3 && battle.getTurnNumber() < 4)
+                if (legion.getHeight() <= 3 && turn < 4)
                 {
                     preferredRange = 2;
                 }
