@@ -31,8 +31,8 @@ class Game extends Frame implements WindowListener, ActionListener
         super("Player Setup");
         pack();
         setSize(300, 250);
-        // XXX This should be centered on the screen.
-        setLocation(300, 300);
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(d.width / 2 - 150, d.height / 2 - 125);
         
         setLayout(new GridLayout(0, 2));
 
@@ -254,11 +254,11 @@ class Game extends Frame implements WindowListener, ActionListener
     
     void initStatusScreen()
     {
+        setVisible(false);
         removeAll();
         setTitle("Game Status");
         setLayout(new GridLayout(0, 9));
-        // XXX It would be nice if this were horizontally centered.
-        setLocation(300, 0);
+
 
         // Need to sort player in descending tower order
         sortPlayers();
@@ -303,6 +303,10 @@ class Game extends Frame implements WindowListener, ActionListener
         }
 
         pack();
+        Dimension d1= Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension d2 = getSize();
+        setLocation((d1.width - d2.width) / 2, 0);
+        setVisible(true);
 
         masterboard = new MasterBoard(this);
     }
