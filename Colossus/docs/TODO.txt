@@ -102,9 +102,6 @@ Make BattleMap less tall.
 Highlight entrances somehow.  Maybe use fixed boxes with an arrow to
    show entry side, instead of cascading.
 
-Add display of dead creatures / total creatures / creatures in play to
-   CreatureCollectionView, and some way to toggle between these values.
-
 Write more design docs.
 
 Add SetupBattle dialog, to allow setting up standalone battles.  
