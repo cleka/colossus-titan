@@ -29,3 +29,5 @@
 *.jpeg -k 'b'
 *.class -k 'b'
 *.jar -k 'b'
+
+indent -k 'b'

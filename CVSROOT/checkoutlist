@@ -11,3 +11,6 @@
 #	[<whitespace>]<filename><whitespace><error message><end-of-line>
 #
 # comment lines begin with '#'
+colossus-jacobe.cfg Failed to checkout colossus-jacobe.cfg
+jacobe Failed to checkout jacobe
+indent-commit.sh Failed to checkout indent-commit.sh
