@@ -267,14 +267,14 @@ public class RationalAI implements AI
                 String hexLabel = (String)moveIt.next();
                 MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
                 double risk_payoff1 = evaluateMove(legion, hex, RECRUIT_TRUE,
-                        enemyAttackMap, 2, true);
+                        enemyAttackMap, 1, true);
 
                 valueStack1[move_i] = risk_payoff1;
                 if (child_legion != null)
                 {
                     double risk_payoff2 = evaluateMove(child_legion, hex,
                             RECRUIT_TRUE,
-                            enemyAttackMap, 2, true);
+                            enemyAttackMap, 1, true);
 
                     valueStack2[move_i] = risk_payoff2;
                 }
@@ -344,6 +344,7 @@ public class RationalAI implements AI
         // game by the scooby snack factor
         if (legion.getHeight() < 6)
         {
+            Log.debug("No split: height < 6");
             return;
         }
 
@@ -412,23 +413,15 @@ public class RationalAI implements AI
         Log.debug("Wait for split");
         client.doSplit(legion.getMarkerId(), newMarkerId, results.toString());
 
-        // wait for split to complete on game/server thread  
-        // XXXX WRONG! For some reason we don't detect the update
-        // so we just time out after 10 waits for the moment
-        int num_waits = 0;
-
-        while (num_waits < 10)
+        // do nothing, wait for split to complete on game/server thread  
+        try
         {
-            // do nothing, wait for split to complete on game/server thread  
-            try
-            {
-                Thread.sleep(30);
-            }
-            catch (InterruptedException e)
-            {
-            }
-            num_waits++;
+            Thread.sleep(300);
         }
+        catch (InterruptedException e)
+        {
+        }
+
         Log.debug("Split complete");
 
         if (client.getTurnNumber() == 1)
@@ -453,15 +446,17 @@ public class RationalAI implements AI
             no_split_value += 10000;
         }
 
-        // If expected value of split <= no split, do not split.
+        // If expected value of split + 5 <= no split, do not split.
+        // This gives tendency to split if not under attack.
         // If no_split_value is < -20 , we are under attack and trapped.
         // Do not split.
-        if (split_value <= no_split_value + 12 ||
+        Log.debug("no split value: " + no_split_value);
+        Log.debug("split value: " + split_value);
+        if (split_value * 1.02 <= no_split_value ||
                 split_value < -20)
         {
             // Undo the split  
-            // server.undoSplit(newMarkerId);
-            client.undoLastSplit();
+            client.undoSplit(newMarkerId);
             Log.debug("undo split - better to keep stack together");
         }
         else
@@ -712,11 +707,18 @@ public class RationalAI implements AI
         Iterator sortIt = creaturesThatHaveMustered.iterator();
         boolean split_all_mustered = false;
 
+        /*
+         if (!at_risk)
+         {
+         split_all_mustered = true;
+         }
+         **/
+
         while (sortIt.hasNext() &&
-                (creaturesToRemove.size() < 2 || split_all_mustered))
+                (creaturesToRemove.size() < 2 || split_all_mustered) &&
+                creaturesToRemove.size() < 4)
         {
             Creature critter = (Creature)sortIt.next();
-
             creaturesToRemove.add(critter);
         }
 
@@ -1010,6 +1012,8 @@ public class RationalAI implements AI
      *  updates the client with the results of a move or mulligan. */
     public boolean masterMove()
     {
+        // Log.debug("This is RationalAI.");
+
         boolean failure = false;
 
         PlayerInfo player = client.getPlayerInfo();
@@ -1028,11 +1032,7 @@ public class RationalAI implements AI
         // we're forced to move.
         Map moveMap = new HashMap();
 
-        failure = handleVoluntaryMoves(player, moveMap, enemyAttackMap, false);
-        if (failure)
-        {
-            handleVoluntaryMoves(player, moveMap, enemyAttackMap, true);
-        }
+        handleVoluntaryMoves(player, moveMap, enemyAttackMap);
 
         return false;
     }
@@ -1158,24 +1158,11 @@ public class RationalAI implements AI
 
     }
 
-    /** Return true if we need to recompute after teleports. */
-    private boolean handleVoluntaryMoves(PlayerInfo player, Map moveMap,
-            Map[] enemyAttackMap, boolean retry)
+    private boolean findMoveList(Map[] enemyAttackMap, List markerIds,
+            List all_legionMoves, TreeSet occupiedHexes, boolean teleportsOnly)
     {
         boolean moved = false;
-        List markerIds = player.getLegionIds();
-
-        Log.debug("handleVoluntaryMoves()");
-
-        List all_legionMoves = new ArrayList();
         Iterator it = markerIds.iterator();
-
-        // N.B.!! We must use a multi-set type container here
-        // since a from hex may show up twice in the case of a split
-        // legion and we must not show this hex as available unless
-        // both of the legions move off of the hex.
-        TreeSet fromHexes = new TreeSet();
-
         while (it.hasNext())
         {
             String markerId = (String)it.next();
@@ -1183,24 +1170,13 @@ public class RationalAI implements AI
 
             Log.debug("consider marker " + markerId);
 
-            if (legion.hasMoved())
+            if (legion.hasMoved() && !teleportsOnly)
             {
-                if (!retry)
-                {
-                    Log.debug("Oops.  handleVoluntaryMoves has already been called.");
-                    continue; // try moves again in case server failed to register one.
-                    // return false;
-                }
-                else
-                {
-                    // XXX client does not correctly update hasMoved() for
-                    // previously teleported legion.  This will cause the
-                    // AI to try to move the teleport legion twice.
-                    // This is OK for now since the game will not allow
-                    // the teleported legion to be moved again.
-                    Log.debug("Legion " + markerId + " has already moved.");
-                    continue;
-                }
+                // return if already called
+                Log.debug("Ack.  handleVoluntaryMoves has already been called.");
+                return true;
+                // moved = true;  // note that we have already moved legions
+                // continue;
             }
 
             if (legion.getCurrentHex() == null)
@@ -1216,24 +1192,30 @@ public class RationalAI implements AI
             LegionBoardMove lmove = new LegionBoardMove(markerId,
                     legion.getCurrentHex().getLabel(),
                     legion.getCurrentHex().getLabel(), value, true);
-            legionMoves.add(lmove);
-            fromHexes.add(legion.getCurrentHex().getLabel());
 
-            Log.debug("value of sitting still at hex " + hex.getLabel() + " : " +
-                    value);
+            if (!teleportsOnly)
+            {
+                legionMoves.add(lmove);
+                occupiedHexes.add(legion.getCurrentHex().getLabel());
+
+                Log.debug("value of sitting still at hex " + hex.getLabel() +
+                        " : " +
+                        value);
+            }
 
             // find the expected value of all moves for this legion
             Set set;
-            if (!retry)
+
+            if (!teleportsOnly)
             {
-                set = client.getMovement().listAllMoves(legion,
+                // exclude teleport moves
+                set = client.getMovement().listNormalMoves(legion,
                         legion.getCurrentHex(), client.getMovementRoll());
             }
             else
             {
-                // exclude teleport moves
-                Log.debug("retry: get normal moves only.");
-                set = client.getMovement().listNormalMoves(legion,
+                // only teleport moves
+                set = client.getMovement().listTeleportMoves(legion,
                         legion.getCurrentHex(), client.getMovementRoll());
             }
 
@@ -1269,18 +1251,47 @@ public class RationalAI implements AI
             all_legionMoves.add(legionMoves);
         }
 
+        return moved;
+
+    }
+
+    private void handleVoluntaryMoves(PlayerInfo player, Map moveMap,
+            Map[] enemyAttackMap)
+    {
+        Log.debug("handleVoluntaryMoves()");
+
+        boolean moved = false;
+        List markerIds = player.getLegionIds();
+        List all_legionMoves = new ArrayList();
+
+        // N.B.!! We must use a multi-set type container here
+        // since a from hex may show up twice in the case of a split
+        // legion and we must not show this hex as available unless
+        // both of the legions move off of the hex.
+        TreeSet occupiedHexes = new TreeSet();
+
+        if (findMoveList(enemyAttackMap, markerIds,
+                all_legionMoves, occupiedHexes, false))
+        {
+            return;
+        }
+
         Log.debug("done computing move values for legions");
 
         // handle teleports
         // XXX
         // just take the best teleport.  this is not quite right
         // since it may stick the legion that does not get to
-        // teleport with a really bad move.  it is not really possible
-        // to figure this out though, without splitting off teleport
-        // moves seperately
-        if (client.getMovementRoll() == 6 && !retry)
+        // teleport with a really bad move.  it is not easy
+        // to figure this out though.
+        if (client.getMovementRoll() == 6)
         {
-            ListIterator legit = all_legionMoves.listIterator();
+            List teleport_legionMoves = new ArrayList();
+            TreeSet dummy = new TreeSet();
+            findMoveList(enemyAttackMap, markerIds, teleport_legionMoves, dummy,
+                    true);
+
+            ListIterator legit = teleport_legionMoves.listIterator();
             LegionBoardMove best_move = new LegionBoardMove("", "", "", 0, true);
             double best_value = 0;
             while (legit.hasNext())
@@ -1306,109 +1317,123 @@ public class RationalAI implements AI
                 {
                     Log.debug("found teleport:  " + best_move.markerId + " to " +
                             best_move.toHex + " value " + best_move.val);
-                    doMove(best_move.markerId, best_move.toHex);
-                }
-            }
-
-            return true; // call again
-        }
-
-        // make a copy of the full list of moves in
-        // case we are forced to move a legion
-        List all_legionMovesCopy = new ArrayList(all_legionMoves);
-
-        // Find any legions that have a best move which
-        // is not also a best move for another legion.
-        // In that case, just move the legion
-        ListIterator legit = all_legionMoves.listIterator();
-        while (legit.hasNext())
-        {
-            List legionMoves = (List)legit.next();
-            if (legionMoves.isEmpty())
-            {
-                continue;
-            }
-            LegionBoardMove lm = (LegionBoardMove)legionMoves.get(0);
-            String best_hex = lm.toHex;
-
-            if (fromHexes.contains(best_hex))
-            {
-                // If we are moving into an occupied hex, assume it may
-                // cause a conflict.  This is to handle moving into hexes
-                // where legions have split.
-                continue;
-            }
-            Iterator legit2 = all_legionMoves.iterator();
-            boolean duplicate = false;
-            // Does another legion have this as a best move?
-            while (legit2.hasNext())
-            {
-                List legionMoves2 = (List)legit2.next();
-                if (legionMoves2.isEmpty())
-                {
-                    continue;
-                }
-                LegionBoardMove lm2 = (LegionBoardMove)legionMoves2.get(0);
-
-                // is lm2 == lm1 ?
-                if (lm2.markerId.equals(lm.markerId))
-                {
-                    continue;
-                }
-
-                String best_hex2 = lm2.toHex;
-                if (best_hex2.equals(best_hex))
-                {
-                    duplicate = true; // found a duplicate
-                    Log.debug("Found duplicate for " + lm.markerId + " at " +
-                            lm.toHex + " duplicate is " + lm2.markerId + " at " +
-                            lm2.toHex);
-                    break;
-                }
-            }
-
-            if (!duplicate)
-            {
-                Log.debug("No conflict. Optimum move for " + lm.markerId +
-                        " is " + lm.toHex);
-                if (!lm.noMove)
-                {
-                    boolean moved_legion = doMove(lm.markerId, lm.toHex);
+                    boolean moved_legion = doMove(best_move.markerId,
+                            best_move.toHex);
+                    boolean found = false;
                     if (moved_legion)
                     {
-                        // remove list of moves - we are done with this legion
-                        legit.remove();
-                        fromHexes.remove(lm.fromHex); // hex is now free
+                        // remove list of moves from all_legionMoves - we are done with this legion
+                        Iterator legit2 = all_legionMoves.iterator();
+                        while (legit2.hasNext())
+                        {
+                            List legionMoves2 = (List)legit2.next();
+                            if (legionMoves2.isEmpty())
+                            {
+                                continue;
+                            }
+                            LegionBoardMove lm2 = (LegionBoardMove)legionMoves2.get(0);
+
+                            // is lm2 == lm1 ?
+                            if (lm2.markerId.equals(best_move.markerId))
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found)
+                        {
+                            legit2.remove();
+                        }
+                        occupiedHexes.remove(best_move.fromHex); // hex is now free
+                        occupiedHexes.add(best_move.toHex);
                         moved = true;
                     }
                 }
             }
         }
 
-        Log.debug("done moving legions with no conflicts");
+        /*
+         // Find any legions that have a best move which
+         // is not also a best move for another legion.
+         // In that case, just move the legion.
+         *
+         * KILL this.  In does not correctly handle
+         * legions that are split and must move.  Why?
+         * Because legion A could move to a spot that prevents
+         * split legion B from moving which is illegal.
+         ListIterator legit = all_legionMoves.listIterator();
+         while (legit.hasNext())
+         {
+         List legionMoves = (List)legit.next();
+         if (legionMoves.isEmpty())
+         {
+         continue;
+         }
+         LegionBoardMove lm = (LegionBoardMove)legionMoves.get(0);
+         String best_hex = lm.toHex;
+
+         if (occupiedHexes.contains(best_hex))
+         {
+         // If we are moving into an occupied hex, assume it may
+         // cause a conflict.  This is to handle moving into hexes
+         // where legions have split.
+         continue;
+         }
+         Iterator legit2 = all_legionMoves.iterator();
+         boolean duplicate = false;
+         // Does another legion have this as a best move?
+         while (legit2.hasNext())
+         {
+         List legionMoves2 = (List)legit2.next();
+         if (legionMoves2.isEmpty())
+         {
+         continue;
+         }
+         LegionBoardMove lm2 = (LegionBoardMove)legionMoves2.get(0);
+
+         // is lm2 == lm1 ?
+         if (lm2.markerId.equals(lm.markerId))
+         {
+         continue;
+         }
+
+         String best_hex2 = lm2.toHex;
+         if (best_hex2.equals(best_hex))
+         {
+         duplicate = true; // found a duplicate
+         Log.debug("Found duplicate for " + lm.markerId + " at " +
+         lm.toHex + " duplicate is " + lm2.markerId + " at " +
+         lm2.toHex);
+         break;
+         }
+         }
+
+         if (!duplicate)
+         {
+         Log.debug("No conflict. Optimum move for " + lm.markerId +
+         " is " + lm.toHex);
+         if (!lm.noMove)
+         {
+         boolean moved_legion = doMove(lm.markerId, lm.toHex);
+         if (moved_legion)
+         {
+         // remove list of moves - we are done with this legion
+         legit.remove();
+         occupiedHexes.remove(lm.fromHex); // hex is now free
+         occupiedHexes.add(lm.toHex);
+         moved = true;
+         }
+         }
+         }
+         }
+
+         Log.debug("done moving legions with no conflicts");
+         **/
 
         // find initial optimum, assuming optimum will move a legion
-        boolean conflicted = handleConflictedMoves(all_legionMoves, false,
-                fromHexes);
-        moved = moved || conflicted;
+        boolean conflicted = handleConflictedMoves(all_legionMoves, !moved,
+                occupiedHexes);
 
-        // if optimum is for everyone to stay at the hex they are
-        // in (no move), have to move at least one legion
-        if (!moved)
-        {
-            Log.debug("Ack! Optimum is to not move any legions!" +
-                    " Try again, with constraint that we must move.");
-            // handle forced move.
-            // pass in the original set of moves for ALL legions.
-            // find optimal move with the constraint that one legion
-            // must move.  This could be slow (3^12 = 531k possibilities for
-            // a bad case), but if we are in a position
-            // where the optimum is not to move ANY legions then most
-            // likely we have only a small set of legions.
-            handleConflictedMoves(all_legionMovesCopy, true, fromHexes);
-        }
-
-        return false;
     }
 
     // find optimimum move for a set of legion moves given by all_legionMoves.
@@ -1417,8 +1442,13 @@ public class RationalAI implements AI
     // then we add the constraint that at least one of these legions must
     // move.
     private boolean handleConflictedMoves(List all_legionMoves, boolean mustMove,
-            TreeSet fromHexes)
+            TreeSet occupiedHexes)
     {
+        if (mustMove)
+        {
+            Log.debug("Ack! Combined optimum has constraint that we must move.");
+        }
+
         boolean moved = false;
 
         if (all_legionMoves.size() < 1)
@@ -1443,8 +1473,10 @@ public class RationalAI implements AI
             iter++;
             Set hexes = new HashSet();
             double value = 0;
-            boolean hasMove = false;
-            boolean hasEmptyHexMove = false;
+            boolean hasMove;
+            boolean hasEmptyHexMove;
+            hasEmptyHexMove = false;
+            hasMove = false;
             Log.debug("Considering combined move number: " + iter);
             for (int i = 0; i < all_legionMoves.size(); i++)
             {
@@ -1463,7 +1495,7 @@ public class RationalAI implements AI
 
                 if (!hasEmptyHexMove)
                 {
-                    if (!fromHexes.contains(hex))
+                    if (!occupiedHexes.contains(hex) || lm.noMove)
                     {
                         hasEmptyHexMove = true;
                     }
@@ -1533,12 +1565,14 @@ public class RationalAI implements AI
                 LegionBoardMove lm = (LegionBoardMove)bm.next();
                 // first make moves which are not going to hexes
                 // currently occupied by our legions
-                if (!fromHexes.contains(lm.toHex))
+                if (!occupiedHexes.contains(lm.toHex) ||
+                        lm.fromHex.equals(lm.toHex))
                 {
                     boolean moved_legion = doMove(lm.markerId, lm.toHex);
                     if (moved_legion)
                     {
-                        fromHexes.remove(lm.fromHex); // hex is now free
+                        occupiedHexes.remove(lm.fromHex); // hex is now free
+                        occupiedHexes.add(lm.toHex);
                         bm.remove(); // move has been made
                         moved = true;
                     }
@@ -1675,68 +1709,6 @@ public class RationalAI implements AI
                     {
                         worst_result_this_roll = result;
                     }
-
-                    // value of blocking attacker from
-                    // further attacks
-                    double block = 0;
-
-                    for (int block_roll = roll + 1; block_roll <= 6 &&
-                            client.getTurnNumber() > 6; block_roll++)
-                    {
-                        // find enemy moves we will block
-                        Set enemy_moves = client.getMovement().listNormalMoves(
-                                enemy,
-                                hex, block_roll - roll, hex.getLabel());
-                        Iterator it2 = enemy_moves.iterator();
-                        while (it2.hasNext())
-                        {
-                            // account for the value of blocking enemy attacks
-                            String nextLabel = (String)it2.next();
-                            String ourMarkerId = client.getFirstEnemyLegion(nextLabel,
-                                    enemy.getPlayerName());
-
-                            if (ourMarkerId != null)
-                            {
-                                // can't block attack against yourself
-                                if (ourMarkerId.equals(legion.getMarkerId()))
-                                {
-                                    continue;
-                                }
-
-                                LegionInfo ourLegion = client.getLegionInfo(ourMarkerId);
-                                // confirm this legion belongs to us
-                                if (ourLegion.getPlayerName().equals(legion.getPlayerName()))
-                                {
-                                    Log.debug("block attack at hex " +
-                                            nextLabel);
-                                    MasterHex nextHex = MasterBoard.getHexByLabel(nextLabel);
-                                    double block_value = evaluateCombat(enemy,
-                                            ourLegion, nextHex, enemyAttackMap);
-                                    if (block_value > 0)
-                                    {
-                                        Log.debug("our loss at hex " +
-                                                nextLabel + " is " +
-                                                block_value);
-                                        block += block_value;
-                                    }
-                                }
-                                else
-                                {
-                                    // Log.debug("this is NOT our legion at hex " + nextLabel);
-                                }
-
-                            }
-                        }
-                    }
-                    // Log.debug("block attack value is " + block);
-
-                    // plus (~ value of next best recruit) / 2 / # of other players
-                    block += enemy.getPointValue() /
-                            enemy.getHeight() / 2 /
-                            (client.getNumLivingPlayers() - 1);
-                    // Log.debug("block muster value is " + block);
-                    risk += block; // reward block
-
                 }
                 risk -= worst_result_this_roll;
             }
@@ -1774,7 +1746,7 @@ public class RationalAI implements AI
 
         if (client.getTurnNumber() < NO_ATTACK_BEFORE_TURN)
         {
-            return value - (int)2 * result.getAttackerDead();
+            return value - (int)5 * result.getAttackerDead();
         } // apply penalty to early attacks
 
         // Log.debug("Raw expected value " + value);
@@ -1811,8 +1783,8 @@ public class RationalAI implements AI
                                 -100;
                     }
                 }
-                else if (result.getAttackerDead() > attackerPointValue / 3)
-                // (1/4) will usually be about 2 pieces since titan
+                else if (result.getAttackerDead() > attackerPointValue / 2)
+                // (1/4) will usually be about 3 pieces since titan
                 // will be large part of value
                 {
                     // ack! we'll fuck up our titan group
@@ -1840,10 +1812,8 @@ public class RationalAI implements AI
             if (!attacker.hasTitan() && defenderTitan)
             {
                 // gun for the titan stack if we can knock out
-                // more than 1-2 pieces
-                // (1/5) will usually be about 2 pieces since titan
-                // will be large part of value
-                if (result.getDefenderDead() > defenderPointValue / 4)
+                // more than 80% of the value
+                if (result.getDefenderDead() > defenderPointValue * .8)
                 {
                     // value should be proportional to amount of Titan stack
                     // killed since we may be able to attack with more
@@ -1977,7 +1947,7 @@ public class RationalAI implements AI
             value += stay_at_hex;
 
             // if we are very likely to be attacked and die here then just return value
-            if (value < -20)
+            if (value < -10)
             {
                 return (int)value;
             }
@@ -1992,7 +1962,7 @@ public class RationalAI implements AI
         for (int roll = 1; roll <= 6; roll++)
         {
             Set moves = client.getMovement().listAllMoves(legion, hex, roll);
-            double bestMoveVal = Integer.MIN_VALUE; // moves will include "stay here"
+            double bestMoveVal = stay_at_hex; // can always stay here
             Iterator nextMoveIt = moves.iterator();
 
             while (nextMoveIt.hasNext())
@@ -2015,9 +1985,9 @@ public class RationalAI implements AI
         }
 
         nextTurnValue /= 6.0;     // 1/6 chance of each happening
-        value += nextTurnValue;
+        value += 0.9 * nextTurnValue; // discount future moves some
 
-        Log.debug("   EVAL " + legion +
+        Log.debug("depth " + depth + " EVAL " + legion +
                 (canRecruitHere != RECRUIT_FALSE ? " move to " : " stay in ") +
                 hex + " = " + value);
 
@@ -2143,6 +2113,7 @@ public class RationalAI implements AI
         int defenderKilled = 0;
         int defenderMuster = 0;
         int round;
+        boolean summonedAngel = false;
 
         round_loop:
         for (round = 0; round < 7; round++)
@@ -2151,18 +2122,19 @@ public class RationalAI implements AI
             // If attacker cannot win without angel then this
             // will often leave a weak group with an angel in it
             // that is a scooby snack.  Also, this makes the AI
-            // to aggressive about attacking and too conservative
+            // too aggressive about attacking and too conservative
             // about moving and mustering
             if (I_HATE_HUMANS)
             {
                 // angel call
-                if (round == 1 && defenderKilled > 0)
+                if (!summonedAngel && defenderKilled > 0)
                 {
                     // String summonAngel = summonAngel(attacker.getMarkerId());
                     // if (summonAngel != null)
                     // {
                     PowerSkill angel = new PowerSkill("Angel", 6, 4);
                     defenderCreatures.add(angel);
+                    summonedAngel = true;
                     // }
                 }
             }

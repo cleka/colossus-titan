@@ -113,7 +113,7 @@ public final class LegionInfo
         }
         catch (NullPointerException e)
         {
-            Log.debug("NullPointerException in getContents(). Return empty set of creatures.");
+            // Log.debug("NullPointerException in getContents(). Return empty set of creatures.");
             return new ArrayList();
         }
     }

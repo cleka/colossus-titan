@@ -834,7 +834,7 @@ public class SimpleAI implements AI
             List friendlyLegions = client.getFriendlyLegions(hexLabel,
                     player.getName());
 
-            while (friendlyLegions.size() > 1 &&
+            if (friendlyLegions.size() > 1 &&
                     !client.getMovement().listNormalMoves(legion,
                     legion.getCurrentHex(),
                     client.getMovementRoll()).isEmpty())

@@ -471,6 +471,7 @@ public final class Client implements IClient
     /** Trigger side effects after changing an option value. */
     private void optionTrigger(String optname, String value)
     {
+        Log.event("optionTrigger " + optname + " : " + value);
         boolean bval = Boolean.valueOf(value).booleanValue();
 
         if (optname.equals(Options.antialias))
@@ -557,7 +558,7 @@ public final class Client implements IClient
     {
         options.loadOptions();
         syncOptions();
-        if (!getOption(Options.autoPlay))
+        // if (!getOption(Options.autoPlay))
         {
             runAllOptionTriggers();
         }
@@ -1850,6 +1851,12 @@ public final class Client implements IClient
     void doRecruit(String markerId)
     {
         LegionInfo info = getLegionInfo(markerId);
+        if (isMyTurn() && isMyLegion(markerId) && info.hasRecruited())
+        {
+            undoRecruit(markerId);
+            return;
+        }
+
         if (info == null || !info.canRecruit() || !isMyTurn() ||
                 !isMyLegion(markerId))
         {
@@ -2125,7 +2132,12 @@ public final class Client implements IClient
         if (getOption(Options.autoRecruit) && !isGameOver())
         {
             ai.muster();
-            doneWithRecruits();
+            // Do not automatically say we are done.
+            // Allow humans to override.
+            if (options.getOption(Options.autoPlay))
+            {
+                doneWithRecruits();
+            }
         }
     }
 
@@ -3276,10 +3288,19 @@ public final class Client implements IClient
         if (!isUndoStackEmpty())
         {
             String splitoffId = (String)popUndoStack();
-            server.undoSplit(splitoffId);
-            getPlayerInfo().addMarkerAvailable(splitoffId);
-            numSplitsThisTurn--;
+            undoSplit(splitoffId);
         }
+    }
+
+    // because of synchronization issues we need to
+    // be able to pass an undo split request to the server even if it is not
+    // yet in the client UndoStack
+    void undoSplit(String splitoffId)
+    {
+        server.undoSplit(splitoffId);
+        getPlayerInfo().addMarkerAvailable(splitoffId);
+        numSplitsThisTurn--;
+        Log.debug("called server.undoSplit");
     }
 
     void undoLastMove()
@@ -3312,6 +3333,11 @@ public final class Client implements IClient
             String markerId = (String)popUndoStack();
             server.undoRecruit(markerId);
         }
+    }
+
+    void undoRecruit(String markerId)
+    {
+        server.undoRecruit(markerId);
     }
 
     void undoAllSplits()
@@ -3693,6 +3719,7 @@ public final class Client implements IClient
 
     private void setType(final String aType)
     {
+        Log.debug("Called setType for " + aType);
         String type = new String(aType);
         if (type.endsWith(Constants.anyAI))
         {
@@ -3703,10 +3730,14 @@ public final class Client implements IClient
         {
             type = Constants.aiPackage + type;
         }
+        Log.debug("final type: " + type);
         if (type.endsWith("AI"))
         {
+            Log.debug("new type is AI. current ai is " +
+                    ai.getClass().getName());
             if (!(ai.getClass().getName().equals(type)))
             {
+                Log.debug("need to change type");
                 Log.event("Changing client " + playerName + " from " +
                         ai.getClass().getName() + " to " + type);
                 try
