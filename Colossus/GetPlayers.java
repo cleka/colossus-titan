@@ -37,6 +37,10 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     public static String mapName = "StrategicMap.map";
     public static String recruitName = "Recruit.ter";
+    private static String anyAI = "A Random AI";
+    private static String defaultAI = "SimpleAI";
+    /* aiList should match the class name of available AI */
+    private static String[] aiList = { "SimpleAI", "MinimaxAI" };
 
     private GetPlayers(JFrame parentFrame)
     {
@@ -44,9 +48,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
         /* get the list of the available AI */
         /* not reliable yet */
-        //String[] aiList = getAIList();
-        String[] aiList = { "SimpleAI", "MinimaxAI" }; 
-        /* should match the class name of available AI */
+        // aiList = getAIList();
 
         int ainum = 0, j = 0;
         for (int i = 0 ; i < aiList.length ; i++) 
@@ -56,7 +58,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
                 ainum++;
             }
         }
-        typeChoices = new String[2 + ainum];
+        typeChoices = new String[3 + ainum];
         typeChoices[0] = "Human";
         typeChoices[1] = "None";
         j = 2;
@@ -68,6 +70,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
             }
             j++;
         }
+	typeChoices[2 + ainum] = anyAI;
 
         this.parentFrame = parentFrame;
         setBackground(Color.lightGray);
@@ -151,6 +154,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         playerInfo.clear();
         HashSet namesTaken = new HashSet();
         int numPlayers = 0;
+	Random aiRand = new Random();
 
         for (int i = 0; i < 6; i++)
         {
@@ -163,6 +167,10 @@ public final class GetPlayers extends JDialog implements WindowListener,
                 {
                     return;
                 }
+		if (type.equals(anyAI))
+		{
+		    type = aiList[aiRand.nextInt(aiList.length)];
+		}
                 numPlayers++;
                 String entry = name + "~" + type;
                 playerInfo.add(entry);
@@ -398,6 +406,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         System.exit(0);
     }
 
+    /*
     class AIFilenameFilter implements FilenameFilter 
     {
         public boolean accept(File dir, String name) 
@@ -418,7 +427,6 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
     }
 
-    /*
     public String[] getAIList() 
     { // not working properly yet.
         String [] aiList = new String[maxAIsupported];
