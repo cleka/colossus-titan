@@ -125,8 +125,6 @@ class Hex
 
         FontMetrics fontMetrics = g.getFontMetrics();
         String name = getTerrainName();
-        int fontHeight = fontMetrics.getMaxAscent() +
-            fontMetrics.getLeading();
 
         g.drawString(name, rectBound.x + (rectBound.width -
             fontMetrics.stringWidth(name)) / 2,
@@ -648,10 +646,12 @@ class Hex
             return 2;
         }
 
-        // Bramble, drift, and sand slow non-natives.
+        // Bramble, drift, and sand slow non-natives, except that sand
+        //     doesn't slow fliers.
         if ((terrain == 'r' && !creature.isNativeBramble()) ||
             (terrain == 'd' && !creature.isNativeDrift()) ||
-            (terrain == 's' && !creature.isNativeSandDune()))
+            (terrain == 's' && !creature.isNativeSandDune() &&
+            !creature.flies()))
         {
             return 2;
         }
