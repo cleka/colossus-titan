@@ -292,6 +292,12 @@ class Player
         // Clear old entry side and teleport information.
         game.getBoard().clearAllEntrySides();
 
+        // Hide all stack contents from other players.
+        for (int i = 0; i < numLegions; i++)
+        {
+            legions[i].hideAllCreatures();
+        }
+
         movementRoll = (int) Math.ceil(6 * Math.random());
     }
 
