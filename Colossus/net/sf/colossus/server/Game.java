@@ -1825,7 +1825,7 @@ public final class Game
     /** Return set of hexLabels describing where this legion can move.
      *  Include moves currently blocked by friendly
      *  legions if ignoreFriends is true. */
-    private Set listAllMoves(Legion legion, MasterHex hex, int movementRoll, 
+    Set listAllMoves(Legion legion, MasterHex hex, int movementRoll, 
         boolean ignoreFriends)
     {
         Set set = listNormalMoves(legion, hex, movementRoll, ignoreFriends);
