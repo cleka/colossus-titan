@@ -86,7 +86,7 @@ public final class Player implements Comparable
         }
         else if (color.equals("Blue"))
         {
-            return "Bl";
+            return "Bu";
         }
         else if (color.equals("Brown"))
         {

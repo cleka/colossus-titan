@@ -1,7 +1,20 @@
+Scale Theodore S. Hetke's chits down to 60x60.  Change code to
+   only use one Titan.gif, and to invert chits in realtime rather
+   than using i_*.gif?
+
+Scale David Lum's markers up to 60x60.  Figure out a way to show
+   legion height in a readable fashion.  (Contrasting color, 
+   centered?)
+
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 
 Centralize scale handling.  Add a rescale option.
+
+Paint all chit names and numbers using fonts, to allow for
+   better scaling?
+
+Allow an arbitrary number of undo operations, rather than just one.
 
 Add an option to show information about MasterBoard hexes when a
    mover is selected, such as whether that legion can recruit
