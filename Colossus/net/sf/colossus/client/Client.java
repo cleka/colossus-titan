@@ -17,7 +17,6 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.AI;
 import net.sf.colossus.server.SimpleAI;
 import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Game;
 
 
 /**
@@ -120,6 +119,7 @@ public final class Client
 
     private String currentLookAndFeel = null;
 
+
     public Client(Server server, String playerName, boolean primary)
     {
         this.server = server;
@@ -133,6 +133,7 @@ public final class Client
     {
         return primary;
     }
+
 
     /** Take a mulligan. */
     void mulligan()
@@ -655,7 +656,7 @@ public final class Client
 
 
     /** Get this legion's info.  Create it first if necessary.
-     *  Public for client-side AI -- do not call from server side. */
+     *  public for client-side AI -- do not call from server side. */
     public LegionInfo getLegionInfo(String markerId)
     {
         LegionInfo info = (LegionInfo)legionInfo.get(markerId);
@@ -1420,22 +1421,6 @@ Log.debug("called Client.acquireAngelCallback()");
         }
     }
 
-    // TODO This should be controlled by the client.
-    public void setBattleWaitCursor()
-    {
-        if (map != null)
-        {
-            map.setWaitCursor();
-        }
-    }
-
-    public void setBattleDefaultCursor()
-    {
-        if (map != null)
-        {
-            map.setDefaultCursor();
-        }
-    }
 
     /** Currently used for human players only. */
     void doRecruit(String markerId)

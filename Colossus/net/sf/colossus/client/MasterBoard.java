@@ -15,8 +15,8 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.server.ConfigFileFilter;
-import net.sf.colossus.server.Game;
 import net.sf.colossus.parser.StrategicMapLoader;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.client.VariantSupport;
 
 /**
@@ -313,7 +313,8 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowAllRecruits(masterFrame, Game.getTerrains(), null);
+                new ShowAllRecruits(masterFrame, 
+                    TerrainRecruitLoader.getTerrains(), null);
             }
         };
 

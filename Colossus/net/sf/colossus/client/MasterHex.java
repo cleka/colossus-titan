@@ -5,7 +5,7 @@ import java.util.*;
 import java.awt.*;
 
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Game;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
 /**
@@ -61,22 +61,22 @@ public class MasterHex extends Hex
 
     public String getTerrainName()
     {
-        return (Game.getTerrainName(getTerrain()));
+        return (TerrainRecruitLoader.getTerrainName(getTerrain()));
     }
 
     public String getTerrainDisplayName()
     {
-        return (Game.getTerrainDisplayName(getTerrain()));
+        return (TerrainRecruitLoader.getTerrainDisplayName(getTerrain()));
     }
 
     public static String getTerrainName(char t)
     {
-        return (Game.getTerrainName(t));
+        return (TerrainRecruitLoader.getTerrainName(t));
     }
 
     public Color getTerrainColor()
     {
-        return (Game.getTerrainColor(getTerrain()));
+        return (TerrainRecruitLoader.getTerrainColor(getTerrain()));
     }
 
 

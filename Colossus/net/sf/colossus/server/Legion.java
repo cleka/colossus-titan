@@ -8,6 +8,7 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.BattleMap;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
 /**
@@ -206,11 +207,13 @@ final class Legion implements Comparable
     static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-        Creature[] startCre = game.getStartingCreatures(MasterBoard.getHexByLabel(hexLabel).getTerrain());
-        Legion oLegion = 
+        Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(
+            MasterBoard.getHexByLabel(hexLabel).getTerrain());
+        Legion legion = 
             new Legion(markerId, null, hexLabel, hexLabel,
                        Creature.getCreatureByName("Titan"),
-                       Creature.getCreatureByName(Game.getPrimaryAcquirable()),
+                       Creature.getCreatureByName(
+                           TerrainRecruitLoader.getPrimaryAcquirable()),
                        startCre[2],
                        startCre[2],
                        startCre[0],
@@ -218,18 +221,18 @@ final class Legion implements Comparable
                        startCre[1],
                        startCre[1],
                        playerName, game);
-        return oLegion;
+        return legion;
     }
 
 
     static Legion getEmptyLegion(String markerId, String parentId,
         String hexLabel, String playerName, Game game)
     {
-        Legion oLegion =
+        Legion legion =
             new Legion(markerId, parentId, hexLabel, hexLabel, null,
                        null, null, null, null, null, null, null, 
                        playerName, game);
-        return oLegion;
+        return legion;
     }
 
 
@@ -278,7 +281,7 @@ final class Legion implements Comparable
         Player player = getPlayer();
         int score = player.getScore();
         player.addPoints(points);
-        int value = Game.getAcquirableRecruitmentsValue();
+        int value = TerrainRecruitLoader.getAcquirableRecruitmentsValue();
         int tmpScore = score;
         int tmpPoints = points;
         

@@ -6,8 +6,8 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
-import net.sf.colossus.server.Game;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
@@ -183,7 +183,7 @@ final class SplitLegion extends KDialog implements MouseListener,
                 Chit chit = (Chit)it.next();
                 String id = chit.getId();
                 if (id.startsWith("Titan") ||
-                    id.equals(Game.getPrimaryAcquirable()))
+                    id.equals(TerrainRecruitLoader.getPrimaryAcquirable()))
                 {
                     numLords++;
                 }

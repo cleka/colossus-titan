@@ -7,8 +7,8 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.Game;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
 /**
@@ -52,13 +52,14 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentY(0);
         panel.setBorder(BorderFactory.createLineBorder(Color.black));
-        panel.setBackground(Game.getTerrainColor(terrain));
+        panel.setBackground(TerrainRecruitLoader.getTerrainColor(terrain));
 
         JLabel terrainLabel = new JLabel(MasterHex.getTerrainName(terrain));
         terrainLabel.setAlignmentX(Label.CENTER_ALIGNMENT);
         panel.add(terrainLabel);
 
-        java.util.List creatures = Game.getPossibleRecruits(terrain);
+        java.util.List creatures = 
+            TerrainRecruitLoader.getPossibleRecruits(terrain);
         Iterator it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
@@ -75,8 +76,8 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
             }
             else
             {
-                numToRecruit = Game.numberOfRecruiterNeeded(prevCreature,
-                    creature, terrain);
+                numToRecruit = TerrainRecruitLoader.numberOfRecruiterNeeded(
+                    prevCreature, creature, terrain);
             }
     
             JLabel numToRecruitLabel = new JLabel("", JLabel.CENTER);

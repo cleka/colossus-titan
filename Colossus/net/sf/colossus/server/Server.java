@@ -8,6 +8,7 @@ import javax.swing.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
 /**
@@ -191,7 +192,7 @@ Log.debug("called Server.makeForcedStrikes() " + playerName + " " + rangestrike)
 
     void allAddMarkers()
     {
-        java.util.List markerIds = game.getAllLegionIds();
+        List markerIds = game.getAllLegionIds();
         Iterator it = markerIds.iterator();
         while (it.hasNext())
         {
@@ -297,6 +298,7 @@ Log.debug("called Server.makeForcedStrikes() " + playerName + " " + rangestrike)
         }
     }
 
+    // XXX Do not pass hexLabels -- let clients calculate them.
     void allSetupMuster()
     {
         Set hexLabels = game.findAllEligibleRecruitHexes();
@@ -457,13 +459,18 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
     // XXX delete add logic to client
-    /** Return a list of creature name strings. */
-    public java.util.List findEligibleRecruiters(String markerId,
-        String recruitName)
+    /** Return a list of Creatures. */
+    public List findEligibleRecruits(String markerId, String hexLabel)
     {
-        java.util.List creatures = 
-            game.findEligibleRecruiters(markerId, recruitName);
-        java.util.List strings = new ArrayList();
+        return game.findEligibleRecruits(markerId, hexLabel);
+    }
+
+    // XXX delete add logic to client
+    /** Return a list of creature name strings. */
+    public List findEligibleRecruiters(String markerId, String recruitName)
+    {
+        List creatures = game.findEligibleRecruiters(markerId, recruitName);
+        List strings = new ArrayList();
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
@@ -513,8 +520,8 @@ Log.debug("called Server.createSummonAngel for " + legion);
     {
         allUpdatePlayerInfo();
 
-        int numRecruiters = Game.numberOfRecruiterNeeded(recruiter, recruit, 
-            legion.getCurrentHex().getTerrain());
+        int numRecruiters = TerrainRecruitLoader.numberOfRecruiterNeeded(
+            recruiter, recruit, legion.getCurrentHex().getTerrain());
         String recruiterName = null;
         if (recruiter != null)
         {
@@ -703,6 +710,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
+    // XXX delete add logic to client
     /** Return a set of hexLabels. */
     public Set findMobileCritters()
     {
@@ -710,6 +718,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
         return battle.findMobileCritters();
     }
 
+    // XXX delete add logic to client
     /** Return a set of hexLabels. */
     public Set showBattleMoves(int tag)
     {
@@ -717,13 +726,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
         return battle.showMoves(tag);
     }
 
-    /** Return a set of hexLabels. */
-    public Set findStrikes(int tag)
-    {
-        Battle battle = game.getBattle();
-        return battle.findStrikes(tag);
-    }
-
+    // XXX delete add logic to client
     /** Return a set of hexLabels. */
     public Set findCrittersWithTargets()
     {
@@ -731,6 +734,13 @@ Log.debug("called Server.createSummonAngel for " + legion);
         return battle.findCrittersWithTargets();
     }
 
+    // XXX delete add logic to client
+    /** Return a set of hexLabels. */
+    public Set findStrikes(int tag)
+    {
+        Battle battle = game.getBattle();
+        return battle.findStrikes(tag);
+    }
 
     void allTellStrikeResults(Critter striker, Critter target,
         int strikeNumber, int [] rolls, int damage, int carryDamageLeft, 
@@ -1175,7 +1185,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
 
     void allRevealCreature(Legion legion, String creatureName)
     {
-        java.util.List names = new ArrayList();
+        List names = new ArrayList();
         names.add(creatureName);
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -1186,14 +1196,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
-
-    /** Return a list of Creatures. */
-    public List findEligibleRecruits(String markerId, String hexLabel)
-    {
-        return game.findEligibleRecruits(markerId, hexLabel);
-    }
-
-
+    // XXX delete add logic to client
     /** Return a set of hexLabels. */
     public Set listTeleportMoves(String markerId)
     {
@@ -1202,6 +1205,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
             legion.getPlayer().getMovementRoll(), false);
     }
 
+    // XXX delete add logic to client
     /** Return a set of hexLabels. */
     public Set listNormalMoves(String markerId)
     {
@@ -1211,6 +1215,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
+    // XXX delete add logic to client
     /** Return an int which is all possible entry sides (1, 3, 5)
      *  added together. */
     public Set getPossibleEntrySides(String markerId, String hexLabel,

@@ -10,7 +10,7 @@ import javax.swing.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.parser.BattlelandLoader;
-import net.sf.colossus.server.Game;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.client.VariantSupport;
 
@@ -58,7 +58,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     /** Set up a static non-GUI hex map for each terrain type. */
     static
     {
-        char [] terrains = Game.getTerrains();
+        char [] terrains = TerrainRecruitLoader.getTerrains();
         for (int t = 0; t < terrains.length; t++)
         {
             char terrain = terrains[t];
@@ -154,7 +154,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private synchronized static void setupHexesGameState(char terrain, 
         BattleHex [][] h)
     {
-        java.util.List directories = VariantSupport.getBattlelandsDirectoriesList();
+        java.util.List directories = 
+            VariantSupport.getBattlelandsDirectoriesList();
         InputStream batIS = ResourceLoader.getInputStream(
                                            MasterHex.getTerrainName(terrain),
                                            directories);

@@ -14,7 +14,6 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.GUIMasterHex;
-import net.sf.colossus.server.Game;
 
 /**
  * StrategicMapLoader load the description of the MasterBoard.
@@ -142,7 +141,7 @@ int oneCase(MasterHex [][] h, java.util.List list, boolean show[][], boolean isG
         //nPosX = posX-1;
         //nPosY = (posY-1)/2;
         Log.debug("Adding case #" + p + " @(" + posX + "," + posY +
-            "), type " + Game.getTerrainName(ter) + " with exit : " +
+            "), type " + ter + " with exit : " +
             s1 + ", " + s2 + ", " + s3);
         if (isGUI)
             h[posX][posY] = new GUIMasterHex();

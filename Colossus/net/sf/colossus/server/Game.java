@@ -50,7 +50,9 @@ public final class Game
     private Server server;
     // Negotiation
     private Set [] proposals = new HashSet[2];
-    private static TerrainRecruitLoader trl;
+
+    // XXX Can we completely eliminate this reference and go all static?
+    private TerrainRecruitLoader trl;
     private LinkedList colorPickOrder = new LinkedList();
     private Set colorsLeft;
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
@@ -74,13 +76,14 @@ public final class Game
         Creature.loadCreatures(); /* try to load creatures */
         try /* try to load the Recruits database */
         {
-            java.util.List directories = VariantSupport.getVarDirectoriesList();
+            java.util.List directories = 
+                VariantSupport.getVarDirectoriesList();
             InputStream terIS = ResourceLoader.getInputStream(
-                                               VariantSupport.getRecruitName(),
-                                               directories);
+                VariantSupport.getRecruitName(), directories);
             if (terIS == null) 
             {
-                throw new FileNotFoundException(VariantSupport.getRecruitName());
+                throw new FileNotFoundException(
+                    VariantSupport.getRecruitName());
             }
             trl = new TerrainRecruitLoader(terIS);
             while (trl.oneTerrain() >= 0) {}
@@ -91,6 +94,7 @@ public final class Game
             System.exit(1);
         }
     }
+
 
     private void initServerAndClients()
     {
@@ -1504,110 +1508,6 @@ public final class Game
     }
 
 
-    /** Return a modifiable list of creatures that can be recruited in
-     *  the given terrain, ordered from lowest to highest. */
-    public static java.util.List getPossibleRecruits(char terrain)
-    {
-        java.util.List recruits = trl.getPossibleRecruits(terrain);
-        return recruits;
-    }
-
-    /** Return a list of creatures that can recruit in
-     *  the given terrain, unordered */
-    public static java.util.List getPossibleRecruiters(char terrain)
-    {
-        java.util.List recruits = trl.getPossibleRecruiters(terrain);
-        return recruits;
-    }
-
-    /** Return the number of the given recruiter needed to muster the given
-      * recruit in the given terrain.  Return an impossibly big number
-      * if the recruiter can't muster that recruit in that terrain. */
-    public static int numberOfRecruiterNeeded(Creature recruiter, Creature
-        recruit, char terrain)
-    {
-        return trl.numberOfRecruiterNeeded(recruiter,recruit,terrain);
-    }
-
-    /**
-     * To obtain all the Creature that can be Acquired.
-     * @return The list of name (as String) that can be Acquired
-     */
-    public static java.util.List getAcquirableList()
-    {
-        return trl.getAcquirableList();
-    }
-
-    /**
-     * Check if the Creature whose name is in parameter is an Acquirable creature or not.
-     * @param name The name of the Creature inquired.
-     * @return If the creature is Acquirable.
-     */
-    public static boolean isAcquirable(String name)
-    {
-        return trl.isAcquirable(name);
-    }
-
-    /**
-     * Check if the Creature in parameter is an Acquirable creature or not.
-     * @param c The Creature inquired.
-     * @return If the creature is Acquirable.
-     */
-    public static boolean isAcquirable(Creature c)
-    {
-        return isAcquirable(c.getName());
-    }
-
-    /**
-     * To obtain all the Creature that can be acquired at the given amount of points in the given terrain.
-     * @param t The Terrain in which the recruitement occurs.
-     * @param value The number of points at which the recruitement occurs. Valid values are constrained.
-     * @return The list of name (as String) that can be acquired in this terrain, for this amount of points.
-     * @see #getAcquirableRecruitmentsValue()
-     */
-    public static java.util.List getRecruitableAcquirableList(char t, int value)
-    {
-        return trl.getRecruitableAcquirableList(t,value);
-    }
-
-    /**
-     * To obtain the base amount of points needed for Acquirement.
-     * All Acquirements must occur at even multiple of this.
-     * @return The base amount of points needed for Acquirement.
-     */
-    public static int getAcquirableRecruitmentsValue()
-    {
-        return trl.getAcquirableRecruitmentsValue();
-    }
-    
-    /**
-     * To obtain the first Acquirable (aka 'primary') Creature name.
-     * This one is the starting Lord with the Titan.
-     * @return The name of the primary Acquirable Creature.
-     */
-    public static String getPrimaryAcquirable()
-    {
-        return trl.getPrimaryAcquirable();
-    }
-
-    /**
-     * To obtain the base amount of points needed for Titan improvement.
-     * @return The base amount of points needed for Titan improvement.
-     */
-    public static int getTitanImprovementValue()
-    {
-        return trl.getTitanImprovementValue();
-    }
-
-    /**
-     * To obtain the amount of points needed for Titan Teleport.
-     * @return The amount of points needed for Titan Teleport.
-     */
-    public static int getTitanTeleportValue()
-    {
-        return trl.getTitanTeleportValue();
-    }
-
     /** Return a list of eligible recruits, as Creatures. */
     java.util.List findEligibleRecruits(String markerId, String hexLabel)
     {
@@ -1618,10 +1518,12 @@ public final class Game
         char terrain = hex.getTerrain();
 
         recruits = new ArrayList();
-        java.util.List temprecruits = getPossibleRecruits(terrain);
-        java.util.List recruiters = getPossibleRecruiters(terrain);
+        java.util.List tempRecruits = 
+            TerrainRecruitLoader.getPossibleRecruits(terrain);
+        java.util.List recruiters = 
+            TerrainRecruitLoader.getPossibleRecruiters(terrain);
 
-        ListIterator lit = temprecruits.listIterator();
+        ListIterator lit = tempRecruits.listIterator();
             
         while (lit.hasNext())
         {
@@ -1630,8 +1532,8 @@ public final class Game
             while (liter.hasNext())
             {
                 Creature lesser = (Creature)liter.next();
-                if ((numberOfRecruiterNeeded(lesser, creature, terrain) <=
-                     legion.numCreature(lesser)) &&
+                if ((TerrainRecruitLoader.numberOfRecruiterNeeded(lesser, 
+                    creature, terrain) <= legion.numCreature(lesser)) &&
                     (recruits.indexOf(creature) == -1))
                 {
                     recruits.add(creature);
@@ -1668,13 +1570,13 @@ public final class Game
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
 
-        recruiters = getPossibleRecruiters(terrain);
+        recruiters = TerrainRecruitLoader.getPossibleRecruiters(terrain);
         Iterator it = recruiters.iterator();
         while (it.hasNext())
         {
             Creature possibleRecruiter = (Creature)it.next();
-            int needed = numberOfRecruiterNeeded(possibleRecruiter,
-                                                 recruit, terrain);
+            int needed = TerrainRecruitLoader.numberOfRecruiterNeeded(
+                possibleRecruiter, recruit, terrain);
             if (needed < 1 || needed > legion.numCreature(possibleRecruiter))
             {
                 // Zap this possible recruiter.
@@ -1697,8 +1599,8 @@ public final class Game
         if (recruiter != null)
         {
             // Mark the recruiter(s) as visible.
-            numRecruiters = numberOfRecruiterNeeded(recruiter,
-                recruit, hex.getTerrain());
+            numRecruiters = TerrainRecruitLoader.numberOfRecruiterNeeded(
+                recruiter, recruit, hex.getTerrain());
         }
 
         Log.event("Legion " + legion.getLongMarkerName() + " in " +
@@ -1723,7 +1625,8 @@ public final class Game
         }
         java.util.List recruits = new ArrayList();
         char t = legion.getCurrentHex().getTerrain();
-        java.util.List allRecruits = getRecruitableAcquirableList(t, score);
+        java.util.List allRecruits = 
+            TerrainRecruitLoader.getRecruitableAcquirableList(t, score);
         java.util.Iterator it = allRecruits.iterator();
         while (it.hasNext())
         {
@@ -1765,8 +1668,9 @@ public final class Game
         String hexLabel = player.getTower();
 
         caretaker.takeOne(Creature.getCreatureByName("Titan"));
-        caretaker.takeOne(Creature.getCreatureByName(getPrimaryAcquirable()));
-        Creature[] startCre = trl.getStartingCreatures(
+        caretaker.takeOne(Creature.getCreatureByName(
+            TerrainRecruitLoader.getPrimaryAcquirable()));
+        Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(
             MasterBoard.getHexByLabel(hexLabel).getTerrain());
         caretaker.takeOne(startCre[2]);
         caretaker.takeOne(startCre[2]);
@@ -3136,6 +3040,7 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
     }
 
 
+    // XXX delete after adding logic to client
     Set findAllEligibleRecruitHexes()
     {
         Player player = getActivePlayer();
@@ -3155,42 +3060,6 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
             }
         }
         return set;
-    }
-
-
-    // XXX Need to eliminate calls to the methods below that
-    // cross the future network interface.
-
-    /** Return an array of the 3 starting tower creatures. */
-    static Creature [] getStartingCreatures()
-    {
-        return trl.getStartingCreatures();
-    }
-
-    /** Return an array of the 3 starting tower creatures. */
-    static Creature [] getStartingCreatures(char t)
-    {
-        return trl.getStartingCreatures(t);
-    }
-
-    public static char[] getTerrains()
-    {
-        return trl.getTerrains();
-    }
-
-    public static String getTerrainName(char t)
-    {
-        return trl.getTerrainName(t);
-    }
-
-    public static String getTerrainDisplayName(char t)
-    {
-        return trl.getTerrainDisplayName(t);
-    }
-
-    public static Color getTerrainColor(char t)
-    {
-        return trl.getTerrainColor(t);
     }
 
 

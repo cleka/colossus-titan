@@ -16,6 +16,7 @@ import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionInfo;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 
 /**
  * Simple implementation of a Titan AI
@@ -547,7 +548,8 @@ public class SimpleAI implements AI
      *  split out. */
     static List doInitialGameSplit(String label)
     {
-        Creature[] startCre = Game.getStartingCreatures(MasterBoard.getHexByLabel(label).getTerrain());
+        Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(
+            MasterBoard.getHexByLabel(label).getTerrain());
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
         final boolean oddTower = "100".equals(label) || "300".equals(label)
@@ -593,7 +595,8 @@ public class SimpleAI implements AI
     private static List CMUsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature, String label)
     {
-        Creature[] startCre = Game.getStartingCreatures(MasterBoard.getHexByLabel(label).getTerrain());
+        Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(
+            MasterBoard.getHexByLabel(label).getTerrain());
         List splitoffs = new LinkedList();
 
         if (favorTitan)
@@ -607,7 +610,8 @@ public class SimpleAI implements AI
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName(Game.getPrimaryAcquirable()));
+                splitoffs.add(Creature.getCreatureByName(
+                    TerrainRecruitLoader.getPrimaryAcquirable()));
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(nonsplitCreature);
                 splitoffs.add(splitCreature);
@@ -621,7 +625,8 @@ public class SimpleAI implements AI
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName(Game.getPrimaryAcquirable()));
+                splitoffs.add(Creature.getCreatureByName(
+                    TerrainRecruitLoader.getPrimaryAcquirable()));
             }
 
             if (Game.rollDie() <= 3)
@@ -646,7 +651,8 @@ public class SimpleAI implements AI
     private static List MITsplit(boolean favorTitan, Creature splitCreature,
         Creature nonsplitCreature, String label)
     {
-        Creature[] startCre = Game.getStartingCreatures(MasterBoard.getHexByLabel(label).getTerrain());
+        Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(
+            MasterBoard.getHexByLabel(label).getTerrain());
         List splitoffs = new LinkedList();
 
         if (favorTitan)
@@ -660,7 +666,8 @@ public class SimpleAI implements AI
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName(Game.getPrimaryAcquirable()));
+                splitoffs.add(Creature.getCreatureByName(
+                    TerrainRecruitLoader.getPrimaryAcquirable()));
                 splitoffs.add(splitCreature);
                 splitoffs.add(splitCreature);
                 splitoffs.add(startCre[1]);
@@ -674,7 +681,8 @@ public class SimpleAI implements AI
             }
             else
             {
-                splitoffs.add(Creature.getCreatureByName(Game.getPrimaryAcquirable()));
+                splitoffs.add(Creature.getCreatureByName(
+                    TerrainRecruitLoader.getPrimaryAcquirable()));
             }
 
             if (Game.rollDie() <= 3)

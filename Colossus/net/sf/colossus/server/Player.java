@@ -6,6 +6,7 @@ import java.io.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
 /**
@@ -267,7 +268,8 @@ Log.debug("Called Player.setType() for " + name + " " + type);
 
     boolean canTitanTeleport()
     {
-        return (score >= Game.getTitanTeleportValue() && !hasTeleported());
+        return (score >= TerrainRecruitLoader.getTitanTeleportValue() && 
+            !hasTeleported());
     }
 
 
@@ -334,7 +336,8 @@ Log.debug("Called Player.setType() for " + name + " " + type);
 
     int getTitanPower()
     {
-        return (int)(6 + (getScore() / Game.getTitanImprovementValue()));
+        return (int)(6 + (getScore() / 
+            TerrainRecruitLoader.getTitanImprovementValue()));
     }
 
 

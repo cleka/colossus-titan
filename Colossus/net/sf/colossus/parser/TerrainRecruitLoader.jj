@@ -25,38 +25,38 @@ public class TerrainRecruitLoader
     /**
      * Map a character (representing a terrain) to a list of recruits.
      */
-    Hashtable carToRecruits = new Hashtable();
+    private static Hashtable carToRecruits = new Hashtable();
     /**
      * Map a character (representing a terrain) to a terrain name.
      */
-    Hashtable carToName = new Hashtable();
+    private static Hashtable carToName = new Hashtable();
     /**
      * Map a character (representing a terrain) to a terrain display name.
      */
-    Hashtable carToDisplayName = new Hashtable();
+    private static Hashtable carToDisplayName = new Hashtable();
     /**
      * Map a character (representing a terrain) to a terrain color.
      */
-    Hashtable carToColor = new Hashtable();
+    private static Hashtable carToColor = new Hashtable();
     /**
      * Map a character (representing a terrain) to a boolean, telling if a Creature can recruit in the usual way or not.
      */
-    Hashtable carToBelow = new Hashtable();
+    private static Hashtable carToBelow = new Hashtable();
     /**
      * All the character that are valid terrains.
      */
-    private char[] terrains = null;
+    private static char[] terrains = null;
     /**
      * The list of Acquirable Creature, as acquirableData
      * @see net.sf.colossus.parser.TerrainRecruitLoader.acquirableData
      */
-    private List acquirableList = null;
+    private static List acquirableList = null;
 
     /**
      * Return an array of all the char representing a valid terrain.
      * @return An array of char, each representing a valid terrain.
      */
-    public char[] getTerrains()
+    public static char[] getTerrains()
     {
         return (char [])terrains.clone();
     }
@@ -116,7 +116,7 @@ public class TerrainRecruitLoader
      * @return an array of Creature representing the starting creatures.
      * @see net.sf.colossus.server.Creature
      */
-    public Creature[] getStartingCreatures(char terrain)
+    public static Creature[] getStartingCreatures(char terrain)
     {
         Creature[] bc = new Creature[3];
         java.util.List to = getPossibleRecruits(terrain);
@@ -130,7 +130,7 @@ public class TerrainRecruitLoader
      * @param tc Character representing a terrain.
      * @return The name of the terrain as a String.
      */
-    public String getTerrainName(char tc)
+    public static String getTerrainName(char tc)
     {
         return((String)carToName.get(new Character(tc)));
     }
@@ -139,7 +139,7 @@ public class TerrainRecruitLoader
      * @param tc Character representing a terrain.
      * @return The display name of the terrain as a String.
      */
-    public String getTerrainDisplayName(char tc)
+    public static String getTerrainDisplayName(char tc)
     {
         return((String)carToDisplayName.get(new Character(tc)));
     }
@@ -148,7 +148,7 @@ public class TerrainRecruitLoader
      * @param tc Character representing a terrain.
      * @return The color of the terrain as Color.
      */
-    public java.awt.Color getTerrainColor(char tc)
+    public static java.awt.Color getTerrainColor(char tc)
     {
         return((java.awt.Color)carToColor.get(new Character(tc)));
     }
@@ -158,7 +158,7 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can be recruited in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public java.util.List getPossibleRecruits(char terrain)
+    public static java.util.List getPossibleRecruits(char terrain)
     {
         ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
         ArrayList re = new ArrayList();
@@ -182,7 +182,7 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can recruit in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public java.util.List getPossibleRecruiters(char terrain)
+    public static java.util.List getPossibleRecruiters(char terrain)
     {
         ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
         ArrayList re = new ArrayList();
@@ -232,7 +232,7 @@ public class TerrainRecruitLoader
      * @return List of Creatures that can recruit in the terrain, including the 'Fake' ones.
      * @see net.sf.colossus.server.Creature
      */
-    private java.util.List getPossibleFakeRecruiters(char terrain)
+    private static java.util.List getPossibleFakeRecruiters(char terrain)
     {
         ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
         ArrayList re = new ArrayList();
@@ -262,7 +262,8 @@ public class TerrainRecruitLoader
      * @return Number of recruiter needed.
      * @see net.sf.colossus.server.Creature
      */
-    public int numberOfRecruiterNeeded(Creature recruiter, Creature recruit, char terrain)
+    public static int numberOfRecruiterNeeded(Creature recruiter, 
+        Creature recruit, char terrain)
     {
         ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
         java.util.List pc = getPossibleRecruits(terrain);
@@ -419,7 +420,7 @@ public class TerrainRecruitLoader
      * All Acquirements must occur at even multiple of this.
      * @return The base amount of points needed for Acquirement.
      */
-    public int getAcquirableRecruitmentsValue()
+    public static int getAcquirableRecruitmentsValue()
     {
         acquirableData ad = (acquirableData)acquirableList.get(0);
         return ad.getValue();
@@ -430,7 +431,7 @@ public class TerrainRecruitLoader
      * This one is the starting Lord with the Titan.
      * @return The name of the primary Acquirable Creature.
      */
-    public String getPrimaryAcquirable()
+    public static String getPrimaryAcquirable()
     {
         acquirableData ad = (acquirableData)acquirableList.get(0);
         return ad.getName();
@@ -443,7 +444,7 @@ public class TerrainRecruitLoader
      * @return The list of name (as String) that can be acquired in this terrain, for this amount of points.
      * @see #getAcquirableRecruitmentsValue()
      */
-    public List getRecruitableAcquirableList(char t, int value)
+    public static List getRecruitableAcquirableList(char t, int value)
     {
         List al = new ArrayList();
         if ((value % getAcquirableRecruitmentsValue()) != 0)
@@ -492,15 +493,15 @@ public class TerrainRecruitLoader
     }
 
     /** Base amount of points needed for Titan improvement. */
-    int titanImprove = 100;
+    private static int titanImprove = 100;
     /** Amount of points needed for Titan Teleport. */
-    int titanTeleport = 400;
+    private static int titanTeleport = 400;
 
     /**
      * To obtain the base amount of points needed for Titan improvement.
      * @return The base amount of points needed for Titan improvement.
      */
-    public int getTitanImprovementValue()
+    public static int getTitanImprovementValue()
     {
         return titanImprove;
     }
@@ -509,7 +510,7 @@ public class TerrainRecruitLoader
      * To obtain the amount of points needed for Titan Teleport.
      * @return The amount of points needed for Titan Teleport.
      */
-    public int getTitanTeleportValue()
+    public static int getTitanTeleportValue()
     {
         return titanTeleport;
     }
