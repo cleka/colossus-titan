@@ -826,9 +826,10 @@ public class Battle
         Player player = getActivePlayer();
         TreeSet set = new TreeSet();
 
-        for (int i = 0; i < getNumCritters(); i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            Critter critter = getCritter(i);
+            Critter critter = (Critter)it.next();
             if (critter.getPlayer() == player)
             {
                 if (countStrikes(critter) > 0)
@@ -936,9 +937,10 @@ public class Battle
         if (!adjacentEnemy && critter.isRangestriker() &&
             getPhase() != STRIKEBACK)
         {
-            for (int i = 0; i < getNumCritters(); i++)
+            Iterator it = critters.iterator();
+            while (it.hasNext())
             {
-                Critter target = getCritter(i);
+                Critter target = (Critter)it.next();
                 if (target.getPlayer() != player && !target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
@@ -975,9 +977,10 @@ public class Battle
     {
         TreeSet set = new TreeSet();
         
-        for (int i = 0; i < getNumCritters(); i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            Critter target = getCritter(i);
+            Critter target = (Critter)it.next();
             if (target.getCarryFlag())
             {
                 set.add(target.getCurrentHex().getLabel());

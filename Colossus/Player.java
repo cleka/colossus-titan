@@ -9,9 +9,9 @@ import java.util.*;
 public class Player
 {
     private String name;
-    private String color;       // Black, Blue, Brown, Gold, Green, Red
-    private int startingTower;  // 1-6
-    private double score;    // track half-points, then round
+    private String color;              // Black, Blue, Brown, Gold, Green, Red
+    private int startingTower;         // 1-6
+    private double score;              // track half-points, then round
     private boolean canSummonAngel = true;
     private String playersEliminated;  // RdBkGr
 

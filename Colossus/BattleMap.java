@@ -150,7 +150,6 @@ public class BattleMap extends Frame implements MouseListener,
         }
         imagesLoaded = true;
 
-        // XXX Does this fix the problem of the chit not showing up?
         chit.repaint();
     }
 
@@ -397,6 +396,7 @@ public class BattleMap extends Frame implements MouseListener,
 
     // Return the Critter whose chit contains the given point,
     //   or null if none does.
+    // XXX Use an iterator?
     private Critter getCritterWithChitContainingPoint(Point point)
     {
         int numCritters = battle.getNumCritters();
@@ -559,6 +559,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
 
         // Draw chits from back to front.
+        // XXX Use an iterator?
         for (int i = battle.getNumCritters() - 1; i >= 0; i--)
         {
             Chit chit = battle.getCritter(i).getChit();
