@@ -5,7 +5,6 @@ import java.util.*;
 
 import net.sf.colossus.client.IClient;
 
-
 /**
  *  IServer is an interface for the client-accessible parts of Server.
  *  @version $Id$
@@ -78,8 +77,6 @@ public interface IServer
     public void assignColor(String color);
 
     public void assignFirstMarker(String markerId);
-
-    public void relayChatMessage(String target, String text);
 
     // XXX Disallow the following methods in network games
     public void newGame();

@@ -1764,31 +1764,4 @@ public final class Server implements IServer
             client.log(message);
         }
     }
-
-    public void relayChatMessage(String target, String text)
-    {
-        String from = getPlayerName();
-        if (target.equals(Constants.all))
-        {
-            Iterator it = clients.iterator();
-            while (it.hasNext())
-            {
-                IClient client = (IClient)it.next();
-                client.showChatMessage(from, text);
-            }
-        }
-        else
-        {
-            IClient client = getClient(target);
-            if (client != null)
-            {
-                client.showChatMessage(from, text);
-            }
-            client = getClient(from);
-            if (client != null)
-            {
-                client.showChatMessage(from, text);
-            }
-        }
-    }
 }

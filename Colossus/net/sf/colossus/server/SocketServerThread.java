@@ -293,12 +293,6 @@ final class SocketServerThread extends Thread implements IClient
             String markerId = (String)args.remove(0);
             server.assignFirstMarker(markerId);
         }
-        else if (method.equals(Constants.relayChatMessage))
-        {
-            String target = (String)args.remove(0);
-            String text = (String)args.remove(0);
-            server.relayChatMessage(target, text);
-        }
         else if (method.equals(Constants.newGame))
         {
             server.newGame();
@@ -647,11 +641,6 @@ final class SocketServerThread extends Thread implements IClient
     public void log(String message)
     {
         out.println(Constants.log + sep + message);
-    }
-
-    public void showChatMessage(String from, String text)
-    {
-        out.println(Constants.showChatMessage + sep + from + sep + text);
     }
 
     public void nakSplit(String parentId)

@@ -232,7 +232,7 @@ public final class Constants
 
     // Protocol packet type constants
     /** XXX If any of the args in the protocol contain this string, then
-     *  the protocol will break.  Escape it for chat. */
+     *  the protocol will break. */
     public static final String protocolTermSeparator=" ~ ";
 
     // From client to server
@@ -272,7 +272,6 @@ public final class Constants
     public static final String assignColor = "assignColor";
     public static final String assignFirstMarker = "assignFirstMarker";
     public static final String askPickFirstMarker = "askPickFirstMarker";
-    public static final String relayChatMessage = "relayChatMessage";
     //public static final String newGame = "newGame";
     //public static final String loadGame = "loadGame";
     //public static final String saveGame = "saveGame";
@@ -331,7 +330,6 @@ public final class Constants
     public static final String didSplit = "didSplit";
     public static final String askPickColor = "askPickColor";
     public static final String log = "log";
-    public static final String showChatMessage = "showChatMessage";
     public static final String nakSplit = "nakSplit";
     public static final String nakMove = "nakMove";
     public static final String nakRecruit = "nakRecruit";

@@ -57,7 +57,6 @@ public final class Options
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";
     public static final String showLogWindow = "Show log window";
-    public static final String showChat = "Show chat";
     public static final String useOverlay = "Use Graphical Overlay";
     public static final String noBaseColor = "Use black overlay on Chits";
     public static final String useColoredBorders = 

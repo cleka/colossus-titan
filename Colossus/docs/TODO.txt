@@ -17,9 +17,6 @@ Bug: The duplicate name detection code for network players is now
    failing with the new initialization timing -- oscillating fixNames
    between dripton and dripton4
 
-Bug: Chat window went modal and started beeping.  Killing it from the
-   Graphics menu worked.
-
 Bug: 2-high titan stack did not run away even though it could be caught
    on 4-6 by a 6-high stack:
 Gold rolls a 4 for movement
@@ -52,8 +49,6 @@ EASY Compute numLegions, numMarkers, numCreatures, titan power, total point valu
 EASY Indicate which players have titan teleport in StatusScreen.
 
 EASY Disable "AIs stop when humans dead" if no human players at start of game.
-
-EASY Colorize chat window.
 
 EASY Make inverting defending units optional.
 

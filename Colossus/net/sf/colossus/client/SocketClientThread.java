@@ -455,12 +455,6 @@ Log.debug("End of SocketClientThread while loop");
                 client.log(message);
             }
         }
-        else if (method.equals(Constants.showChatMessage))
-        {
-            String from = (String)args.remove(0);
-            String text = (String)args.remove(0);
-            client.showChatMessage(from, text);
-        }
         else if (method.equals(Constants.nakSplit))
         {
             String parentId = (String)args.remove(0);
@@ -690,11 +684,6 @@ Log.debug("End of SocketClientThread while loop");
     public void assignFirstMarker(String markerId)
     {
         out.println(Constants.assignFirstMarker + sep + markerId);
-    }
-
-    public void relayChatMessage(String target, String text)
-    {
-        out.println(Constants.relayChatMessage + sep + target + sep + text);
     }
 
     // XXX Disallow the following methods in network games

@@ -42,7 +42,6 @@ public final class Client implements IClient
     private CreatureCollectionView caretakerDisplay;
     private SummonAngel summonAngel;
     private MovementDie movementDie;
-    private Chat chat;
     private EngagementResults engagementResults;
 
     /** hexLabel of MasterHex for current or last engagement. */
@@ -527,10 +526,6 @@ public final class Client implements IClient
                 Log.disposeLogWindow();
             }
         }
-        else if (optname.equals(Options.showChat))
-        {
-            updateChat();
-        }
         else if (optname.equals(Options.showStatusScreen))
         {
             updateStatusScreen();
@@ -675,35 +670,6 @@ public final class Client implements IClient
 
         // XXX Should be called somewhere else, just once.
         setupPlayerLabel();
-        updateChat();
-    }
-
-    private void updateChat()
-    {
-        if (getNumPlayers() < 1)
-        {
-            // Called too early.
-            return;
-        }
-        if (getOption(Options.showChat))
-        {
-            if (chat == null && board != null)
-            {
-                chat = new Chat(this);
-            }
-        }
-        else
-        {
-            if (board != null)
-            {
-                board.twiddleOption(Options.showChat, false);
-            }
-            if (chat != null)
-            {
-                chat.dispose();
-            }
-            chat = null;
-        }
     }
 
 
@@ -3781,23 +3747,6 @@ Log.error("Got nak for split of " + parentId);
         Log.event(message);
     }
 
-    void sendChatMessage(String target, String text)
-    {
-        server.relayChatMessage(target, text);
-    }
-
-    public void showChatMessage(String from, String text)
-    {
-        if (chat != null)
-        {
-            chat.append(from + ": " + text);
-        }
-        else if (board != null)  // Only log chats for human players.
-        {
-            Log.debug("Chat " +  from + ": " + text);
-        }
-    }
-
     public static String getVersion()
     {
         byte [] bytes = new byte[8];  // length of an ISO date
@@ -3913,7 +3862,7 @@ Log.error("Got nak for split of " + parentId);
 
     private void focusMap()
     {
-        if (map == null || chat != null)
+        if (map == null)
         {
             return;
         }
@@ -3923,7 +3872,7 @@ Log.error("Got nak for split of " + parentId);
 
     private void focusBoard()
     {
-        if (board == null || chat != null)
+        if (board == null)
         {
             return;
         }
