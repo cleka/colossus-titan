@@ -100,7 +100,6 @@ class Concede extends Dialog implements ActionListener
         imagesLoaded = true;
         setVisible(true);
         repaint();
-System.out.println("Done with init");
     }
 
 
@@ -154,7 +153,14 @@ System.out.println("Done with init");
             friend.removeLegion();
 
             // Add points, and angels if necessary.
-            enemy.addPoints(points, true);
+            enemy.addPoints(points);
+
+            // If this was the titan stack, its owner dies and gives half
+            // points to the victor.
+            if (friend.numCreature(Creature.titan) == 1) 
+            {
+                friend.getPlayer().die(enemy.getPlayer());
+            }
 
             // Exit this dialog.
             dispose();
