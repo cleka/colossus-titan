@@ -545,15 +545,13 @@ public final class Client implements IClient
         }
     }
 
-    /** Save player options to a file.  The current format is standard
-     *  java.util.Properties keyword=value. */
+    /** Save player options to a file. */
     void saveOptions()
     {
         options.saveOptions();
     }
 
-    /** Load player options from a file. The current format is standard
-     *  java.util.Properties keyword=value */
+    /** Load player options from a file. */
     private void loadOptions()
     {
         options.loadOptions();

@@ -132,9 +132,7 @@ JDK 1.4 changes:
    JFormattedTextField for some inputs?
    Logging API?
    asserts (make sure they're on)
-   Preferences instead of Properties?
    NetworkInterface / localhost
-   LinkedHash*, IdentityHashMap, etc.
 
 Make split prediction optional.
 
