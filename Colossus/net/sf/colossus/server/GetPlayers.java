@@ -454,7 +454,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
                            ResourceLoader.keyContentType));
                 readme.setDocument(doc);
                 if (maxPlayers != VariantSupport.getMaxPlayers())
+                {
                     enablePlayers();
+                }
             }
         }
     }
@@ -537,7 +539,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
                     readme.setContentType(prop);
                     readme.setDocument(doc);
                     if (maxPlayers != VariantSupport.getMaxPlayers())
+                    {
                         enablePlayers();
+                    }
                 }
             }
             else

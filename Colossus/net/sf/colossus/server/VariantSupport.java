@@ -49,6 +49,7 @@ public final class VariantSupport
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
         return loadVariant(tempVarName, tempVarDirectory);
     }
+
     /**
      * Load a Colossus Variant from the specified filename in the specified path.
      * @param tempVarName The name of the file holding the Variant definition.

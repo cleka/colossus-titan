@@ -290,12 +290,14 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The Document, or null if it was not found.
      */
-    public static Document getDocument(String filename, java.util.List directories)
+    public static Document getDocument(String filename, 
+        java.util.List directories)
     {
         InputStream htmlIS = getInputStream(filename + ".html", directories);
         if (htmlIS != null)
         {
-            try {
+            try 
+            {
                 HTMLEditorKit htedk = new HTMLEditorKit();
                 HTMLDocument htdoc = new HTMLDocument(htedk.getStyleSheet());
                 htdoc.putProperty(keyContentType,"text/html");
@@ -311,11 +313,16 @@ public final class ResourceLoader
         }
         InputStream textIS = getInputStream(filename + ".txt", directories);
         if (textIS == null)
+        {
             textIS = getInputStream(filename, directories);
+        }
         if (textIS != null)
         {
-            try {
-                PlainDocument txtdoc = new PlainDocument();
+            try 
+            {
+                // Must be a StyledDocument not a PlainDocument for
+                // JEditorPane.setDocument()
+                StyledDocument txtdoc = new DefaultStyledDocument();
                 char[] buffer = new char[128];
                 InputStreamReader textISR = new InputStreamReader(textIS);
                 int read = 0;
