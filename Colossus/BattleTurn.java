@@ -126,6 +126,12 @@ class BattleTurn extends Dialog implements ActionListener
     }
 
 
+    int getTurnNumber()
+    {
+        return turnNumber;
+    }
+
+
     void advancePhase()
     {
         if (phase == SUMMON || phase == RECRUIT)
