@@ -429,7 +429,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             {
                 return(true);
             }
-            if (f.getName().endsWith(".var"))
+            if (f.getName().endsWith(Constants.varEnd))
             {
                 return(true);
             }
@@ -458,7 +458,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             if (doc != null)
             {
                 String name = varFile.getName();
-                name = name.substring(0, name.lastIndexOf(".var"));
+                name = name.substring(0, name.lastIndexOf(Constants.varEnd));
                 options.setOption(Options.variant, name);
                 readme.setContentType((String)doc.getProperty(
                         ResourceLoader.keyContentType));
@@ -520,7 +520,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             if (!(Constants.getVariantList().contains(varName)))
             {
                 String buttonName = varName.substring(0,
-                        varName.lastIndexOf(".var"));
+                        varName.lastIndexOf(Constants.varEnd));
                 if (variantBox.getItemCount() > Constants.numVariants)
                 {
                     variantBox.removeItemAt(Constants.numVariants);
@@ -537,7 +537,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
             {
                 int maxPlayers = VariantSupport.getMaxPlayers();
                 String value = (String)variantBox.getSelectedItem();
-                if (VariantSupport.getVarName().equals(value + ".var"))
+                if (VariantSupport.getVarName().equals(value +
+                        Constants.varEnd))
                 { // re-selecting the same ; do nothing
                 }
                 else

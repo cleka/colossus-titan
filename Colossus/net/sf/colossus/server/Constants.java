@@ -150,7 +150,8 @@ public final class Constants
     public static final String sectionDefensiveAI = "DefensiveAI:";
 
     /** Default VAR file */
-    public static final String defaultVARFile = "Default.var";
+    public static final String defaultVARFile = "DefaultVar.xml";
+    public static final String varEnd = "Var.xml";
 
     /** markers name are mapped in this one */
     public static final String markersNameFile = "MarkersName";

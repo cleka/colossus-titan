@@ -44,7 +44,7 @@ public final class VariantSupport
      */
     public static void freshenVariant(String variantName)
     {
-        freshenVariant(variantName + "Var.xml", variantName);
+        freshenVariant(variantName + Constants.varEnd, variantName);
     }
 
     /**
@@ -83,7 +83,7 @@ public final class VariantSupport
     public static Document loadVariant(String variantName,
             boolean serverSide)
     {
-        return loadVariant(variantName + "Var.xml", variantName,
+        return loadVariant(variantName + Constants.varEnd, variantName,
                 serverSide);
     }
 
