@@ -1,3 +1,16 @@
+Bug: snap1042861855278.xml 
+- addCreature() Gr09(26): Unicorn Unicorn* Unicorn* Warbear Warbear Ranger Ranger : Archangel
+net.sf.colossus.client.PredictSplitsException: Tried adding to 7-high legion
+at net.sf.colossus.client.Node.addCreature(PredictSplits.java:890)
+at net.sf.colossus.client.LegionInfo.addCreature(LegionInfo.java:211)
+at net.sf.colossus.client.Client.addCreature(Client.java:1087)
+at net.sf.colossus.client.SocketClientThread.callMethod(SocketClientThread.java:163)
+at net.sf.colossus.client.SocketClientThread.parseLine(SocketClientThread.java:105)
+at net.sf.colossus.client.SocketClientThread.run(SocketClientThread.java:86)
+(Legion is actually 6 high -- one of those rangers isn't really there.  Missed a RemoveCreature?)
+
+Bug: ShowLegion appears in wrong place when MasterBoard is scrolled.
+
 Bug: AI player sometimes leaves reinforcements offboard unnecessarily.
 
 Bug: AI player didn't move at start of turn 2.  Just froze.
