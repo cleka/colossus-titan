@@ -2658,7 +2658,7 @@ public final class Game
             loser,
             losingPlayer.equals(getActivePlayer()));
 
-        server.allRemoveLegion(loser.getMarkerId());
+        // server.allRemoveLegion(loser.getMarkerId());
 
         // Remove the dead legion.
         loser.remove();

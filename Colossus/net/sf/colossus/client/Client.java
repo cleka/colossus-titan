@@ -971,15 +971,17 @@ public final class Client implements IClient, IOracle, IOptions
         return Collections.unmodifiableList(markers);
     }
 
+    LegionInfo createLegionInfo(String markerId)
+    {
+    	LegionInfo info = new LegionInfo(markerId, this);
+        legionInfo.put(markerId, info);
+        return info;
+    }
+
     /** Get this legion's info.  Create it first if necessary. */
     LegionInfo getLegionInfo(String markerId)
     {
         LegionInfo info = (LegionInfo)legionInfo.get(markerId);
-        if (info == null)
-        {
-            info = new LegionInfo(markerId, this);
-            legionInfo.put(markerId, info);
-        }
         return info;
     }
 
@@ -1052,7 +1054,12 @@ public final class Client implements IClient, IOracle, IOptions
     // public for IOracle
     public List getLegionImageNames(String markerId)
     {
-        return getLegionInfo(markerId).getImageNames();
+    	LegionInfo info = getLegionInfo(markerId);
+    	if(info != null)
+    	{
+    		return info.getImageNames();
+    	}
+    	return new ArrayList();
     }
 
     /** Return a list of Booleans */
@@ -1094,7 +1101,13 @@ public final class Client implements IClient, IOracle, IOptions
         info.removeCreature(name);
         if (height <= 1)
         {
-            removeLegion(markerId);
+        	// dont remove this, sever will give explicit order to remove it
+        	// removeLegion(markerId);
+        }
+        if (height <= 1 && getTurnNumber() == -1)
+        {
+        	// hack to remove legions correctly durin load
+        	removeLegion(markerId);
         }
         if (board != null)
         {
@@ -1110,6 +1123,7 @@ public final class Client implements IClient, IOracle, IOptions
         if (predictSplits == null || getPredictSplits(pName) == null)
         {
             initPredictSplits(pName, markerId, names);
+            createLegionInfo(markerId);
         }
         getLegionInfo(markerId).revealCreatures(names);
     }
@@ -3765,11 +3779,20 @@ public final class Client implements IClient, IOracle, IOptions
     {
         Log.debug("Client.didSplit " + hexLabel + " " + parentId + " " +
             childId + " " + childHeight + " " + turn);
-        LegionInfo childInfo = getLegionInfo(childId);
-        childInfo.setHexLabel(hexLabel);
 
         LegionInfo parentInfo = getLegionInfo(parentId);
+        LegionInfo childInfo = createLegionInfo(childId);
         parentInfo.split(childHeight, childId, turn);
+
+        childInfo.setHexLabel(hexLabel);
+
+        if (board != null)
+        {
+            Marker marker = new Marker(3 * Scale.get(), childId,
+                board.getFrame(), this);
+            setMarker(childId, marker);
+            board.alignLegions(hexLabel);
+        }
 
         if (isMyLegion(childId))
         {

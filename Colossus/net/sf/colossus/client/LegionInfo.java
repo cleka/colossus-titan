@@ -36,12 +36,16 @@ public final class LegionInfo
     private boolean teleported;
     private int entrySide;
     private boolean recruited;
-
+    PredictSplitNode myNode;
+    boolean isMyLegon;
+    
     LegionInfo(String markerId, Client client)
     {
         this.markerId = markerId;
         this.playerName = client.getPlayerNameByMarkerId(markerId);
         this.client = client;
+        myNode=null;
+        isMyLegon = playerName.equals(client.getPlayerName());
     }
 
     private PredictSplitNode getNode(String markerId)
@@ -53,7 +57,11 @@ public final class LegionInfo
 
     private PredictSplitNode getNode()
     {
-        return getNode(this.markerId);
+    	if(myNode==null)
+    	{
+    		myNode= getNode(this.markerId);
+    	}
+    	return myNode;
     }
 
     void setMarker(Marker marker)
@@ -68,14 +76,11 @@ public final class LegionInfo
 
     public int getHeight()
     {
-        try
-        {
-            return getNode().getHeight();
-        }
-        catch (NullPointerException ex)
-        {
+    	PredictSplitNode node = getNode();
+    	if (node == null) {
             return 0;
-        }
+    	}
+        return node.getHeight();
     }
 
     public void setHexLabel(String hexLabel)
@@ -230,12 +235,15 @@ public final class LegionInfo
     void split(int childHeight, String childId, int turn)
     {
         getNode().split(childHeight, childId, turn);
+        myNode=myNode.getChild1();
     }
 
     void merge(String splitoffId, int turn)
     {
         Log.debug("LegionInfo.merge() for " + markerId + " " + splitoffId);
         getNode().merge(getNode(splitoffId), turn);
+        // since this is potentially a merge of a 3-way split, be safe and find the node again
+        myNode= getNode(this.markerId);
     }
 
     public boolean hasTitan()

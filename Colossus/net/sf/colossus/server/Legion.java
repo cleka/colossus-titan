@@ -446,7 +446,7 @@ public final class Legion implements Comparable
     /** Do the cleanup required before this legion can be removed. */
     void prepareToRemove(boolean returnCrittersToStacks, boolean updateHistory)
     {
-        Log.event("Legion " + critters.toString() + " is eliminated");
+        Log.event("Legion " + markerId + critters.toString() + " is eliminated");
         if (getHeight() > 0)
         {
             // Return immortals to the stacks, others to the Graveyard
@@ -463,8 +463,10 @@ public final class Legion implements Comparable
         game.getCaretaker().resurrectImmortals();
 
         // Let the clients clean up the legion marker, etc.
-        game.getServer().allRemoveLegion(markerId);
-
+        if(updateHistory) 
+        {
+        	game.getServer().allRemoveLegion(markerId);
+        }
         if (getPlayer() != null)
         {
             getPlayer().addLegionMarker(getMarkerId());
@@ -886,7 +888,7 @@ public final class Legion implements Comparable
         sortCritters();
         newLegion.sortCritters();
 
-        game.getServer().allTellLegionLocation(newMarkerId);
+        // game.getServer().allTellLegionLocation(newMarkerId);
 
         return newLegion;
     }
