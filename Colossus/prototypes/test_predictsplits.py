@@ -1337,6 +1337,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr10").removeCreature("Gargoyle")
         ps.getLeaf("Gr10").removeCreature("Gargoyle")
         ps.printLeaves()
+        ps.printNodes()
         assert(not ps.getLeaf("Gr02").allCertain())
         assert(not ps.getLeaf("Gr11").allCertain())
         assert(ps.getLeaf("Gr12").allCertain())

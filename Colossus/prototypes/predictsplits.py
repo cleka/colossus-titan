@@ -209,11 +209,6 @@ class Node:
                 return False
         return True
 
-    def setAllCertain(self):
-        """Set all creatures to certain."""
-        for ci in self.creatures:
-            ci.certain = True
-
     def getAtSplitCreatures(self):
         """Return list of CreatureInfo where atSplit is true."""
         return [ci for ci in self.creatures if ci.atSplit]
@@ -344,6 +339,7 @@ class Node:
                 raise RuntimeError, "No titan in 8-high legion"
             if not "Angel" in self.getCreatureNames():
                 raise RuntimeError, "No angel in 8-high legion"
+
         knownCombo = knownSplit + knownKeep
         if not superset(creatures, knownCombo):
             print " Known creatures not in parent legion"
@@ -410,8 +406,8 @@ class Node:
                     self.child1.removed)
             knownSplit += (self.child2.getCertainAtSplitCreatures() +
                     self.child2.removed)
-        print " first knownSplit is", knownSplit
-        print " first knownKeep is", knownKeep
+        print " knownSplit is", knownSplit
+        print " knownKeep is", knownKeep
 
         pos = self.findAllPossibleSplits(childSize, knownKeep, knownSplit)
         splitoffCreatures = self.chooseCreaturesToSplitOut(pos)
@@ -445,8 +441,6 @@ class Node:
         # child legion is the same as in the parent.
         else:
             print " not all certain" 
-            print " knownSplit is", knownSplit
-            print " knownKeep is", knownKeep
             if len(knownSplit) == childSize:
                 certain = self.getCertain()[:]
                 for ci in knownSplit:
@@ -492,13 +486,13 @@ class Node:
         print " weakList", weakList
         print " strongList", strongList
 
-        afterSplit1 = []
-        afterSplit2 = []
-        removed1 = []
-        removed2 = []
-        if self.child1 is not None:
-            assert self.child2 is not None
-            print " 1 child1 and child2 not None"
+        if self.child1 is None:
+            assert self.child2 is None
+            afterSplit1 = []
+            afterSplit2 = []
+            removed1 = []
+            removed2 = []
+        else:
             afterSplit1 = self.child1.getAfterSplitCreatures()
             afterSplit2 = self.child2.getAfterSplitCreatures()
             removed1 = self.child1.removed
@@ -508,12 +502,10 @@ class Node:
         marker2 = otherMarkerId
 
         strongFinal = strongList + afterSplit1
-        print " removed1 is", removed1
         for ci in removed1:
             strongFinal.remove(ci)
         print " strongFinal is", strongFinal
         weakFinal = weakList + afterSplit2
-        print " removed2 is", removed2
         for ci in removed2:
             weakFinal.remove(ci)
         print " weakFinal is", weakFinal
@@ -524,13 +516,11 @@ class Node:
             self.child1 = Node(marker1, turn, strongFinal, self)
             self.child2 = Node(marker2, turn, weakFinal, self)
         else:
-            print " 2 child1 and child2 not None"
             self.child1.creatures = strongFinal
             self.child2.creatures = weakFinal
 
         if self.childSize1 == 0:
             assert self.childSize2 == 0
-            print " childSize1 and childSize2 are 0"
             self.childSize1 = self.child1.getHeight()
             self.childSize2 = self.child2.getHeight()
         print " child1:", self.child1
