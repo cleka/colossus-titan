@@ -2,11 +2,8 @@
 
 __version__ = "$Id$"
 
-import copy
 import sys
-
-# XXX Make infinite recursion leave smaller stack traces.
-sys.setrecursionlimit(50)
+import copy
 
 """Prototype of Colossus split prediction"""
 
@@ -167,13 +164,13 @@ class Node:
         self.creatures.sort(creatureComp)
         s = self.fullname() + ":"
         for ci in self.creatures:
-            s += " " + ci.__str__()
+            s += " " + str(ci)
         for ci in self.removed:
-            s += " " + ci.__str__() + "-"
+            s += " " + str(ci) + "-"
         return s
 
     def __repr__(self):
-        return self.__str__()
+        return str(self)
 
     def getCertainCreatures(self):
         """Return list of CreatureInfo where certain is true."""
@@ -228,21 +225,14 @@ class Node:
         else:
             return self.child2.markerId
 
-    def getSibling(self):
-        if self.parent is None:
-            return None
-        return self.parent.getOtherChild(self)
-
     def getHeight(self):
         return len(self.creatures)
 
     def revealCreatures(self, cnl):
         """cnl is a list of creature names"""
-        print "revealCreatures for", self, cnl
         if ((not cnl) or 
           (superset(getCreatureNames(self.getCertainCreatures()), cnl)
            and (self.allDescendentsCertain()))):
-            print "no new information, exiting"
             return
 
         cil = [CreatureInfo(name, True, True) for name in cnl]
@@ -292,9 +282,8 @@ class Node:
         # Need to remove count uncertain creatures.
         for unused in range(count):
             removeLastUncertainCreature(self.creatures)
-        print "   near end revealCreatures", self
         if self.parent is not None:
-            self.parent._updateChildContents(self)
+            self.parent._updateChildContents()
 
 
     def _childCreaturesMatch(self):
@@ -334,7 +323,6 @@ class Node:
 
         knownCombo = knownSplit + knownKeep
         if not superset(creatures, knownCombo):
-            print "   Known creatures not in parent legion"
             self.revealCreatures(getCreatureNames(knownCombo))
             return self._findAllPossibleSplits(childSize, knownKeep, knownSplit)
 
@@ -362,7 +350,6 @@ class Node:
     def _chooseCreaturesToSplitOut(self, pos):
         """Decide how to split this legion, and return a list of Creatures to
            remove.  Return empty list on error."""
-        print "_chooseCreaturesToSplitOut for", self, pos
         maximize = (2 * len(pos[0]) > self.getHeight())
 
         bestKillValue = None
@@ -380,8 +367,6 @@ class Node:
 
 
     def split(self, childSize, otherMarkerId, turn=-1):
-        print "split for", self, childSize, otherMarkerId, turn
-
         if len(self.creatures) > 8:
             raise RuntimeError, "More than 8 creatures in legion"
 
@@ -430,29 +415,20 @@ class Node:
                 certain = self.getCertainCreatures()
                 for ci in knownSplit:
                     certain.remove(ci)
-                print "certain", certain, "knownKeep", knownKeep, \
-                  "knownSplit", knownSplit
                 if not superset(certain, knownKeep):
-                    # abort!
-                    print "   abort!"
-                    return
+                    raise RuntimeError, "certain not superset of knownKeep"
                 knownKeep = certain
 
             elif len(knownKeep) == len(self.creatures) - childSize:
                 certain = self.getCertainCreatures()
                 for ci in knownKeep:
                     certain.remove(ci)
-                print "certain", certain, "knownSplit", knownSplit, \
-                  "knownKeep", knownKeep
                 if not superset(certain, knownSplit):
-                    # abort!
-                    print "   abort!"
-                    return
+                    raise RuntimeError, "certain not superset of knownSplit"
                 knownSplit = certain
 
             knownKeepNames = getCreatureNames(knownKeep)
             knownSplitNames = getCreatureNames(knownSplit)
-
 
         # lists of CreatureInfo
         strongList = []
@@ -509,11 +485,8 @@ class Node:
             self.childSize1 = self.child1.getHeight()
             self.childSize2 = self.child2.getHeight()
 
-        self.child1._updateParentContents()
-        self.child2._updateParentContents()
-
-        print "   child1:", self.child1
-        print "   child2:", self.child2
+        self.child1._resplitDescendents()
+        self.child2._resplitDescendents()
 
 
     def merge(self, other, turn):
@@ -521,7 +494,6 @@ class Node:
            move either one. The two legions must share the same parent.  If 
            either legion has the parent's markerId, then that legion will 
            remain. Otherwise this legion will remain."""
-        print "merge for", self, other
         parent = self.parent
         assert parent == other.parent
         if (parent.markerId == self.markerId or
@@ -536,41 +508,21 @@ class Node:
               self.markerId, turn)
 
 
-    def _updateChildContents(self, child):
-        """Tell this parent legion the updated contents of one of its 
-           children."""
-        print "_updateChildContents for node", self, "child", child
-        assert child in [self.child1, self.child2] 
-        self.revealCreatures(getCreatureNames(
-          child.getCertainAtSplitOrRemovedCreatures()))
-        # XXX Resplitting "too often" fixes some certainty issues.
+    def _updateChildContents(self):
+        """Tell this parent legion the updated contents of its children."""
+        names = []
+        for child in [self.child1, self.child2]:
+            names.extend(getCreatureNames(
+              child.getCertainAtSplitOrRemovedCreatures()))
+        self.revealCreatures(names)
         self.split(self.childSize2, self.getOtherChildMarkerId())
 
-    def _updateParentContents(self):
-        """Tell this child legion the updated known contents of its parent."""
-        print "_updateParentContents for node", self
-        if self.getSibling().allCertain() and not self.allCertain():
-            pc = self.parent.getCertainCreatures()
-            sc = self.getSibling().getCertainAtSplitOrRemovedCreatures()
-            print "pc", pc, "sc", sc
-            newcertain = subtractLists(getCreatureNames(pc), 
-              getCreatureNames(sc))
-            for name in getCreatureNames(self.removed):
-                if name in newcertain:
-                    newcertain.remove(name)
-            print "newcertain for", self, ":", newcertain
-            if not superset(getCreatureNames(self.getCertainCreatures()), 
-              newcertain):
-                self.revealCreatures(newcertain)
-        elif not superset(self.parent.creatures, 
-          self.getAtSplitOrRemovedCreatures()):
-            print self, "inconsistent with parent", self.parent
-            self.parent._updateChildContents(self)
+    def _resplitDescendents(self):
+        """Recursively resplit all this legion's descendents."""
         if self.child1 is not None:
             self.split(self.childSize2, self.getOtherChildMarkerId())
 
     def addCreature(self, creatureName):
-        print "addCreature", self, ':', creatureName
         if (self.getHeight() >= 7 and self.child1 is None):
             raise RuntimeError, "Tried adding to 7-high legion"
         ci = CreatureInfo(creatureName, True, False)
@@ -578,7 +530,6 @@ class Node:
 
 
     def removeCreature(self, creatureName):
-        print "removeCreature", self, ':', creatureName
         if (self.getHeight() <= 0):
             raise RuntimeError, "Tried removing from 0-high legion"
         self.revealCreatures([creatureName])
@@ -591,11 +542,9 @@ class Node:
         self.creatures.remove(ci)
 
     def removeCreatures(self, creatureNames):
-        print "removeCreatures", self, ':', creatureNames
         self.revealCreatures(creatureNames)
         for name in creatureNames:
             self.removeCreature(name)
-
 
 
 class PredictSplits:
@@ -682,4 +631,3 @@ class PredictSplits:
             if leaf.markerId == markerId:
                 return leaf
         return None
-
