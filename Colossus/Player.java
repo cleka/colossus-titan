@@ -8,26 +8,30 @@ class Player
 {
     private String name;
     private String color;       // Black, Blue, Brown, Gold, Green, Red 
-    int startingTower;  // 1-6
-    int score = 0;
-    int angels = 1;     // number of angels + archangels in legions
-    boolean canSummonAngel = true;
-    String playersEliminated;  // e.g. 1356, based on starting tower
-    int numMarkersAvailable = 12;
-    String [] markersAvailable = new String[60];
-    String markerSelected;
+    private int startingTower;  // 1-6
+    private int score = 0;
+    private int angels = 1;     // number of angels + archangels in legions
+    private boolean canSummonAngel = true;
+    private String playersEliminated;  // e.g. 1356, based on starting tower
+    private int numMarkersAvailable = 12;
+    private String [] markersAvailable = new String[60];
+    private String markerSelected;
     int numLegions = 0;
     Legion [] legions = new Legion[60];
-    boolean alive = true;
-    int mulligansLeft = 1;
-    int movementRoll;
-    int selectedLegion = -1;
+    private boolean alive = true;
+    private int mulligansLeft = 1;
+    private int movementRoll;
+    private int selectedLegionNum = -1;
 
     Player(String name)
     {
         this.name = name;
     }
 
+    boolean isAlive()
+    {
+        return alive;
+    }
 
     String getColor()
     {
@@ -89,6 +93,22 @@ class Player
     }
 
 
+    int getTower()
+    {
+        return startingTower;
+    }
+
+    int getScore()
+    {
+        return score;
+    }
+
+    String getPlayersElim()
+    {
+        return playersEliminated;
+    }
+
+
     boolean canTitanTeleport()
     {
         return (score >= 400);
@@ -112,7 +132,7 @@ class Player
         int total = 0;
         for (int i = 0; i < numLegions; i++)
         {
-            if (legions[i].moved)
+            if (legions[i].hasMoved())
             {
                 total++;
             }
@@ -122,9 +142,49 @@ class Player
     }
 
 
+    void commitMoves()
+    {
+        // Wipe out any remaining mulligans.
+        mulligansLeft = 0;
+
+        for (int i = 0; i < numLegions; i++)
+        {
+            legions[i].commitMove();
+        }
+    }
+
+
     String getName()
     {
         return name;
+    }
+
+
+    int getMovementRoll()
+    {
+        return movementRoll;
+    }
+
+
+    int getMulligansLeft()
+    {
+        return mulligansLeft;
+    }
+
+
+    void rollMovementDie()
+    {
+        movementRoll = (int) Math.ceil(6 * Math.random());
+    }
+
+
+    void takeMulligan()
+    {
+        if (mulligansLeft > 0)
+        {
+            rollMovementDie();
+            mulligansLeft--;
+        }
     }
 
 
@@ -150,4 +210,74 @@ class Player
         return height;
     }
 
+    void addLegion(Legion legion)
+    {
+        numLegions++;
+        legions[numLegions - 1] = legion;
+    }
+
+
+    void selectLegion(int i)
+    {
+        selectedLegionNum = i;
+    }
+
+
+    int getSelectedLegionNum()
+    {
+        return selectedLegionNum;
+    }
+
+    Legion getSelectedLegion()
+    {
+        if (selectedLegionNum >= 0 && selectedLegionNum < numLegions)
+        {
+            return legions[selectedLegionNum];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    int getNumMarkersAvailable()
+    {
+        return numMarkersAvailable;
+    }
+
+    String getMarker(int i)
+    {
+        return markersAvailable[i];
+    }
+
+    String getSelectedMarker()
+    {
+        return markerSelected;
+    }
+
+    void addSelectedMarker()
+    {
+        markersAvailable[numMarkersAvailable] = new String(markerSelected);
+        numMarkersAvailable++;
+        markerSelected = null;
+    }
+
+    void clearSelectedMarker()
+    {
+        markerSelected = null;
+    }
+
+    void selectMarker(int i)
+    {
+        markerSelected = new String(markersAvailable[i]); 
+
+        // Adjust other markers because this one is taken.
+        for (int j = i; j < numMarkersAvailable - 1; j++)
+        {
+            markersAvailable[j] = new String(markersAvailable[j + 1]);
+        }
+        
+        markersAvailable[numMarkersAvailable - 1] = new String("");
+        numMarkersAvailable--;
+    }
 }
