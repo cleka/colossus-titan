@@ -48,6 +48,7 @@ public final class MasterHex extends Hex
     public static final int ARROW = 3;
     public static final int ARROWS = 4;
 
+
     // The hex vertexes are numbered like this:
     //
     //               normal                     inverted
@@ -116,8 +117,7 @@ public final class MasterHex extends Hex
     public void paint(Graphics g)
     {
         Graphics2D g2 = (Graphics2D)g;
-        // XXX Cache this?
-        if (Game.getOption(Game.antialias))
+        if (getAntialias())
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);

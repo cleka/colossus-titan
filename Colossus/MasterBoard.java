@@ -444,7 +444,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         };
 
         // If running as an applet, disable all file-related actions.
-        if (game != null && game.isApplet())
+        if (game.isApplet())
         {
             newGameAction.setEnabled(false);
             loadGameAction.setEnabled(false);
@@ -472,7 +472,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     {
         JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name);
         cbmi.setMnemonic(mnemonic);
-        cbmi.setSelected(Game.getOption(name));
+        cbmi.setSelected(game.getOption(name));
         cbmi.addItemListener(this);
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
@@ -523,13 +523,13 @@ public final class MasterBoard extends JPanel implements MouseListener,
         // Do not allow autosave if running as an applet.
         if (game.isApplet())
         {
-            Game.setOption(Game.autosave, false);
+            game.setOption(Game.autosave, false);
         }
         addCheckBox(gameMenu, Game.autosave, KeyEvent.VK_A);
         addCheckBox(gameMenu, Game.allStacksVisible, KeyEvent.VK_S);
 
         // Then per-player options
-        
+
         JMenu playerMenu = new JMenu("Player");
         playerMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(playerMenu);
@@ -574,7 +574,13 @@ public final class MasterBoard extends JPanel implements MouseListener,
         JCheckBoxMenuItem cbmi = (JCheckBoxMenuItem)checkboxes.get(name);
         if (cbmi != null)
         {
-            cbmi.setSelected(enable);
+            // Only set the selected state if it has changed,
+            // to avoid infinite feedback loops.
+            boolean previous = cbmi.isSelected();
+            if (enable != previous)
+            {
+                cbmi.setSelected(enable);
+            }
         }
     }
 
@@ -1431,7 +1437,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     private void setupIcon()
     {
-        if (game != null && !game.isApplet())
+        if (!game.isApplet())
         {
             try
             {
@@ -1689,7 +1695,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             if (isPopupButton(e))
             {
                 new ShowLegion(masterFrame, legion, point,
-                    Game.getOption(Game.allStacksVisible) ||
+                    game.getOption(Game.allStacksVisible) ||
                     player == game.getActivePlayer());
                 return;
             }
@@ -1754,7 +1760,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         JMenuItem source = (JMenuItem)e.getSource();
         String text = source.getText();
         boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-        Game.setOption(text, selected);
+        game.setOption(text, selected);
     }
 
 

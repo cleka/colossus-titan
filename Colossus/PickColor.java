@@ -180,7 +180,7 @@ public final class PickColor extends JDialog implements WindowListener,
 
     public Dimension getMinimumSize()
     {
-        return new Dimension(250, 250);
+        return new Dimension(350, 350);
     }
 
     public Dimension getPreferredSize()

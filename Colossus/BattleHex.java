@@ -11,7 +11,6 @@ import java.awt.geom.*;
 public final class BattleHex extends Hex
 {
     private HexMap map;
-
     private String name;
 
     /** Normal hexes hold only one creature, but entrances can hold up to 7. */
@@ -88,8 +87,7 @@ public final class BattleHex extends Hex
     public void paint(Graphics g)
     {
         Graphics2D g2 = (Graphics2D)g;
-        // XXX Cache this?
-        if (Game.getOption(Game.antialias))
+        if (getAntialias())
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);

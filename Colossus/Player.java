@@ -377,7 +377,7 @@ public final class Player implements Comparable
     {
         // It's a new turn, so once-per-turn things are allowed again.
 
-        if (Game.getOption(Game.chooseMovement))
+        if (game.getOption(Game.chooseMovement))
         {
             movementRoll = PickRoll.pickRoll(game.getMasterFrame(),
                 "Pick movement roll");

@@ -56,3 +56,6 @@ Post-battle angel summoning is messed up.  Usually hexes with eligible
    interfered with recruit highlighting, which was fixed with undo
    all recruits.  Is the SummonAngel dialog showing up behind the
    MasterBoard?
+
+Cyclops entered battle map with 4 hits already.  Failed to heal after
+   last battle?

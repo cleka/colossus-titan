@@ -39,6 +39,9 @@ public abstract class Hex
     private int yCoord = -1;
     protected Point center;
 
+    /** Globally turns antialiasing on or off for all hexes. */
+    protected static boolean antialias;
+
 
     public void select()
     {
@@ -131,6 +134,16 @@ public abstract class Hex
     public int getYCoord()
     {
         return yCoord;
+    }
+
+    public static boolean getAntialias()
+    {
+        return antialias;
+    }
+
+    public static void setAntialias(boolean enabled)
+    {
+        antialias = enabled;
     }
 
 

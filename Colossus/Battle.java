@@ -78,7 +78,7 @@ public final class Battle
 
         setupPhase();
 
-        if (Game.getOption(Game.showDice))
+        if (game != null && game.getOption(Game.showDice))
         {
             initBattleDice();
         }
@@ -310,7 +310,7 @@ public final class Battle
             map.setupFightMenu();
 
             // Automatically perform forced strikes if applicable.
-            if (Game.getOption(Game.autoForcedStrike))
+            if (game != null && game.getOption(Game.autoForcedStrike))
             {
                 makeForcedStrikes();
                 // If there are no possible strikes left, move on.
@@ -391,9 +391,9 @@ public final class Battle
             // Allow recruiting a reinforcement.
             Creature recruit = PickRecruit.pickRecruit(
                 map.getFrame(), defender);
-            if (recruit != null)
+            if (recruit != null && game != null)
             {
-                Game.doRecruit(recruit, defender, map.getFrame());
+                game.doRecruit(recruit, defender, map.getFrame());
             }
 
             if (defender.hasRecruited())
@@ -1185,7 +1185,7 @@ public final class Battle
             map.unselectHexByLabel(label);
             Game.logEvent(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
-            if (Game.getOption(Game.showDice))
+            if (game != null && game.getOption(Game.showDice))
             {
                 battleDice.setCarries(carryDamage);
                 battleDice.setup();
@@ -1820,7 +1820,7 @@ public final class Battle
 
                 if (getCarryDamage() == 0)
                 {
-                    if (Game.getOption(Game.autoForcedStrike))
+                    if (game != null && game.getOption(Game.autoForcedStrike))
                     {
                         makeForcedStrikes();
                     }
@@ -1882,9 +1882,9 @@ public final class Battle
                 {
                     Creature recruit = PickRecruit.pickRecruit(
                         board.getFrame(), legion);
-                    if (recruit != null)
+                    if (recruit != null && game != null)
                     {
-                        Game.doRecruit(recruit, legion, board.getFrame());
+                        game.doRecruit(recruit, legion, board.getFrame());
                     }
                 }
             }

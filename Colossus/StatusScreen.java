@@ -242,7 +242,7 @@ public final class StatusScreen extends JFrame implements WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        Game.setOption(Game.showStatusScreen, false);
+        game.setOption(Game.showStatusScreen, false);
     }
 
     public void windowDeactivated(WindowEvent e)

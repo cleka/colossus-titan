@@ -63,7 +63,7 @@ public final class Game
 
     /** Preference file */
     private static final String optionsPath = "Colossus.cfg";
-    private static Properties options = new Properties();
+    private Properties options = new Properties();
 
 
     /** Start a new game. */
@@ -400,7 +400,7 @@ public final class Game
 
     /** Return the value of the boolean option given by name. Default
      *  to false if there is no such option. */
-    public static boolean getOption(String name)
+    public boolean getOption(String name)
     {
         String value = options.getProperty(name);
         if (value == null)
@@ -419,25 +419,24 @@ public final class Game
 
 
     /** Set option name to (a string version of) the given boolean value. */
-    public static void setOption(String name, boolean value)
+    public void setOption(String name, boolean value)
     {
         options.setProperty(name, String.valueOf(value));
 
-        /* XXX These won't work in a static method.
         // Side effects
-        if (name.equals(showStatusScreen)) 
+        if (name.equals(showStatusScreen))
         {
             updateStatusScreen();
         }
         else if (name.equals(antialias))
         {
+            Hex.setAntialias(value);
             repaintAllWindows();
         }
         else if (name.equals(showDice))
         {
             setupDice(value);
         }
-        */ 
     }
 
 
@@ -652,7 +651,10 @@ public final class Game
         else
         {
             board.twiddleOption(showStatusScreen, false);
-            statusScreen.dispose();
+            if (statusScreen != null)
+            {
+                statusScreen.dispose();
+            }
             this.statusScreen = null;
         }
     }
@@ -2002,7 +2004,7 @@ public final class Game
 
     /** Return true if all members of legion who are in recruiters are
      *  already visible. */
-    public static boolean allRecruitersVisible(Legion legion,
+    public boolean allRecruitersVisible(Legion legion,
         ArrayList recruiters)
     {
         if (getOption(allStacksVisible))
@@ -2033,7 +2035,7 @@ public final class Game
     }
 
 
-    public static void doRecruit(Creature recruit, Legion legion,
+    public void doRecruit(Creature recruit, Legion legion,
         JFrame parentFrame)
     {
         // Pick the recruiter(s) if necessary.
