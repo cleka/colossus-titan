@@ -313,7 +313,8 @@ public final class Legion implements Comparable
         }
         else
         {
-            game.getServer().acquireAngel(player.getName(), recruits);
+            angelType = game.getServer().acquireAngel(player.getName(),
+                recruits);
         }
         return angelType;
     }

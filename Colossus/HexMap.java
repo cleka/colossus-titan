@@ -64,6 +64,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 }
             }
             setupHexesGameState(terrain, gameH);
+            setupNeighbors(gameH);
 
             // Initialize non-GUI entrances
             BattleHex [] gameEntrances = new BattleHex[6];
@@ -400,7 +401,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
 
     /** Add references to neighbor hexes. */
-    protected void setupNeighbors(BattleHex [][] h)
+    protected static void setupNeighbors(BattleHex [][] h)
     {
         for (int i = 0; i < h.length; i++)
         {

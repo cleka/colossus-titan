@@ -80,16 +80,15 @@ Win98, 1.4b: Chits are placed slightly off-center in battle hexes.
 
 
 
-Players can skip movement phase.  Error check is missing.
-
 Need to allow first human player to control game options, load game, etc.
-
-Undo split: "Could not find hex Gd08."  Pushing wrong thing on to undostack,
-   or pulling wrong thing off?
 
 Undo move: legion teleported to a new hex and grew to 10 critters.  (Bogus
    recombine with its parent when playing with undosplit?)
 
-Need to repaint hex with stack that recruits, to update height on marker.
+Have to pick recruiter even with all stacks visible set.
 
-Critters entering battle can only move one hex.  Neighbors broken?
+AI players need to unhighlight hexes more often.
+
+Don't let non-active player's client's battlemap click on stuff. 
+
+Extra BattleMap caused by double Fight during negotiation.  Need to lock.

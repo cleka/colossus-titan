@@ -202,15 +202,14 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 {
                     return;
                 }
-                // peek at the undo stack so we know where to align
-                String hexLabel = (String)Client.topUndoStack();
-                if (hexLabel != null)
-                {
-                    player.undoLastSplit();
-                    alignLegions(hexLabel);
-                    highlightTallLegions(player);
-                    repaint();
-                }
+                // Peek at the undo stack so we know where to align
+                String splitoffId = (String)Client.topUndoStack();
+                Legion splitoff = game.getLegionByMarkerId(splitoffId);
+                String hexLabel = splitoff.getCurrentHexLabel();
+                player.undoLastSplit();
+                alignLegions(hexLabel);
+                highlightTallLegions(player);
+                repaint();
             }
         };
 
@@ -717,10 +716,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
         // the defaults.
         if (colorName != null)
         {
-            Color background = PickColor.getBackgroundColor(colorName);
-            Color foreground = PickColor.getForegroundColor(colorName);
-            playerLabel.setBackground(background);
-            playerLabel.setForeground(foreground);
+            Color color = PickColor.getBackgroundColor(colorName);
+            playerLabel.setForeground(color);
         }
         playerLabel.repaint();
     }
@@ -2131,7 +2128,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         }
 
         // No hits on chits or map, so re-highlight.
-        actOnMisclick();
+        if (client.getPlayerName().equals(game.getActivePlayerName()))
+        {
+            actOnMisclick();
+        }
     }
 
 

@@ -17,6 +17,8 @@ public final class BattleMap extends HexMap implements MouseListener,
     private JMenuBar menuBar;
     private JMenu phaseMenu;
     private Client client;
+    private JLabel playerLabel;
+
     // XXX Remove battle reference
     private Battle battle;
     private boolean critterSelected;
@@ -77,8 +79,11 @@ public final class BattleMap extends HexMap implements MouseListener,
         battleFrame.setLocation(location);
 
         contentPane.add(new JScrollPane(this), BorderLayout.CENTER);
-        battleFrame.pack();
 
+        setupPlayerLabel();
+        contentPane.add(playerLabel, BorderLayout.SOUTH);
+
+        battleFrame.pack();
         battleFrame.setVisible(true);
     }
 
@@ -105,6 +110,11 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                if (!client.getPlayerName().equals(
+                    battle.getActivePlayerName()))
+                {
+                    return;
+                }
                 critterSelected = false;
                 battle.undoLastMove();
                 highlightMobileCritters();
@@ -115,6 +125,11 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                if (!client.getPlayerName().equals(
+                    battle.getActivePlayerName()))
+                {
+                    return;
+                }
                 critterSelected = false;
                 battle.undoAllMoves();
                 highlightMobileCritters();
@@ -127,6 +142,11 @@ public final class BattleMap extends HexMap implements MouseListener,
             {
                 if (battle.anyOffboardCreatures())
                 {
+                    if (!client.getPlayerName().equals(
+                        battle.getActivePlayerName()))
+                    {
+                        return;
+                    }
                     if (!client.getOption(Options.autoBattleMove) &&
                         !confirmLeavingCreaturesOffboard())
                     {
@@ -141,6 +161,11 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                if (!client.getPlayerName().equals(
+                    battle.getActivePlayerName()))
+                {
+                    return;
+                }
                 if (battle.isForcedStrikeRemaining())
                 {
                     highlightCrittersWithTargets();
@@ -311,6 +336,26 @@ public final class BattleMap extends HexMap implements MouseListener,
             dispose();
         }
     }
+
+
+    /** Show which player owns this board. */
+    public void setupPlayerLabel()
+    {
+        String playerName = client.getPlayerName();
+        playerLabel = new JLabel(playerName);
+
+        Player player = battle.getGame().getPlayerByName(playerName);
+        String colorName = player.getColor();
+        // If we call this before player colors are chosen, just use
+        // the defaults.
+        if (colorName != null)
+        {
+            Color color = PickColor.getBackgroundColor(colorName);
+            playerLabel.setForeground(color);
+        }
+        playerLabel.repaint();
+    }
+
 
 
     public void placeNewChit(Critter critter, boolean inverted)
@@ -589,6 +634,12 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void mousePressed(MouseEvent e)
     {
+        // Only the active player can click on stuff.
+        if (!client.getPlayerName().equals(battle.getActivePlayerName()))
+        {
+            return;
+        }
+
         Point point = e.getPoint();
 
         BattleChit chit = getBattleChitAtPoint(point);
