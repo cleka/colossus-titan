@@ -1246,8 +1246,9 @@ class MasterBoard extends JFrame implements MouseListener,
                                     {
                                         MasterHex hex = legion.getCurrentHex();
                                         hex.unselect();
+                                        // XXX: This repaint is failing.
+                                        hex.repaint();
                                     }
-                                    repaint();
                                     return;
 
                                 case Game.MOVE:
@@ -1273,8 +1274,12 @@ class MasterBoard extends JFrame implements MouseListener,
                                     if (!legion.canRecruit())
                                     {
                                         legion.getCurrentHex().unselect();
+                                        // XXX This repaint is failing.
+                                        legion.getCurrentHex().repaint();
+
+                                        // Update status window.
+                                        game.updateStatusScreen();
                                     }
-                                    repaint();
                                     return;
                             }
                         }
