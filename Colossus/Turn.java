@@ -325,7 +325,7 @@ class Turn extends JDialog implements ActionListener
                 "Are you sure you want to withdraw from the game?");
             if (answer == JOptionPane.YES_OPTION)
             {
-               game.getActivePlayer().die(null);
+               game.getActivePlayer().die(null, true);
 
                game.advanceTurn();
 
