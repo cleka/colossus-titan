@@ -1,0 +1,50 @@
+#NAME      POWER SKILL      RANGE FLY BRAMBLE DRIFT BOG SANDDUN SLOPE VOLCN RIVER STONE TREE WATER MGCMSL SUMON LORD  DEMILORD  COUNT PLURALNAME BASECOLOR
+# Titan is (-1,4), as its strength varies
+Titan     	-1    5     false false false false false false false false false false false false false false true  false    6     Titans black
+Angel      	6     4     false true  false false false false false false false false false false false true  true  false    18    Angels giantBlue
+Archangel  	9     4     false true  false false false false false false false false false false false true  true  false    6     Archangels hydraOrange
+Guardian   	12    2     false true  false false false false false false false false false false false false false true     6     Guardians colossusPink
+Knight		7     5	    false false false false false false false false false false false false false false true  false    6     Knights black
+Warlock    	5     4     true  false false false false false false false false false false false true  false false true     6     Warlocks hydraOrange
+Druid    	3     5     true  false false true  false false false false false false false false true  false false true     18    Druids ogreRed
+AirElemental    5     4     true  true  true  true  true  true  true  false false false false false true  false false false    21    AirElementals black
+EarthElemental  8     4     true  true  true  true  false true  true  false false false false false true  false false false    18    EarthElementals ogreRed
+WaterElemental 	11    4     true  true  false true  true  false false false true  false false true  true  false false false    15    WaterElementals giantBlue
+FireElemental  	14    4     true  true  false true  false true  true  true  false false true  false true  false false false    12    FireElementals hydraOrange
+Balrog     	20    5     true  true  true  true  true  true  true  true  false false true  false true  true  true  true     1     Balrogs black
+Gargoyle   	4     3     false true  true  false false false false false false false false false false false false false    21    Gargoyles black
+Cyclops    	9     2     false false true  false false false false false false false false false false false false false    28    Cyclopes behemothGreen
+Gorgon     	6     3     true  true  true  false false false false false false false false false false false false false    25    Gorgons black
+Behemoth   	8     3     false false true  false false false false false false false false false false false false false    18    Behemoths behemothGreen
+Manticore  	8     3     true  true  true  false false false false false false false false false false false false false    14    Manticores black
+Serpent    	18    2     false false true  false false false false false false false false false false false false false    10    Serpents hydraOrange
+Jabberwok  	25    2     false false true  false false false false false false false false false false false false false    8     Jabberwok behemothGreen
+Wraith     	60    1     true  true  true  false false false false false false false false false false true  false true     2     Wraiths colossusPink
+Centaur    	3     4     false false false false false false false false false false false false false false false false    25    Centaurs centaurGold
+Ogre       	6     2     false false false false true  false true  false false false false false false false false false    25    Ogres ogreRed
+Lion       	5     3     false false false false false true  true  false false false false false false false false false    28    Lions red
+Troll      	8     2     false false false true  true  false false false false false false false false false false false    28    Trolls giantBlue
+Minotaur   	4     4     true  false false false false false true  false false false false false false false false false    21    Minotaurs ogreRed
+Warbear    	6     3     false false false true  false false false false false false false false false false false false    21    Warbears centaurGold
+Ranger     	4     4     true  true  false false true  false false false false false false false false false false false    28    Rangers colossusPink
+Salamander 	8     3     false false false false true  false false false false false false false false false false false    10    Salamanders ogreRed
+Griffon    	5     4     false true  false false false true  false false false false false false false false false false    18    Griffons hydraOrange
+Wyvern     	7     3     false true  false false true  false false false false false false false false false false false    18    Wyverns colossusPink
+Unicorn    	6     4     false false false false false false true  false false false false false false false false false    12    Unicorns hydraOrange
+Ent        	12    3     false false false false false false false false false false false false false false false false    8     Ents ogreRed
+Dragon     	9     3     true  true  false false false false true  false false false true  false false false false false    18    Dragons red
+Giant      	7     4     true  false false true  false false false false false false false false false false false false    18    Giants giantBlue
+Hydra      	10    3     true  false false false true  true  false false false false false false false false false false    10    Hydrae hydraOrange
+Chimera    	16    3     false false false false true  true  false false false false false false false false false false    6     Chimerae hydraOrange
+Colossus   	10    4     false false false true  false false true  false false false false false false false false false    10    Colossi colossusPink
+Mammoth    	20    3     false false false true  false true  false false false false false false false false false false    4     Mammoths giantBlue
+
+
+
+
+
+
+
+
+
+

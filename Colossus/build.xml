@@ -176,6 +176,8 @@
              includes="**/*.class,
                        version,
                        Default/**,
+                       Abyssal6/**,
+                       Abyssal9/**,
                        TitanPlus/**,
                        ExtTitan/**,
                        Badlands/**,

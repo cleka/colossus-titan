@@ -90,6 +90,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
         net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \
         com/werken/opt/*.class \
         Default TitanPlus ExtTitan Badlands Outlands Undead \
+	Abyssal6 Abyssal9 \
 	TG-ConceptI TG-ConceptII TG-ConceptIII TG-SetII TG-SetIII TG-Wild \
 	Badlands-JDG SmallTitan version
 	chmod +x Colossus.jar
