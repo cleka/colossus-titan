@@ -154,15 +154,18 @@ public final class ShowLegion extends JDialog implements MouseListener,
         frame.pack();
         frame.setVisible(true);
 
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        MasterHex hex = new MasterHex();
         hex.setTerrain('B');
         hex.setLabel(130);
 
-        Player player = new Player("Test", null);
+        Game game = new Game();
+        game.addPlayer("Test");
+        Player player = game.getPlayer(0);
         Legion legion = new Legion("Bk01", null, hex.getLabel(),
             hex.getLabel(), Creature.titan, Creature.gargoyle,
             Creature.gargoyle, Creature.cyclops, Creature.cyclops, null,
-            null, null, player);
+            null, null, player.getName(), game);
+        player.addLegion(legion);
         Point point = new Point(10 * scale, 10 * scale);
 
         new ShowLegion(frame, legion, point, true);

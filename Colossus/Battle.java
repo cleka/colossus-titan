@@ -37,16 +37,19 @@ public final class Battle
     private int activeLegionNum;
     private Legion [] legions = new Legion[2];
     private MasterBoard board;
-    private MasterHex masterHex;
+    private String masterHexLabel;
     private BattleDice battleDice;
     private int turnNumber;
     private int phase;
     private int summonState = NO_KILLS;
     private int carryDamage;
     private boolean critterSelected;
+    // XXX We should really go through the legions, rather than
+    // keeping track of critters twice.
     private ArrayList critters = new ArrayList();
     private boolean attackerElim;
     private boolean defenderElim;
+    private boolean battleOver;
     private boolean attackerEntered;
     private boolean conceded;
     private boolean driftDamageApplied;
@@ -55,12 +58,12 @@ public final class Battle
 
 
     public Battle(Game game, MasterBoard board, Legion attacker,
-        Legion defender, int activeLegionNum, MasterHex masterHex,
+        Legion defender, int activeLegionNum, String masterHexLabel,
         int turnNumber, int phase)
     {
         this.game = game;
         this.board = board;
-        this.masterHex = masterHex;
+        this.masterHexLabel = masterHexLabel;
         this.defender = defender;
         this.attacker = attacker;
         legions[0] = defender;
@@ -68,7 +71,7 @@ public final class Battle
         this.activeLegionNum = activeLegionNum;
         this.turnNumber = turnNumber;
         this.phase = phase;
-        map = new BattleMap(board, masterHex, this);
+        map = new BattleMap(board, masterHexLabel, this);
     }
 
 
@@ -98,7 +101,7 @@ public final class Battle
 
         newBattle.game = null;   // Must set this later.
         newBattle.board = board; // don't need to deep copy
-        newBattle.masterHex = masterHex; // don't need to deep copy
+        newBattle.masterHexLabel = masterHexLabel;
         newBattle.defender = defender.AICopy();
         newBattle.attacker = attacker.AICopy();
         newBattle.legions[0] = newBattle.defender;
@@ -125,6 +128,19 @@ public final class Battle
             newBattle.critters.add(critter.AICopy());
         }
         return newBattle;
+    }
+
+
+    // For AICopy()
+    public void setGame(Game game)
+    {
+        this.game = game;
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            critter.setGame(game);
+        }
     }
 
 
@@ -192,13 +208,13 @@ public final class Battle
 
     public MasterHex getMasterHex()
     {
-        return masterHex;
+        return board.getHexFromLabel(masterHexLabel);
     }
 
 
     public char getTerrain()
     {
-        return masterHex.getTerrain();
+        return getMasterHex().getTerrain();
     }
 
 
@@ -214,15 +230,21 @@ public final class Battle
     }
 
 
-    public boolean getAttackerElim()
+    public boolean isAttackerElim()
     {
         return attackerElim;
     }
 
 
-    public boolean getDefenderElim()
+    public boolean isDefenderElim()
     {
         return defenderElim;
+    }
+
+
+    public boolean isOver()
+    {
+        return battleOver;
     }
 
 
@@ -290,7 +312,7 @@ public final class Battle
                         Game.logEvent("Time loss");
                         // Time loss.  Attacker is eliminated but defender
                         //    gets no points.
-                        if (attacker.numCreature(Creature.titan) != 0)
+                        if (attacker.hasTitan())
                         {
                             // This is the attacker's titan stack, so the
                             // defender gets his markers plus half points
@@ -391,7 +413,7 @@ public final class Battle
             Player player = getActivePlayer();
             if (player.getOption(Options.autoStrike))
             {
-                player.aiStrike(legions[activeLegionNum], this, false);
+                player.aiStrike(legions[activeLegionNum], this, false, false);
             }
             else if (player.getOption(Options.autoForcedStrike))
             {
@@ -607,7 +629,8 @@ public final class Battle
     }
 
 
-    /** Find all legal moves for this critter. */
+    /** Find all legal moves for this critter. The returned list
+     *  contains hex IDs, not hexes. */
     public Set showMoves(Critter critter)
     {
         Set set = new HashSet();
@@ -1002,11 +1025,13 @@ public final class Battle
                 }
             }
         }
-        if (attacker.getPlayer().isTitanEliminated())
+        Player player = attacker.getPlayer();
+        if (player == null || player.isTitanEliminated())
         {
             attackerElim = true;
         }
-        if (defender.getPlayer().isTitanEliminated())
+        player = defender.getPlayer();
+        if (player == null || player.isTitanEliminated())
         {
             defenderElim = true;
         }
@@ -1015,9 +1040,14 @@ public final class Battle
 
     private void checkForElimination()
     {
+        Player attackerPlayer = attacker.getPlayer();
+        Player defenderPlayer = defender.getPlayer();
+
+        boolean attackerTitanDead = attackerPlayer.isTitanEliminated();
+        boolean defenderTitanDead = defenderPlayer.isTitanEliminated();
+
         // Check for mutual Titan elimination.
-        if (attacker.getPlayer().isTitanEliminated() &&
-            defender.getPlayer().isTitanEliminated())
+        if (attackerTitanDead && defenderTitanDead)
         {
             // Nobody gets any points.
             // Make defender die first, to simplify turn advancing.
@@ -1028,7 +1058,7 @@ Game.logDebug("mutual titan elimination");
         }
 
         // Check for single Titan elimination.
-        else if (attacker.getPlayer().isTitanEliminated())
+        else if (attackerTitanDead)
         {
 Game.logDebug("attacker titan elimination");
             if (defenderElim)
@@ -1042,7 +1072,7 @@ Game.logDebug("attacker titan elimination");
             attacker.getPlayer().die(defender.getPlayer(), true);
             cleanup();
         }
-        else if (defender.getPlayer().isTitanEliminated())
+        else if (defenderTitanDead)
         {
 Game.logDebug("defender titan elimination");
             if (attackerElim)
@@ -1108,7 +1138,7 @@ Game.logDebug("defender eliminated");
             if (critter.getPlayer() == player &&
                 countStrikes(critter, true) > 0)
             {
-                set.add(critter.getCurrentHex().getLabel());
+                set.add(critter.getCurrentHexLabel());
             }
         }
 
@@ -1353,7 +1383,8 @@ Game.logDebug("defender eliminated");
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
-    public static int getRange(BattleHex hex1, BattleHex hex2)
+    public static int getRange(BattleHex hex1, BattleHex hex2,
+        boolean allowEntrance)
     {
         int x1 = hex1.getXCoord();
         double y1 = hex1.getYCoord();
@@ -1373,10 +1404,14 @@ Game.logDebug("defender eliminated");
         double xDist = Math.abs(x2 - x1);
         double yDist = Math.abs(y2 - y1);
 
-        // Offboard creatures are out of range.
-        if (x1 == -1 || x2 == -1)
+        // Offboard creatures are out of striking range.
+        if (!allowEntrance && (x1 == -1 || x2 == -1))
         {
             xDist = BIGNUM;
+        }
+        else
+        {
+            // TODO Handle ranges to entrances.
         }
 
         if (xDist >= 2 * yDist)
@@ -1517,7 +1552,7 @@ Game.logDebug("defender eliminated");
             // If there are two walls, striker or target must be at elevation
             //     2 and range must not be 3.
             if (getTerrain() == 'T' && totalObstacles >= 2 &&
-                getRange(initialHex, finalHex) == 3)
+                getRange(initialHex, finalHex, false) == 3)
             {
                 return true;
             }
@@ -1627,7 +1662,7 @@ Game.logDebug("defender eliminated");
         BattleHex currentHex = critter.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
-        int range = getRange(currentHex, targetHex);
+        int range = getRange(currentHex, targetHex, false);
         int skill = critter.getSkill();
 
         if (range > skill)
@@ -1994,12 +2029,30 @@ Game.logDebug("defender eliminated");
     }
 
 
-    // XXX Should this check the legality of the move?
+    /** If legal, move critter to hex. */
     public void doMove(Critter critter, BattleHex hex)
     {
-        critter.moveToHex(hex);
-        critterSelected = false;
-        highlightMovableCritters();
+        String hexLabel = hex.getLabel();
+
+        // Allow null moves.
+        if (hexLabel.equals(critter.getCurrentHexLabel()))
+        {
+            Game.logEvent(critter.getDescription() + " does not move");
+        }
+        else if (showMoves(critter).contains(hexLabel))
+        {
+            Game.logEvent(critter.getName() + " moves from " +
+                critter.getCurrentHexLabel() + " to " + hexLabel);
+            critter.moveToHex(hex);
+            critterSelected = false;
+            highlightMovableCritters();
+        }
+        else
+        {
+            Game.logEvent(critter.getName() + " in " +
+                critter.getCurrentHexLabel() +
+                " tried to illegally move to " + hexLabel);
+        }
     }
 
 
@@ -2028,32 +2081,38 @@ Game.logDebug("defender eliminated");
     {
         disposeBattleDice();
         map.dispose();
+        battleOver = true;
         if (game != null)
         {
-            game.finishBattle(masterHex, attackerEntered);
+            game.finishBattle(getMasterHex(), attackerEntered);
         }
     }
 
 
     public static void main(String [] args)
     {
-        Player player1 = new Player("Attacker", null);
-        Player player2 = new Player("Defender", null);
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setTerrain('B');
-        hex.setLabel(130);
+        Game game = new Game();
+        game.addPlayer("Attacker");
+        Player player1 = game.getPlayer(0);
+        game.addPlayer("Defender");
+        Player player2 = game.getPlayer(1);
+        MasterHex hex = MasterBoard.getHexFromLabel("130");
         Legion attacker = new Legion("Bk01", null, hex.getLabel(),
             hex.getLabel(), Creature.archangel, Creature.troll,
             Creature.ranger, Creature.hydra, Creature.griffon,
-            Creature.angel, Creature.warlock, null, player1);
+            Creature.angel, Creature.warlock, null, player1.getName(),
+            game);
+        player1.addLegion(attacker);
         Legion defender = new Legion("Rd01", null, hex.getLabel(),
             hex.getLabel(), Creature.serpent, Creature.lion,
             Creature.gargoyle, Creature.cyclops, Creature.gorgon,
-            Creature.guardian, Creature.minotaur, null, player2);
+            Creature.guardian, Creature.minotaur, null, player2.getName(),
+            game);
+        player2.addLegion(defender);
         attacker.setEntrySide(5);
 
-        Battle battle = new Battle(null, null, attacker, defender,
-            DEFENDER, hex, 1, MOVE);
+        Battle battle = new Battle(game, null, attacker, defender,
+            DEFENDER, hex.getLabel(), 1, MOVE);
         battle.init();
     }
 }

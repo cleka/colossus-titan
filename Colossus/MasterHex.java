@@ -11,7 +11,7 @@ import java.awt.geom.*;
 public final class MasterHex extends Hex
 {
     private boolean inverted;
-    private ArrayList legions = new ArrayList(3);
+    private ArrayList legionMarkers = new ArrayList(3);
     private MasterBoard board;
     private FontMetrics fontMetrics;
     private int halfFontHeight;
@@ -111,6 +111,12 @@ public final class MasterHex extends Hex
         offCenter = new Point((int)Math.round((xVertex[0] + xVertex[1]) / 2),
             (int)Math.round(((yVertex[0] + yVertex[3]) / 2) +
             (inverted ? -(scale / 6.0) : (scale / 6.0))));
+    }
+
+
+    // No-arg constructor for testing.
+    public MasterHex()
+    {
     }
 
 
@@ -513,41 +519,36 @@ public final class MasterHex extends Hex
 
     public int getNumLegions()
     {
-        return legions.size();
+        return legionMarkers.size();
     }
 
 
     public boolean isOccupied()
     {
-        return (legions.size() > 0);
+        return (legionMarkers.size() > 0);
     }
 
 
-    public Legion getLegion(int i)
+    public String getLegionMarkerId(int i)
     {
-        return (Legion)legions.get(i);
+        return (String)legionMarkers.get(i);
     }
 
 
-    public void moveToTop(Legion legion)
+    public java.util.List getLegionMarkerIds()
     {
-        if (legions.indexOf(legion) > 0)
-        {
-            legions.remove(legion);
-            legions.add(0, legion);
-            alignLegions();
-        }
+        return legionMarkers;
     }
 
 
     public int getNumFriendlyLegions(Player player)
     {
         int count = 0;
-        Iterator it = legions.iterator();
+        Iterator it = legionMarkers.iterator();
         while (it.hasNext())
         {
-            Legion legion = (Legion)it.next();
-            if (legion.getPlayer() == player)
+            String markerId = (String)it.next();
+            if (player.getLegionByMarkerId(markerId) != null)
             {
                 count++;
             }
@@ -558,39 +559,19 @@ public final class MasterHex extends Hex
 
     public int getNumEnemyLegions(Player player)
     {
-        return legions.size() - getNumFriendlyLegions(player);
-    }
-
-
-    public boolean isEngagement()
-    {
-        if (getNumLegions() > 1)
-        {
-            Iterator it = legions.iterator();
-            Legion legion = (Legion)it.next();
-            Player player = legion.getPlayer();
-            while (it.hasNext())
-            {
-                legion = (Legion)it.next();
-                if (legion.getPlayer() != player)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return legionMarkers.size() - getNumFriendlyLegions(player);
     }
 
 
     /** Return the first legion belonging to player. */
     public Legion getFriendlyLegion(Player player)
     {
-        Iterator it = legions.iterator();
+        Iterator it = legionMarkers.iterator();
         while (it.hasNext())
         {
-            Legion legion = (Legion)it.next();
-            if (legion.getPlayer() == player)
+            String markerId = (String)it.next();
+            Legion legion = player.getLegionByMarkerId(markerId);
+            if (legion != null)
             {
                 return legion;
             }
@@ -603,11 +584,12 @@ public final class MasterHex extends Hex
     {
 	ArrayList list = new ArrayList();
 
-        Iterator it = legions.iterator();
+        Iterator it = legionMarkers.iterator();
         while (it.hasNext())
         {
-            Legion legion = (Legion)it.next();
-            if (legion.getPlayer() == player)
+            String markerId = (String)it.next();
+            Legion legion = player.getLegionByMarkerId(markerId);
+            if (legion != null)
             {
                 list.add(legion);
             }
@@ -619,11 +601,13 @@ public final class MasterHex extends Hex
     /** Return the first legion not belonging to player. */
     public Legion getEnemyLegion(Player player)
     {
-        Iterator it = legions.iterator();
+        Game game = board.getGame();
+        Iterator it = legionMarkers.iterator();
         while (it.hasNext())
         {
-            Legion legion = (Legion)it.next();
-            if (legion.getPlayer() != player)
+            String markerId = (String)it.next();
+            Legion legion = game.getLegionByMarkerId(markerId);
+            if (!legion.getPlayerName().equals(player.getName()))
             {
                 return legion;
             }
@@ -639,9 +623,11 @@ public final class MasterHex extends Hex
         {
             return;
         }
+        Game game = board.getGame();
 
-        Legion legion0 = (Legion)legions.get(0);
-        Marker marker = legion0.getMarker();
+        String markerId = (String)legionMarkers.get(0);
+        Legion legion = game.getLegionByMarkerId(markerId);
+        Marker marker = legion.getMarker();
         if (marker == null)
         {
             return;
@@ -669,8 +655,9 @@ public final class MasterHex extends Hex
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale4;
-            Legion legion1 = (Legion)legions.get(1);
-            marker = legion1.getMarker();
+            markerId = (String)legionMarkers.get(1);
+            legion = game.getLegionByMarkerId(markerId);
+            marker = legion.getMarker();
             if (marker != null)
             {
                 // Second marker can be null when loading during
@@ -689,15 +676,17 @@ public final class MasterHex extends Hex
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale4;
-            Legion legion1 = (Legion)legions.get(1);
-            marker = legion1.getMarker();
+            markerId = (String)legionMarkers.get(1);
+            legion = game.getLegionByMarkerId(markerId);
+            marker = legion.getMarker();
             marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale;
-            Legion legion2 = (Legion)legions.get(2);
-            marker = legion2.getMarker();
+            markerId = (String)legionMarkers.get(2);
+            legion = game.getLegionByMarkerId(markerId);
+            marker = legion.getMarker();
             marker.setLocation(point);
         }
 
@@ -707,7 +696,7 @@ public final class MasterHex extends Hex
 
     public void addLegion(Legion legion, boolean top)
     {
-        legions.add(legion);
+        legionMarkers.add(legion.getMarkerId());
         if (top)
         {
             board.moveMarkerToTop(legion);
@@ -720,11 +709,13 @@ public final class MasterHex extends Hex
     }
 
 
-    public void removeLegion(Legion legion)
+    public void removeLegionMarkerId(String markerId)
     {
-        legions.remove(legion);
+        legionMarkers.remove(markerId);
         if (board != null)
         {
+            Game game = board.getGame();
+            Legion legion = game.getLegionByMarkerId(markerId);
             board.removeMarker(legion);
         }
         if (getNumLegions() >= 1)
@@ -736,7 +727,7 @@ public final class MasterHex extends Hex
 
     public void clearLegions()
     {
-        legions.clear();
+        legionMarkers.clear();
     }
 
 

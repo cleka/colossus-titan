@@ -21,9 +21,9 @@ public final class PickEntrySide extends HexMap implements ActionListener,
     private static int entrySide;
 
 
-    private PickEntrySide(JFrame parentFrame, MasterHex masterHex)
+    private PickEntrySide(JFrame parentFrame, String masterHexLabel)
     {
-        super(masterHex);
+        super(masterHexLabel);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
 
         laidOut = false;
@@ -32,7 +32,9 @@ public final class PickEntrySide extends HexMap implements ActionListener,
 
         contentPane.setLayout(null);
 
-        if (masterHex.canEnterViaSide(5))
+        MasterHex hex = MasterBoard.getHexFromLabel(masterHexLabel);
+
+        if (hex.canEnterViaSide(5))
         {
             button5 = new JButton("Left");
             button5.setMnemonic(KeyEvent.VK_L);
@@ -40,7 +42,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
             button5.addActionListener(this);
         }
 
-        if (masterHex.canEnterViaSide(3))
+        if (hex.canEnterViaSide(3))
         {
             button3 = new JButton("Bottom");
             button3.setMnemonic(KeyEvent.VK_B);
@@ -48,7 +50,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
             button3.addActionListener(this);
         }
 
-        if (masterHex.canEnterViaSide(1))
+        if (hex.canEnterViaSide(1))
         {
             button1 = new JButton("Right");
             button1.setMnemonic(KeyEvent.VK_R);
@@ -69,10 +71,10 @@ public final class PickEntrySide extends HexMap implements ActionListener,
     }
 
 
-    public static int pickEntrySide(JFrame parentFrame, MasterHex masterHex)
+    public static int pickEntrySide(JFrame parentFrame, String masterHexLabel)
     {
         entrySide = -1;
-        new PickEntrySide(parentFrame, masterHex);
+        new PickEntrySide(parentFrame, masterHexLabel);
         return entrySide;
     }
 
@@ -171,12 +173,11 @@ public final class PickEntrySide extends HexMap implements ActionListener,
         frame.pack();
         frame.setVisible(true);
 
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setTerrain('D');
+        MasterHex hex = MasterBoard.getAnyHexWithTerrain('D');
         hex.setEntrySide(1);
         hex.setEntrySide(3);
         hex.setEntrySide(5);
-        int side = PickEntrySide.pickEntrySide(frame, hex);
+        int side = PickEntrySide.pickEntrySide(frame, hex.getLabel());
         Game.logEvent("Chose side " + side);
     }
 }

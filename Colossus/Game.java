@@ -125,6 +125,7 @@ public final class Game
         if (battle != null)
 	{
             newGame.battle = battle.AICopy();
+            newGame.battle.setGame(newGame);
         }
 	newGame.movementDie = null;
 	newGame.summonAngel = null;
@@ -365,7 +366,6 @@ public final class Game
     {
         return (Player)players.get(i);
     }
-
 
     public Collection getPlayers()
     {
@@ -993,8 +993,8 @@ public final class Game
     private void dumpLegion(PrintWriter out, Legion legion, boolean inBattle)
     {
         out.println(legion.getMarkerId());
-        out.println(legion.getCurrentHex().getLabel());
-        out.println(legion.getStartingHex().getLabel());
+        out.println(legion.getCurrentHexLabel());
+        out.println(legion.getStartingHexLabel());
         out.println(legion.hasMoved());
         out.println(legion.getEntrySide());
         out.println(legion.getParentId());
@@ -1011,7 +1011,7 @@ public final class Game
             if (inBattle)
             {
                 out.println(critter.getHits());
-                out.println(critter.getCurrentHex().getLabel());
+                out.println(critter.getCurrentHexLabel());
                 out.println(critter.getStartingHex().getLabel());
                 out.println(critter.hasStruck());
                 out.println(critter.getCarryFlag());
@@ -1234,7 +1234,7 @@ public final class Game
                 }
 
                 battle = new Battle(this, board, attacker, defender,
-                    activeLegionNum, engagementHex, battleTurnNum,
+                    activeLegionNum, engagementHex.getLabel(), battleTurnNum,
                     battlePhase);
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
@@ -1303,7 +1303,7 @@ public final class Game
         {
             buf = in.readLine();
             Critter critter = new Critter(
-                Creature.getCreatureFromName(buf), false, null);
+                Creature.getCreatureFromName(buf), false, null, this);
 
             buf = in.readLine();
             boolean visible = Boolean.valueOf(buf).booleanValue();
@@ -1347,7 +1347,7 @@ public final class Game
             legion = new Legion(markerId, parentId, currentHexLabel,
                 startingHexLabel, critters[0], critters[1], critters[2],
                 critters[3], critters[4], critters[5], critters[6],
-                critters[7], player);
+                critters[7], player.getName(), this);
             player.addLegion(legion);
             MasterHex hex = legion.getCurrentHex();
             hex.addLegion(legion, false);
@@ -2343,7 +2343,7 @@ public final class Game
             do
             {
                 selectedMarkerId = PickMarker.pickMarker(masterFrame,
-                    name, player.getMarkersAvailable());
+                    name, player.getMarkersAvailable(), this);
             }
             while (selectedMarkerId == null);
         }
@@ -2365,7 +2365,7 @@ public final class Game
         caretaker.takeOne(Creature.gargoyle);
 
         Legion legion = Legion.getStartingLegion(selectedMarkerId,
-            hex.getLabel(), player);
+            hex.getLabel(), player.getName(), this);
         player.addLegion(legion);
         hex.addLegion(legion, false);
     }
@@ -2385,7 +2385,7 @@ public final class Game
             Legion legion = (Legion)it.next();
             if (!legion.hasMoved())
             {
-                set.add(legion.getCurrentHex().getLabel());
+                set.add(legion.getCurrentHexLabel());
             }
         }
 
@@ -2600,8 +2600,7 @@ public final class Game
             }
 
             // Titan teleport
-            if (player.canTitanTeleport() &&
-                legion.numCreature(Creature.titan) > 0)
+            if (player.canTitanTeleport() && legion.hasTitan())
             {
                 // Mark every hex containing an enemy stack that does not
                 // already contain a friendly stack.
@@ -2613,7 +2612,7 @@ public final class Game
                             j++)
                         {
                             hex = getPlayer(i).getLegion(j).getCurrentHex();
-                            if (!hex.isEngagement())
+                            if (!isEngagement(hex))
                             {
                                 set.add(hex.getLabel());
                                 // Mover can choose side of entry.
@@ -2626,6 +2625,27 @@ public final class Game
         }
 
         return set;
+    }
+
+
+    boolean isEngagement(MasterHex hex)
+    {
+        if (hex.getNumLegions() > 1)
+        {
+            List markerIds = hex.getLegionMarkerIds();
+            Iterator it = markerIds.iterator();
+            String markerId = (String)it.next();
+            Player player = getPlayerByMarkerId(markerId);
+            while (it.hasNext())
+            {
+                markerId = (String)it.next();
+                if (getPlayerByMarkerId(markerId) != player)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -2713,7 +2733,8 @@ public final class Game
         // Handle any after-battle angel summoning or recruiting.
         if (hex.getNumLegions() == 1)
         {
-            Legion legion = hex.getLegion(0);
+            String markerId = hex.getLegionMarkerId(0);
+            Legion legion = getLegionByMarkerId(markerId);
             // Make all creatures in the victorious legion visible.
             legion.revealAllCreatures();
             // Remove battle info from legion and its creatures.
@@ -2782,7 +2803,7 @@ public final class Game
                 MasterHex hex = candidate.getCurrentHex();
                 if ((candidate.numCreature(Creature.angel) > 0 ||
                     candidate.numCreature(Creature.archangel) > 0) &&
-                    !hex.isEngagement())
+                    !isEngagement(hex))
                 {
 
                     count++;
@@ -3017,7 +3038,7 @@ public final class Game
                 else
                 {
                     side = PickEntrySide.pickEntrySide(masterFrame,
-                        hex);
+                        hex.getLabel());
                 }
                 hex.clearAllEntrySides();
                 if (side == 1 || side == 3 || side == 5)
@@ -3077,7 +3098,7 @@ public final class Game
 
         // Do not allow clicking on engagements if one is
         // already being resolved.
-        if (hex.isEngagement() && !engagementInProgress)
+        if (isEngagement(hex) && !engagementInProgress)
         {
             engagementInProgress = true;
             Legion attacker = hex.getFriendlyLegion(player);
@@ -3139,7 +3160,7 @@ public final class Game
                 attacker.revealAllCreatures();
                 defender.revealAllCreatures();
                 battle = new Battle(this, board, attacker, defender,
-                    Battle.DEFENDER, hex, 1, Battle.MOVE);
+                    Battle.DEFENDER, hex.getLabel(), 1, Battle.MOVE);
                 battle.init();
             }
         }
@@ -3172,7 +3193,7 @@ public final class Game
 
         // If this was the titan stack, its owner dies and gives half
         // points to the victor.
-        if (loser.numCreature(Creature.titan) == 1)
+        if (loser.hasTitan())
         {
             loser.getPlayer().die(winner.getPlayer(), true);
         }
@@ -3203,8 +3224,7 @@ public final class Game
                  " agree to mutual elimination");
 
              // If both Titans died, eliminate both players.
-             if (attacker.numCreature(Creature.titan) == 1 &&
-                 defender.numCreature(Creature.titan) == 1)
+             if (attacker.hasTitan() && defender.hasTitan())
              {
                  // Make defender die first, to simplify turn advancing.
                  defender.getPlayer().die(null, false);
@@ -3213,12 +3233,12 @@ public final class Game
 
              // If either was the titan stack, its owner dies and gives
              // half points to the victor.
-             else if (attacker.numCreature(Creature.titan) == 1)
+             else if (attacker.hasTitan())
              {
                  attacker.getPlayer().die(defender.getPlayer(), true);
              }
 
-             else if (defender.numCreature(Creature.titan) == 1)
+             else if (defender.hasTitan())
              {
                  defender.getPlayer().die(attacker.getPlayer(), true);
              }
@@ -3270,7 +3290,7 @@ public final class Game
 
             // If this was the titan stack, its owner dies and gives half
             // points to the victor.
-            if (loser.numCreature(Creature.titan) == 1)
+            if (loser.hasTitan())
             {
                 loser.getPlayer().die(winner.getPlayer(), true);
             }
@@ -3347,6 +3367,37 @@ public final class Game
             list.addAll((ArrayList)player.getLegions());
         }
         return list;
+    }
+
+
+    public Legion getLegionByMarkerId(String markerId)
+    {
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            Legion legion = player.getLegionByMarkerId(markerId);
+            if (legion != null)
+            {
+                return legion;
+            }
+        }
+        return null;
+    }
+
+    public Player getPlayerByMarkerId(String markerId)
+    {
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            Legion legion = player.getLegionByMarkerId(markerId);
+            if (legion != null)
+            {
+                return player;
+            }
+        }
+        return null;
     }
 
 

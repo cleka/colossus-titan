@@ -46,8 +46,10 @@ public final class Negotiate extends JDialog implements MouseListener,
 
         addMouseListener(this);
 
+        Game game = attacker.getGame();
+
         attackerMarker = new Marker(scale, attacker.getImageName(),
-            this, attacker);
+            this, game);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -69,8 +71,8 @@ public final class Negotiate extends JDialog implements MouseListener,
             chit.addMouseListener(this);
         }
 
-        defenderMarker = new Marker(scale, defender.getImageName(), this,
-            defender);
+        defenderMarker = new Marker(scale, defender.getImageName(),
+            this, game);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 1;
         constraints.gridwidth = 1;
@@ -315,7 +317,10 @@ public final class Negotiate extends JDialog implements MouseListener,
         hex.setLabel(130);
         hex.setTerrain('B');
 
-        Player player = new Player("Attacker", null);
+        Game game = new Game();
+
+        game.addPlayer("Attacker");
+        Player player = game.getPlayer(0);
         player.setScore(1400);
         player.setTower(1);
         player.setColor("Red");
@@ -324,19 +329,23 @@ public final class Negotiate extends JDialog implements MouseListener,
         Legion attacker = new Legion(selectedMarkerId, null, hex.getLabel(),
             hex.getLabel(), Creature.titan, Creature.colossus,
             Creature.serpent, Creature.archangel, Creature.hydra,
-            Creature.giant, Creature.dragon, null, player);
-        Marker marker = new Marker(scale, selectedMarkerId, frame, null);
+            Creature.giant, Creature.dragon, null, player.getName(), game);
+        player.addLegion(attacker);
+        Marker marker = new Marker(scale, selectedMarkerId, frame, game);
         attacker.setMarker(marker);
 
-        player = new Player("Defender", null);
+        game.addPlayer("Defender");
+        player = game.getPlayer(1);
         player.setTower(2);
         player.setColor("Blue");
         player.initMarkersAvailable();
         selectedMarkerId = player.selectMarkerId("Bu01");
         Legion defender = new Legion(selectedMarkerId, null, hex.getLabel(),
             hex.getLabel(), Creature.ogre, Creature.centaur,
-            Creature.gargoyle, null, null, null, null, null, player);
-        marker = new Marker(scale, selectedMarkerId, frame, null);
+            Creature.gargoyle, null, null, null, null, null,
+            player.getName(), game);
+        player.addLegion(defender);
+        marker = new Marker(scale, selectedMarkerId, frame, game);
         defender.setMarker(marker);
 
         Negotiate.negotiate(frame, attacker, defender);

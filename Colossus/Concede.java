@@ -27,7 +27,7 @@ public final class Concede extends JDialog implements ActionListener
     private Concede(JFrame parentFrame, Legion ally, Legion enemy,
         boolean flee)
     {
-        super(parentFrame, ally.getPlayer().getName() + ": " + (flee ?
+        super(parentFrame, ally.getPlayerName() + ": " + (flee ?
             "Flee" : "Concede") + " with Legion "  + ally.getLongMarkerName() +
             " in " + ally.getCurrentHex().getDescription() + "?", true);
 
@@ -46,7 +46,8 @@ public final class Concede extends JDialog implements ActionListener
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 
-        allyMarker = new Marker(scale, ally.getImageName(), this, ally);
+        Game game = ally.getGame();
+        allyMarker = new Marker(scale, ally.getImageName(), this, game);
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         gridbag.setConstraints(allyMarker, constraints);
@@ -64,7 +65,7 @@ public final class Concede extends JDialog implements ActionListener
             contentPane.add(chit);
         }
 
-        enemyMarker = new Marker(scale, enemy.getImageName(), this, enemy);
+        enemyMarker = new Marker(scale, enemy.getImageName(), this, game);
         constraints.gridy = 1;
         constraints.gridwidth = 1;
         gridbag.setConstraints(enemyMarker, constraints);
@@ -190,11 +191,13 @@ public final class Concede extends JDialog implements ActionListener
         frame.pack();
         frame.setVisible(true);
 
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setTerrain('B');
-        hex.setLabel(130);
+        MasterBoard board = new MasterBoard();
+        MasterHex hex = board.getHexFromLabel("130");
 
-        Player player = new Player("Attacker", null);
+        Game game = new Game();
+
+        game.addPlayer("Attacker");
+        Player player = game.getPlayer(0);
         player.setScore(1400);
         player.setTower(1);
         player.setColor("Red");
@@ -203,20 +206,24 @@ public final class Concede extends JDialog implements ActionListener
         Legion attacker = new Legion(selectedMarkerId, null, hex.getLabel(),
             hex.getLabel(), Creature.titan, Creature.colossus,
             Creature.serpent, Creature.archangel, Creature.hydra,
-            Creature.giant, Creature.dragon, null, player);
-        Marker marker = new Marker(scale, selectedMarkerId, frame, null);
+            Creature.giant, Creature.dragon, null, player.getName(), game);
+        player.addLegion(attacker);
+        Marker marker = new Marker(scale, selectedMarkerId, frame, game);
         attacker.setMarker(marker);
 
-        player = new Player("Defender", null);
+        game.addPlayer("Defender");
+        player = game.getPlayer(1);
         player.setTower(2);
         player.setColor("Blue");
         player.initMarkersAvailable();
-        selectedMarkerId = player.selectMarkerId("Bl01");
+        selectedMarkerId = player.selectMarkerId("Bu01");
         Legion defender = new Legion(selectedMarkerId, null, hex.getLabel(),
             hex.getLabel(), Creature.ogre, Creature.centaur,
-            Creature.gargoyle, null, null, null, null, null, player);
-        marker = new Marker(scale, selectedMarkerId, frame, null);
-        defender.setMarker(marker);
+            Creature.gargoyle, null, null, null, null, null,
+            player.getName(), game);
+        player.addLegion(defender);
+        Marker marker2 = new Marker(scale, selectedMarkerId, frame, game);
+        defender.setMarker(marker2);
 
         boolean answer = Concede.flee(frame, defender, attacker);
         Game.logEvent("Flee? " + answer);

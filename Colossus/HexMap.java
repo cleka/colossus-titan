@@ -15,7 +15,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private ArrayList hexes = new ArrayList(33);
     protected static int scale;
     protected int chitScale;
-    protected MasterHex masterHex;
+    protected String masterHexLabel;
 
     // ne, e, se, sw, w, nw
     protected BattleHex [] entrances = new BattleHex[6];
@@ -31,9 +31,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     };
 
 
-    public HexMap(MasterHex masterHex)
+    public HexMap(String masterHexLabel)
     {
-        this.masterHex = masterHex;
+        this.masterHexLabel = masterHexLabel;
         findScale();
         findChitScale();
         setOpaque(true);
@@ -75,9 +75,15 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     }
 
 
+    public MasterHex getMasterHex()
+    {
+        return MasterBoard.getHexFromLabel(masterHexLabel);
+    }
+
+
     private void setupHexes()
     {
-        char terrain = masterHex.getTerrain();
+        char terrain = getMasterHex().getTerrain();
 
         int cx = 6 * scale;
         int cy = 3 * scale;
@@ -686,14 +692,23 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public static void main(String [] args)
     {
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setTerrain('D');
+        char terrain;
+        if (args.length == 0)
+        {
+            terrain = 'D';
+        }
+        else
+        {
+            terrain = args[0].charAt(0);
+        }
+        MasterBoard board = new MasterBoard();
+        MasterHex hex = MasterBoard.getAnyHexWithTerrain(terrain);
 
         JFrame window = new JFrame("Hex Map for " + hex.getTerrainName());
         Container contentPane = window.getContentPane();
         contentPane.setLayout(new BorderLayout());
 
-        HexMap hexMap = new HexMap(hex);
+        HexMap hexMap = new HexMap(hex.getLabel());
 
         contentPane.add(hexMap, BorderLayout.CENTER);
         window.pack();

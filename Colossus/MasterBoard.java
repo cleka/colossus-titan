@@ -109,11 +109,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
         masterFrame.addWindowListener(this);
         addMouseListener(this);
 
+        setupHexes();
+
         setupActions();
         setupPopupMenu();
         setupTopMenu();
-
-        setupHexes();
 
         contentPane.add(new JScrollPane(this), BorderLayout.CENTER);
         masterFrame.pack();
@@ -121,9 +121,22 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+    // No-arg constructor for testing.
+    public MasterBoard()
+    {
+        setupHexes();
+    }
+
+
     public void setGame(Game game)
     {
         this.game = game;
+    }
+
+
+    public Game getGame()
+    {
+        return game;
     }
 
 
@@ -326,7 +339,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 MasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame, hex);
+                    new ShowBattleMap(masterFrame, hex.getLabel());
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }
@@ -1425,7 +1438,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 chitScale = 60;
             }
             Marker marker = new Marker(chitScale, legion.getImageName(),
-                this, null);
+                this, game);
             legion.setMarker(marker);
             MasterHex hex = legion.getCurrentHex();
             hex.alignLegions();
@@ -1489,6 +1502,26 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+    /** Do a brute-force search through the hex array, looking for
+     *  a hex with the proper terrain type.  Return the hex, or null
+     * if none is found. */
+    public static MasterHex getAnyHexWithTerrain(char terrain)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            MasterHex hex = (MasterHex)it.next();
+            if (hex.getTerrain() == terrain)
+            {
+                return hex;
+            }
+        }
+
+        Game.logError("Could not find hex with terrain " + terrain);
+        return null;
+    }
+
+
     /** Return the MasterHex that contains the given point, or
      *  null if none does. */
     private MasterHex getHexContainingPoint(Point point)
@@ -1517,10 +1550,9 @@ public final class MasterBoard extends JPanel implements MouseListener,
             Marker marker = (Marker)it.next();
             if (marker != null && marker.contains(point))
             {
-                return marker.getLegion();
+                return game.getLegionByMarkerId(marker.getId());
             }
         }
-
         return null;
     }
 

@@ -30,7 +30,7 @@ public final class PickRecruit extends JDialog implements MouseListener,
 
     private PickRecruit(JFrame parentFrame, Legion legion)
     {
-        super(parentFrame, legion.getPlayer().getName() +
+        super(parentFrame, legion.getPlayerName() +
             ": Pick Recruit in " + legion.getCurrentHex().getDescription(),
             true);
 
@@ -48,7 +48,6 @@ public final class PickRecruit extends JDialog implements MouseListener,
         recruits = game.findEligibleRecruits(legion);
         int numEligible = recruits.size();
 
-
         addMouseListener(this);
         addWindowListener(this);
 
@@ -62,7 +61,7 @@ public final class PickRecruit extends JDialog implements MouseListener,
 
         setResizable(false);
 
-        legionMarker = new Marker(scale, legion.getImageName(), this, legion);
+        legionMarker = new Marker(scale, legion.getImageName(), this, null);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         gridbag.setConstraints(legionMarker, constraints);
@@ -214,15 +213,17 @@ public final class PickRecruit extends JDialog implements MouseListener,
         frame.pack();
         frame.setVisible(true);
 
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setTerrain('B');
-        hex.setLabel(130);
+        MasterBoard board = new MasterBoard();
+        MasterHex hex = board.getHexFromLabel("130");
 
-        Player player = new Player("Test", null);
+        Game game = new Game();
+        game.addPlayer("Test");
+        Player player = game.getPlayer(0);
         Legion legion = new Legion("Bk01", null, hex.getLabel(),
             hex.getLabel(), Creature.titan, Creature.gargoyle,
             Creature.gargoyle, Creature.cyclops, Creature.cyclops, null,
-            null, null, player);
+            null, null, player.getName(), game);
+        player.addLegion(legion);
 
         Creature creature = PickRecruit.pickRecruit(frame, legion);
         Game.logEvent("Recruited " + creature);

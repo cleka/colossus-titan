@@ -11,7 +11,7 @@ public final class Critter extends Creature
 {
     private boolean visible;
     private Creature creature;
-    private Legion legion;
+    private String markerId;
     private BattleMap map;
     private Battle battle;
     private boolean struck;
@@ -22,22 +22,26 @@ public final class Critter extends Creature
     /** Mark whether this critter is a legal carry target. */
     private boolean carryFlag;
     private BattleChit chit;
+    private Game game;
 
 
-    public Critter(Creature creature, boolean visible, Legion legion)
+    public Critter(Creature creature, boolean visible, String markerId,
+        Game game)
     {
         super(creature);
 
         this.creature = creature;
         this.visible = visible;
-        this.legion = legion;
+        this.markerId = markerId;
+        this.game = game;
     }
 
 
     /** Deep copy for AI. */
     public Critter AICopy()
     {
-        Critter newCritter = new Critter(creature, visible, legion.AICopy());
+        Critter newCritter = new Critter(creature, visible, markerId, null);
+        // Caller needs to set the game.
 
         newCritter.map = map;
         newCritter.battle = battle;
@@ -62,42 +66,50 @@ public final class Critter extends Creature
         this.battle = battle;
     }
 
+    public void setGame(Game game)
+    {
+        this.game = game;
+    }
 
     public boolean isVisible()
     {
         return visible;
     }
 
-
     public void setVisible(boolean visible)
     {
         this.visible = visible;
     }
-
 
     public Creature getCreature()
     {
         return creature;
     }
 
+    public String getMarkerId()
+    {
+        return markerId;
+    }
+
+    public void setMarkerId(String markerId)
+    {
+        this.markerId = markerId;
+    }
 
     public Legion getLegion()
     {
-        return legion;
+        return game.getLegionByMarkerId(markerId);
     }
 
-
-    public void setLegion(Legion legion)
+    public Player getPlayer()
     {
-        this.legion = legion;
+        return game.getPlayerByMarkerId(markerId);
     }
-
 
     public BattleChit getChit()
     {
         return chit;
     }
-
 
     /** Return only the base part of the image name for this critter. */
     public String getImageName(boolean inverted)
@@ -126,7 +138,16 @@ public final class Critter extends Creature
     {
         if (isTitan())
         {
-            return getPlayer().getTitanPower();
+            Player player = getPlayer();
+            if (player != null)
+            {
+                return player.getTitanPower();
+            }
+            else
+            {
+                // Just in case player is dead.
+                return 6;
+            }
         }
         return super.getPower();
     }
@@ -344,13 +365,10 @@ public final class Critter extends Creature
     }
 
 
-    // TODO Check move for legality.
-    // TODO Check for move to current hex.
+    /** Most code should use Battle.doMove() instead, since it checks
+     *  for legality and logs the move. */
     public void moveToHex(BattleHex hex)
     {
-        Game.logEvent(getName() + " moves from " + currentHexLabel +
-            " to " + hex.getLabel());
-
         getCurrentHex().removeCritter(this);
         currentHexLabel = hex.getLabel();
         getCurrentHex().addCritter(this);
@@ -478,7 +496,7 @@ public final class Critter extends Creature
         else if (!getName().equals("Warlock"))
         {
             // Range penalty
-            if (battle.getRange(hex, targetHex) == 4)
+            if (battle.getRange(hex, targetHex, false) == 4)
             {
                 attackerSkill--;
             }
@@ -801,8 +819,6 @@ public final class Critter extends Creature
         int [] rolls = new int[dice];
         StringBuffer rollString = new StringBuffer(36);
 
-        Game game = battle.getGame();
-
         if (rollFakeDice)
         {
             for (int i = 0; i < dice; i++)
@@ -920,11 +936,5 @@ public final class Critter extends Creature
             hits = getPower();
         }
         chit.setDead(dead);
-    }
-
-
-    public Player getPlayer()
-    {
-        return legion.getPlayer();
     }
 }

@@ -943,9 +943,10 @@ public final class Player implements Comparable
         }
     }
 
-    public void aiStrike(Legion legion, Battle battle, boolean fakeDice)
+    public void aiStrike(Legion legion, Battle battle, boolean fakeDice,
+        boolean forced)
     {
-        if (getOption(Options.autoStrike))
+        if (forced || getOption(Options.autoStrike))
         {
             ai.strike(legion, battle, game, fakeDice);
         }

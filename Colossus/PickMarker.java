@@ -16,12 +16,15 @@ public final class PickMarker extends JDialog implements MouseListener,
     private ArrayList markers = new ArrayList();
     private static final int scale = 60;
     private static String markerId;
+    private Game game;
 
 
-    private PickMarker(JFrame parentFrame, String name,
-        Collection markerIds)
+    private PickMarker(JFrame parentFrame, String name, Collection markerIds,
+        Game game)
     {
         super(parentFrame, name + ": Pick Legion Marker", true);
+
+        this.game = game;
 
         addMouseListener(this);
         addWindowListener(this);
@@ -40,7 +43,7 @@ public final class PickMarker extends JDialog implements MouseListener,
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-            Marker marker = new Marker(scale, markerId, this, null);
+            Marker marker = new Marker(scale, markerId, this, game);
             markers.add(marker);
             contentPane.add(marker);
             marker.addMouseListener(this);
@@ -59,7 +62,7 @@ public final class PickMarker extends JDialog implements MouseListener,
     /** Return the chosen marker id, or null if none are available or
      *  the player aborts the selection. */
     public static String pickMarker(JFrame parentFrame, String name,
-        Collection markerIds)
+        Collection markerIds, Game game)
     {
         if (markerIds.isEmpty())
         {
@@ -68,7 +71,7 @@ public final class PickMarker extends JDialog implements MouseListener,
 
         markerId = null;
 
-        new PickMarker(parentFrame, name, markerIds);
+        new PickMarker(parentFrame, name, markerIds, game);
 
         return markerId;
     }
@@ -150,13 +153,15 @@ public final class PickMarker extends JDialog implements MouseListener,
         frame.pack();
         frame.setVisible(true);
 
-        Player player = new Player("Test", null);
+        Game game = new Game();
+        game.addPlayer("Test");
+        Player player = game.getPlayer(0);
         player.setTower(1);
         player.setColor("Red");
         player.initMarkersAvailable();
 
         String choice = PickMarker.pickMarker(frame, player.getName(),
-            player.getMarkersAvailable());
+            player.getMarkersAvailable(), game);
         // XXX Pass a deep clone rather than the original list.
         // Or at least call Collections.unmodifyableSortedSet()
         Game.logEvent("Chose " + choice);

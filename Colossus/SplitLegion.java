@@ -37,6 +37,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
 
         this.oldLegion = oldLegion;
         this.parentFrame = parentFrame;
+        Game game = oldLegion.getGame();
         player = oldLegion.getPlayer();
 
         String selectedMarkerId;
@@ -47,7 +48,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         else
         {
             selectedMarkerId = PickMarker.pickMarker(parentFrame,
-                name, player.getMarkersAvailable());
+                name, player.getMarkersAvailable(), game);
         }
 
         if (selectedMarkerId == null)
@@ -63,9 +64,11 @@ public final class SplitLegion extends JDialog implements MouseListener,
         pack();
 
         newLegion = Legion.getEmptyLegion(selectedMarkerId,
-            oldLegion.getMarkerId(), oldLegion.getCurrentHexLabel(), player);
+            oldLegion.getMarkerId(), oldLegion.getCurrentHexLabel(),
+            player.getName(), game);
+        player.addLegion(newLegion);
         String imageName = selectedMarkerId;
-        newMarker = new Marker(scale, imageName, this, null);
+        newMarker = new Marker(scale, imageName, this, game);
         newLegion.setMarker(newMarker);
 
         setBackground(Color.lightGray);
@@ -74,8 +77,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         addMouseListener(this);
         addWindowListener(this);
 
-        oldMarker = new Marker(scale, oldLegion.getImageName(), this,
-            oldLegion);
+        oldMarker = new Marker(scale, oldLegion.getImageName(), this, game);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -149,7 +151,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         {
             active = true;
             new SplitLegion(parentFrame, oldLegion,
-                oldLegion.getPlayer().getName(), autoPickMarker);
+                oldLegion.getPlayerName(), autoPickMarker);
             active = false;
         }
     }
@@ -350,14 +352,17 @@ public final class SplitLegion extends JDialog implements MouseListener,
         frame.pack();
         frame.setVisible(true);
 
-        Player player = new Player("Test", null);
+        Game game = new Game();
+        game.addPlayer("Test");
+        Player player = game.getPlayer(0);
         player.setTower(1);
         player.setColor("Red");
         player.initMarkersAvailable();
         String selectedMarkerId = player.selectMarkerId("Rd01");
         Legion legion = Legion.getStartingLegion(selectedMarkerId, null,
-            player);
-        Marker marker = new Marker(scale, selectedMarkerId, frame, null);
+            player.getName(), game);
+        player.addLegion(legion);
+        Marker marker = new Marker(scale, selectedMarkerId, frame, game);
         legion.setMarker(marker);
 
         SplitLegion.splitLegion(frame, legion, false);

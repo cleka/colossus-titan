@@ -161,7 +161,7 @@ public final class AcquireAngel extends JDialog implements MouseListener,
         Legion legion = new Legion("Bk01", null, hex.getLabel(),
             hex.getLabel(), Creature.titan, Creature.gargoyle,
             Creature.cyclops, Creature.behemoth, Creature.serpent,
-            Creature.warlock, null, null, player);
+            Creature.warlock, null, null, player.getName(), null);
 
         ArrayList recruits = new ArrayList();
         recruits.add("Archangel");

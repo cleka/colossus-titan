@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Caretaker
 {
-    /** 
+    /**
      * mapping from String creature name to Integer count.  If the
      * creature is not found, assume that we have a full count (equal
      * to Creature.getMaxCount())
@@ -19,11 +19,13 @@ public class Caretaker
 
     public int getCount(Creature creature)
     {
-	Integer count = (Integer) map.get(creature.getName());
-	if (count == null)
-	    return creature.getMaxCount();
-        return count.intValue();;
-    } 
+        Integer count = (Integer) map.get(creature.getName());
+        if (count == null)
+        {
+            return creature.getMaxCount();
+        }
+        return count.intValue();
+    }
 
     public void setCount(Creature creature, int count)
     {
@@ -32,36 +34,42 @@ public class Caretaker
 
     public void resetAllCounts()
     {
-	map = new HashMap();
+        map = new HashMap();
     }
 
     public void takeOne(Creature creature)
     {
-	Integer count = (Integer) map.get(creature.getName());
-	if (count == null)
-	{
+        Integer count = (Integer) map.get(creature.getName());
+        if (count == null)
+        {
             Game.logEvent("First " + creature.getName() + " recruited");
-	    map.put(creature.getName(), new Integer(creature.getMaxCount() - 1));
-	}
-	else
-	{
+            map.put(creature.getName(), new Integer(
+		creature.getMaxCount() - 1));
+        }
+        else
+        {
             if (count.intValue() == creature.getMaxCount())
             {
                 // Not quite right for demi-lords.
                 Game.logEvent("First " + creature.getName() + " recruited");
             }
-            if (count.intValue() == 1) 
+            if (count.intValue() == 1)
             {
                 Game.logEvent("Last " + creature.getName() + " recruited");
             }
-	    map.put(creature.getName(), new Integer(count.intValue()-1));
-	}
-    } 
+            map.put(creature.getName(), new Integer(count.intValue()-1));
+        }
+    }
 
     public void putOneBack(Creature creature)
     {
-	Integer count = (Integer) map.get(creature.getName());
-	map.put(creature.getName(), new Integer(count.intValue()+1));
+        Integer count = (Integer)map.get(creature.getName());
+        // count can be null if we're testing a battle.
+        if (count == null)
+        {
+            count = new Integer(creature.getMaxCount() - 1);
+        }
+        map.put(creature.getName(), new Integer(count.intValue()+1));
     }
 
     /**
@@ -69,10 +77,10 @@ public class Caretaker
      */
     public Caretaker AICopy()
     {
-	Caretaker newCaretaker = new Caretaker();
-	// because String and Integer are both immutable, a shallow copy is
-	// the same as a deep copy
-	newCaretaker.map = (HashMap) map.clone();
-	return newCaretaker;
+        Caretaker newCaretaker = new Caretaker();
+        // because String and Integer are both immutable, a shallow copy is
+        // the same as a deep copy
+        newCaretaker.map = (HashMap) map.clone();
+        return newCaretaker;
     }
 }

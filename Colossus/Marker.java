@@ -8,30 +8,18 @@ import java.awt.*;
 
 public final class Marker extends Chit
 {
-    private Legion legion;
     private static Font font;
     private static Font oldFont;
     private static int fontHeight;
     private static int fontWidth;
+    private Game game;
 
 
-    public Marker(int scale, String id, Container container, Legion legion)
+    public Marker(int scale, String id, Container container, Game game)
     {
         super(scale, id, container);
-        this.legion = legion;
         setBackground(Color.black);
-    }
-
-
-    public void setLegion(Legion legion)
-    {
-        this.legion = legion;
-    }
-
-
-    public Legion getLegion()
-    {
-        return legion;
+        this.game = game;
     }
 
 
@@ -54,6 +42,11 @@ public final class Marker extends Chit
         Rectangle rect = getBounds();
         g.drawRect(rect.x, rect.y, rect.width, rect.height);
 
+        if (game == null)
+        {
+            return;
+        }
+        Legion legion = game.getLegionByMarkerId(getId());
         if (legion == null)
         {
             return;

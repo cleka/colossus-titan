@@ -14,7 +14,7 @@ public final class PickRoll extends JDialog implements MouseListener,
     WindowListener, KeyListener
 {
     private Chit [] dice = new Chit[6];
-    private Chit question; 
+    private Chit question;
     private static int scale = 60;
     private static int roll;
 
