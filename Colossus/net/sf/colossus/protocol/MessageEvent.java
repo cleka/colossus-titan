@@ -15,8 +15,8 @@ KIBBITZ <message>
  */
 public class MessageEvent extends GameEvent
 {
-	MessageEvent(Object oSource)
-		{
-			super(oSource);
-		}
+    MessageEvent(Object oSource)
+	{
+	    super(oSource);
+	}
 }

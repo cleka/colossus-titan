@@ -74,8 +74,8 @@ RECRUITS <legion> <units>
 
 public class MasterBoardEvent extends GameEvent
 {
-	MasterBoardEvent(Object oSource)
-		{
-			super(oSource);
-		}
+    MasterBoardEvent(Object oSource)
+	{
+	    super(oSource);
+	}
 }

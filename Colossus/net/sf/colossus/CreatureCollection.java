@@ -9,28 +9,28 @@ import java.util.Hashtable;
  */
 class CreatureCollection implements ICreatureCollection
 {
-	private Hashtable m_oCharacterCounts = new Hashtable();
-	private String m_strName;
+    private Hashtable m_oCharacterCounts = new Hashtable();
+    private String m_strName;
 
-	CreatureCollection(String strName)
-		{
-			m_strName = strName;
-		}
+    CreatureCollection(String strName)
+	{
+	    m_strName = strName;
+	}
 
-	public String getName() { return m_strName; }
+    public String getName() { return m_strName; }
 
-	public void setCount(String strCharacterName, int nCount)
-		{
-			m_oCharacterCounts.put(strCharacterName, new Integer(nCount));
-		}
-	public int getCount(String strCharacterName)
-		{
-			int nCount = 0;
-			if(m_oCharacterCounts.containsKey(strCharacterName))
-			{
-				nCount = ((Integer)m_oCharacterCounts.get(strCharacterName)).intValue();
-			}
-			return nCount;
-		}
+    public void setCount(String strCharacterName, int nCount)
+	{
+	    m_oCharacterCounts.put(strCharacterName, new Integer(nCount));
+	}
+    public int getCount(String strCharacterName)
+	{
+	    int nCount = 0;
+	    if(m_oCharacterCounts.containsKey(strCharacterName))
+	    {
+		nCount = ((Integer)m_oCharacterCounts.get(strCharacterName)).intValue();
+	    }
+	    return nCount;
+	}
 	
 }

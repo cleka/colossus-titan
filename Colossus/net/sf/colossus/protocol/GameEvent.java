@@ -61,8 +61,8 @@ CONCEDE? <legion>
 
 public class GameEvent extends EventObject
 {
-	GameEvent(Object oSource)
-		{
-			super(oSource);
-		}
+    GameEvent(Object oSource)
+	{
+	    super(oSource);
+	}
 }

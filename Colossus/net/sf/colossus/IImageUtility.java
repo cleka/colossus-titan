@@ -14,7 +14,7 @@ import javax.swing.ImageIcon;
  *  @author Tom Fruchterman */
 public interface IImageUtility
 {
-	public ImageIcon getImageIcon(String strPath);
+    public ImageIcon getImageIcon(String strPath);
 
-	public String getImagePath(String strName);
+    public String getImagePath(String strName);
 }

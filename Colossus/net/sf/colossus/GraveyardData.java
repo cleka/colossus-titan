@@ -7,19 +7,19 @@ package net.sf.colossus;
  *  @author Tom Fruchterman
  */
 public class GraveyardData
-	extends CreatureCollection
-	implements java.io.Serializable, IGraveyardData
+    extends CreatureCollection
+    implements java.io.Serializable, IGraveyardData
 {
-	public GraveyardData()
-		{
-			super("Graveyard");
-		}
+    public GraveyardData()
+	{
+	    super("Graveyard");
+	}
 
 
-	public void retireCharacter(String strCharacterName)
-		{
-			int nCount = getCount(strCharacterName);
-			nCount++;
-			setCount(strCharacterName, nCount);
-		}
+    public void retireCharacter(String strCharacterName)
+	{
+	    int nCount = getCount(strCharacterName);
+	    nCount++;
+	    setCount(strCharacterName, nCount);
+	}
 }

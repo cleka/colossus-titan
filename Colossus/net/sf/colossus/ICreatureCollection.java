@@ -8,8 +8,8 @@ package net.sf.colossus;
  */
 public interface ICreatureCollection
 {
-	public String getName();
-	public void setCount(String strCharacterName, int nCount);
-	public int getCount(String strCharacterName);
+    public String getName();
+    public void setCount(String strCharacterName, int nCount);
+    public int getCount(String strCharacterName);
 }
 

@@ -66,8 +66,8 @@ STRIKES <battlehex0> <battlehex1> <number11> <number12> ...
 
 public class BattleBoardEvent extends GameEvent
 {
-	BattleBoardEvent(Object oSource)
-		{
-			super(oSource);
-		}
+    BattleBoardEvent(Object oSource)
+	{
+	    super(oSource);
+	}
 }
