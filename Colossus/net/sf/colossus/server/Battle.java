@@ -690,17 +690,13 @@ Log.debug("Battle.setupSummon() advance will be " + advance);
     /** This method is called by the defender on turn 1 in the tower.
      *  So we know that there are no enemies on board, and all allies
      *  are mobile. */
-    private Set findUnoccupiedTowerHexes(boolean ignoreMobileAllies)
+    private Set findUnoccupiedTowerHexes(boolean ignoreMobileAllies, char t)
     {
         Set set = new HashSet();
-        BattleHex centerHex = HexMap.getCenterTowerHex();
-        if (ignoreMobileAllies || !isOccupied(centerHex))
+        Iterator it = HexMap.getTowerStartList(t).iterator();
+        while (it.hasNext())
         {
-            set.add(centerHex.getLabel());
-        }
-        for (int i = 0; i < 6; i++)
-        {
-            BattleHex hex = centerHex.getNeighbor(i);
+            BattleHex hex = HexMap.getHexByLabel(t, (String)it.next());
             if (ignoreMobileAllies || !isOccupied(hex))
             {
                 set.add(hex.getLabel());
@@ -723,10 +719,10 @@ Log.debug("Battle.setupSummon() advance will be " + advance);
         Set set = new HashSet();
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
-            if (terrain == 'T' && turnNumber == 1 &&
+            if (HexMap.terrainIsTower(terrain) && (turnNumber == 1) &&
                 activeLegionNum == Constants.DEFENDER)
             {
-                set = findUnoccupiedTowerHexes(ignoreMobileAllies);
+                set = findUnoccupiedTowerHexes(ignoreMobileAllies, terrain);
             }
             else
             {
@@ -1495,7 +1491,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
     private boolean isLOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
         BattleHex finalHex, boolean left, int strikeElevation,
         boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle,
-        boolean midCliff, boolean midChit, int totalObstacles)
+        boolean midCliff, boolean midChit, int totalObstacles, int totalWalls)
     {
         boolean targetAtop = false;
         boolean targetAtopCliff = false;
@@ -1533,6 +1529,10 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
                 {
                     strikerAtopCliff = true;
                 }
+                if (hexside == 'w')
+                {
+                    totalWalls++;
+                }
             }
 
             if (hexside2 != ' ')
@@ -1542,6 +1542,10 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
                 if (hexside2 == 'c')
                 {
                     midCliff = true;
+                }
+                if (hexside == 'w')
+                {
+                    totalWalls++;
                 }
             }
         }
@@ -1555,6 +1559,10 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
                 {
                     midCliff = true;
                 }
+                if (hexside == 'w')
+                {
+                    totalWalls++;
+                }
             }
 
             if (hexside2 != ' ')
@@ -1564,6 +1572,10 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
                 if (hexside2 == 'c')
                 {
                     targetAtopCliff = true;
+                }
+                if (hexside == 'w')
+                {
+                    totalWalls++;
                 }
             }
 
@@ -1592,7 +1604,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
 
             // If there are two walls, striker or target must be at elevation
             //     2 and range must not be 3.
-            if (terrain == 'T' && totalObstacles >= 2 &&
+            if (totalWalls >= 2 &&
                 getRange(initialHex, finalHex, false) == 3)
             {
                 return true;
@@ -1619,11 +1631,15 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
                 {
                     midCliff = true;
                 }
+                if (hexside == 'w')
+                {
+                    totalWalls++;
+                }
             }
         }
 
-        // Trees block LOS.
-        if (nextHex.getTerrain() == 't')
+        // hes that block LOS.
+        if (nextHex.blockLineOfSight())
         {
             return true;
         }
@@ -1639,7 +1655,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
 
         return isLOSBlockedDir(initialHex, nextHex, finalHex, left,
             strikeElevation, strikerAtop, strikerAtopCliff,
-            midObstacle, midCliff, midChit, totalObstacles);
+            midObstacle, midCliff, midChit, totalObstacles, totalWalls);
     }
 
     /** Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
@@ -1684,14 +1700,14 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         {
             // Hexspine; try both sides.
             return (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
-                false, false, false, false, false, 0) &&
+                false, false, false, false, false, 0, 0) &&
                 isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
-                false, false, false, false, false, 0));
+                false, false, false, false, false, 0, 0));
         }
         else
         {
             return isLOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
-                strikeElevation, false, false, false, false, false, 0);
+                strikeElevation, false, false, false, false, false, 0, 0);
         }
     }
 

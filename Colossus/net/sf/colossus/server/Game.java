@@ -21,6 +21,7 @@ import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.client.VariantSupport;
+import net.sf.colossus.client.HexMap;
 
 /**
  * Class Game gets and holds high-level data about a Titan game.
@@ -1766,7 +1767,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
 
         caretaker.takeOne(Creature.getCreatureByName("Titan"));
         caretaker.takeOne(Creature.getCreatureByName(getPrimaryAcquirable()));
-        Creature[] startCre = trl.getStartingCreatures();
+        Creature[] startCre = trl.getStartingCreatures(MasterBoard.getHexByLabel(hexLabel).getTerrain());
         caretaker.takeOne(startCre[2]);
         caretaker.takeOne(startCre[2]);
         caretaker.takeOne(startCre[0]);
@@ -1785,7 +1786,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         int entrySide = -1;
         if (cameFrom != -1)
         {
-            if (hex.getTerrain() == 'T') 
+            if (HexMap.terrainIsTower(hex.getTerrain())) 
             {
                 entrySide = 3;
             }
@@ -1987,7 +1988,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         Player player = legion.getPlayer();
 
         // Tower teleport
-        if (hex.getTerrain() == 'T' && legion.numLords() > 0 &&
+        if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0 &&
             !player.hasTeleported())
         {
             // Mark every unoccupied hex within 6 hexes.
@@ -2054,7 +2055,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
                 // Towers only have bottom entry side.
                 // Don't bother finding more than one entry side if unoccupied.
                 if (!isOccupied(targetHexLabel) ||
-                    targetHex.getTerrain() == 'T')
+                    HexMap.terrainIsTower(targetHex.getTerrain()))
                     
                 {
                     entrySides.add(Constants.bottom);  
@@ -2388,7 +2389,8 @@ Log.debug("" + findEngagements().size() + " engagements left");
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         // If this is a tower hex, the only entry side is the bottom.
-        if (hex.getTerrain() == 'T' && !entrySide.equals(Constants.bottom))
+        if (HexMap.terrainIsTower(hex.getTerrain()) &&
+            !entrySide.equals(Constants.bottom))
         {
             Log.warn("Tried to enter invalid side of tower");
             entrySide = Constants.bottom;
@@ -3121,7 +3123,13 @@ Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord +
         return trl.getStartingCreatures();
     }
 
-    public static char[] getTerrains()
+    /** Return an array of the 3 starting tower creatures. */
+    static Creature [] getStartingCreatures(char t)
+    {
+        return trl.getStartingCreatures(t);
+    }
+
+   public static char[] getTerrains()
     {
         return trl.getTerrains();
     }

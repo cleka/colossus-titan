@@ -95,7 +95,7 @@ public final class VariantSupport
                 Log.debug("Variant using TER " + recruitName);
                 if (data[VariantLoader.DEPEND_INDEX] != null)
                 {
-                    dependUpon = Split.split('.', data[VariantLoader.DEPEND_INDEX]);
+                    dependUpon = Split.split(',', data[VariantLoader.DEPEND_INDEX]);
                     Log.debug("Variant dependng upon " + dependUpon);
                 }
                 else

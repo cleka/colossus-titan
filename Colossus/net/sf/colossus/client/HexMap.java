@@ -34,6 +34,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static Map terrainH = new HashMap();
     private static Map terrainHexes = new HashMap();
     private static Map entrancesHex = new HashMap();
+    private static Map towerStartListMap = new HashMap();
 
     /** ne, e, se, sw, w, nw */
     private GUIBattleHex [] entrances = new GUIBattleHex[6];
@@ -161,6 +162,12 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         {
             BattlelandLoader bl = new BattlelandLoader(batIS);
             while (bl.oneBattlelandCase(h) >= 0) {}
+            java.util.List tempTowerStartList = bl.getStartList();
+            if (tempTowerStartList != null)
+            {
+                towerStartListMap.put(new Character(terrain),
+                                      tempTowerStartList);
+            }
         }
         catch (Exception e) 
         {
@@ -442,14 +449,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return set;
     }
 
-
-    /** Return the hex that is defined as the center of the map,
-     *  for defender tower entry purposes. */
-    public static BattleHex getCenterTowerHex()
+    public static java.util.List getTowerStartList(char terrain)
     {
-        return getHexByLabel('T', "D4");
+        return (java.util.List)towerStartListMap.get(new Character(terrain));
     }
-
 
     public void mousePressed(MouseEvent e)
     {
@@ -531,5 +534,17 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public Dimension getPreferredSize()
     {
         return new Dimension(60 * Scale.get(), 55 * Scale.get());
+    }
+
+    public boolean terrainIsTower()
+    {
+        return terrainIsTower(terrain);
+    }
+
+    public static boolean terrainIsTower(char t)
+    {
+        java.util.List temp =
+            (java.util.List)towerStartListMap.get(new Character(t));
+        return (!(temp == null));
     }
 }

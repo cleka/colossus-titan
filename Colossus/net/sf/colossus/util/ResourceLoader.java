@@ -512,8 +512,8 @@ public final class ResourceLoader
 
 	if (tempImage == null)
 	{
-	    Log.error("creation failed for " + filename);
-	    return null;
+	    Log.error("WARNING: creation failed for " + filename);
+	    return createPlainImage(basew, baseh, Color.white, true);
 	}
 	waitOnImage(tempImage);
 	String mapKey = getMapKey(filename, directories);
@@ -593,11 +593,22 @@ public final class ResourceLoader
 
     private static Image createPlainImage(int width, int height, Color color)
     {
-        return createPlainImage(width, height, color, 0, 0, width, height);
+        return createPlainImage(width, height, color,
+                                0, 0, width, height,
+                                false);
     }
 
     private static Image createPlainImage(int width, int height, Color color,
-                                          int t_x, int t_y, int t_w, int t_h)
+                                          boolean border)
+    {
+        return createPlainImage(width, height, color,
+                                0, 0, width, height,
+                                border);
+    }
+
+    private static Image createPlainImage(int width, int height, Color color,
+                                          int t_x, int t_y, int t_w, int t_h,
+                                          boolean border)
     {
         BufferedImage bi = new BufferedImage(width, height,
                                              BufferedImage.TYPE_INT_ARGB);
@@ -606,6 +617,12 @@ public final class ResourceLoader
         biContext.fillRect(0,0,width,height);
         biContext.setColor(color);
         biContext.fillRect(t_x,t_y,t_w,t_h);
+        if (border)
+        {
+            biContext.setColor(Color.black);
+            biContext.drawRect(0,0,width-1,height-1);
+        }
+        waitOnImage(bi);
         return bi;
     }
 
@@ -633,6 +650,7 @@ public final class ResourceLoader
                             0, 0,
                             width, height,
                             null);
+
         if (bi != null)
         {
             waitOnImage(bi);

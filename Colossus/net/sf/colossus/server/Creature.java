@@ -36,6 +36,9 @@ public class Creature implements Comparable
     private final boolean nativeSandDune;
     private final boolean nativeSlope;
     private final boolean nativeVolcano;
+    private final boolean nativeRiver;
+    private final boolean nativeStone;
+    private final boolean nativeTree;
     private final boolean waterDwelling;
     private final boolean magicMissile;
     private final boolean summonable;
@@ -46,8 +49,8 @@ public class Creature implements Comparable
     private static boolean noBaseColor = false;
 
     public static final Creature unknown = new Creature("Unknown", 1, 1,
-        false, false, false, false, false, false, false,
-        false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false,
         1, "Unknown");
 
     /** Sometimes we need to iterate through all creature types. */
@@ -58,8 +61,9 @@ public class Creature implements Comparable
     public Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
-        boolean nativeVolcano, boolean waterDwelling, boolean magicMissile,
-        boolean summonable,
+        boolean nativeVolcano, boolean nativeRiver, boolean nativeStone,
+        boolean nativeTree,
+        boolean waterDwelling, boolean magicMissile, boolean summonable,
         boolean lord, boolean demilord, int maxCount, String pluralName)
     {
         this.name = name;
@@ -73,6 +77,9 @@ public class Creature implements Comparable
         this.nativeSandDune = nativeSandDune;
         this.nativeSlope = nativeSlope;
         this.nativeVolcano = nativeVolcano;
+        this.nativeRiver = nativeRiver;
+        this.nativeStone = nativeStone;
+        this.nativeTree = nativeTree;
         this.waterDwelling = waterDwelling;
         this.magicMissile = magicMissile;
         this.summonable = summonable;
@@ -86,8 +93,9 @@ public class Creature implements Comparable
     public Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
-        boolean nativeVolcano, boolean waterDwelling, boolean magicMissile,
-        boolean summonable,
+        boolean nativeVolcano, boolean nativeRiver, boolean nativeStone,
+        boolean nativeTree,
+        boolean waterDwelling, boolean magicMissile, boolean summonable,
         boolean lord, boolean demilord, int maxCount, String pluralName,
         String baseColor)
     {
@@ -102,6 +110,9 @@ public class Creature implements Comparable
         this.nativeSandDune = nativeSandDune;
         this.nativeSlope = nativeSlope;
         this.nativeVolcano = nativeVolcano;
+        this.nativeRiver = nativeRiver;
+        this.nativeStone = nativeStone;
+        this.nativeTree = nativeTree;
         this.waterDwelling = waterDwelling;
         this.magicMissile = magicMissile;
         this.summonable = summonable;
@@ -125,6 +136,9 @@ public class Creature implements Comparable
         this.nativeSandDune = creature.nativeSandDune;
         this.nativeSlope = creature.nativeSlope;
         this.nativeVolcano = creature.nativeVolcano;
+        this.nativeRiver = creature.nativeRiver;
+        this.nativeStone = creature.nativeStone;
+        this.nativeTree = creature.nativeTree;
         this.waterDwelling = creature.waterDwelling;
         this.magicMissile = creature.magicMissile;
         this.summonable = creature.summonable;
@@ -302,6 +316,21 @@ public class Creature implements Comparable
     public boolean isNativeVolcano()
     {
         return nativeVolcano;
+    }
+
+    public boolean isNativeRiver()
+    {
+        return nativeRiver;
+    }
+
+    public boolean isNativeStone()
+    {
+        return nativeStone;
+    }
+
+    public boolean isNativeTree()
+    {
+        return nativeTree;
     }
 
     public boolean isWaterDwelling()

@@ -531,6 +531,28 @@ final class Critter extends Creature implements Comparable
             strikeNumber++;
         }
 
+        // Native defending in stone, from strike by a non-native: +1
+        // Native defending in stone, from rangestrike by a non-native
+        //     non-magicMissile: +1
+        if (target.getCurrentHex().getTerrain() == 'n' &&
+            target.isNativeStone() &&
+            !isNativeStone() &&
+            !(rangestrike && useMagicMissile()))
+        {
+            strikeNumber++;
+        }
+
+        // Native defending in tree, from strike by a non-native: +1
+        // Native defending in tree, from rangestrike by a non-native
+        //     non-magicMissile: no effect
+        if (target.getCurrentHex().getTerrain() == 't' &&
+            target.isNativeTree() &&
+            !isNativeTree() &&
+            !(rangestrike))
+        {
+            strikeNumber++;
+        }
+
         // Sixes always hit.
         if (strikeNumber > 6)
         {

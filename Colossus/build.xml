@@ -177,6 +177,9 @@
                        ExtTitan/**,
                        Badlands/**,
                        Undead/**,
+                       TG-SetII/**,
+                       TG-ConceptI/**,
+                       TG-ConceptIII/**,
                        Outlands/**"
              excludes="net/sf/colossus/datatools/*.class,
                        **/*Test.class"

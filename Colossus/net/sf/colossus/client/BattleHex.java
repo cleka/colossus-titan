@@ -26,23 +26,26 @@ public class BattleHex extends Hex
     // p, r, s, t, o, v, d, w
     // plain, bramble, sand, tree, bog, volcano, drift, tower
     // also
-    // l
-    // lake
+    // l, n
+    // lake, stone
 
     /**
      * The array of all the valid terrain type for a BattleHex.
      */
     private static final char[] allTerrains =
-    { 'p', 'w', 'r', 's', 't', 'o', 'v', 'd', 'l' };
+    { 'p', 'w', 'r', 's', 't', 'o', 'v', 'd', 'l', 'n' };
 
     // Hexside terrain types are:
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
+    // also
+    // r
+    // river
     /**
      * The array of all the valid terrain type for a BattleHex Side.
      */
     private static final char[] allHexsides =
-    { ' ', 'd', 'c', 's', 'w' };
+    { ' ', 'd', 'c', 's', 'w', 'r' };
 
     /**
      * Hold the type of the six side of the BattleHex.
@@ -119,6 +122,9 @@ public class BattleHex extends Hex
         case 'l':
             terrainName = "Lake";
             break;
+        case 'n':
+            terrainName = "Stone";
+            break;
         default:
             terrainName = "?????";
             break;
@@ -170,6 +176,8 @@ public class BattleHex extends Hex
             return Color.blue;
         case 'l':  // lake
             return HTMLColor.skyBlue;
+        case 'n':  // stone
+            return HTMLColor.dimGray;
         default:
             return Color.black;
         }
@@ -286,6 +294,8 @@ public class BattleHex extends Hex
             return("Slope");
         case 'w':
             return("Wall");
+        case 'r':
+            return("River");
         }
     }
 
@@ -365,6 +375,12 @@ public class BattleHex extends Hex
         return false;
     }
 
+    public boolean blockLineOfSight()
+    {
+        char terrain = getTerrain();
+
+        return ((terrain == 't') || (terrain == 'n'));
+    }
 
     /**
      * Return the number of movement points it costs to enter this hex.
@@ -382,7 +398,8 @@ public class BattleHex extends Hex
 
         // Check to see if the hex is occupied or totally impassable.
         if (((terrain == 'l') && (!creature.isWaterDwelling())) ||
-            (terrain == 't') ||
+            ((terrain == 't') && (!creature.isNativeTree())) ||
+            ((terrain == 'n') && (!creature.isNativeStone())) ||
             ((terrain == 'v') && (!creature.isNativeVolcano())) ||
             ((terrain == 'o') && (!creature.isNativeBog())))
         {
@@ -398,8 +415,17 @@ public class BattleHex extends Hex
             return IMPASSIBLE_COST;
         }
 
+        // river slows both way, except native & water dwellers
+        if ((hexside == 'r' || getOppositeHexside(cameFrom) == 'r') &&
+            !creature.isFlier() && !creature.isWaterDwelling()
+            && !creature.isNativeRiver())
+        {
+            return SLOW_COST;
+        }
+
         // Check for a slowing hexside.
-        if ((hexside == 'w' || (hexside == 's' && !creature.isNativeSlope()))
+        if ((hexside == 'w' ||
+             (hexside == 's' && !creature.isNativeSlope()))
             && !creature.isFlier() &&
             elevation > getNeighbor(cameFrom).getElevation())
         {
@@ -435,6 +461,10 @@ public class BattleHex extends Hex
         { // non-flyer can't fly, obviously...
             return false;
         }
+        if (terrain == 'n')
+        { // no one can fly through stone
+            return false;
+        }
         if (terrain == 'v')
         { // only volcano-native can fly over volcano
             return creature.isNativeVolcano();
@@ -445,7 +475,7 @@ public class BattleHex extends Hex
     /**
      * Return how much damage the Creature should take from this Hex.
      * @param creature The Creature that may suffer damage.
-     * @return HOw much damage the Creature should take from being there.
+     * @return How much damage the Creature should take from being there.
      */
     public int damageToCreature(Creature creature)
     {

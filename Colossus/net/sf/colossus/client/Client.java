@@ -118,6 +118,7 @@ public final class Client
 
     private int numPlayers;
 
+    private String currentLookAndFeel = null;
 
     public Client(Server server, String playerName, boolean primary)
     {
@@ -370,6 +371,10 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
         {
             updateStatusScreen();
         }
+        else if (optname.equals(Options.favoriteLookFeel))
+        {
+            setLookAndFeel(value);
+        }
         syncOptions();
     }
 
@@ -388,7 +393,6 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
         syncOptions();
     }
 
-
     /** Load player options from a file. The current format is standard
      *  java.util.Properties keyword=value */
     private void loadOptions()
@@ -397,7 +401,6 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
         optionChanged = true;
         syncOptions();
     }
-
 
     private void syncOptions()
     {
@@ -409,6 +412,12 @@ Log.debug("called Client.doSummon: " + unit + " from " + donor + " to " + summon
                 syncServerOptions();
             }
             optionChanged = false;
+            
+            String lfName = getStringOption(Options.favoriteLookFeel);
+            if ((lfName != null) && !lfName.equals(currentLookAndFeel))
+            {
+                setLookAndFeel(lfName);
+            }
         }
     }
 
@@ -2460,5 +2469,43 @@ Log.debug("found " + set.size() + " hexes");
     private String getHexForLegion(String markerId)
     {
         return getLegionInfo(markerId).getHexLabel();
+    }
+
+    void setLookAndFeel(String lfName)
+    {
+        try
+        {
+            UIManager.setLookAndFeel(lfName);
+            updateEverything();
+            Log.debug("Switched to Look & Feel: " + lfName);
+            options.setOption(Options.favoriteLookFeel,
+                              lfName);
+            currentLookAndFeel = lfName;
+        }
+        catch (Exception e)
+        {
+            System.err.println("Warning: Look & Feel " + lfName +
+                               " not usable (" + e + ")");
+        }
+    }
+
+    private void updateEverything()
+    {
+        if (board != null)
+        {
+            board.updateComponentTreeUI();
+            board.pack();
+        }
+        if (statusScreen != null)
+        {
+            SwingUtilities.updateComponentTreeUI(statusScreen);
+            statusScreen.pack();
+        }
+        if (caretakerDisplay != null)
+        {
+            SwingUtilities.updateComponentTreeUI(caretakerDisplay);
+            caretakerDisplay.pack();
+        }
+        repaintAllWindows();
     }
 }

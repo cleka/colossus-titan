@@ -645,6 +645,19 @@ public final class MasterBoard extends JPanel
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
 
+        // Then Look & Feel
+        JMenu lfMenu = new JMenu("Look & Feel");
+        menuBar.add(lfMenu);
+        UIManager.LookAndFeelInfo[] lfInfo =
+            UIManager.getInstalledLookAndFeels();
+        for (int i = 0; i < lfInfo.length ; i++)
+        {
+            AbstractAction lfAction =
+                new ChangeLookFeelAction(lfInfo[i].getName(),
+                                         lfInfo[i].getClassName());
+            lfMenu.add(lfAction);
+        }
+
         // Then help menu
         JMenu helpMenu = new JMenu("Help");
         playerMenu.setMnemonic(KeyEvent.VK_H);
@@ -653,6 +666,18 @@ public final class MasterBoard extends JPanel
         mi = helpMenu.add(aboutAction);
     }
 
+    class ChangeLookFeelAction extends AbstractAction
+    {
+        String className;
+        ChangeLookFeelAction(String t, String className)
+        {
+            super(t);
+            this.className = className;
+        }
+        public void actionPerformed(ActionEvent e) {
+            client.setLookAndFeel(className);
+        }
+    }
 
     void twiddleOption(String name, boolean enable)
     {
@@ -2053,7 +2078,7 @@ public final class MasterBoard extends JPanel
         while (it.hasNext())
         {
             Hex bh = (Hex)it.next();
-            if (bh.getTerrain() == 'T')
+            if (HexMap.terrainIsTower(bh.getTerrain()))
             {
                 towerSet.add(bh.getLabel());
             }
@@ -2076,5 +2101,16 @@ public final class MasterBoard extends JPanel
             set.add(hex.getLabel());
         }
         return set;
+    }
+
+    void pack()
+    {
+        masterFrame.pack();
+    }
+
+    void updateComponentTreeUI()
+    {
+        SwingUtilities.updateComponentTreeUI(this);
+        SwingUtilities.updateComponentTreeUI(masterFrame);
     }
 }

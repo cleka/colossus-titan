@@ -17,7 +17,6 @@ import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.LegionInfo;
 
-
 /**
  * Simple implementation of a Titan AI
  * @version $Id$
@@ -547,7 +546,7 @@ public class SimpleAI implements AI
      *  split out. */
     static List doInitialGameSplit(String label)
     {
-        Creature[] startCre = Game.getStartingCreatures();
+        Creature[] startCre = Game.getStartingCreatures(MasterBoard.getHexByLabel(label).getTerrain());
         // in CMU style splitting, we split centaurs in even towers,
         // ogres in odd towers.
         final boolean oddTower = "100".equals(label) || "300".equals(label)
@@ -560,7 +559,7 @@ public class SimpleAI implements AI
         // don't split gargoyles in tower 3 or 6 (because of the extra jungles)
         if ("300".equals(label) || "600".equals(label))
         {
-            return CMUsplit(false, splitCreature, nonsplitCreature);
+            return CMUsplit(false, splitCreature, nonsplitCreature, label);
         }
         //
         // new idea due to David Ripton: split gargoyles in tower 2 or
@@ -571,7 +570,7 @@ public class SimpleAI implements AI
         //
         else if ("200".equals(label) || "500".equals(label))
         {
-            return MITsplit(true, splitCreature, nonsplitCreature);
+            return MITsplit(true, splitCreature, nonsplitCreature, label);
         }
         //
         // otherwise, mix it up for fun
@@ -579,11 +578,11 @@ public class SimpleAI implements AI
         {
             if (Game.rollDie() <= 3)
             {
-                return MITsplit(true, splitCreature, nonsplitCreature);
+                return MITsplit(true, splitCreature, nonsplitCreature, label);
             }
             else
             {
-                return CMUsplit(true, splitCreature, nonsplitCreature);
+                return CMUsplit(true, splitCreature, nonsplitCreature, label);
             }
         }
     }
@@ -591,9 +590,9 @@ public class SimpleAI implements AI
 
     // Keep the gargoyles together.
     private static List CMUsplit(boolean favorTitan, Creature splitCreature,
-        Creature nonsplitCreature)
+        Creature nonsplitCreature, String label)
     {
-        Creature[] startCre = Game.getStartingCreatures();
+        Creature[] startCre = Game.getStartingCreatures(MasterBoard.getHexByLabel(label).getTerrain());
         List splitoffs = new LinkedList();
 
         if (favorTitan)
@@ -644,9 +643,9 @@ public class SimpleAI implements AI
 
     // Split the gargoyles.
     private static List MITsplit(boolean favorTitan, Creature splitCreature,
-        Creature nonsplitCreature)
+        Creature nonsplitCreature, String label)
     {
-        Creature[] startCre = Game.getStartingCreatures();
+        Creature[] startCre = Game.getStartingCreatures(MasterBoard.getHexByLabel(label).getTerrain());
         List splitoffs = new LinkedList();
 
         if (favorTitan)
@@ -1491,7 +1490,7 @@ public class SimpleAI implements AI
         double defenderPointValue = getCombatValue(defender, terrain);
         // TODO: add in enemy's most likely turn 4 recruit
 
-        if (hex.getTerrain() == 'T')
+        if (HexMap.terrainIsTower(hex.getTerrain()))
         {
             // defender in the tower!  ouch!
             defenderPointValue *= 1.2;
@@ -1545,7 +1544,7 @@ public class SimpleAI implements AI
             Constants.NOWHERE, terrainType, moves);
 
         // consider tower teleport
-        if (hex.getTerrain() == 'T' && legion.numLords() > 0
+        if (HexMap.terrainIsTower(hex.getTerrain()) && legion.numLords() > 0
             && moves[6] == false)
         {
             // hack: assume that we can always tower teleport to the terrain we
@@ -2764,7 +2763,7 @@ public class SimpleAI implements AI
         // don't just sit back and wait for a time loss.
         if (critter.isTitan())
         {
-            if (terrain == 'T')
+            if (HexMap.terrainIsTower(terrain))
             {
                 // Stick to the center of the tower.
                 value += TITAN_TOWER_HEIGHT_BONUS * hex.getElevation();
@@ -2791,7 +2790,7 @@ public class SimpleAI implements AI
         // attacking critters to move forward.
         else if (legion == battle.getDefender())
         {
-            if (terrain == 'T')
+            if (HexMap.terrainIsTower(terrain))
             {
                 // Stick to the center of the tower.
                 value += DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation();

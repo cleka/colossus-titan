@@ -71,6 +71,7 @@ public final class Options
 
     // General per-player options
     public static final String favoriteColors = "Favorite colors";
+    public static final String favoriteLookFeel = "Favorite Look And Feel";
 
 
     private Properties props = new Properties();

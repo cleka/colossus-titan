@@ -206,7 +206,7 @@ final class Legion implements Comparable
     static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-        Creature[] startCre = game.getStartingCreatures();
+        Creature[] startCre = game.getStartingCreatures(MasterBoard.getHexByLabel(hexLabel).getTerrain());
         Legion oLegion = 
             new Legion(markerId, null, hexLabel, hexLabel,
                        Creature.getCreatureByName("Titan"),

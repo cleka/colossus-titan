@@ -122,6 +122,9 @@ int oneCreature(List lc) :
     boolean nativeSandDune;
     boolean nativeSlope;
     boolean nativeVolcano;
+    boolean nativeRiver;
+    boolean nativeStone;
+    boolean nativeTree;
     boolean waterDwelling;
     boolean magicMissile;
     boolean summonable;
@@ -143,6 +146,9 @@ int oneCreature(List lc) :
     (nativeSandDune= c_bool())
     (nativeSlope= c_bool())
     (nativeVolcano= c_bool())
+    (nativeRiver= c_bool())
+    (nativeStone= c_bool())
+    (nativeTree= c_bool())
     (waterDwelling= c_bool())
     (magicMissile= c_bool())
     (summonable= c_bool())
@@ -155,11 +161,15 @@ int oneCreature(List lc) :
         lc.add(new Creature(name, power, skill, rangestrikes,
                             flies, nativeBramble, nativeDrift,
                             nativeBog, nativeSandDune, nativeSlope,
-                            nativeVolcano, waterDwelling, magicMissile,
-                            summonable,
+                            nativeVolcano, nativeRiver, nativeStone,
+                            nativeTree,
+                            waterDwelling, magicMissile, summonable,
                             lord, demilord, maxCount, pluralName,
                             baseColor));
-        System.out.println(name + " is a " + power + " " + skill);
+        System.out.println(name + " is a " + power + " " +
+                           (flies ? "*" : "") +
+                           (rangestrikes ? "~" : "") + " " +
+                           skill);
         return 1;
     }
 |   <EOL>

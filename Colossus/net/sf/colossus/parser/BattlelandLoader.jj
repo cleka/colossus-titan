@@ -39,6 +39,14 @@ public class BattlelandLoader
         char type;
         hexSide(int p, char t) { pos = p; type = t; }
     }
+
+    /** hold the list of label for the Tower startlist */
+    private java.util.List startlist = null;
+
+    public java.util.List getStartList()
+    {
+        return startlist;
+    }
 }
 
 PARSER_END(BattlelandLoader)
@@ -79,6 +87,50 @@ TOKEN :
 TOKEN :
 {
         < TERRAIN : ["a"-"z","A"-"Z"] >
+}
+
+TOKEN :
+{
+    < STARTLIST: "STARTLIST" >
+|   < CASELABEL : ["A"-"F","a"-"f"]["1"-"6"] >
+}
+
+String b_hexlabel() :
+{}
+{
+    <CASELABEL>
+    { return new String(token.image); }
+}
+
+java.util.List b_hexlabelList() :
+{
+    java.util.List temp;
+    String hl;
+}
+{
+    (hl = b_hexlabel()) (temp = b_hexlabelList())
+    { temp.add(hl); return temp; }
+|   /* empty */
+    { return new ArrayList(); }
+}
+
+void b_startlist() :
+{
+    java.util.List temp;
+}
+{
+    <STARTLIST> (temp = b_hexlabelList())
+    {
+        Iterator it = temp.iterator();
+        while (it.hasNext())
+        {
+            if (!(it.next() instanceof String))
+                return;
+        }
+        if (temp.size() < 7)
+            return;
+        startlist = temp;
+    }
 }
 
 int b_number() :
@@ -159,5 +211,9 @@ int oneBattlelandCase(BattleHex [][] h) :
 |   <EOF>
     {
         return(-1);
+    }
+|   b_startlist()
+    {
+        return(0);
     }
 }

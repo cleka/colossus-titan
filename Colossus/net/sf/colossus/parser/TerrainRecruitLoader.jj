@@ -102,14 +102,24 @@ public class TerrainRecruitLoader
         }
     }
     /**
-     * Give an array of the starting creatures, those available in the first turn and in the tower.
+     * Give an array of the starting creatures, those available in the first turn and in the Tower.
      * @return an array of Creature representing the starting creatures.
      * @see net.sf.colossus.server.Creature
      */
     public Creature[] getStartingCreatures()
     {
+        return getStartingCreatures('T');
+    }
+    /**
+     * Give an array of the starting creatures, those available in the first turn and in a particular kind of Tower.
+     * @param terrain The kind of Tower considered.
+     * @return an array of Creature representing the starting creatures.
+     * @see net.sf.colossus.server.Creature
+     */
+    public Creature[] getStartingCreatures(char terrain)
+    {
         Creature[] bc = new Creature[3];
-        java.util.List to = getPossibleRecruits('T');
+        java.util.List to = getPossibleRecruits(terrain);
         bc[0] = (Creature)to.get(0);
         bc[1] = (Creature)to.get(1);
         bc[2] = (Creature)to.get(2);

@@ -62,7 +62,10 @@ public final class GetPlayers extends KDialog implements WindowListener,
         "ExtTitan", 
         "Badlands",
         "Outlands",
-        "Undead"
+        "Undead",
+        "TG-SetII",
+        "TG-ConceptI",
+        "TG-ConceptIII"
     };
     private JComboBox variantBox;
     private java.util.List variantList;
