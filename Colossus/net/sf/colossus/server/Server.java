@@ -795,7 +795,6 @@ public final class Server
             Log.error(playerName + "illegally called mulligan()"); 
             return;
         }
-        game.getActivePlayer().undoAllMoves();
         int roll = game.mulligan();
         Log.event(playerName + " takes a mulligan and rolls " + roll);
         if (roll != -1)

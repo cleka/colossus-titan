@@ -106,6 +106,7 @@ public class MasterHex extends Hex
                 // Everyone benefits from walls.
                 return true;
 
+            // XXX In some variants plains and woods might help natives.
             case 'P':
             case 'W':
             default:

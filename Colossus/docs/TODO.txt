@@ -1,7 +1,14 @@
 Remove all excess public methods from Client/Server.
+Remove remaining public Client methods that only directly control the GUI
+   in favor of higher-level events.
+Add proxy interfaces between Client and Server.
+Add RMI connection.
 Change all arguments to public Client/Server methods to String.  (Use a 
    proxy layer for this.)
-Change direct client/server references to sockets.
+Add raw socket interface.
+
+Make TerrainRecruitLoader initialization fully static.
+Should not need to load MasterBoard map data twice.
 
 Bug: AcquireAngel showed 3 angels.  (Both times, on a double-acquire.)
 
@@ -9,10 +16,6 @@ Set Client movementRoll when loading during movement phase after roll.
 
 Add JUnit section to build docs.
 Document test procedures.
-
-Make TerrainRecruitLoader initialization fully static.
-
-Add server-side static map/board initialization?
 
 Add remaining command-line options.  (User prefs dir?)
 
@@ -24,7 +27,9 @@ Change Quit button in GetPlayers dialog to Cancel.  Go back to existing
 
 L&F menu should indicate current L&F somehow, and not show Windows if not
    allowed on this platform.  
-kunstoff L&F in swing.properties file fails.  Works in player cfg file.
+If player chose L&F from config file, it should be added to menu.
+Kunststoff L&F in swing.properties file fails.  Works in player cfg file.
+Add Kunststoff L&F to jar file?
 
 Add explicit cancel buttons to more dialogs.  (PickRecruit)
 
@@ -52,9 +57,6 @@ Initialize autoPickRecruiter and Show Graphical Overlays to true by default.
 
 Optional post-engagement status dialog.
 
-Remove remaining public Client methods that only directly control the GUI
-   in favor of higher-level events.
-
 Always show the current turn, player, and phase in a panel somewhere.
 
 Add confirm dialogs (for conceding with titan, skipping recruits, ...)
@@ -65,8 +67,6 @@ Highlight entrances somehow.  Maybe use fixed boxes with an arrow to
 
 Add display of dead creatures / total creatures / creatures in play to
    CreatureCollectionView, and some way to toggle between these values.
-
-Reveal all stacks at game end.
 
 Write more design docs.
 

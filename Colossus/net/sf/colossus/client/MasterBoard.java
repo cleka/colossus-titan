@@ -17,6 +17,7 @@ import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.server.ConfigFileFilter;
 import net.sf.colossus.parser.StrategicMapLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.parser.ParseException;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
@@ -33,20 +34,10 @@ public final class MasterBoard extends JPanel
     /** "parity" of the board, so that Hexes are displayed the proper way */
     private static int boardParity = 0;
 
-    /** For easy of mapping to the GUI, hexes will be stored
-     *  in a horizSize*vertSize array, with some empty elements. */
-    private GUIMasterHex[][] h = null;
-
-    /** For ease of iterating through all hexes, they'll also be
-     *  stored in a List. */
-    private java.util.List hexes = null;
-
-    /** A static set of non-GUI MasterHexes */
-    private static MasterHex[][] plain = null;
-
-    /** For ease of iterating through all hexes, they'll also be
-     *  stored in a List. */
-    private static java.util.List plainHexes = null;
+    private GUIMasterHex [][] guiHexArray = null;
+    private java.util.List guiHexList = null;
+    private static MasterHex [][] plainHexArray = null;
+    private static java.util.List plainHexList = null;
 
     /** The hexes in the horizSize*vertSize array that actually exist are
      *  represented by true. */
@@ -70,8 +61,6 @@ public final class MasterBoard extends JPanel
     public static final String saveGame = "Save game";
     public static final String saveGameAs = "Save game as";
     public static final String quitGame = "Quit game";
-    public static final String saveOptions = "Save options";
-    public static final String loadOptions = "Load options";
 
     public static final String clearRecruitChits = "Clear recruit chits";
 
@@ -97,8 +86,6 @@ public final class MasterBoard extends JPanel
     private AbstractAction saveGameAction;
     private AbstractAction saveGameAsAction;
     private AbstractAction quitGameAction;
-    private AbstractAction saveOptionsAction;
-    private AbstractAction loadOptionsAction;
 
     private AbstractAction clearRecruitChitsAction;
 
@@ -118,15 +105,36 @@ public final class MasterBoard extends JPanel
     private AbstractAction aboutAction;
 
     /* a Set of label (String) of all Tower hex */
-    private static Set towerSet;
+    private static Set towerSet = null;
 
-    boolean playerLabelDone;
+    private boolean playerLabelDone;
 
-    MediaTracker boardTracker = new MediaTracker(this);
+    private MediaTracker boardTracker = new MediaTracker(this);
+    private static StrategicMapLoader sml = null;
 
+
+    /** Must ensure that variant is loaded before referencing this class. */
+    static
+    {
+Log.debug("Called MasterBoard static initializer");
+        try
+        {
+            readMapData();
+        }
+        catch (Exception e) 
+        {
+            Log.error("Reading map data for non-GUI failed : " + e);
+            System.exit(1);
+        }
+        plainHexArray = new MasterHex[horizSize][vertSize];
+        plainHexList = new ArrayList(horizSize * vertSize);
+        setupHexesGameState(plainHexArray, plainHexList, false);
+        setupTowerSet();
+    }
 
     MasterBoard(Client client)
     {
+Log.debug("Called MasterBoard constructor");
         this.client = client;
 
         masterFrame = new JFrame("MasterBoard");
@@ -139,7 +147,7 @@ public final class MasterBoard extends JPanel
         masterFrame.addWindowListener(new MasterBoardWindowHandler());
         addMouseListener(new MasterBoardMouseHandler());
 
-        setupHexes();
+        setupGUIHexes();
 
         setupActions();
         setupPopupMenu();
@@ -150,23 +158,6 @@ public final class MasterBoard extends JPanel
 
         masterFrame.pack();
         masterFrame.setVisible(true);
-    }
-
-
-    // No-arg constructor for testing and AICopy(), without GUI stuff.
-    // public for unit tests -- may want to keep a copy of the non-GUI
-    // board on the server side later.
-    public MasterBoard()
-    {
-        setupHexes();
-    }
-
-
-    MasterBoard AICopy()
-    {
-        MasterBoard newBoard = new MasterBoard();
-        newBoard.setupActions();
-        return newBoard;
     }
 
 
@@ -427,29 +418,6 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        saveOptionsAction = new AbstractAction(saveOptions)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                client.saveOptions();
-            }
-        };
-
-        loadOptionsAction = new AbstractAction(loadOptions)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                JFileChooser chooser = new JFileChooser(Constants.optionsPath);
-                chooser.setFileFilter(new ConfigFileFilter());
-                int returnVal = chooser.showOpenDialog(masterFrame);
-                if (returnVal == JFileChooser.APPROVE_OPTION)
-                {
-                    client.loadOptions(
-                        chooser.getSelectedFile().getAbsolutePath());
-                }
-            }
-        };
-
         quitGameAction = new AbstractAction(quitGame)
         {
             public void actionPerformed(ActionEvent e)
@@ -563,12 +531,6 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_A);
         mi = fileMenu.add(quitGameAction);
         mi.setMnemonic(KeyEvent.VK_Q);
-
-        fileMenu.addSeparator();
-        mi = fileMenu.add(loadOptionsAction);
-        mi.setMnemonic(KeyEvent.VK_D);
-        mi = fileMenu.add(saveOptionsAction);
-        mi.setMnemonic(KeyEvent.VK_O);
 
         // Phase menu items change by phase and will be set up later.
         phaseMenu = new JMenu("Phase");
@@ -691,29 +653,26 @@ public final class MasterBoard extends JPanel
     }
 
 
-    private void setupHexes()
+    private synchronized void setupGUIHexes()
     {
-        if (plain == null) /* if static array not yet defined */
+        try
         {
-            setupHexesGameState(false);
+            // Shouldn't need to do this twice, but sml is stateful.
+            readMapData();
         }
-        setupHexesGameState(true);
+        catch (Exception e) 
+        {
+            Log.error("Reading map data for GUI failed : " + e);
+            System.exit(1);
+        }
+        guiHexArray = new GUIMasterHex[horizSize][vertSize];
+        guiHexList = new ArrayList(horizSize * vertSize);
+        setupHexesGameState(guiHexArray, guiHexList, true);
         setupHexesGUI();
-        if (towerSet == null) /* if static Set not yet defined */
-        {
-            setupTowerSet();
-        }
     }
 
     private void setupHexesGUI()
     {
-        // There are a total of 96 hexes
-        // Their Titan labels are:
-        // Middle ring: 1-42
-        // Outer ring: 101-142
-        // Towers: 100, 200, 300, 400, 500, 600
-        // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
-
         // For easy of mapping to the GUI, they'll initially be stored
         // in a horizSize*vertSize array, with some empty elements.
         // For ease of iterating through all hexes, they'll then be
@@ -725,18 +684,18 @@ public final class MasterBoard extends JPanel
         int cy = 0 * scale;
 
         // Initialize hexes.
-        for (int i = 0; i < h.length; i++)
+        for (int i = 0; i < guiHexArray.length; i++)
         {
-            for (int j = 0; j < h[0].length; j++)
+            for (int j = 0; j < guiHexArray[0].length; j++)
             {
                 if (show[i][j])
                 {
-                    GUIMasterHex hex;
-                    hex = h[i][j];
-                    hex.init(cx + 4 * i * scale,
-                      (int) Math.round(cy + (3 * j + ((i + boardParity) & 1) *
-                      (1 + 2 * (j / 2)) + ((i + 1 + boardParity) & 1) * 2 *
-                      ((j + 1) / 2)) * Hex.SQRT3 * scale),
+                    GUIMasterHex hex = guiHexArray[i][j]; 
+                    hex.init(
+                        cx + 4 * i * scale,
+                        (int) Math.round(cy + (3 * j + ((i + boardParity) & 1) 
+                            * (1 + 2 * (j / 2)) + ((i + 1 + boardParity) & 1) 
+                            * 2 * ((j + 1) / 2)) * Hex.SQRT3 * scale),
                         scale,
                         isHexInverted(i, j),
                         this);
@@ -773,75 +732,43 @@ public final class MasterBoard extends JPanel
         return null;
     }
 
-
-    /** This method only needs to be run once, since the attributes it
-     *  sets up are constant for the game. */
-    private void setupHexesGameState(boolean isGUI)
+    private static void readMapData() throws Exception
     {
-        // Add terrain types, id labels, label sides, and exits to hexes.
-        MasterHex[][] localH = null;
+        java.util.List directories = VariantSupport.getVarDirectoriesList();
+        InputStream mapIS = ResourceLoader.getInputStream(
+            VariantSupport.getMapName(), directories);
+        if (mapIS == null) 
+        {
+            throw new FileNotFoundException(VariantSupport.getMapName());
+        }
+Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
+        sml = new StrategicMapLoader(mapIS);
+        sml.StrategicMapLoaderInit();
+        int[] size = sml.getHexArraySize();
+        if ((horizSize == 0) && (vertSize == 0))
+        {
+            horizSize = size[0];
+            vertSize = size[1];
+        }
+        else
+        {
+            if ((horizSize != size[0]) || (vertSize != size[1]))
+            {
+                throw new Exception("Map size changed during game !");
+            }
+        }
+        show = new boolean[horizSize][vertSize];
+    }
+
+
+    /** Add terrain types, id labels, label sides, and exits to hexes.
+     *  Side effects on passed list. */
+    private static synchronized void setupHexesGameState(
+        final MasterHex [][] array, final java.util.List list, boolean isGUI)
+    {
         try
         {
-            java.util.List directories = 
-                VariantSupport.getVarDirectoriesList();
-            InputStream mapIS = ResourceLoader.getInputStream(
-                                               VariantSupport.getMapName(),
-                                               directories);
-            if (mapIS == null) 
-            {
-                throw new FileNotFoundException(VariantSupport.getMapName());
-            }
-            StrategicMapLoader sml = new StrategicMapLoader(mapIS);
-            sml.StrategicMapLoaderInit();
-            {
-                int[] size = sml.getHexArraySize();
-                if ((horizSize == 0) && (vertSize == 0))
-                {
-                    horizSize = size[0];
-                    vertSize = size[1];
-                }
-                else
-                {
-                    if ((horizSize != size[0]) ||
-                        (vertSize != size[1]))
-                        throw new Exception("Map size changed during game !");
-                }
-            }
-            if (show == null)
-            {
-                show = new boolean[horizSize][vertSize];
-            }
-
-            if (!isGUI) /* we're filling the plain hexes */
-            {
-                plain = new MasterHex[horizSize][vertSize];
-                plainHexes = new ArrayList(horizSize * vertSize);
-                plainHexes.clear();
-                for (int i = 0; i < show.length; i++)
-                {
-                    for (int j = 0; j < show[i].length; j++)
-                    {
-                        show[i][j] = false;
-                    }
-                }
-                while (sml.oneCase(plain, plainHexes, show, false) >= 0) {}
-                localH = plain;
-            }
-            else /* we're filling the GUI hexes */
-            {
-                h = new GUIMasterHex[horizSize][vertSize];
-                hexes = new ArrayList(horizSize * vertSize);
-                hexes.clear();
-                for (int i = 0; i < show.length; i++)
-                {
-                    for (int j = 0; j < show[i].length; j++)
-                    {
-                        show[i][j] = false;
-                    }
-                }
-                while (sml.oneCase(h, hexes, show, true) >= 0) {} 
-                localH = h;
-            }
+            setupHexArray(array, list, isGUI);
         }
         catch (Exception e) 
         {
@@ -850,10 +777,25 @@ public final class MasterBoard extends JPanel
         }
 
         computeBoardParity();
-        setupExits(localH);
-        setupEntrances(localH);
-        setupHexLabelSides(localH);
-        setupNeighbors(localH);
+        setupExits(array);
+        setupEntrances(array);
+        setupHexLabelSides(array);
+        setupNeighbors(array);
+    }
+
+    /** Side effects on array, list, and show. */
+    private static void setupHexArray(final MasterHex [][] array, 
+        final java.util.List list, final boolean isGUI) throws ParseException
+    {
+        list.clear();
+        for (int i = 0; i < show.length; i++)
+        {
+            for (int j = 0; j < show[i].length; j++)
+            {
+                show[i][j] = false;
+            }
+        }
+        while (sml.oneCase(array, list, show, isGUI) >= 0) {}
     }
 
     private static void computeBoardParity()
@@ -949,7 +891,7 @@ public final class MasterBoard extends JPanel
     {
         for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < plain[0].length; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j])
                 {
@@ -1003,7 +945,7 @@ public final class MasterBoard extends JPanel
 
         for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < plain[0].length; j++)
+            for (int j = 0; j < h[0].length; j++)
             if (show[i][j])
             {
                 double deltaX = i - midX;
@@ -1104,7 +1046,7 @@ public final class MasterBoard extends JPanel
     {
         for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < plain[0].length; j++)
+            for (int j = 0; j < h[0].length; j++)
             {
                 if (show[i][j])
                 {
@@ -1458,7 +1400,7 @@ public final class MasterBoard extends JPanel
     /** This is incredibly inefficient. */
     void alignAllLegions()
     {
-        Iterator it = plainHexes.iterator();
+        Iterator it = plainHexList.iterator();
         while (it.hasNext())
         {
             MasterHex hex = (MasterHex)it.next();
@@ -1572,7 +1514,7 @@ public final class MasterBoard extends JPanel
      *  a match.  Return the hex, or null if none is found. */
     public static MasterHex getHexByLabel(String label)
     {
-        Iterator it = plainHexes.iterator();
+        Iterator it = plainHexList.iterator();
         while (it.hasNext())
         {
             MasterHex hex = (MasterHex)it.next();
@@ -1588,7 +1530,7 @@ public final class MasterBoard extends JPanel
      *  a match.  Return the hex, or null if none is found. */
     GUIMasterHex getGUIHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
+        Iterator it = guiHexList.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
@@ -1606,7 +1548,7 @@ public final class MasterBoard extends JPanel
     private GUIMasterHex getHexContainingPoint(Point point)
     {
         // XXX This is completely inefficient.
-        Iterator it = hexes.iterator();
+        Iterator it = guiHexList.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
@@ -1639,7 +1581,7 @@ public final class MasterBoard extends JPanel
 
     void unselectAllHexes()
     {
-        Iterator it = hexes.iterator();
+        Iterator it = guiHexList.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
@@ -1653,7 +1595,7 @@ public final class MasterBoard extends JPanel
 
     void unselectHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
+        Iterator it = guiHexList.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
@@ -1668,7 +1610,7 @@ public final class MasterBoard extends JPanel
 
     void unselectHexesByLabels(Set labels)
     {
-        Iterator it = hexes.iterator();
+        Iterator it = guiHexList.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
@@ -1682,7 +1624,7 @@ public final class MasterBoard extends JPanel
 
     void selectHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
+        Iterator it = guiHexList.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
@@ -1697,7 +1639,7 @@ public final class MasterBoard extends JPanel
 
     void selectHexesByLabels(Set labels)
     {
-        Iterator it = hexes.iterator();
+        Iterator it = guiHexList.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
@@ -1711,7 +1653,7 @@ public final class MasterBoard extends JPanel
 
     void selectHexesByLabels(Set labels, Color color)
     {
-        Iterator it = hexes.iterator();
+        Iterator it = guiHexList.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
@@ -1947,7 +1889,7 @@ public final class MasterBoard extends JPanel
 
     private void paintHexes(Graphics g)
     {
-        Iterator it = hexes.iterator();
+        Iterator it = guiHexList.iterator();
         while (it.hasNext())
         {
             GUIMasterHex hex = (GUIMasterHex)it.next();
@@ -2020,7 +1962,7 @@ public final class MasterBoard extends JPanel
 
     void rescale()
     {
-        setupHexes();
+        setupHexesGUI();
         client.recreateMarkers();
         setSize(getPreferredSize());
         masterFrame.pack();
@@ -2055,7 +1997,7 @@ public final class MasterBoard extends JPanel
     private static void setupTowerSet()
     {
         towerSet = new HashSet();
-        Iterator it = plainHexes.iterator();
+        Iterator it = plainHexList.iterator();
         while (it.hasNext())
         {
             Hex bh = (Hex)it.next();
@@ -2075,7 +2017,7 @@ public final class MasterBoard extends JPanel
     static Set getAllHexLabels()
     {
         Set set = new HashSet();
-        Iterator it = plainHexes.iterator();
+        Iterator it = plainHexList.iterator();
         while (it.hasNext())
         {
             MasterHex hex = (MasterHex)it.next();

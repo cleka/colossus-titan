@@ -131,6 +131,8 @@ public final class Client
         this.playerName = playerName;
         this.primary = primary;
         options = new Options(playerName);
+        // Need to load options early so they don't overwrite server options.
+        loadOptions();
     }
 
 
@@ -143,9 +145,7 @@ public final class Client
     /** Take a mulligan. */
     void mulligan()
     {
-        // XXX This should be enforced on the server side.
-        undoAllMoves();
-
+        undoAllMoves();   // XXX Maybe move entirely to server
         clearUndoStack();
         clearRecruitChits();
 
@@ -328,6 +328,17 @@ public final class Client
     }
 
 
+    /** Fully sync the board state by running all option triggers. */
+    private void runAllOptionTriggers()
+    {
+        Enumeration en = options.propertyNames();
+        while (en.hasMoreElements())
+        {
+            String name = (String)en.nextElement();
+            String value = getStringOption(name);
+            optionTrigger(name, value);
+        }
+    }
 
     /** Trigger side effects after changing an option value. */
     private void optionTrigger(String optname, String value)
@@ -382,20 +393,11 @@ public final class Client
         syncOptions();
     }
 
-    // TODO Call this implicitly
     /** Save player options to a file.  The current format is standard
      *  java.util.Properties keyword=value. */
     void saveOptions()
     {
         options.saveOptions();
-    }
-
-    /** Load player options from a file. The current format is standard
-     *  java.util.Properties keyword=value */
-    void loadOptions(String optionsFile)
-    {
-        options.loadOptions(optionsFile);
-        syncOptions();
     }
 
     /** Load player options from a file. The current format is standard
@@ -407,11 +409,14 @@ public final class Client
         syncOptions();
     }
 
+    /** Synchronize menu checkboxes, cfg file, and handle side effects
+     *  after an option change. */
     private void syncOptions()
     {
         if (optionChanged)
         {
             syncCheckboxes();
+            saveOptions();
             optionChanged = false;
             
             String lfName = getStringOption(Options.favoriteLookFeel);
@@ -984,10 +989,7 @@ public final class Client
             board = new MasterBoard(this);
             board.requestFocus();
         }
-
-        // Now that the board is ready we can load options and
-        // sync the option checkboxes.
-        loadOptions();
+        runAllOptionTriggers();
     }
 
 
@@ -2865,7 +2867,7 @@ Log.debug("found " + set.size() + " hexes");
             UIManager.setLookAndFeel(lfName);
             updateEverything();
             Log.debug("Switched to Look & Feel: " + lfName);
-            options.setOption(Options.favoriteLookFeel, lfName);
+            setOption(Options.favoriteLookFeel, lfName);
             currentLookAndFeel = lfName;
         }
         catch (Exception e)

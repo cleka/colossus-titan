@@ -731,6 +731,10 @@ public final class Game
         {
             dispose();
         }
+        if (gameOver)
+        {
+            server.allFullyUpdateAllLegionContents();
+        }
     }
 
 
@@ -1277,6 +1281,8 @@ public final class Game
             initServerAndClients();
             server.allSetColor();
 
+            // We need to set the autoPlay option before loading the board,
+            // so that we can avoid showing boards for non-primary AI players.
             syncAutoPlay();
             syncOptions();
 

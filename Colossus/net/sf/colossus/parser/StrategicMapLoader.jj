@@ -119,7 +119,8 @@ int c_way() :
  * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
  * @see net.sf.colossus.client.MasterHex
  */
-int oneCase(MasterHex [][] h, java.util.List list, boolean show[][], boolean isGUI) :
+int oneCase(MasterHex [][] array, java.util.List list, boolean [][] show, 
+    boolean isGUI) :
 {
     String s;
     char ter;
@@ -144,43 +145,47 @@ int oneCase(MasterHex [][] h, java.util.List list, boolean show[][], boolean isG
             "), type " + ter + " with exit : " +
             s1 + ", " + s2 + ", " + s3);
         if (isGUI)
-            h[posX][posY] = new GUIMasterHex();
+        {
+            array[posX][posY] = new GUIMasterHex();
+        }
         else
-            h[posX][posY] = new MasterHex();
+        {
+            array[posX][posY] = new MasterHex();
+        }
         show[posX][posY] = true;
-        list.add(h[posX][posY]);
+        list.add(array[posX][posY]);
 
-        h[posX][posY].setTerrain(ter);
-        h[posX][posY].setLabel(p);
-        h[posX][posY].setXCoord(posX);
-        h[posX][posY].setYCoord(posY);
+        array[posX][posY].setTerrain(ter);
+        array[posX][posY].setLabel(p);
+        array[posX][posY].setXCoord(posX);
+        array[posX][posY].setYCoord(posY);
         if (s1 > 0) 
         {
-            h[posX][posY].setBaseExitType(0, ts1);
+            array[posX][posY].setBaseExitType(0, ts1);
         }
         else 
         {
-            h[posX][posY].setBaseExitType(0, Constants.NONE);
+            array[posX][posY].setBaseExitType(0, Constants.NONE);
         }
-        h[posX][posY].setBaseExitLabel(0, s1);
+        array[posX][posY].setBaseExitLabel(0, s1);
         if (s2 > 0) 
         {
-            h[posX][posY].setBaseExitType(1, ts2);
+            array[posX][posY].setBaseExitType(1, ts2);
         } 
         else 
         {
-            h[posX][posY].setBaseExitType(1, Constants.NONE);
+            array[posX][posY].setBaseExitType(1, Constants.NONE);
         }
-        h[posX][posY].setBaseExitLabel(1, s2);
+        array[posX][posY].setBaseExitLabel(1, s2);
         if (s3 > 0) 
         {
-            h[posX][posY].setBaseExitType(2, ts3);
+            array[posX][posY].setBaseExitType(2, ts3);
         } 
         else 
         {
-            h[posX][posY].setBaseExitType(2, Constants.NONE);
+            array[posX][posY].setBaseExitType(2, Constants.NONE);
         }
-        h[posX][posY].setBaseExitLabel(2, s3);
+        array[posX][posY].setBaseExitLabel(2, s3);
         return(1);
     }
 |   <EOL>

@@ -669,10 +669,6 @@ final class Legion implements Comparable
 
             moved = false;
             Log.event("Legion " + getLongMarkerName() + " undoes its move");
-
-            Set set = new HashSet();
-            set.add(currentHexLabel);
-            set.add(formerHexLabel);
         }
     }
 

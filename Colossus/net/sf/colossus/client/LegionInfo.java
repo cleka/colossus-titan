@@ -363,7 +363,6 @@ public final class LegionInfo
     boolean isEngaged()
     {
         int numInHex = client.getLegionsByHex(getHexLabel()).size();
-Log.debug("LegionInfo.isEngaged() says there are " + numInHex);
         return (numInHex == 2);
     }
 
