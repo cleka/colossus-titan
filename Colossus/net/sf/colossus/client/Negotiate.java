@@ -7,7 +7,9 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -52,6 +54,7 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
         JPanel attackerPane = new JPanel();
         contentPane.add(attackerPane);
 
+Log.debug("making attacker marker " + scale + " " + attackerId);
         attackerMarker = new Marker(scale, attackerId, this, client);
         attackerPane.add(attackerMarker);
 
@@ -200,7 +203,8 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                 while (it.hasNext())
                 {
                     Chit chit = (Chit)it.next();
-                    if (chit.isDead() && chit.getId().startsWith("Titan"))
+                    if (chit.isDead() && chit.getId().startsWith(
+                        Constants.titan))
                     {
                         client.showMessageDialog(
                             "Titan cannot die unless his whole stack dies.");
@@ -217,9 +221,9 @@ final class Negotiate extends KDialog implements MouseListener, ActionListener
                     if (chit.isDead())
                     {
                         String name = chit.getId();
-                        if (name.startsWith("Titan"))
+                        if (name.startsWith(Constants.titan))
                         {
-                            name = "Titan";
+                            name = Constants.titan;
                         }
                         winnerLosses.add(name);
                     }

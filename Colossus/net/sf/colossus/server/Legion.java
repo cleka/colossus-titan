@@ -179,25 +179,6 @@ public final class Legion implements Comparable
     }
 
 
-    //* For AICopy() */
-    Legion(String markerId, String parentId, String currentHexLabel,
-        String startingHexLabel, List critters, String playerName,
-        Game game)
-    {
-        this(markerId, parentId, currentHexLabel, startingHexLabel, null,
-            null, null, null, null, null, null, null, playerName, game);
-
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            Critter myCritter = critter.AICopy(game);
-            this.critters.add(myCritter);
-        }
-
-        initCreatureVisibility();
-    }
-
     private void initCreatureVisibility()
     {
         // Initial legion contents are public; contents of legions created
@@ -217,7 +198,7 @@ public final class Legion implements Comparable
             MasterBoard.getHexByLabel(hexLabel).getTerrain());
         Legion legion = 
             new Legion(markerId, null, hexLabel, hexLabel,
-                       Creature.getCreatureByName("Titan"),
+                       Creature.getCreatureByName(Constants.titan),
                        Creature.getCreatureByName(
                            TerrainRecruitLoader.getPrimaryAcquirable()),
                        startCre[2],
@@ -248,21 +229,6 @@ public final class Legion implements Comparable
         return legion;
     }
 
-
-    /** deep copy for AI */
-    Legion AICopy(Game game)
-    {
-        Legion newLegion = new Legion(markerId, parentId, currentHexLabel,
-            startingHexLabel, critters, playerName, game);
-
-        newLegion.moved = moved;
-        newLegion.recruitName = recruitName;
-        newLegion.battleTally = battleTally;
-        newLegion.entrySide = entrySide;
-        newLegion.teleported = teleported;
-
-        return newLegion;
-    }
 
     int getPointValue()
     {
@@ -1092,7 +1058,7 @@ public final class Legion implements Comparable
         {
             if (hasTitan())
             {
-                lords.add("Titan");
+                lords.add(Constants.titan);
             }
         }
 

@@ -6,6 +6,7 @@ import java.util.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.Battle;
 
 
 /**
@@ -32,7 +33,7 @@ final class Strike
 
     /** Return the set of hex labels for hexes with critters that have
      *  valid strike targets. */
-    Set findCrittersWithTargets()
+    public Set findCrittersWithTargets()
     {
         Set set = new HashSet();
         Iterator it = client.getBattleChits().iterator();
@@ -75,16 +76,17 @@ final class Strike
     synchronized void makeForcedStrikes(boolean rangestrike)
     {
         if (client.getBattlePhase() != Constants.FIGHT && 
-            client.getBattlePhase() != Constants.STRIKEBACK)
+            client.getBattlePhase() != Constants.STRIKEBACK &&
+            !client.isMyBattlePhase())
         {
             Log.error("Called Strike.makeForcedStrikes() in wrong phase");
             return;
         }
-        Iterator it = client.getBattleChits().iterator();
+        Iterator it = client.getActiveBattleChits().iterator();
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
-            if (client.isActive(chit) && !chit.hasStruck())
+            if (!chit.hasStruck())
             {
                 Set set = findStrikes(chit, rangestrike);
                 if (set.size() == 1)
@@ -106,6 +108,13 @@ final class Strike
     {
         return HexMap.getHexByLabel(client.getBattleTerrain(), 
             chit.getHexLabel());
+    }
+
+
+    boolean canStrike(BattleChit striker, BattleChit target)
+    {
+        String targetHexLabel = target.getHexLabel();
+        return findStrikes(striker, true).contains(targetHexLabel);
     }
 
 
@@ -822,5 +831,212 @@ final class Strike
         {
             return countBrambleHexesDir(hex1, hex2, toLeft(xDist, yDist), 0);
         }
+    }
+
+
+    /** Return the number of dice that will be rolled when striking this
+     *  target, including modifications for terrain. */
+    public int getDice(BattleChit chit, BattleChit target)
+    {
+        BattleHex hex = HexMap.getHexByLabel(client.getBattleTerrain(),
+            chit.getCurrentHexLabel());
+        BattleHex targetHex = HexMap.getHexByLabel(client.getBattleTerrain(),
+            target.getCurrentHexLabel());
+        Creature striker = Creature.getCreatureByName(chit.getCreatureName());
+
+        int dice;
+        if (striker.isTitan())
+        {
+            dice = chit.getTitanPower();
+        }
+        else
+        {
+            dice = striker.getPower();
+        }
+
+        boolean rangestrike = !client.isInContact(chit, true);
+        if (rangestrike)
+        {
+            // Divide power in half, rounding down.
+            dice /= 2;
+
+            // volcanoNative rangestriking from volcano: +2
+            if (striker.isNativeVolcano() && hex.getTerrain() == 'v')
+            {
+                dice += 2;
+            }
+        }
+        else
+        {
+            // Dice can be modified by terrain.
+            // volcanoNative striking from volcano: +2
+            if (striker.isNativeVolcano() && hex.getTerrain() == 'v')
+            {
+                dice += 2;
+            }
+
+            // Adjacent hex, so only one possible direction.
+            int direction = Battle.getDirection(hex, targetHex, false);
+            char hexside = hex.getHexside(direction);
+
+            // Native striking down a dune hexside: +2
+            if (hexside == 'd' && striker.isNativeSandDune())
+            {
+                dice += 2;
+            }
+            // Native striking down a slope hexside: +1
+            else if (hexside == 's' && striker.isNativeSlope())
+            {
+                dice++;
+            }
+            // Non-native striking up a dune hexside: -1
+            else if (!striker.isNativeSandDune() &&
+                hex.getOppositeHexside(direction) == 'd')
+            {
+                dice--;
+            }
+        }
+
+        return dice;
+    }
+
+
+    private int getAttackerSkill(BattleChit striker, BattleChit target)
+    {
+        BattleHex hex = HexMap.getHexByLabel(client.getBattleTerrain(),
+            striker.getCurrentHexLabel());
+        BattleHex targetHex = HexMap.getHexByLabel(client.getBattleTerrain(),
+            target.getCurrentHexLabel());
+
+        int attackerSkill = striker.getSkill();
+
+        boolean rangestrike = !client.isInContact(striker, true);
+
+        // Skill can be modified by terrain.
+        if (!rangestrike)
+        {
+            // Non-native striking out of bramble: -1
+            if (hex.getTerrain() == 'r' && 
+                !striker.getCreature().isNativeBramble())
+            {
+                attackerSkill--;
+            }
+
+            if (hex.getElevation() > targetHex.getElevation())
+            {
+                // Adjacent hex, so only one possible direction.
+                int direction = Battle.getDirection(hex, targetHex, false);
+                char hexside = hex.getHexside(direction);
+                // Striking down across wall: +1
+                if (hexside == 'w')
+                {
+                    attackerSkill++;
+                }
+            }
+            else if (hex.getElevation() < targetHex.getElevation())
+            {
+                // Adjacent hex, so only one possible direction.
+                int direction = Battle.getDirection(targetHex, hex, false);
+                char hexside = targetHex.getHexside(direction);
+                // Non-native striking up slope: -1
+                // Striking up across wall: -1
+                if ((hexside == 's' && !striker.getCreature().isNativeSlope()) 
+                    || hexside == 'w')
+                {
+                    attackerSkill--;
+                }
+            }
+        }
+        else if (!striker.getCreature().useMagicMissile())
+        {
+            // Range penalty
+            if (Battle.getRange(hex, targetHex, false) == 4)
+            {
+                attackerSkill--;
+            }
+
+            // Non-native rangestrikes: -1 per intervening bramble hex
+            if (!striker.getCreature().isNativeBramble())
+            {
+                attackerSkill -= Battle.countBrambleHexes(hex, targetHex);
+            }
+
+            // Rangestrike up across wall: -1 per wall
+            if (targetHex.hasWall())
+            {
+                int heightDeficit = targetHex.getElevation() -
+                    hex.getElevation();
+                if (heightDeficit > 0)
+                {
+                    // Because of the design of the tower map, a strike to
+                    // a higher tower hex always crosses one wall per
+                    // elevation difference.
+                    attackerSkill -= heightDeficit;
+                }
+            }
+
+            // Rangestrike into volcano: -1
+            if (targetHex.getTerrain() == 'v')
+            {
+                attackerSkill--;
+            }
+        }
+
+        return attackerSkill;
+    }
+
+    public int getStrikeNumber(BattleChit striker, BattleChit target)
+    {
+        boolean rangestrike = !client.isInContact(striker, true);
+
+        int attackerSkill = getAttackerSkill(striker, target);
+        int defenderSkill = target.getSkill();
+
+        int strikeNumber = 4 - attackerSkill + defenderSkill;
+
+        // Strike number can be modified directly by terrain.
+        // Native defending in bramble, from strike by a non-native: +1
+        // Native defending in bramble, from rangestrike by a non-native
+        //     non-magicMissile: +1
+        if (HexMap.getHexByLabel(client.getBattleTerrain(), 
+                target.getHexLabel()).getTerrain() == 'r' &&
+            target.getCreature().isNativeBramble() &&
+            !striker.getCreature().isNativeBramble() &&
+            !(rangestrike && striker.getCreature().useMagicMissile()))
+        {
+            strikeNumber++;
+        }
+
+        // Native defending in stone, from strike by a non-native: +1
+        // Native defending in stone, from rangestrike by a non-native
+        //     non-magicMissile: +1
+        if (HexMap.getHexByLabel(client.getBattleTerrain(), 
+                target.getHexLabel()).getTerrain() == 'n' &&
+            target.getCreature().isNativeStone() &&
+            !striker.getCreature().isNativeStone() &&
+            !(rangestrike && striker.getCreature().useMagicMissile()))
+        {
+            strikeNumber++;
+        }
+
+        // Native defending in tree, from strike by a non-native: +1
+        // Native defending in tree, from rangestrike by a non-native
+        //     non-magicMissile: no effect
+        if (HexMap.getHexByLabel(client.getBattleTerrain(), 
+                target.getHexLabel()).getTerrain() == 't' &&
+            target.getCreature().isNativeTree() &&
+            !striker.getCreature().isNativeTree() &&
+            !(rangestrike))
+        {
+            strikeNumber++;
+        }
+
+        // Sixes always hit.
+        if (strikeNumber > 6)
+        {
+            strikeNumber = 6;
+        }
+
+        return strikeNumber;
     }
 }

@@ -181,7 +181,7 @@ public class Creature implements Comparable
 
     public boolean isTitan()
     {
-        return name.equals("Titan");
+        return name.equals(Constants.titan);
     }
 
     public boolean isAngel()
@@ -339,7 +339,7 @@ public class Creature implements Comparable
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
-            if (name.equals(creature.getName()))
+            if (name != null && name.equals(creature.getName()))
             {
                 return true;
             }

@@ -1,4 +1,4 @@
-package net.sf.colossus.server;
+package net.sf.colossus.client;
 
 /**
  * Simple implementation of a Titan AI - a bit more coward the regular SimpleAI
@@ -8,9 +8,9 @@ package net.sf.colossus.server;
 
 public class CowardSimpleAI extends SimpleAI
 {
-    CowardSimpleAI()
+    CowardSimpleAI(Client client)
     {
-        super();
+        super(client);
 
         /* up the ratios a little */
         RATIO_WIN_MINIMAL_LOSS = 1.45; // 1.30;

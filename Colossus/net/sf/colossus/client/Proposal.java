@@ -161,7 +161,7 @@ public final class Proposal
     }
 
     /** Create a Proposal from a {sep}-separated list of fields. */
-    public static Proposal makeProposal(String s)
+    public static Proposal makeFromString(String s)
     {
         List li = Split.split(sep, s);
 

@@ -132,11 +132,6 @@ final class Caretaker implements Cloneable
         }
     }
 
-    /** deep copy for AI */
-    Caretaker AICopy()
-    {
-        return (Caretaker)clone();
-    }
 
     public Object clone()
     {

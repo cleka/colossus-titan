@@ -139,7 +139,6 @@ Log.debug("About to create server socket on port " + port);
 
     private void createLocalClients()
     {
-Log.debug("Called Server.createLocalClients()");
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             Player player = game.getPlayer(i);
@@ -175,7 +174,7 @@ Log.debug("Called Server.addClient() for " + playerName);
         }
 
         waitingForClients--;
-Log.debug("Decremented waitingForClients to " + waitingForClients);
+        Log.event("Decremented waitingForClients to " + waitingForClients);
         if (waitingForClients <= 0)
         {
             if (game.isLoadingGame())
@@ -519,7 +518,9 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.setupBattleMove();
+            client.setupBattleMove(
+                game.getBattle().getActivePlayerName(),
+                game.getBattle().getTurnNumber());
         }
     }
 
@@ -535,7 +536,7 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
     }
 
 
-    void allPlaceNewChit(Critter critter)
+    synchronized void allPlaceNewChit(Critter critter)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -567,6 +568,12 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
             IClient client = (IClient)it.next();
             client.highlightEngagements();
         }
+    }
+
+    void nextEngagement()
+    {
+        IClient client = getClient(game.getActivePlayerName());
+        client.nextEngagement();
     }
 
 
@@ -608,7 +615,6 @@ Log.debug("Decremented waitingForClients to " + waitingForClients);
 
     void reinforce(Legion legion)
     {
-Log.debug("Called Server.reinforce()");
         IClient client = getClient(legion.getPlayerName());
         client.doReinforce(legion.getMarkerId());
     }
@@ -723,22 +729,8 @@ Log.debug("Called Server.reinforce()");
     /** Ask ally's player whether he wants to concede with ally. */
     void askConcede(Legion ally, Legion enemy)
     {
-        if (ally.getPlayer().isAI())
-        {
-            if (ally.getPlayer().aiConcede(ally, enemy))
-            {
-                game.concede(ally.getMarkerId());
-            }
-            else
-            {
-                game.doNotConcede(ally.getMarkerId());
-            }
-        }
-        else
-        {
-            IClient client = getClient(ally.getPlayerName());
-            client.askConcede(ally.getMarkerId(), enemy.getMarkerId());
-        }
+        IClient client = getClient(ally.getPlayerName());
+        client.askConcede(ally.getMarkerId(), enemy.getMarkerId());
     }
 
     public void concede(String markerId)
@@ -766,22 +758,8 @@ Log.debug("Called Server.reinforce()");
     /** Ask ally's player whether he wants to flee with ally. */
     void askFlee(Legion ally, Legion enemy)
     {
-        if (ally.getPlayer().isAI())
-        {
-            if (ally.getPlayer().aiFlee(ally, enemy))
-            {
-                game.flee(ally.getMarkerId());
-            }
-            else
-            {
-                game.doNotFlee(ally.getMarkerId());
-            }
-        }
-        else
-        {
-            IClient client = getClient(ally.getPlayerName());
-            client.askFlee(ally.getMarkerId(), enemy.getMarkerId());
-        }
+        IClient client = getClient(ally.getPlayerName());
+        client.askFlee(ally.getMarkerId(), enemy.getMarkerId());
     }
 
     public void flee(String markerId)
@@ -995,7 +973,7 @@ Log.debug("Called Server.reinforce()");
         striker.assignStrikePenalty(prompt);
     }
 
-    void allInitBattle(String masterHexLabel)
+    synchronized void allInitBattle(String masterHexLabel)
     {
         Battle battle = game.getBattle();
         Iterator it = clients.iterator();
@@ -1258,19 +1236,20 @@ Log.debug("Called Server.reinforce()");
         if (game.doMove(markerId, hexLabel, entrySide, teleport,
             teleportingLord))
         {
-            allTellDidMove(markerId, startingHexLabel, hexLabel, teleport);
+            allTellDidMove(markerId, startingHexLabel, hexLabel, entrySide,
+                teleport);
         }
     }
 
     void allTellDidMove(String markerId, String startingHexLabel,
-        String endingHexLabel, boolean teleport)
+        String endingHexLabel, String entrySide, boolean teleport)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
             client.didMove(markerId, startingHexLabel, endingHexLabel,
-                teleport);
+                entrySide, teleport);
         }
     }
 

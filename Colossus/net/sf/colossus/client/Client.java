@@ -14,9 +14,8 @@ import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.AI;
-import net.sf.colossus.server.SimpleAI;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Dice;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
@@ -73,13 +72,16 @@ public final class Client implements IClient
     /** Last movement roll for any player. */
     private int movementRoll = -1;
 
+    // XXX Should be per player
     /** Sorted set of available legion markers for this player. */
-    private TreeSet markersAvailable = new TreeSet();
+    private TreeSet markersAvailable = new TreeSet();  
+
     private String parentId;
     private int numSplitsThisTurn;
 
-    /** Gradually moving AI to client side. */
-    private AI ai = new SimpleAI();
+    // XXX Need to support changing AI type.
+    private String type;      // "Human" or ".*AI"
+    private AI ai = new SimpleAI(this);
 
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
      *  is missing then we assume it is set to the maximum. */
@@ -119,13 +121,11 @@ public final class Client implements IClient
     private boolean remote;
     private SocketClientThread sct; 
 
-    // For negotiation.
-    private String attackerId;
-    private String defenderId;
+    // For negotiation.  (And AI battle.)
     private Negotiate negotiate;
     private ReplyToProposal replyToProposal;
 
-    // XXX temporary until I get things synched
+    // XXX temporary until things are synched
     private boolean tookMulligan;
 
 
@@ -307,7 +307,7 @@ public final class Client implements IClient
         // Call here instead of from setupMove() for mulligans.
         if (isMyTurn() && getOption(Options.autoMasterMove))
         {
-            ai.masterMove(this);
+            ai.masterMove();
         }
     }
 
@@ -752,21 +752,19 @@ public final class Client implements IClient
     }
 
 
-    void doneWithBattleMoves()
+    synchronized void doneWithBattleMoves()
     {
         clearUndoStack();
-        markOffboardCreaturesDead();
         server.doneWithBattleMoves();
     }
 
     boolean anyOffboardCreatures()
     {
-        Iterator it = getBattleChits().iterator();
+        Iterator it = getActiveBattleChits().iterator();
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
-            if (chit.getHexLabel().startsWith("X") &&
-                playerName.equals(getPlayerNameByTag(chit.getTag())))
+            if (chit.getHexLabel().startsWith("X"))
             {
                 return true;
             }
@@ -774,15 +772,45 @@ public final class Client implements IClient
         return false;
     }
 
-    void markOffboardCreaturesDead()
+    java.util.List getActiveBattleChits()
     {
+        java.util.List chits = new ArrayList();
         Iterator it = getBattleChits().iterator();
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
-            if (chit.getHexLabel().startsWith("X") &&
-                battleActivePlayerName.equals(
-                    getPlayerNameByTag(chit.getTag())))
+            if (getBattleActivePlayerName().equals(getPlayerNameByTag(
+                chit.getTag())))
+            {
+                chits.add(chit);
+            }
+        }
+        return chits;
+    }
+
+    java.util.List getInactiveBattleChits()
+    {
+        java.util.List chits = new ArrayList();
+        Iterator it = getBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (!getBattleActivePlayerName().equals(getPlayerNameByTag(
+                chit.getTag())))
+            {
+                chits.add(chit);
+            }
+        }
+        return chits;
+    }
+
+    synchronized void markOffboardCreaturesDead()
+    {
+        Iterator it = getActiveBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (chit.getHexLabel().startsWith("X"))
             {
                 chit.setDead(true);
                 chit.repaint();
@@ -791,22 +819,40 @@ public final class Client implements IClient
     }
 
 
-    void doneWithStrikes()
+    synchronized void doneWithStrikes()
     {
         server.doneWithStrikes();
     }
 
-    private void makeForcedStrikes()
+    synchronized void makeForcedStrikes()
     {
-        if (getOption(Options.autoPlay))
-        {
-            // AI forced strikes are handled on server side.
-            return;
-        }
-        if (playerName.equals(getBattleActivePlayerName()) &&
-            getOption(Options.autoForcedStrike))
+        if (isMyBattlePhase() && getOption(Options.autoForcedStrike))
         {
             strike.makeForcedStrikes(getOption(Options.autoRangeSingle));
+        }
+    }
+
+    synchronized void doAutoStrikes()
+    {
+        if (isMyBattlePhase()) 
+        {
+            if (getOption(Options.autoPlay))
+            {
+                boolean more = ai.strike(getLegionInfo(
+                    getBattleActiveMarkerId()));
+                if (!more)
+                {
+                    doneWithStrikes();
+                }
+            }
+            else
+            {
+                makeForcedStrikes();
+                if (map != null)
+                {
+                    map.highlightCrittersWithTargets();
+                }
+            }
         }
     }
 
@@ -816,18 +862,16 @@ public final class Client implements IClient
         return Collections.unmodifiableList(markers);
     }
 
+    public Set getMarkersAvailable()
+    {
+        return Collections.unmodifiableSortedSet(markersAvailable);
+    }
+
 
     /** Get this legion's info.  Create it first if necessary.
      *  public for client-side AI -- do not call from server side. */
     public LegionInfo getLegionInfo(String markerId)
     {
-    /*
-        if (markerId == null)
-        {
-            Log.error("Called Client.getLegionInfo() with null markerId");
-            return null;
-        }
-        */
         LegionInfo info = (LegionInfo)legionInfo.get(markerId);
         if (info == null)
         {
@@ -982,7 +1026,7 @@ public final class Client implements IClient
     /** Get the BattleChit with this tag. */
     BattleChit getBattleChit(int tag)
     {
-        Iterator it = battleChits.iterator();
+        Iterator it = getBattleChits().iterator();
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
@@ -998,7 +1042,7 @@ public final class Client implements IClient
     // XXX Does this need to be public?
     public void removeDeadBattleChits()
     {
-        Iterator it = battleChits.iterator();
+        Iterator it = getBattleChits().iterator();
         while (it.hasNext())
         {
             BattleChit chit = (BattleChit)it.next();
@@ -1024,12 +1068,12 @@ public final class Client implements IClient
         }
     }
 
-    public void placeNewChit(String imageName, boolean inverted, int tag,
-        String hexLabel)
+    public synchronized void placeNewChit(String imageName, boolean inverted, 
+        int tag, String hexLabel)
     {
+        addBattleChit(imageName, inverted, tag, hexLabel);
         if (map != null)
         {
-            addBattleChit(imageName, inverted, tag, hexLabel);
             map.alignChits(hexLabel);
             // Make sure map is visible after summon or muster.
             map.toFront();
@@ -1037,8 +1081,8 @@ public final class Client implements IClient
     }
 
     /** Create a new BattleChit and add it to the end of the list. */
-    private void addBattleChit(final String bareImageName, boolean inverted,
-        int tag, String hexLabel)
+    private synchronized void addBattleChit(final String bareImageName, 
+        boolean inverted, int tag, String hexLabel)
     {
         String imageName = bareImageName;
         if (imageName.equals(Constants.titan))
@@ -1136,7 +1180,7 @@ public final class Client implements IClient
         return board;
     }
 
-    public void initBoard()
+    public synchronized void initBoard()
     {
         VariantSupport.loadVariant(options.getStringOption(Options.variant));
 
@@ -1182,7 +1226,7 @@ public final class Client implements IClient
     {
         if (getOption(Options.autoSummonAngels))
         {
-            String typeColonDonor = ai.summonAngel(markerId, this);
+            String typeColonDonor = ai.summonAngel(markerId);
             java.util.List parts = Split.split(':', typeColonDonor);
             String unit = (String)parts.get(0);
             String donor = (String)parts.get(1);
@@ -1263,12 +1307,17 @@ public final class Client implements IClient
             Log.error("Called Client.askChooseStrikePenalty with no prompts");
             return;
         }
-        if (map == null)
+
+        if (getOption(Options.autoPlay))
         {
-            Log.error("Called Client.askChooseStrikePenalty with null map");
-            return;
+            // XXX Teach AI to handle strike penalties.  This just takes
+            // the last one.
+            assignStrikePenalty((String)choices.get(choices.size() - 1));
         }
-        new PickStrikePenalty(map.getFrame(), this, choices);
+        else
+        {
+            new PickStrikePenalty(map.getFrame(), this, choices);
+        }
     }
 
     void assignStrikePenalty(String prompt)
@@ -1344,12 +1393,29 @@ public final class Client implements IClient
 
     public void askConcede(String allyMarkerId, String enemyMarkerId)
     {
-        Concede.concede(this, board.getFrame(), allyMarkerId, enemyMarkerId);
+        if (getOption(Options.autoConcede))
+        {
+            answerConcede(allyMarkerId, ai.concede(getLegionInfo(
+                allyMarkerId), getLegionInfo(enemyMarkerId)));
+        }
+        else
+        {
+            Concede.concede(this, board.getFrame(), allyMarkerId, 
+                enemyMarkerId);
+        }
     }
 
     public void askFlee(String allyMarkerId, String enemyMarkerId)
     {
-        Concede.flee(this, board.getFrame(), allyMarkerId, enemyMarkerId);
+        if (getOption(Options.autoFlee))
+        {
+            answerFlee(allyMarkerId, ai.flee(getLegionInfo(allyMarkerId),
+                getLegionInfo(enemyMarkerId)));
+        }
+        else
+        {
+            Concede.flee(this, board.getFrame(), allyMarkerId, enemyMarkerId);
+        }
     }
 
     void answerFlee(String markerId, boolean answer)
@@ -1376,11 +1442,11 @@ public final class Client implements IClient
         }
     }
 
-
+    
     public void askNegotiate(String attackerId, String defenderId)
     {
-        this.attackerId = attackerId;
-        this.defenderId = defenderId;
+        this.attackerMarkerId = attackerId;
+        this.defenderMarkerId = defenderId;
 
         if (getOption(Options.autoNegotiate))
         {
@@ -1400,7 +1466,7 @@ public final class Client implements IClient
     {
         if (proposal != null && proposal.isFight())
         {
-            fight(proposal.getHexLabel());
+            fight(getHexForLegion(attackerMarkerId));
             return;
         }
         else if (proposal != null)
@@ -1410,7 +1476,8 @@ public final class Client implements IClient
 
         if (respawn)
         {
-            negotiate = new Negotiate(this, attackerId, defenderId);
+            negotiate = new Negotiate(this, attackerMarkerId, 
+                defenderMarkerId);
         }
     }
 
@@ -1422,7 +1489,7 @@ public final class Client implements IClient
     /** Inform this player about the other player's proposal. */
     public void tellProposal(String proposalString)
     {
-        Proposal proposal = Proposal.makeProposal(proposalString);
+        Proposal proposal = Proposal.makeFromString(proposalString);
         new ReplyToProposal(this, proposal);
     }
 
@@ -1438,7 +1505,7 @@ public final class Client implements IClient
         return chit.getCreatureName() + " in " + hex.getDescription();
     }
 
-    public void tellStrikeResults(int strikerTag, int targetTag, 
+    public void tellStrikeResults(int strikerTag, int targetTag,
         int strikeNumber, java.util.List rolls, int damage, boolean killed, 
         boolean wasCarry, int carryDamageLeft, Set carryTargetDescriptions)
     {
@@ -1480,26 +1547,14 @@ public final class Client implements IClient
         {
             pickCarries(carryDamageLeft, carryTargetDescriptions);
         }
-        else
-        {
-            makeForcedStrikes();
 
-            if (map != null)
-            {
-                map.highlightCrittersWithTargets();
-            }
-        }
+        doAutoStrikes();
     }
 
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
     {
-        if (!playerName.equals(getBattleActivePlayerName()))
+        if (!isMyBattlePhase())
         {
-            return;
-        }
-        if (getOption(Options.autoPlay))
-        {
-            // AI carries are handled on server side.
             return;
         }
 
@@ -1517,8 +1572,15 @@ public final class Client implements IClient
         }
         else
         {
-            new PickCarry(map.getFrame(), this, carryDamage,
-                carryTargetDescriptions);
+            if (getOption(Options.autoPlay))
+            {
+                ai.handleCarries(carryDamage, carryTargetDescriptions);
+            }
+            else
+            {
+                new PickCarry(map.getFrame(), this, carryDamage,
+                    carryTargetDescriptions);
+            }
         }
     }
 
@@ -1551,6 +1613,9 @@ public final class Client implements IClient
         this.defenderMarkerId = defenderMarkerId;
         this.battleSite = masterHexLabel;
 
+        getLegionInfo(defenderMarkerId).setEntrySide((getLegionInfo(
+            attackerMarkerId).getEntrySide() + 3) % 6);
+
         // Do not show map for AI players.
         if (!getOption(Options.autoPlay))
         {
@@ -1566,31 +1631,41 @@ public final class Client implements IClient
     }
 
 
-    public void cleanupBattle()
+    public synchronized void cleanupBattle()
     {
         if (map != null)
         {
             map.dispose();
             map = null;
         }
-        battleChits.clear();
+        getBattleChits().clear();
         battleTurnNumber = -1;
         battlePhase = -1;
         battleActivePlayerName = null;
     }
 
-
+    // XXX delete?
     public void highlightEngagements()
     {
         if (board != null)
         {
-            if (playerName.equals(getActivePlayerName()))
+            if (getPlayerName().equals(getActivePlayerName()))
             {
                 board.getFrame().toFront();
             }
             board.highlightEngagements();
         }
     }
+
+    public void nextEngagement()
+    {
+        if (isMyTurn() && getOption(Options.autoPickEngagements))
+        {
+            String hexLabel = ai.pickEngagement();
+            engage(hexLabel);
+        }
+    }
+
 
 
     /** Used for human players only.  */
@@ -1641,7 +1716,7 @@ public final class Client implements IClient
     {
         if (getOption(Options.autoReinforce))
         {
-            ai.reinforce(getLegionInfo(markerId), this);
+            ai.reinforce(getLegionInfo(markerId));
         }
         else
         {
@@ -1792,6 +1867,12 @@ public final class Client implements IClient
             }
         }
         updateStatusScreen();
+
+        if (isMyTurn() && getOption(Options.autoSplit))
+        {
+            ai.split();
+            doneWithSplits();
+        }
     }
 
     public void setupMove()
@@ -1813,6 +1894,11 @@ public final class Client implements IClient
             board.setupFightMenu();
         }
         updateStatusScreen();
+
+        if (isMyTurn() && getOption(Options.autoPickEngagements))
+        {
+            ai.pickEngagement();
+        }
     }
 
     public void setupMuster()
@@ -1829,13 +1915,13 @@ public final class Client implements IClient
 
         if (getOption(Options.autoRecruit))
         {
-            ai.muster(this);
+            ai.muster();
             doneWithRecruits();
         }
     }
 
 
-    public void setupBattleSummon(String battleActivePlayerName,
+    public synchronized void setupBattleSummon(String battleActivePlayerName,
         int battleTurnNumber)
     {
         this.battlePhase = Constants.SUMMON;
@@ -1844,7 +1930,7 @@ public final class Client implements IClient
 
         if (map != null)
         {
-            if (playerName.equals(getBattleActivePlayerName()))
+            if (isMyBattlePhase())
             {
                 map.getFrame().toFront();
                 map.setupSummonMenu();
@@ -1853,7 +1939,7 @@ public final class Client implements IClient
         updateStatusScreen();
     }
 
-    public void setupBattleRecruit(String battleActivePlayerName,
+    public synchronized void setupBattleRecruit(String battleActivePlayerName,
         int battleTurnNumber)
     {
         this.battlePhase = Constants.RECRUIT;
@@ -1862,7 +1948,7 @@ public final class Client implements IClient
 
         if (map != null)
         {
-            if (playerName.equals(getBattleActivePlayerName()))
+            if (isMyBattlePhase())
             {
                 map.getFrame().toFront();
                 map.setupRecruitMenu();
@@ -1882,8 +1968,12 @@ public final class Client implements IClient
         }
     }
 
-    public void setupBattleMove()
+    public synchronized void setupBattleMove(String battleActivePlayerName,
+        int battleTurnNumber)
     {
+        setBattleActivePlayerName(battleActivePlayerName);
+        this.battleTurnNumber = battleTurnNumber;
+
         // Just in case the other player started the battle
         // really quickly.
         cleanupNegotiationDialogs();
@@ -1892,32 +1982,42 @@ public final class Client implements IClient
 
         this.battlePhase = Constants.MOVE;
 
-        if (map != null && playerName.equals(getBattleActivePlayerName()))
+        if (map != null && isMyBattlePhase())
         {
             map.getFrame().toFront();
             map.setupMoveMenu();
         }
         updateStatusScreen();
+
+        if (isMyBattlePhase() && getOption(Options.autoPlay))
+        {
+            ai.battleMove();
+            doneWithBattleMoves();
+        }
     }
 
     /** Used for both strike and strikeback. */
-    public void setupBattleFight(int battlePhase,
+    public synchronized void setupBattleFight(int battlePhase,
         String battleActivePlayerName)
     {
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
-
-        makeForcedStrikes();
+        if (battlePhase == Constants.FIGHT)
+        {
+            markOffboardCreaturesDead();
+        }
 
         if (map != null)
         {
-            if (playerName.equals(getBattleActivePlayerName()))
+            if (isMyBattlePhase())
             {
                 map.getFrame().toFront();
-                map.setupFightMenu();
             }
+            map.setupFightMenu();
         }
         updateStatusScreen();
+
+        doAutoStrikes();
     }
 
 
@@ -1997,6 +2097,19 @@ public final class Client implements IClient
         else
         {
             return attackerMarkerId;
+        }
+    }
+
+    String getBattleInactiveMarkerId()
+    {
+        LegionInfo info = getLegionInfo(defenderMarkerId);
+        if (battleActivePlayerName.equals(info.getPlayerName()))
+        {
+            return attackerMarkerId;
+        }
+        else
+        {
+            return defenderMarkerId;
         }
     }
 
@@ -2105,6 +2218,11 @@ public final class Client implements IClient
         }
     }
 
+    String getBattleSite()
+    {
+        return battleSite;
+    }
+
     char getBattleTerrain()
     {
         MasterHex mHex = MasterBoard.getHexByLabel(battleSite);
@@ -2211,7 +2329,7 @@ public final class Client implements IClient
         return (playerName.equals(getPlayerNameByTag(tag)));
     }
 
-    String getActivePlayerName()
+    public String getActivePlayerName()
     {
         return activePlayerName;
     }
@@ -2365,7 +2483,7 @@ public final class Client implements IClient
         String entrySide = null;
         if (getOption(Options.autoPickEntrySide))
         {
-            entrySide = (String)entrySides.iterator().next();
+            entrySide = ai.pickEntrySide(hexLabel, moverId, entrySides);
         }
         else
         {
@@ -2396,7 +2514,7 @@ public final class Client implements IClient
     }
 
     public void didMove(String markerId, String startingHexLabel,
-        String currentHexLabel, boolean teleport)
+        String currentHexLabel, String entrySide, boolean teleport)
     {
         removeRecruitChit(startingHexLabel);
         if (isMyLegion(markerId))
@@ -2405,6 +2523,8 @@ public final class Client implements IClient
         }
         getLegionInfo(markerId).setHexLabel(currentHexLabel);
         getLegionInfo(markerId).setMoved(true);
+        getLegionInfo(markerId).setEntrySide(
+            BattleMap.entrySideNum(entrySide));
         if (teleport)
         {
             getLegionInfo(markerId).setTeleported(true);
@@ -2573,6 +2693,11 @@ public final class Client implements IClient
         return movement;
     }
 
+    public synchronized Strike getStrike()
+    {
+        return strike;
+    }
+
     /** Return a set of hexLabels. */
     Set listTeleportMoves(String markerId)
     {
@@ -2687,7 +2812,7 @@ public final class Client implements IClient
     }
 
     /** Return a set of hexLabels for all hexes with engagements. */
-    Set findEngagements()
+    public Set findEngagements()
     {
         Set set = new HashSet();
         Iterator it = MasterBoard.getAllHexLabels().iterator();
@@ -2780,7 +2905,7 @@ public final class Client implements IClient
     }
 
 
-    int getNumEnemyLegions(String hexLabel, String playerName)
+    public int getNumEnemyLegions(String hexLabel, String playerName)
     {
         return getEnemyLegions(hexLabel, playerName).size();
     }
@@ -2800,6 +2925,16 @@ public final class Client implements IClient
             }
         }
         return markerIds;
+    }
+
+    public String getFirstFriendlyLegion(String hexLabel, String playerName)
+    {
+        java.util.List markerIds = getFriendlyLegions(hexLabel, playerName);
+        if (markerIds.isEmpty())
+        {
+            return null;
+        }
+        return (String)markerIds.get(0);
     }
 
     int getNumFriendlyLegions(String hexLabel, String playerName)
@@ -3007,6 +3142,7 @@ public final class Client implements IClient
     }
 
 
+    /** Used for human players only. */
     void doSplit(String parentId)
     {
         this.parentId = null;
@@ -3053,7 +3189,8 @@ public final class Client implements IClient
         }
     }
 
-    /** Second part of doSplit, after the child marker is picked. */
+    /** Second part of doSplit, after the child marker is picked.
+     * Used for human players only. */
     void pickMarkerCallback(String childId)
     {
         if (parentId == null || childId == null)
@@ -3066,8 +3203,14 @@ public final class Client implements IClient
 
         if (results != null)
         {
-            server.doSplit(parentId, childId, results);
+            doSplit(parentId, childId, results);
         }
+    }
+
+    /** Called by AI, and by pickMarkerCallback() */
+    public void doSplit(String parentId, String childId, String results)
+    {
+        server.doSplit(parentId, childId, results);
     }
 
     /** Callback from server after any successful split. */
@@ -3219,5 +3362,50 @@ public final class Client implements IClient
             Log.error("Problem reading version file " + ex);
         }
         return version;
+    }
+
+
+    boolean testBattleMove(BattleChit chit, String hexLabel)
+    {
+        if (showBattleMoves(chit.getTag()).contains(hexLabel))
+        {
+            chit.setHexLabel(hexLabel);
+            return true;
+        }
+        return false;
+    }
+
+    public void setType(final String aType)
+    {
+        String type = new String(aType);
+Log.debug("Called Client.setType() for " + playerName + " " + type);
+        if (type.endsWith(Constants.anyAI))
+        {
+            int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
+            type = Constants.aiArray[whichAI];
+        }
+        if (!type.startsWith("net.sf.colossus.server."))
+        {
+            type = "net.sf.colossus.server." + type;
+        }
+        if (type.endsWith("AI"))
+        {
+            if (!(ai.getClass().getName().equals(type)))
+            {
+                Log.event("Changing client " + playerName + " from " +
+                    ai.getClass().getName() + " to " + type);
+                try 
+                {
+                    ai = (AI)Class.forName(type).getDeclaredConstructor(
+                        new Class[0]).newInstance(new Object[0]);
+                } 
+                catch (Exception e)
+                {
+                    Log.error("Failed to change client " + playerName +
+                        " from " + ai.getClass().getName() + " to " + type);
+                }
+            }
+        }
+        this.type = type;
     }
 }

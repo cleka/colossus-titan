@@ -65,8 +65,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         setupActions();
         setupTopMenu();
 
-        setupEntrances();
-
         saveWindow = new SaveWindow(client, "BattleMap");
 
         if (location == null)
@@ -91,18 +89,10 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    // Simple constructor for testing and AICopy()
+    // Simple constructor for testing. 
     BattleMap(String masterHexLabel)
     {
         super(masterHexLabel);
-        setupEntrances();
-    }
-
-
-    BattleMap AICopy(String masterHexLabel)
-    {
-        BattleMap newMap = new BattleMap(masterHexLabel);
-        return newMap;
     }
 
 
@@ -679,6 +669,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         setupHexes();
         setupEntrances();
+
         int chitScale = 4 * Scale.get();
         Iterator it = client.getBattleChits().iterator();
         while (it.hasNext())
@@ -705,6 +696,10 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public static int entrySideNum(String side)
     {
+        if (side == null)
+        {
+            return -1;
+        }
         if (side.equals(Constants.right))
         {
             return 1;

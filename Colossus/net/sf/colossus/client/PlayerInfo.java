@@ -103,7 +103,7 @@ public final class PlayerInfo
         return color;
     }
 
-    String getShortColor()
+    public String getShortColor()
     {
         return Player.getShortColor(getColor());
     }
@@ -138,7 +138,7 @@ public final class PlayerInfo
         return titanPower;
     }
 
-    int getScore()
+    public int getScore()
     {
         return score;
     }

@@ -3,6 +3,10 @@ package net.sf.colossus.client;
 
 import java.awt.*;
 
+import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.Creature;
+import net.sf.colossus.util.Log;
+
 
 /**
  * Class BattleChit implements the GUI for a Titan chit representing
@@ -18,17 +22,18 @@ final class BattleChit extends Chit
     private static Font oldFont;
     private static int fontHeight;
     private int hits = 0;
-    private String hexLabel;
+    private String currentHexLabel;
+    private String startingHexLabel;
     private boolean moved;
     private boolean struck;
 
 
     BattleChit(int scale, String id, Container container, boolean inverted,
-        int tag, String hexLabel)
+        int tag, String currentHexLabel)
     {
         super(scale, id, container, inverted);
         this.tag = tag;
-        this.hexLabel = hexLabel;
+        this.currentHexLabel = currentHexLabel;
         setBackground(Color.white);
     }
 
@@ -50,9 +55,15 @@ final class BattleChit extends Chit
         repaint();
     }
 
+    boolean wouldDieFrom(int hits)
+    {
+        return (hits + getHits() >= getPower());
+    }
+
     void setDead(boolean dead)
     {
         super.setDead(dead);
+Log.debug("Called BattleChit.setDead() " + dead + " " + getDescription());
         if (dead)
         {
             setHits(0);
@@ -61,12 +72,36 @@ final class BattleChit extends Chit
 
     String getHexLabel()
     {
-        return hexLabel;
+        return currentHexLabel;
+    }
+
+    String getCurrentHexLabel()
+    {
+        return currentHexLabel;
+    }
+
+    String getStartingHexLabel()
+    {
+        return startingHexLabel;
     }
 
     void setHexLabel(String hexLabel)
     {
-        this.hexLabel = hexLabel;
+        this.currentHexLabel = hexLabel;
+    }
+
+    void setCurrentHexLabel(String hexLabel)
+    {
+        this.currentHexLabel = hexLabel;
+    }
+
+    void moveToHex(String hexLabel)
+    {
+        if (!hexLabel.equals(startingHexLabel))
+        {
+            startingHexLabel = currentHexLabel;
+        }
+        currentHexLabel = hexLabel;
     }
 
     boolean hasMoved()
@@ -90,13 +125,58 @@ final class BattleChit extends Chit
     }
 
 
-    String getCreatureName()
+    public String getCreatureName()
     {
-        if (getId().startsWith("Titan"))
+        if (getId().startsWith(Constants.titan))
         {
-            return "Titan";
+            return Constants.titan;
         }
         return getId();
+    }
+
+    public String getName()
+    {
+        return getCreatureName();
+    }
+
+
+    boolean isTitan()
+    {
+        return getCreatureName().equals(Constants.titan);
+    }
+
+    int getPower()
+    {
+        if (getId().startsWith("Titan-"))
+        {
+            return getTitanPower();
+        }
+        else
+        {
+            return getCreature().getPower();
+        }
+    }
+
+    int getSkill()
+    {
+        return getCreature().getSkill();
+    }
+
+    int getPointValue()
+    {
+        return getPower() * getSkill();
+    }
+
+    boolean isRangestriker()
+    {
+        return getCreature().isRangestriker();
+    }
+
+    // XXX Titans
+    Creature getCreature()
+    {
+        Creature creature = Creature.getCreatureByName(getCreatureName());
+        return creature;
     }
 
 
@@ -143,5 +223,10 @@ final class BattleChit extends Chit
             // Restore the font.
             g.setFont(oldFont);
         }
+    }
+
+    public String getDescription()
+    {
+        return getId() + " in " + getHexLabel();
     }
 }

@@ -30,7 +30,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     // The game state hexes can be set up once for each terrain type.
     private static Map terrainH = new HashMap();
     private static Map terrainHexes = new HashMap();
-    private static Map entrancesHex = new HashMap();
+    private static Map entranceHexes = new HashMap();
     private static Map startlistMap = new HashMap();
     private static Map subtitleMap = new HashMap();
     private static Map towerStatusMap = new HashMap();
@@ -70,7 +70,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         terrainH.clear();
         terrainHexes.clear();
-        entrancesHex.clear();
+        entranceHexes.clear();
         startlistMap.clear();
         subtitleMap.clear();
         towerStatusMap.clear();
@@ -108,7 +108,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 gameHexes.add(gameEntrances[k]);
             }
             setupEntrancesGameState(gameEntrances, gameH);
-            entrancesHex.put(new Character(terrain), gameEntrances);
+            entranceHexes.put(new Character(terrain), gameEntrances);
             // Add hexes to both the [][] and ArrayList maps.
             terrainH.put(new Character(terrain), gameH);
             terrainHexes.put(new Character(terrain), gameHexes);
@@ -124,10 +124,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     void setupHexes()
     {
-        Log.debug("Setup all hexes for Battlelands.");
         setupHexesGUI();
         setupHexesGameState(terrain, h);
         setupNeighbors(h);
+        setupEntrances();
     }
 
     private void setupHexesGUI()
@@ -161,7 +161,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private static synchronized void setupHexesGameState(char terrain, 
         BattleHex [][] h)
     {
-        Log.debug("Loading battleland " + MasterHex.getTerrainName(terrain));
         java.util.List directories = 
             VariantSupport.getBattlelandsDirectoriesList();
         InputStream batIS = ResourceLoader.getInputStream(
@@ -419,7 +418,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         case 'X':
         case 'x':
             /* entrances */
-            BattleHex[] gameEntrances = (BattleHex[])entrancesHex.get(
+            BattleHex[] gameEntrances = (BattleHex[])entranceHexes.get(
                                                 new Character(terrain));
             return gameEntrances[y];
         default:

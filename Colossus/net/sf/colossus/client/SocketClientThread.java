@@ -290,6 +290,10 @@ Log.debug("End of SocketClientThread while loop");
         {
             client.highlightEngagements();
         }
+        else if (method.equals(Constants.nextEngagement))
+        {
+            client.nextEngagement();
+        }
         else if (method.equals(Constants.doReinforce))
         {
             String markerId = (String)args.remove(0);
@@ -353,7 +357,10 @@ Log.debug("End of SocketClientThread while loop");
         }
         else if (method.equals(Constants.setupBattleMove))
         {
-            client.setupBattleMove();
+            String battleActivePlayerName = (String)args.remove(0);
+            int battleTurnNumber = Integer.parseInt((String)args.remove(0));
+            client.setupBattleMove(battleActivePlayerName, 
+                battleTurnNumber);
         }
         else if (method.equals(Constants.setupBattleFight))
         {
@@ -381,10 +388,11 @@ Log.debug("End of SocketClientThread while loop");
             String markerId = (String)args.remove(0);
             String startingHexLabel = (String)args.remove(0);
             String currentHexLabel = (String)args.remove(0);
+            String entrySide = (String)args.remove(0);
             boolean teleport = 
                 Boolean.valueOf((String)args.remove(0)).booleanValue();
             client.didMove(markerId, startingHexLabel, currentHexLabel,
-                teleport);
+                entrySide, teleport);
         }
         else if (method.equals(Constants.undidMove))
         {

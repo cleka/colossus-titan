@@ -60,7 +60,6 @@ class Chit extends JPanel
 
         setBackground(Color.lightGray);
 
-        
         if (!Creature.isCreature(id))
         {
             if (!(id.startsWith("Titan-")))
@@ -99,6 +98,26 @@ class Chit extends JPanel
     {
         this(scale, id, container);
         this.inverted = inverted;
+    }
+
+
+    // XXX Duplicate code.
+    int getTitanPower()
+    {
+        if (!id.startsWith("Titan-"))
+        {
+            return -1;
+        }
+        int index = 6;
+        int index2 = index;
+        char c = id.charAt(index2);
+        while ((c >= '0') && (c <= '9'))
+        {
+            index2++;
+            c = id.charAt(index2);
+        }
+        int power = Integer.parseInt(id.substring(index, index2));
+        return power;
     }
 
     static ImageIcon getImageIcon(String imageFilename)
@@ -144,6 +163,11 @@ class Chit extends JPanel
 
     public void paintComponent(Graphics g)
     {
+        if (container == null)
+        {
+            return;
+        }
+
         Graphics2D g2 = (Graphics2D)g;
         super.paintComponent(g2);
         Image image = icon.getImage();

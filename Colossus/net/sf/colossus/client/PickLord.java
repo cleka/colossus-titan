@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.server.Constants;
 
 /**
  * Class PickLord allows a player to choose which lord tower teleports.
@@ -68,9 +69,9 @@ final class PickLord extends KDialog implements MouseListener, WindowListener
         if (i != -1)
         {
             lordType = (String)imageNames.get(i);
-            if (lordType.startsWith("Titan"))
+            if (lordType.startsWith(Constants.titan))
             {
-                lordType = "Titan";
+                lordType = Constants.titan;
             }
             dispose();
         }

@@ -8,6 +8,7 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
+
 /**
  * Class Player holds the data for one player in a Titan game.
  * @version $Id$
@@ -33,46 +34,12 @@ public final class Player implements Comparable
     private SortedSet markersAvailable = new TreeSet();
     private String type;               // "Human" or ".*AI"
 
-    private AI ai = new SimpleAI();
-
 
     Player(String name, Game game)
     {
         this.name = name;
         this.game = game;
         type = "Human";
-    }
-
-
-    /**
-     *  Deep copy for AI; preserves game state but ignores UI state
-     */
-    Player AICopy(Game game)
-    {
-        Player newPlayer = new Player(name, game);
-        newPlayer.color = color;       // Black, Blue, Brown, Gold, Green, Red
-        newPlayer.startingTower = startingTower;         // 1-6
-        newPlayer.score = score;       // track half-points, then round
-        newPlayer.summoned = summoned;
-        newPlayer.teleported = teleported;
-        newPlayer.playersEliminated = playersEliminated;  // RdBkGr
-        newPlayer.mulligansLeft = mulligansLeft;
-        newPlayer.movementRoll = movementRoll;
-        newPlayer.dead = dead;
-        newPlayer.ai = ai;
-        newPlayer.titanEliminated = titanEliminated;
-        newPlayer.donorId = donorId;
-        newPlayer.type = type;
-        for (int i = 0; i < legions.size(); i++)
-        {
-            newPlayer.legions.add(i, ((Legion)legions.get(i)).AICopy(game));
-        }
-
-        // Strings are immutable, so a shallow copy == a deep copy
-        newPlayer.markersAvailable = new TreeSet();
-        newPlayer.markersAvailable.addAll(markersAvailable);
-
-        return newPlayer;
     }
 
 
@@ -107,32 +74,16 @@ public final class Player implements Comparable
 Log.debug("Called Player.setType() for " + name + " " + type);
         if (type.endsWith(Constants.anyAI))
         {
-            int whichAI = Game.rollDie(Constants.numAITypes) - 1;
+            int whichAI = Dice.rollDie(Constants.numAITypes) - 1;
             type = Constants.aiArray[whichAI];
         }
         if (!type.startsWith("net.sf.colossus.server."))
         {
             type = "net.sf.colossus.server." + type;
         }
-        if (type.endsWith("AI"))
-        {
-            if (!(ai.getClass().getName().equals(type)))
-            {
-                Log.event("Changing player " + name + " from " +
-                    ai.getClass().getName() + " to " + type);
-                try 
-                {
-                    ai = (AI)Class.forName(type).getDeclaredConstructor(
-                        new Class[0]).newInstance(new Object[0]);
-                } 
-                catch (Exception e)
-                {
-                    Log.error("Failed to change player " + name +
-                        " from " + ai.getClass().getName() + " to " + type);
-                }
-            }
-        }
         this.type = type;
+
+        // XXX Push type to client
     }
 
 
@@ -528,7 +479,7 @@ Log.debug("Called Player.setType() for " + name + " " + type);
             return;
         }
 
-        movementRoll = Game.rollDie();
+        movementRoll = Dice.rollDie();
         Log.event(getName() + " rolls a " + movementRoll + " for movement");
         game.getServer().allTellMovementRoll(movementRoll);
     }
@@ -819,101 +770,6 @@ Log.debug("Called Player.setType() for " + name + " " + type);
         return titanEliminated;
     }
 
-
-
-    void aiSplit()
-    {
-        if (isAI())
-        {
-            ai.split(game);
-            // Keep the AI from continuing to play after winning.
-            if (!game.isOver())
-            {
-                game.advancePhase(Constants.SPLIT, getName());
-            }
-        }
-    }
-
-/* XXX
-    void aiMasterMove()
-    {
-        if (isAI())
-        {
-            ai.masterMove(game);
-            recombineIllegalSplits();
-            // Keep the AI from continuing to play after winning.
-            if (!game.isOver())
-            {
-                game.advancePhase(Constants.MOVE, getName());
-            }
-        }
-    }
-    */
-
-
-    boolean aiFlee(Legion legion, Legion enemy)
-    {
-        if (isAI())
-        {
-            return ai.flee(legion, enemy, game);
-        }
-        return false;
-    }
-
-    boolean aiConcede(Legion legion, Legion enemy)
-    {
-        if (isAI())
-        {
-            return ai.concede(legion, enemy, game);
-        }
-        return false;
-    }
-
-    void aiStrike(Legion legion, Battle battle, boolean forced)
-    {
-        if (forced || isAI())
-        {
-            ai.strike(legion, battle);
-        }
-    }
-
-    PenaltyOption aiChooseStrikePenalty(SortedSet penaltyOptions)
-    {
-        if (isAI())
-        {
-            return ai.chooseStrikePenalty(penaltyOptions);
-        }
-        return null;
-    }
-
-    void aiBattleMove()
-    {
-        if (isAI())
-        {
-            ai.battleMove(game);
-            game.getBattle().doneWithMoves();
-        }
-    }
-
-    int aiPickEntrySide(String hexLabel, Legion legion, boolean left, 
-        boolean bottom, boolean right)
-    {
-        if (isAI())
-        {
-            return ai.pickEntrySide(hexLabel, legion, game, left, bottom,
-                right);
-        }
-        return -1;
-    }
-
-    String aiPickEngagement()
-    {
-        if (isAI())
-        {
-            return ai.pickEngagement(game);
-        }
-        return null;
-    }
 
 
     // XXX Prohibit colons in player names.

@@ -100,8 +100,6 @@ public final class ResourceLoader
                         if (image != null)
                         {
                             imageCache.put(mapKey, image);
-                            Log.debug("Loaded " + path + pathSeparator + 
-                                filename + imageExtension[i]);
                         }
                     }
                 }
@@ -165,8 +163,6 @@ public final class ResourceLoader
                         if (icon != null)
                         {
                             imageCache.put(mapKey, icon);
-                            Log.debug("Loaded " + path + pathSeparator + 
-                                filename + imageExtension[i]);
                         }
                     }
                 }

@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
@@ -63,7 +64,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
         Iterator it = creatures.iterator();
         boolean firstTime = true;
         int scale = 4 * Scale.get();
-        Creature prevCreature = Creature.getCreatureByName("Titan");
+        Creature prevCreature = Creature.getCreatureByName(Constants.titan);
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();

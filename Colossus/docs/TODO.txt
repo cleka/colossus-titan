@@ -1,12 +1,11 @@
 Big picture:
-1. Fix network bugs.
-2. Refactor client, adding a read-only Game etc., so AI can be moved to
-   client side without a full rewrite.
-3. Add split prediction so AI can play on client side.
-4. Move AI to client side. 
-5. Improve networking.  (Persistent servers, reporting game openings to web
+1. Fix bugs with client-side AI.
+2. Add split prediction.
+3. Refactor to eliminate duplicate code.
+4. Improve networking.  (Persistent servers, reporting game openings to web
    page.)
-6. Improve AI.
+5. Improve AI.
+
 
 Bug: Failing LOSTest -- problems with slopes and cliffs.
 
@@ -17,24 +16,28 @@ Called SocketServerThread.setPlayerName() old:Gold new:<By color>5 thread: Gold
 From client <By color>5: fixName ~ Gold
 Got fixName new:Gold old:<By color>5
 
-Bug: Need to sort legions before AI moves.
+Bug: Some strike updates do not reach client GUI.
 
-Bug: Some strike updates to not reach client GUI.
+Bug: estimateBattleResults() broken -- missing titans?
 
+Bug: Double advance from split phase when autosplit has no legal splits?
 
-Client-side AIs need All Stacks Visible until split prediction is done.
+Bug: AI needs to set donor, enter angel when summoning into battle.
 
-Need to re-highlight after undo split, undo battle move.
+Bug: Takes 2 undo battle moves to undo a move.
 
-Allow players to specify that they automatically refuse to negotiate.
-   Check for this before showing negotiation dialog to opponent.
+Bug: Need to detect failed AI battle moves and fall back.
+
+Bug: Need to call AI type setting code on client side.
+
+Bug: Hang on AI player "done with moves"
+
+Bug: Need to re-highlight after undo split, undo battle move, undo muster.
+
 
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
    Or make PickRecruit non-modal.
-
-Show battle hex id, legion ids in BattleMap frame title.  (Trying to 
-   set it, but it's not showing up.)
 
 Colorize chat window.
 Colorize StatusScreen.

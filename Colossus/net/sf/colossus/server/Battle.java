@@ -23,7 +23,7 @@ import net.sf.colossus.client.BattleMap;
  * @author Romain Dolbeau
  */
 
-final class Battle
+public final class Battle
 {
     private Game game;
     private Server server;
@@ -125,7 +125,7 @@ final class Battle
     }
 
 
-    private void initBattleChits(Legion legion)
+    private synchronized void initBattleChits(Legion legion)
     {
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
@@ -167,37 +167,6 @@ final class Battle
         {
             advancePhase();
         }
-    }
-
-    /** No-arg constructor for AICopy() */
-    Battle()
-    {
-    }
-
-    /** Make a deep copy for the AI. */
-    Battle AICopy(Game game)
-    {
-        Battle newBattle = new Battle();
-        newBattle.game = game;
-
-        newBattle.masterHexLabel = masterHexLabel;
-        newBattle.terrain = terrain;
-        newBattle.defenderId = defenderId;
-        newBattle.attackerId = attackerId;
-        newBattle.legions[0] = defenderId;
-        newBattle.legions[1] = attackerId;
-        newBattle.activeLegionNum = activeLegionNum;
-        newBattle.turnNumber = turnNumber;
-        newBattle.phase = phase;
-        newBattle.summonState = summonState;
-        newBattle.carryDamage = carryDamage;
-        newBattle.attackerElim = attackerElim;
-        newBattle.defenderElim = defenderElim;
-        newBattle.attackerEntered = attackerEntered;
-        newBattle.conceded = conceded;
-        newBattle.driftDamageApplied = driftDamageApplied;
-
-        return newBattle;
     }
 
 
@@ -502,36 +471,19 @@ final class Battle
     {
         server.allSetupBattleMove();
 
-        // If there are no legal moves, move on.
         if (findMobileCritters().size() < 1)
         {
             return true;
         }
-        else
-        {
-            Player player = getActivePlayer();
-            if (player.isAI())
-            {
-                player.aiBattleMove();
-            }
-        }
+
         return false;
     }
 
     private boolean setupFight()
     {
         server.allSetupBattleFight();
-
         applyDriftDamage();
 
-        // Automatically perform forced strikes if applicable.
-        Player player = getActivePlayer();
-        if (player.isAI())
-        {
-            player.aiStrike(getActiveLegion(), this, false);
-        }
-
-        // If there are no possible strikes left, move on.
         if (findCrittersWithTargets().size() < 1)
         {
             commitStrikes();
@@ -902,24 +854,28 @@ Log.debug("Called Battle.doneReinforcing()");
 
     private void removeDeadCreaturesFromLegion(Legion legion)
     {
-        Iterator it = legion.getCritters().iterator();
-        while (it.hasNext())
+        List critters = legion.getCritters();
+        if (critters != null)
         {
-            Critter critter = (Critter)it.next();
-            if (critter.isDead())
+            Iterator it = critters.iterator();
+            while (it.hasNext())
             {
-                cleanupOneDeadCritter(critter);
-                it.remove();
-            }
-            else  // critter is alive
-            {
-                if (legion == getAttacker())
+                Critter critter = (Critter)it.next();
+                if (critter.isDead())
                 {
-                    attackerElim = false;
+                    cleanupOneDeadCritter(critter);
+                    it.remove();
                 }
-                else
+                else  // critter is alive
                 {
-                    defenderElim = false;
+                    if (legion == getAttacker())
+                    {
+                        attackerElim = false;
+                    }
+                    else
+                    {
+                        defenderElim = false;
+                    }
                 }
             }
         }
@@ -941,12 +897,16 @@ Log.debug("Called Battle.doneReinforcing()");
             {
                 Player player = legion.getPlayer();
                 donor = player.getDonor();
-                donor.addCreature(critter, false);
-                server.allTellAddCreature(donor.getMarkerId(), 
-                    critter.getName());
-                // This summon doesn't count; the player can
-                // summon again later this turn.
-                player.setSummoned(false);
+                if (donor != null)
+                {
+                    Log.error("Null donor in Battle.cleanupOneDeadCritter()");
+                    donor.addCreature(critter, false);
+                    server.allTellAddCreature(donor.getMarkerId(), 
+                        critter.getName());
+                    // This summon doesn't count; the player can
+                    // summon again later this turn.
+                    player.setSummoned(false);
+                }
             }
             else
             {
@@ -1322,7 +1282,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
-    static int getRange(BattleHex hex1, BattleHex hex2,
+    public static int getRange(BattleHex hex1, BattleHex hex2,
         boolean allowEntrance)
     {
         if (hex1 == null || hex2 == null)
@@ -1709,7 +1669,7 @@ Log.debug("Called Battle.doneReinforcing()");
      *  Sometimes two directions are possible.  If the left parameter
      *  is set, the direction further left will be given.  Otherwise,
      *  the direction further right will be given. */
-    static int getDirection(BattleHex hex1, BattleHex hex2,
+    public static int getDirection(BattleHex hex1, BattleHex hex2,
         boolean left)
     {
         if (hex1 == hex2)
@@ -1851,7 +1811,7 @@ Log.debug("Called Battle.doneReinforcing()");
     /** Return the number of intervening bramble hexes.  If LOS is along a
      *  hexspine, go left if argument left is true, right otherwise.  If
      *  LOS is blocked, return a large number. */
-    private int countBrambleHexesDir(BattleHex hex1, BattleHex hex2,
+    private static int countBrambleHexesDir(BattleHex hex1, BattleHex hex2,
         boolean left, int previousCount)
     {
         int count = previousCount;
@@ -1876,19 +1836,6 @@ Log.debug("Called Battle.doneReinforcing()");
             return count;
         }
 
-        // Trees block LOS.
-        if (nextHex.getTerrain() == 't')
-        {
-            return Constants.BIGNUM;
-        }
-
-        // All creatures block LOS.  (There are no height differences on
-        // maps with bramble.)
-        if (isOccupied(nextHex))
-        {
-            return Constants.BIGNUM;
-        }
-
         // Add one if it's bramble.
         if (nextHex.getTerrain() == 'r')
         {
@@ -1900,13 +1847,8 @@ Log.debug("Called Battle.doneReinforcing()");
 
     // Return the number of intervening bramble hexes.  If LOS is along a
     // hexspine and there are two choices, pick the lower one.
-    int countBrambleHexes(BattleHex hex1, BattleHex hex2)
+    public static int countBrambleHexes(BattleHex hex1, BattleHex hex2)
     {
-        // Bramble is found only in brush and jungle.
-        if (terrain != 'B' && terrain != 'J')
-        {
-            return 0;
-        }
         if (hex1 == hex2)
         {
             return 0;

@@ -138,12 +138,6 @@ int oneCase(MasterHex [][] array, java.util.List list, boolean [][] show) :
 {
     (p = c_number()) (ter = c_terrain()) (s1 = c_number()) (ts1 = c_way()) (s2 = c_number()) (ts2 = c_way()) (s3 = c_number()) (ts3 = c_way()) (posX = c_number()) (posY = c_number())
     {
-        //nPosX = posX-1;
-        //nPosY = (posY-1)/2;
-        Log.debug("Adding case #" + p + " @(" + posX + "," + posY +
-            "), type " + ter + " with exit : " +
-            s1 + ", " + s2 + ", " + s3);
-
         array[posX][posY] = new MasterHex();
         show[posX][posY] = true;
         list.add(array[posX][posY]);

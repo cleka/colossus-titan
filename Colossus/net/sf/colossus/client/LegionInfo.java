@@ -5,7 +5,7 @@ import java.util.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.SimpleAI;
+import net.sf.colossus.server.Constants;
 
 
 /**
@@ -30,6 +30,7 @@ public final class LegionInfo
     private String lastRecruit;
     private boolean moved;
     private boolean teleported;
+    private int entrySide;
     private boolean recruited;
 
     /** Creature name strings for *known* contents.  Never null. */
@@ -136,49 +137,21 @@ public final class LegionInfo
             names.add("Unknown");
         }
 
-        int j = names.indexOf("Titan");
+        int j = names.indexOf(Constants.titan);
         if (j != -1)
         {
             names.set(j, getTitanBasename());
         }
 
-        // XXX Ick.  Clean this up.
-        Collections.sort(names, 
-            new Comparator()
-            {
-                public int compare(Object o1, Object o2)
-                {
-                    String s1 = (String)o1;
-                    String s2 = (String)o2;
-                    if (s1.equals(s2))
-                    {
-                        return 0;
-                    }
-                    if (s1.equals("Unknown"))
-                    {
-                        return 1;
-                    }
-                    if (s2.equals("Unknown"))
-                    {
-                        return -1;
-                    }
-                    if (s1.startsWith("Titan"))
-                    {
-                        return -1;
-                    }
-                    if (s2.startsWith("Titan"))
-                    {
-                        return 1;
-                    }
-                    Creature c1 = Creature.getCreatureByName(s1);
-                    Creature c2 = Creature.getCreatureByName(s2);
-                    return SimpleAI.getKillValue(c2) -
-                        SimpleAI.getKillValue(c1);
-                }
-            }
-        );
+        Collections.sort(names, new CreatureNameComparator());
 
         return names;
+    }
+
+
+    public void sortContents()
+    {
+        Collections.sort(contents, new CreatureNameComparator());
     }
 
 
@@ -190,7 +163,7 @@ public final class LegionInfo
 
     /** Return the full basename for a titan in legion markerId,
      *  first finding that legion's player, player color, and titan size.
-     *  Default to "Titan" if the info is not there. */
+     *  Default to Constants.titan if the info is not there. */
     String getTitanBasename()
     {
         try
@@ -202,7 +175,7 @@ public final class LegionInfo
         }
         catch (Exception ex)
         {
-            return "Titan";
+            return Constants.titan;
         }
     }
 
@@ -268,7 +241,7 @@ public final class LegionInfo
 
     public boolean hasTitan()
     {
-        return getContents().contains("Titan");
+        return getContents().contains(Constants.titan);
     }
 
     public int numLords()
@@ -279,7 +252,7 @@ public final class LegionInfo
         while (it.hasNext())
         {
             String name = (String)it.next();
-            if (name.startsWith("Titan"))
+            if (name.startsWith(Constants.titan))
             {
                 count++;
             }
@@ -296,7 +269,7 @@ public final class LegionInfo
     }
 
 
-    // XXX Hardcoded to just archangels and angels for now.
+    // XXX Hardcoded to just archangels and angels.  Use summonables.
     public String bestSummonable()
     {
         if (getContents().contains("Archangel"))
@@ -310,7 +283,7 @@ public final class LegionInfo
         return null;
     }
 
-    boolean hasSummonable()
+    public boolean hasSummonable()
     {
         return (bestSummonable() != null);
     }
@@ -323,7 +296,7 @@ public final class LegionInfo
         while (it.hasNext())
         {
             String name = (String)it.next();
-            if (name.equals("Titan"))
+            if (name.startsWith(Constants.titan))
             {
                 PlayerInfo info = client.getPlayerInfo(playerName);
                 // Assumes titan skill is never changed by variants.
@@ -403,6 +376,16 @@ public final class LegionInfo
         return teleported;
     }
 
+    void setEntrySide(int entrySide)
+    {
+        this.entrySide = entrySide;
+    }
+
+    int getEntrySide()
+    {
+        return entrySide;
+    }
+
 
     void setRecruited(boolean recruited)
     {
@@ -426,5 +409,40 @@ public final class LegionInfo
     public String toString()
     {
         return markerId;
+    }
+
+
+    /** Sorts Titans first, then decreasing order of kill value, then
+     *  Unknowns last */
+    class CreatureNameComparator implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            String s1 = (String)o1;
+            String s2 = (String)o2;
+            if (s1.equals(s2))
+            {
+                return 0;
+            }
+            if (s1.equals("Unknown"))
+            {
+                return 1;
+            }
+            if (s2.equals("Unknown"))
+            {
+                return -1;
+            }
+            if (s1.startsWith(Constants.titan))
+            {
+                return -1;
+            }
+            if (s2.startsWith(Constants.titan))
+            {
+                return 1;
+            }
+            Creature c1 = Creature.getCreatureByName(s1);
+            Creature c2 = Creature.getCreatureByName(s2);
+            return SimpleAI.getKillValue(c2) - SimpleAI.getKillValue(c1);
+        }
     }
 }

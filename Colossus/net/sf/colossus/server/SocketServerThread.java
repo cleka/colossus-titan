@@ -114,7 +114,6 @@ final class SocketServerThread extends Thread implements IClient
         else if (method.equals(Constants.fixName))
         {
             String newName = (String)args.remove(0);
-Log.debug("Got fixName new:" + newName + " old:" + playerName);
             if (!newName.equals(playerName))
             {
                 setPlayerName(newName);
@@ -397,7 +396,6 @@ Log.debug("Got fixName new:" + newName + " old:" + playerName);
 
     public void setPlayerName(String playerName)
     {
-Log.debug("Called SocketServerThread.setPlayerName() old:" + this.playerName + " new:" + playerName + " thread: " + getName());
         this.playerName = playerName;
         setName(playerName);
 
@@ -483,6 +481,11 @@ Log.debug("Called SocketServerThread.setPlayerName() old:" + this.playerName + "
         out.println(Constants.highlightEngagements);
     }
 
+    public void nextEngagement()
+    {
+        out.println(Constants.nextEngagement);
+    }
+
     public void doReinforce(String markerId)
     {
         out.println(Constants.doReinforce + sep + markerId);
@@ -543,9 +546,11 @@ Log.debug("Called SocketServerThread.setPlayerName() old:" + this.playerName + "
             battleActivePlayerName + sep + battleTurnNumber);
     }
 
-    public void setupBattleMove()
+    public void setupBattleMove(String battleActivePlayerName,
+        int battleTurnNumber)
     {
-        out.println(Constants.setupBattleMove);
+        out.println(Constants.setupBattleMove + sep + 
+            battleActivePlayerName + sep + battleTurnNumber);
     }
 
     public void setupBattleFight(int battlePhase,
@@ -569,10 +574,11 @@ Log.debug("Called SocketServerThread.setPlayerName() old:" + this.playerName + "
     }
 
     public void didMove(String markerId, String startingHexLabel,
-        String currentHexLabel, boolean teleport)
+        String currentHexLabel, String entrySide, boolean teleport)
     {
         out.println(Constants.didMove + sep + markerId + sep + 
-            startingHexLabel + sep + currentHexLabel + sep + teleport);
+            startingHexLabel + sep + currentHexLabel + sep + entrySide +
+            sep + teleport);
     }
 
     public void undidMove(String markerId, String formerHexLabel,

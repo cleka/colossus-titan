@@ -77,6 +77,8 @@ public interface IClient
 
     public void highlightEngagements();
 
+    public void nextEngagement();
+
     public void doReinforce(String markerId);
 
     public void didRecruit(String markerId, String recruitName,
@@ -101,7 +103,8 @@ public interface IClient
     public void setupBattleRecruit(String battleActivePlayerName,
         int battleTurnNumber);
 
-    public void setupBattleMove();
+    public void setupBattleMove(String battleActivePlayerName,
+        int battleTurnNumber);
 
     public void setupBattleFight(int battlePhase,
         String battleActivePlayerName);
@@ -112,7 +115,7 @@ public interface IClient
         String endingHexLabel, boolean undo);
 
     public void didMove(String markerId, String startingHexLabel,
-        String currentHexLabel, boolean teleport);
+        String currentHexLabel, String entrySide, boolean teleport);
 
     public void undidMove(String markerId, String formerHexLabel,
         String currentHexLabel);

@@ -1,10 +1,7 @@
-package net.sf.colossus.server;
+package net.sf.colossus.client;
 
 
 import java.util.*;
-
-import net.sf.colossus.client.Client;
-import net.sf.colossus.client.LegionInfo;
 
 
 /**
@@ -17,48 +14,47 @@ import net.sf.colossus.client.LegionInfo;
 public interface AI
 {
     /** make masterboard moves for current player in the Game */
-    void masterMove(Client client);
+    void masterMove();
 
     /** make splits for current player */
-    void split(Game game);
+    void split();
 
     /** make recruits for current player */
-    void muster(Client client);
+    void muster();
 
     /** pick one reinforcement for legion */
-    void reinforce(LegionInfo legion, Client client);
+    void reinforce(LegionInfo legion);
 
     /** choose whether legion should flee from enemy */
-    boolean flee(Legion legion, Legion enemy, Game game);
+    boolean flee(LegionInfo legion, LegionInfo enemy);
 
     /** choose whether legion should concede to enemy */
-    boolean concede(Legion legion, Legion enemy, Game game);
+    boolean concede(LegionInfo legion, LegionInfo enemy);
 
     /** make battle strikes for legion */
-    void strike(Legion legion, Battle battle);
-
-    /** choose whether to take a penalty in order to possibly carry */
-    PenaltyOption chooseStrikePenalty(SortedSet penaltyOptions);
+    boolean strike(LegionInfo legion);
 
     /** make battle moves for the active legion */
-    void battleMove(Game game);
+    void battleMove();
 
     /** pick an entry side */
-    int pickEntrySide(String hexLabel, Legion legion, Game game,
-        boolean left, boolean bottom, boolean right);
+    String pickEntrySide(String hexLabel, String markerId, Set entrySides);
 
     /** pick an engagement to resolve */
-    String pickEngagement(Game game);
+    String pickEngagement();
 
     /** choose whether to acquire an angel or archangel */
     String acquireAngel(String markerId, List recruits);
 
     /** choose whether to summon an angel or archangel */
-    String summonAngel(String summonerId, Client client);
+    String summonAngel(String summonerId);
 
     /** pick a color of legion markers */
     String pickColor(Set colors, List favoriteColors);
 
     /** pick a legion marker */
     String pickMarker(Set markerIds, String preferredShortColor);
+
+    /** choose carry target */
+    void handleCarries(int carryDamage, Set carryTargets);
 }

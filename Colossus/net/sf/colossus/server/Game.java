@@ -43,7 +43,6 @@ public final class Game
     private boolean loadingGame;
     private boolean gameOver;
     private Battle battle;
-    private static Random random = new Random();
     private Caretaker caretaker = new Caretaker(this);
     private int phase;
     private Server server;
@@ -83,37 +82,6 @@ Log.debug("Called Game.initServer()");
         server.initSocketServer();
     }
 
-
-    /**
-     * Make a deep copy for the AI to use.
-     * This preserves all game state but throws away a lot of the UI stuff
-     */
-    Game AICopy()
-    {
-        Game game2 = new Game();
-
-        for (int i = 0; i < players.size(); i++)
-        {
-            Player player = ((Player)players.get(i)).AICopy(game2);
-            game2.players.add(i, player);
-        }
-        game2.activePlayerNum = activePlayerNum;
-        game2.turnNumber = turnNumber;
-        if (battle != null)
-        {
-            game2.battle = battle.AICopy(game2);
-        }
-        game2.caretaker = caretaker.AICopy();
-        game2.phase = phase;
-        game2.engagementInProgress = engagementInProgress;
-        game2.battleInProgress = battleInProgress;
-        game2.summoning = summoning;
-        game2.reinforcing = reinforcing;
-        game2.acquiring = acquiring;
-        game2.server = server;
-
-        return game2;
-    }
 
     private void clearFlags()
     {
@@ -309,7 +277,7 @@ Log.debug("Called Game.newGame2()");
         {
             return name;
         }
-        return getUniqueName(name + rollDie());
+        return getUniqueName(name + Dice.rollDie());
     }
 
 
@@ -486,7 +454,7 @@ Log.debug("Called Game.newGame2()");
 
         while ((playersLeft >= 0) && (!towerList.isEmpty()))
         {
-            int which = rollDie(towerList.size());
+            int which = Dice.rollDie(towerList.size());
             playerTower[playersLeft] = (String)towerList.remove(which - 1);
             playersLeft--;
         }
@@ -538,7 +506,7 @@ Log.debug("Called Game.newGame2()");
         }
 
         // Pick a random starting point.  (Zero-based)
-        int startingTower = rollDie(numTowers) - 1;
+        int startingTower = Dice.rollDie(numTowers) - 1;
 
         // Offset the sequence by the starting point, and get only
         // the number of starting towers we need.
@@ -869,16 +837,13 @@ Log.debug("Called Game.newGame2()");
         player.resetTurnState();
         server.allSetupSplit();
 
+        // XXX Is this causing double advances?
         // If there are no markers available, or no legions tall enough
         // to split, skip forward to movement.
         if (player.getNumMarkersAvailable() == 0 ||
             player.getMaxLegionHeight() < 4)
         {
             advancePhase(Constants.SPLIT, player.getName());
-        }
-        else
-        {
-            player.aiSplit();
         }
     }
 
@@ -1729,19 +1694,6 @@ Log.debug("Called Game.newGame2()");
     }
 
 
-    /** Put all die rolling in one place, in case we decide to change random
-     *  number algorithms, use an external dice server, etc. */
-    static int rollDie()
-    {
-        return rollDie(6);
-    }
-
-    static int rollDie(int size)
-    {
-        return random.nextInt(size) + 1;
-    }
-
-
     private void placeInitialLegion(Player player, String markerId)
     {
         String name = player.getName();
@@ -2258,20 +2210,16 @@ Log.debug("Called Game.newGame2()");
 
     private synchronized void kickEngagements()
     {
-        Player player = getActivePlayer();
-        String engagementHexLabel = player.aiPickEngagement();
-        if (engagementHexLabel != null)
-        {
-            engage(engagementHexLabel);
-        }
 Log.debug("in kickEngagements() summoning=" + summoning + " reinforcing=" +
 reinforcing + " acquiring=" + acquiring); 
 Log.debug("" + findEngagements().size() + " engagements left");
 
+        server.nextEngagement();
+
         if (findEngagements().size() == 0 && !summoning && !reinforcing && 
             !acquiring)
         {
-            advancePhase(Constants.FIGHT, player.getName());
+            advancePhase(Constants.FIGHT, getActivePlayerName());
         }
     }
 
@@ -2480,51 +2428,6 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     }
 
 
-    // XXX Try to merge with the other version.
-    /** Simplified version for AIs and clients that really don't care about
-     *  teleport versus ground or entry sides or teleporting lords. */
-    boolean doMove(String markerId, String hexLabel)
-    {
-        Legion legion = getLegionByMarkerId(markerId);
-        if (legion == null)
-        {
-            return false;
-        }
-        Player player = legion.getPlayer();
-        String startingHexLabel = legion.getCurrentHexLabel();
-        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-
-        // Teleport only if it's the only option.
-        boolean teleport = !(listNormalMoves(legion, hex, 
-            player.getMovementRoll(), false).contains(hexLabel)) &&
-            (listTeleportMoves(legion, hex, player.getMovementRoll(), 
-            false).contains(hexLabel));
-
-        String teleportingLord = "";
-        if (teleport)
-        {
-            teleportingLord = (String)(legion.listTeleportingLords(
-                hexLabel).get(0));
-        }
-
-        Set sides = listPossibleEntrySides(markerId, hexLabel, teleport);
-        String entrySide = "";
-        if (!sides.isEmpty())
-        {
-            entrySide = (String)(sides.iterator().next());
-        }
-
-        boolean moved = doMove(markerId, hexLabel, entrySide, teleport, 
-            teleportingLord);
-        if (moved)
-        {
-            server.allTellDidMove(markerId, startingHexLabel, hexLabel, 
-                teleport);
-        }
-        return moved;
-    }
-
-
     synchronized void engage(String hexLabel)
     {
         // Do not allow clicking on engagements if one is
@@ -2625,7 +2528,7 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             return;
         }
 
-        Proposal proposal = Proposal.makeProposal(proposalString);
+        Proposal proposal = Proposal.makeFromString(proposalString);
 
         int thisPlayerNum;
         if (playerName.equals(getActivePlayerName()))
@@ -2676,7 +2579,8 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
     }
 
 
-    void fight(String hexLabel)
+    /** Synchronized to keep both negotiators from racing to fight. */
+    synchronized void fight(String hexLabel)
     {
         if (!battleInProgress)
         {

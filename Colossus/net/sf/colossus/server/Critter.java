@@ -45,22 +45,6 @@ final class Critter extends Creature implements Comparable
     }
 
 
-    /** Deep copy for AI. */
-    Critter AICopy(Game game)
-    {
-        Critter newCritter = new Critter(creature, markerId, game);
-
-        newCritter.battle = battle;
-        newCritter.struck = struck;
-        newCritter.currentHexLabel = currentHexLabel;
-        newCritter.startingHexLabel = startingHexLabel;
-        newCritter.hits = hits;
-        newCritter.tag = tag;
-
-        return newCritter;
-    }
-
-
     void addBattleInfo(String currentHexLabel, String startingHexLabel,
         Battle battle)
     {
@@ -158,7 +142,7 @@ final class Critter extends Creature implements Comparable
 
     boolean wouldDieFrom(int hits)
     {
-        return (hits + getHits() > getPower());
+        return (hits + getHits() >= getPower());
     }
 
 
@@ -608,26 +592,10 @@ final class Critter extends Creature implements Comparable
 
     private void chooseStrikePenalty()
     {
-        if (getPlayer().isAI())
-        {
-            PenaltyOption po = getPlayer().aiChooseStrikePenalty(
-                Collections.unmodifiableSortedSet(penaltyOptions));
-            if (po == null)
-            {
-                Log.error("aiChooseStrikePenalty returned null!");
-            }
-            else
-            {
-Log.debug("aiChooseStrikePenalty returned: " + po.toString()); 
-                assignStrikePenalty(po.toString());
-            }
-        }
-        else
-        {
-            game.getServer().askChooseStrikePenalty(penaltyOptions);
-        }
+        game.getServer().askChooseStrikePenalty(penaltyOptions);
     }
 
+    /** Side effects. */ 
     void assignStrikePenalty(String prompt)
     {
 Log.debug("calling Critter.assignStrikePenalty() with " + prompt);
@@ -677,6 +645,9 @@ Log.debug("calling Critter.assignStrikePenalty() with " + prompt);
         findCarries(target);
         return (!penaltyOptions.isEmpty());
     }
+
+    // XXX Should be able to return penaltyOptions and carry targets
+    // rather than use side effects.
 
     /** Side effects on penaltyOptions, Battle.carryTargets */
     void findCarries(Critter target)
@@ -825,7 +796,7 @@ Log.debug("new penalty option: " + po.toString());
 
         for (int i = 0; i < dice; i++)
         {
-            int roll = Game.rollDie();
+            int roll = Dice.rollDie();
             rolls.add("" + roll);
             rollString.append(roll);
 

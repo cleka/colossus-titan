@@ -65,7 +65,13 @@ public final class Options
     // AI options (player - on client)
     public static final String autoPickColor = "Auto pick color";
     public static final String autoPickMarker = "Auto pick markers";
+    public static final String autoSplit = "Auto split";
+    public static final String autoMasterMove = "Auto masterboard move";
     public static final String autoPickEntrySide = "Auto pick entry sides";
+    public static final String autoPickLord = "Auto pick teleporting lord";
+    public static final String autoPickEngagements = "Auto pick engagements";
+    public static final String autoFlee = "Auto flee";
+    public static final String autoConcede = "Auto concede";
     public static final String autoNegotiate = "Auto negotiate";
     public static final String autoForcedStrike = "Auto forced strike";
     public static final String autoCarrySingle = "Auto carry single";
@@ -75,8 +81,6 @@ public final class Options
     public static final String autoRecruit = "Auto recruit";
     public static final String autoPickRecruiter = "Auto pick recruiters";
     public static final String autoReinforce = "Auto reinforce";
-    public static final String autoMasterMove = "Auto masterboard move";
-    public static final String autoPickLord = "Auto pick teleporting lord";
     public static final String autoPlay = "Auto play";
 
     // General per-player options
