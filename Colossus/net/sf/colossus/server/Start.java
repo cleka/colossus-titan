@@ -45,6 +45,7 @@ public final class Start
             opts.addOption('v', "variant", true, "Set variant");
             opts.addOption('u', "nhuman", true, "Number of humans");
             opts.addOption('i', "nai", true, "Number of SimpleAIs");
+            opts.addOption('n', "nnetwork", true, "Number of network slots");
             opts.addOption('q', "quit", false, "Quit JVM when game ends");
 
             cl = opts.parse(args);

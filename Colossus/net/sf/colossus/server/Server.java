@@ -72,14 +72,14 @@ public final class Server extends UnicastRemoteObject implements IRMIServer
 
     public void addRemoteClient(IRMIClient client, String playerName)
     {
+        Log.setServer(this);
+        Log.setToRemote(true);
         clients.add(client);
+        remoteClients.add(client);
         String name = game.getUniqueName(playerName);
 Log.debug("Adding client with unique name " + name); 
         clientMap.put(name, client);
         game.addRemoteClient(name);
-        remoteClients.add(client);
-        Log.setServer(this);
-        Log.setToRemote(true);
     }
 
 

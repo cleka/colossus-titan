@@ -1,10 +1,22 @@
-grant 
-{
-    // permission java.net.SocketPermission "*:1024-65535", "connect,accept";
-    // permission java.net.SocketPermission "*:80", "connect";
-    // permission java.util.PropertyPermission "*", "read";
-    // permission java.io.FilePermission "${user.home}/Colossus/*", "read,write";
+// Java security policy file for Colossus.  Required for RMI. 
+// $Id$
 
-    // Wide open for testing
-    permission java.security.AllPermission;
+grant
+{
+    // Allow using any high ports.
+    permission java.net.SocketPermission "*:1024-65535", "connect,accept";
+
+    // Allow connecting to web servers.
+    permission java.net.SocketPermission "*:80", "connect";
+
+    // Allow reading all properties.
+    permission java.util.PropertyPermission "*", "read";
+
+    // Don't show applet window warnings on every window.
+    permission java.awt.AWTPermission "showWindowWithoutWarningBanner";
+
+    // Allow reading and writing files under ${user.home}/Colossus.
+    permission java.io.FilePermission "${user.home}/Colossus/-", "read,write";
+    // XXX Should be covered by the above line, but it's not.
+    permission java.io.FilePermission "${user.home}/Colossus/", "read,write";
 };

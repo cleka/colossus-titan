@@ -114,7 +114,6 @@ public final class MasterBoard extends JPanel
      *  since readMapData() needs it. */
     static
     {
-Log.debug("Called MasterBoard static initializer");
         try
         {
             readMapData();
@@ -130,7 +129,6 @@ Log.debug("Called MasterBoard static initializer");
 
     MasterBoard(Client client)
     {
-Log.debug("Called MasterBoard constructor");
         this.client = client;
 
         masterFrame = new JFrame("MasterBoard");
@@ -461,7 +459,7 @@ Log.debug("Called MasterBoard constructor");
                 }
                 catch (Exception ex)
                 {
-                    Log.debug("Problem reading version file " + ex);
+                    Log.error("Problem reading version file " + ex);
                 }
 
                 client.showMessageDialog("Colossus build: " + version);
@@ -706,7 +704,6 @@ Log.debug("Called MasterBoard constructor");
         {
             throw new FileNotFoundException(VariantSupport.getMapName());
         }
-Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
         sml = new StrategicMapLoader(mapIS);
         int[] size = sml.getHexArraySize();
         if ((horizSize == 0) && (vertSize == 0))

@@ -181,6 +181,7 @@ Log.debug("Incremented waitingForClients to " + waitingForClients);
     {
         int numHumans = 0;
         int numAIs = 0;
+        int numNetworks = 0;
 
         if (cl.optIsSet('v'))
         {
@@ -204,9 +205,15 @@ Log.debug("Incremented waitingForClients to " + waitingForClients);
             String buf = cl.getOptValue('i');
             numAIs = Integer.parseInt(buf);
         }
+        if (cl.optIsSet('n'))
+        {
+            options.clearPlayerInfo();
+            String buf = cl.getOptValue('n');
+            numNetworks = Integer.parseInt(buf);
+        }
         // Quit if values are bogus.
-        if (numHumans < 0 || numAIs < 0 ||
-            numHumans + numAIs > Constants.MAX_PLAYERS)
+        if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
+            numHumans + numAIs + numNetworks > Constants.MAX_PLAYERS)
         {
             Log.error("Illegal number of players");
             options.clear();
@@ -227,11 +234,18 @@ Log.debug("Incremented waitingForClients to " + waitingForClients);
             options.setOption(Options.playerName + i, name);
             options.setOption(Options.playerType + i, Constants.human);
         }
-        for (int j = numHumans; j < numAIs + numHumans; j++)
+        for (int j = numHumans; j < numNetworks + numHumans; j++)
         {
-            String name = Constants.byColor + j;
+            String name = Constants.byClient + j;
             options.setOption(Options.playerName + j, name);
-            options.setOption(Options.playerType + j, Constants.defaultAI);
+            options.setOption(Options.playerType + j, Constants.network);
+        }
+        for (int k = numHumans + numNetworks; 
+            k < numAIs + numHumans + numNetworks; k++)
+        {
+            String name = Constants.byColor + k;
+            options.setOption(Options.playerName + k, name);
+            options.setOption(Options.playerType + k, Constants.defaultAI);
         }
     }
 
@@ -271,7 +285,7 @@ Log.debug("Incremented waitingForClients to " + waitingForClients);
             setupOptionsFromCommandLine(cl);
         }
 
-        // XXX Load game options 'l' and 'z' are handled separately.
+        // Load game options 'l' and 'z' are handled separately.
         if (!cl.optIsSet('s')) 
         {
             new GetPlayers(new JFrame(), options);
@@ -2186,7 +2200,6 @@ Log.debug("Called Game.addedRemoteClient for " + playerName);
 
     void createSummonAngel(Legion attacker)
     {
-Log.debug("called Game.createSummonAngel() for " + attacker);
         summoning = true;
         server.createSummonAngel(attacker);
     }
@@ -2487,9 +2500,6 @@ Log.debug("" + findEngagements().size() + " engagements left");
         {
             entrySide = (String)(sides.iterator().next());
         }
-
-Log.debug("Game.doMove() teleport=" + teleport + " lord=" + teleportingLord + 
-" entrySide=" + entrySide); 
 
         boolean moved = doMove(markerId, hexLabel, entrySide, teleport, 
             teleportingLord);

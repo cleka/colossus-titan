@@ -68,7 +68,7 @@ public final class Log
 
     public static void setToRemote(boolean toRemote)
     {
-        Log.toWindow = toRemote;
+        Log.toRemote = toRemote;
     }
 
 
