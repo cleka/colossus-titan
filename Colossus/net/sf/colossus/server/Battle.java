@@ -804,6 +804,11 @@ final class Battle
             Critter critter = (Critter)it.next();
             critter.setDead(true);
         }
+
+        if (legion.getPlayerName().equals(getActivePlayerName()))
+        {
+            advancePhase();
+        }
     }
 
     /** Here for when we eventually do correct concession timing. */

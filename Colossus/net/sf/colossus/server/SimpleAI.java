@@ -13,6 +13,7 @@ import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.BattleHex;
 import net.sf.colossus.client.HexMap;
 import net.sf.colossus.client.BattleMap;
+import net.sf.colossus.client.Proposal;
 
 
 /**
@@ -95,8 +96,7 @@ class SimpleAI implements AI
     }
 
 
-    static Creature chooseRecruit(Game game, Legion legion,
-        MasterHex hex)
+    static Creature chooseRecruit(Game game, Legion legion, MasterHex hex)
     {
         List recruits = game.findEligibleRecruits(legion.getMarkerId(), 
             hex.getLabel());
@@ -356,12 +356,12 @@ class SimpleAI implements AI
             }
 
             // create the new legion
-            Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion,
-                game.getNumPlayers()));
+            Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion));
 
             // Hide all creatures in both legions.
             legion.hideAllCreatures();
-            // XXX How did this end up null?
+
+            // null if no markers left
             if (newLegion != null)
             {
                 newLegion.hideAllCreatures();
@@ -403,7 +403,8 @@ class SimpleAI implements AI
             Creature bestRecruit = null;
             Caretaker caretaker = game.getCaretaker();
             if ((currentScore + pointValue) / 500 > currentScore / 500 &&
-                caretaker.getCount(Creature.getCreatureByName("Archangel")) >= 1)
+                caretaker.getCount(Creature.getCreatureByName("Archangel")) 
+                >= 1)
             {
                 bestRecruit = Creature.getCreatureByName("Archangel");
             }
@@ -427,7 +428,7 @@ class SimpleAI implements AI
      * Decide how to split this legion, and return a list of
      * Creatures to remove.
      */
-    static List chooseCreaturesToSplitOut(Legion legion, int numPlayers)
+    static List chooseCreaturesToSplitOut(Legion legion)
     {
         //
         // split a 7 or 8 high legion somehow
@@ -449,7 +450,7 @@ class SimpleAI implements AI
         //
         if (legion.getHeight() == 8)
         {
-            return doInitialGameSplit(legion.getCurrentHexLabel(), numPlayers);
+            return doInitialGameSplit(legion.getCurrentHexLabel());
         }
 
         Critter weakest1 = null;
@@ -505,12 +506,6 @@ class SimpleAI implements AI
     }
 
 
-    static List chooseCreaturesToSplitOut(Legion legion)
-    {
-        return chooseCreaturesToSplitOut(legion, 2);
-    }
-
-
     // From Hugh Moore:
     //
     // It really depends on how many players there are and how good I
@@ -528,7 +523,7 @@ class SimpleAI implements AI
 
     /** Return a list of exactly four creatures (including one lord) to
      *  split out. */
-    static List doInitialGameSplit(String label, int numPlayers)
+    static List doInitialGameSplit(String label)
     {
         Creature[] startCre = Game.getStartingCreatures();
         // in CMU style splitting, we split centaurs in even towers,
@@ -1153,7 +1148,7 @@ class SimpleAI implements AI
                         // Arbitrary value for killing a player but
                         // scoring no points: it's worth a little
                         // If there are only 2 players, we should do this.
-                        if (game.getNumPlayers() == 2)
+                        if (game.getNumPlayersRemaining() == 2)
                         {
                             value = WIN_GAME;
                         }
@@ -1630,6 +1625,8 @@ class SimpleAI implements AI
     }
 
     // This is a really dumb placeholder.  TODO Make it smarter.
+    // In particular, the AI should pick a side that will let it enter
+    // as many creatures as possible.
     public int pickEntrySide(String hexLabel, Legion legion, Game game,
         boolean left, boolean bottom, boolean right)
     {
@@ -1638,13 +1635,13 @@ class SimpleAI implements AI
         {
             return 3;
         }
-        if (left)
-        {
-            return 5;
-        }
         if (right)
         {
             return 1;
+        }
+        if (left)
+        {
+            return 5;
         }
         return -1;
     }

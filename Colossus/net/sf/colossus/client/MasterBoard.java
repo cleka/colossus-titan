@@ -163,7 +163,6 @@ public final class MasterBoard extends JPanel
         contentPane.add(new JScrollPane(this), BorderLayout.CENTER);
 
         setupPlayerLabel();
-        contentPane.add(playerLabel, BorderLayout.SOUTH);
 
         masterFrame.pack();
         masterFrame.setVisible(true);
@@ -629,6 +628,12 @@ public final class MasterBoard extends JPanel
         if (playerLabel == null)
         {
             playerLabel = new JLabel(playerName);
+            contentPane.add(playerLabel, BorderLayout.SOUTH);
+            masterFrame.pack();
+        }
+        else
+        {
+            playerLabel.setText(playerName); 
         }
 
         String colorName = client.getColor();
@@ -639,7 +644,6 @@ public final class MasterBoard extends JPanel
             Color color = PickColor.getBackgroundColor(colorName);
             playerLabel.setForeground(color);
         }
-        playerLabel.repaint();
     }
 
 
@@ -1635,7 +1639,14 @@ public final class MasterBoard extends JPanel
                 }
                 else if (client.isMyLegion(markerId))
                 {
-                    actOnLegion(markerId, hex.getLabel());
+                    if (hex != null)
+                    {
+                        actOnLegion(markerId, hex.getLabel());
+                    }
+                    else
+                    {
+                        Log.warn("null hex in MasterBoard.mousePressed()");
+                    }
                     return;
                 }
             }

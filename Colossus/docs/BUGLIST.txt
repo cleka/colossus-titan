@@ -49,7 +49,8 @@ A doomed lion with no allies left struck back against an unwounded
    cyclops (which it can't kill) instead of a gargoyle (which it can).
    AI needs to understand when it's in its last phase.
 
-AI does not recruit post-battle reinforcements.
+AI does not recruit post-battle reinforcements.  AI sometimes skips
+   reinforcements during battle?
 
 6-high AI legion next to top circle with colossi did not grab another
    colossus, for no good reason.
@@ -105,6 +106,7 @@ Consider recruit scarcity (last gargoyle possibly more valuable than
    native terrain.  Get scrub snacks out of nearby opponents' good 
    recruiting terrain and into blocking positions.
 
+AI doesn't titan teleport?  Check.
 
 
 Programming bugs:
@@ -172,8 +174,6 @@ Zero-height legion's (caused by angel being summoned out) marker
 Lost a legion marker somewhere?  Try to reproduce.  (Maybe with 1-high 
    angels stacks?)
 
-CreatureCollectionView does not respect scale.
-
 Carry cursor sometimes fails without an error message.  Race condition?
 
 Negotiation is broken and disabled.
@@ -192,4 +192,13 @@ Turn 1, AI in tower 600 rolled 6, moved legions to 136 and 38.  One of those
 
 Stack with titan, archangel, 2xangel tower teleports.  PickLord shows both
    angels as choices, instead of just one.  Fixed? 
+
+First recruit of each game is very slow.  So is first SummonAngel if no
+   previous recruits.  Handle some initialization in a background thread
+   started earlier?
+
+MinimaxAI's advancePhase() calls are broken?  8-high starting stack split,
+   rolled 6, processed a bunch, and illegally recombined.
+
+Need to reveal legion contents to each other during negotiation.
 

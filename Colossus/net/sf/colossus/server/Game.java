@@ -13,7 +13,7 @@ import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.GetPlayers;
 import net.sf.colossus.client.Client;
-import net.sf.colossus.client.NegotiationResults;
+import net.sf.colossus.client.Proposal;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
@@ -40,7 +40,7 @@ public final class Game
     private int phase;
     private Server server;
     // Negotiation
-    private Set [] offers = new HashSet[2];
+    private Set [] proposals = new HashSet[2];
     private static TerrainRecruitLoader trl;
 
     Game()
@@ -498,6 +498,21 @@ public final class Game
         return remaining;
     }
 
+    int getNumHumanPlayersRemaining()
+    {
+        int remaining = 0;
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            if (player.isHuman() && !player.isDead())
+            {
+                remaining++;
+            }
+        }
+        return remaining;
+    }
+
 
     Player getWinner()
     {
@@ -561,9 +576,10 @@ public final class Game
 
 
     /** Advance to the next phase, only if the passed oldPhase is current. */
-    void advancePhase(int oldPhase)
+    void advancePhase(int oldPhase, String playerName)
     {
-        if (oldPhase != phase || pendingAdvancePhase)
+        if (oldPhase != phase || !playerName.equals(getActivePlayerName()) || 
+            pendingAdvancePhase)
         {
             Log.error("Called advancePhase illegally");
             return;
@@ -651,7 +667,7 @@ public final class Game
         if (player.getNumMarkersAvailable() == 0 ||
             player.getMaxLegionHeight() < 4)
         {
-            advancePhase(Constants.SPLIT);
+            advancePhase(Constants.SPLIT, player.getName());
         }
         else
         {
@@ -675,7 +691,7 @@ public final class Game
         // If there are no engagements, move forward to the muster phase.
         if (!summoningAngel && findEngagements().size() == 0)
         {
-            advancePhase(Constants.FIGHT);
+            advancePhase(Constants.FIGHT, getActivePlayerName());
         }
         else
         {
@@ -693,7 +709,7 @@ public final class Game
         // anything, advance to the next turn.
         if (player.isDead() || !player.canRecruit())
         {
-            advancePhase(Constants.MUSTER);
+            advancePhase(Constants.MUSTER, player.getName());
         }
         else
         {
@@ -2106,10 +2122,9 @@ public final class Game
             server.engage(engagementHexLabel);
         }
 
-        // XXX Still advancing when SummonAngel is visible.
         if (findEngagements().size() == 0 && !summoningAngel)
         {
-            advancePhase(Constants.FIGHT);
+            advancePhase(Constants.FIGHT, player.getName());
         }
     }
 
@@ -2130,23 +2145,28 @@ public final class Game
 
             if (legion.getPlayer() == getActivePlayer())
             {
+Log.debug("testing for post-battle angel summoning");
                 // Attacker won, so possibly summon angel.
                 if (legion.canSummonAngel())
                 {
+Log.debug("legion can summon angel");
                     createSummonAngel(legion);
                 }
             }
             else
             {
+Log.debug("testing for post-battle recruit");
                 // Defender won, so possibly recruit reinforcement.
                 if (attackerEntered && legion.canRecruit())
                 {
+Log.debug("can recruit");
                     Creature recruit = null;
                     Player player = legion.getPlayer();
                     if (server.getClientOption(player.getName(),
                         Options.autoRecruit))
                     {
                         recruit = player.aiReinforce(legion);
+Log.debug("recruit is " + recruit);
                     }
                     else
                     {
@@ -2158,6 +2178,7 @@ public final class Game
                     }
                     if (recruit != null)
                     {
+Log.debug("calling doRecruit()");
                         doRecruit(recruit, legion);
                     }
                 }
@@ -2396,6 +2417,18 @@ public final class Game
     }
 
 
+    // Attacker did not concede early; negotiate. 
+    private void engage3(String hexLabel)
+    {
+        Player player = getActivePlayer();
+        Legion attacker = getFirstFriendlyLegion(hexLabel, player);
+        Legion defender = getFirstEnemyLegion(hexLabel, player);
+        proposals[0] = new HashSet();
+        proposals[1] = new HashSet();
+        server.twoNegotiate(attacker, defender);
+    }
+
+
     // XXX Make sure these methods are called at the right time by
     // the right player.
 
@@ -2407,6 +2440,7 @@ public final class Game
         handleConcession(defender, attacker, true);
     }
 
+    /** Used only for pre-battle attacker concession. */
     void concede(String markerId)
     {
         Legion attacker = getLegionByMarkerId(markerId);
@@ -2422,16 +2456,16 @@ public final class Game
         engage2(hexLabel);
     }
 
+    /** Used only for pre-battle attacker concession. */
     void doNotConcede(String markerId)
     {
         Legion attacker = getLegionByMarkerId(markerId);
         String hexLabel = attacker.getCurrentHexLabel();
-        fight(hexLabel);
+        engage3(hexLabel);
     }
 
-
-/*
-    void negotiate(String playerName, NegotiationResults offer)
+    /** playerName offers proposal. */
+    void makeProposal(String playerName, Proposal proposal)
     {
         // If it's too late to negotiate, just throw this away.
         if (battleInProgress)
@@ -2439,40 +2473,53 @@ public final class Game
             return;
         }
 
-        int thisPlayerSet;
+        int thisPlayerNum;
         if (playerName.equals(getActivePlayerName()))
         {
-            thisPlayerSet = Constants.ATTACKER;
+            thisPlayerNum = Constants.ATTACKER;
         }
         else
         {
-            thisPlayerSet = Constants.DEFENDER;
+            thisPlayerNum = Constants.DEFENDER;
         }
-        int otherSet = (thisPlayerSet + 1) & 1;
+        int otherSet = (thisPlayerNum + 1) & 1;
 
         // If this player wants to fight, cancel negotiations.
-        if (offer.isFight())
+        if (proposal.isFight())
         {
-            Legion attacker = getLegionByMarkerId(offer.getAttackerId());
+            Legion attacker = getLegionByMarkerId(proposal.getAttackerId());
             String hexLabel = attacker.getCurrentHexLabel();
             fight(hexLabel);
         }
 
-        // If this offer matches an earlier one from the other player,
+        // If this proposal matches an earlier one from the other player,
         // settle the engagement.
-        else if (offers[otherSet].contains(offer))
+        else if (proposals[otherSet].contains(proposal))
         {
-            handleNegotiation(offer);
+            handleNegotiation(proposal);
         }
 
-        // Otherwise remember this offer and continue.
+        // Otherwise remember this proposal and continue.
         else
         {
-            offers[thisPlayerSet].add(offer);
-            // XXX Need to tell the other player about the offer.
+            proposals[thisPlayerNum].add(proposal);
+
+            String other = null;
+            if (playerName.equals(getActivePlayerName()))
+            {
+                Legion defender = getLegionByMarkerId(
+                    proposal.getDefenderId());
+                other = defender.getPlayerName();
+            }
+            else
+            {
+                other = getActivePlayerName();
+            }
+
+            // Tell the other player about the proposal.
+            server.tellProposal(other, proposal);
         }
     }
-*/
 
 
     void fight(String hexLabel)
@@ -2553,7 +2600,7 @@ public final class Game
     }
 
 
-    private void handleNegotiation(NegotiationResults results)
+    private void handleNegotiation(Proposal results)
     {
         Legion attacker = getLegionByMarkerId(results.getAttackerId());
         Legion defender = getLegionByMarkerId(results.getAttackerId());
@@ -2607,7 +2654,7 @@ public final class Game
             log.append(" loses creatures ");
 
             // Remove all dead creatures from the winning legion.
-            Set winnerLosses = results.getWinnerLosses();
+            java.util.List winnerLosses = results.getWinnerLosses();
             Iterator it = winnerLosses.iterator();
             while (it.hasNext())
             {

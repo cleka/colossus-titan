@@ -296,7 +296,7 @@ class MinimaxAI extends SimpleAI implements AI
                 }
 
                 // advance phases until we reach the next move phase
-                game.advancePhase(game.getPhase());
+                game.advancePhase(game.getPhase(), game.getActivePlayerName());
 
                 while (game.getPhase() != Constants.MOVE)
                 {
@@ -368,7 +368,8 @@ class MinimaxAI extends SimpleAI implements AI
                     }
 
                     // now advance again until we get to MOVE phase
-                    game.advancePhase(game.getPhase());
+                    game.advancePhase(game.getPhase(),
+                        game.getActivePlayerName());
                 }
 
                 // set activePlayer negative so that we average over dice rolls

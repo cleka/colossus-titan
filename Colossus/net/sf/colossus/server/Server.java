@@ -6,6 +6,8 @@ import java.net.*;
 import javax.swing.*;
 
 import net.sf.colossus.client.Client;
+// XXX temp
+import net.sf.colossus.client.Proposal;
 
 
 /**
@@ -808,24 +810,35 @@ public final class Server
     }
 
 
-/*
-    // XXX This needs to be multithreaded to work properly when
-    // both clients are running in the same JVM.
     public void twoNegotiate(Legion attacker, Legion defender)
     {
-        Client client1 = getClient(attacker.getPlayerName());
+        Client client1 = getClient(defender.getPlayerName());
         client1.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
             defender.getMarkerId(), attacker.getImageNames(true),
             defender.getImageNames(true), attacker.getCurrentHexLabel());
-        Client client2 = getClient(defender.getPlayerName());
+
+        Client client2 = getClient(attacker.getPlayerName());
         client2.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
             defender.getMarkerId(), attacker.getImageNames(true),
             defender.getImageNames(true), attacker.getCurrentHexLabel());
     }
-*/
 
+    // XXX Stringify the proposal.
+    /** playerName makes a proposal. */
+    public void makeProposal(String playerName, Proposal proposal)
+    {
+        game.makeProposal(playerName, proposal);
+    }
+
+    // XXX Stringify the proposal.
+    /** Tell playerName about proposal. */
+    void tellProposal(String playerName, Proposal proposal)
+    {
+        Client client = getClient(playerName);
+        client.tellProposal(proposal);
+    }
 
     public void fight(String hexLabel)
     {
@@ -1040,8 +1053,7 @@ public final class Server
         }
     }
 
-    public List getLegionImageNames(String markerId, 
-        String playerName)
+    public List getLegionImageNames(String markerId, String playerName)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion == null)
@@ -1098,7 +1110,7 @@ public final class Server
         {
             return false;
         }
-        game.advancePhase(Constants.SPLIT);
+        game.advancePhase(Constants.SPLIT, playerName);
         return true;
     }
 
@@ -1130,7 +1142,7 @@ public final class Server
         else
         {
             player.recombineIllegalSplits();
-            game.advancePhase(Constants.MOVE);
+            game.advancePhase(Constants.MOVE, playerName);
             return "";
         }
     }
@@ -1145,7 +1157,7 @@ public final class Server
         // Advance only if there are no unresolved engagements.
         if (game.findEngagements().size() == 0)
         {
-            game.advancePhase(Constants.FIGHT);
+            game.advancePhase(Constants.FIGHT, playerName);
             return true;
         }
         else
@@ -1165,7 +1177,7 @@ public final class Server
         player.commitMoves();
         // Mulligans are only allowed on turn 1.
         player.setMulligansLeft(0);
-        game.advancePhase(Constants.MUSTER);
+        game.advancePhase(Constants.MUSTER, playerName);
         return true;
     }
 
@@ -1183,7 +1195,7 @@ public final class Server
         }
         // XXX If player quits while engaged, might need to set slayer.
         game.getPlayer(playerName).die(null, true);
-        game.advancePhase(game.getPhase());
+        game.advancePhase(game.getPhase(), playerName);
         return true;
     }
 

@@ -22,7 +22,6 @@ final class Concede extends JDialog implements ActionListener, WindowListener
     private static Point location;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
-    private static boolean answer;
     private Client client;
     private String allyMarkerId;
 
@@ -138,7 +137,6 @@ final class Concede extends JDialog implements ActionListener, WindowListener
         java.util.List allyImageNames, String enemyMarkerId, 
         java.util.List enemyImageNames)
     {
-        answer = false;
         new Concede(client, parentFrame, longMarkerName, hexDescription,
             allyMarkerId, allyImageNames, enemyMarkerId, enemyImageNames,
             false);
@@ -150,7 +148,6 @@ final class Concede extends JDialog implements ActionListener, WindowListener
         java.util.List allyImageNames, String enemyMarkerId, 
         java.util.List enemyImageNames)
     {
-        answer = false;
         new Concede(client, parentFrame, longMarkerName, hexDescription,
             allyMarkerId, allyImageNames, enemyMarkerId, enemyImageNames,
             true);
@@ -162,14 +159,13 @@ final class Concede extends JDialog implements ActionListener, WindowListener
         location = point;
     }
 
-
     static Point returnLocation()
     {
         return location;
     }
 
 
-    private void cleanup()
+    private void cleanup(boolean answer)
     {
         location = getLocation();
         dispose();
@@ -189,13 +185,12 @@ final class Concede extends JDialog implements ActionListener, WindowListener
         if (e.getActionCommand().equals("Flee") ||
             e.getActionCommand().equals("Concede"))
         {
-            answer = true;
+            cleanup(true);
         }
         else
         {
-            answer = false;
+            cleanup(false);
         }
-        cleanup();
     }
 
     public void windowClosed(WindowEvent e)
@@ -204,7 +199,7 @@ final class Concede extends JDialog implements ActionListener, WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        cleanup();
+        cleanup(false);
     }
 
     public void windowActivated(WindowEvent e)
@@ -226,5 +221,4 @@ final class Concede extends JDialog implements ActionListener, WindowListener
     public void windowOpened(WindowEvent e)
     {
     }
-
 }

@@ -37,6 +37,9 @@ public final class Client
     private MovementDie movementDie;
     private BattleMap map;
     private BattleDice battleDice;
+    // XXX Will need more than one of each.
+    private Negotiate negotiate;
+    private ReplyToProposal replyToProposal;
 
     private java.util.List battleChits = new ArrayList();
 
@@ -184,6 +187,10 @@ public final class Client
         if (map != null)
         {
             map.rescale();
+        }
+        if (caretakerDisplay != null)
+        {
+            caretakerDisplay.rescale();
         }
         repaintAllWindows();
     }
@@ -768,8 +775,8 @@ public final class Client
 
 
     /** Called from server. */
-    public String pickRecruit(java.util.List recruits, java.util.List imageNames,
-        String hexDescription, String markerId)
+    public String pickRecruit(java.util.List recruits, 
+        java.util.List imageNames, String hexDescription, String markerId)
     {
         return PickRecruit.pickRecruit(board.getFrame(), recruits,
             imageNames, hexDescription, markerId, this);
@@ -943,37 +950,57 @@ public final class Client
     }
 
 
-/*
     public void askNegotiate(String attackerLongMarkerName, 
-        String defenderLongMarkerName, String attackerMarkerId, 
-        String defenderMarkerId, java.util.List attackerImageNames, 
-        java.util.List defenderImageNames, String hexLabel)
+        String defenderLongMarkerName, String attackerId, String defenderId, 
+        java.util.List attackerImageNames, java.util.List defenderImageNames, 
+        String hexLabel)
     {
-        NegotiationResults results = null;
-        // AI players just fight for now anyway, and the AI reference is
-        // on the server side, so make this static rather than jumping
-        // through hoops.
+        Proposal proposal = null;
         if (getOption(Options.autoNegotiate))
         {
-            results = SimpleAI.negotiate();
+            // TODO AI players just fight for now.
+            proposal = new Proposal(attackerId, defenderId, true, false, 
+                null, null, hexLabel);
+            makeProposal(proposal);
         }
         else
         {
-            results = Negotiate.negotiate(this, attackerLongMarkerName, 
-                defenderLongMarkerName, attackerMarkerId, defenderMarkerId,
-                attackerImageNames, defenderImageNames);
-        }
-
-        if (results.isFight())
-        {
-            fight(hexLabel);
-        }
-        else
-        {
-            negotiate(results);
+            negotiate = new Negotiate(this, attackerLongMarkerName, 
+                defenderLongMarkerName, attackerId, defenderId,
+                attackerImageNames, defenderImageNames, hexLabel);
         }
     }
-*/
+
+    void negotiateCallback(Proposal proposal)
+    {
+        if (proposal == null)
+        {
+            // Just drop it.
+        }
+        else if (proposal.isFight())
+        {
+            fight(proposal.getHexLabel());
+        }
+        else
+        {
+            makeProposal(proposal);
+        }
+    }
+
+
+    private void makeProposal(Proposal proposal)
+    {
+        // TODO Stringify the proposal.
+        server.makeProposal(playerName, proposal);
+    }
+
+
+    /** Inform this player about the other player's proposal. */
+    public void tellProposal(Proposal proposal)
+    {
+        new ReplyToProposal(this, proposal);
+    }
+
 
     public void setBattleDiceValues(String attackerName, String defenderName,
         String attackerHexId, String defenderHexId, char terrain,
@@ -998,8 +1025,25 @@ public final class Client
     }
 
 
+    void cleanupNegotiationDialogs()
+    {
+        if (negotiate != null)
+        {
+            negotiate.dispose();
+            negotiate = null;
+        }
+        if (replyToProposal != null)
+        {
+            replyToProposal.dispose();
+            replyToProposal = null;
+        }
+    }
+
+
     public void initBattleMap(String masterHexLabel)
     {
+        cleanupNegotiationDialogs();
+
         // Do not show map for AI players.
         if (!getOption(Options.autoPlay))
         {
@@ -1153,6 +1197,10 @@ public final class Client
 
     public void setupBattleMoveMenu()
     {
+        // Just in case the other player started the battle
+        // really quickly.
+        cleanupNegotiationDialogs();
+
         if (map != null)
         {
             map.setupMoveMenu();

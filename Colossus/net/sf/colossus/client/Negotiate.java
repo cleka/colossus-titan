@@ -10,15 +10,15 @@ import net.sf.colossus.server.Creature;
 
 
 /**
- * Class Negotiate allows two players to settle an engagement.
+ * Negotiate allows making a new proposal to settle an engagement.
  * @version $Id$
  * @author David Ripton
  */
 
 final class Negotiate extends JDialog implements MouseListener, ActionListener
 {
-    private String attackerMarkerId;
-    private String defenderMarkerId;
+    private String attackerId;
+    private String defenderId;
     private java.util.List attackerChits = new ArrayList();
     private java.util.List defenderChits = new ArrayList();
     private Marker attackerMarker;
@@ -26,20 +26,22 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
     private Client client;
-    private static NegotiationResults results;
+    private Proposal proposal;
+    private String hexLabel;
 
 
-    private Negotiate(Client client, String attackerLongMarkerName,
-        String defenderLongMarkerName, String attackerMarkerId,
-        String defenderMarkerId, java.util.List attackerImageNames,
-        java.util.List defenderImageNames)
+    Negotiate(Client client, String attackerLongMarkerName,
+        String defenderLongMarkerName, String attackerId,
+        String defenderId, java.util.List attackerImageNames,
+        java.util.List defenderImageNames, String hexLabel)
     {
         super(client.getBoard().getFrame(), attackerLongMarkerName +
-            " Negotiates with " + defenderLongMarkerName, true);
+            " Negotiates with " + defenderLongMarkerName, false);
 
         this.client = client;
-        this.attackerMarkerId = attackerMarkerId;
-        this.defenderMarkerId = defenderMarkerId;
+        this.attackerId = attackerId;
+        this.defenderId = defenderId;
+        this.hexLabel = hexLabel;
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);
@@ -50,7 +52,7 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
 
         int scale = 4 * Scale.get();
 
-        attackerMarker = new Marker(scale, attackerMarkerId,
+        attackerMarker = new Marker(scale, attackerId,
             this, client);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
@@ -72,7 +74,7 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
             chit.addMouseListener(this);
         }
 
-        defenderMarker = new Marker(scale, defenderMarkerId,
+        defenderMarker = new Marker(scale, defenderId,
             this, client);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 1;
@@ -142,25 +144,11 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
     }
 
 
-    /** Display a dialog allowing one player to offer a settlement to
-     *  an engagement.  Return a NegotiationResults.
-     */
-    static NegotiationResults negotiate(Client client, 
-        String attackerLongMarkerName, String defenderLongMarkerName, 
-        String attackerMarkerId, String defenderMarkerId,
-        java.util.List attackerImageNames, java.util.List defenderImageNames)
-    {
-        new Negotiate(client, attackerLongMarkerName, defenderLongMarkerName,
-            attackerMarkerId, defenderMarkerId, attackerImageNames,
-            defenderImageNames);
-        return results;
-    }
-
-
     void cleanup()
     {
         Concede.saveLocation(getLocation());
         dispose();
+        client.negotiateCallback(proposal);
     }
 
 
@@ -231,12 +219,9 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
             if (!attackersLeft && !defendersLeft)
             {
                 // Mutual destruction.
-                results = new NegotiationResults(attackerMarkerId,
-                    defenderMarkerId, false, true, null, null);
+                proposal = new Proposal(attackerId, defenderId, 
+                    false, true, null, null, hexLabel);
             }
-
-            // If this is not a mutual elimination, figure out how many
-            // points the victor receives.
             else
             {
                 String winnerMarkerId;
@@ -245,14 +230,14 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
 
                 if (!defendersLeft)
                 {
-                    winnerMarkerId = attackerMarkerId;
-                    loserMarkerId = defenderMarkerId;
+                    winnerMarkerId = attackerId;
+                    loserMarkerId = defenderId;
                     winnerChits = attackerChits;
                 }
                 else
                 {
-                    winnerMarkerId = defenderMarkerId;
-                    loserMarkerId = attackerMarkerId;
+                    winnerMarkerId = defenderId;
+                    loserMarkerId = attackerId;
                     winnerChits = defenderChits;
                 }
 
@@ -271,7 +256,7 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
                 }
 
                 // Remove all dead creatures from the winning legion.
-                Set winnerLosses = new HashSet();
+                java.util.List winnerLosses = new ArrayList();
                 it = winnerChits.iterator();
                 while (it.hasNext())
                 {
@@ -283,12 +268,14 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
                         {
                             name = "Titan";
                         }
+                        // XXX bug   There can be more than one of the
+                        // same type of creature, so we need to track
+                        // quantity.
                         winnerLosses.add(Creature.getCreatureByName(name));
                     }
                 }
-                results = new NegotiationResults(attackerMarkerId,
-                    defenderMarkerId, false, false,
-                    winnerMarkerId, winnerLosses);
+                proposal = new Proposal(attackerId, defenderId, 
+                    false, false, winnerMarkerId, winnerLosses, hexLabel);
             }
 
             // Exit this dialog.
@@ -297,8 +284,8 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
 
         else if (e.getActionCommand().equals("Fight"))
         {
-            results = new NegotiationResults(attackerMarkerId,
-                defenderMarkerId, true, false, null, null);
+            proposal = new Proposal(attackerId, defenderId, true,
+                false, null, null, hexLabel);
 
             // Exit this dialog.
             cleanup();

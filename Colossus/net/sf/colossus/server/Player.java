@@ -672,11 +672,6 @@ public final class Player implements Comparable
         return markersAvailable;
     }
 
-    boolean isMarkerAvailable(String markerId)
-    {
-        return (markersAvailable.contains(markerId));
-    }
-
     String getFirstAvailableMarker()
     {
         if (markersAvailable.size() == 0)
@@ -851,7 +846,7 @@ public final class Player implements Comparable
             // Keep the AI from continuing to play after winning.
             if (!game.isOver())
             {
-                game.advancePhase(Constants.SPLIT);
+                game.advancePhase(Constants.SPLIT, getName());
             }
         }
     }
@@ -862,7 +857,7 @@ public final class Player implements Comparable
         {
             ai.masterMove(game);
             recombineIllegalSplits();
-            game.advancePhase(Constants.MOVE);
+            game.advancePhase(Constants.MOVE, getName());
         }
     }
 
@@ -874,7 +869,7 @@ public final class Player implements Comparable
             // Keep the AI from continuing to play after winning.
             if (!game.isOver())
             {
-                game.advancePhase(Constants.MUSTER);
+                game.advancePhase(Constants.MUSTER, getName());
             }
         }
     }

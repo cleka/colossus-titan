@@ -5,23 +5,24 @@ import java.util.*;
 
 
 /**
- * Class NegotiationResults holds the results of a settlement attempt.
+ * Class Proposal holds the results of a settlement attempt.
  * @version $Id$
  * @author David Ripton
  */
 
-public final class NegotiationResults
+public final class Proposal
 {
     private boolean fight;
     private boolean mutual;
     private String attackerId;
     private String defenderId;
     private String winnerId;
-    private Set winnerLosses;
+    private List winnerLosses;  // Must sort before comparing.
+    private String hexLabel;
 
 
-    NegotiationResults(String attackerId, String defenderId, boolean fight,
-        boolean mutual, String winnerId, Set winnerLosses)
+    Proposal(String attackerId, String defenderId, boolean fight,
+        boolean mutual, String winnerId, List winnerLosses, String hexLabel)
     {
         this.attackerId = attackerId;
         this.defenderId = defenderId;
@@ -29,6 +30,7 @@ public final class NegotiationResults
         this.mutual = mutual;
         this.winnerId = winnerId;
         this.winnerLosses = winnerLosses;
+        this.hexLabel = hexLabel;
     }
 
 
@@ -40,6 +42,11 @@ public final class NegotiationResults
     public String getDefenderId()
     {
         return defenderId;
+    }
+
+    public String getHexLabel()
+    {
+        return hexLabel;
     }
 
     public boolean isFight()
@@ -57,42 +64,42 @@ public final class NegotiationResults
         return winnerId;
     }
 
-    public Set getWinnerLosses()
+    public List getWinnerLosses()
     {
         return winnerLosses;
     }
 
     public boolean equals(Object other)
     {
-        if (!(other instanceof NegotiationResults))
+        if (!(other instanceof Proposal))
         {
             return false;
         }
-        NegotiationResults otherResults = (NegotiationResults)other;
+        Proposal otherProposal = (Proposal)other;
 
-        if (fight && otherResults.isFight())
+        if (fight && otherProposal.isFight())
         {
             return true;
         }
-        if (fight != otherResults.isFight())
+        if (fight != otherProposal.isFight())
         {
             return false;
         }
 
-        if (mutual && otherResults.isMutual())
+        if (mutual && otherProposal.isMutual())
         {
             return true;
         }
-        if (mutual != otherResults.isMutual())
+        if (mutual != otherProposal.isMutual())
         {
             return false;
         }
 
-        if (!winnerId.equals(otherResults.getWinnerId()))
+        if (!winnerId.equals(otherProposal.getWinnerId()))
         {
             return false;
         }
-        if (!winnerLosses.equals(otherResults.getWinnerLosses()))
+        if (!winnerLosses.equals(otherProposal.getWinnerLosses()))
         {
             return false;
         }

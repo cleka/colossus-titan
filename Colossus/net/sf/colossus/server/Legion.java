@@ -1092,10 +1092,6 @@ final class Legion implements Comparable
                 return null;
             }
         }
-        if (!player.isMarkerAvailable(newMarkerId))
-        {
-            return null;
-        }
 
         player.selectMarkerId(newMarkerId);
         Legion newLegion = Legion.getEmptyLegion(newMarkerId, markerId,

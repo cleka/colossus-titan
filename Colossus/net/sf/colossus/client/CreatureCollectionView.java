@@ -9,8 +9,8 @@ import java.util.*;
 import net.sf.colossus.server.Creature;
 
 
-/** Viewer for a collection, say the graveyard or the creature keeper
- * <P><B>TODO:</B>remove overlap with existing colossus
+/** 
+ *  Viewer for a collection, say the graveyard or the creature keeper
  *  @version $Id$
  *  @author Tom Fruchterman
  */
@@ -18,6 +18,9 @@ class CreatureCollectionView extends JDialog
 {
     private Client client;
     private static Point location;
+
+    /** hash by creature name to the label that displays the count */
+    Map countMap = new HashMap();
 
 
     CreatureCollectionView(JFrame frame, Client client)
@@ -27,8 +30,8 @@ class CreatureCollectionView extends JDialog
 
         this.client = client;
 
-        JPanel oPanel = makeCreaturePanel();
-        getContentPane().add(oPanel, BorderLayout.CENTER);
+        JPanel panel = makeCreaturePanel();
+        getContentPane().add(panel, BorderLayout.CENTER);
 
         addWindowListener(new WindowAdapter()
         {
@@ -50,46 +53,39 @@ class CreatureCollectionView extends JDialog
         setVisible(true);
     }
 
-    /** hash by creature name to the label that displays the count */
-    Map countMap = new HashMap();
-
     /** the count for an individual creature */
     class CreatureCount extends JPanel
     {
-        CreatureCount(String strName)
+        CreatureCount(String name)
         {
             super(new BorderLayout());
                                 
             setBorder(BorderFactory.createLineBorder(Color.black));
 
-            String strPath = Chit.getImagePath(strName);
-            ImageIcon oIcon = Chit.getImageIcon(strPath);
-            JLabel lblCreatureIcon = new JLabel(oIcon);
-            JLabel lblCreatureCount = new JLabel(Integer.toString(
-                client.getCreatureCount(strName)), SwingConstants.CENTER);
-            countMap.put(strName, lblCreatureCount);
+            Chit chit = new Chit(4 * Scale.get(), name, this);
+            JLabel label = new JLabel(Integer.toString(
+                client.getCreatureCount(name)), SwingConstants.CENTER);
+            countMap.put(name, label);
 
-            // jikes whines because add is defined in both JPanel
-            // and JDialog.
-            this.add(lblCreatureIcon, BorderLayout.CENTER);
-            this.add(lblCreatureCount, BorderLayout.SOUTH);
+            // jikes whines because add is defined in both JPanel and JDialog.
+            this.add(chit, BorderLayout.CENTER);
+            this.add(label, BorderLayout.SOUTH);
         }
     }
 
     private JPanel makeCreaturePanel()
     {
-        java.util.List oCharacterList = Creature.getCreatures();
-        int nNumCharacters = oCharacterList.size();
-        JPanel oCreaturePanel = 
-            new JPanel(new GridLayout(5, nNumCharacters / 5));
-        Iterator it = oCharacterList.iterator();
+        java.util.List creatures = Creature.getCreatures();
+        JPanel creaturePanel = 
+            new JPanel(new GridLayout(5, creatures.size() / 5));
+        Iterator it = creatures.iterator();
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
-            oCreaturePanel.add(new CreatureCount(creature.getName()));
+            creaturePanel.add(new CreatureCount(creature.getName()));
         }
                         
-        return oCreaturePanel;
+        return creaturePanel;
     }
 
     public void update()
@@ -98,15 +94,15 @@ class CreatureCollectionView extends JDialog
         while (it.hasNext())
         {
             Map.Entry entry = (Map.Entry)it.next();
-            String strName = (String)entry.getKey();
-            JLabel lbl = (JLabel)entry.getValue();
-            int count = client.getCreatureCount(strName);
+            String name = (String)entry.getKey();
+            JLabel label = (JLabel)entry.getValue();
+            int count = client.getCreatureCount(name);
             String color;
             if (count == 0)
             {
                 color = "red";
             }
-            else if (count == Creature.getCreatureByName(strName).
+            else if (count == Creature.getCreatureByName(name).
                 getMaxCount())
             {
                 color = "green";
@@ -116,7 +112,7 @@ class CreatureCollectionView extends JDialog
                 color = "black";
             }
             String htmlCount = htmlColorize(Integer.toString(count), color);
-            lbl.setText(htmlCount);
+            label.setText(htmlCount);
         }
 
         repaint();
@@ -139,5 +135,18 @@ class CreatureCollectionView extends JDialog
     {
         super.dispose();
         location = getLocation();
+    }
+
+    void rescale()
+    {
+        getContentPane().removeAll();
+        JPanel panel = makeCreaturePanel();
+        getContentPane().add(panel, BorderLayout.CENTER);
+        pack();
+        // Place dialog at upper right corner of screen.
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        location = new Point(d.width - getSize().width, 0);
+        setLocation(location);
+        update();
     }
 }
