@@ -566,14 +566,17 @@ public class Game extends JFrame implements WindowListener, ActionListener
     //         Color
     //         Starting tower
     //         Score
+    //         Alive?
+    //         Mulligans left
     //         Players eliminated
+    //         Number of markers left
+    //         Remaining marker ids
     //         Number of Legions 
     //         Legion 1: 
     //             Marker id
     //             Height
-    //             Creatures
-    //             Number of visible creatures
-    //             Visible creatures
+    //             Creature 1
+    //             Creature 1 visible?
     //             ...
     //     ...
     private void saveGame()
@@ -611,6 +614,8 @@ public class Game extends JFrame implements WindowListener, ActionListener
             out.println(player.getColor());
             out.println(player.getTower());
             out.println(player.getScore());
+            out.println(player.isAlive());
+            out.println(player.getMulligansLeft());
             out.println(player.getPlayersElim());
             out.println(player.getNumMarkersAvailable());
             for (int j = 0; j < player.getNumMarkersAvailable(); j++)
@@ -690,6 +695,13 @@ public class Game extends JFrame implements WindowListener, ActionListener
                 int score = Integer.parseInt(buf);
                 players[i].setScore(score);
                 
+                buf = in.readLine();
+                players[i].setAlive(Boolean.valueOf(buf).booleanValue());
+
+                buf = in.readLine();
+                int mulligansLeft = Integer.parseInt(buf);
+                players[i].setMulligansLeft(mulligansLeft);
+
                 String playersElim = in.readLine();
                 if (playersElim.equals("null"))
                 {
@@ -732,13 +744,11 @@ public class Game extends JFrame implements WindowListener, ActionListener
                         visibles[k] = Boolean.valueOf(buf).booleanValue();
                     }
 
-
-                    // XXX Get scale from MasterBoard?  Container?  Hex?
-                    Legion legion = new Legion(0, 0, 3 * 17, markerId, null, 
-                        board, height, board.getHexFromLabel(hexLabel),
-                        creatures[0], creatures[1], creatures[2], creatures[3],
-                        creatures[4], creatures[5], creatures[6], creatures[7],
-                        players[i]);
+                    Legion legion = new Legion(0, 0, 3 * board.getScale(), 
+                        markerId, null, board, height, 
+                        board.getHexFromLabel(hexLabel), creatures[0], 
+                        creatures[1], creatures[2], creatures[3], creatures[4],
+                        creatures[5], creatures[6], creatures[7], players[i]);
                     players[i].addLegion(legion);
                 }
             }
