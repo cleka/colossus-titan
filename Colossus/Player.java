@@ -656,10 +656,10 @@ class Player
     }
 
 
-    public void die(Player player, boolean checkForVictory)
+    public void die(Player slayer, boolean checkForVictory)
     {
         // Engaged legions give half points to the player they're
-        // engaged with.  All others give half points to player,
+        // engaged with.  All others give half points to slayer,
         // if non-null.
 
         for (int i = 0; i < numLegions; i++)
@@ -669,17 +669,19 @@ class Player
             Legion enemyLegion = hex.getEnemyLegion(this);
             double halfPoints = legion.getPointValue() / 2.0;
 
+            Player scorer;
+
             if (enemyLegion != null)
             {
-                Player engagedPlayer = enemyLegion.getPlayer();
-                engagedPlayer.addPoints(halfPoints);
+                scorer = enemyLegion.getPlayer();
             }
             else
             {
-                if (player != null)
-                {
-                    player.addPoints(halfPoints);
-                }
+                scorer = slayer;
+            }
+            if (scorer != null)
+            {
+                scorer.addPoints(halfPoints);
             }
         }
 
@@ -690,7 +692,7 @@ class Player
         }
 
 
-        // Removing all legions is icky because the array shrinks as
+        // Removing all legions is tricky because the array shrinks as
         // each is removed.
         for (int i = numLegions - 1; i >= 0; i--)
         {
@@ -698,14 +700,13 @@ class Player
         }
 
         // Mark this player as dead.
-        alive = false;
+        setAlive(false);
 
-        // Mark who eliminated this player and give him this player's
-        // legion markers.
-        if (player != null)
+        // Mark the slayer and give him this player's legion markers.
+        if (slayer != null)
         {
-            player.addPlayerElim(this);
-            player.addLegionMarkers(this);
+            slayer.addPlayerElim(this);
+            slayer.addLegionMarkers(this);
         }
 
         numMarkersAvailable = 0;
@@ -726,6 +727,7 @@ class Player
     {
         titanEliminated = true;
     }
+
 
     public boolean isTitanEliminated()
     {
