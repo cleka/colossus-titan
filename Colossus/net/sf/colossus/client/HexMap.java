@@ -192,8 +192,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
             else
             { // random Battlelands
-                Log.debug("Randomizing " + terrain +
-                          " with " + rndSourceName);
+                Log.debug("Randomizing " + terrain + " with " + rndSourceName);
                 InputStream brlIS =
                     ResourceLoader.getInputStream(rndSourceName,
                                                   directories);
@@ -204,11 +203,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 java.util.List tempTowerStartList = brl.getStartList();
                 if (tempTowerStartList != null)
                 {
-                    startlistMap.put(terrain,
-                                     tempTowerStartList);
+                    startlistMap.put(terrain, tempTowerStartList);
                 }
-                towerStatusMap.put(terrain,
-                                   new Boolean(brl.isTower()));
+                towerStatusMap.put(terrain, new Boolean(brl.isTower()));
                 subtitleMap.put(terrain, null);
                 StringBuffer buf = new StringBuffer();
                 for (int i = 0; i < 6; i++)
@@ -283,12 +280,16 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                         if (show[x][y])
                         {
                             if (h[x][y].getTerrain().equals(hazards[i]))
+                            {
                                 count++;
+                            }
                         }
                     }
                 }
                 if (count >0)
+                {
                     t2n.put(hazards[i], new Integer(count));
+                }
             }
             hazardNumberMap.put(terrain, t2n);
             char[] hazardSides = BattleHex.getHexsides();
@@ -312,7 +313,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                     }
                 }
                 if (count >0)
+                {
                     s2n.put(new Character(hazardSides[i]), new Integer(count));
+                }
             }
             hazardSideNumberMap.put(terrain, s2n);
         }
