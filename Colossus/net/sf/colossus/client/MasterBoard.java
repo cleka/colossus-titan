@@ -109,8 +109,18 @@ public final class MasterBoard extends JPanel
 
     /** Must ensure that variant is loaded before referencing this class,
      *  since readMapData() needs it. */
-    static
+    public static void staticMasterboardInit()
     {
+        // variant can changes those
+        horizSize = 0;
+        vertSize = 0;
+        boardParity = 0;
+        plainHexArray = null;
+        plainHexList = null;
+        show = null;
+        towerSet = null;
+        sml = null;
+
         try
         {
             readMapData();
@@ -120,7 +130,13 @@ public final class MasterBoard extends JPanel
             Log.error("Reading map data for non-GUI failed : " + e);
             System.exit(1);
         }
+        
+        Log.debug("Setting up static arrays in MasterBoard");
+
         setupPlainHexes();
+
+        Log.debug("Setting up static TowerSet in MasterBoard");
+
         setupTowerSet();
     }
 
@@ -693,21 +709,10 @@ public final class MasterBoard extends JPanel
         }
         sml = new StrategicMapLoader(mapIS);
         int[] size = sml.getHexArraySize();
-        if ((horizSize == 0) && (vertSize == 0))
-        {
-            horizSize = size[0];
-            vertSize = size[1];
-        }
-        else
-        {
-            if ((horizSize != size[0]) || (vertSize != size[1]))
-            {
-                throw new Exception("Map size changed during game !");
-            }
-        }
+        horizSize = size[0];
+        vertSize = size[1];
         show = new boolean[horizSize][vertSize];
     }
-
 
     /** Add terrain types, id labels, label sides, and exits to hexes.
      *  Side effects on passed list. */
