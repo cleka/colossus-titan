@@ -81,7 +81,15 @@ public final class Constants
     /** Default directory for datafiles */
     public static String defaultDirName = "Default";
     /** Images subdirectory name */
-    public static String imageDirName = "images";
+    public static String imagesDirName = "images";
     /** Battlelands subdirectory name */
     public static String battlelandsDirName = "Battlelands";
+    /** Default CRE file */
+    public static String defaultCREFile = "Default.cre";
+    /** Default MAP file */
+    public static String defaultMAPFile = "Default.map";
+    /** Default TER file */
+    public static String defaultTERFile = "Default.ter";
+    /** Default VAR file */
+    public static String defaultVARFile = "Default.var";
 }

@@ -9,7 +9,7 @@ import java.awt.geom.*;
 import java.net.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
-
+import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
@@ -61,16 +61,9 @@ class Chit extends JPanel
     static ImageIcon getImageIcon(String imageFilename)
     {
         ImageIcon icon = null;
-
-        // first, build list of candidate directories
-        java.util.List directories = new java.util.ArrayList();
-        directories.add(GetPlayers.getVarDirectory() +
-                        ResourceLoader.getPathSeparator() +
-                        Constants.imageDirName);
-        directories.add(Constants.imageDirName);
+        java.util.List directories = VariantSupport.getImagesDirectoriesList();
         icon = ResourceLoader.getImageIcon(imageFilename,
-                                        directories);
-
+                                           directories);
         if (icon == null)
         {
             System.out.println("Couldn't get image :" + imageFilename);

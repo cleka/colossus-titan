@@ -17,7 +17,7 @@ import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.parser.TerrainRecruitLoader;
-
+import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class Game gets and holds high-level data about a Titan game.
@@ -60,15 +60,13 @@ public final class Game
         Creature.loadCreatures(); /* try to load creatures */
         try /* try to load the Recruits database */
         {
-            java.util.List directories = new java.util.ArrayList();
-            directories.add(GetPlayers.getVarDirectory());
-            directories.add(Constants.defaultDirName);
+            java.util.List directories = VariantSupport.getVarDirectoriesList();
             InputStream terIS = ResourceLoader.getInputStream(
-                                               GetPlayers.getRecruitName(),
+                                               VariantSupport.getRecruitName(),
                                                directories);
             if (terIS == null) 
             {
-                throw new FileNotFoundException(GetPlayers.getRecruitName());
+                throw new FileNotFoundException(VariantSupport.getRecruitName());
             }
             trl = new TerrainRecruitLoader(terIS);
             while (trl.oneTerrain() >= 0) {}

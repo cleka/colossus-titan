@@ -8,7 +8,7 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.client.GetPlayers;
 import net.sf.colossus.parser.CreatureLoader;
-
+import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class Creature represents the CONSTANT information about a Titan
@@ -104,15 +104,13 @@ public class Creature implements Comparable
         try 
         {
             creatures.clear();
-            java.util.List directories = new java.util.ArrayList();
-            directories.add(GetPlayers.getVarDirectory());
-            directories.add(Constants.defaultDirName);
+            java.util.List directories = VariantSupport.getVarDirectoriesList();
             InputStream creIS = ResourceLoader.getInputStream(
-                                               GetPlayers.getCreaturesName(),
+                                               VariantSupport.getCreaturesName(),
                                                directories);
             if (creIS == null) 
             {
-                throw new FileNotFoundException(GetPlayers.getCreaturesName());
+                throw new FileNotFoundException(VariantSupport.getCreaturesName());
             }
             CreatureLoader creatureLoader = new CreatureLoader(creIS);
             while (creatureLoader.oneCreature(creatures) >= 0) {}

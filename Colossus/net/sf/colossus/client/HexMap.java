@@ -12,6 +12,7 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.parser.BattlelandLoader;
 import net.sf.colossus.server.Game;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class HexMap displays a basic battle map.
@@ -152,11 +153,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private synchronized static void setupHexesGameState(char terrain, 
         BattleHex [][] h)
     {
-        java.util.List directories = new java.util.ArrayList();
-        directories.add(GetPlayers.getVarDirectory() +
-                        ResourceLoader.getPathSeparator() +
-                        Constants.battlelandsDirName);
-        directories.add(Constants.battlelandsDirName);
+        java.util.List directories = VariantSupport.getBattlelandsDirectoriesList();
         InputStream batIS = ResourceLoader.getInputStream(
                                            MasterHex.getTerrainName(terrain),
                                            directories);

@@ -13,8 +13,7 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.server.Game;
-import net.sf.colossus.parser.VariantLoader;
-
+import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class GetPlayers is a dialog used to enter players' names.
@@ -31,9 +30,6 @@ public final class GetPlayers extends JDialog implements WindowListener,
     public static final String newGame = "New Game";
     public static final String loadGame = "Load Game";
     public static final String loadVariant = "Load Variant";
-    public static final String loadMap = "Load Map";
-    public static final String loadRec = "Load Recruiters";
-    public static String loadCre = "Load Creatures";
     public static final String quit = "Quit";
     public static final String none = "None";
     public static final String byColor = "<By color>";
@@ -50,12 +46,6 @@ public final class GetPlayers extends JDialog implements WindowListener,
     /** List of Map.Entry objects that map player names to player types */
     private static java.util.List playerInfo = new ArrayList();
 
-    private static final String pathSeparator = "/";
-    private static String varDirectory = "Default";
-    private static String variantName = "Default.var";
-    private static String mapName = "Default.map";
-    private static String recruitName = "Default.ter";
-    private static String creaturesName = "Default.cre";
     private static String anyAI = "A Random AI";
     private static String defaultAI = "SimpleAI";
     /* aiList should match the class name of available AI */
@@ -156,31 +146,9 @@ public final class GetPlayers extends JDialog implements WindowListener,
         button3.addActionListener(this);
         JButton buttonVariant =
             new JButton(loadVariant +
-                        " (" + variantName + ")");
+                        " (" + VariantSupport.getVarName() + ")");
         variantPane.add(buttonVariant);
         buttonVariant.addActionListener(this);
-
-        /*
-         * For Debugging Mostly ;
-         * Allow to load Variant File independantly.
-         * better keep it commented out for regular game.
-         * /
-         /*
-        Container optionPane = new Container();
-        optionPane.setLayout(new GridLayout(0, 3));
-        contentPane.add(optionPane);
-
-        JButton button4 = new JButton(loadMap);
-        optionPane.add(button4);
-        button4.addActionListener(this);
-        JButton button5 = new JButton(loadRec);
-        optionPane.add(button5);
-        button5.addActionListener(this);
-        JButton button6 = new JButton(loadCre);
-        optionPane.add(button6);
-        button6.addActionListener(this);
-        */
-
 
         pack();
 
@@ -291,138 +259,6 @@ public final class GetPlayers extends JDialog implements WindowListener,
     {
     }
 
-    static class mapFileFilter extends javax.swing.filechooser.FileFilter 
-    {
-        public boolean accept(File f) 
-        {
-            if (f.isDirectory()) 
-            {
-                return(true);
-            }
-            if (f.getName().endsWith(".map")) 
-            {
-                return(true);
-            }
-            return(false);
-        }
-        public String getDescription() 
-        {
-            return("Colossus MAP file");
-        }
-    }
-
-    public static String getVarDirectory()
-    {
-        if (varDirectory.equals(""))
-        {
-            return "";
-        }
-        else
-        {
-            return (varDirectory + pathSeparator);
-        }
-    }
-
-    public static String getMapName()
-    {
-        return (mapName);
-    }
-    
-    static class recFileFilter extends javax.swing.filechooser.FileFilter 
-    {
-        public boolean accept(File f) 
-        {
-            if (f.isDirectory()) 
-            {
-                return(true);
-            }
-            if (f.getName().endsWith(".ter")) 
-            {
-                return(true);
-            }
-            return(false);
-        }
-        public String getDescription() 
-        {
-            return("Colossus RECruiters file");
-        }
-    }
-
-    static class creFileFilter extends javax.swing.filechooser.FileFilter 
-    {
-        public boolean accept(File f) 
-        {
-            if (f.isDirectory()) 
-            {
-                return(true);
-            }
-            if (f.getName().endsWith(".cre")) 
-            {
-                return(true);
-            }
-            return(false);
-        }
-        public String getDescription() 
-        {
-            return("Colossus CREatures file");
-        }
-    }
-
-    public static String getRecruitName()
-    {
-        return recruitName;
-    }
-
-    public static String getCreaturesName()
-    {
-        return creaturesName;
-    }
-    
-    private static String chooseMap() 
-    {
-        javax.swing.JFileChooser mapChooser = new JFileChooser(".");
-        mapChooser.setFileFilter(new mapFileFilter());
-        mapChooser.setDialogTitle(
-            "Choose your map (or cancel for default map)");
-        int returnVal = mapChooser.showOpenDialog(mapChooser);
-        String mapName = "Default.map";
-        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) 
-        {
-            mapName = mapChooser.getSelectedFile().getAbsolutePath();
-        }
-        return (mapName);
-    }
-
-    private static String chooseRec() 
-    {
-        javax.swing.JFileChooser recChooser = new JFileChooser(".");
-        recChooser.setFileFilter(new recFileFilter());
-        recChooser.setDialogTitle(
-            "Choose your recruiters base (or cancel for default base)");
-        int returnVal = recChooser.showOpenDialog(recChooser);
-        String recName = "Default.ter";
-        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) 
-        {
-            recName = recChooser.getSelectedFile().getAbsolutePath();
-        }
-        return (recName);
-    }
-
-    private static String chooseCre() 
-    {
-        javax.swing.JFileChooser creChooser = new JFileChooser(".");
-        creChooser.setFileFilter(new creFileFilter());
-        creChooser.setDialogTitle(
-            "Choose your creatures base (or cancel for default base)");
-        int returnVal = creChooser.showOpenDialog(creChooser);
-        String creName = "Default.cre";
-        if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) 
-        {
-            creName = creChooser.getSelectedFile().getAbsolutePath();
-        }
-        return (creName);
-    }
-
     static class varFileFilter extends javax.swing.filechooser.FileFilter 
     {
         public boolean accept(File f) 
@@ -443,68 +279,19 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
     }
 
-    private static String doLoadVariant()
+    private static void doLoadVariant()
     {
         javax.swing.JFileChooser varChooser = new JFileChooser(".");
         varChooser.setFileFilter(new varFileFilter());
         varChooser.setDialogTitle(
-            "Choose your variant (or cancel for default game)");
+                   "Choose your variant (or cancel for default game)");
         int returnVal = varChooser.showOpenDialog(varChooser);
-        String varName = "Default" + pathSeparator + "Default.var";
-        String shortVarName = "Default.var";
-        varDirectory = "Default";
+        String varName = Constants.defaultVARFile;
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File varFile = varChooser.getSelectedFile();
-            varName = varFile.getAbsolutePath();
-            shortVarName = varFile.getName();
-            varDirectory = varFile.getParentFile().getAbsolutePath();
+            VariantSupport.loadVariant(varFile);
         }
-        Log.debug("Loading variant " + shortVarName + ", data files in " + 
-            varDirectory);
-        try
-        {
-            java.util.List directories = new java.util.ArrayList();
-            directories.add(varDirectory);
-            directories.add(Constants.defaultDirName);
-            InputStream varIS = ResourceLoader.getInputStream(
-                                               shortVarName,
-                                               directories);
-            if (varIS == null)
-            {
-                throw new FileNotFoundException(varName);
-            }
-            else
-            {
-                VariantLoader vl = new VariantLoader(varIS);
-                String[] data = new String[3];
-                data[0] = data[1] = data[2] = null;
-                while (vl.oneLine(data) >= 0) {}
-                if (data[VariantLoader.MAP_INDEX] != null)
-                {
-                    mapName = data[VariantLoader.MAP_INDEX];
-                    Log.debug("Variant using MAP " + mapName);
-                }
-                if (data[VariantLoader.CRE_INDEX] != null)
-                {
-                    creaturesName = data[VariantLoader.CRE_INDEX];
-                    Log.debug("Variant using CRE " + creaturesName);
-
-                }
-                if (data[VariantLoader.TER_INDEX] != null)
-                {
-                    recruitName = data[VariantLoader.TER_INDEX];
-                    Log.debug("Variant using TER " + recruitName);
-
-                }
-            }
-        }
-        catch (Exception e) 
-        {
-            shortVarName = "ERROR";
-            System.out.println("Variant loading failed : " + e);
-        }
-        return shortVarName;
     }
 
     public void actionPerformed(ActionEvent e)
@@ -524,21 +311,11 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
         else if (e.getActionCommand().startsWith(loadVariant))
         {
-            variantName = doLoadVariant();
+            doLoadVariant();
             ((JButton)e.getSource()).setText(loadVariant +
-                                             " (" + variantName + ")");
-        }
-        else if (e.getActionCommand().equals(loadMap))
-        {
-            mapName = chooseMap();
-        }
-        else if (e.getActionCommand().equals(loadRec))
-        {
-            recruitName = chooseRec();
-        }
-        else if (e.getActionCommand().equals(loadCre))
-        {
-            creaturesName = chooseCre();
+                                             " (" +
+                                             VariantSupport.getVarName() +
+                                             ")");
         }
         else
         {

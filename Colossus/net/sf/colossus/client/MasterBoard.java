@@ -15,7 +15,7 @@ import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.parser.StrategicMapLoader;
-
+import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
@@ -712,15 +712,13 @@ public final class MasterBoard extends JPanel
         MasterHex[][] localH = null;
         try
         {
-            java.util.List directories = new java.util.ArrayList();
-            directories.add(GetPlayers.getVarDirectory());
-            directories.add(Constants.defaultDirName);
+            java.util.List directories = VariantSupport.getVarDirectoriesList();
             InputStream mapIS = ResourceLoader.getInputStream(
-                                               GetPlayers.getMapName(),
+                                               VariantSupport.getMapName(),
                                                directories);
             if (mapIS == null) 
             {
-                throw new FileNotFoundException(GetPlayers.getMapName());
+                throw new FileNotFoundException(VariantSupport.getMapName());
             }
             StrategicMapLoader sml = new StrategicMapLoader(mapIS);
             sml.StrategicMapLoaderInit();
@@ -1399,7 +1397,7 @@ public final class MasterBoard extends JPanel
     private void setupIcon()
     {
         java.util.List directories = new java.util.ArrayList();
-        directories.add(Constants.imageDirName);
+        directories.add(Constants.imagesDirName);
         
         Image image = ResourceLoader.getImage("Colossus", directories);
         

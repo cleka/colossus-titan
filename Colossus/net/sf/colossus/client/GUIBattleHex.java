@@ -10,6 +10,7 @@ import java.io.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class GUIBattleHex holds GUI info for one battle hex.
@@ -328,11 +329,7 @@ public class GUIBattleHex extends BattleHex
     private static Image loadOneOverlay(String name)
     {
         Image overlay = null;
-        java.util.List directories = new java.util.ArrayList();
-        directories.add(GetPlayers.getVarDirectory() +
-                        ResourceLoader.getPathSeparator() +
-                        Constants.imageDirName);
-        directories.add(Constants.imageDirName);
+        java.util.List directories = VariantSupport.getImagesDirectoriesList();
         overlay = ResourceLoader.getImage(name + imagePostfix, directories);
         return overlay;
     }

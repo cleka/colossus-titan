@@ -169,17 +169,35 @@ finally. between 0 and 6 pair of the form <border_number> <border_type>,
 where <border_number> is between 0 and 5 and <bordet_type> is currently
 one of: d, c, s, w (Dune, Cliff, Slope, Wall).
 
+Note: Theres' a graphical tools, "BattlelandsBuilder", designed
+to allow easy creations of Battlelands; see
+"docs/datatools/README.BattlelandsBuilder"
+
 5) VAR file format (default file used: Default/Default.var)
 
 This file contains a variant definition, i.e. which
-MAP, CRE and TER file should be used.
+MAP, CRE and TER file should be used and other informations
+such as which other variants are required.
 
-Three different lines can exist, in any number and order
-(the last one of each type is used):
+Four different lines can exist, in any number and order
+(only the last one of each type is used):
 
 CRE:<cre_filename>
 MAP:<map_filename>
 TER:<ter_filename>
+DEPEND:<comma-separated list of dependecies>
+
+Note: if one of the  first three type is missing, the Default
+file is implied. if DEPEND is missing, no dependecies are implied.
+In all case, the "Default" directory is looked-up last, so
+mentioning "Default" as a dependency is not required.
+
+# Exemple: A variant that use creatures from ExtTitan, Battlelands from
+# Badlands and a local map could be described as:
+# CRE:ExtTitan.cre
+# MAP:MyBadlandsExtTitan.map
+# TER:Badlands.ter
+# DEPEND:ExtTitan,Badlands
 
 6) Images files under "images"
 

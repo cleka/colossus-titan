@@ -324,7 +324,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     private void setupIcon()
     {
         java.util.List directories = new java.util.ArrayList();
-        directories.add(Constants.imageDirName);
+        directories.add(Constants.imagesDirName);
         
         Image image = ResourceLoader.getImage("Colossus", directories);
         

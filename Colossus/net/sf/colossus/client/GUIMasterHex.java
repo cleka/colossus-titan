@@ -11,7 +11,7 @@ import java.io.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
-
+import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class GUIMasterHex holds GUI information for a MasterHex.
@@ -489,11 +489,7 @@ public final class GUIMasterHex extends MasterHex
     {
         if (overlay == null)
         {
-            java.util.List directories = new java.util.ArrayList();
-            directories.add(GetPlayers.getVarDirectory() +
-                            ResourceLoader.getPathSeparator() +
-                            Constants.imageDirName);
-            directories.add(Constants.imageDirName);
+            java.util.List directories = VariantSupport.getImagesDirectoriesList();
             overlay = ResourceLoader.getImage(getTerrainName() +
                                            (!inverted ? invertedPostfix : ""),
                                            directories);
