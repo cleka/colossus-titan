@@ -235,7 +235,11 @@ public final class Client implements IClient
         }
         if (caretakerDisplay != null)
         {
-            caretakerDisplay.repaint();
+            /* CreatureCollectionView doesn't repaint the Chit
+               unless rescale()ed... so we call rescale instead
+               of repaint. */
+            caretakerDisplay.rescale();
+            // caretakerDisplay.repaint();
         }
         if (board != null)
         {
