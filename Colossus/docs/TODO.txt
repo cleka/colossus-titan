@@ -167,3 +167,6 @@ Place SummonAngel so that it doesn't overlap any of the player's markers
    with summonable angels.
 
 Move jdom, werken.opt out of source tree into separate jar files?
+
+Need to cache eval score for each legion move during AI movement phase,
+   to speed things up when an AI player has many legions.

@@ -11,7 +11,7 @@ skyBlue     Tundra     true	1 Troll    2 Warbear      2 Giant          2 Colossu
 
 # Tower is a special case
 grey        Tower      false  0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian 0 AnyNonLord 5 Knight -1 Titan 1 Warlock 
-purple      Abyss      true	-1 Titan 1 Druid  3 AirElemental   3 EarthElemental 3 WaterElemental  3 FireElemental 3 Balrog
+purple      Abyss      true	-1 Titan 1 Druid  2 AirElemental   3 EarthElemental 3 WaterElemental  3 FireElemental 3 Balrog
 
 ACQUIRABLE 100 Angel 500 Archangel
 TITANTELEPORT 1000
