@@ -1567,8 +1567,10 @@ Log.debug("called Client.acquireAngelCallback()");
 
         numSplitsThisTurn = 0;
 
+
         if (board != null)
         {
+            disposeMovementDie();
             board.setupSplitMenu();
             if (playerName.equals(getActivePlayerName()))
             {

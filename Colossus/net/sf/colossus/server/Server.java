@@ -122,6 +122,8 @@ public final class Server
         battle.doneWithMoves();
     }
 
+    
+    // XXX delete client side should be able to figure out
     public boolean anyOffboardCreatures()
     {
         Battle battle = game.getBattle();
@@ -464,6 +466,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
+    // XXX delete add logic to client
     /** Return true if the legion has moved and can recruit. */
     public boolean canRecruit(String markerId)
     {
@@ -471,6 +474,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
         return legion != null && legion.hasMoved() && legion.canRecruit();
     }
 
+    // XXX delete add logic to client
     /** Return a list of creature name strings. */
     public java.util.List findEligibleRecruiters(String markerId,
         String recruitName)
@@ -711,6 +715,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
+    // XXX delete add logic to client
     public Set getCarryTargets()
     {
         Battle battle = game.getBattle();
@@ -724,7 +729,7 @@ Log.debug("called Server.createSummonAngel for " + legion);
     }
 
 
-    // XXX Stringify the return value.
+    // XXX delete add logic to client
     public int [] getCritterTags(String hexLabel)
     {
         Battle battle = game.getBattle();

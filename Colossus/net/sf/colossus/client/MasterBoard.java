@@ -1983,6 +1983,12 @@ public final class MasterBoard extends JPanel
                 die.setLocation(0, 0);
                 die.paintComponent(g);
             }
+            else
+            {
+                // Paint a black square in the upper-left corner.
+                g.setColor(Color.black);
+                g.fillRect(0, 0, 4 * Scale.get(), 4 * Scale.get());
+            }
         }
     }
 
