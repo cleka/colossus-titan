@@ -66,26 +66,14 @@ class Legion
         {
             if (tmpScore / 500 > (score - points) / 500)
             {
-                // XXX Need archangel / angel dialog
-                if (Creature.archangel.getCount() > 0)
-                {
-                    Creature.archangel.takeOne();
-                    addCreature(Creature.archangel);
-                }
-                else
-                {
-                    Creature.angel.takeOne();
-                    addCreature(Creature.angel);
-                }
+                // Allow Archangel.
+                new AcquireAngel(player.getGame().getBoard(), this, true);
                 tmpScore -= 100;
             }
             else
             {
-                if (Creature.angel.getCount() > 0)
-                {
-                    Creature.angel.takeOne();
-                    addCreature(Creature.angel);
-                }
+                // Disallow Archangel.
+                new AcquireAngel(player.getGame().getBoard(), this, false);
                 tmpScore -= 100;
             }
         }
