@@ -99,8 +99,17 @@ public class BattleMap extends JFrame implements MouseListener,
 
         pack();
         setSize(getPreferredSize());
-        setIconImage(Toolkit.getDefaultToolkit().getImage(
-            Creature.colossus.getImageName()));
+
+        try
+        {
+            setIconImage(Toolkit.getDefaultToolkit().getImage(
+                Creature.colossus.getImageName()));
+        }
+        catch (NullPointerException e)
+        {
+            System.out.println("Couldn't find " + Creature.colossus.getImageName());
+            System.exit(1);
+        }
 
         setBackground(java.awt.Color.white);
         addWindowListener(this);

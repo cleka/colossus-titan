@@ -45,8 +45,16 @@ public class Game extends JFrame implements WindowListener, ActionListener
         setBackground(java.awt.Color.white);
         pack();
         setSize(300, 250);
-        setIconImage(Toolkit.getDefaultToolkit().getImage(
-            Creature.colossus.getImageName()));
+        try
+        {
+            setIconImage(Toolkit.getDefaultToolkit().getImage(
+                Creature.colossus.getImageName()));
+        }
+        catch (NullPointerException e)
+        {
+            System.out.println("Couldn't find " + Creature.colossus.getImageName());
+            System.exit(1);
+        }
 
         // Center dialog on screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -82,8 +90,17 @@ public class Game extends JFrame implements WindowListener, ActionListener
         super("Player Setup");
         setBackground(java.awt.Color.white);
         pack();
-        setIconImage(Toolkit.getDefaultToolkit().getImage(
-            Creature.colossus.getImageName()));
+        try
+        {
+            setIconImage(Toolkit.getDefaultToolkit().getImage(
+                Creature.colossus.getImageName()));
+        }
+        catch (NullPointerException e)
+        {
+            System.out.println("Couldn't find " + Creature.colossus.getImageName());
+            System.exit(1);
+        }
+
 
         addWindowListener(this);
 
