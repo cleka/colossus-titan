@@ -22,8 +22,10 @@ class Player
     private int mulligansLeft = 1;
     private int movementRoll;
     private Game game;
-    private Legion lastLegionMoved = null;
+    private Legion lastLegionMoved;
     private boolean titanEliminated = false;
+    private Legion lastLegionSummonedFrom;
+    private boolean canTeleport = true;
 
 
     Player(String name, Game game)
@@ -132,7 +134,7 @@ class Player
 
     boolean canTitanTeleport()
     {
-        return (score >= 400);
+        return (canTeleport && score >= 400);
     }
 
 
@@ -145,6 +147,34 @@ class Player
     void disallowSummoningAngel()
     {
         canSummonAngel = false;
+    }
+
+
+    boolean canTeleport()
+    {
+        return canTeleport;
+    }
+
+    void allowTeleport()
+    {
+        canTeleport = true;
+    }
+
+    void disallowTeleport()
+    {
+        canTeleport = false;
+    }
+
+
+    Legion getLastLegionSummonedFrom()
+    {
+        return lastLegionSummonedFrom;
+    }
+
+
+    void setLastLegionSummonedFrom(Legion legion)
+    {
+        lastLegionSummonedFrom = legion; 
     }
 
 
@@ -222,8 +252,9 @@ class Player
 
     void rollMovement()
     {
-        // It's a new turn, so it is again legal to summon an angel.
+        // It's a new turn, so once-per-turn things are allowed again.
         canSummonAngel = true;
+        canTeleport = true;
 
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
@@ -264,6 +295,8 @@ class Player
         {
             legions[i].undoMove();
         }
+
+        canTeleport = true;
     }
 
 
