@@ -13,17 +13,18 @@ class Legion
     Chit chit;
     int height;
     String markerId;    // Bk03, Rd12, etc.
-    String splitFrom;   // Bk03, Rd12, etc. or null
+    private String splitFrom;   // Bk03, Rd12, etc. or null
     Creature [] creatures = new Creature[8];  // 8 before initial splits
     private int currentHex;
     private int startingHex;
-    boolean moved = false;
+    private boolean moved = false;
+    private Player player;
 
     Legion(int cx, int cy, int scale, String markerId, String splitFrom,
         Container container, int height, int currentHex, 
         Creature creature0, Creature creature1, Creature creature2, 
         Creature creature3, Creature creature4, Creature creature5, 
-        Creature creature6, Creature creature7)
+        Creature creature6, Creature creature7, Player player)
     {
         this.markerId = markerId;
         String imageFilename = "images/" + markerId + ".gif";
@@ -31,6 +32,7 @@ class Legion
         this.height = height;
         this.currentHex = currentHex;
         this.startingHex = currentHex;
+        this.player = player;
         creatures[0] = creature0;
         creatures[1] = creature1;
         creatures[2] = creature2;
@@ -100,19 +102,39 @@ class Legion
     }
 
 
+    Player getPlayer()
+    {
+        return player;
+    }
+
+
+    boolean hasMoved()
+    {
+        return moved;
+    }
+
+
     void moveToHex(MasterHex hex)
     {
+        MasterBoard.getHexFromLabel(currentHex).removeLegion(this);
         currentHex = hex.label;
-        chit.setLocationAbs(hex.getOffCenter());
+        MasterBoard.getHexFromLabel(currentHex).addLegion(this);
         moved = true;
     }
 
 
     void undoMove()
     {
+        MasterBoard.getHexFromLabel(currentHex).removeLegion(this);
         currentHex = startingHex;
-        MasterHex hex = MasterBoard.getHexFromLabel(startingHex);
-        chit.setLocationAbs(hex.getOffCenter());
+        MasterBoard.getHexFromLabel(currentHex).addLegion(this);
+        moved = false;
+    }
+
+
+    void commitMove()
+    {
+        startingHex = currentHex;
         moved = false;
     }
 
@@ -120,5 +142,12 @@ class Legion
     int getCurrentHex()
     {
         return currentHex;
+    }
+
+
+    void addCreature(Creature creature)
+    {
+        height++;
+        creatures[height - 1] = creature;
     }
 }
