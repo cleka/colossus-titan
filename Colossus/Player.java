@@ -147,7 +147,7 @@ class Player
     }
 
 
-    int titanPower()
+    int getTitanPower()
     {
         return (int) (6 + (score / 100));
     }
