@@ -2241,6 +2241,8 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
 
         if (results == null)
         {
+            Log.debug("Empty split list (" + parentId + ", " +
+                      childId + ")");
             return false;
         }
         java.util.List strings = Split.split(',', results);
@@ -2253,22 +2255,34 @@ Log.debug("Calling Game.reinforce() from Game.finishBattle()");
             creatures.add(creature);
         }
 
-
         // Each legion must have 2+ creatures after the split.
         if (creatures.size() < 2 || legion.getHeight() - creatures.size() < 2)
         {
+            Log.debug("Too small/big split list (" + parentId + ", " +
+                      childId + ")");
             return false;
         }
 
         // All creatures in results must be in the legion.
-        java.util.List tempCreatures = (java.util.List)
-            (((ArrayList)legion.getCritters()).clone());
+        // WARNING: Legion.getCritters() return Critters,
+        // not Creature - different things now.
+        // so we must clone "by hand" the List.
+        java.util.List tempCritters = legion.getCritters();
+        java.util.List tempCreatures = new ArrayList();
+        it = tempCritters.iterator();
+        while (it.hasNext())
+        {
+            tempCreatures.add(((Critter)it.next()).getCreature());
+        }
         it = creatures.iterator();
         while (it.hasNext())
         {
             Creature creature = (Creature)it.next();
             if (!tempCreatures.remove(creature))
             {
+                Log.debug("Unavailable creature in split list (" +
+                          parentId + ", " +
+                          childId + ") : " + creature.getName());
                 return false;
             }
         }
