@@ -48,6 +48,7 @@ public class MasterBoard extends Frame implements MouseListener,
     private boolean imagesLoaded;
     private static int scale;
     private static Game game;
+    private boolean eraseFlag = false;
 
 
     public MasterBoard(Game game)
@@ -89,6 +90,15 @@ public class MasterBoard extends Frame implements MouseListener,
             // Lookup coords for chit starting from player[i].getTower()
             MasterHex hex = getHexFromLabel(100 * game.player[i].getTower());
 
+            Creature.titan.takeOne();
+            Creature.angel.takeOne();
+            Creature.ogre.takeOne();
+            Creature.ogre.takeOne();
+            Creature.centaur.takeOne();
+            Creature.centaur.takeOne();
+            Creature.gargoyle.takeOne();
+            Creature.gargoyle.takeOne();
+
             Legion legion = new Legion(0, 0, 3 * scale, 
                 game.player[i].getSelectedMarker(), null, this, 8, 
                 hex, Creature.titan, Creature.angel, Creature.ogre, 
@@ -128,7 +138,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
     // Do a brute-force search through the hex array, looking for
     //    a match.  Return the hex.
-    static MasterHex getHexFromLabel(int label)
+    MasterHex getHexFromLabel(int label)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -142,7 +152,7 @@ public class MasterBoard extends Frame implements MouseListener,
         }
 
         // Error, so return a bogus hex.
-        return new MasterHex(-1, -1, -1, false);
+        return new MasterHex(-1, -1, -1, false, null);
     }
 
 
@@ -155,8 +165,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 if (show[i][j] && h[i][j].isSelected())
                 {
                     h[i][j].unselect();
-                    Rectangle clip = new Rectangle(h[i][j].getBounds());
-                    repaint(clip.x, clip.y, clip.width, clip.height);
+                    h[i][j].repaint();
                 }
             }
         }
@@ -167,10 +176,13 @@ public class MasterBoard extends Frame implements MouseListener,
     //    all legal final destinations.  If block >= 0, go only
     //    that way.  If block == -1, use arches and arrows.  If
     //    block == -2, use only arrows.  Do not double back in
-    //    the direction you just came from.
-    void findMoves(MasterHex hex, Player player, Legion legion, 
+    //    the direction you just came from.  Return the number of
+    //    moves found.
+    int findMoves(MasterHex hex, Player player, Legion legion, 
         int roll, int block, int cameFrom)
     {
+        int count = 0;
+
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
         // also a friendly legion there, just stop recursing.
@@ -179,10 +191,9 @@ public class MasterBoard extends Frame implements MouseListener,
             if (hex.getNumFriendlyLegions(player) == 0)
             {
                 hex.select();
-                Rectangle clip = new Rectangle(hex.getBounds());
-                repaint(clip.x, clip.y, clip.width, clip.height);
+                hex.repaint();
             }
-            return;
+            return count;
         }
 
         if (roll == 0)
@@ -195,20 +206,20 @@ public class MasterBoard extends Frame implements MouseListener,
                 if (player.legions[i].getCurrentHex() == hex &&
                     player.legions[i] != legion)
                 {
-                    return;
+                    return count;
                 }
             }
             hex.select();
-            Rectangle clip = new Rectangle(hex.getBounds());
-            repaint(clip.x, clip.y, clip.width, clip.height);
-            return;
+            hex.repaint();
+            count++;
+            return count;
         }
 
 
         if (block >= 0)
         {
-            findMoves(hex.neighbor[block], player, legion, roll - 1, -2,
-                (block + 3) % 6);
+            count += findMoves(hex.neighbor[block], player, legion, roll - 1, 
+                -2, (block + 3) % 6);
         }
         else if (block == -1)
         {
@@ -216,8 +227,8 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 if (hex.exitType[i] >= MasterHex.ARCH && i != cameFrom)
                 {
-                    findMoves(hex.neighbor[i], player, legion, roll - 1, -2,
-                        (i + 3) % 6);
+                    count += findMoves(hex.neighbor[i], player, legion, 
+                        roll - 1, -2, (i + 3) % 6);
                 }
             }
         }
@@ -227,11 +238,13 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 if (hex.exitType[i] >= MasterHex.ARROW && i != cameFrom)
                 {
-                    findMoves(hex.neighbor[i], player, legion, roll - 1, -2,
-                        (i + 3) % 6);
+                    count += findMoves(hex.neighbor[i], player, legion, 
+                        roll - 1, -2, (i + 3) % 6);
                 }
             }
         }
+
+        return count;
     }
     
     
@@ -247,8 +260,7 @@ public class MasterBoard extends Frame implements MouseListener,
         if (hex.getNumLegions() == 0)
         {
             hex.select();
-            Rectangle clip = new Rectangle(hex.getBounds());
-            repaint(clip.x, clip.y, clip.width, clip.height);
+            hex.repaint();
         }
 
         if (roll > 0)
@@ -266,13 +278,16 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    void showMoves(Legion legion, Player player)
+    // Return number of legal non-teleport moves.
+    int showMoves(Legion legion, Player player)
     {
+        int count = 0;
+
         unselectAllHexes();
 
         if (legion.hasMoved())
         {
-            return;
+            return count;
         }
 
         MasterHex hex = legion.getCurrentHex();
@@ -290,14 +305,13 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 
-        findMoves(hex, player, legion, player.getMovementRoll(), block, -1);
+        count += findMoves(hex, player, legion, player.getMovementRoll(), 
+            block, -1);
 
         if (player.getMovementRoll() == 6)
         {
             // Tower teleport
-            if (hex.terrain == 'T' && (legion.numCreature(Creature.titan) > 0 ||
-                legion.numCreature(Creature.angel) > 0 ||
-                legion.numCreature(Creature.archangel) > 0))
+            if (hex.terrain == 'T' && legion.numLords() > 0)
             {
                 // Mark every unoccupied hex within 6 hexes.
                 findTowerTeleportMoves(hex, player, legion, 6, -1);
@@ -309,8 +323,7 @@ public class MasterBoard extends Frame implements MouseListener,
                     if (hex.getNumLegions() == 0)
                     {
                         hex.select();
-                        Rectangle clip = new Rectangle(hex.getBounds());
-                        repaint(clip.x, clip.y, clip.width, clip.height);
+                        hex.repaint();
                     }
                 }
             }
@@ -327,15 +340,16 @@ public class MasterBoard extends Frame implements MouseListener,
                         for (int j = 0; j < game.player[i].getNumLegions(); 
                             j++)
                         {
-                            game.player[i].legions[j].getCurrentHex().select();
-                            Rectangle clip = new Rectangle(h[i][j].
-                                getBounds());
-                            repaint(clip.x, clip.y, clip.width, clip.height);
+                            hex = game.player[i].legions[j].getCurrentHex();
+                            hex.select();
+                            hex.repaint();
                         }
                     }
                 }
             }
         }
+
+        return count;
     }
 
 
@@ -355,7 +369,8 @@ public class MasterBoard extends Frame implements MouseListener,
                         (cx + 4 * i * scale,
                         (int) Math.round(cy + (3 * j + (i & 1) *
                         (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 * ((j + 1) / 2))
-                        * MasterHex.SQRT3 * scale), scale, ((i + j) & 1) == 0);
+                        * MasterHex.SQRT3 * scale), scale, ((i + j) & 1) == 0,
+                        this);
                 }
             }
         }
@@ -1105,8 +1120,7 @@ public class MasterBoard extends Frame implements MouseListener,
                             break;
                     }
 
-                    Rectangle clip = new Rectangle(hex.getBounds());
-                    repaint(clip.x, clip.y, clip.width, clip.height);
+                    hex.repaint();
                     return;
                 }
             }
@@ -1166,6 +1180,12 @@ public class MasterBoard extends Frame implements MouseListener,
         update(g);
     }
 
+    // This is used to fix artifacts from legions hanging outside hexes. 
+    void setEraseFlag()
+    {
+        eraseFlag = true;
+    }
+
 
     public void update(Graphics g)
     {
@@ -1184,6 +1204,13 @@ public class MasterBoard extends Frame implements MouseListener,
             offDimension = d;
             offImage = createImage(d.width, d.height);
             gBack = offImage.getGraphics();
+        }
+
+        // If the erase flag is set, erase the background.
+        if (eraseFlag)
+        {
+            gBack.clearRect(0, 0, d.width, d.height);
+            eraseFlag = false;
         }
 
         for (int i = 0; i < h.length; i++)
