@@ -109,7 +109,7 @@ class Game extends Frame implements WindowListener, ActionListener
         player = new Player[numPlayers];
         for (int i = 0; i < numPlayers; i++)
         {
-            player[i] = new Player(playerName[i]);
+            player[i] = new Player(playerName[i], this);
         }
 
         // Since the inputs are validated, it's time to roll for towers.
