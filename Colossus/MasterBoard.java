@@ -328,6 +328,8 @@ public class MasterBoard extends JPanel implements MouseListener,
                 if (hex != null)
                 {
                     new ShowMasterHex(masterFrame, hex, lastPoint);
+                    // Work around a Windows JDK 1.3 bug.
+                    hex.repaint();
                 }
             }
         };
@@ -340,6 +342,8 @@ public class MasterBoard extends JPanel implements MouseListener,
                 if (hex != null)
                 {
                     new ShowBattleMap(masterFrame, hex);
+                    // Work around a Windows JDK 1.3 bug.
+                    hex.repaint();
                 }
             }
         };
@@ -1768,6 +1772,9 @@ public class MasterBoard extends JPanel implements MouseListener,
 
         if (legion != null)
         {
+            // Move the clicked-on legion to the top of the z-order.
+            moveMarkerToTop(legion);
+
             Player player = legion.getPlayer();
 
             // What to do depends on which mouse button was used
@@ -1779,9 +1786,6 @@ public class MasterBoard extends JPanel implements MouseListener,
                 InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                 InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
             {
-                // Move the clicked-on legion to the top of the z-order.
-                moveMarkerToTop(legion);
-
                 new ShowLegion(masterFrame, legion, point,
                     game.getAllStacksVisible() ||
                     player == game.getActivePlayer());

@@ -179,43 +179,31 @@ public class Player implements Comparable
 
     public boolean canTitanTeleport()
     {
-        return (score >= 400 && canTeleport());
+        return (score >= 400 && canTeleport);
     }
 
 
-    public boolean canSummonAngel()
+    public boolean getCanSummonAngel()
     {
         return canSummonAngel;
     }
 
 
-    public void allowSummoningAngel()
+    public void setCanSummonAngel(boolean canSummonAngel)
     {
-        canSummonAngel = true;
+        this.canSummonAngel = canSummonAngel;
     }
 
 
-    public void disallowSummoningAngel()
-    {
-        canSummonAngel = false;
-    }
-
-
-    public boolean canTeleport()
+    public boolean getCanTeleport()
     {
         return canTeleport;
     }
 
 
-    public void allowTeleport()
+    public void setCanTeleport(boolean canTeleport)
     {
-        canTeleport = true;
-    }
-
-
-    public void disallowTeleport()
-    {
-        canTeleport = false;
+        this.canTeleport = canTeleport;
     }
 
 
@@ -342,8 +330,8 @@ public class Player implements Comparable
     public void rollMovement()
     {
         // It's a new turn, so once-per-turn things are allowed again.
-        allowSummoningAngel();
-        allowTeleport();
+        canSummonAngel = true;
+        canTeleport = true;
 
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
@@ -387,9 +375,10 @@ public class Player implements Comparable
     }
 
 
-    public void setLastLegionMoved(Legion legion)
+    public void setLastLegionMoved()
     {
-        lastLegionMoved = legion;
+        lastLegionMoved = mover;
+        mover = null;
     }
 
 

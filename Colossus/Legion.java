@@ -25,9 +25,9 @@ public class Legion
     private Creature teleportingLord;
 
 
-    public Legion(String markerId, Legion parent, MasterHex hex, 
-        Creature creature0, Creature creature1, Creature creature2, 
-        Creature creature3, Creature creature4, Creature creature5, 
+    public Legion(String markerId, Legion parent, MasterHex hex,
+        Creature creature0, Creature creature1, Creature creature2,
+        Creature creature3, Creature creature4, Creature creature5,
         Creature creature6, Creature creature7, Player player)
     {
         this.markerId = markerId;
@@ -114,7 +114,7 @@ public class Legion
             // from a single battle.
             boolean didArchangel = false;
 
-            ArrayList recruits; 
+            ArrayList recruits;
 
             while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
             {
@@ -123,7 +123,7 @@ public class Legion
                 {
                     // Allow Archangel.
                     recruits = Game.findEligibleAngels(this, true);
-                    String type = AcquireAngel.acquireAngel(masterFrame, 
+                    String type = AcquireAngel.acquireAngel(masterFrame,
                         player.getName(), recruits);
                     tmpScore -= 100;
                     if (type != null && recruits.contains(type))
@@ -145,7 +145,7 @@ public class Legion
                 {
                     // Disallow Archangel.
                     recruits = Game.findEligibleAngels(this, false);
-                    String type = AcquireAngel.acquireAngel(masterFrame, 
+                    String type = AcquireAngel.acquireAngel(masterFrame,
                         player.getName(), recruits);
                     tmpScore -= 100;
                     if (type != null && recruits.contains(type))
@@ -230,8 +230,8 @@ public class Legion
         this.marker = marker;
         marker.setLegion(this);
     }
-    
-    
+
+
     public boolean canFlee()
     {
         Iterator it = critters.iterator();
@@ -349,9 +349,9 @@ public class Legion
 
         Game.logEvent("Legion " + getMarkerId() + " in " +
             currentHex.getDescription() +
-            (teleported ? 
+            (teleported ?
                 (hex.isOccupied() ? " titan teleports " :
-                    " tower teleports (" + teleportingLord + ") " ) 
+                    " tower teleports (" + teleportingLord + ") " )
                 : " moves ") +
             "to " + hex.getDescription());
 
@@ -359,28 +359,32 @@ public class Legion
         currentHex = hex;
         currentHex.addLegion(this, true);
         moved = true;
-        player.setLastLegionMoved(this);
+        player.setLastLegionMoved();
         // If we teleported, no more teleports are allowed this turn.
         if (teleported)
         {
-            player.disallowTeleport();
+            player.setCanTeleport(false);
         }
     }
 
 
     public void undoMove()
     {
-        // If this legion teleported, allow teleporting again.
-        if (teleported)
+        if (currentHex != startingHex)
         {
-            teleported = false;
-            player.allowTeleport();
+            currentHex.removeLegion(this);
+            currentHex = startingHex;
+            currentHex.addLegion(this, true);
+            moved = false;
+            Game.logEvent("Legion " + getMarkerId() + " undoes its move");
+
+            // If this legion teleported, allow teleporting again.
+            if (teleported)
+            {
+                teleported = false;
+                player.setCanTeleport(true);
+            }
         }
-        currentHex.removeLegion(this);
-        currentHex = startingHex;
-        currentHex.addLegion(this, true);
-        moved = false;
-        Game.logEvent("Legion " + getMarkerId() + " undoes its move");
     }
 
 
@@ -438,7 +442,7 @@ public class Legion
     // Return true if this legion can summon an angel or archangel.
     public boolean canSummonAngel()
     {
-        if (getHeight() >= 7 || !player.canSummonAngel())
+        if (getHeight() >= 7 || !player.getCanSummonAngel())
         {
             return false;
         }
@@ -495,7 +499,7 @@ public class Legion
                 return;
             }
         }
-        
+
         // Newly added critters are visible.
         critters.add(new Critter(creature, true, this));
     }
@@ -524,7 +528,7 @@ public class Legion
     }
 
 
-    /** Remove the first creature matching the passed creature's type 
+    /** Remove the first creature matching the passed creature's type
         from the legion.  Return the removed creature. */
     public Creature removeCreature(Creature creature, boolean
         returnImmortalToStack, boolean disbandIfEmpty)
@@ -581,7 +585,7 @@ public class Legion
 
 
     /** Recombine this legion into another legion. Only remove this
-        legion from the Player if remove is true.  If it's false, the 
+        legion from the Player if remove is true.  If it's false, the
         caller is responsible for removing this legion, which can avoid
         concurrent access problems. */
     public void recombine(Legion legion, boolean remove)
@@ -656,7 +660,7 @@ public class Legion
     public void revealCreatures(Creature creature, int numberToReveal)
     {
         int numberAlreadyRevealed = 0;
-        
+
         Iterator it = critters.iterator();
         while (it.hasNext())
         {
@@ -693,7 +697,7 @@ public class Legion
     }
 
 
-    /** Reveal the lord who tower teleported the legion.  Pick one if 
+    /** Reveal the lord who tower teleported the legion.  Pick one if
      *  necessary. */
     public void revealTeleportingLord(JFrame parentFrame)
     {
@@ -710,7 +714,7 @@ public class Legion
                 lords.add(critter.getCreature());
             }
         }
-        
+
         int lordTypes = lords.size();
 
         if (lordTypes == 1)

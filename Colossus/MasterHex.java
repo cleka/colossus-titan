@@ -122,6 +122,41 @@ public class MasterHex extends Hex
         g2.fill(hexagon);
         g2.setColor(Color.black);
         g2.draw(hexagon);
+        
+        // Draw exits and entrances
+        for (int i = inverted ? 0 : 1; i < 6; i += 2)
+        {
+            int n = (i + 1) % 6;
+
+            // Draw exits
+            // There are up to 3 gates to draw.  Each is 1/6 of a hexside
+            // square.  The first is positioned from 1/6 to 1/3 of the way
+            // along the hexside, the second from 5/12 to 7/12, and the
+            // third from 2/3 to 5/6.  The inner edge of each is 1/12 of a
+            // hexside inside the hexside, and the outer edge is 1/12 of a
+            // hexside outside the hexside.
+
+            if (exitType[i] != NONE)
+            {
+                drawGate(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
+                                exitType[i]);
+            }
+
+            // Draw entrances
+            // Unfortunately, since exits extend out into adjacent hexes,
+            // they sometimes get overdrawn.  So we need to draw them
+            // again from the other hex, as entrances.
+
+            if (entranceType[i] != NONE)
+            {
+                drawGate(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
+                                entranceType[i]);
+            }
+        }
+            
+        // Do not anti-alias text.
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_OFF);
 
         // Draw label and terrain name
         if (fontMetrics == null)
@@ -200,38 +235,6 @@ public class MasterHex extends Hex
             g2.drawString(name, rectBound.x + ((rectBound.width -
                 fontMetrics.stringWidth(name)) >> 1),
                 rectBound.y + halfFontHeight + (rectBound.height >> 1));
-        }
-
-
-        // Draw exits and entrances
-        for (int i = inverted ? 0 : 1; i < 6; i += 2)
-        {
-            int n = (i + 1) % 6;
-
-            // Draw exits
-            // There are up to 3 gates to draw.  Each is 1/6 of a hexside
-            // square.  The first is positioned from 1/6 to 1/3 of the way
-            // along the hexside, the second from 5/12 to 7/12, and the
-            // third from 2/3 to 5/6.  The inner edge of each is 1/12 of a
-            // hexside inside the hexside, and the outer edge is 1/12 of a
-            // hexside outside the hexside.
-
-            if (exitType[i] != NONE)
-            {
-                drawGate(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
-                                exitType[i]);
-            }
-
-            // Draw entrances
-            // Unfortunately, since exits extend out into adjacent hexes,
-            // they sometimes get overdrawn.  So we need to draw them
-            // again from the other hex, as entrances.
-
-            if (entranceType[i] != NONE)
-            {
-                drawGate(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
-                                entranceType[i]);
-            }
         }
     }
 

@@ -14,6 +14,7 @@ Win98, jdk1.3: setLocation() to keep ShowLegion, ShowMasterHex
 Solaris, jdk1.3; Linux, Blackdown jdk1.3: JPopupMenu mnemonics don't 
    work.  They work okay in Win98 jdk1.3.
 
+Win98, jdk1.3: Popup menus are not erased properly.
 
 
 Current programming bugs:
@@ -33,4 +34,8 @@ Linux, Solaris, jdk1.3: Dialogs sometimes beep for no good reason.
 
 Serpent has 2 targets, angel and archangel, both up cliff hexsides
    with same penalty.  Was not allowed to carry.  Check rules.
+
+Post-battle angel summoning is broken.  Donor hexes are selected, but
+   clicking on them brings up a SummonAngel dialog with both angel
+   and archangel permanently Xed out.
 

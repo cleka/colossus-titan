@@ -2143,21 +2143,19 @@ public class Game
 
         Player player = getActivePlayer();
         player.setDonor(null);
-
+        List legions = player.getLegions();
         HashSet set = new HashSet();
-
-        for (int i = 0; i < player.getNumLegions(); i++)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Legion legion = player.getLegion(i);
+            Legion legion = (Legion)it.next();
             if (!legion.hasMoved())
             {
-                MasterHex hex = legion.getCurrentHex();
-                set.add(hex.getLabel());
+                set.add(legion.getCurrentHex().getLabel());
             }
         }
 
         board.selectHexesByLabels(set);
-
         board.repaint();
     }
 
@@ -2352,7 +2350,7 @@ public class Game
         {
             // Tower teleport
             if (hex.getTerrain() == 'T' && legion.numLords() > 0 &&
-                player.canTeleport())
+                player.getCanTeleport())
             {
                 // Mark every unoccupied hex within 6 hexes.
                 set.addAll(findTowerTeleportMoves(hex, player, legion, 6,
@@ -2455,6 +2453,14 @@ public class Game
 
     public void createSummonAngel(Legion attacker)
     {
+        // Make sure the MasterBoard is visible.
+        if (masterFrame.getState() == JFrame.ICONIFIED)
+        {
+            masterFrame.setState(JFrame.NORMAL);
+        }
+        // And bring it to the front.
+        masterFrame.show();
+
         summonAngel = new SummonAngel(board, attacker);
     }
 
@@ -2591,7 +2597,6 @@ public class Game
 
                 SplitLegion.splitLegion(masterFrame, legion);
 
-                // Update status window.
                 updateStatusScreen();
                 // If we split, unselect this hex.
                 if (legion.getHeight() < 7)
@@ -2604,8 +2609,6 @@ public class Game
             case Game.MOVE:
                 // Select this legion.
                 player.setMover(legion);
-                // And move it to the top of the z-order.
-                board.moveMarkerToTop(legion);
                 // Just painting the marker doesn't always do the trick.
                 legion.getCurrentHex().repaint();
 
@@ -2737,20 +2740,17 @@ public class Game
 
     private void doFight(MasterHex hex, Player player)
     {
-        if (battle != null)
+        if (summonAngel != null)
         {
-            if (summonAngel != null)
+            Legion donor = hex.getFriendlyLegion(player);
+            if (donor != null)
             {
-                Legion donor = hex.getFriendlyLegion(player);
-                if (donor != null)
-                {
-                    player.setDonor(donor);
-                    summonAngel.updateChits();
-                    summonAngel.repaint();
-                    donor.getMarker().repaint();
-                }
-                return;
+                player.setDonor(donor);
+                summonAngel.updateChits();
+                summonAngel.repaint();
+                donor.getMarker().repaint();
             }
+            return;
         }
 
         // Do not allow clicking on engagements if one is
@@ -2801,7 +2801,7 @@ public class Game
                     }
                 }
                 else if (hex.getLegion(0) == attacker &&
-                    attacker.getHeight() < 7 && player.canSummonAngel())
+                    attacker.getHeight() < 7 && player.getCanSummonAngel())
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.

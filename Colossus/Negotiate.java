@@ -300,7 +300,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
                             name = "Titan";
                         }
                         log.append(name);
-                        if (!it.hasNext())
+                        if (it.hasNext())
                         {
                             log.append(", ");
                         }

@@ -242,17 +242,8 @@ public class Battle
     {
         if (summonState == Battle.FIRST_BLOOD)
         {
-            if (attacker.canSummonAngel())
+            if (attacker.canSummonAngel() && game != null)
             {
-                // Make sure the MasterBoard is visible.
-                JFrame masterFrame = board.getFrame();
-                if (masterFrame.getState() == JFrame.ICONIFIED)
-                {
-                    masterFrame.setState(JFrame.NORMAL);
-                }
-                // And bring it to the front.
-                masterFrame.show();
-
                 game.createSummonAngel(attacker);
             }
 
@@ -261,7 +252,7 @@ public class Battle
             summonState = Battle.TOO_LATE;
         }
 
-        if (game.getSummonAngel() == null)
+        if (game == null || game.getSummonAngel() == null)
         {
             if (phase == SUMMON)
             {
@@ -696,7 +687,7 @@ public class Battle
                         donor.addCreature(critter, false);
                         // This summon doesn't count; the player can
                         // summon again later this turn.
-                        player.allowSummoningAngel();
+                        player.setCanSummonAngel(true);
                     }
                     else
                     {
@@ -1735,15 +1726,8 @@ public class Battle
                 // Summon angel
                 if (legion.canSummonAngel())
                 {
-                    if (board != null)
+                    if (game != null)
                     {
-                        // Make sure the MasterBoard is visible.
-                        JFrame masterFrame = board.getFrame();
-                        if (masterFrame.getState() == JFrame.ICONIFIED)
-                        {
-                            masterFrame.setState(JFrame.NORMAL);
-                        }
-
                         game.createSummonAngel(attacker);
                     }
                 }

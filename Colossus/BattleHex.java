@@ -112,21 +112,6 @@ public class BattleHex extends Hex
         g2.setColor(Color.black);
         g2.draw(hexagon);
 
-        if (name == null)
-        {
-            name = getTerrainName().toUpperCase();
-        }
-
-        FontMetrics fontMetrics = g2.getFontMetrics();
-
-        g2.drawString(name, rectBound.x + ((rectBound.width -
-            fontMetrics.stringWidth(name)) >> 1),
-            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 1));
-
-        // Show hex label in upper left corner.
-        g2.drawString(label, rectBound.x + (rectBound.width -
-            fontMetrics.stringWidth(label)) / 3,
-            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 2));
 
         // Draw hexside features.
         for (int i = 0; i < 6; i++)
@@ -149,6 +134,25 @@ public class BattleHex extends Hex
                     hexside);
             }
         }
+        
+        // Do not anti-alias text. 
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_OFF);
+        if (name == null)
+        {
+            name = getTerrainName().toUpperCase();
+        }
+
+        FontMetrics fontMetrics = g2.getFontMetrics();
+
+        g2.drawString(name, rectBound.x + ((rectBound.width -
+            fontMetrics.stringWidth(name)) >> 1),
+            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 1));
+
+        // Show hex label in upper left corner.
+        g2.drawString(label, rectBound.x + (rectBound.width -
+            fontMetrics.stringWidth(label)) / 3,
+            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 2));
     }
 
 
