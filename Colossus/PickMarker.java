@@ -50,8 +50,8 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
 
             for (int i = 0; i < player.getNumMarkersAvailable(); i++)
             {
-                markers[i] = new Chit(cx + (i % 12) * (scale + 3),
-                    cy + (i / 12) * (scale + 3), scale, 
+                markers[i] = new Chit(cx + (i % 12) * (21 * scale / 20),
+                    cy + (i / 12) * (21 * scale / 20), scale,
                     "images/" + player.getMarker(i) + ".gif", this);
             }
 
@@ -99,7 +99,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
     }
 
 
-    public void mouseClicked(MouseEvent e)
+    public void mousePressed(MouseEvent e)
     {
         if (player.getNumMarkersAvailable() == 0)
         {
@@ -132,7 +132,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
     {
     }
     
-    public void mousePressed(MouseEvent e)
+    public void mouseClicked(MouseEvent e)
     {
     }
     
