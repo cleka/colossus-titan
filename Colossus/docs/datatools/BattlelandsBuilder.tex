@@ -1,0 +1,102 @@
+\documentclass{article}
+\usepackage[latin1]{inputenc}
+\usepackage{html}
+
+\begin{document}
+
+% $Header$
+
+\title{The Colossus Battlelands Builder}
+
+\author{Romain Dolbeau}
+
+\maketitle
+
+\section{BattlelandsBuilder}
+
+BattlelandsBuilder is a (crude) tool to interactively
+create Battlelands for use with the
+``\htmladdnormallink{Colossus}{http://colossus.sf.net/}'' Game.
+It has the same requirements as Colossus itself, see
+\htmladdnormallink{Colossus README}{../../README/index.html}
+and
+\htmladdnormallink{Colossus build-HOWTO}{../../build/index.html}.
+
+To create the program, just type ``make datatools'' or ``and tools''.
+See the
+\htmladdnormallink{Colossus build-HOWTO}{../../build/index.html}
+for more details.
+This should create all the datatools for Colossus, including
+BattlelandsBuilder.
+
+You can use it directly, starting from a bare plain,
+or you can give a pre-existing Battlelands as a
+starting point. Just give the path to the file as
+the first argument to the command.
+
+Exemples:
+\texttt{java -jar BattlelandsBuilder.jar}
+\texttt{java -jar BattlelandsBuilder.jar Battlelands/Woods}
+
+Editing is point-and-click : click in the middle
+of an hex to get a popup-menu to change the type
+and elevation of the hex ; click near the border of
+an hex to get a popup-menu to change this border of
+this hex (warning: beware slope or wall who can
+easily be put on the wrong hex, as there's not much
+visual clue of their orientation).
+
+\begin{itemize}
+
+\item The ``Load Map'' menu item is used to load a Battlelands 
+file in the map. The loaded battleland is \emph{merged}
+with the currently displayed battleland. Use ``Erase Map''
+below if you want to start from scratch.
+
+\item The ``Save As'' menu item save the Battleland to a
+file choosen by the user.
+
+\item The ``Show Battleland'' menu item dump the Battleland
+on standard output.
+
+\item The ``Erase Map'' menu item return the map to the
+default, i.e. only Plains of elevation 0, and no
+hexside.
+
+\item The ``Randomize Map'' menu item is used to generate
+a random map from a description file. See the
+\htmladdnormallink{BattlelandsRandomizer}{../BattlelandsRandomizer/index.html}
+for a description of the input file.
+
+\end{itemize}
+
+\section{Frequently Asked Questions}
+
+\begin{enumerate}
+
+\item I can't get the Hex Side popup-menu !
+\item My Hex Side is on the wrong hex !
+
+To get the Hex Side menu, you must be quite close
+to the Side itself. You must also not be on one
+of the outer side, without a neighbor Hex, as you
+can't put an Hex Side there. Finally, if the Hex
+Side is put ``backward'', that means you clicked on
+the wrong Hex ; for instance, you must click behind
+the straight border, on the Sand, to get a proper
+Dune. Clicking where you intend to get the round
+part will put the Dune backward.
+
+\item BattlelandsBuilder let me do dumb thing !
+
+Well, yes. It's designed that way : you can do
+whatever you please with it, including surrounding
+a Tree with dune or filling the map with Volcanoes.
+It will try to flag some obviously ``dangerous''
+or ``wrong'' combinations with warnings, but you
+can use the output anyway (the warnings are
+comments that will be ignored by Colossus).
+
+\end{enumerate}
+
+\end{document}

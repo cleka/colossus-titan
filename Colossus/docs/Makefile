@@ -10,8 +10,38 @@ DESTS=$(addsuffix .ps,$(SOURCES))
 DESTSTXT=$(addsuffix .txt,$(SOURCES))
 DESTSHTML=$(addsuffix .html,$(SOURCES))
 
-all: $(DESTS) $(DESTSTXT)
+all: $(DESTS) $(DESTSTXT) all-datatools
 
+clean: clean-datatools
+	rm -f *.aux *.log *.toc *.blg *.bbl *.dvi *~
+
+distclean: clean distclean-datatools
+	rm -f $(DESTS) $(DESTSTXT)
+
+html: all $(DESTSHTML) html-datatools
+
+
+htmlclean: distclean htmlclean-datatools
+	rm -rf $(basename $(DESTSHTML))
+
+
+# recursion in datatools
+all-datatools:
+	cd datatools && $(MAKE)
+
+html-datatools:
+	cd datatools && $(MAKE) html
+
+clean-datatools:
+	cd datatools && $(MAKE) clean
+
+distclean-datatools:
+	cd datatools && $(MAKE) distclean
+
+htmlclean-datatools:
+	cd datatools && $(MAKE) htmlclean
+
+## actual work below
 %.ps: %.dvi
 	$(DVIPS) $< -o $@
 
@@ -22,16 +52,5 @@ all: $(DESTS) $(DESTSTXT)
 %.txt: %.dvi
 	$(DVI2TTY) $< -o $@
 
-clean:
-	rm -f *.aux *.log *.toc *.blg *.bbl *.dvi *~
-
-distclean: clean
-	rm -f $(DESTS) $(DESTSTXT)
-
-html: all $(DESTSHTML)
-
 %.html: %.tex
 	$(LATEX2HTML) $<
-
-htmlclean: distclean
-	rm -rf $(basename $(DESTSHTML))
