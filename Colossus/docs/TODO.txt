@@ -28,6 +28,11 @@ We can safely split AND attack with Br02
 We can safely split AND attack with Br02
 (Hung here)
 
+Bug: Logic to keep ShowLegion fully onscreen also failing on RH 7.3, 1.4.0,
+   Sawfish at 1600x1200
+
+Caretaker Titan has excess "Titan" at top, obscured by image.  Use
+   black 6-4 titan instead?
 
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 

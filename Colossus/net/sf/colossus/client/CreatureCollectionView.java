@@ -32,8 +32,10 @@ class CreatureCollectionView extends KDialog implements WindowListener
         new JLabel(baseString, SwingConstants.CENTER);
     private final static JLabel legendLabel =
         new JLabel(htmlizeOnly(
-            htmlColorizeOnly("Bottom Values are: ", "black") +
-            htmlColorizeOnly("In Stack/", "black") +
+            htmlColorizeOnly("Values are: ", "black") +
+            htmlColorizeOnly("Total", "blue") +
+            htmlColorizeOnly("/", "black") +
+            htmlColorizeOnly("In Stack", "black") +
             htmlColorizeOnly("/", "black") +
             htmlColorizeOnly("In Game", "green") +
             htmlColorizeOnly("/", "black") +
@@ -85,6 +87,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
     {
         private JLabel label;
         private JLabel topLabel;
+        private Chit chit;
 
         CreatureCount(String name)
         {
@@ -92,14 +95,13 @@ class CreatureCollectionView extends KDialog implements WindowListener
                                 
             setBorder(BorderFactory.createLineBorder(Color.black));
 
-            Chit chit = new Chit(4 * Scale.get(), name, this);
+            chit = new Chit(4 * Scale.get(), name, this);
             label = new JLabel(baseString, SwingConstants.CENTER);
             topLabel =
                 new JLabel(htmlizeOnly(
                              htmlColorizeOnly(
                                Integer.toString(
-                                 client.getCreatureMaxCount(name)),
-                               "blue")),
+                                 client.getCreatureMaxCount(name)), "blue")),
                            SwingConstants.CENTER);
             label.setFont(countFont);
             topLabel.setFont(countFont);
@@ -114,8 +116,9 @@ class CreatureCollectionView extends KDialog implements WindowListener
         public Dimension getPreferredSize()
         {
             Dimension labelDim = label.getPreferredSize();
-            int minX = 4 * Scale.get() + 1;
-            int minY = 4 * Scale.get() + (2 * (int)labelDim.getHeight()) + 1;
+            Rectangle chitDim = chit.getBounds();
+            int minX = chitDim.width + 1;
+            int minY = chitDim.height + (2 * (int)labelDim.getHeight()) + 1;
             if (minX < (int)labelDim.getWidth() + 2)
                 minX = (int)labelDim.getWidth() + 2;
             return new Dimension(minX, minY);
@@ -126,8 +129,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
     {
         java.util.List creatures = Creature.getCreatures();
         JPanel creaturePanel = 
-            new JPanel(/* new GridLayout(5, creatures.size() / 5) */
-                       new FlowLayout(FlowLayout.LEFT, 2, 2));
+            new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
