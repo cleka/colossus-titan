@@ -679,7 +679,14 @@ public final class Player implements Comparable
 
     public void setMover(Legion mover)
     {
-        this.moverId = mover.getMarkerId();
+        if (mover == null)
+        {
+            moverId = null;
+        }
+        else
+        {
+            moverId = mover.getMarkerId();
+        }
     }
 
     public Legion getMover()
@@ -1076,6 +1083,10 @@ public final class Player implements Comparable
             String s1 = (String)o1;
             String s2 = (String)o2;
             String myPrefix = getShortColor();
+            if (myPrefix == null)
+            {
+                myPrefix = "";
+            }
             boolean mine1 = s1.startsWith(myPrefix);
             boolean mine2 = s2.startsWith(myPrefix);
             if (mine1 && !mine2)

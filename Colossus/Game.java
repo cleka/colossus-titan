@@ -70,9 +70,7 @@ public final class Game
         this.applet = applet;
         isApplet = (applet != null);
         Chit.setApplet(isApplet);
-
-        board = new MasterBoard(this);
-        masterFrame = board.getFrame();
+        initBoard();
         loadGame(filename);
         updateStatusScreen();
     }
@@ -81,6 +79,21 @@ public final class Game
     /** Default constructor, for testing only. */
     public Game()
     {
+    }
+
+
+    /** Initialize the board and masterFrame. */
+    public void initBoard()
+    {
+        if (board == null)
+        {
+            board = new MasterBoard(this);
+        }
+        else
+        {
+            board.setGame(this);
+        }
+        masterFrame = board.getFrame();
     }
 
 
@@ -147,15 +160,7 @@ public final class Game
             logEvent("Add player " + name);
         }
 
-        if (board == null)
-        {
-            board = new MasterBoard(this);
-        }
-        else
-        {
-            board.setGame(this);
-        }
-        masterFrame = board.getFrame();
+        initBoard();
 
         assignTowers();
 
@@ -3013,7 +3018,7 @@ public final class Game
             false).contains(hexLabel))
         {
             Player player = legion.getPlayer();
-            MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+            MasterHex hex = board.getHexByLabel(hexLabel);
 
             // Pick teleport or normal move if necessary.
             if (legion.getTeleported(hexLabel) &&
@@ -3060,8 +3065,8 @@ public final class Game
                 }
                 else
                 {
-                    side = PickEntrySide.pickEntrySide(masterFrame, hexLabel,
-                        legion);
+                    side = PickEntrySide.pickEntrySide(masterFrame, board,
+                        hexLabel, legion);
                 }
                 legion.clearAllEntrySides(hexLabel);
                 if (side == 1 || side == 3 || side == 5)
@@ -3229,7 +3234,7 @@ public final class Game
 
         // Unselect and repaint the hex.
         String hexLabel = winner.getCurrentHexLabel();
-        MasterBoard.unselectHexByLabel(hexLabel);
+        board.unselectHexByLabel(hexLabel);
 
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering

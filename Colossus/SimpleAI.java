@@ -599,9 +599,10 @@ class SimpleAI implements AI
         {
             handleForcedSingleMove(game, player, moveMap);
 
-            // Perhaps that forced move opened up a good move for
-            // another legion.  So iterate again.
+            // Perhaps that forced move opened up a good move for another
+            // legion, or forced a split move.  So iterate again.
             handleVoluntaryMoves(game, player, moveMap, enemyAttackMap);
+            handleForcedSplitMoves(game, player, moveMap);
         }
     }
 

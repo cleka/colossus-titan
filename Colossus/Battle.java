@@ -66,7 +66,7 @@ public final class Battle
         this.activeLegionNum = activeLegionNum;
         this.turnNumber = turnNumber;
         this.phase = phase;
-        map = new BattleMap(masterHexLabel, this);
+        map = new BattleMap(game.getBoard(), masterHexLabel, this);
         terrain = getMasterHex().getTerrain();
     }
 
@@ -251,7 +251,8 @@ public final class Battle
 
     public MasterHex getMasterHex()
     {
-        return MasterBoard.getHexByLabel(masterHexLabel);
+        MasterBoard board = game.getBoard();
+        return board.getHexByLabel(masterHexLabel);
     }
 
 
@@ -2190,7 +2191,9 @@ Game.logDebug("defender eliminated");
         Player player1 = game.getPlayer(0);
         game.addPlayer("Defender");
         Player player2 = game.getPlayer(1);
-        MasterHex hex = MasterBoard.getHexByLabel("130");
+        game.initBoard();
+        MasterBoard board = game.getBoard();
+        MasterHex hex = board.getHexByLabel("130");
         Legion attacker = new Legion("Bk01", null, hex.getLabel(),
             hex.getLabel(), Creature.archangel, Creature.troll,
             Creature.ranger, Creature.hydra, Creature.griffon,

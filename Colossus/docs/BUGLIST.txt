@@ -87,19 +87,8 @@ Solaris, 1.3.1: Loading in the middle of a battle resets turn
    map, keeps the map around after the battle is over, etc.  It's
    a mess.
 
-Win98 and Solaris, 1.3.1: Human-controlled legions are staying 
-   highlighted after summoning or splitting.  They un-highlight 
-   after moving.  unselect() and repaint() are being called.  
-   Problem does not always happen right after loading a game.  Seems
-   to wait until after a battle has been fought.  AICopy() problem?
-   The AI starts before Game.loadGame() finishes resolving.
-   MasterBoard.hexes has way too many entries.  It's static
-   and copies are adding more.
-
 Win98, 1.3.1: Legions sometimes miss the risk of staying in their
    current hex.  For example, 2-high titan legion in H4 saw no
    risk from enemy 6-high legion in D7, when it could have easily
    moved to safety.
-
-Solaris, 1.3.1: The game slows down way too much after a battle.
 

@@ -252,42 +252,4 @@ public final class BattleDice extends JFrame implements WindowListener
     {
         return false;
     }
-
-
-    public static void main(String [] args)
-    {
-        BattleDice battleDice = new BattleDice(null);
-
-        Player player1 = new Player("Attacker", null);
-        player1.setScore(1400);
-        Legion attacker = new Legion("Rd01", null, null, null,
-            Creature.titan, Creature.colossus, Creature.serpent,
-            Creature.archangel, Creature.hydra, Creature.giant,
-            Creature.dragon, null, player1.getName(), null);
-
-        Player player2 = new Player("Defender", null);
-        player2.setScore(1000);
-        Legion defender = new Legion("Bk01", null, null, null,
-            Creature.titan, Creature.colossus, Creature.serpent,
-            Creature.angel, Creature.hydra, Creature.giant,
-            Creature.dragon, null, player2.getName(), null);
-
-        MasterHex hex = MasterBoard.getAnyHexWithTerrain('D');
-        BattleMap map = new BattleMap(hex.getLabel());
-
-        Critter serpent = attacker.getCritter(Creature.serpent);
-        serpent.addBattleInfo("C3", "C3", null, null, 0);
-
-        Critter angel = defender.getCritter(Creature.angel);
-        angel.addBattleInfo("C2", "C2", null, null, 1);
-
-        int targetNumber = 6;
-        int [] rolls = {1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6};
-        int hits = 3;
-        int carries = 0;
-
-        battleDice.setValues(serpent, angel, targetNumber, rolls, hits,
-            carries);
-        battleDice.showRoll();
-    }
 }

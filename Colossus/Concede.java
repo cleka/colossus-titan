@@ -191,10 +191,11 @@ public final class Concede extends JDialog implements ActionListener
         frame.pack();
         frame.setVisible(true);
 
-        MasterBoard board = new MasterBoard();
-        MasterHex hex = board.getHexByLabel("130");
 
         Game game = new Game();
+        game.initBoard();
+        MasterBoard board = new MasterBoard();
+        MasterHex hex = board.getHexByLabel("130");
 
         game.addPlayer("Attacker");
         Player player = game.getPlayer(0);

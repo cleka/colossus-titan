@@ -352,14 +352,16 @@ public final class SplitLegion extends JDialog implements MouseListener,
         frame.setVisible(true);
 
         Game game = new Game();
+        game.initBoard();
+        MasterHex hex = game.getBoard().getHexByLabel("130");
         game.addPlayer("Test");
         Player player = game.getPlayer(0);
         player.setTower(1);
         player.setColor("Red");
         player.initMarkersAvailable();
         String selectedMarkerId = player.selectMarkerId("Rd01");
-        Legion legion = Legion.getStartingLegion(selectedMarkerId, null,
-            player.getName(), game);
+        Legion legion = Legion.getStartingLegion(selectedMarkerId,
+            hex.getLabel(), player.getName(), game);
         player.addLegion(legion);
         Marker marker = new Marker(scale, selectedMarkerId, frame, game);
         legion.setMarker(marker);

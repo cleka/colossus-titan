@@ -313,11 +313,10 @@ public final class Negotiate extends JDialog implements MouseListener,
         frame.pack();
         frame.setVisible(true);
 
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setLabel(130);
-        hex.setTerrain('B');
-
         Game game = new Game();
+        game.initBoard();
+        MasterBoard board = game.getBoard();
+        MasterHex hex = board.getHexByLabel("130");
 
         game.addPlayer("Attacker");
         Player player = game.getPlayer(0);

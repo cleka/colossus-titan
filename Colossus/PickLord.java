@@ -160,11 +160,11 @@ public final class PickLord extends JDialog implements MouseListener,
         frame.pack();
         frame.setVisible(true);
 
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
-        hex.setTerrain('B');
-        hex.setLabel(130);
-
         Game game = new Game();
+        game.initBoard();
+        MasterBoard board = game.getBoard();
+        MasterHex hex = board.getHexByLabel("130");
+
         game.addPlayer("Test");
         Player player = game.getPlayer(0);
         Legion legion = new Legion("Bk01", null, hex.getLabel(),

@@ -16,6 +16,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     protected static int scale;
     protected static int chitScale;
     protected String masterHexLabel;
+    protected MasterBoard board;
 
     // ne, e, se, sw, w, nw
     protected BattleHex [] entrances = new BattleHex[6];
@@ -31,9 +32,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     };
 
 
-    public HexMap(String masterHexLabel)
+    public HexMap(MasterBoard board, String masterHexLabel)
     {
         this.masterHexLabel = masterHexLabel;
+        this.board = board;
         findScale();
         findChitScale();
         setOpaque(true);
@@ -77,7 +79,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     public MasterHex getMasterHex()
     {
-        return MasterBoard.getHexByLabel(masterHexLabel);
+        return board.getHexByLabel(masterHexLabel);
     }
 
 
@@ -701,13 +703,16 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         {
             terrain = args[0].charAt(0);
         }
-        MasterHex hex = MasterBoard.getAnyHexWithTerrain(terrain);
+        Game game = new Game();
+        game.initBoard();
+        MasterBoard board = game.getBoard();
+        MasterHex hex = board.getAnyHexWithTerrain(terrain);
 
         JFrame window = new JFrame("Hex Map for " + hex.getTerrainName());
         Container contentPane = window.getContentPane();
         contentPane.setLayout(new BorderLayout());
 
-        HexMap hexMap = new HexMap(hex.getLabel());
+        HexMap hexMap = new HexMap(board, hex.getLabel());
 
         contentPane.add(hexMap, BorderLayout.CENTER);
         window.pack();

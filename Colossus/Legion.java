@@ -756,7 +756,8 @@ public final class Legion implements Comparable
 
     public MasterHex getCurrentHex()
     {
-        return MasterBoard.getHexByLabel(currentHexLabel);
+        MasterBoard board = game.getBoard();
+        return board.getHexByLabel(currentHexLabel);
     }
 
     public String getStartingHexLabel()
@@ -766,7 +767,8 @@ public final class Legion implements Comparable
 
     public MasterHex getStartingHex()
     {
-        return MasterBoard.getHexByLabel(startingHexLabel);
+        MasterBoard board = game.getBoard();
+        return board.getHexByLabel(startingHexLabel);
     }
 
 

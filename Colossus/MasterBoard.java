@@ -13,7 +13,7 @@ import java.io.*;
 public final class MasterBoard extends JPanel implements MouseListener,
     WindowListener, ItemListener
 {
-    private static ArrayList hexes = new ArrayList();
+    private ArrayList hexes = new ArrayList();
 
     public static final boolean[][] show =
     {
@@ -345,7 +345,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 MasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame, hex.getLabel());
+                    new ShowBattleMap(masterFrame, MasterBoard.this,
+                        hex.getLabel());
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }
@@ -1568,7 +1569,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
-    public static MasterHex getHexByLabel(String label)
+    public MasterHex getHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1588,7 +1589,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     /** Do a brute-force search through the hex array, looking for
      *  a hex with the proper terrain type.  Return the hex, or null
      * if none is found. */
-    public static MasterHex getAnyHexWithTerrain(char terrain)
+    public MasterHex getAnyHexWithTerrain(char terrain)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1653,7 +1654,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public static void unselectAllHexes()
+    public void unselectAllHexes()
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1668,7 +1669,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public static void unselectHexByLabel(String label)
+    public void unselectHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1684,7 +1685,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public static void unselectHexesByLabels(Set labels)
+    public void unselectHexesByLabels(Set labels)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1699,7 +1700,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public static void selectHexByLabel(String label)
+    public void selectHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
@@ -1715,7 +1716,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    public static void selectHexesByLabels(Set labels)
+    public void selectHexesByLabels(Set labels)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
