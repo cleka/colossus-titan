@@ -348,6 +348,11 @@ public class TerrainRecruitLoader
         {
             where.add(new Character(t));
         }
+        /**
+         * Tell if the Acquirable can be Acquired in the terrain.
+         * @param t The terrain in which the Acquirements occurs.
+         * @return True if the Acquirable can be acquired here, false otherwise.
+         */
         boolean isAvailable(char t)
         {
             if (where.isEmpty() ||
@@ -526,7 +531,7 @@ TOKEN:
 {
     < TERRAINLIST : (<TERCAR><COMMA>)*<TERCAR> >
 |   < #TERCAR : ["a"-"z","A"-"Z"] >
-|   < #COMMA : "'" >
+|   < #COMMA : "," >
 }
 
 TOKEN :
