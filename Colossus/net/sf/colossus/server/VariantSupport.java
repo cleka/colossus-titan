@@ -373,20 +373,23 @@ public final class VariantSupport
         {
             o = ResourceLoader.getNewObject(hintName,
                     getVarDirectoriesList());
-        }
-        if ((o != null) && (o instanceof HintInterface))
-        {
-            aihl = (HintInterface)o;
-            Log.debug("Using class " + hintName +
-                    " to supply hints to the AIs.");
+            if ((o != null) && (o instanceof HintInterface))
+            {
+                aihl = (HintInterface)o;
+                Log.debug("Using class " + hintName +
+                        " to supply hints to the AIs.");
+            }
+            else
+            {
+                if (hintName.equals(Constants.defaultHINTFile))
+                {
+                    Log.error("Couldn't load default hints !");
+                    System.exit(1);
+                }
+            }
         }
         else
         {
-            if (hintName.equals(Constants.defaultHINTFile))
-            {
-                Log.error("Couldn't load default hints !");
-                System.exit(1);
-            }
             Log.warn("Couldn't load hints. Trying with Default.");
             hintName = Constants.defaultHINTFile;
             loadHints();

@@ -142,7 +142,7 @@ public final class Constants
     public static final String defaultTERFile = "DefaultTer.xml";
 
     /** Default HINT file */
-    public static final String defaultHINTFile = "DefaultHint";
+    public static final String defaultHINTFile = "Default.DefaultHint";
 
     // AI types for hints
     public static final String sectionAllAI = "AllAI:";

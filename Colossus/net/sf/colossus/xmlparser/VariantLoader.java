@@ -67,8 +67,7 @@ public class VariantLoader
             Element max_players = root.getChild("max_players");
             if (max_players != null)
             {
-                String s = max_players.getTextTrim();
-                maxPlayers = Integer.parseInt(s);
+                maxPlayers = max_players.getAttribute("num").getIntValue();
             }
         }
         catch (JDOMException ex)

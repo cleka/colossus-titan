@@ -397,173 +397,139 @@
     </hex>
 <!--  outer hubs -->
     <hex label="1001" terrain="Wasteland" xpos="0" ypos="3">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="1002" />
         <exit type="ARROW" label="130" />
     </hex>
     <hex label="1002" terrain="Castle" xpos="0" ypos="2">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="1001" />
         <exit type="ARROW" label="1003" />
     </hex>
     <hex label="1003" terrain="Tombs" xpos="1" ypos="2">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="1002" />
         <exit type="ARROW" label="128" />
     </hex>
     <hex label="2001" terrain="Wasteland" xpos="1" ypos="7">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="2002" />
         <exit type="ARROW" label="137" />
     </hex>
     <hex label="2002" terrain="Castle" xpos="0" ypos="7">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="2003" />
         <exit type="ARROW" label="2001" />
     </hex>
     <hex label="2003" terrain="Tombs" xpos="0" ypos="6">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="2002" />
         <exit type="ARROW" label="135" />
     </hex>
     <hex label="3001" terrain="Wasteland" xpos="13" ypos="2">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="3002" />
         <exit type="ARROW" label="116" />
     </hex>
     <hex label="3002" terrain="Castle" xpos="14" ypos="2">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="3003" />
         <exit type="ARROW" label="3001" />
     </hex>
     <hex label="3003" terrain="Tombs" xpos="14" ypos="3">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="3002" />
         <exit type="ARROW" label="114" />
     </hex>
     <hex label="4001" terrain="Wasteland" xpos="14" ypos="6">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="4002" />
         <exit type="ARROW" label="109" />
     </hex>
     <hex label="4002" terrain="Castle" xpos="14" ypos="7">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="4003" />
         <exit type="ARROW" label="4001" />
     </hex>
     <hex label="4003" terrain="Tombs" xpos="13" ypos="7">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="4002" />
         <exit type="ARROW" label="107" />
     </hex>
     <hex label="5001" terrain="Tombs" xpos="6" ypos="9">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="5002" />
         <exit type="ARROW" label="142" />
     </hex>
     <hex label="5002" terrain="Castle" xpos="7" ypos="9">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="5003" />
         <exit type="ARROW" label="5001" />
     </hex>
     <hex label="5003" terrain="Wasteland" xpos="8" ypos="9">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="5002" />
         <exit type="ARROW" label="102" />
     </hex>
     <hex label="6001" terrain="Wasteland" xpos="6" ypos="0">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="6002" />
         <exit type="ARROW" label="123" />
     </hex>
     <hex label="6002" terrain="Castle" xpos="7" ypos="0">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="6003" />
         <exit type="ARROW" label="6001" />
     </hex>
     <hex label="6003" terrain="Tombs" xpos="8" ypos="0">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="6002" />
         <exit type="ARROW" label="121" />
     </hex>
 <!--  outer corners -->
     <hex label="1101" terrain="Wasteland" xpos="2" ypos="1">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="1102" />
         <exit type="ARROW" label="126" />
     </hex>
     <hex label="1102" terrain="Keep" xpos="2" ypos="0">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="1101" />
         <exit type="ARROW" label="1103" />
     </hex>
     <hex label="1103" terrain="Abyss" xpos="3" ypos="0">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="1102" />
         <exit type="ARROW" label="1104" />
     </hex>
     <hex label="1104" terrain="Graveyard" xpos="4" ypos="0">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="1103" />
         <exit type="ARROW" label="125" />
     </hex>
     <hex label="2101" terrain="Graveyard" xpos="10" ypos="0">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="2102" />
         <exit type="ARROW" label="119" />
     </hex>
     <hex label="2102" terrain="Abyss" xpos="11" ypos="0">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="2101" />
         <exit type="ARROW" label="2103" />
     </hex>
     <hex label="2103" terrain="Keep" xpos="12" ypos="0">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="2102" />
         <exit type="ARROW" label="2104" />
     </hex>
     <hex label="2104" terrain="Wasteland" xpos="12" ypos="1">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="2103" />
         <exit type="ARROW" label="118" />
     </hex>
     <hex label="3101" terrain="Wasteland" xpos="12" ypos="8">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="3102" />
         <exit type="ARROW" label="105" />
     </hex>
     <hex label="3102" terrain="Keep" xpos="12" ypos="9">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="3101" />
         <exit type="ARROW" label="3103" />
     </hex>
     <hex label="3103" terrain="Abyss" xpos="11" ypos="9">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="3102" />
         <exit type="ARROW" label="3104" />
     </hex>
     <hex label="3104" terrain="Graveyard" xpos="10" ypos="9">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="3103" />
         <exit type="ARROW" label="104" />
     </hex>
     <hex label="4101" terrain="Graveyard" xpos="4" ypos="9">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="4102" />
         <exit type="ARROW" label="140" />
     </hex>
     <hex label="4102" terrain="Abyss" xpos="3" ypos="9">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="4101" />
         <exit type="ARROW" label="4103" />
     </hex>
     <hex label="4103" terrain="Keep" xpos="2" ypos="9">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="4102" />
         <exit type="ARROW" label="4104" />
     </hex>
     <hex label="4104" terrain="Wasteland" xpos="2" ypos="8">
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="4103" />
         <exit type="ARROW" label="139" />
     </hex>

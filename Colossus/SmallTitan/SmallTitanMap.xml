@@ -153,38 +153,32 @@
         <exit type="ARROWS" label="1" />
         <exit type="ARCH" label="37" />
     </hex>
-<!-- 	Towers	0		0 -->
+<!-- Towers -->
     <hex label="100" terrain="Mountains" xpos="5" ypos="5">
         <exit type="ARROW" label="41" />
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="3" />
     </hex>
     <hex label="200" terrain="Tundra" xpos="9" ypos="4">
         <exit type="ARROW" label="6" />
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="10" />
     </hex>
     <hex label="300" terrain="Mountains" xpos="9" ypos="1">
         <exit type="ARROW" label="13" />
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="17" />
     </hex>
     <hex label="400" terrain="Tundra" xpos="5" ypos="0">
         <exit type="ARROW" label="20" />
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="24" />
     </hex>
     <hex label="500" terrain="Mountains" xpos="1" ypos="1">
         <exit type="ARROW" label="27" />
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="31" />
     </hex>
     <hex label="600" terrain="Tundra" xpos="1" ypos="4">
         <exit type="ARROW" label="34" />
-        <exit type="ARROW" label="0" />
         <exit type="ARROW" label="38" />
     </hex>
-<!-- 	inner			0 -->
+<!-- inner -->
     <hex label="1000" terrain="Brush" xpos="5" ypos="3">
         <exit type="ARROWS" label="1" />
     </hex>
