@@ -284,7 +284,7 @@ class Legion
     public boolean canRecruit()
     {
         if (recruited || height > 6 || !getPlayer().isAlive() ||
-            PickRecruit.findEligibleRecruits(this, new Creature[5]) == 0)
+            Game.findEligibleRecruits(this, new Creature[5]) == 0)
         {
             return false;
         }

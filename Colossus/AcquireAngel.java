@@ -39,7 +39,7 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
         int scale = 60;
         setLayout(new FlowLayout());
 
-        numEligible = findEligibleRecruits(legion, recruits, archangel);
+        numEligible = Game.findEligibleAngels(legion, recruits, archangel);
         if (numEligible == 0)
         {
             dispose();
@@ -84,55 +84,6 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
 
         setVisible(true);
         repaint();
-    }
-
-
-    // Returns the number of eligible recruits.
-    static int findEligibleRecruits(Legion legion, Creature [] recruits,
-        boolean archangel)
-    {
-        if (legion.getHeight() > 6)
-        {
-            return 0;
-        }
-
-        recruits[0] = Creature.angel;
-        if (archangel)
-        {
-            recruits[1] = Creature.archangel;
-        }
-
-        // Check for availability of chits.
-        for (int i = 0; i < recruits.length; i++)
-        {
-            if (recruits[i] != null && recruits[i].getCount() < 1)
-            {
-                recruits[i] = null;
-            }
-        }
-
-        // Pack the recruits array for display.
-        for (int i = 0; i < recruits.length - 1; i++)
-        {
-            if (recruits[i] == null)
-            {
-                for (int j = i; j < recruits.length - 1; j++)
-                {
-                    recruits[j] = recruits[j + 1];
-                }
-                recruits[recruits.length - 1] = null;
-            }
-        }
-
-        int count = 0;
-        for (int i = 0; i < recruits.length; i++)
-        {
-            if (recruits[i] != null)
-            {
-                count++;
-            }
-        }
-        return count;
     }
 
 

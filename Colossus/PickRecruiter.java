@@ -160,10 +160,10 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
 
     public void mousePressed(MouseEvent e)
     {
-        Point point = e.getPoint();
+        Object source = e.getSource();
         for (int i = 0; i < numEligible; i++)
         {
-            if (recruiterChits[i].select(point))
+            if (recruiterChits[i] == source)
             {
                 // The selected recruiter will be placed in the 0th 
                 // position of the array.

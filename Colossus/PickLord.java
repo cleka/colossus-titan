@@ -128,10 +128,10 @@ class PickLord extends Dialog implements MouseListener, WindowListener
 
     public void mousePressed(MouseEvent e)
     {
-        Point point = e.getPoint();
+        Object source = e.getSource();
         for (int i = 0; i < chits.length; i++)
         {
-            if (chits[i].select(point))
+            if (chits[i] == source)
             {
                 legion.revealCreatures(lords[i], 1);
                 dispose();

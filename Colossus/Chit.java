@@ -11,13 +11,8 @@ import java.io.*;
 class Chit extends Canvas
 {
     private Image image;
-    private boolean selected = false;
     private Rectangle rect;
     private static Container container;
-
-    // Offset of the mouse cursor within the chit.
-    private int dx = 0;
-    private int dy = 0;
 
     // Flag to mark chit as dead and paint it with an "X" through it.
     private boolean dead = false;
@@ -85,8 +80,6 @@ class Chit extends Canvas
 
     void rescale(int scale)
     {
-        dx = 0;
-        dy = 0;
         rect.width = scale;
         rect.height = scale;
         setBounds(rect);
@@ -125,27 +118,25 @@ class Chit extends Canvas
     }
 
 
-    boolean select(Point point)
-    {
-        if (rect.contains(point))
-        {
-            selected = true;
-            dx = point.x - rect.x;
-            dy = point.y - rect.y;
-        }
-        else
-        {
-            selected = false;
-        }
-        return selected;
-    }
-
-
     void setLocationAbs(Point point)
     {
         rect.setLocation(point);
         setBounds(rect);
     }
+
+
+    boolean select(Point point)
+    {
+        if (rect.contains(point))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 
 
     public Rectangle getBounds()

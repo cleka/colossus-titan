@@ -642,7 +642,7 @@ class MasterBoard extends Frame implements MouseListener,
             if (legion.hasMoved() && legion.canRecruit())
             {
                 Creature [] recruits = new Creature[5];
-                if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
+                if (Game.findEligibleRecruits(legion, recruits) >= 1)
                 {
                     MasterHex hex = legion.getCurrentHex();
                     hex.select();
