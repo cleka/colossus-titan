@@ -26,6 +26,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
     private Frame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
+    private boolean dialogLock = false;
 
 
     PickRecruit(Frame parentFrame, Legion legion)
@@ -870,8 +871,11 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         Object source = e.getSource();
         for (int i = 0; i < numEligible; i++)
         {
-            if (recruitChits[i] == source)
+            if (recruitChits[i] == source && !dialogLock)
             {
+                // Prevent multiple clicks from yielding multiple recruits.
+                dialogLock = true;
+
                 Creature recruit = recruits[i];
 
                 // Pick the recruiter(s) if necessary.
