@@ -10,15 +10,16 @@ import java.util.*;
 
 class Legion
 {
-    Chit chit;
-    int height;
+    private Chit chit;
+    private int height;
     private String markerId;    // Bk03, Rd12, etc.
     private Legion splitFrom;
-    Creature [] creatures = new Creature[8];  // 8 before initial splits
+    private Creature [] creatures = new Creature[8];  // 8 before initial splits
     private MasterHex currentHex;
     private MasterHex startingHex;
     private boolean moved = false;
     private Player player;
+
 
     Legion(int cx, int cy, int scale, String markerId, Legion splitFrom,
         Container container, int height, MasterHex currentHex, 
@@ -92,6 +93,12 @@ class Legion
     }
 
 
+    Chit getChit()
+    {
+        return chit;
+    }
+
+
     boolean canFlee()
     {
         for (int i = 0; i < height; i++)
@@ -136,6 +143,12 @@ class Legion
     int getHeight()
     {
         return height;
+    }
+
+
+    void setHeight(int height)
+    {
+        this.height = height;
     }
 
 
@@ -232,6 +245,25 @@ class Legion
                 return;
             }
         }
+    }
+
+
+    Creature getCreature(int i)
+    {
+        if (i > height - 1)
+        {
+            return null;
+        }
+        else
+        {
+            return creatures[i];
+        }
+    }
+
+
+    void setCreature(int i, Creature creature)
+    {
+        creatures[i] = creature;
     }
 
 
