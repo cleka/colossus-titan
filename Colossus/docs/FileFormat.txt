@@ -104,6 +104,7 @@ of a succession of lines:
 <name> <power> <skill>
 <rangestrikes> <flies>
 <nativeBramble> <nativeDrift> <nativeBog> <nativeSandDune> <nativeSlope>
+<nativeVolcano> <waterDwelling> <magicMissile>
 <lord> <demilord>
 <maxCount>
 <pluralName>
@@ -116,7 +117,14 @@ all on one line.
 <rangestrikes> <and flies> are boolean values ('true' or 'false'),
  defining if the creature can rangestrike or fly respectively.
 <nativeXXX> are boolean values defining if the creature is
- native for terrain type XXX
+ native for terrain type XXX.
+<waterDwelling> is a boolean value defining if the creature
+ can live in water (i.e., Bog or Lake). Water Dweller don't
+ like being dry, and as such take damage in Sand as other
+ Creatures do in Drift.
+<magicMissile> is a boolean value defining if the creature
+ use magic missile, i.e. it can fires through anything
+ (foe, obstacle, ...) toward anyone (including lord).
 <lord> and <demilord> are boolean values, defining if the creature
  is a lord or a demilord (mutually exclusive).
 <maxCount> is the max number of creature in the caretaker stack.

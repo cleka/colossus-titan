@@ -74,46 +74,45 @@ public class BattleHex extends Hex
 
     public String getTerrainName()
     {
+        String terrainName;
+
         switch (getTerrain())
         {
         case 'p':
-            switch (elevation)
-            {
-            case 0:
-                return "Plains";
-            case 1:
-                return "Plains (1)";
-            case 2:
-                return "Plains (2)";
-            }
+            terrainName = "Plains";
+            break;
         case 'w':
-            switch (elevation)
-            {
-            case 0:
-                return "Tower";
-            case 1:
-                return "Tower (1)";
-            case 2:
-                return "Tower (2)";
-            }
+            terrainName = "Tower";
+            break;
         case 'r':
-            return "Bramble";
+            terrainName = "Bramble";
+            break;
         case 's':
-            return "Sand";
+            terrainName = "Sand";
+            break;
         case 't':
+            /* tree height is irrelevant, so get out now */
             return "Tree";
         case 'o':
-            return "Bog";
+            terrainName = "Bog";
+            break;
         case 'v':
-            return "Volcano (2)";
+            terrainName = "Volcano";
+            break;
         case 'd':
-            return "Drift";
+            terrainName = "Drift";
+            break;
         case 'l':
-            return "Lake";
-            
+            terrainName = "Lake";
+            break;
         default:
-            return "?????";
+            terrainName = "?????";
+            break;
         }
+        if (elevation == 0)
+            return(terrainName);
+        else
+            return(terrainName + " (" + elevation + ")");
     }
     
 
@@ -128,6 +127,7 @@ public class BattleHex extends Hex
                 return HTMLColor.lightOlive;
             case 1:
                 return HTMLColor.darkYellow;
+            default:
             case 2:
                 return Color.yellow;
             }
@@ -138,6 +138,7 @@ public class BattleHex extends Hex
                 return HTMLColor.lightGray;
             case 1:
                 return Color.gray;
+            default:
             case 2:
                 return HTMLColor.darkGray;
             }
@@ -365,16 +366,11 @@ public class BattleHex extends Hex
     {
         char terrain = getTerrain();
 
-        // lake is impassable
-        if (terrain == 'l')
-        {
-            return IMPASSIBLE_COST;
-        }
-
         // Check to see if the hex is occupied or totally impassable.
-        if (terrain == 't' || (terrain == 'v' &&
-            !creature.getName().equals("Dragon")) || (terrain == 'o' &&
-            !creature.isNativeBog()))
+        if (((terrain == 'l') && (!creature.isWaterDwelling())) ||
+            (terrain == 't') ||
+            ((terrain == 'v') && (!creature.isNativeVolcano())) ||
+            ((terrain == 'o') && (!creature.isNativeBog())))
         {
             return IMPASSIBLE_COST;
         }
@@ -426,8 +422,8 @@ public class BattleHex extends Hex
             return false;
         }
         if (terrain == 'v')
-        { // only dragon can fly over volcano
-            return ((creature.getName()).equals("Dragon"));
+        { // only volcano-native can fly over volcano
+            return creature.isNativeVolcano();
         }
         return(true);
     }

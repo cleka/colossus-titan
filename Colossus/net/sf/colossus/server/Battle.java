@@ -877,12 +877,12 @@ final class Battle
 
     void applyDriftDamage()
     {
-        // Drift hexes are only found on the tundra map.
         // Drift damage is applied only once per player turn,
         //    during the strike phase.
-        if (terrain == 't' && phase == Constants.FIGHT && !driftDamageApplied)
+        if (phase == Constants.FIGHT && !driftDamageApplied)
         {
             Iterator it = getAllCritters().iterator();
+            driftDamageApplied = true;
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
@@ -891,7 +891,13 @@ final class Battle
                 {
                     Log.event(critter.getName() + " takes drift damage");
                     critter.wound(1);
-                    driftDamageApplied = true;
+                }
+                if (critter.getCurrentHex().getTerrain() == 's' &&
+                    critter.isWaterDwelling())
+                {
+                    Log.event(critter.getName() +
+                              ", a Water Dweller, takes sand damage");
+                    critter.wound(1);
                 }
             }
         }
@@ -1705,9 +1711,9 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
             return false;
         }
 
-        // Only warlocks can rangestrike at range 2, rangestrike Lords,
+        // Only magicMissile can rangestrike at range 2, rangestrike Lords,
         // or rangestrike without LOS.
-        else if (!critter.getName().equals("Warlock") && (range < 3 ||
+        else if (!critter.useMagicMissile() && (range < 3 ||
             target.isLord() || isLOSBlocked(currentHex, targetHex)))
         {
             return false;

@@ -33,13 +33,17 @@ public class Creature implements Comparable
     private final boolean nativeBog;
     private final boolean nativeSandDune;
     private final boolean nativeSlope;
+    private final boolean nativeVolcano;
+    private final boolean waterDwelling;
+    private final boolean magicMissile;
     private final boolean lord;
     private final boolean demilord;
     private final int maxCount;
 
     /** For marking unknown enemy creatures when tracking PBEM games. */
     public static final Creature unknown = new Creature("Unknown", 1, 1,
-        false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false,
+        false, false, false, false, false,
         1, "Unknown");
 
     /** Sometimes we need to iterate through all creature types. */
@@ -49,6 +53,7 @@ public class Creature implements Comparable
     public Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
+        boolean nativeVolcano, boolean waterDwelling, boolean magicMissile,
         boolean lord, boolean demilord, int maxCount, String pluralName)
     {
         this.name = name;
@@ -61,6 +66,9 @@ public class Creature implements Comparable
         this.nativeBog = nativeBog;
         this.nativeSandDune = nativeSandDune;
         this.nativeSlope = nativeSlope;
+        this.nativeVolcano = nativeVolcano;
+        this.waterDwelling = waterDwelling;
+        this.magicMissile = magicMissile;
         this.lord = lord;
         this.demilord = demilord;
         this.maxCount = maxCount;
@@ -80,6 +88,9 @@ public class Creature implements Comparable
         this.nativeBog = creature.nativeBog;
         this.nativeSandDune = creature.nativeSandDune;
         this.nativeSlope = creature.nativeSlope;
+        this.nativeVolcano = creature.nativeVolcano;
+        this.waterDwelling = creature.waterDwelling;
+        this.magicMissile = creature.magicMissile;
         this.lord = creature.lord;
         this.demilord = creature.demilord;
         this.maxCount = creature.maxCount;
@@ -221,6 +232,20 @@ public class Creature implements Comparable
         return nativeSlope;
     }
 
+    public boolean isNativeVolcano()
+    {
+        return nativeVolcano;
+    }
+
+    public boolean isWaterDwelling()
+    {
+        return waterDwelling;
+    }
+
+    public boolean useMagicMissile()
+    {
+        return magicMissile;
+    }
 
     public static Creature getCreatureByName(String name)
     {

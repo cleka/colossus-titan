@@ -421,8 +421,8 @@ final class Critter extends Creature implements Comparable
             // Divide power in half, rounding down.
             dice /= 2;
 
-            // Dragon rangestriking from volcano: +2
-            if (getName().equals("Dragon") && hex.getTerrain() == 'v')
+            // volcanoNative rangestriking from volcano: +2
+            if (isNativeVolcano() && hex.getTerrain() == 'v')
             {
                 dice += 2;
             }
@@ -430,8 +430,8 @@ final class Critter extends Creature implements Comparable
         else
         {
             // Dice can be modified by terrain.
-            // Dragon striking from volcano: +2
-            if (getName().equals("Dragon") && hex.getTerrain() == 'v')
+            // volcanoNative striking from volcano: +2
+            if (isNativeVolcano() && hex.getTerrain() == 'v')
             {
                 dice += 2;
             }
@@ -504,7 +504,7 @@ final class Critter extends Creature implements Comparable
                 }
             }
         }
-        else if (!getName().equals("Warlock"))
+        else if (!useMagicMissile())
         {
             // Range penalty
             if (battle.getRange(hex, targetHex, false) == 4)
@@ -555,11 +555,11 @@ final class Critter extends Creature implements Comparable
         // Strike number can be modified directly by terrain.
         // Native defending in bramble, from strike by a non-native: +1
         // Native defending in bramble, from rangestrike by a non-native
-        //     non-warlock: +1
+        //     non-magicMissile: +1
         if (target.getCurrentHex().getTerrain() == 'r' &&
             target.isNativeBramble() &&
             !isNativeBramble() &&
-            !(rangestrike && getName().equals("Warlock")))
+            !(rangestrike && useMagicMissile()))
         {
             strikeNumber++;
         }
