@@ -79,8 +79,18 @@ public class Game extends JFrame implements WindowListener, ActionListener
     // Load a saved game.
     Game(String filename)
     {
-        loadGame(filename);
+        super("Player Setup");
+        setBackground(java.awt.Color.white);
+        pack();
+        setIconImage(Toolkit.getDefaultToolkit().getImage(
+            Creature.colossus.getImageName()));
 
+        addWindowListener(this);
+
+        board = new MasterBoard(this, false);
+
+        loadGame(filename);
+        
         initStatusScreen(false);
     }
 
@@ -267,6 +277,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
             {
                 players[j].setColor(color);
                 colorLabel[j].setText(color);
+                players[j].initMarkersAvailable();
             }
         }
 
@@ -355,7 +366,10 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
         setVisible(true);
 
-        board = new MasterBoard(this, newgame);
+        if (newgame)
+        {
+            board = new MasterBoard(this, newgame);
+        }
     }
 
 
@@ -598,12 +612,18 @@ public class Game extends JFrame implements WindowListener, ActionListener
             out.println(player.getTower());
             out.println(player.getScore());
             out.println(player.getPlayersElim());
+            out.println(player.getNumMarkersAvailable());
+            for (int j = 0; j < player.getNumMarkersAvailable(); j++)
+            {
+                out.println(player.getMarker(j));
+            }
             out.println(player.getNumLegions());
 
             for (int j = 0; j < player.getNumLegions(); j++)
             {
                 Legion legion = player.getLegion(j);
                 out.println(legion.getMarkerId());
+                out.println(legion.getCurrentHex().getLabel());
 
                 out.println(legion.getHeight());
                 for (int k = 0; k < legion.getHeight(); k++)
@@ -653,6 +673,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
                 Creature.creatures[i].setCount(count);
             }
 
+            players = new Player[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
                 String name = in.readLine();
@@ -670,30 +691,59 @@ public class Game extends JFrame implements WindowListener, ActionListener
                 players[i].setScore(score);
                 
                 String playersElim = in.readLine();
+                if (playersElim.equals("null"))
+                {
+                    playersElim = new String("");
+                }
                 players[i].setPlayersElim(playersElim);
                 
                 buf = in.readLine();
+                int numMarkersAvailable = Integer.parseInt(buf);
+
+                for (int j = 0; j < numMarkersAvailable; j++)
+                {
+                    String markerId = in.readLine();
+                    players[i].addLegionMarker(markerId);
+                }
+
+                buf = in.readLine();
                 int numLegions = Integer.parseInt(buf);
-                players[i].setNumLegions(numLegions);
+                // Do not set numLegions in Player yet; let
+                // addLegion() do it.
 
                 for (int j = 0; j < numLegions; j++)
                 {
                     String markerId = in.readLine();
+
+                    buf = in.readLine();
+                    int hexLabel = Integer.parseInt(buf);
     
                     buf = in.readLine();
                     int height = Integer.parseInt(buf);
-                    Creature [] creatures = new Creature[height];
+
+                    Creature [] creatures = new Creature[8];
+                    boolean [] visibles = new boolean[height];
 
                     for (int k = 0; k < height; k++)
                     {
                         buf = in.readLine();
                         creatures[k] = Creature.getCreatureFromName(buf);
                         buf = in.readLine();
-                        boolean visible = Boolean.valueOf(buf).booleanValue();
-                        // XXX set up critter
+                        visibles[k] = Boolean.valueOf(buf).booleanValue();
                     }
+
+
+                    // XXX Get scale from MasterBoard?  Container?  Hex?
+                    Legion legion = new Legion(0, 0, 3 * 17, markerId, null, 
+                        board, height, board.getHexFromLabel(hexLabel),
+                        creatures[0], creatures[1], creatures[2], creatures[3],
+                        creatures[4], creatures[5], creatures[6], creatures[7],
+                        players[i]);
+                    players[i].addLegion(legion);
                 }
             }
+
+            board.finishInit(false);
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
