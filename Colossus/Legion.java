@@ -11,9 +11,7 @@ import net.sf.colossus.battle.*;
  * @author David Ripton
  */
 
-public final class Legion 
-    extends GameSource
-    implements Comparable
+public final class Legion extends GameSource implements Comparable
 {
     private String markerId;    // Bk03, Rd12, etc.
     private String parentId;
@@ -112,7 +110,7 @@ public final class Legion
     }
 
     /**
-     * TMJF sez: these are public but I think they are only for 
+     * TMJF sez: these are public but I think they are only for
      * testing purposes
      */
 
@@ -210,7 +208,7 @@ public final class Legion
     public static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-        Legion oLegion = 
+        Legion oLegion =
             new Legion(markerId, null, hexLabel, hexLabel, Creature.titan,
                        Creature.angel, Creature.ogre, Creature.ogre,
                        Creature.centaur, Creature.centaur, Creature.gargoyle,
@@ -224,7 +222,7 @@ public final class Legion
     public static Legion getEmptyLegion(String markerId, String parentId,
         String hexLabel, String playerName, Game game)
     {
-        Legion oLegion = 
+        Legion oLegion =
             new Legion(markerId, parentId, hexLabel, hexLabel, null,
                        null, null, null, null, null, null, null, playerName, game);
         // Probably not the right place to be adding this
@@ -640,8 +638,9 @@ public final class Legion
             currentHexLabel = startingHexLabel;
 
             moved = false;
-            Log.event("Legion " + getLongMarkerName() +
-                " undoes its move");
+            Log.event("Legion " + getLongMarkerName() + " undoes its move");
+
+            clearAllHexInfo();
 
             Set set = new HashSet();
             set.add(currentHexLabel);
@@ -703,7 +702,7 @@ public final class Legion
             game.getServer().allRepaintHex(currentHexLabel);
 
             // Because we are modifying the caretaker
-            fireEvent(new LegionEvent(this, 
+            fireEvent(new LegionEvent(this,
                 LegionEvent.nLEGION_LOST_CHARACTER));
         }
     }
@@ -969,7 +968,7 @@ public final class Legion
                 return;
             }
 
-            fireEvent(new LegionEvent(this, 
+            fireEvent(new LegionEvent(this,
                 LegionEvent.nLEGION_GAINED_CHARACTER));
         }
 
@@ -992,7 +991,7 @@ public final class Legion
             {
                 game.getCaretaker().putOneBack(critter);
             }
-            fireEvent(new LegionEvent(this, 
+            fireEvent(new LegionEvent(this,
                 LegionEvent.nLEGION_LOST_CHARACTER));
         }
 
@@ -1044,7 +1043,7 @@ public final class Legion
             {
                 game.getCaretaker().putOneBack(critter);
             }
-            fireEvent(new LegionEvent(this, 
+            fireEvent(new LegionEvent(this,
                 LegionEvent.nLEGION_LOST_CHARACTER));
         }
         return critter;
@@ -1369,15 +1368,15 @@ public final class Legion
                               getPlayer().getName()
                               );
     }
-    
+   
     private static Creature getCreatureByName(String strName)
     {
         return strName != null ? Creature.getCreatureByName(strName) : null;
     }
     public Legion(Game oGame, LegionMemo oMemo)
     {
-        this(oMemo.getMarkerId(), 
-             oMemo.getParentMarkerId(), 
+        this(oMemo.getMarkerId(),
+             oMemo.getParentMarkerId(),
              oMemo.getCurrentHexLabel(),
              oMemo.getStartingHexLabel(),
              getCreatureByName(oMemo.getCritter(0)),
