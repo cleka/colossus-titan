@@ -756,7 +756,17 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public static int getHazardCountInTerrain(String hazard, String terrain)
     {
         HashMap t2n = (HashMap)hazardNumberMap.get(terrain);
-        Object o = t2n.get(hazard);
+        Object o = null;
+
+        if (t2n == null)
+        {
+            Log.debug("Terrain " + terrain +
+                      " doesn't exist in this variant.");
+        }
+        else
+        {
+            o = t2n.get(hazard);
+        }
 
         if (o == null)
             return 0;
@@ -765,13 +775,23 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
         return (number.intValue());
     }
-
+    
     public static int getHazardSideCountInTerrain(char hazard,
                                                   String terrain)
     {
         HashMap s2n = (HashMap)hazardSideNumberMap.get(terrain);
-        Object o = s2n.get(new Character(hazard));
-
+        Object o = null;
+        
+        if (s2n == null)
+        {
+            Log.debug("Terrain " + terrain +
+                      " doesn't exist in this variant.");
+        }
+        else
+        {
+            o = s2n.get(new Character(hazard));
+        }
+        
         if (o == null)
             return 0;
         
