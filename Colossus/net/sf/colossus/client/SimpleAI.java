@@ -25,9 +25,9 @@ public class SimpleAI implements AI
 {
     Client client;
 
-    private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
-    private boolean timeIsUp;
-    private Random random = new DevRandom();
+    int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
+    boolean timeIsUp;
+    Random random = new DevRandom();
     String[] hintSectionUsed = { Constants.sectionOffensiveAI };
 
     static HashMap aiCreatureInfos;
@@ -191,16 +191,12 @@ public class SimpleAI implements AI
         return true;
     }
 
+    /** Unused in this AI; just return true to indicate done. */
     public boolean splitCallback(String parentId, String childId)
     {
         return true;
     }
 
-    /** Unused in this AI; just return true to indicate done. */
-    public boolean splitCallback()
-    {
-        return true;
-    }
 
     private void splitOneLegion(PlayerInfo player, String markerId)
     {
@@ -545,7 +541,7 @@ public class SimpleAI implements AI
     }
 
     /** Keep the gargoyles together. */
-    private List CMUsplit(boolean favorTitan, Creature splitCreature,
+    List CMUsplit(boolean favorTitan, Creature splitCreature,
             Creature nonsplitCreature, String label)
     {
         Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(
@@ -600,7 +596,7 @@ public class SimpleAI implements AI
     }
 
     /** Split the gargoyles. */
-    private List MITsplit(boolean favorTitan, Creature splitCreature,
+    List MITsplit(boolean favorTitan, Creature splitCreature,
             Creature nonsplitCreature, String label)
     {
         Creature[] startCre = TerrainRecruitLoader.getStartingCreatures(
@@ -1605,7 +1601,7 @@ public class SimpleAI implements AI
         }
     }
 
-    private class SimpleAIOracle implements
+    class SimpleAIOracle implements
                 net.sf.colossus.server.HintOracleInterface
     {
         LegionInfo legion;
@@ -1720,16 +1716,12 @@ public class SimpleAI implements AI
     }
 
     Creature getVariantRecruitHint(LegionInfo legion,
-            MasterHex hex,
-            List recruits)
+            MasterHex hex, List recruits)
     {
-        String recruitName =
-                VariantSupport.getRecruitHint(hex.getTerrain(),
-                legion,
-                recruits,
-                new SimpleAIOracle(legion, hex,
-                recruits),
-                hintSectionUsed);
+        String recruitName = VariantSupport.getRecruitHint(hex.getTerrain(),
+            legion, recruits, new SimpleAIOracle(legion, hex, recruits),
+            hintSectionUsed);
+
         if (recruitName == null)
         {
             return (Creature)recruits.get(recruits.size() - 1);
@@ -1741,27 +1733,17 @@ public class SimpleAI implements AI
         }
 
         Creature recruit = Creature.getCreatureByName(recruitName);
-
         if (!(recruits.contains(recruit)))
         {
             Log.warn("HINT: Invalid Hint for this variant ! (can't recruit " +
                     recruitName + ")");
             return ((Creature)recruits.get(recruits.size() - 1));
         }
-
-        /*
-         if (!(basic.equals(recruit.getName())))
-         {
-         Log.debug("HINT: (" + hex.getLabel() +
-         ") variant hint suggest recruiting " +
-         recruitName + " instead of " + basic);
-         }
-         */
         return recruit;
     }
 
-    private int getNumberOfWaysToTerrain(LegionInfo legion,
-            MasterHex hex, String terrainType)
+    int getNumberOfWaysToTerrain(LegionInfo legion, MasterHex hex, 
+            String terrainType)
     {
         int total = 0;
         for (int roll = 1; roll <= 6; roll++)
@@ -2405,12 +2387,13 @@ public class SimpleAI implements AI
         return val;
     }
 
-    private static int getKillValue(final Creature creature)
+    static int getKillValue(final Creature creature)
     {
         return getKillValue(creature, null);
     }
 
-    private static int getKillValue(final BattleChit chit, 
+    // XXX titan power
+    static int getKillValue(final BattleChit chit, 
             final String terrain)
     {
         return getKillValue(chit.getCreature(), terrain);
@@ -2768,7 +2751,7 @@ public class SimpleAI implements AI
         return moveList;
     }
 
-    private void setupTimer()
+    void setupTimer()
     {
         // java.util.Timer, not Swing Timer
         Timer timer = new Timer();
@@ -3369,7 +3352,7 @@ public class SimpleAI implements AI
         return sum;
     }
 
-    private int ghrv(Creature creature, LegionInfo legion, String[] section)
+    int ghrv(Creature creature, LegionInfo legion, String[] section)
     {
         if (!creature.isTitan())
         {
