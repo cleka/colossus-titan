@@ -464,8 +464,9 @@ System.out.println("MasterBoard.finishSummoningAngel");
 
     void finishBattle()
     {
-        if (summoningAngel)
+        if (summoningAngel && summonAngel != null)
         {
+            highlightSummonableAngels(summonAngel.getLegion());
             summonAngel.repaint();
         }
         else
@@ -1074,14 +1075,6 @@ System.out.println("MasterBoard.finishSummoningAngel");
     }
 
 
-    public void mouseDragged(MouseEvent e)
-    {
-    }
-
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
@@ -1292,9 +1285,6 @@ System.out.println("summonAngel is null");
                             }
                             break;
 
-                        case Game.MUSTER:
-                            break;
-
                         default:
                             break;
                     }
@@ -1304,6 +1294,38 @@ System.out.println("summonAngel is null");
                 }
             }
         }
+
+        // No hits on chits or map, so re-highlight.
+        switch(game.getPhase())
+        {
+            case Game.MOVE:
+                highlightUnmovedLegions();
+                break;
+
+            case Game.FIGHT:
+                if (summoningAngel && summonAngel != null)
+                {
+                    highlightSummonableAngels(summonAngel.getLegion());
+                    summonAngel.repaint();
+                }
+                else
+                {
+                    highlightEngagements();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+    
+
+    public void mouseDragged(MouseEvent e)
+    {
+    }
+
+    public void mouseReleased(MouseEvent e)
+    {
     }
 
     public void mouseMoved(MouseEvent e)
