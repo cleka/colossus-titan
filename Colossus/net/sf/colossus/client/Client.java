@@ -326,7 +326,7 @@ public final class Client implements IClient
             board.repaint();
             summonAngel = null;
 
-            board.highlightEngagements();
+            highlightEngagements();
             board.repaint();
         }
     }
@@ -1943,8 +1943,7 @@ public final class Client implements IClient
         battleActivePlayerName = null;
     }
 
-    // XXX delete?
-    public void highlightEngagements()
+    private void highlightEngagements()
     {
         if (board != null)
         {
@@ -1958,6 +1957,7 @@ public final class Client implements IClient
 
     public void nextEngagement()
     {
+        highlightEngagements();
         nakable = null;
         if (isMyTurn())
         {

@@ -345,7 +345,6 @@ public final class Constants
     public static final String tellStrikeResults = "tellStrikeResults";
     public static final String initBattle = "initBattle";
     public static final String cleanupBattle = "cleanupBattle";
-    public static final String highlightEngagements = "highlightEngagements";
     public static final String nextEngagement = "nextEngagement";
     public static final String doReinforce = "doReinforce";
     public static final String didRecruit = "didRecruit";

@@ -512,11 +512,6 @@ final class SocketServerThread extends Thread implements IClient
         out.println(Constants.cleanupBattle);
     }
 
-    public void highlightEngagements()
-    {
-        out.println(Constants.highlightEngagements);
-    }
-
     public void nextEngagement()
     {
         out.println(Constants.nextEngagement);

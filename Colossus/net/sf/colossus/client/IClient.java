@@ -84,8 +84,6 @@ public interface IClient
 
     public void cleanupBattle();
 
-    public void highlightEngagements();
-
     public void nextEngagement();
 
     public void doReinforce(String markerId);

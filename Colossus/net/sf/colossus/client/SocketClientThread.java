@@ -308,10 +308,6 @@ final class SocketClientThread extends Thread implements IServer
         {
             client.cleanupBattle();
         }
-        else if (method.equals(Constants.highlightEngagements))
-        {
-            client.highlightEngagements();
-        }
         else if (method.equals(Constants.nextEngagement))
         {
             client.nextEngagement();

@@ -597,16 +597,6 @@ public final class Server implements IServer
         }
     }
 
-    void allHighlightEngagements()
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            IClient client = (IClient)it.next();
-            client.highlightEngagements();
-        }
-    }
-
     void allTellEngagementResults(String winnerId, String method, int points)
     {
         Iterator it = clients.iterator();

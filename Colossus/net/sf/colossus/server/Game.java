@@ -2243,7 +2243,6 @@ public final class Game
         server.allTellEngagementResults(winnerId, "fight", points);
         if (!summoning && !reinforcing && !acquiring)
         {
-            server.allHighlightEngagements();
             kickEngagements();
         }
     }
@@ -2700,7 +2699,6 @@ public final class Game
         server.allUpdatePlayerInfo();
         server.allTellEngagementResults(winner.getMarkerId(),
                 fled ? "flee" : "concede", points);
-        server.allHighlightEngagements();
         if (!acquiring)
         {
             kickEngagements();
@@ -2829,10 +2827,6 @@ public final class Game
         server.allUpdatePlayerInfo();
         server.allTellEngagementResults(winner == null ? null :
                 winner.getMarkerId(), "negotiate", points);
-        if (!summoning && !reinforcing && !acquiring)
-        {
-            server.allHighlightEngagements();
-        }
         kickEngagements();
     }
 
@@ -2848,7 +2842,6 @@ public final class Game
         acquiring = false;
         if (!summoning && !reinforcing)
         {
-            server.allHighlightEngagements();
             kickEngagements();
         }
     }
