@@ -1,16 +1,11 @@
-Log splits, but not exact creatures split unless showAllLegions option 
-   is set.
-
-Log first recruit of each creature type, and when each is exhausted.
+Enable autoPickRecruit for reinforcements.
 
 AI: Consider recruit scarcity (last gargoyle more valuable than troll).  
    Don't leave non-moved legion highlighted. Consider terrain when
    deciding whether to fight.  Don't cheat and peek at the opposing 
    stack unless all stacks are visible or some cheat option is set.
    Add some value to flying and rangestrike to creature recruiting scores, 
-   or just make up a good value for each creature type.  
-   Don't give as much value for recruiting creatures less powerful than 
-   the ones already there, especially if already 6 high.  Give some value 
+   or just make up a good value for each creature type.  Give some value 
    to sitting in native terrain.  Get scrub snacks out of nearby 
    opponents' good recruiting terrain, and into blocking positions.
 
@@ -32,9 +27,6 @@ Add a way to show each player's remaining legion markers outside PickMarker.
 
 Centralize scale handling.  Add a global rescale option.
 Scale should change when windows are resized.
-
-Need to be able to undo an auto recruit of a reinforcement in battle.
-   Or else turn off auto recruit for reinforcements.
 
 Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
@@ -63,8 +55,6 @@ Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 
 Add auto-BattleMap-move option.
 Add auto-strike option.
-Add auto-flee / auto-concede option.
-Add auto-play option.
 
 Add ability to specify computer opponents in GetPlayers.  Also a
    way to pick which AI subclass each uses.

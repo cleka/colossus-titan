@@ -2119,8 +2119,7 @@ public final class Game
 
     /** Return true if all members of legion who are in recruiters are
      *  already visible. */
-    public boolean allRecruitersVisible(Legion legion,
-        ArrayList recruiters)
+    private boolean allRecruitersVisible(Legion legion, ArrayList recruiters)
     {
         if (getOption(allStacksVisible))
         {
@@ -2942,8 +2941,7 @@ public final class Game
                     if (!hex.isOccupied() || hex.getNumEntrySides() == 1)
                     {
                         // If the legion teleported, reveal a lord.
-                        if (hex.getTeleported() &&
-                            !getOption(allStacksVisible))
+                        if (hex.getTeleported())
                         {
                             // If it was a Titan teleport, that
                             // lord must be the titan.
@@ -2953,7 +2951,8 @@ public final class Game
                             }
                             else
                             {
-                                legion.revealTeleportingLord(masterFrame);
+                                legion.revealTeleportingLord(masterFrame,
+                                    getOption(allStacksVisible));
                             }
                         }
 
@@ -3029,8 +3028,15 @@ public final class Game
 
             // The attacker may concede now without
             // allowing the defender a reinforcement.
-            boolean concedes = Concede.concede(masterFrame, attacker,
-                defender);
+            boolean concedes;
+            if (attacker.getPlayer().getOption(autoFlee))
+            {
+                concedes = attacker.getPlayer().aiConcede(defender, attacker);
+            }
+            else
+            {
+                concedes = Concede.concede(masterFrame, attacker, defender);
+            }
 
             if (concedes)
             {

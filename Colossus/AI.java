@@ -16,5 +16,8 @@ public interface AI
     public void muster(Game game);
     
     /** choose whether legion should flee from enemy */
-    public boolean flee(Legion legion, Legion enemy);
+    public boolean flee(Legion legion, Legion enemy, Game game);
+    
+    /** choose whether legion should concede to enemy */
+    public boolean concede(Legion legion, Legion enemy, Game game);
 }

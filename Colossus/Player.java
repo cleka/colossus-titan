@@ -895,7 +895,20 @@ Game.logDebug("Called eliminateTitan for " + name);
     {
         if (getOption(Game.autoFlee))
         {
-            return ai.flee(legion, enemy);
+            return ai.flee(legion, enemy, game);
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    
+    public boolean aiConcede(Legion legion, Legion enemy)
+    {
+        if (getOption(Game.autoFlee))
+        {
+            return ai.concede(legion, enemy, game);
         }
         else
         {

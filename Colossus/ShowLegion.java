@@ -18,8 +18,7 @@ public final class ShowLegion extends JDialog implements MouseListener,
     public ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean
         allStacksVisible)
     {
-        super(parentFrame, "Contents of Legion " +
-            legion.getLongMarkerName(), false);
+        super(parentFrame, "Legion " + legion.getLongMarkerName(), false);
 
         pack();
         setBackground(Color.lightGray);

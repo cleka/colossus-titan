@@ -807,6 +807,7 @@ public final class Legion
             return null;
         }
 
+        player.selectMarkerId(newMarkerId);
         Legion newLegion = Legion.getEmptyLegion(newMarkerId, markerId,
             currentHex, player);
 
@@ -928,7 +929,8 @@ public final class Legion
 
     /** Reveal the lord who tower teleported the legion.  Pick one if
      *  necessary. */
-    public void revealTeleportingLord(JFrame parentFrame)
+    public void revealTeleportingLord(JFrame parentFrame, boolean
+        autoPick)
     {
         teleportingLord = null;
         TreeSet lords = new TreeSet();
@@ -952,7 +954,14 @@ public final class Legion
         }
         else
         {
-            teleportingLord = PickLord.pickLord(parentFrame, this);
+            if (autoPick)
+            {
+                teleportingLord = (Creature)lords.first();
+            }
+            else
+            {
+                teleportingLord = PickLord.pickLord(parentFrame, this);
+            }
         }
 
         if (teleportingLord != null)

@@ -40,10 +40,20 @@ public class Caretaker
 	Integer count = (Integer) map.get(creature.getName());
 	if (count == null)
 	{
+            Game.logEvent("First " + creature.getName() + " recruited");
 	    map.put(creature.getName(), new Integer(creature.getMaxCount() - 1));
 	}
 	else
 	{
+            if (count.intValue() == creature.getMaxCount())
+            {
+                // Not quite right for demi-lords.
+                Game.logEvent("First " + creature.getName() + " recruited");
+            }
+            if (count.intValue() == 1) 
+            {
+                Game.logEvent("Last " + creature.getName() + " recruited");
+            }
 	    map.put(creature.getName(), new Integer(count.intValue()-1));
 	}
     } 
