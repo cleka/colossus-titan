@@ -15,6 +15,7 @@ import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.server.ConfigFileFilter;
+import net.sf.colossus.server.Game;
 import net.sf.colossus.parser.StrategicMapLoader;
 import net.sf.colossus.client.VariantSupport;
 
@@ -80,7 +81,8 @@ public final class MasterBoard extends JPanel
     public static final String concedeBattle = "Concede battle";
     public static final String withdrawFromGame = "Withdraw from Game";
 
-    public static final String viewRecruitInfo = "View Full Recruit Tree";
+    public static final String viewFullRecruitTree = "View Full Recruit Tree";
+    public static final String viewHexRecruitTree = "View Hex Recruit Tree";
     public static final String viewBattleMap = "View Battle Map";
     public static final String changeScale = "Change Scale";
     public static final String changeAIDelay = "Change AI Delay";
@@ -104,7 +106,8 @@ public final class MasterBoard extends JPanel
     private AbstractAction takeMulliganAction;
     private AbstractAction withdrawFromGameAction;
 
-    private AbstractAction viewRecruitInfoAction;
+    private AbstractAction viewFullRecruitTreeAction;
+    private AbstractAction viewHexRecruitTreeAction;
     private AbstractAction viewBattleMapAction;
     private AbstractAction changeScaleAction;
     private AbstractAction changeAIDelayAction;
@@ -289,11 +292,24 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        viewRecruitInfoAction = new AbstractAction(viewRecruitInfo)
+        viewFullRecruitTreeAction = new AbstractAction(viewFullRecruitTree)
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowAllRecruits(masterFrame, client);
+                new ShowAllRecruits(masterFrame, Game.getTerrains(), null);
+            }
+        };
+
+        viewHexRecruitTreeAction = new AbstractAction(viewHexRecruitTree)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                GUIMasterHex hex = getHexContainingPoint(lastPoint);
+                if (hex != null)
+                {
+                    char [] terrains = { hex.getTerrain() };
+                    new ShowAllRecruits(masterFrame, terrains, lastPoint);
+                }
             }
         };
 
@@ -491,7 +507,7 @@ public final class MasterBoard extends JPanel
         popupMenu = new JPopupMenu();
         contentPane.add(popupMenu);
 
-        JMenuItem mi = popupMenu.add(viewRecruitInfoAction);
+        JMenuItem mi = popupMenu.add(viewHexRecruitTreeAction);
         mi.setMnemonic(KeyEvent.VK_R);
 
         mi = popupMenu.add(viewBattleMapAction);
@@ -595,6 +611,8 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.useOverlay, KeyEvent.VK_V);
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
+        mi = graphicsMenu.add(viewFullRecruitTreeAction);
+        mi.setMnemonic(KeyEvent.VK_R);
 
         // Then help menu
         JMenu helpMenu = new JMenu("Help");

@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.util.KDialog;
 
 
 /**
@@ -15,7 +16,7 @@ import net.sf.colossus.server.Creature;
  * @author David Ripton
  */
 
-final class ReplyToProposal extends JDialog implements ActionListener
+final class ReplyToProposal extends KDialog implements ActionListener
 {
     private String attackerId;
     private String defenderId;
@@ -149,11 +150,13 @@ final class ReplyToProposal extends JDialog implements ActionListener
         Point location = Concede.returnLocation();
         if (location == null)
         {
-            location = new Point(d.width / 2 - getSize().width / 2,
-                d.height / 2 - getSize().height / 2);
+            centerOnScreen();
+            location = getLocation();
         }
-        setLocation(location);
-
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
         repaint();
     }

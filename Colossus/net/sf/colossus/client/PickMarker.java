@@ -6,6 +6,8 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
+import net.sf.colossus.util.KDialog;
+
 
 /**
  * Class PickMarker allows a player to pick a legion marker.
@@ -14,7 +16,7 @@ import javax.swing.*;
  */
 
 
-final class PickMarker extends JDialog implements MouseListener, WindowListener
+final class PickMarker extends KDialog implements MouseListener, WindowListener
 {
     private java.util.List markers = new ArrayList();
     private Client client;
@@ -52,11 +54,7 @@ final class PickMarker extends JDialog implements MouseListener, WindowListener
         }
 
         pack();
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
-
+        centerOnScreen();
         setVisible(true);
     }
 
@@ -80,48 +78,8 @@ final class PickMarker extends JDialog implements MouseListener, WindowListener
         }
     }
 
-    public void mouseEntered(MouseEvent e)
-    {
-    }
-
-    public void mouseExited(MouseEvent e)
-    {
-    }
-
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
     public void windowClosing(WindowEvent e)
     {
         cleanup(null);
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
     }
 }

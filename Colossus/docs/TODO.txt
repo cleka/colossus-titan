@@ -21,9 +21,6 @@ Optional post-engagement status dialog.
 Change some dialogs to show info in a label instead of the title (so
    the dialog is wide enough) and add explicit cancel buttons.
 
-Move code to center a dialog on screen to one place.  Maybe add a
-   parent dialog class?
-
 Change StatusScreen to use a JTable.  
 Pass smaller chunks of changed info to StatusScreen, from generalized
     info update messages. 

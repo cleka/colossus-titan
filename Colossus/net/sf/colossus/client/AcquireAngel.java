@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
+import net.sf.colossus.util.KDialog;
 
 /**
  * Class AcquireAngel allows a player to acquire an angel or archangel.
@@ -14,7 +15,7 @@ import java.util.*;
  */
 
 
-final class AcquireAngel extends JDialog implements MouseListener,
+final class AcquireAngel extends KDialog implements MouseListener,
     WindowListener, ActionListener
 {
     private java.util.List chits = new ArrayList();
@@ -57,11 +58,7 @@ final class AcquireAngel extends JDialog implements MouseListener,
         cancelButton.addActionListener(this);
 
         pack();
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
-
+        centerOnScreen();
         setVisible(true);
         repaint();
     }
@@ -84,49 +81,10 @@ final class AcquireAngel extends JDialog implements MouseListener,
         }
     }
 
-    public void mouseEntered(MouseEvent e)
-    {
-    }
-
-    public void mouseExited(MouseEvent e)
-    {
-    }
-
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
 
     public void windowClosing(WindowEvent e)
     {
         cleanup(null);
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
     }
 
     public void actionPerformed(ActionEvent e)

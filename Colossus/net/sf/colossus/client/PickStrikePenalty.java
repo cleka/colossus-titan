@@ -7,13 +7,14 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.KDialog;
 
 
 /** Chooses between multiple strike penalty options.
  *  @version $Id$
  *  @author David Ripton
  */
-final class PickStrikePenalty extends JDialog implements ActionListener
+final class PickStrikePenalty extends KDialog implements ActionListener
 {
     private Client client;
 
@@ -39,10 +40,7 @@ final class PickStrikePenalty extends JDialog implements ActionListener
         addWindowListener(new WindowAdapter() {} );
 
         pack();
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
+        centerOnScreen();
         setVisible(true);
     }
 

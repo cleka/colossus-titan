@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import net.sf.colossus.server.Options;
+import net.sf.colossus.util.KDialog;
 
 
 /** 
@@ -15,7 +16,7 @@ import net.sf.colossus.server.Options;
  *  @author David Ripton
  */
 
-final class PickDelay extends JDialog implements WindowListener,
+final class PickDelay extends KDialog implements WindowListener,
     ChangeListener, ActionListener
 {
     private static int newDelay;
@@ -61,11 +62,7 @@ final class PickDelay extends JDialog implements WindowListener,
         buttonBar.add(cancel);
 
         pack();
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
-
+        centerOnScreen();
         setVisible(true);
         repaint();
     }
@@ -100,40 +97,5 @@ final class PickDelay extends JDialog implements WindowListener,
                 client.setIntOption(Options.aiDelay, newDelay);
             }
         }
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-    }
-
-
-    public static void main(String [] args)
-    {
-        JFrame frame = new JFrame();
-        PickDelay.pickDelay(frame, null, 100);
     }
 }

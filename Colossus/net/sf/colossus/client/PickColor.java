@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.HTMLColor;
+import net.sf.colossus.util.KDialog;
 import net.sf.colossus.server.Constants;
 
 
@@ -17,7 +18,7 @@ import net.sf.colossus.server.Constants;
  */
 
 
-final class PickColor extends JDialog implements WindowListener, ActionListener
+final class PickColor extends KDialog implements WindowListener, ActionListener
 {
     private JLabel [] colorLabel = new JLabel[6];
 
@@ -62,12 +63,7 @@ final class PickColor extends JDialog implements WindowListener, ActionListener
         }
 
         pack();
-
-        // Center dialog on screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
-                     - getSize().height / 2));
-
+        centerOnScreen();
         addWindowListener(this);
         setVisible(true);
     }
@@ -128,34 +124,6 @@ final class PickColor extends JDialog implements WindowListener, ActionListener
         return -1;
     }
 
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-    }
 
     public void actionPerformed(ActionEvent e)
     {

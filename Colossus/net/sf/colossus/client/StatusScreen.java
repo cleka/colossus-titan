@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.KDialog;
 import net.sf.colossus.server.Options;
 
 
@@ -17,7 +18,7 @@ import net.sf.colossus.server.Options;
  */
 
 
-final class StatusScreen extends JDialog implements WindowListener
+final class StatusScreen extends KDialog implements WindowListener
 {
     private JLabel [] nameLabel;
     private JLabel [] towerLabel;
@@ -38,7 +39,7 @@ final class StatusScreen extends JDialog implements WindowListener
 
     StatusScreen(JFrame frame, Client client, String [] playerInfo)
     {
-        super(frame, "Game Status");
+        super(frame, "Game Status", false);
 
         setVisible(false);
         this.client = client;
@@ -151,12 +152,13 @@ final class StatusScreen extends JDialog implements WindowListener
 
         if (location == null)
         {
-            // Place dialog at bottom right of screen.
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            location = new Point(d.width - getSize().width,
-                d.height - getSize().height);
+            lowerRightCorner();
+            location = getLocation();
         }
-        setLocation(location);
+        else
+        {
+            setLocation(location);
+        }
 
         setVisible(true);
     }
@@ -224,33 +226,9 @@ final class StatusScreen extends JDialog implements WindowListener
     }
 
 
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
     public void windowClosing(WindowEvent e)
     {
         client.setOption(Options.showStatusScreen, false);
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
     }
 
 

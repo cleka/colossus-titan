@@ -4,7 +4,9 @@ package net.sf.colossus.client;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.util.KDialog;
 
 /**
  * Allows a player to summon an angel or archangel.
@@ -14,7 +16,7 @@ import net.sf.colossus.server.Creature;
  */
 
 
-final class SummonAngel extends JDialog implements MouseListener,
+final class SummonAngel extends KDialog implements MouseListener,
     ActionListener, WindowListener
 {
     private String markerId;
@@ -130,50 +132,11 @@ final class SummonAngel extends JDialog implements MouseListener,
         }
     }
 
-    public void mouseEntered(MouseEvent e)
-    {
-    }
-
-    public void mouseExited(MouseEvent e)
-    {
-    }
-
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
     public void windowClosing(WindowEvent e)
     {
         cleanup(null, null);
     }
 
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-    }
 
     /** Upstate state of angel and archangel chits to reflect donor */
     void updateChits()

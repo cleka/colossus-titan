@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
+import net.sf.colossus.util.KDialog;
 
 /**
  * Class PickRecruiter allows a player to choose which creature(s) recruit.
@@ -14,7 +15,7 @@ import java.util.*;
  */
 
 
-final class PickRecruiter extends JDialog implements MouseListener,
+final class PickRecruiter extends KDialog implements MouseListener,
     WindowListener
 {
     private java.util.List recruiters;
@@ -90,11 +91,7 @@ final class PickRecruiter extends JDialog implements MouseListener,
         }
 
         pack();
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
-
+        centerOnScreen();
         setVisible(true);
         repaint();
     }
@@ -124,58 +121,8 @@ final class PickRecruiter extends JDialog implements MouseListener,
     }
 
 
-    public void mouseEntered(MouseEvent e)
-    {
-    }
-
-
-    public void mouseExited(MouseEvent e)
-    {
-    }
-
-
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-
-
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-
     public void windowClosing(WindowEvent e)
     {
         dispose();
-    }
-
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-
-    public void windowOpened(WindowEvent e)
-    {
     }
 }

@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.util.KDialog;
 
 
 /**
@@ -15,7 +16,7 @@ import net.sf.colossus.server.Creature;
  * @author David Ripton
  */
 
-final class Negotiate extends JDialog implements MouseListener, ActionListener
+final class Negotiate extends KDialog implements MouseListener, ActionListener
 {
     private String attackerId;
     private String defenderId;
@@ -47,7 +48,6 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
         contentPane.setLayout(gridbag);
         pack();
         setBackground(Color.lightGray);
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         addMouseListener(this);
 
         int scale = 4 * Scale.get();
@@ -134,11 +134,13 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
         Point location = Concede.returnLocation();
         if (location == null)
         {
-            location = new Point(d.width / 2 - getSize().width / 2,
-                d.height / 2 - getSize().height / 2);
+            centerOnScreen();
+            location = getLocation();
         }
-        setLocation(location);
-
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
         repaint();
     }
@@ -161,22 +163,6 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
             chit.toggleDead();
             chit.repaint();
         }
-    }
-
-    public void mouseEntered(MouseEvent e)
-    {
-    }
-
-    public void mouseExited(MouseEvent e)
-    {
-    }
-
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-
-    public void mouseReleased(MouseEvent e)
-    {
     }
 
     public void actionPerformed(ActionEvent e)

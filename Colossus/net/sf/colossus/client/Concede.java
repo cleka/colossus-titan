@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
+import net.sf.colossus.util.KDialog;
 
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
@@ -13,7 +14,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-final class Concede extends JDialog implements ActionListener, WindowListener
+final class Concede extends KDialog implements ActionListener, WindowListener
 {
     private JFrame parentFrame;
     private boolean flee;
@@ -118,15 +119,15 @@ final class Concede extends JDialog implements ActionListener, WindowListener
 
         pack();
 
-        // Initially, center the dialog on the screen.  Save the
-        // location for future invocations.
         if (location == null)
         {
-            location = new Point(d.width / 2 - getSize().width / 2,
-                d.height / 2 - getSize().height / 2);
+            centerOnScreen();
+            location = getLocation();
         }
-        setLocation(location);
-
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
         repaint();
     }

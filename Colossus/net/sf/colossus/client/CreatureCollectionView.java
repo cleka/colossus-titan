@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.util.*;
 
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.util.KDialog;
 
 
 /** 
@@ -15,7 +16,7 @@ import net.sf.colossus.server.Creature;
  *  @author Tom Fruchterman
  *  @author David Ripton
  */
-class CreatureCollectionView extends JDialog
+class CreatureCollectionView extends KDialog implements WindowListener
 {
     private Client client;
     private static Point location;
@@ -26,31 +27,26 @@ class CreatureCollectionView extends JDialog
 
     CreatureCollectionView(JFrame frame, Client client)
     {
-        super(frame);
-        setTitle("Caretaker's Stacks");
+        super(frame, "Caretaker's Stacks", false);
 
         this.client = client;
 
         JPanel panel = makeCreaturePanel();
         getContentPane().add(panel, BorderLayout.CENTER);
 
-        addWindowListener(new WindowAdapter()
-        {
-            public void windowClosing(WindowEvent e)
-            {
-                dispose();
-            }
-        });
+        addWindowListener(this);
 
         pack();
 
         if (location == null)
         {
-            // Place dialog at upper right corner of screen.
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            location = new Point(d.width - getSize().width, 0);
+            upperRightCorner();
+            location = getLocation();
         }
-        setLocation(location);
+        else
+        {
+            setLocation(location);
+        }
         setVisible(true);
     }
 
@@ -144,10 +140,13 @@ class CreatureCollectionView extends JDialog
         JPanel panel = makeCreaturePanel();
         getContentPane().add(panel, BorderLayout.CENTER);
         pack();
-        // Place dialog at upper right corner of screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        location = new Point(d.width - getSize().width, 0);
-        setLocation(location);
+        upperRightCorner();
+        location = getLocation();
         update();
+    }
+
+    public void windowClosing(WindowEvent e)
+    {
+        dispose();
     }
 }

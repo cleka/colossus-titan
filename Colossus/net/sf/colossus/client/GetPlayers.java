@@ -10,6 +10,7 @@ import java.util.*;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
+import net.sf.colossus.util.KDialog;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.server.Game;
@@ -23,7 +24,7 @@ import net.sf.colossus.client.VariantSupport;
  */
 
 
-public final class GetPlayers extends JDialog implements WindowListener,
+public final class GetPlayers extends KDialog implements WindowListener,
     ActionListener
 {
     public static final int maxAIsupported = 16;
@@ -81,6 +82,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
                 ainum++;
             }
         }
+        // Use a Vector because JComboBox does not know about Lists.
         Vector typeChoices = new Vector();
         typeChoices.add("Human");
         typeChoices.add("None");
@@ -175,10 +177,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
         pack();
 
-        // Center dialog on screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
-                     - getSize().height / 2));
+        centerOnScreen();
 
         addWindowListener(this);
         setVisible(true);
@@ -253,34 +252,11 @@ public final class GetPlayers extends JDialog implements WindowListener,
     }
 
 
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
     public void windowClosing(WindowEvent e)
     {
         dispose();
     }
 
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-    }
 
     static class varFileFilter extends javax.swing.filechooser.FileFilter 
     {
