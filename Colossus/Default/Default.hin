@@ -47,12 +47,17 @@ DefensiveAI:
 RECRUIT P Centaur   2 Centaur  ((NOT (HASCREATURE Warbear)) AND
                                 (NOT (HEIGHTIS 6)) AND
                                 (ALLATTACKERSMALLERTHAN 0) AND
-                                (CANREACH W))
+                                (CANREACH W) AND
+                                (NOT (LABELIS "1")) AND
+                                (NOT (LABELIS "15")) AND
+                                (NOT (LABELIS "29")))
 RECRUIT M Ogre      2 Ogre     ((NOT (HASCREATURE Minotaur)) AND
                                 (NOT (HEIGHTIS 6)) AND
                                 (ALLATTACKERSMALLERTHAN 0) AND
-                                (CANREACH H))
-
+                                (CANREACH H) AND
+                                (NOT (LABELIS "8")) AND
+                                (NOT (LABELIS "22")) AND
+                                (NOT (LABELIS "36")))
 OffensiveAI:
 RECRUIT P Centaur   2 Centaur  ((NOT (HASCREATURE Warbear)) AND
                                 (HEIGHTIS 2) AND

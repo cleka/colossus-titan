@@ -1,3 +1,5 @@
+AllAI:
+
 RECRUIT B Cyclops   2 Cyclops  ((CANREACH J) AND
                                 (NOT (HASCREATURE Behemoth)) AND
                                 (2 Behemoth AVAILABLE) AND
@@ -6,17 +8,9 @@ RECRUIT P Lion      2 Lion     ((CANREACH D) AND
                                 (NOT (HASCREATURE Griffon)) AND
                                 (2 Griffon AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
-RECRUIT P Centaur   2 Centaur  ((CANREACH W) AND
-                                (NOT (HASCREATURE Warbear)) AND
-                                (2 Warbear AVAILABLE) AND
-                                (NOT (HEIGHTIS 6)))
 RECRUIT M Troll     2 Troll    ((CANREACH S) AND
                                 (NOT (HASCREATURE Wyvern)) AND
                                 (2 Wyvern AVAILABLE) AND
-                                (NOT (HEIGHTIS 6)))
-RECRUIT M Ogre      2 Ogre     ((CANREACH H) AND
-                                (NOT (HASCREATURE Minotaur)) AND
-                                (2 Minotaur AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
 RECRUIT M Ranger    2 Ranger   ((CANREACH P) AND
                                 (NOT (HASCREATURE AirElemental)) AND
@@ -79,3 +73,28 @@ INITIALSPLIT "600" 1.0 ( Titan Ogre Ogre Centaur ) ( Angel Gargoyle Gargoyle  Ce
 
 # Let's claim the Druid has almost no recruitment value so that the Titan will pick-up anything over a Druid.
 RECRUITVALUE Druid -10
+
+DefensiveAI:
+RECRUIT P Centaur   2 Centaur  ((NOT (HASCREATURE Warbear)) AND
+                                (NOT (HEIGHTIS 6)) AND
+                                (ALLATTACKERSMALLERTHAN 0) AND
+                                (CANREACH W) AND
+                                (NOT (LABELIS "1")) AND
+                                (NOT (LABELIS "15")) AND
+                                (NOT (LABELIS "29")))
+RECRUIT M Ogre      2 Ogre     ((NOT (HASCREATURE Minotaur)) AND
+                                (NOT (HEIGHTIS 6)) AND
+                                (ALLATTACKERSMALLERTHAN 0) AND
+                                (CANREACH H) AND
+                                (NOT (LABELIS "8")) AND
+                                (NOT (LABELIS "22")) AND
+                                (NOT (LABELIS "36")))
+OffensiveAI:
+RECRUIT P Centaur   2 Centaur  ((NOT (HASCREATURE Warbear)) AND
+                                (HEIGHTIS 2) AND
+                                (ALLATTACKERSMALLERTHAN 0) AND
+                                (CANREACH W))
+RECRUIT M Ogre      2 Ogre     ((NOT (HASCREATURE Minotaur)) AND
+                                (HEIGHTIS 2) AND
+                                (ALLATTACKERSMALLERTHAN 0) AND
+                                (CANREACH H))
