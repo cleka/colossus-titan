@@ -89,7 +89,8 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, "waitForAll was interrupted");
+            new MessageBox(parentFrame, e.toString() +
+                "waitForAll was interrupted");
         }
         imagesLoaded = true;
 
