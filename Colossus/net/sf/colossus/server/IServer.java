@@ -2,13 +2,8 @@ package net.sf.colossus.server;
 
 
 import java.util.*;
-import java.net.*;
-import javax.swing.*;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
-import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
 /**
@@ -21,7 +16,7 @@ public interface IServer
     public void leaveCarryMode();
 
     public void doneWithBattleMoves();
-    
+
     public void doneWithStrikes(String playerName);
 
     public void makeForcedStrikes(String playerName, boolean rangestrike);
@@ -30,7 +25,6 @@ public interface IServer
 
     public void doSummon(String markerId, String donorId, String angel);
 
-    /** Handle mustering for legion. */ 
     public void doRecruit(String markerId, String recruitName,
         String recruiterName);
 
@@ -44,7 +38,6 @@ public interface IServer
 
     public void doNotFlee(String markerId);
 
-    /** playerName makes a proposal. */
     public void makeProposal(String playerName, Proposal proposal);
 
     public void fight(String hexLabel);
@@ -84,17 +77,14 @@ public interface IServer
     public void doMove(String markerId, String hexLabel, String entrySide,
         boolean teleport, String teleportingLord);
 
-    // XXX Disallow in network games
+    public void assignColor(String playerName, String color);
+
+    // XXX Disallow the following methods in network games
     public void newGame();
 
-    // XXX Disallow in network games
     public void loadGame(String filename);
 
-    // XXX Disallow in network games
     public void saveGame();
 
-    // XXX Disallow in network games
     public void saveGame(String filename);
-
-    public void assignColor(String playerName, String color);
 }

@@ -2,22 +2,7 @@ package net.sf.colossus.client;
 
 
 import java.util.*;
-import java.net.*;
-import javax.swing.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.*;
 
-import net.sf.colossus.util.Log;
-import net.sf.colossus.util.Split;
-import net.sf.colossus.server.Server;
-import net.sf.colossus.util.Options;
-import net.sf.colossus.server.Player;
-import net.sf.colossus.server.Creature;
-import net.sf.colossus.server.AI;
-import net.sf.colossus.server.SimpleAI;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
 /**
@@ -56,7 +41,7 @@ public interface IClient
 
     public void removeDeadBattleChits();
 
-    public void placeNewChit(String imageName, boolean inverted, int tag, 
+    public void placeNewChit(String imageName, boolean inverted, int tag,
         String hexLabel);
 
     public void initBoard();
@@ -79,17 +64,17 @@ public interface IClient
     public void askFlee(String longMarkerName, String hexDescription,
         String allyMarkerId, String enemyMarkerId);
 
-    public void askNegotiate(String attackerLongMarkerName, 
-        String defenderLongMarkerName, String attackerId, String defenderId, 
+    public void askNegotiate(String attackerLongMarkerName,
+        String defenderLongMarkerName, String attackerId, String defenderId,
         String hexLabel);
 
     public void tellProposal(Proposal proposal);
 
     public void tellStrikeResults(String strikerDesc, int strikerTag,
-        String targetDesc, int targetTag, int strikeNumber, int [] rolls, 
+        String targetDesc, int targetTag, int strikeNumber, int [] rolls,
         int damage, boolean killed, boolean wasCarry, int carryDamageLeft,
         Set carryTargetDescriptions);
-        
+
     public void initBattle(String masterHexLabel, int battleTurnNumber,
         String battleActivePlayerName, int battlePhase,
         String attackerMarkerId, String defenderMarkerId);
@@ -124,12 +109,12 @@ public interface IClient
 
     public void setupBattleMove();
 
-    public void setupBattleFight(int battlePhase, 
+    public void setupBattleFight(int battlePhase,
         String battleActivePlayerName);
 
     public void tellLegionLocation(String markerId, String hexLabel);
 
-    public void tellBattleMove(int tag, String startingHexLabel, 
+    public void tellBattleMove(int tag, String startingHexLabel,
         String endingHexLabel, boolean undo);
 
     public void didMove(String markerId, String startingHexLabel,

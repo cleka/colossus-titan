@@ -1,6 +1,9 @@
+Add RMI connection.
+
 Add remote players to GetPlayers.
 
-Add RMI connection.
+Eliminate excess arguments to Flee, Concede, Negotiate.
+
 
 Change all arguments to public Client/Server methods to String.  (Use a 
    proxy layer for this.)
