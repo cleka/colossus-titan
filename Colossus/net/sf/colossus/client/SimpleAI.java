@@ -2130,6 +2130,9 @@ public class SimpleAI implements AI
         case WIN_WITH_HEAVY_LOSSES:
         case DRAW:
         case LOSE_BUT_INFLICT_HEAVY_LOSSES:
+            Log.debug("Legion " + legion.getMarkerId() + " doesn't flee " +
+                      " before " + enemy.getMarkerId() + " with result " + 
+                      result);
             return false;
         case LOSE:
             // don't bother unless we can try to weaken the titan stack
