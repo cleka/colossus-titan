@@ -35,7 +35,7 @@ public class SetupBattleHexes
                     h[i][j] = new BattleHex
                         ((int) Math.round(cx + 3 * i * scale),
                         (int) Math.round(cy + (2 * j + (i & 1)) *
-                        BattleHex.SQRT3 * scale), scale, map, i, j);
+                        Hex.SQRT3 * scale), scale, map, i, j);
                 }
             }
         }

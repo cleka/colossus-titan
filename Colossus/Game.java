@@ -1977,6 +1977,9 @@ public class Game
 
         // Insert a blank line in the log file after each battle.
         logEvent("\n");
+
+        // XXX Try to work around memory leaks.
+        System.gc();
     }
 
 

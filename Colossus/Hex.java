@@ -76,6 +76,12 @@ public abstract class Hex
     {
         return label;
     }
+    
+    
+    public void setLabel(String label)
+    {
+        this.label = label;
+    }
 
 
     public abstract String getTerrainName();

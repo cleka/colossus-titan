@@ -147,7 +147,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
 
     // Do a brute-force search through the hex array, looking for
-    //    a match.  Return the hex.
+    //    a match.  Return the hex, or null if none is found.
     public static MasterHex getHexFromLabel(int label)
     {
         for (int i = 0; i < h.length; i++)
@@ -162,9 +162,8 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 
-        // Error, so return a bogus hex.
         System.out.println("Could not find hex " + label);
-        return new MasterHex(-1, -1, -1, false, null);
+        return null;
     }
 
 
@@ -449,7 +448,7 @@ public class MasterBoard extends Frame implements MouseListener,
                 for (int tower = 100; tower <= 600; tower += 100)
                 {
                     hex = getHexFromLabel(tower);
-                    if (!hex.isOccupied())
+                    if (hex != null && !hex.isOccupied())
                     {
                         if (show)
                         {

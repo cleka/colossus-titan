@@ -1,6 +1,3 @@
-import java.awt.*;
-import java.awt.event.*;
-
 /**
  * Class Battle holds data about a Titan battle.
  * @version $Id$
@@ -252,7 +249,7 @@ public class Battle
 
         if (!summoningAngel)
         {
-            if (phase == Battle.SUMMON)
+            if (phase == SUMMON)
             {
                 advancePhase();
             }
@@ -583,17 +580,23 @@ public class Battle
 
     public void clearAllCarries()
     {
+        boolean needToRepaint = false;
+
         for (int i = 0; i < numCritters; i++)
         {
             Critter critter = critters[i];
             if (critter.getCarryFlag())
             {
                 critter.setCarryFlag(false);
-                critter.getCurrentHex().unselect();
-                critter.getCurrentHex().repaint();
+                needToRepaint = true;
             }
         }
         carryDamage = 0;
+
+        if (needToRepaint)
+        {
+            map.unselectAllHexes();
+        }
     }
 
 
@@ -618,22 +621,6 @@ public class Battle
         }
     }
 
-
-    // Return the Critter whose chit contains the given point,
-    //   or null if none does.
-    public Critter getCritterWithChitContainingPoint(Point point)
-    {
-        for (int i = 0; i < numCritters; i++)
-        {
-            if (critters[i].getChit().contains(point)) 
-            {
-                return critters[i];
-            }
-        }
-
-        return null;
-    }
-    
     
     private void removeDeadCreatures()
     {
@@ -889,6 +876,7 @@ public class Battle
                         if (highlight)
                         {
                             targetHex.select();
+                            // XXX not working right
                             targetHex.repaint();
                         }
                         count++;
@@ -899,8 +887,8 @@ public class Battle
 
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally.
-        if (!critter.isInContact(true) && critter.isRangestriker() &&
-            getPhase() != Battle.STRIKEBACK)
+        if (count == 0 && critter.isRangestriker() &&
+            getPhase() != STRIKEBACK)
         {
             for (int i = 0; i < getNumCritters(); i++)
             {
@@ -909,18 +897,14 @@ public class Battle
                 {
                     BattleHex targetHex = target.getCurrentHex();
 
-                    // Can't rangestrike if it can be struck normally.
-                    if (!targetHex.isSelected())
+                    if (isRangestrikePossible(critter, target))
                     {
-                        if (isRangestrikePossible(critter, target))
+                        if (highlight)
                         {
-                            if (highlight)
-                            {
-                                targetHex.select();
-                                targetHex.repaint();
-                            }
-                            count++;
+                            targetHex.select();
+                            targetHex.repaint();
                         }
+                        count++;
                     }
                 }
             }
@@ -980,6 +964,9 @@ public class Battle
         {
             target.setCarryFlag(false);
             target.getCurrentHex().unselect();
+
+            showDice.setCarries(carryDamage);
+            showDice.setup();
         }
     }
 
@@ -1557,18 +1544,19 @@ public class Battle
 
             switch (getPhase())
             {
-                case Battle.MOVE:
+                case MOVE:
                     // Highlight all legal destinations for this chit.
                     showMoves(critter);
                     break;
 
-                case Battle.FIGHT:
-                case Battle.STRIKEBACK:
+                case FIGHT:
+                case STRIKEBACK:
+                    // Leave carry mode.
+                    clearAllCarries();
+
                     // Highlight all legal strikes for this chit.
                     highlightStrikes(critter);
 
-                    // Leave carry mode.
-                    clearAllCarries();
                     break;
 
                 default:
@@ -1582,7 +1570,7 @@ public class Battle
     {
         switch (getPhase())
         {
-            case Battle.MOVE:
+            case MOVE:
                 if (isChitSelected())
                 {
                     getCritter(0).moveToHex(hex);
@@ -1591,8 +1579,8 @@ public class Battle
                 highlightMovableChits();
                 break;
 
-            case Battle.FIGHT:
-            case Battle.STRIKEBACK:
+            case FIGHT:
+            case STRIKEBACK:
                 if (getCarryDamage() > 0)
                 {
                     applyCarries(hex.getCritter());
@@ -1619,12 +1607,12 @@ public class Battle
     {
         switch (getPhase())
         {
-            case Battle.MOVE:
+            case MOVE:
                 highlightMovableChits();
                 break;
     
-            case Battle.FIGHT:
-            case Battle.STRIKEBACK:
+            case FIGHT:
+            case STRIKEBACK:
                 highlightChitsWithTargets();
                 break;
     
@@ -1683,8 +1671,9 @@ public class Battle
     
             map.dispose();
     
-            masterHex.unselect();
-            masterHex.repaint();
+            // XXX needed?
+            //masterHex.unselect();
+            //masterHex.repaint();
             board.getGame().finishBattle();
         }
         catch (NullPointerException e)

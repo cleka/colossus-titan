@@ -37,7 +37,6 @@ public class BattleHex extends Hex
     // Letters increase left to right; numbers increase bottom to top.
 
 
-
     public BattleHex(int cx, int cy, int scale, BattleMap map, int xCoord, 
         int yCoord)
     {

@@ -35,18 +35,18 @@ public class BattleMap extends Frame implements MouseListener,
 
     public BattleMap(MasterBoard board, MasterHex masterHex, Battle battle)
     {
-        super(battle.getAttacker().getMarkerId() + " (" + 
+        super(battle.getAttacker().getMarkerId() + " (" +
             battle.getAttacker().getPlayer().getName() +
             ") attacks " + battle.getDefender().getMarkerId() + " (" +
-            battle.getDefender().getPlayer().getName() + ")" + " in " + 
+            battle.getDefender().getPlayer().getName() + ")" + " in " +
             masterHex.getDescription());
-        
+
         Legion attacker = battle.getAttacker();
         Legion defender = battle.getDefender();
 
-        Game.logEvent("\n" + attacker.getMarkerId() + " (" + 
-            attacker.getPlayer().getName() + ") attacks " + 
-            defender.getMarkerId() + " (" + defender.getPlayer().getName() + 
+        Game.logEvent("\n" + attacker.getMarkerId() + " (" +
+            attacker.getPlayer().getName() + ") attacks " +
+            defender.getMarkerId() + " (" + defender.getPlayer().getName() +
             ")" + " in " + masterHex.getDescription());
 
         this.masterHex = masterHex;
@@ -89,7 +89,7 @@ public class BattleMap extends Frame implements MouseListener,
         imagesLoaded = true;
 
         pack();
-        
+
         if (location == null)
         {
             location = new Point(0, 2 * scale);
@@ -112,7 +112,7 @@ public class BattleMap extends Frame implements MouseListener,
             }
             catch (NullPointerException e)
             {
-                System.out.println(e.toString() + " Couldn't find " + 
+                System.out.println(e.toString() + " Couldn't find " +
                     Creature.colossus.getImageName());
                 dispose();
             }
@@ -131,7 +131,7 @@ public class BattleMap extends Frame implements MouseListener,
         battle.addCritter(critter);
 
         BattleChit chit = new BattleChit(chitScale,
-            critter.getImageName(legion == battle.getDefender()), this, 
+            critter.getImageName(legion == battle.getDefender()), this,
             critter);
         tracker.addImage(chit.getImage(), 0);
         critter.addBattleInfo(entrance, this, chit, battle);
@@ -149,7 +149,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         imagesLoaded = true;
     }
-        
+
 
     private void placeLegion(Legion legion, boolean inverted)
     {
@@ -158,7 +158,7 @@ public class BattleMap extends Frame implements MouseListener,
         {
             Critter critter = legion.getCritter(i);
             battle.addCritter(critter);
-            BattleChit chit = new BattleChit(chitScale, 
+            BattleChit chit = new BattleChit(chitScale,
                 critter.getImageName(inverted), this, critter);
             tracker.addImage(chit.getImage(), 0);
             critter.addBattleInfo(entrance, this, chit, battle);
@@ -178,6 +178,63 @@ public class BattleMap extends Frame implements MouseListener,
                 {
                     h[i][j].unselect();
                     h[i][j].repaint();
+                }
+            }
+        }
+    }
+
+
+    public static boolean listContains(String [] list, String item)
+    {
+        for (int i = list.length - 1; i >= 0; i--)
+        {
+            if (item.equals(list[i]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public static void unselectHexesByLabels(String [] labels)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (SetupBattleHexes.show[i][j])
+                {
+                    BattleHex hex = h[i][j];
+
+                    if (hex.isSelected() && listContains(labels, 
+                        hex.getLabel()))
+                    {
+                        hex.unselect();
+                        hex.repaint();
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    public static void selectHexesByLabels(String [] labels)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (SetupBattleHexes.show[i][j])
+                {
+                    BattleHex hex = h[i][j];
+
+                    if (!hex.isSelected() && listContains(labels,
+                        hex.getLabel()))
+                    {
+                        hex.select();
+                        hex.repaint();
+                    }
                 }
             }
         }
@@ -286,6 +343,27 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    // Do a brute-force search through the hex array, looking for
+    //    a match.  Return the hex, or null.
+    public static BattleHex getHexFromLabel(String label)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (SetupBattleHexes.show[i][j] && h[i][j].getLabel().equals(
+                    (label)))
+                {
+                    return h[i][j];
+                }
+            }
+        }
+
+        System.out.println("Could not find hex " + label);
+        return null;
+    }
+
+
     // Return the BattleHex that contains the given point, or
     //    null if none does.
     private static BattleHex getHexContainingPoint(Point point)
@@ -305,10 +383,29 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    // Return the Critter whose chit contains the given point,
+    //   or null if none does.
+    private Critter getCritterWithChitContainingPoint(Point point)
+    {
+        int numCritters = battle.getNumCritters();
+        for (int i = 0; i < numCritters; i++)
+        {
+            Critter critter = battle.getCritter(i);
+            Chit chit = critter.getChit();
+            if (chit.contains(point))
+            {
+                return critter;
+            }
+        }
+
+        return null;
+    }
+
+
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
-        Critter critter = battle.getCritterWithChitContainingPoint(point);
+        Critter critter = getCritterWithChitContainingPoint(point);
         BattleHex hex = getHexContainingPoint(point);
 
         // Only the active player can move or strike.
@@ -316,7 +413,7 @@ public class BattleMap extends Frame implements MouseListener,
         {
             battle.actOnCritter(critter);
         }
-    
+
         // No hits on chits, so check map.
         else if (hex != null && hex.isSelected())
         {
@@ -329,38 +426,38 @@ public class BattleMap extends Frame implements MouseListener,
             battle.actOnMisclick();
         }
     }
-    
-    
+
+
     public void mouseReleased(MouseEvent e)
     {
     }
-    
-    
+
+
     public void mouseClicked(MouseEvent e)
     {
     }
-    
-    
+
+
     public void mouseEntered(MouseEvent e)
     {
     }
-    
-    
+
+
     public void mouseExited(MouseEvent e)
     {
     }
-    
-    
+
+
     public void windowActivated(WindowEvent e)
     {
     }
-    
-    
+
+
     public void windowClosed(WindowEvent e)
     {
     }
-    
-    
+
+
     public void windowClosing(WindowEvent e)
     {
         if (board != null)
@@ -369,52 +466,52 @@ public class BattleMap extends Frame implements MouseListener,
         }
         battle.cleanup();
     }
-    
-    
+
+
     public void windowDeactivated(WindowEvent e)
     {
     }
-    
-    
+
+
     public void windowDeiconified(WindowEvent e)
     {
     }
-    
-    
+
+
     public void windowIconified(WindowEvent e)
     {
     }
-    
-    
+
+
     public void windowOpened(WindowEvent e)
     {
     }
-    
-    
+
+
     // This is used to fix artifacts from chits outside visible hexes.
     public static void setEraseFlag()
     {
         eraseFlag = true;
     }
-    
-    
+
+
     public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
-    
+
         Rectangle rectClip = g.getClipBounds();
-        
+
         // Abort if called too early.
         if (rectClip == null)
         {
             return;
         }
-        
+
         Dimension d = getSize();
-    
+
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
@@ -423,26 +520,26 @@ public class BattleMap extends Frame implements MouseListener,
             offImage = createImage(2 * d.width, 2 * d.height);
             offGraphics = offImage.getGraphics();
         }
-    
+
         // If the erase flag is set, erase the background.
         if (eraseFlag)
         {
             offGraphics.clearRect(0, 0, d.width, d.height);
             eraseFlag = false;
         }
-    
+
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (SetupBattleHexes.show[i][j] && 
+                if (SetupBattleHexes.show[i][j] &&
                     rectClip.intersects(h[i][j].getBounds()))
                 {
                     h[i][j].paint(offGraphics);
                 }
             }
         }
-    
+
         // Draw chits from back to front.
         for (int i = battle.getNumCritters() - 1; i >= 0; i--)
         {
@@ -452,11 +549,11 @@ public class BattleMap extends Frame implements MouseListener,
                 chit.paint(offGraphics);
             }
         }
-    
+
         g.drawImage(offImage, 0, 0, this);
     }
-    
-    
+
+
     public void paint(Graphics g)
     {
         // Double-buffer everything.
@@ -471,20 +568,20 @@ public class BattleMap extends Frame implements MouseListener,
 
         super.dispose();
     }
-    
-    
+
+
     public Dimension getMinimumSize()
     {
         return getPreferredSize();
     }
-    
-    
+
+
     public Dimension getPreferredSize()
     {
         return new Dimension(30 * scale, 28 * scale);
     }
-    
-    
+
+
     public static void main(String [] args)
     {
         Battle.main(args);

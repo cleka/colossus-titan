@@ -1,7 +1,5 @@
-Update number of carries shown in ShowDice after each carry,
-   in cases where there are enough to carry to multiple enemies.
-
-Make ShowDice a bit smaller?
+Have methods in Game and Battle return lists of hex labels, 
+   rather than actually selecting and repainting hexes.
 
 Add some keyboard shortcuts.
 

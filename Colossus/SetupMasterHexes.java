@@ -52,9 +52,9 @@ public class SetupMasterHexes
                     h[i][j] = new MasterHex
                         (cx + 4 * i * scale,
                         (int) Math.round(cy + (3 * j + (i & 1) *
-                        (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 * ((j + 1) / 2))
-                        * MasterHex.SQRT3 * scale), scale, ((i + j) & 1) == 0,
-                        board);
+                        (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 * 
+                        ((j + 1) / 2)) * Hex.SQRT3 * scale), scale, 
+                        ((i + j) & 1) == 0, board);
                 }
             }
         }
