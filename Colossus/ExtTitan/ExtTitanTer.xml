@@ -79,9 +79,9 @@
         <recruit name="Unicorn" number="2" />
     </terrain>
     <acquirable name="Angel" points="100" />
-    <acquirable name="FireElemental" points="100"" terrain="Desert" />
-    <acquirable name="WaterElemental" points="100"" terrain="Swamp" />
-    <acquirable name="AirElemental" points="100"" terrain="Woods" />
-    <acquirable name="EarthElemental" points="100"" terrain="Hills" />
+    <acquirable name="FireElemental" points="100" terrain="Desert" />
+    <acquirable name="WaterElemental" points="100" terrain="Swamp" />
+    <acquirable name="AirElemental" points="100" terrain="Woods" />
+    <acquirable name="EarthElemental" points="100" terrain="Hills" />
     <acquirable name="Archangel" points="300" />
 </terrains>

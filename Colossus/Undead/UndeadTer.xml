@@ -63,7 +63,6 @@
         <recruit name="Dendroid" number="2" />
         <recruit name="GreenDragon" number="2" />
     </terrain>
-<!--  Tower is a special case -->
     <terrain name="Tower" color="grey" regular_recruit="False" >
         <recruit name="Anything" number="0" />
         <recruit name="Paladin" number="0" />
@@ -83,14 +82,14 @@
     <titan_improve points="75" />
     <titan_teleport points="700" />
     <acquirable name="Angel" points="100" />
-    <acquirable name="FireElemental" points="100"" terrain="Desert" />
-    <acquirable name="WaterElemental" points="100"" terrain="Swamp" />
-    <acquirable name="AirElemental" points="100"" terrain="Woods" />
-    <acquirable name="EarthElemental" points="100"" terrain="Hills" />
-    <acquirable name="Archdevil" points="100"" terrain="Jungle" />
-    <acquirable name="Efreet" points="100"" terrain="Moutains" />
-    <acquirable name="Genie" points="100"" terrain="Tundra" />
-    <acquirable name="Necromancer" points="100"" terrain="Tower" />
-    <acquirable name="TheReaper" points="300"" terrain="Tower" />
+    <acquirable name="FireElemental" points="100" terrain="Desert" />
+    <acquirable name="WaterElemental" points="100" terrain="Swamp" />
+    <acquirable name="AirElemental" points="100" terrain="Woods" />
+    <acquirable name="EarthElemental" points="100" terrain="Hills" />
+    <acquirable name="Archdevil" points="100" terrain="Jungle" />
+    <acquirable name="Efreet" points="100" terrain="Moutains" />
+    <acquirable name="Genie" points="100" terrain="Tundra" />
+    <acquirable name="Necromancer" points="100" terrain="Tower" />
+    <acquirable name="TheReaper" points="300" terrain="Tower" />
     <acquirable name="Archangel" points="300" />
 </terrains>
