@@ -1971,6 +1971,8 @@ final class Battle
         if (hexLabel.equals(critter.getCurrentHexLabel()))
         {
             Log.event(critter.getDescription() + " does not move");
+            // Call moveToHex() anyway to sync client.
+            critter.moveToHex(hexLabel);
             return true;
         }
         else if (showMoves(critter, false).contains(hexLabel))
