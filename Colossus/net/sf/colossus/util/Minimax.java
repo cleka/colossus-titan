@@ -282,7 +282,7 @@ public class Minimax
 
         public Iterator generateMoves()
         {
-            ArrayList list = new ArrayList();
+            List list = new ArrayList();
 
             list.add(new TestMove("1"));
             list.add(new TestMove("2"));

@@ -20,7 +20,7 @@ final class Legion implements Comparable
 {
     private String markerId;    // Bk03, Rd12, etc.
     private String parentId;
-    private ArrayList critters = new ArrayList();
+    private List critters = new ArrayList();
     private String currentHexLabel;
     private String startingHexLabel;
     private boolean moved;
@@ -176,7 +176,7 @@ final class Legion implements Comparable
 
     //* For AICopy() */
     Legion(String markerId, String parentId, String currentHexLabel,
-        String startingHexLabel, ArrayList critters, String playerName,
+        String startingHexLabel, List critters, String playerName,
         Game game)
     {
         this(markerId, parentId, currentHexLabel, startingHexLabel, null,
@@ -300,7 +300,7 @@ final class Legion implements Comparable
         // from a single battle.
         boolean didArchangel = false;
 
-        ArrayList recruits;
+        List recruits;
 
         while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
         {
@@ -327,7 +327,7 @@ final class Legion implements Comparable
 
 
     /** recruits holds the types of angels can can acquire. */
-    private String acquireAngel(ArrayList recruits)
+    private String acquireAngel(List recruits)
     {
         Player player = getPlayer();
         String angelType = null;
@@ -428,10 +428,10 @@ final class Legion implements Comparable
      *  Unless showAll is true, return "Unknown" for critters that
      *  are not visible.  Put all the Unknowns at the end of the
      *  list to avoid giving out too much information. */
-    java.util.List getImageNames(boolean showAll)
+    List getImageNames(boolean showAll)
     {
         sortCritters();
-        java.util.List imageNames = new ArrayList();
+        List imageNames = new ArrayList();
         Iterator it = getCritters().iterator();
         int unknowns = 0;
         while (it.hasNext())
@@ -455,10 +455,10 @@ final class Legion implements Comparable
 
 
     /** Return a list of unique imageNames for all lords in this legion. */
-    java.util.List getUniqueLordImageNames()
+    List getUniqueLordImageNames()
     {
         sortCritters();
-        java.util.List imageNames = new ArrayList();
+        List imageNames = new ArrayList();
         Iterator it = getCritters().iterator();
         int unknowns = 0;
         while (it.hasNext())
@@ -1092,7 +1092,7 @@ final class Legion implements Comparable
     }
 
 
-    ArrayList getCritters()
+    List getCritters()
     {
         return critters;
     }
@@ -1381,7 +1381,7 @@ final class Legion implements Comparable
     }
 
 
-    private String[] convertCritterListToStringArray(ArrayList oCritterList)
+    private String[] convertCritterListToStringArray(List oCritterList)
     {
         int nSize = oCritterList.size();
         String[] strArray = new String[nSize];

@@ -177,8 +177,7 @@
                          **/Colossus.jar,
                          **/.#Colossus.jar*,
                          **/Colossus.*.zip,
-                         javadoc/**,
-                         net/sf/colossus/parser/*.java"
+                         javadoc/**"
                 />
         </delete>
 </target>

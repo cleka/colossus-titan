@@ -2030,9 +2030,9 @@ final class Battle
 
 
     /** Return a list of all critters in the battle. */
-    private ArrayList getAllCritters()
+    private List getAllCritters()
     {
-        ArrayList critters = new ArrayList();
+        List critters = new ArrayList();
         Legion defender = getDefender();
         if (defender != null)
         {
@@ -2085,9 +2085,9 @@ final class Battle
         return null;
     }
 
-    ArrayList getCritters(String hexLabel)
+    List getCritters(String hexLabel)
     {
-        ArrayList critters = new ArrayList();
+        List critters = new ArrayList();
         Iterator it = getAllCritters().iterator();
         while (it.hasNext())
         {

@@ -19,8 +19,8 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
 {
     private String attackerMarkerId;
     private String defenderMarkerId;
-    private ArrayList attackerChits = new ArrayList();
-    private ArrayList defenderChits = new ArrayList();
+    private java.util.List attackerChits = new ArrayList();
+    private java.util.List defenderChits = new ArrayList();
     private Marker attackerMarker;
     private Marker defenderMarker;
     private GridBagLayout gridbag = new GridBagLayout();
@@ -241,7 +241,7 @@ final class Negotiate extends JDialog implements MouseListener, ActionListener
             {
                 String winnerMarkerId;
                 String loserMarkerId;
-                ArrayList winnerChits;
+                java.util.List winnerChits;
 
                 if (!defendersLeft)
                 {

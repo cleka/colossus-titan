@@ -19,8 +19,8 @@ import net.sf.colossus.server.Creature;
 final class PickRecruiter extends JDialog implements MouseListener,
     WindowListener
 {
-    private ArrayList recruiters;
-    private ArrayList recruiterChits = new ArrayList();
+    private java.util.List recruiters;
+    private java.util.List recruiterChits = new ArrayList();
     private Marker legionMarker;
     private int height;
     private GridBagLayout gridbag = new GridBagLayout();
@@ -29,7 +29,7 @@ final class PickRecruiter extends JDialog implements MouseListener,
 
 
     /** recruiters is a list of Creatures */
-    private PickRecruiter(JFrame parentFrame, ArrayList recruiters, 
+    private PickRecruiter(JFrame parentFrame, java.util.List recruiters, 
         java.util.List imageNames, String hexDescription, String markerId,
         Client client)
     {
@@ -103,7 +103,7 @@ final class PickRecruiter extends JDialog implements MouseListener,
 
 
     static Creature pickRecruiter(JFrame parentFrame, 
-        ArrayList recruiters, java.util.List imageNames, 
+        java.util.List recruiters, java.util.List imageNames, 
         String hexDescription, String markerId, Client client)
     {
         new PickRecruiter(parentFrame, recruiters, imageNames, 

@@ -1,7 +1,7 @@
 Reduce cross-platform imports.  Document remaining public classes, which 
    are those that need to be included in the network protocol.
 
-Add test .jnlp files that points to a jar in the local filesystem,
+Add test .jnlp file that points to a jar in the local filesystem,
    and to a jar on a test webserver or another directory on the
    SF webserver.
 
@@ -20,8 +20,7 @@ Allow dragging chits in addition to clicking source and destination.
 Eliminate persistent legion.hexInfo and instead return a temporary
    object containing all the entry sides and teleport possibilities
    along with the possible hexes that the legion can move to.
-
-Try SableCC.
+Highlight teleport and normal moves differently, and show entry sides.
 
 Confirmation prompt to avoid skipping recruits?
 
@@ -59,22 +58,15 @@ Change more modal dialogs to use a factory that returns a value,
    rather than a public constructor and a call to a mutator.
    This should reduce global access from dialogs to game objects,
    and allow dialog results to be more easily replicated by network
-   and computer dialog replacements.  
+   and computer dialog replacements.
 All parameters passed into dialogs should be read-only or clones, with 
    all changes to game state done by the caller.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 Add optional additional handicap mulligans that can be used after turn 1.
 
-Highlight teleport and normal moves differently, and show entry sides.
-Differently-highlight hexes where a legion could move if
-   a friendly stack were not already there?
-
-Color code StatusScreen better.
-
 Show StatusScreen and ShowLegion info in the masterboard window, rather 
    than in separate windows.
-
 
 Client-server networking.
 

@@ -16,7 +16,7 @@ import java.util.*;
 
 final class PickLord extends JDialog implements MouseListener, WindowListener
 {
-    private ArrayList chits = new ArrayList();
+    private java.util.List chits = new ArrayList();
     private static String lordType;
     private java.util.List imageNames;
 

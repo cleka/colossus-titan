@@ -172,7 +172,7 @@ final class StatusScreen extends JDialog implements WindowListener
     {
         for (int i = 0; i < playerInfo.length; i++)
         {
-            ArrayList data = Split.split(':', playerInfo[i]);
+            java.util.List data = Split.split(':', playerInfo[i]);
 
             Color color;
             if ("true".equals((String)data.get(0)))

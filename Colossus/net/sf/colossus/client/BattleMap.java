@@ -719,7 +719,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        ArrayList battleChits = client.getBattleChits();
+        java.util.List battleChits = client.getBattleChits();
         ListIterator lit = battleChits.listIterator(battleChits.size());
         while (lit.hasPrevious())
         {

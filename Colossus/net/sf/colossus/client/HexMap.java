@@ -28,7 +28,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     // GUI hexes need to be recreated for each object, since scale varies.
     private GUIBattleHex [][] h = new GUIBattleHex[6][6];
-    private ArrayList hexes = new ArrayList(33);
+    private java.util.List hexes = new ArrayList(33);
 
     // The game state hexes can be set up once for each terrain type.
     // XXX Also Need entrances in non-GUI maps.
@@ -64,7 +64,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             char terrain = terrains[t];
 
             BattleHex [][] gameH = new BattleHex[6][6];
-            ArrayList gameHexes = new ArrayList();
+            java.util.List gameHexes = new ArrayList();
 
             // Initialize game state hex array.
             for (int i = 0; i < gameH.length; i++)
@@ -399,7 +399,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  hexes, looking for a match.  Return the hex, or null. */
     public static BattleHex getHexByLabel(char terrain, String label)
     {
-        ArrayList correctHexes = (ArrayList)terrainHexes.get(
+        java.util.List correctHexes = (java.util.List)terrainHexes.get(
             new Character(terrain));
         Iterator it = correctHexes.iterator();
         while (it.hasNext())

@@ -48,7 +48,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
     private JComboBox [] playerNames = new JComboBox[6];
 
     /** List of Map.Entry objects that map player names to player types */
-    private static ArrayList playerInfo = new ArrayList();
+    private static java.util.List playerInfo = new ArrayList();
 
     private static final String pathSeparator = "/";
     private static String varDirectory = "";

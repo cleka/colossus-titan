@@ -16,8 +16,8 @@ import javax.swing.*;
 final class SplitLegion extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
-    private ArrayList oldChits = new ArrayList(8);
-    private ArrayList newChits = new ArrayList(8);
+    private java.util.List oldChits = new ArrayList(8);
+    private java.util.List newChits = new ArrayList(8);
 
     private Marker oldMarker;
     private Marker newMarker;
@@ -141,7 +141,7 @@ final class SplitLegion extends JDialog implements MouseListener,
 
 
     /** Move a chit to the end of the other line. */
-    private void moveChitToOtherLine(ArrayList fromChits, ArrayList
+    private void moveChitToOtherLine(java.util.List fromChits, java.util.List
         toChits, int oldPosition, int gridy)
     {
         Container contentPane = getContentPane();

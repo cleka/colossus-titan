@@ -28,15 +28,15 @@ public final class MasterBoard extends JPanel
     private GUIMasterHex[][] h = new GUIMasterHex[15][8];
 
     /** For ease of iterating through all hexes, they'll also be
-     *  stored in an ArrayList. */
-    private ArrayList hexes = new ArrayList(96);
+     *  stored in a List. */
+    private java.util.List hexes = new ArrayList(96);
 
     /** A static set of non-GUI MasterHexes */
     private static MasterHex[][] plain = new MasterHex[15][8];
 
     /** For ease of iterating through all hexes, they'll also be
-     *  stored in an ArrayList. */
-    private static ArrayList plainHexes = new ArrayList(96);
+     *  stored in a List. */
+    private static java.util.List plainHexes = new ArrayList(96);
 
     /** The hexes in the 15x8 array that actually exist are
      *  represented by true. */
@@ -654,7 +654,7 @@ public final class MasterBoard extends JPanel
         // For easy of mapping to the GUI, they'll initially be stored
         // in a 15x8 array, with some empty elements.
         // For ease of iterating through all hexes, they'll then be
-        // stored in an ArrayList.
+        // stored in a List.
 
         int scale = Scale.get();
 
@@ -1198,7 +1198,7 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        ArrayList markerIds = client.getLegionMarkerIds(hexLabel);
+        java.util.List markerIds = client.getLegionMarkerIds(hexLabel);
 
         // Put the current player's legions first.
         Collections.sort(markerIds, MarkerComparator.getMarkerComparator(

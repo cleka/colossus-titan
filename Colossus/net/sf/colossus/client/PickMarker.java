@@ -16,7 +16,7 @@ import javax.swing.*;
 
 final class PickMarker extends JDialog implements MouseListener, WindowListener
 {
-    private ArrayList markers = new ArrayList();
+    private java.util.List markers = new ArrayList();
     private static String markerId;
 
 

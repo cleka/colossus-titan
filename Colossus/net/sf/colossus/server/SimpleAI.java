@@ -378,7 +378,7 @@ class SimpleAI implements AI
         Critter weakest = legion.getCritter(legion.getHeight() - 1);
 
         // Consider recruiting.
-        ArrayList recruits = game.findEligibleRecruits(legion.getMarkerId(), 
+        List recruits = game.findEligibleRecruits(legion.getMarkerId(), 
             hexLabel);
         if (!recruits.isEmpty())
         {
@@ -427,8 +427,7 @@ class SimpleAI implements AI
      * Decide how to split this legion, and return a list of
      * Creatures to remove.
      */
-    static List chooseCreaturesToSplitOut(Legion legion,
-        int numPlayers)
+    static List chooseCreaturesToSplitOut(Legion legion, int numPlayers)
     {
         //
         // split a 7 or 8 high legion somehow
@@ -497,7 +496,7 @@ class SimpleAI implements AI
             }
         }
 
-        ArrayList creaturesToRemove = new ArrayList();
+        List creaturesToRemove = new ArrayList();
 
         creaturesToRemove.add(weakest1);
         creaturesToRemove.add(weakest2);
@@ -578,7 +577,7 @@ class SimpleAI implements AI
         Creature nonsplitCreature)
     {
         Creature[] startCre = Game.getStartingCreatures();
-        LinkedList splitoffs = new LinkedList();
+        List splitoffs = new LinkedList();
 
         if (favorTitan)
         {
@@ -631,7 +630,7 @@ class SimpleAI implements AI
         Creature nonsplitCreature)
     {
         Creature[] startCre = Game.getStartingCreatures();
-        LinkedList splitoffs = new LinkedList();
+        List splitoffs = new LinkedList();
 
         if (favorTitan)
         {
@@ -707,7 +706,7 @@ class SimpleAI implements AI
         /** cache all places enemies can move to, for use in risk analysis. */
         HashMap[] enemyAttackMap = buildEnemyAttackMap(game, player);
 
-        // A mapping from Legion to ArrayList of MoveInfo objects,
+        // A mapping from Legion to List of MoveInfo objects,
         // listing all moves that we've evaluated.  We use this if
         // we're forced to move.
         HashMap moveMap = new HashMap();
@@ -768,7 +767,7 @@ class SimpleAI implements AI
                 }
 
                 // compute the value of sitting still
-                ArrayList moveList = new ArrayList();
+                List moveList = new ArrayList();
                 moveMap.put(legion, moveList);
 
                 MoveInfo sitStillMove = new MoveInfo(legion, null,
@@ -842,12 +841,12 @@ class SimpleAI implements AI
                 // legions that are here, and sort them by their
                 // difference from sitting still multiplied by
                 // the value of the legion.
-                ArrayList allmoves = new ArrayList();
+                List allmoves = new ArrayList();
                 Iterator friendlyLegionIt = friendlyLegions.iterator();
                 while (friendlyLegionIt.hasNext())
                 {
                     Legion friendlyLegion = (Legion)friendlyLegionIt.next();
-                    ArrayList moves = (ArrayList)moveMap.get(friendlyLegion);
+                    List moves = (List)moveMap.get(friendlyLegion);
                     allmoves.addAll(moves);
                 }
 
@@ -909,13 +908,13 @@ class SimpleAI implements AI
         // first, concatenate all the moves all legions, and
         // sort them by their difference from sitting still
 
-        ArrayList allmoves = new ArrayList();
+        List allmoves = new ArrayList();
         List legions = player.getLegions();
         Iterator friendlyLegionIt = legions.iterator();
         while (friendlyLegionIt.hasNext())
         {
             Legion friendlyLegion = (Legion)friendlyLegionIt.next();
-            ArrayList moves = (ArrayList)moveMap.get(friendlyLegion);
+            List moves = (List)moveMap.get(friendlyLegion);
 
             allmoves.addAll(moves);
         }
@@ -996,7 +995,7 @@ class SimpleAI implements AI
                              effectiveRoll++)
                         {
                             // legion can attack to hexlabel on a effectiveRoll
-                            ArrayList list = (ArrayList)enemyMap[effectiveRoll]
+                            List list = (List)enemyMap[effectiveRoll]
                                 .get(hexlabel);
 
                             if (list == null)
@@ -1767,7 +1766,7 @@ class SimpleAI implements AI
     }
 
 
-    public String acquireAngel(Legion legion, ArrayList recruits, Game game)
+    public String acquireAngel(Legion legion, List recruits, Game game)
     {
         // This is a dumb placeholder.
         // TODO If the legion is 6 high and can recruit something better,
@@ -2164,7 +2163,7 @@ class SimpleAI implements AI
         // getting stuff out of the way so that a reinforcement
         // has room to enter.
 
-        ArrayList bestOrder = findBattleMoves(game);
+        List bestOrder = findBattleMoves(game);
 
         // Now that critters are sorted into the order in which they
         // should move, start moving them for real.  If the preferred
@@ -2179,7 +2178,7 @@ class SimpleAI implements AI
             Iterator it = bestOrder.iterator();
             while (it.hasNext())
             {
-                ArrayList moveList = (ArrayList)it.next();
+                List moveList = (List)it.next();
                 Iterator it2 = moveList.iterator();
                 while (it2.hasNext())
                 {
@@ -2201,9 +2200,9 @@ class SimpleAI implements AI
     }
 
     /** Compute a set of CritterMoves for the game's active legion.
-     *  Return an ArrayList containing one ArrayList of CritterMoves
+     *  Return a List containing one List of CritterMoves
      *  for each Critter. */
-    ArrayList findBattleMoves(Game realGame)
+    List findBattleMoves(Game realGame)
     {
         // Consider one critter at a time, in order of importance.
         // Examine all possible moves for that critter not already
@@ -2220,14 +2219,14 @@ class SimpleAI implements AI
         final Battle battle = game.getBattle();
         final char terrain = battle.getTerrain();
         final Legion legion = battle.getActiveLegion();
-        ArrayList critters = legion.getCritters();
+        List critters = legion.getCritters();
 
         // Sort critters in decreasing order of importance.  Keep
         // identical creatures together with a secondary sort by
         // creature name.
         Collections.sort(critters, new CritterComparator(terrain));
 
-        // allCritterMoves is an ArrayList of moveLists.
+        // allCritterMoves is an ArrayList (for clone()) of moveLists.
         final ArrayList allCritterMoves = new ArrayList();
         HashSet hexesTaken = new HashSet();
 
@@ -2261,7 +2260,7 @@ class SimpleAI implements AI
             Iterator it2 = allCritterMoves.iterator();
             while (it2.hasNext())
             {
-                ArrayList moveList = (ArrayList)it2.next();
+                List moveList = (List)it2.next();
                 CritterMove cm = (CritterMove)moveList.get(0);
                 Critter critter2 = cm.getCritter();
                 Log.debug("Simulating moving " + critter2.getName() + " to " + 
@@ -2270,7 +2269,7 @@ class SimpleAI implements AI
             }
 
             // moveList is a list of CritterMoves for one critter.
-            ArrayList moveList = new ArrayList();
+            List moveList = new ArrayList();
 
             it2 = moves.iterator();
             while (it2.hasNext())
@@ -2339,7 +2338,7 @@ class SimpleAI implements AI
             it2 = allCritterMoves.iterator();
             while (it2.hasNext())
             {
-                moveList = (ArrayList)it2.next();
+                moveList = (List)it2.next();
                 CritterMove cm = (CritterMove)moveList.get(0);
                 Critter critter2 = cm.getCritter();
                 critter2.setCurrentHexLabel(cm.getStartingHexLabel());
@@ -2357,7 +2356,7 @@ class SimpleAI implements AI
         it = trimmedCritterMoves.iterator();
         while (it.hasNext())
         {
-            ArrayList moveList = (ArrayList)it.next();
+            List moveList = (List)it.next();
             CritterMove cm = (CritterMove)moveList.get(0);
             if (cm.getStartingHexLabel().equals(cm.getEndingHexLabel()))
             {
@@ -2388,8 +2387,8 @@ class SimpleAI implements AI
 
         int turn = battle.getTurnNumber();
         int bestScore = 0;
-        ArrayList bestOrder = null;
-        ArrayList lastOrder = null;
+        List bestOrder = null;
+        List lastOrder = null;
         int count = 0;
 
         it = new Perms(trimmedCritterMoves).iterator();
@@ -2426,7 +2425,7 @@ class SimpleAI implements AI
                     break;
                 }
             }
-            lastOrder = (ArrayList)order.clone();
+            lastOrder = (List)order.clone();
 
             // Just bailing out after 100 speeds things up a lot
             // and seems to work okay.
@@ -2445,13 +2444,13 @@ class SimpleAI implements AI
     // TODO Optimize this method.
     /** Try each of the moves in order.  Return the number that succeed,
      *  scaled by the importance of each critter. */
-    private int testMoveOrder(ArrayList order, Battle battle)
+    private int testMoveOrder(List order, Battle battle)
     {
         int val = 0;
         Iterator it = order.iterator();
         while (it.hasNext())
         {
-            ArrayList moveList = (ArrayList)it.next();
+            List moveList = (List)it.next();
             CritterMove cm = (CritterMove)moveList.get(0);
             Critter critter = cm.getCritter();
             String hexLabel = cm.getEndingHexLabel();
@@ -2464,7 +2463,7 @@ class SimpleAI implements AI
         it = order.iterator();
         while (it.hasNext())
         {
-            ArrayList moveList = (ArrayList)it.next();
+            List moveList = (List)it.next();
             CritterMove cm = (CritterMove)moveList.get(0);
             Critter critter = cm.getCritter();
             String hexLabel = cm.getStartingHexLabel();
@@ -2473,10 +2472,10 @@ class SimpleAI implements AI
         return val;
     }
 
-    /** For an ArrayList of moveLists, which are ArrayLists of CritterMoves,
+    /** For an List of moveLists, which are List of CritterMoves,
      *  concatenate all the creature names in order.  If the list is null
      *  or empty, return an empty String. */
-    private String creatureNames(ArrayList list)
+    private String creatureNames(List list)
     {
         if (list == null)
         {
@@ -2486,7 +2485,7 @@ class SimpleAI implements AI
         Iterator it = list.iterator();
         while (it.hasNext())
         {
-            ArrayList moveList = (ArrayList)it.next();
+            List moveList = (List)it.next();
             CritterMove cm = (CritterMove)moveList.get(0);
             Critter critter = cm.getCritter();
             buf.append(critter.getName());
@@ -2779,8 +2778,8 @@ class SimpleAI implements AI
             final char terrain = battle.getTerrain();
             final Legion legion = battle.getActiveLegion();
 
-            ArrayList moveList1 = (ArrayList)o1;
-            ArrayList moveList2 = (ArrayList)o2;
+            List moveList1 = (List)o1;
+            List moveList2 = (List)o2;
             CritterMove cm1 = (CritterMove)moveList1.get(0);
             CritterMove cm2 = (CritterMove)moveList2.get(0);
             Critter critter1 = cm1.getCritter();

@@ -20,9 +20,9 @@ final class PickRecruit extends JDialog implements MouseListener,
     WindowListener
 {
     private java.util.List recruits;   // of Creatures
-    private ArrayList recruitChits = new ArrayList();
+    private java.util.List recruitChits = new ArrayList();
     private Marker legionMarker;
-    private ArrayList legionChits = new ArrayList();
+    private java.util.List legionChits = new ArrayList();
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();

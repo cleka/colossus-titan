@@ -17,13 +17,14 @@ import java.util.*;
 final class AcquireAngel extends JDialog implements MouseListener,
     WindowListener
 {
-    private ArrayList chits = new ArrayList();
+    private java.util.List chits = new ArrayList();
     private static String recruit;
-    private ArrayList recruits;
+    private java.util.List recruits;
     private static boolean active;
 
 
-    private AcquireAngel(JFrame parentFrame, String name, ArrayList recruits)
+    private AcquireAngel(JFrame parentFrame, String name, 
+        java.util.List recruits)
     {
         super(parentFrame, name + ": Acquire Angel", true);
 
@@ -60,7 +61,7 @@ final class AcquireAngel extends JDialog implements MouseListener,
 
 
     static String acquireAngel(JFrame parentFrame, String name,
-        ArrayList recruits)
+        java.util.List recruits)
     {
         recruit = null;
         if (recruits.isEmpty())

@@ -712,7 +712,7 @@ final class Critter extends Creature implements Comparable
         if (carryPossible)
         {
             boolean haveCarryTarget = false;
-            ArrayList penaltyOptions = new ArrayList();
+            List penaltyOptions = new ArrayList();
 
             for (int i = 0; i < 6; i++)
             {
@@ -764,7 +764,7 @@ final class Critter extends Creature implements Comparable
             // Find the group of PenaltyOptions with identical dice and
             //    strike numbers.
             PenaltyOption option;
-            ArrayList critters = new ArrayList();
+            List critters = new ArrayList();
             ListIterator lit = penaltyOptions.listIterator();
             while (lit.hasNext())
             {

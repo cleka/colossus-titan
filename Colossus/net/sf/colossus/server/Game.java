@@ -26,7 +26,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 
 public final class Game
 {
-    private ArrayList players = new ArrayList(6);
+    private java.util.List players = new ArrayList(6);
     private int activePlayerNum;
     private int turnNumber;    // Advance when every player has a turn
     private boolean engagementInProgress;
@@ -178,7 +178,7 @@ public final class Game
         while (it.hasNext())
         {
             String entry = (String)it.next();
-            ArrayList values = Split.split('~', entry);
+            java.util.List values = Split.split('~', entry);
             String name = (String)values.get(0);
             String type = (String)values.get(1);
             addPlayer(name, type);
@@ -1344,9 +1344,9 @@ public final class Game
 
     /** Return a list of creatures that can be recruited in
      *  the given terrain, ordered from lowest to highest. */
-    public static ArrayList getPossibleRecruits(char terrain)
+    public static java.util.List getPossibleRecruits(char terrain)
     {
-        ArrayList recruits = trl.getPossibleRecruits(terrain);
+        java.util.List recruits = trl.getPossibleRecruits(terrain);
         return recruits;
     }
 
@@ -1361,10 +1361,10 @@ public final class Game
 
 
     /** Return a list of eligible recruits, as Creatures. */
-    ArrayList findEligibleRecruits(String markerId, String hexLabel)
+    java.util.List findEligibleRecruits(String markerId, String hexLabel)
     {
         Legion legion = getLegionByMarkerId(markerId);
-        ArrayList recruits;
+        java.util.List recruits;
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
@@ -1475,9 +1475,9 @@ public final class Game
 
     /** Return a list of eligible recruiters. Use Critters instead
      *  of Creatures so that Titan power is shown properly. */
-    ArrayList findEligibleRecruiters(String markerId, Creature recruit)
+    java.util.List findEligibleRecruiters(String markerId, Creature recruit)
     {
-        ArrayList recruiters = new ArrayList(4);
+        java.util.List recruiters = new ArrayList(4);
 
         Legion legion = getLegionByMarkerId(markerId);
         String hexLabel = legion.getCurrentHexLabel();
@@ -1488,7 +1488,7 @@ public final class Game
         {
             // Towers are a special case.  The recruiter of tower creatures
             // remains anonymous, so we only deal with guardians and warlocks.
-            ArrayList possibleRecruiters = getPossibleRecruits(terrain);
+            java.util.List possibleRecruiters = getPossibleRecruits(terrain);
             Creature warlockOrNot = (Creature)possibleRecruiters.get(4);
             Creature guardianOrNot = (Creature)possibleRecruiters.get(3);
             if (recruit.getName().equals(warlockOrNot.getName()))
@@ -1547,7 +1547,8 @@ public final class Game
 
     /** Return true if all members of legion who are in recruiters are
      *  already visible. */
-    private boolean allRecruitersVisible(Legion legion, ArrayList recruiters)
+    private boolean allRecruitersVisible(Legion legion, 
+        java.util.List recruiters)
     {
         if (server.getClientOption(Options.allStacksVisible))
         {
@@ -1581,8 +1582,8 @@ public final class Game
     void doRecruit(Creature recruit, Legion legion)
     {
         // Pick the recruiter(s) if necessary.
-        ArrayList recruiters = findEligibleRecruiters(legion.getMarkerId(), 
-            recruit);
+        java.util.List recruiters = findEligibleRecruiters(
+            legion.getMarkerId(), recruit);
         Creature recruiter;
         Player player = legion.getPlayer();
 
@@ -1639,13 +1640,13 @@ public final class Game
 
 
     /** Return a list of names of angel types that can be acquired. */
-    ArrayList findEligibleAngels(Legion legion, boolean archangel)
+    java.util.List findEligibleAngels(Legion legion, boolean archangel)
     {
         if (legion.getHeight() >= 7)
         {
             return null;
         }
-        ArrayList recruits = new ArrayList(2);
+        java.util.List recruits = new ArrayList(2);
         if (caretaker.getCount(Creature.getCreatureByName("Angel")) >= 1)
         {
             recruits.add(Creature.getCreatureByName("Angel").toString());
@@ -1940,7 +1941,7 @@ public final class Game
     {
         if (getNumLegions(hexLabel) > 1)
         {
-            ArrayList markerIds = getLegionMarkerIds(hexLabel);
+            java.util.List markerIds = getLegionMarkerIds(hexLabel);
             Iterator it = markerIds.iterator();
             String markerId = (String)it.next();
             Player player = getPlayerByMarkerId(markerId);
@@ -2173,7 +2174,7 @@ public final class Game
             String newMarkerId = (String)strings.remove(0);
 
             // Need to replace strings with creatures.
-            ArrayList creatures = new ArrayList();
+            java.util.List creatures = new ArrayList();
             Iterator it = strings.iterator();
             while (it.hasNext())
             {
@@ -2630,9 +2631,9 @@ public final class Game
 
 
     /** Return a list of all players' legions. */
-    ArrayList getAllLegions()
+    java.util.List getAllLegions()
     {
-        ArrayList list = new ArrayList();
+        java.util.List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player player = (Player)it.next();
@@ -2654,9 +2655,9 @@ public final class Game
     }
 
     /** Return a list of all legions not belonging to player. */
-    ArrayList getAllEnemyLegions(Player player)
+    java.util.List getAllEnemyLegions(Player player)
     {
-        ArrayList list = new ArrayList();
+        java.util.List list = new ArrayList();
         for (Iterator it = players.iterator(); it.hasNext();)
         {
             Player nextPlayer = (Player)it.next();
@@ -2719,7 +2720,7 @@ public final class Game
     int getAverageLegionPointValue()
     {
         int total = 0;
-        ArrayList legions = getAllLegions();
+        java.util.List legions = getAllLegions();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -2773,9 +2774,9 @@ public final class Game
         return null;
     }
 
-    ArrayList getLegionMarkerIds(String hexLabel)
+    java.util.List getLegionMarkerIds(String hexLabel)
     {
-        ArrayList markerIds = new ArrayList();
+        java.util.List markerIds = new ArrayList();
         Iterator it = getAllLegions().iterator();
         while (it.hasNext())
         {
@@ -2817,9 +2818,9 @@ public final class Game
         return null;
     }
 
-    ArrayList getFriendlyLegions(String hexLabel, Player player)
+    java.util.List getFriendlyLegions(String hexLabel, Player player)
     {
-        ArrayList legions = new ArrayList();
+        java.util.List legions = new ArrayList();
         Iterator it = player.getLegions().iterator();
         while (it.hasNext())
         {

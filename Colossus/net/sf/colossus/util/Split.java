@@ -12,9 +12,9 @@ import java.util.*;
 public final class Split
 {
     /** Split the string into a list of substrings delimited by sep. */
-    public static ArrayList split(final char sep, String s)
+    public static List split(final char sep, String s)
     {
-        ArrayList list = new ArrayList();
+        List list = new ArrayList();
 
         int pos = 0;
         int len = s.length();

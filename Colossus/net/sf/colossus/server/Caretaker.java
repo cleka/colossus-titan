@@ -21,15 +21,13 @@ import net.sf.colossus.util.Log;
 
 final class Caretaker implements Cloneable
 {
-    /**
-     * mapping from String creature name to Integer count.  If the
-     * creature is not found, assume that we have a full count (equal
-     * to Creature.getMaxCount())
-     */
+    /** Mapping from String creature name to Integer count.  If the
+     *  creature is not found, assume that we have a full count (equal
+     *  to Creature.getMaxCount()) */
     private HashMap map = new HashMap();
 
-    // XXX Temporary?  We need a Game reference for callback events.
     private Game game;
+
 
     Caretaker(Game game)
     {
@@ -118,16 +116,12 @@ final class Caretaker implements Cloneable
         }
     }
 
-    /**
-     * deep copy for AI
-     */
+    /** deep copy for AI */
     Caretaker AICopy()
     {
         return (Caretaker)clone();
     }
 
-    // ---------------------------------
-    // Override from Object 
 
     public Object clone()
     {

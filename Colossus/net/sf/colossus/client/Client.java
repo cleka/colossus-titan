@@ -38,7 +38,7 @@ public final class Client
     private BattleMap map;
     private BattleDice battleDice;
 
-    private ArrayList battleChits = new ArrayList();
+    private java.util.List battleChits = new ArrayList();
 
     /** Stack of legion marker ids, to allow multiple levels of undo for
      *  splits, moves, and recruits. */
@@ -47,9 +47,9 @@ public final class Client
     private String moverId;
 
     /** The end of the list is on top in the z-order. */
-    private ArrayList markers = new ArrayList();
+    private java.util.List markers = new ArrayList();
 
-    private ArrayList recruitChits = new ArrayList();
+    private java.util.List recruitChits = new ArrayList();
 
     // Per-client and per-player options should be kept here instead
     // of in Game.  (For now we can move all options from Game/Player
@@ -534,7 +534,7 @@ public final class Client
     }
 
 
-    ArrayList getBattleChits()
+    java.util.List getBattleChits()
     {
         return battleChits;
     }
@@ -614,7 +614,7 @@ public final class Client
     }
 
 
-    ArrayList getRecruitChits()
+    java.util.List getRecruitChits()
     {
         return recruitChits;
     }
@@ -746,14 +746,14 @@ public final class Client
 
 
     /** Called from server. */
-    public String pickRecruit(ArrayList recruits, java.util.List imageNames,
+    public String pickRecruit(java.util.List recruits, java.util.List imageNames,
         String hexDescription, String markerId)
     {
         return PickRecruit.pickRecruit(board.getFrame(), recruits,
             imageNames, hexDescription, markerId, this);
     }
 
-    public String pickRecruiter(ArrayList recruiters, 
+    public String pickRecruiter(java.util.List recruiters, 
         java.util.List imageNames, String hexDescription, String markerId)
     {
         Creature recruiter = PickRecruiter.pickRecruiter(board.getFrame(),
@@ -775,7 +775,7 @@ public final class Client
 
 
 
-    public String acquireAngel(ArrayList recruits)
+    public String acquireAngel(java.util.List recruits)
     {
         board.deiconify();
         return AcquireAngel.acquireAngel(board.getFrame(), playerName,
@@ -1386,7 +1386,7 @@ public final class Client
     }
 
 
-    ArrayList getLegionMarkerIds(String hexLabel)
+    java.util.List getLegionMarkerIds(String hexLabel)
     {
         return server.getLegionMarkerIds(hexLabel);
     }

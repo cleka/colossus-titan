@@ -60,7 +60,7 @@ final class ShowMasterHex extends JDialog implements MouseListener,
         contentPane.setLayout(new GridLayout(0, 3));
 
         char terrain = hex.getTerrain();
-        ArrayList creatures = Game.getPossibleRecruits(terrain);
+        java.util.List creatures = Game.getPossibleRecruits(terrain);
         Iterator it = creatures.iterator();
         boolean firstTime = true;
         Creature prevCreature = Creature.getCreatureByName("Titan");

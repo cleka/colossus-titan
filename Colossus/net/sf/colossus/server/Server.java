@@ -24,12 +24,15 @@ public final class Server
     // XXX How do we keep track of which client goes with which player?
     // Sort by tower number when the game starts?
 
+    // XXX Need to verify that various requests came from the correct
+    // client for that player.
+
     /** For now we'll keep a list of client refs locally rather than using
      *  the network protocol.  We will eventually instead keep a list of the
      *  existing socket connections to use. Maybe also save things like
      *  the originating IP, in case a connection breaks and we need to
      *  authenticate reconnects.  Do not share these references. */
-    private ArrayList clients = new ArrayList();
+    private List clients = new ArrayList();
 
 
     Server(Game game)
@@ -219,8 +222,8 @@ public final class Server
         return -1;
     }
 
-    /** Get the option from the first human-controlled client.  If there are none,
-     *  get the option from the first AI-controlled client. */
+    /** Get the option from the first human-controlled client.  If there 
+     *  are none, get the option from the first AI-controlled client. */
     boolean getClientOption(String optname)
     {
         int clientNum = getFirstHumanClientNum();
@@ -596,7 +599,7 @@ public final class Server
 
 
     /** Find out if the player wants to acquire and angel or archangel. */
-    String acquireAngel(String playerName, ArrayList recruits)
+    String acquireAngel(String playerName, List recruits)
     {
         String angelType = null;
         Client client = getClient(playerName);
@@ -633,9 +636,9 @@ public final class Server
     {
         legion.sortCritters();
         Client client = getClient(legion.getPlayerName());
-        ArrayList recruits = game.findEligibleRecruits(legion.getMarkerId(),
-            legion.getCurrentHexLabel());
-        java.util.List imageNames = legion.getImageNames(true);
+        List recruits = game.findEligibleRecruits(
+            legion.getMarkerId(), legion.getCurrentHexLabel());
+        List imageNames = legion.getImageNames(true);
         String hexDescription = legion.getCurrentHex().getDescription();
 
         return client.pickRecruit(recruits, imageNames, hexDescription,
@@ -673,11 +676,11 @@ public final class Server
 
 
     /** Called from Game. */
-    String pickRecruiter(Legion legion, ArrayList recruiters)
+    String pickRecruiter(Legion legion, List recruiters)
     {
         Client client = getClient(legion.getPlayerName());
 
-        java.util.List imageNames = legion.getImageNames(true);
+        List imageNames = legion.getImageNames(true);
         String hexDescription = legion.getCurrentHex().getDescription();
         return client.pickRecruiter(recruiters, imageNames, hexDescription,
             legion.getMarkerId());
@@ -811,7 +814,7 @@ public final class Server
     public int [] getCritterTags(String hexLabel)
     {
         Battle battle = game.getBattle();
-        ArrayList critters = battle.getCritters(hexLabel);
+        List critters = battle.getCritters(hexLabel);
         int [] tags = new int[critters.size()];
         int i = 0;
         Iterator it = critters.iterator();
@@ -962,8 +965,6 @@ public final class Server
         client.setupPlayerLabel();
     }
 
-    // XXX Need to verify that the request came from the correct
-    // client, rather than trusting the passed playerName.
     /** Return the new die roll, or -1 on error. */
     public int mulligan(String playerName)
     {
@@ -988,7 +989,7 @@ public final class Server
         }
     }
 
-    public java.util.List getLegionImageNames(String markerId, 
+    public List getLegionImageNames(String markerId, 
         String playerName)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
@@ -1280,7 +1281,7 @@ public final class Server
     }
 
     /** Return a list of Creatures. */
-    public java.util.List findEligibleRecruits(String markerId, 
+    public List findEligibleRecruits(String markerId, 
         String hexLabel)
     {
         return game.findEligibleRecruits(markerId, hexLabel);
@@ -1304,7 +1305,7 @@ public final class Server
         return game.listMoves(markerId);
     }
 
-    public java.util.List getAllLegionIds()
+    public List getAllLegionIds()
     {
         return game.getAllLegionIds();
     }
@@ -1314,7 +1315,7 @@ public final class Server
         return game.getActivePlayerNum();
     }
 
-    public ArrayList getLegionMarkerIds(String hexLabel)
+    public List getLegionMarkerIds(String hexLabel)
     {
         return game.getLegionMarkerIds(hexLabel);
     }

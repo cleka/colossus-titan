@@ -27,7 +27,7 @@ public final class Player implements Comparable
     private String playersEliminated = "";  // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll;          // 0 if movement has not been rolled.
-    private ArrayList legions = new ArrayList();
+    private List legions = new ArrayList();
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
@@ -336,7 +336,7 @@ public final class Player implements Comparable
         return null;
     }
 
-    ArrayList getLegions()
+    List getLegions()
     {
         return legions;
     }
@@ -959,7 +959,7 @@ public final class Player implements Comparable
         return null;
     }
 
-    String aiAcquireAngel(Legion legion, ArrayList recruits, Game game)
+    String aiAcquireAngel(Legion legion, List recruits, Game game)
     {
         if (game.getServer().getClientOption(name, Options.autoAcquireAngels))
         {
@@ -984,7 +984,7 @@ public final class Player implements Comparable
         // Convert favorite colors from a comma-separated string to a list.
         String favorites = game.getServer().getClientStringOption(name,
             Options.favoriteColors);
-        ArrayList favoriteColors = null;
+        List favoriteColors = null;
         if (favorites != null)
         {
             favoriteColors = Split.split(',', favorites);
