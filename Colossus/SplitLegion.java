@@ -19,6 +19,9 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
     Player player;
     final int scale = 60;
     Frame parentFrame;
+    Button button1;
+    Button button2;
+    boolean laidOut = false;
 
     SplitLegion(Frame parentFrame, Legion oldLegion, Player player)
     {
@@ -34,11 +37,17 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
         imagesLoaded = false;
 
         PickMarker pickmarker = new PickMarker(parentFrame, player);
-        setSize((21 * scale / 20) * (oldLegion.height + 1), 7 * scale / 2);
 
-         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
-             - getSize().height / 2));
+        newLegion = new Legion(scale / 5, 2 * scale, 
+            oldLegion.chit.getBounds().width, player.markerSelected, 
+            oldLegion.markerId, this, 0, null, null, null, null, null, 
+            null, null, null);
+
+        setSize(getPreferredSize());
+
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
+            - getSize().height / 2));
 
         // If there were no markers left to pick, exit.
         if (player.markerSelected == null)
@@ -61,10 +70,6 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             oldMarker = new Chit(scale / 5, scale / 2, scale, 
                 "images/" + oldLegion.markerId + ".gif", this);
 
-            newLegion = new Legion(scale / 5, 2 * scale, scale, 
-                player.markerSelected, oldLegion.markerId, this, 0, null,
-                null, null, null, null, null, null, null);
-
             tracker = new MediaTracker(this);
 
             for (int i = 0; i < oldLegion.height; i++)
@@ -83,8 +88,8 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
                 new MessageBox(parentFrame, "waitForAll was interrupted");
             }
 
-            Button button1 = new Button("Done");
-            Button button2 = new Button("Cancel");
+            button1 = new Button("Done");
+            button2 = new Button("Cancel");
             add(button1);
             add(button2);
             button1.addActionListener(this);
@@ -131,6 +136,17 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
                 newChits[i].paint(g);
             }
         }
+
+        if (!laidOut)
+        {
+            Insets insets = getInsets(); 
+            Dimension d = getSize();
+            button1.setBounds(insets.left + d.width / 8, 7 * d.height / 8 - 
+                insets.bottom, d.width / 8, d.height / 8);
+            button2.setBounds(3 * d.width / 4 - insets.right, 
+                7 * d.height / 8 - insets.bottom, d.width / 8, d.height / 8);
+        }
+
     }
 
 
@@ -268,9 +284,9 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
 
         else if (e.getActionCommand() == "Cancel")
         {
-            // Original legion must have height < 8 for this
+            // Original legion must have had height < 8 for this
             // to be allowed.
-            if (oldLegion.height >= 8)
+            if (oldLegion.height  + newLegion.height>= 8)
             {
                 new MessageBox(parentFrame, "Must split.");
             }
@@ -294,4 +310,17 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             }
         }
     }
+
+
+    public Dimension getMinimumSize()
+    {
+        return getPreferredSize();
+    }
+
+    public Dimension getPreferredSize()
+    {
+        return new Dimension((21 * scale / 20) * (oldLegion.height + 
+            newLegion.height + 1), 7 * scale / 2);
+    }
+
 }
