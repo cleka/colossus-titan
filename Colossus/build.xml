@@ -175,7 +175,7 @@
                 <fileset dir="." 
                  includes = 
                          "net/sf/colossus/parser/*.java,
-                          saves/*.sav"
+                          **/*.sav"
                 />
         </delete>
 </target>
