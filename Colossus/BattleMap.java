@@ -11,6 +11,7 @@ public class BattleMap extends Frame implements MouseListener,
     MouseMotionListener, WindowListener
 {
     private Hex[][] h = new Hex[6][6];
+    private int numChits;
     private Chit[] chits = new Chit[14];
     private int tracking;
     private static final boolean[][] show =
@@ -89,16 +90,19 @@ public class BattleMap extends Frame implements MouseListener,
 
         tracker = new MediaTracker(this);
 
-        for (int i = 0; i < attacker.getHeight(); i++)
+        int ah = attacker.getHeight();
+        numChits = ah + defender.getHeight();
+
+        for (int i = 0; i < ah; i++)
         {
-            chits[i] = new Chit(0, 0, chitScale, Creature.ogre.getImageName(),
-                this);
+            chits[i] = new Chit(0, 0, chitScale, 
+                attacker.getCreature(i).getImageName(), this);
             tracker.addImage(chits[i].getImage(), 0);
         }
-        for (int i = 8; i < 8 + defender.getHeight(); i++)
+        for (int i = ah; i < numChits; i++)
         {
-            chits[i] = new Chit(0, 0, chitScale, Creature.ogre.getImageName(),
-                this);
+            chits[i] = new Chit(0, 0, chitScale, 
+                defender.getCreature(i - ah).getImageName(), this);
             tracker.addImage(chits[i].getImage(), 0);
         }
 
@@ -139,7 +143,7 @@ public class BattleMap extends Frame implements MouseListener,
     {
         Point point = e.getPoint();
 
-        for (int i=0; i < chits.length; i++)
+        for (int i = 0; i < numChits; i++)
         {
             if (chits[i].select(point))
             {
@@ -244,7 +248,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
 
         // Draw chits from back to front.
-        for (int i = chits.length - 1; i >= 0; i--)
+        for (int i = numChits - 1; i >= 0; i--)
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
@@ -295,7 +299,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
 
         // Draw chits from back to front.
-        for (int i = chits.length - 1; i >= 0; i--)
+        for (int i = numChits - 1; i >= 0; i--)
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
