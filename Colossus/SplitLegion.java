@@ -18,15 +18,18 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
     Chit oldMarker;
     Player player;
     final int scale = 60;
+    Frame parentFrame;
 
     SplitLegion(Frame parentFrame, Legion oldLegion, Player player)
     {
-        super(parentFrame, "Split Legion " + oldLegion.markerId, true);
+        super(parentFrame, player.name + ": Split Legion " + 
+            oldLegion.markerId, true);
 
         setLayout(null);
 
         this.oldLegion = oldLegion;
         this.player = player;
+        this.parentFrame = parentFrame;
 
         imagesLoaded = false;
 
@@ -77,7 +80,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             }
             catch (InterruptedException e)
             {
-                System.out.println("waitForAll was interrupted");
+                new MessageBox(parentFrame, "waitForAll was interrupted");
             }
 
             Button button1 = new Button("Done");
@@ -222,14 +225,14 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             // must have height 4 and one lord.
             if (oldLegion.height < 2 || newLegion.height < 2)
             {
-                System.out.println("Legion too short.");
+                new MessageBox(parentFrame, "Legion too short.");
                 return;
             }
             if (oldLegion.height + newLegion.height == 8)
             {
                 if (oldLegion.height != newLegion.height)
                 {
-                    System.out.println("Initial split not 4-4.");
+                    new MessageBox(parentFrame, "Initial split not 4-4.");
                     return;
                 }
                 else
@@ -244,7 +247,8 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
                     }
                     if (lordCounter != 1)
                     {
-                        System.out.println("Each stack must have one lord.");
+                        new MessageBox(parentFrame, 
+                            "Each stack must have one lord.");
                         return;
                     }
                 }
@@ -268,7 +272,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             // to be allowed.
             if (oldLegion.height >= 8)
             {
-                System.out.println("Must split.");
+                new MessageBox(parentFrame, "Must split.");
             }
 
             // Put the stack marker back, reset the old legion, then exit.
