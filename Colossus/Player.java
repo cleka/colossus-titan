@@ -240,6 +240,9 @@ class Player
             }
         }
 
+        // Re-highlight legions to clean up after showMoves()
+        game.getBoard().highlightUnmovedLegions();
+
         return count;
     }
 
