@@ -2015,6 +2015,8 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
                 }
             }
         }
+        set.remove(null);
+        set.remove("null");
         return set;
     }
 
