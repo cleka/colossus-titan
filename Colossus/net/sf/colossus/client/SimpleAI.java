@@ -152,7 +152,7 @@ public class SimpleAI implements AI
         Creature temprecruit =
             getBestRecruitmentOneTurnAhead(legion, hex, recruits);
         Creature temprecruit2 =
-            getBestRecruitmentInfinityAhead(recruits, legion);
+            getBestRecruitmentInfinityAhead(legion, hex, recruits);
         Creature temprecruit3 =
             getBestRecruitmentPlacesNextTurn(legion, hex, recruits);
 
@@ -1706,7 +1706,8 @@ public class SimpleAI implements AI
 
         if (!(basic.equals(recruit.getName())))
         {
-            Log.debug("GRAPH: OneTurnAhead suggest recruiting " +
+            Log.debug("GRAPH: (" + hex.getLabel() +
+                      ") OneTurnAhead suggest recruiting " +
                       recruit.getName() +" instead of " + basic +
                       " because we can get better next turn");
         }
@@ -1714,8 +1715,9 @@ public class SimpleAI implements AI
         return recruit;
     }
 
-    private Creature getBestRecruitmentInfinityAhead(List recruits,
-                                                     LegionInfo legion)
+    private Creature getBestRecruitmentInfinityAhead(LegionInfo legion, 
+                                                     MasterHex hex,
+                                                     List recruits)
     {
         ListIterator it = recruits.listIterator(recruits.size());
         Creature best = null;
@@ -1739,7 +1741,8 @@ public class SimpleAI implements AI
 
         if (!(basic.equals(best.getName())))
         {
-            Log.debug("GRAPH: InfinityAhead suggest recruiting " +
+            Log.debug("GRAPH: (" + hex.getLabel() +
+                      ") InfinityAhead suggest recruiting " +
                       best.getName() + " instead of " + basic +
                       " because it has the best creature in its tree");
         }
@@ -1747,6 +1750,7 @@ public class SimpleAI implements AI
         return best;
     }
 
+    /* this next one is fairly dumb, as a single hex will be counted multilpe times if there's an enemy stack on it - so it will suggest taking an Ogre over a Troll if there's someone sitting on a nearby Hills... */
     private Creature getBestRecruitmentPlacesNextTurn(LegionInfo legion,
                                                       MasterHex hex,
                                                       List recruits)
@@ -1775,9 +1779,11 @@ public class SimpleAI implements AI
         }
         if (!(basic.equals(best.getName())))
         {
-            Log.debug("GRAPH: PlacesNextTurn suggest recruiting " +
+            Log.debug("GRAPH: (" + hex.getLabel() +
+                      ") PlacesNextTurn suggest recruiting " +
                       best.getName() + " instead of " + basic +
-                      " because it recruits in the greater number of places");
+                      " because it recruits in the greater number of places ("
+                      + maxwnum + ")");
         }
         return best;
     }
