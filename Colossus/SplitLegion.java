@@ -35,7 +35,6 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
         super(parentFrame, player.getName() + ": Split Legion " + 
             oldLegion.getMarkerId(), true);
 
-        setResizable(false);
         getContentPane().setLayout(null);
 
         this.oldLegion = oldLegion;
@@ -59,6 +58,7 @@ class SplitLegion extends JDialog implements MouseListener, ActionListener,
 
         setBackground(java.awt.Color.lightGray);
         setSize(getPreferredSize());
+        setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2

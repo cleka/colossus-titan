@@ -33,8 +33,6 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         super(parentFrame, attacker.getMarkerId() + " Negotiates with " + 
             defender.getMarkerId(), true);
 
-        setResizable(false);
-
         Container contentPane = getContentPane();
         contentPane.setLayout(null);
 
@@ -45,6 +43,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         pack();
         setBackground(java.awt.Color.lightGray);
         setSize(getPreferredSize());
+        setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2

@@ -25,8 +25,6 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     {
         super(parentFrame, player.getName() + ": Pick Legion Marker", true);
         
-        setResizable(false);
-
         this.player = player;
         markers = new Chit[player.getNumMarkersAvailable()];
 
@@ -49,6 +47,7 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
             setSize((21 * scale / 20) * (Math.min(12, 
                 player.getNumMarkersAvailable()) + 1), (21 * scale / 20) * 
                 ((player.getNumMarkersAvailable() - 1) / 12 + 2));
+            setResizable(false);
             
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
             setLocation(new Point(d.width / 2 - getSize().width / 2, 

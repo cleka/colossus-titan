@@ -30,8 +30,6 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         super(parentFrame, legion.getPlayer().getName() + 
             ": Pick Recruit", true);
         
-        setResizable(false);
-
         if (!legion.canRecruit())
         {
             dispose();
@@ -59,6 +57,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
 
         setBackground(java.awt.Color.lightGray);
         setSize(scale * (numEligible + 1), (23 * scale / 10));
+        setResizable(false);
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, 

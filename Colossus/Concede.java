@@ -35,8 +35,6 @@ class Concede extends JDialog implements ActionListener
             "Flee" : "Concede") + " with Legion "  + friend.getMarkerId() 
             + "?", true);
 
-        setResizable(false);
-
         Container contentPane = getContentPane();
         contentPane.setLayout(null);
 
@@ -49,6 +47,7 @@ class Concede extends JDialog implements ActionListener
 
         setBackground(java.awt.Color.lightGray);
         setSize(getPreferredSize());
+        setResizable(false);
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2

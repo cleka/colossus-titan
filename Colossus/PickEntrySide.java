@@ -70,12 +70,12 @@ class PickEntrySide extends JDialog implements ActionListener,
             button3.addActionListener(this);
         }
 
-        setResizable(false);
         addWindowListener(this);
 
         pack();
 
         setSize(getPreferredSize());
+        setResizable(false);
         setBackground(java.awt.Color.white);
 
         setupHexes();
