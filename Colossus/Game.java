@@ -18,11 +18,11 @@ public class Game
     private int turnNumber = 1;  // Advance when every player has a turn
     private StatusScreen statusScreen;
     private GameApplet applet;
-    private SummonAngel summonAngel;
     private Battle battle;
     private BattleMap map;
     private static Random random = new Random();
     private MovementDie movementDie;
+    private SummonAngel summonAngel;
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -90,12 +90,9 @@ public class Game
         board = new MasterBoard(this);
         masterFrame = board.getFrame();
         loadGame(filename);
-        board.loadInitialMarkerImages();
-        statusScreen = new StatusScreen(this);
-        // XXX Assumes that we only load at the beginning of a phase.
-        board.setupPhase();
 
         loadOptions();
+        updateStatusScreen();
     }
 
 
@@ -123,7 +120,10 @@ public class Game
         logEvent("\nStarting new game");
 
         Creature.resetAllCounts();
-        board.clearLegions();
+        if (board != null)
+        {
+            board.clearLegions();
+        }
         players.clear();
 
         JFrame frame = new JFrame();
@@ -154,7 +154,6 @@ public class Game
 
         if (!disposed)
         {
-            statusScreen = new StatusScreen(this);
             if (board == null)
             {
                 board = new MasterBoard(this);
@@ -172,6 +171,7 @@ public class Game
                 updateStatusScreen();
             }
             board.loadInitialMarkerImages();
+            // XXX Assumes that we only load at the beginning of a phase.
             board.setupPhase();
 
             board.setVisible(true);
@@ -179,6 +179,7 @@ public class Game
         }
 
         loadOptions();
+        updateStatusScreen();
 
         if (showDice)
         {
@@ -572,6 +573,7 @@ public class Game
     /** Create a text file describing this game's state, in
      *  file filename.
      *  Format:
+     *     XXX Add a magic number or version string to the top of the file.
      *     Number of players
      *     Turn number
      *     Whose turn
@@ -587,10 +589,12 @@ public class Game
      *         Players eliminated
      *         Number of markers left
      *         Remaining marker ids
+     *         XXX Add movement roll, last legion moved/split/recruited
      *         Number of Legions
      *         Legion 1:
      *             Marker id
      *             Hex label
+     *             XXX add parent, moved, recruited
      *             Height
      *             Creature 1:
      *                 Creature type
@@ -976,10 +980,11 @@ public class Game
     }
 
 
-    // Try to load a game from ./filename first, then from saves/filename.
-    // If the filename is "--latest" then load the latest savegame found in
-    // saves/
-    private void loadGame(String filename)
+    /** Try to load a game from ./filename first, then from
+     *  saveDirName/filename.  If the filename is "--latest" then load
+     *  the latest savegame found in saveDirName.  board must be non-null.
+     */
+    public void loadGame(String filename)
     {
         // XXX Need a dialog to pick the savegame's filename, and
         //     confirmation if there's already a game in progress.
@@ -1040,6 +1045,8 @@ public class Game
             }
 
             players.clear();
+            board.clearLegions();
+
             for (int i = 0; i < numPlayers; i++)
             {
                 String name = in.readLine();
@@ -1130,6 +1137,10 @@ public class Game
             {
                 initMovementDie();
             }
+
+            board.loadInitialMarkerImages();
+            // XXX Assumes that we only load at the beginning of a phase.
+            board.setupPhase();
 
             board.setVisible(true);
             board.repaint();
@@ -2131,7 +2142,7 @@ public class Game
         board.unselectAllHexes();
 
         Player player = getActivePlayer();
-        player.unselectLegion();
+        player.setDonor(null);
 
         HashSet set = new HashSet();
 
@@ -2436,9 +2447,15 @@ public class Game
     }
 
 
-    public void setSummonAngel(SummonAngel summonAngel)
+    public SummonAngel getSummonAngel()
     {
-        this.summonAngel = summonAngel;
+        return summonAngel;
+    }
+
+
+    public void createSummonAngel(Legion attacker)
+    {
+        summonAngel = new SummonAngel(board, attacker);
     }
 
 
@@ -2465,13 +2482,13 @@ public class Game
     }
 
 
-    // Return number of legions with summonable angels.
+    /** Return number of legions with summonable angels. */
     public int highlightSummonableAngels(Legion legion)
     {
         board.unselectAllHexes();
 
         Player player = legion.getPlayer();
-        player.unselectLegion();
+        player.setDonor(null);
 
         int count = 0;
 
@@ -2506,11 +2523,11 @@ public class Game
     public void finishSummoningAngel()
     {
         highlightEngagements();
-        summonAngel = null;
         if (battle != null)
         {
-            battle.finishSummoningAngel();
+            battle.finishSummoningAngel(summonAngel.getSummoned());
         }
+        summonAngel = null;
     }
 
 
@@ -2585,9 +2602,8 @@ public class Game
                 return;
 
             case Game.MOVE:
-                // Mark this legion as active.
-                player.selectLegion(legion);
-
+                // Select this legion.
+                player.setMover(legion);
                 // And move it to the top of the z-order.
                 board.moveMarkerToTop(legion);
                 // Just painting the marker doesn't always do the trick.
@@ -2636,7 +2652,7 @@ public class Game
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
             case Game.MOVE:
-                Legion legion = player.getSelectedLegion();
+                Legion legion = player.getMover();
                 if (legion != null && hex.isSelected())
                 {
                     // Pick teleport or normal move if necessary.
@@ -2721,21 +2737,25 @@ public class Game
 
     private void doFight(MasterHex hex, Player player)
     {
-        if (summonAngel != null)
+        if (battle != null)
         {
-            Legion donor = hex.getFriendlyLegion(player);
-            if (donor != null)
+            if (summonAngel != null)
             {
-                player.selectLegion(donor);
-                summonAngel.updateChits();
-                summonAngel.repaint();
-                donor.getMarker().repaint();
+                Legion donor = hex.getFriendlyLegion(player);
+                if (donor != null)
+                {
+                    player.setDonor(donor);
+                    summonAngel.updateChits();
+                    summonAngel.repaint();
+                    donor.getMarker().repaint();
+                }
+                return;
             }
         }
 
         // Do not allow clicking on engagements if one is
         // already being resolved.
-        else if (hex.isEngagement() && !engagementInProgress)
+        if (hex.isEngagement() && !engagementInProgress)
         {
             engagementInProgress = true;
             Legion attacker = hex.getFriendlyLegion(player);
@@ -2785,7 +2805,7 @@ public class Game
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.
-                    summonAngel = new SummonAngel(board, attacker);
+                    createSummonAngel(attacker);
                 }
                 highlightEngagements();
                 engagementInProgress = false;
@@ -2852,11 +2872,12 @@ public class Game
         switch (getPhase())
         {
             case Game.MOVE:
+                getActivePlayer().setMover(null);
                 highlightUnmovedLegions();
                 break;
 
             case Game.FIGHT:
-                if (battle != null && summonAngel != null)
+                if (summonAngel != null)
                 {
                     highlightSummonableAngels(summonAngel.getLegion());
                     summonAngel.repaint();

@@ -31,6 +31,6 @@ Linux, Solaris, jdk1.3: Dialogs sometimes beep for no good reason.
    to be the main culprits.  Also AcquireAngel.  Doesn't seem to happen
    in Win98.
 
-After-battle SummonAngel pops up behind MasterBoard, or isn't shown
-   at all until a hex is clicked on.
+Serpent has 2 targets, angel and archangel, both up cliff hexsides
+   with same penalty.  Was not allowed to carry.  Check rules.
 

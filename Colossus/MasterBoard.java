@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import java.io.*;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
@@ -367,6 +368,25 @@ public class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                String [] options = new String[2];
+                options[0] = "Yes";
+                options[1] = "No";
+                int answer = JOptionPane.showOptionDialog(masterFrame,
+                    "Are you sure you with to load another game?",
+                    "Load Game?",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[1]);
+
+                if (answer == JOptionPane.YES_OPTION)
+                {
+                    JFileChooser chooser = new JFileChooser(Game.saveDirname);
+                    chooser.setFileFilter(new SaveGameFilter());
+                    int returnVal = chooser.showOpenDialog(masterFrame);
+                    if (returnVal == JFileChooser.APPROVE_OPTION)
+                    {
+                        game.loadGame(chooser.getSelectedFile().getName());
+                    }
+                }
             }
         };
 
@@ -390,7 +410,18 @@ public class MasterBoard extends JPanel implements MouseListener,
                 int returnVal = chooser.showSaveDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
-                    game.saveGame(chooser.getSelectedFile().getName());
+                    String dirname = chooser.getCurrentDirectory().getName();
+                    String basename = chooser.getSelectedFile().getName();
+                    StringBuffer path = new StringBuffer();
+                    path.append(dirname);
+                    path.append(File.separator);
+                    path.append(basename);
+                    // Add default savegame extension.
+                    if (!path.toString().endsWith(Game.saveExtension))
+                    {
+                        path.append(Game.saveExtension);
+                    }
+                    game.saveGame(path.toString());
                 }
             }
         };
@@ -407,6 +438,19 @@ public class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                String [] options = new String[2];
+                options[0] = "Yes";
+                options[1] = "No";
+                int answer = JOptionPane.showOptionDialog(masterFrame,
+                    "Are you sure you with to quit?",
+                    "Quit Game?",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[1]);
+
+                if (answer == JOptionPane.YES_OPTION)
+                {
+                    game.dispose();
+                }
             }
         };
     }
@@ -1230,6 +1274,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+    // XXX Assumes that we only load at the beginning of a phase.
     public void setupPhase()
     {
         switch (game.getPhase())

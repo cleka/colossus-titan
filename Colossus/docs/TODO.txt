@@ -1,10 +1,6 @@
 Write a minimal, complete Game.loadGame() that reuses existing 
    objects as much as possible.
 
-Hook up remaining actions in MasterBoard menu.
-
-Highlight teleport and normal moves differently.
-
 Disable file-related options when running as an applet.
 
 Add per-player option menu, with results saved to playername.cfg
@@ -49,6 +45,7 @@ Should be able to undo moves until an engagement is resolved.
 Finish XML savegame file.  Write saveGameXML and loadGameXML.
 
 Highlight selected legion better. 
+Highlight teleport and normal moves differently.
 Differently-highlight hexes where a legion could move if
    a friendly stack were not already there?
 
@@ -65,7 +62,7 @@ Move GUI/client classes and model/server classes into separate
 Add a ShowAllRecruits window that displays all recruits by terrain 
    type.
 
-Finish SetupBattle class, to allow setting up standalone battles.
+Add SetupBattle class, to allow setting up standalone battles.
 
 Fix concession timing.
 

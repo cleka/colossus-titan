@@ -147,7 +147,7 @@ public class SummonAngel extends JDialog implements MouseListener,
 
     public void mousePressed(MouseEvent e)
     {
-        donor = player.getSelectedLegion();
+        donor = player.getDonor();
         if (donor == null)
         {
             return;
@@ -226,7 +226,7 @@ public class SummonAngel extends JDialog implements MouseListener,
     /** Upstate state of angel and archangel chits to reflect donor */
     public void updateChits()
     {
-        donor = player.getSelectedLegion();
+        donor = player.getDonor();
         if (donor == null)
         {
             return;
@@ -244,7 +244,7 @@ public class SummonAngel extends JDialog implements MouseListener,
     {
         if (e.getActionCommand().equals("Summon"))
         {
-            donor = player.getSelectedLegion();
+            donor = player.getDonor();
             if (donor == null)
             {
                 JOptionPane.showMessageDialog(board, "Must select a legion.");

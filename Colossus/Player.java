@@ -8,26 +8,25 @@ import java.util.*;
 
 public class Player implements Comparable
 {
+    private Game game;
     private String name;
     private String color;              // Black, Blue, Brown, Gold, Green, Red
     private int startingTower;         // 1-6
     private double score;              // track half-points, then round
     private boolean canSummonAngel = true;
+    private boolean canTeleport = true;
     private String playersEliminated;  // RdBkGr
-
-    private TreeSet markersAvailable = new TreeSet();
-
-    private ArrayList legions = new ArrayList();
-    private Legion selectedLegion = null;
-    private boolean dead;
     private int mulligansLeft = 1;
     private int movementRoll;
-    private Game game;
+    private TreeSet markersAvailable = new TreeSet();
+    private ArrayList legions = new ArrayList();
+    private boolean dead;
+    private boolean titanEliminated;
+    private Legion donor;
+    private Legion mover;
     private Legion lastLegionMoved;
     private Legion lastLegionSplitOff;
-    private boolean titanEliminated;
     private Legion lastLegionSummonedFrom;
-    private boolean canTeleport = true;
     private Legion lastLegionRecruited;
 
 
@@ -567,21 +566,27 @@ public class Player implements Comparable
     }
 
 
-    public void selectLegion(Legion legion)
+    public void setDonor(Legion donor)
     {
-        selectedLegion = legion;
+        this.donor = donor;
     }
 
 
-    public void unselectLegion()
+    public Legion getDonor()
     {
-        selectedLegion = null;
+        return donor;
+    }
+    
+    
+    public void setMover(Legion mover)
+    {
+        this.mover = mover;
     }
 
 
-    public Legion getSelectedLegion()
+    public Legion getMover()
     {
-        return selectedLegion;
+        return mover;
     }
 
 

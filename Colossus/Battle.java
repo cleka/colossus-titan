@@ -30,7 +30,6 @@ public class Battle
     private Legion activeLegion;
     private MasterBoard board;
     private MasterHex masterHex;
-    private SummonAngel summonAngel;
     private BattleDice battleDice;
 
     private int turnNumber = 1;
@@ -239,12 +238,6 @@ public class Battle
     }
 
 
-    public SummonAngel getSummonAngel()
-    {
-        return summonAngel;
-    }
-
-
     private void startSummoningAngel()
     {
         if (summonState == Battle.FIRST_BLOOD)
@@ -260,8 +253,7 @@ public class Battle
                 // And bring it to the front.
                 masterFrame.show();
 
-                summonAngel = new SummonAngel(board, attacker);
-                game.setSummonAngel(summonAngel);
+                game.createSummonAngel(attacker);
             }
 
             // This is the last chance to summon an angel until the
@@ -269,7 +261,7 @@ public class Battle
             summonState = Battle.TOO_LATE;
         }
 
-        if (summonAngel == null)
+        if (game.getSummonAngel() == null)
         {
             if (phase == SUMMON)
             {
@@ -279,15 +271,13 @@ public class Battle
     }
 
 
-    // This is called from Game after the SummonAngel finishes.
-    public void finishSummoningAngel()
+    /** Called from Game after the SummonAngel finishes. */
+    public void finishSummoningAngel(boolean placeNewChit)
     {
-        if (summonAngel.getSummoned())
+        if (placeNewChit)
         {
             map.placeNewChit(attacker);
         }
-
-        summonAngel = null;
 
         if (phase == SUMMON)
         {
@@ -1754,9 +1744,7 @@ public class Battle
                             masterFrame.setState(JFrame.NORMAL);
                         }
 
-                        SummonAngel summonAngel = new SummonAngel(board,
-                            getAttacker());
-                        game.setSummonAngel(summonAngel);
+                        game.createSummonAngel(attacker);
                     }
                 }
             }
