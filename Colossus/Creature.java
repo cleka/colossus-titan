@@ -237,7 +237,7 @@ class Creature
     {
         for (int i = 0; i < creatures.length; i++)
         {
-            if (name.compareTo(creatures[i].getName()) == 0)
+            if (name.equals(creatures[i].getName()))
             {
                 return creatures[i];
             }
