@@ -7,7 +7,7 @@
 class Player
 {
     private String name;
-    private String color;       // Black, Blue, Brown, Gold, Green, Red 
+    private String color;       // Black, Blue, Brown, Gold, Green, Red
     private int startingTower;  // 1-6
     private double score = 0;    // track half-points, then round
     private boolean canSummonAngel = true;
@@ -26,6 +26,7 @@ class Player
     private boolean titanEliminated = false;
     private Legion lastLegionSummonedFrom;
     private boolean canTeleport = true;
+    private Legion lastLegionRecruited;
 
 
     Player(String name, Game game)
@@ -52,7 +53,7 @@ class Player
         this.color = color;
         for (int i = 0; i <= 8; i++)
         {
-            markersAvailable[i] = getShortColor() + '0' + 
+            markersAvailable[i] = getShortColor() + '0' +
                 Integer.toString(i + 1);
         }
         for (int i = 9; i <= 11; i++)
@@ -64,27 +65,27 @@ class Player
 
     String getShortColor()
     {
-        if (color == "Black") 
+        if (color == "Black")
         {
             return new String("Bk");
         }
-        else if (color == "Blue") 
+        else if (color == "Blue")
         {
             return new String("Bl");
         }
-        else if (color == "Brown") 
+        else if (color == "Brown")
         {
             return new String("Br");
         }
-        else if (color == "Gold") 
+        else if (color == "Gold")
         {
             return new String("Gd");
         }
-        else if (color == "Green") 
+        else if (color == "Green")
         {
             return new String("Gr");
         }
-        else if (color == "Red") 
+        else if (color == "Red")
         {
             return new String("Rd");
         }
@@ -182,7 +183,7 @@ class Player
 
     void setLastLegionSummonedFrom(Legion legion)
     {
-        lastLegionSummonedFrom = legion; 
+        lastLegionSummonedFrom = legion;
     }
 
 
@@ -307,6 +308,37 @@ class Player
         allowTeleport();
     }
 
+    
+    void undoLastRecruit()
+    {
+        if (lastLegionRecruited != null)
+        {
+            lastLegionRecruited.undoRecruit();
+            lastLegionRecruited = null;
+        }
+    }
+
+
+    void markLastLegionRecruited(Legion legion)
+    {
+        lastLegionRecruited = legion;
+    }
+
+
+    void clearLastLegionRecruited()
+    {
+        lastLegionRecruited = null;
+    }
+
+    
+    void undoAllRecruits()
+    {
+        for (int i = 0; i < numLegions; i++)
+        {
+            legions[i].undoRecruit();
+        }
+    }
+
 
     void highlightTallLegions()
     {
@@ -332,7 +364,7 @@ class Player
             if (hex.getNumLegions() > 1)
             {
                 Legion parent = hex.getLegion(0);
-                if (parent != legion) 
+                if (parent != legion)
                 {
                     legion.recombine(parent);
                 }
@@ -463,14 +495,14 @@ class Player
         }
         else
         {
-            markerSelected = new String(markersAvailable[i]); 
+            markerSelected = new String(markersAvailable[i]);
 
             // Adjust other markers because this one is taken.
             for (int j = i; j < numMarkersAvailable - 1; j++)
             {
                 markersAvailable[j] = new String(markersAvailable[j + 1]);
             }
-        
+
             markersAvailable[numMarkersAvailable - 1] = new String("");
             numMarkersAvailable--;
         }
@@ -547,14 +579,14 @@ class Player
         // Mark this player as dead.
         alive = false;
 
-        // Mark who eliminated this player and give him this player's 
+        // Mark who eliminated this player and give him this player's
         // legion markers.
         if (player != null)
         {
             player.addPlayerElim(this);
             player.addLegionMarkers(this);
         }
-        
+
         numMarkersAvailable = 0;
 
         game.updateStatusScreen();
