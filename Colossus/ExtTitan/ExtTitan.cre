@@ -36,7 +36,7 @@ Wraith    10     4     false true  false false false false false false false fal
 #NAME           POWER SKILL RANGE FLY BRAMBLE DRIFT BOG SANDDUN SLOPE VOLCN RIVER STONE TREE  WATER MGCMSL SUMON LORD DEMILORD COUNT PLURALNAME      BASECOLOR
 AirElemental    9     4     false true  true  false false false false false false false false false false false false true     6     AirElementals   black
 EarthElemental 20     2     false false false false false true  true  false false true  false false false false false true     6     EarthElementals ogreRed
-FireElemental  12     3     true  false false false false false false true  false false false false false false false true     6     FireElementals  hydraOrange
+FireElemental  12     3     true  false false false false true  true  true  false false false false false false false true     6     FireElementals  hydraOrange
 WaterElemental 10     4     false false false true  true  false false false true  false false false false false false true     6     WaterElementals giantBlue
 #Balrog        12     3     true  true  false false false false false false false false false false true  false false true     6     Balrogs         black
 #Ent            8     4     false false false false false false false false false false false false false false false false    8     Ents            ogreRed
