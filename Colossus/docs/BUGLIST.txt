@@ -215,3 +215,6 @@ AcquireAngel at end of game can't be cancelled with Cancel button.
 
 Variant loading is broken in JWS and local jar files -- it always
    wants to browse the local filesystem.
+
+AI vs. AI battle sometimes starts before overlays are loaded.  Add a
+   sleep?

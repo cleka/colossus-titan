@@ -129,9 +129,9 @@ final class Critter extends Creature implements Comparable
     }
 
     /** Return only the base part of the image name for this critter. */
-    public String getImageName(boolean inverted)
+    public String getImageName()
     {
-        String basename = super.getImageName(inverted);
+        String basename = super.getImageName();
 
         if (isTitan() && getPower() >= 6 && getPower() <= 20)
         {

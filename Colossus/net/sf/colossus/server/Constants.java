@@ -59,8 +59,6 @@ public final class Constants
     public static final int ARROWS_ONLY = -2;
     public static final int NOWHERE = -1;
 
-    public static final String invertedPrefix = "i_";
-
     // MasterBoard size
     public final static int MIN_HORIZ_SIZE=15;
     public final static int MIN_VERT_SIZE=8;

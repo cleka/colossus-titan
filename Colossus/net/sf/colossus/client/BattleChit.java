@@ -20,9 +20,10 @@ final class BattleChit extends Chit
     private int hits = 0;
 
 
-    BattleChit(int scale, String id, Container container, int tag)
+    BattleChit(int scale, String id, Container container, boolean inverted,
+        int tag)
     {
-        super(scale, id, container);
+        super(scale, id, container, inverted);
         this.tag = tag;
         setBackground(Color.white);
     }

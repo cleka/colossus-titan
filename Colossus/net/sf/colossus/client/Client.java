@@ -607,10 +607,10 @@ Log.debug("Client.makeForcedStrikes()");
     }
 
     /** Create a new BattleChit and add it to the end of the list. */
-    void addBattleChit(String imageName, int tag)
+    void addBattleChit(String imageName, boolean inverted, int tag)
     {
         BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
-            map, tag);
+            map, inverted, tag);
         battleChits.add(chit);
     }
 
@@ -634,11 +634,12 @@ Log.debug("Client.makeForcedStrikes()");
     }
 
     // Rename
-    public void placeNewChit(String imageName, int tag, String hexLabel)
+    public void placeNewChit(String imageName, boolean inverted, int tag, 
+        String hexLabel)
     {
         if (map != null)
         {
-            map.placeNewChit(imageName, tag, hexLabel);
+            map.placeNewChit(imageName, inverted, tag, hexLabel);
         }
     }
 

@@ -162,22 +162,10 @@ public class Creature implements Comparable
         return pluralName;
     }
 
-    public String getImageName(boolean inverted)
-    {
-        StringBuffer basename = new StringBuffer();
-        if (inverted)
-        {
-            basename.append(Constants.invertedPrefix);
-        }
-        basename.append(name);
-        return basename.toString();
-    }
-
     public String getImageName()
     {
-        return getImageName(false);
+        return name;
     }
-
 
     public int getPower()
     {

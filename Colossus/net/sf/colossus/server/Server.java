@@ -406,7 +406,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.placeNewChit(critter.getImageName(inverted), 
+            client.placeNewChit(critter.getImageName(), inverted,
                 critter.getTag(), critter.getCurrentHexLabel());
         }
     }

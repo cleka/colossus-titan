@@ -31,6 +31,9 @@ class Chit extends JPanel
     /** Flag to paint a border around the chit. */
     private boolean border;
 
+    /** Flag to paint the chit upside-down. */
+    private boolean inverted = false;
+
     private String id;
 
     private static BasicStroke threeWide = new BasicStroke(3);
@@ -58,12 +61,18 @@ class Chit extends JPanel
         icon = getImageIcon(id);
     }
 
+    Chit(int scale, String id, Container container, boolean inverted)
+    {
+        this(scale, id, container);
+        this.inverted = inverted;
+    }
+
+
     static ImageIcon getImageIcon(String imageFilename)
     {
         ImageIcon icon = null;
         java.util.List directories = VariantSupport.getImagesDirectoriesList();
-        icon = ResourceLoader.getImageIcon(imageFilename,
-                                           directories);
+        icon = ResourceLoader.getImageIcon(imageFilename, directories);
         if (icon == null)
         {
             System.out.println("Couldn't get image :" + imageFilename);
@@ -98,8 +107,18 @@ class Chit extends JPanel
         Graphics2D g2 = (Graphics2D)g;
         super.paintComponent(g2);
 
-        g2.drawImage(icon.getImage(), rect.x, rect.y, rect.width,
-            rect.height, container);
+        if (inverted)
+        {
+            g2.drawImage(icon.getImage(), 
+                rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
+                rect.width, rect.height, 0, 0,
+                container);
+        }
+        else
+        {
+            g2.drawImage(icon.getImage(), rect.x, rect.y, rect.width,
+                rect.height, container);
+        }
 
         if (isDead())
         {

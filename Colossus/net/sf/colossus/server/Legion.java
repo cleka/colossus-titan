@@ -442,7 +442,7 @@ final class Legion implements Comparable
             Critter critter = (Critter)it.next();
             if (showAll || critter.isVisible())
             {
-                imageNames.add(critter.getImageName(false));
+                imageNames.add(critter.getImageName());
             }
             else
             {
@@ -469,11 +469,7 @@ final class Legion implements Comparable
             Critter critter = (Critter)it.next();
             if (critter.isLord()) 
             {
-                String imageName = critter.getImageName(true);
-                if (!imageNames.contains(imageName))
-                {
-                    imageNames.add(critter.getImageName(false));
-                }
+                String imageName = critter.getImageName();
             }
         }
         return imageNames;
