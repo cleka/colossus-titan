@@ -44,8 +44,8 @@ O yellow      Town      true  1 Centaur  2 Lion     2 Ranger
 o yellow      Waterhole true  1 Centaur  2 Lion     2 Ranger
 
 # New Galt Battlelands
-n red         MountainsAlt true  1 Lion     2 Minotaur 2 Dragon   2 Colossus
-h saddleBrown HillsAlt     true  1 Ogre     3 Minotaur 2 Unicorn
-u grey        TowerAlt     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock
+n red         MountainsAlt true  1 Lion     2 Minotaur 2 Dragon   2 Colossus Moutains
+h saddleBrown HillsAlt     true  1 Ogre     3 Minotaur 2 Unicorn Hills
+u grey        TowerAlt     false 0 Anything 0 Centaur 0 Anything 0 Gargoyle 0 Anything 0  Ogre 0 AnyNonLord 3 Guardian -1 Titan 1 Warlock Tower
 
 ACQUIRABLE 100 Angel 500 Archangel
