@@ -52,8 +52,11 @@ public class BattleMap extends Frame implements MouseListener,
     private char terrain;
     private BattleTurn turn;
 
-    int attackerPoints = 0;
-    int defenderPoints = 0;
+    private int attackerPoints = 0;
+    private int defenderPoints = 0;
+
+    private boolean summonedAngel = false;
+    private boolean recruitedReinforcement = false;
 
 
     public BattleMap(Legion attacker, Legion defender, char terrain, char side)
@@ -286,6 +289,22 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    // If any chits were left off-board, kill them.  
+    // XXX: If they were newly summoned, unsummon them instead.
+    void removeOffboardChits()
+    {
+        Player player = turn.getActivePlayer();
+        for (int i = 0; i < numChits; i++)
+        {
+            if (chits[i].getCurrentHex().getXCoord() == -1 &&
+                chits[i].getPlayer() == player)
+            {
+                chits[i].setDead(true);
+            }
+        }
+    }
+
+
     void commitMoves()
     {
         clearLastChitMoved();
@@ -419,7 +438,16 @@ public class BattleMap extends Frame implements MouseListener,
     // inclusive at both ends.
     int getRange(Hex hex1, Hex hex2)
     {
-        // XXX: Fix this.
+        int x1 = hex1.getXCoord();
+        int y1 = hex1.getYCoord();
+        int x2 = hex2.getXCoord();
+        int y2 = hex2.getYCoord();
+
+        int xDist = x2 - x1; 
+        int yDist = y2 - y1;
+
+        
+        // XXX: Finish this.
         return 0;
     }
 
@@ -433,9 +461,11 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    // XXX: Need to handle Titans.
     void removeDeadChits()
     {
+        boolean attackerElim = true;
+        boolean defenderElim = true;
+
         for (int i = numChits - 1; i >= 0; i--)
         {
             if (chits[i].isDead())
@@ -451,7 +481,14 @@ public class BattleMap extends Frame implements MouseListener,
                     attackerPoints += creature.getPointValue();
                 }
 
+                // XXX: Need to remove the exact chit?
                 legion.removeCreature(creature);
+
+                if (creature == Creature.titan)
+                {
+                    legion.getPlayer().eliminateTitan();
+                }
+
                 Hex hex = chits[i].getCurrentHex();
                 hex.removeChit(chits[i]);
                 hex.repaint();
@@ -463,6 +500,78 @@ public class BattleMap extends Frame implements MouseListener,
                 chits[numChits - 1] = null;
                 numChits--;
             }
+            else
+            {
+                if (chits[i].getLegion() == attacker)
+                {
+                    attackerElim = false;
+                }
+                else
+                {
+                    defenderElim = false;
+                }
+            }
+        }
+
+        // Check for mutual Titan elimination.
+        if (attacker.getPlayer().isTitanEliminated() && 
+            defender.getPlayer().isTitanEliminated())
+        {
+            // Nobody gets any points. 
+            attacker.getPlayer().die(null);
+            defender.getPlayer().die(null);
+            turn.dispose();
+            dispose();
+        }
+
+        // Check for single Titan elimination.  Victor gets full points
+        // for eliminated characters, and half points for what's left,
+        // except for legions engaged with other players, who then get
+        // the half points.
+        else if (attacker.getPlayer().isTitanEliminated())
+        {
+            if (!defenderElim)
+            {
+                defender.addPoints(defenderPoints);
+            }
+            attacker.getPlayer().die(defender.getPlayer());
+            turn.dispose();
+            dispose();
+        }
+        else if (defender.getPlayer().isTitanEliminated())
+        {
+            if (!attackerElim)
+            {
+                attacker.addPoints(defenderPoints);
+            }
+            defender.getPlayer().die(attacker.getPlayer());
+            turn.dispose();
+            dispose();
+        }
+
+        // Check for mutual legion elimination.
+        else if (attackerElim && defenderElim)
+        {
+            attacker.removeLegion();
+            defender.removeLegion();
+            turn.dispose();
+            dispose();
+        }
+
+        // Check for single legion elimination.
+        else if (attackerElim)
+        {
+            defender.addPoints(defenderPoints);
+            attacker.removeLegion();
+            turn.dispose();
+            dispose();
+        }
+        else if (defenderElim)
+        {
+            attacker.addPoints(attackerPoints);
+            defender.removeLegion();
+            turn.dispose();
+            dispose();
         }
     }
 
@@ -482,7 +591,7 @@ public class BattleMap extends Frame implements MouseListener,
                     h[i][j] = new Hex
                         ((int) Math.round(cx + 3 * i * scale),
                         (int) Math.round(cy + (2 * j + i % 2) *
-                        Hex.SQRT3 * scale), scale, this);
+                        Hex.SQRT3 * scale), scale, this, i, j);
                 }
             }
         }
@@ -490,17 +599,17 @@ public class BattleMap extends Frame implements MouseListener,
 
         // Initialize entrances.
         entrances[0] = new Hex(cx + 15 * scale,
-            (int) Math.round(cy + 1 * scale), scale, this);
+            (int) Math.round(cy + 1 * scale), scale, this, -1, 0);
         entrances[1] = new Hex(cx + 21 * scale,
-            (int) Math.round(cy + 10 * scale), scale, this);
+            (int) Math.round(cy + 10 * scale), scale, this, -1, 1);
         entrances[2] = new Hex(cx + 17 * scale,
-            (int) Math.round(cy + 22 * scale), scale, this);
+            (int) Math.round(cy + 22 * scale), scale, this, -1, 2);
         entrances[3] = new Hex(cx + 2 * scale,
-            (int) Math.round(cy + 21 * scale), scale, this);
+            (int) Math.round(cy + 21 * scale), scale, this, -1, 3);
         entrances[4] = new Hex(cx - 3 * scale,
-            (int) Math.round(cy + 10 * scale), scale, this);
+            (int) Math.round(cy + 10 * scale), scale, this, -1, 4);
         entrances[5] = new Hex(cx + 1 * scale,
-            (int) Math.round(cy + 1 * scale), scale, this);
+            (int) Math.round(cy + 1 * scale), scale, this, -1, 5);
 
 
         // Add terrain, hexsides, elevation, and exits to hexes.
