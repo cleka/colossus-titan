@@ -16,6 +16,7 @@ import net.sf.colossus.server.Constants;
 /* batik stuff for SVG */
 import org.apache.batik.transcoder.*;
 import org.apache.batik.transcoder.image.ImageTranscoder;
+import org.apache.batik.util.XMLResourceDescriptor;
 
 
 /**
@@ -49,7 +50,7 @@ public final class ResourceLoader
         }
 
         public Class findClass(String className)
-                throws ClassNotFoundException
+            throws ClassNotFoundException
         {
             try
             {
@@ -117,12 +118,18 @@ public final class ResourceLoader
     {
         try
         {
-            Class theClass = baseCL.loadClass("org.apache.batik.transcoder.image.ImageTranscoder");
+            Class theClass = baseCL.loadClass(
+                    "org.apache.batik.transcoder.image.ImageTranscoder");
             hasBatik = true;
+            // Use Crimson, not Xerces
+            XMLResourceDescriptor.setXMLParserClassName(
+                    "org.apache.crimson.parser.XMLReaderImpl");
         }
         catch (Exception e)
         {
-            Log.debug("Couldn't load class \"org.apache.batik.transcoder.image.ImageTranscoder\", assuming batik (and SVG files) not available.");
+            Log.debug("Couldn't load class \"" +
+                    "org.apache.batik.transcoder.image.ImageTranscoder\", " +
+                    "assuming batik (and SVG files) not available.");
         }
     }
 
@@ -735,7 +742,7 @@ public final class ResourceLoader
      * @param directories List of directories.
      * @return A String to use as a key when storing/loading in a cache the specified array of name of files from the specified list of directories.
      */
-    private static String getMapKey(String filenames[], java.util.List directories)
+    private static String getMapKey(String[] filenames, java.util.List directories)
     {
         StringBuffer buf = new StringBuffer(filenames[0]);
         for (int i = 1; i < filenames.length; i++)
@@ -777,7 +784,7 @@ public final class ResourceLoader
         {
             return((ImageIcon)cached).getImage();
         }
-        Image tempImage[] = new Image[filenames.length];
+        Image[] tempImage = new Image[filenames.length];
         for (int i = 0; i < filenames.length; i++)
         {
             tempImage[i] =
@@ -1305,7 +1312,7 @@ public final class ResourceLoader
         Object o = null;
         if (parameter != null)
         {
-            Class paramClasses[] = new Class[parameter.length];
+            Class[] paramClasses = new Class[parameter.length];
             for (int i = 0; i < parameter.length; i++)
             {
                 paramClasses[i] = parameter[i].getClass();
@@ -1402,7 +1409,7 @@ public final class ResourceLoader
         }
 
         public void writeImage(BufferedImage image, TranscoderOutput output)
-                throws TranscoderException
+            throws TranscoderException
         {
             this.image = image;
         }
@@ -1420,7 +1427,8 @@ public final class ResourceLoader
      * @param path Path to search for the file
      * @return Resulting Image, or null if it fails.
      */
-    private static Image tryLoadSVGImageFromFile(String filename, String path, int width, int height)
+    private static Image tryLoadSVGImageFromFile(String filename, String path,
+            int width, int height)
     {
         if (!hasBatik)
         {

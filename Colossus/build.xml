@@ -134,6 +134,7 @@
                 excludes="**/*Test.java">
             <classpath>
                 <pathelement location="libs/batik-transcoder.jar"/>
+                <pathelement location="libs/batik-util.jar"/>
             </classpath>
         </javamake>
 </target>
