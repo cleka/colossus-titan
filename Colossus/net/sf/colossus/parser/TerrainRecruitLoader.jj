@@ -43,10 +43,10 @@ public class TerrainRecruitLoader
      */
     private char[] terrains = null;
     /**
-     * The list of Angel-like Creature, as angelData
-     * @see net.sf.colossus.parser.TerrainRecruitLoader.angelData
+     * The list of Acquirable Creature, as acquirableData
+     * @see net.sf.colossus.parser.TerrainRecruitLoader.acquirableData
      */
-    private List angelList = null;
+    private List acquirableList = null;
 
     /**
      * Return an array of all the char representing a valid terrain.
@@ -281,16 +281,16 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Used internally to record the Angel name, points needed for recruitment, and the list of terrains in which the Angel dwells.
+     * Used internally to record the Acquirable name, points needed for recruitment, and the list of terrains in which the Acquirable dwells.
      * @author Romain Dolbeau
      * @version $Id$
      */
-    private class angelData
+    private class acquirableData
     {
         private final String name;
         private final int value;
         private final List where;
-        angelData(String n, int v)
+        acquirableData(String n, int v)
         {
             name = n;
             value = v;
@@ -322,72 +322,72 @@ public class TerrainRecruitLoader
         }
         public String toString()
         {
-            return("Angel by name of " + name +
+            return("Acquirable by name of " + name +
                    ", available every " + value +
                    (where.isEmpty() ? "" : ", in terrain " + where));
         }
     }
 
-    private void addAngel(angelData ad) throws ParseException
+    private void addAcquirable(acquirableData ad) throws ParseException
     {
-        if (angelList == null)
+        if (acquirableList == null)
         {
-            angelList = new ArrayList();
+            acquirableList = new ArrayList();
         }
-        angelList.add(ad);
-        if ((ad.getValue() % getAngelRecruitmentsValue()) != 0)
+        acquirableList.add(ad);
+        if ((ad.getValue() % getAcquirableRecruitmentsValue()) != 0)
         {
-            throw new ParseException("Wrong Value for an Angel : " +
+            throw new ParseException("Wrong Value for an Acquirable : " +
                                      ad + " ; should multiple of " +
-                                     getAngelRecruitmentsValue());
+                                     getAcquirableRecruitmentsValue());
         }
     }
 
     /**
-     * To obtain all the Creature that can be recruited as Angel.
-     * @return The list of name (as String) that can be recruited as Angel
+     * To obtain all the Creature that can be recruited as Acquirable.
+     * @return The list of name (as String) that can be recruited as Acquirable
      */
-    public List getAngelList()
+    public List getAcquirableList()
     {
         List al = new ArrayList();
-        Iterator it = angelList.iterator();
+        Iterator it = acquirableList.iterator();
         while (it.hasNext())
         {
-            angelData ad = (angelData)it.next();
+            acquirableData ad = (acquirableData)it.next();
             al.add(ad.getName());
         }
         return al;
     }
 
     /**
-     * To obtain the base amount of points needed for Angel recruitement.
-     * All Angel recruitements must occur at even multiple of this.
-     * @return The base amount of points needed for Angel recruitement.
+     * To obtain the base amount of points needed for Acquirable recruitement.
+     * All Acquirable recruitements must occur at even multiple of this.
+     * @return The base amount of points needed for Acquirable recruitement.
      */
-    public int getAngelRecruitmentsValue()
+    public int getAcquirableRecruitmentsValue()
     {
-        angelData ad = (angelData)angelList.get(0);
+        acquirableData ad = (acquirableData)acquirableList.get(0);
         return ad.getValue();
     }
 
     /**
-     * To obtain all the Creature that can be recruited as Angel at the given amount of points in the given terrain.
+     * To obtain all the Creature that can be recruited as Acquirable at the given amount of points in the given terrain.
      * @param t The Terrain in which the recruitement occurs.
      * @param value The number of points at which the recruitement occurs. Valid values are constrained.
-     * @return The list of name (as String) that can be recruited as Angel in this terrain, for this amount of points.
-     * @see #getAngelRecruitmentsValue()
+     * @return The list of name (as String) that can be recruited as Acquirable in this terrain, for this amount of points.
+     * @see #getAcquirableRecruitmentsValue()
      */
-    public List getRecruitableAngelList(char t, int value)
+    public List getRecruitableAcquirableList(char t, int value)
     {
         List al = new ArrayList();
-        if ((value % getAngelRecruitmentsValue()) != 0)
+        if ((value % getAcquirableRecruitmentsValue()) != 0)
         {
             return al;
         }
-        Iterator it = angelList.iterator();
+        Iterator it = acquirableList.iterator();
         while (it.hasNext())
         {
-            angelData ad = (angelData)it.next();
+            acquirableData ad = (acquirableData)it.next();
             if (ad.isAvailable(t) && ((value % ad.getValue()) == 0))
             {
                 al.add(ad.getName());
@@ -397,16 +397,16 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Check if the Creature whose name is in parameter is an Angel-like creature or not.
+     * Check if the Creature whose name is in parameter is an Acquirable creature or not.
      * @param name The name of the Creature inquired.
-     * @return If the creature is Angel-like.
+     * @return If the creature is Acquirable.
      */
-    public boolean isAngel(String name)
+    public boolean isAcquirable(String name)
     {
-        Iterator it = angelList.iterator();
+        Iterator it = acquirableList.iterator();
         while (it.hasNext())
         {
-            angelData ad = (angelData)it.next();
+            acquirableData ad = (acquirableData)it.next();
             if (name.equals(ad.getName()))
              {
                 return true;
@@ -416,13 +416,13 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * Check if the Creature in parameter is an Angel-like creature or not.
+     * Check if the Creature in parameter is an Acquirable creature or not.
      * @param c The Creature inquired.
-     * @return If the creature is Angel-like.
+     * @return If the creature is Acquirable.
      */
-    public boolean isAngel(Creature c)
+    public boolean isAcquirable(Creature c)
     {
-        return isAngel(c.getName());
+        return isAcquirable(c.getName());
     }
 }
 
@@ -457,7 +457,7 @@ TOKEN :
 
 TOKEN :
 {
-    < ANGEL : "ANGEL" >
+    < ACQUIRABLE : "ACQUIRABLE" >
 }
 
 TOKEN :
@@ -516,7 +516,7 @@ String r_terrainList() :
     }
 }
 
-angelData r_angelData() :
+acquirableData r_acquirableData() :
 {
     String name;
     int value;
@@ -525,7 +525,7 @@ angelData r_angelData() :
 {
     (value = r_number()) (name = r_chaine()) (tl = r_terrainList())?
     {
-        angelData ad = new angelData(name, value);
+        acquirableData ad = new acquirableData(name, value);
         if (tl != null)
         {
         List li = net.sf.colossus.util.Split.split(',',tl);
@@ -564,13 +564,13 @@ ArrayList r_allRecruit() :
 
 }
 
-List r_angelDataList() :
+List r_acquirableDataList() :
 {
-    angelData ad;
+    acquirableData ad;
     List temp;
 }
 {
-    (ad = r_angelData()) (temp = r_angelDataList())
+    (ad = r_acquirableData()) (temp = r_acquirableDataList())
     {
         temp.add(ad);
         return temp;
@@ -628,15 +628,15 @@ int oneTerrain() :
         Log.debug("Found comment : " + s);
         return(0);
     }
-|   <ANGEL> (al = r_angelDataList())
+|   <ACQUIRABLE> (al = r_acquirableDataList())
     {
         ListIterator it = al.listIterator(al.size());
         while (it.hasPrevious())
         {
-            angelData ad = (angelData)it.previous();
-            addAngel(ad);
+            acquirableData ad = (acquirableData)it.previous();
+            addAcquirable(ad);
         }
-        Log.debug("Using Angel List : " + angelList);
+        Log.debug("Using Acquirable List : " + acquirableList);
         return(0);
     }
 |   <EOF>
