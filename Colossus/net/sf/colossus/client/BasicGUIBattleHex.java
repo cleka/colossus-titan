@@ -17,8 +17,8 @@ public class BasicGUIBattleHex extends BattleHex
     private GeneralPath innerHexagon;
 
     // Hex terrain types are:
-    // p, r, s, t, o, v, d
-    // plain, bramble, sand, tree, bog, volcano, drift
+    // p, r, s, t, o, v, d, w
+    // plain, bramble, sand, tree, bog, volcano, drift, tower
     // also
     // l
     // lake

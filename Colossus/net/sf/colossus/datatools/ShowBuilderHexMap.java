@@ -6,6 +6,9 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
+import net.sf.colossus.client.BattleHex;
+import net.sf.colossus.client.BasicGUIBattleHex;
+
 /**
  * Class ShowBuilderHexMap displays a battle map.
  * @version $Id$
@@ -22,24 +25,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private Point lastPoint;
     private Component lastComponent;
     private int lastSide;
-
-    private static final String[] terrains = 
-    {
-        "Plain",
-        "Tower",
-        "Bramble",
-        "Sand",
-        "Tree",
-        "Bog",
-        "Volcano",
-        "Drift",
-        "Lake"
-    };
-
-    private static final char[] c_terrains = 
-    {
-        'p', 'w', 'r', 's', 't', 'o', 'v', 'd', 'l'
-    };
 
     class TerrainAction extends AbstractAction
     {
@@ -70,20 +55,6 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             h.repaint();
         }
     }
-
-    private static final String[] hexsides =
-    {
-        "Nothing",
-        "Dune",
-        "Cliff",
-        "Slope",
-        "Wall"
-    };
-
-    private static final char[] c_hexsides = 
-    {
-        ' ', 'd', 'c', 's', 'w'
-    };
 
     class HexsideAction extends AbstractAction        
     {
@@ -161,11 +132,14 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
         popupMenuTerrain = new JPopupMenu("Choose Terrain");
         contentPane.add(popupMenuTerrain);
+        char[] terrains = BattleHex.getTerrains();
+        BasicGUIBattleHex tempH = new BasicGUIBattleHex(0,0,1,0,0);
 
         for (int i = 0 ; i < terrains.length ; i++)
         {
-            mi = popupMenuTerrain.add(new TerrainAction(terrains[i],
-                                                        c_terrains[i]));
+            tempH.setTerrain(terrains[i]);
+            mi = popupMenuTerrain.add(new TerrainAction(tempH.getTerrainName(),
+                                                        terrains[i]));
         }
         popupMenuTerrain.addSeparator();
         for (int i = 0 ; i < 3 ; i++)
@@ -177,11 +151,13 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
 
         popupMenuBorder = new JPopupMenu("Choose Border");
         contentPane.add(popupMenuBorder);
+        char[] hexsides = BattleHex.getHexsides();
 
         for (int i = 0 ; i < hexsides.length ; i++)
         {
-            mi = popupMenuBorder.add(new HexsideAction(hexsides[i],
-                                                       c_hexsides[i]));
+            tempH.setHexside(0,hexsides[i]);
+            mi = popupMenuBorder.add(new HexsideAction(tempH.getHexsideName(0),
+                                                       hexsides[i]));
         }
         
         lastPoint = new Point(0,0);
@@ -220,11 +196,15 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             if (h.innerContains(lastPoint) ||
                 (h.getNeighbor(lastSide) == null))
             { // change content
-                popupMenuTerrain.show(e.getComponent(), lastPoint.x, lastPoint.y);
+                popupMenuTerrain.show(e.getComponent(),
+                                      lastPoint.x,
+                                      lastPoint.y);
             }
             else
             { // change border
-                popupMenuBorder.show(e.getComponent(), lastPoint.x, lastPoint.y); 
+                popupMenuBorder.show(e.getComponent(),
+                                     lastPoint.x,
+                                     lastPoint.y); 
             }
         }
     }

@@ -22,15 +22,21 @@ public class BattleHex extends Hex
     private int elevation;
 
     // Hex terrain types are:
-    // p, r, s, t, o, v, d
-    // plain, bramble, sand, tree, bog, volcano, drift
+    // p, r, s, t, o, v, d, w
+    // plain, bramble, sand, tree, bog, volcano, drift, tower
     // also
     // l
     // lake
 
+    private static char[] allTerrains =
+    { 'p', 'w', 'r', 's', 't', 'o', 'v', 'd', 'l' };
+
     // Hexside terrain types are:
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
+    private static char[] allHexsides =
+    { ' ', 'd', 'c', 's', 'w'};
+
     // The hexside is marked only in the higher hex.
     private char [] hexsides = new char[6];
 
@@ -249,6 +255,23 @@ public class BattleHex extends Hex
         }
     }
 
+    public String getHexsideName(int i)
+    {
+        switch(hexsides[i])
+        {
+        default:
+        case ' ':
+            return("Nothing");
+        case 'd':
+            return("Dune");
+        case 'c':
+            return("Cliff");
+        case 's':
+            return("Slope");
+        case 'w':
+            return("Wall");
+        }
+    }
 
     /** Return the flip side of hexside i. */
     public char getOppositeHexside(int i)
@@ -387,5 +410,15 @@ public class BattleHex extends Hex
     {
         return getHexside(hexside) == 'c' || 
             getOppositeHexside(hexside) == 'c';
+    }
+
+    public static char[] getTerrains()
+    {
+        return (char[])allTerrains.clone();
+    }
+
+    public static char[] getHexsides()
+    {
+        return (char[])allHexsides.clone();
     }
 }
