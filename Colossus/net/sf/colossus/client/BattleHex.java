@@ -252,7 +252,7 @@ public class BattleHex
     private void assignLabel()
     {
         String label;
-        if (xCoord < 0)   // towi: changed from ´== -1´ to ´< 0´.
+        if (xCoord < 0)   // towi: changed from ?== -1? to ?< 0?.
         {
             label = "X" + yCoord;
         }
