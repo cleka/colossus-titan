@@ -197,6 +197,14 @@
                 eof="remove" tablength="8"
                 includes="**/*.java"
         />
+        <fixcrlf srcDir="." eol="lf" tab="remove" javafiles="no"
+                eof="remove" tablength="8"
+                includes="**/*.xml,
+                          **/*.html,
+                          **/*.txt,
+                          **/*.py,
+                          **/*.pl"
+        />
 </target>
 
 
