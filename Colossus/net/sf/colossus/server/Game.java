@@ -280,7 +280,7 @@ public final class Game
         }
 
         // XXX Load game options 'l' and 'z' are handled separately.
-        if (!options.isEmpty() && !cl.optIsSet('s')) 
+        if (!cl.optIsSet('s')) 
         {
             new GetPlayers(new JFrame(), options);
         }
