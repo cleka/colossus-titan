@@ -78,8 +78,8 @@ public final class Start
         options.loadOptions();
         clearNonPersistentOptions(options);
 
-        String loadFilename = options.getStringOption(Constants.loadGame);
         new GetPlayers(new JFrame(), options);
+        String loadFilename = options.getStringOption(Constants.loadGame);
 
         if (options.isEmpty())
         {
