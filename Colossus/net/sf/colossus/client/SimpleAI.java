@@ -2118,12 +2118,56 @@ public class SimpleAI implements AI
 
     public boolean flee(LegionInfo legion, LegionInfo enemy)
     {
-        // TODO Make this smarter.
-        char terrain = legion.getCurrentHex().getTerrain();
-        if (getCombatValue(legion, terrain) < 0.7 * getCombatValue(enemy,
-            terrain))
+        if (legion.hasTitan())
+            return false; // Titan never flee !
+        
+        int result = estimateBattleResults(enemy, legion,
+                                           legion.getCurrentHex());
+
+        switch (result)
         {
-            return true;
+        case WIN_WITH_MINIMAL_LOSSES:
+        case WIN_WITH_HEAVY_LOSSES:
+        case DRAW:
+        case LOSE_BUT_INFLICT_HEAVY_LOSSES:
+            return false;
+        case LOSE:
+            // don't bother unless we can try to weaken the titan stack
+            // and we aren't going to help him by removing cruft
+            // also, 7-height stack never flee and wimpy stack always flee
+            if (legion.getHeight() < 4)
+            {
+                Log.debug("Legion " + legion.getMarkerId() + " flee " +
+                          " as they are just " + legion.getHeight()  +
+                          " wimps !");
+                return true;
+            }
+            if (enemy.getHeight() == 7)
+            {
+                java.util.List recruits =
+                    client.findEligibleRecruits(enemy.getMarkerId(),
+                                      enemy.getCurrentHex().getTerrainName());
+                Creature best = (Creature)recruits.get(recruits.size() - 1);
+                int lValue = enemy.getPointValue();
+                if (best.getPointValue() > (lValue / enemy.getHeight()))
+                {
+                    Log.debug("Legion " + legion.getMarkerId() + " flee " +
+                              " to prevent " + enemy.getMarkerId() +
+                              " to be able to recruit " + best.getName());
+                    return true;
+                }
+            }
+            if (enemy.hasTitan())
+            {
+                Log.debug("Legion " + legion.getMarkerId() + " doesn't flee " +
+                          " to fight the Titan in " + enemy.getMarkerId());
+            }
+            if (legion.getHeight() == 7)
+            {
+                Log.debug("Legion " + legion.getMarkerId() + " doesn't flee " +
+                          " they are the magnificent 7 !");
+            }
+            return !(enemy.hasTitan() || (legion.getHeight() == 7));
         }
         return false;
     }
