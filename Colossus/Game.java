@@ -31,6 +31,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
     private JLabel [] elimLabel;
     private JLabel [] legionsLabel;
     private JLabel [] markersLabel;
+    private JLabel [] creaturesLabel;
     private JLabel [] titanLabel;
     private JLabel [] scoreLabel;
     private Container contentPane;
@@ -280,13 +281,13 @@ public class Game extends JFrame implements WindowListener, ActionListener
         contentPane.removeAll();
         setTitle("Game Status");
         contentPane = getContentPane();
-        contentPane.setLayout(new GridLayout(0, 9));
+        contentPane.setLayout(new GridLayout(0, 10));
 
         // Need to sort players in descending tower order
         sortPlayers();
 
         // active, player name, tower, color, colors eliminated, legions,
-        //     markers, titan power, score
+        //     markers, creatures, titan power, score
 
         contentPane.add(new JLabel(""));
         contentPane.add(new JLabel("Player "));
@@ -295,6 +296,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
         contentPane.add(new JLabel("Elim "));
         contentPane.add(new JLabel("Legions "));
         contentPane.add(new JLabel("Markers "));
+        contentPane.add(new JLabel("Creatures "));
         contentPane.add(new JLabel("Titan Power "));
         contentPane.add(new JLabel("Score"));
 
@@ -302,6 +304,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
         elimLabel = new JLabel[numPlayers];
         legionsLabel = new JLabel[numPlayers];
         markersLabel = new JLabel[numPlayers];
+        creaturesLabel = new JLabel[numPlayers];
         titanLabel = new JLabel[numPlayers];
         scoreLabel = new JLabel[numPlayers];
 
@@ -310,7 +313,8 @@ public class Game extends JFrame implements WindowListener, ActionListener
             activeLabel[i] = new JLabel(" ");
             contentPane.add(activeLabel[i]);
             contentPane.add(new JLabel(players[i].getName()));
-            contentPane.add(new JLabel(String.valueOf(100 * players[i].getTower())));
+            contentPane.add(new JLabel(
+                String.valueOf(100 * players[i].getTower())));
             contentPane.add(new JLabel(players[i].getColor()));
             elimLabel[i] = new JLabel("");
             contentPane.add(elimLabel[i]);
@@ -318,6 +322,8 @@ public class Game extends JFrame implements WindowListener, ActionListener
             contentPane.add(legionsLabel[i]);
             markersLabel[i] = new JLabel("12");
             contentPane.add(markersLabel[i]);
+            creaturesLabel[i] = new JLabel("8");
+            contentPane.add(creaturesLabel[i]);
             titanLabel[i] = new JLabel("6");
             contentPane.add(titanLabel[i]);
             scoreLabel[i] = new JLabel("0");
@@ -354,6 +360,8 @@ public class Game extends JFrame implements WindowListener, ActionListener
                 players[i].getNumLegions()));
             markersLabel[i].setText(String.valueOf(
                 players[i].getNumMarkersAvailable()));
+            creaturesLabel[i].setText(String.valueOf(
+                players[i].getNumCreatures()));
             titanLabel[i].setText(String.valueOf(players[i].getTitanPower()));
             scoreLabel[i].setText(String.valueOf(players[i].getScore()));
         }
