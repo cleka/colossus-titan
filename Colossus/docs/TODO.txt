@@ -1,3 +1,6 @@
+Bug: stresstest is broken by new options processing.  cfg file ends up
+   overriding command-line options and inserting a human player.
+
 Bug: Chat window went modal and started beeping.  Killing it from the
    Graphics menu worked.
 
