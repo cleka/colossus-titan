@@ -530,7 +530,7 @@ class MasterBoard extends JFrame implements MouseListener,
         for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion legion = player.getLegion(i);
-            if (legion.canRecruit() && legion.hasMoved())
+            if (legion.canRecruit())
             {
                 Creature [] recruits = new Creature[5];
                 if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
@@ -1211,7 +1211,7 @@ class MasterBoard extends JFrame implements MouseListener,
                         InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                         InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
                     {
-                        new ShowLegion(this, legion, point);
+                        new ShowLegion(this, legion, point, i == game.getActivePlayerNum());
                         return;
                     }
                     else
@@ -1354,10 +1354,46 @@ class MasterBoard extends JFrame implements MouseListener,
                                 if (!hex.isOccupied() ||
                                     hex.getNumEntrySides() == 1)
                                 {
+                                    // If the legion teleported, reveal a lord.
+                                    if (hex.teleported())
+                                    {
+                                        // If it was a Titan teleport, that 
+                                        // lord must be the titan.
+                                        if (hex.isOccupied())
+                                        {
+                                            legion.revealCreatures(
+                                                Creature.titan, 1);
+                                        }
+                                        else
+                                        {
+                                            // XXX Need a dialog for this.
+                                            // For now, reveal angels then
+                                            // archangels than titan.
+                                            if (legion.numCreature(
+                                                Creature.angel) > 0)
+                                            {
+                                                legion.revealCreatures(
+                                                    Creature.angel, 1);
+                                            }
+                                            else if (legion.numCreature(
+                                                Creature.archangel) > 0)
+                                            {
+                                                legion.revealCreatures(
+                                                    Creature.archangel, 1);
+                                            }
+                                            else
+                                            {
+                                                legion.revealCreatures(
+                                                    Creature.titan, 1);
+                                            }
+                                        }
+                                    }
+
                                     legion.moveToHex(hex);
                                     legion.getStartingHex().repaint();
                                     hex.repaint();
                                 }
+
 
                                 highlightUnmovedLegions();
                             }
@@ -1446,6 +1482,9 @@ class MasterBoard extends JFrame implements MouseListener,
                                         turn.setVisible(false);
                                         turn.setEnabled(false);
 
+                                        // Reveal both legions to all players.
+                                        attacker.revealAllCreatures();
+                                        defender.revealAllCreatures();
                                         map = new BattleMap(this, attacker,
                                             defender, hex, hex.getEntrySide());
                                     }
