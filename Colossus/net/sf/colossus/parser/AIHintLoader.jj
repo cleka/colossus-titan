@@ -32,7 +32,7 @@ public class AIHintLoader implements net.sf.colossus.server.HintInterface
     Map labelToInitialSplitList = new HashMap();
     Map nameToRecruitmentValueOffset = new HashMap();
     java.util.Stack argStack = new java.util.Stack();
-    Random rnd = new Random();
+    Random rnd = new net.sf.colossus.util.DevRandom();
 
     /* make sure the default entry is present, to avoid null pointer exception */
     {
