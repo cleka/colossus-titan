@@ -481,7 +481,7 @@ final class EngagementResults extends KDialog
         }
 
         public String getSummary() {
-            return "In turn " + this.gameTurn + ", " + this.attackerId +
+            return "On turn " + this.gameTurn + ", " + this.attackerId +
                 " attacked " + this.defenderId + " in " +
                 MasterBoard.getHexByLabel(this.hexLabel).getDescription();
         }
