@@ -230,13 +230,15 @@ and $\langle$optional\_condition$\rangle$ is an optional condition builded with 
 \item \texttt{( LABELIS $\langle$hex\_label$\rangle$ )} : The stack is in hex $\langle$hex\_label$\rangle$.
 \end{itemize}
 
+If the recruitee's name is ``nothing'' or ``Nothing'', then the hint suggest not recruiting there.
+
 \section{\texttt{VAR} file format (default file used: ``Default/Default.var'')}
 \label{VAR}
 
 This file contains a variant definition, i.e. which
 \texttt{MAP}, \texttt{CRE} and \texttt{TER} file should be used and other informations such as which other variants are required.
 
-Four different lines can exist, in any number and order (only the last one of each type is used):
+Six different lines can exist, in any number and order (only the last one of each type is used):
 
 \texttt{\texttt{CRE}:$\langle$cre\_filename$\rangle$}
 
@@ -244,7 +246,10 @@ Four different lines can exist, in any number and order (only the last one of ea
 
 \texttt{\texttt{TER}:$\langle$ter\_filename$\rangle$}
 
+\texttt{\texttt{HINT}:$\langle$hint\_filename$\rangle$}
+
 \texttt{\texttt{DEPEND}:$\langle$comma-separated list of dependecies$\rangle$}
+
 \texttt{\texttt{MAXPLAYERS}:$\langle$max number of players$\rangle$}
 
 \textit{Note:} if one of the  first three type is missing, the Default file is implied. if \texttt{DEPEND} is missing, no dependencies are implied. In all case, the ``Default'' directory is looked-up last, so mentioning ``Default'' as a dependency is not required.

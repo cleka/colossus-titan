@@ -289,10 +289,10 @@ public class SimpleAI implements AI
 
         if (recruit != temprecruit4)
         {
-            Log.debug("Variant Hint disagree with built-in heuristic: " +
+            Log.debug("HINT: Variant Hint disagree with built-in heuristic: " +
                       temprecruit4 + " vs. " + recruit);
         }
-
+        
         return recruit;
     }
 
@@ -1848,6 +1848,12 @@ public class SimpleAI implements AI
         {
             return (Creature)recruits.get(recruits.size() - 1);
         }
+        if ((recruitName.equals("nothing")) ||
+            (recruitName.equals("Nothing")))
+        { // suggest recruiting nothing
+            return null;
+        }
+        
         Creature recruit = Creature.getCreatureByName(recruitName);
         String basic = ((Creature)recruits.get(recruits.size() - 1)).getName();
         
