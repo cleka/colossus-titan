@@ -289,7 +289,7 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
-    // If any chits were left off-board, kill them.  
+    // If any chits were left off-board, kill them.
     // XXX: If they were newly summoned, unsummon them instead.
     void removeOffboardChits()
     {
@@ -389,13 +389,35 @@ public class BattleMap extends Frame implements MouseListener,
             }
         }
 
-        // Then do rangestrikes if applicable.
+        // Then do rangestrikes if applicable.  Rangestrikes are not allowed
+        // if the creature can strike normally.
         Creature creature = chit.getCreature();
-        if (creature.rangeStrikes())
+        if (count == 0 && creature.rangeStrikes())
         {
             int skill = creature.getSkill();
 
-            // XXX: Icky LOS code here.
+            for (int i = 0; i < numChits; i++)
+            {
+                BattleChit bogie = chits[i];
+                if (bogie.getPlayer() != player && !bogie.isDead())
+                {
+                    Hex hex = bogie.getCurrentHex();
+
+                    // Can't rangestrike if it can be struck normally.
+                    if (!hex.isSelected())
+                    {
+                        if (getRangestrikePenalty(chit, bogie) < 10)
+                        {
+                            if (highlight)
+                            {
+                                hex.select();
+                                hex.repaint();
+                            }
+                            count++;
+                        }
+                    }
+                }
+            }
         }
 
         return count;
@@ -439,16 +461,71 @@ public class BattleMap extends Frame implements MouseListener,
     int getRange(Hex hex1, Hex hex2)
     {
         int x1 = hex1.getXCoord();
-        int y1 = hex1.getYCoord();
+        float y1 = hex1.getYCoord();
         int x2 = hex2.getXCoord();
-        int y2 = hex2.getYCoord();
+        float y2 = hex2.getYCoord();
 
-        int xDist = x2 - x1; 
-        int yDist = y2 - y1;
-
+        // Hexes with odd X coordinates are pushed down half a hex.
+        if ((x1 & 1) == 1)
+        {
+            y1 += 0.5;
+        }
+        if ((x2 & 1) == 1)
+        {
+            y2 += 0.5;
+        }
         
-        // XXX: Finish this.
-        return 0;
+        float xDist = Math.abs(x2 - x1);
+        float yDist = Math.abs(y2 - y1);
+        
+        // Offboard chits are out of range.
+        if (x1 == -1 || x2 == -1)
+        {
+            xDist = 10;
+        }
+
+        if (xDist >= 2 * yDist)
+        {
+            return (int) Math.round(xDist + 1);
+        }
+        else if (xDist >= yDist)
+        {
+            return (int) Math.round(xDist + 2); 
+        }
+        else if (yDist >= 2 * xDist)
+        {
+            return (int) Math.round(yDist + 1);
+        }
+        else
+        {
+            return (int) Math.round(yDist + 2);
+        }
+    }
+
+
+    // Return a large number if the strike is impossible.  Otherwise
+    // return the total skill penalty for range and terrain.
+    int getRangestrikePenalty(BattleChit rangestriker, BattleChit target)
+    {
+        Hex currentHex = rangestriker.getCurrentHex();
+        Hex targetHex = target.getCurrentHex();
+        int skill = rangestriker.getCreature().getSkill();
+        int range = getRange(currentHex, targetHex);
+
+        int penalty = 0;
+
+        if (range > skill)
+        {
+            penalty += 10;
+        }
+        else if (range == 4 && rangestriker.getCreature() != Creature.warlock)
+        {
+            penalty += 1;
+        }
+        
+        // XXX: LOS code.
+        // XXX: Terrain penalties.
+        return penalty;
     }
 
 
@@ -514,10 +591,10 @@ public class BattleMap extends Frame implements MouseListener,
         }
 
         // Check for mutual Titan elimination.
-        if (attacker.getPlayer().isTitanEliminated() && 
+        if (attacker.getPlayer().isTitanEliminated() &&
             defender.getPlayer().isTitanEliminated())
         {
-            // Nobody gets any points. 
+            // Nobody gets any points.
             attacker.getPlayer().die(null);
             defender.getPlayer().die(null);
             turn.dispose();
@@ -1225,6 +1302,6 @@ public class BattleMap extends Frame implements MouseListener,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian, null, null,
             player2);
-        new BattleMap(attacker, defender, 'm', 'b');
+        new BattleMap(attacker, defender, 'H', 'b');
     }
 }
