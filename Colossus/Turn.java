@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class Turn gets and holds chronological and sequence data for a Titan game.
@@ -7,14 +8,15 @@ import java.awt.event.*;
  * author David Ripton
  */
 
-class Turn extends Dialog implements ActionListener
+class Turn extends JDialog implements ActionListener
 {
     private static Game game;
-    private Frame parentFrame;
+    private JFrame parentFrame;
     private MasterBoard board;
+    private Container contentPane;
 
 
-    Turn(Frame parentFrame, Game game, MasterBoard board)
+    Turn(JFrame parentFrame, Game game, MasterBoard board)
     {
         super(parentFrame, game.getActivePlayer().getName() + " Turn " +
             game.getTurnNumber());
@@ -24,11 +26,9 @@ class Turn extends Dialog implements ActionListener
         this.board = board;
 
         setBackground(java.awt.Color.lightGray);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         setupSplitDialog();
-
-        // This is necessary to prevent a visible resize.
-        pack();
 
         setVisible(true);
     }
@@ -48,16 +48,17 @@ System.out.println("setupSplitDialog");
         }
         else
         {
-            removeAll();
-            setLayout(new GridLayout(0, 3));
+            contentPane = getContentPane();
+            contentPane.removeAll();
+            contentPane.setLayout(new GridLayout(0, 3));
 
-            add(new Label(game.getActivePlayer().getName() + 
+            contentPane.add(new JLabel(game.getActivePlayer().getName() + 
                 " : Split stacks"));
-            Button button1 = new Button("Undo All Splits");
-            add(button1);
+            JButton button1 = new JButton("Undo All Splits");
+            contentPane.add(button1);
             button1.addActionListener(this);
-            Button button2 = new Button("Done with Splits");
-            add(button2);
+            JButton button2 = new JButton("Done with Splits");
+            contentPane.add(button2);
             button2.addActionListener(this);
 
             pack();
@@ -75,39 +76,40 @@ System.out.println("setupSplitDialog");
     void setupMoveDialog()
     {
 System.out.println("setupMoveDialog");
-        removeAll();
+        contentPane = getContentPane();
+        contentPane.removeAll();
         Player player = game.getActivePlayer();
         if (player.getMulligansLeft() > 0)
         {
-            setLayout(new GridLayout(0, 5));
+            contentPane.setLayout(new GridLayout(0, 5));
         }
         else
         {
-            setLayout(new GridLayout(0, 4));
+            contentPane.setLayout(new GridLayout(0, 4));
         }
 
         player.rollMovement();
 
-        add(new Label(player.getName() + " : Movement Roll: " + 
-            player.getMovementRoll()));
+        contentPane.add(new JLabel(player.getName() + " : Movement Roll: " + 
+            player.getMovementRoll() + "  "));
 
-        Button button1 = new Button("Undo Last Move");
-        add(button1);
+        JButton button1 = new JButton("Undo Last Move");
+        contentPane.add(button1);
         button1.addActionListener(this);
 
-        Button button2 = new Button("Undo All Moves");
-        add(button2);
+        JButton button2 = new JButton("Undo All Moves");
+        contentPane.add(button2);
         button2.addActionListener(this);
 
         if (player.getMulligansLeft() > 0)
         {
-            Button button3 = new Button("Take Mulligan");
-            add(button3);
+            JButton button3 = new JButton("Take Mulligan");
+            contentPane.add(button3);
             button3.addActionListener(this);
         }
 
-        Button button4 = new Button("Done with Moves");
-        add(button4);
+        JButton button4 = new JButton("Done with Moves");
+        contentPane.add(button4);
         button4.addActionListener(this);
            
         pack();
@@ -133,13 +135,14 @@ System.out.println("setupFightDialog");
         }
         else
         {
-            removeAll();
-            setLayout(new GridLayout(0, 2));
+            contentPane = getContentPane();
+            contentPane.removeAll();
+            contentPane.setLayout(new GridLayout(0, 2));
 
-            add(new Label(game.getActivePlayer().getName() + 
+            contentPane.add(new JLabel(game.getActivePlayer().getName() + 
                 " : Resolve Engagements"));
-            Button button1 = new Button("Done with Engagements");
-            add(button1);
+            JButton button1 = new JButton("Done with Engagements");
+            contentPane.add(button1);
             button1.addActionListener(this);
 
             pack();
@@ -161,19 +164,20 @@ System.out.println("setupMusterDialog");
         }
         else
         {
-            removeAll();
-            setLayout(new GridLayout(0, 4));
+            contentPane = getContentPane();
+            contentPane.removeAll();
+            contentPane.setLayout(new GridLayout(0, 4));
 
-            add(new Label(game.getActivePlayer().getName() + 
+            contentPane.add(new JLabel(game.getActivePlayer().getName() + 
                 " : Muster Recruits"));
-            Button button1 = new Button("Undo Last Recruit");
-            add(button1);
+            JButton button1 = new JButton("Undo Last Recruit");
+            contentPane.add(button1);
             button1.addActionListener(this);
-            Button button2 = new Button("Undo All Recruits");
-            add(button2);
+            JButton button2 = new JButton("Undo All Recruits");
+            contentPane.add(button2);
             button2.addActionListener(this);
-            Button button3 = new Button("End Turn");
-            add(button3);
+            JButton button3 = new JButton("End Turn");
+            contentPane.add(button3);
             button3.addActionListener(this);
 
             pack();
@@ -204,7 +208,7 @@ System.out.println("setupMusterDialog");
         {
             if (player.getMaxLegionHeight() > 7)
             {
-                new MessageBox(parentFrame, "Must split.");
+                JOptionPane.showMessageDialog(parentFrame, "Must split.");
                 return;
             }
             game.advancePhase();
