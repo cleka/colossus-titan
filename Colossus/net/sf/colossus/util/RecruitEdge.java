@@ -67,4 +67,11 @@ public class RecruitEdge
         }
         return false;
     }
+
+    public String toString()
+    {
+        return "RecruitEdge from " + number + " " +
+            src.getCreatureName() + " to " +
+            dst.getCreatureName() + " in " + terrain + ". ";
+    }
 }

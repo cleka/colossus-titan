@@ -83,4 +83,10 @@ public class RecruitVertex
         }
         return false;
     }
+
+    public String toString()
+    {
+        return "RecruitVertex " + cre.getName() + " with " +
+            outgoingEdges.size() + "exits. ";
+    }
 }
