@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import javax.swing.*;
 
 /**
  * Class PickMarker allows a player to pick a legion marker.
@@ -10,7 +9,7 @@ import javax.swing.*;
  */
 
 
-class PickMarker extends JDialog implements MouseListener, WindowListener
+class PickMarker extends Dialog implements MouseListener, WindowListener
 {
     private Chit [] markers;
     private MediaTracker tracker;
@@ -21,7 +20,7 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     private Image offImage;
 
 
-    PickMarker(JFrame parentFrame, Player player)
+    PickMarker(Frame parentFrame, Player player)
     {
         super(parentFrame, player.getName() + ": Pick Legion Marker", true);
 
@@ -33,13 +32,13 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
 
         if (player.getNumMarkersAvailable() == 0)
         {
-            JOptionPane.showMessageDialog(parentFrame, "No markers available");
+            new MessageBox(parentFrame, "No markers available");
             dispose();
         }
         else
         {
             int scale = 60;
-            getContentPane().setLayout(null);
+            setLayout(null);
 
             pack();
 
@@ -77,8 +76,7 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
             }
             catch (InterruptedException e)
             {
-                JOptionPane.showMessageDialog(parentFrame,
-                    "waitForAll was interrupted");
+                new MessageBox(parentFrame, "waitForAll was interrupted");
             }
             imagesLoaded = true;
             setVisible(true);

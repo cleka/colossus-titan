@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class SummonAngel allows a player to Summon an angel or archangel.
@@ -9,7 +8,7 @@ import javax.swing.*;
  */
 
 
-class SummonAngel extends JDialog implements MouseListener, ActionListener,
+class SummonAngel extends Dialog implements MouseListener, ActionListener,
     WindowListener
 {
     private int numEligible = 0;
@@ -18,8 +17,8 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
     private Player player;
     private Legion legion;
     private MasterBoard board;
-    private JButton button1;
-    private JButton button2;
+    private Button button1;
+    private Button button2;
     private static final int scale = 60;
     private boolean laidOut = false;
     private Chit angelChit;
@@ -58,8 +57,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         addMouseListener(this);
         addWindowListener(this);
 
-        Container contentPane = getContentPane();
-        contentPane.setLayout(null);
+        setLayout(null);
 
         pack();
 
@@ -88,14 +86,14 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(board, "waitForAll was interrupted");
+            new MessageBox(board, "waitForAll was interrupted");
         }
         imagesLoaded = true;
 
-        button1 = new JButton("Summon");
-        button2 = new JButton("Cancel");
-        contentPane.add(button1);
-        contentPane.add(button2);
+        button1 = new Button("Summon");
+        button2 = new Button("Cancel");
+        add(button1);
+        add(button2);
         button1.addActionListener(this);
         button2.addActionListener(this);
 
@@ -171,7 +169,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
         g.drawImage(offImage, 0, 0, this);
 
-        // These are necessary because JButtons are lightweight.
+        // These are necessary because Buttons are lightweight.
         button1.repaint();
         button2.repaint();
     }
@@ -280,12 +278,12 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand() == "Summon")
+        if (e.getActionCommand().equals("Summon"))
         {
             donor = player.getSelectedLegion();
             if (donor == null)
             {
-                JOptionPane.showMessageDialog(board, "Must select a legion.");
+                new MessageBox(board, "Must select a legion.");
                 return;
             }
 
@@ -294,8 +292,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
             if (angels == 0 && archangels == 0)
             {
-                JOptionPane.showMessageDialog(board,
-                    "No angels are available.");
+                new MessageBox(board, "No angels are available.");
                 return;
             }
 
@@ -314,15 +311,14 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             else
             {
                 // If both are available, make the player click on one.
-                JOptionPane.showMessageDialog(board,
-                    "Select angel or archangel.");
+                new MessageBox(board, "Select angel or archangel.");
                 return;
             }
 
             cleanup(true);
         }
 
-        else if (e.getActionCommand() == "Cancel")
+        else if (e.getActionCommand().equals("Cancel"))
         {
             cleanup(false);
         }

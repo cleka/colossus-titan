@@ -62,6 +62,9 @@ class Player
 
     public void initMarkersAvailable()
     {
+        numMarkersAvailable = 0;
+        markersAvailable = new String[72];
+
         for (int i = 1; i <= 9; i++)
         {
             addLegionMarker(getShortColor() + '0' + Integer.toString(i));
@@ -75,27 +78,27 @@ class Player
 
     public String getShortColor()
     {
-        if (color == "Black")
+        if (color.equals("Black"))
         {
             return new String("Bk");
         }
-        else if (color == "Blue")
+        else if (color.equals("Blue"))
         {
             return new String("Bl");
         }
-        else if (color == "Brown")
+        else if (color.equals("Brown"))
         {
             return new String("Br");
         }
-        else if (color == "Gold")
+        else if (color.equals("Gold"))
         {
             return new String("Gd");
         }
-        else if (color == "Green")
+        else if (color.equals("Green"))
         {
             return new String("Gr");
         }
-        else if (color == "Red")
+        else if (color.equals("Red"))
         {
             return new String("Rd");
         }

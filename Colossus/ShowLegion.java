@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 import java.io.*;
 
 /**
@@ -9,7 +8,7 @@ import java.io.*;
  * author David Ripton
  */
 
-class ShowLegion extends JDialog implements MouseListener, WindowListener
+class ShowLegion extends Dialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
@@ -20,7 +19,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
     private Image offImage;
 
 
-    ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean 
+    ShowLegion(Frame parentFrame, Legion legion, Point point, boolean 
         allVisible)
     {
         super(parentFrame, "Contents of Legion " + legion.getMarkerId(), false);
@@ -57,7 +56,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         }
         setLocation(origin);
 
-        getContentPane().setLayout(null);
+        setLayout(null);
 
         this.legion = legion;
 
@@ -104,8 +103,7 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(parentFrame,
-                "waitForAll was interrupted");
+            new MessageBox(parentFrame, "waitForAll was interrupted");
         }
         imagesLoaded = true;
 

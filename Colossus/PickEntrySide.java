@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class PickEntrySide allows picking which side of a MasterBoard hex
@@ -9,7 +8,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-class PickEntrySide extends JDialog implements ActionListener, 
+class PickEntrySide extends Dialog implements ActionListener, 
     WindowListener
 {
     private BattleHex [][] h = new BattleHex[6][6];
@@ -33,21 +32,21 @@ class PickEntrySide extends JDialog implements ActionListener,
     private MasterHex masterHex;
     private char terrain;
 
-    private JButton button1;  // left
-    private JButton button2;  // bottom
-    private JButton button3;  // right
+    private Button button1;  // left
+    private Button button2;  // bottom
+    private Button button3;  // right
 
     private boolean laidOut = false;
 
 
-    public PickEntrySide(JFrame parentFrame, MasterHex masterHex)
+    public PickEntrySide(Frame parentFrame, MasterHex masterHex)
     {
         super(parentFrame, "Pick entry side", true);
 
         this.masterHex = masterHex;
         this.terrain = masterHex.getTerrain();
 
-        getContentPane().setLayout(null);
+        setLayout(null);
 
         // Make sure the board fits on the screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -62,22 +61,22 @@ class PickEntrySide extends JDialog implements ActionListener,
 
         if (masterHex.canEnterViaSide(5))
         {
-            button1 = new JButton("Left");
-            getContentPane().add(button1);
+            button1 = new Button("Left");
+            add(button1);
             button1.addActionListener(this);
         }
         
         if (masterHex.canEnterViaSide(3))
         {
-            button2 = new JButton("Bottom");
-            getContentPane().add(button2);
+            button2 = new Button("Bottom");
+            add(button2);
             button2.addActionListener(this);
         }
         
         if (masterHex.canEnterViaSide(1))
         {
-            button3 = new JButton("Right");
-            getContentPane().add(button3);
+            button3 = new Button("Right");
+            add(button3);
             button3.addActionListener(this);
         }
 
@@ -524,17 +523,17 @@ class PickEntrySide extends JDialog implements ActionListener,
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand() == "Left")
+        if (e.getActionCommand().equals("Left"))
         {
             cleanup(5);
         }
 
-        else if (e.getActionCommand() == "Right")
+        else if (e.getActionCommand().equals("Right"))
         {
             cleanup(1);
         }
 
-        else if (e.getActionCommand() == "Bottom")
+        else if (e.getActionCommand().equals("Bottom"))
         {
             cleanup(3);
         }

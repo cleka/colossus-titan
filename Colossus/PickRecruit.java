@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class PickRecruit allows a player to pick a creature to recruit.
@@ -9,7 +8,7 @@ import javax.swing.*;
  */
 
 
-class PickRecruit extends JDialog implements MouseListener, WindowListener
+class PickRecruit extends Dialog implements MouseListener, WindowListener
 {
     private int numEligible;
     private Creature [] recruits;
@@ -27,10 +26,10 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     private Image offImage;
     private int height;
     private int leadWidth;
-    private JFrame parentFrame;
+    private Frame parentFrame;
 
 
-    PickRecruit(JFrame parentFrame, Legion legion)
+    PickRecruit(Frame parentFrame, Legion legion)
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruit in " + 
@@ -54,13 +53,12 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         addMouseListener(this);
         addWindowListener(this);
 
-        getContentPane().setLayout(null);
+        setLayout(null);
 
         pack();
 
         setBackground(java.awt.Color.lightGray);
 
-        // setSize(scale * (numEligible + 1), (23 * scale / 10));
         height = legion.getHeight();
 
         setSize(scale * (Math.max(numEligible, height + 1) + 1),
@@ -112,8 +110,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(parentFrame,
-                "waitForAll was interrupted");
+            new MessageBox(parentFrame, "waitForAll was interrupted");
         }
         imagesLoaded = true;
 
