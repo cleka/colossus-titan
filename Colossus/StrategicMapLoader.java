@@ -57,41 +57,41 @@ public class StrategicMapLoader implements StrategicMapLoaderConstants {
       posX = c_number();
       posY = c_number();
       jj_consume_token(EOL);
-        nPosX = posX-1;
-        nPosY = (posY-1)/2;
-        Log.debug("Adding case #" + p + " @(" + nPosX + "," + nPosY +
+        //nPosX = posX-1;
+        //nPosY = (posY-1)/2;
+        Log.debug("Adding case #" + p + " @(" + posX + "," + posY +
             "), type " + Game.getTerrainName(ter) + " with exit : " + s1 + ", " + s2 + ", " + s3);
-        h[nPosX][nPosY].setTerrain(ter);
-        h[nPosX][nPosY].setLabel(p);
-        h[nPosX][nPosY].setXCoord(nPosX);
-        h[nPosX][nPosY].setYCoord(nPosY);
+        h[posX][posY].setTerrain(ter);
+        h[posX][posY].setLabel(p);
+        h[posX][posY].setXCoord(posX);
+        h[posX][posY].setYCoord(posY);
         if (s1 > 0)
         {
-            h[nPosX][nPosY].setBaseExitType(0, ts1);
+            h[posX][posY].setBaseExitType(0, ts1);
         }
         else
         {
-            h[nPosX][nPosY].setBaseExitType(0, MasterHex.NONE);
+            h[posX][posY].setBaseExitType(0, MasterHex.NONE);
         }
-        h[nPosX][nPosY].setBaseExitLabel(0, s1);
+        h[posX][posY].setBaseExitLabel(0, s1);
         if (s2 > 0)
         {
-            h[nPosX][nPosY].setBaseExitType(1, ts2);
+            h[posX][posY].setBaseExitType(1, ts2);
         }
         else
         {
-            h[nPosX][nPosY].setBaseExitType(1, MasterHex.NONE);
+            h[posX][posY].setBaseExitType(1, MasterHex.NONE);
         }
-        h[nPosX][nPosY].setBaseExitLabel(1, s2);
+        h[posX][posY].setBaseExitLabel(1, s2);
         if (s3 > 0)
         {
-            h[nPosX][nPosY].setBaseExitType(2, ts3);
+            h[posX][posY].setBaseExitType(2, ts3);
         }
         else
         {
-            h[nPosX][nPosY].setBaseExitType(2, MasterHex.NONE);
+            h[posX][posY].setBaseExitType(2, MasterHex.NONE);
         }
-        h[nPosX][nPosY].setBaseExitLabel(2, s3);
+        h[posX][posY].setBaseExitLabel(2, s3);
         {if (true) return(1);}
       break;
     case EOL:

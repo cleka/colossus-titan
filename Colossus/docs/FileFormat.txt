@@ -26,10 +26,10 @@ All of those should be on one line.
  for exit of label '0' (no exit) any of the four value can be
  used, as exit type is irrelevant.
 <X_pos> and <Y_pos> is the position X,Y of the Hex on the
- masterboard. They both start from 'one', on the first line
- and first column. all lines are different (i.e. on the default
- master board, case 126 and 125 are on two different lines,
-respectively 2 and one, and on columns 4 and 5).
+ masterboard. They both start from 'zero', on the first line
+ and first column. Not all lines are different (i.e. on the default
+ master board, case 126 and 125 are on the same line number 0
+and on columns 4 and 3).
 
 At the moment, max size is the same as the default master board.
 
