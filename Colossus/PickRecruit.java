@@ -26,6 +26,12 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
         
         setResizable(false);
 
+        if (legion.getHeight() > 6)
+        {
+            dispose();
+            return;
+        }
+
         this.legion = legion;
         player = legion.getPlayer();
 
