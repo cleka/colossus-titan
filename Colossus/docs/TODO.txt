@@ -62,6 +62,11 @@ java.lang.NullPointerException
         at net.sf.colossus.server.SocketServerThread.parseLine(SocketServerThread.java:104)
         at net.sf.colossus.server.SocketServerThread.run(SocketServerThread.java:65)
 
+Bug: During a battle against an opponent's titan stack, right-clicking on
+another one of his stacks showed a titan with a ?.  Looks like we're not
+updating certainties at the beginning of the engagement.  This fixes itself at
+the end of the battle.
+
 Remove advancePhaseInternal from PhaseAdvancer; make private
 
 Remove AWT dependency from server by moving image manipulation in
@@ -110,7 +115,7 @@ When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
    Or make PickRecruit non-modal.
 
-Observer clients.
+Observer clients, which can attach in mid-game.
 
 Sometimes refuse remote newGame/loadGame/saveGame calls?
 
@@ -190,3 +195,5 @@ Try PMD (lint tool).
 
 Dead players' markers should be zero in StatusScreen.
 
+Auto-advance on client side.
+Done button not on during empty engagement phase.
