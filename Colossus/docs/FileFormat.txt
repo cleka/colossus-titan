@@ -11,6 +11,8 @@ should be in the same directory.
 
 This file define the Colossus Masterboard ; what terrain type to use
 for an hex and what sort of exit to which hex. It's composed
+first of a pair of integer represanting the map size
+(horizontaly then vertically), and then
 of a succession of line:
 
 <case_label> <case_type>
@@ -35,8 +37,6 @@ All of those should be on one line.
  master board, case 126 and 125 are on the same line number 0
 and on columns 4 and 3).
 
-At the moment, max size is the same as the default master board.
-
 2) TER file format (default file used: Default/Default.ter)
 
 This file define the Colossus Recruit Trees ; what
@@ -58,11 +58,32 @@ of a succession of line:
 
 <recruit> is the name of the recruit creature (Gargoyle, ...)
 
-The last two as a pair can be repeated any number of time. The first pair
-ignore the <recruiter_needed> number, so it should be '1'.
+The last two as a pair can be repeated any number of time.
 Any later creature can recruit a previous one or itself.
 A creature can recruit the next one only if they are numerous
 enough, as indicated by the <recruiter_needed> _of the recruit_.
+
+Too special name exist (pseudo-creature) : "Anything", which
+means any creature can recruit the following creature provided
+thay are numerous enough, and "Lord"  which means a Lord (Angel,
+Titan, Archangel...) can recruit the following creature.
+Note that for "Lord" and "Titan", only one recruiter
+is needed, and the number before the recruits indicate
+how many of the creatures _before_ Lord or Titan are
+needed.
+
+When <recruiter_needed> is 0 (zero), then the creature can
+recruit, but cannot be recruited. Such creature, and the
+pseudo-creature above, are ignored for the purpose of
+normal recruitements. If you put 'Titan' as a recruiter,
+it should _always_ be zero, as beeing able to recruit
+Titan is going to cause lots of trouble.
+
+exemple: if you use "0 Anything 3 ogre 0 Titan 2 Gargoyle",
+you will be able to recruit an Ogre with any 3 creatures
+or with a Gargoyle, and you will be able to recruits
+a gargoyle with two Ogres or the Titan. You won't be
+able to recruit "Anything" or "Titan", of course;
 
 The line that starts with 'T' and of name 'Tower' (mandatory) is
 different. It should contain 5 pairs, all with '1' as the
@@ -116,14 +137,13 @@ at elevation '0', and no border.
 <X_pos> and <Y_pos> are the X and Y position of the modified case.
 
 <terrain_type> is the terrain type of the case ; it's currently
-one of: p, r, s, t, o, v, d, w (Plain, bRamble, Sand, Tree, bOg, Volcano, Drift, toWer)
+one of: p, r, s, t, o, v, d, w, l (Plain, bRamble, Sand, Tree, bOg, Volcano, Drift, toWer, Lake)
 
 <terrain_elevation> is the altitude of the terrain (between 0 and 2)
 
 finally. between 0 and 6 pair of the form <border_number> <border_type>,
 where <border_number> is between 0 and 5 and <bordet_type> is currently
-one of: d, c, s, w (Dune, Cliff, Slope, Wall) ; space (' ') is allowed,
-but it is the default 'no obstacle' and so it is not needed.
+one of: d, c, s, w (Dune, Cliff, Slope, Wall).
 
 5) VAR file format (default file used: Default/Default.var)
 

@@ -61,6 +61,11 @@ public final class Constants
 
     public static final String invertedPrefix = "i_";
 
+    // MasterBoard size
+    public final static int MIN_HORIZ_SIZE=15;
+    public final static int MIN_VERT_SIZE=8;
+    public final static int MAX_HORIZ_SIZE=20;
+    public final static int MAX_VERT_SIZE=12;
 
     public static final String [] colorNames =
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};

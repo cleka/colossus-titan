@@ -23,6 +23,9 @@ public class BattleHex extends Hex
     // Hex terrain types are:
     // p, r, s, t, o, v, d
     // plain, bramble, sand, tree, bog, volcano, drift
+    // also
+    // l
+    // lake
 
     // Hexside terrain types are:
     // d, c, s, w, space
@@ -65,82 +68,87 @@ public class BattleHex extends Hex
     {
         switch (getTerrain())
         {
-            case 'p':
-                switch (elevation)
-                {
-                    case 0:
-                        return "Plains";
-                    case 1:
-                        return "Plains (1)";
-                    case 2:
-                        return "Plains (2)";
-                }
-            case 'w':
-                switch (elevation)
-                {
-                    case 0:
-                        return "Tower";
-                    case 1:
-                        return "Tower (1)";
-                    case 2:
-                        return "Tower (2)";
-                }
-            case 'r':
-                return "Bramble";
-            case 's':
-                return "Sand";
-            case 't':
-                return "Tree";
-            case 'o':
-                return "Bog";
-            case 'v':
-                return "Volcano (2)";
-            case 'd':
-                return "Drift";
-            default:
-                return "?????";
+        case 'p':
+            switch (elevation)
+            {
+            case 0:
+                return "Plains";
+            case 1:
+                return "Plains (1)";
+            case 2:
+                return "Plains (2)";
+            }
+        case 'w':
+            switch (elevation)
+            {
+            case 0:
+                return "Tower";
+            case 1:
+                return "Tower (1)";
+            case 2:
+                return "Tower (2)";
+            }
+        case 'r':
+            return "Bramble";
+        case 's':
+            return "Sand";
+        case 't':
+            return "Tree";
+        case 'o':
+            return "Bog";
+        case 'v':
+            return "Volcano (2)";
+        case 'd':
+            return "Drift";
+        case 'l':
+            return "Lake";
+            
+        default:
+            return "?????";
         }
     }
-
+    
 
     Color getTerrainColor()
     {
         switch (getTerrain())
         {
-            case 'p':  // plain
-                switch (elevation)
-                {
-                    case 0:
-                        return HTMLColor.lightOlive;
-                    case 1:
-                        return HTMLColor.darkYellow;
-                    case 2:
-                        return Color.yellow;
-                }
-            case 'w':  // tower
-                switch (elevation)
-                {
-                    case 0:
-                        return HTMLColor.lightGray;
-                    case 1:
-                        return Color.gray;
-                    case 2:
-                        return HTMLColor.darkGray;
-                }
-            case 'r':  // bramble
-                return Color.green;
-            case 's':  // sand
-                return Color.orange;
-            case 't':  // tree
-                return HTMLColor.brown;
-            case 'o':  // bog
+        case 'p':  // plain
+            switch (elevation)
+            {
+            case 0:
+                return HTMLColor.lightOlive;
+            case 1:
+                return HTMLColor.darkYellow;
+            case 2:
+                return Color.yellow;
+            }
+        case 'w':  // tower
+            switch (elevation)
+            {
+            case 0:
+                return HTMLColor.lightGray;
+            case 1:
                 return Color.gray;
-            case 'v':  // volcano
-                return Color.red;
-            case 'd':  // drift
-                return Color.blue;
-            default:
-                return Color.black;
+            case 2:
+                return HTMLColor.darkGray;
+            }
+        case 'r':  // bramble
+            return Color.green;
+        case 's':  // sand
+            return Color.orange;
+        case 't':  // tree
+            return HTMLColor.brown;
+        case 'o':  // bog
+            return Color.gray;
+        case 'v':  // volcano
+            return Color.red;
+        case 'd':  // drift
+            return Color.blue;
+        case 'l':  // lake
+            return HTMLColor.skyBlue;
+        default:
+            return Color.black;
         }
     }
 
@@ -318,6 +326,12 @@ public class BattleHex extends Hex
     public int getEntryCost(Creature creature, int cameFrom)
     {
         char terrain = getTerrain();
+
+        // lake is impassable
+        if (terrain == 'l')
+        {
+            return IMPASSIBLE_COST;
+        }
 
         // Check to see if the hex is occupied or totally impassable.
         if (terrain == 't' || (terrain == 'v' &&

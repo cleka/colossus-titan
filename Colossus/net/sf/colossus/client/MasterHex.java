@@ -54,7 +54,7 @@ public class MasterHex extends Hex
     //           4------------3                  4------3
 
 
-    MasterHex()
+    public MasterHex()
     {
         super();
     }

@@ -84,7 +84,7 @@ public class TerrainRecruitLoader
     public Creature[] getStartingCreatures()
     {
         Creature[] bc = new Creature[3];
-        ArrayList to = getPossibleRecruits('T');
+        java.util.List to = getPossibleRecruits('T');
         bc[0] = (Creature)to.get(0);
         bc[1] = (Creature)to.get(1);
         bc[2] = (Creature)to.get(2);
@@ -114,21 +114,81 @@ public class TerrainRecruitLoader
      * @return List of Creature that can be recruited in the terrain.
      * @see net.sf.colossus.server.Creature
      */
-    public ArrayList getPossibleRecruits(char terrain)
+    public java.util.List getPossibleRecruits(char terrain)
     {
-        ArrayList re = new ArrayList();
         ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
+        ArrayList re = new ArrayList();
         Iterator it = al.iterator();
         while (it.hasNext())
         {
             recruitNumber tr = (recruitNumber)it.next();
-            if (tr.number > 0)
+            if ((tr.number > 0) && !(tr.name.equals("Anything"))
+                                && !(tr.name.equals("Lord")))
             {
                 re.add(Creature.getCreatureByName(tr.name));
             }
         }
+        return(re);
+    }
+    public java.util.List getPossibleRecruiters(char terrain)
+    {
+        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
+        ArrayList re = new ArrayList();
+        Iterator it = al.iterator();
+        while (it.hasNext())
+        {
+            recruitNumber tr = (recruitNumber)it.next();
+            if (!(tr.name.equals("Anything")) &&
+                !(tr.name.equals("Lord")))
+            {
+                re.add(Creature.getCreatureByName(tr.name));
+            }
+            else
+            {
+                if (tr.name.equals("Anything"))
+                { // anyone can recruit here...
+                    java.util.List creatures = Creature.getCreatures();
+                    return(new ArrayList(creatures));
+                }
+                if (tr.name.equals("Lord"))
+                {
+                    java.util.List potential = Creature.getCreatures();
+                    ListIterator lit = potential.listIterator();
+                    while (lit.hasNext())
+                    {
+                        Creature creature = (Creature)lit.next();
+                        if (creature.isLord())
+                        {
+                            re.add(creature);
+                        }
+                    }
+                }
+
+            }
+        }
+        return(re);
+    }
+    private java.util.List getPossibleFakeRecruiters(char terrain)
+    {
+        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
+        ArrayList re = new ArrayList();
+        Iterator it = al.iterator();
+        while (it.hasNext())
+        {
+            recruitNumber tr = (recruitNumber)it.next();
+            if (!(tr.name.equals("Anything")) &&
+                !(tr.name.equals("Lord")))
+            {
+                re.add(Creature.getCreatureByName(tr.name));
+            }
+            else
+            {
+                re.add(Creature.unknown);
+            }
+        }
         return re;
     }
+
     /**
      * Give the number of a given recruiters needed to recruit a given Creature.
      * @param recruiter The Creature that wish to recruit.
@@ -142,53 +202,79 @@ public class TerrainRecruitLoader
         if (terrain != 'T') /* handle Tower with care */
         {
             ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
-            ArrayList pc = getPossibleRecruits(terrain);
+            java.util.List pc = getPossibleRecruits(terrain);
+            java.util.List pr = getPossibleFakeRecruiters(terrain);
 
             int iReer = pc.indexOf(recruiter);
             int iRe = pc.indexOf(recruit);
-            if ((iReer == -1) || (iRe == -1))
-            {
-                return 99; /* can't recruit/be recruited here */
+            int iReerFake = pr.indexOf(recruiter);
+            int iReFake = pr.indexOf(recruit);
+            if (iRe == -1)
+            { // can't be recruited here
+                return 99;
             }
-
             if (iReer >= iRe)
-            {
-                return 1; /* only one to recruit same or below */
+            { // only one to recruit same or below
+                return 1;
+            }
+            if ((iReer != -1) && ((iReer+1) < iRe))
+            { // can't recruit 2 or more above
+                return 99;
+            }
+            if (iReer != -1)
+            { // regular recruitments
+                return (((recruitNumber)al.get(iReFake)).number);
+            }
+            if (iReFake == 0)
+            { // first in stack, itself only (taken care of above)
+                return 99;
             }
 
-            if ((iReer+1) < iRe)
-            {
-                return 99; /* can't recruit 2 above */
-            }
+            // OK, now iReer == -1, but it still can recruit
+            // it's something that can recruit, but cannot be recruited
 
-            return (((recruitNumber)al.get(iRe)).number);
+            // find out what's below the recruit in the recruiters stack
+            String below = ((recruitNumber)al.get(iReFake - 1)).name;
+
+            // First, "Anything" ; the number is needed no matter what
+            // the recruiter is
+            if (below.equals("Anything"))
+                return (((recruitNumber)al.get(iReFake)).number);
+            // Second, "Lord" ; only one Lord can recruit
+            if (below.equals("Lord") && (recruiter.isLord()))
+                return 1;
+            // Third, "Titan" ; only the Titan can recruit
+            if (below.equals("Titan") && (recruiter.isTitan()))
+                return 1;
+            // not possible to recruit, after all
+            return 99;
         }
         /* Tower, special */
-        ArrayList to = getPossibleRecruits(terrain); /* this is 'T' */
+        java.util.List to = getPossibleRecruits(terrain); /* this is 'T' */
         if (recruit.getName().equals(((Creature)to.get(0)).getName()) ||
-                    recruit.getName().equals(((Creature)to.get(1)).getName()) ||
-                    recruit.getName().equals(((Creature)to.get(2)).getName()))
-        { /* first three can be recruited by anything */
+            recruit.getName().equals(((Creature)to.get(1)).getName()) ||
+            recruit.getName().equals(((Creature)to.get(2)).getName()))
+        { // first three can be recruited by anything
             return 0;
-        } 
+        }
         else if (recruit.getName().equals(((Creature)to.get(4)).getName()))
         {
             if (recruiter.getName().equals("Titan") ||
                 recruiter.getName().equals(((Creature)to.get(4)).getName()))
-            { /* fifth recruited by Titan or itself */
+            { // fifth recruited by Titan or itself
                 return 1;
             } 
-            else 
+            else
             {
                 return 99;
             }
         } 
         else if (recruit.getName().equals(((Creature)to.get(3)).getName()))
-        { /* fourth recruited by any 3 or itself */
+        { // fourth recruited by any 3 or itself
             if (recruiter.getName().equals(((Creature)to.get(3)).getName()))
             {
                 return 1;
-            } 
+            }
             else 
             {
                 return 3;

@@ -13,6 +13,7 @@ import java.util.*;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.client.MasterHex;
+import net.sf.colossus.client.GUIMasterHex;
 import net.sf.colossus.server.Game;
 
 /**
@@ -119,7 +120,7 @@ int c_way() :
  * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
  * @see net.sf.colossus.client.MasterHex
  */
-int oneCase(MasterHex [][] h) :
+int oneCase(MasterHex [][] h, java.util.List list, boolean show[][], boolean isGUI) :
 {
     String s;
     char ter;
@@ -141,7 +142,15 @@ int oneCase(MasterHex [][] h) :
         //nPosX = posX-1;
         //nPosY = (posY-1)/2;
         Log.debug("Adding case #" + p + " @(" + posX + "," + posY +
-            "), type " + Game.getTerrainName(ter) + " with exit : " + s1 + ", " + s2 + ", " + s3);
+            "), type " + Game.getTerrainName(ter) + " with exit : " +
+            s1 + ", " + s2 + ", " + s3);
+        if (isGUI)
+            h[posX][posY] = new GUIMasterHex();
+        else
+            h[posX][posY] = new MasterHex();
+        show[posX][posY] = true;
+        list.add(h[posX][posY]);
+
         h[posX][posY].setTerrain(ter);
         h[posX][posY].setLabel(p);
         h[posX][posY].setXCoord(posX);
@@ -187,5 +196,25 @@ int oneCase(MasterHex [][] h) :
 |   <EOF>
     {
         return(-1);
+    }
+}
+
+int[] getHexArraySize() :
+{
+    int[] size = new int[2];
+}
+{
+    (size[0] = c_number()) (size[1] = c_number()) <EOL>
+    {
+        if ((size[0] < Constants.MIN_HORIZ_SIZE) ||
+            (size[0] > Constants.MAX_HORIZ_SIZE) ||
+            (size[1] < Constants.MIN_VERT_SIZE) ||
+            (size[1] > Constants.MAX_VERT_SIZE))
+        {
+            throw new ParseException(
+                "MasterBoard size out of range : " +
+                size[0] + ", " + size[1]);
+        }
+        return(size);
     }
 }

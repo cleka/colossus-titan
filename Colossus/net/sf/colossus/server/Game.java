@@ -736,7 +736,6 @@ public final class Game
     }
 
 
-
     int getTurnNumber()
     {
         return turnNumber;
@@ -1352,7 +1351,16 @@ public final class Game
      *  the given terrain, ordered from lowest to highest. */
     public static java.util.List getPossibleRecruits(char terrain)
     {
-        return trl.getPossibleRecruits(terrain);
+        java.util.List recruits = trl.getPossibleRecruits(terrain);
+        return recruits;
+    }
+
+    /** Return a list of creatures that can recruit in
+     *  the given terrain, unordered */
+    public static java.util.List getPossibleRecruiters(char terrain)
+    {
+        java.util.List recruits = trl.getPossibleRecruiters(terrain);
+        return recruits;
     }
 
     /** Return the number of the given recruiter needed to muster the given
@@ -1407,58 +1415,25 @@ public final class Game
         }
         else
         {
-            recruits = getPossibleRecruits(terrain);
+            recruits = new ArrayList();
+            java.util.List temprecruits = getPossibleRecruits(terrain);
+            java.util.List recruiters = getPossibleRecruiters(terrain);
 
-            ListIterator lit = recruits.listIterator(recruits.size());
-            while (lit.hasPrevious())
+            ListIterator lit = temprecruits.listIterator();
+            
+            while (lit.hasNext())
             {
-                Creature creature = (Creature)lit.previous();
-                int numCreature = legion.numCreature(creature);
-                if (numCreature >= 1)
+                Creature creature = (Creature)lit.next();
+                ListIterator liter = recruiters.listIterator();
+                while (liter.hasNext())
                 {
-                    // We already have one of this creature, so we
-                    // can recruit it and all lesser creatures in
-                    // this hex.
-                    break;
-                }
-                else
-                {
-                    if (lit.hasPrevious())
+                    Creature lesser = (Creature)liter.next();
+                    if ((numberOfRecruiterNeeded(
+                            lesser, creature, terrain) <=
+                         legion.numCreature(lesser)) &&
+                        (recruits.indexOf(creature) == -1))
                     {
-                        Creature lesser = (Creature)lit.previous();
-                        int numLesser = legion.numCreature(lesser);
-                        if (numLesser >= numberOfRecruiterNeeded(lesser,
-                            creature, terrain))
-                        {
-                            // We have enough of the previous creature
-                            // to recruit this and all lesser creatures
-                            // in this hex.
-                            break;
-                        }
-                        else if (numLesser >= 1)
-                        {
-                            // We can't recruit this creature, but
-                            // we have at least one of the previous
-                            // creature, so we can recruit all lesser
-                            // creatures in this hex.
-                            lit.next();
-                            lit.next();
-                            lit.remove();
-                            break;
-                        }
-                        else
-                        {
-                            // We can't recruit this creature.  Continue.
-                            lit.next();
-                            lit.next();
-                            lit.remove();
-                        }
-                    }
-                    else
-                    {
-                        // This is the lowest creature in this hex,
-                        // so we can't recruit it with a lesser creature.
-                        lit.remove();
+                        recruits.add(creature);
                     }
                 }
             }
@@ -1534,7 +1509,7 @@ public final class Game
         }
         else
         {
-            recruiters = getPossibleRecruits(terrain);
+            recruiters = getPossibleRecruiters(terrain);
             Iterator it = recruiters.iterator();
             while (it.hasNext())
             {
@@ -1847,12 +1822,18 @@ public final class Game
                 Constants.NOWHERE, ignoreFriends));
 
             // Mark every unoccupied tower.
-            for (int tower = 100; tower <= 600; tower += 100)
+            // only 9 towers are allowed, numbered from 100 to 900
+            // by increment of 100. Label '1000' is on the
+            // inner circle.
+            for (int tower = 100; tower <= 900; tower += 100)
             {
                 String hexLabel = String.valueOf(tower);
-                if (!isOccupied(hexLabel) || ignoreFriends)  // XXX bug?
+                if (MasterBoard.getHexByLabel(hexLabel) != null)
                 {
-                    set.add(hexLabel);
+                    if (!isOccupied(hexLabel) || ignoreFriends)  // XXX bug?
+                    {
+                        set.add(hexLabel);
+                    }
                 }
             }
         }

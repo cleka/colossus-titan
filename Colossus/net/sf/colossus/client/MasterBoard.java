@@ -24,41 +24,27 @@ import net.sf.colossus.parser.StrategicMapLoader;
 
 public final class MasterBoard extends JPanel
 {
+    private static int horizSize = 0;
+    private static int vertSize = 0;
+
     /** For easy of mapping to the GUI, hexes will be stored
-     *  in a 15x8 array, with some empty elements. */
-    private GUIMasterHex[][] h = new GUIMasterHex[15][8];
+     *  in a horizSize*vertSize array, with some empty elements. */
+    private GUIMasterHex[][] h = null;
 
     /** For ease of iterating through all hexes, they'll also be
      *  stored in a List. */
-    private java.util.List hexes = new ArrayList(96);
+    private java.util.List hexes = null;
 
     /** A static set of non-GUI MasterHexes */
-    private static MasterHex[][] plain = new MasterHex[15][8];
+    private static MasterHex[][] plain = null;
 
     /** For ease of iterating through all hexes, they'll also be
      *  stored in a List. */
-    private static java.util.List plainHexes = new ArrayList(96);
+    private static java.util.List plainHexes = null;
 
-    /** The hexes in the 15x8 array that actually exist are
+    /** The hexes in the horizSize*vertSize array that actually exist are
      *  represented by true. */
-    private static final boolean[][] show =
-    {
-        {false, false, false, true, true, false, false, false},
-        {false, false, true, true, true, true, false, false},
-        {false, true, true, true, true, true, true, false},
-        {true, true, true, true, true, true, true, true},
-        {true, true, true, true, true, true, true, true},
-        {true, true, true, true, true, true, true, true},
-        {true, true, true, true, true, true, true, true},
-        {true, true, true, true, true, true, true, true},
-        {true, true, true, true, true, true, true, true},
-        {true, true, true, true, true, true, true, true},
-        {true, true, true, true, true, true, true, true},
-        {true, true, true, true, true, true, true, true},
-        {false, true, true, true, true, true, true, false},
-        {false, false, true, true, true, true, false, false},
-        {false, false, false, true, true, false, false, false}
-    };
+    private static boolean[][] show = null;
 
     private Client client;
 
@@ -118,7 +104,7 @@ public final class MasterBoard extends JPanel
 
     private AbstractAction aboutAction;
 
-
+    /*
     static
     {
         plainHexes.clear();
@@ -139,7 +125,7 @@ public final class MasterBoard extends JPanel
 
         setupHexesGameState(plain);
     }
-
+    */
 
     MasterBoard(Client client)
     {
@@ -649,8 +635,10 @@ public final class MasterBoard extends JPanel
 
     private void setupHexes()
     {
+        if (plain == null) /* if static array not yet defined */
+            setupHexesGameState(false);
+        setupHexesGameState(true);
         setupHexesGUI();
-        setupHexesGameState(h);
     }
 
     private void setupHexesGUI()
@@ -663,7 +651,7 @@ public final class MasterBoard extends JPanel
         // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
 
         // For easy of mapping to the GUI, they'll initially be stored
-        // in a 15x8 array, with some empty elements.
+        // in a horizSize*vertSize array, with some empty elements.
         // For ease of iterating through all hexes, they'll then be
         // stored in a List.
 
@@ -672,8 +660,6 @@ public final class MasterBoard extends JPanel
         int cx = 3 * scale;
         int cy = 0 * scale;
 
-        hexes.clear();
-
         // Initialize hexes.
         for (int i = 0; i < h.length; i++)
         {
@@ -681,7 +667,8 @@ public final class MasterBoard extends JPanel
             {
                 if (show[i][j])
                 {
-                    GUIMasterHex hex = new GUIMasterHex();
+                    GUIMasterHex hex;
+                    hex = h[i][j];
                     hex.init(cx + 4 * i * scale,
                         (int) Math.round(cy + (3 * j + (i & 1) *
                             (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 *
@@ -692,9 +679,6 @@ public final class MasterBoard extends JPanel
 
                     hex.setXCoord(i);
                     hex.setYCoord(j);
-
-                    h[i][j] = hex;
-                    hexes.add(hex);
                 }
             }
         }
@@ -728,10 +712,11 @@ public final class MasterBoard extends JPanel
 
     /** This method only needs to be run once, since the attributes it
      *  sets up are constant for the game. */
-    private static void setupHexesGameState(MasterHex [][] h)
+    private void setupHexesGameState(boolean isGUI)
     {
         // Add terrain types, id labels, label sides, and exits to hexes.
-        try 
+        MasterHex[][] localH = null;
+        try
         {
             ClassLoader cl = Client.class.getClassLoader();
             InputStream mapIS = 
@@ -746,18 +731,62 @@ public final class MasterBoard extends JPanel
             }
             StrategicMapLoader sml = new StrategicMapLoader(mapIS);
             sml.StrategicMapLoaderInit();
-            while (sml.oneCase(h) >= 0) {}
-        }
-        catch (Exception e) 
+            {
+                int[] size = sml.getHexArraySize();
+                if ((horizSize == 0) && (vertSize == 0))
+                {
+                    horizSize = size[0];
+                    vertSize = size[1];
+                }
+                else
+                {
+                    if ((horizSize != size[0]) ||
+                        (vertSize != size[1]))
+                        throw new Exception("Map size changed during game !");
+                }
+            }
+            if (show == null)
+                show = new boolean[horizSize][vertSize];
+            if (!isGUI) /* we're filling the plain hexes */
+            {
+                plain = new MasterHex[horizSize][vertSize];
+                plainHexes = new ArrayList(horizSize * vertSize);
+                plainHexes.clear();
+                for (int i = 0; i < show.length; i++)
+                {
+                    for (int j = 0; j < show[i].length; j++)
+                    {
+                        show[i][j] = false;
+                    }
+                }
+                while (sml.oneCase(plain, plainHexes, show, false) >= 0) {}
+                localH = plain;
+            }
+            else /* we're filling the GUI hexes */
+            {
+                h = new GUIMasterHex[horizSize][vertSize];
+                hexes = new ArrayList(horizSize * vertSize);
+                hexes.clear();
+                for (int i = 0; i < show.length; i++)
+                {
+                    for (int j = 0; j < show[i].length; j++)
+                    {
+                        show[i][j] = false;
+                    }
+                }
+                while (sml.oneCase(h, hexes, show, true) >= 0) {} 
+                localH = h;
+            }
+        }        catch (Exception e) 
         {
             Log.error("Strategic map loading failed : " + e);
             System.exit(1);
         }
 
-        setupExits(h);
-        setupEntrances(h);
-        setupHexLabelSides(h);
-        setupNeighbors(h);
+        setupExits(localH);
+        setupEntrances(localH);
+        setupHexLabelSides(localH);
+        setupNeighbors(localH);
     }
 
     private static void setupExits(MasterHex [][] h)
@@ -1821,7 +1850,8 @@ public final class MasterBoard extends JPanel
     public Dimension getMinimumSize()
     {
         int scale = Scale.get();
-        return new Dimension(64 * scale, 56 * scale);
+        return new Dimension(((horizSize + 1) * 4) * scale,
+                             (vertSize * 7) * scale);
     }
 
     public Dimension getPreferredSize()

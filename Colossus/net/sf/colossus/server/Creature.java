@@ -43,7 +43,7 @@ public class Creature implements Comparable
         1, "Unknown");
 
     /** Sometimes we need to iterate through all creature types. */
-    private static List creatures = new ArrayList();
+    private static ArrayList creatures = new ArrayList();
 
 
     public Creature(String name, int power, int skill, boolean rangestrikes,
@@ -113,7 +113,7 @@ public class Creature implements Comparable
         }
     }
 
-    public static List getCreatures()
+    public static ArrayList getCreatures()
     {
         return creatures;
     }

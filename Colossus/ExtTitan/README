@@ -1,0 +1,42 @@
+1) What are ExtTitan and Extended Titan ?
+
+Extended Titan is an extension to regular Titan, the game
+from Avalon Hill upon which Colossus is based.
+ExtTitan is a variant pack to allow Colossus player
+to play (a close approximation of) Extended Titan.
+See <http://www.cheewai.com/titan/variants_extended.asp>,
+as the original Two Bit Productions page seems
+unreachable (<http://www.2bp.com/>).
+
+ExtTitan was implemented by Romain Dolbeau <dolbeau@irisa.fr>
+
+2) How to use it ?
+
+Just use the "Load Variant" button in Colossus, and
+open the ExtTitan.var file inside the ExtTitan directory.
+That should be enough. If not, please report the problem.
+
+3) What are the differences with regular Titan ?
+
+New creatures, some old creatures are stronger,
+new recruiting tables, and bigger masterboard.
+See the page cited above for more details.
+
+4) What are the differences between Extended Titan and ExtTitan ?
+
+- only 6 players are allowed in ExtTitan, that will start
+  in the inner 6 Towers. The two external towers can still
+  be used for recruiting or teleporting or fighting or...
+
+- Cannot recruit Wraith, or Elementals
+
+5) Graphics are ugly or wrong !
+
+The new graphics are only scaled-down version of the
+graphics found on the aforementioned page. Old
+graphics haven't been redone for upgraded creatures.
+If you're an artist and are willing to redo the graphics,
+you're very welcome !
+
+
+File Version: $Header$

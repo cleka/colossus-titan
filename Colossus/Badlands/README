@@ -1,0 +1,33 @@
+1) What is Badlands ?
+
+Badlands is an extension to regular Titan, the game
+from Avalon Hill upon which Colossus is based. It
+is also a variant pack to allow Colossus player to
+play (a close approximation of) Badlands.
+See <http://www.cheewai.com/titan/variants_badlands.asp>,
+for more details and the original copyright on Badlands.
+
+Badlands was implemented in Colossus by Romain Dolbeau <dolbeau@irisa.fr>
+
+2) How to use it ?
+
+Just use the "Load Variant" button in Colossus, and
+open the Badlands.var file inside the Badlands directory.
+That should be enough. If not, please report the problem.
+
+3) What are the differences with regular Titan ?
+
+New Battlelands for some terrains.
+
+4) What are the differences between the original Badlands
+and Badlands in Colossus ?
+
+In the original Badlands, Battlelands were used randomly
+when multiple Battlelands were available. In the current
+implementation for Colossus, alternate Battlelands are
+distributed statically on the strategic map.
+
+This restriction is due to technical limitations in Colossus,
+it might be lifted in the future :-)
+
+File Version: $Header$

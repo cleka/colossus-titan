@@ -14,7 +14,7 @@ import net.sf.colossus.server.Constants;
  * @author David Ripton
  */
 
-final class GUIMasterHex extends MasterHex
+public final class GUIMasterHex extends MasterHex
 {
     private boolean inverted;
     private FontMetrics fontMetrics;
@@ -48,7 +48,7 @@ final class GUIMasterHex extends MasterHex
     // Use two-stage initialization so that we can clone the GUIMasterHex
     // from an existing MasterHex, then add the GUI info.
 
-    GUIMasterHex()
+    public GUIMasterHex()
     {
         super();
     }

@@ -1,0 +1,41 @@
+Angel      6 4 false true  false false false false false true  false 18 Angels
+Archangel  9 4 false true  false false false false false true  false  6 Archangels
+Behemoth  10 3 false false true  false false false false false false 18 Behemoths
+Centaur    3 4 false false false false false false false false false 25 Centaurs
+Colossus  15 4 false false false true  false false true  false false 10 Colossi
+Cyclops    9 2 false false true  false false false false false false 28 Cyclopes
+Dragon    14 3 true  true  false false false false true  false false 18 Dragons
+Gargoyle   4 3 false true  true  false false false false false false 21 Gargoyles
+Giant     10 4 true  false false true  false false false false false 18 Giants
+Gorgon     6 3 true  true  true  false false false false false false 25 Gorgons
+Griffon    5 4 false true  false false false true  false false false 18 Griffons
+Guardian  12 2 false true  false false false false false false true   6 Guardians
+Hydra     14 3 true  false false false true  true  false false false 10 Hydrae
+Lion       5 3 false false false false false true  true  false false 28 Lions
+Minotaur   4 4 true  false false false false false true  false false 21 Minotaurs
+Ogre       6 2 false false false false true  false true  false false 25 Ogres
+Ranger     4 4 true  true  false false true  false false false false 28 Rangers
+Serpent   25 2 false false true  false false false false false false 10 Serpents
+Titan     -1 4 false false false false false false false true  false  6 Titans
+Troll      8 2 false false false true  true  false false false false 28 Trolls
+Unicorn    8 4 false false false false false false true  false false 12 Unicorns
+Warbear    6 3 false false false true  false false false false false 21 Warbears
+Warlock    5 4 true  false false false false false false false true   6 Warlocks
+Wyvern     7 3 false true  false false true  false false false false 18 Wyverns
+
+Chimera    9 3 true  true  false false true  false false false false 12 Chimerae
+Jabberwok 16 2 false false true  false false false false false false 21 Jabberwok
+Mammoth   10 3 false false false true  true  false false false false 21 Mammoths
+Manticore  9 3 true  true  true  false false false false false false 21 Manticores
+Salamander 7 4 false false false false false true  true  false false 21 Salamanders
+
+Wraith    10 4 false true  false false false false false false true 6 Wraiths
+
+AirElemental    9 4 false true  true  false false false false false true  6 AirElementals
+EarthElemental 20 2 false false false false false true  true  false true  6 EarthElementals
+FireElemental  12 3 true  false false false false false false false true  6 FireElementals
+WaterElemental 10 4 false false false true  true  false false false true  6 WaterElementals
+
+Balrog      12 3 true  true  false false false false false false false 28 Balrogs
+
+Ent          8 4 false false false false false false false false false 28 Ents
