@@ -36,6 +36,7 @@ where
     <hex_label>
     (<label>)
     SOMEOF(<number>,<list_of_hex>)
+    SURROUNDINGSOF(<list_of_hex)
 
     where <number> is a number between 0 and 5, and <range> is of the form
         <number>-<number>
@@ -56,6 +57,10 @@ where
     
     SOMEOF is a literal string ; result is a list of <number> hexes taken
     randomly from the <list_of_hex> in parameter.
+
+    SURROUNDINGSOF is a literal string ; result is the list of hexes
+    adjacent to any hex(es) in the <list_of_hex> in parameter. Note that
+    all hexes present in the <list_of_hex> are excluded from the result.
 
 * <list_of_hazards> is a list of Hazard from the following available forms:
     <hazard_letter>
