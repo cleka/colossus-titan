@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 
 /**
  * Class ShowLegion displays the chits of the Creatures in a Legion
@@ -92,7 +91,8 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, "waitForAll was interrupted");
+            new MessageBox(parentFrame, e.toString() +
+                "waitForAll was interrupted");
         }
         imagesLoaded = true;
 
