@@ -384,6 +384,17 @@ public class TerrainRecruitLoader
     }
 
     /**
+     * To obtain the first Acquirable (aka 'primary') Creature name.
+     * This one is the starting Lord with the Titan.
+     * @return The name of the primary Acquirable Creature.
+     */
+    public String getPrimaryAcquirable()
+    {
+        acquirableData ad = (acquirableData)acquirableList.get(0);
+        return ad.getName();
+    }
+
+    /**
      * To obtain all the Creature that can be acquired at the given amount of points in the given terrain.
      * @param t The Terrain in which the recruitement occurs.
      * @param value The number of points at which the recruitement occurs. Valid values are constrained.

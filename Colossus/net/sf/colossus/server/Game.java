@@ -1408,6 +1408,16 @@ public final class Game
     {
         return trl.getAcquirableRecruitmentsValue();
     }
+    
+    /**
+     * To obtain the first Acquirable (aka 'primary') Creature name.
+     * This one is the starting Lord with the Titan.
+     * @return The name of the primary Acquirable Creature.
+     */
+    public String getPrimaryAcquirable()
+    {
+        return trl.getPrimaryAcquirable();
+    }
 
     /** Return a list of eligible recruits, as Creatures. */
     java.util.List findEligibleRecruits(String markerId, String hexLabel)
