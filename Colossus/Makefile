@@ -42,6 +42,7 @@ all: jar
 
 sources = $(wildcard *.java) $(wildcard net/sf/colossus/*.java) \
 	$(wildcard net/sf/colossus/protocol/*.java) \
+	$(wildcard net/sf/colossus/masterboard/*.java) \
 	$(wildcard net/sf/colossus/battle/*.java) 
 
 CLASS_FILES = $(sources:%.java=%.class)
