@@ -73,15 +73,15 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         {
             for (int i = 0; i < legion.getHeight(); i++)
             {
-                Creature creature = legion.getVisibleCreature(i);
+                Critter critter = legion.getCritter(i);
                 String imageName;
-                if (creature == null)
+                if (!critter.isVisible())
                 {
                     imageName = "images" + File.separator + "Question.gif"; 
                 }
                 else
                 {
-                    imageName = creature.getImageName();
+                    imageName = critter.getImageName();
                 }
 
                 chits[i] = new Chit(i * scale + (scale / 5), scale / 2, scale,
