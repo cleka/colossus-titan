@@ -10,7 +10,6 @@ class Player
     private String color;       // Black, Blue, Brown, Gold, Green, Red 
     private int startingTower;  // 1-6
     private int score = 0;
-    private int angels = 1;     // number of angels + archangels in legions
     private boolean canSummonAngel = true;
     private String playersEliminated;  // e.g. 1356, based on starting tower
     private int numMarkersAvailable = 12;
@@ -22,16 +21,20 @@ class Player
     private boolean alive = true;
     private int mulligansLeft = 1;
     private int movementRoll;
+    private Game game;
 
-    Player(String name)
+    Player(String name, Game game)
     {
         this.name = name;
+        this.game = game;
     }
+
 
     boolean isAlive()
     {
         return alive;
     }
+
 
     String getColor()
     {
@@ -98,10 +101,12 @@ class Player
         return startingTower;
     }
 
+
     int getScore()
     {
         return score;
     }
+
 
     String getPlayersElim()
     {
@@ -224,6 +229,11 @@ class Player
         {
             if (legion == legions[i])
             {
+                // Free up the legion marker.
+                markersAvailable[numMarkersAvailable] = legion.getMarkerId();
+                numMarkersAvailable++;
+
+                // Compress the legions array.
                 for (int j = i; j < numLegions - 1; j++)
                 {
                     legions[j] = legions[j + 1];
@@ -286,5 +296,12 @@ class Player
         
         markersAvailable[numMarkersAvailable - 1] = new String("");
         numMarkersAvailable--;
+    }
+
+
+    void addPoints(int points)
+    {
+        score += points;
+        game.updateStatusScreen();
     }
 }
