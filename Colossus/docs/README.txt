@@ -301,6 +301,6 @@ GUI ideas: Kris Giesing, David Lum
 
 Bug reports:  Anthony Kam, Augustin Ku, Sean McCulloch, Luca Ferraro, 
               Jonathan Woodward, Aneel Nazareth, Paul Macgowan,
-              Magnus Berglund, Don Woods, Dean Gaudet
+              Magnus Berglund, Don Woods, Dean Gaudet, Peter Becker
 
 Web and CVS space, bug tracker, mailing lists, etc.: SourceForge

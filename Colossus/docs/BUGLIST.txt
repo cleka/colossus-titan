@@ -213,4 +213,5 @@ Engagement hex not unselected after human player loses sole battle.
 AcquireAngel at end of game can't be cancelled with Cancel button.
    acquiring=false in kickEngagements
 
-Variants not loading from jar files, local or JWS.
+Variant loading is broken in JWS and local jar files -- it always
+   wants to browse the local filesystem.
