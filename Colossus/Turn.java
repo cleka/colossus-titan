@@ -119,6 +119,20 @@ class Turn extends Dialog implements ActionListener
         // Place this window in the upper right corner.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width - getSize().width, 0));
+        
+        // Highlight hexes with engagements.
+        Player player = game.getActivePlayer();
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.legions[i];
+            MasterHex hex = legion.getCurrentHex();
+            if (hex.getNumEnemyLegions(player) > 0)
+            {
+                hex.select();
+                Rectangle clip = new Rectangle(hex.getBounds());
+                board.repaint(clip.x, clip.y, clip.width, clip.height);
+            }
+        }
     }
 
 
@@ -220,6 +234,17 @@ class Turn extends Dialog implements ActionListener
 
         else if (e.getActionCommand() == "Muster Recruits")
         {
+            // Advance only if there are no unresolved engagements.
+            for (int i = 0; i < player.getNumLegions(); i++)
+            {
+                Legion legion = player.legions[i];
+                MasterHex hex = legion.getCurrentHex();
+                if (hex.getNumEnemyLegions(player) > 0)
+                {
+                    return;
+                }
+            }
+
             game.advancePhase();
 
             setupMusterDialog();
