@@ -4,12 +4,12 @@
 #    it will continue to work portably.
 
 
-JC = jikes -depend -g -deprecation
-#JC = javac -depend -J-Djavac.pipe.output=true -g -deprecation
-#JC = javac -depend -J-Djavac.pipe.output=true -O:interclass
+#JC = jikes -depend -g
+JC = javac -J-Djavac.pipe.output=true -g -deprecation
 
 
-all: BattleMap.class \
+all: AcquireAngel.class \
+     BattleMap.class \
      BattleChit.class \
      BattleTurn.class \
      Chit.class \
@@ -30,6 +30,9 @@ all: BattleMap.class \
      SplitLegion.class \
      SummonAngel.class \
      Turn.class
+
+AcquireAngel.class: AcquireAngel.java
+	$(JC) AcquireAngel.java
 
 BattleMap.class: BattleMap.java
 	$(JC) BattleMap.java
