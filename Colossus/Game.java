@@ -19,7 +19,6 @@ public final class Game
     private Battle battle;
     private static Random random = new Random();
     private Caretaker caretaker = new Caretaker();
-    private Properties options = new Properties();
     private Server server;
 
     // Constants for phases of a turn.
@@ -46,10 +45,6 @@ public final class Game
     public static final String configVersion =
         "Colossus config file version 2";
 
-    /** Preference file */
-    public static final String optionsPath = "Colossus";
-    public static final String optionsSep = "-";
-    public static final String optionsExtension = ".cfg";
 
 
     public Game()
@@ -57,18 +52,39 @@ public final class Game
     }
 
 
-    /** Initialize the board. */
-    public void initBoard()
+    // XXX temp
+    public void initServerAndClients()
+    {
+        server = new Server(this);
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            server.addClient(new Client(server, player.getName()));
+        }
+    }
+
+    /** Initialize the board.   XXX temp */
+    public void initBoard(Client client)
     {
         if (board == null)
         {
-            board = new MasterBoard(this);
+            board = new MasterBoard(client);
         }
         else
         {
+            board.setClient(client);
             board.setGame(this);
         }
+        client.setBoard(board);
         board.requestFocus();
+    }
+
+    /** Temporary to avoid having to rename this everywhere.*/
+    public void initBoard()
+    {
+        initServerAndClients();
+        initBoard(server.getClient(0));
     }
 
 
@@ -78,13 +94,12 @@ public final class Game
      */
     public Game AICopy()
     {
-	// Make sure to clear player options so that we don't get into
+	// XXX Make sure to clear player options so that we don't get into
         // an AI infinite loop.
 	Game newGame = new Game();
 	for (int i = 0; i < players.size(); i++)
         {
             Player player = ((Player)players.get(i)).AICopy(newGame);
-            player.clearAllOptions();
 	    newGame.players.add(i, player);
         }
 	newGame.board = board.AICopy(newGame);
@@ -109,16 +124,16 @@ public final class Game
     public void newGame()
     {
         turnNumber = 1;
-
         caretaker.resetAllCounts();
         players.clear();
-        // XXX client
+
+        // XXX client side
         statusScreen = null;
 
+
+        // XXX Temporary hotseat startup code
         JFrame frame = new JFrame();
-
         TreeMap playerInfo = GetPlayers.getPlayers(frame);
-
         if (playerInfo.isEmpty())
         {
             // User selected Quit.
@@ -126,7 +141,6 @@ public final class Game
             return;
         }
 
-        initBoard();
 
         // See if user hit the Load game button, and we should
         // load a game instead of starting a new one.
@@ -159,7 +173,11 @@ public final class Game
         Collections.sort(players);
         activePlayerNum = 0;
 
-        loadOptions();
+        // XXX temp  Now that we have players we can init server, clients,
+        // and board.
+        initBoard();
+
+        server.loadOptions();
 
         // Override autoPlay option with checkbox selection.
         it = players.iterator();
@@ -169,11 +187,13 @@ public final class Game
             String autoPlay = (String)playerInfo.get(player.getName());
             if (autoPlay.equals(GetPlayers.ai))
             {
-                player.setOption(Options.autoPlay, true);
+                server.setClientOption(player.getName(), Options.autoPlay,
+                    true);
             }
             else if (autoPlay.equals(GetPlayers.human))
             {
-                player.setOption(Options.autoPlay, false);
+                server.setClientOption(player.getName(), Options.autoPlay,
+                    false);
             }
         }
 
@@ -190,7 +210,8 @@ public final class Game
             String color;
             do
             {
-                if (player.getOption(Options.autoPickColor))
+                if (server.getClientOption(player.getName(),
+                    Options.autoPickColor))
                 {
                     color = player.aiPickColor(colorsLeft);
                 }
@@ -211,11 +232,11 @@ public final class Game
         {
             Player player = (Player)it.next();
             placeInitialLegion(player);
-            updateStatusScreen();
+            server.allUpdateStatusScreen();
         }
         board.loadInitialMarkerImages();
 
-        if (getOption(Options.autosave))
+        if (server.getClientOption(Options.autosave))
         {
             saveGame();
         }
@@ -225,7 +246,7 @@ public final class Game
         board.setVisible(true);
         board.repaint();
 
-        updateStatusScreen();
+        server.allUpdateStatusScreen();
     }
 
     private static String getPhaseName(int phase)
@@ -387,119 +408,6 @@ public final class Game
     }
 
 
-    public boolean getOption(String name)
-    {
-        if (Options.getPerPlayerOptions().contains(name))
-        {
-            try
-            {
-                return getActivePlayer().getOption(name);
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-        else
-        {
-            String value = options.getProperty(name);
-            if (value != null && value.equals("true"))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
-
-
-    public void setOption(String name, boolean value)
-    {
-        if (Options.getPerPlayerOptions().contains(name))
-        {
-            getActivePlayer().setOption(name, value);
-            return;
-        }
-
-        options.setProperty(name, String.valueOf(value));
-    }
-
-
-    // XXX Use separate files and methods for client and server options.
-
-    /** Save game options to a file.  The current format is standard
-     *  java.util.Properties keyword=value. */
-    public void saveOptions()
-    {
-        final String optionsFile = optionsPath + optionsExtension;
-        try
-        {
-            FileOutputStream out = new FileOutputStream(optionsFile);
-            options.store(out, configVersion);
-            out.close();
-        }
-        catch (IOException e)
-        {
-            Log.error("Couldn't write options to " + optionsFile);
-        }
-
-        // Save options for each player
-        Iterator it = players.iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            player.saveOptions();
-        }
-    }
-
-
-    /** Load game options from a file. The current format is standard
-     *  java.util.Properties keyword=value */
-    public void loadOptions()
-    {
-        final String optionsFile = optionsPath + optionsExtension;
-        try
-        {
-            FileInputStream in = new FileInputStream(optionsFile);
-            options.load(in);
-        }
-        catch (IOException e)
-        {
-            Log.error("Couldn't read game options from " + optionsFile);
-            return;
-        }
-
-        // Load options for each player
-        Collection players = getPlayers();
-        Iterator it = players.iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            player.loadOptions();
-        }
-
-        syncCheckboxes();
-        getActivePlayer().syncCheckboxes();
-    }
-
-
-    public void syncCheckboxes()
-    {
-        Enumeration en = options.propertyNames();
-        while (en.hasMoreElements())
-        {
-            String name = (String)en.nextElement();
-            boolean value = getOption(name);
-            if (board != null)
-            {
-                board.twiddleOption(name, value);
-            }
-        }
-    }
-
-
     public int getNumPlayersRemaining()
     {
         int remaining = 0;
@@ -644,7 +552,7 @@ public final class Game
     private void setupMove()
     {
         Player player = getActivePlayer();
-        player.clearUndoStack();
+        Client.clearUndoStack();
         player.rollMovement();
         board.setupMoveMenu();
 
@@ -658,6 +566,7 @@ public final class Game
     {
         // Highlight hexes with engagements.
         // If there are no engagements, move forward to the muster phase.
+        Client.clearUndoStack();
         if (highlightEngagements() == 0)
         {
             advancePhase();
@@ -678,7 +587,7 @@ public final class Game
         else
         {
             player.disbandEmptyDonor();
-            player.clearUndoStack();
+            Client.clearUndoStack();
             board.setupMusterMenu();
 
             // Highlight hexes with legions eligible to muster.
@@ -708,37 +617,13 @@ public final class Game
             Player player = getActivePlayer();
             Log.event(player.getName() + "'s turn, number " + turnNumber);
 
-            player.syncCheckboxes();
-            updateStatusScreen();
-            if (getOption(Options.autosave))
+            // XXX temp  Needed?
+            server.getClient(player.getName()).syncCheckboxes();
+            server.allUpdateStatusScreen();
+            if (server.getClientOption(Options.autosave))
             {
                 saveGame();
             }
-        }
-    }
-
-
-    public void updateStatusScreen()
-    {
-        if (getOption(Options.showStatusScreen))
-        {
-            if (statusScreen != null)
-            {
-                statusScreen.updateStatusScreen();
-            }
-            else
-            {
-                statusScreen = new StatusScreen(this);
-            }
-        }
-        else
-        {
-            board.twiddleOption(Options.showStatusScreen, false);
-            if (statusScreen != null)
-            {
-                statusScreen.dispose();
-            }
-            this.statusScreen = null;
         }
     }
 
@@ -1106,6 +991,10 @@ public final class Game
                 }
             }
 
+            // XXX Now that we have players we can set up server, clients,
+            // and board.
+            initBoard();
+
             // Battle stuff
             buf = in.readLine();
             if (buf != null && buf.length() > 0)
@@ -1157,7 +1046,7 @@ public final class Game
                 battle.init();
             }
 
-            loadOptions();
+            server.loadOptions();
 
             // Setup MasterBoard
             board.loadInitialMarkerImages();
@@ -1166,7 +1055,7 @@ public final class Game
             board.repaint();
 
             // Setup status screen
-            updateStatusScreen();
+            server.allUpdateStatusScreen();
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -2040,7 +1929,7 @@ public final class Game
      *  already visible. */
     private boolean allRecruitersVisible(Legion legion, ArrayList recruiters)
     {
-        if (getOption(Options.allStacksVisible))
+        if (server.getClientOption(Options.allStacksVisible))
         {
             return true;
         }
@@ -2080,7 +1969,7 @@ public final class Game
 
             if (!legion.canRecruit())
             {
-                updateStatusScreen();
+                server.allUpdateStatusScreen();
                 board.unselectHexByLabel(legion.getCurrentHexLabel());
             }
         }
@@ -2099,8 +1988,8 @@ public final class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (player.getOption(Options.autoPickRecruiter) ||
-            numEligibleRecruiters == 1 ||
+        else if (server.getClientOption(player.getName(),
+            Options.autoPickRecruiter) || numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
             // If there's only one possible recruiter, or if all
@@ -2178,7 +2067,7 @@ public final class Game
     {
         String name = player.getName();
         String selectedMarkerId;
-        if (player.getOption(Options.autoPickMarker))
+        if (server.getClientOption(player.getName(), Options.autoPickMarker))
         {
             selectedMarkerId = player.getFirstAvailableMarker();
         }
@@ -2564,7 +2453,7 @@ public final class Game
     public void createSummonAngel(Legion attacker)
     {
         Player player = getActivePlayer();
-        if (player.getOption(Options.autoSummonAngels))
+        if (server.getClientOption(player.getName(), Options.autoSummonAngels))
         {
             String typeColonDonor = player.aiSummonAngel(attacker);
             int split = typeColonDonor.indexOf(':');
@@ -2632,9 +2521,9 @@ public final class Game
 
     public void finishBattle(String hexLabel, boolean attackerEntered)
     {
-        board.getFrame().show();
-
         battle = null;
+        Client.clearUndoStack();
+        board.getFrame().show();
 
         // Handle any after-battle angel summoning or recruiting.
         if (getNumLegions(hexLabel) == 1)
@@ -2660,7 +2549,8 @@ public final class Game
                 {
                     Creature recruit;
                     Player player = legion.getPlayer();
-                    if (player.getOption(Options.autoRecruit))
+                    if (server.getClientOption(player.getName(),
+                        Options.autoRecruit))
                     {
                         recruit = player.aiReinforce(legion);
                     }
@@ -2677,7 +2567,7 @@ public final class Game
             }
         }
         engagementInProgress = false;
-        updateStatusScreen();
+        server.allUpdateStatusScreen();
 
         if (summonAngel == null)
         {
@@ -2801,7 +2691,7 @@ public final class Game
         MasterHex hex = legion.getCurrentHex();
         if (newHeight < 7)
         {
-            updateStatusScreen();
+            server.allUpdateStatusScreen();
             board.unselectHexByLabel(hex.getLabel());
             board.alignLegions(hex.getLabel());
         }
@@ -2846,7 +2736,9 @@ public final class Game
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
             case Game.MOVE:
-                doMove(player.getMover(), hexLabel);
+                String moverId = Client.getMoverId();
+                Legion mover = player.getLegionByMarkerId(moverId);
+                doMove(mover, hexLabel);
                 break;
 
             // If we're fighting and there is an engagement here,
@@ -2862,10 +2754,11 @@ public final class Game
     }
 
 
+    // XXX Move to client side.
     public void selectMover(Legion legion)
     {
         // Select this legion.
-        legion.getPlayer().setMover(legion);
+        Client.setMoverId(legion.getMarkerId());
 
         // Just painting the marker doesn't always do the trick.
         legion.getCurrentHex().repaint();
@@ -2893,7 +2786,8 @@ public final class Game
                 legion.canEnterViaLand(hexLabel))
             {
                 boolean answer;
-                if (player.getOption(Options.autoPickEntrySide))
+                if (server.getClientOption(player.getName(),
+                    Options.autoPickEntrySide))
                 {
                     // Always choose to move normally rather
                     // than teleport if auto-picking entry sides.
@@ -2927,7 +2821,8 @@ public final class Game
             if (isOccupied(hexLabel) && legion.getNumEntrySides(hexLabel) > 1)
             {
                 int side;
-                if (player.getOption(Options.autoPickEntrySide))
+                if (server.getClientOption(player.getName(),
+                    Options.autoPickEntrySide))
                 {
                     side = player.aiPickEntrySide(hexLabel, legion);
                 }
@@ -2960,7 +2855,7 @@ public final class Game
                     else
                     {
                         legion.revealTeleportingLord(board.getFrame(),
-                            getOption(Options.allStacksVisible));
+                            server.getClientOption(Options.allStacksVisible));
                     }
                 }
                 legion.moveToHex(hex);
@@ -3013,7 +2908,8 @@ public final class Game
                 // attacker the chance to summon an angel.
 
                 boolean flees;
-                if (defender.getPlayer().getOption(Options.autoFlee))
+                if (server.getClientOption(defender.getPlayer().getName(),
+                    Options.autoFlee))
                 {
                     flees = defender.getPlayer().aiFlee(defender, attacker);
                 }
@@ -3031,7 +2927,8 @@ public final class Game
             // The attacker may concede now without
             // allowing the defender a reinforcement.
             boolean concedes;
-            if (attacker.getPlayer().getOption(Options.autoFlee))
+            if (server.getClientOption(defender.getPlayer().getName(),
+                Options.autoFlee))
             {
                 concedes = attacker.getPlayer().aiConcede(attacker, defender);
             }
@@ -3238,7 +3135,7 @@ public final class Game
         switch (getPhase())
         {
             case Game.MOVE:
-                getActivePlayer().setMover(null);
+                Client.setMoverId(null);
                 highlightUnmovedLegions();
                 break;
 
@@ -3276,6 +3173,17 @@ public final class Game
         return list;
     }
 
+    /** Return a list of all players' legions' marker ids. */
+    public List getAllLegionIds()
+    {
+        List list = new ArrayList();
+        for (Iterator it = players.iterator(); it.hasNext();)
+        {
+            Player player = (Player)it.next();
+            list.addAll(player.getLegionIds());
+        }
+        return list;
+    }
 
     /** Return a list of all legions not belonging to player. */
     public ArrayList getAllEnemyLegions(Player player)
@@ -3292,6 +3200,20 @@ public final class Game
         return list;
     }
 
+    /** Return a list of ids for all legions not belonging to player. */
+    public List getAllEnemyLegionIds(Player player)
+    {
+        List list = new ArrayList();
+        for (Iterator it = players.iterator(); it.hasNext();)
+        {
+            Player nextPlayer = (Player)it.next();
+            if (nextPlayer != player)
+            {
+                list.addAll(nextPlayer.getLegionIds());
+            }
+        }
+        return list;
+    }
 
     public Legion getLegionByMarkerId(String markerId)
     {

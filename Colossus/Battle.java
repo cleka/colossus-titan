@@ -49,8 +49,6 @@ public final class Battle
     private boolean attackerEntered;
     private boolean conceded;
     private boolean driftDamageApplied;
-    /** Stack of critters moved, to allow multiple levels of undo. */
-    private LinkedList lastCrittersMoved = new LinkedList();
 
 
     public Battle(Game game, String attackerId, String defenderId,
@@ -66,9 +64,11 @@ public final class Battle
         this.turnNumber = turnNumber;
         this.phase = phase;
         map = new BattleMap(game.getBoard(), masterHexLabel, this);
+        Client.setMap(map);
         map.getFrame().toFront();
         map.requestFocus();
         terrain = getMasterHex().getTerrain();
+        Client.clearUndoStack();
     }
 
 
@@ -437,7 +437,8 @@ Log.debug("called game.createSummonAngel from Battle");
         {
             map.setupMoveMenu();
             Player player = getActivePlayer();
-            if (player.getOption(Options.autoBattleMove))
+            if (game.getServer().getClientOption(player.getName(),
+                Options.autoBattleMove))
             {
                 player.aiBattleMove();
             }
@@ -460,11 +461,13 @@ Log.debug("called game.createSummonAngel from Battle");
 
             // Automatically perform forced strikes if applicable.
             Player player = getActivePlayer();
-            if (player.getOption(Options.autoStrike))
+            if (game.getServer().getClientOption(player.getName(),
+                Options.autoStrike))
             {
                 player.aiStrike(getActiveLegion(), this, false, false);
             }
-            else if (player.getOption(Options.autoForcedStrike))
+            else if (game.getServer().getClientOption(player.getName(),
+                Options.autoForcedStrike))
             {
                 makeForcedStrikes(false);
             }
@@ -522,7 +525,8 @@ Log.debug("called game.createSummonAngel from Battle");
             // Allow recruiting a reinforcement.
             Creature recruit;
             Player player = defender.getPlayer();
-            if (player.getOption(Options.autoRecruit))
+            if (game.getServer().getClientOption(player.getName(),
+                Options.autoRecruit))
             {
                 recruit = player.aiReinforce(defender);
             }
@@ -669,15 +673,15 @@ Log.debug("called game.createSummonAngel from Battle");
 
     public void setLastCritterMoved(Critter critter)
     {
-        lastCrittersMoved.addFirst(critter);
+        Client.pushUndoStack(critter);
     }
 
     public void undoLastMove()
     {
         critterSelected = false;
-        if (!lastCrittersMoved.isEmpty())
+        if (!Client.isUndoStackEmpty())
         {
-            Critter critter = (Critter)lastCrittersMoved.removeFirst();
+            Critter critter = (Critter)Client.popUndoStack();
             critter.undoMove();
         }
         highlightMobileCritters();
@@ -824,7 +828,7 @@ Log.debug("called game.createSummonAngel from Battle");
 
     private void commitMoves()
     {
-        lastCrittersMoved.clear();
+        Client.clearUndoStack();
 
         Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
@@ -839,7 +843,9 @@ Log.debug("called game.createSummonAngel from Battle");
         if (anyOffboardCreatures())
         {
             // Don't prompt AI players.
-            if (getActivePlayer().getOption(Options.autoBattleMove) ||
+            Player player = getActivePlayer();
+            if (game.getServer().getClientOption(player.getName(),
+                Options.autoBattleMove) ||
                 confirmLeavingCreaturesOffboard())
             {
                 removeOffboardCreatures();
@@ -2002,7 +2008,8 @@ Log.debug("defender eliminated");
                     if (game != null)
                     {
                         Player player = getActivePlayer();
-                        if (player.getOption(Options.autoForcedStrike))
+                        if (game.getServer().getClientOption(player.getName(),
+                            Options.autoForcedStrike))
                         {
                             makeForcedStrikes(false);
                         }

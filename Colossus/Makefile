@@ -19,7 +19,6 @@ JCC = javac -J-Djavac.pipe.output=true -g -deprecation -target 1.2
 #JCC = kjc -g --deprecation --warning
 
 
-# Install directory for html and applet jar files.
 HTMLDIR = /home/groups/c/co/colossus/htdocs
 DOWNLOAD_DIR = $(HTMLDIR)/download
 FTPDIR = /home/groups/ftp/pub/colossus
@@ -58,7 +57,6 @@ $(JARFILE): $(CLASS_FILES) $(IMAGES) META-INF/MANIFEST.MF
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar *.class images/*.gif
 	chmod +x Colossus.jar
 
-# Install jar and html files for applet
 INST_JARFILE = $(HTMLDIR)/$(JARFILE)
 INST_README = $(HTMLDIR)/README.txt
 INST_DIST = $(FTPDIR)/$(ZIPFILE)

@@ -10,7 +10,6 @@ import java.util.*;
 
 public final class Legion implements Comparable
 {
-    private Marker marker;
     private String markerId;    // Bk03, Rd12, etc.
     private String parentId;
     private ArrayList critters = new ArrayList();
@@ -226,7 +225,6 @@ public final class Legion implements Comparable
         newLegion.recruitName = recruitName;
         newLegion.battleTally = battleTally;
         newLegion.teleportingLord = teleportingLord;
-        newLegion.marker = marker;
 
         // Deep copy hexInfoMap
         Iterator it = hexInfoMap.entrySet().iterator();
@@ -308,7 +306,8 @@ public final class Legion implements Comparable
     {
         Player player = getPlayer();
         String angelType = null;
-        if (player.getOption(Options.autoAcquireAngels))
+        if (game.getServer().getClientOption(player.getName(),
+            Options.autoAcquireAngels))
         {
             angelType = player.aiAcquireAngel(this, recruits, game);
         }
@@ -414,13 +413,12 @@ public final class Legion implements Comparable
 
     public Marker getMarker()
     {
-        return marker;
+        return Client.getMarker(markerId);
     }
-
 
     public void setMarker(Marker marker)
     {
-        this.marker = marker;
+        Client.setMarker(markerId, marker);
     }
 
 
@@ -547,14 +545,9 @@ public final class Legion implements Comparable
         prepareToRemove();
 
         Player player = getPlayer();
-        // XXX The player can be null if the legion has not been fully
-        // created.  Fix SplitLegion.  Still needed?
-        //if (player == null)
-        //{
-        //    player = game.getActivePlayer();
-        //}
         player.getLegions().remove(this);
 
+        Client.removeMarker(markerId);
         game.getBoard().alignLegions(hexLabel);
     }
 
@@ -589,12 +582,8 @@ public final class Legion implements Comparable
         Log.event(log.toString());
 
         // Free up the legion marker.
+        Client.removeMarker(markerId);
         Player player = getPlayer();
-        // XXX Is the bug that required this workaround fixed?
-        //if (player == null)
-        //{
-        //    player = game.getActivePlayer();
-        //}
         player.getMarkersAvailable().add(getMarkerId());
     }
 
@@ -606,7 +595,8 @@ public final class Legion implements Comparable
 
         currentHexLabel = hexLabel;
         moved = true;
-        player.setLastLegionMoved();
+        Client.setMoverId(null);
+        Client.pushUndoStack(markerId);
 
         boolean teleported = getTeleported(hexLabel);
 
@@ -1170,14 +1160,14 @@ public final class Legion implements Comparable
             newLegion.addCreature(creature);
         }
 
-        Marker newMarker = new Marker(marker.getBounds().width,
+        Marker newMarker = new Marker(getMarker().getBounds().width,
             newMarkerId, game.getBoard().getFrame(), game);
         newLegion.setMarker(newMarker);
 
         player.addLegion(newLegion);
         player.setLastLegionSplitOff(newLegion);
 
-        game.updateStatusScreen();
+        game.getServer().allUpdateStatusScreen();
         Log.event(newLegion.getHeight() +
             " creatures are split off from legion " + getLongMarkerName() +
             " into new legion " + newLegion.getLongMarkerName());

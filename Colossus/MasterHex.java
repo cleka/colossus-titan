@@ -10,14 +10,15 @@ import java.awt.geom.*;
 
 public final class MasterHex extends Hex
 {
-    private boolean inverted;
-    private MasterBoard board;
+    // GUI stuff
     private FontMetrics fontMetrics;
     private int halfFontHeight;
     private Point offCenter;
 
+    // Game state
+    private boolean inverted;
+    private MasterBoard board;
     private String name;
-
     private MasterHex [] neighbors = new MasterHex[6];
 
     // Terrain types are:

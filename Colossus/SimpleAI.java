@@ -77,7 +77,7 @@ Log.debug("Setting for whatever color is left");
         }
 
         game.getBoard().unselectAllHexes();
-        game.updateStatusScreen();
+        game.getServer().allUpdateStatusScreen();
     }
 
 

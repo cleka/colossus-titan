@@ -30,6 +30,7 @@ public final class Server
         this.game = game;
     }
 
+
     /** Temporary.  We will not use direct client refs later. */
     public void addClient(Client client)
     {
@@ -81,6 +82,80 @@ public final class Server
         {
             Client client = (Client)it.next();
             client.clearAllCarries();
+        }
+    }
+
+    // XXX temp
+    public void loadOptions()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.loadOptions();
+        }
+    }
+
+    /** XXX do not use */
+    public Client getClient(String playerName)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            if (playerName.equals(client.getPlayerName()))
+            {
+                return client;
+            }
+        }
+        return null;
+    }
+
+    /** Don't use this. */
+    public Client getClient(int playerNum)
+    {
+        return (Client)clients.get(playerNum);
+    }
+
+
+    public boolean getClientOption(String playerName, String optname)
+    {
+        Client client = getClient(playerName);
+        if (client != null)
+        {
+            return client.getOption(optname);
+        }
+        return false;
+    }
+
+    public boolean getClientOption(String optname)
+    {
+        Client client = getClient(0);
+        if (client != null)
+        {
+            return client.getOption(optname);
+        }
+        return false;
+    }
+
+    public String getClientStringOption(String playerName, String optname)
+    {
+        Client client = getClient(playerName);
+        if (client != null)
+        {
+            return client.getStringOption(optname);
+        }
+        return "false";
+    }
+
+    /** XXX temp */
+    public void setClientOption(String playerName, String optname,
+        boolean value)
+    {
+        Client client = getClient(playerName);
+        if (client != null)
+        {
+            client.setOption(optname, value);
         }
     }
 

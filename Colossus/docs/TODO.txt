@@ -1,19 +1,15 @@
-Create one Client per player, and one Server for the whole game.  Allow 
-   direct references between them for now, but try not to overuse them.
+Get per-player options working right through clients.  Currently all players
+   seem to be using first player's options.
 
 Stuff to move out of Game:
-   Client-side options.
-   Applet stuff.
-   Startup code.
-   All direct references to GUI classes.
-Split GUI parts of MasterBoard and the logical arrangement of the board into
-   separate classes.  The GUI class only goes on the client side, but the
-   other stuff is needed on both sides.
+   All direct references to GUI classes.  (Go through Server and Client.
+   Use static stuff at first for simplicity, and make it per-client later.)
 
-Move all Chits to client side.  (Look up a Legion's marker in a hashmap 
-   kept on the Client.)
+Try to split the non-GUI stuff out of map/board/*hex into separate classes.
 
-Track selected mover on client side rather than in Player.
+highlight* methods should move down to Client or MasterBoard/BattleMap.
+
+Move BattleChits to client side.
 
 
 Add UI for players to specify favorite colors.

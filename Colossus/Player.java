@@ -23,14 +23,9 @@ public final class Player implements Comparable
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
-    private String moverId;
     private MarkerComparator markerComparator = new MarkerComparator();
     private TreeSet markersAvailable = new TreeSet(markerComparator);
 
-    /** Stack of legion marker ids, to allow multiple levels of undo for
-     *  splits, moves, and recruits. */
-    private LinkedList undoStack = new LinkedList();
-    private Properties options = new Properties();
     private AI ai = new SimpleAI();  // TODO Allow pluggable AIs.
 
 
@@ -39,6 +34,7 @@ public final class Player implements Comparable
         this.name = name;
         this.game = game;
     }
+
 
     /**
      *  Deep copy for AI; preserves game state but ignores UI state
@@ -58,7 +54,6 @@ public final class Player implements Comparable
         newPlayer.ai = ai;
         newPlayer.titanEliminated = titanEliminated;
         newPlayer.donorId = donorId;
-        newPlayer.moverId = moverId;
         for (int i = 0; i < legions.size(); i++)
         {
             newPlayer.legions.add(i, ((Legion)legions.get(i)).AICopy(game));
@@ -303,6 +298,18 @@ public final class Player implements Comparable
         return legions;
     }
 
+    public List getLegionIds()
+    {
+        List ids = new ArrayList();
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            ids.add(legion.getMarkerId());
+        }
+        return ids;
+    }
+
 
     /** Sort legions into order of descending importance.  Titan legion
      *  first, then others by point value. */
@@ -431,7 +438,7 @@ public final class Player implements Comparable
         teleported = false;
         movementRoll = 0;
 
-        clearUndoStack();
+        Client.clearUndoStack();
 
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
@@ -473,7 +480,8 @@ public final class Player implements Comparable
 
         movementRoll = Game.rollDie();
         Log.event(getName() + " rolls a " + movementRoll + " for movement");
-        game.getServer().allShowMovementRoll(movementRoll);
+        Server server = game.getServer();
+        server.allShowMovementRoll(movementRoll);
     }
 
 
@@ -495,32 +503,17 @@ public final class Player implements Comparable
     }
 
 
-    /** Clear the legion undo stack.  This should be called at the
-     *  beginning of each phase. */
-    public void clearUndoStack()
-    {
-        undoStack.clear();
-    }
-
-
-    public void setLastLegionMoved()
-    {
-        undoStack.addFirst(moverId);
-        moverId = null;
-    }
-
-
     public void setLastLegionSplitOff(Legion legion)
     {
-        undoStack.addFirst(legion.getMarkerId());
+        Client.pushUndoStack(legion.getMarkerId());
     }
 
 
     public void undoLastMove()
     {
-        if (!undoStack.isEmpty())
+        if (!Client.isUndoStackEmpty())
         {
-            String markerId = (String)undoStack.removeFirst();
+            String markerId = (String)Client.popUndoStack();
             Legion legion = getLegionByMarkerId(markerId);
             legion.undoMove();
         }
@@ -559,21 +552,21 @@ public final class Player implements Comparable
 
     public void undoLastRecruit()
     {
-        if (!undoStack.isEmpty())
+        if (!Client.isUndoStackEmpty())
         {
-            String markerId = (String)undoStack.removeFirst();
+            String markerId = (String)Client.popUndoStack();
             Legion legion = getLegionByMarkerId(markerId);
             legion.undoRecruit();
         }
 
         // Update number of creatures in status window.
-        game.updateStatusScreen();
+        game.getServer().allUpdateStatusScreen();
     }
 
 
     public void setLastLegionRecruited(Legion legion)
     {
-        undoStack.addFirst(legion.getMarkerId());
+        Client.pushUndoStack(legion.getMarkerId());
     }
 
 
@@ -587,7 +580,7 @@ public final class Player implements Comparable
         }
 
         // Update number of creatures in status window.
-        game.updateStatusScreen();
+        game.getServer().allUpdateStatusScreen();
     }
 
 
@@ -612,9 +605,9 @@ public final class Player implements Comparable
 
     public void undoLastSplit()
     {
-        if (!undoStack.isEmpty())
+        if (!Client.isUndoStackEmpty())
         {
-            String splitoffId = (String)undoStack.removeFirst();
+            String splitoffId = (String)Client.popUndoStack();
             Legion splitoff = getLegionByMarkerId(splitoffId);
             String hexLabel = splitoff.getCurrentHexLabel();
             splitoff.recombine(splitoff.getParent(), true);
@@ -667,24 +660,6 @@ public final class Player implements Comparable
         {
             board.alignLegions(legion.getCurrentHexLabel());
         }
-    }
-
-
-    public void setMover(Legion mover)
-    {
-        if (mover == null)
-        {
-            moverId = null;
-        }
-        else
-        {
-            moverId = mover.getMarkerId();
-        }
-    }
-
-    public Legion getMover()
-    {
-        return getLegionByMarkerId(moverId);
     }
 
 
@@ -747,7 +722,7 @@ public final class Player implements Comparable
             score += points;
             if (game != null)
             {
-                game.updateStatusScreen();
+                game.getServer().allUpdateStatusScreen();
             }
 
             Log.event(getName() + " earns " + points + " points");
@@ -820,7 +795,7 @@ public final class Player implements Comparable
             slayer.addLegionMarkers(this);
         }
 
-        game.updateStatusScreen();
+        game.getServer().allUpdateStatusScreen();
 
         MasterBoard board = game.getBoard();
         it = hexLabelsToAlign.iterator();
@@ -852,108 +827,10 @@ public final class Player implements Comparable
     }
 
 
-    /** Return the value of the boolean option given by name. Default
-     *  to false if there is no such option. */
-    public boolean getOption(String optname)
-    {
-        String value = getStringOption(optname);
-        if (value != null && value.equals("true"))
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public String getStringOption(String optname)
-    {
-        // If autoPlay is set, all options that start with "Auto" return true.
-        if (optname.startsWith("Auto"))
-        {
-            String value = options.getProperty(Options.autoPlay);
-            if (value != null && value.equals("true"))
-            {
-                return "true";
-            }
-        }
-
-        String value = options.getProperty(optname);
-        return value;
-    }
-
-    /** Set option name to (a string version of) the given boolean value. */
-    public void setOption(String optname, boolean value)
-    {
-        setStringOption(optname, String.valueOf(value));
-    }
-
-    public void setStringOption(String optname, String value)
-    {
-        options.setProperty(optname, String.valueOf(value));
-        // TODO Add some triggers so that if autoPlay or autoSplit is set
-        // during this player's split phase, the appropriate action
-        // is called.
-    }
-
-
-    /** Save player options to a file.  The current format is standard
-     *  java.util.Properties keyword=value. */
-    public void saveOptions()
-    {
-        final String optionsFile = Options.optionsPath + Options.optionsSep +
-            name + Options.optionsExtension;
-        try
-        {
-            FileOutputStream out = new FileOutputStream(optionsFile);
-            options.store(out, Options.configVersion);
-            out.close();
-        }
-        catch (IOException e)
-        {
-            Log.error("Couldn't write options to " + optionsFile);
-        }
-    }
-
-
-    /** Load game options from a file. The current format is standard
-     *  java.util.Properties keyword=value */
-    public void loadOptions()
-    {
-        final String optionsFile = Options.optionsPath + Options.optionsSep +
-            name + Options.optionsExtension;
-        try
-        {
-            FileInputStream in = new FileInputStream(optionsFile);
-            options.load(in);
-        }
-        catch (IOException e)
-        {
-            Log.error("Couldn't read player options from " + optionsFile);
-        }
-    }
-
-
-    public void clearAllOptions()
-    {
-        options.clear();
-    }
-
-
-    /** Ensure that Player menu checkboxes reflect the correct state. */
-    public void syncCheckboxes()
-    {
-        Iterator it = Options.getPerPlayerOptions().iterator();
-        while (it.hasNext())
-        {
-            String optname = (String)it.next();
-            boolean value = getOption(optname);
-            game.getBoard().twiddleOption(optname, value);
-        }
-    }
-
     public String pickMarker()
     {
         String markerId = null;
-        if (getOption(Options.autoPickMarker))
+        if (game.getServer().getClientOption(name, Options.autoPickMarker))
         {
             markerId = aiPickMarker();
         }
@@ -967,7 +844,7 @@ public final class Player implements Comparable
 
     public String aiPickMarker()
     {
-        if (getOption(Options.autoPickMarker))
+        if (game.getServer().getClientOption(name, Options.autoPickMarker))
         {
             return ai.pickMarker(getMarkersAvailable());
         }
@@ -976,7 +853,7 @@ public final class Player implements Comparable
 
     public void aiSplit()
     {
-        if (getOption(Options.autoSplit))
+        if (game.getServer().getClientOption(name, Options.autoSplit))
         {
             ai.split(game);
         }
@@ -984,7 +861,7 @@ public final class Player implements Comparable
 
     public void aiMasterMove()
     {
-        if (getOption(Options.autoMasterMove))
+        if (game.getServer().getClientOption(name, Options.autoMasterMove))
         {
             ai.masterMove(game);
         }
@@ -992,7 +869,7 @@ public final class Player implements Comparable
 
     public void aiRecruit()
     {
-        if (getOption(Options.autoRecruit))
+        if (game.getServer().getClientOption(name, Options.autoRecruit))
         {
             ai.muster(game);
         }
@@ -1000,7 +877,7 @@ public final class Player implements Comparable
 
     public Creature aiReinforce(Legion legion)
     {
-        if (getOption(Options.autoRecruit))
+        if (game.getServer().getClientOption(name, Options.autoRecruit))
         {
             return ai.reinforce(legion, game);
         }
@@ -1009,7 +886,7 @@ public final class Player implements Comparable
 
     public boolean aiFlee(Legion legion, Legion enemy)
     {
-        if (getOption(Options.autoFlee))
+        if (game.getServer().getClientOption(name, Options.autoFlee))
         {
             return ai.flee(legion, enemy, game);
         }
@@ -1018,7 +895,7 @@ public final class Player implements Comparable
 
     public boolean aiConcede(Legion legion, Legion enemy)
     {
-        if (getOption(Options.autoFlee))
+        if (game.getServer().getClientOption(name, Options.autoFlee))
         {
             return ai.concede(legion, enemy, game);
         }
@@ -1028,7 +905,7 @@ public final class Player implements Comparable
     public void aiStrike(Legion legion, Battle battle, boolean fakeDice,
         boolean forced)
     {
-        if (forced || getOption(Options.autoStrike))
+        if (forced || game.getServer().getClientOption(name, Options.autoStrike))
         {
             ai.strike(legion, battle, game, fakeDice);
         }
@@ -1037,7 +914,7 @@ public final class Player implements Comparable
     public boolean aiChooseStrikePenalty(Critter critter, Critter target,
         Critter carryTarget, Battle battle)
     {
-        if (getOption(Options.autoStrike))
+        if (game.getServer().getClientOption(name, Options.autoStrike))
         {
             return ai.chooseStrikePenalty(critter, target, carryTarget,
                 battle, game);
@@ -1047,7 +924,7 @@ public final class Player implements Comparable
 
     public void aiBattleMove()
     {
-        if (getOption(Options.autoBattleMove))
+        if (game.getServer().getClientOption(name, Options.autoBattleMove))
         {
             ai.battleMove(game);
         }
@@ -1055,7 +932,7 @@ public final class Player implements Comparable
 
     public int aiPickEntrySide(String hexLabel, Legion legion)
     {
-        if (getOption(Options.autoPickEntrySide))
+        if (game.getServer().getClientOption(name, Options.autoPickEntrySide))
         {
             return ai.pickEntrySide(hexLabel, legion, game);
         }
@@ -1064,7 +941,7 @@ public final class Player implements Comparable
 
     public String aiPickEngagement()
     {
-        if (getOption(Options.autoPickEngagement))
+        if (game.getServer().getClientOption(name, Options.autoPickEngagement))
         {
             return ai.pickEngagement(game);
         }
@@ -1073,7 +950,7 @@ public final class Player implements Comparable
 
     public String aiAcquireAngel(Legion legion, ArrayList recruits, Game game)
     {
-        if (getOption(Options.autoAcquireAngels))
+        if (game.getServer().getClientOption(name, Options.autoAcquireAngels))
         {
             return ai.acquireAngel(legion, recruits, game);
         }
@@ -1084,7 +961,7 @@ public final class Player implements Comparable
       * angel is to be summoned. */
     public String aiSummonAngel(Legion legion)
     {
-        if (getOption(Options.autoSummonAngels))
+        if (game.getServer().getClientOption(name, Options.autoSummonAngels))
         {
             return ai.summonAngel(legion, game);
         }
@@ -1093,11 +970,12 @@ public final class Player implements Comparable
 
     public String aiPickColor(Set colors)
     {
-        if (getOption(Options.autoPickColor))
+        if (game.getServer().getClientOption(name, Options.autoPickColor))
         {
             // Convert favorite colors from a comma-separated string
             // to a list.
-            String favorites = getStringOption(Options.favoriteColors);
+            String favorites = game.getServer().getClientStringOption(name,
+                Options.favoriteColors);
             List favoriteColors = null;
             if (favorites != null)
             {

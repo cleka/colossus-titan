@@ -34,9 +34,8 @@ public final class Start
         {
             // Load a game.
             Game game = new Game();
-            game.initBoard();
+            game.initServerAndClients();
             game.loadGame(args[0]);
-            game.updateStatusScreen();
         }
     }
 }

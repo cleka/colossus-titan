@@ -22,6 +22,7 @@ public final class StatusScreen extends JFrame implements WindowListener
     private JLabel [] titanLabel;
     private JLabel [] scoreLabel;
 
+    private Client client;
     private Game game;
 
     private static Point location;
@@ -30,11 +31,12 @@ public final class StatusScreen extends JFrame implements WindowListener
 
     // TODO Should not take a direct Game reference, since that may contain
     // privileged information.
-    public StatusScreen(Game game)
+    public StatusScreen(Client client, Game game)
     {
         super("Game Status");
 
         setVisible(false);
+        this.client = client;
         this.game = game;
 
         setupIcon();
@@ -132,6 +134,11 @@ public final class StatusScreen extends JFrame implements WindowListener
 
         pack();
 
+        if (size != null)
+        {
+            setSize(size);
+        }
+
         if (location == null)
         {
             // Place dialog at bottom right of screen.
@@ -140,11 +147,6 @@ public final class StatusScreen extends JFrame implements WindowListener
                 d.height - getSize().height);
         }
         setLocation(location);
-
-        if (size != null)
-        {
-            setSize(size);
-        }
 
         setVisible(true);
     }
@@ -239,7 +241,7 @@ public final class StatusScreen extends JFrame implements WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        game.setOption(Options.showStatusScreen, false);
+        client.setOption(Options.showStatusScreen, false);
     }
 
     public void windowDeactivated(WindowEvent e)

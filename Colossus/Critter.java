@@ -599,7 +599,8 @@ public final class Critter extends Creature implements Comparable
         options[0] = "Take Penalty";
         options[1] = "Do Not Take Penalty";
 
-        if (getPlayer().getOption(Options.autoStrike))
+        if (game.getServer().getClientOption(getPlayer().getName(),
+            Options.autoStrike))
         {
             return getPlayer().aiChooseStrikePenalty(this, target,
                 carryTarget, battle);
@@ -878,7 +879,7 @@ public final class Critter extends Creature implements Comparable
         struck = true;
 
         // Display the rolls in the BattleDice dialog, if enabled.
-        if (game != null && game.getOption(Options.showDice))
+        if (game != null && game.getServer().getClientOption(Options.showDice))
         {
             // XXX temporary hack
             if (Client.battleDice != null)

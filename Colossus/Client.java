@@ -19,36 +19,46 @@ public final class Client
 
     // Moved here from Game.
 
-    private MasterBoard board;
+    /** Temporarily static. */
+    private static MasterBoard board;
+
     private StatusScreen statusScreen;
     private SummonAngel summonAngel;
     private MovementDie movementDie;
 
     // Moved here from Battle.
-    private BattleMap map;
-    public static BattleDice battleDice; // XXX Only temporarily static.
-    /** Stack of critters moved, to allow multiple levels of undo. */
-    private LinkedList lastCrittersMoved = new LinkedList();
+    /** Temporarily static. */
+    private static BattleMap map;
+    /** Temporarily static. */
+    public static BattleDice battleDice;
 
     // Moved here from Player.
     /** Stack of legion marker ids, to allow multiple levels of undo for
-     *  splits, moves, and recruits. */
-    private LinkedList undoStack = new LinkedList();
-    private String moverId;
+     *  splits, moves, and recruits.  Also used for critters in battle.
+     *  Temporarily static. */
+    private static LinkedList undoStack = new LinkedList();
+
+    /**  Temporarily static. */
+    private static String moverId;
+
+    /** Temporarily static.  The end of the list is on top in the z-order. */
+    private static ArrayList markers = new ArrayList();
 
     // Per-client and per-player options should be kept here instead
-    // of in Game.
+    // of in Game.  (For now we can move all options from Game/Player
+    // to client.  The few server options can be moved back to Game or
+    // Server later, and have their GUI manipulators removed or restricted.)
     private Properties options = new Properties();
 
     /** Help keep straight whose client this is. */
     String playerName;
-    int playerNum;
 
 
     /** Temporary constructor. */
-    public Client(Server server)
+    public Client(Server server, String playerName)
     {
         this.server = server;
+        this.playerName = playerName;
     }
 
     public Client()
@@ -451,6 +461,7 @@ public final class Client
         options.clear();
     }
 
+    /** Ensure that Player menu checkboxes reflect the correct state. */
     public void syncCheckboxes()
     {
         Enumeration en = options.propertyNames();
@@ -476,7 +487,7 @@ public final class Client
             }
             else
             {
-                statusScreen = new StatusScreen(server.getGame()); // XXX
+                statusScreen = new StatusScreen(this, server.getGame());
             }
         }
         else
@@ -520,6 +531,117 @@ public final class Client
     public void clearAllCarries()
     {
         map.unselectAllHexes();
+    }
+
+
+    public static List getMarkers()
+    {
+        return markers;
+    }
+
+    /** Get the first marker with this id. */
+    public static Marker getMarker(String id)
+    {
+        Iterator it = markers.iterator();
+        while (it.hasNext())
+        {
+            Marker marker = (Marker)it.next();
+            if (marker.getId() == id)
+            {
+                return marker;
+            }
+        }
+        return null;
+    }
+
+    /** Add the marker to the end of the list.  If it's already
+     *  in the list, remove the earlier entry. */
+    public static void setMarker(String id, Marker marker)
+    {
+        removeMarker(id);
+        markers.add(marker);
+    }
+
+    /** Remove the first marker with this id from the list. Return
+     *  the removed marker. */
+    public static Marker removeMarker(String id)
+    {
+        Iterator it = markers.iterator();
+        while (it.hasNext())
+        {
+            Marker marker = (Marker)it.next();
+            if (marker.getId() == id)
+            {
+                it.remove();
+                return marker;
+            }
+        }
+        return null;
+    }
+
+    public static void clearUndoStack()
+    {
+        undoStack.clear();
+    }
+
+    public static Object popUndoStack()
+    {
+        return undoStack.removeFirst();
+    }
+
+    public static void pushUndoStack(Object object)
+    {
+        undoStack.addFirst(object);
+    }
+
+    public static boolean isUndoStackEmpty()
+    {
+        return undoStack.isEmpty();
+    }
+
+
+    public static String getMoverId()
+    {
+        return moverId;
+    }
+
+    public static void setMoverId(String moverId)
+    {
+        Client.moverId = moverId;
+    }
+
+
+    public static MasterBoard getBoard()
+    {
+        return board;
+    }
+
+    public static void setBoard(MasterBoard board)
+    {
+        Client.board = board;
+    }
+
+
+    public static BattleMap getBattleMap()
+    {
+        return map;
+    }
+
+    public static void setMap(BattleMap map)
+    {
+        Client.map = map;
+    }
+
+    /** Don't use this. */
+    public Game getGame()
+    {
+        return server.getGame();
+    }
+
+
+    public String getPlayerName()
+    {
+        return playerName;
     }
 
 

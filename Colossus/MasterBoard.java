@@ -105,9 +105,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private AbstractAction changeScaleAction;
 
 
-    public MasterBoard(Game game)
+    public MasterBoard(Client client)
     {
-        this.game = game;
+        this.client = client;
+
+        // XXX temporary
+        this.game = client.getGame();
 
         masterFrame = new JFrame("MasterBoard");
         contentPane = masterFrame.getContentPane();
@@ -148,6 +151,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public void setGame(Game game)
     {
         this.game = game;
+    }
+
+    public void setClient(Client client)
+    {
+        this.client = client;
     }
 
 
@@ -444,7 +452,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
-                game.saveOptions();
+                client.saveOptions();
             }
         };
 
@@ -502,7 +510,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     {
         JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name);
         cbmi.setMnemonic(mnemonic);
-        cbmi.setSelected(game.getOption(name));
+        cbmi.setSelected(client.getOption(name));
         cbmi.addItemListener(this);
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
@@ -1601,9 +1609,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
      *  null if none does. */
     private MasterHex getHexContainingPoint(Point point)
     {
-        // XXX This is completely inefficient.  We could easily store the
-        // bounding rectangle for each hex and narrow down which hexes we
-        // need to check greatly.
+        // XXX This is completely inefficient.
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
@@ -1617,30 +1623,18 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
-    /** Return the topmost Legion whose marker contains the given point,
-     *  or null if none does.  If legions overlap, the active player's
-     *  legion is checked first. */
-    private Legion getLegionAtPoint(Point point)
+    /** Return the topmost Marker that contains the given point, or
+     *  null if none does. */
+    private Marker getMarkerAtPoint(Point point)
     {
-        Player player = game.getActivePlayer();
-        Iterator it = player.getLegions().iterator();
-        while (it.hasNext())
+        java.util.List markers = Client.getMarkers();
+        ListIterator lit = markers.listIterator(markers.size());
+        while (lit.hasPrevious())
         {
-            Legion legion = (Legion)it.next();
-            Marker marker = legion.getMarker();
+            Marker marker = (Marker)lit.previous();
             if (marker != null && marker.contains(point))
             {
-                return legion;
-            }
-        }
-        it = game.getAllEnemyLegions(player).iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            Marker marker = legion.getMarker();
-            if (marker != null && marker.contains(point))
-            {
-                return legion;
+                return marker;
             }
         }
         return null;
@@ -1737,14 +1731,15 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
-        Legion legion = getLegionAtPoint(point);
-        if (legion != null)
+        Marker marker = getMarkerAtPoint(point);
+        if (marker != null)
         {
+            String markerId = marker.getId();
+            Legion legion = game.getLegionByMarkerId(markerId);
             Player player = legion.getPlayer();
 
-            // Move the clicked-on legion to the top of the z-order.
-            // XXX This should be tracked on the client side only.
-            player.moveToTop(legion);
+            // Move the clicked-on marker to the top of the z-order.
+            Client.setMarker(markerId, marker);
 
             // What to do depends on which mouse button was used
             // and the current phase of the turn.
@@ -1753,9 +1748,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
             // legion.
             if (isPopupButton(e))
             {
+                // TODO We need a client-side legion class that doesn't
+                // know the full contents of every enemy legion.
                 legion.sortCritters();
                 new ShowLegion(masterFrame, legion, point,
-                    game.getOption(Options.allStacksVisible) ||
+                    client.getOption(Options.allStacksVisible) ||
                     player == game.getActivePlayer());
                 return;
             }
@@ -1815,7 +1812,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         JMenuItem source = (JMenuItem)e.getSource();
         String text = source.getText();
         boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-        game.setOption(text, selected);
+        client.setOption(text, selected);
     }
 
     public void windowActivated(WindowEvent e)
@@ -1870,27 +1867,18 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
         }
 
-        // Paint markers in reverse order.  The active player's
-        // markers are painted last.
-        ArrayList legions = new ArrayList();
-        Player player = game.getActivePlayer();
-        if (player != null)
+        // Paint markers in z-order.
+        it = Client.getMarkers().iterator();
+        while (it.hasNext())
         {
-            legions.addAll(player.getLegions());
-        }
-        legions.addAll(game.getAllEnemyLegions(player));
-
-        ListIterator lit = legions.listIterator(legions.size());
-        while (lit.hasPrevious())
-        {
-            Legion legion = (Legion)lit.previous();
-            Marker marker = legion.getMarker();
-            if (marker != null && rectClip.intersects(
-                legion.getCurrentHex().getBounds()))
+            Marker marker = (Marker)it.next();
+            if (marker != null && rectClip.intersects(marker.getBounds()))
             {
                 marker.paintComponent(g);
             }
         }
+
+        // XXX Do we need to paint the active player's markers last?
     }
 
 
@@ -1915,6 +1903,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public static void main(String [] args)
     {
         Game game = new Game();
-        new MasterBoard(game);
+        game.initServerAndClients();
+        new MasterBoard(game.getServer().getClient(0));
     }
 }
