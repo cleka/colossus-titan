@@ -9,7 +9,6 @@ import javax.swing.*;
 
 public final class Start
 {
-
     public static void main(String [] args)
     {
         // Set look and feel to native, since Metal does not show titles
@@ -34,7 +33,6 @@ public final class Start
         {
             // Load a game.
             Game game = new Game();
-            game.initServerAndClients();
             game.loadGame(args[0]);
         }
     }

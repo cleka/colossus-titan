@@ -2684,7 +2684,9 @@ public final class Game
 
             offers[Battle.DEFENDER] = new HashSet();
             offers[Battle.ATTACKER] = new HashSet();
-            server.twoNegotiate(attacker, defender);
+            // XXX Skip negotiation for now, and just do the fight.
+            // server.twoNegotiate(attacker, defender);
+            fight(hexLabel);
         }
     }
 

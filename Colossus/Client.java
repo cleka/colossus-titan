@@ -641,18 +641,13 @@ public final class Client
     /** Create a new BattleChit and add it to the end of the list. */
     public void addBattleChit(String imageName, Critter critter)
     {
+Log.debug("Called Client.addBattleChit() for " + imageName + " with tag "
++critter.getTag());
         BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
             map, critter);
-        setBattleChit(critter.getTag(), chit);
-    }
-
-    /** Add the BattleChit to the end of the list.  If it's already
-     *  in the list, remove the earlier entry. */
-    public void setBattleChit(int tag, BattleChit chit)
-    {
-        removeBattleChit(tag);
         battleChits.add(chit);
     }
+
 
     /** Remove the first BattleChit with this tag from the list. Return
      *  the removed BattleChit. */
@@ -1024,8 +1019,13 @@ public final class Client
 
     public void disposeBattleMap()
     {
-        map.dispose();
-        map = null;
+        if (map != null)
+        {
+            map.dispose();
+            map = null;
+        }
+        // Should this be in a separate method?
+        battleChits.clear();
     }
 
 
@@ -1106,7 +1106,10 @@ public final class Client
 
     public void deiconifyBoard()
     {
-        board.deiconify();
+        if (board != null)
+        {
+            board.deiconify();
+        }
     }
 
     public void unselectHexByLabel(String hexLabel)

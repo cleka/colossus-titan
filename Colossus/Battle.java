@@ -1970,15 +1970,19 @@ Log.debug("defender eliminated");
 
     public Critter getCritter(int tag)
     {
+Log.debug("called Battle.getCritter() for tag " + tag);
         Iterator it = getAllCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
+Log.debug("checking " + critter.getName() + " with tag " + critter.getTag());
             if (critter.getTag() == tag)
             {
+Log.debug("found a match");
                 return critter;
             }
         }
+Log.debug("no match");
         return null;
     }
 

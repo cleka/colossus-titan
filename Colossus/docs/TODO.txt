@@ -1,3 +1,8 @@
+Automatically advance past strike phases after everything has struck
+   and all carries are done.
+
+Need to allow first human player to control game options, load game, etc.
+
 All GUI method calls need to be moved out of non-GUI classes.
 Split GUI classes from model classes.
 

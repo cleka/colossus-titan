@@ -924,7 +924,7 @@ public final class Player implements Comparable
         if (game.getServer().getClientOption(name, Options.autoBattleMove))
         {
             ai.battleMove(game);
-            game.getBattle().advancePhase();
+            game.getBattle().doneWithMoves();
         }
     }
 

@@ -61,7 +61,7 @@ Solaris, 1.3.1: Popup windows (e.g. ShowMasterHex) pop up in the wrong
    place if the window has been scrolled.  Scrollbars do not immediately
    appear / disappear after a rescale().
 
-Win98, 1.4b: Turn 1, player started in tower 300.  Rolled a 6.  Titan
+Win98, 1.3.1-1.4b: Turn 1, player started in tower 300.  Rolled a 6.  Titan
    to tower 400, got "teleport or move normally" prompt despite the
    fact that it could only get there by teleporting.  Angel to marsh
    22, got same prompt even though titan already teleported.
@@ -83,8 +83,6 @@ Win98, 1.4b: Chits are placed slightly off-center in battle hexes.
 
 Current hot bugs:
 
-Need to allow first human player to control game options, load game, etc.
-
 Currently have to pick recruiter even with "all stacks visible" set.
 
 One player's info dialogs block all other players.  No real solution
@@ -92,15 +90,23 @@ One player's info dialogs block all other players.  No real solution
 
 Some creatures show up on the battlemap but can't be clicked.  Not just
    summoned angels.  "Engaged creature must strike" but can't click on
-   creature so battle sticks.  Bad chits vs. critter tag?
+   creature so battle sticks.  Bad chits vs. critter tag.  Chit is there,
+   but battle.getCritter() returns null, because chit's tag does not
+   match any critter's tag.  Removing battle chits from client at the
+   end of each battle doesn't help.
 
 BattleDice is not being dismissed at end of combat.
 
 Game zoomed past human player's split, move, fight phases to muster.
    Is this a problem with a leftover 'D' characters in the buffer, or
-   with the AI calling advancePhase() too many times?
+   with the AI calling advancePhase() too many times?  Human player's
+   legion was auto-split even with autoSplit option off, so it appears
+   that the wrong player's info is being used.  Can't undo the split,
+   because the game moves forward to movement.  Once it happens, it
+   keeps happening every turn.
 
-Automatically advance past strike phases after everything has struck
-   and all carries are done.
-
-AI isn't moving much in battle.  Side effect of null map?
+AI defender enters map, phase advances to human player's move, but
+   map goes inactive as if a modal dialog were pending somewhere.
+   Fixed by skipping negotiation.   Also happens when AI attacker
+   attacks human defender -- not fixed there.  Concede?
+   Doesn't happen immediately after loading a game -- some flag stuck?
