@@ -151,7 +151,7 @@ class Creature
         {
             return "images" + File.separator + "i_" + name + ".gif";
         }
-	else
+        else
         {
             return "images" + File.separator + name + ".gif";
         }
