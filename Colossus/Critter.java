@@ -11,6 +11,7 @@ public class Critter extends Creature
     private Legion legion;
 
     private BattleMap map;
+    private Battle battle;
     private boolean moved = false;
     private boolean struck = false;
 
@@ -52,12 +53,14 @@ public class Critter extends Creature
     }
     
     
-    public void addBattleInfo(BattleHex hex, BattleMap map, BattleChit chit)
+    public void addBattleInfo(BattleHex hex, BattleMap map, BattleChit chit,
+        Battle battle)
     {
         this.currentHex = hex;
         this.startingHex = hex;
         this.map = map;
         this.chit = chit;
+        this.battle = battle;
     }
     
     
@@ -306,7 +309,7 @@ public class Critter extends Creature
         currentHex = hex;
         currentHex.addCritter(this);
         moved = true;
-        map.markLastCritterMoved(this);
+        battle.markLastCritterMoved(this);
         map.repaint();
     }
 
@@ -317,7 +320,7 @@ public class Critter extends Creature
         currentHex = startingHex;
         currentHex.addCritter(this);
         moved = false;
-        map.clearLastCritterMoved();
+        battle.clearLastCritterMoved();
         map.repaint();
         Game.logEvent(getName() + " undoes move and returns to " + 
             startingHex.getLabel()); 
@@ -355,7 +358,7 @@ public class Critter extends Creature
             }
 
             // Adjacent hex, so only one possible direction.
-            int direction = map.getDirection(currentHex, targetHex, false);
+            int direction = battle.getDirection(currentHex, targetHex, false);
             char hexside = currentHex.getHexside(direction);
             char oppHexside = currentHex.getOppositeHexside(direction);
 
@@ -400,7 +403,8 @@ public class Critter extends Creature
             if (currentHex.getElevation() > targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = map.getDirection(currentHex, targetHex, false);
+                int direction = battle.getDirection(currentHex, targetHex,
+                    false);
                 char hexside = currentHex.getHexside(direction);
                 // Striking down across wall: +1
                 if (hexside == 'w')
@@ -411,7 +415,8 @@ public class Critter extends Creature
             else if (currentHex.getElevation() < targetHex.getElevation())
             {
                 // Adjacent hex, so only one possible direction.
-                int direction = map.getDirection(targetHex, currentHex, false);
+                int direction = battle.getDirection(targetHex, currentHex,
+                    false);
                 char hexside = targetHex.getHexside(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
@@ -426,7 +431,7 @@ public class Critter extends Creature
         else if (!getName().equals("Warlock"))
         {
             // Range penalty
-            if (map.getRange(currentHex, targetHex) == 4)
+            if (battle.getRange(currentHex, targetHex) == 4)
             {
                 attackerSkill--;
             }
@@ -434,7 +439,8 @@ public class Critter extends Creature
             // Non-native rangestrikes: -1 per intervening bramble hex
             if (!isNativeBramble())
             {
-                attackerSkill -= map.countBrambleHexes(currentHex, targetHex);
+                attackerSkill -= battle.countBrambleHexes(currentHex,
+                    targetHex);
             }
 
             // Rangestrike up across wall: -1 per wall
@@ -610,7 +616,7 @@ public class Critter extends Creature
                             // carry up across dune hexsides.
                             if (currentHex.getOppositeHexside(i) == 'd')
                             {
-                                int direction = map.getDirection(targetHex,
+                                int direction = battle.getDirection(targetHex,
                                     currentHex, false);
                                 if (targetHex.getHexside(direction) != 'd')
                                 {
@@ -725,7 +731,7 @@ public class Critter extends Creature
         // Let the attacker choose whether to carry, if applicable.
         if (carryDamage > 0)
         {
-            map.highlightCarries(carryDamage);
+            battle.highlightCarries(carryDamage);
         }
 
         // Record that this attacker has struck.

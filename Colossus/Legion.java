@@ -98,30 +98,37 @@ public class Legion
 
     public void addPoints(int points)
     {
-        if (player != null)
+        try
         {
             player.addPoints(points);
-
+            
+            MasterBoard board = player.getGame().getBoard();
             int score = player.getScore();
             int tmpScore = score;
             boolean didArchangel = false;
-
+            
             while (height < 7 && tmpScore / 100 > (score - points) / 100)
             {
-                if (tmpScore / 500 > (score - points) / 500 && !didArchangel)
+                if (tmpScore / 500 > (score - points) / 500 &&
+                    !didArchangel)
                 {
                     // Allow Archangel.
-                    new AcquireAngel(player.getGame().getBoard(), this, true);
+                    new AcquireAngel(board, this, true);
                     tmpScore -= 100;
                     didArchangel = true;
                 }
                 else
                 {
                     // Disallow Archangel.
-                    new AcquireAngel(player.getGame().getBoard(), this, false);
+                    new AcquireAngel(board, this, false);
                     tmpScore -= 100;
                 }
             }
+        }
+        catch (NullPointerException e)
+        {
+            // If we're testing battles with player or game or board
+            // null, don't crash.
         }
     }
 

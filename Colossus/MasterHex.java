@@ -32,7 +32,9 @@ public class MasterHex extends Hex
     private int[] entranceType = new int[6];
 
     // hexsides 0 - 5, though only 1, 3, and 5 are actually used.
+    // 1 is right, 3 is bottom, 5 is left
     private boolean[] entrySide = new boolean[6];
+
     private boolean teleported = false;
 
     public static final int NONE = 0;
@@ -244,8 +246,15 @@ public class MasterHex extends Hex
 
     public void repaint()
     {
-        board.repaint(rectBound.x, rectBound.y, rectBound.width, 
-            rectBound.height);
+        try
+        {
+            board.repaint(rectBound.x, rectBound.y, rectBound.width, 
+                rectBound.height);
+        }
+        catch (NullPointerException e)
+        {
+            // Don't crash if we're testing a battle and board is null.
+        }
     }
 
 

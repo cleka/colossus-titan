@@ -51,6 +51,7 @@ public class MasterBoard extends Frame implements MouseListener,
     private boolean eraseFlag = false;
     private boolean summoningAngel = false;
     private SummonAngel summonAngel;
+    private Battle battle;
     private BattleMap map;
     private Turn turn;
 
@@ -721,9 +722,9 @@ public class MasterBoard extends Frame implements MouseListener,
         summoningAngel = false;
         highlightEngagements();
         summonAngel = null;
-        if (map != null)
+        if (battle != null)
         {
-            map.getTurn().finishSummoningAngel();
+            battle.finishSummoningAngel();
         }
     }
 
@@ -747,6 +748,7 @@ public class MasterBoard extends Frame implements MouseListener,
         {
             highlightEngagements();
         }
+        battle = null;
         map = null;
 
         turn.setVisible(true);
@@ -1739,8 +1741,9 @@ public class MasterBoard extends Frame implements MouseListener,
                                 // Reveal both legions to all players.
                                 attacker.revealAllCreatures();
                                 defender.revealAllCreatures();
-                                map = new BattleMap(this, attacker, defender, 
-                                    hex, hex.getEntrySide());
+                                battle = new Battle(this, attacker, defender,
+                                    hex);
+                                map = battle.getBattleMap();
                             }
                         }
 

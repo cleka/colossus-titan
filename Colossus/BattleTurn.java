@@ -10,40 +10,24 @@ import java.awt.event.*;
 public class BattleTurn extends Dialog implements ActionListener,
     WindowListener
 {
-    // Phases of a battle turn
-    public static final int SUMMON = 0;
-    public static final int RECRUIT = 1;
-    public static final int MOVE = 2;
-    public static final int FIGHT = 3;
-    public static final int STRIKEBACK = 4;
-
     private Frame parentFrame;
     private BattleMap map;
-    private Legion attacker;
-    private Legion defender;
-    private Legion activeLegion;
-    private int turnNumber = 1;
-    private int phase = MOVE;
     private SummonAngel summonAngel;
     private boolean summoningAngel = false;
     private static Point location;
+    private Battle battle;
 
 
-    public BattleTurn(Frame parentFrame, BattleMap map, Legion attacker, Legion
-        defender)
+    public BattleTurn(Frame parentFrame, BattleMap map, Battle battle)
     {
-        super(parentFrame, defender.getPlayer().getName() + " Turn 1");
+        super(parentFrame);
 
         this.parentFrame = parentFrame;
         this.map = map;
-        this.attacker = attacker;
-        this.defender = defender;
-        activeLegion = defender;
+        this.battle = battle;
         
         setBackground(Color.lightGray);
-
-        setupMoveDialog();
-
+        
         pack();
 
         // Place this window in the upper left corner, or at the saved
@@ -53,125 +37,87 @@ public class BattleTurn extends Dialog implements ActionListener,
             location = new Point(0, 0);
         }
         setLocation(location);
-
-        setVisible(true);
-    }
-
-
-    public static String getPhaseName(int phase)
-    {
-        switch (phase)
-        {
-            case SUMMON:
-                return "Summon";
-            case RECRUIT:
-                return "Recruit";
-            case MOVE:
-                return "Move";
-            case FIGHT:
-                return "Fight";
-            case STRIKEBACK:
-                return "Strikeback";
-            default:
-                return "?????";
-        }
     }
 
 
     public void setupRecruitDialog()
     {
         removeAll();
-        setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+        setTitle(battle.getActivePlayer().getName() + " Turn " + 
+            battle.getTurnNumber());
         setLayout(new GridLayout(0, 1));
-        add(new Label(getActivePlayer().getName() + " : Recruit"));
+        add(new Label(battle.getActivePlayer().getName() + " : Recruit"));
 
-        if (turnNumber == 4 && defender.canRecruit())
+        if (battle.getTurnNumber() == 4 && battle.getDefender().canRecruit())
         {
             // Allow recruiting a reinforcement.
-            new PickRecruit(map, defender);
+            new PickRecruit(map, battle.getDefender());
 
-            if (defender.recruited())
+            if (battle.getDefender().recruited())
             {
-                map.placeNewChit(defender);
+                map.placeNewChit(battle.getDefender());
             }
         }
             
-        advancePhase();
+        battle.advancePhase();
     }
     
     
     public void setupSummonDialog()
     {
         removeAll();
-        setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+        setTitle(battle.getActivePlayer().getName() + " Turn " +
+            battle.getTurnNumber());
         setLayout(new GridLayout(0, 1));
-        add(new Label(getActivePlayer().getName() + " : Summon"));
+        add(new Label(battle.getActivePlayer().getName() + " : Summon"));
 
-        int summonState = map.getSummonState();
+        int summonState = battle.getSummonState();
 
-        if (summonState == BattleMap.FIRST_BLOOD)
+        if (summonState == Battle.FIRST_BLOOD)
         {
-            if (attacker.canSummonAngel())
+            if (battle.getAttacker().canSummonAngel())
             {
                 summoningAngel = true;
 
                 // Make sure the MasterBoard is visible.
-                map.getBoard().deiconify();
-                map.getBoard().show();
+                battle.getBoard().deiconify();
+                battle.getBoard().show();
 
-                summonAngel = new SummonAngel(map.getBoard(), attacker);
-                map.getBoard().setSummonAngel(summonAngel);
+                summonAngel = new SummonAngel(battle.getBoard(),
+                    battle.getAttacker());
+                battle.getBoard().setSummonAngel(summonAngel);
             }
 
             // This is the last chance to summon an angel until the
             // battle is over.
-            map.setSummonState(map.TOO_LATE);
+            battle.setSummonState(Battle.TOO_LATE);
         }
 
         if (!summoningAngel)
         {
-            if (phase == SUMMON)
+            if (battle.getPhase() == Battle.SUMMON)
             {
-                advancePhase();
+                battle.advancePhase();
             }
         }
-    }
-
-
-    // This is called from MasterBoard after the SummonAngel finishes.
-    public void finishSummoningAngel()
-    {
-        if (attacker.summoned())
-        {
-            map.placeNewChit(attacker);
-        }
-
-        summoningAngel = false;
-
-        if (phase == SUMMON)
-        {
-            advancePhase();
-        }
-
-        // Bring the BattleMap back to the front.
-        map.show();
     }
 
 
     public void setupMoveDialog()
     {
         // If there are no legal moves, move on.
-        if (map.highlightMovableChits() < 1)
+        if (battle.highlightMovableChits() < 1)
         {
-            advancePhase();
+            battle.advancePhase();
         }
         else
         {
             removeAll();
-            setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
+            setTitle(battle.getActivePlayer().getName() + " Turn " + 
+                battle.getTurnNumber());
             setLayout(new GridLayout(0, 5));
 
-            add(new Label(getActivePlayer().getName() + " : Move"));
+            add(new Label(battle.getActivePlayer().getName() + " : Move"));
 
             Button button1 = new Button("Undo Last Move");
             add(button1);
@@ -190,6 +136,7 @@ public class BattleTurn extends Dialog implements ActionListener,
             button4.addActionListener(this);
 
             pack();
+            setVisible(true);
         }
     }
 
@@ -197,23 +144,24 @@ public class BattleTurn extends Dialog implements ActionListener,
     public void setupFightDialog()
     {
         // Apply drift damage only once per player turn.
-        if (phase == FIGHT)
+        if (battle.getPhase() == Battle.FIGHT)
         {
-            map.applyDriftDamage();
+            battle.applyDriftDamage();
         }
 
         // If there are no possible strikes, move on.
-        if (map.highlightChitsWithTargets() < 1)
+        if (battle.highlightChitsWithTargets() < 1)
         {
-            advancePhase();
+            battle.advancePhase();
         }
         else
         {
             removeAll();
             setLayout(new GridLayout(0, 3));
 
-            add(new Label(getActivePlayer().getName() + 
-                ((phase == FIGHT) ? " : Strike" : " : Strikeback")));
+            add(new Label(battle.getActivePlayer().getName() + 
+                ((battle.getPhase() == Battle.FIGHT) ? 
+                " : Strike" : " : Strikeback")));
 
             Button button1 = new Button("Concede Battle");
             add(button1);
@@ -225,124 +173,6 @@ public class BattleTurn extends Dialog implements ActionListener,
 
             pack();
         }
-    }
-
-
-    public Legion getActiveLegion()
-    {
-        return activeLegion;
-    }
-
-
-    public Player getActivePlayer()
-    {
-        return activeLegion.getPlayer();
-    }
-
-
-    public int getPhase()
-    {
-        return phase;
-    }
-
-
-    public int getTurnNumber()
-    {
-        return turnNumber;
-    }
-
-
-    public void advancePhase()
-    {
-        if (phase == SUMMON)
-        {
-            phase = MOVE;
-            Game.logEvent("Battle phase advances to " + 
-                getPhaseName(phase));
-            setupMoveDialog();
-        }
-        
-        else if (phase == RECRUIT)
-        {
-            phase = MOVE;
-            Game.logEvent("Battle phase advances to " + 
-                getPhaseName(phase));
-            setupMoveDialog();
-        }
-
-        else if (phase == MOVE)
-        {
-            phase = FIGHT;
-            Game.logEvent("Battle phase advances to " + 
-                getPhaseName(phase));
-            setupFightDialog();
-        }
-
-        else if (phase == FIGHT)
-        {
-            if (activeLegion == defender)
-            {
-                activeLegion = attacker;
-            }
-            else
-            {
-                activeLegion = defender;
-            }
-
-            phase = STRIKEBACK;
-            Game.logEvent("Battle phase advances to " + 
-                getPhaseName(phase));
-            setupFightDialog();
-        }
-
-        else if (phase == STRIKEBACK)
-        {
-            map.removeDeadCreatures();
-
-            // Make sure the battle isn't over before continuing.
-            if (attacker.getHeight() >= 1 && defender.getHeight() >= 1)
-            {
-                if (activeLegion == attacker)
-                {
-                    phase = SUMMON;
-                    Game.logEvent(getActivePlayer().getName() + 
-                        "'s battle turn, number " + turnNumber);
-                    setupSummonDialog();
-                }
-                else
-                {
-                    turnNumber++;
-                    if (turnNumber > 7)
-                    {
-                        Game.logEvent("Time loss");
-                        // Time loss.  Attacker is eliminated but defender
-                        //    gets no points.
-                        if (attacker.numCreature(Creature.titan) != 0)
-                        {
-                            // This is the attacker's titan stack, so the 
-                            // defender gets his markers plus half points for 
-                            // his unengaged legions.
-                            Player player = attacker.getPlayer();
-                            attacker.removeLegion();
-                            player.die(defender.getPlayer(), true);
-                        }
-                        else
-                        {
-                            attacker.removeLegion();
-                        }
-                        map.cleanup();
-                    }
-                    else
-                    {
-                        phase = RECRUIT;
-                        setupRecruitDialog();
-                        Game.logEvent(getActivePlayer().getName() + 
-                            "'s battle turn, number " + turnNumber);
-                    }
-                }
-            }
-        }
-
     }
 
 
@@ -363,33 +193,33 @@ public class BattleTurn extends Dialog implements ActionListener,
     {
         if (e.getActionCommand().equals("Undo Last Move"))
         {
-            map.undoLastMove();
+            battle.undoLastMove();
         }
 
         else if (e.getActionCommand().equals("Undo All Moves"))
         {
-            map.undoAllMoves();
+            battle.undoAllMoves();
         }
 
         else if (e.getActionCommand().equals("Done with Moves"))
         {
-            map.removeOffboardChits();
-            map.commitMoves();
-            advancePhase();
+            battle.removeOffboardChits();
+            battle.commitMoves();
+            battle.advancePhase();
         }
 
         else if (e.getActionCommand().equals("Done with Strikes"))
         {
             // Advance only if there are no unresolved strikes.
-            if (map.forcedStrikesRemain())
+            if (battle.forcedStrikesRemain())
             {
-                map.highlightChitsWithTargets();
+                battle.highlightChitsWithTargets();
                 new MessageBox(parentFrame, "Engaged creatures must strike.");
             }
             else
             {
-                map.commitStrikes();
-                advancePhase();
+                battle.commitStrikes();
+                battle.advancePhase();
             }
         }
 
@@ -401,9 +231,9 @@ public class BattleTurn extends Dialog implements ActionListener,
                 "Yes", "No");
             if (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION)
             {
-                map.concede(getActivePlayer());
+                battle.concede(battle.getActivePlayer());
             }
-            advancePhase();
+            battle.advancePhase();
         }
     }
 
