@@ -159,8 +159,7 @@ class MasterHex
         FontMetrics fontMetrics = g.getFontMetrics();
         String sLabel = Integer.toString(label);
         String sName = getTerrainName();
-        int fontHeight = fontMetrics.getMaxAscent() + 
-            fontMetrics.getLeading();
+        int fontHeight = fontMetrics.getMaxAscent() + fontMetrics.getLeading();
 
         if (inverted)
         {
@@ -651,6 +650,170 @@ class MasterHex
         }
     }
 
+    
+    // Return the number of the next lower creature needed to muster the ith 
+    // recruit possible in this terrain type. If not applicable, return 0.
+    int getNumToRecruit(int i)
+    {
+        switch (terrain)
+        {
+            case 'B':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 2;
+                    case 2:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            case 'D':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 3;
+                    case 2:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            case 'H':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 3;
+                    case 2:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            case 'J':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 2;
+                    case 2:
+                        return 3;
+                    case 3:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            case 'm':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 2;
+                    case 2:
+                        return 2;
+                    case 3:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            case 'M':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 2;
+                    case 2:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            case 'P':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 2;
+                    case 2:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            case 'S':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 3;
+                    case 2:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            case 'T':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 0;
+                    case 2:
+                        return 0;
+                    case 3:
+                        return 0;
+                    case 4:
+                        return 0;
+                    default:
+                        return 0;
+                }
+
+            case 't':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 2;
+                    case 2:
+                        return 2;
+                    case 3:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            case 'W':
+                switch (i)
+                {
+                    case 0:
+                        return 0;
+                    case 1:
+                        return 3;
+                    case 2:
+                        return 2;
+                    default:
+                        return 0;
+                }
+
+            default:
+                return 0;
+        }
+    }
 
     // Return a point near the center of the hex, vertically offset
     // a bit toward the fat side.
