@@ -133,6 +133,8 @@ public final class Constants
     public static final String defaultHINTFile = "Default.hin";
     /** Default VAR file */
     public static final String defaultVARFile = "Default.var";
+    /** markers name are mapped in this one */
+    public static final String markersNameFile = "MarkersName";
 
     /* icon setup */
     public static final String masterboardIconImage = "Colossus";

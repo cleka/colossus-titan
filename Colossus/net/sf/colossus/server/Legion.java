@@ -32,139 +32,8 @@ public final class Legion implements Comparable
     private String recruitName;
     private String playerName;
     private int battleTally;
-    private static Map markerNames = new HashMap();
     private Game game;
     private int angelsToAcquire;
-
-    static
-    {
-        /* Black */
-        markerNames.put("Bk01", "Axes");
-        markerNames.put("Bk02", "Eye");
-        markerNames.put("Bk03", "Die");
-        markerNames.put("Bk04", "Feather");
-        markerNames.put("Bk05", "Hand");
-        markerNames.put("Bk06", "Lightning");
-        markerNames.put("Bk07", "Pumpkin");
-        markerNames.put("Bk08", "Rose");
-        markerNames.put("Bk09", "Scorpion");
-        markerNames.put("Bk10", "Skull");
-        markerNames.put("Bk11", "Spearhead");
-        markerNames.put("Bk12", "Tombstone");
-
-        /* Brown */
-        markerNames.put("Br01", "Antlers");
-        markerNames.put("Br02", "Bell");
-        markerNames.put("Br03", "Chest");
-        markerNames.put("Br04", "Figurehead");
-        markerNames.put("Br05", "Hook");
-        markerNames.put("Br06", "Hourglass");
-        markerNames.put("Br07", "Paw");
-        markerNames.put("Br08", "Ram");
-        markerNames.put("Br09", "Scroll");
-        markerNames.put("Br10", "Spider");
-        markerNames.put("Br11", "Tankard");
-        markerNames.put("Br12", "Wheel");
-
-        /* Blue */
-        markerNames.put("Bu01", "Anchor");
-        markerNames.put("Bu02", "Bat");
-        markerNames.put("Bu03", "Candle");
-        markerNames.put("Bu04", "Cloud");
-        markerNames.put("Bu05", "Egg");
-        markerNames.put("Bu06", "Foot");
-        markerNames.put("Bu07", "Fountain");
-        markerNames.put("Bu08", "Moon");
-        markerNames.put("Bu09", "Octopus");
-        markerNames.put("Bu10", "Padlock");
-        markerNames.put("Bu11", "Tornado");
-        markerNames.put("Bu12", "Trident");
-
-        /* Gold */
-        markerNames.put("Gd01", "Caduceus");
-        markerNames.put("Gd02", "Claw");
-        markerNames.put("Gd03", "Coins");
-        markerNames.put("Gd04", "Crown");
-        markerNames.put("Gd05", "Horn");
-        markerNames.put("Gd06", "Lamp");
-        markerNames.put("Gd07", "Pyramid");
-        markerNames.put("Gd08", "Rings");
-        markerNames.put("Gd09", "Scarab");
-        markerNames.put("Gd10", "Scimitars");
-        markerNames.put("Gd11", "Sun");
-        markerNames.put("Gd12", "Wheat");
-
-        /* Green */
-        markerNames.put("Gr01", "Cauldron");
-        markerNames.put("Gr02", "Dagger");
-        markerNames.put("Gr03", "Diamond");
-        markerNames.put("Gr04", "Fish");
-        markerNames.put("Gr05", "Fleur");
-        markerNames.put("Gr06", "Frog");
-        markerNames.put("Gr07", "Grapple");
-        markerNames.put("Gr08", "Harp");
-        markerNames.put("Gr09", "Lobster");
-        markerNames.put("Gr10", "Olive");
-        markerNames.put("Gr11", "Scales");
-        markerNames.put("Gr12", "Snake");
-
-        /* Red */
-        markerNames.put("Rd01", "Cross");
-        markerNames.put("Rd02", "Eagle");
-        markerNames.put("Rd03", "Fist");
-        markerNames.put("Rd04", "Gong");
-        markerNames.put("Rd05", "Heart");
-        markerNames.put("Rd06", "Jester");
-        markerNames.put("Rd07", "Salamander");
-        markerNames.put("Rd08", "Shield");
-        markerNames.put("Rd09", "Spiral");
-        markerNames.put("Rd10", "Star");
-        markerNames.put("Rd11", "Sword");
-        markerNames.put("Rd12", "Torch");
-
-        /* Orange */
-        markerNames.put("Or01", "Ankh");
-        markerNames.put("Or02", "Broom");
-        markerNames.put("Or03", "Cat");
-        markerNames.put("Or04", "Crystal");
-        markerNames.put("Or05", "Flames");
-        markerNames.put("Or06", "Fox");
-        markerNames.put("Or07", "Gate");
-        markerNames.put("Or08", "Pentacle");
-        markerNames.put("Or09", "Potion");
-        markerNames.put("Or10", "Staff");
-        markerNames.put("Or11", "Wand");
-        markerNames.put("Or12", "Wings");
-
-        /* Purple */ 
-        markerNames.put("Pu01", "Carriage");
-        markerNames.put("Pu02", "Castle");
-        markerNames.put("Pu03", "Circlet");
-        markerNames.put("Pu04", "Eggplant");
-        markerNames.put("Pu05", "Golgotha");
-        markerNames.put("Pu06", "Grapes");
-        markerNames.put("Pu07", "Helmet");
-        markerNames.put("Pu08", "Inkwell");
-        markerNames.put("Pu09", "Mountain");
-        markerNames.put("Pu10", "Penguin");
-        markerNames.put("Pu11", "Pomegranate");
-        markerNames.put("Pu12", "Violet");
-
-        /* Silver */
-        markerNames.put("Si01", "Bomb");
-        markerNames.put("Si02", "Buckle");
-        markerNames.put("Si03", "Bullets");
-        markerNames.put("Si04", "Horseshoe");
-        markerNames.put("Si05", "Ingots");
-        markerNames.put("Si06", "Medal");
-        markerNames.put("Si07", "Mine");
-        markerNames.put("Si08", "Pin");
-        markerNames.put("Si09", "Pistol");
-        markerNames.put("Si10", "Seraph");
-        markerNames.put("Si11", "Shackles");
-        markerNames.put("Si12", "Spoons");
-    }
-
 
     Legion(String markerId, String parentId, String currentHexLabel,
         String startingHexLabel, Creature creature0, Creature creature1,
@@ -409,7 +278,7 @@ public final class Legion implements Comparable
 
     public static String getMarkerName(String markerId)
     {
-        return (String)markerNames.get(markerId);
+        return (String)net.sf.colossus.server.VariantSupport.getMarkerNamesMap().get(markerId);
     }
 
     public static String getLongMarkerName(String markerId)

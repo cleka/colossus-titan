@@ -30,6 +30,7 @@ public final class VariantSupport
     private static boolean loadedVariant = false;
     private static int maxPlayers = Constants.DEFAULT_MAX_PLAYERS;
     private static AIHintLoader aihl = null;
+    private static java.util.Map markerNames;
 
     /**
      * Load a Colossus Variant by name.
@@ -178,6 +179,7 @@ public final class VariantSupport
             Creature.loadCreatures();
             loadTerrainsAndRecruits();
             loadHints();
+            markerNames = loadMarkerNamesMap();
         }
         else
         {
@@ -307,6 +309,51 @@ public final class VariantSupport
             Log.error("Masterboard loading failed : " + e);
             System.exit(1);
         }
+    }
+
+    private static java.util.Map loadMarkerNamesMap()
+    {
+        java.util.Map allNames = new java.util.HashMap();
+        java.util.List directories = 
+            VariantSupport.getVarDirectoriesList();
+        /* unlike other, don't use file-level granularity ; 
+           load all files in order, so that we get the
+           default mapping at the end */
+        java.util.Iterator it = directories.iterator();
+        while (it.hasNext())
+        {
+            java.util.List singleDirectory = new java.util.ArrayList();
+            singleDirectory.add(it.next());
+            try
+            {
+                InputStream mmfIS =
+                    ResourceLoader.getInputStream(Constants.markersNameFile,
+                                                  singleDirectory);
+                if (mmfIS != null)
+                {
+                    java.util.Properties temporary =
+                        new java.util.Properties();
+                    temporary.load(mmfIS);
+                    java.util.Enumeration e = temporary.propertyNames();
+                    while (e.hasMoreElements())
+                    {
+                        String name = (String)e.nextElement();
+                        String longName = temporary.getProperty(name);
+                        allNames.put(name,longName);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.warn("Markers name loading partially failed.");
+            }
+        }
+        return allNames;
+    }
+
+    public static java.util.Map getMarkerNamesMap()
+    {
+        return markerNames;
     }
 
     public synchronized static void loadHints()
