@@ -48,8 +48,6 @@ public class SimpleAI implements AI
 
     public String pickMarker(Set markerIds, String preferredShortColor)
     {
-// XXX AI players are still picking the wrong markers.
-Log.debug("called SimpleAI.pickMarker with " + markerIds.size() + " markers and preferred color " + preferredShortColor);
         Iterator it = markerIds.iterator();
         String markerId = null;
         while (it.hasNext())
@@ -375,15 +373,17 @@ legion.hasMoved() + " canRecruit=" + legion.canRecruit());
                 }
             }
 
+            String markerId = pickMarker(player.getMarkersAvailable(),
+                player.getShortColor());
             // create the new legion
-            Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion));
+            Legion newLegion = legion.split(chooseCreaturesToSplitOut(legion),
+                markerId);
 
             // Hide all creatures in both legions.
-            legion.hideAllCreatures();
-
             // null if no markers left
             if (newLegion != null)
             {
+                legion.hideAllCreatures();
                 newLegion.hideAllCreatures();
             }
         }

@@ -1,8 +1,9 @@
 Copy various new docs to web page from inst.  tex -> html first when possible.
-Put web page under CVS.
-Split up README into separate files.
+Put old, new web pages under CVS.
+ant inst all html stuff to web site.
+Install dvi2tty on SF first.
 
-Document test procedures.  
+Document test procedures.
 
 Add some JUnit tests.
 
@@ -13,9 +14,9 @@ Highlight appropriate engagement hex while engagement is being resolved.
 
 Make most returned collections unmodifiable.
 
-Initialize autoPickRecruiter and overlays to true by default.
+Initialize autoPickRecruiter and Show Graphical Overlays to true by default.
 
-Optional post-engagement status dialog. 
+Optional post-engagement status dialog.
 
 Change some dialogs to show info in a label instead of the title (so
    the dialog is wide enough) and add explicit cancel buttons.
@@ -26,17 +27,16 @@ Move code to center a dialog on screen to one place.  Maybe add a
 Change StatusScreen to use a JTable.  
 Pass smaller chunks of changed info to StatusScreen, from generalized
     info update messages. 
-
 Cache legion heights, then known legion contents in Client.
 
 Change remaining client->server information methods to void requests 
    and callbacks.
 
-Cache known legion contents in Client.
-Both require sending events to all clients when a legion is formed
-    (game start or load), splits/joins, moves/unmoves, recruits/unrecruits, 
-    reinforces, acquires, summons, dies (flees/concedes/negotiates/battles), 
-    or gets reduced (by negotiation or battle).
+Cache known legion contents in Client.  Requires sending events to all 
+   clients when a legion is formed (game start or load), splits/joins, 
+   moves/unmoves, recruits/unrecruits, reinforces, acquires, summons, 
+   dies (flees/concedes/negotiates/battles), or gets reduced (by 
+   negotiation or battle).
 
 Remove remaining public Client methods that only directly control the GUI
    in favor of higher-level events.
@@ -79,7 +79,7 @@ Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
    account.
 
-Write some design docs.
+Write more design docs.
 
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
@@ -101,4 +101,3 @@ Show StatusScreen and ShowLegion info in the masterboard window, rather
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
 
-Bug: Drift damage not passed to client.

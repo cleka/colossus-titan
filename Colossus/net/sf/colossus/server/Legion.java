@@ -1075,11 +1075,7 @@ final class Legion implements Comparable
         Player player = getPlayer();
         if (newMarkerId == null)
         {
-            newMarkerId = player.getFirstAvailableMarker();
-            if (newMarkerId == null)
-            {
-                return null;
-            }
+            return null;
         }
 
         player.selectMarkerId(newMarkerId);
@@ -1115,10 +1111,6 @@ final class Legion implements Comparable
         return newLegion;
     }
 
-    Legion split(List creatures)
-    {
-        return split(creatures, null);
-    }
 
 
     void hideAllCreatures()
