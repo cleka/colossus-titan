@@ -844,9 +844,6 @@ public final class Game
 
     private void setupMuster()
     {
-        // XXX Redundant call to try to work around a bug.
-        caretaker.resurrectImmortals();
-
         Player player = getActivePlayer();
 
         player.removeEmptyLegions();
@@ -2247,8 +2244,6 @@ public final class Game
         }
         engagementInProgress = false;
         battleInProgress = false;
-
-        caretaker.resurrectImmortals();
 
         server.allUpdatePlayerInfo();
         String winnerId = null;
