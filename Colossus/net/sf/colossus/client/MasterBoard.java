@@ -311,13 +311,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                GUIMasterHex hex = getHexContainingPoint(lastPoint);
-                if (hex != null)
-                {
-                    new ShowMasterHex(masterFrame, client, hex, lastPoint);
-                    // Work around a Windows JDK 1.3 bug.
-                    hex.repaint();
-                }
+                new ShowAllRecruits(masterFrame, client);
             }
         };
 
@@ -716,13 +710,11 @@ public final class MasterBoard extends JPanel
     }
 
 
-    // TODO Break this method up. 
     /** This method only needs to be run once, since the attributes it
      *  sets up are constant for the game. */
     private static void setupHexesGameState(MasterHex [][] h)
     {
         // Add terrain types, id labels, label sides, and exits to hexes.
-
         try 
         {
             ClassLoader cl = Client.class.getClassLoader();
@@ -739,13 +731,21 @@ public final class MasterBoard extends JPanel
             StrategicMapLoader sml = new StrategicMapLoader(mapIS);
             sml.StrategicMapLoaderInit();
             while (sml.oneCase(h) >= 0) {}
-        } 
+        }
         catch (Exception e) 
         {
             Log.error("Strategic map loading failed : " + e);
             System.exit(1);
         }
-        
+
+        setupExits(h);
+        setupEntrances(h);
+        setupHexLabelSides(h);
+        setupNeighbors(h);
+    }
+
+    private static void setupExits(MasterHex [][] h)
+    {
         for (int i = 0; i < h.length; i++) 
         {
             for (int j = 0; j < h[i].length; j++) 
@@ -818,11 +818,10 @@ public final class MasterBoard extends JPanel
                 }
             }
         }
+    }
 
-        setupHexLabelSides(h);
-
-
-        // Derive entrances from exits.
+    private static void setupEntrances(MasterHex [][] h)
+    {
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < plain[0].length; j++)
@@ -860,51 +859,7 @@ public final class MasterBoard extends JPanel
                 }
             }
         }
-
-        // Add references to neighbor hexes.
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < plain[0].length; j++)
-            {
-                if (show[i][j])
-                {
-                    MasterHex hex = h[i][j];
-
-                    if (hex.getExitType(0) != Constants.NONE ||
-                        hex.getEntranceType(0) != Constants.NONE)
-                    {
-                        hex.setNeighbor(0, h[i][j - 1]);
-                    }
-                    if (hex.getExitType(1) != Constants.NONE ||
-                        hex.getEntranceType(1) != Constants.NONE)
-                    {
-                        hex.setNeighbor(1, h[i + 1][j]);
-                    }
-                    if (hex.getExitType(2) != Constants.NONE ||
-                        hex.getEntranceType(2) != Constants.NONE)
-                    {
-                        hex.setNeighbor(2, h[i + 1][j]);
-                    }
-                    if (hex.getExitType(3) != Constants.NONE ||
-                        hex.getEntranceType(3) != Constants.NONE)
-                    {
-                        hex.setNeighbor(3, h[i][j + 1]);
-                    }
-                    if (hex.getExitType(4) != Constants.NONE ||
-                        hex.getEntranceType(4) != Constants.NONE)
-                    {
-                        hex.setNeighbor(4, h[i - 1][j]);
-                    }
-                    if (hex.getExitType(5) != Constants.NONE ||
-                        hex.getEntranceType(5) != Constants.NONE)
-                    {
-                        hex.setNeighbor(5, h[i - 1][j]);
-                    }
-                }
-            }
-        }
     }
-
 
     /** If the shortest hexside closest to the center of the board
      *  is a short hexside, set the label side to it.
@@ -1012,6 +967,51 @@ public final class MasterBoard extends JPanel
                                 h[i][j].setLabelSide(2);
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void setupNeighbors(MasterHex [][] h)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < plain[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    MasterHex hex = h[i][j];
+
+                    if (hex.getExitType(0) != Constants.NONE ||
+                        hex.getEntranceType(0) != Constants.NONE)
+                    {
+                        hex.setNeighbor(0, h[i][j - 1]);
+                    }
+                    if (hex.getExitType(1) != Constants.NONE ||
+                        hex.getEntranceType(1) != Constants.NONE)
+                    {
+                        hex.setNeighbor(1, h[i + 1][j]);
+                    }
+                    if (hex.getExitType(2) != Constants.NONE ||
+                        hex.getEntranceType(2) != Constants.NONE)
+                    {
+                        hex.setNeighbor(2, h[i + 1][j]);
+                    }
+                    if (hex.getExitType(3) != Constants.NONE ||
+                        hex.getEntranceType(3) != Constants.NONE)
+                    {
+                        hex.setNeighbor(3, h[i][j + 1]);
+                    }
+                    if (hex.getExitType(4) != Constants.NONE ||
+                        hex.getEntranceType(4) != Constants.NONE)
+                    {
+                        hex.setNeighbor(4, h[i - 1][j]);
+                    }
+                    if (hex.getExitType(5) != Constants.NONE ||
+                        hex.getEntranceType(5) != Constants.NONE)
+                    {
+                        hex.setNeighbor(5, h[i - 1][j]);
                     }
                 }
             }

@@ -57,17 +57,12 @@ class CreatureCollectionView extends JDialog
     /** the count for an individual creature */
     class CreatureCount extends JPanel
     {
-        String m_strName;
-
         CreatureCount(String strName)
         {
             super(new BorderLayout());
                                 
             setBorder(BorderFactory.createLineBorder(Color.black));
 
-            m_strName = strName;
-            JLabel lblCreatureName = 
-                new JLabel(strName, SwingConstants.CENTER);
             String strPath = Chit.getImagePath(strName);
             ImageIcon oIcon = Chit.getImageIcon(strPath);
             JLabel lblCreatureIcon = new JLabel(oIcon);
@@ -77,13 +72,8 @@ class CreatureCollectionView extends JDialog
 
             // jikes whines because add is defined in both JPanel
             // and JDialog.
-            this.add(lblCreatureName, BorderLayout.NORTH);
             this.add(lblCreatureIcon, BorderLayout.CENTER);
             this.add(lblCreatureCount, BorderLayout.SOUTH);
-        }
-
-        void update()
-        {
         }
     }
 
@@ -106,7 +96,7 @@ class CreatureCollectionView extends JDialog
     public void update()
     {
         Iterator it = countMap.entrySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             Map.Entry entry = (Map.Entry)it.next();
             String strName = (String)entry.getKey();
@@ -117,7 +107,8 @@ class CreatureCollectionView extends JDialog
             {
                 color = "red";
             }
-            else if (count == Creature.getCreatureByName(strName).getMaxCount())
+            else if (count == Creature.getCreatureByName(strName).
+                getMaxCount())
             {
                 color = "green";
             }

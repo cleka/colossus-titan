@@ -37,7 +37,12 @@ public class TerrainRecruitLoader
     /**
      * All the character that are valid terrains.
      */    
-    public char[] terrains = null;
+    private char[] terrains = null;
+
+    public char[] getTerrains()
+    {
+        return (char [])terrains.clone();
+    }
 
     /**
      * Used internally to associate a creature name and the number of creatures needed to recruit it.
@@ -286,10 +291,14 @@ int oneTerrain() :
         {
             terrains = new char[1];
             terrains[0] = tc;
-        } else {
+        } 
+        else 
+        {
             char[] t2 = new char[terrains.length + 1];
             for (int i = 0; i < terrains.length ; i++)
+            {
                 t2[i] = terrains[i];
+            }
             t2[terrains.length] = tc;
             terrains = t2;
         }

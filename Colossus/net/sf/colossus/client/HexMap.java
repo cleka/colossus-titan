@@ -58,7 +58,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     /** Set up a static non-GUI hex map for each terrain type. */
     static
     {
-        char terrains[] = Game.getTerrainsArray();
+        char [] terrains = Game.getTerrains();
         for (int t = 0; t < terrains.length; t++)
         {
             char terrain = terrains[t];

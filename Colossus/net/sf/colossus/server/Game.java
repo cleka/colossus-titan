@@ -2933,9 +2933,9 @@ public final class Game
         return trl.getStartingCreatures();
     }
 
-    public static char[] getTerrainsArray()
+    public static char[] getTerrains()
     {
-        return trl.terrains;
+        return trl.getTerrains();
     }
 
     public static String getTerrainName(char t)
