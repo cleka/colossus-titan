@@ -14,6 +14,7 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.VariantSupport;
 
+
 /**
  * Class Chit implements the GUI for a Titan chit representing
  * either a character or a legion.
@@ -29,7 +30,6 @@ class Chit extends JPanel
     Rectangle rect;
     private Container container;
     Client client;  // may be null; set for some subclasses
-
 
     /** Flag to mark chit as dead and paint it with an "X" through it. */
     private boolean dead;
@@ -55,12 +55,12 @@ class Chit extends JPanel
     }
 
     Chit(int scale, String id, Container container, boolean inverted,
-         boolean dubious)
+            boolean dubious)
     {
         super();
-        
+
         this.inverted = inverted;
-        
+
         Point point = getLocation();
 
         // Images are 60x60, so if scale is close to that, avoid
@@ -82,7 +82,7 @@ class Chit extends JPanel
         {
             if (!(id.startsWith("Titan-")))
             {
-                icon = getImageIcon(id);
+                icon = getImageIcon(id, scale);
             }
             else
             { // special case : the Titan.
@@ -102,14 +102,14 @@ class Chit extends JPanel
                 filenames[2] = "Power-" + power + color;
                 int skill = Creature.getCreatureByName("Titan").getSkill();
                 filenames[3] = "Skill-" + skill + "" + color;
-                
+
                 if (dubious)
                 {
                     filenames[4] = "QuestionMarkMask" +
-                        (color.equals("BlackColossus") ? "Red" : "");
+                            (color.equals("BlackColossus") ? "Red" : "");
                 }
-                
-                icon = getImageIcon(filenames);
+
+                icon = getImageIcon(filenames, scale);
             }
         }
         else
@@ -120,19 +120,18 @@ class Chit extends JPanel
             if (dubious)
             {
                 String[] names2 = new String[names.length + 1];
-                for (int i = 0; i < names.length ; i++)
+                for (int i = 0; i < names.length; i++)
                 {
                     names2[i] = names[i];
                 }
-                names2[names.length] = "QuestionMarkMask" + 
-                    (cre.getBaseColor().equals("black") ? "Red" : "");
+                names2[names.length] = "QuestionMarkMask" +
+                        (cre.getBaseColor().equals("black") ? "Red" : "");
                 names = names2;
             }
 
-            icon = getImageIcon(names);
+            icon = getImageIcon(names, scale);
         }
     }
-
 
     // XXX Duplicate code.
     int getTitanPower()
@@ -153,25 +152,27 @@ class Chit extends JPanel
         return power;
     }
 
-    static ImageIcon getImageIcon(String imageFilename)
+    static ImageIcon getImageIcon(String imageFilename, int scale)
     {
         ImageIcon tempIcon = null;
         java.util.List directories = VariantSupport.getImagesDirectoriesList();
-        tempIcon = ResourceLoader.getImageIcon(imageFilename, directories);
+        tempIcon = ResourceLoader.getImageIcon(imageFilename, directories,
+                scale, scale);
         if (tempIcon == null)
         {
             Log.error("Couldn't get image :" + imageFilename);
             System.exit(1);
         }
-        
+
         return tempIcon;
     }
 
-    static ImageIcon getImageIcon(String imageFilenames[])
+    static ImageIcon getImageIcon(String imageFilenames[], int scale)
     {
         java.util.List directories = VariantSupport.getImagesDirectoriesList();
         Image composite = ResourceLoader.getCompositeImage(imageFilenames,
-                                                           directories);
+                directories,
+                scale, scale);
         return new ImageIcon(composite);
     }
 
@@ -185,14 +186,12 @@ class Chit extends JPanel
         return id;
     }
 
-
     void rescale(int scale)
     {
         rect.width = scale;
         rect.height = scale;
         setBounds(rect);
     }
-
 
     public void paintComponent(Graphics g)
     {
@@ -205,25 +204,26 @@ class Chit extends JPanel
         super.paintComponent(g2);
         Image image = icon.getImage();
 
-        if (inverted && 
-            (client == null || !client.getOption(Options.doNotInvertDefender)))
+        if (inverted &&
+                (client == null ||
+                !client.getOption(Options.doNotInvertDefender)))
         {
             if (invertedIcon == null)
             {
                 int width = icon.getIconWidth();
                 int height = icon.getIconHeight();
                 BufferedImage bi = new BufferedImage(
-                                           width, height,
-                                           BufferedImage.TYPE_INT_RGB);
+                        width, height,
+                        BufferedImage.TYPE_INT_RGB);
                 Graphics2D biContext = bi.createGraphics();
                 biContext.drawImage(image, 0, 0, null);
                 double theta = Math.PI;
                 AffineTransform at = AffineTransform.getRotateInstance(
-                                         theta,
-                                         width / 2,
-                                         height / 2);
+                        theta,
+                        width / 2,
+                        height / 2);
                 AffineTransformOp ato = new AffineTransformOp(at,
-                                            AffineTransformOp.TYPE_BILINEAR);
+                        AffineTransformOp.TYPE_BILINEAR);
                 BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
                 bi2 = ato.filter(bi, bi2);
                 invertedIcon = new ImageIcon(bi2);
@@ -231,16 +231,16 @@ class Chit extends JPanel
             image = invertedIcon.getImage();
         }
         g2.drawImage(image, rect.x, rect.y, rect.width,
-                     rect.height, container);
+                rect.height, container);
         if (isDead())
         {
             // Draw a triple-wide red X.
             g2.setStroke(threeWide);
             g2.setColor(Color.red);
             g2.drawLine(rect.x, rect.y, rect.x + rect.width,
-                rect.y + rect.height);
+                    rect.y + rect.height);
             g2.drawLine(rect.x + rect.width, rect.y, rect.x,
-                rect.y + rect.height);
+                    rect.y + rect.height);
         }
 
         if (border)
@@ -251,19 +251,16 @@ class Chit extends JPanel
         }
     }
 
-
     public void setLocation(Point point)
     {
         rect.setLocation(point);
         setBounds(rect);
     }
 
-
     public boolean contains(Point point)
     {
         return rect.contains(point);
     }
-
 
     public Rectangle getBounds()
     {
@@ -289,7 +286,6 @@ class Chit extends JPanel
     {
         return getPreferredSize();
     }
-
 
     boolean isDead()
     {

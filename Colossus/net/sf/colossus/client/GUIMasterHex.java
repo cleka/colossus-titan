@@ -29,11 +29,11 @@ public final class GUIMasterHex extends MasterHex
     private int halfFontHeight;
     private Point offCenter;
     private MasterBoard board;
+
     /** Terrain display name in upper case. */
     private String name;
     private GeneralPath innerHexagon;
     private Color selectColor = Color.white;
-
 
     // The hex vertexes are numbered like this:
     //
@@ -124,27 +124,25 @@ public final class GUIMasterHex extends MasterHex
         hexagon = makePolygon(6, xVertex, yVertex, true);
         rectBound = hexagon.getBounds();
         offCenter = new Point((int)Math.round((xVertex[0] + xVertex[1]) / 2),
-            (int)Math.round(((yVertex[0] + yVertex[3]) / 2) +
-            (inverted ? -(scale / 6.0) : (scale / 6.0))));
+                (int)Math.round(((yVertex[0] + yVertex[3]) / 2) +
+                (inverted ? -(scale / 6.0) : (scale / 6.0))));
 
         Point2D.Double center = findCenter2D();
 
         final double innerScale = 0.8;
         AffineTransform at = AffineTransform.getScaleInstance(innerScale,
-            innerScale);
+                innerScale);
         innerHexagon = (GeneralPath)hexagon.createTransformedShape(at);
 
         // Translate innerHexagon to make it concentric.
-        Rectangle2D innerBounds = innerHexagon.getBounds2D(); 
+        Rectangle2D innerBounds = innerHexagon.getBounds2D();
         Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX() +
-            innerBounds.getWidth() / 2.0, innerBounds.getY() + 
-            innerBounds.getHeight() / 2.0);
-        at = AffineTransform.getTranslateInstance(center.getX() - 
-            innerCenter.getX(), center.getY() - innerCenter.getY());
+                innerBounds.getWidth() / 2.0, innerBounds.getY() +
+                innerBounds.getHeight() / 2.0);
+        at = AffineTransform.getTranslateInstance(center.getX() -
+                innerCenter.getX(), center.getY() - innerCenter.getY());
         innerHexagon.transform(at);
-        loadOverlay();
     }
-
 
     public void paint(Graphics g)
     {
@@ -157,12 +155,12 @@ public final class GUIMasterHex extends MasterHex
         if (getAntialias())
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
+                    RenderingHints.VALUE_ANTIALIAS_ON);
         }
         else
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_OFF);
+                    RenderingHints.VALUE_ANTIALIAS_OFF);
         }
 
         if (isSelected())
@@ -203,7 +201,7 @@ public final class GUIMasterHex extends MasterHex
             if (getExitType(i) != Constants.NONE)
             {
                 drawGate(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
-                    getExitType(i));
+                        getExitType(i));
             }
 
             // Draw entrances
@@ -214,18 +212,13 @@ public final class GUIMasterHex extends MasterHex
             if (getEntranceType(i) != Constants.NONE)
             {
                 drawGate(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
-                    getEntranceType(i));
+                        getEntranceType(i));
             }
         }
 
-        if (useOverlay && (overlay != null))
+        paintLabel(g2);
+        if (!(useOverlay && paintOverlay(g2)))
         {
-            paintLabel(g2);
-            paintOverlay(g2);
-        }
-        else
-        {
-            paintLabel(g2);
             paintTerrainName(g2);
         }
     }
@@ -236,12 +229,12 @@ public final class GUIMasterHex extends MasterHex
         String fontName = oldFont.getName();
         int size = oldFont.getSize();
         int style = oldFont.getStyle();
-            
-        Font font = new Font(fontName, style,  9 * size / 10);
+
+        Font font = new Font(fontName, style, 9 * size / 10);
         g2.setFont(font);
         fontMetrics = g2.getFontMetrics();
         halfFontHeight = (fontMetrics.getMaxAscent() +
-            fontMetrics.getLeading()) / 2;
+                fontMetrics.getLeading()) / 2;
         name = getTerrainDisplayName().toUpperCase();
     }
 
@@ -255,49 +248,49 @@ public final class GUIMasterHex extends MasterHex
         return (int)Math.round(fontMetrics.getStringBounds(s, g2).getWidth());
     }
 
-    private void paintLabel(Graphics2D g2) 
+    private void paintLabel(Graphics2D g2)
     {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_OFF);
+                RenderingHints.VALUE_ANTIALIAS_OFF);
         shrinkFont(g2);
-        
+
         switch (getLabelSide())
         {
-        case 0:
-            g2.drawString(getLabel(), rectBound.x +
-                ((rectBound.width - stringWidth(getLabel(), g2)) / 2), 
-                rectBound.y + halfFontHeight + rectBound.height / 10);
-            break;
+            case 0:
+                g2.drawString(getLabel(), rectBound.x +
+                        ((rectBound.width - stringWidth(getLabel(), g2)) / 2),
+                        rectBound.y + halfFontHeight + rectBound.height / 10);
+                break;
 
-        case 1:
-            g2.drawString(getLabel(), rectBound.x + ((rectBound.width -
-                stringWidth(getLabel(), g2)) * 5 / 6), rectBound.y + 
-                halfFontHeight + rectBound.height / 8);
-            break;
+            case 1:
+                g2.drawString(getLabel(), rectBound.x + ((rectBound.width -
+                        stringWidth(getLabel(), g2)) * 5 / 6), rectBound.y +
+                        halfFontHeight + rectBound.height / 8);
+                break;
 
-        case 2:
-            g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-                stringWidth(getLabel(), g2)) * 5 / 6, rectBound.y + 
-                halfFontHeight + rectBound.height * 7 / 8);
-            break;
+            case 2:
+                g2.drawString(getLabel(), rectBound.x + (rectBound.width -
+                        stringWidth(getLabel(), g2)) * 5 / 6, rectBound.y +
+                        halfFontHeight + rectBound.height * 7 / 8);
+                break;
 
-        case 3:
-            g2.drawString(getLabel(), rectBound.x + ((rectBound.width -
-                stringWidth(getLabel(), g2)) / 2), rectBound.y + 
-                halfFontHeight + rectBound.height * 9 / 10);
-            break;
+            case 3:
+                g2.drawString(getLabel(), rectBound.x + ((rectBound.width -
+                        stringWidth(getLabel(), g2)) / 2), rectBound.y +
+                        halfFontHeight + rectBound.height * 9 / 10);
+                break;
 
-        case 4:
-            g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-                stringWidth(getLabel(), g2)) / 6, rectBound.y + 
-                halfFontHeight + rectBound.height * 5 / 6);
-            break;
+            case 4:
+                g2.drawString(getLabel(), rectBound.x + (rectBound.width -
+                        stringWidth(getLabel(), g2)) / 6, rectBound.y +
+                        halfFontHeight + rectBound.height * 5 / 6);
+                break;
 
-        case 5:
-            g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-                stringWidth(getLabel(), g2)) / 6, rectBound.y + 
-                halfFontHeight + rectBound.height / 8);
-            break;
+            case 5:
+                g2.drawString(getLabel(), rectBound.x + (rectBound.width -
+                        stringWidth(getLabel(), g2)) / 6, rectBound.y +
+                        halfFontHeight + rectBound.height / 8);
+                break;
         }
 
         restoreFont(g2);
@@ -307,33 +300,31 @@ public final class GUIMasterHex extends MasterHex
     {
         // Do not anti-alias text.
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                            RenderingHints.VALUE_ANTIALIAS_OFF);
+                RenderingHints.VALUE_ANTIALIAS_OFF);
         if (fontMetrics == null)
         {
             fontMetrics = g2.getFontMetrics();
             halfFontHeight = (fontMetrics.getMaxAscent() +
-                              fontMetrics.getLeading()) / 2;
+                    fontMetrics.getLeading()) / 2;
             name = getTerrainDisplayName().toUpperCase();
         }
 
-        shrinkFont(g2); 
-        g2.drawString(name, 
-            rectBound.x + ((rectBound.width - stringWidth(name, g2)) / 2), 
-            rectBound.y + halfFontHeight + rectBound.height * 
+        shrinkFont(g2);
+        g2.drawString(name,
+                rectBound.x + ((rectBound.width - stringWidth(name, g2)) / 2),
+                rectBound.y + halfFontHeight + rectBound.height *
                 (isInverted() ? 1 : 2) / 3);
         restoreFont(g2);
     }
 
-
     public void repaint()
     {
         board.repaint(rectBound.x, rectBound.y, rectBound.width,
-            rectBound.height);
+                rectBound.height);
     }
 
-
     private void drawGate(Graphics2D g2, double vx1, double vy1, double vx2,
-        double vy2, int gateType)
+            double vy2, int gateType)
     {
         double x0;                    // first focus point
         double y0;
@@ -342,8 +333,8 @@ public final class GUIMasterHex extends MasterHex
         double x2;                    // center point
         double y2;
         double theta;                 // gate angle
-        double [] x = new double[4];  // gate points
-        double [] y = new double[4];
+        double[] x = new double[4];  // gate points
+        double[] y = new double[4];
 
         x0 = vx1 + (vx2 - vx1) / 6;
         y0 = vy1 + (vy2 - vy1) / 6;
@@ -392,8 +383,8 @@ public final class GUIMasterHex extends MasterHex
                 rect.height = 2 * len;
 
                 Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
-                    rect.width, rect.height,
-                    Math.toDegrees(-theta), 180, Arc2D.OPEN);
+                        rect.width, rect.height,
+                        Math.toDegrees(-theta), 180, Arc2D.OPEN);
 
                 g2.setColor(Color.white);
                 g2.fill(arc);
@@ -414,7 +405,7 @@ public final class GUIMasterHex extends MasterHex
                 g2.setColor(Color.white);
                 g2.fill(polygon);
                 // Erase the existing hexside line.
-                g2.draw(new Line2D.Double(x0, y0 , x1, y1));
+                g2.draw(new Line2D.Double(x0, y0, x1, y1));
 
                 g2.setColor(Color.black);
                 g2.draw(new Line2D.Double(x1, y1, x[1], y[1]));
@@ -467,7 +458,6 @@ public final class GUIMasterHex extends MasterHex
         }
     }
 
-
     /** Return a point near the center of the hex, vertically offset
      *  a bit toward the fat side. */
     Point getOffCenter()
@@ -475,12 +465,10 @@ public final class GUIMasterHex extends MasterHex
         return offCenter;
     }
 
-
     boolean isInverted()
     {
         return inverted;
     }
-
 
     void setSelectColor(Color color)
     {
@@ -501,60 +489,65 @@ public final class GUIMasterHex extends MasterHex
 
     // overlay picture support
     private static final String invertedPostfix = "_i";
-    private Image overlay;
 
-    private void loadOverlay()
+    private Image getOverlayImage()
     {
-        if (overlay == null)
-        {
-            java.util.List directories = 
+        Image overlay = null;
+        java.util.List directories =
                 VariantSupport.getImagesDirectoriesList();
-            overlay = ResourceLoader.getImage(getTerrainDisplayName() +
-                                           (!inverted ? invertedPostfix : ""),
-                                           directories);
-            
-            /* DISABLED
-            // code to use if we want rotate the overlay,
-            // to look more like the 'regular' Titan Masterboard
-            // need to give theta the proper value,
-            // depending where on the masterboard we are.
-            // Disabled, as not only the theta is computed wrong,
-            // But it looks ugly (the destination rectangle is wrong too)
+        overlay = ResourceLoader.getImage(getTerrainDisplayName() +
+                (!inverted ? invertedPostfix : ""),
+                directories,
+                rectBound.width,
+                rectBound.height);
 
-            int width = overlay.getWidth(board);
-            int height = overlay.getHeight(board);
-            BufferedImage bi = new BufferedImage(width, height,
-                                                 BufferedImage.TYPE_INT_ARGB);
-            Graphics2D biContext = bi.createGraphics();
-            biContext.drawImage(overlay, 0, 0, null);
-            double theta =
-                theta = ((getLabelSide() + (isInverted() ? 3 : 0)) % 6) *
-                Math.PI / 3.;
-            
-            AffineTransform at = AffineTransform.getRotateInstance(theta,
-                                                                   width / 2,
-                                                                   height / 2);
-            AffineTransformOp ato = new AffineTransformOp(at,
-                                        AffineTransformOp.TYPE_BILINEAR);
-            BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
-            bi2 = ato.filter(bi, bi2);
-            overlay = bi2;
-            */
-        }
+        /* DISABLED
+         // code to use if we want rotate the overlay,
+         // to look more like the 'regular' Titan Masterboard
+         // need to give theta the proper value,
+         // depending where on the masterboard we are.
+         // Disabled, as not only the theta is computed wrong,
+         // But it looks ugly (the destination rectangle is wrong too)
+
+         int width = overlay.getWidth(board);
+         int height = overlay.getHeight(board);
+         BufferedImage bi = new BufferedImage(width, height,
+         BufferedImage.TYPE_INT_ARGB);
+         Graphics2D biContext = bi.createGraphics();
+         biContext.drawImage(overlay, 0, 0, null);
+         double theta =
+         theta = ((getLabelSide() + (isInverted() ? 3 : 0)) % 6) *
+         Math.PI / 3.;
+         
+         AffineTransform at = AffineTransform.getRotateInstance(theta,
+         width / 2,
+         height / 2);
+         AffineTransformOp ato = new AffineTransformOp(at,
+         AffineTransformOp.TYPE_BILINEAR);
+         BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
+         bi2 = ato.filter(bi, bi2);
+         overlay = bi2;
+         */
+
+        return overlay;
     }
-    
-    private void paintOverlay(Graphics2D g)
+
+    private boolean paintOverlay(Graphics2D g)
     {
+        Image overlay = getOverlayImage();
+
         if (overlay == null)
         {
-            return;
+            return false;
         }
 
         g.drawImage(overlay,
-                    rectBound.x,
-                    rectBound.y,
-                    rectBound.width,
-                    rectBound.height,
-                    board);
+                rectBound.x,
+                rectBound.y,
+                rectBound.width,
+                rectBound.height,
+                board);
+
+        return true;
     }
 }

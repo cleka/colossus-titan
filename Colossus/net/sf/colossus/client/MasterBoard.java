@@ -20,6 +20,7 @@ import net.sf.colossus.parser.StrategicMapLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.parser.ParseException;
 
+
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
  * @version $Id$
@@ -35,9 +36,9 @@ public final class MasterBoard extends JPanel
     /** "parity" of the board, so that Hexes are displayed the proper way */
     private static int boardParity = 0;
 
-    private GUIMasterHex [][] guiHexArray = null;
+    private GUIMasterHex[][] guiHexArray = null;
     private java.util.List guiHexList = null;
-    private static MasterHex [][] plainHexArray = null;
+    private static MasterHex[][] plainHexArray = null;
     private static java.util.List plainHexList = null;
 
     /** The hexes in the horizSize*vertSize array that actually exist are
@@ -56,10 +57,10 @@ public final class MasterBoard extends JPanel
 
     /**The scrollbarspanel, needed to correct lastPoint.*/
     private JScrollPane scrollPane;
-    
+
     private Container contentPane;
     private JLabel playerLabel;
-    
+
     public static final String saveGameAs = "Save game as";
 
     public static final String clearRecruitChits = "Clear recruit chits";
@@ -80,7 +81,7 @@ public final class MasterBoard extends JPanel
     public static final String chooseScreen = "Choose Screen For Info Windows";
 
     public static final String about = "About";
-    
+
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;
     private AbstractAction saveGameAction;
@@ -132,12 +133,12 @@ public final class MasterBoard extends JPanel
         {
             readMapData();
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             Log.error("Reading map data for non-GUI failed : " + e);
             System.exit(1);
         }
-        
+
         Log.debug("Setting up static arrays in MasterBoard");
 
         setupPlainHexes();
@@ -166,7 +167,7 @@ public final class MasterBoard extends JPanel
         setupActions();
         setupPopupMenu();
         setupTopMenu();
-        
+
         scrollPane = new JScrollPane(this);
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
@@ -175,7 +176,6 @@ public final class MasterBoard extends JPanel
         masterFrame.pack();
         masterFrame.setVisible(true);
     }
-
 
     private void setupActions()
     {
@@ -192,7 +192,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 int phase = client.getPhase();
-                switch(phase)
+                switch (phase)
                 {
                     case Constants.SPLIT:
                         client.undoLastSplit();
@@ -226,7 +226,7 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 int phase = client.getPhase();
-                switch(phase)
+                switch (phase)
                 {
                     case Constants.SPLIT:
                         client.undoAllSplits();
@@ -255,13 +255,12 @@ public final class MasterBoard extends JPanel
             }
         };
 
-
         doneWithPhaseAction = new AbstractAction(doneWithPhase)
         {
             public void actionPerformed(ActionEvent e)
             {
                 int phase = client.getPhase();
-                switch(phase)
+                switch (phase)
                 {
                     case Constants.SPLIT:
                         client.doneWithSplits();
@@ -285,32 +284,30 @@ public final class MasterBoard extends JPanel
             }
         };
 
-
         takeMulliganAction = new AbstractAction(takeMulligan)
         {
             public void actionPerformed(ActionEvent e)
             {
-                client.mulligan(); 
+                client.mulligan();
             }
         };
-
 
         withdrawFromGameAction = new AbstractAction(withdrawFromGame)
         {
             public void actionPerformed(ActionEvent e)
             {
-                String [] options = new String[2];
+                String[] options = new String[2];
                 options[0] = "Yes";
                 options[1] = "No";
                 int answer = JOptionPane.showOptionDialog(masterFrame,
-                    "Are you sure you with to withdraw from the game?",
-                    "Confirm Withdrawal?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[1]);
+                        "Are you sure you with to withdraw from the game?",
+                        "Confirm Withdrawal?",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, options, options[1]);
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
-                   client.withdrawFromGame();
+                    client.withdrawFromGame();
                 }
             }
         };
@@ -319,9 +316,9 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                new ShowAllRecruits(masterFrame, 
-                    TerrainRecruitLoader.getTerrains(), null, null, 
-                    scrollPane);
+                new ShowAllRecruits(masterFrame,
+                        TerrainRecruitLoader.getTerrains(), null, null,
+                        scrollPane);
             }
         };
 
@@ -334,7 +331,7 @@ public final class MasterBoard extends JPanel
                 {
                     String[] terrains = { hex.getTerrain() };
                     new ShowAllRecruits(masterFrame, terrains, lastPoint,
-                                        hex.getLabel(), scrollPane);
+                            hex.getLabel(), scrollPane);
                 }
             }
         };
@@ -359,15 +356,15 @@ public final class MasterBoard extends JPanel
             {
                 if (!client.isGameOver())
                 {
-                    String [] options = new String[2];
+                    String[] options = new String[2];
                     options[0] = "Yes";
                     options[1] = "No";
                     int answer = JOptionPane.showOptionDialog(masterFrame,
-                        "Are you sure you with to start a new game?",
-                        "New Game?",
-                        JOptionPane.YES_NO_OPTION, 
-                        JOptionPane.QUESTION_MESSAGE, null, options, 
-                        options[1]);
+                            "Are you sure you with to start a new game?",
+                            "New Game?",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE, null, options,
+                            options[1]);
 
                     if (answer != JOptionPane.YES_OPTION)
                     {
@@ -412,8 +409,8 @@ public final class MasterBoard extends JPanel
                 int returnVal = chooser.showSaveDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
-                    String dirname = 
-                        chooser.getCurrentDirectory().getAbsolutePath();
+                    String dirname =
+                            chooser.getCurrentDirectory().getAbsolutePath();
                     String basename = chooser.getSelectedFile().getName();
                     // Add default savegame extension.
                     if (!basename.endsWith(Constants.xmlExtension))
@@ -434,14 +431,14 @@ public final class MasterBoard extends JPanel
                     System.exit(0);
                 }
 
-                String [] options = new String[2];
+                String[] options = new String[2];
                 options[0] = "Yes";
                 options[1] = "No";
                 int answer = JOptionPane.showOptionDialog(masterFrame,
-                    "Are you sure you wish to quit?",
-                    "Quit Game?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[1]);
+                        "Are you sure you wish to quit?",
+                        "Quit Game?",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, options, options[1]);
                 if (answer == JOptionPane.YES_OPTION)
                 {
                     client.withdrawFromGame();
@@ -456,11 +453,12 @@ public final class MasterBoard extends JPanel
             {
                 final int oldScale = Scale.get();
                 final int newScale = PickIntValue.pickIntValue(masterFrame,
-                    oldScale, "Pick scale", 5, 25, 1);
+                        oldScale, "Pick scale", 5, 25, 1);
                 if (newScale != oldScale)
                 {
                     client.setOption(Options.scale, newScale);
                     Scale.set(newScale);
+                    net.sf.colossus.util.ResourceLoader.purgeImageCache();
                     client.rescaleAllWindows();
                 }
             }
@@ -474,21 +472,19 @@ public final class MasterBoard extends JPanel
             }
         };
 
-
         aboutAction = new AbstractAction(about)
         {
             public void actionPerformed(ActionEvent e)
             {
                 client.showMessageDialog(
-                    "Colossus build: " + Client.getVersion() + 
-                    "\n" +
-                    "user.home:      " + System.getProperty("user.home") + 
-                    "\n" +
-                    "java.version:   " + System.getProperty("java.version"));
+                        "Colossus build: " + Client.getVersion() +
+                        "\n" +
+                        "user.home:      " + System.getProperty("user.home") +
+                        "\n" +
+                        "java.version:   " + System.getProperty("java.version"));
             }
         };
     }
-
 
     private void setupPopupMenu()
     {
@@ -514,7 +510,6 @@ public final class MasterBoard extends JPanel
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
     }
-
 
     private void setupTopMenu()
     {
@@ -543,7 +538,6 @@ public final class MasterBoard extends JPanel
         phaseMenu = new JMenu("Phase");
         phaseMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(phaseMenu);
-
 
         // Then per-player options
 
@@ -584,8 +578,8 @@ public final class MasterBoard extends JPanel
         mi = graphicsMenu.add(viewFullRecruitTreeAction);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
-        if (GraphicsEnvironment.getLocalGraphicsEnvironment().
-            getScreenDevices().length > 1)
+        if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length >
+                1)
         {
             mi = graphicsMenu.add(chooseScreenAction);
         }
@@ -594,13 +588,13 @@ public final class MasterBoard extends JPanel
         lfMenu = new JMenu("Look & Feel");
         menuBar.add(lfMenu);
         UIManager.LookAndFeelInfo[] lfInfo =
-            UIManager.getInstalledLookAndFeels();
+                UIManager.getInstalledLookAndFeels();
         String currentLF = UIManager.getLookAndFeel().getName();
-        for (int i = 0; i < lfInfo.length ; i++)
+        for (int i = 0; i < lfInfo.length; i++)
         {
             AbstractAction lfAction =
-                new ChangeLookFeelAction(lfInfo[i].getName(),
-                                         lfInfo[i].getClassName());
+                    new ChangeLookFeelAction(lfInfo[i].getName(),
+                    lfInfo[i].getClassName());
             JCheckBoxMenuItem temp = new JCheckBoxMenuItem(lfAction);
             lfMenu.add(temp);
             temp.setState(lfInfo[i].getName().equals(currentLF));
@@ -622,10 +616,12 @@ public final class MasterBoard extends JPanel
             super(t);
             this.className = className;
         }
-        public void actionPerformed(ActionEvent e) {
+
+        public void actionPerformed(ActionEvent e)
+        {
             client.setLookAndFeel(className);
             String currentLF = UIManager.getLookAndFeel().getName();
-            for (int i = 0 ; i < lfMenu.getItemCount() ; i++)
+            for (int i = 0; i < lfMenu.getItemCount(); i++)
             {
                 JCheckBoxMenuItem it = (JCheckBoxMenuItem)lfMenu.getItem(i);
                 it.setState(it.getText().equals(currentLF));
@@ -648,7 +644,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     /** Show which player owns this board. */
     void setupPlayerLabel()
     {
@@ -665,7 +660,7 @@ public final class MasterBoard extends JPanel
         }
         else
         {
-            playerLabel.setText(playerName); 
+            playerLabel.setText(playerName);
         }
 
         String colorName = client.getColor();
@@ -679,7 +674,6 @@ public final class MasterBoard extends JPanel
             playerLabelDone = true;
         }
     }
-
 
     private void setupGUIHexes()
     {
@@ -698,13 +692,13 @@ public final class MasterBoard extends JPanel
                 {
                     GUIMasterHex hex = new GUIMasterHex(plainHexArray[i][j]);
                     hex.init(
-                        cx + 4 * i * scale,
-                        (int) Math.round(cy + (3 * j + ((i + boardParity) & 1) 
-                            * (1 + 2 * (j / 2)) + ((i + 1 + boardParity) & 1) 
+                            cx + 4 * i * scale,
+                            (int)Math.round(cy + (3 * j + ((i + boardParity) & 1)
+                            * (1 + 2 * (j / 2)) + ((i + 1 + boardParity) & 1)
                             * 2 * ((j + 1) / 2)) * Hex.SQRT3 * scale),
-                        scale,
-                        isHexInverted(i, j),
-                        this);
+                            scale,
+                            isHexInverted(i, j),
+                            this);
                     guiHexArray[i][j] = hex;
                     guiHexList.add(hex);
                 }
@@ -713,19 +707,18 @@ public final class MasterBoard extends JPanel
         setupNeighbors(guiHexArray);
     }
 
-
     private static boolean isHexInverted(int i, int j)
     {
         return (((i + j) & 1) == boardParity);
     }
 
-    static MasterHex hexByLabel(MasterHex [][] h, int label)
+    static MasterHex hexByLabel(MasterHex[][] h, int label)
     {
-        for (int i = 0; i < h.length; i++) 
+        for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < h[i].length; j++) 
+            for (int j = 0; j < h[i].length; j++)
             {
-                if (show[i][j]) 
+                if (show[i][j])
                 {
                     if (h[i][j].getLabel().equals(Integer.toString(label)))
                     {
@@ -738,12 +731,13 @@ public final class MasterBoard extends JPanel
         return null;
     }
 
-    private static void readMapData() throws Exception
+    private static void readMapData()
+            throws Exception
     {
         java.util.List directories = VariantSupport.getVarDirectoriesList();
         InputStream mapIS = ResourceLoader.getInputStream(
-            VariantSupport.getMapName(), directories);
-        if (mapIS == null) 
+                VariantSupport.getMapName(), directories);
+        if (mapIS == null)
         {
             throw new FileNotFoundException(VariantSupport.getMapName());
         }
@@ -769,9 +763,11 @@ public final class MasterBoard extends JPanel
         }
         try
         {
-            while (sml.oneCase(plainHexArray, plainHexList, show) >= 0) {}
+            while (sml.oneCase(plainHexArray, plainHexList, show) >= 0)
+            {
+            }
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             Log.error("Strategic map loading failed : " + e);
             System.exit(1);
@@ -784,34 +780,33 @@ public final class MasterBoard extends JPanel
         setupNeighbors(plainHexArray);
     }
 
-
     private static void computeBoardParity()
     {
         boardParity = 0;
         for (int x = 0; x < horizSize; x++)
         {
-            for (int y = 0; y < vertSize - 1 ; y++)
+            for (int y = 0; y < vertSize - 1; y++)
             {
-                if (show[x][y] && show[x][y+1])
+                if (show[x][y] && show[x][y + 1])
                 {
-                    boardParity = 1 - ((x+y) & 1);
+                    boardParity = 1 - ((x + y) & 1);
                     return;
                 }
             }
         }
     }
 
-    private static void setupExits(MasterHex [][] h)
+    private static void setupExits(MasterHex[][] h)
     {
-        for (int i = 0; i < h.length; i++) 
+        for (int i = 0; i < h.length; i++)
         {
-            for (int j = 0; j < h[i].length; j++) 
+            for (int j = 0; j < h[i].length; j++)
             {
-                if (show[i][j]) 
+                if (show[i][j])
                 {
-                    for (int k = 0; k < 3; k++) 
+                    for (int k = 0; k < 3; k++)
                     {
-                        if (h[i][j].getBaseExitType(k) != Constants.NONE) 
+                        if (h[i][j].getBaseExitType(k) != Constants.NONE)
                         {
                             setupOneExit(h, i, j, k);
                         }
@@ -821,60 +816,60 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private static void setupOneExit(MasterHex [][] h, int i, int j, int k)
+    private static void setupOneExit(MasterHex[][] h, int i, int j, int k)
     {
         MasterHex dh = hexByLabel(h, h[i][j].getBaseExitLabel(k));
-        if (dh == null) 
+        if (dh == null)
         {
             Log.error("null pointer ; i=" + i + ", j=" + j + ", k=" + k);
             System.exit(1);
         }
-        if (dh.getXCoord() == i) 
+        if (dh.getXCoord() == i)
         {
-            if (dh.getYCoord() == (j - 1)) 
+            if (dh.getYCoord() == (j - 1))
             {
                 h[i][j].setExitType(0, h[i][j].getBaseExitType(k));
-            } 
-            else if (dh.getYCoord() == (j + 1)) 
+            }
+            else if (dh.getYCoord() == (j + 1))
             {
                 h[i][j].setExitType(3, h[i][j].getBaseExitType(k));
-            } 
-            else 
+            }
+            else
             {
                 Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
             }
-        } 
-        else if (dh.getXCoord() == (i + 1)) 
+        }
+        else if (dh.getXCoord() == (i + 1))
         {
-            if (dh.getYCoord() == j) 
+            if (dh.getYCoord() == j)
             {
                 h[i][j].setExitType(2 - ((i + j + boardParity) & 1),
-                    h[i][j].getBaseExitType(k));
-            } 
-            else 
+                        h[i][j].getBaseExitType(k));
+            }
+            else
             {
                 Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
             }
-        } 
-        else if (dh.getXCoord() == (i - 1)) 
+        }
+        else if (dh.getXCoord() == (i - 1))
         {
-            if (dh.getYCoord() == j) 
+            if (dh.getYCoord() == j)
             {
-                h[i][j].setExitType(4 + ((i + j + boardParity) & 1), 
-                    h[i][j].getBaseExitType(k));
-            } 
-            else 
+                h[i][j].setExitType(4 + ((i + j + boardParity) & 1),
+                        h[i][j].getBaseExitType(k));
+            }
+            else
             {
                 Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
             }
-        } 
-        else 
+        }
+        else
         {
             Log.warn("bad exit ; i=" + i + ", j=" + j + ", k=" + k);
         }
     }
 
-    private static void setupEntrances(MasterHex [][] h)
+    private static void setupEntrances(MasterHex[][] h)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -892,21 +887,27 @@ public final class MasterBoard extends JPanel
                                 case 0:
                                     h[i][j - 1].setEntranceType(3, gateType);
                                     break;
+
                                 case 1:
                                     h[i + 1][j].setEntranceType(4, gateType);
                                     break;
+
                                 case 2:
                                     h[i + 1][j].setEntranceType(5, gateType);
                                     break;
+
                                 case 3:
                                     h[i][j + 1].setEntranceType(0, gateType);
                                     break;
+
                                 case 4:
                                     h[i - 1][j].setEntranceType(1, gateType);
                                     break;
+
                                 case 5:
                                     h[i - 1][j].setEntranceType(2, gateType);
                                     break;
+
                                 default:
                                     Log.error("Bogus hexside");
                             }
@@ -920,7 +921,7 @@ public final class MasterBoard extends JPanel
     /** If the shortest hexside closest to the center of the board
      *  is a short hexside, set the label side to it.
      *  Else set the label side to the opposite hexside. */
-    private static void setupHexLabelSides(MasterHex [][] h)
+    private static void setupHexLabelSides(MasterHex[][] h)
     {
         // First find the center of the board.
         int width = h.length;
@@ -933,94 +934,96 @@ public final class MasterBoard extends JPanel
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
-            if (show[i][j])
             {
-                double deltaX = i - midX;
-                // Adjust for aspect ratio of h array, which has roughly
-                // twice as many horizontal as vertical elements even
-                // though the board is roughly square.
-                double deltaY = (j - midY) * (double)width / height;
-
-                double ratio;
-
-                // Watch for division by zero.
-                if (deltaY == 0)
+                if (show[i][j])
                 {
-                    ratio = deltaX * 99999999;
-                }
-                else
-                {
-                    ratio = deltaX / deltaY;
-                }
+                    double deltaX = i - midX;
+                    // Adjust for aspect ratio of h array, which has roughly
+                    // twice as many horizontal as vertical elements even
+                    // though the board is roughly square.
+                    double deltaY = (j - midY) * (double)width / height;
 
-                // Derive the exact number if needed.
-                if (Math.abs(ratio) < 0.6)
-                {
-                    // Vertically dominated, so top or bottom hexside.
-                    // top, unless inverted
-                    if (isHexInverted(i, j))
+                    double ratio;
+
+                    // Watch for division by zero.
+                    if (deltaY == 0)
                     {
-                        h[i][j].setLabelSide(3);
+                        ratio = deltaX * 99999999;
                     }
                     else
                     {
-                        h[i][j].setLabelSide(0);
+                        ratio = deltaX / deltaY;
                     }
-                }
-                else
-                {
-                    // One of the left or right side hexsides.
-                    if (deltaX >= 0)
+
+                    // Derive the exact number if needed.
+                    if (Math.abs(ratio) < 0.6)
                     {
-                        if (deltaY >= 0)
+                        // Vertically dominated, so top or bottom hexside.
+                        // top, unless inverted
+                        if (isHexInverted(i, j))
                         {
-                            // 2 unless inverted
-                            if (isHexInverted(i, j))
-                            {
-                                h[i][j].setLabelSide(5);
-                            }
-                            else
-                            {
-                                h[i][j].setLabelSide(2);
-                            }
+                            h[i][j].setLabelSide(3);
                         }
                         else
                         {
-                            // 4 unless inverted
-                            if (isHexInverted(i, j))
-                            {
-                                h[i][j].setLabelSide(1);
-                            }
-                            else
-                            {
-                                h[i][j].setLabelSide(4);
-                            }
+                            h[i][j].setLabelSide(0);
                         }
                     }
                     else
                     {
-                        if (deltaY >= 0)
+                        // One of the left or right side hexsides.
+                        if (deltaX >= 0)
                         {
-                            // 4 unless inverted
-                            if (isHexInverted(i, j))
+                            if (deltaY >= 0)
                             {
-                                h[i][j].setLabelSide(1);
+                                // 2 unless inverted
+                                if (isHexInverted(i, j))
+                                {
+                                    h[i][j].setLabelSide(5);
+                                }
+                                else
+                                {
+                                    h[i][j].setLabelSide(2);
+                                }
                             }
                             else
                             {
-                                h[i][j].setLabelSide(4);
+                                // 4 unless inverted
+                                if (isHexInverted(i, j))
+                                {
+                                    h[i][j].setLabelSide(1);
+                                }
+                                else
+                                {
+                                    h[i][j].setLabelSide(4);
+                                }
                             }
                         }
                         else
                         {
-                            // 2 unless inverted
-                            if (isHexInverted(i, j))
+                            if (deltaY >= 0)
                             {
-                                h[i][j].setLabelSide(5);
+                                // 4 unless inverted
+                                if (isHexInverted(i, j))
+                                {
+                                    h[i][j].setLabelSide(1);
+                                }
+                                else
+                                {
+                                    h[i][j].setLabelSide(4);
+                                }
                             }
                             else
                             {
-                                h[i][j].setLabelSide(2);
+                                // 2 unless inverted
+                                if (isHexInverted(i, j))
+                                {
+                                    h[i][j].setLabelSide(5);
+                                }
+                                else
+                                {
+                                    h[i][j].setLabelSide(2);
+                                }
                             }
                         }
                     }
@@ -1029,7 +1032,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
-    private static void setupNeighbors(MasterHex [][] h)
+    private static void setupNeighbors(MasterHex[][] h)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -1040,32 +1043,32 @@ public final class MasterBoard extends JPanel
                     MasterHex hex = h[i][j];
 
                     if (hex.getExitType(0) != Constants.NONE ||
-                        hex.getEntranceType(0) != Constants.NONE)
+                            hex.getEntranceType(0) != Constants.NONE)
                     {
                         hex.setNeighbor(0, h[i][j - 1]);
                     }
                     if (hex.getExitType(1) != Constants.NONE ||
-                        hex.getEntranceType(1) != Constants.NONE)
+                            hex.getEntranceType(1) != Constants.NONE)
                     {
                         hex.setNeighbor(1, h[i + 1][j]);
                     }
                     if (hex.getExitType(2) != Constants.NONE ||
-                        hex.getEntranceType(2) != Constants.NONE)
+                            hex.getEntranceType(2) != Constants.NONE)
                     {
                         hex.setNeighbor(2, h[i + 1][j]);
                     }
                     if (hex.getExitType(3) != Constants.NONE ||
-                        hex.getEntranceType(3) != Constants.NONE)
+                            hex.getEntranceType(3) != Constants.NONE)
                     {
                         hex.setNeighbor(3, h[i][j + 1]);
                     }
                     if (hex.getExitType(4) != Constants.NONE ||
-                        hex.getEntranceType(4) != Constants.NONE)
+                            hex.getEntranceType(4) != Constants.NONE)
                     {
                         hex.setNeighbor(4, h[i - 1][j]);
                     }
                     if (hex.getExitType(5) != Constants.NONE ||
-                        hex.getEntranceType(5) != Constants.NONE)
+                            hex.getEntranceType(5) != Constants.NONE)
                     {
                         hex.setNeighbor(5, h[i - 1][j]);
                     }
@@ -1073,7 +1076,6 @@ public final class MasterBoard extends JPanel
             }
         }
     }
-
 
     void setupSplitMenu()
     {
@@ -1083,14 +1085,14 @@ public final class MasterBoard extends JPanel
         String activePlayerName = client.getActivePlayerName();
 
         masterFrame.setTitle(activePlayerName + " Turn " +
-            client.getTurnNumber() + " : Split stacks");
+                client.getTurnNumber() + " : Split stacks");
 
         phaseMenu.removeAll();
 
         if (client.getPlayerName().equals(activePlayerName))
         {
             JMenuItem mi;
-    
+
             mi = phaseMenu.add(clearRecruitChitsAction);
             mi.setMnemonic(KeyEvent.VK_C);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
@@ -1100,17 +1102,17 @@ public final class MasterBoard extends JPanel
             mi = phaseMenu.add(undoLastAction);
             mi.setMnemonic(KeyEvent.VK_U);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
-    
+
             mi = phaseMenu.add(undoAllAction);
             mi.setMnemonic(KeyEvent.VK_A);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-    
+
             mi = phaseMenu.add(doneWithPhaseAction);
             mi.setMnemonic(KeyEvent.VK_D);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-    
+
             phaseMenu.addSeparator();
-    
+
             mi = phaseMenu.add(withdrawFromGameAction);
             mi.setMnemonic(KeyEvent.VK_W);
 
@@ -1125,8 +1127,8 @@ public final class MasterBoard extends JPanel
 
         String activePlayerName = client.getActivePlayerName();
         masterFrame.setTitle(activePlayerName + " Turn " +
-            client.getTurnNumber() + " : Movement Roll: " +
-            client.getMovementRoll());
+                client.getTurnNumber() + " : Movement Roll: " +
+                client.getMovementRoll());
 
         phaseMenu.removeAll();
 
@@ -1139,19 +1141,19 @@ public final class MasterBoard extends JPanel
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
 
             phaseMenu.addSeparator();
-    
+
             mi = phaseMenu.add(undoLastAction);
             mi.setMnemonic(KeyEvent.VK_U);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
-    
+
             mi = phaseMenu.add(undoAllAction);
             mi.setMnemonic(KeyEvent.VK_A);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-    
+
             mi = phaseMenu.add(doneWithPhaseAction);
             mi.setMnemonic(KeyEvent.VK_D);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-    
+
             if (client.getMulligansLeft() > 0)
             {
                 phaseMenu.addSeparator();
@@ -1159,9 +1161,9 @@ public final class MasterBoard extends JPanel
                 mi.setMnemonic(KeyEvent.VK_M);
                 mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
             }
-    
+
             phaseMenu.addSeparator();
-    
+
             mi = phaseMenu.add(withdrawFromGameAction);
             mi.setMnemonic(KeyEvent.VK_W);
 
@@ -1180,7 +1182,7 @@ public final class MasterBoard extends JPanel
         String activePlayerName = client.getActivePlayerName();
 
         masterFrame.setTitle(activePlayerName + " Turn " +
-            client.getTurnNumber() + " : Resolve Engagements ");
+                client.getTurnNumber() + " : Resolve Engagements ");
 
         phaseMenu.removeAll();
 
@@ -1215,14 +1217,14 @@ public final class MasterBoard extends JPanel
         String activePlayerName = client.getActivePlayerName();
 
         masterFrame.setTitle(activePlayerName + " Turn " +
-            client.getTurnNumber() + " : Muster Recruits ");
+                client.getTurnNumber() + " : Muster Recruits ");
 
         phaseMenu.removeAll();
 
         if (client.getPlayerName().equals(activePlayerName))
         {
             JMenuItem mi;
-    
+
             mi = phaseMenu.add(clearRecruitChitsAction);
             mi.setMnemonic(KeyEvent.VK_C);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
@@ -1232,17 +1234,17 @@ public final class MasterBoard extends JPanel
             mi = phaseMenu.add(undoLastAction);
             mi.setMnemonic(KeyEvent.VK_U);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
-    
+
             mi = phaseMenu.add(undoAllAction);
             mi.setMnemonic(KeyEvent.VK_A);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-    
+
             mi = phaseMenu.add(doneWithPhaseAction);
             mi.setMnemonic(KeyEvent.VK_D);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
-    
+
             phaseMenu.addSeparator();
-    
+
             mi = phaseMenu.add(withdrawFromGameAction);
             mi.setMnemonic(KeyEvent.VK_W);
 
@@ -1250,19 +1252,16 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     void highlightPossibleRecruits()
     {
         unselectAllHexes();
         selectHexesByLabels(client.getPossibleRecruitHexes());
     }
 
-
     JFrame getFrame()
     {
         return masterFrame;
     }
-
 
     void alignLegions(String hexLabel)
     {
@@ -1367,7 +1366,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     void highlightTallLegions()
     {
         unselectAllHexes();
@@ -1380,7 +1378,6 @@ public final class MasterBoard extends JPanel
         selectHexesByLabels(client.findUnmovedLegionHexes());
         repaint();
     }
-
 
     /** Select hexes where this legion can move. */
     private void highlightMoves(String markerId)
@@ -1400,7 +1397,6 @@ public final class MasterBoard extends JPanel
         showBestRecruit(markerId, combo);
     }
 
-
     private void showBestRecruit(String markerId, Set set)
     {
         client.clearRecruitChits();
@@ -1409,14 +1405,14 @@ public final class MasterBoard extends JPanel
         {
             String hexLabel = (String)it.next();
             java.util.List recruits = client.findEligibleRecruits(markerId,
-                hexLabel);
+                    hexLabel);
             if (recruits != null && recruits.size() > 0)
             {
                 if ((!client.showAllRecruitChits) ||
-                    (recruits.size() == 1))
+                        (recruits.size() == 1))
                 {
                     Creature recruit =
-                        (Creature)recruits.get(recruits.size() - 1);
+                            (Creature)recruits.get(recruits.size() - 1);
                     String recruitName = recruit.getName();
                     client.addRecruitChit(recruitName, hexLabel);
                 }
@@ -1428,14 +1424,12 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     void highlightEngagements()
     {
         Set set = client.findEngagements();
         unselectAllHexes();
         selectHexesByLabels(set);
     }
-
 
     /** Return number of legions with summonable angels. */
     int highlightSummonableAngels(String markerId)
@@ -1446,27 +1440,26 @@ public final class MasterBoard extends JPanel
         return set.size();
     }
 
-
-
     private void setupIcon()
     {
         java.util.List directories = new java.util.ArrayList();
         directories.add(Constants.defaultDirName +
-                        ResourceLoader.getPathSeparator() +
-                        Constants.imagesDirName);
+                ResourceLoader.getPathSeparator() +
+                Constants.imagesDirName);
 
         String[] iconNames = { Constants.masterboardIconImage,
-                               Constants.masterboardIconText +
-                               "-Name-" +
-                               Constants.masterboardIconTextColor,
-                               Constants.masterboardIconSubscript +
-                               "-Subscript-" +
-                               Constants.masterboardIconTextColor };
-        
+            Constants.masterboardIconText +
+                    "-Name-" +
+                    Constants.masterboardIconTextColor,
+            Constants.masterboardIconSubscript +
+                    "-Subscript-" +
+                    Constants.masterboardIconTextColor };
+
         Image image =
-            ResourceLoader.getCompositeImage(iconNames,
-                                             directories);
-        
+                ResourceLoader.getCompositeImage(iconNames,
+                directories,
+                60, 60);
+
         if (image == null)
         {
             Log.error("Couldn't find Colossus icon");
@@ -1477,7 +1470,6 @@ public final class MasterBoard extends JPanel
             masterFrame.setIconImage(image);
         }
     }
-
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
@@ -1511,7 +1503,6 @@ public final class MasterBoard extends JPanel
         return null;
     }
 
-
     /** Return the MasterHex that contains the given point, or
      *  null if none does. */
     private GUIMasterHex getHexContainingPoint(Point point)
@@ -1529,7 +1520,6 @@ public final class MasterBoard extends JPanel
         return null;
     }
 
-
     /** Return the topmost Marker that contains the given point, or
      *  null if none does. */
     private Marker getMarkerAtPoint(Point point)
@@ -1546,7 +1536,6 @@ public final class MasterBoard extends JPanel
         }
         return null;
     }
-
 
     void unselectAllHexes()
     {
@@ -1635,7 +1624,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     void actOnMisclick()
     {
         switch (client.getPhase())
@@ -1668,7 +1656,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     /** Return true if the MouseEvent e came from button 2 or 3.
      *  In theory, isPopupTrigger() is the right way to check for
      *  this.  In practice, the poor design choice of only having
@@ -1678,8 +1665,8 @@ public final class MasterBoard extends JPanel
     {
         int modifiers = e.getModifiers();
         return (((modifiers & InputEvent.BUTTON2_MASK) != 0) ||
-            ((modifiers & InputEvent.BUTTON3_MASK) != 0) ||
-            e.isAltDown() || e.isControlDown());
+                ((modifiers & InputEvent.BUTTON3_MASK) != 0) ||
+                e.isAltDown() || e.isControlDown());
     }
 
     class MasterBoardMouseHandler extends MouseAdapter
@@ -1703,9 +1690,9 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     new ShowLegion(masterFrame, markerId,
-                        client.getLegionImageNames(markerId), 
-                        client.getLegionCreatureCertainties(markerId), 
-                        point, scrollPane);
+                            client.getLegionImageNames(markerId),
+                            client.getLegionCreatureCertainties(markerId),
+                            point, scrollPane);
                     return;
                 }
                 else if (client.isMyLegion(markerId))
@@ -1736,7 +1723,7 @@ public final class MasterBoard extends JPanel
                 // Otherwise, the action to take depends on the phase.
                 // Only the current player can manipulate game state.
                 if (client.getPlayerName().equals(
-                    client.getActivePlayerName()))
+                        client.getActivePlayerName()))
                 {
                     actOnHex(hex.getLabel());
                     hex.repaint();
@@ -1751,7 +1738,6 @@ public final class MasterBoard extends JPanel
             }
         }
     }
-
 
     private void actOnLegion(String markerId, String hexLabel)
     {
@@ -1825,6 +1811,7 @@ public final class MasterBoard extends JPanel
         }
     }
 
+
     class MasterBoardWindowHandler extends WindowAdapter
     {
         public void windowClosing(WindowEvent e)
@@ -1837,14 +1824,14 @@ public final class MasterBoard extends JPanel
                 System.exit(0);
             }
 
-            String [] options = new String[2];
+            String[] options = new String[2];
             options[0] = "Yes";
             options[1] = "No";
             int answer = JOptionPane.showOptionDialog(masterFrame,
-               "Are you sure you wish to quit?",
-               "Quit Game?",
-               JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-               null, options, options[1]);
+                    "Are you sure you wish to quit?",
+                    "Quit Game?",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[1]);
 
             if (answer == JOptionPane.YES_OPTION)
             {
@@ -1898,8 +1885,8 @@ public final class MasterBoard extends JPanel
         while (it.hasNext())
         {
             Marker marker = (Marker)it.next();
-            if (marker != null && 
-                g.getClipBounds().intersects(marker.getBounds()))
+            if (marker != null &&
+                    g.getClipBounds().intersects(marker.getBounds()))
             {
                 marker.paintComponent(g);
             }
@@ -1938,12 +1925,11 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     public Dimension getMinimumSize()
     {
         int scale = Scale.get();
         return new Dimension(((horizSize + 1) * 4) * scale,
-                             (vertSize * 7) * scale);
+                (vertSize * 7) * scale);
     }
 
     public Dimension getPreferredSize()
@@ -1960,7 +1946,6 @@ public final class MasterBoard extends JPanel
         repaint();
     }
 
-
     void deiconify()
     {
         if (masterFrame.getState() == JFrame.ICONIFIED)
@@ -1968,7 +1953,6 @@ public final class MasterBoard extends JPanel
             masterFrame.setState(JFrame.NORMAL);
         }
     }
-
 
     public void dispose()
     {
@@ -1978,7 +1962,6 @@ public final class MasterBoard extends JPanel
         masterFrame.setEnabled(false);
         masterFrame.dispose();
     }
-
 
     public static Set getTowerSet()
     {
@@ -2027,7 +2010,6 @@ public final class MasterBoard extends JPanel
         SwingUtilities.updateComponentTreeUI(this);
         SwingUtilities.updateComponentTreeUI(masterFrame);
     }
-
 
     void fullRepaint()
     {

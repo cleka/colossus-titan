@@ -12,6 +12,7 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.VariantSupport;
 
+
 /**
  * Class GUIBattleHex holds GUI info for one battle hex.
  * @version $Id$
@@ -42,8 +43,8 @@ public class GUIBattleHex extends BattleHex
     // Letters increase left to right; numbers increase bottom to top.
 
 
-    public GUIBattleHex(int cx, int cy, int scale, Component map, 
-        int xCoord, int yCoord)
+    public GUIBattleHex(int cx, int cy, int scale, Component map,
+            int xCoord, int yCoord)
     {
         super(xCoord, yCoord);
         this.map = map;
@@ -70,19 +71,18 @@ public class GUIBattleHex extends BattleHex
 
         final double innerScale = 0.8;
         AffineTransform at = AffineTransform.getScaleInstance(innerScale,
-            innerScale);
+                innerScale);
         innerHexagon = (GeneralPath)hexagon.createTransformedShape(at);
 
         // Translate innerHexagon to make it concentric.
-        Rectangle2D innerBounds = innerHexagon.getBounds2D(); 
+        Rectangle2D innerBounds = innerHexagon.getBounds2D();
         Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX() +
-            innerBounds.getWidth() / 2.0, innerBounds.getY() + 
-            innerBounds.getHeight() / 2.0);
-        at = AffineTransform.getTranslateInstance(center.getX() - 
-            innerCenter.getX(), center.getY() - innerCenter.getY());
+                innerBounds.getWidth() / 2.0, innerBounds.getY() +
+                innerBounds.getHeight() / 2.0);
+        at = AffineTransform.getTranslateInstance(center.getX() -
+                innerCenter.getX(), center.getY() - innerCenter.getY());
         innerHexagon.transform(at);
     }
-
 
     public void paint(Graphics g)
     {
@@ -90,20 +90,24 @@ public class GUIBattleHex extends BattleHex
         if (getAntialias())
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
+                    RenderingHints.VALUE_ANTIALIAS_ON);
         }
         else
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_OFF);
+                    RenderingHints.VALUE_ANTIALIAS_OFF);
         }
 
         if (isSelected())
         {
             if (getTerrainColor().equals(highlightColor))
+            {
                 g2.setColor(HTMLColor.invertRGBColor(highlightColor));
+            }
             else
+            {
                 g2.setColor(highlightColor);
+            }
             g2.fill(hexagon);
 
             g2.setColor(getTerrainColor());
@@ -121,7 +125,6 @@ public class GUIBattleHex extends BattleHex
         g2.setColor(Color.black);
         g2.draw(hexagon);
 
-
         if ((useOverlay) && (paintOverlay(g2)))
         {
             // well, ok...
@@ -137,39 +140,41 @@ public class GUIBattleHex extends BattleHex
                 {
                     n = (i + 1) % 6;
                     drawHexside(g2,
-                                xVertex[i], yVertex[i],
-                                xVertex[n], yVertex[n],
-                                hexside);
+                            xVertex[i], yVertex[i],
+                            xVertex[n], yVertex[n],
+                            hexside);
                 }
-                
+
                 // Draw them again from the other side.
                 hexside = getOppositeHexside(i);
                 if (hexside != ' ')
                 {
                     n = (i + 1) % 6;
                     drawHexside(g2,
-                                xVertex[n], yVertex[n],
-                                xVertex[i], yVertex[i],
-                                hexside);
+                            xVertex[n], yVertex[n],
+                            xVertex[i], yVertex[i],
+                            hexside);
                 }
             }
         }
-            
+
         // Do not anti-alias text.
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_OFF);
+                RenderingHints.VALUE_ANTIALIAS_OFF);
         String name = getTerrainName().toUpperCase();
-        
+
         FontMetrics fontMetrics = g2.getFontMetrics();
 
         g2.drawString(name, rectBound.x + ((rectBound.width -
-            fontMetrics.stringWidth(name)) / 2),
-            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 2));
+                fontMetrics.stringWidth(name)) / 2),
+                rectBound.y +
+                ((fontMetrics.getHeight() + rectBound.height) / 2));
 
         // Show hex label in upper left corner.
         g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-            fontMetrics.stringWidth(getLabel())) / 3,
-            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 4));
+                fontMetrics.stringWidth(getLabel())) / 3,
+                rectBound.y +
+                ((fontMetrics.getHeight() + rectBound.height) / 4));
     }
 
     public void repaint()
@@ -182,12 +187,12 @@ public class GUIBattleHex extends BattleHex
         else
         {
             map.repaint(getBounds().x, getBounds().y, getBounds().width,
-                        getBounds().height);
+                    getBounds().height);
         }
     }
 
     void drawHexside(Graphics2D g2, double vx1, double vy1, double vx2,
-        double vy2, char hexsideType)
+            double vy2, char hexsideType)
     {
         double x0;                     // first focus point
         double y0;
@@ -196,9 +201,8 @@ public class GUIBattleHex extends BattleHex
         double x2;                     // center point
         double y2;
         double theta;                  // gate angle
-        double [] x = new double[4];   // hexside points
-        double [] y = new double[4];   // hexside points
-
+        double[] x = new double[4];   // hexside points
+        double[] y = new double[4];   // hexside points
 
         x0 = vx1 + (vx2 - vx1) / 6;
         y0 = vy1 + (vy2 - vy1) / 6;
@@ -260,9 +264,9 @@ public class GUIBattleHex extends BattleHex
 
                     g2.setColor(Color.white);
                     Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
-                        rect.width, rect.height,
-                        Math.toDegrees(2 * Math.PI - theta), 180,
-                        Arc2D.OPEN);
+                            rect.width, rect.height,
+                            Math.toDegrees(2 * Math.PI - theta), 180,
+                            Arc2D.OPEN);
                     g2.fill(arc);
                     g2.setColor(Color.black);
                     g2.draw(arc);
@@ -337,57 +341,56 @@ public class GUIBattleHex extends BattleHex
         return (innerHexagon.contains(point));
     }
 
-    // overlays support
-    static HashMap hexOverlay;
-    static HashMap hexsideOverlay;
     private static String imagePostfix = "_Hazard";
 
-    
-    private static Image loadOneOverlay(String name)
+    private static Image loadOneOverlay(String name, int width, int height)
     {
         Image overlay = null;
         java.util.List directories = VariantSupport.getImagesDirectoriesList();
-        overlay = ResourceLoader.getImage(name + imagePostfix, directories);
+        overlay = ResourceLoader.getImage(name + imagePostfix, directories,
+                width, height);
         return overlay;
     }
 
-    public static void loadOverlay()
-    {
-        hexOverlay = new HashMap();
-        hexsideOverlay = new HashMap();
-        BattleHex tempHex = new BattleHex(0,0);
-        for (int i = 0; i < getTerrains().length ; i++)
-        {
-            tempHex.setTerrain(getTerrains()[i]);
-            Image temp = loadOneOverlay(tempHex.getTerrainName());
-            if (temp != null)
-            {
-                hexOverlay.put(getTerrains()[i], temp);
-            }
-        }
-        for (int i = 0; i < getHexsides().length ; i++)
-        {
-            tempHex.setHexside(0, getHexsides()[i]);
-            Image temp = loadOneOverlay(tempHex.getHexsideName(0));
-            if (temp != null)
-            {
-                hexsideOverlay.put(new Character(getHexsides()[i]), temp);
-            }
-        }
-    }
-
+    /*
+     public static void loadOverlay()
+     {
+     hexOverlay = new HashMap();
+     hexsideOverlay = new HashMap();
+     BattleHex tempHex = new BattleHex(0,0);
+     for (int i = 0; i < getTerrains().length ; i++)
+     {
+     tempHex.setTerrain(getTerrains()[i]);
+     Image temp = loadOneOverlay(tempHex.getTerrainName(),
+     216, 188);
+     if (temp != null)
+     {
+     hexOverlay.put(getTerrains()[i], temp);
+     }
+     }
+     for (int i = 0; i < getHexsides().length ; i++)
+     {
+     tempHex.setHexside(0, getHexsides()[i]);
+     Image temp = loadOneOverlay(tempHex.getHexsideName(0),
+     248, 220);
+     if (temp != null)
+     {
+     hexsideOverlay.put(new Character(getHexsides()[i]), temp);
+     }
+     }
+     }
+     */
     public boolean paintOverlay(Graphics2D g)
     {
-        if (hexOverlay == null)
-            loadOverlay();
-        Image overlay = (Image)hexOverlay.get(getTerrain());
+        Image overlay = loadOneOverlay(getTerrain(),
+                rectBound.width, rectBound.height);
         if (overlay != null)
         { // first, draw the Hex itself
             g.drawImage(overlay,
-                        rectBound.x,
-                        rectBound.y,
-                        rectBound.width,
-                        rectBound.height,
+                    rectBound.x,
+                    rectBound.y,
+                    rectBound.width,
+                    rectBound.height,
                     map);
         }
         boolean didAllHexside = true;
@@ -402,48 +405,43 @@ public class GUIBattleHex extends BattleHex
             if (op != ' ')
             {
                 BattleHex neighbor = getNeighbor(i);
-                Image sideOverlay = (Image)hexsideOverlay.get(
-                                            new Character(op));
+
+                int firstVertex = i;
+                int secondVertex = (i + 1) % 6;
+                Rectangle neighborBound = neighbor.getBounds();
+                int dx1 = 0, dx2 = 0, dy1 = 0, dy2 = 0;
+
+                final float xm, ym;
+                float xi, yi;
+                xm = (float)neighbor.findCenter2D().x;
+                ym = (float)neighbor.findCenter2D().y;
+                xi = (float)neighbor.xVertex[5] - xm;
+                yi = (float)neighbor.yVertex[0] - ym;
+                xi *= 1.2; //1.14814814814814814814;
+                yi *= 1.2; //1.17021276595744680851;
+                xi += xm;
+                yi += ym;
+                dx1 = (int)xi;
+                dy1 = (int)yi;
+                xi = (float)neighbor.xVertex[2] - xm;
+                yi = (float)neighbor.yVertex[3] - ym;
+                xi *= 1.2; //1.14814814814814814814;
+                yi *= 1.2; //1.17021276595744680851;
+                xi += xm;
+                yi += ym;
+                dx2 = (int)xi;
+                dy2 = (int)yi;
+
+                Image sideOverlay = loadOneOverlay(neighbor.getHexsideName((i +
+                                3) %
+                        6),
+                        dx2 - dx1, dy2 - dy1);
+
                 if (sideOverlay != null)
                 {
-                    int firstVertex = i;
-                    int secondVertex = (i + 1) % 6;
-                    int sx1 = 0, sx2 = 0, sy1 = 0, sy2 = 0;
-                    Rectangle neighborBound = neighbor.getBounds();
-                    int dx1 = 0, dx2 = 0, dy1 = 0, dy2 = 0;
-                    int sourceWidth, sourceHeight;
-                    sourceWidth = sideOverlay.getWidth(map);
-                    sourceHeight = sideOverlay.getHeight(map);
-
-                    sx1 = 0;
-                    sy1 = 0;
-                    sx2 = sideOverlay.getWidth(map);
-                    sy2 = sideOverlay.getHeight(map);
-                    float xm,ym;
-                    float xi,yi;
-                    xm = (float)neighbor.findCenter2D().x;
-                    ym = (float)neighbor.findCenter2D().y;
-                    xi = (float)neighbor.xVertex[5] - xm;
-                    yi = (float)neighbor.yVertex[0] - ym;
-                    xi *= 1.2; //1.14814814814814814814;
-                    yi *= 1.2; //1.17021276595744680851;
-                    xi += xm;
-                    yi += ym;
-                    dx1 = (int)xi;
-                    dy1 = (int)yi;
-                    xi = (float)neighbor.xVertex[2] - xm;
-                    yi = (float)neighbor.yVertex[3] - ym;
-                    xi *= 1.2; //1.14814814814814814814;
-                    yi *= 1.2; //1.17021276595744680851;
-                    xi += xm;
-                    yi += ym;
-                    dx2 = (int)xi;
-                    dy2 = (int)yi;
-                    
                     g.drawImage(sideOverlay,
-                                dx1, dy1, dx2, dy2,
-                                sx1, sy1, sx2, sy2,
-                                map);
+                            dx1, dy1, dx2 - dx1, dy2 - dy1,
+                            map);
                 }
                 else
                 {
