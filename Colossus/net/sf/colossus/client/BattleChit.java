@@ -6,6 +6,7 @@ import java.awt.*;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.HTMLColor;
 
 
 /**
@@ -26,15 +27,26 @@ final class BattleChit extends Chit
     private String startingHexLabel;
     private boolean moved;
     private boolean struck;
+    private String colorName;
+    private Color color;
+    private static BasicStroke oneWide = new BasicStroke(1);
+    private BasicStroke borderStroke;
+    private Rectangle midRect;
+    private Rectangle outerRect;
+    private int scale;
 
 
     BattleChit(int scale, String id, Container container, boolean inverted,
-        int tag, String currentHexLabel)
+        int tag, String currentHexLabel, String colorName)
     {
         super(scale, id, container, inverted);
+        this.scale = scale;
         this.tag = tag;
         this.currentHexLabel = currentHexLabel;
+        this.colorName = colorName;
+        color = HTMLColor.stringToColor(colorName + "Colossus");
         setBackground(Color.white);
+        borderStroke = new BasicStroke(scale / 7);
     }
 
 
@@ -109,6 +121,7 @@ final class BattleChit extends Chit
         this.moved = moved;
     }
 
+
     boolean hasStruck()
     {
         return struck;
@@ -134,11 +147,11 @@ final class BattleChit extends Chit
         return getCreatureName();
     }
 
-
     boolean isTitan()
     {
         return getCreatureName().equals(Constants.titan);
     }
+
 
     int getPower()
     {
@@ -179,46 +192,82 @@ final class BattleChit extends Chit
     {
         super.paintComponent(g);
 
+        Graphics2D g2 = (Graphics2D)g;
+
         if (hits > 0 && !isDead())
         {
             String hitString = Integer.toString(hits);
-            Rectangle rect = getBounds();
             FontMetrics fontMetrics;
 
             // Construct a font twice the size of the current font.
             if (font == null)
             {
-                oldFont = g.getFont();
+                oldFont = g2.getFont();
                 String name = oldFont.getName();
                 int size = oldFont.getSize();
                 int style = oldFont.getStyle();
                 font = new Font(name, style, 2 * size);
-                g.setFont(font);
-                fontMetrics = g.getFontMetrics();
+                g2.setFont(font);
+                fontMetrics = g2.getFontMetrics();
                 fontHeight = 4 * fontMetrics.getAscent() / 5;
             }
             else
             {
-                g.setFont(font);
-                fontMetrics = g.getFontMetrics();
+                g2.setFont(font);
+                fontMetrics = g2.getFontMetrics();
             }
             int fontWidth = fontMetrics.stringWidth(hitString);
 
             // Provide a high-contrast background for the number.
-            g.setColor(Color.white);
-            g.fillRect(rect.x + (rect.width - fontWidth) / 2,
+            g2.setColor(Color.white);
+            g2.fillRect(rect.x + (rect.width - fontWidth) / 2,
                 rect.y + (rect.height - fontHeight) / 2,
                 fontWidth, fontHeight);
 
             // Show number of hits taken in red.
-            g.setColor(Color.red);
-            g.drawString(hitString, rect.x + (rect.width - fontWidth) / 2,
+            g2.setColor(Color.red);
+            g2.drawString(hitString, rect.x + (rect.width - fontWidth) / 2,
                 rect.y + (rect.height + fontHeight) / 2);
 
             // Restore the font.
-            g.setFont(oldFont);
+            g2.setFont(oldFont);
+
         }
+        // Draw border using player color.
+        g2.setColor(color);
+        g2.setStroke(borderStroke);
+        g2.drawRect(midRect.x, midRect.y, midRect.width, midRect.height);
+        g2.setColor(Color.black);
+        g2.setStroke(oneWide);
+        g2.drawRect(outerRect.x, outerRect.y, outerRect.width, 
+            outerRect.height);
     }
+
+    public void setLocation(Point point)
+    {
+        outerRect.setLocation(point);
+        setBounds(outerRect);
+    }
+
+    public boolean contains(Point point)
+    {
+        return outerRect.contains(point);
+    }
+
+    public Rectangle getBounds()
+    {
+        return outerRect;
+    }
+
+    public void setBounds(Rectangle outerRect)
+    {
+        this.outerRect = outerRect;
+        rect = new Rectangle(outerRect.x + scale / 8, outerRect.y + scale / 8, 
+            outerRect.width - scale / 4, outerRect.height - scale / 4);
+        midRect = new Rectangle(rect.x - scale / 16, rect.y - scale / 16, 
+            rect.width + scale / 8, rect.height + scale / 8);
+    }
+
 
     public String getDescription()
     {

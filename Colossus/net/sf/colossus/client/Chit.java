@@ -25,7 +25,7 @@ class Chit extends JPanel
 {
     private ImageIcon icon;
     private ImageIcon invertedIcon;
-    private Rectangle rect;
+    Rectangle rect;
     private Container container;
 
     /** Flag to mark chit as dead and paint it with an "X" through it. */

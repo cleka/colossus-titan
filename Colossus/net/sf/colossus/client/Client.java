@@ -1234,8 +1234,17 @@ public final class Client implements IClient
                 imageName = getTitanBasename(attackerMarkerId);
             }
         }
-        BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
-            map, inverted, tag, hexLabel);
+        String colorName;
+        if (inverted)
+        {
+            colorName = getColorByMarkerId(defenderMarkerId);
+        }
+        else
+        {
+            colorName = getColorByMarkerId(attackerMarkerId);
+        }
+        BattleChit chit = new BattleChit(5 * Scale.get(), imageName,
+            map, inverted, tag, hexLabel, colorName);
         battleChits.add(chit);
     }
 
@@ -3508,6 +3517,13 @@ Log.error("Got nak for recruit with " + markerId);
             }
         }
         return null;
+    }
+
+    String getColorByMarkerId(String markerId)
+    {
+        String playerName = getPlayerNameByMarkerId(markerId);
+        PlayerInfo info = getPlayerInfo(playerName);
+        return info.getColor();
     }
 
 
