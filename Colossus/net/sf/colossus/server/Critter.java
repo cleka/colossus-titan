@@ -791,13 +791,16 @@ final class Critter /* extends Creature */ implements Comparable
 
         // Roll the dice.
         int damage = 0;
+        // Check if we roll or if we don't
+        boolean randomized =
+           !(game.getOption(net.sf.colossus.util.Options.nonRandomBattleDice));
 
         java.util.List rolls = new ArrayList();
         StringBuffer rollString = new StringBuffer(36);
 
         for (int i = 0; i < dice; i++)
         {
-            int roll = Dice.rollDie();
+            int roll = (randomized ? Dice.rollDie() : Dice.rollDieNonRandom());
             rolls.add("" + roll);
             rollString.append(roll);
 

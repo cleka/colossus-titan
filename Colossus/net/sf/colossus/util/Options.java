@@ -41,7 +41,7 @@ public final class Options
     // more rules options
     public static final String cumulativeSlow = "Slowing is cumulative";
     public static final String oneHexAllowed = "Always allows one hex";
-    
+    public static final String nonRandomBattleDice = "Use non-random battle dice";
 
     // Will add player numbers 0-5 to the end of these.
     public static final String playerName = "Player name ";

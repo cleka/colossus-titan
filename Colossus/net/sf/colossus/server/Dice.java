@@ -24,4 +24,15 @@ public final class Dice
     {
         return random.nextInt(size) + 1;
     }
+
+
+    private static int[] basicSequence = {4,3,1,6,5,2};
+    private static int seqNum = -1;
+    
+    /* this one return from a fixed sequence, instead of a random value */
+    public static int rollDieNonRandom()
+    {
+        seqNum = (seqNum + 1) % basicSequence.length;
+        return (basicSequence[seqNum]);
+    }
 }
