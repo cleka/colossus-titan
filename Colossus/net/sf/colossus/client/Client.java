@@ -1038,9 +1038,11 @@ Log.debug("called Client.acquireAngelCallback()");
         }
         else
         {
+        /* TODO Finish
             negotiate = new Negotiate(this, attackerLongMarkerName, 
                 defenderLongMarkerName, attackerId, defenderId,
                 attackerImageNames, defenderImageNames, hexLabel);
+        */
         }
     }
 

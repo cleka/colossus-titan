@@ -135,3 +135,9 @@ Bug: Angel acquiring is broken.  Default variant.
      Legion Rd01 (Cross) in Tower hex 300 recruits Warlock with 1 Titan
      Legion Rd03 (Fist) in Marsh hex 112 recruits Troll with 2 Ogres
      Legion Rd02 (Eagle) in Tower hex 200 recruits Centaur with 1 Angel
+
+Bug: Entering AI player left troll offboard.  (Had to -- no room.)  It
+     was shown in the entrance for the rest of the battle, without an X.
+     Points were given for it, correctly.  But no log message showing
+     it being swept.
+

@@ -68,6 +68,8 @@ public final class MasterBoard extends JPanel
     public static final String quitGame = "Quit game";
     public static final String saveOptions = "Save options";
 
+    public static final String clearRecruitChits = "Clear recruit chits";
+
     public static final String undoLast = "Undo";
     public static final String undoAll = "Undo All";
     public static final String doneWithPhase = "Done";
@@ -76,7 +78,7 @@ public final class MasterBoard extends JPanel
     public static final String concedeBattle = "Concede battle";
     public static final String withdrawFromGame = "Withdraw from Game";
 
-    public static final String viewRecruitInfo = "View Recruit Info";
+    public static final String viewRecruitInfo = "View Full Recruit Tree";
     public static final String viewBattleMap = "View Battle Map";
     public static final String changeScale = "Change Scale";
     public static final String changeAIDelay = "Change AI Delay";
@@ -89,6 +91,8 @@ public final class MasterBoard extends JPanel
     private AbstractAction saveGameAsAction;
     private AbstractAction quitGameAction;
     private AbstractAction saveOptionsAction;
+
+    private AbstractAction clearRecruitChitsAction;
 
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
@@ -155,6 +159,14 @@ public final class MasterBoard extends JPanel
 
     private void setupActions()
     {
+        clearRecruitChitsAction = new AbstractAction(clearRecruitChits)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                client.clearRecruitChits();
+            }
+        };
+
         undoLastAction = new AbstractAction(undoLast)
         {
             public void actionPerformed(ActionEvent e)
@@ -1069,6 +1081,12 @@ public final class MasterBoard extends JPanel
         {
             JMenuItem mi;
     
+            mi = phaseMenu.add(clearRecruitChitsAction);
+            mi.setMnemonic(KeyEvent.VK_SPACE);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
+
+            phaseMenu.addSeparator();
+
             mi = phaseMenu.add(undoLastAction);
             mi.setMnemonic(KeyEvent.VK_U);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
@@ -1106,6 +1124,12 @@ public final class MasterBoard extends JPanel
         if (client.getPlayerName().equals(activePlayerName))
         {
             JMenuItem mi;
+
+            mi = phaseMenu.add(clearRecruitChitsAction);
+            mi.setMnemonic(KeyEvent.VK_SPACE);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
+
+            phaseMenu.addSeparator();
     
             mi = phaseMenu.add(undoLastAction);
             mi.setMnemonic(KeyEvent.VK_U);
@@ -1153,6 +1177,12 @@ public final class MasterBoard extends JPanel
         {
             JMenuItem mi;
 
+            mi = phaseMenu.add(clearRecruitChitsAction);
+            mi.setMnemonic(KeyEvent.VK_SPACE);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
+
+            phaseMenu.addSeparator();
+
             mi = phaseMenu.add(doneWithPhaseAction);
             mi.setMnemonic(KeyEvent.VK_D);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
@@ -1183,6 +1213,12 @@ public final class MasterBoard extends JPanel
         {
             JMenuItem mi;
     
+            mi = phaseMenu.add(clearRecruitChitsAction);
+            mi.setMnemonic(KeyEvent.VK_SPACE);
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
+
+            phaseMenu.addSeparator();
+
             mi = phaseMenu.add(undoLastAction);
             mi.setMnemonic(KeyEvent.VK_U);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
