@@ -47,6 +47,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
         {
             setLocation(location);
         }
+        update();
         setVisible(true);
     }
 
