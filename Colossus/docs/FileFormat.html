@@ -1,0 +1,785 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+    <title>The Colossus Files Formats</title>
+    <!-- $Id$ -->
+  </head>
+
+  <body>
+    <h1 align="center">The Colossus Files Formats</h1>
+
+    <div class="p">
+      <h3 align="center">Romain Dolbeau</h3>
+    </div>
+
+    <div class="p">
+      <h2>Introduction</h2>
+    </div>
+
+    <div class="p">
+      This file document file formats for the various datafile used by
+      Colossus. In all these files, comments start with a "#" and
+      extend to the end-of-line.
+    </div>
+
+    <div class="p">
+      All files, and the two subdirectory "Battlelands" and
+      "images" should be in the same directory. Default files live in
+      "Default", "Default/images" and
+      "Default/Battelands".
+    </div>
+
+    <div class="p">
+      <h2><a id="tth_sEc1" name="tth_sEc1">1</a> The <tt>README</tt> file</h2>
+    </div>
+
+    <div class="p">
+      This file describe the variant. It can be either a pure text file or a
+      HTML file. It must be named README, README.txt (both should be pure text)
+      or README.html (should be HTML) and live in the same directory as the
+      <tt>VAR</tt> file (see below, section ). It&#39;s displayed in the
+      opening dialog.
+    </div>
+
+    <div class="p">
+      <h2><a id="tth_sEc2" name="tth_sEc2">2</a> <tt>MAP</tt> file format
+      (default file used: "Default/Default.map")</h2>
+    </div>
+
+    <div class="p">
+      This file defines the Colossus Masterboard ; what terrain type to use for
+      an hex and what sort of exit to which hex. It&#39;s composed first of a
+      pair of integer represanting the map size (horizontaly then vertically),
+      and then of a succession of line:
+    </div>
+
+    <div class="p">
+      &lt;case_label&gt; &lt;terrain_name&gt; &lt;exit_1_label&gt;
+      &lt;exit_1_type&gt; &lt;exit_2_label&gt; &lt;exit_2_type&gt;
+      &lt;exit_3_label&gt; &lt;exit_3_type&gt; &lt;X_pos&gt; &lt;Y_pos&gt;
+    </div>
+
+    <div class="p">
+      All of those should be on one line.
+    </div>
+
+    <div class="p">
+      <ul>
+        <li>&lt;case_label&gt; is the numeric label of the Hex.</li>
+
+        <li>&lt;terrain_name&gt; is the name of the terrain type of the hex
+        (same as in the <tt>TER</tt> file).</li>
+
+        <li>&lt;exit_N_label&gt; are numeric labels for exits 1-3, or 0 for no
+        (second, third) exit.</li>
+
+        <li>&lt;exit_N_type&gt; is the type of exits (<tt>ARROW</tt>,
+        <tt>ARROWS</tt>, <tt>ARCH</tt>, <tt>BLOCK</tt>) ; for exit of label
+        &#39;0&#39; (no exit) any of the four value can be used, as exit type
+        is irrelevant.</li>
+
+        <li>&lt;X_pos&gt; and &lt;Y_pos&gt; is the position X, of the Hex on
+        the masterboard. They both start from &#39;zero&#39;, on the first line
+        and first column. Not all lines are different (i.e. on the default
+        master board, case 126 and 125 are on the same line number 0 and on
+        columns 4 and 3).</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      NOTE: Put at least MAXPLAYERS (see below the VAR file, section ) towers
+      currently, as having less Towers than players is going to cause problems.
+      The upper number is not constrained (or isn&#39;t supposed to be), and
+      neither are the labels. For readability reasons, it&#39;s probably better
+      to use 100 to 900 as the labels for the first 9 towers.
+    </div>
+
+    <div class="p">
+      WARNING: The way the Hex are displayed (pointy part upside or downside)
+      depend on the parity of the X+Y sum. It is possible to create a perfectly
+      legit <tt>MAP</tt> where all the Hex are upside-down ! Should this
+      happen, the only way to fix this &#39;feature&#39; currently, is to move
+      everything one column right <em>or</em> one row down, i.e., force the
+      reversal of the parity. Sorry about that, the problem hasn&#39;t yet been
+      solved.
+    </div>
+
+    <div class="p">
+      <h2><a id="tth_sEc3" name="tth_sEc3">3</a> <tt>TER</tt> file format
+      (default file used: "Default/Default.ter")</h2>
+      <a id="TER" name="TER"></a>
+    </div>
+
+    <div class="p">
+      This file define the Colossus Recruit Trees ; what can recruit and be
+      recruited on what terrain. it&#39;s composed of a succession of line of
+      four different kind. The first two are mandatory (at least one of each
+      should appear), the other two are optional (default values are supplied).
+    </div>
+
+    <div class="p">
+      <h4>The first kind is:</h4>
+    </div>
+
+    <div class="p">
+      &lt;terrain_color&gt; &lt;terrain_name&gt; &lt;regular_recruit&gt; (
+      &lt;recruiter_needed&gt; &lt;recruit&gt;)+ &lt;terrain_display_name
+     &gt;?
+    </div>
+
+    <div class="p">
+      <ul>
+        <li>&lt;terrain_color&gt; is the color used to display this terrain
+        type, see <tt>HTMLC</tt>olor.java for the various available color.</li>
+
+        <li>&lt;terrain_name&gt; is the descriptive name of the terrain
+        (Brush, ...) ; it is used also as the Battlelands file name. If
+        &lt;terrain_display_name&gt; is not present, it is also used as the
+        display name. Must be unique.</li>
+
+        <li>&lt;regular_recruit&gt;&gt; is a boolean (i.e. true or false)
+        telling if a Creature can recruit below or above its rank (usually true
+        except for Tower).</li>
+
+        <li>&lt;recruiter_needed&gt; is the number of lower-rank creature
+        needed to recruit the next creature.</li>
+
+        <li>&lt;recruit&gt; is the name of the recruit creature (Gargoyle,
+        ...)</li>
+
+        <li>&lt;terrain_display_name&gt; is an optional string, used to
+        display the name of the terrain on the MasterBoard, and as the name of
+        the overlay file (see section "Images files" below). If
+        absent, &lt;terrain_name&gt; is used instead.</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      The last two as a pair can be repeated any number of time. Any later
+      creature can recruit a previous one or itself. A creature can recruit the
+      next one only if they are numerous enough, as indicated by the
+      &lt;recruiter_needed&gt; <em>of the recruit</em>.
+    </div>
+
+    <div class="p">
+      Three specials names exist (pseudo-creature): 
+
+      <ul>
+        <li><tt>Anything</tt>, which means any creature can recruit the
+        following creature provided they are numerous enough</li>
+
+        <li><tt>AnyNonLord</tt> which is the same but excludes Immortal (Lord
+        or DemiLord) from the possible recruiters</li>
+
+        <li><tt>Lord</tt> which means a Lord (Angel, Titan, Archangel, etc.,
+        but not a Demilord) can recruit the following creature.</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      Note that for <tt>Lord</tt> and <tt>Titan</tt>, only one recruiter is
+      needed, and the number before the recruits indicate how many of the
+      creatures <em>before</em> Lord or Titan are needed.
+    </div>
+
+    <div class="p">
+      When &lt;recruiter_needed&gt; is 0 (zero), then the creature can be
+      recruited, but the recruiter will remain anonymous. This is useful only
+      if the recruiter is <tt>Anything</tt> or <tt>AnyNonLord</tt>, of course.
+      Don&#39;t use with a regular recruiter.
+    </div>
+
+    <div class="p">
+      When &lt;recruiter_needed&gt; is -1 (minus one), then the creature can
+      recruit, but cannot be recruited. Such creature, and the pseudo-creature
+      above, are ignored for the purpose of normal recruitements. If you put
+      <tt>Titan</tt> as a recruiter, it should <em>always</em> be -1, as beeing
+      able to recruit Titan is going to cause lots of trouble.
+    </div>
+
+    <div class="p">
+      Exemple: if you use <tt>0 Anything 3 ogre 0 Titan 2 Gargoyle</tt>, you
+      will be able to recruit an Ogre with any 3 creatures or with a Gargoyle,
+      and you will be able to recruits a gargoyle with two Ogres or the Titan.
+      You won&#39;t be able to recruit <tt>Anything</tt> or <tt>Titan</tt>, of
+      course.
+    </div>
+
+    <div class="p">
+      Any line that will be used as a Tower (See Battlelands below) should
+      follow these rules: There should always be at least 3 regular creatures,
+      recruitable with zero of Anything, at the beggining. The line should be
+      marked as "non-regular" recruitments. The 3 creatures will be
+      used as starting creatures for the Player starting in that kind of Tower.
+    </div>
+
+    <div class="p">
+      Both &lt;terrain_name&gt; and &lt;terrain_display_name&gt; can be
+      either purely alphabetical, or alphanumerical plus spaces between
+      doublequotes ""&#39;. If a filename is involved, all spaces
+      will be replaced by underscores "_".
+    </div>
+
+    <div class="p">
+      <h4>The second kind is:</h4>
+    </div>
+
+    <div class="p">
+      <tt>ACQUIRABLE</tt> &lt;point_value&gt; &lt;acquirable_name&gt; ((
+      &lt;terrain_name&gt;,)* &lt;terrain_name&gt;)?
+    </div>
+
+    <div class="p">
+      <tt>ACQUIRABLE</tt> is the literal string <tt>ACQUIRABLE</tt>
+    </div>
+
+    <div class="p">
+      <ul>
+        <li>&lt;point_value&gt; is the amount of points needed to recruit the
+        Acquirable</li>
+
+        <li>&lt;acquirable_name&gt; is the name of the Creature to consider as
+        an Acquirable</li>
+
+        <li>&lt;terrain_name&gt; is an (optional) comma-separated list of
+        terrain name (see above) that restrict the availability of the
+        Acquirable. If the list is ommited, the Acquirable can be recruited
+        everywhere.</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      Note that all &lt;point_value&gt; must be even multiple of the first
+      &lt;point_value&gt; ; other values are erroneous and will be flagged as
+      such. Also, the first acquirable creature should be a Lord, and is
+      recruited in the starting stack (it&#39;s the &#39;primary&#39;
+      acquirable creature).
+    </div>
+
+    <div class="p">
+      Multiple line can be present, in which case, the behavior is the same as
+      if all the Acquirable where on one line. Order of Acquirable is not
+      important, except for the first one, which defines the reference for
+      &lt;point_value&gt; and the primary acquirable creature.
+    </div>
+
+    <div class="p">
+      <h4>The third kind is:</h4>
+    </div>
+
+    <div class="p">
+      <tt>TITANIMPROVE &lt;point_value&gt;</tt>
+    </div>
+
+    <div class="p">
+      To give the amount of points required for the Titan to improve by one.
+      Said differently, Titan power is equal to 6 + ( &lt;player_points&gt; /
+      &lt;above_value&gt;). The default supplied value is 100.
+    </div>
+
+    <div class="p">
+      <h4>The fourth kind is:</h4>
+    </div>
+
+    <div class="p">
+      <tt>TITANTELEPORT &lt;point_value&gt;</tt>
+    </div>
+
+    <div class="p">
+      To give the amount of points required for the Titan to be able to Titan
+      Teleport. The default supplied value is 400.
+    </div>
+
+    <div class="p">
+      <h2><a id="tth_sEc4" name="tth_sEc4">4</a> <tt>CRE</tt> file format
+      (default file used: "Default/Default.cre")</h2>
+      <a id="CRE" name="CRE"></a>
+    </div>
+
+    <div class="p">
+      This file define the Colossus Creatures ; it&#39;s composed of a
+      succession of lines:
+    </div>
+
+    <div class="p">
+      <tt>&lt;name&gt; &lt;power&gt; &lt;skill&gt; &lt;rangestrikes&gt;
+      &lt;flies&gt; &lt;nativeBramble&gt; &lt;nativeDrift&gt; &lt;nativeBog
+     &gt; &lt;nativeSandDune&gt; &lt;nativeSlope&gt; &lt;nativeVolcano&gt;
+      &lt;nativeRiver&gt; &lt;nativeStone&gt; &lt;nativeTree&gt;
+      &lt;waterDwelling&gt; &lt;magicMissile&gt; &lt;summonable&gt; &lt;lord
+     &gt; &lt;demilord&gt; &lt;maxCount&gt; &lt;pluralName&gt; (
+      &lt;baseColorName&gt;)?</tt>
+    </div>
+
+    <div class="p">
+      all on one line.
+    </div>
+
+    <div class="p">
+      <ul>
+        <li>&lt;name&gt; is the display name of the creature</li>
+
+        <li>&lt;power&gt; and &lt;skill&gt; are the numeric value of power
+        and skill respectively.</li>
+
+        <li>&lt;rangestrikes&gt; &lt;and flies&gt; are boolean values
+        (&#39;true&#39; or &#39;false&#39;), defining if the creature can
+        rangestrike or fly respectively.</li>
+
+        <li>&lt;nativeXXX&gt; are boolean values defining if the creature is
+        native for terrain type XXX.</li>
+
+        <li>&lt;waterDwelling&gt; is a boolean value defining if the creature
+        can live in water (i.e., Bog or Lake). Water Dweller don&#39;t like
+        being dry, and as such take damage in Sand as other Creatures do in
+        Drift.</li>
+
+        <li>&lt;magicMissile&gt; is a boolean value defining if the creature
+        use magic missile, i.e. it can fires through anything (foe, obstacle,
+        ...) toward anyone (including lord).</li>
+
+        <li>&lt;summonable&gt; is a boolean value defining if the creature can
+        be summoned in a fight.</li>
+
+        <li>&lt;lord&gt; and &lt;demilord&gt; are boolean values, defining if
+        the creature is a lord or a demilord (mutually exclusive).</li>
+
+        <li>&lt;maxCount&gt; is the max number of creature in the caretaker
+        stack.</li>
+
+        <li>&lt;pluralName&gt; is the same as name, just plural.</li>
+
+        <li>&lt;baseColorName&gt; (optional) is the name of the color to use
+        for the name, power and skill value of the creature (when displayed on
+        screen). This name (is used to determine which overlay to use for
+        name/power/skill, or which color to use for drawing them (black is the
+        default in this case). If this field is not present, then <em>no</em>
+        overlay are used: Colossus will assume a simgle image is enough to
+        supply all informations.</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      Both &lt;name&gt; and &lt;pluralName&gt; can be either purely
+      alphabetical, or alphanumerical plus spaces between doublequotes
+      ""&#39;. If a filename is involved, all spaces will be replaced
+      by underscores "_".
+    </div>
+
+    <div class="p">
+      <h2><a id="tth_sEc5" name="tth_sEc5">5</a> Battleland file format (files
+      used: by terrain name under "Battlelands")</h2>
+      <a id="BATTLELANDS" name="BATTLELANDS"></a>
+    </div>
+
+    <div class="p">
+      These files define the Colossus Battlelands. they&#39;re composed of a
+      succession of lines:
+    </div>
+
+    <div class="p">
+      <tt>&lt;X_pos&gt; &lt;Y_pos&gt; &lt;terrain_name&gt;
+      &lt;terrain_elevation&gt; ( &lt;border_number&gt; &lt;border_type
+     &gt;)*</tt>
+    </div>
+
+    <div class="p">
+      all on one line.
+    </div>
+
+    <div class="p">
+      Any cas not mentioned in this file is assumed to be of type &#39;p&#39;,
+      at elevation &#39;0&#39;, and no border.
+    </div>
+
+    <div class="p">
+      <ul>
+        <li>&lt;X_pos&gt; and &lt;Y_pos&gt; are the X and Y position of the
+        modified case.</li>
+
+        <li>&lt;terrain_name&gt; is the terrain type of the case ; it&#39;s
+        currently one of: Plains, Brambles, Sand, Tree, Bog, Volcano, Drift,
+        Tower, Lake, Stone. Case is significant here.</li>
+
+        <li>&lt;terrain_elevation&gt; is the altitude of the terrain (between
+        0 and 2)</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      finally. between 0 and 6 pair of the form &lt;border_number&gt;
+      &lt;border_type&gt;, where &lt;border_number&gt; is between 0 and 5 and
+      &lt;bordet_type&gt; is currently one of: d, c, s, w, r (Dune, Cliff,
+      Slope, Wall, River).
+    </div>
+
+    <div class="p">
+      Lake, Stone and River are non-standard hazards:
+    </div>
+
+    <div class="p">
+      <ul>
+        <li>Lake is impassable except by Water Dweller, and has no other
+        effect.</li>
+
+        <li>Stone is impassable except by Stone Native, block rangestrike, and
+        doesn&#39;t allow flying through (or over). A non-native attacking a
+        Stone Native in a Stone loose one skill (both hand-to-hand and
+        rangestrike).</li>
+
+        <li>River slows non-River Native non-Water Dweller crossing it.</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      Also, non-Tree Native attacking a Tree Native in a Tree lose one skill
+      (but not rangestriker).
+    </div>
+
+    <div class="p">
+      NOTE: Theres&#39; a graphical tools, "", designed to allow easy
+      creations of Battlelands. It doesn&#39;t handle Startlist yet (see
+      below).
+    </div>
+
+    <div class="p">
+      One more line exist ; the startlist. It&#39;s a single line containing
+      first the word <tt>STARTLIST</tt>, then a space-separated list of hex
+      label (one letter followed by one digit, displayed in each hexagon of the
+      Battleland). This is where the Defender will enter the terrain. For
+      instance, in the usual Titan Tower, the line used is:
+    </div>
+
+    <div class="p">
+      <tt>STARTLIST D4 C4 E4 D3 C3 E3 D5</tt>
+    </div>
+
+    <div class="p">
+      Also, the line imply the Attacker will enter by the bottom side. This is
+      usually used for Tower, but can be used for other terrain as well.
+    </div>
+
+    <div class="p">
+      Towers are denoted by the keyword <tt>TOWER</tt> by itself on a line. The
+      terrain is then considered a Tower, i.e. you can Tower Teleport from it,
+      and players are allowed to start in it.
+    </div>
+
+    <div class="p">
+      <h2><a id="tth_sEc6" name="tth_sEc6">6</a> <tt>HINT</tt> file format
+      (default file used: "Default/Default.hin")</h2>
+    </div>
+
+    <div class="p">
+      This file lists some hints to the Colossus AI on how to play the game.
+    </div>
+
+    <div class="p">
+      The file is cut off into sections, each specifying behavior for one kind
+      of AI. Any hints appearing before a section name is assumed to belong to
+      section "AllAI:". A section name is a name ending in
+      "AI:" ; known values are "AllAI:",
+      "OffensiveAI:" and "DefensiveAI:". Any section name
+      can be used, but if none of the AI is aware of a section, it won&#39;t be
+      used. All AI will used hints from section "AllAI" as a last
+      resort, after trying zero, one or more other section(s). Note that some
+      AIs may ignore hints entirely, and some may decide to change the used
+      sections in the middle of the game :-) A hint belongs to the last section
+      whose name appears before the hint.
+    </div>
+
+    <div class="p">
+      Each hint is a line of one of the forms:
+    </div>
+
+    <div class="p">
+      <tt>RECRUIT &lt;terrain_name&gt; &lt;recruiter_name&gt;
+      &lt;recruiter_number&gt; &lt;recruitee_name&gt; &lt;optional_condition
+     &gt;</tt>
+    </div>
+
+    <div class="p">
+      <tt>INITIALSPLIT &lt;hex_label&gt; &lt;decimal_value&gt; &quot;(&quot;
+      &lt;split_creature_name&gt; * &quot;)&quot; *</tt>
+    </div>
+
+    <div class="p">
+      <tt>RECRUITVALUE</tt> &lt;creature_name&gt; &lt;value_offset&gt;
+    </div>
+
+    <div class="p">
+      where for <tt>RECRUIT</tt>:
+    </div>
+
+    <div class="p">
+      <ul>
+        <li>&lt;terrain_name&gt; is the name of the terrain</li>
+
+        <li>&lt;recruiter_name&gt; is the name of the recruiting creature</li>
+
+        <li>&lt;recruiter_number&gt; is the number of recruiting creature</li>
+
+        <li>&lt;recruitee_name&gt; is the name of the suggested recruited
+        creature</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      and &lt;optional_condition&gt; is an optional condition builded with the
+      following &lt;condition_node&gt;:
+    </div>
+
+    <div class="p">
+      <ul>
+        <li><tt>( &lt;condition_node&gt; AND &lt;condition_node&gt; )</tt> :
+        both condition must be true.</li>
+
+        <li><tt>( &lt;condition_node&gt; OR &lt;condition_node&gt; )</tt> :
+        one condition at least must be true.</li>
+
+        <li><tt>( NOT &lt;condition_node&gt;)</tt> : the condition must be
+        false.</li>
+
+        <li><tt>( CANREACH &lt;terrain_name&gt; )</tt> : The recruiting stack
+        can reach at least one terrain of type &lt;terrain_name&gt; in the
+        next turn.</li>
+
+        <li><tt>( HASCREATURE &lt;creature_name&gt; )</tt> : The stack already
+        has one creature by the name of &lt;creature_name&gt;.</li>
+
+        <li><tt>( OTHERSTACKHASCREATURE &lt;creature_name&gt;+ )</tt> : A
+        different stack from the same player already has at least one of each
+        creature in the list of &lt;creature_name&gt;.</li>
+
+        <li><tt>( RANDOM &lt;decimal_value&gt; )</tt> : True (100 *
+        &lt;decimal_value&gt;) % of the time ( &lt;decimal_value&gt; must be
+        between 0.0 and 1.0).</li>
+
+        <li><tt>( &lt;number&gt; &lt;creature_name&gt; AVAILABLE )</tt> : At
+        least &lt;number&gt; of the creature &lt;creature_name&gt; are
+        available in the caretaker&#39;s stack.</li>
+
+        <li><tt>( CANRECRUIT &lt;creature_name&gt; )</tt> : The stack can also
+        recruit the creature &lt;creature_name&gt;.</li>
+
+        <li><tt>( HEIGHTIS &lt;number&gt; )</tt> : The stack is exactly
+        &lt;number&gt; in height.</li>
+
+        <li><tt>( LABELIS &lt;hex_label&gt; )</tt> : The stack is in hex
+        &lt;hex_label&gt;.</li>
+
+        <li><tt>( ALLATTACKERSMALLERTHAN &lt;number&gt; )</tt> : The stack
+        cannot by attacked by a stack more (strictly) than &lt;number&gt; in
+        height. A value of 0 means that no enemy stack can attack.</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      If the recruitee&#39;s name is "nothing" or
+      "Nothing", then the hint suggest not recruiting there.
+    </div>
+
+    <div class="p">
+      where for <tt>INITIALSPLIT</tt>:
+    </div>
+
+    <div class="p">
+      <ul>
+        <li>&lt;hex_label&gt; is the label of the Tower where the split occurs
+        (should be quoted in double quote \&quot;, as most label are
+        numbers).</li>
+
+        <li>&lt;decimal_value&gt; is the probability (between 0.0 and 1.0) of
+        this split to occurs.</li>
+
+        <li>&lt;split_creature_name&gt; is the name of one splitted
+        creature.</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      At the moment, there should be exactly two lists of exactly four
+      creatures in the hint. The 8 creatures should be exactly one Titan, one
+      Angel (those two in different stacks), and 2 of each of the three
+      starting creatures of the Tower.
+    </div>
+
+    <div class="p">
+      Each split for a given Tower is checked in order, and the first to pass
+      the test is used, so the last one for each Tower should always use
+      "1.0" as the probability.
+    </div>
+
+    <div class="p">
+      where for <tt>RECRUITVALUE</tt>
+    </div>
+
+    <div class="p">
+      The &lt;creature_name&gt; is the name of the affected creature, and the
+      &lt;value_offset&gt; is how many points to add/retire to the normal
+      value. This only affect the AI estimation of the recruitment value of the
+      crature: a creature with a big positive value will be recruited before
+      anything else, a creature with a big negative value will be recruited
+      after anything else.
+    </div>
+
+    <div class="p">
+      <h2><a id="tth_sEc7" name="tth_sEc7">7</a> <tt>VAR</tt> file format
+      (default file used: "Default/Default.var")</h2>
+      <a id="VAR" name="VAR"></a>
+    </div>
+
+    <div class="p">
+      This file contains a variant definition, i.e. which <tt>MAP</tt>,
+      <tt>CRE</tt> and <tt>TER</tt> file should be used and other informations
+      such as which other variants are required.
+    </div>
+
+    <div class="p">
+      Six different lines can exist, in any number and order (only the last one
+      of each type is used):
+    </div>
+
+    <div class="p">
+      <tt>CRE</tt>: &lt;cre_filename&gt;
+    </div>
+
+    <div class="p">
+      <tt>MAP</tt>: &lt;map_filename&gt;
+    </div>
+
+    <div class="p">
+      <tt>TER</tt>: &lt;ter_filename&gt;
+    </div>
+
+    <div class="p">
+      <tt>HINT</tt>: &lt;comma-separated list of hint_filenames&gt;
+    </div>
+
+    <div class="p">
+      <tt>DEPEND</tt>: &lt;comma-separated list of dependecies&gt;
+    </div>
+
+    <div class="p">
+      <tt>MAXPLAYERS</tt>: &lt;max number of players&gt;
+    </div>
+
+    <div class="p">
+      <i>Note:</i> if one of the first three type is missing, the Default file
+      is implied. if <tt>DEPEND</tt> is missing, no dependencies are implied.
+      In all case, the "Default" directory is looked-up last, so
+      mentioning "Default" as a dependency is not required.
+    </div>
+
+    <div class="p">
+      <i>Note:</i> Do not use a <tt>MAXPLAYERS</tt> value higher than the
+      number of Tower in the <tt>MAP</tt> file, this will crash Colossus. If
+      <tt>MAXPLAYERS</tt> isn&#39;t specified, 6 is the default value used. If
+      <tt>MAXPLAYERS</tt> is too big for Colossus, the default maximum will be
+      used instead to avoid crashing.
+    </div>
+
+    <div class="p">
+      <i>Exemple:</i> A variant that use creatures from ExtTitan, Battlelands
+      from Badlands and a local map could be described as:
+    </div>
+
+    <div class="p">
+      <tt>CRE</tt>:ExtTitan.cre
+    </div>
+
+    <div class="p">
+      <tt>MAP</tt>:MyBadlandsExtTitan.map
+    </div>
+
+    <div class="p">
+      <tt>TER</tt>:Badlands.ter
+    </div>
+
+    <div class="p">
+      <tt>DEPEND</tt>:ExtTitan,Badlands
+    </div>
+
+    <div class="p">
+      <h2><a id="tth_sEc8" name="tth_sEc8">8</a> Images files under
+      "images"</h2>
+      <a id="images" name="images"></a>
+    </div>
+
+    <div class="p">
+      <ul>
+        <li>Chit (i.e. images representing a Creature) should be
+        non-transparent <tt>GIF</tt> file, size 60 * 60 (other size may work
+        but won&#39;t look as nice). They should be named after the Creature
+        they represent, with a ".gif" extension. If the file
+        doesn&#39;t exist, troubles may occur. Also, see below for
+        name/power/skill overlay.</li>
+
+        <li>Graphical Overlay for the Hexes on the Masterboard should be
+        transparent <tt>GIF</tt> file, of size whatever-you-want (they are
+        resized to the same size as the Hex the represent). Default supplied
+        files are 255x255. Use them as examples of what is possible to do. If
+        the file doesn&#39;t exist, the non-overlayed display is used instead
+        (i.e. name of the terrain and the label in the proper corner).</li>
+
+        <li style="list-style: none">
+          <div class="p">
+            Two version of the file should be supplied, one with and one
+            without the "_i" postfix to the name (i.e
+            &#39;MyTerrain.gif&#39; and &#39;MyTerrain_i.gif&#39;). The first
+            is used when the biggest part of the hexagon is down, the second
+            when the biggest part is up. The Display Name (see section <a
+            href="#TER">3</a> above, "<tt>TER</tt> file format") is
+            used if present, and Name is used if not.
+          </div>
+        </li>
+
+        <li>Graphical overlay for the Hexes on the Battlelands (aka Hazard)
+        should be transparent GIF file, of size 216x188 for the interior of the
+        hexes (Bog, Sand...), and size 248x220 for the hexsides (Cliff,
+        Slope...). The filename should the name of the hazard followed by
+        "_Hazard", followed by the extension ".gif" (for
+        instance "MySea_Hazard.gif"). Only one version is
+        needed.</li>
+
+        <li style="list-style: none">
+          <div class="p">
+            Other sizes <em>may</em> work (they are resized on-the-fly), and
+            odds are better if the aspect ratio is the same.
+          </div>
+        </li>
+
+        <li>Skill, Power, and the name of creature are overlay added to the
+        main Chit. If they are not available, they are created on the fly,
+        using the color specified in the creature (see above the <tt>CRE</tt>
+        file, section <a href="#CRE">4</a>). You may supply none, any or all of
+        them. Name should be respectively "Skill- &lt;skill_factor
+       &gt;.gif", "Power- &lt;power_factor&gt;.gif", and
+        " &lt;creature_name&gt;-Name.gif" for Creature which
+        don&#39;t specify a color at all, or "Skill- &lt;skill_factor&gt;-
+        &lt;color_name&gt;.gif", "Power- &lt;power_factor&gt;-
+        &lt;color_name&gt;.gif", and " &lt;creature_name&gt;-Name-
+        &lt;color_name&gt;.gif" for Creature with a color
+        specified.</li>
+      </ul>
+    </div>
+
+    <div class="p">
+      <h2><a id="tth_sEc9" name="tth_sEc9">9</a> Miscellaneous stuff</h2>
+    </div>
+
+    <div class="p">
+      A variant can customize the legion marker appearances and names. Legion
+      markers are 56x56 <tt>GIF</tt> files that lives in "images" and
+      are named with the marker short color name (see ) followed by its number
+      (between 01 and 12), i.e. the first marker of the black set is
+      <tt>Bk01.gif</tt>. The short name is mapped to a long name in the file
+      "MarkersName", a java property file. A variant can supply its
+      own "MarkersName", either fully or partially redefining the
+      marker&#39;s names (the default mapping is used for missing entries).
+    </div>
+  </body>
+</html>
+
