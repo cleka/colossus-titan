@@ -183,6 +183,23 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
+    // Clear all entry side and teleport information from all unoccupied hexes.
+    public void clearAllUnoccupiedEntrySides()
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j] && !h[i][j].isOccupied())
+                {
+                    h[i][j].clearAllEntrySides();
+                    h[i][j].clearTeleported();
+                }
+            }
+        }
+    }
+
+
     // Recursively find conventional moves from this hex.  Select
     //    all legal final destinations.  If block >= 0, go only
     //    that way.  If block == -1, use arches and arrows.  If
@@ -284,12 +301,12 @@ class MasterBoard extends JFrame implements MouseListener,
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
 
-        if (hex.getNumLegions() == 0)
+        if (!hex.isOccupied())
         {
             hex.select();
             hex.repaint();
             // Mover can choose side of entry.
-            hex.setEntrySide(-1);
+            hex.setTeleported();
         }
 
         if (roll > 0)
@@ -316,6 +333,8 @@ class MasterBoard extends JFrame implements MouseListener,
         {
             return 0;
         }
+
+        clearAllUnoccupiedEntrySides();
         
         int count = 0;
 
@@ -352,12 +371,12 @@ class MasterBoard extends JFrame implements MouseListener,
                 for (int tower = 100; tower <= 600; tower += 100)
                 {
                     hex = getHexFromLabel(tower);
-                    if (hex.getNumLegions() == 0)
+                    if (!hex.isOccupied())
                     {
                         hex.select();
                         hex.repaint();
                         // Mover can choose side of entry.
-                        hex.setEntrySide(-1);
+                        hex.setTeleported();
                     }
                 }
             }
@@ -379,7 +398,7 @@ class MasterBoard extends JFrame implements MouseListener,
                             hex.select();
                             hex.repaint();
                             // Mover can choose side of entry.
-                            hex.setEntrySide(-1);
+                            hex.setTeleported();
                         }
                     }
                 }
@@ -1262,9 +1281,45 @@ System.out.println("MasterBoard.finishSummoningAngel");
                             Legion legion = player.getSelectedLegion();
                             if (legion != null && hex.isSelected())
                             {
-                                legion.moveToHex(hex);
-                                legion.getStartingHex().repaint();
-                                hex.repaint();
+                                // Pick teleport or normal move if necessary.
+                                if (hex.teleported() && hex.canEnterViaLand())
+                                {
+                                    hex.chooseWhetherToTeleport();
+                                }
+
+                                // If this is a tower hex, set the entry side
+                                // to '3', regardless.
+                                if (hex.getTerrain() == 'T')
+                                {
+                                    hex.clearAllEntrySides();
+                                    hex.setEntrySide(3);
+                                }
+                                // If this is a teleport to a non-tower hex,
+                                // then allow entry from all three sides.
+                                else if (hex.teleported())
+                                {
+                                    hex.setEntrySide(1);
+                                    hex.setEntrySide(3);
+                                    hex.setEntrySide(5);
+                                }
+
+                                // Pick entry side if necessary.
+                                // XXX: Pick entry side only if hex is 
+                                //      occupied by an enemy legion.
+                                if (hex.getNumEntrySides() > 1)
+                                {
+                                    new PickEntrySide(this, hex);
+                                }
+
+                                // Unless the PickEntrySide was cancelled,
+                                // execute the move.
+                                if (hex.getNumEntrySides() == 1) 
+                                {
+                                    legion.moveToHex(hex);
+                                    legion.getStartingHex().repaint();
+                                    hex.repaint();
+                                }
+
                                 highlightUnmovedLegions();
                             }
                             else
@@ -1349,14 +1404,8 @@ System.out.println("summonAngel is null");
                                     // Battle
                                     if (hex.isEngagement())
                                     {
-                                        if (hex.getEntrySide() == -1)
-                                        {
-                                            // XXX: Need PickEntrySide dialog.
-System.out.println("entry side was -1; setting it to 3");
-                                            hex.setEntrySide(3);
-                                        }
-                                        map = new BattleMap(attacker, defender, 
-                                            hex, hex.getEntrySide(), this);
+                                        map = new BattleMap(this, attacker, 
+                                            defender, hex, hex.getEntrySide());
                                     }
                                 }
                             }
