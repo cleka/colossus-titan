@@ -143,6 +143,12 @@ public class BalrogRecruitment extends net.sf.colossus.server.CustomRecruitBase
                       " from " + alreadyNumber + " to " + nowNumber +
                       " (new available count is: " + newcount +")");
         }
+        else if (difference < 0)
+        {
+            Log.debug("CUSTOM: WARNING: DIMINISHING the total number of " +
+                      name + " from " + alreadyNumber + " to " + nowNumber +
+                      " (new available count is: " + newcount +")");
+        }
     }
     
     private PlayerInfo findPlayerWithStartingTower(String hexLabel)
@@ -157,5 +163,11 @@ public class BalrogRecruitment extends net.sf.colossus.server.CustomRecruitBase
                 return pi;
         }
         return null;
+    }
+
+    protected void resetInstance()
+    {
+        Log.debug("CUSTOM: resetting " + getClass().getName());
+        nameToOldScore.clear();
     }
 }

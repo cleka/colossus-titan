@@ -68,10 +68,9 @@ public final class Game
     /** Public only for JUnit test setup. */
     public Game()
     {
-        CustomRecruitBase.setCaretaker(caretaker);
-        CustomRecruitBase.setGame(this);
-    }
 
+    }
+    
     /** For Start */
     Options getOptions()
     {
@@ -130,20 +129,27 @@ public final class Game
     void newGame()
     {
         clearFlags();
+        
         turnNumber = 1;
         phase = Constants.SPLIT;
         caretaker.resetAllCounts();
         players.clear();
-
+        
         options.saveOptions();
         
         VariantSupport.loadVariant(options.getStringOption(Options.variant),
                                    true);
+        
         Log.event("Starting new game");
+        
+        CustomRecruitBase.resetAllInstances();
+        CustomRecruitBase.setCaretaker(caretaker);
+        CustomRecruitBase.setGame(this);
+        
         addPlayersFromOptions();
-
+        
         history = new History();
-
+        
         initServer();
     }
 

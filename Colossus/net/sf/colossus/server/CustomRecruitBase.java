@@ -23,16 +23,38 @@ abstract public class CustomRecruitBase
 
     public CustomRecruitBase()
     {
+        Log.debug("CUSTOM: adding " + getClass().getName());
         allCustomRecruitBase.add(this);
     }
+    
 
-    public static void reset()
+    /* full reset (change variant) */
+    synchronized public static final void reset()
     {
         allPlayerInfo.clear();
         allCaretakerInfo.clear();
         allCustomRecruitBase.clear();
+        serverGame = null;
+        serverCaretaker = null;
     }
 
+    /* partial reset (change game) */
+    synchronized public static final void resetAllInstances()
+    {
+
+        allPlayerInfo.clear();
+        allCaretakerInfo.clear();
+        serverGame = null;
+        serverCaretaker = null;
+        
+        Iterator it = allCustomRecruitBase.iterator();
+        while (it.hasNext())
+        {
+            CustomRecruitBase crb = (CustomRecruitBase)it.next();
+            crb.resetInstance();
+        }
+    }
+    
     synchronized public static final void everyoneAdvanceTurn(int newActivePlayer)
     {
         Iterator it = allCustomRecruitBase.iterator();
@@ -221,4 +243,7 @@ abstract public class CustomRecruitBase
     /** bookkeeping function, called once after every player turn.
      private as it should only be called from everyoneAdvanceTurn() */
     abstract protected void changeOfTurn(int newActivePlayer);
+
+    /** reset, called at the beginning of a game */
+    abstract protected void resetInstance();
 }
