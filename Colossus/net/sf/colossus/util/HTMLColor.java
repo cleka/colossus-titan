@@ -158,6 +158,15 @@ public final class HTMLColor
     public static final Color darkYellow = new Color(200, 200, 0);
     public static final Color lightOlive = new Color(150, 150, 0);
 
+    // The Player Colors
+    public static final Color BlackColossus = HTMLColor.black;
+    public static final Color BlueColossus = HTMLColor.blue;
+    public static final Color BrownColossus = HTMLColor.maroon;
+    public static final Color GoldColossus = HTMLColor.lightOlive;
+    public static final Color GreenColossus = HTMLColor.darkGreen;
+    public static final Color RedColossus = HTMLColor.red;
+
+
     public static Color stringToColor(String colorName)
     {
         Color theColor;

@@ -133,12 +133,9 @@ final class Critter extends Creature implements Comparable
     {
         String basename = super.getImageName();
 
-        if (isTitan() && getPower() >= 6 && getPower() <= 20)
+        if (isTitan())
         {
-            // Use Titan14.gif for a 14-power titan, etc.  Use the generic
-            // Titan.gif (with X-4) for ridiculously big titans, to avoid
-            // the need for an infinite number of images.
-            basename = basename + getPower();
+            basename = "Titan-" + getPower() + "-" + getPlayer().getColor();
         }
 
         return basename;

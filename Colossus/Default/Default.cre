@@ -1,10 +1,10 @@
 #NAME      POWER SKILL RANGE FLY BRAMBLE DRIFT BOG SANDDUN SLOPE VOLCN WATER MGCMSL SUMON LORD DEMILORD COUNT PLURALNAME BASECOLOR
 Angel      6     4     false true  false false false false false false false false true  true  false    18    Angels     blue
 Archangel  9     4     false true  false false false false false false false false true  true  false     6    Archangels orange
-Behemoth   8     3     false false true  false false false false false false false false false false    18    Behemoths  green
-Centaur    3     4     false false false false false false false false false false false false false    25    Centaurs   gold
+Behemoth   8     3     false false true  false false false false false false false false false false    18    Behemoths  darkGreen
+Centaur    3     4     false false false false false false false false false false false false false    25    Centaurs   lightOlive
 Colossus  10     4     false false false true  false false true  false false false false false false    10    Colossi    purple
-Cyclops    9     2     false false true  false false false false false false false false false false    28    Cyclopes   green
+Cyclops    9     2     false false true  false false false false false false false false false false    28    Cyclopes   darkGreen
 Dragon     9     3     true  true  false false false false true  true  false false false false false    18    Dragons    red
 Gargoyle   4     3     false true  true  false false false false false false false false false false    21    Gargoyles  black
 Giant      7     4     true  false false true  false false false false false false false false false    18    Giants     blue
@@ -21,6 +21,6 @@ Serpent   18     2     false false true  false false false false false false fal
 Titan     -1     4     false false false false false false false false false false false true  false     6    Titans     black
 Troll      8     2     false false false true  true  false false false false false false false false    28    Trolls     blue
 Unicorn    6     4     false false false false false false true  false false false false false false    12    Unicorns   orange
-Warbear    6     3     false false false true  false false false false false false false false false    21    Warbears   gold
+Warbear    6     3     false false false true  false false false false false false false false false    21    Warbears   lightOlive
 Warlock    5     4     true  false false false false false false false false true  false false true      6    Warlocks   orange
 Wyvern     7     3     false true  false false true  false false false false false false false false    18    Wyverns    purple

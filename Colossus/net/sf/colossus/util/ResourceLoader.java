@@ -334,12 +334,12 @@ public final class ResourceLoader
                 return((ImageIcon)cached).getImage();
             }
             Image tempImage[] = new Image[filenames.length];
-            int basew = -1, baseh = -1;
+            int basew = 60, baseh = 60;
             for (int i = 0; i < filenames.length ; i++)
             {
                 tempImage[i] =
                     getImage(filenames[i], directories);
-                if (i == 0)
+                if ((i == 0) && (tempImage[i] != null))
                 {
                     ImageIcon tempicon = new ImageIcon(tempImage[i]);
                     basew = tempicon.getIconWidth();
@@ -347,6 +347,12 @@ public final class ResourceLoader
                 }
                 if (tempImage[i] == null)
                 {
+                    if (filenames[i].startsWith("Plain-"))
+                    {
+                        tempImage[i] =
+                            createPlainImage(basew,baseh,
+                                              colorFromFilename(filenames[i], "Plain-"));
+                    }
                     if (filenames[i].startsWith("Power-"))
                     {
                         int val = numberFromFilename(filenames[i], "Power-");
@@ -383,18 +389,14 @@ public final class ResourceLoader
                     waitOnImage(tempImage[i]);
                 }
             }
-
-            ImageIcon tempIcon = new ImageIcon(tempImage[0]);
-            int width = tempIcon.getIconWidth();
-            int height = tempIcon.getIconHeight();
-            bi = new BufferedImage(width, height,
+            bi = new BufferedImage(basew, baseh,
                                    BufferedImage.TYPE_INT_ARGB);
             Graphics2D biContext = bi.createGraphics();
             for (int i = 0; i < filenames.length ; i++)
             {
                 biContext.drawImage(tempImage[i],
                                     0, 0,
-                                    width, height,
+                                    basew, baseh,
                                     null);
             }
             waitOnImage(bi);
@@ -469,6 +471,16 @@ public final class ResourceLoader
         {
             imageCache.put(mapKey, bi);
         }
+        return bi;
+    }
+
+    private static Image createPlainImage(int width, int height, Color color)
+    {
+        BufferedImage bi = new BufferedImage(width, height,
+                                             BufferedImage.TYPE_INT_ARGB);
+        Graphics2D biContext = bi.createGraphics();
+        biContext.setColor(color);
+        biContext.fillRect(0,0,width,height);
         return bi;
     }
 

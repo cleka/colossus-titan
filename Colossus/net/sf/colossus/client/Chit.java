@@ -64,7 +64,36 @@ class Chit extends JPanel
         
         if (!Creature.isCreature(id))
         {
-            icon = getImageIcon(id);
+            if (!(id.startsWith("Titan-")))
+            {
+                icon = getImageIcon(id);
+            }
+            else
+            { // special case : the Titan.
+System.err.println("TRYING: " + id);
+                String[] filenames = new String[4];
+                int index = 6;
+                int index2 = index;
+                char c = id.charAt(index2);
+                while ((c >= '0') && (c <= '9'))
+                {
+                    index2++;
+                    c = id.charAt(index2);
+                }
+                int power = Integer.parseInt(id.substring(index, index2));
+                String color = id.substring(index2) + "Colossus";
+                filenames[0] = "Plain" + color;
+                filenames[1] = "TitanMask";
+                filenames[2] = "Power-" + power + color;
+                filenames[3] = "Skill-4" + color;
+System.err.println("WILL TRY WITH: " +
+                   filenames[0] + "," +
+                   filenames[1] + "," +
+                   filenames[2] + "," +
+                   filenames[3]);
+                   
+                icon = getImageIcon(filenames);
+            }
         }
         else
         {
