@@ -259,14 +259,18 @@
         <chmod file="BattlelandsRandomizer.jar" perm="755"/>
 </target>
 
-<!-- TODO If a jar is already signed, don't sign it again. -->
 <target name="sign" depends="jar"
-        description = "Sign jar file">
+        description = "Sign main jar file">
         <signjar jar="Colossus.jar"
                  alias="${user.name}"
                  keystore="${user.name}Keystore"
                  storepass="${env.JARPASSWORD}"
         />
+        <chmod file="Colossus.jar" perm="755"/>
+</target>
+
+<target name="signall" depends="jar, sign"
+        description = "Sign all jar files">
         <signjar jar="libs/jdom.jar"
                  alias="${user.name}"
                  keystore="${user.name}Keystore"
@@ -342,7 +346,6 @@
                  keystore="${user.name}Keystore"
                  storepass="${env.JARPASSWORD}"
         />
-        <chmod file="Colossus.jar" perm="755"/>
 </target>
 
 
