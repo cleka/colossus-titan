@@ -71,6 +71,8 @@ public final class Battle
 
         // Set defender's entry side opposite attacker's.
         Legion attacker = getAttacker();
+        System.out.println("a: " + attacker);
+        System.out.println("label: " + masterHexLabel);
         int side = attacker.getEntrySide(masterHexLabel);
         Legion defender = getDefender();
         defender.clearAllEntrySides(masterHexLabel);
@@ -2079,27 +2081,42 @@ public final class Battle
         Game game = new Game();
         game.addPlayer("Attacker");
         Player player1 = game.getPlayer(0);
+        player1.setColor(oMemo.getAttacker().getColor());
         game.addPlayer("Defender");
         Player player2 = game.getPlayer(1);
+        player2.setColor(oMemo.getDefender().getColor());
         game.initBoard();
         Legion attacker = new Legion(game, oMemo.getAttacker());
         Legion defender = new Legion(game, oMemo.getDefender());
-        attacker.setEntrySide(oMemo.getMasterHex(), oMemo.getEntrySide());
+        player1.addLegion(attacker);
+        player2.addLegion(defender);
+        String strMasterHex = oMemo.getMasterHex();
+        System.out.println("Battle.makeLegionsAndReturnGame: strMasterHex: " + strMasterHex);
+        attacker.setEntrySide(strMasterHex, oMemo.getEntrySide());
 
         return game;
     }
 
-    public Battle(BattleMemo oMemo)
+    public static Battle makeBattleFromMemo(BattleMemo oMemo)
     {
-        this(makeLegionsAndReturnGame(oMemo), 
-             oMemo.getAttacker().getMarkerId(),
-             oMemo.getDefender().getMarkerId(),
+        LegionMemo oAttacker = oMemo.getAttacker();
+        LegionMemo oDefender = oMemo.getDefender();
+        String strAttackerId = oAttacker.getMarkerId();
+        String strDefenderId = oDefender.getMarkerId();
+        System.out.println("a: " + oAttacker);
+        System.out.println("a id: " + strAttackerId);
+
+        Game oGame = makeLegionsAndReturnGame(oMemo);
+
+        return new Battle
+            (oGame, 
+             strAttackerId,
+             strDefenderId,
              Battle.DEFENDER,
-             oMemo.getAttacker().getCurrentHexLabel(),
+             oMemo.getMasterHex(),
              1,
              Battle.MOVE);
     }
-
 
     public static void main(String [] args)
     {
