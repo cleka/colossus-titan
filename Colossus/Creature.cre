@@ -16,6 +16,7 @@ Minotaur   4 4 true  false false false false false true  false false 21 Minotaur
 Ogre       6 2 false false false false true  false true  false false 25 Ogres
 Ranger     4 4 true  true  false false true  false false false false 28 Rangers
 Serpent   18 2 false false true  false false false false false false 10 Serpents
+# Titan is (-1,4), as its strength varies
 Titan     -1 4 false false false false false false false true  false  6 Titans
 Troll      8 2 false false false true  true  false false false false 28 Trolls
 Unicorn    6 4 false false false false false false true  false false 12 Unicorns

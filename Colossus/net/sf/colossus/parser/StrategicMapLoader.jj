@@ -53,6 +53,21 @@ SKIP :
 
 TOKEN :
 {
+        < COMMENT : "#"(<NOTNEWLINE>)*"\r" | "#"(<NOTNEWLINE>)*"\n" >
+|       < #NOTNEWLINE : ~["\n","\r"] >
+}
+
+String c_comment() :
+{}
+{
+    <COMMENT>
+    {
+        return(new String(token.image));
+    }
+}
+
+TOKEN :
+{
         < EOL: "\n" >
 }
 
@@ -106,6 +121,7 @@ int c_way() :
  */
 int oneCase(MasterHex [][] h) :
 {
+    String s;
     char ter;
     int p;
     int s1;
@@ -120,7 +136,7 @@ int oneCase(MasterHex [][] h) :
     int nPosY;
 }
 {
-    (p = c_number()) (ter = c_terrain()) (s1 = c_number()) (ts1 = c_way()) (s2 = c_number()) (ts2 = c_way()) (s3 = c_number()) (ts3 = c_way()) (posX = c_number()) (posY = c_number()) <EOL>
+    (p = c_number()) (ter = c_terrain()) (s1 = c_number()) (ts1 = c_way()) (s2 = c_number()) (ts2 = c_way()) (s3 = c_number()) (ts3 = c_way()) (posX = c_number()) (posY = c_number())
     {
         //nPosX = posX-1;
         //nPosY = (posY-1)/2;
@@ -159,12 +175,17 @@ int oneCase(MasterHex [][] h) :
         h[posX][posY].setBaseExitLabel(2, s3);
         return(1);
     }
-|       <EOL>
-        {
-                return(0);
-        }
-|       <EOF>
-        {
-                return(-1);
-        }
+|   <EOL>
+    {
+        return(0);
+    }
+|   (s = c_comment())
+    {
+        Log.debug("Found comment : " + s);
+        return(0);
+    }
+|   <EOF>
+    {
+        return(-1);
+    }
 }

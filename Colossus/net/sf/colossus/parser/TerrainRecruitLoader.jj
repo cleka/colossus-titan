@@ -211,6 +211,21 @@ SKIP :
 
 TOKEN :
 {
+        < COMMENT : "#"(<NOTNEWLINE>)*"\r" | "#"(<NOTNEWLINE>)*"\n" >
+|       < #NOTNEWLINE : ~["\n","\r"] >
+}
+
+String r_comment() :
+{}
+{
+    <COMMENT>
+    {
+        return(new String(token.image));
+    }
+}
+
+TOKEN :
+{
     < EOL: "\n" >
 }
 
@@ -280,9 +295,10 @@ int oneTerrain() :
     String col;
     char tc;
     ArrayList rl;
+    String s;
 }
 {
-    (tc = r_char()) (col = r_chaine()) (t = r_chaine()) (rl = r_allRecruit()) <EOL>
+    (tc = r_char()) (col = r_chaine()) (t = r_chaine()) (rl = r_allRecruit())
     {
         carToRecruits.put(new Character(tc), rl);
         carToName.put(new Character (tc), t);
@@ -307,6 +323,11 @@ int oneTerrain() :
     }
 |   <EOL>
     {
+        return(0);
+    }
+|   (s = r_comment())
+    {
+        Log.debug("Found comment : " + s);
         return(0);
     }
 |   <EOF>

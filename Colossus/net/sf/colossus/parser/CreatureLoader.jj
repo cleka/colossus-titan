@@ -10,6 +10,7 @@ package net.sf.colossus.parser;
 
 import java.util.*;
 
+import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Creature;
 
 /**
@@ -29,6 +30,21 @@ SKIP :
     " "
   | "\r"
   | "\t"
+}
+
+TOKEN :
+{
+        < COMMENT : "#"(<NOTNEWLINE>)*"\r" | "#"(<NOTNEWLINE>)*"\n" >
+|       < #NOTNEWLINE : ~["\n","\r"] >
+}
+
+String c_comment() :
+{}
+{
+    <COMMENT>
+    {
+        return(new String(token.image));
+    }
 }
 
 TOKEN :
@@ -100,6 +116,7 @@ int oneCreature(List lc) :
     boolean lord;
     boolean demilord;
     int maxCount;
+    String s;
 }
 {
     (name = c_chaine())
@@ -115,7 +132,7 @@ int oneCreature(List lc) :
     (lord= c_bool())
     (demilord= c_bool())
     (maxCount= c_number())
-    (pluralName = c_chaine()) <EOL>
+    (pluralName = c_chaine())
     {
         lc.add(new Creature(name, power, skill, rangestrikes,
                               flies, nativeBramble, nativeDrift,
@@ -126,6 +143,11 @@ int oneCreature(List lc) :
     }
 |   <EOL>
     {
+        return(0);
+    }
+|   (s = c_comment())
+    {
+        Log.debug("Found comment : " + s);
         return(0);
     }
 |   <EOF>

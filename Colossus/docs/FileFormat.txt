@@ -1,7 +1,8 @@
 /* $Header$ */
 
 This file document file formats for the various datafile used
-by Colossus.
+by Colossus. In all these files, comments start with
+a "#" and extend to the end-of-line.
 
 1) MAP file format (default file used: StrategicMap.map)
 

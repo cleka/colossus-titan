@@ -10,6 +10,7 @@ package net.sf.colossus.parser;
 
 import java.util.*;
 
+import net.sf.colossus.util.Log;
 import net.sf.colossus.client.BattleHex;
 
 /**
@@ -47,6 +48,21 @@ SKIP :
         " "
   |     "\r"
   |     "\t"
+}
+
+TOKEN :
+{
+        < COMMENT : "#"(<NOTNEWLINE>)*"\r" | "#"(<NOTNEWLINE>)*"\n" >
+|       < #NOTNEWLINE : ~["\n","\r"] >
+}
+
+String b_comment() :
+{}
+{
+    <COMMENT>
+    {
+        return(new String(token.image));
+    }
 }
 
 TOKEN :
@@ -117,9 +133,10 @@ int oneBattlelandCase(BattleHex [][] h) :
     int x,y,e;
     char t;
     ArrayList hsl;
+    String s;
 }
 {
-    (x = b_number()) (y = b_number()) (t = b_terrain()) (e = b_number()) (hsl = b_allHexSide()) <EOL>
+    (x = b_number()) (y = b_number()) (t = b_terrain()) (e = b_number()) (hsl = b_allHexSide())
     {
         h[x][y].setTerrain(t);
         h[x][y].setElevation(e);
@@ -132,6 +149,11 @@ int oneBattlelandCase(BattleHex [][] h) :
     }
 |   <EOL>
     {
+        return(0);
+    }
+|   (s = b_comment())
+    {
+        Log.debug("Found comment : " + s);
         return(0);
     }
 |   <EOF>

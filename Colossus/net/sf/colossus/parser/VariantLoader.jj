@@ -7,7 +7,7 @@ options
 PARSER_BEGIN(VariantLoader)
 package net.sf.colossus.parser;
 
-
+import net.sf.colossus.util.Log;
 import java.util.*;
 
 /**
@@ -29,6 +29,21 @@ SKIP :
         " "
   |     "\r"
   |     "\t"
+}
+
+TOKEN :
+{
+        < COMMENT : "#"(<NOTNEWLINE>)*"\r" | "#"(<NOTNEWLINE>)*"\n" >
+|       < #NOTNEWLINE : ~["\n","\r"] >
+}
+
+String v_comment() :
+{}
+{
+    <COMMENT>
+    {
+        return(new String(token.image));
+    }
 }
 
 TOKEN :
@@ -79,7 +94,9 @@ void v_ter(String[] ls) :
 }
 
 int oneLine(String[] ls) :
-{}
+{
+    String s;
+}
 {
     v_map(ls)      
     {
@@ -95,6 +112,11 @@ int oneLine(String[] ls) :
     }
 |   <EOL>
     {
+        return(0);
+    }
+|   (s = v_comment())
+    {
+        Log.debug("Found comment : " + s);
         return(0);
     }
 |   <EOF>
