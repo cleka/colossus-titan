@@ -114,9 +114,21 @@ class Player
     }
 
 
+    public void setScore(int score)
+    {
+        this.score = score;
+    }
+
+
     public String getPlayersElim()
     {
         return playersEliminated;
+    }
+    
+    
+    void setPlayersElim(String playersEliminated)
+    {
+        this.playersEliminated = playersEliminated;
     }
 
 
@@ -196,6 +208,12 @@ class Player
     public int getNumLegions()
     {
         return numLegions;
+    }
+
+
+    public void setNumLegions(int numLegions)
+    {
+        this.numLegions = numLegions;
     }
 
 
