@@ -56,7 +56,8 @@ sources = $(wildcard *.java) \
 	$(wildcard net/sf/colossus/client/*.java) \
 	$(wildcard net/sf/colossus/server/*.java) \
 	$(wildcard net/sf/colossus/util/*.java) \
-	$(wildcard net/sf/colossus/parser/*.java)
+	$(wildcard net/sf/colossus/parser/*.java) \
+	$(wildcard com/werken/opt/*.java)
 
 CLASS_FILES = $(sources:%.java=%.class)
 
@@ -82,6 +83,7 @@ $(JARFILE): net/sf/colossus/parser/StrategicMapLoader.java \
 	jar -mcf META-INF/MANIFEST.MF Colossus.jar \
         net/sf/colossus/client/*.class net/sf/colossus/server/*.class \
         net/sf/colossus/util/*.class net/sf/colossus/parser/*.class \
+	com/werken/opt/*.class \
         Default TitanPlus ExtTitan Badlands Outlands Undead version
 	chmod +x Colossus.jar
 
