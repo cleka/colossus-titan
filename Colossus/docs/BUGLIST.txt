@@ -105,3 +105,7 @@ Linux, ibmjdk118: Battle did not end once when a player died.
    Happened twice -- see 968280760325.sav (movement 3)
    Player.die() was called.
 
+Solaris, jdk1.2.2: Popup menu text is barely visible.
+
+Solaris, jdk1.2.2: jar files made in Linux won't execute.
+   Exception in thread "main" java.lang.NoClassDefFoundError: Game

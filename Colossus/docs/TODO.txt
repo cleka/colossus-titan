@@ -1,4 +1,12 @@
+Make PickColor dialog bigger.
+
+Add some keyboard shortcuts.
+
+Highlight selected legion better. 
+
 Split GUI classes from model classes.
+
+Make Turn dialog vertical, so that it fits on screen better.
 
 Move GUI/client classes and model/server classes into separate
    packages.  Make all possible public classes package private.
