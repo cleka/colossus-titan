@@ -132,8 +132,13 @@ class BattleChit extends Chit
     // Dead chits count as chits in contact only if countDead is true.
     int numInContact(boolean countDead)
     {
-        int count = 0;
+        // Offboard chits are not in contact.
+        if (currentHex.getXCoord() == -1)
+        {
+            return 0;
+        }
 
+        int count = 0;
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not in contact.
