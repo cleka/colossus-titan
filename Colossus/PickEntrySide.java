@@ -32,9 +32,9 @@ class PickEntrySide extends Dialog implements ActionListener,
     private MasterHex masterHex;
     private char terrain;
 
-    private Button button1;  // left
-    private Button button2;  // bottom
-    private Button button3;  // right
+    private Button button5;  // left
+    private Button button3;  // bottom
+    private Button button1;  // right
 
     private boolean laidOut = false;
 
@@ -61,23 +61,23 @@ class PickEntrySide extends Dialog implements ActionListener,
 
         if (masterHex.canEnterViaSide(5))
         {
-            button1 = new Button("Left");
-            add(button1);
-            button1.addActionListener(this);
+            button5 = new Button("Left");
+            add(button5);
+            button5.addActionListener(this);
         }
         
         if (masterHex.canEnterViaSide(3))
         {
-            button2 = new Button("Bottom");
-            add(button2);
-            button2.addActionListener(this);
+            button3 = new Button("Bottom");
+            add(button3);
+            button3.addActionListener(this);
         }
         
         if (masterHex.canEnterViaSide(1))
         {
-            button3 = new Button("Right");
-            add(button3);
-            button3.addActionListener(this);
+            button1 = new Button("Right");
+            add(button1);
+            button1.addActionListener(this);
         }
 
         addWindowListener(this);
@@ -448,22 +448,25 @@ class PickEntrySide extends Dialog implements ActionListener,
 
         if (!laidOut)
         {
-            if (button1 != null)
+            int cx = 6 * scale;
+            int cy = 3 * scale;
+
+            if (button5 != null)
             {
-                button1.setBounds(d.width / 7,
-                    7 * d.height / 8,
-                    d.width / 7, d.height / 16);
-            }
-            if (button2 != null)
-            {
-                button2.setBounds(3 * d.width / 7,
-                    7 * d.height / 8,
+                button5.setBounds(cx + 1 * scale,
+                    (int) Math.round(cy + 1 * scale),
                     d.width / 7, d.height / 16);
             }
             if (button3 != null)
             {
-                button3.setBounds(5 * d.width / 7,
-                    7 * d.height / 8,
+                button3.setBounds(cx + 1 * scale,
+                    (int) Math.round(cy + 21 * scale),
+                    d.width / 7, d.height / 16);
+            }
+            if (button1 != null)
+            {
+                button1.setBounds(cx + 19 * scale,
+                    (int) Math.round(cy + 11 * scale),
                     d.width / 7, d.height / 16);
             }
 
@@ -561,5 +564,20 @@ class PickEntrySide extends Dialog implements ActionListener,
 
     public void windowDeiconified(WindowEvent e)
     {
+    }
+
+
+    public static void main(String [] args)
+    {
+        Frame frame = new Frame("testing PickEntrySide");
+        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        frame.pack();
+        frame.setVisible(true);
+
+        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setEntrySide(1);
+        hex.setEntrySide(3);
+        hex.setEntrySide(5);
+        new PickEntrySide(frame, hex);
     }
 }
