@@ -427,9 +427,9 @@ public final class Legion implements Comparable
     }
 
     /** Eliminate this legion. */
-    void remove(boolean returnCrittersToStacks)
+    void remove(boolean returnCrittersToStacks, boolean updateHistory)
     {
-        prepareToRemove(returnCrittersToStacks);
+        prepareToRemove(returnCrittersToStacks, updateHistory);
         if (getPlayer() != null)
         {
             getPlayer().removeLegion(this);
@@ -438,11 +438,11 @@ public final class Legion implements Comparable
 
     void remove()
     {
-        remove(true);
+        remove(true, true);
     }
 
     /** Do the cleanup required before this legion can be removed. */
-    void prepareToRemove(boolean returnCrittersToStacks)
+    void prepareToRemove(boolean returnCrittersToStacks, boolean updateHistory)
     {
         Log.event("Legion " + critters.toString() + " is eliminated");
         if (getHeight() > 0)
@@ -452,7 +452,8 @@ public final class Legion implements Comparable
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
-                prepareToRemoveCritter(critter, returnCrittersToStacks);
+                prepareToRemoveCritter(critter, returnCrittersToStacks,
+                        updateHistory);
                 it.remove();
             }
         }
@@ -466,11 +467,6 @@ public final class Legion implements Comparable
         {
             getPlayer().addLegionMarker(getMarkerId());
         }
-    }
-
-    void prepareToRemove()
-    {
-        prepareToRemove(true);
     }
 
     void moveToHex(MasterHex hex, String entrySide, boolean teleported,
@@ -682,7 +678,7 @@ public final class Legion implements Comparable
         // If there are no critters left, disband the legion.
         if (disbandIfEmpty && getHeight() == 0)
         {
-            remove(false);
+            remove(false, true);
         }
         // return a Creature, not a Critter
         return critter.getCreature();
@@ -711,7 +707,8 @@ public final class Legion implements Comparable
      *  legion.  Do not actually remove it, to prevent comodification
      *  errors.  Do not disband the legion if empty, since the critter
      *  has not actually been removed. */
-    void prepareToRemoveCritter(Critter critter, boolean returnToStacks)
+    void prepareToRemoveCritter(Critter critter, boolean returnToStacks,
+            boolean updateHistory)
     {
         if (critter == null || !critters.contains(critter))
         {
@@ -724,7 +721,10 @@ public final class Legion implements Comparable
         {
             game.getCaretaker().putDeadOne(critter.getCreature());
         }
-        game.history.removeCreatureEvent(getMarkerId(), critter.getName());
+        if (updateHistory)
+        {
+            game.history.removeCreatureEvent(getMarkerId(), critter.getName());
+        }
     }
 
     List getCritters()
@@ -826,11 +826,11 @@ public final class Legion implements Comparable
 
         if (remove)
         {
-            remove(false);
+            remove(false, false);
         }
         else
         {
-            prepareToRemove(false);
+            prepareToRemove(false, false);
         }
 
         Log.event("Legion " + getLongMarkerName() +

@@ -281,7 +281,7 @@ public final class Player implements Comparable
                 {
                     donorId = null;
                 }
-                legion.prepareToRemove();
+                legion.prepareToRemove(true, true);
                 it.remove();
             }
         }
@@ -698,7 +698,7 @@ public final class Player implements Comparable
 
             // Call the iterator's remove() method rather than
             // removeLegion() to avoid concurrent modification problems.
-            legion.prepareToRemove();
+            legion.prepareToRemove(true, true);
             it.remove();
         }
 

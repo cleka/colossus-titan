@@ -856,7 +856,7 @@ public final class Battle
 
         // If an angel or archangel was returned to its donor instead of 
         // the stack, then don't put it back on the stack.
-        legion.prepareToRemoveCritter(critter, donor == null);
+        legion.prepareToRemoveCritter(critter, donor == null, true);
 
         if (critter.isTitan())
         {
