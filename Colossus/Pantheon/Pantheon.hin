@@ -8,5 +8,4 @@ RECRUIT Marsh Troll     2 Troll    ((CANREACH Swamp) AND
                                 (NOT (HASCREATURE Wyvern)) AND
                                 (2 Wyvern AVAILABLE) AND
                                 (NOT (HEIGHTIS 6)))
-RECRUIT Brumble Gorgon  2 Cyclop     
-
+RECRUIT Bramble Gorgon  2 Cyclops
