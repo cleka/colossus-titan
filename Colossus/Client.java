@@ -370,6 +370,15 @@ public final class Client
     public boolean getOption(String name)
     {
         String value = options.getProperty(name);
+
+        // If autoplay is set, then return true for all other auto* options.
+        if (name.startsWith("Auto") && !name.equals(Options.autoPlay))
+        {
+            if (getOption(Options.autoPlay))
+            {
+                return true;
+            }
+        }
         return (value != null && value.equals("true"));
     }
 
@@ -556,7 +565,7 @@ public final class Client
     /** Create a new marker and add it to the end of the list. */
     public void addMarker(String markerId)
     {
-        Marker marker = new Marker(4 * Scale.get(), markerId,
+        Marker marker = new Marker(3 * Scale.get(), markerId,
             board.getFrame(), server.getGame().getLegionByMarkerId(markerId));
         setMarker(markerId, marker);
     }
@@ -747,8 +756,7 @@ public final class Client
     public void doSummon(Legion legion, Legion donor, Creature angel)
     {
         server.getGame().doSummon(legion, donor, angel);
-        //XXX donor.getCurrentHex().repaint();
-        //XXX legion.getCurrentHex().repaint();
+        //XXX Should just repaint donor and legion hexes.
         board.repaint();
         summonAngel = null;
         board.highlightEngagements();
@@ -926,6 +934,114 @@ public final class Client
     {
         map.dispose();
         map = null;
+    }
+
+
+    public void highlightEngagements()
+    {
+        board.highlightEngagements();
+    }
+
+    public void setupSplitMenu()
+    {
+        board.setupSplitMenu();
+    }
+
+    public void setupMoveMenu()
+    {
+        board.setupMoveMenu();
+    }
+
+    public void setupFightMenu()
+    {
+        board.setupFightMenu();
+    }
+
+    public void setupMusterMenu()
+    {
+        board.setupMusterMenu();
+    }
+
+    public void alignLegions(String hexLabel)
+    {
+        board.alignLegions(hexLabel);
+    }
+
+    public void alignLegions(Set hexLabels)
+    {
+        board.alignLegions(hexLabels);
+    }
+
+    public void deiconifyBoard()
+    {
+        board.deiconify();
+    }
+
+    public void unselectHexByLabel(String hexLabel)
+    {
+        board.unselectHexByLabel(hexLabel);
+    }
+
+    public void unselectAllHexes()
+    {
+        board.unselectAllHexes();
+    }
+
+
+    public void highlightCarries()
+    {
+        map.highlightCarries();
+    }
+
+    public void setupBattleSummonMenu()
+    {
+        map.setupSummonMenu();
+    }
+
+    public void setupBattleRecruitMenu()
+    {
+        map.setupRecruitMenu();
+    }
+
+    public void setupBattleMoveMenu()
+    {
+        map.setupMoveMenu();
+    }
+
+    public void setupBattleFightMenu()
+    {
+        map.setupFightMenu();
+    }
+
+    public void unselectBattleHexByLabel(String hexLabel)
+    {
+        map.unselectHexByLabel(hexLabel);
+    }
+
+    public void unselectAllBattleHexes()
+    {
+        map.unselectAllHexes();
+    }
+
+    public void alignBattleChits(String hexLabel)
+    {
+        map.alignChits(hexLabel);
+    }
+
+    public void alignBattleChits(Set hexLabels)
+    {
+        map.alignChits(hexLabels);
+    }
+
+
+    public void loadInitialMarkerImages()
+    {
+        board.loadInitialMarkerImages();
+    }
+
+    public void setupPlayerLabel()
+    {
+        board.setupPlayerLabel();
     }
 
 

@@ -17,11 +17,18 @@ public final class PickColor extends JDialog implements WindowListener,
     private JLabel [] colorLabel = new JLabel[6];
     private Game game;
     private Player player;
+
     public static final String [] colorNames =
         {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
+    private static final Color [] background = { Color.black, Color.blue,
+        HTMLColor.brown, Color.yellow, Color.green, Color.red };
+    private static final Color [] foreground = { Color.white, Color.white,
+        Color.white, Color.black, Color.black, Color.black };
+
     private static final int [] colorMnemonics =
         {KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O, KeyEvent.VK_G,
             KeyEvent.VK_E, KeyEvent.VK_R};
+
     private static String color;
 
 
@@ -85,11 +92,6 @@ public final class PickColor extends JDialog implements WindowListener,
             i++;
         }
 
-        Color [] background = { Color.black, Color.blue, HTMLColor.brown,
-            Color.yellow, Color.green, Color.red };
-        Color [] foreground = { Color.white, Color.white, Color.white,
-            Color.black, Color.black, Color.black };
-
         for (i = 0; i < 6; i++)
         {
             JButton button = new JButton();
@@ -126,6 +128,40 @@ public final class PickColor extends JDialog implements WindowListener,
     {
         new PickColor(parentFrame, game, player);
         return color;
+    }
+
+
+    public static String getColorName(int i)
+    {
+        if (i >= 0 && i < colorNames.length)
+        {
+            return colorNames[i];
+        }
+        return null;
+    }
+
+    public static Color getForegroundColor(String colorName)
+    {
+        for (int i = 0; i < colorNames.length; i++)
+        {
+            if (colorName.equals(colorNames[i]))
+            {
+                return foreground[i];
+            }
+        }
+        return null;
+    }
+
+    public static Color getBackgroundColor(String colorName)
+    {
+        for (int i = 0; i < colorNames.length; i++)
+        {
+            if (colorName.equals(colorNames[i]))
+            {
+                return background[i];
+            }
+        }
+        return null;
     }
 
 

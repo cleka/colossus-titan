@@ -177,7 +177,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().loadInitialMarkerImages();
+            client.loadInitialMarkerImages();
         }
     }
 
@@ -203,7 +203,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().highlightEngagements();
+            client.highlightEngagements();
         }
     }
 
@@ -214,7 +214,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBattleMap().highlightCarries();
+            client.highlightCarries();
         }
     }
 
@@ -225,7 +225,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().setupSplitMenu();
+            client.setupSplitMenu();
         }
     }
 
@@ -235,7 +235,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().setupMoveMenu();
+            client.setupMoveMenu();
         }
     }
 
@@ -245,7 +245,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().setupFightMenu();
+            client.setupFightMenu();
         }
     }
 
@@ -255,7 +255,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().setupMusterMenu();
+            client.setupMusterMenu();
         }
     }
 
@@ -266,7 +266,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBattleMap().setupSummonMenu();
+            client.setupBattleSummonMenu();
         }
     }
 
@@ -276,7 +276,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBattleMap().setupRecruitMenu();
+            client.setupBattleRecruitMenu();
         }
     }
 
@@ -286,7 +286,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBattleMap().setupMoveMenu();
+            client.setupBattleMoveMenu();
         }
     }
 
@@ -296,7 +296,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBattleMap().setupFightMenu();
+            client.setupBattleFightMenu();
         }
     }
 
@@ -307,7 +307,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().alignLegions(hexLabel);
+            client.alignLegions(hexLabel);
         }
     }
 
@@ -317,7 +317,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().alignLegions(hexLabels);
+            client.alignLegions(hexLabels);
         }
     }
 
@@ -328,7 +328,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().deiconify();
+            client.deiconifyBoard();
         }
     }
 
@@ -358,7 +358,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().unselectHexByLabel(hexLabel);
+            client.unselectHexByLabel(hexLabel);
         }
     }
 
@@ -368,7 +368,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBoard().unselectAllHexes();
+            client.unselectAllHexes();
         }
     }
 
@@ -389,7 +389,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBattleMap().unselectHexByLabel(hexLabel);
+            client.unselectBattleHexByLabel(hexLabel);
         }
     }
 
@@ -399,7 +399,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBattleMap().unselectAllHexes();
+            client.unselectAllBattleHexes();
         }
     }
 
@@ -420,7 +420,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBattleMap().alignChits(hexLabel);
+            client.alignBattleChits(hexLabel);
         }
     }
 
@@ -430,7 +430,7 @@ public final class Server
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.getBattleMap().alignChits(hexLabels);
+            client.alignBattleChits(hexLabels);
         }
     }
 
@@ -606,6 +606,13 @@ public final class Server
             Client client = (Client)it.next();
             client.disposeBattleMap();
         }
+    }
+
+
+    public void setupPlayerLabel(String playerName)
+    {
+        Client client = getClient(playerName);
+        client.setupPlayerLabel();
     }
 
 

@@ -54,15 +54,16 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     private Client client;
 
-    private static JFrame masterFrame;
-    private static JMenu phaseMenu;
-    private static JPopupMenu popupMenu;
-    private static HashMap checkboxes = new HashMap();
+    private JFrame masterFrame;
+    private JMenu phaseMenu;
+    private JPopupMenu popupMenu;
+    private HashMap checkboxes = new HashMap();
 
     /** Last point clicked is needed for popup menus. */
-    private static Point lastPoint;
+    private Point lastPoint;
 
-    private static Container contentPane;
+    private Container contentPane;
+    private JLabel playerLabel;
 
     public static final String newGame = "New game";
     public static final String loadGame = "Load game";
@@ -154,6 +155,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         setupPopupMenu();
         setupTopMenu();
         contentPane.add(new JScrollPane(this), BorderLayout.CENTER);
+
+        setupPlayerLabel();
+        contentPane.add(playerLabel, BorderLayout.SOUTH);
+
         masterFrame.pack();
         masterFrame.setVisible(true);
     }
@@ -193,6 +198,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 // peek at the undo stack so we know where to align
                 String hexLabel = (String)Client.topUndoStack();
                 player.undoLastSplit();
@@ -207,6 +216,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 // peek at the undo stack so we know where to align
                 player.undoAllSplits();
                 alignAllLegions();
@@ -219,9 +232,13 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 // Initial legions must be split.
-                if (game.getTurnNumber() == 1 &&
-                    game.getActivePlayer().getNumLegions() == 1)
+                if (game.getTurnNumber() == 1 && player.getNumLegions() == 1)
                 {
                     JOptionPane.showMessageDialog(masterFrame, "Must split.");
                 }
@@ -237,6 +254,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 player.undoLastMove();
                 highlightUnmovedLegions();
             }
@@ -247,6 +268,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 player.undoAllMoves();
                 highlightUnmovedLegions();
             }
@@ -257,6 +282,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 player.takeMulligan();
 
                 // Reroll movement die.  Remove Take Mulligan option
@@ -270,6 +299,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 // If any legion has a legal non-teleport move, then the
                 // player must move at least one legion.
                 if (player.legionsMoved() == 0 &&
@@ -304,10 +337,14 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
+                Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 // Advance only if there are no unresolved engagements.
                 if (highlightEngagements() == 0)
                 {
-                // XXX
                     game.advancePhase();
                 }
                 else
@@ -323,6 +360,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 player.undoLastRecruit();
                 highlightPossibleRecruits();
             }
@@ -333,6 +374,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 player.undoAllRecruits();
                 highlightPossibleRecruits();
             }
@@ -343,6 +388,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 player.commitMoves();
                 // Mulligans are only allowed on turn 1.
                 player.setMulligansLeft(0);
@@ -350,11 +399,17 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
         };
 
+
+        // TODO Let inactive players withdraw from the game.
         withdrawFromGameAction = new AbstractAction(withdrawFromGame)
         {
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                if (player.getName() != client.getPlayerName())
+                {
+                    return;
+                }
                 String [] options = new String[2];
                 options[0] = "Yes";
                 options[1] = "No";
@@ -644,6 +699,27 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 cbmi.setSelected(enable);
             }
         }
+    }
+
+
+    /** Show which player owns this board. */
+    public void setupPlayerLabel()
+    {
+        String playerName = client.getPlayerName();
+        playerLabel = new JLabel(playerName);
+
+        Player player = game.getPlayerByName(playerName);
+        String colorName = player.getColor();
+        // If we call this before player colors are chosen, just use
+        // the defaults.
+        if (colorName != null)
+        {
+            Color background = PickColor.getBackgroundColor(colorName);
+            Color foreground = PickColor.getForegroundColor(colorName);
+            playerLabel.setBackground(background);
+            playerLabel.setForeground(foreground);
+        }
+        playerLabel.repaint();
     }
 
 
@@ -1436,7 +1512,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         unselectAllHexes();
         requestFocus();
 
-        masterFrame.setTitle(game.getActivePlayer().getName() + " Turn " +
+        masterFrame.setTitle(game.getActivePlayerName() + " Turn " +
             game.getTurnNumber() + " : Resolve Engagements ");
 
         phaseMenu.removeAll();
@@ -1461,7 +1537,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         unselectAllHexes();
         requestFocus();
 
-        masterFrame.setTitle(game.getActivePlayer().getName() + " Turn " +
+        masterFrame.setTitle(game.getActivePlayerName() + " Turn " +
             game.getTurnNumber() + " : Muster Recruits ");
 
         phaseMenu.removeAll();
@@ -1498,7 +1574,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
     /** Create markers for all existing legions. */
     public void loadInitialMarkerImages()
     {
-        int chitScale = 3 * Scale.get();
         Iterator it = game.getAllLegionIds().iterator();
         while (it.hasNext())
         {
@@ -1980,7 +2055,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             String markerId = marker.getId();
             Legion legion = game.getLegionByMarkerId(markerId);
-            Player player = legion.getPlayer();
+            String playerName = legion.getPlayerName();
 
             // Move the clicked-on marker to the top of the z-order.
             client.setMarker(markerId, marker);
@@ -1997,13 +2072,14 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 legion.sortCritters();
                 new ShowLegion(masterFrame, legion, point,
                     client.getOption(Options.allStacksVisible) ||
-                    player == game.getActivePlayer());
+                    playerName == game.getActivePlayerName());
                 return;
             }
             else
             {
                 // Only the current player can manipulate his legions.
-                if (player == game.getActivePlayer())
+                if (playerName.equals(client.getPlayerName()) &&
+                    playerName.equals(game.getActivePlayerName()))
                 {
                     actOnLegion(legion);
                     return;
@@ -2026,9 +2102,13 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
 
             // Otherwise, the action to take depends on the phase.
-            actOnHex(hex.getLabel());
-            hex.repaint();
-            return;
+            // Only the current player can manipulate game state.
+            if (client.getPlayerName().equals(game.getActivePlayerName()))
+            {
+                actOnHex(hex.getLabel());
+                hex.repaint();
+                return;
+            }
         }
 
         // No hits on chits or map, so re-highlight.

@@ -105,6 +105,11 @@ public final class Critter extends Creature implements Comparable
         return game.getPlayerByMarkerId(markerId);
     }
 
+    public String getPlayerName()
+    {
+        return game.getPlayerByMarkerId(markerId).getName();
+    }
+
     int getTag()
     {
         return tag;

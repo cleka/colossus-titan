@@ -630,7 +630,11 @@ public final class Player implements Comparable
     public void addLegion(Legion legion)
     {
         legions.add(legion);
-        game.getServer().allAlignLegions(legion.getCurrentHexLabel());
+        Server server = game.getServer();
+        if (server != null)
+        {
+            server.allAlignLegions(legion.getCurrentHexLabel());
+        }
     }
 
 

@@ -8,10 +8,10 @@ import java.awt.*;
 
 public final class Marker extends Chit
 {
-    private static Font font;
-    private static Font oldFont;
-    private static int fontHeight;
-    private static int fontWidth;
+    private Font font;
+    private Font oldFont;
+    private int fontHeight;
+    private int fontWidth;
     private Legion legion;
 
 

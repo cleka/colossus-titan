@@ -198,7 +198,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        battleFrame.setTitle(battle.getActivePlayer().getName() +
+        battleFrame.setTitle(battle.getActivePlayerName() +
             " Turn " + battle.getTurnNumber() + " : Summon");
         phaseMenu.removeAll();
 
@@ -213,7 +213,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        battleFrame.setTitle(battle.getActivePlayer().getName() +
+        battleFrame.setTitle(battle.getActivePlayerName() +
             " Turn " + battle.getTurnNumber() + " : Recruit");
         if (phaseMenu != null)
         {
@@ -231,7 +231,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        battleFrame.setTitle(battle.getActivePlayer().getName() +
+        battleFrame.setTitle(battle.getActivePlayerName() +
             " Turn " + battle.getTurnNumber() + " : Move");
 
         phaseMenu.removeAll();
@@ -268,7 +268,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        battleFrame.setTitle(battle.getActivePlayer().getName() +
+        battleFrame.setTitle(battle.getActivePlayerName() +
             ((battle.getPhase() == Battle.FIGHT) ?
             " : Strike" : " : Strikeback"));
         phaseMenu.removeAll();
@@ -593,7 +593,8 @@ public final class BattleMap extends HexMap implements MouseListener,
         Critter critter = battle.getCritter(chit.getTag());
 
         // Only the active player can move or strike.
-        if (critter != null && critter.getPlayer() == battle.getActivePlayer())
+        if (critter != null && critter.getPlayerName() ==
+            battle.getActivePlayerName())
         {
             actOnCritter(critter);
         }

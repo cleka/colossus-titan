@@ -165,6 +165,11 @@ public final class Battle
         return game.getPlayerByMarkerId(legions[activeLegionNum]);
     }
 
+    public String getActivePlayerName()
+    {
+        return getActivePlayer().getName();
+    }
+
     public String getAttackerId()
     {
         return attackerId;
@@ -340,7 +345,7 @@ public final class Battle
                 if (activeLegionNum == ATTACKER)
                 {
                     phase = SUMMON;
-                    Log.event(getActivePlayer().getName() +
+                    Log.event(getActivePlayerName() +
                         "'s battle turn, number " + turnNumber);
                     again = setupSummon();
                 }

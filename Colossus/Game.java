@@ -102,8 +102,6 @@ public final class Game
         caretaker.resetAllCounts();
         players.clear();
 
-
-
         // XXX Temporary hotseat startup code
         JFrame frame = new JFrame();
         TreeMap playerInfo = GetPlayers.getPlayers(frame);
@@ -113,7 +111,6 @@ public final class Game
             dispose();
             return;
         }
-
 
         // See if user hit the Load game button, and we should
         // load a game instead of starting a new one.
@@ -204,6 +201,7 @@ public final class Game
         {
             Player player = (Player)it.next();
             placeInitialLegion(player);
+            server.setupPlayerLabel(player.getName());
             server.allUpdateStatusScreen();
         }
         server.allLoadInitialMarkerImages();
@@ -339,6 +337,11 @@ public final class Game
         {
             return null;
         }
+    }
+
+    public String getActivePlayerName()
+    {
+        return getActivePlayer().getName();
     }
 
     public int getActivePlayerNum()
@@ -511,6 +514,7 @@ public final class Game
         Player player = getActivePlayer();
         Client.clearUndoStack();
         player.rollMovement();
+        server.allSetupMoveMenu();
 
         player.aiMasterMove();
     }
@@ -721,7 +725,7 @@ public final class Game
         {
             out.println(battle.getMasterHexLabel());
             out.println(battle.getTurnNumber());
-            out.println(battle.getActivePlayer().getName());
+            out.println(battle.getActivePlayerName());
             out.println(battle.getPhase());
             out.println(battle.getSummonState());
             out.println(battle.getCarryDamage());
@@ -2663,7 +2667,7 @@ public final class Game
     public void negotiate(String playerName, NegotiationResults offer)
     {
         int thisPlayerSet;
-        if (playerName.equals(getActivePlayer().getName()))
+        if (playerName.equals(getActivePlayerName()))
         {
             thisPlayerSet = Battle.ATTACKER;
         }
