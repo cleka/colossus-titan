@@ -220,7 +220,7 @@ class Player
     }
 
 
-    void rollMovementDie()
+    void rollMovement()
     {
         // It's a new turn, so it is again legal to summon an angel.
         canSummonAngel = true;
@@ -236,7 +236,7 @@ class Player
     {
         if (mulligansLeft > 0)
         {
-            rollMovementDie();
+            rollMovement();
             mulligansLeft--;
         }
     }
