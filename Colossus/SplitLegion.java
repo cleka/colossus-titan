@@ -26,7 +26,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
     private static boolean active;
 
 
-    private SplitLegion(JFrame parentFrame, Legion oldLegion, String name)
+    private SplitLegion(JFrame parentFrame, Legion oldLegion, String name,
+        boolean autoPickMarker)
     {
         super(parentFrame, name + ": Split Legion " +
             oldLegion.getMarkerId(), true);
@@ -38,8 +39,16 @@ public final class SplitLegion extends JDialog implements MouseListener,
         this.parentFrame = parentFrame;
         player = oldLegion.getPlayer();
 
-        String selectedMarkerId = PickMarker.pickMarker(parentFrame,
-            name, player.getMarkersAvailable());
+        String selectedMarkerId;
+        if (autoPickMarker)
+        {
+            selectedMarkerId = player.getFirstAvailableMarker();
+        }
+        else
+        {
+            selectedMarkerId = PickMarker.pickMarker(parentFrame,
+                name, player.getMarkersAvailable());
+        }
 
         if (selectedMarkerId == null)
         {
@@ -135,13 +144,14 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
-    public static void splitLegion(JFrame parentFrame, Legion oldLegion)
+    public static void splitLegion(JFrame parentFrame, Legion oldLegion,
+        boolean autoPickMarker)
     {
         if (!active)
         {
             active = true;
             new SplitLegion(parentFrame, oldLegion,
-                oldLegion.getPlayer().getName());
+                oldLegion.getPlayer().getName(), autoPickMarker);
             active = false;
         }
     }
@@ -319,7 +329,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
             dispose();
 
             Game.logEvent(newLegion.getHeight() +
-                " creatures were split off from legion " +
+                " creatures are split off from legion " +
                 oldLegion.getMarkerId() +
                 " into new legion " + newLegion.getMarkerId());
 
@@ -357,6 +367,6 @@ public final class SplitLegion extends JDialog implements MouseListener,
         Marker marker = new Marker(scale, selectedMarkerId, frame, null);
         legion.setMarker(marker);
 
-        SplitLegion.splitLegion(frame, legion);
+        SplitLegion.splitLegion(frame, legion, false);
     }
 }

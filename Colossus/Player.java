@@ -375,14 +375,15 @@ public final class Player implements Comparable
 
         if (game.getChooseMovement())
         {
-            movementRoll = game.pickRoll();
-            Game.logEvent(getName() + " chose a " + movementRoll +
+            movementRoll = PickRoll.pickRoll(game.getMasterFrame(),
+                "Pick movement roll");
+            Game.logEvent(getName() + " chooses a " + movementRoll +
                 " for movement");
         }
         else
         {
             movementRoll = Game.rollDie();
-            Game.logEvent(getName() + " rolled a " + movementRoll +
+            Game.logEvent(getName() + " rolls a " + movementRoll +
                 " for movement");
         }
         game.showMovementRoll(movementRoll);
@@ -394,7 +395,7 @@ public final class Player implements Comparable
         if (mulligansLeft > 0)
         {
             undoAllMoves();
-            Game.logEvent(getName() + " took a mulligan");
+            Game.logEvent(getName() + " takes a mulligan");
             mulligansLeft--;
             movementRoll = 0;
         }
@@ -614,6 +615,16 @@ public final class Player implements Comparable
     public Collection getMarkersAvailable()
     {
         return markersAvailable;
+    }
+
+
+    public String getFirstAvailableMarker()
+    {
+        if (markersAvailable.size() == 0)
+        {
+            return null;
+        }
+        return (String)markersAvailable.first();
     }
 
 

@@ -146,7 +146,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
             legion.getCurrentHex().repaint();
 
             Game.logEvent("An " + creature.getName() +
-                " was summoned from legion " + donor.getMarkerId() +
+                " is summoned from legion " + donor.getMarkerId() +
                 " into legion " + legion.getMarkerId());
         }
 

@@ -53,9 +53,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private JCheckBoxMenuItem miAllStacksVisible;
     private JCheckBoxMenuItem miAutoRecruit;
     private JCheckBoxMenuItem miAutoPickRecruiter;
+    private JCheckBoxMenuItem miAutoPickMarker;
     private JCheckBoxMenuItem miAutosave;
     private JCheckBoxMenuItem miAntialias;
     private JCheckBoxMenuItem miChooseMovement;
+    private JCheckBoxMenuItem miChooseHits;
+    private JCheckBoxMenuItem miChooseTowers;
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
@@ -114,15 +117,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         contentPane = masterFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
-
         scale = findScale();
-
         setOpaque(true);
-
         setupIcon();
-
         setBackground(Color.black);
-
         masterFrame.addWindowListener(this);
         addMouseListener(this);
 
@@ -134,7 +132,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         contentPane.add(this, BorderLayout.CENTER);
         masterFrame.pack();
-
         masterFrame.setVisible(true);
     }
 
@@ -552,6 +549,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
         miAutoPickRecruiter.addItemListener(this);
         optionsMenu.add(miAutoPickRecruiter);
 
+        miAutoPickMarker = new JCheckBoxMenuItem(Game.sAutoPickMarker);
+        miAutoPickMarker.setMnemonic(KeyEvent.VK_M);
+        miAutoPickMarker.setSelected(game.getAutoPickMarker());
+        miAutoPickMarker.addItemListener(this);
+        optionsMenu.add(miAutoPickMarker);
+
         optionsMenu.addSeparator();
 
         // Then per-client GUI options
@@ -578,20 +581,31 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         mi = optionsMenu.add(saveOptionsAction);
         mi.setMnemonic(KeyEvent.VK_O);
-        
-        // Debug menu 
+
+        // Debug menu
 
         debugMenu = new JMenu("Debug");
         debugMenu.setMnemonic(KeyEvent.VK_D);
         menuBar.add(debugMenu);
-        
+
         miChooseMovement = new JCheckBoxMenuItem(Game.sChooseMovement);
         miChooseMovement.setMnemonic(KeyEvent.VK_M);
         miChooseMovement.setSelected(game.getChooseMovement());
         miChooseMovement.addItemListener(this);
         debugMenu.add(miChooseMovement);
 
-        // Force number of hits
+        miChooseHits = new JCheckBoxMenuItem(Game.sChooseHits);
+        miChooseHits.setMnemonic(KeyEvent.VK_H);
+        miChooseHits.setSelected(game.getChooseHits());
+        miChooseHits.addItemListener(this);
+        debugMenu.add(miChooseHits);
+
+        miChooseTowers = new JCheckBoxMenuItem(Game.sChooseTowers);
+        miChooseTowers.setMnemonic(KeyEvent.VK_T);
+        miChooseTowers.setSelected(game.getChooseTowers());
+        miChooseTowers.addItemListener(this);
+        debugMenu.add(miChooseTowers);
+
         // Allow changing creature types
     }
 
@@ -622,6 +636,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public void twiddleAutoPickRecruiter(boolean enable)
     {
         miAutoPickRecruiter.setSelected(enable);
+    }
+
+
+    public void twiddleAutoPickMarker(boolean enable)
+    {
+        miAutoPickMarker.setSelected(enable);
     }
 
 
@@ -1933,6 +1953,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             game.setAutoPickRecruiter(selected);
         }
+        else if (text.equals(Game.sAutoPickMarker))
+        {
+            game.setAutoPickMarker(selected);
+        }
         else if (text.equals(Game.sShowStatusScreen))
         {
             game.setShowStatusScreen(selected);
@@ -1948,6 +1972,14 @@ public final class MasterBoard extends JPanel implements MouseListener,
         else if (text.equals(Game.sChooseMovement))
         {
             game.setChooseMovement(selected);
+        }
+        else if (text.equals(Game.sChooseHits))
+        {
+            game.setChooseHits(selected);
+        }
+        else if (text.equals(Game.sChooseTowers))
+        {
+            game.setChooseTowers(selected);
         }
     }
 

@@ -63,7 +63,7 @@ public final class ShowLegion extends JDialog implements MouseListener,
             String imageName;
             if (!allStacksVisible && !critter.isVisible())
             {
-                imageName = "Question";
+                imageName = "Unknown";
             }
             else
             {

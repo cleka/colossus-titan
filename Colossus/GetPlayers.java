@@ -163,7 +163,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         {
             String name = (String)it.next();
             game.addPlayer(name);
-            Game.logEvent("Added player " + name);
+            Game.logEvent("Add player " + name);
         }
     }
 }

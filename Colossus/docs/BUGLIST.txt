@@ -46,3 +46,10 @@ All creatures are invisible after loading a game.
 
 Defender dies.  Battle phase advances to Move.  
    Battle phase advances to Fight.  Defender's battle turn, number X
+
+Post-battle angel summoning is messed up.  Usually hexes with eligible 
+   donor legions are highlighted, but the SummonAngel dialog does not
+   appear unless the donor is clicked.  Once the donor highlighting
+   interfered with recruit highlighting, which was fixed with undo
+   all recruits.
+

@@ -719,14 +719,45 @@ System.out.println("DENIED CARRY UP DUNE HEXSIDE");
 
         int [] rolls = new int[dice];
         StringBuffer rollString = new StringBuffer(36);
-        for (int i = 0; i < dice; i++)
-        {
-            rolls[i] = Game.rollDie();
-            rollString.append(rolls[i]);
 
-            if (rolls[i] >= strikeNumber)
+        if (battle.getGame().getChooseHits())
+        {
+            do
             {
-                damage++;
+                String answer = JOptionPane.showInputDialog(map,
+                    "Input number of hits (0-" + dice + ")");
+                try
+                {
+                    damage = Integer.parseInt(answer);
+                }
+                catch (NumberFormatException e)
+                {
+                    damage = -1;
+                }
+            }
+            while (damage < 0 || damage > dice);
+            for (int i = 0; i < damage; i++)
+            {
+                rolls[i] = 6;
+                rollString.append(rolls[i]);
+            }
+            for (int i = damage; i < dice; i++)
+            {
+                rolls[i] = 1;
+                rollString.append(rolls[i]);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < dice; i++)
+            {
+                rolls[i] = Game.rollDie();
+                rollString.append(rolls[i]);
+
+                if (rolls[i] >= strikeNumber)
+                {
+                    damage++;
+                }
             }
         }
 

@@ -98,7 +98,12 @@ public class Creature implements Comparable
         false, true, false, false, true, false, false, false, false,
         18, "Wyverns");
 
-    // Sometimes we need to iterate through all creature types.
+    /** For marking unknown enemy creatures when tracking PBEM games. */
+    public static final Creature unknown = new Creature("Unknown", 1, 1,
+        false, false, false, false, false, false, false, false, false,
+        1, "Unknown");
+
+    /** Sometimes we need to iterate through all creature types. */
     private static final Creature [] creaturesArray = {angel, archangel,
         behemoth, centaur, colossus, cyclops, dragon, gargoyle, giant,
         gorgon, griffon, guardian, hydra, lion, minotaur, ogre, ranger,

@@ -42,11 +42,15 @@ public final class Game
     public static final String saveGameVersion =
         "Colossus savegame version 4";
 
+    public static final String configVersion =
+        "Colossus config file version 2";
+
     // Option names
     public static final String sAutosave = "Autosave";
     public static final String sAllStacksVisible = "All stacks visible";
     public static final String sAutoRecruit = "Auto recruit";
     public static final String sAutoPickRecruiter = "Autopick recruiter";
+    public static final String sAutoPickMarker = "Autopick marker";
     public static final String sShowStatusScreen = "Show game status";
     public static final String sShowDice = "Show dice";
     public static final String sAntialias = "Antialias";
@@ -58,6 +62,7 @@ public final class Game
     // Per-player client options
     private static boolean autoRecruit;
     private static boolean autoPickRecruiter;
+    private static boolean autoPickMarker;
     private static boolean showDice = true;
     private static boolean showStatusScreen = true;
     private static boolean antialias = false;
@@ -121,6 +126,7 @@ public final class Game
             board.clearLegions();
         }
         players.clear();
+        statusScreen = null;
 
         JFrame frame = new JFrame();
 
@@ -130,13 +136,29 @@ public final class Game
         {
             String name = (String)it.next();
             addPlayer(name);
-            logEvent("Added player " + name);
+            logEvent("Add player " + name);
         }
+
+        if (disposed)
+        {
+            return;
+        }
+
+        if (board == null)
+        {
+            board = new MasterBoard(this);
+        }
+        else
+        {
+            board.setGame(this);
+        }
+        masterFrame = board.getFrame();
 
         assignTowers();
 
         // Renumber players in descending tower order.
         Collections.sort(players);
+        activePlayerNum = 0;
 
         ListIterator lit = players.listIterator(players.size());
         while (lit.hasPrevious())
@@ -153,32 +175,21 @@ public final class Game
             player.initMarkersAvailable();
         }
 
-        if (!disposed)
-        {
-            if (board == null)
-            {
-                board = new MasterBoard(this);
-            }
-            else
-            {
-                board.setGame(this);
-            }
-            masterFrame = board.getFrame();
-            it = players.iterator();
-            while (it.hasNext())
-            {
-                Player player = (Player)it.next();
-                placeInitialLegion(player);
-                updateStatusScreen();
-            }
-            board.loadInitialMarkerImages();
-            board.setupPhase();
-
-            board.setVisible(true);
-            board.repaint();
-        }
-
         loadOptions();
+
+        it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            placeInitialLegion(player);
+            updateStatusScreen();
+        }
+        board.loadInitialMarkerImages();
+        board.setupPhase();
+
+        board.setVisible(true);
+        board.repaint();
+
         updateStatusScreen();
 
         if (showDice)
@@ -226,28 +237,33 @@ public final class Game
             {
                 if (playerTower[i] == UNASSIGNED)
                 {
-                    rolls[i] = rollDie();
+                    if (chooseTowers)
+                    {
+                        Player player = getPlayer(i);
+                        rolls[i] = PickRoll.pickRoll(masterFrame,
+                            "Choose tower roll for " + player.getName());
+                    }
+                    else
+                    {
+                        rolls[i] = rollDie();
+                    }
                 }
             }
 
+            outer:
             for (int i = 0; i < numPlayers; i++)
             {
                 if (playerTower[i] == UNASSIGNED)
                 {
-                    boolean unique = true;
                     for (int j = 0; j < numPlayers; j++)
                     {
                         if (i != j && rolls[i] == rolls[j])
                         {
-                            unique = false;
-                            break;
+                            continue outer;
                         }
                     }
-                    if (unique)
-                    {
-                        playerTower[i] = rolls[i];
-                        playersLeft--;
-                    }
+                    playerTower[i] = rolls[i];
+                    playersLeft--;
                 }
             }
         }
@@ -277,17 +293,35 @@ public final class Game
     {
         return chooseMovement;
     }
-    
-    
+
+
     public void setChooseMovement(boolean chooseMovement)
     {
         this.chooseMovement = chooseMovement;
     }
 
 
-    public int pickRoll()
+    public boolean getChooseHits()
     {
-        return PickRoll.pickRoll(masterFrame);
+        return chooseHits;
+    }
+
+
+    public void setChooseHits(boolean chooseHits)
+    {
+        this.chooseHits = chooseHits;
+    }
+
+
+    public boolean getChooseTowers()
+    {
+        return chooseTowers;
+    }
+
+
+    public void setChooseTowers(boolean chooseTowers)
+    {
+        this.chooseTowers = chooseTowers;
     }
 
 
@@ -370,6 +404,18 @@ public final class Game
     public void setAutoPickRecruiter(boolean autoPickRecruiter)
     {
         this.autoPickRecruiter = autoPickRecruiter;
+    }
+
+
+    public boolean getAutoPickMarker()
+    {
+        return autoPickMarker;
+    }
+
+
+    public void setAutoPickMarker(boolean autoPickMarker)
+    {
+        this.autoPickMarker = autoPickMarker;
     }
 
 
@@ -473,6 +519,12 @@ public final class Game
     public void setAutosave(boolean autosave)
     {
         this.autosave = autosave;
+    }
+
+
+    public JFrame getMasterFrame()
+    {
+        return masterFrame;
     }
 
 
@@ -1183,6 +1235,8 @@ public final class Game
             allStacksVisible));
         options.setProperty(sAutoPickRecruiter, String.valueOf(
             autoPickRecruiter));
+        options.setProperty(sAutoPickMarker, String.valueOf(
+            autoPickMarker));
         options.setProperty(sShowDice, String.valueOf(showDice));
         options.setProperty(sShowStatusScreen, String.valueOf(
             showStatusScreen));
@@ -1191,8 +1245,7 @@ public final class Game
         try
         {
             FileOutputStream out = new FileOutputStream(optionsPath);
-            String header = "Colossus config file version 1.0";
-            options.store(out, header);
+            options.store(out, configVersion);
         }
         catch (IOException e)
         {
@@ -1218,11 +1271,12 @@ public final class Game
             return;
         }
 
-        // XXX Handle partial options files?
         autosave = (options.getProperty(sAutosave, "false").equals("true"));
         allStacksVisible = (options.getProperty(sAllStacksVisible,
             "false").equals( "true"));
         autoPickRecruiter = (options.getProperty(sAutoPickRecruiter,
+            "false").equals( "true"));
+        autoPickMarker = (options.getProperty(sAutoPickMarker,
             "false").equals( "true"));
         showDice = (options.getProperty(sShowDice, "true").equals("true"));
         showStatusScreen = (options.getProperty(sShowStatusScreen,
@@ -1234,6 +1288,7 @@ public final class Game
         board.twiddleAutosave(autosave);
         board.twiddleAllStacksVisible(allStacksVisible);
         board.twiddleAutoPickRecruiter(autoPickRecruiter);
+        board.twiddleAutoPickMarker(autoPickMarker);
         board.twiddleShowStatusScreen(showStatusScreen);
         board.twiddleShowDice(showDice);
         board.twiddleAntialias(antialias);
@@ -2167,15 +2222,22 @@ public final class Game
     {
         String name = player.getName();
         String selectedMarkerId;
-        do
+        if (autoPickMarker)
         {
-            selectedMarkerId = PickMarker.pickMarker(masterFrame,
-                name, player.getMarkersAvailable());
+            selectedMarkerId = player.getFirstAvailableMarker();
         }
-        while (selectedMarkerId == null);
+        else
+        {
+            do
+            {
+                selectedMarkerId = PickMarker.pickMarker(masterFrame,
+                    name, player.getMarkersAvailable());
+            }
+            while (selectedMarkerId == null);
+        }
 
         player.selectMarkerId(selectedMarkerId);
-        logEvent(name + " selected initial marker");
+        logEvent(name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
         MasterHex hex = MasterBoard.getHexFromLabel(String.valueOf(
@@ -2235,7 +2297,7 @@ public final class Game
      *  block == -2, use only arrows.  Do not double back in
      *  the direction you just came from.
      */
-    private Set findMoves(MasterHex hex, Player player, Legion legion,
+    private Set findNormalMoves(MasterHex hex, Player player, Legion legion,
         int roll, int block, int cameFrom)
     {
         HashSet set = new HashSet();
@@ -2281,7 +2343,7 @@ public final class Game
 
         if (block >= 0)
         {
-            set.addAll(findMoves(hex.getNeighbor(block), player, legion,
+            set.addAll(findNormalMoves(hex.getNeighbor(block), player, legion,
                 roll - 1, ARROWS_ONLY, Hex.oppositeHexsideNum(block)));
         }
         else if (block == ARCHES_AND_ARROWS)
@@ -2290,8 +2352,9 @@ public final class Game
             {
                 if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
                 {
-                    set.addAll(findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, ARROWS_ONLY, Hex.oppositeHexsideNum(i)));
+                    set.addAll(findNormalMoves(hex.getNeighbor(i), player,
+                        legion, roll - 1, ARROWS_ONLY,
+                        Hex.oppositeHexsideNum(i)));
                 }
             }
         }
@@ -2301,8 +2364,8 @@ public final class Game
             {
                 if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
                 {
-                    set.addAll(findMoves(hex.getNeighbor(i), player, legion,
-                        roll - 1, ARROWS_ONLY, Hex.oppositeHexsideNum(i)));
+                    set.addAll(findNormalMoves(hex.getNeighbor(i), player,
+                    legion, roll - 1, ARROWS_ONLY, Hex.oppositeHexsideNum(i)));
                 }
             }
         }
@@ -2350,7 +2413,7 @@ public final class Game
     /** Return number of legal non-teleport moves. */
     public int countConventionalMoves(Legion legion)
     {
-        return showMoves(legion, false).size();
+        return listMoves(legion, false).size();
     }
 
 
@@ -2358,7 +2421,7 @@ public final class Game
      *  legal moves. */
     public int highlightMoves(Legion legion)
     {
-        Set set = showMoves(legion, true);
+        Set set = listMoves(legion, true);
         board.unselectAllHexes();
         board.selectHexesByLabels(set);
         return set.size();
@@ -2367,7 +2430,7 @@ public final class Game
 
     /** Return set of hex labels where this legion can move.
      *  Include teleport moves only if teleport is true. */
-    private Set showMoves(Legion legion, boolean teleport)
+    private Set listMoves(Legion legion, boolean teleport)
     {
         HashSet set = new HashSet();
 
@@ -2377,10 +2440,9 @@ public final class Game
         }
 
         Player player = legion.getPlayer();
+        MasterHex hex = legion.getCurrentHex();
 
         board.clearAllNonFriendlyOccupiedEntrySides(player);
-
-        MasterHex hex = legion.getCurrentHex();
 
         // Conventional moves
 
@@ -2395,8 +2457,8 @@ public final class Game
             }
         }
 
-        set.addAll(findMoves(hex, player, legion, player.getMovementRoll(),
-            block, NOWHERE));
+        set.addAll(findNormalMoves(hex, player, legion,
+            player.getMovementRoll(), block, NOWHERE));
 
         if (teleport && player.getMovementRoll() == 6)
         {
@@ -2411,10 +2473,11 @@ public final class Game
                 // Mark every unoccupied tower.
                 for (int tower = 100; tower <= 600; tower += 100)
                 {
-                    hex = MasterBoard.getHexFromLabel(String.valueOf(tower));
+                    String label = String.valueOf(tower);
+                    hex = MasterBoard.getHexFromLabel(label);
                     if (!hex.isOccupied())
                     {
-                        set.add(hex.getLabel());
+                        set.add(label);
 
                         // Mover can choose side of entry.
                         hex.setTeleported(true);
@@ -2645,7 +2708,7 @@ public final class Game
                     return;
                 }
 
-                SplitLegion.splitLegion(masterFrame, legion);
+                SplitLegion.splitLegion(masterFrame, legion, autoPickMarker);
 
                 updateStatusScreen();
                 // If we split, unselect this hex.
@@ -2706,7 +2769,10 @@ public final class Game
             // destination, move the legion here.
             case Game.MOVE:
                 Legion legion = player.getMover();
-                if (legion != null && hex.isSelected())
+                // Verify that the move is legal, rather than trusting
+                // hex.isSelected().
+                if (legion != null && listMoves(legion, true).contains(
+                    hex.getLabel()))
                 {
                     // Pick teleport or normal move if necessary.
                     if (hex.getTeleported() && hex.canEnterViaLand())
@@ -2771,7 +2837,7 @@ public final class Game
                 }
                 else
                 {
-                    highlightUnmovedLegions();
+                    actOnMisclick();
                 }
                 break;
 

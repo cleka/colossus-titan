@@ -1,7 +1,8 @@
-For PBEM and debug, add a menu with the ability to specify tower 
-   assignments and number of hits in combat.  Also allow the ability 
-   to replace any creature in a legion with a different creature type, 
-   and a creature type of "unknown"
+Make auto recruit smarter.  Take the correct small creature in a 
+   tower, and take a third cyclops over a gorgon.
+
+Add allow the ability to replace any creature in a legion with a 
+   different creature type or "unknown," for PBEM and debug.
 
 Add per-player option menu, with results saved to playername.cfg
 
@@ -16,7 +17,6 @@ Change more modal dialogs to use a factory that returns a value,
 Add test main() to remaining dialogs.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
-Add auto-recruit option.
 Add auto-forced-strike option.
 Add auto-pick-legion-markers option.
 Add auto-pick-entry-side option.

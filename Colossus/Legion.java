@@ -132,7 +132,7 @@ public final class Legion
                     {
                         addCreature(angel, true);
                         Game.logEvent("Legion " + getMarkerId() +
-                            " acquired an " + type);
+                            " acquires an " + type);
                         if (type.equals("Archangel"))
                         {
                             didArchangel = true;
