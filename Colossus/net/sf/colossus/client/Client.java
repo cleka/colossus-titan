@@ -2794,10 +2794,15 @@ public final class Client implements IClient
         }
 
         // if this hex is already occupied, return false
-        int friendlyLegions = getNumFriendlyLegions(hexLabel, activePlayerName);
-        if (friendlyLegions > 0)
+        LegionInfo li = getLegionInfo(moverId);
+        if (!hexLabel.equals(li.getHexLabel()))
         {
-            return false;
+            int friendlyLegions = getNumFriendlyLegions(hexLabel,
+                    activePlayerName);
+            if (friendlyLegions > 0)
+            {
+                return false;
+            }
         }
 
         server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
