@@ -448,11 +448,13 @@ public class Game extends Frame implements WindowListener, ActionListener
     {
         board.unselectAllHexes();
         phase++;
+System.out.println("advancePhase to phase " + phase);
     }
 
 
     void advanceTurn()
     {
+System.out.println("advanceTurn");
         board.unselectAllHexes();
         activePlayerNum++;
         activePlayerNum %= numPlayers;
@@ -461,6 +463,7 @@ public class Game extends Frame implements WindowListener, ActionListener
             turnNumber++;
         }
         phase = SPLIT;
+System.out.println("phase = SPLIT  activePlayerNum = " + activePlayerNum);
         if (getActivePlayer().isAlive() == false)
         {
             advanceTurn();
