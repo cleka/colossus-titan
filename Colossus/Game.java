@@ -12,7 +12,10 @@ class Game extends Frame implements WindowListener, ActionListener
 {
     int numPlayers;
     Player [] player;
-    TextField [] tf = new TextField[7];
+    MasterBoard masterboard;
+    int turn = 0;
+
+    TextField [] tf = new TextField[6];
     int currentColor;  // state holder during color choice
     Label [] colorLabel = new Label[6];
     Button [] colorButton = new Button[6];
@@ -31,27 +34,14 @@ class Game extends Frame implements WindowListener, ActionListener
         
         setLayout(new GridLayout(0, 2));
 
-        add(new Label("Number of Players (2-6)"));
-        tf[0] = new TextField(1);
-        add(tf[0]);
-        add(new Label("Player 1 Name"));
-        tf[1] = new TextField(20);
-        add(tf[1]);
-        add(new Label("Player 2 Name"));
-        tf[2] = new TextField(20);
-        add(tf[2]);
-        add(new Label("Player 3 Name"));
-        tf[3] = new TextField(20);
-        add(tf[3]);
-        add(new Label("Player 4 Name"));
-        tf[4] = new TextField(20);
-        add(tf[4]);
-        add(new Label("Player 5 Name"));
-        tf[5] = new TextField(20);
-        add(tf[5]);
-        add(new Label("Player 6 Name"));
-        tf[6] = new TextField(20);
-        add(tf[6]);
+        for (int i = 0; i < 6; i++)
+        {
+            String s = "Player " + (i + 1) + " Name";
+            add(new Label(s));
+            tf[i] = new TextField(20);
+            add(tf[i]);
+        }
+        
         Button b1 = new Button("OK");
         add(b1);
         b1.addActionListener(this);
@@ -67,55 +57,46 @@ class Game extends Frame implements WindowListener, ActionListener
     void validateInputs()
     {
         boolean error = false;
-        String [] s = new String[7];
-        for (int i = 0; i <= 6; i++)
+        String [] s = new String[6];
+        String [] playerName = new String[6];
+
+        for (int i = 0; i < 6; i++)
         {
-           s[i] = tf[i].getText(); 
+            s[i] = tf[i].getText();
         }
 
-        // s[0] needs to be a number in the range 1-6
-        try
-        {
-            numPlayers = Integer.valueOf(s[0]).intValue();
-            if (numPlayers < 1 || numPlayers > 6)
-            {
-                throw new NumberFormatException();
-            }
-        }
-        catch (NumberFormatException e)
-        {
-            tf[0].setText(""); 
-            return;
-        }
+        // Sort in reverse order so that empties go last.
+        sortStrings(s);
 
-        // Now we know the size of the player array.
-        player = new Player[numPlayers];
-
-        // Make sure each player has a unique, non-empty name
-        String [] playerName = new String[numPlayers];
-        for (int i = 0; i < numPlayers; i++)
+        // Make sure each player has a unique name.
+        numPlayers = 0;
+        for (int i = 0; i < 6; i++)
         {
-            playerName[i] = tf[i + 1].getText();
-            if (playerName[i].length() == 0)
+            if (s[i].length() > 0)
             {
-                error = true;
-            }
-            for (int j = 0; j < i; j++)
-            {
-                if (playerName[i].compareTo(playerName[j]) == 0)
+                if (i > 0 && s[i].compareTo(s[i - 1]) == 0)
                 {
                     error = true;
-                    tf[i + 1].setText("");
+                }
+                else
+                {
+                    playerName[numPlayers] = s[i];
+                    numPlayers++;
                 }
             }
         }
         
-        if (error)
+        if (error || numPlayers == 0)
         {
+            for (int i = 0; i < 6; i++)
+            {
+                tf[i].setText("");
+            }
             return;
         }
 
         // Fill the player objects
+        player = new Player[numPlayers];
         for (int i = 0; i < numPlayers; i++)
         {
             player[i] = new Player(playerName[i]);
@@ -156,7 +137,7 @@ class Game extends Frame implements WindowListener, ActionListener
     }
 
 
-    // XXX This should really be one dialog per player
+    // XXX This should be one dialog per player.
     void chooseColors()
     {
         removeAll();
@@ -213,7 +194,6 @@ class Game extends Frame implements WindowListener, ActionListener
         add(b3);
         b3.addActionListener(this);
 
-        setSize(300, 250);
         pack();
 
         for (int i = 1; i <= 6; i++)
@@ -266,7 +246,6 @@ class Game extends Frame implements WindowListener, ActionListener
                 }
             }
         }
-
     }
 
     
@@ -276,9 +255,10 @@ class Game extends Frame implements WindowListener, ActionListener
         setTitle("Game Status");
         setLayout(new GridLayout(0, 9));
 
-        // XXX Need to sort player in descending tower order
+        // Need to sort player in descending tower order
+        sortPlayers();
 
-        // active?, player name, tower, color, colors eliminated, legions,
+        // active, player name, tower, color, colors eliminated, legions,
         //     markers, titan power, score
 
         add(new Label(""));
@@ -286,8 +266,8 @@ class Game extends Frame implements WindowListener, ActionListener
         add(new Label("Tower"));
         add(new Label("Color"));
         add(new Label("Colors Elim"));
-        add(new Label("# Legions"));
-        add(new Label("# Markers"));
+        add(new Label("Legions"));
+        add(new Label("Markers"));
         add(new Label("Titan Power"));
         add(new Label("Score"));
 
@@ -318,6 +298,8 @@ class Game extends Frame implements WindowListener, ActionListener
         }
 
         pack();
+
+        masterboard = new MasterBoard(this);
     }
 
 
@@ -340,7 +322,46 @@ class Game extends Frame implements WindowListener, ActionListener
             titanLabel[i].setText(String.valueOf(player[i].titanPower()));
             scoreLabel[i].setText(String.valueOf(player[i].score));
         }
+
+        repaint();
     }
+
+    
+    // Sort player array into turn order, by descending tower number.
+    void sortPlayers()
+    {
+        for (int i = 0; i < numPlayers - 1; i++)
+        {
+            for (int j = i + 1; j < numPlayers; j++)
+            {
+                if (player[i].startingTower < player[j].startingTower)
+                {
+                    Player tempPlayer = player[i];
+                    player[i] = player[j];
+                    player[j] = tempPlayer;
+                }
+            }
+        }
+    }
+    
+    
+    // Sort string array in reverse order
+    void sortStrings(String [] s)
+    {
+        for (int i = 0; i < s.length - 1; i++)
+        {
+            for (int j = i + 1; j < s.length; j++)
+            {
+                if (s[i].compareTo(s[j]) > 0)
+                {
+                    String temp = s[i];
+                    s[i] = s[j];
+                    s[j] = temp;
+                }
+            }
+        }
+    }
+
 
     public void windowActivated(WindowEvent event)
     {
@@ -387,12 +408,22 @@ class Game extends Frame implements WindowListener, ActionListener
         }
         else if (e.getActionCommand() == "Done")
         {
+            // Make sure all colors are assigned before continuing.
+            for (int i = 0; i < numPlayers; i++)
+            {
+                if (player[i].color == null) 
+                {
+                    return;
+                }
+            }
+
             // Change this window into a status screen, and then 
             //     move on to the first player's first turn.
             initStatusScreen();
         }
-        else  // Color button
+        else
         {
+            // Color button
             processColorChoice(e.getActionCommand());
         }
     }
