@@ -36,12 +36,12 @@ final class Caretaker implements Cloneable
     }
 
 
-    int getCount(String strCreatureName)
+    int getCount(String creatureName)
     {
-        Integer count = (Integer)map.get(strCreatureName);
+        Integer count = (Integer)map.get(creatureName);
         if (count == null)
         {
-            return (Creature.getCreatureByName(strCreatureName).getMaxCount());
+            return (Creature.getCreatureByName(creatureName).getMaxCount());
         }
         return count.intValue();
     }
@@ -51,10 +51,10 @@ final class Caretaker implements Cloneable
         return getCount(creature.getName());
     }
 
-    void setCount(String strCreatureName, int count)
+    void setCount(String creatureName, int count)
     {
-        map.put(strCreatureName, new Integer(count)); 
-        updateDisplays();
+        map.put(creatureName, new Integer(count)); 
+        updateDisplays(creatureName);
     }
 
     void setCount(Creature creature, int count)
@@ -65,7 +65,7 @@ final class Caretaker implements Cloneable
     void resetAllCounts()
     {
         map.clear(); 
-        updateDisplays();
+        fullySyncDisplays();
     }
 
     void takeOne(Creature creature)
@@ -90,7 +90,7 @@ final class Caretaker implements Cloneable
             }
             map.put(creature.getName(), new Integer(count.intValue() - 1));
         }
-        updateDisplays();
+        updateDisplays(creature.getName());
     }
 
     void putOneBack(Creature creature)
@@ -101,19 +101,34 @@ final class Caretaker implements Cloneable
         {
             count = new Integer(creature.getMaxCount() - 1);
         }
-        map.put(creature.getName(), new Integer(count.intValue()+1));
-        updateDisplays();
+        map.put(creature.getName(), new Integer(count.intValue() + 1));
+        updateDisplays(creature.getName());
     }
 
-    void updateDisplays()
+    /** Update creatureName's count on all clients. */
+    private void updateDisplays(String creatureName)
     {
-        if (game != null)
+        Server server = game.getServer();
+        if (server != null)
         {
-            Server server = game.getServer();
-            if (server != null)
+            if (creatureName != null)
             {
-                server.allUpdateCreatureCounts();
+                server.allUpdateCreatureCount(creatureName, 
+                    getCount(creatureName));
             }
+        }
+    }
+
+    /** Update ALL creatures' counts on all clients.  This should only
+     *  be called when a game is loaded or restarted. */
+    void fullySyncDisplays()
+    {
+        // Do *all* creatures, not just the ones in the map.
+        Iterator it = Creature.getCreatures().iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            updateDisplays(creature.getName());
         }
     }
 
@@ -130,10 +145,5 @@ final class Caretaker implements Cloneable
         // the same as a deep copy
         newCaretaker.map = (HashMap)map.clone();
         return newCaretaker;
-    }
-
-    Map getCreatureCountMap()
-    {
-        return Collections.unmodifiableMap((Map)map.clone());
     }
 }

@@ -306,7 +306,7 @@ public final class Client
         }
         else if (name.equals(Options.showCaretaker))
         {
-            updateCreatureCounts();
+            updateCreatureCountDisplay();
         }
         else if (name.equals(Options.showLogWindow))
         {
@@ -460,26 +460,17 @@ public final class Client
     }
 
 
-    private void updateCreatureCounts()
+    public void updateCreatureCount(String creatureName, int count)
     {
-        updateCreatureCounts(null);
+        if (creatureName != null)
+        {
+            creatureCounts.put(creatureName, new Integer(count));
+        }
+        updateCreatureCountDisplay();
     }
 
-    // TODO Stringify
-    public void updateCreatureCounts(Map counts)
+    private void updateCreatureCountDisplay()
     {
-        if (counts != null)
-        {
-            Iterator it = creatureCounts.entrySet().iterator();
-            while (it.hasNext())
-            {
-                Map.Entry entry = (Map.Entry)it.next();
-                String creatureName = (String)entry.getKey();
-                Integer num = (Integer)entry.getValue();
-                creatureCounts.put(creatureName, num);
-            }
-        }
-
         if (getOption(Options.showCaretaker))
         {
             if (caretakerDisplay == null)

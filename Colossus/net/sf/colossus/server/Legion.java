@@ -769,7 +769,7 @@ final class Legion implements Comparable
         Player player = getPlayer();
         Collection legions = player.getLegions();
         Iterator it = legions.iterator();
-        List summonableList = Creature.getSummonablesCreatures();
+        List summonableList = Creature.getSummonableCreatures();
         while (it.hasNext())
         {
             Legion candidate = (Legion)it.next();

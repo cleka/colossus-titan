@@ -308,8 +308,7 @@ public final class Game
         setupPhase();
 
         server.allUpdateStatusScreen();
-        // XXX Needed?
-        server.allUpdateCreatureCounts();
+        caretaker.fullySyncDisplays();
     }
 
 
@@ -1161,9 +1160,7 @@ public final class Game
             setupPhase();
 
             server.allUpdateStatusScreen();
-
-            // XXX Needed?
-            server.allUpdateCreatureCounts();
+            caretaker.fullySyncDisplays();
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -2078,7 +2075,7 @@ reinforcing + " acquiring=" + acquiring);
                 String hexLabel = candidate.getCurrentHexLabel();
                 boolean hasSummonable = false;
                 java.util.List summonableList =
-                    Creature.getSummonablesCreatures();
+                    Creature.getSummonableCreatures();
                 Iterator sumIt = summonableList.iterator();
                 while (sumIt.hasNext() && !hasSummonable)
                 {

@@ -43,7 +43,6 @@ public class Creature implements Comparable
     private final boolean demilord;
     private final int maxCount;
 
-    /** For marking unknown enemy creatures when tracking PBEM games. */
     public static final Creature unknown = new Creature("Unknown", 1, 1,
         false, false, false, false, false, false, false,
         false, false, false, false, false, false,
@@ -51,7 +50,7 @@ public class Creature implements Comparable
 
     /** Sometimes we need to iterate through all creature types. */
     private static java.util.List creatures = new ArrayList();
-    private static java.util.List summonablesCreatures = new ArrayList();
+    private static java.util.List summonableCreatures = new ArrayList();
 
 
     public Creature(String name, int power, int skill, boolean rangestrikes,
@@ -126,14 +125,14 @@ public class Creature implements Comparable
             System.out.println("Creatures def. loading failed : " + e);
             System.exit(1);
         }
-        summonablesCreatures.clear();
+        summonableCreatures.clear();
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
             Creature c = (Creature)it.next();
             if (c.isSummonable())
             {
-                summonablesCreatures.add(c);
+                summonableCreatures.add(c);
             }
         }
     }
@@ -143,9 +142,9 @@ public class Creature implements Comparable
         return java.util.Collections.unmodifiableList(creatures);
     }
 
-    public static java.util.List getSummonablesCreatures()
+    public static java.util.List getSummonableCreatures()
     {
-        return java.util.Collections.unmodifiableList(summonablesCreatures);
+        return java.util.Collections.unmodifiableList(summonableCreatures);
     }
 
     public int getMaxCount()

@@ -77,17 +77,16 @@ public final class Server
         }
     }
 
-    // TODO Only update the ones that have changed.
-    void allUpdateCreatureCounts()
+    void allUpdateCreatureCount(String creatureName, int count)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            Map creatureCountMap = game.getCaretaker().getCreatureCountMap();
-            client.updateCreatureCounts(creatureCountMap);
+            client.updateCreatureCount(creatureName, count);
         }
     }
+
 
     void allTellMovementRoll(int roll)
     {

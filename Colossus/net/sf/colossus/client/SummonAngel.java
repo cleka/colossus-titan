@@ -52,7 +52,7 @@ final class SummonAngel extends JDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
-        java.util.List summonableList = Creature.getSummonablesCreatures();
+        java.util.List summonableList = Creature.getSummonableCreatures();
         java.util.Iterator it = summonableList.iterator();
         sumChitList = new java.util.ArrayList();
         while (it.hasNext())
