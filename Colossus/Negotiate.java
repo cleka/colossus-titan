@@ -9,19 +9,20 @@ import java.awt.event.*;
 
 class Negotiate extends Dialog implements MouseListener, ActionListener
 {
-    MediaTracker tracker;
-    boolean imagesLoaded;
-    Legion attacker;
-    Legion defender;
-    Chit [] attackerChits;
-    Chit [] defenderChits;
-    Chit attackerMarker;
-    Chit defenderMarker;
-    final int scale = 60;
-    Frame parentFrame;
-    Button button1;
-    Button button2;
-    boolean laidOut = false;
+    private MediaTracker tracker;
+    private boolean imagesLoaded;
+    private Legion attacker;
+    private Legion defender;
+    private Chit [] attackerChits;
+    private Chit [] defenderChits;
+    private Chit attackerMarker;
+    private Chit defenderMarker;
+    private static final int scale = 60;
+    private Frame parentFrame;
+    private Button button1;
+    private Button button2;
+    private boolean laidOut = false;
+
 
     Negotiate(Frame parentFrame, Legion attacker, Legion defender)
     {
@@ -49,7 +50,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         for (int i = 0; i < attacker.getHeight(); i++)
         {
             attackerChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                scale / 2, scale, attacker.creatures[i].getImageName(),
+                scale / 2, scale, attacker.getCreature(i).getImageName(),
                 this);
         }
         
@@ -57,7 +58,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         for (int i = 0; i < defender.getHeight(); i++)
         {
             defenderChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                2 * scale, scale, defender.creatures[i].getImageName(),
+                2 * scale, scale, defender.getCreature(i).getImageName(),
                 this);
         }
             
@@ -258,7 +259,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
                 // Titan.
                 for (int i = winner.getHeight() - 1; i >= 0; i--) 
                 {
-                    if (winnerChits[i].isDead() && winner.creatures[i] ==
+                    if (winnerChits[i].isDead() && winner.getCreature(i) ==
                         Creature.titan)
                     {
                         new MessageBox(parentFrame, 
