@@ -456,9 +456,22 @@ System.out.println("MasterBoard.finishSummoningAngel");
     }
 
 
+    void setSummonAngel(SummonAngel summonAngel)
+    {
+        this.summonAngel = summonAngel;
+    }
+
+
     void finishBattle()
     {
-        highlightEngagements();
+        if (summoningAngel)
+        {
+            summonAngel.repaint();
+        }
+        else
+        {
+            highlightEngagements();
+        }
         map = null;
     }
 
