@@ -587,7 +587,7 @@ class Player
     }
 
 
-    public void die(Player player)
+    public void die(Player player, boolean checkForVictory)
     {
         // Engaged legions give half points to the player they're
         // engaged with.  All others give half points to player,
@@ -642,7 +642,10 @@ class Player
         game.getBoard().repaint();
 
         // See if the game is over.
-        game.checkForVictory();
+        if (checkForVictory)
+        {
+            game.checkForVictory();
+        }
     }
 
 
