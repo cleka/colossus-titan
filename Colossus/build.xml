@@ -100,6 +100,13 @@
 <target name="test" depends="compile,jar"
         description = "Run all unit tests using JUnit">
         <junit printsummary="yes" fork="no" haltonfailure="no">
+                <classpath>
+                    <pathelement location="libs/junit.jar"/>
+                    <pathelement location="libs/werken.opt.jar"/>
+                    <pathelement location="libs/jdom.jar"/>
+                    <pathelement location="libs/batik-transcoder.jar"/>
+                    <pathelement location="libs/batik-util.jar"/>
+                </classpath>
                 <formatter type="plain"/>
                 <test name="net.sf.colossus.server.DiceTest"/>
                 <test name="net.sf.colossus.util.CombosTest"/>
