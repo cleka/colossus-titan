@@ -24,6 +24,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     private Chit angelChit;
     private Chit archangelChit;
     private boolean imagesLoaded = false;
+    private Legion donor;
 
 
     SummonAngel(MasterBoard board, Legion legion)
@@ -109,6 +110,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             // Only one angel can be summoned per turn.
             player.disallowSummoningAngel();
             legion.markSummoned();
+            player.setLastLegionSummonedFrom(donor);
         }
 
         board.finishSummoningAngel();
@@ -124,7 +126,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             return;
         }
 
-        Legion donor = player.getSelectedLegion();
+        donor = player.getSelectedLegion();
         if (donor != null)
         {
             int angels = donor.numCreature(Creature.angel);
@@ -145,13 +147,14 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right, 
                 7 * d.height / 8 - insets.bottom, d.width / 3, d.height / 8);
+            laidOut = true;
         }
     }
 
 
     public void mousePressed(MouseEvent e)
     {
-        Legion donor = player.getSelectedLegion();
+        donor = player.getSelectedLegion();
         if (donor == null)
         {
             return;
@@ -225,7 +228,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     {
         if (e.getActionCommand() == "Summon")
         {
-            Legion donor = player.getSelectedLegion();
+            donor = player.getSelectedLegion();
             if (donor == null) 
             {
                 new MessageBox(board, "Must select a legion.");
@@ -255,7 +258,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             }
             else
             {
-                // XXX: If both are available, make the player choose.
+                // If both are available, make the player click on one.
                 new MessageBox(board, "Select angel or archangel.");
                 return;
             }
