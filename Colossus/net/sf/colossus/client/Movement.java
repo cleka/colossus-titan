@@ -168,12 +168,18 @@ public final class Movement
         return set;
     }
 
-
     /** Return set of hexLabels describing where this legion can move. */
     public Set listAllMoves(LegionInfo legion, MasterHex hex, int movementRoll)
     {
-        Set set = listNormalMoves(legion, hex, movementRoll);
-        set.addAll(listTeleportMoves(legion, hex, movementRoll));
+        return listAllMoves(legion, hex, movementRoll, false);
+    }
+
+    /** Return set of hexLabels describing where this legion can move. */
+    public Set listAllMoves(LegionInfo legion, MasterHex hex, int movementRoll,
+                            boolean inAdvance)
+    {
+        Set set = listNormalMoves(legion, hex, movementRoll, inAdvance);
+        set.addAll(listTeleportMoves(legion, hex, movementRoll, inAdvance));
         return set;
     }
 
@@ -192,13 +198,20 @@ public final class Movement
         return block;
     }
 
-
     /** Return set of hexLabels describing where this legion can move
      *  without teleporting. */
     public Set listNormalMoves(LegionInfo legion, MasterHex hex, 
         int movementRoll)
     {
-        if (legion.hasMoved())
+        return listNormalMoves(legion, hex, movementRoll, false);
+    }
+    
+    /** Return set of hexLabels describing where this legion can move
+     *  without teleporting. */
+    public Set listNormalMoves(LegionInfo legion, MasterHex hex, 
+        int movementRoll, boolean inAdvance)
+    {
+        if (legion.hasMoved() && (!inAdvance))
         {
             return new HashSet();
         }
@@ -275,14 +288,21 @@ public final class Movement
         return true;
     }
 
-
     /** Return set of hexLabels describing where this legion can teleport. */
     Set listTeleportMoves(LegionInfo legion, MasterHex hex, int movementRoll)
+    {
+        return listTeleportMoves(legion, hex, movementRoll, false);
+    }
+        
+    /** Return set of hexLabels describing where this legion can teleport. */
+    Set listTeleportMoves(LegionInfo legion, MasterHex hex, int movementRoll,
+                          boolean inAdvance)
     {
         PlayerInfo player = legion.getPlayerInfo();
 
         Set set = new HashSet();
-        if (movementRoll != 6 || legion.hasMoved() || player.hasTeleported())
+        if ((!inAdvance) &&
+            (movementRoll != 6 || legion.hasMoved() || player.hasTeleported()))
         {
             return set;
         }

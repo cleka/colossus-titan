@@ -357,6 +357,10 @@ public final class VariantSupport
         {
             return aihl.getRecruitHint(terrain,legion,recruits,oracle);
         }
+        else
+        {
+            Log.error("Huh, no AIHintLoader available ! This should never happen.");
+        }
         return null;
     }
 

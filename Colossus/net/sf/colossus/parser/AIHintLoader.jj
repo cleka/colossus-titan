@@ -126,6 +126,13 @@ public class AIHintLoader
             return false;
         }
 
+        public String toString()
+        {
+            return "RecruitHint: in " + terrain + ", " + number + " " +
+                recruiter + " get a " + recruitee +
+                (ctn == null ? "" : " if " + ctn);
+        }
+
         boolean match(char terrain,
                       String recruiter,
                       int number)
@@ -477,6 +484,7 @@ public class AIHintLoader
         
         if (temp == null)
         { // no hint for this terrain
+            //Log.debug("HINT: none found for terrain type " + terrain);
             return null;
         }
         
@@ -484,7 +492,7 @@ public class AIHintLoader
         while (hintIt.hasNext() && (hint == null))
         {
             recruitHintData th = (recruitHintData)hintIt.next();
-
+            //Log.debug("HINT: checking " + th);
             synchronized (th)
             {
                 th.setOracle(oracle);
@@ -494,20 +502,26 @@ public class AIHintLoader
                 while (legionIt.hasNext() && (hint == null))
                 { // this will try creatures as many times as they exist. yuck !
                     String creature = (String)legionIt.next();
-                    
-                    if (th.match(terrain, creature, legion.numCreature(creature)))
+                    int num = legion.numCreature(creature);
+                    /* Log.debug("HINT: trying to match [1] " + terrain +
+                              " / " + creature +
+                              " / " + num); */
+                    if (th.match(terrain, creature, num))
                     {
                         hint = th.getRecruitee();
                     }
                 }
                 // second, try with all recruitable creature (so that
-                // hint with (number == ) are tried)
+                // hint with (number == 0) are tried)
                 Iterator recruitsIt = recruits.iterator();
                 while (recruitsIt.hasNext() && (hint == null))
                 { // this will try creatures as many times as they exist. yuck !
                     String creature = ((Creature)recruitsIt.next()).getName();
-                    
-                    if (th.match(terrain, creature, legion.numCreature(creature)))
+                    int num = legion.numCreature(creature);
+                    /* Log.debug("HINT: trying to match [2] " + terrain +
+                              " / " + creature +
+                              " / " + num); */
+                    if (th.match(terrain, creature, num))
                     {
                         hint = th.getRecruitee();
                     }

@@ -92,6 +92,7 @@ public class SimpleAI implements AI
                 (legion.hasTitan() || legion.getPointValue() >=
                     minimumSizeToRecruit))
             {
+                //Log.debug("Calling chooseRecruit() in muster().");
                 Creature recruit = chooseRecruit(legion, legion.getHexLabel());
 
                 if (recruit != null)
@@ -115,6 +116,7 @@ public class SimpleAI implements AI
 
     public void reinforce(LegionInfo legion)
     {
+        //Log.debug("Calling chooseRecruit() in reinforce().");
         Creature recruit = chooseRecruit(legion, legion.getHexLabel());
         String recruitName = null;
         String recruiterName = null;
@@ -1323,6 +1325,7 @@ public class SimpleAI implements AI
 
         if (canRecruitHere)
         {
+            //Log.debug("Calling chooseRecruit() in evaluateMove().");
             recruit = chooseRecruit(legion, hex.getLabel());
 
             if (recruit != null)
@@ -1845,19 +1848,29 @@ public class SimpleAI implements AI
 
         public boolean canReach(char t)
         {
-            return (getNumberOfWaysToTerrain(legion,hex,t) > 0);
+            int now = getNumberOfWaysToTerrain(legion,hex,t);
+            //Log.debug("ORACLE: now is " + now + " ( from hex " + hex.getLabel() + " to a " + t + ")");
+            return (now > 0);
         }
         public int creatureAvailable(String name)
         {
-            return client.getCreatureCount(Creature.getCreatureByName(name));
+            int count =
+                client.getCreatureCount(Creature.getCreatureByName(name));
+            //Log.debug("ORACLE: count is " + count);
+            return count;
         }
         public boolean hasCreature(String name)
         {
-            return (legion.numCreature(name) > 0);
+            int num = legion.numCreature(name);
+            //Log.debug("ORACLE: num is " + num);
+            return (num > 0);
         }
         public boolean canRecruit(String name)
         {
-            return recruits.contains(Creature.getCreatureByName(name));
+            boolean contains =
+                recruits.contains(Creature.getCreatureByName(name));
+            //Log.debug("ORACLE: contains is " + false);
+            return contains;
         }
         public int stackHeight()
         {
@@ -1907,6 +1920,7 @@ public class SimpleAI implements AI
                                           new SimpleAIOracle(legion,hex,recruits));
         if (recruitName == null)
         {
+            //Log.debug("HINT: \"null\" found for " + hex.getLabel() + "...");
             return (Creature)recruits.get(recruits.size() - 1);
         }
         if ((recruitName.equals("nothing")) ||
@@ -1939,7 +1953,8 @@ public class SimpleAI implements AI
         int total = 0;
         for (int roll = 1; roll <= 6; roll++)
         {
-            Set set = client.getMovement().listAllMoves(legion, hex, roll);
+            Set set = client.getMovement().listAllMoves(legion, hex,
+                                                        roll, true);
             if (setContainsHexWithTerrain(set, terrainType))
             {
                 total++;
