@@ -371,7 +371,7 @@ public final class ResourceLoader
                 }
                 if (stream == null)
                 {
-                    Log.error("getInputStream:: " +
+                    Log.warn("getInputStream:: " +
                               " Couldn't get InputStream for file " +
                               filename + " in " + directories +
                               (cachedOnly ? " (cached only)" : ""));
@@ -404,7 +404,7 @@ public final class ResourceLoader
 
                         if (is == null)
                         {
-                            Log.error("getInputStream:: " +
+                            Log.warn("getInputStream:: " +
                                       " Couldn't get InputStream from socket" +
                                       " for file " +
                                       filename + " in " + directories +
@@ -454,7 +454,7 @@ public final class ResourceLoader
                                         server != null, cachedOnly);
         if (is == null)
         {
-            Log.error("getBytesFromFile:: " +
+            Log.warn("getBytesFromFile:: " +
                       " Couldn't get InputStream for file " +
                       filename + " in " + directories +
                       (cachedOnly ? " (cached only)" : ""));
@@ -508,7 +508,7 @@ public final class ResourceLoader
     {
         if (data == null)
         {
-            Log.error("getInputStreamFromString:: " +
+            Log.warn("getInputStreamFromString:: " +
                       " Cant't create InputStream from null String");
             return null;
         }
@@ -524,7 +524,7 @@ public final class ResourceLoader
     {
         if (data == null)
         {
-            Log.error("getInputStreamFromBytes:: " +
+            Log.warn("getInputStreamFromBytes:: " +
                       " Cant't create InputStream from null byte array");
             return null;
         }
@@ -815,7 +815,7 @@ public final class ResourceLoader
 
         if (tempImage == null)
         {
-            Log.error("WARNING: creation failed for " + filename);
+            Log.warn("WARNING: creation failed for " + filename);
             return createPlainImage(basew, baseh, Color.white, true);
         }
         waitOnImage(tempImage);
