@@ -103,9 +103,11 @@ public final class ResourceLoader
     private final static String sep = Constants.protocolTermSeparator;
 
     private static String server = null;
-    public static void setDataServer(String server)
+    private static int serverPort = 0;
+    public static void setDataServer(String server, int port)
     {
         ResourceLoader.server = server;
+        ResourceLoader.serverPort = port;
     }
 
     /**
@@ -397,9 +399,7 @@ public final class ResourceLoader
                 {
                     try
                     {  
-                        Socket fileSocket =
-                            new Socket(server,
-                                       Constants.defaultFileServerPort);
+                        Socket fileSocket = new Socket(server, serverPort);
                         InputStream is = fileSocket.getInputStream();
 
                         if (is == null)

@@ -177,9 +177,10 @@ public final class Constants
 
     // Network stuff
     public static final int defaultPort = 26567;
-    public static final int defaultFileServerPort = 26568;
+    // next one unused, the filr server port is (serverPort + 1)
+    // public static final int defaultFileServerPort = 26568;
     public static final int numSavedServerNames = 10;
-
+    
     // Game actions used in several places.
     public static final String newGame = "New game";
     public static final String loadGame = "Load game";

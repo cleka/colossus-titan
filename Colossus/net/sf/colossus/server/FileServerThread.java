@@ -22,7 +22,7 @@ final class FileServerThread extends Thread
 
     private boolean keepGoingOn = true;
 
-    FileServerThread(java.util.List activeSocketList)
+    FileServerThread(java.util.List activeSocketList, int port)
     {
         super();
         setDaemon(true);
@@ -30,7 +30,7 @@ final class FileServerThread extends Thread
         try
         {
             fileServer =
-                new ServerSocket(Constants.defaultFileServerPort,
+                new ServerSocket(port,
                                  Constants.MAX_MAX_PLAYERS);
         }
         catch (Exception e)

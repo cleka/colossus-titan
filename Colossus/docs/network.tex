@@ -60,9 +60,14 @@ alongside the game.
 \item[A] We changed from RMI to simple sockets, so the game should be
 much more firewall-friendly.  The server accepts connections from 
 clients on one port, and piggybacks return traffic on the same sockets
-rather than opening more.  So as long as the client machines have the
-ability to connect out to high ports, and the server machine has one
-inbound port open, it should work.
+rather than opening more.  The server also use a second port to serve
+data files to clients. So as long as the client machines have the
+ability to connect out to high ports, and the server machine has two
+consecutive inbound ports open, it should work.
+
+Default ports are 26567 and 26568, but they can be changed at game
+startup time (the port must be consecutive ATM, you give only the
+first).
 
 \end{itemize}
 

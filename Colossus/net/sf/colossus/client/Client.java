@@ -154,11 +154,11 @@ public final class Client implements IClient
 
         if (remote)
         {
-            net.sf.colossus.util.ResourceLoader.setDataServer(host);
+            net.sf.colossus.util.ResourceLoader.setDataServer(host, port + 1);
         }
         else
         {
-            net.sf.colossus.util.ResourceLoader.setDataServer(null);
+            net.sf.colossus.util.ResourceLoader.setDataServer(null, 0);
         }
         
         sct.start();

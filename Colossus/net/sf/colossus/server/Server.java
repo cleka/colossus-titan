@@ -112,7 +112,7 @@ Log.debug("About to create server socket on port " + port);
         // if the client ask for a file *before*
         // the file server is up.
 
-        Log.debug("Initializing the FileServerThread ");
+        Log.debug("About to create file server socket on port " + (port + 1));
 
         if (fileServerThread != null)
         {
@@ -131,7 +131,8 @@ Log.debug("About to create server socket on port " + port);
         
         if (!activeSocketList.isEmpty())
         {
-            fileServerThread = new FileServerThread(activeSocketList);
+            fileServerThread = new FileServerThread(activeSocketList,
+                                                    port + 1);
             fileServerThread.start();
         }
         else
