@@ -86,15 +86,21 @@ public final class Constants
     public static final int MAX_HORIZ_SIZE=60;
     public static final int MAX_VERT_SIZE=32;
 
-    /* the two arrays below must match ; see also
+    /* the three arrays below must match ; see also
        net.sf.colossus.server.Legion, it uses the
        shortened name directly */
+    /* all should be MAX_MAX_PLAYERS long */
     public static final String [] colorNames =
-        {"Black", "Blue", "Brown", "Gold", "Green", "Red",
+        {"Black",  "Blue", "Brown", "Gold", "Green", "Red",
          "Orange", "Purple"};
     public static final String [] shortColorNames = 
-        { "Bk",   "Bu",   "Br",    "Gd",   "Gr",    "Rd" ,
+        {"Bk",     "Bu",   "Br",    "Gd",   "Gr",    "Rd" ,
          "Or",     "Pu"};
+    public static final int [] colorMnemonics = {
+        KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O,
+        KeyEvent.VK_G, KeyEvent.VK_E, KeyEvent.VK_R,
+        KeyEvent.VK_A, KeyEvent.VK_P};
+
     public static final String noShortName = "XX";
     private static final java.util.HashMap shortNamesMap = new HashMap();
     

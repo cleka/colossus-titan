@@ -125,7 +125,7 @@ public interface IClient
     public void didSplit(String hexLabel, String parentId, String childId,
         int childHeight);
 
-    public void askPickColor(Set colorsLeft);
+    public void askPickColor(java.util.List colorsLeft);
 
     public void log(String message);
 

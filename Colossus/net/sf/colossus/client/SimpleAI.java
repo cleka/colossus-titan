@@ -33,7 +33,7 @@ public class SimpleAI implements AI
     }
 
 
-    public String pickColor(Set colors, List favoriteColors)
+    public String pickColor(java.util.List colors, List favoriteColors)
     {
         Iterator it = favoriteColors.iterator();
         while (it.hasNext())

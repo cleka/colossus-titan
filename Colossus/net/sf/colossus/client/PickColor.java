@@ -20,21 +20,31 @@ import net.sf.colossus.server.Constants;
 
 final class PickColor extends KDialog implements WindowListener, ActionListener
 {
-    private JLabel [] colorLabel = new JLabel[6];
+    private JLabel [] colorLabel = new JLabel[Constants.MAX_MAX_PLAYERS];
 
-    private static final Color [] background = { Color.black, Color.blue,
-        HTMLColor.brown, Color.yellow, Color.green, Color.red };
-    private static final Color [] foreground = { Color.white, Color.white,
-        Color.white, Color.black, Color.black, Color.black };
-
-    private static final int [] colorMnemonics =
-        {KeyEvent.VK_B, KeyEvent.VK_L, KeyEvent.VK_O, KeyEvent.VK_G,
-            KeyEvent.VK_E, KeyEvent.VK_R};
+    private static final Color [] background;// = { Color.black, Color.blue, HTMLColor.brown, Color.yellow, Color.green, Color.red };
+    private static final Color [] foreground;// = { Color.white, Color.white, Color.white, Color.black, Color.black, Color.black };
 
     private static String color;
 
+    static
+    {
+        background = new Color[Constants.MAX_MAX_PLAYERS];
+        foreground = new Color[Constants.MAX_MAX_PLAYERS];
+        
+        for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
+        {
+            background[i] = HTMLColor.stringToColor(Constants.colorNames[i] +
+                                                    "Colossus");
+            int sum =
+                background[i].getRed() +
+                background[i].getGreen() +
+                background[i].getBlue();
+            foreground[i] = (sum > 200 ? Color.black : Color.white);
+        }
+    }
 
-    private PickColor(JFrame parentFrame, String playerName, Set colorsLeft)
+    private PickColor(JFrame parentFrame, String playerName, java.util.List colorsLeft)
     {
         super(parentFrame, playerName + ", Pick a Color", true);
 
@@ -46,7 +56,7 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
         Container contentPane = getContentPane();
         contentPane.setLayout(new FlowLayout());
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             if (colorsLeft.contains(Constants.colorNames[i]))
             {
@@ -54,7 +64,7 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
                 int scale = Scale.get();
                 button.setPreferredSize(new Dimension(7 * scale, 4 * scale));
                 button.setText(Constants.colorNames[i]);
-                button.setMnemonic(colorMnemonics[i]);
+                button.setMnemonic(Constants.colorMnemonics[i]);
                 button.setBackground(background[i]);
                 button.setForeground(foreground[i]);
                 button.addActionListener(this);
@@ -70,7 +80,7 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
 
 
     static String pickColor(JFrame parentFrame, String playerName,
-        Set colorsLeft)
+        java.util.List colorsLeft)
     {
         new PickColor(parentFrame, playerName, colorsLeft);
         return color;
@@ -113,7 +123,7 @@ final class PickColor extends KDialog implements WindowListener, ActionListener
 
     private int colorNumber(String colorName)
     {
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             if (colorName.equals(Constants.colorNames[i]))
             {

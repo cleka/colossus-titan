@@ -50,7 +50,7 @@ public interface AI
     String summonAngel(String summonerId);
 
     /** pick a color of legion markers */
-    String pickColor(Set colors, List favoriteColors);
+    String pickColor(java.util.List colors, List favoriteColors);
 
     /** pick a legion marker */
     String pickMarker(Set markerIds, String preferredShortColor);

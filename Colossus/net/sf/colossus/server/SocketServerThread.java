@@ -602,7 +602,7 @@ final class SocketServerThread extends Thread implements IClient
             sep + childId + sep + childHeight); 
     }
 
-    public void askPickColor(Set colorsLeft)
+    public void askPickColor(java.util.List colorsLeft)
     {
         out.println(Constants.askPickColor + sep + Glob.glob(colorsLeft));
     }

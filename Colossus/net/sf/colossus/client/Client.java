@@ -3314,7 +3314,7 @@ public final class Client implements IClient
     }
 
 
-    public void askPickColor(Set colorsLeft)
+    public void askPickColor(java.util.List colorsLeft)
     {
         String color = null;
         if (getOption(Options.autoPickColor))

@@ -417,7 +417,7 @@ Log.debug("End of SocketClientThread while loop");
         else if (method.equals(Constants.askPickColor))
         {
             List clList = Split.split(Glob.sep, (String)args.remove(0));
-            Set colorsLeft = new HashSet();
+            java.util.List colorsLeft = new ArrayList();
             colorsLeft.addAll(clList);
             client.askPickColor(colorsLeft);
         }

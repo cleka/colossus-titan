@@ -49,7 +49,7 @@ public final class Game
     private Set [] proposals = new HashSet[2];
 
     private LinkedList colorPickOrder = new LinkedList();
-    private Set colorsLeft;
+    private java.util.List colorsLeft;
     private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
     private Options options = new Options(Constants.optionsServerName);
 
@@ -350,10 +350,23 @@ Log.debug("Called Game.newGame2()");
 
     private void assignColors()
     {
-        colorsLeft = new HashSet();
+        java.util.List cli = new ArrayList();
+        colorsLeft = new ArrayList();
         for (int i = 0; i < Constants.colorNames.length; i++)
         {
-            colorsLeft.add(Constants.colorNames[i]);
+            cli.add(Constants.colorNames[i]);
+        }
+
+        /* Add the first 6 colors in random order, ... */
+        for (int i = 0; i < Constants.DEFAULT_MAX_PLAYERS; i++)
+        {
+            colorsLeft.add(cli.remove(Dice.rollDie(Constants.DEFAULT_MAX_PLAYERS - i) - 1));
+        }
+        /* ... and finish with the newer ones, also in random order */
+        int newer = cli.size();
+        for (int i = 0; i < newer; i++)
+        {
+            colorsLeft.add(cli.remove(Dice.rollDie(newer - i) - 1));
         }
 
         // Let human players pick colors first, followed by AI players.

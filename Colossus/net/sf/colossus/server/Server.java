@@ -1399,7 +1399,8 @@ Log.debug("Server.setPlayerName() from " + playerName + " to " + newName);
         clientMap.put(newName, client);
     }
 
-    synchronized void askPickColor(String playerName, final Set colorsLeft)
+    synchronized void askPickColor(String playerName,
+                                   final java.util.List colorsLeft)
     {
         IClient client = getClient(playerName);
         if (client != null)
