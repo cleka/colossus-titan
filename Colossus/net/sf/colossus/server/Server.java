@@ -76,20 +76,9 @@ public final class Server implements IServer
             {
                 serverSocket.close();
                 serverSocket = null;
-                // Bug 626646 -- bind exception here on NT 4
-                // when restarting game
-                // XXX Pausing for a few seconds may or may not help
-                // TODO Set SO_REUSEADDR, when we require JDK 1.4
-                try
-                {
-                    Thread.sleep(3000);
-                }
-                catch (InterruptedException ex)
-                {
-                    Log.error(ex.toString());
-                }
             }
             serverSocket = new ServerSocket(port, Constants.MAX_MAX_PLAYERS);
+            serverSocket.setReuseAddress(true);
         }
         catch (IOException ex)
         {
