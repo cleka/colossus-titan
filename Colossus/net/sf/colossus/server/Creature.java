@@ -253,6 +253,55 @@ Log.debug("Creature.loadCreatures()");
         return flies;
     }
 
+    public boolean isNativeTerrain(char t)
+    {
+        switch(t)
+        {
+        case 'p': /* undefined */
+            return false;
+        case 'w': /* undefined */
+            return false;
+        case 'r':
+            return isNativeBramble();
+        case 's':
+            return isNativeSandDune();
+        case 't':
+            return isNativeTree();
+        case 'o':
+            return isNativeBog();
+        case 'v':
+            return isNativeVolcano();
+        case 'd':
+            return isNativeDrift();
+        case 'l':
+            return isWaterDwelling();
+        case 'n':
+            return isNativeStone();
+        default:
+            return false;
+        }
+    }
+
+    public boolean isNativeHexside(char h)
+    {
+        switch(h)
+        {
+        default:
+            return false;
+        case ' ': /* undefined */
+            return false;
+        case 'd':
+            return isNativeSandDune();
+        case 'c': /* undefined */
+            return false;
+        case 's':
+            return isNativeSlope();
+        case 'w': /* undefined */
+            return false;
+        case 'r': 
+            return isNativeRiver();
+        }
+    }
 
     public boolean isNativeBramble()
     {
