@@ -32,12 +32,11 @@ class PickLord extends Dialog implements MouseListener, WindowListener
         addMouseListener(this);
         addWindowListener(this);
 
-        setLayout(null);
+        setLayout(new FlowLayout());
 
         pack();
 
         setBackground(Color.lightGray);
-
 
         lords = new Critter[3];
 
@@ -58,22 +57,15 @@ class PickLord extends Dialog implements MouseListener, WindowListener
             numLordTypes++;
         }
         
-
-        setSize((numLordTypes + 2) * scale, 3 * scale);
-
         setResizable(false);
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
-
 
         chits = new Chit[numLordTypes];
 
         for (int i = 0; i < chits.length; i++)
         {
-            chits[i] = new Chit(scale * (i + 1), scale, scale, 
-                lords[i].getImageName(), this);
+            chits[i] = new Chit(-1, -1, scale, lords[i].getImageName(), this);
+            add(chits[i]);
+            chits[i].addMouseListener(this);
         }
         
         tracker = new MediaTracker(this);
@@ -92,7 +84,13 @@ class PickLord extends Dialog implements MouseListener, WindowListener
             new MessageBox(parentFrame, e.toString() +
                 " waitForAll was interrupted");
         }
+
         imagesLoaded = true;
+        pack();
+
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
+            d.height / 2 - getSize().height / 2));
 
         setVisible(true);
         repaint();
@@ -107,23 +105,14 @@ class PickLord extends Dialog implements MouseListener, WindowListener
         }
 
         Dimension d = getSize();
-        Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
-        d.height != offDimension.height)
+            d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
             offGraphics = offImage.getGraphics();
-        }
-
-        for (int i = 0; i < chits.length;  i++)
-        {
-            if (rectClip.intersects(chits[i].getBounds()))
-            {
-                chits[i].paint(offGraphics);
-            }
         }
 
         g.drawImage(offImage, 0, 0, this);
