@@ -37,6 +37,11 @@ public class RationalAI implements AI
         this.client = client;
     }
 
+    private static double r3(double value)
+    {
+        return Math.round(1000. * value) / 1000.;
+    }
+
     public String pickColor(java.util.List colors, List favoriteColors)
     {
         Iterator it = favoriteColors.iterator();
@@ -1255,7 +1260,7 @@ public class RationalAI implements AI
                 value = evaluateMove(legion, hex, RECRUIT_TRUE, enemyAttackMap,
                         2, true);
 
-                Log.debug("value hex " + hexLabel + " value: " + value);
+                Log.debug("value hex " + hexLabel + " value: " + r3(value));
 
                 lmove = new LegionBoardMove(markerId,
                         legion.getCurrentHex().getLabel(),
@@ -1778,7 +1783,7 @@ public class RationalAI implements AI
 
         }
 
-        Log.debug("compute final attack risk as " + risk);
+        Log.debug("compute final attack risk as " + r3(risk));
 
         return risk;
     }
@@ -2042,7 +2047,8 @@ public class RationalAI implements AI
             }
             bestMoveVal *= discount;
             nextTurnValue += bestMoveVal;
-            discount *= DISC_FACTOR; // squares that are further away are more likely to be blocked
+            // squares that are further away are more likely to be blocked
+            discount *= DISC_FACTOR;
         }
 
         nextTurnValue /= 6.0;     // 1/6 chance of each happening
@@ -2050,7 +2056,7 @@ public class RationalAI implements AI
 
         Log.debug("depth " + depth + " EVAL " + legion +
                 (canRecruitHere != RECRUIT_FALSE ? " move to " : " stay in ") +
-                hex + " = " + value);
+                hex + " = " + r3(value));
 
         return (int)value;
     }
