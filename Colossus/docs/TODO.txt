@@ -5,13 +5,14 @@ Bug: Occasional "Error: java.net.SocketException: Connection reset by peer:
      Connection reset by peer" for no known reason, which drops the client
      and kills the game.  Happens with local clients.  Also remote?
 
+Add Client.jnlp file.
 
 Authenticate all remote calls to ensure that they come from the correct
    client.  (By socket, using the thread name, set to player name.)
 
 Chat window.
 
-Add Client.jnlp file.
+Fix docs.
 
 Sometimes refuse remote newGame/loadGame/saveGame calls?
 

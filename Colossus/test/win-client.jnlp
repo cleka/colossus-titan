@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+     <!-- JNLP File for Colossus local testing -->
+     <!-- TODO Find a way to make the codebase path relative -->
+     <jnlp
+       codebase="file:///c:/src/Colossus/test"
+       href="win-client.jnlp">
+       <application-desc main-class="net.sf.colossus.client.StartClient"/>
+       <information>
+         <title>Colossus</title>
+         <vendor>David Ripton</vendor>
+         <icon href="Colossus.gif"/>
+         <offline-allowed/>
+         <homepage href="index.html"/>
+       </information>
+       <resources>
+         <jar href="Colossus.jar"/>
+         <j2se version="1.4 1.3+"/>
+       </resources>
+       <security>
+           <all-permissions/>
+       </security>
+     </jnlp>

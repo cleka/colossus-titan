@@ -359,6 +359,7 @@
         description = "Copy files into htdocs tree on SF"> 
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
+        <copy file="Colossus-client.jnlp" todir="${HTMLDIR}"/>
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
         <copy file="ChangeLog" todir="${HTMLDIR}"/>
         <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>

@@ -42,30 +42,20 @@
 
 \item[Q] When is network play going to be done?
 
-\item[A] Probably about April 2002. No guarantees -- real life sometimes
- gets in the way of fun programming projects.
-
- It's a lot of work, because I want to do it the right away (a 
- language-neutral, simple socket protocol with a server that enforces
- the rules rather than trusting the clients) rather than just slapping
- an quick RMI layer on the existing game.
+\item[A] It's done.  (I made the April 2002 deadline.)  Now we just have to make it more robust.
 
 
 \item[Q] Why is the AI so dumb?
 
-\item[A] Nobody's doing much with the AI right now. I'll start working
- on it seriously again after the network game is finished.
+\item[A] Nobody's doing much with the AI right now.  We'll start working
+ on it seriously again soon.
 
 
-\item[Q] What's the difference between SimpleAI and MinimaxAI and RandomAI?
+\item[Q] What's the difference between SimpleAI and CowardSimpleAI and A Random AI?
 
 \item[A] SimpleAI does a straightforward one-ply lookahead for MasterBoard
- moves. It works fairly well. MinimaxAI uses a more general minimax 
- algorithm that in theory should be stronger (but slower), but it's 
- still very buggy so it's not recommended for non-developer use. 
- RandomAI just chooses one of the available AIs at random -- this 
- will be a more interesting option when there are multiple viable 
- alternatives.
+ moves. It works fairly well.  CowardSimpleAI is the same code with some
+ constants changed to make it less aggressive.  A Random AI just chooses one of the available AIs at random -- this will be a more interesting option when there are more viable alternatives.
 
 
 \item[Q] What's the ``Load External Variant'' button do? 
