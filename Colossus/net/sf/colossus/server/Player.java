@@ -518,7 +518,7 @@ public final class Player implements Comparable
             if (game.getNumFriendlyLegions(hexLabel, this) > 1 &&
                     legion.hasConventionalMove())
             {
-                Log.debug("Found split legions that are not separated at hex " +
+                Log.debug("Found unseparated split legions at hex " +
                         hexLabel);
                 return true;
             }

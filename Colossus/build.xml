@@ -101,6 +101,7 @@
         <junit printsummary="yes" fork="no" haltonfailure="no">
             <classpath refid="project.class.path"/>
                 <formatter type="plain"/>
+                <test name="net.sf.colossus.util.MultiSetTest"/>
                 <test name="net.sf.colossus.server.DiceTest"/>
                 <test name="net.sf.colossus.util.CombosTest"/>
                 <test name="net.sf.colossus.client.PredictSplitsTest"/>

@@ -8,6 +8,7 @@ import net.sf.colossus.util.Probs;
 import net.sf.colossus.util.Perms;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.DevRandom;
+import net.sf.colossus.util.MultiSet;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
@@ -1191,7 +1192,8 @@ public class RationalAI implements AI
     }
 
     private boolean findMoveList(Map[] enemyAttackMap, List markerIds,
-            List all_legionMoves, TreeSet occupiedHexes, boolean teleportsOnly)
+            List all_legionMoves, MultiSet occupiedHexes,
+            boolean teleportsOnly)
     {
         boolean moved = false;
         Iterator it = markerIds.iterator();
@@ -1296,11 +1298,7 @@ public class RationalAI implements AI
         List markerIds = player.getLegionIds();
         List all_legionMoves = new ArrayList();
 
-        // N.B.!! We must use a multi-set type container here
-        // since a from hex may show up twice in the case of a split
-        // legion and we must not show this hex as available unless
-        // both of the legions move off of the hex.
-        TreeSet occupiedHexes = new TreeSet();
+        MultiSet occupiedHexes = new MultiSet();
 
         if (findMoveList(enemyAttackMap, markerIds,
                 all_legionMoves, occupiedHexes, false))
@@ -1319,7 +1317,7 @@ public class RationalAI implements AI
         if (client.getMovementRoll() == 6)
         {
             List teleport_legionMoves = new ArrayList();
-            TreeSet dummy = new TreeSet();
+            MultiSet dummy = new MultiSet();
             findMoveList(enemyAttackMap, markerIds, teleport_legionMoves, dummy,
                     true);
 
@@ -1384,84 +1382,6 @@ public class RationalAI implements AI
             }
         }
 
-        /*
-         // Find any legions that have a best move which
-         // is not also a best move for another legion.
-         // In that case, just move the legion.
-         *
-         * KILL this.  In does not correctly handle
-         * legions that are split and must move.  Why?
-         * Because legion A could move to a spot that prevents
-         * split legion B from moving which is illegal.
-         ListIterator legit = all_legionMoves.listIterator();
-         while (legit.hasNext())
-         {
-         List legionMoves = (List)legit.next();
-         if (legionMoves.isEmpty())
-         {
-         continue;
-         }
-         LegionBoardMove lm = (LegionBoardMove)legionMoves.get(0);
-         String best_hex = lm.toHex;
-
-         if (occupiedHexes.contains(best_hex))
-         {
-         // If we are moving into an occupied hex, assume it may
-         // cause a conflict.  This is to handle moving into hexes
-         // where legions have split.
-         continue;
-         }
-         Iterator legit2 = all_legionMoves.iterator();
-         boolean duplicate = false;
-         // Does another legion have this as a best move?
-         while (legit2.hasNext())
-         {
-         List legionMoves2 = (List)legit2.next();
-         if (legionMoves2.isEmpty())
-         {
-         continue;
-         }
-         LegionBoardMove lm2 = (LegionBoardMove)legionMoves2.get(0);
-
-         // is lm2 == lm1 ?
-         if (lm2.markerId.equals(lm.markerId))
-         {
-         continue;
-         }
-
-         String best_hex2 = lm2.toHex;
-         if (best_hex2.equals(best_hex))
-         {
-         duplicate = true; // found a duplicate
-         Log.debug("Found duplicate for " + lm.markerId + " at " +
-         lm.toHex + " duplicate is " + lm2.markerId + " at " +
-         lm2.toHex);
-         break;
-         }
-         }
-
-         if (!duplicate)
-         {
-         Log.debug("No conflict. Optimum move for " + lm.markerId +
-         " is " + lm.toHex);
-         if (!lm.noMove)
-         {
-         boolean moved_legion = doMove(lm.markerId, lm.toHex);
-         if (moved_legion)
-         {
-         // remove list of moves - we are done with this legion
-         legit.remove();
-         occupiedHexes.remove(lm.fromHex); // hex is now free
-         occupiedHexes.add(lm.toHex);
-         moved = true;
-         }
-         }
-         }
-         }
-
-         Log.debug("done moving legions with no conflicts");
-         **/
-
         // find initial optimum, assuming optimum will move a legion
         boolean conflicted = handleConflictedMoves(all_legionMoves, !moved,
                 occupiedHexes);
@@ -1473,7 +1393,7 @@ public class RationalAI implements AI
     // then we add the constraint that at least one of these legions must
     // move.
     private boolean handleConflictedMoves(List all_legionMoves,
-            boolean mustMove, TreeSet occupiedHexes)
+            boolean mustMove, MultiSet occupiedHexes)
     {
         if (mustMove)
         {
