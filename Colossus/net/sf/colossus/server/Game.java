@@ -1123,7 +1123,7 @@ public final class Game
         try
         {
             Log.event("Loading game from " + file);
-            SAXBuilder builder = new SAXBuilder("com.bluecast.xml.Piccolo");
+            SAXBuilder builder = new SAXBuilder();
             Document doc = builder.build(file);
 
             Element root = doc.getRootElement();
