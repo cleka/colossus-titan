@@ -298,12 +298,12 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
                 // half points to the victor.
                 if (attacker.numCreature(Creature.titan) == 1)
                 {
-                    attacker.getPlayer().die(defender.getPlayer());
+                    attacker.getPlayer().die(defender.getPlayer(), true);
                 }
 
                 if (defender.numCreature(Creature.titan) == 1)
                 {
-                    defender.getPlayer().die(attacker.getPlayer());
+                    defender.getPlayer().die(attacker.getPlayer(), true);
                 }
             }
 
@@ -362,7 +362,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
                 // points to the victor.
                 if (loser.numCreature(Creature.titan) == 1)
                 {
-                    loser.getPlayer().die(winner.getPlayer());
+                    loser.getPlayer().die(winner.getPlayer(), true);
                 }
             }
 
