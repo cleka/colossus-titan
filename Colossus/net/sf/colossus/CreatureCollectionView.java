@@ -18,17 +18,21 @@ public class CreatureCollectionView extends JDialog
 
 	protected IImageUtility m_oImageUtility;
 
+	CreatureCount m_oCreatureCount;
+
 	public CreatureCollectionView(JFrame oParentFrame, 
 								  ICreatureCollection oCollection,
 								  IImageUtility oImageUtility)
 		{
-			super(oParentFrame, oCollection.getName(), true);
+			// third arg says we are NOT modal
+			super(oParentFrame, oCollection.getName(), false);
 
 			m_oCollection = oCollection;
 			m_oImageUtility = oImageUtility;
 
 			JPanel oButtonPanel = new JPanel(new FlowLayout());
-			getContentPane().add(makeCreaturePanel(), 
+			JPanel oPanel = makeCreaturePanel();
+			getContentPane().add(oPanel,
 								 BorderLayout.CENTER);
 			getContentPane().add(oButtonPanel, BorderLayout.SOUTH);
 
@@ -42,7 +46,11 @@ public class CreatureCollectionView extends JDialog
 						}
 				});
 		}
-	
+
+	/** hash by creature name to the label that displays the count */
+	Hashtable m_oCountHash = new Hashtable();
+
+	/** the count for an individual creature */
 	class CreatureCount extends JPanel
 	{
 		String m_strName;
@@ -59,9 +67,13 @@ public class CreatureCollectionView extends JDialog
 				ImageIcon oIcon = m_oImageUtility.getImageIcon(strPath);
 				JLabel lblCreatureIcon = new JLabel(oIcon);
 				JLabel lblCreatureCount = new JLabel(Integer.toString(m_oCollection.getCount(strName)), SwingConstants.CENTER);
+				m_oCountHash.put(strName, lblCreatureCount);
 				add(lblCreatureName, BorderLayout.NORTH);
 				add(lblCreatureIcon, BorderLayout.CENTER);
 				add(lblCreatureCount, BorderLayout.SOUTH);
+			}
+		void update()
+			{
 			}
 	}
 
@@ -78,5 +90,21 @@ public class CreatureCollectionView extends JDialog
 			}
 			
 			return oCreaturePanel;
+		}
+
+	public void update()
+		{
+			System.out.println("CreatureCollectionView.update");
+
+			Enumeration oCountLabels = m_oCountHash.keys();
+			while(oCountLabels.hasMoreElements())
+			{
+				String strName = (String) oCountLabels.nextElement();
+				JLabel lbl = (JLabel) m_oCountHash.get(strName);
+				String strNewCount = Integer.toString(m_oCollection.getCount(strName));
+				String strOldCount = lbl.getText();
+				System.out.println("CreatureCollectionView.update: " + strName + ", from " + strOldCount + " to " + strNewCount);
+				lbl.setText(strNewCount);
+			}
 		}
 }
