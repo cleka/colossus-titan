@@ -25,6 +25,7 @@ public class SimpleAI implements AI
     private Client client;
     private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
     private boolean timeIsUp;
+    private Random random = new Random();
 
 
     public SimpleAI(Client client)
@@ -2579,7 +2580,7 @@ Log.debug("Called findBattleMoves()");
         int bestScore = Integer.MIN_VALUE;
         LegionMove best = null;
 
-        Collections.shuffle(legionMoves, Dice.getEntropySource());
+        Collections.shuffle(legionMoves, random);
 
         setupTimer();
 
