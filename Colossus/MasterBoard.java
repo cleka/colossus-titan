@@ -195,6 +195,14 @@ class MasterBoard extends Frame implements MouseListener,
             {
                 hex.select();
                 hex.repaint();
+                if (hex.inverted())
+                {
+                    hex.setEntrySide((cameFrom + 3) % 6);
+                }
+                else
+                {
+                    hex.setEntrySide(cameFrom);
+                }
             }
             return count;
         }
