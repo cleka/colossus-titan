@@ -14,12 +14,12 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
     private int numEligible = 0;
     private Creature [] recruits;
     private MediaTracker tracker;
-    private boolean imagesLoaded;
+    private boolean imagesLoaded = false;
     private Player player;
     private Legion legion;
     private Chit [] markers;
     private Container contentPane;
-    private Graphics gBack;
+    private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
 
@@ -68,7 +68,6 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
                 recruits[i].getImageName(), this, false);
         }
 
-        imagesLoaded = false;
         tracker = new MediaTracker(this);
 
         for (int i = 0; i < numEligible; i++)
@@ -152,19 +151,19 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
         Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
-        if (gBack == null || d.width != offDimension.width ||
+        if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
         {
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
-            gBack = offImage.getGraphics();
+            offGraphics = offImage.getGraphics();
         }
 
         for (int i = 0; i < numEligible; i++)
         {
             if (rectClip.intersects(markers[i].getBounds()))
             {
-                markers[i].paint(gBack);
+                markers[i].paint(offGraphics);
             }
         }
 
@@ -179,6 +178,28 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
     }
 
 
+    // Attempt to free resources to work around Java memory leaks.
+    private void cleanup()
+    {
+        setVisible(false);
+
+        if (offImage != null)
+        {
+            offImage.flush();
+            offGraphics.dispose();
+        }
+
+        for (int i = 0; i < numEligible; i++)
+        {
+            tracker.removeImage(markers[i].getImage());
+            markers[i].getImage().flush();
+        }
+
+        dispose();
+        System.gc();
+    }
+
+
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
@@ -190,7 +211,7 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
                 legion.addCreature(recruits[i]);
 
                 // Then exit.
-                dispose();
+                cleanup();
                 return;
             }
         }
@@ -201,13 +222,16 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
     {
     }
 
+
     public void mouseExited(MouseEvent e)
     {
     }
+
     
     public void mouseClicked(MouseEvent e)
     {
     }
+
     
     public void mouseReleased(MouseEvent e)
     {
@@ -218,26 +242,32 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
     {
     }
 
+
     public void windowClosed(WindowEvent event)
     {
     }
 
+
     public void windowClosing(WindowEvent event)
     {
-        dispose();
+        cleanup();
     }
+
 
     public void windowDeactivated(WindowEvent event)
     {
     }
+
                                                          
     public void windowDeiconified(WindowEvent event)
     {
     }
 
+
     public void windowIconified(WindowEvent event)
     {
     }
+
 
     public void windowOpened(WindowEvent event)
     {
