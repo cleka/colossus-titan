@@ -37,7 +37,8 @@ public final class PlayerInfo
     private int mulligansLeft;
 
     /** Sorted set of available legion markers for this player. */
-    private SortedSet markersAvailable = null;
+    private SortedSet markersAvailable = new TreeSet(new MarkerComparator(
+        getShortColor()));
 
     /** Two-stage initialization. */
     PlayerInfo(Client client)
@@ -82,11 +83,6 @@ public final class PlayerInfo
 
         if (!data.isEmpty())
         {
-            if (markersAvailable == null)
-            {
-                markersAvailable = new TreeSet(new MarkerComparator(
-                        getShortColor()));
-            }
             setMarkersAvailable(data);
         }
     }
