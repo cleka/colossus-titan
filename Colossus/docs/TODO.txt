@@ -184,3 +184,4 @@ Place SummonAngel so that it doesn't overlap any of the player's markers
 
 Convert TeX docs to simple HTML to simplify build.
 
+Clean out battle turn number in StatusScreen when there's no battle.
