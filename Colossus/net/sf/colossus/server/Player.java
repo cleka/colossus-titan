@@ -260,7 +260,7 @@ public final class Player implements Comparable
 
     boolean canTitanTeleport()
     {
-        return (score >= Game.getTitanTeleportValue() && !teleported);
+        return (score >= Game.getTitanTeleportValue() && !hasTeleported());
     }
 
 
@@ -502,7 +502,7 @@ public final class Player implements Comparable
         summoned = false;
         donorId = null;
 
-        teleported = false;
+        setTeleported(false);
         movementRoll = 0;
 
         // Make sure that all legions are allowed to move and recruit.

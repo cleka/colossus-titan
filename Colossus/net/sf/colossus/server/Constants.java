@@ -29,6 +29,8 @@ public final class Constants
     public static final String saveGameVersion =
         "Colossus savegame version 10";
 
+    // Constants for config files
+    public static final String configExtension = ".cfg";
     public static final String configVersion =
         "Colossus config file version 2";
 

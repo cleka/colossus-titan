@@ -466,6 +466,8 @@ public final class BattleMap extends HexMap implements MouseListener,
         Set set = client.findCrittersWithTargets();
         unselectAllHexes();
         selectHexesByLabels(set);
+        // XXX Needed?
+        repaint();
     }
 
     /** Highlight all hexes with targets that the critter can strike. */
@@ -474,6 +476,8 @@ public final class BattleMap extends HexMap implements MouseListener,
         Set set = client.findStrikes(tag);
         unselectAllHexes();
         selectHexesByLabels(set);
+        // XXX Needed?
+        repaint();
     }
 
 

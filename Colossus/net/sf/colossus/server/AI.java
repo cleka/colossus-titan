@@ -55,5 +55,5 @@ public interface AI
     String pickColor(Set colors, List favoriteColors);
 
     /** pick a legion marker */
-    String pickMarker(Set markerIds);
+    String pickMarker(Set markerIds, String preferredShortColor);
 }

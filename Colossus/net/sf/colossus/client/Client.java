@@ -373,10 +373,8 @@ public final class Client
 
     /** Load player options from a file. The current format is standard
      *  java.util.Properties keyword=value */
-    private void loadOptions()
+    void loadOptions(String optionsFile)
     {
-        final String optionsFile = Options.optionsPath + Options.optionsSep +
-            playerName + Options.optionsExtension;
         try
         {
             FileInputStream in = new FileInputStream(optionsFile);
@@ -389,6 +387,16 @@ public final class Client
         }
         syncCheckboxes();
         setBooleanOptions();
+    }
+
+
+    /** Load player options from a file. The current format is standard
+     *  java.util.Properties keyword=value */
+    private void loadOptions()
+    {
+        final String optionsFile = Options.optionsPath + Options.optionsSep +
+            playerName + Options.optionsExtension;
+        loadOptions(optionsFile);
     }
 
 
@@ -610,7 +618,6 @@ Log.debug("Client.makeForcedStrikes()");
     /** Remove the first marker with this id from the list. */
     public void removeMarker(String id)
     {
-Log.debug("called Client.removeMarker() for " + id);
         Iterator it = markers.iterator();
         while (it.hasNext())
         {
@@ -791,30 +798,6 @@ Log.debug("called board.alignLegions() for " + hexLabel);
         // Now that the board is ready we can load options and
         // sync the option checkboxes.
         loadOptions();
-
-        sleepWhileImagesLoad();
-    }
-
-
-    // XXX Trying to give the image loading background thread a
-    // fair shot at the CPU.  Need to find the right calling point.
-    void sleepWhileImagesLoad()
-    {
-        if (board == null)
-        {
-            return;
-        }
-
-Log.debug("Sleeping to let images load");
-        try
-        {
-            Thread.sleep(2000);
-        }
-        catch (InterruptedException ex)
-        {
-            Log.debug("Interrupted");
-        }
-Log.debug("Done sleeping");
     }
 
 
@@ -1092,7 +1075,7 @@ Log.debug("called Client.acquireAngelCallback()");
         }
         else
         {
-            // TODO Reduce round trips by doing this on the server.
+            // TODO Reduce round trips by doing this on the server?
             makeForcedStrikes();
 
             if (map != null)
@@ -2028,7 +2011,7 @@ Log.debug("Client.getCarryTargets()");
 
         if (getOption(Options.autoPickMarker))
         {
-            String childId = ai.pickMarker(markersAvailable);
+            String childId = ai.pickMarker(markersAvailable, getShortColor());
             pickMarkerCallback(childId);
         }
         else

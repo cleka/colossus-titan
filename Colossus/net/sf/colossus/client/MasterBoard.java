@@ -14,6 +14,7 @@ import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Options;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.SaveGameFilter;
+import net.sf.colossus.server.ConfigFileFilter;
 import net.sf.colossus.parser.StrategicMapLoader;
 import net.sf.colossus.client.VariantSupport;
 
@@ -67,6 +68,7 @@ public final class MasterBoard extends JPanel
     public static final String saveGameAs = "Save game as";
     public static final String quitGame = "Quit game";
     public static final String saveOptions = "Save options";
+    public static final String loadOptions = "Load options";
 
     public static final String clearRecruitChits = "Clear recruit chits";
 
@@ -91,6 +93,7 @@ public final class MasterBoard extends JPanel
     private AbstractAction saveGameAsAction;
     private AbstractAction quitGameAction;
     private AbstractAction saveOptionsAction;
+    private AbstractAction loadOptionsAction;
 
     private AbstractAction clearRecruitChitsAction;
 
@@ -399,6 +402,20 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        loadOptionsAction = new AbstractAction(loadOptions)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setFileFilter(new ConfigFileFilter());
+                int returnVal = chooser.showOpenDialog(masterFrame);
+                if (returnVal == JFileChooser.APPROVE_OPTION)
+                {
+                    client.loadOptions(chooser.getSelectedFile().getName());
+                }
+            }
+        };
+
         quitGameAction = new AbstractAction(quitGame)
         {
             public void actionPerformed(ActionEvent e)
@@ -519,6 +536,8 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_Q);
 
         fileMenu.addSeparator();
+        mi = fileMenu.add(loadOptionsAction);
+        mi.setMnemonic(KeyEvent.VK_D);
         mi = fileMenu.add(saveOptionsAction);
         mi.setMnemonic(KeyEvent.VK_O);
 

@@ -46,14 +46,22 @@ public class SimpleAI implements AI
         return null;
     }
 
-    public String pickMarker(Set markerIds)
+    public String pickMarker(Set markerIds, String preferredShortColor)
     {
         Iterator it = markerIds.iterator();
-        if (it.hasNext())
+        String markerId = null;
+        while (it.hasNext())
         {
-            return (String)it.next();
+            markerId = (String)it.next();
+            // Prefer own marker color.
+            if (markerId.startsWith(preferredShortColor))
+            {
+                return markerId;
+            }
         }
-        return null;
+        // Could not find one of own color -- return whatever we
+        // could find.  Will be null if no markers are available.
+        return markerId;
     }
 
 
@@ -134,16 +142,6 @@ public class SimpleAI implements AI
             && recruits.contains(Creature.getCreatureByName("Cyclops"))
             && legion.numCreature(Creature.getCreatureByName("Behemoth")) == 0
             && legion.numCreature(Creature.getCreatureByName("Cyclops")) == 2)
-        {
-            recruit = Creature.getCreatureByName("Cyclops");
-        }
-        // take a fourth cyclops in brush
-        // (so that we can split out a cyclops and still keep 3)
-        else if (recruit == Creature.getCreatureByName("Gorgon")
-            && recruits.contains(Creature.getCreatureByName("Cyclops"))
-            && legion.getHeight() == 6
-            && legion.numCreature(Creature.getCreatureByName("Behemoth")) == 0
-            && legion.numCreature(Creature.getCreatureByName("Gargoyle")) == 0)
         {
             recruit = Creature.getCreatureByName("Cyclops");
         }
@@ -1885,16 +1883,10 @@ public class SimpleAI implements AI
         }
     }
 
-
-    private void doOneStrike(Legion legion, Battle battle)
+    /** Create a map containing each target and the number of hits it would 
+     *  likely take if all possible creatures attacked it. */
+    private Map generateDamageMap(Legion legion, Battle battle)
     {
-        // Simple one-ply group strike algorithm.
-        // First make forced strikes, including rangestrikes for
-        // rangestrikers with only one target.
-        battle.makeForcedStrikes(true);
-
-        // Then create a map containing each target and the likely number
-        // of hits it would take if all possible creatures attacked it.
         Map map = new HashMap();
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
@@ -1919,14 +1911,15 @@ public class SimpleAI implements AI
                 map.put(target, new Double(h));
             }
         }
+        return map;
+    }
 
-        // Pick the most important target that can likely be killed this
-        // turn.  If none can, pick the most important target.
+    private Critter findBestTarget(Map map, char terrain)
+    {
         boolean canKillSomething = false;
         Critter bestTarget = null;
-        char terrain = battle.getTerrain();
 
-        it = map.keySet().iterator();
+        Iterator it = map.keySet().iterator();
         while (it.hasNext())
         {
             Critter target = (Critter)it.next();
@@ -1935,9 +1928,9 @@ public class SimpleAI implements AI
             if (h + target.getHits() >= target.getPower())
             {
                 // We can probably kill this target.
-                if (bestTarget == null ||!canKillSomething
-                    || getKillValue(target, terrain)
-                       > getKillValue(bestTarget, terrain))
+                if (bestTarget == null || !canKillSomething || 
+                    getKillValue(target, terrain)
+                        > getKillValue(bestTarget, terrain))
                 {
                     bestTarget = target;
                     canKillSomething = true;
@@ -1946,41 +1939,32 @@ public class SimpleAI implements AI
             else
             {
                 // We probably can't kill this target.
-                if (bestTarget == null
-                    || (!canKillSomething
-                        && getKillValue(target, terrain)
-                           > getKillValue(bestTarget, terrain)))
+                if (bestTarget == null || (!canKillSomething && 
+                    getKillValue(target, terrain)
+                        > getKillValue(bestTarget, terrain)))
                 {
                     bestTarget = target;
                 }
             }
         }
+        return bestTarget;
+    }
 
-        if (bestTarget == null)
-        {
-            return;
-        }
-
-        Log.debug("Best target is " + bestTarget.getDescription());
-
-        // Having found the target, pick an attacker.  The
-        // first priority is finding one that does not need
-        // to worry about carry penalties to hit this target.
-        // The second priority is using the weakest attacker,
-        // so that more information is available when the
-        // stronger attackers strike.
+    private Critter findBestAttacker(Legion legion, Critter target,
+        char terrain)
+    {
         Critter bestAttacker = null;
 
-        it = legion.getCritters().iterator();
+        Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (critter.canStrike(bestTarget))
+            if (critter.canStrike(target))
             {
-                if (critter.possibleStrikePenalty(bestTarget))
+                if (critter.possibleStrikePenalty(target))
                 {
                     if (bestAttacker == null ||
-                        (bestAttacker.possibleStrikePenalty(bestTarget)
+                        (bestAttacker.possibleStrikePenalty(target)
                             && getCombatValue(critter, terrain) <
                                 getCombatValue(bestAttacker, terrain)))
                     {
@@ -1990,7 +1974,7 @@ public class SimpleAI implements AI
                 else
                 {
                     if (bestAttacker == null ||
-                        bestAttacker.possibleStrikePenalty(bestTarget) ||
+                        bestAttacker.possibleStrikePenalty(target) ||
                         getCombatValue(critter, terrain) <
                             getCombatValue(bestAttacker, terrain))
                     {
@@ -1999,56 +1983,96 @@ public class SimpleAI implements AI
                 }
             }
         }
+        return bestAttacker;
+    }
 
+    /** Apply carries first to the biggest creature that could be killed 
+     *  with them, then to the biggest creature. */
+    private void handleCarries(Battle battle)
+    {
+        char terrain = battle.getTerrain();
+        Critter bestTarget = null;
+
+        Iterator it = battle.getCarryTargets().iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            Critter target = battle.getCritter(hexLabel);
+
+            if (target.wouldDieFrom(battle.getCarryDamage()))
+            {
+                if (bestTarget == null ||
+                    !bestTarget.wouldDieFrom(battle.getCarryDamage()) ||
+                    getKillValue(target, terrain)
+                       > getKillValue(bestTarget, terrain))
+                {
+                    bestTarget = target;
+                }
+            }
+            else
+            {
+                if (bestTarget == null ||
+                    (!bestTarget.wouldDieFrom(battle.getCarryDamage()) &&
+                    getKillValue(target, terrain) >
+                    getKillValue(bestTarget, terrain)))
+                {
+                    bestTarget = target;
+                }
+            }
+        }
+        if (bestTarget == null)
+        {
+            Log.warn("No carry target but " + battle.getCarryDamage() +
+                " points of available carry damage");
+            battle.setCarryDamage(0);
+            return;
+        }
+        Log.debug("Best carry target is " + bestTarget.getDescription());
+        battle.applyCarries(bestTarget);
+    }
+
+    /** Simple one-ply group strike algorithm. */
+    private void doOneStrike(Legion legion, Battle battle)
+    {
+        // First make forced strikes, including rangestrikes for
+        // rangestrikers with only one target.
+        battle.makeForcedStrikes(true);
+
+        // Then create a map containing each target and the likely number
+        // of hits it would take if all possible creatures attacked it.
+        Map map = generateDamageMap(legion, battle);
+
+        // Pick the most important target that can likely be killed this
+        // turn.  If none can, pick the most important target.
+        // TODO If none can, and we're going to lose the battle this turn, 
+        // pick the easiest target to kill.
+
+        char terrain = battle.getTerrain();
+        Critter bestTarget = findBestTarget(map, terrain);
+        if (bestTarget == null)
+        {
+            return;
+        }
+        Log.debug("Best target is " + bestTarget.getDescription());
+
+        // Having found the target, pick an attacker.  The
+        // first priority is finding one that does not need
+        // to worry about carry penalties to hit this target.
+        // The second priority is using the weakest attacker,
+        // so that more information is available when the
+        // stronger attackers strike.
+
+        Critter bestAttacker = findBestAttacker(legion, bestTarget, terrain);
         Log.debug("Best attacker is " + bestAttacker.getDescription());
+
         // Having found the target and attacker, strike.
         // Take a carry penalty if there is still a 95%
         // chance of killing this target.
         bestAttacker.strike(bestTarget);
 
-        // If there are any carries, apply them first to
-        // the biggest creature that could be killed with
-        // them, then to the biggest creature.
         while (battle.getCarryDamage() > 0)
         {
-            bestTarget = null;
-
-            it = battle.getCarryTargets().iterator();
-            while (it.hasNext())
-            {
-                String hexLabel = (String)it.next();
-                Critter target = battle.getCritter(hexLabel);
-
-                if (target.wouldDieFrom(battle.getCarryDamage()))
-                {
-                    if (bestTarget == null ||
-                        !bestTarget.wouldDieFrom(battle.getCarryDamage()) ||
-                        getKillValue(target, terrain)
-                           > getKillValue(bestTarget, terrain))
-                    {
-                        bestTarget = target;
-                    }
-                }
-                else
-                {
-                    if (bestTarget == null ||
-                        (!bestTarget.wouldDieFrom(battle.getCarryDamage()) &&
-                        getKillValue(target, terrain) >
-                        getKillValue(bestTarget, terrain)))
-                    {
-                        bestTarget = target;
-                    }
-                }
-            }
-            if (bestTarget == null)
-            {
-                Log.warn("No carry target but " + battle.getCarryDamage() +
-                    " points of available carry damage");
-                battle.setCarryDamage(0);
-                return;
-            }
-            Log.debug("Best carry target is " + bestTarget.getDescription());
-            battle.applyCarries(bestTarget);
+            handleCarries(battle);
         }
     }
 
