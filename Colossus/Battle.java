@@ -34,8 +34,8 @@ public final class Battle
     private MasterHex masterHex;
     private BattleDice battleDice;
 
-    private int turnNumber = 1;
-    private int phase = MOVE;
+    private int turnNumber;
+    private int phase;
     private int summonState = NO_KILLS;
     private int carryDamage;
     private boolean chitSelected;
@@ -47,28 +47,33 @@ public final class Battle
 
     private boolean attackerEntered;
     private boolean conceded;
+    private boolean driftDamageApplied;
 
 
     public Battle(MasterBoard board, Legion attacker, Legion defender,
-        MasterHex masterHex)
+        Legion activeLegion, MasterHex masterHex, boolean inProgress,
+        int turnNumber, int phase)
     {
         this.board = board;
         this.masterHex = masterHex;
         this.defender = defender;
         this.attacker = attacker;
+        this.activeLegion = activeLegion;
+        this.turnNumber = turnNumber;
+        this.phase = phase;
         if (board != null)
         {
             this.game = board.getGame();
         }
 
-        activeLegion = defender;
+        if (!inProgress)
+        {
+            attacker.clearBattleTally();
+            defender.clearBattleTally();
+        }
 
-        attacker.clearBattleTally();
-        defender.clearBattleTally();
+        map = new BattleMap(board, masterHex, this, inProgress);
 
-        map = new BattleMap(board, masterHex, this);
-
-        // XXX Assumes that battles load at the beginning of a phase.
         map.setupPhase();
 
         if (getShowDice())
@@ -122,12 +127,6 @@ public final class Battle
     }
 
 
-    public void setActiveLegion(Legion activeLegion)
-    {
-        this.activeLegion = activeLegion;
-    }
-
-
     public MasterHex getMasterHex()
     {
         return masterHex;
@@ -140,21 +139,9 @@ public final class Battle
     }
 
 
-    public void setPhase(int phase)
-    {
-        this.phase = phase;
-    }
-
-
     public int getTurnNumber()
     {
         return turnNumber;
-    }
-
-
-    public void setTurnNumber(int turnNumber)
-    {
-        this.turnNumber = turnNumber;
     }
 
 
@@ -198,7 +185,7 @@ public final class Battle
             {
                 activeLegion = defender;
             }
-
+            driftDamageApplied = false;
             phase = STRIKEBACK;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
             map.setupFight();
@@ -641,7 +628,8 @@ public final class Battle
         // Drift hexes are only found on the tundra map.
         // Drift damage is applied only once per player turn,
         //    during the strike phase.
-        if (masterHex.getTerrain() == 't' && phase == FIGHT)
+        if (masterHex.getTerrain() == 't' && phase == FIGHT &&
+            !driftDamageApplied)
         {
             Iterator it = critters.iterator();
             while (it.hasNext())
@@ -652,11 +640,23 @@ public final class Battle
                 {
                     Game.logEvent(critter.getName() + " takes drift damage");
                     critter.wound(1);
+                    driftDamageApplied = true;
                 }
             }
         }
     }
 
+
+    public boolean isDriftDamageApplied()
+    {
+        return driftDamageApplied;
+    }
+
+
+    public void setDriftDamageApplied(boolean driftDamageApplied)
+    {
+        this.driftDamageApplied = driftDamageApplied;
+    }
 
     public void clearAllCarries()
     {
@@ -724,7 +724,7 @@ public final class Battle
                         donor.addCreature(critter, false);
                         // This summon doesn't count; the player can
                         // summon again later this turn.
-                        player.setCanSummonAngel(true);
+                        player.setSummoned(false);
                     }
                     else
                     {
@@ -1809,7 +1809,7 @@ public final class Battle
             Creature.minotaur, null, player2);
         attacker.setEntrySide(5);
 
-        new Battle(null, attacker, defender, hex);
+        new Battle(null, attacker, defender, defender, hex, false, 1, MOVE);
     }
 }
 

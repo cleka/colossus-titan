@@ -134,7 +134,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
             summoned = true;
 
             // Only one angel can be summoned per turn.
-            player.setCanSummonAngel(false);
+            player.setSummoned(true);
             player.setLastLegionSummonedFrom(donor);
 
             // Move the angel or archangel.

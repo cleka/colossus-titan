@@ -13,8 +13,8 @@ public final class Player implements Comparable
     private String color;              // Black, Blue, Brown, Gold, Green, Red
     private int startingTower;         // 1-6
     private double score;              // track half-points, then round
-    private boolean canSummonAngel = true;
-    private boolean canTeleport = true;
+    private boolean summoned;
+    private boolean teleported;
     private String playersEliminated;  // RdBkGr
     private int mulligansLeft = 1;
     private int movementRoll;          // 0 if movement has not been rolled.
@@ -82,31 +82,31 @@ public final class Player implements Comparable
         }
         else if (color.equals("Black"))
         {
-            return new String("Bk");
+            return "Bk";
         }
         else if (color.equals("Blue"))
         {
-            return new String("Bl");
+            return "Bl";
         }
         else if (color.equals("Brown"))
         {
-            return new String("Br");
+            return "Br";
         }
         else if (color.equals("Gold"))
         {
-            return new String("Gd");
+            return "Gd";
         }
         else if (color.equals("Green"))
         {
-            return new String("Gr");
+            return "Gr";
         }
         else if (color.equals("Red"))
         {
-            return new String("Rd");
+            return "Rd";
         }
         else
         {
-            return new String("XX");
+            return "XX";
         }
     }
 
@@ -159,7 +159,7 @@ public final class Player implements Comparable
 
     public void setPlayersElim(String playersEliminated)
     {
-        this.playersEliminated = new String(playersEliminated);
+        this.playersEliminated = playersEliminated;
     }
 
 
@@ -167,43 +167,42 @@ public final class Player implements Comparable
     {
         if (playersEliminated == null)
         {
-            playersEliminated = new String(player.getShortColor());
+            playersEliminated = player.getShortColor();
         }
         else
         {
-            playersEliminated = new String(playersEliminated +
-                player.getShortColor());
+            playersEliminated = playersEliminated + player.getShortColor();
         }
     }
 
 
     public boolean canTitanTeleport()
     {
-        return (score >= 400 && canTeleport);
+        return (score >= 400 && !teleported);
     }
 
 
-    public boolean getCanSummonAngel()
+    public boolean hasSummoned()
     {
-        return canSummonAngel;
+        return summoned;
     }
 
 
-    public void setCanSummonAngel(boolean canSummonAngel)
+    public void setSummoned(boolean summoned)
     {
-        this.canSummonAngel = canSummonAngel;
+        this.summoned = summoned;
     }
 
 
-    public boolean getCanTeleport()
+    public boolean hasTeleported()
     {
-        return canTeleport;
+        return teleported;
     }
 
 
-    public void setCanTeleport(boolean canTeleport)
+    public void setTeleported(boolean teleported)
     {
-        this.canTeleport = canTeleport;
+        this.teleported = teleported;
     }
 
 
@@ -350,8 +349,8 @@ public final class Player implements Comparable
 
     public void resetTurnState()
     {
-        canSummonAngel = true;
-        canTeleport = true;
+        summoned = false;
+        teleported = false;
         movementRoll = 0;
 
         // Make sure that all legions are allowed to move and recruit.

@@ -20,6 +20,9 @@ public final class Critter extends Creature
     private BattleHex currentHex;
     private BattleHex startingHex;
 
+    private String currentHexLabel;
+    private String startingHexLabel;
+
     /** Damage taken */
     private int hits;
 
@@ -55,11 +58,11 @@ public final class Critter extends Creature
     }
 
 
-    public void addBattleInfo(BattleHex hex, BattleMap map, BattleChit chit,
-        Battle battle)
+    public void addBattleInfo(BattleHex currentHex, BattleHex startingHex,
+        BattleMap map, BattleChit chit, Battle battle)
     {
-        this.currentHex = hex;
-        this.startingHex = hex;
+        this.currentHex = currentHex;
+        this.startingHex = startingHex;
         this.map = map;
         this.chit = chit;
         this.battle = battle;
@@ -87,6 +90,12 @@ public final class Critter extends Creature
     public Legion getLegion()
     {
         return legion;
+    }
+
+
+    public void setLegion(Legion legion)
+    {
+        this.legion = legion;
     }
 
 
@@ -243,21 +252,47 @@ public final class Critter extends Creature
     }
 
 
-    public void setCurrentHex(BattleHex hex)
-    {
-        this.currentHex = hex;
-    }
-
-
     public BattleHex getStartingHex()
     {
         return startingHex;
     }
 
 
-    public void setStartingHex(BattleHex hex)
+    public String getCurrentHexLabel()
     {
-        this.startingHex = hex;
+        if (currentHex != null)
+        {
+            return currentHex.getLabel();
+        }
+        else
+        {
+            return currentHexLabel;
+        }
+    }
+
+
+    public void setCurrentHexLabel(String label)
+    {
+        this.currentHexLabel = label;
+    }
+
+
+    public String getStartingHexLabel()
+    {
+        if (startingHex != null)
+        {
+            return startingHex.getLabel();
+        }
+        else
+        {
+            return startingHexLabel;
+        }
+    }
+
+
+    public void setStartingHexLabel(String label)
+    {
+        this.startingHexLabel = label;
     }
 
 

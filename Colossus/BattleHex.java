@@ -467,7 +467,7 @@ public final class BattleHex extends Hex
         }
 
         int yLabel = 6 - yCoord - (int)Math.abs(((xCoord - 3) / 2));
-        label = new String(xLabel + Integer.toString(yLabel));
+        label = xLabel + Integer.toString(yLabel);
     }
 
 

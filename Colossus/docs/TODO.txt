@@ -1,14 +1,6 @@
-Reorder guardian and warlock, since guardian is bigger.
-
-Write a minimal, complete Game.loadGame() that reuses existing 
-   objects as much as possible.
-
 Disable file-related options when running as an applet.
 
 Add per-player option menu, with results saved to playername.cfg
-
-Add chits and hexes to containers and use layout managers to place
-   chits?  Difficulties with overlapping hexes, stacked chits.
 
 Change more modal dialogs to use a factory that returns a value,
    rather than a public constructor and a call to a mutator.

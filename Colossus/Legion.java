@@ -316,14 +316,14 @@ public final class Legion
     }
 
 
-    /** Eliminate this legion */
+    /** Eliminate this legion. */
     public void remove()
     {
         prepareToRemove();
         player.getLegions().remove(this);
     }
-
-
+    
+    
     /** Do the cleanup required before this legion can be removed. */
     public void prepareToRemove()
     {
@@ -382,7 +382,7 @@ public final class Legion
         // If we teleported, no more teleports are allowed this turn.
         if (teleported)
         {
-            player.setCanTeleport(false);
+            player.setTeleported(true);
         }
     }
 
@@ -401,7 +401,7 @@ public final class Legion
             if (teleported)
             {
                 teleported = false;
-                player.setCanTeleport(true);
+                player.setTeleported(false);
             }
         }
     }
@@ -458,10 +458,10 @@ public final class Legion
     }
 
 
-    // Return true if this legion can summon an angel or archangel.
+    /** Return true if this legion can summon an angel or archangel. */
     public boolean canSummonAngel()
     {
-        if (getHeight() >= 7 || !player.getCanSummonAngel())
+        if (getHeight() >= 7 || player.hasSummoned())
         {
             return false;
         }
@@ -592,6 +592,13 @@ public final class Legion
     }
 
 
+    public void setCritter(int i, Critter critter)
+    {
+        critters.set(i, critter);
+        critter.setLegion(this);
+    }
+
+
     /** Gets the first critter in this legion with the same creature
         type as the passed creature. */
     public Critter getCritter(Creature creature)
@@ -622,7 +629,7 @@ public final class Legion
 
             legion.addCreature(critter, false);
 
-            // Keep removeLegion from returning lords to stacks.
+            // Keep removeLegion() from returning lords to stacks.
             if (critter.isLord())
             {
                 critter.takeOne();
