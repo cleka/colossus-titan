@@ -9,9 +9,10 @@ import java.awt.event.*;
 
 class Turn extends Dialog implements ActionListener
 {
-    static Game game;
-    Frame parentFrame;
-    MasterBoard board;
+    private static Game game;
+    private Frame parentFrame;
+    private MasterBoard board;
+
 
     Turn(Frame parentFrame, Game game, MasterBoard board)
     {
@@ -64,7 +65,7 @@ class Turn extends Dialog implements ActionListener
             // Highlight hexes with 7 high legions.
             for (int i = 0; i < player.getNumLegions(); i++)
             {
-                Legion legion = player.legions[i];
+                Legion legion = player.getLegion(i);
                 if (legion.getHeight() >= 7)
                 {
                     MasterHex hex = legion.getCurrentHex();
@@ -174,7 +175,7 @@ class Turn extends Dialog implements ActionListener
         Player player = game.getActivePlayer();
         for (int i = 0; i < player.getNumLegions(); i++)
         {
-            Legion legion = player.legions[i];
+            Legion legion = player.getLegion(i);
             if (legion.getHeight() < 7 && legion.hasMoved())
             {
                 Creature [] recruits = new Creature[5];
@@ -258,7 +259,7 @@ class Turn extends Dialog implements ActionListener
 
                 for (int i = 0; i < player.getNumLegions(); i++)
                 {
-                    Legion legion = player.legions[i];
+                    Legion legion = player.getLegion(i);
                     MasterHex hex = legion.getCurrentHex();
                     if (hex.getNumFriendlyLegions(player) > 1)
                     {
