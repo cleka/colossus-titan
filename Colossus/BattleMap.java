@@ -340,6 +340,28 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    void applyDriftDamage()
+    {
+        // Drift hexes are only found on the tundra map.
+        if (terrain == 't')
+        {
+            for (int i = 0; i < numChits; i++)
+            {
+                BattleChit chit = chits[i];
+                if (chit.getCurrentHex().getTerrain() == 'd' && 
+                    !chit.getCreature().isNativeDrift())
+                {
+                    int totalDamage = chit.getHits();
+                    totalDamage++;
+                    chit.setHits(totalDamage);
+                    chit.checkForDeath();
+                    chit.repaint();
+                }
+            }
+        }
+    }
+
+
     int highlightChitsWithTargets()
     {
         unselectAllHexes();
@@ -1790,6 +1812,6 @@ public class BattleMap extends Frame implements MouseListener,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
             Creature.cyclops, Creature.gorgon, Creature.guardian, null, null,
             player2);
-        new BattleMap(attacker, defender, 'm', 'b');
+        new BattleMap(attacker, defender, 't', 'b');
     }
 }
