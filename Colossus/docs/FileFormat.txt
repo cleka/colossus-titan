@@ -5,9 +5,8 @@ by Colossus. In all these files, comments start with
 a "#" and extend to the end-of-line.
 
 All files, and the two subdirectory 'Battlelands' and 'images'
-should be in the same directory (except for the default files,
-whose subdirectories are at the root of the Colossus package,
-but that shouldn't concern you :-)
+should be in the same directory. Default files live in
+'Default', 'Default/images' and 'Default/Battelands'.
 
 1) MAP file format (default file used: Default/Default.map)
 
@@ -57,7 +56,9 @@ hasn't yet been solved.
 
 This file define the Colossus Recruit Trees ; what
 can recruit and be recruited on what terrain. it's composed
-of a succession of line:
+of a succession of line of two different kind.
+
+# The first kind is:
 
 <terrain_letter> <terrain_color> <terrain_name> <regular_recruit> (<recruiter_needed> <recruit>)+
 
@@ -110,6 +111,27 @@ special. There should always be at least 3 regular creatures,
 recruitable with one of Anything, and should be marked
 as 'non-regular' recruitments. The 3 creatures will be used
 as starting creatures.
+
+# The second kind is:
+
+ANGEL <point_value> <angel_name> ((<terrain_letter>,)*<terrain_letter>)?
+
+ANGEL is the literal string ANGEL
+
+<point_value> is the amount of points needed to recruit the Angel
+<angel_name> is the name of the Creature to consider as an Angel
+<terrain_letter> is an (optional) comma-separated list of terrain
+letter (see above) that restrict the availability of the Angel.
+If the list is ommited, the Angel can bre recruited everywhere.
+
+Note that all <point_value> must be even multiple of the first
+<point_value> ; other values are erroneous and will be flagged
+as such.
+
+Multiple line can be present, in which case, the behavior is
+the same as if all the Angel where on one line. Order of
+Angel is not important, except for the first one, which
+defines the reference for <point_value>.
 
 3) CRE file format (default file used: Default/Default.cre)
 

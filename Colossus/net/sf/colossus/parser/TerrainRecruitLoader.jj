@@ -42,6 +42,11 @@ public class TerrainRecruitLoader
      * All the character that are valid terrains.
      */
     private char[] terrains = null;
+    /**
+     * The list of Angel-like Creature, as angelData
+     * @see net.sf.colossus.parser.TerrainRecruitLoader.angelData
+     */
+    private List angelList = null;
 
     /**
      * Return an array of all the char representing a valid terrain.
@@ -57,16 +62,16 @@ public class TerrainRecruitLoader
      * @author Romain Dolbeau
      * @version $Id$
      */
-    class recruitNumber
+    private class recruitNumber
     {
         /**
          * Name of the creature
          */
-        public String name;
+        private final String name;
         /**
          * Number of creatures needed to recruit it, depend on the terrain.
          */
-        public int number;
+        private final int number;
         /**
          * @param n Name of the creature
          * @param i Number of creatures needed to recruit it in the terrain considered.
@@ -74,6 +79,14 @@ public class TerrainRecruitLoader
         public recruitNumber(String n, int i)
         {
             name = n; number = i;
+        }
+        String getName()
+        {
+            return name;
+        }
+        int getNumber()
+        {
+            return number;
         }
         /**
          * Textual representation of the data.
@@ -130,10 +143,10 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             recruitNumber tr = (recruitNumber)it.next();
-            if ((tr.number > 0) && !(tr.name.equals("Anything"))
-                                && !(tr.name.equals("Lord")))
+            if ((tr.getNumber() > 0) && !(tr.getName().equals("Anything"))
+                                && !(tr.getName().equals("Lord")))
             {
-                re.add(Creature.getCreatureByName(tr.name));
+                re.add(Creature.getCreatureByName(tr.getName()));
             }
         }
         return(re);
@@ -152,19 +165,19 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             recruitNumber tr = (recruitNumber)it.next();
-            if (!(tr.name.equals("Anything")) &&
-                !(tr.name.equals("Lord")))
+            if (!(tr.getName().equals("Anything")) &&
+                !(tr.getName().equals("Lord")))
             {
-                re.add(Creature.getCreatureByName(tr.name));
+                re.add(Creature.getCreatureByName(tr.getName()));
             }
             else
             {
-                if (tr.name.equals("Anything"))
+                if (tr.getName().equals("Anything"))
                 { // anyone can recruit here...
                     java.util.List creatures = Creature.getCreatures();
                     return(new ArrayList(creatures));
                 }
-                if (tr.name.equals("Lord"))
+                if (tr.getName().equals("Lord"))
                 {
                     java.util.List potential = Creature.getCreatures();
                     ListIterator lit = potential.listIterator();
@@ -196,10 +209,10 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             recruitNumber tr = (recruitNumber)it.next();
-            if (!(tr.name.equals("Anything")) &&
-                !(tr.name.equals("Lord")))
+            if (!(tr.getName().equals("Anything")) &&
+                !(tr.getName().equals("Lord")))
             {
-                re.add(Creature.getCreatureByName(tr.name));
+                re.add(Creature.getCreatureByName(tr.getName()));
             }
             else
             {
@@ -243,7 +256,7 @@ public class TerrainRecruitLoader
         }
         if ((iReer != -1) && ((iReer+1) == iRe) && regularRecruit)
         { // regular recruitments if possible
-            return (((recruitNumber)al.get(iReFake)).number);
+            return (((recruitNumber)al.get(iReFake)).getNumber());
         }
         if (iReFake == 0)
         { // first in stack, itself only (taken care of above)
@@ -251,12 +264,12 @@ public class TerrainRecruitLoader
         }
 
         // find out what's below the recruit in the recruiters stack
-        String below = ((recruitNumber)al.get(iReFake - 1)).name;
+        String below = ((recruitNumber)al.get(iReFake - 1)).getName();
 
         // First, "Anything" ; the number is needed no matter what
         // the recruiter is
         if (below.equals("Anything"))
-            return (((recruitNumber)al.get(iReFake)).number);
+            return (((recruitNumber)al.get(iReFake)).getNumber());
         // Second, "Lord" ; only one Lord can recruit
         if (below.equals("Lord") && (recruiter.isLord()))
             return 1;
@@ -265,6 +278,151 @@ public class TerrainRecruitLoader
             return 1;
         // not possible to recruit, after all
         return 99;
+    }
+
+    /**
+     * Used internally to record the Angel name, points needed for recruitment, and the list of terrains in which the Angel dwells.
+     * @author Romain Dolbeau
+     * @version $Id$
+     */
+    private class angelData
+    {
+        private final String name;
+        private final int value;
+        private final List where;
+        angelData(String n, int v)
+        {
+            name = n;
+            value = v;
+            where = new ArrayList();
+        }
+        String getName()
+        {
+            return name;
+        }
+        int getValue()
+        {
+            return value;
+        }
+        void addTerrain(char t)
+        {
+            where.add(new Character(t));
+        }
+        boolean isAvailable(char t)
+        {
+            if (where.isEmpty() ||
+                ((where.indexOf(new Character(t))) != -1))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public String toString()
+        {
+            return("Angel by name of " + name +
+                   ", available every " + value +
+                   (where.isEmpty() ? "" : ", in terrain " + where));
+        }
+    }
+
+    private void addAngel(angelData ad) throws ParseException
+    {
+        if (angelList == null)
+        {
+            angelList = new ArrayList();
+        }
+        angelList.add(ad);
+        if ((ad.getValue() % getAngelRecruitmentsValue()) != 0)
+        {
+            throw new ParseException("Wrong Value for an Angel : " +
+                                     ad + " ; should multiple of " +
+                                     getAngelRecruitmentsValue());
+        }
+    }
+
+    /**
+     * To obtain all the Creature that can be recruited as Angel.
+     * @return The list of name (as String) that can be recruited as Angel
+     */
+    public List getAngelList()
+    {
+        List al = new ArrayList();
+        Iterator it = angelList.iterator();
+        while (it.hasNext())
+        {
+            angelData ad = (angelData)it.next();
+            al.add(ad.getName());
+        }
+        return al;
+    }
+
+    /**
+     * To obtain the base amount of points needed for Angel recruitement.
+     * All Angel recruitements must occur at even multiple of this.
+     * @return The base amount of points needed for Angel recruitement.
+     */
+    public int getAngelRecruitmentsValue()
+    {
+        angelData ad = (angelData)angelList.get(0);
+        return ad.getValue();
+    }
+
+    /**
+     * To obtain all the Creature that can be recruited as Angel at the given amount of points in the given terrain.
+     * @param t The Terrain in which the recruitement occurs.
+     * @param value The number of points at which the recruitement occurs. Valid values are constrained.
+     * @return The list of name (as String) that can be recruited as Angel in this terrain, for this amount of points.
+     * @see #getAngelRecruitmentsValue()
+     */
+    public List getRecruitableAngelList(char t, int value)
+    {
+        List al = new ArrayList();
+        if ((value % getAngelRecruitmentsValue()) != 0)
+        {
+            return al;
+        }
+        Iterator it = angelList.iterator();
+        while (it.hasNext())
+        {
+            angelData ad = (angelData)it.next();
+            if (ad.isAvailable(t) && ((value % ad.getValue()) == 0))
+            {
+                al.add(ad.getName());
+            }
+        }
+        return al;
+    }
+
+    /**
+     * Check if the Creature whose name is in parameter is an Angel-like creature or not.
+     * @param name The name of the Creature inquired.
+     * @return If the creature is Angel-like.
+     */
+    public boolean isAngel(String name)
+    {
+        Iterator it = angelList.iterator();
+        while (it.hasNext())
+        {
+            angelData ad = (angelData)it.next();
+            if (name.equals(ad.getName()))
+             {
+                return true;
+             }
+        }
+        return false;
+    }
+
+    /**
+     * Check if the Creature in parameter is an Angel-like creature or not.
+     * @param c The Creature inquired.
+     * @return If the creature is Angel-like.
+     */
+    public boolean isAngel(Creature c)
+    {
+        return isAngel(c.getName());
     }
 }
 
@@ -299,18 +457,25 @@ TOKEN :
 
 TOKEN :
 {
+    < ANGEL : "ANGEL" >
+}
+
+TOKEN :
+{
     < NUMBER : (<DIGIT>)+ >
 |   < #DIGIT : ["0" - "9"] >
 }
 
 TOKEN :
 {
-    < TERCAR : ["a"-"z","A"-"Z"] >
+    < BOOL: "true"|"false" >
 }
 
-TOKEN :
+TOKEN:
 {
-    < BOOL: "true"|"false" >
+    < TERRAINLIST : (<TERCAR><COMMA>)*<TERCAR> >
+|   < #TERCAR : ["a"-"z","A"-"Z"] >
+|   < #COMMA : "'" >
 }
 
 TOKEN :
@@ -329,7 +494,7 @@ boolean r_bool() :
 char r_char() :
 {}
 {
-    <TERCAR>
+    <TERRAINLIST>
     { return (token.image.charAt(0)); }
 }
 
@@ -339,6 +504,40 @@ String r_chaine() :
     <CHAINE>
     {
         return(new String(token.image));
+    }
+}
+
+String r_terrainList() :
+{}
+{
+    <TERRAINLIST>
+    {
+        return(new String(token.image));
+    }
+}
+
+angelData r_angelData() :
+{
+    String name;
+    int value;
+    String tl = null;
+}
+{
+    (value = r_number()) (name = r_chaine()) (tl = r_terrainList())?
+    {
+        angelData ad = new angelData(name, value);
+        if (tl != null)
+        {
+        List li = net.sf.colossus.util.Split.split(',',tl);
+        Iterator it = li.iterator();
+        while (it.hasNext())
+        {
+            String ter = (String)it.next();
+            char t = ter.charAt(0);
+            ad.addTerrain(t);
+        }
+        }
+        return ad;
     }
 }
 
@@ -365,6 +564,21 @@ ArrayList r_allRecruit() :
 
 }
 
+List r_angelDataList() :
+{
+    angelData ad;
+    List temp;
+}
+{
+    (ad = r_angelData()) (temp = r_angelDataList())
+    {
+        temp.add(ad);
+        return temp;
+    }
+|   /* empty */
+    { return new ArrayList(); }
+}
+
 /**
  * Load a terrain and the recruit possibility in this terrain.
  * @return Status of the parser ; negative at the end of file, positive on success, null on blank line.
@@ -377,6 +591,7 @@ int oneTerrain() :
     ArrayList rl;
     String s;
     boolean rb;
+    List al;
 }
 {
     (tc = r_char()) (col = r_chaine()) (t = r_chaine())
@@ -411,6 +626,17 @@ int oneTerrain() :
 |   (s = r_comment())
     {
         Log.debug("Found comment : " + s);
+        return(0);
+    }
+|   <ANGEL> (al = r_angelDataList())
+    {
+        ListIterator it = al.listIterator(al.size());
+        while (it.hasPrevious())
+        {
+            angelData ad = (angelData)it.previous();
+            addAngel(ad);
+        }
+        Log.debug("Using Angel List : " + angelList);
         return(0);
     }
 |   <EOF>

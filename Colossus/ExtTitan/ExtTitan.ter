@@ -20,3 +20,7 @@ T grey        Tower     false 0 Anything 1 Centaur 0 Anything 1 Gargoyle 0 Anyth
 t skyBlue     Tundra    true  1 Troll    2 Warbear  2 Mammoth    2 Giant     2 Colossus
 
 W olive       Woods     true  1 Centaur  2 Warbear  2 Griffon    2 Unicorn
+
+ANGEL 100 Angel
+ANGEL 100 FireElemental D 100 WaterElemental S 100 AirElemental W 100 EarthElemental H
+ANGEL 500 Archangel
