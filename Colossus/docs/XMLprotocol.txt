@@ -57,7 +57,8 @@ Requests (client to server)
 <mulligan />
     Re-roll movement.
 
-<move legion="[legion]" hex="[land]" {entryside="[entryside]" teleport="[bool"]} />
+<move legion="[legion]" hex="[land]" {entryside="[entryside]" 
+      teleport="[bool"]} />
     Move [legion] to masterboard hex [land] entering on side
     [entryside].  If [entryside] is omitted, the server picks.
     If the legion can both teleport and move without teleporting and 
@@ -67,8 +68,8 @@ Requests (client to server)
     Move [legion] back to its previous location.
 
 <recruit legion="[legion]" recruit="[creature]" {recruiter="[creature]"}
-    Muster a recruit using the right number of recruiter.  If recruiter is not
-    set then the server picks.
+    Muster a recruit using the right number of recruiter.  If recruiter 
+    is not set then the server picks.
 
 <undorecruit legion="[legion]" />
     [legion] undoes its last recruit. 
@@ -95,8 +96,8 @@ Requests (client to server)
     </creatures>
 </negotiate>
     Offer a negotiated settlement to the engagement in [land] where 
-    survivor wins, and is left with creatures.  If survivor or creatures is
-    missing or empty, offer mutual destruction.
+    survivor wins, and is left with creatures.  If survivor or 
+    creatures is missing or empty, offer mutual destruction.
 
 <accept hex="[land]" survivor="[legion]">
     <losses legion="[legion]">
@@ -206,7 +207,8 @@ Messages (server to one or more clients)
 <mulligan />
     The active player took a mulligan.
 
-<move legion="[legion]" hex="[land]" entryside="[entryside]" teleport="[bool"] />
+<move legion="[legion]" hex="[land]" entryside="[entryside]" 
+      teleport="[bool"] />
     [legion] moved to masterboard hex [land] entering on side
     [entryside].  If teleport is "true" then this move was a teleport.
 
@@ -218,8 +220,8 @@ Messages (server to one or more clients)
         <creature name="[creature1]">
         <creature name="[creatureN]">
     </creatures>
-    Active player chose to resolve the engagement in [land].  The opposing legion's
-    creatures are revealed.
+    Active player chose to resolve the engagement in [land].  The 
+    opposing legion's creatures are revealed.
 
 <flee legion="[legion]">
     <creatures>
@@ -283,8 +285,8 @@ Messages (server to one or more clients)
 <drift  [battlehex] />
     creature in [battlehex] took one point of drift damage.
 
-<strike strikerhex="[battlehex]" targethex="[battlehex]" 
-        dice="[number]" strike="[number]" hits="[number]" carries="[number]">
+<strike strikerhex="[battlehex]" targethex="[battlehex]" dice="[number]" 
+        strike="[number]" hits="[number]" carries="[number]">
     <rolls>
         [number1]
         [numberN]
@@ -294,9 +296,9 @@ Messages (server to one or more clients)
         [battlehexN]
     </carryhexes>
 </strike>
-    creature in strikerhex struck creature in targethex, rolling dice against the 
-    given strike number.  Exact rolls, hits, carries, and carry targets 
-    are given.
+    Creature in strikerhex struck creature in targethex, rolling dice 
+    against the given strike number.  Exact rolls, hits, carries, and 
+    carry targets are given.
 
 <carry targethex="[battlehex]" hits="[number]" carries="[number]">
     <carryhexes>
@@ -304,8 +306,8 @@ Messages (server to one or more clients)
         [battlehexN]
     </carryhexes>
 </carry>
-    Hits were carried to the creature in targethex.  If there are still carries
-    and carry targets remaining, they are shown.
+    Hits were carried to the creature in targethex.  If there are still 
+    carries and carry targets remaining, they are shown.
 
 <donestriking />
     All battle strikes are finished for this phase.
