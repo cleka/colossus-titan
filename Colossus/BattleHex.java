@@ -68,6 +68,16 @@ public class BattleHex extends Hex
                     case 2:
                         return "Plains (2)";
                 }
+            case 'w':
+                switch (elevation)
+                {
+                    case 0:
+                        return "Tower";
+                    case 1:
+                        return "Tower (1)";
+                    case 2:
+                        return "Tower (2)";
+                }
             case 'r':
                 return "Bramble";
             case 's':
@@ -99,6 +109,16 @@ public class BattleHex extends Hex
                         return HTMLColor.darkYellow;
                     case 2:
                         return Color.yellow;
+                }
+            case 'w':  // tower
+                switch (elevation)
+                {
+                    case 0:
+                        return HTMLColor.lightGray;
+                    case 1:
+                        return Color.gray;
+                    case 2:
+                        return HTMLColor.darkGray;
                 }
             case 'r':  // bramble
                 return Color.green;

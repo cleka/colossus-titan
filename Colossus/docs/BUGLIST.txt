@@ -131,4 +131,8 @@ Add confirm dialog when quitting by exiting frame.
 
 AI sometimes concedes with its titan stack.  Check.
 
-rescale is broken and causes exceptions.
+rescale is broken and causes exceptions.  When it works, scale is not saved to (or
+   maybe not loaded from) cfg file.
+
+autosave is happening even with autosave option off.
+

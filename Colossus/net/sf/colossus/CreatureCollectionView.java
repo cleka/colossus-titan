@@ -11,7 +11,7 @@ import java.util.*;
  *  @version $Id$
  *  @author Tom Fruchterman
  */
-public class CreatureCollectionView extends JFrame
+public class CreatureCollectionView extends JDialog
 {
     private ICreatureCollection m_oCollection;
 
@@ -20,11 +20,10 @@ public class CreatureCollectionView extends JFrame
     private static Point location;
 
 
-    public CreatureCollectionView(ICreatureCollection oCollection,
-                                  IImageUtility oImageUtility)
+    public CreatureCollectionView(JFrame frame, ICreatureCollection oCollection,
+        IImageUtility oImageUtility)
     {
-        // third arg says we are NOT modal
-        super(oCollection.getName());
+        super(frame, oCollection.getName());
 
         m_oCollection = oCollection;
         m_oImageUtility = oImageUtility;

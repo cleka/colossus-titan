@@ -492,7 +492,8 @@ public final class Client
             }
             else
             {
-                statusScreen = new StatusScreen(this, server.getGame());
+                statusScreen = new StatusScreen(board.getFrame(), this, 
+                    server.getGame());
             }
         }
         else
@@ -520,7 +521,7 @@ public final class Client
                 ICreatureCollection oCaretakerCollection =
                     server.getGame().getCaretaker().getCollectionInterface();
                 caretakerDisplay = new CreatureCollectionView(
-                    oCaretakerCollection, oImageUtility);
+                    board.getFrame(), oCaretakerCollection, oImageUtility);
                 caretakerDisplay.addWindowListener(new WindowAdapter()
                 {
                     public void windowClosing(WindowEvent e)

@@ -363,6 +363,14 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 break;
 
             case 'T':
+                h[2][2].setTerrain('w');
+                h[2][3].setTerrain('w');
+                h[3][1].setTerrain('w');
+                h[3][2].setTerrain('w');
+                h[3][3].setTerrain('w');
+                h[4][2].setTerrain('w');
+                h[4][3].setTerrain('w');
+
                 h[2][2].setElevation(1);
                 h[2][3].setElevation(1);
                 h[3][1].setElevation(1);

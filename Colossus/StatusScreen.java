@@ -10,7 +10,7 @@ import javax.swing.*;
  */
 
 
-public final class StatusScreen extends JFrame implements WindowListener
+public final class StatusScreen extends JDialog implements WindowListener
 {
     private JLabel [] nameLabel;
     private JLabel [] towerLabel;
@@ -31,15 +31,13 @@ public final class StatusScreen extends JFrame implements WindowListener
 
     // TODO Should not take a direct Game reference, since that may contain
     // privileged information.
-    public StatusScreen(Client client, Game game)
+    public StatusScreen(JFrame frame, Client client, Game game)
     {
-        super("Game Status");
+        super(frame, "Game Status");
 
         setVisible(false);
         this.client = client;
         this.game = game;
-
-        setupIcon();
 
         addWindowListener(this);
 
@@ -149,23 +147,6 @@ public final class StatusScreen extends JFrame implements WindowListener
         setLocation(location);
 
         setVisible(true);
-    }
-
-
-    private void setupIcon()
-    {
-        try
-        {
-            setIconImage(Toolkit.getDefaultToolkit().getImage(
-                getClass().getResource(Chit.getImagePath(
-                Creature.colossus.getImageName()))));
-        }
-        catch (NullPointerException e)
-        {
-            Log.error(e.toString() + " Could not find " +
-                Creature.colossus.getImageName());
-            dispose();
-        }
     }
 
 
