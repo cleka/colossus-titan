@@ -197,12 +197,6 @@ public final class Server
         }
     }
 
-    public void highlightEngagements(String playerName)
-    {
-        Client client = getClient(playerName);
-        client.highlightEngagements();
-    }
-
 
     public void highlightCarries(String playerName)
     {

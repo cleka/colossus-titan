@@ -82,7 +82,7 @@ Win98, 1.4b: Chits are placed slightly off-center in battle hexes.
 
 Need to allow first human player to control game options, load game, etc.
 
-Currently have to pick recruiter even with all stacks visible set.
+Currently have to pick recruiter even with "all stacks visible" set.
 
 AI players need to unhighlight hexes more often, and not highlight
    stuff on other players' turns.
@@ -90,4 +90,20 @@ AI players need to unhighlight hexes more often, and not highlight
 Need to re-highlight after taking forced or auto strikes.
 
 One player's dialogs block all other players.  Need to not display dialogs
-   to AI players.
+   to AI players.  Actually, need to not display anything to AI players,
+   after they learn how to advance phases.
+
+Some creatures show up on the battlemap but can't be clicked.  Not just
+   summoned angels.  "Engaged creature must strike" but can't click on
+   creature so battle sticks.  Bad chits vs. critter tag?
+
+Add a class that calls JOptionPane.showMessageDialog() etc. to Client, and 
+   always use that instead so that we can easily bypass such messages for 
+   AI clients.
+
+BattleDice is not being dismissed at end of combat.
+
+highlightEngagements() is a mess.  Call the AI from the server side, and
+   advancePhase() when there are no engagements left.  Change from int
+   to void and use a separate method to count.
+

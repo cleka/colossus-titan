@@ -311,6 +311,23 @@ public final class Player implements Comparable
     }
 
 
+    public int getMaxLegionHeight()
+    {
+        int max = 0;
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            int height = legion.getHeight();
+            if (height > max)
+            {
+                max = height;
+            }
+        }
+        return max;
+    }
+
+
     /** Sort legions into order of descending importance.  Titan legion
      *  first, then others by point value. */
     public void sortLegions()
@@ -519,7 +536,6 @@ public final class Player implements Comparable
         }
     }
 
-
     public void undoAllMoves()
     {
         Iterator it = legions.iterator();
@@ -586,7 +602,6 @@ public final class Player implements Comparable
             splitoff.recombine(splitoff.getParent(), true);
         }
     }
-
 
     public void undoAllSplits()
     {
@@ -818,6 +833,7 @@ public final class Player implements Comparable
         if (game.getServer().getClientOption(name, Options.autoSplit))
         {
             ai.split(game);
+            game.advancePhase();
         }
     }
 
@@ -826,6 +842,7 @@ public final class Player implements Comparable
         if (game.getServer().getClientOption(name, Options.autoMasterMove))
         {
             ai.masterMove(game);
+            game.advancePhase();
         }
     }
 
@@ -834,6 +851,7 @@ public final class Player implements Comparable
         if (game.getServer().getClientOption(name, Options.autoRecruit))
         {
             ai.muster(game);
+            game.advancePhase();
         }
     }
 
@@ -867,7 +885,8 @@ public final class Player implements Comparable
     public void aiStrike(Legion legion, Battle battle, boolean fakeDice,
         boolean forced)
     {
-        if (forced || game.getServer().getClientOption(name, Options.autoStrike))
+        if (forced || game.getServer().getClientOption(name,
+            Options.autoStrike))
         {
             ai.strike(legion, battle, game, fakeDice);
         }
@@ -889,6 +908,7 @@ public final class Player implements Comparable
         if (game.getServer().getClientOption(name, Options.autoBattleMove))
         {
             ai.battleMove(game);
+            game.getBattle().advancePhase();
         }
     }
 

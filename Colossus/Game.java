@@ -500,8 +500,10 @@ public final class Game
         Player player = getActivePlayer();
         player.resetTurnState();
 
-        // If there are no markers available, skip forward to movement.
-        if (player.getNumMarkersAvailable() == 0)
+        // If there are no markers available, or no legions tall enough
+        // to split, skip forward to movement.
+        if (player.getNumMarkersAvailable() == 0 ||
+            player.getMaxLegionHeight() < 4)
         {
             advancePhase();
         }
@@ -525,7 +527,6 @@ public final class Game
 
     private void setupFight()
     {
-        // Highlight hexes with engagements.
         // If there are no engagements, move forward to the muster phase.
         Client.clearUndoStack();
         if (findEngagements().size() == 0)
@@ -535,8 +536,10 @@ public final class Game
         else
         {
             server.allSetupFightMenu();
+            aiSetupEngagements();
         }
     }
+
 
     private void setupMuster()
     {
@@ -2377,6 +2380,22 @@ public final class Game
     }
 
 
+    private void aiSetupEngagements()
+    {
+        Player player = getActivePlayer();
+        String engagementHexLabel = player.aiPickEngagement();
+        if (engagementHexLabel != null)
+        {
+            server.engage(engagementHexLabel);
+        }
+
+        if (findEngagements().size() == 0)
+        {
+            advancePhase();
+        }
+    }
+
+
     public void finishBattle(String hexLabel, boolean attackerEntered)
     {
         battle = null;
@@ -2427,7 +2446,7 @@ public final class Game
         }
         engagementInProgress = false;
         battleInProgress = false;
-        server.highlightEngagements(getActivePlayerName());
+        aiSetupEngagements();
         server.allUpdateStatusScreen();
     }
 
@@ -2779,7 +2798,7 @@ public final class Game
         // defender flees or the attacker concedes before entering
         // the battle.
         engagementInProgress = false;
-        server.highlightEngagements(getActivePlayerName());
+        aiSetupEngagements();
     }
 
 
@@ -2906,7 +2925,7 @@ public final class Game
             }
         }
         engagementInProgress = false;
-        server.highlightEngagements(getActivePlayerName());
+        aiSetupEngagements();
     }
 
 

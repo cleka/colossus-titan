@@ -23,16 +23,16 @@ public final class BattleMap extends HexMap implements MouseListener,
     private Battle battle;
     private boolean critterSelected;
 
-    public static final String undoLastMove = "Undo Last Move";
-    public static final String undoAllMoves = "Undo All Moves";
-    public static final String doneWithMoves = "Done with Moves";
-    public static final String doneWithStrikes = "Done with Strikes";
+    public static final String undoLast = "Undo Last"; 
+    public static final String redoLast = "Redo Last";
+    public static final String undoAll = "Undo All";
+    public static final String doneWithPhase = "Done";
     public static final String concedeBattle = "Concede Battle";
 
-    private AbstractAction undoLastMoveAction;
-    private AbstractAction undoAllMovesAction;
-    private AbstractAction doneWithMovesAction;
-    private AbstractAction doneWithStrikesAction;
+    private AbstractAction undoLastAction;
+    private AbstractAction redoLastAction;
+    private AbstractAction undoAllAction;
+    private AbstractAction doneWithPhaseAction;
     private AbstractAction concedeBattleAction;
 
 
@@ -106,7 +106,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     private void setupActions()
     {
-        undoLastMoveAction = new AbstractAction(undoLastMove)
+        undoLastAction = new AbstractAction(undoLast)
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -115,13 +115,16 @@ public final class BattleMap extends HexMap implements MouseListener,
                 {
                     return;
                 }
-                critterSelected = false;
-                battle.undoLastMove();
-                highlightMobileCritters();
+                if (battle.getPhase() == battle.MOVE)
+                {
+                    critterSelected = false;
+                    battle.undoLastMove();
+                    highlightMobileCritters();
+                }
             }
         };
 
-        undoAllMovesAction = new AbstractAction(undoAllMoves)
+        undoAllAction = new AbstractAction(undoAll)
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -130,34 +133,16 @@ public final class BattleMap extends HexMap implements MouseListener,
                 {
                     return;
                 }
-                critterSelected = false;
-                battle.undoAllMoves();
-                highlightMobileCritters();
-            }
-        };
-
-        doneWithMovesAction = new AbstractAction(doneWithMoves)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                if (battle.anyOffboardCreatures())
+                if (battle.getPhase() == Battle.MOVE)
                 {
-                    if (!client.getPlayerName().equals(
-                        battle.getActivePlayerName()))
-                    {
-                        return;
-                    }
-                    if (!client.getOption(Options.autoBattleMove) &&
-                        !confirmLeavingCreaturesOffboard())
-                    {
-                        return;
-                    }
+                    critterSelected = false;
+                    battle.undoAllMoves();
+                    highlightMobileCritters();
                 }
-                battle.doneWithMoves();
             }
         };
 
-        doneWithStrikesAction = new AbstractAction(doneWithStrikes)
+        doneWithPhaseAction = new AbstractAction(doneWithPhase)
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -166,18 +151,39 @@ public final class BattleMap extends HexMap implements MouseListener,
                 {
                     return;
                 }
-                if (battle.isForcedStrikeRemaining())
+
+                int phase = battle.getPhase();
+                switch (phase)
                 {
-                    highlightCrittersWithTargets();
-                    JOptionPane.showMessageDialog(battleFrame,
-                        "Engaged creatures must strike.");
-                }
-                else
-                {
-                    battle.doneWithStrikes();
+                    case Battle.MOVE:
+                        if (battle.anyOffboardCreatures())
+                        {
+                            if (!client.getOption(Options.autoBattleMove) &&
+                                !confirmLeavingCreaturesOffboard())
+                            {
+                                return;
+                            }
+                        }
+                        battle.doneWithMoves();
+                        break;
+
+                    case Battle.FIGHT:
+                    case Battle.STRIKEBACK:
+                        if (battle.isForcedStrikeRemaining())
+                        {
+                            highlightCrittersWithTargets();
+                            JOptionPane.showMessageDialog(battleFrame,
+                                "Engaged creatures must strike.");
+                        }
+                        else
+                        {
+                            battle.doneWithStrikes();
+                        }
+                        break;
                 }
             }
         };
+
 
         concedeBattleAction = new AbstractAction(concedeBattle)
         {
@@ -263,15 +269,15 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         JMenuItem mi;
 
-        mi = phaseMenu.add(undoLastMoveAction);
+        mi = phaseMenu.add(undoLastAction);
         mi.setMnemonic(KeyEvent.VK_U);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
 
-        mi = phaseMenu.add(undoAllMovesAction);
+        mi = phaseMenu.add(undoAllAction);
         mi.setMnemonic(KeyEvent.VK_A);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
 
-        mi = phaseMenu.add(doneWithMovesAction);
+        mi = phaseMenu.add(doneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
@@ -303,7 +309,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         JMenuItem mi;
 
-        mi = phaseMenu.add(doneWithStrikesAction);
+        mi = phaseMenu.add(doneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 

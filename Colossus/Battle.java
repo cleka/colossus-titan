@@ -292,7 +292,7 @@ public final class Battle
     }
 
 
-    private void advancePhase()
+    public void advancePhase()
     {
         boolean again = false;
 

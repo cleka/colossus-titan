@@ -70,44 +70,38 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public static final String saveGame = "Save game";
     public static final String saveGameAs = "Save game as";
     public static final String quitGame = "Quit game";
-    public static final String concedeBattle = "Concede battle";
     public static final String saveOptions = "Save options";
-    public static final String undoLastSplit = "Undo Last Split";
-    public static final String undoAllSplits = "Undo All Splits";
-    public static final String withdrawFromGame = "Withdraw from Game";
-    public static final String doneWithSplits = "Done with Splits";
-    public static final String undoLastMove = "Undo Last Move";
-    public static final String undoAllMoves = "Undo All Moves";
+
+    public static final String undoLast = "Undo";
+    public static final String redoLast = "Redo";
+    public static final String undoAll = "Undo All";
+    public static final String doneWithPhase = "Done";
+
     public static final String takeMulligan = "Take Mulligan";
-    public static final String doneWithMoves = "Done with Moves";
-    public static final String doneWithEngagements = "Done with Engagements";
-    public static final String undoLastRecruit = "Undo Last Recruit";
-    public static final String undoAllRecruits = "Undo All Recruits";
-    public static final String doneWithTurn = "Done with Turn";
+    public static final String concedeBattle = "Concede battle";
+    public static final String withdrawFromGame = "Withdraw from Game";
+
     public static final String viewRecruitInfo = "View Recruit Info";
     public static final String viewBattleMap = "View Battle Map";
     public static final String changeScale = "Change Scale";
 
-    private AbstractAction undoLastSplitAction;
-    private AbstractAction undoAllSplitsAction;
-    private AbstractAction doneWithSplitsAction;
-    private AbstractAction undoLastMoveAction;
-    private AbstractAction undoAllMovesAction;
-    private AbstractAction takeMulliganAction;
-    private AbstractAction doneWithMovesAction;
-    private AbstractAction doneWithEngagementsAction;
-    private AbstractAction undoLastRecruitAction;
-    private AbstractAction undoAllRecruitsAction;
-    private AbstractAction doneWithTurnAction;
-    private AbstractAction withdrawFromGameAction;
-    private AbstractAction viewRecruitInfoAction;
-    private AbstractAction viewBattleMapAction;
     private AbstractAction newGameAction;
     private AbstractAction loadGameAction;
     private AbstractAction saveGameAction;
     private AbstractAction saveGameAsAction;
-    private AbstractAction saveOptionsAction;
     private AbstractAction quitGameAction;
+    private AbstractAction saveOptionsAction;
+
+    private AbstractAction undoLastAction;
+    private AbstractAction redoLastAction;
+    private AbstractAction undoAllAction;
+    private AbstractAction doneWithPhaseAction;
+
+    private AbstractAction takeMulliganAction;
+    private AbstractAction withdrawFromGameAction;
+
+    private AbstractAction viewRecruitInfoAction;
+    private AbstractAction viewBattleMapAction;
     private AbstractAction changeScaleAction;
 
 
@@ -193,7 +187,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     private void setupActions()
     {
-        undoLastSplitAction = new AbstractAction(undoLastSplit)
+        undoLastAction = new AbstractAction(undoLast)
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -202,56 +196,39 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 {
                     return;
                 }
-                // Peek at the undo stack so we know where to align
-                String splitoffId = (String)Client.topUndoStack();
-                Legion splitoff = game.getLegionByMarkerId(splitoffId);
-                String hexLabel = splitoff.getCurrentHexLabel();
-                player.undoLastSplit();
-                alignLegions(hexLabel);
-                highlightTallLegions(player);
-                repaint();
-            }
-        };
 
-        undoAllSplitsAction = new AbstractAction(undoAllSplits)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                Player player = game.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
+                int phase = game.getPhase();
+                switch(phase)
                 {
-                    return;
-                }
-                // peek at the undo stack so we know where to align
-                player.undoAllSplits();
-                alignAllLegions();
-                highlightTallLegions(player);
-                repaint();
-            }
-        };
+                    case Game.SPLIT:
+                        // Peek at the undo stack so we know where to align
+                        String splitoffId = (String)Client.topUndoStack();
+                        Legion splitoff = game.getLegionByMarkerId(splitoffId);
+                        String hexLabel = splitoff.getCurrentHexLabel();
+                        player.undoLastSplit();
+                        alignLegions(hexLabel);
+                        highlightTallLegions(player);
+                        repaint();
+                        break;
 
-        doneWithSplitsAction = new AbstractAction(doneWithSplits)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                Player player = game.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
-                {
-                    return;
-                }
-                // Initial legions must be split.
-                if (game.getTurnNumber() == 1 && player.getNumLegions() == 1)
-                {
-                    JOptionPane.showMessageDialog(masterFrame, "Must split.");
-                }
-                else
-                {
-                    game.advancePhase();
+                    case Game.MOVE:
+                        player.undoLastMove();
+                        highlightUnmovedLegions();
+                        break;
+
+                    case Game.FIGHT:
+                        Log.error("called undoLastAction in FIGHT");
+                        break;
+
+                    case Game.MUSTER:
+                        player.undoLastRecruit();
+                        highlightPossibleRecruits();
+                        break;
                 }
             }
         };
 
-        undoLastMoveAction = new AbstractAction(undoLastMove)
+        undoAllAction = new AbstractAction(undoAll)
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -260,12 +237,37 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 {
                     return;
                 }
-                player.undoLastMove();
-                highlightUnmovedLegions();
+
+                int phase = game.getPhase();
+                switch(phase)
+                {
+                    case Game.SPLIT:
+                        // peek at the undo stack so we know where to align
+                        player.undoAllSplits();
+                        alignAllLegions();
+                        highlightTallLegions(player);
+                        repaint();
+                        break;
+
+                    case Game.MOVE:
+                        player.undoAllMoves();
+                        highlightUnmovedLegions();
+                        break;
+
+                    case Game.FIGHT:
+                        Log.error("called undoAllAction in FIGHT");
+                        break;
+
+                    case Game.MUSTER:
+                        player.undoAllRecruits();
+                        highlightPossibleRecruits();
+                        break;
+                }
             }
         };
 
-        undoAllMovesAction = new AbstractAction(undoAllMoves)
+/* TODO
+        redoLastAction = new AbstractAction(redoLast)
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -274,10 +276,116 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 {
                     return;
                 }
-                player.undoAllMoves();
-                highlightUnmovedLegions();
+
+                int phase = game.getPhase();
+                switch(phase)
+                {
+                    case Game.SPLIT:
+                        player.redoLastSplit();
+                        alignLegions(hexLabel);
+                        highlightTallLegions(player);
+                        repaint();
+                        break;
+
+                    case Game.MOVE:
+                        player.redoLastMove();
+                        highlightUnmovedLegions();
+                        break;
+
+                    case Game.FIGHT:
+                        Log.error("called redoLastAction in FIGHT");
+                        break;
+
+                    case Game.MUSTER:
+                        player.redoLastRecruit();
+                        highlightPossibleRecruits();
+                        break;
+                }
             }
         };
+*/
+
+        doneWithPhaseAction = new AbstractAction(doneWithPhase)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                if (!player.getName().equals(client.getPlayerName()))
+                {
+                    return;
+                }
+
+                int phase = game.getPhase();
+                switch(phase)
+                {
+                    case Game.SPLIT:
+                        // Initial legions must be split.
+                        if (game.getTurnNumber() == 1 &&
+                            player.getNumLegions() == 1)
+                        {
+                            // XXX Only do this for humans.
+                            JOptionPane.showMessageDialog(masterFrame,
+                                "Must split.");
+                        }
+                        else
+                        {
+                            game.advancePhase();
+                        }
+                        break;
+
+                    case Game.MOVE:
+                        // If any legion has a legal non-teleport move, then
+                        // the player must move at least one legion.
+                        if (player.legionsMoved() == 0 &&
+                            player.countMobileLegions() > 0)
+                        {
+                            highlightUnmovedLegions();
+                            JOptionPane.showMessageDialog(masterFrame,
+                                "At least one legion must move.");
+                        }
+                        else
+                        {
+                            // If legions share a hex and have a legal
+                            // non-teleport move, force one of them to take it.
+                            if (player.splitLegionHasForcedMove())
+                            {
+                                highlightUnmovedLegions();
+                                JOptionPane.showMessageDialog(masterFrame,
+                                    "Split legions must be separated.");
+                            }
+                            // Otherwise, recombine all split legions still in
+                            // the same hex, and move on to the next phase.
+                            else
+                            {
+                                player.undoAllSplits();
+                                game.advancePhase();
+                            }
+                        }
+                        break;
+
+                    case Game.FIGHT:
+                        // Advance only if there are no unresolved engagements.
+                        if (game.findEngagements().size() == 0)
+                        {
+                            game.advancePhase();
+                        }
+                        else
+                        {
+                            JOptionPane.showMessageDialog(masterFrame,
+                                "Must Resolve Engagements.");
+                        }
+                        break;
+
+                    case Game.MUSTER:
+                        player.commitMoves();
+                        // Mulligans are only allowed on turn 1.
+                        player.setMulligansLeft(0);
+                        game.advancePhase();
+                        break;
+                }
+            }
+        };
+
 
         takeMulliganAction = new AbstractAction(takeMulligan)
         {
@@ -296,110 +404,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
         };
 
-        doneWithMovesAction = new AbstractAction(doneWithMoves)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                Player player = game.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
-                {
-                    return;
-                }
-                // If any legion has a legal non-teleport move, then the
-                // player must move at least one legion.
-                if (player.legionsMoved() == 0 &&
-                    player.countMobileLegions() > 0)
-                {
-                    highlightUnmovedLegions();
-                    JOptionPane.showMessageDialog(masterFrame,
-                        "At least one legion must move.");
-                }
-                else
-                {
-                    // If legions share a hex and have a legal non-teleport
-                    // move, force one of them to take it.
-                    if (player.splitLegionHasForcedMove())
-                    {
-                        highlightUnmovedLegions();
-                        JOptionPane.showMessageDialog(masterFrame,
-                            "Split legions must be separated.");
-                    }
-                    // Otherwise, recombine all split legions still in the
-                    // same hex, and move on to the next phase.
-                    else
-                    {
-                        player.undoAllSplits();
-                        game.advancePhase();
-                    }
-                }
-            }
-        };
 
-        doneWithEngagementsAction = new AbstractAction(doneWithEngagements)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                String activePlayerName = game.getActivePlayerName();
-                if (!activePlayerName.equals(client.getPlayerName()))
-                {
-                    return;
-                }
-                // Advance only if there are no unresolved engagements.
-                if (highlightEngagements() == 0)
-                {
-                    game.advancePhase();
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(masterFrame,
-                        "Must Resolve Engagements.");
-                }
-            }
-        };
 
-        undoLastRecruitAction = new AbstractAction(undoLastRecruit)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                Player player = game.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
-                {
-                    return;
-                }
-                player.undoLastRecruit();
-                highlightPossibleRecruits();
-            }
-        };
 
-        undoAllRecruitsAction = new AbstractAction(undoAllRecruits)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                Player player = game.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
-                {
-                    return;
-                }
-                player.undoAllRecruits();
-                highlightPossibleRecruits();
-            }
-        };
 
-        doneWithTurnAction = new AbstractAction(doneWithTurn)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                Player player = game.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
-                {
-                    return;
-                }
-                player.commitMoves();
-                // Mulligans are only allowed on turn 1.
-                player.setMulligansLeft(0);
-                game.advancePhase();
-            }
-        };
 
 
         // TODO Let inactive players withdraw from the game.
@@ -1443,15 +1451,21 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         JMenuItem mi;
 
-        mi = phaseMenu.add(undoLastSplitAction);
+        mi = phaseMenu.add(undoLastAction);
         mi.setMnemonic(KeyEvent.VK_U);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
 
-        mi = phaseMenu.add(undoAllSplitsAction);
+/* TODO
+        mi = phaseMenu.add(redoLastAction);
+        mi.setMnemonic(KeyEvent.VK_R);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0));
+*/
+
+        mi = phaseMenu.add(undoAllAction);
         mi.setMnemonic(KeyEvent.VK_A);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
 
-        mi = phaseMenu.add(doneWithSplitsAction);
+        mi = phaseMenu.add(doneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
@@ -1481,15 +1495,21 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         JMenuItem mi;
 
-        mi = phaseMenu.add(undoLastMoveAction);
+        mi = phaseMenu.add(undoLastAction);
         mi.setMnemonic(KeyEvent.VK_U);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
 
-        mi = phaseMenu.add(undoAllMovesAction);
+/*
+        mi = phaseMenu.add(redoLastAction);
+        mi.setMnemonic(KeyEvent.VK_R);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0));
+*/
+
+        mi = phaseMenu.add(undoAllAction);
         mi.setMnemonic(KeyEvent.VK_A);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
 
-        mi = phaseMenu.add(doneWithMovesAction);
+        mi = phaseMenu.add(doneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
@@ -1527,7 +1547,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         JMenuItem mi;
 
-        mi = phaseMenu.add(doneWithEngagementsAction);
+        mi = phaseMenu.add(doneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
@@ -1557,15 +1577,21 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         JMenuItem mi;
 
-        mi = phaseMenu.add(undoLastRecruitAction);
+        mi = phaseMenu.add(undoLastAction);
         mi.setMnemonic(KeyEvent.VK_U);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
 
-        mi = phaseMenu.add(undoAllRecruitsAction);
+/*
+        mi = phaseMenu.add(redoLastAction);
+        mi.setMnemonic(KeyEvent.VK_R);
+        mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0));
+*/
+
+        mi = phaseMenu.add(undoAllAction);
         mi.setMnemonic(KeyEvent.VK_A);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
 
-        mi = phaseMenu.add(doneWithTurnAction);
+        mi = phaseMenu.add(doneWithPhaseAction);
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
@@ -1758,21 +1784,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
 
     /** Return number of engagements found. */
-    public int highlightEngagements()
+    public void highlightEngagements()
     {
         Set set = game.findEngagements();
         unselectAllHexes();
         selectHexesByLabels(set);
-
-        // XXX Not the best place to call the AI.
-        Player player = game.getActivePlayer();
-        String engagementHexLabel = player.aiPickEngagement();
-        if (engagementHexLabel != null)
-        {
-            client.engage(engagementHexLabel);
-        }
-
-        return set.size();
     }
 
 
