@@ -34,8 +34,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private Vector typeChoices = new Vector();
     private JComboBox [] playerTypes = new JComboBox[Constants.MAX_MAX_PLAYERS];
     private JComboBox [] playerNames = new JComboBox[Constants.MAX_MAX_PLAYERS];
-    private JEditorPane readme = new JEditorPane();
-    private JScrollPane scrollPane = null;
+    private JTextPane readme = new JTextPane();
 
     private JComboBox variantBox;
 
@@ -62,9 +61,16 @@ public final class GetPlayers extends KDialog implements WindowListener,
         setBackground(Color.lightGray);
         pack();
 
-        Container contentPane = getContentPane();
-        BoxLayout baseLayout = new BoxLayout(contentPane, BoxLayout.Y_AXIS);
-        contentPane.setLayout(baseLayout);
+        Container mainPane = new JPanel();
+        BoxLayout baseLayout = new BoxLayout(mainPane, BoxLayout.Y_AXIS);
+        mainPane.setLayout(baseLayout);
+
+        JScrollPane mainScrollPane = new JScrollPane(mainPane, 
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(mainScrollPane, BorderLayout.CENTER);
 
         try
         {
@@ -72,7 +78,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             JLabel iaLabel = new JLabel("Running on " + ia.toString());
             Container iaPane = new Container();
             iaPane.setLayout(new GridLayout(0, 1));
-            contentPane.add(iaPane);
+            mainPane.add(iaPane);
             iaPane.add(iaLabel);
         }
         catch (UnknownHostException ex)
@@ -85,7 +91,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         BoxLayout allPlayersLayout = new BoxLayout(allPlayersPane, 
             BoxLayout.Y_AXIS);
         allPlayersPane.setLayout(allPlayersLayout);
-        contentPane.add(allPlayersPane);
+        mainPane.add(allPlayersPane);
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             doOnePlayer(i, allPlayersPane);
@@ -94,7 +100,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         JPanel gamePane = new JPanel();
         gamePane.setBorder(new TitledBorder("Game Startup"));
         gamePane.setLayout(new GridLayout(0, 3));
-        contentPane.add(gamePane);
+        mainPane.add(gamePane);
         
         JButton button1 = new JButton(Constants.newGame);
         button1.setMnemonic(KeyEvent.VK_N);
@@ -111,7 +117,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         JPanel checkboxPane = new JPanel(new GridLayout(0, 3));
         checkboxPane.setBorder(new TitledBorder("General Options"));
-        contentPane.add(checkboxPane);
+        mainPane.add(checkboxPane);
         
         addCheckbox(Options.autosave, checkboxPane);
         addCheckbox(Options.logDebug, checkboxPane);
@@ -122,7 +128,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         JPanel teleportPane = new JPanel(new GridLayout(0, 2));
         teleportPane.setBorder(new TitledBorder("Teleport Options"));
-        contentPane.add(teleportPane);
+        mainPane.add(teleportPane);
 
         addCheckbox(Options.noFirstTurnT2TTeleport, teleportPane);
         addCheckbox(Options.noFirstTurnTeleport, teleportPane);
@@ -132,7 +138,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         JPanel aiTimePane = new JPanel(new FlowLayout());
         aiTimePane.setBorder(new TitledBorder("AI Timing"));
-        contentPane.add(aiTimePane);
+        mainPane.add(aiTimePane);
 
         oldDelay = options.getIntOption(Options.aiDelay);
         if (oldDelay < Constants.MIN_AI_DELAY || 
@@ -164,7 +170,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         JPanel variantPane = new JPanel();
         variantPane.setBorder(new TitledBorder("Variant"));
         variantPane.setLayout(new GridLayout(0, 2));
-        contentPane.add(variantPane);
+        mainPane.add(variantPane);
 
         String variantName = options.getStringOption(Options.variant);
         // XXX Make sure chosen variant is in the list.
@@ -185,9 +191,12 @@ public final class GetPlayers extends KDialog implements WindowListener,
         JPanel readmePane = new JPanel();
         readmePane.setLayout(new GridLayout(0, 1));
         readme.setEditable(false);
-        scrollPane = new JScrollPane(readme);
-        readmePane.add(scrollPane);
-        contentPane.add(readmePane);
+        // Must be tall enough for biggest variant readme file.
+        Dimension readmeSize = new Dimension(600, 2000);
+        readmePane.setMaximumSize(readmeSize);
+        readmePane.setPreferredSize(readmeSize);
+        readmePane.add(readme);
+        mainPane.add(readmePane);
 
         Document doc = VariantSupport.loadVariant(variantName);
         readme.setContentType((String)doc.getProperty(
