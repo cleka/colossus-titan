@@ -320,6 +320,12 @@ class Player
     }
 
 
+    void unselectLegion()
+    {
+        selectedLegion = null;
+    }
+
+
     Legion getSelectedLegion()
     {
         return selectedLegion;
@@ -463,5 +469,11 @@ class Player
 
         // If only one player remains, note the victory.
         game.checkForVictory();
+
+        // If it is this player's turn, advance to the next player.
+        if (game.getActivePlayer() == this) 
+        {
+            game.advanceTurn();
+        }
     }
 }
