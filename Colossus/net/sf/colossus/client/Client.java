@@ -3075,6 +3075,22 @@ Log.debug(playerName + " Client.cleanupBattle()");
         return getEnemyLegions(hexLabel, playerName).size();
     }
 
+    java.util.List getFriendlyLegions(String playerName)
+    {
+        java.util.List markerIds = new ArrayList();
+        Iterator it = legionInfo.values().iterator();
+        while (it.hasNext())
+        {
+            LegionInfo info = (LegionInfo)it.next();
+            String markerId = info.getMarkerId();
+            if (playerName.equals(info.getPlayerName()))
+            {
+                markerIds.add(markerId);
+            }
+        }
+        return markerIds;
+    }
+
     java.util.List getFriendlyLegions(String hexLabel, 
         String playerName)
     {

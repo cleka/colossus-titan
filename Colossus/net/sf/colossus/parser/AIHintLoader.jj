@@ -255,6 +255,31 @@ public class AIHintLoader
         }
     }
 
+    private class ConditionTreeNode_OtherStackHasCreature extends ConditionTreeNode_Leaf
+    {
+        java.util.List allNames;
+
+        public ConditionTreeNode_OtherStackHasCreature(java.util.List allNames)
+        {
+            super();
+            this.allNames = allNames;
+        }
+        
+        public boolean isTrue()
+        {
+            if (oracle != null)
+            {
+                return oracle.otherStackHasCreature(allNames);
+            }
+            return false;
+        }
+
+        public String toString()
+        {
+            return "( another stack has " + allNames + ")";
+        }
+    }
+
     private class ConditionTreeNode_CreatureAvailable extends ConditionTreeNode_Leaf
     {
         int n;
@@ -651,6 +676,7 @@ TOKEN :
 |   < LABELIS : "LABELIS" >
 |   < AVAILABLE : "AVAILABLE" >
 |   < ALLATTACKERSMALLERTHAN : "ALLATTACKERSMALLERTHAN" >
+|   < OTHERSTACKHASCREATURE : "OTHERSTACKHASCREATURE" >
 |   < RANDOM : "RANDOM" >
 |   < OR : "OR" >
 |   < AND : "AND" >
@@ -817,6 +843,7 @@ void h_recruit_leaf() :
     int n;
     String name;
     double p;
+    java.util.List allNames = new ArrayList();
 }
 {
     (tc = h_recruit_reachterrain())
@@ -850,6 +877,10 @@ void h_recruit_leaf() :
 |   <ALLATTACKERSMALLERTHAN> (n = h_number())
     {
         argStack.push(new ConditionTreeNode_AllAttackerSmallerThan(n));
+    }
+|   <OTHERSTACKHASCREATURE> (name = h_chaine() { allNames.add(name); } )+
+    {
+        argStack.push(new ConditionTreeNode_OtherStackHasCreature(allNames));
     }
 |   "(" h_recruit_ornode() ")"
 }

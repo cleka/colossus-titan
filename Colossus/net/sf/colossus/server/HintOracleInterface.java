@@ -8,6 +8,7 @@ package net.sf.colossus.server;
 public interface HintOracleInterface
 {
     public boolean hasCreature(String name); // in the Stack/Legion
+    public boolean otherStackHasCreature(java.util.List allNames); // in a different Stack/Legion
     public boolean canRecruit(String name); // name could be recruited
     public boolean canReach(char t); // t can be reached by the Stack/Legion
 

@@ -1876,6 +1876,36 @@ public class SimpleAI implements AI
             //Log.debug("ORACLE: count is " + count);
             return count;
         }
+        public boolean otherStackHasCreature(java.util.List allNames)
+        {
+            java.util.List all = client.getFriendlyLegions(client.getPlayerName());
+
+            Iterator it = all.iterator();
+            while (it.hasNext())
+            {
+                String markerId = (String)it.next();
+                if (!(legion.getMarkerId().equals(markerId)))
+                {
+                    LegionInfo other = client.getLegionInfo(markerId);
+                    boolean hasAll = true;
+
+                    Iterator it2 = allNames.iterator();
+                    while (it2.hasNext() && hasAll)
+                    {
+                        String name = (String)it2.next();
+                        if (other.numCreature(name) <= 0)
+                        {
+                            hasAll = false;
+                        }
+                    }
+                    if (hasAll)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
         public boolean hasCreature(String name)
         {
             int num = legion.numCreature(name);
