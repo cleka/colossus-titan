@@ -71,7 +71,7 @@ public final class Server
     }
 
 
-    void allUpdatePlayerInfo()
+    public void allUpdatePlayerInfo()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())

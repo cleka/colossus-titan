@@ -2194,6 +2194,10 @@ Log.debug("called Client.acquireAngelCallback()");
     String getPlayerNameByMarkerId(String markerId)
     {
         String shortColor = markerId.substring(0, 2);
+        if (playerInfo == null)
+        {
+            server.allUpdatePlayerInfo();
+        }
         for (int i = 0; i < playerInfo.length; i++)
         {
             PlayerInfo info = playerInfo[i];
