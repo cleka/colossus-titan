@@ -10,7 +10,7 @@ import java.util.*;
 
 class Legion
 {
-    private Chit chit;
+    private Chit marker;
     private int height;
     private String markerId;    // Bk03, Rd12, etc.
     private Legion splitFrom;
@@ -29,7 +29,7 @@ class Legion
     {
         this.markerId = markerId;
         this.splitFrom = splitFrom;
-        this.chit = new Chit(cx, cy, scale, getImageName(), container);
+        this.marker = new Chit(cx, cy, scale, getImageName(), container);
         this.height = height;
         this.currentHex = hex;
         this.startingHex = hex;
@@ -93,9 +93,9 @@ class Legion
     }
 
 
-    Chit getChit()
+    Chit getMarker()
     {
-        return chit;
+        return marker;
     }
 
 
