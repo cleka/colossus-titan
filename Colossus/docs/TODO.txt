@@ -42,6 +42,8 @@ Bug: Enemy had two stacks, one fully known and one fully unknown.  Should
 Bug: Out of memory error after many consecutive Load Game actions.  Find leak.
    Not enough memory to copy history from from savegame JDOM tree to new one?
 
+Need to track removeLegion events for split prediction.
+
 The updateHistory flag used to avoid infinite loops should be an instance
    variable rather than an argument to many methods.
 

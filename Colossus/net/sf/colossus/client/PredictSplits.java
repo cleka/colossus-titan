@@ -19,6 +19,7 @@ public final class PredictSplits
 {
     private String playerName;
     private Node root;           // All contents of root must be known.
+    private NodeTurnComparator nodeTurnComparator = new NodeTurnComparator();
 
 
     PredictSplits(String playerName, String rootId, 
@@ -143,7 +144,7 @@ public final class PredictSplits
     {
         Log.debug("*** nodes ***");
         java.util.List nodes = getNodes(root);
-        Collections.sort(nodes);
+        Collections.sort(nodes, nodeTurnComparator);
         Iterator it = nodes.iterator();
         while (it.hasNext())
         {
@@ -226,6 +227,11 @@ class Node implements Comparable
         return child2;
     }
 
+    Node getParent()
+    {
+        return parent;
+    }
+
     int getTurnCreated()
     {
         return turnCreated;
@@ -239,6 +245,13 @@ class Node implements Comparable
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             sb.append(" " + ci.toString());
+        }
+        if (child1 != null)
+        {
+            sb.append(" : ");
+            sb.append(child1.getFullName());
+            sb.append(", ");
+            sb.append(child2.getFullName());
         }
         return sb.toString();
     }
@@ -365,7 +378,8 @@ class Node implements Comparable
         }
         else
         {
-            Log.error("Node.tellChildContents() Not my child");
+            throw new PredictSplitsException(
+                "Node.tellChildContents() Not my child");
         }
         return otherChild;
     }
@@ -423,9 +437,9 @@ class Node implements Comparable
 
         if (count > getHeight())
         {
-            Log.error("Certainty error in revealCreatures -- count is " +
+            throw new PredictSplitsException(
+                "Certainty error in revealCreatures -- count is " +
                 count + " height is " + getHeight());
-            return;
         }
 
         // Mark passed creatures as certain and then communicate this to
@@ -546,14 +560,11 @@ class Node implements Comparable
     CreatureInfoList findAllPossibleSplits(int childSize, 
         CreatureInfoList knownKeep, CreatureInfoList knownSplit)
     {
-        Log.debug("findAllPossibleSplits() for " + this + " " + childSize +
-            " " + knownKeep + " " + knownSplit);
-
         // Sanity checks
         if (knownSplit.size() > childSize)
         {
-            Log.error("More known splitoffs than splitoffs");
-            return null;
+            throw new PredictSplitsException(
+                "More known splitoffs than splitoffs");
         }
         if (creatures.size() > 8)
         {
@@ -626,7 +637,6 @@ class Node implements Comparable
      *  remove.  Return null on error. */
     CreatureInfoList chooseCreaturesToSplitOut(List pos)
     {
-        Log.debug("chooseCreaturesToSplitOut() " + this);
         List firstElement = (List)pos.get(0);
         boolean maximize = (2 * firstElement.size() > getHeight());
         int bestKillValue = -1;
@@ -903,8 +913,8 @@ class Node implements Comparable
         CreatureInfo ci = creatures.getCreatureInfo(creatureName);
         if (ci == null)
         {
-            Log.error("Tried to remove nonexistant creature");
-            return;
+            throw new PredictSplitsException(
+                "Tried to remove nonexistant creature");
         }
 
         // Only need to track the removed creature for future parent split
@@ -998,3 +1008,35 @@ class PredictSplitsException extends RuntimeException
     }
 }
 
+class NodeTurnComparator implements Comparator
+{
+    public int compare(Object o1, Object o2)
+    {
+        if (o1 instanceof Node && o2 instanceof Node)
+        {
+            Node n1 = (Node)o1;
+            Node n2 = (Node)o2;
+            int diff = n1.getTurnCreated() - n2.getTurnCreated();
+            if (diff != 0)
+            {
+                return diff;
+            }
+            diff = n1.getParent().toString().compareTo(
+                n2.getParent().toString());
+            if (diff != 0)
+            {
+                return diff;
+            }
+            diff = n2.getCreatures().size() - n1.getCreatures().size();
+            if (diff != 0)
+            {
+                return diff;
+            }
+            return (n1.toString().compareTo(n2.toString()));
+        }
+        else
+        {
+            throw new ClassCastException();
+        }
+    }
+}

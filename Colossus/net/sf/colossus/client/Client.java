@@ -979,6 +979,7 @@ public final class Client implements IClient
         Marker marker = getMarker(id);
         markers.remove(marker);
 
+        // TODO Do for all players
         if (isMyLegion(id))
         {
             getPlayerInfo().addMarkerAvailable(id);
