@@ -25,6 +25,10 @@ import net.sf.colossus.client.CaretakerInfo;
  */
 public class TerrainRecruitLoader
 {
+    public static final String Keyword_Anything = "Anything";
+    public static final String Keyword_AnyNonLord = "AnyNonLord";
+    public static final String Keyword_Lord = "Lord";
+
     /**
      * Map a character (representing a terrain) to a list of recruits.
      */
@@ -89,10 +93,10 @@ public class TerrainRecruitLoader
                 recruitNumber tr = (recruitNumber)it.next();
                 String v2 = tr.getName();
                 if ((v2 != null) &&
-                    !(v2.equals("Anything")) &&
-                    !(v2.equals("AnyNonLord")) &&
+                    !(v2.equals(Keyword_Anything)) &&
+                    !(v2.equals(Keyword_AnyNonLord)) &&
                     !(v2.equals("Titan")) &&
-                    !(v2.equals("Lord")) &&
+                    !(v2.equals(Keyword_Lord)) &&
                     !(tr.getNumber() < 0))
                 { // we musn't add the Edges going to non-recruitable
                     if (v1 != null)
@@ -279,10 +283,10 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             recruitNumber tr = (recruitNumber)it.next();
-            if ((tr.getNumber() >= 0) && !(tr.getName().equals("Anything"))
-                                      && !(tr.getName().equals("AnyNonLord"))
+            if ((tr.getNumber() >= 0) && !(tr.getName().equals(Keyword_Anything))
+                                      && !(tr.getName().equals(Keyword_AnyNonLord))
                                       && !(tr.getName().equals("Titan"))
-                                      && !(tr.getName().equals("Lord")))
+                                      && !(tr.getName().equals(Keyword_Lord)))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
             }
@@ -303,25 +307,25 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             recruitNumber tr = (recruitNumber)it.next();
-            if (!(tr.getName().equals("Anything")) &&
-                !(tr.getName().equals("AnyNonLord")) &&
-                !(tr.getName().equals("Lord")))
+            if (!(tr.getName().equals(Keyword_Anything)) &&
+                !(tr.getName().equals(Keyword_AnyNonLord)) &&
+                !(tr.getName().equals(Keyword_Lord)))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
             }
             else
             {
-                if (tr.getName().equals("Anything"))
+                if (tr.getName().equals(Keyword_Anything))
                 { // anyone can recruit here...
                     java.util.List creatures = Creature.getCreatures();
                     return(new ArrayList(creatures));
                 }
-                if (tr.getName().equals("AnyNonLord"))
+                if (tr.getName().equals(Keyword_AnyNonLord))
                 { // anyone can recruit here...
                     java.util.List creatures = Creature.getCreatures();
                     return(new ArrayList(creatures));
                 }
-                if (tr.getName().equals("Lord"))
+                if (tr.getName().equals(Keyword_Lord))
                 {
                     java.util.List potential = Creature.getCreatures();
                     ListIterator lit = potential.listIterator();
@@ -355,9 +359,9 @@ public class TerrainRecruitLoader
         while (it.hasNext())
         {
             recruitNumber tr = (recruitNumber)it.next();
-            if (!(tr.getName().equals("Anything")) &&
-                !(tr.getName().equals("AnyNonLord")) &&
-                !(tr.getName().equals("Lord")))
+            if (!(tr.getName().equals(Keyword_Anything)) &&
+                !(tr.getName().equals(Keyword_AnyNonLord)) &&
+                !(tr.getName().equals(Keyword_Lord)))
             {
                 re.add(Creature.getCreatureByName(tr.getName()));
             }
@@ -451,14 +455,14 @@ public class TerrainRecruitLoader
 
         // First, "Anything" ; the number is needed no matter what
         // the recruiter is
-        if (below.equals("Anything"))
+        if (below.equals(Keyword_Anything))
             return (((recruitNumber)al.get(iReFake)).getNumber());
         // second, "AnyNonLord" ; the number is needed no matter what
         // the recruiter is
-        if (below.equals("AnyNonLord") && !recruiter.isImmortal())
+        if (below.equals(Keyword_AnyNonLord) && !recruiter.isImmortal())
             return (((recruitNumber)al.get(iReFake)).getNumber());
         // Third, "Lord" ; only one Lord can recruit
-        if (below.equals("Lord") && (recruiter.isLord()))
+        if (below.equals(Keyword_Lord) && (recruiter.isLord()))
             return 1;
         // Third, "Titan" ; only the Titan can recruit
         if (below.equals("Titan") && (recruiter.isTitan()))

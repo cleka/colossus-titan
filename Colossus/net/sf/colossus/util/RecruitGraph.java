@@ -5,7 +5,7 @@ import java.util.*;
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.client.CaretakerInfo;
-
+import net.sf.colossus.parser.TerrainRecruitLoader;
 /**
  * Implementation of a graph dedicated to the Recruit "Tree" (it's a directed
  * graph, not a tree, as we can have cycle in theory).
@@ -345,9 +345,12 @@ public class RecruitGraph
             {
                 RecruitVertex tempSrc = theEdge.getSource();
                 if ((source == tempSrc) ||
-                    (tempSrc.getCreatureName().equals("Anything")) ||
-                    ((!isLord) && (tempSrc.getCreatureName().equals("AnyNonLord"))) ||
-                    ((isLord) && (tempSrc.getCreatureName().equals("Lord"))))
+                    (tempSrc.getCreatureName().equals(
+                         TerrainRecruitLoader.Keyword_Anything)) ||
+                    ((!isLord) && (tempSrc.getCreatureName().equals(
+                         TerrainRecruitLoader.Keyword_AnyNonLord))) ||
+                    ((isLord) && (tempSrc.getCreatureName().equals(
+                         TerrainRecruitLoader.Keyword_Lord))))
                 {
                     if (minValue > theEdge.getNumber())
                     {
