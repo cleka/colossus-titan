@@ -12,7 +12,7 @@ class Player
     private double score = 0;    // track half-points, then round
     private boolean canSummonAngel = true;
     private String playersEliminated;  // RdBkGr
-    private int numMarkersAvailable = 12;
+    private int numMarkersAvailable = 0;
     private String [] markersAvailable = new String[72];
     private String markerSelected;
     private int numLegions = 0;
@@ -51,14 +51,18 @@ class Player
     public void setColor(String color)
     {
         this.color = color;
-        for (int i = 0; i <= 8; i++)
+    }
+
+
+    public void initMarkersAvailable()
+    {
+        for (int i = 1; i <= 9; i++)
         {
-            markersAvailable[i] = getShortColor() + '0' +
-                Integer.toString(i + 1);
+            addLegionMarker(getShortColor() + '0' + Integer.toString(i));
         }
-        for (int i = 9; i <= 11; i++)
+        for (int i = 10; i <= 12; i++)
         {
-            markersAvailable[i] = getShortColor() + Integer.toString(i + 1);
+            addLegionMarker(getShortColor() + Integer.toString(i));
         }
     }
 
@@ -572,6 +576,13 @@ class Player
             markersAvailable[numMarkersAvailable - 1] = new String("");
             numMarkersAvailable--;
         }
+    }
+
+
+    public void addLegionMarker(String markerId)
+    {
+        markersAvailable[numMarkersAvailable] = markerId;
+        numMarkersAvailable++;
     }
 
 
