@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
+import javax.swing.text.*;
 import java.util.*;
 
 import net.sf.colossus.util.Split;
@@ -43,7 +44,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private JComboBox [] playerTypes = new JComboBox[6];
     private JComboBox [] playerNames = new JComboBox[6];
-    private JTextArea readme = null;
+    private JEditorPane readme = null;
     private JScrollPane scrollPane = null;
 
     /** List of Map.Entry objects that map player names to player types */
@@ -179,16 +180,17 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         JPanel readmePane = new JPanel();
         readmePane.setLayout(new GridLayout(0, 1));
-        readme = new JTextArea("", 12, 60);
+        readme = new JEditorPane();
         readme.setEditable(false);
-        readme.setLineWrap(true);
-        readme.setWrapStyleWord(true);
         scrollPane = new JScrollPane(readme);
         readmePane.add(scrollPane);
         contentPane.add(readmePane);
 
-        readme.setText(VariantSupport.loadVariant(variantArray[0] + ".var",
-                                                  variantArray[0]));
+        Document doc =
+            VariantSupport.loadVariant(variantArray[0] + ".var",
+                                       variantArray[0]);
+        readme.setContentType((String)doc.getProperty(ResourceLoader.keyContentType));
+        readme.setDocument(doc);
 
         pack();
         
@@ -304,7 +306,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File varFile = varChooser.getSelectedFile();
-            readme.setText(VariantSupport.loadVariant(varFile));
+            Document doc = VariantSupport.loadVariant(varFile);
+            readme.setContentType((String)doc.getProperty(ResourceLoader.keyContentType));
+            readme.setDocument(doc);
         }
     }
 
@@ -352,8 +356,11 @@ public final class GetPlayers extends KDialog implements WindowListener,
                 { // selecting different ; remove all non-included
                     if (variantBox.getItemCount() > variantArray.length)
                         variantBox.removeItemAt(variantArray.length);
-                    readme.setText(VariantSupport.loadVariant(value + ".var",
-                                                              value));
+                    Document doc =
+                        VariantSupport.loadVariant(value + ".var",
+                                                   value);
+                    readme.setContentType((String)doc.getProperty(ResourceLoader.keyContentType));
+                    readme.setDocument(doc);
                 }
             }
             else

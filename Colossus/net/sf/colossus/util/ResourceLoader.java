@@ -1,6 +1,8 @@
 package net.sf.colossus.util;
 
 import javax.swing.*;
+import javax.swing.text.*;
+import javax.swing.text.html.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
@@ -16,7 +18,7 @@ import java.util.*;
 
 public final class ResourceLoader
 {
-
+    public static final String keyContentType = "ResourceLoaderContentType";
     public static final String defaultFontName = "Lucida Sans Bold";
     public static final int defaultFontStyle = Font.PLAIN;
     public static final int defaultFontSize = 12;
@@ -281,6 +283,66 @@ public final class ResourceLoader
             }
         }
         return(stream);
+    }
+
+    /**
+     * Return the first Document from file of name filename in the list of directories.
+     * It also add a property of key keyContentType and of type String describing the content type of the Document.
+     * This can currently load HTML and pure text.
+     * @param filename Name of the file to load.
+     * @param directories List of directories to search (in order).
+     * @return The Document, or null if it was not found.
+     */
+    public static Document getDocument(String filename, java.util.List directories)
+    {
+        InputStream htmlIS = getInputStream(filename + ".html", directories);
+        if (htmlIS != null)
+        {
+            try {
+                HTMLEditorKit htedk = new HTMLEditorKit();
+                HTMLDocument htdoc = new HTMLDocument(htedk.getStyleSheet());
+                htdoc.putProperty(keyContentType,"text/html");
+                htedk.read(htmlIS, htdoc, 0);
+                return htdoc;
+            }
+            catch (Exception e)
+            {
+                System.err.println("ERROR: html document exist, but cannot be loaded (" + filename + "): " + e);
+            }
+            return null;
+        }
+        InputStream textIS = getInputStream(filename + ".txt", directories);
+        if (textIS == null)
+            textIS = getInputStream(filename, directories);
+        if (textIS != null)
+        {
+            try {
+                PlainDocument txtdoc = new PlainDocument();
+                char[] buffer = new char[128];
+                InputStreamReader textISR = new InputStreamReader(textIS);
+                int read = 0;
+                int offset = 0;
+                while (read != -1)
+                {
+                    read = textISR.read(buffer, 0, 128);
+                    if (read != -1)
+                    {
+                        txtdoc.insertString(offset,
+                                            new String(buffer, 0, read),
+                                            null);
+                        offset += read;
+                    }
+                }
+                txtdoc.putProperty(keyContentType,"text/plain");
+                return txtdoc;
+            }
+            catch (Exception e)
+            {
+                System.err.println("ERROR: text document exist, but cannot be loaded (" + filename + "): " + e);
+            }
+            return null;
+        }
+        return null;
     }
 
     private static String getMapKey(String filename, java.util.List directories)

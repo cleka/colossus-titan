@@ -6,6 +6,7 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.parser.VariantLoader;
 import java.io.*;
+import javax.swing.text.*;
 
 /**
  * Class VariantSupport hold the members and functions required to support Variant in Colossus
@@ -25,9 +26,9 @@ public final class VariantSupport
     /**
      * Load a Colossus Variant from the specified File
      * @param varFile The File to load as a Variant.
-     * @return A String describing the variant.
+     * @return A Document describing the variant.
      */
-    public static String loadVariant(java.io.File varFile)
+    public static Document loadVariant(java.io.File varFile)
     {
         String tempVarName = varFile.getName();
         String tempVarDirectory = varFile.getParentFile().getAbsolutePath();
@@ -37,11 +38,11 @@ public final class VariantSupport
      * Load a Colossus Variant from the specified filename in the specified path.
      * @param tempVarName The name of the file holding the Variant definition.
      * @param tempVarDirectory The path to the directory holding the Variant.
-     * @return A String describing the variant.
+     * @return A Document describing the variant.
      */
-    public static String loadVariant(String tempVarName, String tempVarDirectory)
+    public static Document loadVariant(String tempVarName, String tempVarDirectory)
     {
-        String readme = "This variant doesn't have a README file";
+        Document readme = null;
         Log.debug("Loading variant " + tempVarName +
                   ", data files in " + tempVarDirectory);
         try
@@ -104,26 +105,9 @@ public final class VariantSupport
             }
             directories = new java.util.ArrayList();
             directories.add(tempVarDirectory);
-            InputStream readmeIS = ResourceLoader.getInputStream("README",
-                                                                 directories);
-            if (readmeIS != null)
-            {
-                char[] buffer = new char[128];
-                StringBuffer sbuf = new StringBuffer();
-                InputStreamReader readmeISR = new InputStreamReader(readmeIS);
-                int read = 0;
-                while (read != -1)
-                {
-                    read = readmeISR.read(buffer, 0, 128);
-                    if (read != -1)
-                    {
-                        sbuf.append(buffer, 0, read);
-                    }
-                }
-                readme = sbuf.toString();
-            }
+            readme = ResourceLoader.getDocument("README", directories);
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             System.out.println("Variant loading failed : " + e);
             varDirectory = Constants.defaultDirName;
@@ -131,6 +115,7 @@ public final class VariantSupport
             mapName = Constants.defaultMAPFile;
             recruitName = Constants.defaultTERFile;
             creaturesName = Constants.defaultCREFile;
+            readme = null;
         }
         return readme;
     }
