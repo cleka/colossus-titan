@@ -19,8 +19,32 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
         super(parentFrame, "Contents of Legion " + legion.getMarkerId(), true);
 
         int scale = 60;
-        setLocation(new Point(point.x - scale, point.y - scale));
         setSize(2 * scale / 5 + scale * legion.getHeight(), 8 * scale / 5);
+
+        // Place dialog relative to parentFrame's origin, and fully on-screen.
+        Point parentOrigin = parentFrame.getLocation();
+        Point origin = new Point(point.x + parentOrigin.x - scale, point.y +
+            parentOrigin.y - scale);
+        if (origin.x < 0)
+        {
+            origin.x = 0;
+        }
+        if (origin.y < 0)
+        {
+            origin.y = 0;
+        }
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        int adj = origin.x + getSize().width - d.width;
+        if (adj > 0)
+        {
+            origin.x -= adj;
+        }
+        adj = origin.y + getSize().height - d.height;
+        if (adj > 0)
+        {
+            origin.y -= adj;
+        }
+        setLocation(origin);
         
         setLayout(null);
 
