@@ -574,6 +574,11 @@ public final class ResourceLoader
         {
             Thread.yield();
         }
+        if (icon.getImageLoadStatus() != MediaTracker.COMPLETE)
+        {
+            System.err.println("Image loading failed (" +
+                               tempIcon.getImageLoadStatus() + ")");
+        }
     }
 
     private static int numberFromFilename(String filename, String prefix)

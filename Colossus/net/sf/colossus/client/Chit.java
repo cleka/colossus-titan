@@ -70,7 +70,6 @@ class Chit extends JPanel
             }
             else
             { // special case : the Titan.
-System.err.println("TRYING: " + id);
                 String[] filenames = new String[4];
                 int index = 6;
                 int index2 = index;
@@ -86,11 +85,6 @@ System.err.println("TRYING: " + id);
                 filenames[1] = "TitanMask";
                 filenames[2] = "Power-" + power + color;
                 filenames[3] = "Skill-4" + color;
-System.err.println("WILL TRY WITH: " +
-                   filenames[0] + "," +
-                   filenames[1] + "," +
-                   filenames[2] + "," +
-                   filenames[3]);
                    
                 icon = getImageIcon(filenames);
             }
