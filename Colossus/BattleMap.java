@@ -10,7 +10,7 @@ import java.awt.event.*;
 public class BattleMap extends Frame implements MouseListener,
     MouseMotionListener
 {
-    public static final double SQRT3 = 1.73205080757;
+    public static final double SQRT3 = Math.sqrt(3.0);
     private Hex[][] h = new Hex[6][6];
     private Chit[] chits = new Chit[24];
     private int tracking;
@@ -305,7 +305,7 @@ public class BattleMap extends Frame implements MouseListener,
 
 class Hex
 {
-    public static final double SQRT3 = 1.73205080757;
+    public static final double SQRT3 = Math.sqrt(3.0);
     private boolean selected;
     private int[] xVertex = new int[6];
     private int[] yVertex = new int[6];
