@@ -4,7 +4,7 @@ LATEX=latex
 DVIPS=dvips
 DVI2TTY=dvi2tty
 
-SOURCES=FileFormat
+SOURCES=FileFormat CodingStandards
 DESTS=$(addsuffix .ps,$(SOURCES))
 DESTSTXT=$(addsuffix .txt,$(SOURCES))
 
