@@ -51,7 +51,10 @@ def numCreature(li, creatureName):
 
 
 def getCreatureInfo(li, creatureName):
-    """Return the first CreatureInfo that matches the passed name."""
+    """Return the first CreatureInfo that matches the passed name.
+    
+       Return None if no matching CreatureInfo is found.
+    """
     for ci in li:
         if ci.name == creatureName:
             return ci
@@ -527,16 +530,21 @@ class Node(object):
 
 
     def removeCreature(self, creatureName):
+        print "removeCreature", self, creatureName
         if (self.getHeight() <= 0):
             raise RuntimeError, "Tried removing from 0-high legion"
         self.revealCreatures([creatureName])
-        ci = getCreatureInfo(self.creatures, creatureName)
+        ci = getCreatureInfo(self.getCertainCreatures(), creatureName)
+        assert ci is not None
 
         # Only need to track the removed creature for future parent split
         # predictions if it was here at the time of the split.
         if ci.atSplit:
             self.removed.append(ci)
-        self.creatures.remove(ci)
+        for (ii, creature) in enumerate(self.creatures):
+            if creature == ci and creature.certain:
+                del self.creatures[ii]
+                break
 
     def removeCreatures(self, creatureNames):
         self.revealCreatures(creatureNames)
@@ -562,7 +570,7 @@ class PredictSplits(object):
         return nodes
 
     def getLeaves(self, root=None):
-        """Return all non-empty childless nodes in subtree starting from root."""
+        """Return all non-empty childless nodes in subtree."""
         if root is None:
             root = self.root
         leaves = []
