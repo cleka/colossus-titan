@@ -14,8 +14,7 @@ import net.sf.colossus.server.Constants;
  */
 
 // XXX There is massive duplication of code between this class and
-// the server-side movement code in Game.  Need to completely refactor
-// this after networking is done.
+// the server-side movement code in Game.  Need to completely refactor.
 
 public final class Movement
 {
@@ -369,6 +368,8 @@ public final class Movement
                 }
             }
         }
+        set.remove(null);
+        set.remove("null");
         return set;
     }
 

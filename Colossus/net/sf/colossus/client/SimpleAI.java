@@ -245,7 +245,6 @@ public class SimpleAI implements AI
                 {
                     String hexLabel = (String)moveIt.next();
                     MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-
                     if (client.getNumEnemyLegions(hexLabel, 
                         player.getName()) == 0)
                     {
@@ -529,7 +528,7 @@ public class SimpleAI implements AI
         final Creature nonsplitCreature = oddTower ? startCre[0]
                 : startCre[2];
 
-// XXX Hardcoded to default board.
+        // XXX Hardcoded to default board.
         // don't split gargoyles in tower 3 or 6 (because of the extra jungles)
         if ("300".equals(label) || "600".equals(label))
         {
@@ -1361,10 +1360,6 @@ public class SimpleAI implements AI
             {
                 String nextLabel = (String)nextMoveIt.next();
                 MasterHex nextHex = MasterBoard.getHexByLabel(nextLabel);
-                if (nextHex == null)  // XXX How does this happen?
-                {
-                    continue;
-                }
                 // if we have to fight in that hex and we can't
                 // WIN_WITH_MINIMAL_LOSSES, then assume we can't
                 // recruit there.  IDEA: instead of doing any of this
