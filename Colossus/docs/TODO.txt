@@ -12,8 +12,6 @@ Save/load/test scale.
 
 Force cfg files and savegames to load from user.home/Colossus
 
-Bug: Titan teleport allowed in ExtTitan at 400 points, not 700.
-
 Bug: All stacks visible is broken.
 
 Bug: Own legions not always shown sorted.
@@ -22,6 +20,12 @@ Bug: Undo move with a recruitChit showing, not cleared.
 
 Bug: Still getting excess Acquire dialog, for 6-high legion that earns two
    angels, but angel is not added.
+
+Bug: Non-overlay terrain layers shown too far to the right.
+
+Change Quit button in GetPlayers dialog to Cancel.  Go back to existing 
+   game if there is one from Cancel, or quit if just starting.  Eliminate
+   confirmation before calling dialog.
 
 L&F menu should indicate current L&F somehow, and not show Windows if not
    allowed on this platform.
