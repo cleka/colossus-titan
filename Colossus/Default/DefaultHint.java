@@ -36,6 +36,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             if (recruits.contains("Lion") &&
                     !legion.contains("Griffon") &&
                     legion.numCreature("Lion") == 2 &&
+                    oracle.canReach("Desert") &&
                     oracle.creatureAvailable("Griffon") >= 2)
             {
                 return "Lion";
@@ -73,6 +74,7 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             if (recruits.contains("Troll") &&
                     !legion.contains("Wyvern") &&
                     legion.numCreature("Troll") == 2 &&
+                    oracle.canReach("Swamp") &&
                     oracle.creatureAvailable("Wyvern") >= 2)
             {
                 return "Troll";
