@@ -11,24 +11,23 @@ import java.util.*;
 class Chit
 {
     private Image image;
-    private boolean selected;
+    private boolean selected = false;
     private Rectangle rect;
     private Container container;
 
-    // offset of the mouse cursor within the chit.
-    private int dx;
-    private int dy;
+    // Offset of the mouse cursor within the chit.
+    private int dx = 0;
+    private int dy = 0;
 
+    // Flag to mark chit as dead and paint it with an "X" through it.
+    private boolean dead = false;
 
     Chit(int cx, int cy, int scale, String imageFilename,
         Container container)
     {
-        selected = false;
         rect = new Rectangle(cx, cy, scale, scale);
         image = Toolkit.getDefaultToolkit().getImage(imageFilename);
         this.container = container;
-        dx = 0;
-        dy = 0;
     }
 
 
@@ -44,6 +43,25 @@ class Chit
     public void paint(Graphics g)
     {
         g.drawImage(image, rect.x, rect.y, rect.width, rect.width, container);
+        if (dead)
+        {
+            // Draw a triple-wide red X.
+            g.setColor(java.awt.Color.red);    
+
+            g.drawLine(rect.x, rect.y, rect.x + rect.width, 
+                rect.y + rect.height);
+            g.drawLine(rect.x, rect.y - 1, rect.x + rect.width - 1, 
+                rect.y + rect.height);
+            g.drawLine(rect.x + 1, rect.y, rect.x + rect.width, 
+                rect.y + rect.height - 1);
+
+            g.drawLine(rect.x + rect.width, rect.y, rect.x, 
+                rect.y + rect.height);
+            g.drawLine(rect.x + rect.width - 1, rect.y, rect.x, 
+                rect.y + rect.height - 1);
+            g.drawLine(rect.x + rect.width, rect.y + 1, rect.x + 1, 
+                rect.y + rect.height);
+        }
     }
 
 
@@ -98,5 +116,23 @@ class Chit
     public Image getImage()
     {
         return image;
+    }
+
+
+    public boolean isDead()
+    {
+        return dead;
+    }
+
+
+    public void setDead(boolean dead)
+    {
+        this.dead = dead;
+    }
+
+
+    public void toggleDead()
+    {
+        dead = !dead;
     }
 }
