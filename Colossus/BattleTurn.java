@@ -99,6 +99,7 @@ System.out.println("SummonAngel");
                 map.getBoard().show();
 
                 summonAngel = new SummonAngel(map.getBoard(), attacker);
+                map.getBoard().setSummonAngel(summonAngel);
             }
 
             // This is the last chance to summon an angel until the
