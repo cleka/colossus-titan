@@ -293,7 +293,7 @@ Programming:  David Ripton  dripton@wizard.net
 
 Counter art:  Jerry Reiger, David Lum, Tchula Ripton
 
-Overlay art:  ??? (Masterboard), D. U. Thibault (Battlelands)
+Overlay art:  Chris Howe (Masterboard), D. U. Thibault (Battlelands)
 
 Network protocol: Falk Hueffner
 
