@@ -69,12 +69,10 @@
      helps a lot by compiling all files in one Java process, and only
     recompiling the files that need to be recompiled.</p>
     <h4>Build tools</h4>
-    <p>There are two main alternatives for building Colossus, Ant and make.</p>
-    <p>
     <a href="http://jakarta.apache.org/ant/">Ant</a>
      is a newer cross-platform build tool used by many Java projects. It&#39;s
-    faster than make for Colossus because all compiles are done in one Java
-    process. It uses a file called 
+    fairly fast because all compiles are done in one Java process. It uses a 
+    file called 
     <b>build.xml</b>
      . You need version 1.5 or newer. You&#39;ll need to set 
     <b>ANT_HOME</b>
@@ -83,13 +81,6 @@
      in your 
     <b>PATH</b>
      .</p>
-    <p>Make is the old-school Unix build tool. It uses a build file called 
-    <b>Makefile</b>
-     . (Colossus only has one, not nested Makefiles in each directory.) Make is
-    to Ant as C is to Java. It&#39;s fast, it&#39;s already included on Unix
-    boxes, it&#39;s portable only if you handle all the special cases yourself,
-    it&#39;s somewhat user-hostile, and a lot of people already know how to use
-    it because it&#39;s been around forever.</p>
     <p>
     <a
     href="http://www.experimentalstuff.com/Technologies/JavaMake/">Javamake</a>
@@ -163,11 +154,9 @@
     comes with the JDK. To use it, you need to create a personal authentication
     key, and put it in a keystore file. The 
     <b>sign</b>
-     targets in 
+     target in 
     <b>build.xml</b>
-     and 
-    <b>Makefile</b>
-     assume that your key name and keystore filename match your username. If
+     assumes that your key name and keystore filename match your username. If
     you don&#39;t like this, you can add new targets.</p>
     <h4>zip and unzip tools</h4>
     <p>You need something that can work with the standard zip format. WinZip,
@@ -255,10 +244,8 @@
      or (to get the newest possible code) pull from CVS.</p>
     <p>If you just type 
     <b>ant</b>
-     or 
-    <b>make</b>
-     from the project base directory, then you get the default target, which in
-    both cases will compile all the .jj files into .java files with JavaCC,
+     from the project base directory, then you get the default target, which
+    will compile all the .jj files into .java files with JavaCC,
     then compile all the .java files into .class files with javac, then make an
     unsigned executable jar file.</p>
     <p>Other interesting targets include 
