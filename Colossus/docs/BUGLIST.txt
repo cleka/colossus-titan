@@ -301,14 +301,14 @@ Ack! forced to move a split group
 forced to move split legion Bk01 to Brush hex 24 taking penalty 16 in order to handle illegal legion Bk01
 Move failed
 forced to move split legion Bk01 to Tower hex 600 taking penalty 16 in order to handle illegal legion Bk01
-Warn: Tried to enter invalid side of tower
-Legion Bk01 (Axes) in 400 tower teleports (null) to Tower hex 600 entering on Bottom
-(Should mention titan.)
+
 
 Human forced strikes not taken after carry.
-Game does not advance past the strike phase automatically after a carry if no 
+Game does not advance past the strike phase automatically after a carry if no
    strikes/carries left.
 Strike / carry hexes are not unselected after carrying.
 
 Engagement hex not unselected after human player loses sole battle.
    Phase does not automatically advance.
+
+Half repaints of some chits during battle.

@@ -72,4 +72,9 @@ public final class Constants
 
     public static final int MIN_DELAY = 0;      //in ms
     public static final int MAX_DELAY = 5000;
+
+    // Entry sides
+    public static final String bottom = "Bottom";
+    public static final String right = "Right";
+    public static final String left = "Left";
 }

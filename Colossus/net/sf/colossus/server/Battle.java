@@ -890,7 +890,7 @@ final class Battle
             {
                 Critter critter = (Critter)it.next();
                 int dam = critter.getCurrentHex().damageToCreature(critter);
-                if (dam >= 0)
+                if (dam > 0)
                 {
                     critter.wound(dam);
                     Log.event(critter.getName() + " takes Hex damage");

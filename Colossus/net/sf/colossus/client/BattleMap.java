@@ -691,24 +691,24 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         switch (side)
         {
-            case 1: return "Right";
-            case 3: return "Bottom";
-            case 5: return "Left";
+            case 1: return Constants.right;
+            case 3: return Constants.bottom;
+            case 5: return Constants.left;
             default: return "";
         }
     }
 
     public static int entrySideNum(String side)
     {
-        if (side.equals("Right"))
+        if (side.equals(Constants.right))
         {
             return 1;
         }
-        else if (side.equals("Bottom"))
+        else if (side.equals(Constants.bottom))
         {
             return 3;
         }
-        else if (side.equals("Left"))
+        else if (side.equals(Constants.left))
         {
             return 5;
         }

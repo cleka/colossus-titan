@@ -1,6 +1,11 @@
+Re-add infinite mulligans cheat option for debug.
+
+Highlight appropriate engagement hex while engagement is being resolved.
+   (Except during angel summoning.)
+
 Make most returned collections unmodifiable.
 
-Initialize autoPickRecruiter to true by default.
+Initialize autoPickRecruiter, overlays to true by default.
 
 Show just-recruited enemy critters on top of their stacks.
 
@@ -31,6 +36,8 @@ Remove public Client methods that only affect the GUI, e.g. unselectAllHexes()
    in favor of higher-level events.
 
 Always show the current turn, player, and phase in a panel somewhere.
+
+Add confirm dialogs (for conceding with titan, ...)
 
 If there is more than one human player, move the active player's
    map/board to the front.

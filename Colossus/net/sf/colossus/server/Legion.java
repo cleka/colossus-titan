@@ -30,7 +30,6 @@ final class Legion implements Comparable
     private String recruitName;
     private String playerName;
     private int battleTally;
-    private Creature teleportingLord;
     private static Map markerNames = new HashMap();
     private Game game;
     private int angelsToAcquire;
@@ -247,7 +246,6 @@ final class Legion implements Comparable
         newLegion.moved = moved;
         newLegion.recruitName = recruitName;
         newLegion.battleTally = battleTally;
-        newLegion.teleportingLord = teleportingLord;
         newLegion.entrySide = entrySide;
         newLegion.teleported = teleported;
 
@@ -654,7 +652,8 @@ final class Legion implements Comparable
     }
 
 
-    void moveToHex(MasterHex hex, String entrySide, boolean teleported)
+    void moveToHex(MasterHex hex, String entrySide, boolean teleported,
+        String teleportingLord)
     {
         Player player = getPlayer();
         String hexLabel = hex.getLabel();

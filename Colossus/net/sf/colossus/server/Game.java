@@ -1600,6 +1600,24 @@ public final class Game
         player.addLegion(legion);
     }
 
+    /** Set the entry side relative to the hex label. */
+    private int findEntrySide(MasterHex hex, int cameFrom)
+    {
+        int entrySide = -1;
+        if (cameFrom != -1)
+        {
+            if (hex.getTerrain() == 'T') 
+            {
+                entrySide = 3;
+            }
+            else
+            {
+                entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
+            }
+        }
+        return entrySide;
+    }
+
 
     /** Recursively find conventional moves from this hex.  
      *  If block >= 0, go only that way.  If block == -1, use arches and 
@@ -1622,17 +1640,8 @@ public final class Game
                 // Set the entry side relative to the hex label.
                 if (cameFrom != -1)
                 {
-                    int entrySide; 
-                    if (hex.getTerrain() == 'T') 
-                    {
-                        entrySide = 3;
-                    }
-                    else
-                    {
-                        entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
-                    }
                     set.add(hexLabel + ":" + BattleMap.entrySideName(
-                        entrySide));
+                        findEntrySide(hex, cameFrom)));
                 }
             }
             return set;
@@ -1656,8 +1665,8 @@ public final class Game
 
             if (cameFrom != -1)
             {
-                int entrySide = (6 + cameFrom - hex.getLabelSide()) % 6;
-                set.add(hexLabel + ":" + BattleMap.entrySideName(entrySide));
+                set.add(hexLabel + ":" + BattleMap.entrySideName(
+                    findEntrySide(hex, cameFrom)));
                 return set;
             }
         }
@@ -1868,14 +1877,14 @@ public final class Game
                     targetHex.getTerrain() == 'T')
                     
                 {
-                    entrySides.add("Bottom");  
+                    entrySides.add(Constants.bottom);  
                     return entrySides;
                 }
                 else
                 {
-                    entrySides.add("Bottom");  
-                    entrySides.add("Left");  
-                    entrySides.add("Right");  
+                    entrySides.add(Constants.bottom);
+                    entrySides.add(Constants.left);  
+                    entrySides.add(Constants.right);  
                     return entrySides;
                 }
             }
@@ -1892,6 +1901,7 @@ public final class Game
         while (it.hasNext())
         {
             String tuple = (String)it.next();
+Log.debug(tuple);
             java.util.List parts = Split.split(':', tuple);
             String hl = (String)parts.get(0);
             if (hl.equals(targetHexLabel))
@@ -2198,10 +2208,10 @@ reinforcing + " acquiring=" + acquiring);
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         // If this is a tower hex, the only entry side is the bottom.
-        if (hex.getTerrain() == 'T' && !entrySide.equals("bottom")) 
+        if (hex.getTerrain() == 'T' && !entrySide.equals(Constants.bottom))
         {
             Log.warn("Tried to enter invalid side of tower");
-            entrySide = "Bottom";
+            entrySide = Constants.bottom;
         }
 
         // If the legion teleported, reveal a lord.
@@ -2212,7 +2222,7 @@ reinforcing + " acquiring=" + acquiring);
                 Creature.getCreatureByName(teleportingLord), 1);
         }
 
-        legion.moveToHex(hex, entrySide, teleport);
+        legion.moveToHex(hex, entrySide, teleport, teleportingLord);
         return true;
     }
 
@@ -2240,13 +2250,16 @@ reinforcing + " acquiring=" + acquiring);
         {
             teleportingLord = (String)(legion.listTeleportingLords(
                 hexLabel).get(0));
+Log.debug("teleportingLord is " + teleportingLord);
         }
+
         Set sides = getPossibleEntrySides(markerId, hexLabel, teleport);
         String entrySide = "";
         if (!sides.isEmpty())
         {
             entrySide = (String)(sides.iterator().next());
         }
+Log.debug("entrySide is" + entrySide);
 
         return doMove(markerId, hexLabel, entrySide, teleport, 
             teleportingLord);

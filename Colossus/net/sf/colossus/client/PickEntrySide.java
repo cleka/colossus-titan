@@ -6,6 +6,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
+import net.sf.colossus.server.Constants;
+
 
 /**
  * Class PickEntrySide allows picking which side of a MasterBoard hex
@@ -33,25 +35,25 @@ final class PickEntrySide extends HexMap implements ActionListener,
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(null);
 
-        if (sides.contains("Left"))
+        if (sides.contains(Constants.left))
         {
-            leftButton = new JButton("Left");
+            leftButton = new JButton(Constants.left);
             leftButton.setMnemonic(KeyEvent.VK_L);
             contentPane.add(leftButton);
             leftButton.addActionListener(this);
         }
 
-        if (sides.contains("Bottom"))
+        if (sides.contains(Constants.bottom))
         {
-            bottomButton = new JButton("Bottom");
+            bottomButton = new JButton(Constants.bottom);
             bottomButton.setMnemonic(KeyEvent.VK_B);
             contentPane.add(bottomButton);
             bottomButton.addActionListener(this);
         }
 
-        if (sides.contains("Right"))
+        if (sides.contains(Constants.right))
         {
-            rightButton = new JButton("Right");
+            rightButton = new JButton(Constants.right);
             rightButton.setMnemonic(KeyEvent.VK_R);
             contentPane.add(rightButton);
             rightButton.addActionListener(this);

@@ -16,6 +16,7 @@ import net.sf.colossus.server.Player;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.AI;
 import net.sf.colossus.server.SimpleAI;
+import net.sf.colossus.server.Constants;
 
 
 /**
@@ -504,6 +505,7 @@ public final class Client
 
     public void doneWithCarries()
     {
+Log.debug("Client.doneWithCarries()");
         if (map != null)
         {
             map.unselectAllHexes();
@@ -515,6 +517,7 @@ public final class Client
     /** Called from BattleMap to leave carry mode. */
     void leaveCarryMode()
     {
+Log.debug("Client.leaveCarryMode()");
         server.leaveCarryMode();
     }
 
@@ -1047,6 +1050,7 @@ public final class Client
             return;
         }
 
+Log.debug("Client.pickCarries()");
         if (carryDamage < 1 || carryTargetDescriptions.isEmpty())
         {
             leaveCarryMode();
@@ -1470,6 +1474,7 @@ Log.debug("Called Client.reinforce for " + markerId);
     /** Attempt to apply carries to the critter in hexLabel. */
     void applyCarries(String hexLabel)
     {
+Log.debug("Client.applyCarries() for " + hexLabel);
         server.applyCarries(hexLabel);
         if (map != null)
         {
@@ -1480,11 +1485,13 @@ Log.debug("Called Client.reinforce for " + markerId);
 
     int getCarryDamage()
     {
+Log.debug("Client.getCarryDamage()");
         return server.getCarryDamage();
     }
 
     Set getCarryTargets()
     {
+Log.debug("Client.getCarryTargets()");
         return server.getCarryTargets();
     }
 
@@ -1619,10 +1626,11 @@ Log.debug("Called Client.reinforce for " + markerId);
         server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
     }
 
-    boolean goodEntrySide(String entrySide)
+    private boolean goodEntrySide(String entrySide)
     {
-        return (entrySide != null && (entrySide.equals("Left") || 
-            entrySide.equals("Bottom") || entrySide.equals("Right")));
+        return (entrySide != null && (entrySide.equals(Constants.left) ||
+            entrySide.equals(Constants.bottom) ||
+            entrySide.equals(Constants.right)));
     }
 
     public void didMove(String markerId)
