@@ -67,11 +67,8 @@ public final class Game extends GameSource
                 terIS = new FileInputStream(recruitName);
             }
             if (terIS == null) 
-            {
-                System.out.println(
-                    "Recruit-per-terrain loading failed for file " + 
-                     recruitName);
-                System.exit(1);
+	    {
+                throw new FileNotFoundException(recruitName);
             }
             trl = new TerrainRecruitLoader(terIS);
             while (trl.oneTerrain() >= 0) {}

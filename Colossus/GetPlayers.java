@@ -39,6 +39,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
     /** List of Map.Entry objects that map player names to player types */
     private static ArrayList playerInfo = new ArrayList();
 
+    private static final String pathSeparator = "/";
+    private static String varDirectory = "";
     private static String mapName = "StrategicMap.map";
     private static String recruitName = "Recruit.ter";
     private static String creaturesName = "Creature.cre";
@@ -283,9 +285,17 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
     }
 
+    public static String getVarDirectory()
+    {
+	if (varDirectory.equals(""))
+	    return "";
+	else
+	    return (varDirectory + pathSeparator);
+    }
+
     public static String getMapName()
     {
-        return mapName;
+	return (getVarDirectory() + mapName);
     }
     
     static class recFileFilter extends javax.swing.filechooser.FileFilter 
@@ -330,12 +340,12 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     public static String getRecruitName()
     {
-        return recruitName;
+	return (getVarDirectory() + recruitName);
     }
 
     public static String getCreaturesName()
     {
-	return creaturesName;
+	return (getVarDirectory() + creaturesName);
     }
     
     private static String chooseMap() 
@@ -411,13 +421,16 @@ public final class GetPlayers extends JDialog implements WindowListener,
             "Choose your variant (or cancel for default game)");
         int returnVal = varChooser.showOpenDialog(varChooser);
         String varName = "Default.var";
+	varDirectory = "";
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
-            varName = varChooser.getSelectedFile().getAbsolutePath();
+	    File varFile = varChooser.getSelectedFile();
+            varName = varFile.getAbsolutePath();
+	    varDirectory = varFile.getParentFile().getAbsolutePath();
         }
-	Log.debug("Loading variant " + varName);
+	Log.debug("Loading variant " + varName + ", data files in " + varDirectory);
         try
-        {
+	    {
             ClassLoader cl = Game.class.getClassLoader();
             InputStream varIS = 
                 cl.getResourceAsStream(varName);
@@ -426,10 +439,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
                 varIS = new FileInputStream(varName);
             }
             if (varIS == null) 
-            {
-                System.out.println(
-                    "Variant loading failed for file " + 
-                     varName);
+	    {
+		throw new FileNotFoundException(varName);
             }
 	    else
 	    {

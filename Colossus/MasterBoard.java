@@ -692,10 +692,8 @@ public final class MasterBoard extends JPanel
                 mapIS = new FileInputStream(mapName);
             }
             if (mapIS == null) 
-            {
-                Log.error("Strategic map loading failed for map " +
-                    mapName);
-                System.exit(1);
+	    {
+		throw new FileNotFoundException(mapName);
             }
             StrategicMapLoader sml = new StrategicMapLoader(mapIS);
             sml.StrategicMapLoaderInit();

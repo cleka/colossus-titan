@@ -94,10 +94,24 @@ public class Chit extends JPanel
                 }
             }
             if (icon == null)
+		{ // try with the var-specific directory
+		url = new java.net.URL("file:" + GetPlayers.getVarDirectory() + imageFilename);
+		if (url != null)
+		{
+		    Image image = Toolkit.getDefaultToolkit().getImage(url);
+		    if (image != null)
+		    {
+			icon = new ImageIcon(image);
+		    }
+		}
+	    }
+            if (icon == null)
             {
                 // try direct file access
                 Image image = Toolkit.getDefaultToolkit().getImage(
                     imageFilename);
+		// Warning: image is never null even if the file
+		// doesn't exist, it seems.
                 if (image != null)
                 {
                     icon = new ImageIcon(image);

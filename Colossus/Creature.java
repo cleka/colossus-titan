@@ -177,15 +177,12 @@ public class Creature implements Comparable
 		    creIS = new FileInputStream(GetPlayers.getCreaturesName());
 		}
 		if (creIS == null) 
-	        {
-		    System.out.println(
-		        "Creatures def. loading failed for file " + 
-			GetPlayers.getCreaturesName());
-		    System.exit(1);
+		{
+		    throw new FileNotFoundException(GetPlayers.getCreaturesName());
 		}
 		CreatureLoader cl = new CreatureLoader(creIS);
 		while (cl.oneCreature(creatures) >= 0) {}
-	} 
+	}
         catch (Exception e) 
 	{
             System.out.println("Creatures def. loading failed : " + e);

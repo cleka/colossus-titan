@@ -145,299 +145,45 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  uphill movement. */
     protected synchronized static void setupHexesGameState(char terrain, BattleHex [][] h)
     {
+	InputStream terIS = null;
+	String terrainName =
+	    battlelandsDirName +
+	    pathSeparator +
+	    MasterHex.getTerrainName(terrain);
 	try
         {
-            String terrainName =
-		battlelandsDirName +
-		pathSeparator +
-		MasterHex.getTerrainName(terrain);
             ClassLoader cl = Game.class.getClassLoader();
-            InputStream terIS = 
-                cl.getResourceAsStream(terrainName);
+            terIS = cl.getResourceAsStream(terrainName);
             if (terIS == null)
-            {
-                terIS = new FileInputStream(terrainName);
-            }
-            if (terIS == null) 
-            {
-                System.out.println(
-		    "Battlelands loading failed for file " + 
-		    terrainName);
-            }
-            BattlelandLoader bl = new BattlelandLoader(terIS);
-            while (bl.oneBattlelandCase(h) >= 0) {}
-        }
-        catch (Exception e) 
 	    {
-            System.out.println("Battlelands loading failed : " + e);
+		terIS = new FileInputStream(terrainName);
+            }
         }
-	/*
-        switch (terrain)
-        {
-            case 'P':
-                break;
-
-            case 'W':
-                h[0][2].setTerrain('t');
-                h[2][3].setTerrain('t');
-                h[3][5].setTerrain('t');
-                h[4][1].setTerrain('t');
-                h[4][3].setTerrain('t');
-
-                h[0][2].setElevation(1);
-                h[2][3].setElevation(1);
-                h[3][5].setElevation(1);
-                h[4][1].setElevation(1);
-                h[4][3].setElevation(1);
-                break;
-
-            case 'D':
-                h[0][3].setTerrain('s');
-                h[0][4].setTerrain('s');
-                h[1][3].setTerrain('s');
-                h[3][0].setTerrain('s');
-                h[3][1].setTerrain('s');
-                h[3][2].setTerrain('s');
-                h[3][5].setTerrain('s');
-                h[4][1].setTerrain('s');
-                h[4][2].setTerrain('s');
-                h[4][5].setTerrain('s');
-                h[5][1].setTerrain('s');
-
-                h[0][3].setHexside(0, 'd');
-                h[0][3].setHexside(1, 'd');
-                h[1][3].setHexside(0, 'd');
-                h[1][3].setHexside(1, 'd');
-                h[1][3].setHexside(2, 'd');
-                h[1][3].setHexside(3, 'c');
-                h[3][1].setHexside(4, 'd');
-                h[3][2].setHexside(2, 'd');
-                h[3][2].setHexside(3, 'c');
-                h[3][2].setHexside(4, 'c');
-                h[3][2].setHexside(5, 'd');
-                h[3][5].setHexside(0, 'd');
-                h[3][5].setHexside(5, 'd');
-                h[4][2].setHexside(2, 'd');
-                h[4][2].setHexside(3, 'd');
-                h[4][5].setHexside(0, 'c');
-                h[4][5].setHexside(1, 'd');
-                h[4][5].setHexside(5, 'd');
-                break;
-
-            case 'B':
-                h[0][2].setTerrain('r');
-                h[1][3].setTerrain('r');
-                h[2][2].setTerrain('r');
-                h[3][1].setTerrain('r');
-                h[3][4].setTerrain('r');
-                h[3][5].setTerrain('r');
-                h[4][3].setTerrain('r');
-                h[5][1].setTerrain('r');
-                break;
-
-            case 'J':
-                h[0][3].setTerrain('r');
-                h[1][1].setTerrain('t');
-                h[2][1].setTerrain('r');
-                h[2][3].setTerrain('r');
-                h[2][5].setTerrain('r');
-                h[3][2].setTerrain('r');
-                h[3][3].setTerrain('t');
-                h[4][4].setTerrain('r');
-                h[5][1].setTerrain('r');
-                h[5][2].setTerrain('t');
-
-                h[1][1].setElevation(1);
-                h[3][3].setElevation(1);
-                h[5][2].setElevation(1);
-                break;
-
-            case 'M':
-                h[0][2].setTerrain('o');
-                h[2][3].setTerrain('o');
-                h[2][4].setTerrain('o');
-                h[3][1].setTerrain('o');
-                h[4][3].setTerrain('o');
-                h[4][5].setTerrain('o');
-                break;
-
-            case 'S':
-                h[1][3].setTerrain('o');
-                h[2][1].setTerrain('o');
-                h[2][2].setTerrain('t');
-                h[2][4].setTerrain('t');
-                h[3][3].setTerrain('o');
-                h[3][5].setTerrain('o');
-                h[4][2].setTerrain('t');
-                h[5][3].setTerrain('o');
-
-                h[2][2].setElevation(1);
-                h[2][4].setElevation(1);
-                h[4][2].setElevation(1);
-                break;
-
-            case 'H':
-                h[2][2].setTerrain('t');
-                h[2][4].setTerrain('t');
-                h[5][3].setTerrain('t');
-
-                h[1][2].setElevation(1);
-                h[1][4].setElevation(1);
-                h[2][2].setElevation(1);
-                h[2][4].setElevation(1);
-                h[3][0].setElevation(1);
-                h[3][4].setElevation(1);
-                h[4][3].setElevation(1);
-                h[5][3].setElevation(1);
-
-                h[1][2].setHexside(0, 's');
-                h[1][2].setHexside(1, 's');
-                h[1][2].setHexside(2, 's');
-                h[1][2].setHexside(3, 's');
-                h[1][2].setHexside(4, 's');
-                h[1][2].setHexside(5, 's');
-                h[1][4].setHexside(0, 's');
-                h[1][4].setHexside(1, 's');
-                h[1][4].setHexside(2, 's');
-                h[1][4].setHexside(5, 's');
-                h[3][0].setHexside(2, 's');
-                h[3][0].setHexside(3, 's');
-                h[3][0].setHexside(4, 's');
-                h[3][4].setHexside(0, 's');
-                h[3][4].setHexside(1, 's');
-                h[3][4].setHexside(2, 's');
-                h[3][4].setHexside(3, 's');
-                h[3][4].setHexside(4, 's');
-                h[3][4].setHexside(5, 's');
-                h[4][3].setHexside(0, 's');
-                h[4][3].setHexside(1, 's');
-                h[4][3].setHexside(2, 's');
-                h[4][3].setHexside(3, 's');
-                h[4][3].setHexside(4, 's');
-                h[4][3].setHexside(5, 's');
-                break;
-
-            case 'm':
-                h[3][2].setTerrain('v');
-
-                h[0][4].setElevation(1);
-                h[1][1].setElevation(1);
-                h[1][3].setElevation(1);
-                h[1][4].setElevation(2);
-                h[2][1].setElevation(2);
-                h[2][2].setElevation(1);
-                h[2][5].setElevation(1);
-                h[3][0].setElevation(2);
-                h[3][1].setElevation(1);
-                h[3][2].setElevation(2);
-                h[3][3].setElevation(1);
-                h[4][1].setElevation(1);
-                h[4][2].setElevation(1);
-                h[4][3].setElevation(1);
-                h[5][1].setElevation(2);
-                h[5][2].setElevation(1);
-                h[5][3].setElevation(2);
-                h[5][4].setElevation(1);
-
-                h[0][4].setHexside(0, 's');
-                h[1][1].setHexside(3, 's');
-                h[1][1].setHexside(4, 's');
-                h[1][3].setHexside(0, 's');
-                h[1][3].setHexside(1, 's');
-                h[1][3].setHexside(2, 's');
-                h[1][3].setHexside(5, 's');
-                h[1][4].setHexside(0, 's');
-                h[1][4].setHexside(1, 'c');
-                h[1][4].setHexside(2, 's');
-                h[1][4].setHexside(5, 's');
-                h[2][1].setHexside(2, 's');
-                h[2][1].setHexside(3, 's');
-                h[2][1].setHexside(4, 's');
-                h[2][2].setHexside(3, 's');
-                h[2][2].setHexside(4, 's');
-                h[2][5].setHexside(0, 's');
-                h[2][5].setHexside(1, 's');
-                h[2][5].setHexside(2, 's');
-                h[3][0].setHexside(2, 's');
-                h[3][0].setHexside(3, 's');
-                h[3][2].setHexside(0, 's');
-                h[3][2].setHexside(1, 's');
-                h[3][2].setHexside(2, 's');
-                h[3][2].setHexside(3, 's');
-                h[3][2].setHexside(4, 'c');
-                h[3][2].setHexside(5, 's');
-                h[3][3].setHexside(2, 's');
-                h[3][3].setHexside(3, 's');
-                h[3][3].setHexside(4, 's');
-                h[3][3].setHexside(5, 's');
-                h[4][3].setHexside(3, 's');
-                h[5][1].setHexside(3, 's');
-                h[5][1].setHexside(4, 's');
-                h[5][1].setHexside(5, 's');
-                h[5][3].setHexside(0, 's');
-                h[5][3].setHexside(3, 's');
-                h[5][3].setHexside(4, 'c');
-                h[5][3].setHexside(5, 's');
-                h[5][4].setHexside(4, 's');
-                h[5][4].setHexside(5, 's');
-                break;
-
-            case 't':
-                h[0][4].setTerrain('d');
-                h[1][3].setTerrain('d');
-                h[2][1].setTerrain('d');
-                h[2][2].setTerrain('d');
-                h[2][4].setTerrain('d');
-                h[3][3].setTerrain('d');
-                h[4][2].setTerrain('d');
-                h[4][5].setTerrain('d');
-                h[5][3].setTerrain('d');
-                break;
-
-            case 'T':
-                h[2][2].setTerrain('w');
-                h[2][3].setTerrain('w');
-                h[3][1].setTerrain('w');
-                h[3][2].setTerrain('w');
-                h[3][3].setTerrain('w');
-                h[4][2].setTerrain('w');
-                h[4][3].setTerrain('w');
-
-                h[2][2].setElevation(1);
-                h[2][3].setElevation(1);
-                h[3][1].setElevation(1);
-                h[3][2].setElevation(2);
-                h[3][3].setElevation(1);
-                h[4][2].setElevation(1);
-                h[4][3].setElevation(1);
-
-                h[2][2].setHexside(0, 'w');
-                h[2][2].setHexside(4, 'w');
-                h[2][2].setHexside(5, 'w');
-                h[2][3].setHexside(3, 'w');
-                h[2][3].setHexside(4, 'w');
-                h[2][3].setHexside(5, 'w');
-                h[3][1].setHexside(0, 'w');
-                h[3][1].setHexside(1, 'w');
-                h[3][1].setHexside(5, 'w');
-                h[3][2].setHexside(0, 'w');
-                h[3][2].setHexside(1, 'w');
-                h[3][2].setHexside(2, 'w');
-                h[3][2].setHexside(3, 'w');
-                h[3][2].setHexside(4, 'w');
-                h[3][2].setHexside(5, 'w');
-                h[3][3].setHexside(2, 'w');
-                h[3][3].setHexside(3, 'w');
-                h[3][3].setHexside(4, 'w');
-                h[4][2].setHexside(0, 'w');
-                h[4][2].setHexside(1, 'w');
-                h[4][2].setHexside(2, 'w');
-                h[4][3].setHexside(1, 'w');
-                h[4][3].setHexside(2, 'w');
-                h[4][3].setHexside(3, 'w');
-                break;
+	catch (FileNotFoundException e)
+	{
+	    // let's try in the var-specific directory
+	    try
+	    {
+		terIS = new FileInputStream(GetPlayers.getVarDirectory() + terrainName);
+	    }
+	    catch (Exception e2) 
+	    {
+		System.out.println("Battlelands loading failed : " + e2);
+	    }
+	}
+        catch (Exception e) 
+	{
+	    System.out.println("Battlelands loading failed : " + e);
         }
-	*/
+	try
+	{
+	    BattlelandLoader bl = new BattlelandLoader(terIS);
+	    while (bl.oneBattlelandCase(h) >= 0) {}
+	}
+        catch (Exception e) 
+	{
+	    System.out.println("Battlelands loading failed : " + e);
+        }
     }
 
 
