@@ -8,9 +8,10 @@ import java.util.*;
 import javax.swing.*;
 
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.parser.BattlelandLoader;
 import net.sf.colossus.server.Game;
-
+import net.sf.colossus.server.Constants;
 
 /**
  * Class HexMap displays a basic battle map.
@@ -22,9 +23,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 {
     private String masterHexLabel;
     private char terrain;
-    private static final String pathSeparator = "/";
-    private static String battlelandsDirName = "Battlelands";
-
 
     // GUI hexes need to be recreated for each object, since scale varies.
     private GUIBattleHex [][] h = new GUIBattleHex[6][6];
@@ -154,40 +152,17 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     private synchronized static void setupHexesGameState(char terrain, 
         BattleHex [][] h)
     {
-        InputStream terIS = null;
-        String terrainName =
-            battlelandsDirName +
-            pathSeparator +
-            MasterHex.getTerrainName(terrain);
+        java.util.List directories = new java.util.ArrayList();
+        directories.add(GetPlayers.getVarDirectory() +
+                        ResourceLoader.getPathSeparator() +
+                        Constants.battlelandsDirName);
+        directories.add(Constants.battlelandsDirName);
+        InputStream batIS = ResourceLoader.getInputStream(
+                                           MasterHex.getTerrainName(terrain),
+                                           directories);
         try
         {
-            ClassLoader cl = Client.class.getClassLoader();
-            terIS = cl.getResourceAsStream(terrainName);
-            if (terIS == null)
-            {
-                terIS = new FileInputStream(terrainName);
-            }
-        }
-        catch (FileNotFoundException e)
-        {
-            // let's try in the var-specific directory
-            try
-            {
-                terIS = new FileInputStream(GetPlayers.getVarDirectory() + 
-                    terrainName);
-            }
-            catch (Exception e2) 
-            {
-                System.out.println("Battlelands loading failed : " + e2);
-            }
-        }
-        catch (Exception e) 
-        {
-            System.out.println("Battlelands loading failed : " + e);
-        }
-        try
-        {
-            BattlelandLoader bl = new BattlelandLoader(terIS);
+            BattlelandLoader bl = new BattlelandLoader(batIS);
             while (bl.oneBattlelandCase(h) >= 0) {}
         }
         catch (Exception e) 

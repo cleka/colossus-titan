@@ -82,4 +82,6 @@ public final class Constants
     public static String defaultDirName = "Default";
     /** Images subdirectory name */
     public static String imageDirName = "images";
+    /** Battlelands subdirectory name */
+    public static String battlelandsDirName = "Battlelands";
 }

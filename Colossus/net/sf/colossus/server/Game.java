@@ -9,6 +9,7 @@ import java.awt.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.client.MasterBoard;
 import net.sf.colossus.client.MasterHex;
 import net.sf.colossus.client.GetPlayers;
@@ -59,17 +60,15 @@ public final class Game
         Creature.loadCreatures(); /* try to load creatures */
         try /* try to load the Recruits database */
         {
-            String recruitName = GetPlayers.getRecruitName();
-            ClassLoader cl = Game.class.getClassLoader();
-            InputStream terIS = 
-                cl.getResourceAsStream(recruitName);
-            if (terIS == null)
-            {
-                terIS = new FileInputStream(recruitName);
-            }
+            java.util.List directories = new java.util.ArrayList();
+            directories.add(GetPlayers.getVarDirectory());
+            directories.add(Constants.defaultDirName);
+            InputStream terIS = ResourceLoader.getInputStream(
+                                               GetPlayers.getRecruitName(),
+                                               directories);
             if (terIS == null) 
             {
-                throw new FileNotFoundException(recruitName);
+                throw new FileNotFoundException(GetPlayers.getRecruitName());
             }
             trl = new TerrainRecruitLoader(terIS);
             while (trl.oneTerrain() >= 0) {}
