@@ -366,7 +366,7 @@
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
-        <copy file="ChangeLog" todir="${HTMLDIR}"/-->
+        <copy file="ChangeLog" todir="${HTMLDIR}"/>
         <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>
         <delete> 
                 <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/> 
