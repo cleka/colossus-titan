@@ -10,7 +10,7 @@ import java.util.*;
 
 public class BattleEditor extends JFrame
 {
-    private String m_strFileName = "c:/Default.battle";
+    private String m_strFileName = "Default.battle";
     LegionEditor m_oFirstLegionEditor;
     LegionEditor m_oSecondLegionEditor;
     HexEditor m_oHexEditor;
@@ -104,7 +104,7 @@ public class BattleEditor extends JFrame
         if(strArgsArray.length == 1)
             strFileName = strArgsArray[0];
         else
-            strFileName = "c:/Default.battle";
+            strFileName = "Default.battle";
 
         BattleEditor oFrame = new BattleEditor(strFileName);
         oFrame.restoreBattle();

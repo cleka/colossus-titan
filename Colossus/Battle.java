@@ -1423,6 +1423,34 @@ public final class Battle
         return min;
     }
 
+
+    /** Return the titan range (inclusive at both ends) from the critter to the
+     *  closest enemy critter.  Return OUT_OF_RANGE if there are none. */
+    public int minRangeToEnemy(Critter critter)
+    {
+        BattleHex hex = critter.getCurrentHex();
+        int min = OUT_OF_RANGE;
+
+        Legion enemy = getInactiveLegion();
+        Iterator it = enemy.getCritters().iterator();
+        while (it.hasNext())
+        {
+            Critter target = (Critter)it.next();
+            BattleHex targetHex = target.getCurrentHex();
+            int range = getRange(hex, targetHex, false);
+            // Exit early if adjacent.
+            if (range == 2)
+            {
+                return range;
+            }
+            else if (range < min)
+            {
+                 min = range;
+            }
+        }
+        return min;
+    }
+
     /** Caller must ensure that yDist != 0 */
     private static boolean toLeft(double xDist, double yDist)
     {
@@ -2051,30 +2079,30 @@ public final class Battle
     }
 
     BattleMemo saveToMemo()
-        {
-            BattleMemo oMemo = null;
-            Legion oDefenderLegion = getActiveLegion();
-            Legion oAttackerLegion = getInactiveLegion();
-            LegionMemo oAttackerMemo = oAttackerLegion.saveToMemo();
-            LegionMemo oDefenderMemo = oDefenderLegion.saveToMemo();
+    {
+        BattleMemo oMemo = null;
+        Legion oDefenderLegion = getActiveLegion();
+        Legion oAttackerLegion = getInactiveLegion();
+        LegionMemo oAttackerMemo = oAttackerLegion.saveToMemo();
+        LegionMemo oDefenderMemo = oDefenderLegion.saveToMemo();
 
-            int nEntrySide = -1;
-            nEntrySide = oAttackerLegion.getEntrySide(masterHexLabel);
-            boolean bHasSummoned = oAttackerLegion.getPlayer().hasSummoned(); 
-            boolean bAngelAvailable = oAttackerLegion.angelAvailable();
-            boolean bArchangelAvailable = oAttackerLegion.archangelAvailable();
+        int nEntrySide = -1;
+        nEntrySide = oAttackerLegion.getEntrySide(masterHexLabel);
+        boolean bHasSummoned = oAttackerLegion.getPlayer().hasSummoned(); 
+        boolean bAngelAvailable = oAttackerLegion.angelAvailable();
+        boolean bArchangelAvailable = oAttackerLegion.archangelAvailable();
 
-            oMemo = new BattleMemo(
-                oAttackerMemo,
-                oDefenderMemo,
-                bAngelAvailable,
-                bArchangelAvailable,
-                terrain,
-                masterHexLabel,
-                nEntrySide);
+        oMemo = new BattleMemo(
+            oAttackerMemo,
+            oDefenderMemo,
+            bAngelAvailable,
+            bArchangelAvailable,
+            terrain,
+            masterHexLabel,
+            nEntrySide);
 
-            return oMemo;
-        }
+        return oMemo;
+    }
 
     private static Game makeLegionsAndReturnGame(BattleMemo oMemo)
     {

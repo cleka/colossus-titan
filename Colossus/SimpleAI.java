@@ -50,8 +50,8 @@ class SimpleAI implements AI
     {
         // Do not recruit if this legion is a scooby snack.
         double scoobySnackFactor = 0.15;
-        int minimumSizeToRecruit = (int)(scoobySnackFactor
-                * game.getAverageLegionPointValue());
+        int minimumSizeToRecruit = (int)(scoobySnackFactor *
+            game.getAverageLegionPointValue());
         Player player = game.getActivePlayer();
         List legions = player.getLegions();
         Iterator it = legions.iterator();
@@ -64,7 +64,7 @@ class SimpleAI implements AI
                 minimumSizeToRecruit))
             {
                 Creature recruit = chooseRecruit(game, legion,
-                        legion.getCurrentHex());
+                    legion.getCurrentHex());
 
                 if (recruit != null)
                 {
@@ -801,8 +801,8 @@ class SimpleAI implements AI
             String hexLabel = legion.getCurrentHexLabel();
             List friendlyLegions = game.getFriendlyLegions(hexLabel, player);
 
-            outer: while (friendlyLegions.size() > 1
-                   && game.countConventionalMoves(legion) > 0)
+            outer: while (friendlyLegions.size() > 1 &&
+                game.countConventionalMoves(legion) > 0)
             {
                 // Pick the legion in this hex whose best move has the
                 // least difference with its sitStillValue, scaled by
@@ -1330,7 +1330,7 @@ class SimpleAI implements AI
                 {
                     Legion enemy = (Legion)it.next();
                     final int result = estimateBattleResults(enemy, false,
-                            legion, hex, recruit);
+                        legion, hex, recruit);
 
                     if (result == WIN_WITH_MINIMAL_LOSSES ||
                         result == DRAW && legion.hasTitan())
@@ -1827,7 +1827,7 @@ class SimpleAI implements AI
     }
 
     public void strike(Legion legion, Battle battle, Game game,
-                       boolean fakeDice)
+        boolean fakeDice)
     {
         // Repeat until no attackers with valid targets remain.
         while (!battle.isOver() && battle.findCrittersWithTargets().size() > 0)
@@ -2650,14 +2650,16 @@ Log.debug("Simulating moving " + critter2.getName() + " to " + cm.getEndingHexLa
                 }
             });
 
-
             // Mark this critter's favorite move as taken, unless it's
             // offboard.
-            CritterMove cm = (CritterMove)moveList.get(0);
-            String hexLabel = cm.getEndingHexLabel();
-            if (!hexLabel.startsWith("X"))
+            if (!moveList.isEmpty())
             {
-                hexesTaken.add(hexLabel);
+                CritterMove cm = (CritterMove)moveList.get(0);
+                String hexLabel = cm.getEndingHexLabel();
+                if (!hexLabel.startsWith("X"))
+                {
+                    hexesTaken.add(hexLabel);
+                }
             }
 
             // Show the moves considered.
@@ -2667,7 +2669,7 @@ Log.debug("Simulating moving " + critter2.getName() + " to " + cm.getEndingHexLa
             it2 = moveList.iterator();
             while (it2.hasNext())
             {
-                cm = (CritterMove)it2.next();
+                CritterMove cm = (CritterMove)it2.next();
                 buf.append(" " + cm.getEndingHexLabel());
             }
             Log.debug(buf.toString());
@@ -2680,7 +2682,7 @@ Log.debug("Simulating moving " + critter2.getName() + " to " + cm.getEndingHexLa
             while (it2.hasNext())
             {
                 moveList = (ArrayList)it2.next();
-                cm = (CritterMove)moveList.get(0);
+                CritterMove cm = (CritterMove)moveList.get(0);
                 Critter critter2 = cm.getCritter();
                 critter2.setCurrentHexLabel(cm.getStartingHexLabel());
             }
@@ -2745,7 +2747,6 @@ Log.debug("perfect score is : " + perfectScore);
 
             // TODO Generate and save all permutations, then sort, so that
             // we can eliminate all duplicates, not just consecutive ones.
-
 
             if (turn == 1 && creatureNames(order).equals(creatureNames(
                 lastOrder)))
@@ -2834,6 +2835,7 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         return buf.toString();
     }
 
+    // TODO Pull out all the constants for easier tuning.
     private static int evaluateCritterMove(Battle battle, Critter critter)
     {
         final char terrain = battle.getTerrain();
@@ -2857,7 +2859,7 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         {
             if (hex.isNativeBonusTerrain())
             {
-                value += 10;
+                value += 5;
             }
             // Hack: We want marsh natives to slightly prefer
             // moving to bog hexes, even though there's no
@@ -2865,14 +2867,14 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
             // for non-native allies.
             else if (hex.getTerrain() == 'o')
             {
-                value += 9;
+                value += 2;
             }
         }
         else
         {
             if (hex.isNonNativePenaltyTerrain())
             {
-                value -= 20;
+                value -= 10;
             }
         }
 
@@ -2996,12 +2998,10 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
         }
 
         // Reward adjacent friendly creatures.
-        int buddies = critter.numAdjacentAllies();
+        // XXX Completely broken.  We need to better simulate the game
+        // state so that allied moves count and aren't so order-dependent.
 
-if (buddies > 0)
-{
-Log.debug("FOUND SOME BUDDIES!");
-}
+        int buddies = critter.numAdjacentAllies();
 
         value += 15 * buddies;
 
@@ -3066,14 +3066,10 @@ Log.debug("FOUND SOME BUDDIES!");
                 }
             }
         }
-        else  // attacker
+        else  // Attacker, non-titan
         {
-            // In the last couple of turns, just head for enemy creatures,
-            // not board edges.
-            if (turn <= 5)
-            {
-                value += 3 * battle.getRange(hex, entrance, true);
-            }
+            // Head for enemy creatures, not board edges.
+            value -= 5 * battle.minRangeToEnemy(critter);
         }
 
         Log.debug("EVAL " + critter.getName() +
