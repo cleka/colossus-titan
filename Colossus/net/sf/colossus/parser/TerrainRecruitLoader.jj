@@ -516,6 +516,12 @@ public class TerrainRecruitLoader
     /** Amount of points needed for Titan Teleport. */
     private static int titanTeleport = 400;
 
+    /* re-set the default values each time a new TER file is loaded */
+    {
+        titanImprove = 100;
+        titanTeleport = 400;
+    }
+
     /**
      * To obtain the base amount of points needed for Titan improvement.
      * @return The base amount of points needed for Titan improvement.
