@@ -15,12 +15,11 @@ public final class ShowBattleMap extends HexMap implements WindowListener,
     private JDialog dialog;
 
 
-    public ShowBattleMap(JFrame parentFrame, MasterBoard board,
-        String masterHexLabel)
+    public ShowBattleMap(JFrame parentFrame, String masterHexLabel)
     {
-        super(board, masterHexLabel);
+        super(masterHexLabel);
 
-        MasterHex hex = board.getHexByLabel(masterHexLabel);
+        MasterHex hex = MasterBoard.getHexByLabel(masterHexLabel);
         dialog = new JDialog(parentFrame, "Battle Map for " +
             hex.getTerrainName(), true);
 
@@ -71,9 +70,9 @@ public final class ShowBattleMap extends HexMap implements WindowListener,
         frame.setVisible(true);
 
         Game game = new Game();
+        game.addPlayer("Test");
         game.initBoard();
-        MasterBoard board = game.getBoard();
-        MasterHex hex = board.getAnyHexWithTerrain('D');
-        new ShowBattleMap(frame, board, hex.getLabel());
+        MasterHex hex = MasterBoard.getAnyHexWithTerrain('D');
+        new ShowBattleMap(frame, hex.getLabel());
     }
 }

@@ -313,14 +313,7 @@ public final class Legion implements Comparable
         }
         else
         {
-            // Make sure the board is visible.
-            JFrame masterFrame = game.getBoard().getFrame();
-            if (masterFrame.getState() == JFrame.ICONIFIED)
-            {
-                masterFrame.setState(JFrame.NORMAL);
-            }
-            angelType = AcquireAngel.acquireAngel(masterFrame,
-                playerName, recruits);
+            game.getServer().acquireAngel(player.getName(), recruits);
         }
         return angelType;
     }
@@ -408,17 +401,6 @@ public final class Legion implements Comparable
     public String getImageName()
     {
         return markerId;
-    }
-
-
-    public Marker getMarker()
-    {
-        return Client.getMarker(markerId);
-    }
-
-    public void setMarker(Marker marker)
-    {
-        Client.setMarker(markerId, marker);
     }
 
 
@@ -547,8 +529,8 @@ public final class Legion implements Comparable
         Player player = getPlayer();
         player.getLegions().remove(this);
 
-        Client.removeMarker(markerId);
-        game.getBoard().alignLegions(hexLabel);
+        game.getServer().allRemoveMarker(markerId);
+        game.getServer().allAlignLegions(hexLabel);
     }
 
 
@@ -582,7 +564,7 @@ public final class Legion implements Comparable
         Log.event(log.toString());
 
         // Free up the legion marker.
-        Client.removeMarker(markerId);
+        game.getServer().allRemoveMarker(markerId);
         Player player = getPlayer();
         player.getMarkersAvailable().add(getMarkerId());
     }
@@ -595,7 +577,7 @@ public final class Legion implements Comparable
 
         currentHexLabel = hexLabel;
         moved = true;
-        Client.setMoverId(null);
+        game.getServer().getClient(playerName).setMoverId(null);
         Client.pushUndoStack(markerId);
 
         boolean teleported = getTeleported(hexLabel);
@@ -606,12 +588,11 @@ public final class Legion implements Comparable
             player.setTeleported(true);
         }
 
-        MasterBoard board = game.getBoard();
-        board.alignLegions(currentHexLabel);
-        board.alignLegions(startingHexLabel);
+        game.getServer().allAlignLegions(currentHexLabel);
+        game.getServer().allAlignLegions(startingHexLabel);
 
         Log.event("Legion " + getLongMarkerName() + " in " +
-            getCurrentHex().getDescription() + (teleported ?
+            getCurrentHexLabel() + (teleported ?
             (game.isOccupied(hexLabel) ? " titan teleports " :
             " tower teleports (" + teleportingLord + ") " ) : " moves ") +
             "to " + hex.getDescription());
@@ -635,9 +616,8 @@ public final class Legion implements Comparable
             Log.event("Legion " + getLongMarkerName() +
                 " undoes its move");
 
-            MasterBoard board = game.getBoard();
-            board.alignLegions(currentHexLabel);
-            board.alignLegions(formerHexLabel);
+            game.getServer().allAlignLegions(currentHexLabel);
+            game.getServer().allAlignLegions(formerHexLabel);
         }
     }
 
@@ -728,8 +708,7 @@ public final class Legion implements Comparable
 
     public MasterHex getCurrentHex()
     {
-        MasterBoard board = game.getBoard();
-        return board.getHexByLabel(currentHexLabel);
+        return MasterBoard.getHexByLabel(currentHexLabel);
     }
 
     public String getStartingHexLabel()
@@ -739,8 +718,7 @@ public final class Legion implements Comparable
 
     public MasterHex getStartingHex()
     {
-        MasterBoard board = game.getBoard();
-        return board.getHexByLabel(startingHexLabel);
+        return MasterBoard.getHexByLabel(startingHexLabel);
     }
 
 
@@ -1160,9 +1138,7 @@ public final class Legion implements Comparable
             newLegion.addCreature(creature);
         }
 
-        Marker newMarker = new Marker(getMarker().getBounds().width,
-            newMarkerId, game.getBoard().getFrame(), game);
-        newLegion.setMarker(newMarker);
+        game.getServer().allAddMarker(newMarkerId);
 
         player.addLegion(newLegion);
         player.setLastLegionSplitOff(newLegion);
@@ -1246,8 +1222,7 @@ public final class Legion implements Comparable
 
     /** Reveal the lord who tower teleported the legion.  Pick one if
      *  necessary. */
-    public void revealTeleportingLord(JFrame parentFrame, boolean
-        autoPick)
+    public void revealTeleportingLord(boolean autoPick)
     {
         teleportingLord = null;
         TreeSet lords = new TreeSet();
@@ -1264,7 +1239,6 @@ public final class Legion implements Comparable
         }
 
         int lordTypes = lords.size();
-
         if (lordTypes == 1)
         {
             teleportingLord = (Creature)lords.first();
@@ -1277,7 +1251,8 @@ public final class Legion implements Comparable
             }
             else
             {
-                teleportingLord = PickLord.pickLord(parentFrame, this);
+                String lordName = game.getServer().pickLord(this);
+                teleportingLord = Creature.getCreatureByName(lordName);
             }
         }
 

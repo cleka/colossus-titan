@@ -19,8 +19,7 @@ public final class Client
 
     // Moved here from Game.
 
-    /** Temporarily static. */
-    private static MasterBoard board;
+    private MasterBoard board;
 
     private StatusScreen statusScreen;
     private SummonAngel summonAngel;
@@ -38,11 +37,10 @@ public final class Client
      *  Temporarily static. */
     private static LinkedList undoStack = new LinkedList();
 
-    /**  Temporarily static. */
-    private static String moverId;
+    private String moverId;
 
-    /** Temporarily static.  The end of the list is on top in the z-order. */
-    private static ArrayList markers = new ArrayList();
+    /** The end of the list is on top in the z-order. */
+    private ArrayList markers = new ArrayList();
 
     // Per-client and per-player options should be kept here instead
     // of in Game.  (For now we can move all options from Game/Player
@@ -61,6 +59,7 @@ public final class Client
         this.playerName = playerName;
     }
 
+    /** Null constructor for testing only. */
     public Client()
     {
     }
@@ -159,9 +158,9 @@ public final class Client
     }
 
     /** Resolve engagement in land. */
-    boolean engage(String land)
+    void engage(String land)
     {
-        return false;
+        server.engage(land);
     }
 
     /** Legion flees. */
@@ -534,13 +533,13 @@ public final class Client
     }
 
 
-    public static List getMarkers()
+    public List getMarkers()
     {
         return markers;
     }
 
     /** Get the first marker with this id. */
-    public static Marker getMarker(String id)
+    public Marker getMarker(String id)
     {
         Iterator it = markers.iterator();
         while (it.hasNext())
@@ -554,9 +553,17 @@ public final class Client
         return null;
     }
 
+    /** Create a new marker and add it to the end of the list. */
+    public void addMarker(String markerId)
+    {
+        Marker marker = new Marker(4 * Scale.get(), markerId,
+            board.getFrame(), server.getGame().getLegionByMarkerId(markerId));
+        setMarker(markerId, marker);
+    }
+
     /** Add the marker to the end of the list.  If it's already
      *  in the list, remove the earlier entry. */
-    public static void setMarker(String id, Marker marker)
+    public void setMarker(String id, Marker marker)
     {
         removeMarker(id);
         markers.add(marker);
@@ -564,7 +571,7 @@ public final class Client
 
     /** Remove the first marker with this id from the list. Return
      *  the removed marker. */
-    public static Marker removeMarker(String id)
+    public Marker removeMarker(String id)
     {
         Iterator it = markers.iterator();
         while (it.hasNext())
@@ -584,6 +591,11 @@ public final class Client
         undoStack.clear();
     }
 
+    public static Object topUndoStack()
+    {
+        return undoStack.getFirst();
+    }
+
     public static Object popUndoStack()
     {
         return undoStack.removeFirst();
@@ -594,31 +606,33 @@ public final class Client
         undoStack.addFirst(object);
     }
 
+
     public static boolean isUndoStackEmpty()
     {
         return undoStack.isEmpty();
     }
 
 
-    public static String getMoverId()
+    public String getMoverId()
     {
         return moverId;
     }
 
-    public static void setMoverId(String moverId)
+    public void setMoverId(String moverId)
     {
-        Client.moverId = moverId;
+        this.moverId = moverId;
     }
 
 
-    public static MasterBoard getBoard()
+    public MasterBoard getBoard()
     {
         return board;
     }
 
-    public static void setBoard(MasterBoard board)
+    public void initBoard()
     {
-        Client.board = board;
+        board = new MasterBoard(this);
+        board.requestFocus();
     }
 
 
@@ -642,6 +656,139 @@ public final class Client
     public String getPlayerName()
     {
         return playerName;
+    }
+
+    public SummonAngel getSummonAngel()
+    {
+        return summonAngel;
+    }
+
+    public void createSummonAngel(Legion legion)
+    {
+        board.deiconify();
+        summonAngel = SummonAngel.summonAngel(this, legion);
+    }
+
+    public void doSummon(Legion legion, Legion donor, Creature angel)
+    {
+        server.getGame().doSummon(legion, donor, angel);
+        //XXX donor.getCurrentHex().repaint();
+        //XXX legion.getCurrentHex().repaint();
+        board.repaint();
+        summonAngel = null;
+        board.highlightEngagements();
+    }
+
+
+    public String pickRecruit(Legion legion)
+    {
+        Creature recruit = PickRecruit.pickRecruit(board.getFrame(), legion);
+        if (recruit != null)
+        {
+            return recruit.toString();
+        }
+        return null;
+    }
+
+    public String pickRecruiter(Legion legion, ArrayList recruiters)
+    {
+        Creature recruiter = PickRecruiter.pickRecruiter(board.getFrame(),
+            legion, recruiters);
+        if (recruiter != null)
+        {
+            return recruiter.toString();
+        }
+        return null;
+    }
+
+
+    public String splitLegion(Legion legion, String selectedMarkerId)
+    {
+        return SplitLegion.splitLegion(board.getFrame(), legion,
+            selectedMarkerId);
+    }
+
+
+
+    public String acquireAngel(ArrayList recruits)
+    {
+        board.deiconify();
+        return AcquireAngel.acquireAngel(board.getFrame(), playerName,
+            recruits);
+    }
+
+
+    /** Present a dialog allowing the player to enter via land or teleport.
+     *  Return true if the player chooses to teleport. */
+    public boolean chooseWhetherToTeleport()
+    {
+        String [] options = new String[2];
+        options[0] = "Teleport";
+        options[1] = "Move Normally";
+        int answer = JOptionPane.showOptionDialog(board, "Teleport?",
+            "Teleport?", JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+
+        // If Teleport, then leave teleported set.
+        return (answer == JOptionPane.YES_OPTION);
+    }
+
+
+    public int pickEntrySide(String hexLabel, Legion legion)
+    {
+        return PickEntrySide.pickEntrySide(board.getFrame(), hexLabel, legion);
+    }
+
+
+    public String pickLord(Legion legion)
+    {
+        Creature lord = PickLord.pickLord(board.getFrame(), legion);
+        return lord.toString();
+    }
+
+
+    public void repaintMasterHex(String hexLabel)
+    {
+        board.getGUIHexByLabel(hexLabel).repaint();
+    }
+
+
+    public void doFight(String hexLabel)
+    {
+        if (summonAngel != null)
+        {
+            Player player = server.getGame().getPlayerByName(playerName);
+            Legion donor = server.getGame().getFirstFriendlyLegion(
+                hexLabel, player);
+            if (donor != null)
+            {
+                player.setDonor(donor);
+                summonAngel.updateChits();
+                summonAngel.repaint();
+                getMarker(donor.getMarkerId()).repaint();
+            }
+        }
+        else
+        {
+            engage(hexLabel);
+        }
+    }
+
+
+    public boolean askFlee(Legion defender, Legion attacker)
+    {
+        return Concede.flee(board.getFrame(), defender, attacker);
+    }
+
+    public boolean askConcede(Legion ally, Legion enemy)
+    {
+        return Concede.concede(board.getFrame(), ally, enemy);
+    }
+
+    public void askNegotiate(Legion attacker, Legion defender)
+    {
+        NegotiationResults results =
+            Negotiate.negotiate(board.getFrame(), attacker, defender);
     }
 
 

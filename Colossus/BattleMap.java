@@ -32,9 +32,9 @@ public final class BattleMap extends HexMap implements MouseListener,
     private AbstractAction concedeBattleAction;
 
 
-    public BattleMap(MasterBoard board, String masterHexLabel, Battle battle)
+    public BattleMap(String masterHexLabel, Battle battle)
     {
-        super(board, masterHexLabel);
+        super(masterHexLabel);
 
         battleFrame = new JFrame();
         Legion attacker = battle.getAttacker();
@@ -44,7 +44,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             attacker.getPlayerName() + ") attacks " +
             defender.getLongMarkerName() + " (" +
             defender.getPlayerName() + ")" + " in " +
-            board.getHexByLabel(masterHexLabel).getDescription());
+            MasterBoard.getHexByLabel(masterHexLabel).getDescription());
 
         this.battle = battle;
 
@@ -80,16 +80,16 @@ public final class BattleMap extends HexMap implements MouseListener,
 
 
     // Simple constructor for testing and AICopy()
-    public BattleMap(MasterBoard board, String masterHexLabel)
+    public BattleMap(String masterHexLabel)
     {
-        super(board, masterHexLabel);
+        super(masterHexLabel);
         setupEntrances();
     }
 
 
     public BattleMap AICopy(Battle battle)
     {
-        BattleMap newMap = new BattleMap(board, masterHexLabel);
+        BattleMap newMap = new BattleMap(masterHexLabel);
         newMap.battle = battle;
         return newMap;
     }

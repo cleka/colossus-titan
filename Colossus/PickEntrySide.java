@@ -21,10 +21,10 @@ public final class PickEntrySide extends HexMap implements ActionListener,
     private static int entrySide;
 
 
-    private PickEntrySide(JFrame parentFrame, MasterBoard board,
-        String masterHexLabel, Legion legion)
+    private PickEntrySide(JFrame parentFrame, String masterHexLabel,
+        Legion legion)
     {
-        super(board, masterHexLabel);
+        super(masterHexLabel);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
         laidOut = false;
         Container contentPane = dialog.getContentPane();
@@ -67,11 +67,11 @@ public final class PickEntrySide extends HexMap implements ActionListener,
     }
 
 
-    public static int pickEntrySide(JFrame parentFrame, MasterBoard board,
-        String masterHexLabel, Legion legion)
+    public static int pickEntrySide(JFrame parentFrame, String masterHexLabel,
+        Legion legion)
     {
         entrySide = -1;
-        new PickEntrySide(parentFrame, board, masterHexLabel, legion);
+        new PickEntrySide(parentFrame, masterHexLabel, legion);
         return entrySide;
     }
 
@@ -174,8 +174,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
 
         Game game = new Game();
         game.initBoard();
-        MasterBoard board = game.getBoard();
-        MasterHex hex = board.getAnyHexWithTerrain('D');
+        MasterHex hex = MasterBoard.getAnyHexWithTerrain('D');
         String hexLabel = hex.getLabel();
         game.addPlayer("Test");
         Player player = game.getPlayer(0);
@@ -189,8 +188,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
         legion.setEntrySide(hexLabel, 3);
         legion.setEntrySide(hexLabel, 5);
 
-        int side = PickEntrySide.pickEntrySide(frame, board, hex.getLabel(),
-            legion);
+        int side = PickEntrySide.pickEntrySide(frame, hex.getLabel(), legion);
         System.out.println("Chose side " + side);
         System.exit(0);
     }

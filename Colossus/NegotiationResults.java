@@ -8,42 +8,90 @@ import java.util.*;
 
 public final class NegotiationResults
 {
-    private boolean settled;
+    private boolean fight;
     private boolean mutual;
-    private Legion winner;
-    private ArrayList winnerLosses;
+    private String attackerId;
+    private String defenderId;
+    private String winnerId;
+    private Set winnerLosses;
 
 
-    public NegotiationResults(boolean settled, boolean mutual, Legion
-        winner, ArrayList winnerLosses)
+    public NegotiationResults(String attackerId, String defenderId,
+        boolean fight, boolean mutual, String winnerId, Set winnerLosses)
     {
-        this.settled = settled;
+        this.attackerId = attackerId;
+        this.defenderId = defenderId;
+        this.fight = fight;
         this.mutual = mutual;
-        this.winner = winner;
+        this.winnerId = winnerId;
         this.winnerLosses = winnerLosses;
     }
 
 
-    public boolean isSettled()
+    public String getAttackerId()
     {
-        return settled;
+        return attackerId;
     }
 
+    public String getDefenderId()
+    {
+        return defenderId;
+    }
+
+    public boolean isFight()
+    {
+        return fight;
+    }
 
     public boolean isMutual()
     {
         return mutual;
     }
 
-
-    public Legion getWinner()
+    public String getWinnerId()
     {
-        return winner;
+        return winnerId;
     }
 
-
-    public ArrayList getWinnerLosses()
+    public Set getWinnerLosses()
     {
         return winnerLosses;
+    }
+
+    public boolean equals(Object other)
+    {
+        if (!(other instanceof NegotiationResults))
+        {
+            return false;
+        }
+        NegotiationResults otherResults = (NegotiationResults)other;
+
+        if (fight && otherResults.isFight())
+        {
+            return true;
+        }
+        if (fight != otherResults.isFight())
+        {
+            return false;
+        }
+
+        if (mutual && otherResults.isMutual())
+        {
+            return true;
+        }
+        if (mutual != otherResults.isMutual())
+        {
+            return false;
+        }
+
+        if (!winnerId.equals(otherResults.getWinnerId()))
+        {
+            return false;
+        }
+        if (!winnerLosses.equals(otherResults.getWinnerLosses()))
+        {
+            return false;
+        }
+        return true;
     }
 }

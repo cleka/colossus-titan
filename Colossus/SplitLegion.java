@@ -326,8 +326,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
         Legion legion = Legion.getStartingLegion(selectedMarkerId,
             "130", player.getName(), game);
         player.addLegion(legion);
-        Marker marker = new Marker(4 * scale, selectedMarkerId, frame, game);
-        legion.setMarker(marker);
+        Client client = new Client();
+        client.addMarker(selectedMarkerId);
 
         selectedMarkerId = player.selectMarkerId("Rd02");
 

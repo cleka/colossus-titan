@@ -213,8 +213,7 @@ public final class PickRecruit extends JDialog implements MouseListener,
 
         Game game = new Game();
         game.initBoard();
-        MasterBoard board = game.getBoard();
-        MasterHex hex = board.getHexByLabel("130");
+        MasterHex hex = MasterBoard.getHexByLabel("130");
         game.addPlayer("Test");
         Player player = game.getPlayer(0);
         Legion legion = new Legion("Bk01", null, hex.getLabel(),

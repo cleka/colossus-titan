@@ -12,14 +12,14 @@ public final class Marker extends Chit
     private static Font oldFont;
     private static int fontHeight;
     private static int fontWidth;
-    private Game game;
+    private Legion legion;
 
 
-    public Marker(int scale, String id, Container container, Game game)
+    public Marker(int scale, String id, Container container, Legion legion)
     {
         super(scale, id, container);
         setBackground(Color.black);
-        this.game = game;
+        this.legion = legion;
     }
 
 
@@ -42,11 +42,6 @@ public final class Marker extends Chit
         Rectangle rect = getBounds();
         g.drawRect(rect.x, rect.y, rect.width, rect.height);
 
-        if (game == null)
-        {
-            return;
-        }
-        Legion legion = game.getLegionByMarkerId(getId());
         if (legion == null)
         {
             return;

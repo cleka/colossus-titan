@@ -15,11 +15,18 @@ public final class MasterBoard extends JPanel implements MouseListener,
 {
     /** For easy of mapping to the GUI, hexes will be stored
      *  in a 15x8 array, with some empty elements. */
-    private MasterHex[][] h = new MasterHex[15][8];
+    private GUIMasterHex[][] h = new GUIMasterHex[15][8];
 
     /** For ease of iterating through all hexes, they'll also be
      *  stored in an ArrayList. */
-    private ArrayList hexes = new ArrayList();
+    private ArrayList hexes = new ArrayList(96);
+
+    /** A static set of non-GUI MasterHexes */
+    private static MasterHex[][] plain = new MasterHex[15][8];
+
+    /** For ease of iterating through all hexes, they'll also be
+     *  stored in an ArrayList. */
+    private static ArrayList plainHexes = new ArrayList(96);
 
     /** The hexes in the 15x8 array that actually exist are
      *  represented by true. */
@@ -42,11 +49,9 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {false, false, false, true, true, false, false, false}
     };
 
-    // XXX This direct Game reference needs to be eliminated.  The
-    // board should have a reference to a Client instead,
-    // which has a reference (later a network connection) to
-    // a Server, which has a reference to the game.
+    // XXX This direct Game reference needs to be eliminated.
     private Game game;
+
     private Client client;
 
     private static JFrame masterFrame;
@@ -103,6 +108,28 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private AbstractAction saveOptionsAction;
     private AbstractAction quitGameAction;
     private AbstractAction changeScaleAction;
+
+
+    static
+    {
+        plainHexes.clear();
+
+        // Initialize plain hexes.
+        for (int i = 0; i < plain.length; i++)
+        {
+            for (int j = 0; j < plain[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    MasterHex hex = new MasterHex();
+                    plain[i][j] = hex;
+                    plainHexes.add(hex);
+                }
+            }
+        }
+
+        setupHexesGameState(plain);
+    }
 
 
     public MasterBoard(Client client)
@@ -166,7 +193,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                // peek at the undo stack so we know where to align
+                String hexLabel = (String)Client.topUndoStack();
                 player.undoLastSplit();
+                alignLegions(hexLabel);
+                highlightTallLegions(player);
                 repaint();
             }
         };
@@ -176,7 +207,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 Player player = game.getActivePlayer();
+                // peek at the undo stack so we know where to align
                 player.undoAllSplits();
+                alignAllLegions();
+                highlightTallLegions(player);
                 repaint();
             }
         };
@@ -204,7 +238,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             {
                 Player player = game.getActivePlayer();
                 player.undoLastMove();
-                game.highlightUnmovedLegions();
+                highlightUnmovedLegions();
             }
         };
 
@@ -214,7 +248,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             {
                 Player player = game.getActivePlayer();
                 player.undoAllMoves();
-                game.highlightUnmovedLegions();
+                highlightUnmovedLegions();
             }
         };
 
@@ -241,7 +275,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 if (player.legionsMoved() == 0 &&
                     player.countMobileLegions() > 0)
                 {
-                    game.highlightUnmovedLegions();
+                    highlightUnmovedLegions();
                     JOptionPane.showMessageDialog(masterFrame,
                         "At least one legion must move.");
                 }
@@ -251,7 +285,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                     // move, force one of them to take it.
                     if (player.splitLegionHasForcedMove())
                     {
-                        game.highlightUnmovedLegions();
+                        highlightUnmovedLegions();
                         JOptionPane.showMessageDialog(masterFrame,
                             "Split legions must be separated.");
                     }
@@ -271,8 +305,9 @@ public final class MasterBoard extends JPanel implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 // Advance only if there are no unresolved engagements.
-                if (game.highlightEngagements() == 0)
+                if (highlightEngagements() == 0)
                 {
+                // XXX
                     game.advancePhase();
                 }
                 else
@@ -289,7 +324,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             {
                 Player player = game.getActivePlayer();
                 player.undoLastRecruit();
-                game.highlightPossibleRecruits();
+                highlightPossibleRecruits();
             }
         };
 
@@ -299,7 +334,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             {
                 Player player = game.getActivePlayer();
                 player.undoAllRecruits();
-                game.highlightPossibleRecruits();
+                highlightPossibleRecruits();
             }
         };
 
@@ -341,7 +376,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
-                MasterHex hex = getHexContainingPoint(lastPoint);
+                GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
                     new ShowMasterHex(masterFrame, game, hex, lastPoint);
@@ -355,11 +390,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             public void actionPerformed(ActionEvent e)
             {
-                MasterHex hex = getHexContainingPoint(lastPoint);
+                GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame, MasterBoard.this,
-                        hex.getLabel());
+                    new ShowBattleMap(masterFrame, hex.getLabel());
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }
@@ -616,7 +650,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private void setupHexes()
     {
         setupHexesGUI();
-        setupHexesGameState();
+        setupHexesGameState(h);
     }
 
     private void setupHexesGUI()
@@ -647,11 +681,14 @@ public final class MasterBoard extends JPanel implements MouseListener,
             {
                 if (show[i][j])
                 {
-                    MasterHex hex = new MasterHex(cx + 4 * i * scale,
+                    GUIMasterHex hex = new GUIMasterHex();
+                    hex.init(cx + 4 * i * scale,
                         (int) Math.round(cy + (3 * j + (i & 1) *
-                        (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 *
-                        ((j + 1) / 2)) * Hex.SQRT3 * scale), scale,
-                        ((i + j) & 1) == 0, this);
+                            (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 *
+                            ((j + 1) / 2)) * Hex.SQRT3 * scale),
+                        scale,
+                        ((i + j) & 1) == 0,
+                        this);
 
                     hex.setXCoord(i);
                     hex.setYCoord(j);
@@ -665,18 +702,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     /** This method only needs to be run once, since the attributes it
      *  sets up are constant for the game. */
-    private void setupHexesGameState()
+    private static void setupHexesGameState(MasterHex [][] h)
     {
-        // Check to see if this method has already been run, and
-        // abort early if it has.
-        // XXX The real solution is to split the GUI part of MasterHex
-        // from the game state, and make the game state part static.
-        if (h[0][3].getTerrain() == 'S')
-        {
-            return;
-        }
-
-
         // Add terrain types, id labels, label sides, and exits to hexes.
         h[0][3].setTerrain('S');
         h[0][3].setLabel(132);
@@ -1243,79 +1270,84 @@ public final class MasterBoard extends JPanel implements MouseListener,
         h[14][4].setExitType(4, MasterHex.ARROWS);
 
         // Derive entrances from exits.
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
+        for (int i = 0; i < h.length; i++)
         {
-            MasterHex hex = (MasterHex)it.next();
-            int i = hex.getXCoord();
-            int j = hex.getYCoord();
-            for (int k = 0; k < 6; k++)
+            for (int j = 0; j < plain[0].length; j++)
             {
-                int gateType = hex.getExitType(k);
-                if (gateType != MasterHex.NONE)
+                if (show[i][j])
                 {
-                    switch (k)
+                    for (int k = 0; k < 6; k++)
                     {
-                        case 0:
-                            h[i][j - 1].setEntranceType(3, gateType);
-                            break;
-                        case 1:
-                            h[i + 1][j].setEntranceType(4, gateType);
-                            break;
-                        case 2:
-                            h[i + 1][j].setEntranceType(5, gateType);
-                            break;
-                        case 3:
-                            h[i][j + 1].setEntranceType(0, gateType);
-                            break;
-                        case 4:
-                            h[i - 1][j].setEntranceType(1, gateType);
-                            break;
-                        case 5:
-                            h[i - 1][j].setEntranceType(2, gateType);
-                        break;
+                        int gateType = h[i][j].getExitType(k);
+                        if (gateType != MasterHex.NONE)
+                        {
+                            switch (k)
+                            {
+                                case 0:
+                                    h[i][j - 1].setEntranceType(3, gateType);
+                                    break;
+                                case 1:
+                                    h[i + 1][j].setEntranceType(4, gateType);
+                                    break;
+                                case 2:
+                                    h[i + 1][j].setEntranceType(5, gateType);
+                                    break;
+                                case 3:
+                                    h[i][j + 1].setEntranceType(0, gateType);
+                                    break;
+                                case 4:
+                                    h[i - 1][j].setEntranceType(1, gateType);
+                                    break;
+                                case 5:
+                                    h[i - 1][j].setEntranceType(2, gateType);
+                                break;
+                            }
+                        }
                     }
                 }
             }
         }
 
         // Add references to neighbor hexes.
-        it = hexes.iterator();
-        while (it.hasNext())
+        for (int i = 0; i < h.length; i++)
         {
-            MasterHex hex = (MasterHex)it.next();
-            int i = hex.getXCoord();
-            int j = hex.getYCoord();
+            for (int j = 0; j < plain[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    MasterHex hex = h[i][j];
 
-            if (hex.getExitType(0) != MasterHex.NONE ||
-                hex.getEntranceType(0) != MasterHex.NONE)
-            {
-                hex.setNeighbor(0, h[i][j - 1]);
-            }
-            if (hex.getExitType(1) != MasterHex.NONE ||
-                hex.getEntranceType(1) != MasterHex.NONE)
-            {
-                hex.setNeighbor(1, h[i + 1][j]);
-            }
-            if (hex.getExitType(2) != MasterHex.NONE ||
-                hex.getEntranceType(2) != MasterHex.NONE)
-            {
-                hex.setNeighbor(2, h[i + 1][j]);
-            }
-            if (hex.getExitType(3) != MasterHex.NONE ||
-                hex.getEntranceType(3) != MasterHex.NONE)
-            {
-                hex.setNeighbor(3, h[i][j + 1]);
-            }
-            if (hex.getExitType(4) != MasterHex.NONE ||
-                hex.getEntranceType(4) != MasterHex.NONE)
-            {
-                hex.setNeighbor(4, h[i - 1][j]);
-            }
-            if (hex.getExitType(5) != MasterHex.NONE ||
-                hex.getEntranceType(5) != MasterHex.NONE)
-            {
-                hex.setNeighbor(5, h[i - 1][j]);
+                    if (hex.getExitType(0) != MasterHex.NONE ||
+                        hex.getEntranceType(0) != MasterHex.NONE)
+                    {
+                        hex.setNeighbor(0, h[i][j - 1]);
+                    }
+                    if (hex.getExitType(1) != MasterHex.NONE ||
+                        hex.getEntranceType(1) != MasterHex.NONE)
+                    {
+                        hex.setNeighbor(1, h[i + 1][j]);
+                    }
+                    if (hex.getExitType(2) != MasterHex.NONE ||
+                        hex.getEntranceType(2) != MasterHex.NONE)
+                    {
+                        hex.setNeighbor(2, h[i + 1][j]);
+                    }
+                    if (hex.getExitType(3) != MasterHex.NONE ||
+                        hex.getEntranceType(3) != MasterHex.NONE)
+                    {
+                        hex.setNeighbor(3, h[i][j + 1]);
+                    }
+                    if (hex.getExitType(4) != MasterHex.NONE ||
+                        hex.getEntranceType(4) != MasterHex.NONE)
+                    {
+                        hex.setNeighbor(4, h[i - 1][j]);
+                    }
+                    if (hex.getExitType(5) != MasterHex.NONE ||
+                        hex.getEntranceType(5) != MasterHex.NONE)
+                    {
+                        hex.setNeighbor(5, h[i - 1][j]);
+                    }
+                }
             }
         }
     }
@@ -1323,8 +1355,13 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public void setupSplitMenu()
     {
-        masterFrame.setTitle(game.getActivePlayer().getName() + " Turn " +
-                game.getTurnNumber() + " : Split stacks");
+        unselectAllHexes();
+        requestFocus();
+
+        Player player = game.getActivePlayer();
+
+        masterFrame.setTitle(player.getName() + " Turn " +
+            game.getTurnNumber() + " : Split stacks");
 
         phaseMenu.removeAll();
 
@@ -1346,11 +1383,16 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         mi = phaseMenu.add(withdrawFromGameAction);
         mi.setMnemonic(KeyEvent.VK_W);
+
+        highlightTallLegions(player);
     }
 
 
     public void setupMoveMenu()
     {
+        unselectAllHexes();
+        requestFocus();
+
         Player player = game.getActivePlayer();
         masterFrame.setTitle(player.getName() + " Turn " +
             game.getTurnNumber() + " : Movement Roll: " +
@@ -1372,7 +1414,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
-        if (game.getActivePlayer().getMulligansLeft() > 0)
+        if (player.getMulligansLeft() > 0)
         {
             phaseMenu.addSeparator();
             mi = phaseMenu.add(takeMulliganAction);
@@ -1384,11 +1426,16 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         mi = phaseMenu.add(withdrawFromGameAction);
         mi.setMnemonic(KeyEvent.VK_W);
+
+        highlightUnmovedLegions();
     }
 
 
     public void setupFightMenu()
     {
+        unselectAllHexes();
+        requestFocus();
+
         masterFrame.setTitle(game.getActivePlayer().getName() + " Turn " +
             game.getTurnNumber() + " : Resolve Engagements ");
 
@@ -1404,11 +1451,16 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         mi = phaseMenu.add(withdrawFromGameAction);
         mi.setMnemonic(KeyEvent.VK_W);
+
+        highlightEngagements();
     }
 
 
     public void setupMusterMenu()
     {
+        unselectAllHexes();
+        requestFocus();
+
         masterFrame.setTitle(game.getActivePlayer().getName() + " Turn " +
             game.getTurnNumber() + " : Muster Recruits ");
 
@@ -1432,6 +1484,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         mi = phaseMenu.add(withdrawFromGameAction);
         mi.setMnemonic(KeyEvent.VK_W);
+
+        highlightPossibleRecruits();
     }
 
 
@@ -1444,23 +1498,24 @@ public final class MasterBoard extends JPanel implements MouseListener,
     /** Create markers for all existing legions. */
     public void loadInitialMarkerImages()
     {
-        Iterator it = game.getAllLegions().iterator();
+        int chitScale = 3 * Scale.get();
+        Iterator it = game.getAllLegionIds().iterator();
         while (it.hasNext())
         {
-            Legion legion = (Legion)it.next();
-            int chitScale = 3 * Scale.get();
-            Marker marker = new Marker(chitScale, legion.getImageName(),
-                this, game);
-            legion.setMarker(marker);
+            String markerId = (String)it.next();
+            client.addMarker(markerId);
+            Legion legion = game.getLegionByMarkerId(markerId);
             String hexLabel = legion.getCurrentHexLabel();
             alignLegions(hexLabel);
         }
+        masterFrame.setVisible(true);
+        repaint();
     }
 
 
     public void alignLegions(String hexLabel)
     {
-        MasterHex hex = getHexByLabel(hexLabel);
+        GUIMasterHex hex = getGUIHexByLabel(hexLabel);
         ArrayList markerIds = game.getLegionMarkerIds(hexLabel);
         Player player = game.getActivePlayer();
         if (player == null)
@@ -1479,8 +1534,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         }
 
         String markerId = (String)markerIds.get(0);
-        Legion legion = game.getLegionByMarkerId(markerId);
-        Marker marker = legion.getMarker();
+        Marker marker = client.getMarker(markerId);
         if (marker == null)
         {
             hex.repaint();
@@ -1511,8 +1565,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             point.x -= chitScale4;
             point.y -= chitScale4;
             markerId = (String)markerIds.get(1);
-            legion = game.getLegionByMarkerId(markerId);
-            marker = legion.getMarker();
+            marker = client.getMarker(markerId);
             if (marker != null)
             {
                 // Second marker can be null when loading during
@@ -1532,20 +1585,145 @@ public final class MasterBoard extends JPanel implements MouseListener,
             point.x -= chitScale4;
             point.y -= chitScale4;
             markerId = (String)markerIds.get(1);
-            legion = game.getLegionByMarkerId(markerId);
-            marker = legion.getMarker();
+            marker = client.getMarker(markerId);
             marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale4;
             point.y -= chitScale;
             markerId = (String)markerIds.get(2);
-            legion = game.getLegionByMarkerId(markerId);
-            marker = legion.getMarker();
+            marker = client.getMarker(markerId);
             marker.setLocation(point);
         }
 
         hex.repaint();
+    }
+
+    public void alignLegions(Set hexLabels)
+    {
+        Iterator it = hexLabels.iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            alignLegions(hexLabel);
+        }
+    }
+
+    /** This is incredibly inefficient. */
+    public void alignAllLegions()
+    {
+        Iterator it = plainHexes.iterator();
+        while (it.hasNext())
+        {
+            MasterHex hex = (MasterHex)it.next();
+            alignLegions(hex.getLabel());
+        }
+    }
+
+
+    public void highlightTallLegions(Player player)
+    {
+        HashSet set = new HashSet();
+
+        Iterator it = player.getLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (legion.getHeight() >= 7)
+            {
+                MasterHex hex = legion.getCurrentHex();
+                set.add(hex.getLabel());
+            }
+        }
+        selectHexesByLabels(set);
+    }
+
+    public void highlightUnmovedLegions()
+    {
+        unselectAllHexes();
+        Player player = game.getActivePlayer();
+        HashSet set = new HashSet();
+        Iterator it = player.getLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (!legion.hasMoved())
+            {
+                set.add(legion.getCurrentHexLabel());
+            }
+        }
+        selectHexesByLabels(set);
+        repaint();
+    }
+
+
+    /** Select hexes where this legion can move. Return total number of
+     *  legal moves. */
+    public int highlightMoves(Legion legion)
+    {
+        Set set = game.listMoves(legion, true, true, false);
+        unselectAllHexes();
+        selectHexesByLabels(set);
+        return set.size();
+    }
+
+
+    /** Return number of engagements found. */
+    public int highlightEngagements()
+    {
+        Set set = game.findEngagements();
+        unselectAllHexes();
+        selectHexesByLabels(set);
+
+        // XXX Not the best place to call the AI.
+        Player player = game.getActivePlayer();
+        String engagementHexLabel = player.aiPickEngagement();
+        if (engagementHexLabel != null)
+        {
+            client.engage(engagementHexLabel);
+        }
+
+        return set.size();
+    }
+
+
+
+    /** Return number of legions with summonable angels. */
+    public int highlightSummonableAngels(Legion legion)
+    {
+        Set set = game.findSummonableAngels(legion);
+        unselectAllHexes();
+        selectHexesByLabels(set);
+        return set.size();
+    }
+
+
+    public void highlightPossibleRecruits()
+    {
+        int count = 0;
+        Player player = game.getActivePlayer();
+
+        HashSet set = new HashSet();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.getLegion(i);
+            if (legion.hasMoved() && legion.canRecruit())
+            {
+                ArrayList recruits = game.findEligibleRecruits(legion);
+                if (!recruits.isEmpty())
+                {
+                    MasterHex hex = getHexByLabel(legion.getCurrentHexLabel());
+                    set.add(hex.getLabel());
+                    count++;
+                }
+            }
+        }
+
+        if (count > 0)
+        {
+            selectHexesByLabels(set);
+        }
     }
 
 
@@ -1568,9 +1746,9 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null if none is found. */
-    public MasterHex getHexByLabel(String label)
+    public static MasterHex getHexByLabel(String label)
     {
-        Iterator it = hexes.iterator();
+        Iterator it = plainHexes.iterator();
         while (it.hasNext())
         {
             MasterHex hex = (MasterHex)it.next();
@@ -1579,18 +1757,33 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 return hex;
             }
         }
-
         Log.error("Could not find hex " + label);
         return null;
     }
 
+    /** Do a brute-force search through the hex array, looking for
+     *  a match.  Return the hex, or null if none is found. */
+    public GUIMasterHex getGUIHexByLabel(String label)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            GUIMasterHex hex = (GUIMasterHex)it.next();
+            if (hex.getLabel().equals(label))
+            {
+                return hex;
+            }
+        }
+        Log.error("Could not find hex " + label);
+        return null;
+    }
 
     /** Do a brute-force search through the hex array, looking for
      *  a hex with the proper terrain type.  Return the hex, or null
-     * if none is found. */
-    public MasterHex getAnyHexWithTerrain(char terrain)
+     *  if none is found. */
+    public static MasterHex getAnyHexWithTerrain(char terrain)
     {
-        Iterator it = hexes.iterator();
+        Iterator it = plainHexes.iterator();
         while (it.hasNext())
         {
             MasterHex hex = (MasterHex)it.next();
@@ -1604,16 +1797,35 @@ public final class MasterBoard extends JPanel implements MouseListener,
         return null;
     }
 
+    /** Do a brute-force search through the hex array, looking for
+     *  a hex with the proper terrain type.  Return the hex, or null
+     *  if none is found. */
+    public GUIMasterHex getAnyGUIHexWithTerrain(char terrain)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            GUIMasterHex hex = (GUIMasterHex)it.next();
+            if (hex.getTerrain() == terrain)
+            {
+                return hex;
+            }
+        }
+
+        Log.error("Could not find hex with terrain " + terrain);
+        return null;
+    }
+
 
     /** Return the MasterHex that contains the given point, or
      *  null if none does. */
-    private MasterHex getHexContainingPoint(Point point)
+    private GUIMasterHex getHexContainingPoint(Point point)
     {
         // XXX This is completely inefficient.
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            MasterHex hex = (MasterHex)it.next();
+            GUIMasterHex hex = (GUIMasterHex)it.next();
             if (hex.contains(point))
             {
                 return hex;
@@ -1627,7 +1839,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
      *  null if none does. */
     private Marker getMarkerAtPoint(Point point)
     {
-        java.util.List markers = Client.getMarkers();
+        java.util.List markers = client.getMarkers();
         ListIterator lit = markers.listIterator(markers.size());
         while (lit.hasPrevious())
         {
@@ -1646,7 +1858,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            MasterHex hex = (MasterHex)it.next();
+            GUIMasterHex hex = (GUIMasterHex)it.next();
             if (hex.isSelected())
             {
                 hex.unselect();
@@ -1660,7 +1872,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            MasterHex hex = (MasterHex)it.next();
+            GUIMasterHex hex = (GUIMasterHex)it.next();
             if (hex.isSelected() && label.equals(hex.getLabel()))
             {
                 hex.unselect();
@@ -1675,7 +1887,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            MasterHex hex = (MasterHex)it.next();
+            GUIMasterHex hex = (GUIMasterHex)it.next();
             if (hex.isSelected() && labels.contains(hex.getLabel()))
             {
                 hex.unselect();
@@ -1689,7 +1901,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            MasterHex hex = (MasterHex)it.next();
+            GUIMasterHex hex = (GUIMasterHex)it.next();
             if (!hex.isSelected() && label.equals(hex.getLabel()))
             {
                 hex.select();
@@ -1704,12 +1916,44 @@ public final class MasterBoard extends JPanel implements MouseListener,
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            MasterHex hex = (MasterHex)it.next();
+            GUIMasterHex hex = (GUIMasterHex)it.next();
             if (!hex.isSelected() && labels.contains(hex.getLabel()))
             {
                 hex.select();
                 hex.repaint();
             }
+        }
+    }
+
+
+    public void actOnMisclick()
+    {
+        switch (game.getPhase())
+        {
+            case Game.MOVE:
+                client.setMoverId(null);
+                highlightUnmovedLegions();
+                break;
+
+            case Game.FIGHT:
+                SummonAngel summonAngel = client.getSummonAngel();
+                if (summonAngel != null)
+                {
+                    highlightSummonableAngels(summonAngel.getLegion());
+                    summonAngel.repaint();
+                }
+                else
+                {
+                    highlightEngagements();
+                }
+                break;
+
+            case Game.MUSTER:
+                highlightPossibleRecruits();
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -1739,7 +1983,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             Player player = legion.getPlayer();
 
             // Move the clicked-on marker to the top of the z-order.
-            Client.setMarker(markerId, marker);
+            client.setMarker(markerId, marker);
 
             // What to do depends on which mouse button was used
             // and the current phase of the turn.
@@ -1761,7 +2005,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 // Only the current player can manipulate his legions.
                 if (player == game.getActivePlayer())
                 {
-                    game.actOnLegion(legion);
+                    actOnLegion(legion);
                     return;
                 }
             }
@@ -1769,7 +2013,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         // No hits on chits, so check map.
 
-        MasterHex hex = getHexContainingPoint(point);
+        GUIMasterHex hex = getHexContainingPoint(point);
         if (hex != null)
         {
             if (isPopupButton(e))
@@ -1782,14 +2026,80 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
 
             // Otherwise, the action to take depends on the phase.
-            game.actOnHex(hex.getLabel());
+            actOnHex(hex.getLabel());
             hex.repaint();
             return;
         }
 
         // No hits on chits or map, so re-highlight.
-        game.actOnMisclick();
+        actOnMisclick();
     }
+
+
+    private void actOnLegion(Legion legion)
+    {
+        switch (game.getPhase())
+        {
+            case Game.SPLIT:
+                game.doSplit(legion, legion.getPlayer());
+                break;
+
+            case Game.MOVE:
+                client.setMoverId(legion.getMarkerId());
+                getGUIHexByLabel(legion.getCurrentHexLabel()).repaint();
+                highlightMoves(legion);
+                break;
+
+            case Game.FIGHT:
+                client.doFight(legion.getCurrentHexLabel());
+                break;
+
+            case Game.MUSTER:
+                game.doMuster(legion);
+                break;
+        }
+    }
+
+    private void actOnHex(String hexLabel)
+    {
+        Player player = game.getActivePlayer();
+
+        switch (game.getPhase())
+        {
+            // If we're moving, and have selected a legion which
+            // has not yet moved, and this hex is a legal
+            // destination, move the legion here.
+            case Game.MOVE:
+                String moverId = client.getMoverId();
+                if (game.doMove(moverId, hexLabel))
+                {
+                    Legion mover = game.getLegionByMarkerId(moverId);
+                    getGUIHexByLabel(hexLabel).repaint();
+                    getGUIHexByLabel(mover.getStartingHexLabel()).repaint();
+                    highlightUnmovedLegions();
+                }
+                else
+                {
+                    actOnMisclick();
+                }
+                break;
+
+            // If we're fighting and there is an engagement here,
+            // resolve it.  If an angel is being summoned, mark
+            // the donor legion instead.
+            case Game.FIGHT:
+                client.engage(hexLabel);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
+
+
+
 
     public void mouseReleased(MouseEvent e)
     {
@@ -1860,7 +2170,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            MasterHex hex = (MasterHex)it.next();
+            GUIMasterHex hex = (GUIMasterHex)it.next();
             if (rectClip.intersects(hex.getBounds()))
             {
                 hex.paint(g);
@@ -1868,7 +2178,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         }
 
         // Paint markers in z-order.
-        it = Client.getMarkers().iterator();
+        it = client.getMarkers().iterator();
         while (it.hasNext())
         {
             Marker marker = (Marker)it.next();
@@ -1877,8 +2187,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 marker.paintComponent(g);
             }
         }
-
-        // XXX Do we need to paint the active player's markers last?
     }
 
 
@@ -1895,8 +2203,18 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public void rescale()
     {
-        setupHexes();
+        setupHexesGUI();
         loadInitialMarkerImages();
+    }
+
+
+    public void deiconify()
+    {
+        if (masterFrame.getState() == JFrame.ICONIFIED)
+        {
+            masterFrame.setState(JFrame.NORMAL);
+        }
+        masterFrame.show();
     }
 
 

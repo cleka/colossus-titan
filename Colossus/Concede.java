@@ -46,8 +46,7 @@ public final class Concede extends JDialog implements ActionListener
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         int scale = 4 * Scale.get();
 
-        Game game = ally.getGame();
-        allyMarker = new Marker(scale, ally.getImageName(), this, game);
+        allyMarker = new Marker(scale, ally.getImageName(), this, ally);
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         gridbag.setConstraints(allyMarker, constraints);
@@ -65,7 +64,7 @@ public final class Concede extends JDialog implements ActionListener
             contentPane.add(chit);
         }
 
-        enemyMarker = new Marker(scale, enemy.getImageName(), this, game);
+        enemyMarker = new Marker(scale, enemy.getImageName(), this, enemy);
         constraints.gridy = 1;
         constraints.gridwidth = 1;
         gridbag.setConstraints(enemyMarker, constraints);
@@ -193,11 +192,12 @@ public final class Concede extends JDialog implements ActionListener
         frame.setVisible(true);
 
         Game game = new Game();
+        game.addPlayer("Attacker");
         game.initBoard();
-        MasterBoard board = new MasterBoard();
+        Client client = game.getServer().getClient(0);
+        MasterBoard board = client.getBoard();
         MasterHex hex = board.getHexByLabel("130");
 
-        game.addPlayer("Attacker");
         Player player = game.getPlayer(0);
         player.setScore(1400);
         player.setTower(1);
@@ -209,8 +209,7 @@ public final class Concede extends JDialog implements ActionListener
             Creature.serpent, Creature.archangel, Creature.hydra,
             Creature.giant, Creature.dragon, null, player.getName(), game);
         player.addLegion(attacker);
-        Marker marker = new Marker(scale, selectedMarkerId, frame, game);
-        attacker.setMarker(marker);
+        client.addMarker(selectedMarkerId);
 
         game.addPlayer("Defender");
         player = game.getPlayer(1);
@@ -223,8 +222,7 @@ public final class Concede extends JDialog implements ActionListener
             Creature.gargoyle, null, null, null, null, null,
             player.getName(), game);
         player.addLegion(defender);
-        Marker marker2 = new Marker(scale, selectedMarkerId, frame, game);
-        defender.setMarker(marker2);
+        client.addMarker(selectedMarkerId);
 
         boolean answer = Concede.flee(frame, defender, attacker);
         System.out.println("Flee? " + answer);

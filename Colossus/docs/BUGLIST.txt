@@ -76,6 +76,3 @@ Win98, 1.4b: Attacking AI creatures aren't aggressive enough near the end
    of battles, which causes time losses. 
 
 Win98, 1.4b: Chits are placed slightly off-center in battle hexes.
-
-MovementDie and BattleDice are not working because player/game options
-   are not yet being copied to Client.

@@ -63,7 +63,7 @@ public final class Battle
         this.activeLegionNum = activeLegionNum;
         this.turnNumber = turnNumber;
         this.phase = phase;
-        map = new BattleMap(game.getBoard(), masterHexLabel, this);
+        map = new BattleMap(masterHexLabel, this);
         Client.setMap(map);
         map.getFrame().toFront();
         map.requestFocus();
@@ -247,8 +247,7 @@ public final class Battle
 
     public MasterHex getMasterHex()
     {
-        MasterBoard board = game.getBoard();
-        return board.getHexByLabel(masterHexLabel);
+        return MasterBoard.getHexByLabel(masterHexLabel);
     }
 
 
@@ -398,25 +397,20 @@ public final class Battle
     private boolean setupSummon()
     {
         map.setupSummonMenu();
+        boolean advance = true;
         if (summonState == Battle.FIRST_BLOOD)
         {
-            if (getAttacker().canSummonAngel() && game != null)
+            if (game != null && getAttacker().canSummonAngel())
             {
-Log.debug("called game.createSummonAngel from Battle");
                 game.createSummonAngel(getAttacker());
+                advance = false;
             }
+
             // This is the last chance to summon an angel until the
             // battle is over.
             summonState = Battle.TOO_LATE;
         }
-        if (game == null || game.getSummonAngel() == null)
-        {
-            if (phase == SUMMON)
-            {
-                return true;
-            }
-        }
-        return false;
+        return advance;
     }
 
 
@@ -536,7 +530,7 @@ Log.debug("called game.createSummonAngel from Battle");
             }
             if (recruit != null && game != null)
             {
-                game.doRecruit(recruit, defender, map.getFrame());
+                game.doRecruit(recruit, defender);
             }
 
             if (defender.hasRecruited())
@@ -949,7 +943,8 @@ Log.debug("called game.createSummonAngel from Battle");
                             Player player = legion.getPlayer();
                             donor = player.getDonor();
                             donor.addCreature(critter, false);
-                            donor.getCurrentHex().repaint();
+                            game.getServer().allRepaintHex(
+                                donor.getCurrentHexLabel());
                             // This summon doesn't count; the player can
                             // summon again later this turn.
                             player.setSummoned(false);
@@ -2181,8 +2176,7 @@ Log.debug("defender eliminated");
         game.addPlayer("Defender");
         Player player2 = game.getPlayer(1);
         game.initBoard();
-        MasterBoard board = game.getBoard();
-        MasterHex hex = board.getHexByLabel("130");
+        MasterHex hex = MasterBoard.getHexByLabel("130");
         Legion attacker = new Legion("Bk01", null, hex.getLabel(),
             hex.getLabel(), Creature.archangel, Creature.troll,
             Creature.ranger, Creature.hydra, Creature.griffon,

@@ -70,13 +70,12 @@ Log.debug("Setting for whatever color is left");
 
                 if (recruit != null)
                 {
-                    game.doRecruit(recruit, legion,
-                        game.getBoard().getFrame());
+                    game.doRecruit(recruit, legion);
                 }
             }
         }
 
-        game.getBoard().unselectAllHexes();
+        game.getServer().allUnselectAllHexes();
         game.getServer().allUpdateStatusScreen();
     }
 
@@ -90,7 +89,7 @@ Log.debug("Setting for whatever color is left");
     private static Creature chooseRecruit(Game game, Legion legion,
         MasterHex hex)
     {
-        List recruits = game.findEligibleRecruits(legion, hex);
+        List recruits = game.findEligibleRecruits(legion, hex.getLabel());
 
         if (recruits.size() == 0)
         {
@@ -235,8 +234,7 @@ Log.debug("Setting for whatever color is left");
                     while (moveIt.hasNext())
                     {
                         String hexLabel = (String)moveIt.next();
-                        MasterHex hex = game.getBoard().getHexByLabel(
-                            hexLabel);
+                        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
 
                         if (game.getNumEnemyLegions(hexLabel, player) == 0)
                         {
@@ -320,8 +318,7 @@ Log.debug("Setting for whatever color is left");
         Critter weakest = legion.getCritter(legion.getHeight() - 1);
 
         // Consider recruiting.
-        ArrayList recruits = game.findEligibleRecruits(legion,
-            game.getBoard().getHexByLabel(hexLabel));
+        ArrayList recruits = game.findEligibleRecruits(legion, hexLabel);
         if (!recruits.isEmpty())
         {
             Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
@@ -645,7 +642,7 @@ Log.debug("Setting for whatever color is left");
                 Map.Entry entry = (Map.Entry)it.next();
                 Legion legion = (Legion)entry.getKey();
                 MasterHex hex = (MasterHex)entry.getValue();
-                game.doMove(legion, hex.getLabel());
+                game.doMove(legion.getMarkerId(), hex.getLabel());
             }
         }
     }
@@ -714,7 +711,7 @@ Log.debug("Setting for whatever color is left");
             player.takeMulligan();
             player.rollMovement();
             // Necessary to update the movement roll in the title bar.
-            game.getBoard().setupMoveMenu();
+            game.getServer().allSetupMoveMenu();
         }
     }
 
@@ -757,8 +754,7 @@ Log.debug("Setting for whatever color is left");
                     moveIterator.hasNext();)
                 {
                     final String hexLabel = (String)moveIterator.next();
-                    final MasterHex hex = game.getBoard().getHexByLabel(
-                        hexLabel);
+                    final MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
                     final int value = evaluateMove(game, legion, hex, true,
                         enemyAttackMap);
 
@@ -775,7 +771,7 @@ Log.debug("Setting for whatever color is left");
                 // if we found a move that's better than sitting still, move
                 if (bestValue > sitStillMove.value)
                 {
-                    if (game.doMove(legion, bestHex.getLabel()))
+                    if (game.doMove(legion.getMarkerId(), bestHex.getLabel()))
                     {
                         moved = true;
                         // Break out of the move loop and start over with
@@ -849,7 +845,8 @@ Log.debug("Setting for whatever color is left");
                             + " to " + move.hex + " taking penalty "
                             + move.difference
                             + " in order to handle illegal legion " + legion);
-                    game.doMove(move.legion, move.hex.getLabel());
+                    game.doMove(move.legion.getMarkerId(),
+                        move.hex.getLabel());
 
                     // check again if this legion is ok; if so, break
                     friendlyLegions = game.getFriendlyLegions(hexLabel,
@@ -919,7 +916,7 @@ Log.debug("Setting for whatever color is left");
             Log.debug("forced to move " + move.legion + " to " + move.hex
                     + " taking penalty " + move.difference
                     + " in order to handle illegal legion " + move.legion);
-            game.doMove(move.legion, move.hex.getLabel());
+            game.doMove(move.legion.getMarkerId(), move.hex.getLabel());
         }
     }
 
@@ -1253,7 +1250,7 @@ Log.debug("Setting for whatever color is left");
                  nextMoveIt.hasNext(); )
             {
                 String nextLabel = (String)nextMoveIt.next();
-                MasterHex nextHex = game.getBoard().getHexByLabel(nextLabel);
+                MasterHex nextHex = MasterBoard.getHexByLabel(nextLabel);
                 // if we have to fight in that hex and we can't
                 // WIN_WITH_MINIMAL_LOSSES, then assume we can't
                 // recruit there.  IDEA: instead of doing any of this
@@ -1272,7 +1269,8 @@ Log.debug("Setting for whatever color is left");
                     continue;
                 }
 
-                List nextRecruits = game.findEligibleRecruits(legion, nextHex);
+                List nextRecruits = game.findEligibleRecruits(legion,
+                    nextLabel);
 
                 if (nextRecruits.size() == 0)
                 {
@@ -1643,7 +1641,7 @@ Log.debug("Setting for whatever color is left");
         Player player = game.getActivePlayer();
         Legion attacker = game.getFirstFriendlyLegion(hexLabel, player);
         Legion defender = game.getFirstEnemyLegion(hexLabel, player);
-        MasterHex hex = game.getBoard().getHexByLabel(hexLabel);
+        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         int value = 0;
 
         final int result = estimateBattleResults(attacker, defender, hex);
@@ -2264,7 +2262,7 @@ Log.debug("Setting for whatever color is left");
                 while (it2.hasNext())
                 {
                     String hexLabel = (String)it2.next();
-                    MasterHex hex = game.getBoard().getHexByLabel(hexLabel);
+                    MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
                     HashMap moves = new HashMap();
                     moves.put(legion, hex);
                     PlayerMove move = new PlayerMove(moves, this);
@@ -2315,7 +2313,7 @@ Log.debug("Setting for whatever color is left");
                     MasterHex hex = (MasterHex)entry.getValue();
 
                     Log.debug("applymove: try " + legion + " to " + hex);
-                    game.doMove(legion, hex.getLabel());
+                    game.doMove(legion.getMarkerId(), hex.getLabel());
                 }
 
                 // advance phases until we reach the next move phase

@@ -15,7 +15,6 @@ public final class SummonAngel extends JDialog implements MouseListener,
     private Player player;
     private Legion legion;
     private MasterBoard board;
-    private Game game;
     private Chit angelChit;
     private Chit archangelChit;
     private GridBagLayout gridbag = new GridBagLayout();
@@ -23,17 +22,18 @@ public final class SummonAngel extends JDialog implements MouseListener,
     private JButton button1;
     private JButton button2;
     private static boolean active;
+    private Client client;
 
 
-    private SummonAngel(Game game, Legion legion)
+    private SummonAngel(Client client, Legion legion)
     {
-        super(game.getBoard().getFrame(), legion.getPlayerName() +
+        super(client.getBoard().getFrame(), legion.getPlayerName() +
             ": Summon Angel into Legion " + legion.getLongMarkerName(), false);
 
-        this.game = game;
         this.legion = legion;
         player = legion.getPlayer();
-        this.board = game.getBoard();
+        this.client = client;
+        this.board = client.getBoard();
 
         // Paranoia
         if (!legion.canSummonAngel())
@@ -44,7 +44,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
         // Count and highlight legions with summonable angels, and put
         // board into a state where those legions can be selected.
-        if (game.highlightSummonableAngels(legion) < 1)
+        if (board.highlightSummonableAngels(legion) < 1)
         {
             cleanup(null, null);
             return;
@@ -103,12 +103,12 @@ public final class SummonAngel extends JDialog implements MouseListener,
         repaint();
     }
 
-    public static SummonAngel summonAngel(Game game, Legion legion)
+    public static SummonAngel summonAngel(Client client, Legion legion)
     {
         if (!active)
         {
             active = true;
-            return new SummonAngel(game, legion);
+            return new SummonAngel(client, legion);
         }
         return null;
     }
@@ -121,7 +121,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
     private void cleanup(Legion donor, Creature angel)
     {
-        game.doSummon(legion, donor, angel);
+        client.doSummon(legion, donor, angel);
         dispose();
         active = false;
     }

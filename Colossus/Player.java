@@ -584,35 +584,13 @@ public final class Player implements Comparable
     }
 
 
-    public void highlightTallLegions()
-    {
-        HashSet set = new HashSet();
-
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            if (legion.getHeight() >= 7)
-            {
-                MasterHex hex = legion.getCurrentHex();
-                set.add(hex.getLabel());
-            }
-        }
-
-        game.getBoard().selectHexesByLabels(set);
-    }
-
-
     public void undoLastSplit()
     {
         if (!Client.isUndoStackEmpty())
         {
             String splitoffId = (String)Client.popUndoStack();
             Legion splitoff = getLegionByMarkerId(splitoffId);
-            String hexLabel = splitoff.getCurrentHexLabel();
             splitoff.recombine(splitoff.getParent(), true);
-            game.getBoard().alignLegions(hexLabel);
-            highlightTallLegions();
         }
     }
 
@@ -629,11 +607,8 @@ public final class Player implements Comparable
             {
                 legion.recombine(parent, false);
                 it.remove();
-                game.getBoard().alignLegions(parent.getCurrentHexLabel());
             }
         }
-
-        highlightTallLegions();
     }
 
 
@@ -655,11 +630,7 @@ public final class Player implements Comparable
     public void addLegion(Legion legion)
     {
         legions.add(legion);
-        MasterBoard board = game.getBoard();
-        if (board != null)
-        {
-            board.alignLegions(legion.getCurrentHexLabel());
-        }
+        game.getServer().allAlignLegions(legion.getCurrentHexLabel());
     }
 
 
@@ -795,15 +766,8 @@ public final class Player implements Comparable
             slayer.addLegionMarkers(this);
         }
 
+        game.getServer().allAlignLegions(hexLabelsToAlign);
         game.getServer().allUpdateStatusScreen();
-
-        MasterBoard board = game.getBoard();
-        it = hexLabelsToAlign.iterator();
-        while (it.hasNext())
-        {
-            String hexLabel = (String)it.next();
-            board.alignLegions(hexLabel);
-        }
 
         Log.event(getName() + " dies");
 
@@ -836,7 +800,8 @@ public final class Player implements Comparable
         }
         else
         {
-            markerId = PickMarker.pickMarker(game.getBoard().getFrame(), name,
+            markerId = PickMarker.pickMarker(game.getServer().
+                getClient(name).getBoard().getFrame(), name,
                 getMarkersAvailable());
         }
         return markerId;

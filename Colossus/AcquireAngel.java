@@ -154,7 +154,7 @@ public final class AcquireAngel extends JDialog implements MouseListener,
         frame.pack();
         frame.setVisible(true);
 
-        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        MasterHex hex = new MasterHex();
         hex.setTerrain('B');
         hex.setLabel(130);
 
