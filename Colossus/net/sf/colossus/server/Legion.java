@@ -824,9 +824,6 @@ public final class Legion implements Comparable
             legion.addCreature(critter.getCreature(), false);
         }
 
-        // Let the clients know that the legions have recombined.
-        game.getServer().undidSplit(getMarkerId(), legion.getMarkerId());
-
         if (remove)
         {
             remove(false);
@@ -840,6 +837,10 @@ public final class Legion implements Comparable
                 " recombined into legion " + legion.getLongMarkerName());
 
         sortCritters();
+
+        // Let the clients know that the legions have recombined.
+        game.getServer().undidSplit(getMarkerId(), legion.getMarkerId(),
+                true, game.getTurnNumber());
     }
 
     /**

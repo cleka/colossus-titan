@@ -1134,11 +1134,6 @@ public final class Server implements IServer
         }
     }
 
-    void undidSplit(String splitoffId, String survivorId)
-    {
-        undidSplit(splitoffId, survivorId, true, game.getTurnNumber());
-    }
-
     public void undoMove(String markerId)
     {
         if (!isActivePlayer())

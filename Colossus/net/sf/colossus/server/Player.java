@@ -556,7 +556,6 @@ public final class Player implements Comparable
         Legion parent = splitoff.getParent();
         splitoff.recombine(parent, true);
         game.getServer().allUpdatePlayerInfo();
-        game.getServer().undidSplit(splitoffId, parent.getMarkerId());
     }
 
     synchronized void recombineIllegalSplits()
@@ -571,8 +570,6 @@ public final class Player implements Comparable
                     legion.getCurrentHexLabel(), this);
             if (legion != parent)
             {
-                game.getServer().undidSplit(legion.getMarkerId(),
-                        parent.getMarkerId());
                 legion.recombine(parent, false);
                 it.remove();
             }
