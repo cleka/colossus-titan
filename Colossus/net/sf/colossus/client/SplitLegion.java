@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-
+import net.sf.colossus.server.Game;
 
 /**
  * Class SplitLegion allows a player to split a Legion into two Legions.
@@ -187,7 +187,8 @@ final class SplitLegion extends JDialog implements MouseListener,
             {
                 Chit chit = (Chit)it.next();
                 String id = chit.getId();
-                if (id.startsWith("Titan") || id.equals("Angel"))
+                if (id.startsWith("Titan") ||
+                    id.equals(Game.getPrimaryAcquirable()))
                 {
                     numLords++;
                 }

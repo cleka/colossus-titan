@@ -4,12 +4,13 @@ package net.sf.colossus.client;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-
+import net.sf.colossus.server.Creature;
 
 /**
  * Allows a player to summon an angel or archangel.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 
@@ -17,8 +18,7 @@ final class SummonAngel extends JDialog implements MouseListener,
     ActionListener, WindowListener
 {
     private String markerId;
-    private Chit angelChit;
-    private Chit archangelChit;
+    private java.util.List sumChitList;
     private JButton cancelButton;
     private static boolean active;
     private Client client;
@@ -52,17 +52,22 @@ final class SummonAngel extends JDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
-        angelChit = new Chit(scale, "Angel", this);
-        contentPane.add(angelChit);
-        angelChit.addMouseListener(this);
+        java.util.List summonableList = Creature.getSummonablesCreatures();
+        java.util.Iterator it = summonableList.iterator();
+        sumChitList = new java.util.ArrayList();
+        while (it.hasNext())
+        {
+            Chit tempChit;
+            Creature c = (Creature)it.next();
+            tempChit = new Chit(scale, c.getName(), this);
+            contentPane.add(tempChit);
+            tempChit.addMouseListener(this);
+            
+            // X out chits since no legion is selected.
+            tempChit.setDead(true);
 
-        archangelChit = new Chit(scale, "Archangel", this);
-        contentPane.add(archangelChit);
-        archangelChit.addMouseListener(this);
-
-        // X out chits since no legion is selected.
-        angelChit.setDead(true);
-        archangelChit.setDead(true);
+            sumChitList.add(tempChit);
+        }
 
         cancelButton = new JButton("Cancel");
         cancelButton.setMnemonic(KeyEvent.VK_C);
@@ -112,13 +117,16 @@ final class SummonAngel extends JDialog implements MouseListener,
             return;
         }
         Object source = e.getSource();
-        if (angelChit == source && !angelChit.isDead())
+        java.util.Iterator it = sumChitList.iterator();
+        boolean done = false;
+        while (it.hasNext() && !done)
         {
-            cleanup(donorId, "Angel");
-        }
-        else if (archangelChit == source && !archangelChit.isDead())
-        {
-            cleanup(donorId, "Archangel");
+            Chit c = (Chit)it.next();
+            if ((source == c) && !(c.isDead()))
+            {
+                cleanup(donorId, c.getId());
+                done = true;
+            }
         }
     }
 
@@ -167,7 +175,6 @@ final class SummonAngel extends JDialog implements MouseListener,
     {
     }
 
-
     /** Upstate state of angel and archangel chits to reflect donor */
     void updateChits()
     {
@@ -176,11 +183,14 @@ final class SummonAngel extends JDialog implements MouseListener,
         {
             return;
         }
-
-        angelChit.setDead(!client.donorHasAngel());
-        archangelChit.setDead(!client.donorHasArchangel());
+        java.util.Iterator it = sumChitList.iterator();
+        boolean done = false;
+        while (it.hasNext())
+        {
+            Chit c = (Chit)it.next();
+            c.setDead(!client.donorHas(c.getId()));
+        }
     }
-
 
     public void actionPerformed(ActionEvent e)
     {

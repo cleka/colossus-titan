@@ -986,7 +986,7 @@ final class Battle
         if (critter.getCurrentHex().isEntrance() &&
             getTurnNumber() > 1)
         {
-            if (critter.isAngel())
+            if (critter.isSummonable())
             {
                 Player player = legion.getPlayer();
                 donor = player.getDonor();
@@ -1023,7 +1023,7 @@ final class Battle
         // If an angel or archangel was returned to its donor instead of 
         // the stack, then don't put it back on the stack.
         legion.prepareToRemoveCritter(critter, 
-            (donor == null || !critter.isAngel()));
+            (donor == null || !critter.isSummonable()));
 
         if (critter.isTitan())
         {

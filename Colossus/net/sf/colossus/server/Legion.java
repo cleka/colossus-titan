@@ -15,6 +15,7 @@ import net.sf.colossus.client.BattleMap;
  * stack marker.
  * @version $Id$
  * @author David Ripton
+ * @author Romain Dolbeau
  */
 
 final class Legion implements Comparable
@@ -33,7 +34,6 @@ final class Legion implements Comparable
     private static Map markerNames = new HashMap();
     private Game game;
     private int angelsToAcquire;
-    private boolean canAcquireArchangel;
 
     static
     {
@@ -214,7 +214,7 @@ final class Legion implements Comparable
         Legion oLegion = 
             new Legion(markerId, null, hexLabel, hexLabel,
                        Creature.getCreatureByName("Titan"),
-                       Creature.getCreatureByName("Angel"),
+                       Creature.getCreatureByName(Game.getPrimaryAcquirable()),
                        startCre[2],
                        startCre[2],
                        startCre[0],
@@ -280,32 +280,27 @@ final class Legion implements Comparable
             return;
         }
         Player player = getPlayer();
-        player.addPoints(points);
         int score = player.getScore();
+        player.addPoints(points);
+        int value = Game.getAcquirableRecruitmentsValue();
         int tmpScore = score;
-
-        // It's practically impossible to get more than one archangel
-        // from a single battle.
-        boolean didArchangel = false;
-
+        int tmpPoints = points;
+        
+        tmpScore = tmpScore - (tmpScore % value);
+        tmpPoints = tmpPoints - (tmpPoints % value);
+        
         List recruits;
-
-        while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
+        
+        while ((getHeight() < 7) && (tmpPoints >= value))
         {
-            angelsToAcquire++;
-            boolean archangel = !didArchangel && (tmpScore / 500 >
-                (score - points) / 500);
-            if (archangel)
+            tmpScore += value;
+            tmpPoints -= value;
+            recruits = game.findEligibleAngels(this, tmpScore);
+            if ((recruits != null) && (!recruits.isEmpty()))
             {
-                canAcquireArchangel = true;
-                didArchangel = true;
-            }
-            recruits = game.findEligibleAngels(this, archangel);
-            if (!recruits.isEmpty())
-            {
+                angelsToAcquire++;
                 game.askAcquireAngel(getPlayerName(), getMarkerId(), recruits);
             }
-            tmpScore -= 100;
         }
     }
 
@@ -315,15 +310,9 @@ final class Legion implements Comparable
         {
             return;
         }
-
         if (angelType == null)
         {
             // Declined to acquire.
-            angelsToAcquire--;
-        }
-        else if (angelType.equals("Archangel") && !canAcquireArchangel)
-        {
-            return;
         }
         else
         {
@@ -332,15 +321,10 @@ final class Legion implements Comparable
             {
                 addCreature(angel, true);
                 Log.event("Legion " + getLongMarkerName() + " acquires an " + 
-                    angelType);
-                angelsToAcquire--;
-                if (angelType.equals("Archangel"))
-                {
-                    canAcquireArchangel = false;
-                }
+                          angelType);
             }
         }
-
+        angelsToAcquire--;
         if (angelsToAcquire == 0)
         {
             game.doneAcquiringAngels();
@@ -570,6 +554,20 @@ final class Legion implements Comparable
         return false;
     }
 
+    boolean hasSummonable()
+    {
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (critter.isSummonable())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     int getHeight()
     {
@@ -761,7 +759,7 @@ final class Legion implements Comparable
     }
 
 
-    /** Return true if this legion can summon an angel or archangel. */
+    /** Return true if this legion can summon. */
     boolean canSummonAngel()
     {
         Player player = getPlayer();
@@ -770,50 +768,33 @@ final class Legion implements Comparable
             return false;
         }
 
-        return angelAvailable() || archangelAvailable();
+        return summonableAvailable();
     }
 
-    /** Return true if this legion can summon an angel (only). */
-    boolean angelAvailable()
+    /** Return true if this legion can summon. */
+    boolean summonableAvailable()
     {
         Player player = getPlayer();
         Collection legions = player.getLegions();
         Iterator it = legions.iterator();
+        List summonableList = Creature.getSummonablesCreatures();
         while (it.hasNext())
         {
             Legion candidate = (Legion)it.next();
-            if (candidate != this &&
-                (candidate.numCreature(Creature.getCreatureByName("Angel")) 
-                > 0) && !game.isEngagement(candidate.getCurrentHexLabel()))
-            {
-                return true;
+            if (candidate != this)
+            {    
+                Iterator sumoIt = summonableList.iterator();
+                while (sumoIt.hasNext())
+                {
+                    Creature c = (Creature)sumoIt.next();
+                    if (candidate.numCreature(c) > 0)
+                        return true;
+                }
             }
         }
 
         return false;
     }
-
-    /** Return true if this legion can summon an archangel. */
-    boolean archangelAvailable()
-    {
-        Player player = getPlayer();
-        Collection legions = player.getLegions();
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion candidate = (Legion)it.next();
-            if (candidate != this &&
-                (candidate.numCreature(
-                Creature.getCreatureByName("Archangel")) > 0) &&
-                !game.isEngagement(candidate.getCurrentHexLabel()))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 
     String getCurrentHexLabel()
     {

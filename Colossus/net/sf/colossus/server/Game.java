@@ -24,6 +24,7 @@ import net.sf.colossus.client.VariantSupport;
  * @version $Id$
  * @author David Ripton
  * @author Bruce Sherrod <bruce@thematrix.com>
+ * @author Romain Dolbeau
  */
 
 public final class Game
@@ -1414,7 +1415,7 @@ public final class Game
      * This one is the starting Lord with the Titan.
      * @return The name of the primary Acquirable Creature.
      */
-    public String getPrimaryAcquirable()
+    public static String getPrimaryAcquirable()
     {
         return trl.getPrimaryAcquirable();
     }
@@ -1529,28 +1530,29 @@ public final class Game
 
         reinforcing = false;
     }
-
-
+    
+    
     /** Return a list of names of angel types that can be acquired. */
-    java.util.List findEligibleAngels(Legion legion, boolean archangel)
+    java.util.List findEligibleAngels(Legion legion, int score)
     {
         if (legion.getHeight() >= 7)
         {
             return null;
         }
-        java.util.List recruits = new ArrayList(2);
-        if (caretaker.getCount(Creature.getCreatureByName("Angel")) >= 1)
+        java.util.List recruits = new ArrayList();
+        char t = legion.getCurrentHex().getTerrain();
+        java.util.List allRecruits = getRecruitableAcquirableList(t, score);
+        java.util.Iterator it = allRecruits.iterator();
+        while (it.hasNext())
         {
-            recruits.add("Angel");
-        }
-        if (archangel && caretaker.getCount(
-            Creature.getCreatureByName("Archangel")) >= 1)
-        {
-            recruits.add("Archangel");
+            String name = (String)it.next();
+            if (caretaker.getCount(Creature.getCreatureByName(name)) >= 1)
+            {
+                recruits.add(name);
+            }
         }
         return recruits;
     }
-
 
     void dispose()
     {
@@ -1580,7 +1582,7 @@ public final class Game
         String hexLabel = player.getTower();
 
         caretaker.takeOne(Creature.getCreatureByName("Titan"));
-        caretaker.takeOne(Creature.getCreatureByName("Angel"));
+        caretaker.takeOne(Creature.getCreatureByName(getPrimaryAcquirable()));
         Creature[] startCre = trl.getStartingCreatures();
         caretaker.takeOne(startCre[2]);
         caretaker.takeOne(startCre[2]);
@@ -2091,9 +2093,17 @@ reinforcing + " acquiring=" + acquiring);
             if (candidate != legion)
             {
                 String hexLabel = candidate.getCurrentHexLabel();
-                if ((candidate.numCreature(Creature.getCreatureByName("Angel"))
-                    > 0 || candidate.numCreature(
-                    Creature.getCreatureByName("Archangel")) > 0) &&
+                boolean hasSummonable = false;
+                java.util.List summonableList =
+                    Creature.getSummonablesCreatures();
+                Iterator sumIt = summonableList.iterator();
+                while (sumIt.hasNext() && !hasSummonable)
+                {
+                    Creature c = (Creature)sumIt.next();
+                    hasSummonable = hasSummonable ||
+                        (candidate.numCreature(c) > 0);
+                }
+                if (hasSummonable &&
                     !isEngagement(hexLabel))
                 {
                     set.add(hexLabel);
@@ -2102,7 +2112,6 @@ reinforcing + " acquiring=" + acquiring);
         }
         return set;
     }
-
 
 
     /** Return true if the split succeeded. */

@@ -1733,7 +1733,7 @@ public class SimpleAI implements AI
         }
 
         // Fight early with angel legions, so that others can summon.
-        if (result <= WIN_WITH_HEAVY_LOSSES && attacker.hasAngel())
+        if (result <= WIN_WITH_HEAVY_LOSSES && attacker.hasSummonable())
         {
             value += 5;
         }

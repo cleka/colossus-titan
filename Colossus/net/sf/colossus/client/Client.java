@@ -766,17 +766,11 @@ Log.debug("Client.makeForcedStrikes()");
         return server.getDonorId(playerName);
     }
 
-    boolean donorHasAngel()
+    boolean donorHas(String name)
     {
-        return server.donorHasAngel(playerName);
+        return server.donorHas(playerName, name);
     }
-
-    boolean donorHasArchangel()
-    {
-        return server.donorHasArchangel(playerName);
-    }
-
-
+    
     public void askAcquireAngel(String markerId, java.util.List recruits)
     {
         if (getOption(Options.autoAcquireAngels))

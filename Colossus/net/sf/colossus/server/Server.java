@@ -1115,36 +1115,20 @@ public final class Server
         }
     }
 
-    public boolean donorHasAngel(String playerName)
+    public boolean donorHas(String playerName, String name)
     {
         Player player = game.getPlayer(playerName);
         Legion donor = player.getDonor();
         if (donor != null)
         {
-            return (donor.numCreature(Creature.getCreatureByName("Angel")) 
-                >= 1);
+            return (donor.numCreature(Creature.getCreatureByName(name)) 
+                    >= 1);
         }
         else
         {
             return false;
         }
     }
-
-    public boolean donorHasArchangel(String playerName)
-    {
-        Player player = game.getPlayer(playerName);
-        Legion donor = player.getDonor();
-        if (donor != null)
-        {
-            return (donor.numCreature(Creature.getCreatureByName("Archangel"))
-                >= 1);
-        }
-        else
-        {
-            return false;
-        }
-    }
-
 
     // XXX Stringify the return value.
     public String [] getPlayerInfo()
