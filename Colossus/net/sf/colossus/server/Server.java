@@ -736,7 +736,7 @@ public final class Server implements IServer
         if (!getPlayerName().equals(legion.getPlayerName()))
         {
             Log.error(getPlayerName() + " illegally called doRecruit()");
-            client.nakRecruit(markerId);
+            client.nak();
             return;
         }
 
@@ -763,7 +763,7 @@ public final class Server implements IServer
         }
         else
         {
-            client.nakRecruit(markerId);
+            client.nak();
 
             // XXX -- uncomment after verifying it doesn't cause hangs
             // during reinforcement phase.  (May need to handle
@@ -948,13 +948,13 @@ public final class Server implements IServer
         if (!isBattleActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doBattleMove()");
-            client.nakBattleMove(tag);
+            client.nak();
             return;
         }
         boolean moved = game.getBattle().doMove(tag, hexLabel);
         if (!moved)
         {
-            client.nakBattleMove(tag);
+            client.nak();
         }
     }
 
@@ -976,21 +976,21 @@ public final class Server implements IServer
         if (!isBattleActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called strike()");
-            client.nakStrike(tag);
+            client.nak();
             return;
         }
         Battle battle = game.getBattle();
         if (battle == null)
         {
             Log.error("null battle in Server.strike()");
-            client.nakStrike(tag);
+            client.nak();
             return;
         }
         Legion legion = battle.getActiveLegion();
         if (legion == null)
         {
             Log.error("null active legion in Server.strike()");
-            client.nakStrike(tag);
+            client.nak();
             return;
         }
         Critter critter = legion.getCritterByTag(tag);
@@ -998,14 +998,14 @@ public final class Server implements IServer
         {
             Log.error("No critter with tag " + tag + " in Server.strike()");
             // XXX Hang here.
-            client.nakStrike(tag);
+            client.nak();
             return;
         }
         Critter target = battle.getCritter(hexLabel);
         if (target == null)
         {
             Log.error("No target in hex " + hexLabel + " in Server.strike()");
-            client.nakStrike(tag);
+            client.nak();
             return;
         }
         critter.strike(target);
@@ -1377,12 +1377,12 @@ public final class Server implements IServer
         if (!isActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doSplit()");
-            client.nakSplit(parentId);
+            client.nak();
             return;
         }
         if (!game.doSplit(parentId, childId, results))
         {
-            client.nakSplit(parentId);
+            client.nak();
         }
     }
 
@@ -1451,7 +1451,7 @@ public final class Server implements IServer
         if (!isActivePlayer())
         {
             Log.error(getPlayerName() + " illegally called doMove()");
-            client.nakMove(markerId);
+            client.nak();
             return;
         }
         Legion legion = game.getLegionByMarkerId(markerId);
@@ -1465,7 +1465,7 @@ public final class Server implements IServer
         }
         else
         {
-            client.nakMove(markerId);
+            client.nak();
         }
     }
 

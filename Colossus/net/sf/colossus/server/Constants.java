@@ -330,11 +330,7 @@ public final class Constants
     public static final String didSplit = "didSplit";
     public static final String askPickColor = "askPickColor";
     public static final String log = "log";
-    public static final String nakSplit = "nakSplit";
-    public static final String nakMove = "nakMove";
-    public static final String nakRecruit = "nakRecruit";
-    public static final String nakBattleMove = "nakBattleMove";
-    public static final String nakStrike = "nakStrike";
+    public static final String nak = "nak";
     static
     {
         if (colorNames.length != shortColorNames.length)

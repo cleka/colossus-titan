@@ -11,9 +11,6 @@ import java.util.*;
  */
 public interface IClient
 {
-    // Not in network protocol
-    public String getPlayerName();
-
     public void tellEngagement(String hexLabel, String attackerId, 
         String defenderId);
 
@@ -138,13 +135,5 @@ public interface IClient
 
     public void log(String message);
 
-    public void nakSplit(String parentId);
-
-    public void nakMove(String markerId);
-
-    public void nakRecruit(String markerId);
-
-    public void nakBattleMove(int tag);
-
-    public void nakStrike(int tag);
+    public void nak();
 }

@@ -448,30 +448,9 @@ Log.debug("End of SocketClientThread while loop");
                 client.log(message);
             }
         }
-        else if (method.equals(Constants.nakSplit))
+        else if (method.equals(Constants.nak))
         {
-            String parentId = (String)args.remove(0);
-            client.nakSplit(parentId);
-        }
-        else if (method.equals(Constants.nakMove))
-        {
-            String markerId = (String)args.remove(0);
-            client.nakMove(markerId);
-        }
-        else if (method.equals(Constants.nakRecruit))
-        {
-            String markerId = (String)args.remove(0);
-            client.nakRecruit(markerId);
-        }
-        else if (method.equals(Constants.nakBattleMove))
-        {
-            int tag = Integer.parseInt((String)args.remove(0));
-            client.nakBattleMove(tag);
-        }
-        else if (method.equals(Constants.nakStrike))
-        {
-            int tag = Integer.parseInt((String)args.remove(0));
-            client.nakBattleMove(tag);
+            client.nak();
         }
         else if (method.equals(Constants.tellEngagement))
         {

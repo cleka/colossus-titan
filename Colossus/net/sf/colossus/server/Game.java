@@ -1316,7 +1316,9 @@ Log.debug("DataFileKey: " + mapKey + " DataFileContent :\n" + content);
             // History
             history = new History();
             Element his = root.getChild("History");
+Log.debug("About to copy history tree from savegame");
             history.copyTree(his);
+Log.debug("Done copying history tree from savegame");
 
             initServer();
             // Remaining stuff has been moved to loadGame2()

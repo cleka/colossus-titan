@@ -1743,9 +1743,9 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-    public void nakStrike(int tag)
+    public void nak()
     {
-        Log.error("Got nak for strike by " + tag);
+        Log.error(playerName + " got nak");
     }
 
     private void pickCarries(int carryDamage, Set carryTargetDescriptions)
@@ -1976,11 +1976,6 @@ Log.debug(playerName + " Client.initBoard()");
             hex.repaint();
             board.highlightPossibleRecruits();
         }
-    }
-
-    public void nakRecruit(String markerId)
-    {
-        Log.error("Got nak for recruit with " + markerId);
     }
 
     public void undidRecruit(String markerId, String recruitName)
@@ -2484,12 +2479,6 @@ Log.debug(playerName + " Client.initBoard()");
         }
     }
 
-    public void nakBattleMove(int tag)
-    {
-        Log.error("Got nak for move of " + tag);
-    }
-
-
     /** Attempt to have critter tag strike the critter in hexLabel. */
     void strike(int tag, String hexLabel)
     {
@@ -2860,11 +2849,6 @@ Log.debug(playerName + " Client.initBoard()");
         {
             doAutoMoves();
         }
-    }
-
-    public void nakMove(String markerId)
-    {
-        Log.error("Got nak for move of " + markerId);
     }
 
     public void undidMove(String markerId, String formerHexLabel,
@@ -3612,11 +3596,6 @@ Log.debug(playerName + " Client.initBoard()");
             board.alignLegions(hexLabel);
             board.highlightTallLegions();
         }
-    }
-
-    public void nakSplit(String parentId)
-    {
-        Log.error("Got nak for split of " + parentId);
     }
 
 

@@ -641,28 +641,8 @@ final class SocketServerThread extends Thread implements IClient
         out.println(Constants.log + sep + message);
     }
 
-    public void nakSplit(String parentId)
+    public void nak()
     {
-        out.println(Constants.nakSplit + sep + parentId);
-    }
-
-    public void nakMove(String markerId)
-    {
-        out.println(Constants.nakMove + sep + markerId);
-    }
-
-    public void nakRecruit(String markerId)
-    {
-        out.println(Constants.nakRecruit + sep + markerId);
-    }
-
-    public void nakBattleMove(int tag)
-    {
-        out.println(Constants.nakBattleMove + sep + tag);
-    }
-
-    public void nakStrike(int tag)
-    {
-        out.println(Constants.nakStrike + sep + tag);
+        out.println(Constants.nak);
     }
 }

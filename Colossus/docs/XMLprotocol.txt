@@ -174,8 +174,8 @@ Messages (server to one or more clients)
 </formgame>
     Form a new game with the listed options.
 
-<nak packet="[number]" />
-    Request [number] (starting from 0) from this client was denied.
+<nak />
+    Last request from this client was denied.
 
 <join name="[name]" />
     A player with name [name] has connected.
