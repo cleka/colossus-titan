@@ -922,7 +922,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
     public void assignStrikePenalty(String playerName, String prompt)
     {
         striker.assignStrikePenalty(prompt);
-        striker = null;
     }
 
     void allInitBattle(String masterHexLabel)
