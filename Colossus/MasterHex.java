@@ -528,18 +528,18 @@ class MasterHex
 
     boolean isEngagement()
     {
-        Player player = legions[0].getPlayer();
-        for (int i = 1; i < numLegions; i++)
+        if (numLegions > 0)
         {
-            if (legions[i] == null)
+            Player player = legions[0].getPlayer();
+            for (int i = 1; i < numLegions; i++)
             {
-                System.out.println("null legions " + i); 
-            }
-            if (legions[i].getPlayer() != player)
-            {
-                return true;
+                if (legions[i].getPlayer() != player)
+                {
+                    return true;
+                }
             }
         }
+
         return false;
     }
 
