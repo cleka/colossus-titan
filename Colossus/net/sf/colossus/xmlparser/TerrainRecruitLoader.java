@@ -53,7 +53,8 @@ public class TerrainRecruitLoader
     private static HashMap strToBelow = new HashMap();
 
     /**
-     * Map a String (representing a terrain) to an optional BattlelandsRandomizer filename.
+     * Map a String (representing a terrain) to an 
+     *   optional BattlelandsRandomizer filename.
      */
     private static HashMap strToRnd = new HashMap();
 
@@ -151,7 +152,9 @@ public class TerrainRecruitLoader
                     }
                 }
                 if ((v2 != null) && v2.startsWith(Keyword_Special))
-                { // special recruitment, need to add edge between the special aned every possible recruit
+                { 
+                    // special recruitment, need to add edge 
+                    // between the special aned every possible recruit
                     CustomRecruitBase cri = getCustomRecruitBase(v2);
                     java.util.List allRecruits =
                             cri.getAllPossibleSpecialRecruits(t);
@@ -160,7 +163,8 @@ public class TerrainRecruitLoader
                     {
                         Creature cre = (Creature)it3.next();
                         // use 99 so no-one will rely on this
-                        graph.addEdge(v2, cre.getName(), 99, t);
+                        graph.addEdge(v2, cre.getName(), 
+                            RecruitGraph.BIGNUM, t);
                     }
                 }
                 v1 = v2;
@@ -271,26 +275,29 @@ public class TerrainRecruitLoader
             rl.add(rn);
         }
 
-        this.strToRecruits.put(name, rl);
-        this.strToDisplayName.put(name, displayName);
-        this.strToColor.put(name, HTMLColor.stringToColor(color));
-        this.strToBelow.put(name, new Boolean(regularRecruit));
-        this.strToRnd.put(name, null);   // XXX Random not yet supported
+        TerrainRecruitLoader.strToRecruits.put(name, rl);
+        TerrainRecruitLoader.strToDisplayName.put(name, displayName);
+        TerrainRecruitLoader.strToColor
+            .put(name, HTMLColor.stringToColor(color));
+        TerrainRecruitLoader.strToBelow
+            .put(name, new Boolean(regularRecruit));
+        // XXX Random not yet supported:            
+        TerrainRecruitLoader.strToRnd.put(name, null); 
 
-        if (this.terrains == null)
+        if (TerrainRecruitLoader.terrains == null)
         {
-            this.terrains = new String[1];
-            this.terrains[0] = name;
+            TerrainRecruitLoader.terrains = new String[1];
+            TerrainRecruitLoader.terrains[0] = name;
         }
         else
         {
-            String[] t2 = new String[this.terrains.length + 1];
-            for (int i = 0; i < this.terrains.length; i++)
+            String[] t2 = new String[TerrainRecruitLoader.terrains.length + 1];
+            for (int i = 0; i < TerrainRecruitLoader.terrains.length; i++)
             {
-                t2[i] = this.terrains[i];
+                t2[i] = TerrainRecruitLoader.terrains[i];
             }
-            t2[this.terrains.length] = name;
-            this.terrains = t2;
+            t2[TerrainRecruitLoader.terrains.length] = name;
+            TerrainRecruitLoader.terrains = t2;
         }
 
         addToGraph(rl, name);
@@ -313,13 +320,15 @@ public class TerrainRecruitLoader
     private void handleTitanImprove(Element el)
         throws JDOMException
     {
-        this.titanImprove = el.getAttribute("points").getIntValue();
+        TerrainRecruitLoader.titanImprove = 
+            el.getAttribute("points").getIntValue();
     }
 
     private void handleTitanTeleport(Element el)
         throws JDOMException
     {
-        this.titanTeleport = el.getAttribute("points").getIntValue();
+        TerrainRecruitLoader.titanTeleport = 
+            el.getAttribute("points").getIntValue();
     }
 
     /**

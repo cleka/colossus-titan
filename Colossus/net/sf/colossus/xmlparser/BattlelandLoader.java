@@ -50,7 +50,20 @@ public class BattlelandLoader
             Element startlistEl = root.getChild("startlist");
             if (startlistEl != null)
             {
-                List startlistHexes = startlistEl.getChildren("battlehex");
+                // towi: the DTD "battlehex" definitions clashed.
+                //    renamed to "battlehexref"
+                List startlistHexes = startlistEl.getChildren("battlehexref");
+                if (startlistHexes.size() == 0)
+                {
+                    // support old format with warning
+                    startlistHexes = startlistEl.getChildren("battlehex");
+                    if (startlistHexes.size() > 0)
+                    {
+                        Log.warn("DEPRECATION WARNING: in 'startlist' use "
+                            +"'battlehexref' instead of 'battlehex'!");
+                    }                    
+                }
+                
                 for (Iterator it = startlistHexes.iterator(); it.hasNext();)
                 {
                     Element el = (Element)it.next();
@@ -60,11 +73,13 @@ public class BattlelandLoader
         }
         catch (JDOMException ex)
         {
-            Log.error("JDOM" + ex.toString());
+            // towi TODO : is it really good to swallow the exception? 
+            Log.error("JDOM " + ex.toString());
         }
         catch (IOException ex)
         {
-            Log.error("IO" + ex.toString());
+            // towi TODO: is it really good to swallow the exception? 
+            Log.error("IO " + ex.toString());
         }
     }
 
