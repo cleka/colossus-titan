@@ -1,24 +1,23 @@
 AllAI:
-RECRUIT u Ogre      2 Ogre     (NOT ((CANRECRUIT Warlock) OR
+RECRUIT TowerAlt Ogre      2 Ogre     (NOT ((CANRECRUIT Warlock) OR
                                     (CANRECRUIT Guardian)))
-RECRUIT u Centaur   2 Centaur  (NOT ((CANRECRUIT Warlock) OR
+RECRUIT TowerAlt Centaur   2 Centaur  (NOT ((CANRECRUIT Warlock) OR
                                     (CANRECRUIT Guardian)))
-RECRUIT u Gargoyle  1 Gargoyle ((3 Cyclops AVAILABLE) AND
+RECRUIT TowerAlt Gargoyle  1 Gargoyle ((3 Cyclops AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian))))
-RECRUIT u Ogre      1 Ogre     ((2 Troll AVAILABLE) AND
+RECRUIT TowerAlt Ogre      1 Ogre     ((2 Troll AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian))))
-RECRUIT u Centaur   1 Centaur  ((2 Lion AVAILABLE) AND
+RECRUIT TowerAlt Centaur   1 Centaur  ((2 Lion AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian))))
-RECRUIT u Gargoyle  0 Gargoyle ((6 Cyclops AVAILABLE) AND
+RECRUIT TowerAlt Gargoyle  0 Gargoyle ((6 Cyclops AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian))))
-RECRUIT u Ogre      0 Ogre     ((6 Troll AVAILABLE) AND
+RECRUIT TowerAlt Ogre      0 Ogre     ((6 Troll AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian))))
-RECRUIT u Centaur   0 Centaur  ((6 Lion AVAILABLE) AND
+RECRUIT TowerAlt Centaur   0 Centaur  ((6 Lion AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
                                       (CANRECRUIT Guardian))))
-

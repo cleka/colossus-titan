@@ -3,28 +3,27 @@ AllAI:
 # b is the same as B
 RECRUIT Brush Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
                                 (2 Behemoth AVAILABLE))
-RECRUIT b Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
+RECRUIT Brush Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
                                 (2 Behemoth AVAILABLE))
 # d is the same as D
 # (F)ort, T(O)wn and Waterh(o)le are the same as (P)lains
-RECRUIT Plains Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH d)) AND
+RECRUIT Plains Lion    2 Lion     ((((CANREACH Desert) OR (CANREACH DesertAlt)) AND
                                  (NOT (HASCREATURE Griffon))) AND
                                 (2 Griffon AVAILABLE))
-RECRUIT F Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH d)) AND
+RECRUIT Fort Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH DesertAlt)) AND
                                  (NOT (HASCREATURE Griffon))) AND
                                 (2 Griffon AVAILABLE))
-RECRUIT O Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH d)) AND
+RECRUIT Town Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH DesertAlt)) AND
                                  (NOT (HASCREATURE Griffon))) AND
                                 (2 Griffon AVAILABLE))
-RECRUIT o Lion      2 Lion     ((((CANREACH Desert) OR (CANREACH d)) AND
+RECRUIT Waterhole Lion 2 Lion     ((((CANREACH Desert) OR (CANREACH DesertAlt)) AND
                                  (NOT (HASCREATURE Griffon))) AND
                                 (2 Griffon AVAILABLE))
 # s is the same as S
-RECRUIT Marsh Troll     2 Troll    ((((CANREACH Swamp) OR (CANREACH s)) AND
+RECRUIT Marsh Troll    2 Troll    ((((CANREACH Swamp) OR (CANREACH SwampAlt)) AND
                                  (NOT (HASCREATURE Wyvern))) AND
                                 (2 Wyvern AVAILABLE))
 # N is the same as M
-RECRUIT N Troll     2 Troll    ((((CANREACH Swamp) OR (CANREACH s)) AND
+RECRUIT Marsh Troll    2 Troll    ((((CANREACH Swamp) OR (CANREACH SwampAlt)) AND
                                  (NOT (HASCREATURE Wyvern))) AND
                                 (2 Wyvern AVAILABLE))
-
