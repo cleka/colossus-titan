@@ -15,10 +15,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     private Player player;
     private Legion legion;
     private MasterBoard board;
-    private Button button1;
-    private Button button2;
     private static final int scale = 60;
-    private boolean laidOut = false;
     private Chit angelChit;
     private Chit archangelChit;
     private boolean imagesLoaded = false;
@@ -26,6 +23,8 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     private Graphics offGraphics;
     private Dimension offDimension;
     private Image offImage;
+    private GridBagLayout gridbag = new GridBagLayout();
+    private GridBagConstraints constraints = new GridBagConstraints();
 
 
     SummonAngel(MasterBoard board, Legion legion)
@@ -55,22 +54,27 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         addMouseListener(this);
         addWindowListener(this);
 
-        setLayout(null);
+        setLayout(gridbag);
 
         pack();
 
         setBackground(Color.lightGray);
-        setSize(getPreferredSize());
         setResizable(false);
 
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(new Point(d.width / 2 - getSize().width / 2,
-            d.height / 2 - getSize().height / 2));
-
-        angelChit = new Chit(2 * scale, scale, scale,
+        angelChit = new Chit(-1, -1, scale, 
             Creature.angel.getImageName(), this);
-        archangelChit = new Chit(5 * scale, scale, scale,
+        constraints.gridy = 0;
+        gridbag.setConstraints(angelChit, constraints);
+        add(angelChit);
+        angelChit.addMouseListener(this);
+
+        archangelChit = new Chit(-1, -1, scale, 
             Creature.archangel.getImageName(), this);
+        constraints.gridy = 0;
+        gridbag.setConstraints(archangelChit, constraints);
+        add(archangelChit);
+        archangelChit.addMouseListener(this);
+
         // X out chits since no legion is selected.
         angelChit.setDead(true);
         archangelChit.setDead(true);
@@ -89,12 +93,21 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         }
         imagesLoaded = true;
 
-        button1 = new Button("Summon");
-        button2 = new Button("Cancel");
+        Button button1 = new Button("Summon");
+        Button button2 = new Button("Cancel");
+        constraints.gridy = 1;
+        gridbag.setConstraints(button1, constraints);
         add(button1);
-        add(button2);
         button1.addActionListener(this);
+        gridbag.setConstraints(button2, constraints);
+        add(button2);
         button2.addActionListener(this);
+
+        pack();
+        
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
+            d.height / 2 - getSize().height / 2));
 
         setVisible(true);
         repaint();
@@ -115,6 +128,10 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             player.disallowSummoningAngel();
             legion.markSummoned();
             player.setLastLegionSummonedFrom(donor);
+
+            // Update the number of creatures in both stacks.
+            donor.getCurrentHex().repaint();
+            legion.getCurrentHex().repaint();
         }
 
         dispose();
@@ -142,27 +159,19 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             offGraphics = offImage.getGraphics();
         }
 
+        // Prevent repaint loop by only calling repaint if the
+        // donor is new.
+        Legion oldDonor = donor;
         donor = player.getSelectedLegion();
-        if (donor != null)
+        if (donor != null && donor != oldDonor)
         {
             int angels = donor.numCreature(Creature.angel);
             angelChit.setDead(angels == 0);
+            angelChit.repaint();
 
             int archangels = donor.numCreature(Creature.archangel);
             archangelChit.setDead(archangels == 0);
-        }
-
-        angelChit.paint(offGraphics);
-        archangelChit.paint(offGraphics);
-
-        if (!laidOut)
-        {
-            Insets insets = getInsets();
-            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 -
-                insets.bottom, d.width / 3, d.height / 8);
-            button2.setBounds(5 * d.width / 9 - insets.right,
-                3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
-            laidOut = true;
+            archangelChit.repaint();
         }
 
         g.drawImage(offImage, 0, 0, this);
@@ -184,29 +193,23 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             return;
         }
 
-        Point point = e.getPoint();
+        Object source = e.getSource();
 
-        if (angelChit.select(point) && !angelChit.isDead())
+        if (angelChit == source && !angelChit.isDead())
         {
             donor.removeCreature(Creature.angel);
-            // Update the number of creatures in the donor stack.
-            donor.getCurrentHex().repaint();
-
             legion.addCreature(Creature.angel);
-            // Update the number of creatures in the legion.
-            legion.getCurrentHex().repaint();
 
             cleanup(true);
         }
 
-        else if (archangelChit.select(point) && !archangelChit.isDead())
+        else if (archangelChit == source && !archangelChit.isDead())
         {
             donor.removeCreature(Creature.archangel);
-            // Update the number of creatures in the donor stack.
-            donor.getCurrentHex().repaint();
-
             legion.addCreature(Creature.archangel);
-            // Update the number of creatures in the legion.
+            
+            // Update the number of creatures in both stacks.
+            donor.getCurrentHex().repaint();
             legion.getCurrentHex().repaint();
 
             cleanup(true);
@@ -316,17 +319,5 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         {
             cleanup(false);
         }
-    }
-
-
-    public Dimension getMinimumSize()
-    {
-        return getPreferredSize();
-    }
-
-
-    public Dimension getPreferredSize()
-    {
-        return new Dimension(8 * scale, 3 * scale);
     }
 }
