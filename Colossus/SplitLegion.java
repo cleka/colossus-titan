@@ -28,6 +28,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
         super(parentFrame, player.name + ": Split Legion " + 
             oldLegion.markerId, true);
 
+        setResizable(false);
         setLayout(null);
 
         this.oldLegion = oldLegion;
@@ -38,10 +39,9 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
 
         PickMarker pickmarker = new PickMarker(parentFrame, player);
 
-        newLegion = new Legion(scale / 5, 2 * scale, 
-            oldLegion.chit.getBounds().width, player.markerSelected, 
-            oldLegion.markerId, this, 0, null, null, null, null, null, 
-            null, null, null);
+        newLegion = new Legion(scale / 5, 2 * scale, scale,
+            player.markerSelected, oldLegion.markerId, this, 0, null, 
+            null, null, null, null, null, null, null);
 
         setSize(getPreferredSize());
 
@@ -273,6 +273,8 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             // The split is legal.
             // Set the new chit next to the old chit on the masterboard.
             newLegion.chit.setLocationAbs(oldLegion.chit.center());
+            // Resize it.
+            newLegion.chit.rescale(oldLegion.chit.getBounds().width);
 
             // Add the new legion to the player.
             player.numLegions++;
