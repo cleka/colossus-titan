@@ -2145,7 +2145,8 @@ public final class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (player.getOption(autoPickRecruiter) ||
+        else if (player.getOption(autoPlay) ||
+            player.getOption(autoPickRecruiter) ||
             numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
