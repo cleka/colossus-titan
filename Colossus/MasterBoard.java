@@ -992,12 +992,22 @@ public class MasterBoard extends Frame implements MouseListener,
                             switch(game.getPhase())
                             {
                                 case Game.SPLIT:
+                                    // Need a legion marker to split.
+                                    if (player.getNumMarkersAvailable() == 0)
+                                    {
+                                        new MessageBox(this, 
+                                            "No markers are available.");
+                                        return;
+                                    }
                                     // Don't allow extra splits in turn 1.
                                     if (game.getTurnNumber() == 1 &&
                                         player.getNumLegions() > 1)
                                     {
+                                        new MessageBox(this,
+                                            "Cannot split twice on Turn 1.");
                                         return;
                                     }
+
                                     new SplitLegion(this, legion, player);
                                     // Update status window.
                                     game.updateStatusScreen();
