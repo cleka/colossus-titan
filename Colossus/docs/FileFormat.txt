@@ -59,7 +59,7 @@ This file define the Colossus Recruit Trees ; what
 can recruit and be recruited on what terrain. it's composed
 of a succession of line:
 
-<terrain_letter> <terrain_color> <terrain_name> <underecruit_allowed> (<recruiter_needed> <recruit>)+
+<terrain_letter> <terrain_color> <terrain_name> <regular_recruit> (<recruiter_needed> <recruit>)+
 
 <terrain_letter> is the letter internaly used to identify the terrain.
  they must all be different.
@@ -69,8 +69,9 @@ of a succession of line:
 
 <terrain_name> is the descriptive name of the terrain (Brush, ...)
 
-<underecruit_allowed> is a boolean (i.e. true or false) telling if
-a Creature can recruit below its rank (usually true except for Tower).
+<regular_recruit>> is a boolean (i.e. true or false) telling if
+a Creature can recruit below or above its rank (usually true
+except for Tower).
 
 <recruiter_needed> is the number of lower-rank creature needed
  to recruit the next creature.
@@ -105,15 +106,10 @@ a gargoyle with two Ogres or the Titan. You won't be
 able to recruit "Anything" or "Titan", of course;
 
 The line that starts with 'T' and of name 'Tower' (mandatory) is
-different. It should contain 5 pairs, all with '1' as the
-<recruiter_needed> except for the next-to-last that should be '3'.
-First three are 'anything  can recruit' creature, 4the fourth is
-'anything numerous enough can recruit', the fifth and last is 'Titan
-can recruit'. First three will also be used as the starting
-creatures (starting legion will get 2 of each).
-
-Note: for the guardian or the guardian replacement, any value
-other than '3' will _not_ work.
+special. There should always be at least 3 regular creatures,
+recruitable with one of Anything, and should be marked
+as 'non-regular' recruitments. The 3 creatures will be used
+as starting creatures.
 
 3) CRE file format (default file used: Default/Default.cre)
 
