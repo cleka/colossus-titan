@@ -191,6 +191,7 @@ public final class PickEntrySide extends HexMap implements ActionListener,
 
         int side = PickEntrySide.pickEntrySide(frame, board, hex.getLabel(),
             legion);
-        Game.logEvent("Chose side " + side);
+        System.out.println("Chose side " + side);
+        System.exit(0);
     }
 }

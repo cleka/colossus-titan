@@ -200,11 +200,11 @@ public final class PickColor extends JDialog implements WindowListener,
         game.addPlayer(p1);
 
         String answer = pickColor(frame, game, p0);
-        Game.logEvent(p0.getName() + " chooses color " + answer);
+        Log.event(p0.getName() + " chooses color " + answer);
         p0.setColor(answer);
 
         answer = pickColor(frame, game, p1);
-        Game.logEvent(p1.getName() + " chooses color " + answer);
+        Log.event(p1.getName() + " chooses color " + answer);
         p1.setColor(answer);
 
         System.exit(0);

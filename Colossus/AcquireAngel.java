@@ -171,6 +171,7 @@ public final class AcquireAngel extends JDialog implements MouseListener,
         String type = AcquireAngel.acquireAngel(frame, player.getName(),
             recruits);
 
-        Game.logEvent("Chose " + type);
+        System.out.println("Chose " + type);
+        System.exit(0);
     }
 }

@@ -80,7 +80,7 @@ public class Chit extends JPanel
             }
             catch (Exception e)
             {
-                Game.logError("Couldn't load image " + imageFilename + e);
+                Log.error("Couldn't load image " + imageFilename + e);
             }
         }
         else
@@ -164,8 +164,12 @@ public class Chit extends JPanel
         return new Dimension(rect.width, rect.height);
     }
 
-
     public Dimension getMinimumSize()
+    {
+        return getPreferredSize();
+    }
+
+    public Dimension getMaximumSize()
     {
         return getPreferredSize();
     }
@@ -215,7 +219,7 @@ public class Chit extends JPanel
         File dir = new File(imageDirName);
         if (!dir.exists() || !dir.isDirectory())
         {
-            Game.logError("No images directory");
+            Log.error("No images directory");
             return;
         }
         String [] filenames = dir.list();
@@ -236,5 +240,6 @@ public class Chit extends JPanel
 
         frame.pack();
         frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

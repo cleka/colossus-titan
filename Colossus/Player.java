@@ -467,7 +467,7 @@ public final class Player implements Comparable
         // Only allow rolling if it hasn't already been done.
         if (movementRoll != 0)
         {
-            Game.logWarn("Called rollMovement() illegally");
+            Log.warn("Called rollMovement() illegally");
             return;
         }
 
@@ -475,13 +475,13 @@ public final class Player implements Comparable
         {
             movementRoll = PickRoll.pickRoll(game.getMasterFrame(),
                 "Pick movement roll");
-            Game.logEvent(getName() + " chooses a " + movementRoll +
+            Log.event(getName() + " chooses a " + movementRoll +
                 " for movement");
         }
         else
         {
             movementRoll = Game.rollDie();
-            Game.logEvent(getName() + " rolls a " + movementRoll +
+            Log.event(getName() + " rolls a " + movementRoll +
                 " for movement");
         }
         game.showMovementRoll(movementRoll);
@@ -493,7 +493,7 @@ public final class Player implements Comparable
         if (mulligansLeft > 0)
         {
             undoAllMoves();
-            Game.logEvent(getName() + " takes a mulligan");
+            Log.event(getName() + " takes a mulligan");
             mulligansLeft--;
             movementRoll = 0;
 
@@ -673,7 +673,11 @@ public final class Player implements Comparable
     public void addLegion(Legion legion)
     {
         legions.add(legion);
-        game.getBoard().alignLegions(legion.getCurrentHexLabel());
+        MasterBoard board = game.getBoard();
+        if (board != null)
+        {
+            board.alignLegions(legion.getCurrentHexLabel());
+        }
     }
 
 
@@ -757,7 +761,7 @@ public final class Player implements Comparable
                 game.updateStatusScreen();
             }
 
-            Game.logEvent(getName() + " earns " + points + " points");
+            Log.event(getName() + " earns " + points + " points");
         }
     }
 
@@ -837,7 +841,7 @@ public final class Player implements Comparable
             board.alignLegions(hexLabel);
         }
 
-        Game.logEvent(getName() + " dies");
+        Log.event(getName() + " dies");
 
         // See if the game is over.
         if (checkForVictory)
@@ -916,7 +920,7 @@ public final class Player implements Comparable
         }
         catch (IOException e)
         {
-            Game.logError("Couldn't write options to " + optionsFile);
+            Log.error("Couldn't write options to " + optionsFile);
         }
     }
 
@@ -934,7 +938,7 @@ public final class Player implements Comparable
         }
         catch (IOException e)
         {
-            Game.logError("Couldn't read player options from " + optionsFile);
+            Log.error("Couldn't read player options from " + optionsFile);
         }
     }
 

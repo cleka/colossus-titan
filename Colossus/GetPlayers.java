@@ -70,6 +70,14 @@ public final class GetPlayers extends JDialog implements WindowListener,
             button.addActionListener(this);
         }
 
+        // Fix tab order.
+        for (int i = 0; i < 6; i++)
+        {
+            JTextField tf = (JTextField)textFields.get(i);
+            JTextField next = (JTextField)textFields.get((i + 1) % 6);
+            tf.setNextFocusableComponent(next);
+        }
+
         JButton button1 = new JButton("New Game");
         button1.setMnemonic(KeyEvent.VK_N);
         contentPane.add(button1);
@@ -236,7 +244,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
             {
                 String filename = (String)playerInfo.get(key);
                 System.out.println("Would load game from " + filename);
-                return;
+                System.exit(0);
             }
         }
 
@@ -248,5 +256,6 @@ public final class GetPlayers extends JDialog implements WindowListener,
             String ap = (String)entry.getValue();
             System.out.println("Add " + ap + " player " + name);
         }
+        System.exit(0);
     }
 }

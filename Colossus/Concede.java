@@ -192,7 +192,6 @@ public final class Concede extends JDialog implements ActionListener
         frame.pack();
         frame.setVisible(true);
 
-
         Game game = new Game();
         game.initBoard();
         MasterBoard board = new MasterBoard();
@@ -228,8 +227,9 @@ public final class Concede extends JDialog implements ActionListener
         defender.setMarker(marker2);
 
         boolean answer = Concede.flee(frame, defender, attacker);
-        Game.logEvent("Flee? " + answer);
+        System.out.println("Flee? " + answer);
         answer = Concede.concede(frame, attacker, defender);
-        Game.logEvent("Concede? " + answer);
+        System.out.println("Concede? " + answer);
+        System.exit(0);
     }
 }

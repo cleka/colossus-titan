@@ -16,11 +16,9 @@ public final class SplitLegion extends JDialog implements MouseListener,
     private ArrayList oldChits = new ArrayList(8);
     private ArrayList newChits = new ArrayList(8);
 
-    // Use Chits instead of markers since we won't paint heights.
-    private Chit oldMarker;
-    private Chit newMarker;
+    private Marker oldMarker;
+    private Marker newMarker;
 
-    private Player player;
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
@@ -43,7 +41,6 @@ public final class SplitLegion extends JDialog implements MouseListener,
         this.oldLegion = oldLegion;
         this.parentFrame = parentFrame;
         Game game = oldLegion.getGame();
-        player = oldLegion.getPlayer();
 
         if (selectedMarkerId == null)
         {
@@ -51,19 +48,17 @@ public final class SplitLegion extends JDialog implements MouseListener,
             return;
         }
 
-        pack();
-
-        int scale = 4 * Scale.get();
-
-        newMarker = new Chit(scale, selectedMarkerId, this);
-
         setBackground(Color.lightGray);
-        setResizable(false);
+
+        // We get graphical glitches in Solaris if we don't allow resizing.
+        setResizable(true);
 
         addMouseListener(this);
         addWindowListener(this);
 
-        oldMarker = new Chit(scale, oldLegion.getImageName(), this);
+        int scale = 4 * Scale.get();
+
+        oldMarker = new Marker(scale, oldLegion.getImageName(), this, null);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -82,6 +77,8 @@ public final class SplitLegion extends JDialog implements MouseListener,
             chit.addMouseListener(this);
         }
 
+        newMarker = new Marker(scale, selectedMarkerId, this, null);
+
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 1;
         constraints.gridwidth = 1;
@@ -94,8 +91,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         button2.setMnemonic(KeyEvent.VK_C);
 
          // Attempt to center the buttons.
-        int chitWidth = Math.max(oldChits.size(),
-            newChits.size()) + 1;
+        int chitWidth = Math.max(oldChits.size(), newChits.size()) + 1;
         if (chitWidth < 4)
         {
             constraints.gridwidth = 1;
@@ -115,6 +111,7 @@ public final class SplitLegion extends JDialog implements MouseListener,
         gridbag.setConstraints(button1, constraints);
         contentPane.add(button1);
         button1.addActionListener(this);
+
         constraints.gridx = leadSpace + constraints.gridwidth;
         gridbag.setConstraints(button2, constraints);
         contentPane.add(button2);
@@ -145,20 +142,21 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
-    // Move a chit to the end of the other line.
+    /** Move a chit to the end of the other line. */
     private void moveChitToOtherLine(ArrayList fromChits, ArrayList
         toChits, int oldPosition, int gridy)
     {
+        Container contentPane = getContentPane();
+
         Chit chit = (Chit)fromChits.remove(oldPosition);
-        remove(chit);
+        contentPane.remove(chit);
 
         toChits.add(chit);
+
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = gridy;
         constraints.gridwidth = 1;
         gridbag.setConstraints(chit, constraints);
-
-        Container contentPane = getContentPane();
         contentPane.add(chit);
 
         pack();
@@ -166,100 +164,9 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
-    private void cancel()
-    {
-        results = null;
-        dispose();
-    }
-
-    private void performSplit()
-    {
-        StringBuffer buf = new StringBuffer(newMarker.getId());
-        Iterator it = newChits.iterator();
-        while (it.hasNext())
-        {
-            buf.append(",");
-            Chit chit = (Chit)it.next();
-            buf.append(chit.getId());
-        }
-        results = buf.toString();
-        dispose();
-    }
-
-
-    public void mousePressed(MouseEvent e)
-    {
-        Object source = e.getSource();
-        int i = oldChits.indexOf(source);
-        if (i != -1)
-        {
-            moveChitToOtherLine(oldChits, newChits, i, 1);
-            return;
-        }
-        else
-        {
-            i = newChits.indexOf(source);
-            if (i != -1)
-            {
-                moveChitToOtherLine(newChits, oldChits, i, 0);
-                return;
-            }
-        }
-    }
-
-
-    public void mouseEntered(MouseEvent e)
-    {
-    }
-
-    public void mouseExited(MouseEvent e)
-    {
-    }
-
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-        cancel();
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-    }
-
-
-    /**
-     *  Return true if the split is legal. Each legion must have
+    /** Return true if the split is legal.  Each legion must have
      *  height >= 2.  If this was an initial split, each legion
-     *  must have height == 4 and one lord.
-     */
+     *  must have height == 4 and one lord. */
     private boolean isSplitLegal()
     {
         if (oldChits.size() < 2 || newChits.size() < 2)
@@ -298,6 +205,93 @@ public final class SplitLegion extends JDialog implements MouseListener,
     }
 
 
+    private void cancel()
+    {
+        results = null;
+        dispose();
+    }
+
+
+    private void performSplit()
+    {
+        StringBuffer buf = new StringBuffer(newMarker.getId());
+        Iterator it = newChits.iterator();
+        while (it.hasNext())
+        {
+            buf.append(",");
+            Chit chit = (Chit)it.next();
+            buf.append(chit.getId());
+        }
+        results = buf.toString();
+        dispose();
+    }
+
+
+    public void mousePressed(MouseEvent e)
+    {
+        Object source = e.getSource();
+        int i = oldChits.indexOf(source);
+        if (i != -1)
+        {
+            moveChitToOtherLine(oldChits, newChits, i, 1);
+            return;
+        }
+        else
+        {
+            i = newChits.indexOf(source);
+            if (i != -1)
+            {
+                moveChitToOtherLine(newChits, oldChits, i, 0);
+                return;
+            }
+        }
+    }
+
+    public void mouseEntered(MouseEvent e)
+    {
+    }
+
+    public void mouseExited(MouseEvent e)
+    {
+    }
+
+    public void mouseClicked(MouseEvent e)
+    {
+    }
+
+    public void mouseReleased(MouseEvent e)
+    {
+    }
+
+    public void windowActivated(WindowEvent e)
+    {
+    }
+
+    public void windowClosed(WindowEvent e)
+    {
+    }
+
+    public void windowClosing(WindowEvent e)
+    {
+        cancel();
+    }
+
+    public void windowDeactivated(WindowEvent e)
+    {
+    }
+
+    public void windowDeiconified(WindowEvent e)
+    {
+    }
+
+    public void windowIconified(WindowEvent e)
+    {
+    }
+
+    public void windowOpened(WindowEvent e)
+    {
+    }
+
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals("Done"))
@@ -319,13 +313,10 @@ public final class SplitLegion extends JDialog implements MouseListener,
     {
         JFrame frame = new JFrame("testing SplitLegion");
         int scale = Scale.get();
-        frame.setSize(new Dimension(80 * scale, 80 * scale));
         frame.pack();
         frame.setVisible(true);
 
         Game game = new Game();
-        game.initBoard();
-        MasterHex hex = game.getBoard().getHexByLabel("130");
         game.addPlayer("Test");
         Player player = game.getPlayer(0);
         player.setTower(1);
@@ -333,13 +324,16 @@ public final class SplitLegion extends JDialog implements MouseListener,
         player.initMarkersAvailable();
         String selectedMarkerId = player.selectMarkerId("Rd01");
         Legion legion = Legion.getStartingLegion(selectedMarkerId,
-            hex.getLabel(), player.getName(), game);
+            "130", player.getName(), game);
         player.addLegion(legion);
         Marker marker = new Marker(4 * scale, selectedMarkerId, frame, game);
         legion.setMarker(marker);
 
+        selectedMarkerId = player.selectMarkerId("Rd02");
+
         String retval = SplitLegion.splitLegion(frame, legion,
-            player.pickMarker());
+            selectedMarkerId);
+
         System.out.println(retval);
         System.exit(0);
     }

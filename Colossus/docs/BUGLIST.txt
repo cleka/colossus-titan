@@ -20,6 +20,9 @@ Win98 1.3: Popup menus are not erased properly.  They erase fine
 Linux 1.4b: Problems running to a remote X display.  Some of the
    startup dialogs never show up.  Behind the MasterBoard?
 
+Linux, Solaris, 1.3: Dialogs sometimes beep for no good reason.
+   Doesn't happen in Win98.
+
 
 Current programming bugs:
 
@@ -28,12 +31,6 @@ Concession timing.  If both players want to concede, the non-phasing
    aren't allowed in the middle of strikes.  Etc.
 Striking continues after concession, until the normal time to check for
    creature (and then player) death.
-
-Linux, Solaris, 1.3: Dialogs sometimes beep for no good reason.
-   Are modal dialogs moving behind other windows before being destroyed?
-   Added setVisible(false) before dispose() calls, which doesn't seem
-   to help.  SplitLegion and PickRecruit (both called from Game) seem
-   to be the main culprits.  Also AcquireAngel.  Doesn't happen in Win98.
 
 --latest finds savegames with non-numeric filenames, and always uses
    them in preference to those with normal numeric filenames.
@@ -64,3 +61,11 @@ Solaris, 1.3.1: Popup windows (e.g. ShowMasterHex) pop up in the wrong
    place if the window has been scrolled.  Scrollbars do not immediately
    appear / disappear after a rescale().
 
+Win98, 1.4b: Turn 1, player started in tower 300.  Rolled a 6.  Titan
+   to tower 400, got "teleport or move normally" prompt despite the
+   fact that it could only get there by teleporting.  Angel to marsh
+   22, got same prompt even though titan already teleported.
+
+Solaris, 1.3.1: MovementDie is appearing mostly off right edge of the
+   screen.  StatusScreen is appearing with its bottom edge off the
+   bottom of the screen.

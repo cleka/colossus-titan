@@ -529,7 +529,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
         }
 
-        Game.logError("Could not find hex " + label);
+        Log.error("Could not find hex " + label);
         return null;
     }
 
@@ -659,15 +659,16 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         MasterBoard board = game.getBoard();
         MasterHex hex = board.getAnyHexWithTerrain(terrain);
 
-        JFrame window = new JFrame("Hex Map for " + hex.getTerrainName());
-        Container contentPane = window.getContentPane();
+        JFrame frame = new JFrame("Hex Map for " + hex.getTerrainName());
+        Container contentPane = frame.getContentPane();
         contentPane.setLayout(new BorderLayout());
 
         HexMap hexMap = new HexMap(board, hex.getLabel());
 
         contentPane.add(hexMap, BorderLayout.CENTER);
-        window.pack();
-        window.setResizable(false);
-        window.setVisible(true);
+        frame.pack();
+        frame.setResizable(false);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

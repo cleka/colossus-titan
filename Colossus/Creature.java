@@ -288,7 +288,7 @@ public class Creature implements Comparable
             }
         }
 
-        Game.logError("There is no creature called " + name);
+        Log.error("There is no creature called " + name);
         return null;
     }
 

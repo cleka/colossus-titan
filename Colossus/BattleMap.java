@@ -40,7 +40,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         Legion attacker = battle.getAttacker();
         Legion defender = battle.getDefender();
 
-        Game.logEvent(attacker.getLongMarkerName() + " (" +
+        Log.event(attacker.getLongMarkerName() + " (" +
             attacker.getPlayerName() + ") attacks " +
             defender.getLongMarkerName() + " (" +
             defender.getPlayerName() + ")" + " in " +
@@ -262,7 +262,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             }
             catch (NullPointerException e)
             {
-                Game.logError(e.toString() + " Couldn't find " +
+                Log.error(e.toString() + " Couldn't find " +
                     Creature.colossus.getImageName());
                 dispose();
             }

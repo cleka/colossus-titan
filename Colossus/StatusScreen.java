@@ -160,7 +160,7 @@ public final class StatusScreen extends JFrame implements WindowListener
             }
             catch (NullPointerException e)
             {
-                Game.logError(e.toString() + " Could not find " +
+                Log.error(e.toString() + " Could not find " +
                     Creature.colossus.getImageName());
                 dispose();
             }

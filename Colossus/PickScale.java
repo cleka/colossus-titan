@@ -36,8 +36,7 @@ public final class PickScale extends JDialog implements WindowListener,
         slider.addChangeListener(this);
 
         // Need another BoxLayout to place buttons horizontally.
-        JPanel buttonBar = new JPanel();
-        buttonBar.setLayout(new BoxLayout(buttonBar, BoxLayout.X_AXIS));
+        Box buttonBar = new Box(BoxLayout.X_AXIS);
         contentPane.add(buttonBar);
 
         JButton accept = new JButton("Accept");

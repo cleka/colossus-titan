@@ -175,6 +175,7 @@ public final class PickLord extends JDialog implements MouseListener,
         player.addLegion(legion);
 
         Creature creature = PickLord.pickLord(frame, legion);
-        Game.logEvent("Chose " + creature);
+        System.out.println("Chose " + creature);
+        System.exit(0);
     }
 }

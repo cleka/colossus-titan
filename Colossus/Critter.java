@@ -387,7 +387,7 @@ public final class Critter extends Creature implements Comparable
     {
         String formerHexLabel = currentHexLabel;
         currentHexLabel = startingHexLabel;
-        Game.logEvent(getName() + " undoes move and returns to " +
+        Log.event(getName() + " undoes move and returns to " +
             startingHexLabel);
         BattleMap map = battle.getBattleMap();
         map.alignChits(formerHexLabel);
@@ -682,7 +682,7 @@ public final class Critter extends Creature implements Comparable
         // Sanity check
         if (target.getPlayer() == getPlayer())
         {
-            Game.logError(getName() + " tried to strike allied " +
+            Log.error(getName() + " tried to strike allied " +
                 target.getName());
             return;
         }
@@ -881,7 +881,7 @@ public final class Critter extends Creature implements Comparable
             }
         }
 
-        Game.logEvent(getName() + " in " + currentHexLabel +
+        Log.event(getName() + " in " + currentHexLabel +
             " strikes " + target.getName() + " in " +
             targetHex.getLabel() + " with strike number " +
             strikeNumber + " : " + rollString + ": " + damage +
@@ -896,7 +896,7 @@ public final class Critter extends Creature implements Comparable
         // Let the attacker choose whether to carry, if applicable.
         if (carryDamage > 0)
         {
-            Game.logEvent(carryDamage + (carryDamage == 1 ?
+            Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
             battle.setCarryDamage(carryDamage);
             battle.highlightCarries();

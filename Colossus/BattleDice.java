@@ -205,7 +205,7 @@ public final class BattleDice extends JFrame implements WindowListener
             }
             catch (NullPointerException e)
             {
-                Game.logError(e.toString() + " Couldn't find " +
+                Log.error(e.toString() + " Couldn't find " +
                     Creature.colossus.getImageName());
                 dispose();
             }

@@ -91,7 +91,7 @@ class Minimax
         int alpha,       // alpha
         int beta)        // beta
     {
-        SimpleAI.debugln("search d " + depth + " / " + maxDepth + " alpha "
+        Log.debug("search d " + depth + " / " + maxDepth + " alpha "
                          + alpha + " beta " + beta);
 
         int best_score;
@@ -100,10 +100,10 @@ class Minimax
 
         if (depth >= maxDepth)
         {
-            SimpleAI.debugln("at max depth");
+            Log.debug("at max depth");
             best_score = position.evaluation();
             best_move = position.generateNullMove();
-            SimpleAI.debugln(" returning score " + best_score);
+            Log.debug(" returning score " + best_score);
         }
         else
         {
@@ -191,7 +191,7 @@ class Minimax
             if (numMovesExamined == 0)
             {
                 // no legal moves from here, so terminate
-                SimpleAI.debugln("no moves found; terminating search");
+                Log.debug("no moves found; terminating search");
                 best_score = position.evaluation();
                 best_move = position.generateNullMove();
             }
@@ -250,7 +250,7 @@ class Minimax
 
         public int evaluation()
         {
-            SimpleAI.debugln("called evaluation on " + position);
+            Log.debug("called evaluation on " + position);
 
             if ("11".equals(position))
             {
@@ -305,19 +305,15 @@ class Minimax
     public void test()
     {
         TestGame game = new TestGame();
-
         game.position = "";
-
         TestMove move = (TestMove)search(game, 2);
-
-        SimpleAI.debugln("Final result is to make move " + move.move +
+        System.out.println("Final result is to make move " + move.move +
             " with value " + move.getValue());
     }
 
     public static void main(String[] args)
     {
         Minimax minimax = new Minimax();
-
         minimax.test();
     }
 }

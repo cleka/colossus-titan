@@ -77,7 +77,7 @@ public final class MovementDie extends JFrame implements WindowListener
             }
             catch (NullPointerException e)
             {
-                Game.logError(e.toString() + " Couldn't find " +
+                Log.error(e.toString() + " Couldn't find " +
                     Creature.colossus.getImageName());
                 dispose();
             }
@@ -128,6 +128,7 @@ public final class MovementDie extends JFrame implements WindowListener
     public static void main(String [] args)
     {
         MovementDie movementDie = new MovementDie(null);
+        movementDie.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         movementDie.showRoll(6);
     }
 }

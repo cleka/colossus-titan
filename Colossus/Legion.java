@@ -291,7 +291,7 @@ public final class Legion implements Comparable
                 if (angel != null)
                 {
                     addCreature(angel, true);
-                    Game.logEvent("Legion " + getLongMarkerName() +
+                    Log.event("Legion " + getLongMarkerName() +
                         " acquires an " + angelType);
                     if (angelType.equals("Archangel"))
                     {
@@ -586,7 +586,7 @@ public final class Legion implements Comparable
             log.append("] ");
         }
         log.append("is eliminated");
-        Game.logEvent(log.toString());
+        Log.event(log.toString());
 
         // Free up the legion marker.
         Player player = getPlayer();
@@ -621,7 +621,7 @@ public final class Legion implements Comparable
         board.alignLegions(currentHexLabel);
         board.alignLegions(startingHexLabel);
 
-        Game.logEvent("Legion " + getLongMarkerName() + " in " +
+        Log.event("Legion " + getLongMarkerName() + " in " +
             getCurrentHex().getDescription() + (teleported ?
             (game.isOccupied(hexLabel) ? " titan teleports " :
             " tower teleports (" + teleportingLord + ") " ) : " moves ") +
@@ -643,7 +643,7 @@ public final class Legion implements Comparable
             currentHexLabel = startingHexLabel;
 
             moved = false;
-            Game.logEvent("Legion " + getLongMarkerName() +
+            Log.event("Legion " + getLongMarkerName() +
                 " undoes its move");
 
             MasterBoard board = game.getBoard();
@@ -699,7 +699,7 @@ public final class Legion implements Comparable
             game.getCaretaker().putOneBack(creature);
             removeCreature(creature, false, true);
             recruitName = null;
-            Game.logEvent("Legion " + getLongMarkerName() +
+            Log.event("Legion " + getLongMarkerName() +
                 " undoes its recruit");
         }
     }
@@ -1100,7 +1100,7 @@ public final class Legion implements Comparable
         // Sanity check
         if (legion == this)
         {
-            Game.logWarn("Tried to recombine a legion with itself!");
+            Log.warn("Tried to recombine a legion with itself!");
             return;
         }
         Iterator it = critters.iterator();
@@ -1125,7 +1125,7 @@ public final class Legion implements Comparable
             prepareToRemove();
         }
 
-        Game.logEvent("Legion " + getLongMarkerName() +
+        Log.event("Legion " + getLongMarkerName() +
             " recombined into legion " + legion.getLongMarkerName());
 
         sortCritters();
@@ -1179,7 +1179,7 @@ public final class Legion implements Comparable
         player.setLastLegionSplitOff(newLegion);
 
         game.updateStatusScreen();
-        Game.logEvent(newLegion.getHeight() +
+        Log.event(newLegion.getHeight() +
             " creatures are split off from legion " + getLongMarkerName() +
             " into new legion " + newLegion.getLongMarkerName());
 

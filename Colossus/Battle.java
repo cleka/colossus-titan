@@ -99,7 +99,7 @@ public final class Battle
                 advance = setupFight();
                 break;
             default:
-                Game.logError("Bogus phase");
+                Log.error("Bogus phase");
         }
         if (advance)
         {
@@ -300,14 +300,14 @@ public final class Battle
         if (phase == SUMMON)
         {
             phase = MOVE;
-            Game.logEvent("Battle phase advances to " + getPhaseName(phase));
+            Log.event("Battle phase advances to " + getPhaseName(phase));
             again = setupMove();
         }
 
         else if (phase == RECRUIT)
         {
             phase = MOVE;
-            Game.logEvent("Battle phase advances to " + getPhaseName(phase));
+            Log.event("Battle phase advances to " + getPhaseName(phase));
             again = setupMove();
         }
 
@@ -321,7 +321,7 @@ public final class Battle
                 attackerEntered = true;
             }
             phase = FIGHT;
-            Game.logEvent("Battle phase advances to " + getPhaseName(phase));
+            Log.event("Battle phase advances to " + getPhaseName(phase));
             again = setupFight();
         }
 
@@ -332,7 +332,7 @@ public final class Battle
             activeLegionNum = (activeLegionNum + 1) & 1;
             driftDamageApplied = false;
             phase = STRIKEBACK;
-            Game.logEvent("Battle phase advances to " + getPhaseName(phase));
+            Log.event("Battle phase advances to " + getPhaseName(phase));
             again = setupFight();
         }
 
@@ -348,7 +348,7 @@ public final class Battle
                 if (activeLegionNum == ATTACKER)
                 {
                     phase = SUMMON;
-                    Game.logEvent(getActivePlayer().getName() +
+                    Log.event(getActivePlayer().getName() +
                         "'s battle turn, number " + turnNumber);
                     again = setupSummon();
                 }
@@ -357,7 +357,7 @@ public final class Battle
                     turnNumber++;
                     if (turnNumber > 7)
                     {
-                        Game.logEvent("Time loss");
+                        Log.event("Time loss");
                         Legion attacker = getAttacker();
                         // Time loss.  Attacker is eliminated but defender
                         //    gets no points.
@@ -384,7 +384,7 @@ public final class Battle
                         Player player = getActivePlayer();
                         if (player != null)
                         {
-                            Game.logEvent(player.getName() +
+                            Log.event(player.getName() +
                             "'s battle turn, number " + turnNumber);
                         }
                     }
@@ -408,7 +408,7 @@ public final class Battle
         {
             if (getAttacker().canSummonAngel() && game != null)
             {
-Game.logDebug("called game.createSummonAngel from Battle");
+Log.debug("called game.createSummonAngel from Battle");
                 game.createSummonAngel(getAttacker());
             }
             // This is the last chance to summon an angel until the
@@ -735,7 +735,7 @@ Game.logDebug("called game.createSummonAngel from Battle");
 
         if (answer == JOptionPane.YES_OPTION)
         {
-            Game.logEvent(player.getName() + " concedes the battle");
+            Log.event(player.getName() + " concedes the battle");
             concede(player);
             return true;
         }
@@ -874,7 +874,7 @@ Game.logDebug("called game.createSummonAngel from Battle");
                 if (critter.getCurrentHex().getTerrain() == 'd' &&
                     !critter.isNativeDrift())
                 {
-                    Game.logEvent(critter.getName() + " takes drift damage");
+                    Log.event(critter.getName() + " takes drift damage");
                     critter.wound(1);
                     driftDamageApplied = true;
                 }
@@ -1043,7 +1043,7 @@ Game.logDebug("called game.createSummonAngel from Battle");
         {
             // Nobody gets any points.
             // Make defender die first, to simplify turn advancing.
-Game.logDebug("mutual titan elimination");
+Log.debug("mutual titan elimination");
             defender.getPlayer().die(null, false);
             attacker.getPlayer().die(null, true);
             cleanup();
@@ -1052,7 +1052,7 @@ Game.logDebug("mutual titan elimination");
         // Check for single Titan elimination.
         else if (attackerTitanDead)
         {
-Game.logDebug("attacker titan elimination");
+Log.debug("attacker titan elimination");
             String slayerName = defender.getPlayerName();
             if (defenderElim)
             {
@@ -1067,7 +1067,7 @@ Game.logDebug("attacker titan elimination");
         }
         else if (defenderTitanDead)
         {
-Game.logDebug("defender titan elimination");
+Log.debug("defender titan elimination");
             String slayerName = attacker.getPlayerName();
             if (attackerElim)
             {
@@ -1084,7 +1084,7 @@ Game.logDebug("defender titan elimination");
         // Check for mutual legion elimination.
         else if (attackerElim && defenderElim)
         {
-Game.logDebug("mutual");
+Log.debug("mutual");
             attacker.remove();
             defender.remove();
             cleanup();
@@ -1093,14 +1093,14 @@ Game.logDebug("mutual");
         // Check for single legion elimination.
         else if (attackerElim)
         {
-Game.logDebug("attacker eliminated");
+Log.debug("attacker eliminated");
             defender.addBattleTallyToPoints();
             attacker.remove();
             cleanup();
         }
         else if (defenderElim)
         {
-Game.logDebug("defender eliminated");
+Log.debug("defender eliminated");
             attacker.addBattleTallyToPoints();
             defender.remove();
             cleanup();
@@ -1340,7 +1340,7 @@ Game.logDebug("defender eliminated");
         dealt -= carryDamage;
         target.setCarryFlag(false);
 
-        Game.logEvent(dealt + (dealt == 1 ? " hit carries to " :
+        Log.event(dealt + (dealt == 1 ? " hit carries to " :
             " hits carry to ") + target.getDescription());
 
         if (carryDamage <= 0 || findCarryTargets().isEmpty())
@@ -1351,7 +1351,7 @@ Game.logDebug("defender eliminated");
         {
             String label = target.getCurrentHexLabel();
             map.unselectHexByLabel(label);
-            Game.logEvent(carryDamage + (carryDamage == 1 ?
+            Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
             if (game != null && game.getOption(Options.showDice))
             {
@@ -1371,7 +1371,7 @@ Game.logDebug("defender eliminated");
     {
         if (hex1 == null || hex2 == null)
         {
-            Game.logWarn("passed null hex to getRange()");
+            Log.warn("passed null hex to getRange()");
             return OUT_OF_RANGE;
         }
         if (hex1.isEntrance() || hex2.isEntrance())
@@ -2050,12 +2050,12 @@ Game.logDebug("defender eliminated");
         // Allow null moves.
         if (hexLabel.equals(critter.getCurrentHexLabel()))
         {
-            Game.logEvent(critter.getDescription() + " does not move");
+            Log.event(critter.getDescription() + " does not move");
             return true;
         }
         else if (showMoves(critter, false).contains(hexLabel))
         {
-            Game.logEvent(critter.getName() + " moves from " +
+            Log.event(critter.getName() + " moves from " +
                 critter.getCurrentHexLabel() + " to " + hexLabel);
             critter.moveToHex(hex);
             critterSelected = false;
@@ -2064,7 +2064,7 @@ Game.logDebug("defender eliminated");
         }
         else
         {
-            Game.logEvent(critter.getName() + " in " +
+            Log.event(critter.getName() + " in " +
                 critter.getCurrentHexLabel() +
                 " tried to illegally move to " + hexLabel);
             return false;

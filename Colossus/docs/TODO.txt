@@ -1,5 +1,7 @@
-Make GetPlayers dialog less hideous.  (Use BoxLayout to group radio buttons
-   closer together.)  Change tab order to do all player names first.
+Stuff to move out of Game:
+   Client-side options.
+   Applet stuff.
+   Startup code.
 
 Add UI for players to specify favorite colors.
 
@@ -38,10 +40,7 @@ Add SetupBattle dialog, to allow setting up standalone battles.
    (terrain, entry side, creatures in attacking and defending legions,
    angel/archangel available to summon, recruits available for terrain
    type, player scores for titan power.)
-Add show stacks / show graveyard dialogs.  (From Prometheus.)
-
-Add a global rescale option.  Really need higher-res images and numbers 
-   done with scalable fonts for this to look good.
+Add show caretaker stacks / show graveyard dialogs.  (From Prometheus.)
 
 Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
@@ -60,13 +59,13 @@ Change more modal dialogs to use a factory that returns a value,
    rather than a public constructor and a call to a mutator.
    This should reduce global access from dialogs to game objects,
    and allow dialog results to be more easily replicated by network
-   and computer dialog replacements.  All parameters passed into
-   the dialogs should eventually be read-only or clones, with all
-   changes to game state done by the caller.
+   and computer dialog replacements.  
+All parameters passed into dialogs should be read-only or clones, with 
+   all changes to game state done by the caller.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 
-Add keyboard legion selection?
+Add keyboard legion/critter selection?  (Previous, next, unselect keys)
 Add toolbars?
 Add tooltips?
 
@@ -92,4 +91,5 @@ Fix concession timing.
 
 Client-server networking.
 
-Chat window.
+Chat window.  (From Prometheus.)
+

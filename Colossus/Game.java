@@ -35,9 +35,6 @@ public final class Game
     private JFrame masterFrame;
     private boolean engagementInProgress;
 
-    private static boolean DEBUG = true;
-
-
     // Constants for savegames
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
@@ -167,7 +164,7 @@ public final class Game
             }
         }
 
-        logEvent("Starting new game");
+        Log.event("Starting new game");
 
         Iterator it = playerInfo.entrySet().iterator();
         while (it.hasNext())
@@ -176,7 +173,7 @@ public final class Game
             String name = (String)entry.getKey();
             String autoPlay = (String)entry.getValue();
             addPlayer(name);
-            logEvent("Add " + autoPlay + " player " + name);
+            Log.event("Add " + autoPlay + " player " + name);
         }
 
         assignTowers();
@@ -227,7 +224,7 @@ public final class Game
             }
             while (color == null);
             colorsLeft.remove(color);
-            logEvent(player.getName() + " chooses color " + color);
+            Log.event(player.getName() + " chooses color " + color);
             player.setColor(color);
             player.initMarkersAvailable();
         }
@@ -331,7 +328,7 @@ public final class Game
         for (int i = 0; i < numPlayers; i++)
         {
             Player player = getPlayer(i);
-            logEvent(player.getName() + " gets tower " + playerTower[i]);
+            Log.event(player.getName() + " gets tower " + playerTower[i]);
             player.setTower(playerTower[i]);
         }
     }
@@ -603,7 +600,7 @@ public final class Game
         }
         catch (IOException e)
         {
-            logError("Couldn't write options to " + optionsFile);
+            Log.error("Couldn't write options to " + optionsFile);
         }
 
         // Save options for each player
@@ -628,7 +625,7 @@ public final class Game
         }
         catch (IOException e)
         {
-            logError("Couldn't read game options from " + optionsFile);
+            Log.error("Couldn't read game options from " + optionsFile);
             return;
         }
 
@@ -714,14 +711,14 @@ public final class Game
         switch (remaining)
         {
             case 0:
-                logEvent("Draw");
+                Log.event("Draw");
                 JOptionPane.showMessageDialog(board, "Draw");
                 dispose();
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
-                logEvent(winnerName + " wins");
+                Log.event(winnerName + " wins");
                 JOptionPane.showMessageDialog(board, winnerName + " wins");
                 dispose();
                 break;
@@ -756,7 +753,7 @@ public final class Game
         else
         {
             board.unselectAllHexes();
-            logEvent("Phase advances to " + getPhaseName(phase));
+            Log.event("Phase advances to " + getPhaseName(phase));
         }
 
         setupPhase();
@@ -782,7 +779,7 @@ public final class Game
                 setupMuster();
                 break;
             default:
-                logError("Bogus phase");
+                Log.error("Bogus phase");
         }
     }
 
@@ -873,7 +870,7 @@ public final class Game
         else
         {
             Player player = getActivePlayer();
-            logEvent(player.getName() + "'s turn, number " + turnNumber);
+            Log.event(player.getName() + "'s turn, number " + turnNumber);
 
             player.syncCheckboxes();
             updateStatusScreen();
@@ -996,8 +993,8 @@ public final class Game
         }
         catch (IOException e)
         {
-            logError(e.toString());
-            logError("Couldn't open " + filename);
+            Log.error(e.toString());
+            Log.error("Couldn't open " + filename);
             return;
         }
         PrintWriter out = new PrintWriter(fileWriter);
@@ -1068,7 +1065,7 @@ public final class Game
 
         if (out.checkError())
         {
-            logError("Write error " + filename);
+            Log.error("Write error " + filename);
             // XXX Delete the partial file?
             return;
         }
@@ -1115,7 +1112,7 @@ public final class Game
         {
              if (!savesDir.mkdir())
              {
-                 logError("Could not create saves directory");
+                 Log.error("Could not create saves directory");
                  return;
              }
         }
@@ -1140,13 +1137,13 @@ public final class Game
             File dir = new File(saveDirname);
             if (!dir.exists() || !dir.isDirectory())
             {
-                logError("No saves directory");
+                Log.error("No saves directory");
                 dispose();
             }
             String [] filenames = dir.list(new SaveGameFilter());
             if (filenames.length < 1)
             {
-                logError("No savegames found in saves directory");
+                Log.error("No savegames found in saves directory");
                 dispose();
             }
             file = new File(saveDirname + File.separator +
@@ -1170,7 +1167,7 @@ public final class Game
             buf = in.readLine();
             if (!buf.equals(saveGameVersion))
             {
-                logError("Can't load this savegame version.");
+                Log.error("Can't load this savegame version.");
                 dispose();
             }
             // Get rid of the status screen, so that we can create
@@ -1350,7 +1347,7 @@ public final class Game
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
         {
-            logError(e + "Tried to load corrupt savegame.");
+            Log.error(e + "Tried to load corrupt savegame.");
             e.printStackTrace();
             dispose();
         }
@@ -2307,7 +2304,7 @@ public final class Game
             }
         }
 
-        logEvent("Legion " + legion.getLongMarkerName() + " in " +
+        Log.event("Legion " + legion.getLongMarkerName() + " in " +
             hex.getDescription() + " recruits " + recruit.getName() +
             " with " + (numRecruiters == 0 ? "nothing" :
             numRecruiters + " " + (numRecruiters > 1 ?
@@ -2381,40 +2378,6 @@ public final class Game
     }
 
 
-    //    debug -- intended for developer only -- console or logfile
-    //    info  -- routine info -- console or logfile or GUI scroll window
-    //    warn  -- user mistake or important info -- message dialog
-    //    error -- serious program error -- message dialog or stderr
-    //    fatal -- fatal program error -- message dialog or stderr
-
-    /** Log an event. */
-    public static void logEvent(String s)
-    {
-        System.out.println(s);
-    }
-
-    /** Log an error. */
-    public static void logError(String s)
-    {
-        System.out.println("Error: " + s);
-    }
-
-    /** Log a warning. */
-    public static void logWarn(String s)
-    {
-        System.out.println("Warn:" + s);
-    }
-
-    /** Log a debug message. */
-    public static void logDebug(String s)
-    {
-        if (DEBUG)
-        {
-            System.out.println(s);
-        }
-    }
-
-
     /** Put all die rolling in one place, in case we decide to change random
      *  number algorithms, use an external dice server, etc. */
     public static int rollDie()
@@ -2442,7 +2405,7 @@ public final class Game
         }
 
         player.selectMarkerId(selectedMarkerId);
-        logEvent(name + " selects initial marker");
+        Log.event(name + " selects initial marker");
 
         // Lookup coords for chit starting from player[i].getTower()
         String hexLabel = (String.valueOf(100 * player.getTower()));
@@ -2857,7 +2820,7 @@ public final class Game
             donor.getCurrentHex().repaint();
             legion.getCurrentHex().repaint();
 
-            Game.logEvent("An " + angel.getName() +
+            Log.event("An " + angel.getName() +
                 " is summoned from legion " + donor.getLongMarkerName() +
                 " into legion " + legion.getLongMarkerName());
         }
@@ -3278,7 +3241,7 @@ public final class Game
             boolean concedes;
             if (attacker.getPlayer().getOption(Options.autoFlee))
             {
-                concedes = attacker.getPlayer().aiConcede(defender, attacker);
+                concedes = attacker.getPlayer().aiConcede(attacker, defender);
             }
             else
             {
@@ -3323,14 +3286,18 @@ public final class Game
         if (fled)
         {
             points /= 2;
-            Game.logEvent("Legion " + loser.getLongMarkerName() +
+            Log.event("Legion " + loser.getLongMarkerName() +
                 " flees from legion " + winner.getLongMarkerName());
         }
         else
         {
-            Game.logEvent("Legion " + loser.getLongMarkerName() +
+            Log.event("Legion " + loser.getLongMarkerName() +
                 " concedes to legion " + winner.getLongMarkerName());
         }
+
+        // Need to grab the player reference before the legion is
+        // removed.
+        Player losingPlayer = loser.getPlayer();
 
         // Remove the dead legion.
         loser.remove();
@@ -3344,7 +3311,7 @@ public final class Game
         // points to the victor.
         if (loser.hasTitan())
         {
-            loser.getPlayer().die(winner.getPlayerName(), true);
+            losingPlayer.die(winner.getPlayerName(), true);
         }
 
         // Unselect and repaint the hex.
@@ -3368,7 +3335,7 @@ public final class Game
              attacker.remove();
              defender.remove();
 
-             Game.logEvent(attacker.getLongMarkerName() + " and " +
+             Log.event(attacker.getLongMarkerName() + " and " +
                  defender.getLongMarkerName() +
                  " agree to mutual elimination");
 
@@ -3423,7 +3390,7 @@ public final class Game
                 }
                 winner.removeCreature(creature, true, true);
             }
-            Game.logEvent(log.toString());
+            Log.event(log.toString());
 
             int points = loser.getPointValue();
 
@@ -3433,7 +3400,7 @@ public final class Game
             // Add points, and angels if necessary.
             winner.addPoints(points);
 
-            Game.logEvent("Legion " + loser.getLongMarkerName() +
+            Log.event("Legion " + loser.getLongMarkerName() +
                " is eliminated by legion " + winner.getLongMarkerName() +
                " via negotiation");
 
@@ -3465,7 +3432,6 @@ public final class Game
                 {
                     // If the attacker won the battle by agreement,
                     // he may summon an angel.
-Game.logDebug("Calling createSummonAngel() from handleNegotiation");
                     createSummonAngel(attacker);
                 }
             }
@@ -3727,7 +3693,7 @@ Game.logDebug("Calling createSummonAngel() from handleNegotiation");
         }
         catch (Exception e)
         {
-            logError(e + "Could not set look and feel.");
+            Log.error(e + "Could not set look and feel.");
         }
 
         if (args.length == 0)

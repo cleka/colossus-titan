@@ -12,15 +12,6 @@ import java.util.*;
 class SimpleAI implements AI
 {
     private Minimax minimax = new Minimax();
-    public static boolean DEBUG = true;
-
-    public static void debugln(String s)
-    {
-        if (DEBUG)
-        {
-            System.out.println(s);
-        }
-    }
 
 
     public String pickColor(Set colors, List favoriteColors)
@@ -29,7 +20,7 @@ class SimpleAI implements AI
         while (it.hasNext())
         {
             String preferredColor = (String)it.next();
-debugln("Looking for " + preferredColor);
+Log.debug("Looking for " + preferredColor);
             if (colors.contains(preferredColor))
             {
                 return preferredColor;
@@ -39,7 +30,7 @@ debugln("Looking for " + preferredColor);
         it = colors.iterator();
         if (it.hasNext())
         {
-debugln("Setting for whatever color is left");
+Log.debug("Setting for whatever color is left");
             return (String)it.next();
         }
         return null;
@@ -264,7 +255,7 @@ debugln("Setting for whatever color is left");
 
                             if (result == WIN_WITH_MINIMAL_LOSSES)
                             {
-                                debugln("We can safely split AND attack with "
+                                Log.debug("We can safely split AND attack with "
                                     + legion);
                                 safeMoves++;
 
@@ -284,7 +275,7 @@ debugln("Setting for whatever color is left");
                                 && roll <= 4)
                             {
                                 // don't split so that we can attack!
-                                debugln("Not splitting " + legion +
+                                Log.debug("Not splitting " + legion +
                                     " because we want the muscle to attack");
 
                                 forcedToAttack = 999;
@@ -307,7 +298,7 @@ debugln("Setting for whatever color is left");
                 if (!goodRecruit)
                 {
                     // No point in splitting, since we can't improve.
-                    debugln("Not splitting " + legion +
+                    Log.debug("Not splitting " + legion +
                         " because it can't improve from here");
                     continue outer;
                 }
@@ -792,7 +783,7 @@ debugln("Setting for whatever color is left");
                     }
                     else
                     {
-                        debugln("game.doMove() failed!");
+                        Log.debug("game.doMove() failed!");
                     }
                 }
             }
@@ -817,7 +808,7 @@ debugln("Setting for whatever color is left");
                 // Pick the legion in this hex whose best move has the
                 // least difference with its sitStillValue, scaled by
                 // the point value of the legion, and force it to move.
-                debugln("Ack! forced to move a split group");
+                Log.debug("Ack! forced to move a split group");
 
                 // first, concatenate all the moves for all the
                 // legions that are here, and sort them by their
@@ -853,7 +844,7 @@ debugln("Setting for whatever color is left");
                     {
                         continue;       // skip the sitStill moves
                     }
-                    debugln("forced to move split legion " + move.legion
+                    Log.debug("forced to move split legion " + move.legion
                             + " to " + move.hex + " taking penalty "
                             + move.difference
                             + " in order to handle illegal legion " + legion);
@@ -880,7 +871,7 @@ debugln("Setting for whatever color is left");
     private void handleForcedSingleMove(Game game, Player player,
         HashMap moveMap)
     {
-        debugln("Ack! forced to move someone");
+        Log.debug("Ack! forced to move someone");
 
         // Pick the legion whose best move has the least
         // difference with its sitStillValue, scaled by the
@@ -924,7 +915,7 @@ debugln("Setting for whatever color is left");
                 continue;       // skip the sitStill moves
             }
 
-            debugln("forced to move " + move.legion + " to " + move.hex
+            Log.debug("forced to move " + move.legion + " to " + move.hex
                     + " taking penalty " + move.difference
                     + " in order to handle illegal legion " + move.legion);
             game.doMove(move.legion, move.hex.getLabel());
@@ -959,7 +950,7 @@ debugln("Setting for whatever color is left");
             {
                 Legion legion = (Legion)legionIt.next();
 
-                // debugln("checking where " + legion +
+                // Log.debug("checking where " + legion +
                 //    " can attack next turn..");
                 // for each movement roll he might make
                 for (int roll = 1; roll <= 6; roll++)
@@ -990,7 +981,7 @@ debugln("Setting for whatever color is left");
                             }
 
                             list.add(legion);
-                            // debugln("" + legion + " can attack "
+                            // Log.debug("" + legion + " can attack "
                             // + hexlabel + " on a " + effectiveRoll);
                             enemyMap[effectiveRoll].put(hexlabel, list);
                         }
@@ -999,7 +990,7 @@ debugln("Setting for whatever color is left");
             }
         }
 
-        // debugln("built map");
+        // Log.debug("built map");
         return enemyMap;
     }
 
@@ -1032,7 +1023,7 @@ debugln("Setting for whatever color is left");
             {
 
                 case WIN_WITH_MINIMAL_LOSSES:
-                    debugln("legion " + legion + " can attack " + enemyLegion
+                    Log.debug("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and WIN_WITH_MINIMAL_LOSSES");
 
                     // we score a fraction of an angel
@@ -1047,7 +1038,7 @@ debugln("Setting for whatever color is left");
                     break;
 
                 case WIN_WITH_HEAVY_LOSSES:
-                    debugln("legion " + legion + " can attack " + enemyLegion
+                    Log.debug("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and WIN_WITH_HEAVY_LOSSES");
                     // don't do this with our titan unless we can win the game
                     Player player = legion.getPlayer();
@@ -1108,7 +1099,7 @@ debugln("Setting for whatever color is left");
                     break;
 
                 case DRAW:
-                    debugln("legion " + legion + " can attack " + enemyLegion
+                    Log.debug("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and DRAW");
 
                     // If this is an unimportant group for us, but
@@ -1136,7 +1127,7 @@ debugln("Setting for whatever color is left");
                     break;
 
                 case LOSE_BUT_INFLICT_HEAVY_LOSSES:
-                    debugln("legion " + legion + " can attack " + enemyLegion
+                    Log.debug("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex
                             + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
 
@@ -1145,7 +1136,7 @@ debugln("Setting for whatever color is left");
                     break;
 
                 case LOSE:
-                    debugln("legion " + legion + " can attack " + enemyLegion
+                    Log.debug("legion " + legion + " can attack " + enemyLegion
                             + " in " + hex + " and LOSE");
 
                     value += LOSE_LEGION;
@@ -1181,7 +1172,7 @@ debugln("Setting for whatever color is left");
                     // sometimes refused to go to a safe desert/jungle
                     // because the value of the recruit was toned down
                     // too much. So the effect has been reduced by half.
-                    debugln("--- 6-HIGH SPECIAL CASE");
+                    Log.debug("--- 6-HIGH SPECIAL CASE");
 
                     Critter weakest1 = null;
                     Critter weakest2 = null;
@@ -1242,7 +1233,7 @@ debugln("Setting for whatever color is left");
                     value += (((newPV - oldPV) + recruit.getPointValue()) / 2);
                 }
 
-                debugln("--- if " + legion + " moves to " + hex
+                Log.debug("--- if " + legion + " moves to " + hex
                         + " then recruit " + recruit.toString() + " (adding "
                         + (value - oldval) + ")");
             }
@@ -1309,11 +1300,11 @@ debugln("Setting for whatever color is left");
         {
             if (canRecruitHere)
             {
-                debugln("considering risk of moving " + legion + " to " + hex);
+                Log.debug("considering risk of moving " + legion + " to " + hex);
             }
             else
             {
-                debugln("considering risk of leaving " + legion + " in " +
+                Log.debug("considering risk of leaving " + legion + " in " +
                     hex);
             }
 
@@ -1330,7 +1321,7 @@ debugln("Setting for whatever color is left");
                     continue;
                 }
 
-                debugln("got enemies that can attack on a " + roll + " :"
+                Log.debug("got enemies that can attack on a " + roll + " :"
                         + enemies);
 
                 Iterator it = enemies.iterator();
@@ -1380,7 +1371,7 @@ debugln("Setting for whatever color is left");
         // (i.e. if another legion has warbears under the top that
         // recruit on 1,3,5, and we have a behemoth with choice of 3/5
         // to jungle or 4/6 to jungle, prefer the 4/6 location).
-        debugln("EVAL " + legion
+        Log.debug("EVAL " + legion
                 + (canRecruitHere ? " move to " : " stay in ") + hex + " = "
                 + value);
 
@@ -1429,7 +1420,7 @@ debugln("Setting for whatever color is left");
 
         if (recruit != null)
         {
-            // debugln("adding in recruited " + recruit +
+            // Log.debug("adding in recruited " + recruit +
             // " when evaluating battle");
             attackerPointValue += getCombatValue(recruit, terrain);
         }
@@ -1912,7 +1903,7 @@ debugln("Setting for whatever color is left");
             return;
         }
 
-        debugln("Best target is " + bestTarget.getDescription());
+        Log.debug("Best target is " + bestTarget.getDescription());
 
         // Having found the target, pick an attacker.  The
         // first priority is finding one that does not need
@@ -1951,7 +1942,7 @@ debugln("Setting for whatever color is left");
             }
         }
 
-        debugln("Best attacker is " + bestAttacker.getDescription());
+        Log.debug("Best attacker is " + bestAttacker.getDescription());
         // Having found the target and attacker, strike.
         // Take a carry penalty if there is still a 95%
         // chance of killing this target.
@@ -1993,7 +1984,7 @@ debugln("Setting for whatever color is left");
                     }
                 }
 
-                debugln("Best carry target is " + bestTarget.getDescription());
+                Log.debug("Best carry target is " + bestTarget.getDescription());
                 battle.applyCarries(bestTarget);
             }
         }
@@ -2137,7 +2128,7 @@ debugln("Setting for whatever color is left");
 
         public int evaluation()
         {
-            debugln("evaluating game position");
+            Log.debug("evaluating game position");
 
             // TODO: need to correct for the fact that more material
             // is not always better.
@@ -2148,7 +2139,7 @@ debugln("Setting for whatever color is left");
             // check for loss
             if (activePlayer.isDead())
             {
-                debugln("evaluation: loss! " + Integer.MIN_VALUE);
+                Log.debug("evaluation: loss! " + Integer.MIN_VALUE);
 
                 return Integer.MIN_VALUE;
             }
@@ -2159,11 +2150,11 @@ debugln("Setting for whatever color is left");
                 switch (playersRemaining)
                 {
                     case 0:
-                        debugln("evaluation: draw! " + 0);
+                        Log.debug("evaluation: draw! " + 0);
                         return 0;
 
                     case 1:
-                        debugln("evaluation: win! " + Integer.MAX_VALUE);
+                        Log.debug("evaluation: win! " + Integer.MAX_VALUE);
                         return Integer.MAX_VALUE;
                 }
             }
@@ -2200,14 +2191,14 @@ debugln("Setting for whatever color is left");
                     // his stacks near each other
                 }
             }
-            debugln("evaluation: " + value);
+            Log.debug("evaluation: " + value);
             return value;
         }
 
 
         public Iterator generateMoves()
         {
-            debugln("generating moves..");
+            Log.debug("generating moves..");
 
             // check for loss
             final Player activePlayer =
@@ -2279,7 +2270,7 @@ debugln("Setting for whatever color is left");
                     allmoves.add(move);
                 }
             }
-            debugln("considering " + allmoves.size() + " possible moves ");
+            Log.debug("considering " + allmoves.size() + " possible moves ");
             return allmoves.iterator();
         }
 
@@ -2290,11 +2281,11 @@ debugln("Setting for whatever color is left");
 
         public Minimax.GamePosition applyMove(Minimax.Move move)
         {
-            debugln("applying moves..");
+            Log.debug("applying moves..");
 
             if (move instanceof DiceMove)
             {
-                debugln("applying dice move");
+                Log.debug("applying dice move");
 
                 // apply dice rolling
                 DiceMove dicemove = (DiceMove)move;
@@ -2308,7 +2299,7 @@ debugln("Setting for whatever color is left");
             }
             else if (move instanceof PlayerMove)
             {
-                debugln("applying player move");
+                Log.debug("applying player move");
 
                 PlayerMove playermove = (PlayerMove)move;
                 MasterBoardPosition position =
@@ -2322,7 +2313,7 @@ debugln("Setting for whatever color is left");
                     Legion legion = (Legion)entry.getKey();
                     MasterHex hex = (MasterHex)entry.getValue();
 
-                    debugln("applymove: try " + legion + " to " + hex);
+                    Log.debug("applymove: try " + legion + " to " + hex);
                     game.doMove(legion, hex.getLabel());
                 }
 
@@ -2493,7 +2484,7 @@ debugln("Setting for whatever color is left");
 
     public void battleMove(Game game)
     {
-        debugln("Called battleMove()");
+        Log.debug("Called battleMove()");
 
         // Consider one critter at a time, in order of importance.
         // Examine all possible moves for that critter not already
@@ -2529,7 +2520,7 @@ debugln("Setting for whatever color is left");
                         fakeCritter.getTag());
 
                     BattleHex hex = cm.getEndingHex(map);
-                    debugln("applymove: try " + critter + " to " +
+                    Log.debug("applymove: try " + critter + " to " +
                         hex.getLabel());
                     if (battle.doMove(critter, hex))
                     {
@@ -2540,7 +2531,7 @@ debugln("Setting for whatever color is left");
             }
         }
 
-        debugln("Done with battleMove");
+        Log.debug("Done with battleMove");
     }
 
     /** Compute a set of CritterMoves for the game's active legion.
@@ -2566,7 +2557,7 @@ debugln("Setting for whatever color is left");
         final Legion legion = battle.getActiveLegion();
         ArrayList critters = legion.getCritters();
 
-debugln("There are " + critters.size() + " critters");
+Log.debug("There are " + critters.size() + " critters");
 
         // Sort critters in decreasing order of importance.  Keep
         // identical creatures together with a secondary sort by
@@ -2598,7 +2589,7 @@ debugln("There are " + critters.size() + " critters");
             // Not moving is also an option.
             moves.add(currentHexLabel);
 
-debugln("Found " + moves.size() + " moves for " + critter.getDescription());
+Log.debug("Found " + moves.size() + " moves for " + critter.getDescription());
 
             // Move previously considered critters into their preferred
             // position so we can take them into account when evaluating
@@ -2672,7 +2663,7 @@ debugln("Found " + moves.size() + " moves for " + critter.getDescription());
                 cm = (CritterMove)it2.next();
                 buf.append(" " + cm.getEndingHexLabel());
             }
-            debugln(buf.toString());
+            Log.debug(buf.toString());
 
             // Add this critter's moves to the list.
             allCritterMoves.add(moveList);
@@ -2710,12 +2701,12 @@ debugln("Found " + moves.size() + " moves for " + critter.getDescription());
                 perfectScore += cm.getCritter().getPointValue();
             }
         }
-debugln("perfect score is : " + perfectScore);
+Log.debug("perfect score is : " + perfectScore);
 
         if (perfectScore == 0)
         {
             // No moves, so exit.
-debugln("no moves");
+Log.debug("no moves");
             return null;
         }
 
@@ -2762,7 +2753,7 @@ debugln("no moves");
             // Maybe pop up a progress bar or progress monitor.
 if (count % 100 == 0)
 {
-debugln(count + " tries");
+Log.debug(count + " tries");
 }
 
             int score = testMoveOrder(order, battle);
@@ -2772,13 +2763,13 @@ debugln(count + " tries");
                 bestScore = score;
                 if (score >= perfectScore)
                 {
-debugln("got perfect score: " + score);
+Log.debug("got perfect score: " + score);
                     break;
                 }
             }
             lastOrder = (ArrayList)order.clone();
         }
-debugln("Got score " + bestScore + " in " + count + " permutations");
+Log.debug("Got score " + bestScore + " in " + count + " permutations");
         return bestOrder;
     }
 
@@ -3062,7 +3053,7 @@ debugln("Got score " + bestScore + " in " + count + " permutations");
             value += 10 * battle.getRange(hex, entrance, true);
         }
 
-        debugln("EVAL " + critter.getName() +
+        Log.debug("EVAL " + critter.getName() +
                 (critter.hasMoved() ? " move to " : " stay in ") + hex +
                 " = " + value);
 

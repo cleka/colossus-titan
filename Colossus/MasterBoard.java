@@ -1556,7 +1556,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
             catch (NullPointerException e)
             {
-                Game.logError(e.toString() + " Couldn't find " +
+                Log.error(e.toString() + " Couldn't find " +
                     Creature.colossus.getImageName());
                 game.dispose();
             }
@@ -1578,7 +1578,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
         }
 
-        Game.logError("Could not find hex " + label);
+        Log.error("Could not find hex " + label);
         return null;
     }
 
@@ -1598,7 +1598,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
         }
 
-        Game.logError("Could not find hex with terrain " + terrain);
+        Log.error("Could not find hex with terrain " + terrain);
         return null;
     }
 
