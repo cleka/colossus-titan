@@ -3,6 +3,7 @@ package net.sf.colossus.server;
 
 import java.util.*;
 import java.net.*;
+import java.io.*;
 import javax.swing.*;
 
 import com.werken.opt.Option;
@@ -298,6 +299,11 @@ public final class Start
         {
             Log.error(ex.toString());
             ex.printStackTrace();
+            PrintWriter fileout = Log.getFileout();
+            if (fileout != null)
+            {
+                ex.printStackTrace(fileout);
+            }
             System.exit(1);
         }
     }

@@ -14,11 +14,11 @@ import net.sf.colossus.client.Client;
 
 public final class Log
 {
-    //    debug -- intended for developers only -- console or logfile
-    //    info  -- routine info -- console or logfile or GUI scroll window
-    //    warn  -- user mistake or important info -- message dialog
-    //    error -- serious program error -- message dialog or stderr
-    //    fatal -- fatal program error -- message dialog or stderr
+    // debug -- intended for developers only -- console or logfile
+    // info  -- routine info -- console or logfile or GUI scroll window
+    // warn  -- user mistake or important info -- message dialog
+    // error -- serious program error -- message dialog or stderr
+    // fatal -- fatal program error -- message dialog or stderr
 
 
     private static boolean showDebug = true;
@@ -33,6 +33,12 @@ public final class Log
     private static Client client;
     private static PrintWriter fileout;
 
+
+    /** Needed for printing exception stack traces to the log. */
+    public static PrintWriter getFileout()
+    {
+        return fileout;
+    }
 
     public static boolean getShowDebug()
     {
@@ -162,6 +168,7 @@ public final class Log
         out("Warn: " + s.trim());
     }
 
+    // XXX This looks thread-unsafe.
     /** Log a debug message, to stdout only. */
     public static void debug(String s)
     {
