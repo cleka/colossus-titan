@@ -60,15 +60,12 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         setLocation(new Point(d.width / 2 - getSize().width / 2, 
             d.height / 2 - getSize().height / 2));
 
-        int cx = scale / 2;
-        int cy = scale * 2 / 3;
-
         markers = new Chit[numEligible];
         counts = new int[numEligible]; 
         for (int i = 0; i < numEligible; i++)
         {
-            markers[i] = new Chit(cx + i * (21 * scale / 20), cy, scale,
-                recruits[i].getImageName(), this, false);
+            markers[i] = new Chit(scale * (21 * i + 10) / 20,
+                scale * 2 / 3, scale, recruits[i].getImageName(), this, false);
             counts[i] = recruits[i].getCount();
         }
 
@@ -412,7 +409,7 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
             }
 
             String countLabel = Integer.toString(counts[i]);
-            g.drawString(countLabel, scale * (21 * i / 20 + 1) -
+            g.drawString(countLabel, scale * (21 * i + 20) / 20 -
                 g.getFontMetrics().stringWidth(countLabel) / 2, 2 * scale);
         }
     }
