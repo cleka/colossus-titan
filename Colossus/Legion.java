@@ -153,7 +153,6 @@ class Legion
 
     void removeLegion()
     {
-        currentHex.removeLegion(this);
         player.removeLegion(this);
     }
 
