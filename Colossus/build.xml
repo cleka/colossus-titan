@@ -431,7 +431,7 @@
 
 <!-- TODO Eliminate double maintenance -->
 <!-- TODO Do not copy unchanged files -->
-<!-- XXX * does not work as a wildcard.  Fix -->
+<!-- XXX libs/*.jar is not copied -->
 <!-- This requires a good ssh-agent setup. -->
 <target name="remote-inst" depends="init,sign,dist,changelog"
         description = "scp files into htdocs tree on SF">
@@ -443,9 +443,6 @@
         </exec>
         <exec executable="ssh" os="Linux,SunOS">
             <arg line="${SERVER} mkdir ${LIBS_DIR}"/>
-        </exec>
-        <exec executable="scp" os="Linux,SunOS">
-            <arg line="libs/*.jar ${SERVER}:${LIBS_DIR}"/>
         </exec>
 
         <exec executable="scp" os="Linux,SunOS">
