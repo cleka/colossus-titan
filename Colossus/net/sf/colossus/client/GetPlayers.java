@@ -51,6 +51,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     private static final String pathSeparator = "/";
     private static String varDirectory = "";
+    private static String variantName = "Default.var";
     private static String mapName = "StrategicMap.map";
     private static String recruitName = "Recruit.ter";
     private static String creaturesName = "Creature.cre";
@@ -134,12 +135,9 @@ public final class GetPlayers extends JDialog implements WindowListener,
         gamePane.setLayout(new GridLayout(0, 3));
         Container variantPane = new Container();
         variantPane.setLayout(new GridLayout(0, 1));
-        Container optionPane = new Container();
-        optionPane.setLayout(new GridLayout(0, 3));
 
         contentPane.add(gamePane);
         contentPane.add(variantPane);
-        contentPane.add(optionPane);
         
         JButton button1 = new JButton(newGame);
         button1.setMnemonic(KeyEvent.VK_N);
@@ -153,9 +151,22 @@ public final class GetPlayers extends JDialog implements WindowListener,
         button3.setMnemonic(KeyEvent.VK_Q);
         gamePane.add(button3);
         button3.addActionListener(this);
-        JButton buttonVariant = new JButton(loadVariant);
+        JButton buttonVariant =
+            new JButton(loadVariant +
+                        " (" + variantName + ")");
         variantPane.add(buttonVariant);
         buttonVariant.addActionListener(this);
+
+        /*
+         * For Debugging Mostly ;
+         * Allow to load Variant File independantly.
+         * better keep it commented out for regular game.
+         * /
+         /*
+        Container optionPane = new Container();
+        optionPane.setLayout(new GridLayout(0, 3));
+        contentPane.add(optionPane);
+
         JButton button4 = new JButton(loadMap);
         optionPane.add(button4);
         button4.addActionListener(this);
@@ -165,6 +176,8 @@ public final class GetPlayers extends JDialog implements WindowListener,
         JButton button6 = new JButton(loadCre);
         optionPane.add(button6);
         button6.addActionListener(this);
+        */
+
 
         pack();
 
@@ -425,7 +438,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
     }
 
-    private static void doLoadVariant()
+    private static String doLoadVariant()
     {
         javax.swing.JFileChooser varChooser = new JFileChooser(".");
         varChooser.setFileFilter(new varFileFilter());
@@ -433,11 +446,13 @@ public final class GetPlayers extends JDialog implements WindowListener,
             "Choose your variant (or cancel for default game)");
         int returnVal = varChooser.showOpenDialog(varChooser);
         String varName = "Default.var";
+        String shortVarName = varName;
         varDirectory = "";
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
         {
             File varFile = varChooser.getSelectedFile();
             varName = varFile.getAbsolutePath();
+            shortVarName = varFile.getName();
             varDirectory = varFile.getParentFile().getAbsolutePath();
         }
         Log.debug("Loading variant " + varName + ", data files in " + 
@@ -482,8 +497,10 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
         catch (Exception e) 
         {
+            shortVarName = "ERROR";
             System.out.println("Variant loading failed : " + e);
         }
+        return shortVarName;
     }
 
     public void actionPerformed(ActionEvent e)
@@ -501,9 +518,11 @@ public final class GetPlayers extends JDialog implements WindowListener,
         {
             doLoadGame();
         }
-        else if (e.getActionCommand().equals(loadVariant))
+        else if (e.getActionCommand().startsWith(loadVariant))
         {
-            doLoadVariant();
+            variantName = doLoadVariant();
+            ((JButton)e.getSource()).setText(loadVariant +
+                                             " (" + variantName + ")");
         }
         else if (e.getActionCommand().equals(loadMap))
         {
