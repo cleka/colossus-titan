@@ -420,7 +420,7 @@ class PickRecruit extends Dialog implements MouseListener, WindowListener
                 legion.addCreature(recruits[i]);
 
                 // Recruits are one to a customer.
-                legion.markRecruit();
+                legion.markRecruited();
 
                 // Then exit.
                 dispose();
