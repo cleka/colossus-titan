@@ -39,14 +39,25 @@ public final class CaretakerInfo
         Integer count = (Integer)creatureCounts.get(creatureName);
         if (count == null)
         {
-            return Creature.getCreatureByName(creatureName).getMaxCount();
+            Creature cre = Creature.getCreatureByName(creatureName);
+            if (cre != null)
+            {
+                return cre.getMaxCount();
+            }
+            else
+            { // Creature doesn't exist
+                return -1;
+            }
         }
         return count.intValue();
     }
 
     public int getCount(Creature creature)
     {
-        return getCount(creature.getName());
+        if (creature != null)
+            return getCount(creature.getName());
+        else
+            return -1;
     }
 
     public int getDeadCount(String creatureName)
@@ -61,9 +72,12 @@ public final class CaretakerInfo
 
     public int getDeadCount(Creature creature)
     {
-        return getDeadCount(creature.getName());
+        if (creature != null)
+            return getDeadCount(creature.getName());
+        else
+            return 0;
     }
-
+    
     public int getMaxCount(String creatureName)
     {
         return getMaxCount(Creature.getCreatureByName(creatureName));
@@ -71,6 +85,9 @@ public final class CaretakerInfo
 
     public int getMaxCount(Creature creature)
     {
-        return creature.getMaxCount();
+        if (creature != null)
+            return creature.getMaxCount();
+        else
+            return 0;
     }
 }

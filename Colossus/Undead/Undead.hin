@@ -1,0 +1,26 @@
+RECRUIT B Zombie    2 Zombie   ((NOT (HASCREATURE Wraith)) AND
+                                (2 Wraith AVAILABLE))
+RECRUIT P Naga      2 Naga     (((CANREACH D) AND
+                                 (NOT (HASCREATURE Griffin))) AND
+                                (2 Griffin AVAILABLE))
+RECRUIT M Orc       2 Orc      (((CANREACH S) AND
+                                 (NOT (HASCREATURE Wyvern))) AND
+                                (2 Wyvern AVAILABLE))
+RECRUIT T Skeleton  1 Skeleton ((3 Zombie AVAILABLE) AND
+                                (NOT ((CANRECRUIT Wizard) OR
+                                      (CANRECRUIT Golem))))
+RECRUIT T Troglodyte 1 Troglodyte ((2 Orc AVAILABLE) AND
+                                (NOT ((CANRECRUIT Wizard) OR
+                                      (CANRECRUIT Golem))))
+RECRUIT T Paladin   1 Paladin  ((2 Naga AVAILABLE) AND
+                                (NOT ((CANRECRUIT Wizard) OR
+                                      (CANRECRUIT Golem))))
+RECRUIT T Skeleton  0 Skeleton ((6 Zombie AVAILABLE) AND
+                                (NOT ((CANRECRUIT Wizard) OR
+                                      (CANRECRUIT Golem))))
+RECRUIT T Troglodyte 0 Troglodyte ((6 Orc AVAILABLE) AND
+                                (NOT ((CANRECRUIT Wizard) OR
+                                      (CANRECRUIT Golem))))
+RECRUIT T Paladin   0 Paladin  ((6 Naga AVAILABLE) AND
+                                (NOT ((CANRECRUIT Wizard) OR
+                                      (CANRECRUIT Golem))))

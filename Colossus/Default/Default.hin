@@ -12,19 +12,19 @@ RECRUIT T Centaur   2 Centaur  (NOT ((CANRECRUIT Warlock) OR
                                     (CANRECRUIT Guardian)))
 RECRUIT T Gargoyle  1 Gargoyle ((3 Cyclops AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
-                                    (CANRECRUIT Guardian))))
+                                      (CANRECRUIT Guardian))))
 RECRUIT T Ogre      1 Ogre     ((2 Troll AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
-                                    (CANRECRUIT Guardian))))
+                                      (CANRECRUIT Guardian))))
 RECRUIT T Centaur   1 Centaur  ((2 Lion AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
-                                    (CANRECRUIT Guardian))))
+                                      (CANRECRUIT Guardian))))
 RECRUIT T Gargoyle  0 Gargoyle ((6 Cyclops AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
-                                    (CANRECRUIT Guardian))))
+                                      (CANRECRUIT Guardian))))
 RECRUIT T Ogre      0 Ogre     ((6 Troll AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
-                                    (CANRECRUIT Guardian))))
+                                      (CANRECRUIT Guardian))))
 RECRUIT T Centaur   0 Centaur  ((6 Lion AVAILABLE) AND
                                 (NOT ((CANRECRUIT Warlock) OR
-                                    (CANRECRUIT Guardian))))
+                                      (CANRECRUIT Guardian))))

@@ -324,7 +324,21 @@ public final class VariantSupport
                     VariantSupport.getHintName());
             }
             aihl = new AIHintLoader(aihlIS);
-            while (aihl.oneHint() >= 0) {}
+            boolean done = false;
+            int totalHints = 0;
+            while (!done)
+            {
+                int result = aihl.oneHint();
+                if (result < 0)
+                {
+                    done = true;
+                }
+                else
+                {
+                    totalHints += result;
+                }
+            }
+            Log.debug("Found " + totalHints + " hints in " + VariantSupport.getHintName());
         }
         catch (Exception e) 
         {
@@ -333,7 +347,7 @@ public final class VariantSupport
         }
     }
 
-    public static String getRecruitHint(
+    public synchronized static String getRecruitHint(
         char terrain,
         net.sf.colossus.client.LegionInfo legion,
         net.sf.colossus.server.HintOracleInterface oracle)

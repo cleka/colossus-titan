@@ -292,7 +292,7 @@ public class AIHintLoader
         }
     }
     
-    public String getRecruitHint(
+    public synchronized String getRecruitHint(
         char terrain,
         LegionInfo legion,
         HintOracleInterface oracle)
@@ -329,7 +329,9 @@ public class AIHintLoader
                         {
                             hint = th.getRecruitee();
                         }
-                    }   
+                    }
+                    // remove the Oracle, just in case
+                    ctn.setOracle(null);
                 }
             }
             else
