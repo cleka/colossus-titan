@@ -15,7 +15,12 @@ class Game extends Frame implements WindowListener, ActionListener
     MasterBoard masterboard;
     int activePlayer = 0;
     int turnNumber = 1;
-    int phase = 1;   // 1 = split  2 = move  3 = fight  4 = muster 
+
+    static final int SPLIT = 1;
+    static final int MOVE = 2;
+    static final int FIGHT = 3;
+    static final int MUSTER = 4;
+    int phase = SPLIT;
 
     TextField [] tf = new TextField[6];
     int currentColor;  // state holder during color choice
@@ -323,7 +328,7 @@ class Game extends Frame implements WindowListener, ActionListener
     {
         for (int i = 0; i < numPlayers; i++)
         {
-            if (player[i].myTurn)
+            if (activePlayer == i)
             {
                 activeLabel[i].setText("*");
             }
