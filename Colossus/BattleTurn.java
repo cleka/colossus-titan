@@ -44,6 +44,32 @@ class BattleTurn extends Dialog implements ActionListener
     }
 
 
+    // XXX: Finish this.
+    void setupRecruitDialog()
+    {
+        // If it's not time to recruit, move on.
+        if (true)
+        // if (turnNumber != 4 || defender.getHeight() > 6)
+        {
+            advancePhase();
+        }
+        else
+        {
+            new PickRecruit(map, defender);
+
+            // XXX: When the dialog is dismissed, mark if a recruit 
+            // was taken and advance phase.
+        }
+    }
+    
+    
+    // XXX: Write this.
+    void setupSummonDialog()
+    {
+        advancePhase();
+    }
+
+
     void setupMoveDialog()
     {
         // If there are no legal moves, move on.
@@ -82,6 +108,12 @@ class BattleTurn extends Dialog implements ActionListener
 
     void setupFightDialog()
     {
+        // Apply drift damage only once per player turn.
+        if (phase == FIGHT)
+        {
+            map.applyDriftDamage();
+        }
+
         // If there are no possible strikes, move on.
         if (map.highlightChitsWithTargets() < 1)
         {
@@ -134,7 +166,13 @@ class BattleTurn extends Dialog implements ActionListener
 
     void advancePhase()
     {
-        if (phase == SUMMON || phase == RECRUIT)
+        if (phase == SUMMON)
+        {
+            phase = MOVE;
+            setupMoveDialog();
+        }
+        
+        if (phase == RECRUIT)
         {
             phase = MOVE;
             setupMoveDialog();
@@ -168,8 +206,8 @@ class BattleTurn extends Dialog implements ActionListener
 
             if (activeLegion == attacker)
             {
-                phase = MOVE;
-                setupMoveDialog();
+                phase = SUMMON;
+                setupSummonDialog();
             }
             else
             {
@@ -184,8 +222,8 @@ class BattleTurn extends Dialog implements ActionListener
                 }
                 else
                 {
-                    phase = MOVE;
-                    setupMoveDialog();
+                    phase = RECRUIT;
+                    setupRecruitDialog();
                 }
             }
         }
