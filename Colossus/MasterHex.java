@@ -21,25 +21,25 @@ class MasterHex
     private double l;              // hexside length
     private int numLegions = 0;
     private Legion [] legions = new Legion[3];
-    private boolean selected;
+    private boolean selected = false;
     private MasterBoard board;
 
-    public MasterHex [] neighbor = new MasterHex[6];
+    private MasterHex [] neighbors = new MasterHex[6];
     
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
     // Swamp, Tower, tundra, Woods
-    public char terrain;
+    private char terrain;
 
     // Middle ring: 1-42
     // Outer ring: 101-142
     // Towers: 100, 200, 300, 400, 500, 600
     // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
-    public int label;
+    private int label;
 
     // n, ne, se, s, sw, nw
-    public int[] exitType = new int[6];
-    public int[] entranceType = new int[6];
+    private int[] exitType = new int[6];
+    private int[] entranceType = new int[6];
 
     // 0=none, 1=block, 2=arch, 3=arrow 4=arrows
     public static final int NONE = 0;
@@ -51,7 +51,6 @@ class MasterHex
 
     MasterHex(int cx, int cy, int scale, boolean inverted, MasterBoard board)
     {
-        selected = false;
         this.inverted = inverted;
         this.scale = scale;
         this.board = board;
@@ -196,7 +195,7 @@ class MasterHex
             // hexside inside the hexside, and the outer edge is 1/12 of a
             // hexside outside the hexside.
 
-            if (exitType[i] != 0)
+            if (exitType[i] != NONE)
             {
                 drawGate(g, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
                                 exitType[i]);
@@ -207,7 +206,7 @@ class MasterHex
             // they sometimes get overdrawn.  So we need to draw them
             // again from the other hex, as entrances.
 
-            if (entranceType[i] != 0)
+            if (entranceType[i] != NONE)
             {
                 drawGate(g, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
                                 entranceType[i]);
@@ -405,6 +404,11 @@ class MasterHex
     char getTerrain()
     {
         return terrain;
+    }
+    
+    void setTerrain(char terrain)
+    {
+        this.terrain = terrain;
     }
 
     String getTerrainName()
@@ -655,5 +659,57 @@ class MasterHex
                 return;
             }
         }
+    }
+
+
+    void setNeighbor(int i, MasterHex hex)
+    {
+        neighbors[i] = hex;
+    }
+
+
+    MasterHex getNeighbor(int i)
+    {
+        if (i < 0 || i > 6)
+        {
+            return null;
+        }
+        else
+        {
+            return neighbors[i];
+        }
+    }
+
+
+    int getLabel()
+    {
+        return label;
+    }
+
+
+    void setLabel(int label)
+    {
+        this.label = label;
+    }
+
+
+    void setExitType(int i, int exitType)
+    {
+        this.exitType[i] = exitType;
+    }
+
+    int getExitType(int i)
+    {
+        return exitType[i];
+    }
+    
+    void setEntranceType(int i, int entranceType)
+    {
+        this.entranceType[i] = entranceType;
+    }
+
+    int getEntranceType(int i)
+    {
+        return entranceType[i];
     }
 }
