@@ -200,6 +200,7 @@
                        TG-Wild/**,
                        Outlands/**,
                        SmallTitan/**,
+                       Unified/**,
                        Balrog/**,
                        Random/**"
              excludes="net/sf/colossus/datatools/*.class,
