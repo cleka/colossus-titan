@@ -14,6 +14,9 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
     private MasterHex hex;
     private Chit [] chits;
     private int numChits;
+    private int [] numToRecruit;
+    private int [] count;
+    int scale = 60;
 
 
     ShowMasterHex(Frame parentFrame, MasterHex hex, Point point)
@@ -21,8 +24,9 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(), 
             true);
 
-        int scale = 60;
-        setSize(3 * scale, 23 * scale / 4);
+        numChits = hex.getNumRecruitTypes();
+        
+        setSize(3 * scale, numChits * scale + 3 * scale / 4);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
         Point parentOrigin = parentFrame.getLocation();
@@ -59,12 +63,17 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
 
         imagesLoaded = false;
 
-        numChits = hex.getNumRecruitTypes();
         chits = new Chit[numChits];
+        numToRecruit = new int[numChits];
+        count = new int[numChits];
         for (int i = 0; i < numChits; i++)
         {
+            Creature creature = hex.getRecruit(i);
+
+            numToRecruit[i] = hex.getNumToRecruit(i);
+            count[i] = creature.getCount();
             chits[i] = new Chit(scale, scale / 2 + i * scale, scale, 
-                hex.getRecruit(i).getImageName(), this, false);
+                creature.getImageName(), this, false);
         }
 
         tracker = new MediaTracker(this);
@@ -98,9 +107,24 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
 
         // No need to mess around with clipping rectangles, since
         //    this window is ephemeral.
-        for (int i = numChits - 1; i >= 0; i--)
+        
+        FontMetrics fontMetrics = g.getFontMetrics();
+        int fontHeight = fontMetrics.getMaxAscent() + fontMetrics.getLeading();
+
+        for (int i = 0; i < numChits; i++)
         {
             chits[i].paint(g);
+
+            if (numToRecruit[i] > 0)
+            {
+                String numToRecruitLabel = Integer.toString(numToRecruit[i]);
+                g.drawString(numToRecruitLabel, scale / 3, (i + 1) * scale +
+                    fontHeight / 2);
+            }
+
+            String countLabel = Integer.toString(count[i]);
+            g.drawString(countLabel, 7 * scale / 3, (i + 1) * scale + 
+                fontHeight / 2);
         }
     }
 
