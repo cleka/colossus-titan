@@ -97,3 +97,19 @@ java.lang.NullPointerException
 
 Solaris, 1.3: "tower teleports (null)" when all stacks visible.
    Should fill in a random lord from the stack instead.
+
+Solaris, 1.3: Can post-battle angel summon from an engaged
+   donor legion.  SummonAngel dialog appeared during movement
+   phase!
+
+Solaris, 1.3: When clicking on engagement:
+   Exception occurred during event dispatching:
+java.lang.NullPointerException
+        at SummonAngel.updateChits(SummonAngel.java:251)
+        at Game.doFight(Game.java:2886)
+        at Game.actOnLegion(Game.java:2735)
+        at MasterBoard.mousePressed(MasterBoard.java:1708)
+
+Solaris, 1.3: Dead titan, but player keeps going.  Need to check
+   for player death more often to work around this bug?
+
