@@ -127,16 +127,7 @@ public final class ResourceLoader
     /** empty the cache so that all files have to be reloaded */
     public synchronized static void purgeFileCache()
     {
-        //Log.debug("Purging File Cache.");
-        try
-        {
-            throw new Exception("Purging File Cache.");
-        }
-        catch (Exception e)
-        {
-            Log.debug("" + e);
-            e.printStackTrace();
-        }
+        Log.debug("Purging File Cache.");
         fileCache.clear();
     }
     
