@@ -12,9 +12,12 @@ class Game extends Frame implements WindowListener, ActionListener
     int numPlayers;
     String [] playerName; 
     int [] playerTower;
-    String [] playerColor;
+    String [] playerColor = new String[6];
     Player [] player;
     TextField [] tf = new TextField[7];
+    int currentColor;
+    Label [] colorLabel = new Label[6];
+    Button [] colorButton = new Button[6];
 
 
     Game()
@@ -46,7 +49,7 @@ class Game extends Frame implements WindowListener, ActionListener
         add(new Label("Player 6 Name"));
         tf[6] = new TextField(20);
         add(tf[6]);
-        Button b1 = new Button("Done");
+        Button b1 = new Button("OK");
         add(b1);
         b1.addActionListener(this);
         Button b2 = new Button("Quit");
@@ -65,7 +68,6 @@ class Game extends Frame implements WindowListener, ActionListener
         for (int i = 0; i <= 6; i++)
         {
            s[i] = tf[i].getText(); 
-           System.out.println(i + ": " + s[i]);
         }
 
         // s[0] needs to be a number in the range 1-6
@@ -79,7 +81,6 @@ class Game extends Frame implements WindowListener, ActionListener
         }
         catch (NumberFormatException e)
         {
-            System.out.println("Bogus number of players: " + s[0]);
             tf[0].setText(""); 
             return;
         }
@@ -92,15 +93,12 @@ class Game extends Frame implements WindowListener, ActionListener
             if (playerName[i].length() == 0)
             {
                 error = true;
-                System.out.println("Player " + (i + 1) + " has an empty name");
             }
             for (int j = 0; j < i; j++)
             {
                 if (playerName[i].compareTo(playerName[j]) == 0)
                 {
                     error = true;
-                    System.out.println("Players " + (j + 1) + " and " + (i + 1) 
-                        + " have the same name.");
                     tf[i + 1].setText("");
                 }
             }
@@ -138,12 +136,6 @@ class Game extends Frame implements WindowListener, ActionListener
             playerTower[n] = t;
         }
 
-        for (int i = 0; i < numPlayers; i++)
-        {
-            System.out.println(i + ": tower " + playerTower[i] + "00  name: " 
-                + playerName[i]);
-        }
-
         chooseColors();
     }
 
@@ -160,7 +152,6 @@ class Game extends Frame implements WindowListener, ActionListener
         add(new Label("Name"));
         add(new Label("Color"));
 
-        Label [] colorLabel = new Label[numPlayers];
 
         // Sort in increasing tower order
         for (int i = 1; i <= 6; i++)
@@ -177,7 +168,6 @@ class Game extends Frame implements WindowListener, ActionListener
             }
         }
 
-        Button [] colorButton = new Button[6];
         colorButton[0] = new Button("Black");
         colorButton[1] = new Button("Blue");
         colorButton[2] = new Button("Brown");
@@ -187,7 +177,18 @@ class Game extends Frame implements WindowListener, ActionListener
         for (int i = 0; i < 6; i++)
         {
             add(colorButton[i]);
+            colorButton[i].addActionListener(this);
         }
+
+        Button b1 = new Button("Done");
+        add(b1);
+        b1.addActionListener(this);
+        Button b2 = new Button("Restart");
+        add(b2);
+        b2.addActionListener(this);
+        Button b3 = new Button("Quit");
+        add(b3);
+        b3.addActionListener(this);
 
         pack();
 
@@ -197,7 +198,45 @@ class Game extends Frame implements WindowListener, ActionListener
             {
                 if (playerTower[j] == i)
                 {
+                    currentColor = i;
                     colorLabel[j].setText("?");
+                    return;
+                }
+            }
+        }
+    }
+
+
+    void processColorChoice(String color)
+    {
+        // Turn off the button that was just used.
+        int i = 0;
+        while (colorButton[i].getLabel() != color)
+        {
+            i++;
+        }
+        colorButton[i].setLabel("");
+        colorButton[i].removeActionListener(this);
+
+
+        for (int j = 0; j < numPlayers; j++)
+        {
+            if (playerTower[j] == currentColor)
+            {
+                playerColor[j] = new String(color);
+                colorLabel[j].setText(color);
+            }
+        }
+    
+        for (i = currentColor + 1; i <= 6; i++)
+        {
+            for (int j = 0; j < numPlayers; j++)
+            {
+                if (playerTower[j] == i)
+                {
+                    currentColor = i;
+                    colorLabel[j].setText("?");
+                    return;
                 }
             }
         }
@@ -240,9 +279,22 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             System.exit(0);
         }
-        else if (e.getActionCommand() == "Done")
+        else if (e.getActionCommand() == "OK")
         {
             validateInputs();
+        }
+        else if (e.getActionCommand() == "Restart")
+        {
+            chooseColors();
+        }
+        else if (e.getActionCommand() == "Done")
+        {
+            // Set up Player classes
+            System.exit(0);
+        }
+        else  // Color button
+        {
+            processColorChoice(e.getActionCommand());
         }
     }
 
