@@ -22,9 +22,9 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public static final double SQRT3 = Math.sqrt(3.0);
 
-    private MasterHex[][] h = new MasterHex[15][8];
+    private static MasterHex[][] h = new MasterHex[15][8];
 
-    final private boolean[][] show =
+    final static private boolean[][] show =
     {
         {false, false, false, true, true, false, false, false},
         {false, false, true, true, true, true, false, false},
@@ -48,7 +48,7 @@ public class MasterBoard extends Frame implements MouseListener,
     private Dimension offDimension;
     private MediaTracker tracker;
     private boolean imagesLoaded;
-    private int scale;
+    private static int scale;
     static Game game;
 
 
@@ -89,8 +89,8 @@ public class MasterBoard extends Frame implements MouseListener,
         for (int i = 0; i < game.numPlayers; i++)
         {
             // Lookup coords for chit starting from player[i].startingTower
-            Point point = getOffCenterFromLabel(100 * 
-                game.player[i].startingTower);
+            Point point = getHexFromLabel(100 * game.player[i].startingTower).
+                getOffCenter();
 
             game.player[i].legions[0] = new Legion(point.x - (3 * scale / 2), 
                 point.y - (3 * scale / 2), 3 * scale, 
@@ -125,13 +125,13 @@ public class MasterBoard extends Frame implements MouseListener,
         setVisible(true);
         repaint();
 
-        Turn turn = new Turn(this, game);
+        Turn turn = new Turn(this, game, this);
     }
 
 
     // Do a brute-force search through the hex array, looking for
     //    a match.  Return the hex.
-    MasterHex getHexFromLabel(int label)
+    static MasterHex getHexFromLabel(int label)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -146,29 +146,6 @@ public class MasterBoard extends Frame implements MouseListener,
 
         // Error, so return a bogus hex.
         return new MasterHex(-1, -1, -1, false);
-    }
-
-
-    // Do a brute-force search through the hex array, looking for
-    //    a match.  Return a point near the center of that hex,
-    //    vertically offset a bit toward the fat side.
-    Point getOffCenterFromLabel(int label)
-    {
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (show[i][j] && h[i][j].label == label)
-                {
-                    return new Point((h[i][j].xVertex[0] + 
-                        h[i][j].xVertex[1]) / 2, 
-                        (h[i][j].yVertex[0] + h[i][j].yVertex[3]) / 2 +
-                        (h[i][j].inverted ? -(scale / 2) : (scale / 2)));
-                }
-            }
-        }
-        // No match
-        return new Point(-1, -1);
     }
 
 
@@ -329,7 +306,6 @@ System.out.println("engagement in hex " + hex.label);
                 legion.numCreature(Creature.angel) > 0 ||
                 legion.numCreature(Creature.archangel) > 0))
             {
-System.out.println("Tower teleport is legal.");
                 // Mark every unoccupied hex within 6 hexes.
                 findTowerTeleportMoves(hex, player, legion, 6);
 
@@ -361,7 +337,6 @@ System.out.println("Tower teleport is legal.");
             if (player.canTitanTeleport() && 
                 legion.numCreature(Creature.titan) > 0)
             {
-System.out.println("Titan teleport is legal.");
                 // Mark every hex containing an enemy unit. 
 
             }
@@ -1046,21 +1021,29 @@ System.out.println("Titan teleport is legal.");
             {
                 if (show[i][j] && h[i][j].contains(point))
                 {
-                    h[i][j].select(point);
-
                     // If we're moving and have selected a legion and this
                     // hex is a legal destination, move the legion here.
                     if (game.phase == game.MOVE)
                     {
+                        if (game.player[game.activePlayer].selectedLegion != -1 
+                            && h[i][j].selected == true)
+                        {
+                            game.player[game.activePlayer].legions
+                                [game.player[game.activePlayer].selectedLegion]
+                                .moveToHex(h[i][j]);
+                            unselectAllHexes();
+                            // XXX Repaint only affected hexes and chits?
+                            repaint();
+                        }
                     }
 
-                    // If we're fighting and there's an engagement here,
+                    // If we're fighting and there is an engagement here,
                     // resolve it.
                     else if (game.phase == game.FIGHT)
                     {
                     }
 
-                    // If we're mustering and there's a legion here that's
+                    // If we're mustering and there is a legion here that is
                     // eligible to muster a recruit, do so. 
                     else if (game.phase == game.MUSTER)
                     {
