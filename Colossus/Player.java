@@ -9,32 +9,24 @@ class Player
     String name;
     String color;       // Black, Blue, Brown, Gold, Green, Red 
     int startingTower;  // 1-6
-    int score;
-    int angels;         // number of angels + archangels in legions
-    boolean canSummonAngel; 
+    int score = 0;
+    int angels = 1;     // number of angels + archangels in legions
+    boolean canSummonAngel = true;
     String playersEliminated;  // e.g. 1356, based on starting tower
-    int numMarkersAvailable;
+    int numMarkersAvailable = 12;
     String [] markersAvailable = new String[60];
     String markerSelected;
-    int numLegions;
+    int numLegions = 0;
     Legion [] legions = new Legion[60];
-    boolean alive;
-    boolean myTurn;
+    boolean alive = true;
     int mulligansLeft = 1;
     int movementRoll;
-    int legionsMoved;
+    int legionsMoved = 0;
+    int selectedLegion = -1;
 
     Player(String name)
     {
         this.name = name;
-        score = 0;
-        angels = 1; 
-        canSummonAngel = true;
-        numMarkersAvailable = 12;
-        numLegions = 0;
-        alive = true;
-        myTurn = false;
-        legionsMoved = 0;
     }
 
 
