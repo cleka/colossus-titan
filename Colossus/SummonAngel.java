@@ -170,7 +170,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
         g.drawImage(offImage, 0, 0, this);
         
-        // XXX: Handle via super.paint() instead?
+        // These are necessary because JButtons are lightweight.
         button1.repaint();
         button2.repaint();
     }
