@@ -54,7 +54,6 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             return;
         }
 
-        setResizable(false);
         addMouseListener(this);
         addWindowListener(this);
 
@@ -65,6 +64,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
         setBackground(java.awt.Color.lightGray);
         setSize(getPreferredSize());
+        setResizable(false);
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width / 2 - getSize().width / 2, 
