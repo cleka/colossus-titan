@@ -82,6 +82,9 @@ class BattleTurn extends Dialog implements ActionListener
             {
 System.out.println("SummonAngel");
                 summonAngel = new SummonAngel(map.getBoard(), attacker);
+                // This is the last chance to summon an angel until the
+                // battle is over.
+                map.setSummonState(map.TOO_LATE);
             }
         }
 
