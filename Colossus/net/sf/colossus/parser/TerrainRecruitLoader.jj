@@ -88,8 +88,13 @@ public class TerrainRecruitLoader
             {
                 recruitNumber tr = (recruitNumber)it.next();
                 String v2 = tr.getName();
-                if (v2 != null)
-                {
+                if ((v2 != null) &&
+                    !(v2.equals("Anything")) &&
+                    !(v2.equals("AnyNonLord")) &&
+                    !(v2.equals("Titan")) &&
+                    !(v2.equals("Lord")) &&
+                    !(tr.getNumber() < 0))
+                { // we musn't add the Edges going to non-recruitable
                     if (v1 != null)
                     {
                         graph.addEdge(v1, v2, tr.getNumber(), t);
