@@ -47,24 +47,22 @@ class Concede extends Dialog implements ActionListener
         friendChits = new Chit[friend.getHeight()];
         for (int i = 0; i < friend.getHeight(); i++)
         {
-            friendChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                scale / 2, scale, "images/" + friend.creatures[i].name 
-                + ".gif", this);
+            friendChits[i] = new Chit((i + 1) * scale + (scale / 5), scale / 2,
+                scale, friend.creatures[i].getImageName(),this);
         }
 
         enemyChits = new Chit[enemy.getHeight()];
         for (int i = 0; i < enemy.getHeight(); i++)
         {
             enemyChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                2 * scale, scale, "images/" + enemy.creatures[i].name 
-                + ".gif", this);
+                2 * scale, scale, enemy.creatures[i].getImageName(), this);
         }
 
         friendMarker = new Chit(scale / 5, scale / 2, scale, 
-            "images/" + friend.getMarkerId() + ".gif", this);
+            friend.getImageName(), this);
         
         enemyMarker = new Chit(scale / 5, 2 * scale, scale, 
-            "images/" + enemy.getMarkerId() + ".gif", this);
+            enemy.getImageName(), this);
 
         tracker = new MediaTracker(this);
 
@@ -168,8 +166,7 @@ class Concede extends Dialog implements ActionListener
             // Unselect and repaint the hex.
             MasterHex hex = enemy.getCurrentHex();
             hex.unselect();
-            Rectangle clip = new Rectangle(hex.getBounds());
-            repaint(clip.x, clip.y, clip.width, clip.height);
+            hex.repaint();
         }
 
         else
