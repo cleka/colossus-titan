@@ -897,10 +897,9 @@ Log.debug("Called Battle.doneReinforcing()");
         // no points awarded.
         if (critter.getCurrentHex().isEntrance() && getTurnNumber() > 1)
         {
-            // XXX If a critter is both summonable and a recruitable
-            // reinforcement, then this logic fails.
-            if (critter.isSummonable())
+            if (legion == getAttacker())
             {
+                // Summoned angel.
                 Player player = legion.getPlayer();
                 donor = player.getDonor();
                 if (donor != null)
@@ -944,9 +943,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
         // If an angel or archangel was returned to its donor instead of 
         // the stack, then don't put it back on the stack.
-        // XXX Buggy?
-        legion.prepareToRemoveCritter(critter,
-            (donor == null || !critter.isSummonable()));
+        legion.prepareToRemoveCritter(critter, donor == null); 
 
         if (critter.isTitan())
         {
