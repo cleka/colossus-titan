@@ -223,57 +223,6 @@ class PredictSplitsTestCase(unittest.TestCase):
 
         print "test 1 ends"
 
-        """
-        Start Rd01: Tit, Ang, Ogr, Ogr, Cen, Cen, Gar, Gar
-        Turn 1  Split off Ang, Gar, Cen, Cen into Rd02
-                Rd01 recruits Tro with 2xOgr
-                Rd02 recruits Lio with 2xCen
-        Turn 2  Rd01 recruits Gar with Gar
-                Rd02 recruits Lio with Lio
-        Turn 3  Rd01 recruits Wlk with Tit
-                Rd02 recruits Gar (in tower)
-        Turn 4  Rd01 splits off Ogr, Ogr into Rd03
-                Rd02 splits off Cen, Cen into Rd04
-                Rd01 recruits Cyc with 2xGar
-                Rd02 recruits Cyc with 2xGar
-        Turn 5  Rd01 recruits Wlk with Wlk
-                Rd02 recruits Ogr (in tower)
-                Rd03 recruits Tro with 2xOgr
-                Rd04 recruits Lio with 2xCen
-        Turn 6  Rd02 splits off Gar, Gar into Rd05
-                Rd01 attacks and is revealed: Tit, Wlk, Wlk, Cyc, Tro, Gar, Gar
-                Angel summoned from Rd02 into Rd01
-                2xGar killed, Rd01 revealed as Tit, Ang, Wlk, Wlk, Cyc, Tro
-                Rd02 recruits Min with 2xLio
-                Rd04 recruits Lio with Lio
-                Rd02 attacked, revealed as Cyc, Min, Lio, Lio, Ogr
-                Min recruits Min reinforcement
-                Rd02 destroyed
-        Turn 7  Rd01 acquires Angel after enemy flees
-                Rd03 recruits Tro with Tro
-                Rd04 recruits Lio with Lio
-        Turn 8  Rd01 splits off Ang, Ang into Rd02
-                Rd01 recruits Cyc with Cyc
-                Rd05 recruits Cyc with 2xGar
-        Turn 9  Rd01 recruits Tro with Tro
-                Rd03 recruits Tro with Tro
-                Rd04 recruits Gri with 3xLio
-                Rd05 recruits Cyc with Cyc
-        Turn 10 Rd01 splits off Tro, Tro into Rd06
-        Turn 11 Rd04 attacks, revealed as Gri, 3xLio, 2xCen
-                Rd01 recruits Cyc with Cyc
-                Rd03 recruits Ran with 2xTro
-        Turn 12 Rd02 recruits Cen (in tower)
-                Rd03 recruits Wbe with 2xTro
-                Rd05 recruits Cyc with Cyc
-        Turn 13 Rd01 attacks, revealed as Tit, Wlk, Wlk, Cyc, Cyc, Cyc
-                Rd05 recruits Beh with 3xCyc
-        Turn 14 Rd04 attacks, revealed as Gri, Lio, Lio, Lio, Cen, Cen
-                Angel summoned from Rd02 into Rd04
-                Rd04 loses Ang, Lio, Lio, Lio, Cen, Cen
-                Rd04 acquires Angel
-                win
-        """
 
     def testPredictSplits2(self):
         print "\ntest 2 begins"
@@ -638,103 +587,6 @@ class PredictSplitsTestCase(unittest.TestCase):
 
         print "test 2 ends"
 
-        """
-        Start Rd11: Tit, Ang, Ogr, Ogr, Cen, Cen, Gar, Gar
-        Turn 1  Split off Tit, Ogr, Ogr, Gar into Rd10
-                Rd10 recruits Tro with 2xOgr
-                Rd11 recruits Gar with Gar
-        Turn 2  Rd10 recruits Tro with Tro
-        Turn 3  Rd10 recruits Ran with 2xTro
-                Rd11 recruits Cyc with 2xGar
-        Turn 4  Rd10 attacks, revealed as Tit, Ran, Tro, Tro, Gar, Ogr, Ogr
-                Rd10 loses Gar
-                Angel summoned from Rd11 to Rd10
-        Turn 5  Rd10 splits off Ogr, Ogr into Rd01
-                Rd10 recruits Tro with Tro
-                Rd01 recruits Tro with 2xOgr
-        Turn 6  Rd01 attacks, revealed (to Green) as Tro, Ogr, Ogr
-                Rd01 recruits Tro with Tro
-                Rd10 recruits Wyv with 3xTro
-                Rd11 recruits Cyc with Cyc
-        Turn 7  Rd10 splits off Tro, Tro into Rd06
-                Rd11 recruits Lio with 2xCen
-        Turn 8  Rd11 splits off Gar, Gar into Rd07
-                Rd01 attacks, revealed as Tro, Tro, Ogr, Ogr
-                Angel summoned from Rd10 into Rd01
-                Rd01 loses Tro, Tro, Ogr, Ogr
-                Rd01 acquires Angel
-                Rd10 recruits Wyv with Wyv
-                Rd11 recruits Lio with Lio
-        Turn 9  Rd07 recruits Cen
-                Rd11 recruits Cyc with Cyc
-        Turn 10 Rd11 splits off Cen, Cen into Rd08
-                Rd01 attacks, revealed (to Green) as Ang, Ang
-                Rd06 recruits Wbe with 2xTro
-                Rd07 recruits Cen with Cen
-                Rd08 recruits Lio with 2xCen
-                Rd10 recruits Ran with Ran
-                Rd11 recruits Beh with 3xCyc
-                Rd01 attacked, revealed as Ang, Ang
-                Rd01 eliminated, losing Ang, Ang
-        Turn 11 Rd06 recruits Ran with 2xTro
-                Rd07 recruits Lio with 2xCen
-                Rd08 recruits Lio with Lio
-                Rd10 recruits Wlk with Tit
-        Turn 12 Rd10 splits off Ran, Tro into Rd05
-                Rd05 recruits Tro with Tro
-                Rd06 recruits Wbe with 2xTro
-                Rd07 recruits Lio with Lio
-                Rd11 recruits Ran with 2xLio
-        Turn 13 Rd11 splits off Cyc, Lio into Rd04
-                Rd05 recruits Wbe with 2xTro
-                Rd07 recruits Cyc with 2xGar
-                Rd11 recruits Ran with Ran
-                Rd08 attacked, revealed as Lio, Lio, Cen, Cen
-                Rd08 eliminated, losing Lio, Lio, Cen, Cen
-        Turn 14 Rd06 attacks, revealed (to Green) as Wbe, Wbe, Ran, Tro, Tro
-                Rd04 recruits Cyc with Cyc
-                Rd06 recruits Ran with Ran
-                Rd10 recruits Hyd with 2xWyv
-                Rd11 recruits Ran with Ran
-        Turn 15 Rd07 splits off Gar, Gar into Rd02
-                Rd11 splits off Ran, Lio into Rd01
-                Rd05 recruits Tro with Tro
-                Rd06 recruits Ran with Ran
-                Rd11 recruits Gor with 2xCyc
-        Turn 16 Rd06 attacks, revealed as Wbe, Wbe, Ran, Ran, Ran, Tro, Tro
-                Rd01 recruits Ran with Ran
-                Rd04 recruits Cyc with Cyc
-                Rd05 recruits Ran with Ran
-                Rd07 recruits Ran with 2xLio
-                Rd10 recruits Ran with Ran
-                Rd11 recruits Ran with Ran
-        Turn 17 Rd06 splits off Tro, Tro into Rd08
-                Rd11 splits off Cyc, Cyc into Rd03
-                Rd08 attacks, revealed as Tro, Tro
-                Rd08 eliminated, losing Tro, Tro
-                Rd05 recruits Wbe with Wbe
-                Rd11 recruits Beh with Beh
-        Turn 18 Rd10 splits off Ran, Ran into Rd12
-                Rd01 recruits Ran with Ran
-                Rd11 recruits Gor with Gor
-                Rd12 attacked, revealed as Ran, Ran
-                Rd12 eliminated, losing Ran, Ran
-        Turn 19 Rd11 splits off Ran, Ran into Rd08
-                Rd07 attacks, revealed as Cyc, Ran, Lio, Lio, Cen, Cen
-                Rd07 loses Lio, Cen, Cen
-                Rd01 recruits Ran with Ran
-                Rd03 recruits Cyc with Cyc
-                Rd04 recruits Gor with 2xCyc
-                Rd07 recruits Ran with Ran
-                Rd08 recruits Ran with Ran
-        Turn 20 Rd04 attacks, revealed as Gor, Cyc, Cyc, Cyc, Lio
-                Rd10 attacks, revealed as Tit, Hyd, Wyv, Wyv, Wlk
-                Rd10 acquires Ang
-                Rd05 attacks, revealed as Wbe, Wbe, Ran, Ran, Tro, Tro, Tro
-                Ang summoned from Rd10 into Rd05
-                Rd05 loses Ang, Wbe, Wbe, Ran, Ran, Tro, Tro
-                win
-        """
 
     def testPredictSplits3(self):
         print "\ntest 3 begins"
@@ -778,15 +630,6 @@ class PredictSplitsTestCase(unittest.TestCase):
 
         print "test 3 ends"
 
-        """
-        Start Gr07: Tit, Ang, Ogr, Ogr, Cen, Cen, Gar, Gar
-        Turn 1  Split off Ang, Cen, Cen, Ogr into Gr11
-                Gr07 recruits Cyc with 2xGar
-                Gr11 recruits Cen with Cen
-        Turn 2  Gr07 recruits Cyc with 2xGar
-                Gr11 recruits Ogr with Ogr
-        Turn 3  Gr11 recruits Wbe with 2xCen
-        """
 
     def testPredictSplits4(self):
         print "\ntest 4 begins"
@@ -800,7 +643,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         n.revealCreatures(['Gargoyle', 'Gargoyle'])
         print n
         assert(n.allCertain())
-        print "test 7 ends"
+        print "test 4 ends"
 
 
     def testPredictSplits5(self):
@@ -1181,93 +1024,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.printLeaves()
         print "\ntest 8 ends"
 
-        """
-        Start Gd04: Tit, Ang, Ogr, Ogr, Cen, Cen, Gar, Gar
-        Turn 1  Gd04 splits off Tit, Gar, Gar, Cen into Gd12
-                Gd12 teleports (Titan)
-                Gd04 recruits Cen with Cen
-                Gd12 recruits Wlk with Tit
-        Turn 2  Gd04 recruits Tro with 2xOgr
-                Gd12 recruits Cyc with 2xGar
-        Turn 3  Gd04 recruits Lio with 2xCen
-        Turn 4  Gd04 splits off Cen, Cen into Gd07
-                Gd04 recruits Tro with Tro
-        Turn 5  Gd04 recruits Lio with Lio
-                Gd12 recruits Cen with Cen
-        Turn 6  Gd04 splits off Ogr, Ogr into Gd08
-                Gd12 splits off Gar, Gar into Gd03
-                Gd08 recruits Ogr with Ogr
-                Gd12 recruits Lio with 2xCen
-        Turn 7  Gd07 recruits Lio with 2xCen
-        Turn 8  Gd12 splits off Cen, Cen into Gd09
-                Gd03 recruits Cyc with 2xGar
-                Gd07 recruits Lio with Lio
-                Gd08 recruits Tro with 2xOgr
-        Turn 9  Gd04 recruits Ran with 2xLio
-                Gd07 recruits Ran with 2xLio
-                Gd08 recruits Tro with Tro
-                Gd12 recruits Wlk with Tit
-        Turn 10 Gd07 recruits Ran with Ran
-                Gd12 recruits Ran with 2xLio
-        Turn 11 Gd04 recruits Cyc with Cyc
-                Gd07 recruits Ran with 2xLio
-                Gd09 recruits Cen with Cen
-                Gd08 loses Tro, Tro, Ogr, Ogr, Ogr
-        Turn 12 Gd07 splits off Cen, Cen into Gd06
-                Gd09 recruits Lio with 2xCen
-        Turn 13 Gd12 splits off Lio, Lio into Gd10
-                Gd03 recruits Cyc with Cyc
-                Gd04 recruits Ran with 2xLio
-                Gd12 recruits Gor with 2xCyc
-        Turn 14 Gd04 splits off Lio, Lio into Gd02
-                Gd07 recruits Min with 2xLio
-                Gd09 recruits Wbe with 3xCen
-                Gd10 recruits Lio with Lio
-                Gd12 recruits Cyc with Cyc
-        Turn 15 Gd12 splits off Cyc, Ran into Gd11
-                Gd07 revealed as Ran, Ran, Ran, Min, Lio, Lio
-                Angel summoned from Gd04 to Gd07
-                Gd02 recruits Ran with 2xLio
-                Gd11 recruits Ran with Ran
-        Turn 17 Gd07 splits off Lio, Lio into Gd08
-                Gd12 revealed to Gr as Tit, Wlk, Gor, Cyc, Cyc
-                Gd02 recruits Ran with Ran
-                Gd04 recruits Tro with Tro
-                Gd09 recruits Lio with Lio
-                Gd10 recruits Gri with 3xLio
-                Gd11 recruits Cyc with Cyc
-                Gd07 loses Ang, Ran, Ran, Ran, Min
-                Gd04 loses Ran, Ran, Tro, Tro, Tro
-        Turn 18 Gd02 recruits Lio with Lio
-        Turn 19 Gd08 recruits Ran with 2xLio
-                Gd10 recruits Ran with 2xLio
-                Gd06 loses Cen, Cen
-        Turn 20 Gd03 recruits Gor with 2xCyc
-                Gd10 recruits Lio with Lio
-        Turn 21 Gd02 recruits Gri with 3xLio
-                Gd08 recruits Lio with Lio
-                Gd11 recruits Ran with Ran
-        Turn 22 Gd09 splits off Cen, Cen into Gd07
-                Gd03 recruits Beh with 3xCyc
-                Gd08 recruits Wbe with Wbe
-                Gd10 recruits Tro with Ran
-                Gd11 recruits Lio with Ran
-                Gd12 recruits Gor with 2xCyc
-                Gd10 revealed to Bk as Gri, Ran, Tro, 4xLio
-        Turn 23 Gd02 recruits Tro with Ran
-                Gd03 recruits Gor with 2xCyc
-                Gd07 recruits Cen with Cen
-                Gd08 recruits Lio with Lio
-                Gd11 recruits Lio with Lio
-                Gd12 recruits Cyc with Cyc
-        Turn 24 Gd02 splits off Lio, Lio into Gd04
-                Gd10 splits off Lio, Lio into Gd06
-                Gd02 recruits Tro with Ran
-                Gd03 recruits Beh with 3xCyc
-                Gd05 recruits Cyc with 2xGar
-                Gd08 recruits Cen with Lio
-        """
-
 
     def testPredictSplits6(self):
         print "\ntest 6 begins"
@@ -1360,27 +1116,6 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(ps.getLeaf("Gr11").allCertain())
         assert(ps.getLeaf("Gr12").allCertain())
         print "\ntest 9 ends"
-
-        """
-        Start Gr11: Tit, Ang, Ogr, Ogr, Cen, Cen, Gar, Gar
-        Turn 1  Gr11 splits off Tit, Gar, Gar, Cen into Gr02
-                Gr02 teleports (Titan)
-                Gr02 recruits Cyc with 2xGar
-                Gr11 recruits Cen with Cen
-        Turn 2  Gr02 recruits Wlk with Tit
-                Gr11 recruits Cen with Cen
-        Turn 3  Gr02 recruits Cyc with Cyc
-                Gr11 recruits Lio with 2xCen
-        Turn 4  Gr02 splits off Gar, Gar into Gr10
-                Gr11 splits off Cen, Cen, Cen into Gr03
-                Gr03 merges back into Gr11
-        Turn 5  Gr11 splits off Cen, Cen, Cen into Gr12
-                Gr02 recruits Wlk with Wlk
-                Gr10 recruits Cyc with 2xGar
-                Gr12 recruits Wbe with 3xCen
-                Gr10 is attacked, revealed as Gar, Gar, Cyc, eliminated
-        Turn 6  Gr02 recruits Cen with Cen
-        """
 
 
     def testPredictSplits7(self):
@@ -1645,34 +1380,149 @@ class PredictSplitsTestCase(unittest.TestCase):
         assert(ps.getLeaf("Gr08").allCertain())
         assert(ps.getLeaf("Gr12").allCertain())
 
-    """
-        Start Gr08: Tit, Ang, Ogr, Ogr, Cen, Cen, Gar, Gar
-        Turn 1  Gr08 splits off Tit, Gar, Ogr, Ogr into Gr04
-                Gr04 recruits Wlk with Tit
-                Gr08 recruits Cen with Cen
-        Turn 2  Gr04 recruits Gar with Gar
-        Turn 3  Gr04 recruits Cyc with 2xGar
-        Turn 4  Gr04 splits off Gar, Gar into Gr06
-                Gr04 recruits Ogr with Ogr
-                Gr08 recruits Lio with 2xCen
-        Turn 5  Gr04 recruits Cyc with Cyc
-                Gr06 recruits Ogr
-                Gr08 recruits Lio with Lio
-        Turn 6  Gr04 splits off Ogr, Ogr into Gr07
-                Gr08 splits off Cen, Cen into Gr11
-                Gr04 recruits Wlk with Tit
-                Gr06 recruits Ogr with Ogr
-                Gr11 loses Cen, Cen
-        Turn 7  Gr04 recruits Cyc with Cyc
-                Gr06 recruits Tro with 2xOgr
-                Gr07 recruits Ogr with Ogr
-        Turn 8  Gr04 splits off Cyc, Ogr into Gr12
-                Gr07 recruits Min with 3xOgr
-                Gr08 recruits Gar with Gar
-                Gr06 loses Tro, Gar, Gar, Ogr, Ogr
-                Gr12 loses Cyc, Ogr
-        Turn 9  Gr08 recruits Cyc with 2xGar
-    """
+
+    def testPredictSplits8(self):
+        print "\ntest 8 begins"
+        ps = PredictSplits("Gd", "Gd03", ['Titan', 'Angel', 'Gargoyle', 
+          'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+
+        turn = 1
+        print "\nTurn", turn
+        ps.getLeaf("Gd03").split(4, "Gd04", turn)
+        ps.getLeaf("Gd03").revealCreatures(['Ogre'])
+        ps.getLeaf("Gd03").addCreature("Ogre")
+        ps.getLeaf("Gd04").revealCreatures(['Gargoyle', 'Gargoyle'])
+        ps.getLeaf("Gd04").addCreature("Cyclops")
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        ps.printLeaves()
+
+        turn = 2
+        print "\nTurn", turn
+        ps.getLeaf("Gd03").revealCreatures(['Centaur'])
+        ps.getLeaf("Gd03").addCreature("Centaur")
+        ps.getLeaf("Gd04").revealCreatures(['Ogre'])
+        ps.getLeaf("Gd04").addCreature("Ogre")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(len(ps.getLeaf("Gd03").getCertainCreatures()) == 5)
+        assert(len(ps.getLeaf("Gd04").getCertainCreatures()) == 5)
+
+        turn = 3
+        print "\nTurn", turn
+        ps.getLeaf("Gd04").revealCreatures(['Cyclops'])
+        ps.getLeaf("Gd04").addCreature("Cyclops")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+
+        turn = 4
+        print "\nTurn", turn
+        ps.getLeaf("Gd04").split(2, "Gd11", turn)
+        ps.getLeaf("Gd04").revealCreatures(['Ogre', 'Ogre'])
+        ps.getLeaf("Gd04").addCreature("Troll")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(not ps.getLeaf("Gd11").allCertain())
+
+        turn = 5
+        print "\nTurn", turn
+        ps.getLeaf("Gd04").revealCreatures(['Cyclops'])
+        ps.getLeaf("Gd04").addCreature("Cyclops")
+        ps.getLeaf("Gd11").revealCreatures(['Gargoyle', 'Gargoyle'])
+        ps.getLeaf("Gd11").addCreature("Cyclops")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(ps.getLeaf("Gd11").allCertain())
+        assert(len(ps.getLeaf("Gd03").getCertainCreatures()) == 5)
+        assert(len(ps.getLeaf("Gd04").getCertainCreatures()) == 6)
+
+        turn = 6
+        print "\nTurn", turn
+        ps.getLeaf("Gd04").split(2, "Gd10", turn)
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(not ps.getLeaf("Gd10").allCertain())
+        assert(ps.getLeaf("Gd11").allCertain())
+
+        turn = 7
+        print "\nTurn", turn
+        ps.getLeaf("Gd04").revealCreatures(['Cyclops', 'Cyclops', 'Cyclops'])
+        ps.getLeaf("Gd04").addCreature("Behemoth")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(not ps.getLeaf("Gd10").allCertain())
+        assert(ps.getLeaf("Gd11").allCertain())
+
+        turn = 8
+        print "\nTurn", turn
+        ps.getLeaf("Gd03").revealCreatures(['Ogre', 'Ogre'])
+        ps.getLeaf("Gd03").addCreature("Troll")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(not ps.getLeaf("Gd10").allCertain())
+        assert(ps.getLeaf("Gd11").allCertain())
+
+        turn = 9
+        print "\nTurn", turn
+        ps.getLeaf("Gd03").split(2, "Gd01", turn)
+        ps.printLeaves()
+        ps.getLeaf("Gd04").revealCreatures(['Troll'])
+        ps.getLeaf("Gd04").addCreature("Troll")
+        ps.getLeaf("Gd03").revealCreatures(['Troll'])
+        ps.getLeaf("Gd03").addCreature("Troll")
+        ps.getLeaf("Gd11").revealCreatures(['Cyclops'])
+        ps.getLeaf("Gd11").addCreature("Cyclops")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd01").allCertain())
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(not ps.getLeaf("Gd10").allCertain())
+        assert(ps.getLeaf("Gd11").allCertain())
+        assert(len(ps.getLeaf("Gd04").getCertainCreatures()) == 6)
+        assert(len(ps.getLeaf("Gd10").getCertainCreatures()) == 1)
+
+        ps.getLeaf("Gd01").removeCreature("Centaur")
+        ps.getLeaf("Gd01").removeCreature("Centaur")
+        ps.printLeaves()
+        assert(len(ps.getLeaf("Gd03").getCertainCreatures()) == 5)
+
+        turn = 10
+        print "\nTurn", turn
+        ps.getLeaf("Gd04").split(2, "Gd08", turn)
+        ps.getLeaf("Gd11").revealCreatures(['Cyclops'])
+        ps.getLeaf("Gd11").addCreature("Cyclops")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(not ps.getLeaf("Gd08").allCertain())
+        assert(not ps.getLeaf("Gd10").allCertain())
+        assert(ps.getLeaf("Gd11").allCertain())
+
+        ps.getLeaf("Gd10").removeCreature("Ogre")
+        ps.getLeaf("Gd10").removeCreature("Ogre")
+        ps.printLeaves()
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(not ps.getLeaf("Gd08").allCertain())
+        assert(ps.getLeaf("Gd11").allCertain())
+
+        turn = 11
+        print "\nTurn", turn
+        ps.getLeaf("Gd03").revealCreatures(['Troll'])
+        ps.getLeaf("Gd03").addCreature("Troll")
+        ps.printLeaves()
+        print "\ntest 8 ends"
+        assert(not ps.getLeaf("Gd03").allCertain())
+        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(not ps.getLeaf("Gd08").allCertain())
+        assert(ps.getLeaf("Gd11").allCertain())
 
 
 if __name__ == "__main__":
