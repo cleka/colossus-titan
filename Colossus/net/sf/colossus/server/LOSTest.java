@@ -3,7 +3,6 @@ package net.sf.colossus.server;
 import java.util.*;
 import junit.framework.*;
 
-import net.sf.colossus.client.VariantSupport;
 
 
 /** 

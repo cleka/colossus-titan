@@ -11,7 +11,6 @@ import net.sf.colossus.client.IClient;
 import net.sf.colossus.client.Client;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.parser.TerrainRecruitLoader;
-import net.sf.colossus.client.VariantSupport;
 
 /**
  *  Class Server lives on the server side and handles all communcation with

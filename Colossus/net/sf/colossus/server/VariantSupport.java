@@ -1,12 +1,12 @@
-package net.sf.colossus.client;
+package net.sf.colossus.server;
 
 import net.sf.colossus.util.ResourceLoader;
-import net.sf.colossus.server.Constants;
-import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
 import net.sf.colossus.parser.VariantLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.client.HexMap;
+
 import java.io.*;
 import javax.swing.text.*;
 
@@ -61,8 +61,6 @@ public final class VariantSupport
         if (loadedVariant && variantName.equals(tempVarName) &&
             varDirectory.equals(tempVarDirectory))
         {
-            Log.debug("*not* loading already loaded variant " + tempVarName +
-                      ", data files in " + tempVarDirectory);
             return varREADME;
         }
 

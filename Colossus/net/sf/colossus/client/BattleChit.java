@@ -228,4 +228,9 @@ final class BattleChit extends Chit
     {
         return getCreatureName() + " in " + getHexLabel();
     }
+
+    public String toString()
+    {
+        return getDescription();
+    }
 }

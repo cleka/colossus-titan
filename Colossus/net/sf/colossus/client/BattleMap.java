@@ -441,7 +441,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     /** Select all hexes containing critters eligible to move. */
     void highlightMobileCritters()
     {
-        Set set = client.findMobileCritters();
+        Set set = client.findMobileCritterHexes();
         unselectAllHexes();
         selectHexesByLabels(set);
     }

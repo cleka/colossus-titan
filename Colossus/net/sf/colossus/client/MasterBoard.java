@@ -15,6 +15,7 @@ import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.SaveGameFilter;
 import net.sf.colossus.server.ConfigFileFilter;
+import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.parser.StrategicMapLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.parser.ParseException;

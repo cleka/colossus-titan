@@ -8,7 +8,6 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.parser.CreatureLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
-import net.sf.colossus.client.VariantSupport;
 
 /**
  * Class Creature represents the CONSTANT information about a Titan

@@ -14,7 +14,6 @@ import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.util.Log;
-import net.sf.colossus.client.VariantSupport;
 import net.sf.colossus.client.PickIntValue;
 
 /**

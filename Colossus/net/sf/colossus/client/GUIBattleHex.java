@@ -10,6 +10,7 @@ import java.io.*;
 import net.sf.colossus.util.HTMLColor;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
+import net.sf.colossus.server.VariantSupport;
 
 /**
  * Class GUIBattleHex holds GUI info for one battle hex.

@@ -16,6 +16,7 @@ import net.sf.colossus.server.Player;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.Dice;
+import net.sf.colossus.server.VariantSupport;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 
@@ -1514,14 +1515,30 @@ Log.debug(playerName + " Called Client.leaveCarryMode()");
     }
 
 
+    BattleHex getBattleHex(BattleChit chit)
+    {
+        return HexMap.getHexByLabel(getBattleTerrain(), chit.getHexLabel());
+    }
+
+    BattleHex getStartingBattleHex(BattleChit chit)
+    {
+        return HexMap.getHexByLabel(getBattleTerrain(), 
+            chit.getStartingHexLabel());
+    }
+
+    boolean isOccupied(BattleHex hex)
+    {
+        return !getBattleChits(hex.getLabel()).isEmpty();
+    }
+
+
     private String getBattleChitDescription(BattleChit chit)
     {
         if (chit == null)
         {
             return "";
         }
-        BattleHex hex = HexMap.getHexByLabel(getBattleTerrain(), 
-            chit.getHexLabel());
+        BattleHex hex = getBattleHex(chit);
         return chit.getCreatureName() + " in " + hex.getDescription();
     }
 
@@ -2263,8 +2280,7 @@ Log.debug("Client.tellStrikeResults() " + strikerTag + " " + targetTag + " " + s
      *  Dead critters count as being in contact only if countDead is true. */
     boolean isInContact(BattleChit chit, boolean countDead)
     {
-        BattleHex hex = HexMap.getHexByLabel(getBattleTerrain(),
-            chit.getHexLabel());
+        BattleHex hex = getBattleHex(chit);
 
         // Offboard creatures are not in contact.
         if (hex.isEntrance())
@@ -2302,7 +2318,7 @@ Log.debug("Client.tellStrikeResults() " + strikerTag + " " + targetTag + " " + s
 
 
     /** Return a set of hexLabels. */
-    Set findMobileCritters()
+    Set findMobileCritterHexes()
     {
         Set set = new HashSet();
         Iterator it = getActiveBattleChits().iterator();
@@ -2312,6 +2328,22 @@ Log.debug("Client.tellStrikeResults() " + strikerTag + " " + targetTag + " " + s
             if (!chit.hasMoved() && !isInContact(chit, false))
             {
                 set.add(chit.getHexLabel());
+            }
+        }
+        return set;
+    }
+
+    /** Return a set of BattleChits. */
+    Set findMobileBattleChits()
+    {
+        Set set = new HashSet();
+        Iterator it = getActiveBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (!chit.hasMoved() && !isInContact(chit, false))
+            {
+                set.add(chit);
             }
         }
         return set;

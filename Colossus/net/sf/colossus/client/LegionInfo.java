@@ -269,18 +269,30 @@ public final class LegionInfo
     }
 
 
-    // XXX Hardcoded to just archangels and angels.  Use summonables.
     public String bestSummonable()
     {
-        if (getContents().contains("Archangel"))
+        Creature best = null;
+
+        Iterator it = getContents().iterator();
+        while (it.hasNext())
         {
-            return "Archangel";
+            String name = (String)it.next();
+            Creature creature = Creature.getCreatureByName(name);
+            if (creature.isSummonable())
+            {
+                if (best == null || creature.getPointValue() > 
+                    best.getPointValue())
+                {
+                    best = creature;
+                }
+            }
         }
-        if (getContents().contains("Angel"))
+
+        if (best == null)
         {
-            return "Angel";
+            return null;
         }
-        return null;
+        return best.getName();
     }
 
     public boolean hasSummonable()

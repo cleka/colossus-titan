@@ -11,6 +11,7 @@ import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.parser.BattlelandLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.server.VariantSupport;
 
 /**
  * Class HexMap displays a basic battle map.
@@ -66,7 +67,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
 
     /** Set up a static non-GUI hex map for each terrain type. */
-    static void staticBattlelandsInit()
+    public static void staticBattlelandsInit()
     {
         terrainH.clear();
         terrainHexes.clear();

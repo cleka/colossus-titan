@@ -90,7 +90,7 @@ public class SimpleAI implements AI
 
                 if (recruit != null)
                 {
-                    java.util.List recruiters = client.findEligibleRecruiters(
+                    List recruiters = client.findEligibleRecruiters(
                         markerId, recruit.getName());
 
                     String recruiterName = null;
@@ -115,7 +115,7 @@ public class SimpleAI implements AI
         if (recruit != null)
         {
             recruitName = recruit.getName();
-            java.util.List recruiters = client.findEligibleRecruiters(
+            List recruiters = client.findEligibleRecruiters(
                 legion.getMarkerId(), recruit.getName());
             if (!recruiters.isEmpty())
             {
@@ -813,7 +813,7 @@ public class SimpleAI implements AI
             }
 
             // compute the value of sitting still
-            List moveList = new ArrayList();
+            MoveList moveList = new MoveList();
             moveMap.put(legion, moveList);
 
             MoveInfo sitStillMove = new MoveInfo(legion, null,
@@ -1798,7 +1798,7 @@ public class SimpleAI implements AI
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            java.util.List legions = client.getLegionsByHex(hexLabel);
+            List legions = client.getLegionsByHex(hexLabel);
             if (legions.size() != 1)
             {
                 Log.error("SimpleAI.summonAngel(): Engagement in " + hexLabel);
@@ -2197,192 +2197,47 @@ Log.debug("Best target is null, aborting");
         // should move, start moving them for real.  If the preferred
         // move fails, fall back to the critter's remaining moves.
 
-        final char terrain = client.getBattleTerrain();
-
         if (bestOrder != null)
         {
             Iterator it = bestOrder.iterator();
             while (it.hasNext())
             {
-                List moveList = (List)it.next();
-                Iterator it2 = moveList.iterator();
-                while (it2.hasNext())
-                {
-                    CritterMove cm = (CritterMove)it2.next();
-                    BattleChit fakeCritter = cm.getCritter();
+                CritterMove cm = (CritterMove)it.next();
+                BattleChit fakeCritter = cm.getCritter();
 
-                    String hexLabel = cm.getEndingHexLabel();
-                    Log.debug("applymove: try " + fakeCritter + " to " + 
-                        hexLabel);
-                    client.doBattleMove(fakeCritter.getTag(), hexLabel);
-                    // XXX Need to test that the move was okay, and
-                    // try another one if it failed.
-                    break;
-                }
+                String hexLabel = cm.getEndingHexLabel();
+                Log.debug("applymove: try " + fakeCritter + " to " + hexLabel);
+                client.doBattleMove(fakeCritter.getTag(), hexLabel);
+                // XXX Need to test that the move was okay, and
+                // try another one if it failed.
             }
         }
 
         Log.debug("Done with battleMove()");
     }
 
-    /** Compute a set of CritterMoves for the active legion.
-     *  Return a List containing one List of CritterMoves for each Critter. */
-    List findBattleMoves()
+
+    private static final int MAX_MOVE_ORDER_PERMUTATIONS = 10000;
+
+    List findMoveOrder(LegionMove lm)
     {
-Log.debug("Called findBattleMoves()");
-
-        // Consider one critter at a time, in order of importance.
-        // Examine all possible moves for that critter not already
-        // taken by a more important one.
-
-        // TODO Handle summoned/recruited critters, in particular
-        // getting stuff out of the way so that a reinforcement
-        // has room to enter.
-
-        // Work on a copy of the game state.  The caller is responsible
-        // for actually making the moves.
-        final char terrain = client.getBattleTerrain();
-        List critters = client.getActiveBattleChits();
-
-        // Sort critters in decreasing order of importance.  Keep
-        // identical creatures together with a secondary sort by
-        // creature name.
-        Collections.sort(critters, new CritterComparator(terrain));
-
-        // allCritterMoves is an ArrayList (for clone()) of moveLists.
-        final ArrayList allCritterMoves = new ArrayList();
-        Set hexesTaken = new HashSet();
-
-        Iterator it = critters.iterator();
-        while (it.hasNext())
+        if (lm == null)
         {
-            BattleChit critter = (BattleChit)it.next();
-            String currentHexLabel = critter.getCurrentHexLabel();
-
-            // moves is a list of hex labels where one critter
-            // can move.
-
-            // Sometimes friendly critters need to get out of the way
-            // to clear a path for a more important critter.  We
-            // consider moves that the critter could make,
-            // disregarding mobile allies.
-
-            // TODO Make less important creatures get out of the way.
-
-            // XXX Should show moves including moving through mobile allies.
-            Set moves = client.showBattleMoves(critter.getTag());
-
-            // Not moving is also an option.
-            moves.add(currentHexLabel);
-
-            Log.debug("Found " + moves.size() + " moves for " + 
-                critter.getDescription());
-
-            // Move previously considered critters into their preferred
-            // position so we can take them into account when evaluating
-            // this critter's moves.
-            Iterator it2 = allCritterMoves.iterator();
-            while (it2.hasNext())
-            {
-                List moveList = (List)it2.next();
-                CritterMove cm = (CritterMove)moveList.get(0);
-                BattleChit critter2 = cm.getCritter();
-                Log.debug("Simulating moving " + critter2.getCreatureName() + 
-                    " to " + cm.getEndingHexLabel());
-                critter2.moveToHex(cm.getEndingHexLabel());
-            }
-
-            // moveList is a list of CritterMoves for one critter.
-            List moveList = new ArrayList();
-
-            it2 = moves.iterator();
-            while (it2.hasNext())
-            {
-                String hexLabel = (String)it2.next();
-
-                // Don't bother evaluating this hex if a more important
-                // critter already has dibs on it.
-                if (hexesTaken.contains(hexLabel))
-                {
-                    continue;
-                }
-
-                CritterMove cm = new CritterMove(critter,
-                   currentHexLabel, hexLabel);
-
-                // Need to move the critter to evaluate.
-                critter.moveToHex(hexLabel);
-
-                // Compute and save the value for each CritterMove.
-                cm.setValue(evaluateCritterMove(critter));
-                moveList.add(cm);
-            }
-            // Move the critter back where it started.
-            critter.moveToHex(critter.getStartingHexLabel());
-
-            // Sort critter moves in descending order of score.
-            Collections.sort(moveList, new Comparator()
-            {
-                public int compare(Object o1, Object o2)
-                {
-                    CritterMove cm1 = (CritterMove)o1;
-                    CritterMove cm2 = (CritterMove)o2;
-                    return cm2.getValue() - cm1.getValue();
-                }
-            });
-
-            // Mark this critter's favorite move as taken, unless it's
-            // offboard.
-            if (!moveList.isEmpty())
-            {
-                CritterMove cm = (CritterMove)moveList.get(0);
-                String hexLabel = cm.getEndingHexLabel();
-                if (!hexLabel.startsWith("X"))
-                {
-                    hexesTaken.add(hexLabel);
-                }
-            }
-
-            // Show the moves considered.
-            StringBuffer buf = new StringBuffer("Considered " +
-                moveList.size() + " moves for " + critter.getName() + " in " +
-                critter.getStartingHexLabel() + ":");
-            it2 = moveList.iterator();
-            while (it2.hasNext())
-            {
-                CritterMove cm = (CritterMove)it2.next();
-                buf.append(" " + cm.getEndingHexLabel());
-            }
-            Log.debug(buf.toString());
-
-            // Add this critter's moves to the list.
-            allCritterMoves.add(moveList);
-
-            // Put all critters back where they started.
-            it2 = allCritterMoves.iterator();
-            while (it2.hasNext())
-            {
-                moveList = (List)it2.next();
-                CritterMove cm = (CritterMove)moveList.get(0);
-                BattleChit critter2 = cm.getCritter();
-                critter2.moveToHex(cm.getStartingHexLabel());
-            }
+            return null;
         }
 
-
-        // Remove critters that don't want to move from the list
-        // before finding permutations of move orders.
         int perfectScore = 0;
-        ArrayList trimmedCritterMoves = (ArrayList)allCritterMoves.clone();
-        Collections.sort(trimmedCritterMoves, new MoveOrderComparator());
 
-        it = trimmedCritterMoves.iterator();
+        ArrayList critterMoves = new ArrayList();
+        critterMoves.addAll(lm.getCritterMoves());
+
+        Iterator it = critterMoves.iterator();
         while (it.hasNext())
         {
-            List moveList = (List)it.next();
-            CritterMove cm = (CritterMove)moveList.get(0);
+            CritterMove cm = (CritterMove)it.next();
             if (cm.getStartingHexLabel().equals(cm.getEndingHexLabel()))
             {
+                // Prune non-movers
                 it.remove();
             }
             else
@@ -2404,16 +2259,13 @@ Log.debug("Called findBattleMoves()");
         // order, until we find an order that lets every creature reach
         // its preferred hex.  If none does, take the best we can find.
 
-        // This is too slow.  TODO Optimize it.  Move it to a separate
-        // worker thread if necessary, so that the GUI stays responsive.
-
         int turn = client.getBattleTurnNumber();
         int bestScore = 0;
         List bestOrder = null;
         List lastOrder = null;
         int count = 0;
 
-        it = new Perms(trimmedCritterMoves).iterator();
+        it = new Perms(critterMoves).iterator();
         while (it.hasNext())
         {
             ArrayList order = (ArrayList)it.next();
@@ -2446,19 +2298,17 @@ Log.debug("Called findBattleMoves()");
             }
             lastOrder = (List)order.clone();
 
-            // Just bailing out after 100 speeds things up a lot
-            // and seems to work okay.
-            if (count > 99)
+            // Bail out early
+            if (count > MAX_MOVE_ORDER_PERMUTATIONS)
             {
                 break;
             }
         }
-
         Log.debug("Got score " + bestScore + " in " + count + " permutations");
         return bestOrder;
     }
 
-    // TODO Optimize this method.
+
     /** Try each of the moves in order.  Return the number that succeed,
      *  scaled by the importance of each critter. */
     private int testMoveOrder(List order)
@@ -2467,12 +2317,12 @@ Log.debug("Called findBattleMoves()");
         Iterator it = order.iterator();
         while (it.hasNext())
         {
-            List moveList = (List)it.next();
-            CritterMove cm = (CritterMove)moveList.get(0);
+            CritterMove cm = (CritterMove)it.next();
             BattleChit critter = cm.getCritter();
             String hexLabel = cm.getEndingHexLabel();
             if (client.testBattleMove(critter, hexLabel))
             {
+                // XXX Use kill value instead?
                 val += critter.getPointValue();
             }
         }
@@ -2480,8 +2330,7 @@ Log.debug("Called findBattleMoves()");
         it = order.iterator();
         while (it.hasNext())
         {
-            List moveList = (List)it.next();
-            CritterMove cm = (CritterMove)moveList.get(0);
+            CritterMove cm = (CritterMove)it.next();
             BattleChit critter = cm.getCritter();
             String hexLabel = cm.getStartingHexLabel();
             critter.setHexLabel(hexLabel);
@@ -2489,9 +2338,289 @@ Log.debug("Called findBattleMoves()");
         return val;
     }
 
-    /** For an List of moveLists, which are List of CritterMoves,
-     *  concatenate all the creature names in order.  If the list is null
-     *  or empty, return an empty String. */
+
+
+    private final int MAX_LEGION_MOVES = 10000;
+
+    /** Find the maximum number of moves per creature to test, such that
+     *  numMobileCreaturesInLegion ^ N <= LEGION_MOVE_LIMIT, but we must
+     *  have at least as many moves as mobile creatures to ensure that
+     *  every creature has somewhere to go. */
+    int getCreatureMoveLimit()
+    {
+        int mobileCritters = client.findMobileBattleChits().size();
+Log.debug("mobileCritters is " + mobileCritters);
+        if (mobileCritters <= 1)
+        {
+            // Avoid infinite logs and division by zero, and just try
+            // all possible moves.
+            return Constants.BIGNUM;
+        }
+        int max = (int)Math.floor(Math.log(MAX_LEGION_MOVES) / 
+            Math.log(mobileCritters));
+        return (Math.min(max, mobileCritters));
+    }
+
+    List findBattleMoves()
+    {
+Log.debug("Called findBattleMoves()");
+
+        // Consider one critter at a time in isolation.  
+        // Find the best N moves for each critter.
+        
+        // TODO Do not consider immobile critters.  Also, do not allow
+        // non-flying creatures to move through their hexes.
+
+        // TODO Handle summoned/recruited critters, in particular
+        // getting stuff out of the way so that a reinforcement
+        // has room to enter.
+
+        // The caller is responsible for actually making the moves.
+
+        List critters = client.getActiveBattleChits();
+
+        // allCritterMoves is an ArrayList (for clone()) of moveLists.
+        final ArrayList allCritterMoves = new ArrayList();
+
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            BattleChit critter = (BattleChit)it.next();
+            String currentHexLabel = critter.getCurrentHexLabel();
+
+            // moves is a list of hex labels where one critter can move.
+
+            // Sometimes friendly critters need to get out of the way to 
+            // clear a path for a more important critter.  We consider 
+            // moves that the critter could make, disregarding mobile allies.
+
+            // XXX Should show moves including moving through mobile allies.
+            Set moves = client.showBattleMoves(critter.getTag());
+
+            // TODO Make less important creatures get out of the way.
+
+            // Not moving is also an option.
+            moves.add(currentHexLabel);
+
+            List moveList = new MoveList();
+
+            Iterator it2 = moves.iterator();
+            while (it2.hasNext())
+            {
+                String hexLabel = (String)it2.next();
+
+                CritterMove cm = new CritterMove(critter, currentHexLabel, 
+                    hexLabel);
+
+                // Need to move the critter to evaluate.
+                critter.moveToHex(hexLabel);
+
+                // Compute and save the value for each CritterMove.
+                cm.setValue(evaluateCritterMove(critter));
+                moveList.add(cm);
+            }
+            // Move the critter back where it started.
+            critter.moveToHex(critter.getStartingHexLabel());
+
+            // Sort critter moves in descending order of score.
+            Collections.sort(moveList, new Comparator()
+            {
+                public int compare(Object o1, Object o2)
+                {
+                    CritterMove cm1 = (CritterMove)o1;
+                    CritterMove cm2 = (CritterMove)o2;
+                    return cm2.getValue() - cm1.getValue();
+                }
+            });
+
+            // Show the moves considered.
+            StringBuffer buf = new StringBuffer("Considered " +
+                moveList.size() + " moves for " + critter.getName() + " in " +
+                critter.getStartingHexLabel() + ":");
+            it2 = moveList.iterator();
+            while (it2.hasNext())
+            {
+                CritterMove cm = (CritterMove)it2.next();
+                buf.append(" " + cm.getEndingHexLabel());
+            }
+            Log.debug(buf.toString());
+
+            // Add this critter's moves to the list.
+            allCritterMoves.add(moveList);
+
+            // Put all critters back where they started.
+            it2 = allCritterMoves.iterator();
+            while (it2.hasNext())
+            {
+                moveList = (MoveList)it2.next();
+                CritterMove cm = (CritterMove)moveList.get(0);
+                BattleChit critter2 = cm.getCritter();
+                critter2.moveToHex(cm.getStartingHexLabel());
+            }
+        }
+
+        List legionMoves = findLegionMoves(allCritterMoves);
+
+        // Eval all legion moves to find the best.
+        // TODO Limit the number tested if too slow.
+        LegionMove best = findBestLegionMove(legionMoves);
+
+        List bestOrder = findMoveOrder(best);
+
+        return bestOrder;
+    }
+
+    LegionMove findBestLegionMove(List legionMoves)
+    {
+        int bestScore = Integer.MIN_VALUE;
+        LegionMove best = null;
+
+        Iterator it = legionMoves.iterator();
+        while (it.hasNext())
+        {
+            LegionMove lm = (LegionMove)it.next();
+            int score = evaluateLegionBattleMove(lm);
+            if (score > bestScore)
+            {
+                bestScore = score;
+                best = lm;
+            }
+        }
+        Log.debug("Best legion move: " + ((best == null) ? "none " : 
+            best.toString()));
+        return best;
+    }
+
+
+    private Set duplicateLegionMoveChecker = new HashSet();
+
+    /** allCritterMoves is a List of sorted moveLists.  A moveList is a 
+     *  sorted List of CritterMoves for one critter.  Return a sorted List 
+     *  of legionMoves.  A legionMove is a List of one CritterMove per
+     *  mobile critter in the legion, where no two critters move to the
+     *  same hex. */
+    List findLegionMoves(final ArrayList allCritterMoves)
+    {
+        ArrayList critterMoves = (ArrayList)allCritterMoves.clone();
+        while (trimCritterMoves(critterMoves)) {}  // Just trimming
+
+        // Now that the list is as small as possible, start finding combos.
+        List legionMoves = new ArrayList();
+        duplicateLegionMoveChecker.clear();
+        final int limit = getCreatureMoveLimit();
+        int [] indexes = new int[critterMoves.size()];
+
+        nestForLoop(indexes, indexes.length - 1, critterMoves, legionMoves);
+
+        Log.debug("Got " + legionMoves.size() + " legion moves");
+        return legionMoves;
+    }
+
+
+    private Set duplicateHexChecker = new HashSet();
+
+    private void nestForLoop(int [] indexes, final int level, final
+        List critterMoves, List legionMoves)
+    {
+        // TODO See if doing the set test at every level is faster.
+        if (level == 0)
+        {
+            duplicateHexChecker.clear();
+            for (int j = 0; j < indexes.length; j++)
+            {
+                MoveList moveList = (MoveList)critterMoves.get(j);
+                if (indexes[j] >= moveList.size())
+                {
+                    return;
+                }
+                CritterMove cm = (CritterMove)moveList.get(indexes[j]);
+                duplicateHexChecker.add(cm.getEndingHexLabel());
+            }
+            if (duplicateHexChecker.size() == indexes.length)
+            {
+                LegionMove lm  = makeLegionMove(indexes, critterMoves);
+                if (!duplicateLegionMoveChecker.contains(lm))
+                {
+                    legionMoves.add(lm);
+                    duplicateLegionMoveChecker.add(lm);
+                }
+                else
+                {
+                    // XXX Not working at all.
+Log.debug("Pruning a duplicate legion move");
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < indexes.length; i++)
+            {
+                indexes[level] = i;
+                nestForLoop(indexes, level - 1, critterMoves, legionMoves);
+            }
+        }
+    }
+
+    private LegionMove makeLegionMove(int [] indexes, List critterMoves) 
+    {
+        LegionMove lm = new LegionMove();
+        for (int i = 0; i < indexes.length; i++)
+        {
+            MoveList moveList = (MoveList)critterMoves.get(i);
+            CritterMove cm = (CritterMove)moveList.get(indexes[i]);
+            lm.add(cm);
+        }
+        return lm;
+    }
+
+
+
+    /** Modify allCritterMoves in place, and return true if it changed. */
+    boolean trimCritterMoves(ArrayList allCritterMoves)
+    {
+        Set takenHexLabels = new HashSet();  // XXX reuse?
+        boolean changed = false;
+
+        // First trim immobile creatures from the list, and add their
+        // hexes to takenHexLabels.
+        Iterator it = allCritterMoves.iterator();
+        while (it.hasNext())
+        {
+            MoveList moveList = (MoveList)it.next();
+            if (moveList.size() == 1)
+            {
+                // This critter is not mobile, and its hex is taken.
+                CritterMove cm = (CritterMove)moveList.get(0);
+                BattleChit critter2 = cm.getCritter();
+                takenHexLabels.add(cm.getStartingHexLabel());
+                it.remove();
+                changed = true;
+            }
+        }
+
+        // Now trim all moves to taken hexes from all movelists.
+        it = allCritterMoves.iterator();
+        while (it.hasNext())
+        {
+            List moveList = (List)it.next();
+            Iterator it2 = moveList.iterator();
+            while (it2.hasNext())
+            {
+                CritterMove cm = (CritterMove)it2.next();
+                if (takenHexLabels.contains(cm.getEndingHexLabel()))
+                {
+                    it.remove();
+                    changed = true;
+                }
+            }
+        }
+
+        return changed;
+    }
+
+
+    /** For an List of CritterMoves, concatenate all the creature names 
+     *  in order.  If the list is null or empty, return an empty String. */
     private String creatureNames(List list)
     {
         if (list == null)
@@ -2502,8 +2631,7 @@ Log.debug("Called findBattleMoves()");
         Iterator it = list.iterator();
         while (it.hasNext())
         {
-            List moveList = (List)it.next();
-            CritterMove cm = (CritterMove)moveList.get(0);
+            CritterMove cm = (CritterMove)it.next();
             BattleChit critter = cm.getCritter();
             buf.append(critter.getCreatureName());
         }
@@ -2511,7 +2639,6 @@ Log.debug("Called findBattleMoves()");
     }
 
 
-    // TODO Account for buddies.
     private int evaluateCritterMove(BattleChit critter)
     {
         final char terrain = client.getBattleTerrain();
@@ -2523,8 +2650,7 @@ Log.debug("Called findBattleMoves()");
         final Creature creature = Creature.getCreatureByName(
             critter.getCreatureName());
         final int skill = creature.getSkill();
-        final BattleHex hex = HexMap.getHexByLabel(client.getBattleTerrain(),
-            critter.getHexLabel());
+        final BattleHex hex = client.getBattleHex(critter);
         final int turn = client.getBattleTurnNumber();
 
         // Weight constants.
@@ -2547,11 +2673,13 @@ Log.debug("Called findBattleMoves()");
         final int ATTACKER_GET_HIT_SCALE_FACTOR = -1;
         final int DEFENDER_GET_HIT_SCALE_FACTOR = -2;
         final int TITAN_TOWER_HEIGHT_BONUS = 1000;
-        final int TITAN_FORWARD_EARLY_PENALTY = -1000;
+        final int TITAN_FORWARD_EARLY_PENALTY = -10000;
         final int TITAN_BY_EDGE_OR_TREE_BONUS = 400;
         final int DEFENDER_TOWER_HEIGHT_BONUS = 80;
         final int DEFENDER_FORWARD_EARLY_PENALTY = -60;
-        final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -100;
+        final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -300;
+        final int ADJACENT_TO_BUDDY = 100;
+        final int ADJACENT_TO_BUDDY_TITAN = 200;
 
         int value = 0;
 
@@ -2768,7 +2896,6 @@ Log.debug("Called findBattleMoves()");
         }
 
         // Encourage defending critters to hang back, and
-        // attacking critters to move forward.
         else if (legion.getMarkerId().equals(client.getDefenderMarkerId()))
         {
             if (HexMap.terrainIsTower(terrain))
@@ -2797,18 +2924,70 @@ Log.debug("Called findBattleMoves()");
             }
         }
 
-        else  // Attacker, non-titan
+        else  // Attacker, non-titan, needs to charge.
         {
             // Head for enemy creatures.
             value += ATTACKER_DISTANCE_FROM_ENEMY_PENALTY *
                 client.getStrike().minRangeToEnemy(critter);
         }
 
-        Log.debug("EVAL " + critter.getCreatureName() +
-            (critter.getCurrentHexLabel().equals(critter.getStartingHexLabel())
-                ? " move to " : " stay in ") + hex + " = " + value);
+        // Adjacent buddies
+        for (int i = 0; i < 6; i++)        
+        {
+            if (!hex.isCliff(i))
+            {
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor != null && client.isOccupied(neighbor))
+                {
+                    BattleChit other = client.getBattleChit(
+                        neighbor.getLabel());
+                    if (other.isInverted() == critter.isInverted())
+                    {
+                        // Buddy
+                        if (other.isTitan())
+                        {
+                            value += ADJACENT_TO_BUDDY_TITAN;
+                        }
+                        else
+                        {
+                            value += ADJACENT_TO_BUDDY;
+                        }
+                    }
+                }
+            }
+        }
 
         return value;
+    }
+
+    private int evaluateLegionBattleMove(LegionMove lm)
+    {
+        // First we need to move all critters into position.
+        Iterator it = lm.getCritterMoves().iterator();
+        while (it.hasNext())
+        {
+            CritterMove cm = (CritterMove)it.next();
+            cm.getCritter().moveToHex(cm.getEndingHexLabel());
+        }
+
+        // Then find the sum of all critter evals.
+        int sum = 0;
+        it = lm.getCritterMoves().iterator();
+        while (it.hasNext())
+        {
+            CritterMove cm = (CritterMove)it.next();
+            sum += evaluateCritterMove(cm.getCritter());
+        }
+
+        // Then move them all back.
+        it = lm.getCritterMoves().iterator();
+        while (it.hasNext())
+        {
+            CritterMove cm = (CritterMove)it.next();
+            cm.getCritter().moveToHex(cm.getStartingHexLabel());
+        }
+
+        return sum;
     }
 
 
@@ -2828,8 +3007,8 @@ Log.debug("Called findBattleMoves()");
         {
             final char terrain = client.getBattleTerrain();
 
-            ArrayList moveList1 = (ArrayList)o1;
-            ArrayList moveList2 = (ArrayList)o2;
+            ArrayList moveList1 = (MoveList)o1;
+            ArrayList moveList2 = (MoveList)o2;
             CritterMove cm1 = (CritterMove)moveList1.get(0);
             CritterMove cm2 = (CritterMove)moveList2.get(0);
             BattleChit critter1 = cm1.getCritter();
@@ -2848,12 +3027,10 @@ Log.debug("Called findBattleMoves()");
                 return -1;
             }
 
-            int range1 = client.getStrike().getRange(HexMap.getHexByLabel(
-                client.getBattleTerrain(), critter1.getStartingHexLabel()),
-                desiredHex1, true);
-            int range2 = client.getStrike().getRange(HexMap.getHexByLabel(
-                client.getBattleTerrain(), critter2.getStartingHexLabel()),
-                desiredHex2, true);
+            int range1 = client.getStrike().getRange(
+                client.getStartingBattleHex(critter1), desiredHex1, true);
+            int range2 = client.getStrike().getRange(
+                client.getStartingBattleHex(critter2), desiredHex2, true);
             int diff = range2 - range1;
             if (diff != 0)
             {
@@ -2967,6 +3144,64 @@ Log.debug("Called findBattleMoves()");
         BattleHex getEndingHex(char terrain)
         {
             return HexMap.getHexByLabel(terrain, endingHexLabel);
+        }
+
+        public String toString()
+        {
+            return critter.getDescription() + " to " + getEndingHexLabel();
+        }
+    }
+
+    /** MoveList is an ArrayList of CritterMoves */
+    class MoveList extends ArrayList
+    {
+    }
+
+    /** LegionMove has a List of one CritterMove per mobile critter
+     *  in the legion. */
+    class LegionMove
+    {
+        private List critterMoves = new ArrayList();
+
+        void add(CritterMove cm)
+        {
+            critterMoves.add(cm);
+        }
+
+        List getCritterMoves()
+        {
+            return Collections.unmodifiableList(critterMoves);
+        }
+
+        public String toString()
+        {
+            StringBuffer sb = new StringBuffer();
+            Iterator it = critterMoves.iterator();
+            while (it.hasNext())
+            {
+                CritterMove cm = (CritterMove)it.next();
+                sb.append(cm.toString());
+                if (it.hasNext())
+                {
+                    sb.append(", ");    
+                }
+            }
+            return sb.toString();
+        }
+
+        public boolean equals(Object ob)
+        {
+            if (!(ob instanceof LegionMove))
+            {
+                return false;
+            }
+            LegionMove lm = (LegionMove)ob;
+            return toString().equals(lm.toString());
+        }
+
+        public int hashCode()
+        {
+            return toString().hashCode();
         }
     }
 }

@@ -115,7 +115,6 @@ public final class Options
         }
 
         String optionsFile = getOptionsFilename();
-        Log.event("Trying to read options from " + optionsFile);
         try
         {
             FileInputStream in = new FileInputStream(optionsFile);
@@ -138,7 +137,6 @@ public final class Options
             return;
         }
         String optionsFile = getOptionsFilename();
-        Log.event("Trying to save options to " + optionsFile);
 
         File optionsDir = new File(Constants.gameDataPath);
         if (!optionsDir.exists() || !optionsDir.isDirectory())

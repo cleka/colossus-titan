@@ -64,7 +64,6 @@ public class TerrainRecruitLoader
             Log.debug("TerrainRecruitLoader: Destroying previous ``terrains'' ; this should never happen during a game...");
             terrains = null;
         }
-        Log.debug("TerrainRecruitLoader: clearing all Hashtables ; this should never happen during a game...");
         carToRecruits.clear();
         carToName.clear();
         carToDisplayName.clear();

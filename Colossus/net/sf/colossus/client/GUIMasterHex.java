@@ -11,6 +11,7 @@ import java.io.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Constants;
+import net.sf.colossus.server.VariantSupport;
 
 /**
  * Class GUIMasterHex holds GUI information for a MasterHex.

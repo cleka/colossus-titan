@@ -111,12 +111,6 @@ final class Strike
         return !client.getBattleChits(hex.getLabel()).isEmpty();
     }
 
-    BattleHex getCurrentHex(BattleChit chit)
-    {
-        return HexMap.getHexByLabel(client.getBattleTerrain(), 
-            chit.getHexLabel());
-    }
-
 
     boolean canStrike(BattleChit striker, BattleChit target)
     {
@@ -145,7 +139,7 @@ final class Strike
         }
 
         boolean inverted = chit.isInverted();
-        BattleHex currentHex = getCurrentHex(chit);
+        BattleHex currentHex = client.getBattleHex(chit);
 
         boolean adjacentEnemy = false;
 
@@ -156,7 +150,7 @@ final class Strike
             if (!currentHex.isCliff(i))
             {
                 BattleHex targetHex = currentHex.getNeighbor(i);
-                if (targetHex != null && isOccupied(targetHex))
+                if (targetHex != null && client.isOccupied(targetHex))
                 {
                     BattleChit target = client.getBattleChit(
                         targetHex.getLabel());
@@ -188,7 +182,7 @@ final class Strike
                 if (chit.isInverted() != target.isInverted() && 
                     !target.isDead())
                 {
-                    BattleHex targetHex = getCurrentHex(target);
+                    BattleHex targetHex = client.getBattleHex(target);
                     if (isRangestrikePossible(chit, target))
                     {
                         set.add(targetHex.getLabel());
@@ -298,7 +292,7 @@ final class Strike
      *  closest enemy critter.  Return OUT_OF_RANGE if there are none. */
     int minRangeToEnemy(BattleChit chit)
     {
-        BattleHex hex = getCurrentHex(chit);
+        BattleHex hex = client.getBattleHex(chit);
         int min = Constants.OUT_OF_RANGE;
 
         Iterator it = client.getBattleChits().iterator();
@@ -307,7 +301,7 @@ final class Strike
             BattleChit target = (BattleChit)it.next();
             if (chit.isInverted() != target.isInverted())
             {
-                BattleHex targetHex = getCurrentHex(target);
+                BattleHex targetHex = client.getBattleHex(target);
                 int range = getRange(hex, targetHex, false);
                 // Exit early if adjacent.
                 if (range == 2)
@@ -504,8 +498,8 @@ final class Strike
         // Creatures block LOS, unless both striker and target are at higher
         //     elevation than the creature, or unless the creature is at
         //     the base of a cliff and the striker or target is atop it.
-        if (isOccupied(nextHex) && nextHex.getElevation() >= strikeElevation
-            && (!strikerAtopCliff || currentHex != initialHex))
+        if (client.isOccupied(nextHex) && nextHex.getElevation() >= 
+            strikeElevation && (!strikerAtopCliff || currentHex != initialHex))
         {
             midChit = true;
         }
@@ -575,8 +569,8 @@ final class Strike
         Creature targetCreature = Creature.getCreatureByName(
             target.getCreatureName());
 
-        BattleHex currentHex = getCurrentHex(chit);
-        BattleHex targetHex = getCurrentHex(target);
+        BattleHex currentHex = client.getBattleHex(chit);
+        BattleHex targetHex = client.getBattleHex(target);
 
         int range = getRange(currentHex, targetHex, false);
         int skill = creature.getSkill();
@@ -775,7 +769,7 @@ final class Strike
 
         // All creatures block LOS.  (There are no height differences on
         // maps with bramble.)
-        if (isOccupied(nextHex))
+        if (client.isOccupied(nextHex))
         {
             return Constants.BIGNUM;
         }
@@ -845,10 +839,8 @@ final class Strike
      *  target, including modifications for terrain. */
     public int getDice(BattleChit chit, BattleChit target)
     {
-        BattleHex hex = HexMap.getHexByLabel(client.getBattleTerrain(),
-            chit.getCurrentHexLabel());
-        BattleHex targetHex = HexMap.getHexByLabel(client.getBattleTerrain(),
-            target.getCurrentHexLabel());
+        BattleHex hex = client.getBattleHex(chit);
+        BattleHex targetHex = client.getBattleHex(target);
         Creature striker = Creature.getCreatureByName(chit.getCreatureName());
 
         int dice;
@@ -910,10 +902,8 @@ final class Strike
 
     private int getAttackerSkill(BattleChit striker, BattleChit target)
     {
-        BattleHex hex = HexMap.getHexByLabel(client.getBattleTerrain(),
-            striker.getCurrentHexLabel());
-        BattleHex targetHex = HexMap.getHexByLabel(client.getBattleTerrain(),
-            target.getCurrentHexLabel());
+        BattleHex hex = client.getBattleHex(striker);
+        BattleHex targetHex = client.getBattleHex(target);
 
         int attackerSkill = striker.getSkill();
 
@@ -1005,8 +995,7 @@ final class Strike
         // Native defending in bramble, from strike by a non-native: +1
         // Native defending in bramble, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (HexMap.getHexByLabel(client.getBattleTerrain(), 
-                target.getHexLabel()).getTerrain() == 'r' &&
+        if (client.getBattleHex(target).getTerrain() == 'r' &&
             target.getCreature().isNativeBramble() &&
             !striker.getCreature().isNativeBramble() &&
             !(rangestrike && striker.getCreature().useMagicMissile()))
@@ -1017,8 +1006,7 @@ final class Strike
         // Native defending in stone, from strike by a non-native: +1
         // Native defending in stone, from rangestrike by a non-native
         //     non-magicMissile: +1
-        if (HexMap.getHexByLabel(client.getBattleTerrain(), 
-                target.getHexLabel()).getTerrain() == 'n' &&
+        if (client.getBattleHex(target).getTerrain() == 'n' &&
             target.getCreature().isNativeStone() &&
             !striker.getCreature().isNativeStone() &&
             !(rangestrike && striker.getCreature().useMagicMissile()))
@@ -1029,8 +1017,7 @@ final class Strike
         // Native defending in tree, from strike by a non-native: +1
         // Native defending in tree, from rangestrike by a non-native
         //     non-magicMissile: no effect
-        if (HexMap.getHexByLabel(client.getBattleTerrain(), 
-                target.getHexLabel()).getTerrain() == 't' &&
+        if (client.getBattleHex(target).getTerrain() == 't' &&
             target.getCreature().isNativeTree() &&
             !striker.getCreature().isNativeTree() &&
             !(rangestrike))

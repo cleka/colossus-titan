@@ -139,8 +139,7 @@ final class BattleMovement
             {
                 Creature creature = Creature.getCreatureByName(
                     chit.getCreatureName());
-                BattleHex hex = HexMap.getHexByLabel(
-                    client.getBattleTerrain(), chit.getHexLabel());
+                BattleHex hex = client.getBattleHex(chit);
                 set = findMoves(hex, creature, creature.isFlier(), 
                     creature.getSkill(), -1);
             }

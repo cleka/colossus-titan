@@ -11,6 +11,7 @@ import java.net.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.server.Creature;
+import net.sf.colossus.server.VariantSupport;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
