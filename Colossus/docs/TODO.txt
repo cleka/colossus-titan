@@ -1,11 +1,9 @@
-Fix autoStop.
+Implement auto stop when all human players dead.
 
-Fix unit tests for server options.
-
+Add unit tests for server options.
 Add JUnit section to build docs.
 Document test procedures.
 
-Mention werken.opts in docs.
 Add remaining command-line options.
 
 Save/load/test scale.
@@ -19,16 +17,18 @@ Bug: Own legions not always shown sorted.
 Bug: Undo move with a recruitChit showing, not cleared.
 
 Bug: Still getting excess Acquire dialog, for 6-high legion that earns two
-   angels, but angel is not added.
+   angels, but at least angel is not added.
 
-Bug: Non-overlay terrain layers shown too far to the right.
+Bug: Non-overlay terrain layers shown a bit too far to the right.
+
+Bug: No T2T teleport on first turn only works for first player?
 
 Change Quit button in GetPlayers dialog to Cancel.  Go back to existing 
    game if there is one from Cancel, or quit if just starting.  Eliminate
    confirmation before calling dialog.
 
 L&F menu should indicate current L&F somehow, and not show Windows if not
-   allowed on this platform.
+   allowed on this platform.  Test with kunstoff in properties file.
 
 Change some dialogs to show info in a label instead of the title (so
    the dialog is wide enough) and add explicit cancel buttons.
