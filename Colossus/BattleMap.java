@@ -37,8 +37,8 @@ public class BattleMap extends JFrame implements MouseListener,
     private boolean imagesLoaded = false;
     private boolean eraseFlag = false;
 
-    private static int scale = 30;
-    private static int chitScale = 2 * scale;
+    private static int scale;
+    private static int chitScale;
 
     private Legion attacker;
     private Legion defender;
@@ -86,8 +86,13 @@ public class BattleMap extends JFrame implements MouseListener,
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         if (d.height < 1000)
         {
-            scale = scale * d.height / 1000;
+            scale = 30 * d.height / 1000;
         }
+        else
+        {
+            scale = 30;
+        }
+        chitScale = 2 * scale;
 
         pack();
         setSize(getPreferredSize());
