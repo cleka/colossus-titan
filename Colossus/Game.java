@@ -22,6 +22,7 @@ public final class Game extends GameSource
     private boolean battleInProgress;
     private boolean summoningAngel;
     private boolean pendingAdvancePhase;
+    private boolean gameOver;
     private Battle battle;
     private static Random random = new Random();
     private Caretaker caretaker = new Caretaker(this);
@@ -119,6 +120,7 @@ public final class Game extends GameSource
         battleInProgress = false;
         summoningAngel = false;
         pendingAdvancePhase = false;
+        gameOver = false;
         caretaker.resetAllCounts();
         players.clear();
 
@@ -229,6 +231,8 @@ public final class Game extends GameSource
 
         server.allUpdateStatusScreen();
         server.allUpdateCaretakerDisplay();
+        // Reset the color of the player label now that it's known.
+        server.allSetupPlayerLabel();
     }
 
 
@@ -489,19 +493,25 @@ public final class Game extends GameSource
             case 0:
                 Log.event("Draw");
                 server.allShowMessageDialog("Draw");
-                //dispose();
+                gameOver = true;
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
                 Log.event(winnerName + " wins");
                 server.allShowMessageDialog(winnerName + " wins");
-                //dispose();
+                gameOver = true;
                 break;
 
             default:
                 break;
         }
+    }
+
+
+    public boolean isOver()
+    {
+        return gameOver;
     }
 
 
@@ -944,6 +954,7 @@ public final class Game extends GameSource
             // Reset flags that are not in the savegame file.
             pendingAdvancePhase = false;
             summoningAngel = false;
+            gameOver = false;
 
 
             buf = in.readLine();
@@ -2666,6 +2677,7 @@ public final class Game extends GameSource
             false).contains(hexLabel))
         {
             Player player = legion.getPlayer();
+            String playerName = player.getName();
             MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
 
             // Pick teleport or normal move if necessary.
@@ -2673,7 +2685,7 @@ public final class Game extends GameSource
                 legion.canEnterViaLand(hexLabel))
             {
                 boolean answer;
-                if (server.getClientOption(player.getName(),
+                if (server.getClientOption(playerName,
                     Options.autoPickEntrySide))
                 {
                     // Always choose to move normally rather
@@ -2682,7 +2694,7 @@ public final class Game extends GameSource
                 }
                 else
                 {
-                    answer = server.getClient(player.getName()).
+                    answer = server.getClient(playerName).
                         chooseWhetherToTeleport();
                 }
                 legion.setTeleported(hexLabel, answer);
@@ -2709,7 +2721,7 @@ public final class Game extends GameSource
             if (isOccupied(hexLabel) && legion.getNumEntrySides(hexLabel) > 1)
             {
                 int side;
-                if (server.getClientOption(player.getName(),
+                if (server.getClientOption(playerName,
                     Options.autoPickEntrySide))
                 {
                     side = player.aiPickEntrySide(hexLabel, legion);
@@ -2742,8 +2754,9 @@ public final class Game extends GameSource
                     else
                     {
                         legion.revealTeleportingLord(
-                            server.getClientOption(Options.autoPlay) ||
-                            server.getClientOption(Options.allStacksVisible));
+                            server.getClientOption(playerName, 
+                                Options.autoPlay) || server.getClientOption(
+                                playerName, Options.allStacksVisible));
                     }
                 }
                 legion.moveToHex(hex);

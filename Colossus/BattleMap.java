@@ -303,6 +303,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
 
         battleFrame.setTitle(battle.getActivePlayerName() +
+            " Turn " + battle.getTurnNumber() +
             ((battle.getPhase() == Battle.FIGHT) ?
             " : Strike" : " : Strikeback"));
         phaseMenu.removeAll();

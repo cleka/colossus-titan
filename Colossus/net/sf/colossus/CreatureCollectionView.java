@@ -5,12 +5,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-// XXX Importing from the default package is not recommended and might
-// not work in some JDKs.
-import Log;
-import Client;
-import Options;
-
 
 /** Viewer for a collection, say the graveyard or the creature keeper
  * <P><B>TODO:</B>remove overlap with existing colossus
@@ -25,15 +19,12 @@ public class CreatureCollectionView extends JFrame
 
     CreatureCount m_oCreatureCount;
 
-    private Client client;
     private static Point location;
 
-    private static boolean disposeLock;
 
 
     public CreatureCollectionView(ICreatureCollection oCollection,
-                                  IImageUtility oImageUtility,
-                                  final Client client)
+                                  IImageUtility oImageUtility)
     {
         // third arg says we are NOT modal
         super(oCollection.getName());
@@ -41,26 +32,8 @@ public class CreatureCollectionView extends JFrame
         m_oCollection = oCollection;
         m_oImageUtility = oImageUtility;
 
-        // XXX This may be unclean.
-        if (client != null)
-        {
-            this.client = client;
-        }
-
-        JPanel oButtonPanel = new JPanel(new FlowLayout());
         JPanel oPanel = makeCreaturePanel();
         getContentPane().add(oPanel, BorderLayout.CENTER);
-
-        getContentPane().add(oButtonPanel, BorderLayout.SOUTH);
-        JButton oCloseButton = new JButton("Close");
-        oButtonPanel.add(oCloseButton);
-        oCloseButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent evtAction)
-            { 
-                dispose();
-            }
-        });
 
         addWindowListener(new WindowAdapter()
         {
@@ -135,8 +108,6 @@ public class CreatureCollectionView extends JFrame
 
     public void update()
     {
-        Log.debug("CreatureCollectionView.update");
-
         Iterator it = m_oCountHash.entrySet().iterator();
         while(it.hasNext())
         {
@@ -146,9 +117,6 @@ public class CreatureCollectionView extends JFrame
             String strNewCount = Integer.toString(
                 m_oCollection.getCount(strName));
             String strOldCount = lbl.getText();
-            Log.debug("CreatureCollectionView.update: " 
-                + strName + ", from " + strOldCount 
-                + " to " + strNewCount);
             lbl.setText(strNewCount);
         }
 
@@ -160,13 +128,5 @@ public class CreatureCollectionView extends JFrame
     {
         super.dispose();
         location = getLocation();
-
-        // Tell the client to turn off the menu option.
-        if (client != null && !disposeLock)
-        {
-            disposeLock = true;
-            client.setOption(Options.showCaretaker, false);
-        }
-        disposeLock = false;
     }
 }

@@ -219,6 +219,16 @@ public final class Server
         }
     }
 
+    public void allSetupPlayerLabel()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setupPlayerLabel();
+        }
+    }
+
     public void showMessageDialog(String playerName, String message)
     {
         Client client = getClient(playerName);

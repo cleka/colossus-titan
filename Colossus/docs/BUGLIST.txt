@@ -62,6 +62,9 @@ Win98, 1.3.1-1.4b: Turn 1, player started in tower 300.  Rolled a 6.  Titan
    to tower 400, got "teleport or move normally" prompt despite the
    fact that it could only get there by teleporting.  Angel to marsh
    22, got same prompt even though titan already teleported.  Still there.
+Solaris, 1.3.1: Titan teleport to faraway enemy, undo move, repeat move.
+   Got "teleport or move normally prompt" even though only teleporting
+   would work.
 
 Win98, 1.4b: Currently have to pick recruiter even with "all stacks visible"
    set.
@@ -71,7 +74,28 @@ Solaris, 1.3.1: All enemy creatures are invisible after loading a game.
 Attacking AI is way too happy to take a time loss.  Need to crank up
    aggression in the last few turns of battle.
 
-Client status line is colored after loading a game, but always black
-   for a new game.  Need to reset color once it's known.
-
 In evalutateCritterMove(), buddies is always 0.
+
+Did File/New while winning AI was playing against itself:
+Maybe we need to sleep for a second to let the timer events clear out?
+Exception occurred during event dispatching:
+java.lang.NullPointerException
+        at Game.advancePhaseInternal(Game.java:551)
+        at Game.access$000(Game.java:16)
+        at Game$1.actionPerformed(Game.java:529)
+        at javax.swing.Timer.fireActionPerformed(Timer.java:150)
+        at javax.swing.Timer$DoPostEvent.run(Timer.java:108)
+        at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:154)
+        at java.awt.EventQueue.dispatchEvent(EventQueue.java:337)
+        at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:131)
+        at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:98)
+        at java.awt.Dialog.show(Dialog.java:380)
+        at java.awt.Component.show(Component.java:946)
+        at java.awt.Component.setVisible(Component.java:903)
+        at GetPlayers.<init>(GetPlayers.java:96)
+
+A doomed lion with no allies left struck back against an unwounded 
+   cyclops (which it can't kill) instead of a gargoyle (which it can).
+
+Zero-height legion's (caused by angel being summoned out) marker
+   doesn't go away.  997978269986.sav

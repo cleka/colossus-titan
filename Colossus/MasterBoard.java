@@ -721,7 +721,10 @@ public final class MasterBoard extends JPanel
     public void setupPlayerLabel()
     {
         String playerName = client.getPlayerName();
-        playerLabel = new JLabel(playerName);
+        if (playerLabel == null)
+        {
+            playerLabel = new JLabel(playerName);
+        }
 
         Player player = game.getPlayer(playerName);
         String colorName = player.getColor();

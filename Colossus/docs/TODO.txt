@@ -4,8 +4,6 @@ Advance phases on space instead of 'D'?
 
 Confirmation prompt to avoid skipping recruits?
 
-AI needs to stop moving when the game ends.
-
 Attacking AI creatures need to chargest closest enemy in the last few
    turns, rather than accepting a time loss.
 

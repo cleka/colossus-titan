@@ -2,6 +2,7 @@ import java.util.*;
 import java.net.*;
 import javax.swing.*;
 import java.io.*;
+import java.awt.event.*;
 
 /**
  *  Class Client lives on the client side and handles all communication
@@ -540,7 +541,14 @@ public final class Client
                 ICreatureCollection oCaretakerCollection = 
                     server.getGame().getCaretaker().getCollectionInterface();
                 caretakerDisplay = new CreatureCollectionView(
-                    oCaretakerCollection, oImageUtility, this);
+                    oCaretakerCollection, oImageUtility);
+                caretakerDisplay.addWindowListener(new WindowAdapter()
+                {
+                    public void windowClosing(WindowEvent e)
+                    {
+                        setOption(Options.showCaretaker, false);
+                    }
+                });
             }
             else
             {

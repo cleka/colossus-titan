@@ -871,7 +871,11 @@ private int mulligansLeft = 99;
         if (game.getServer().getClientOption(name, Options.autoSplit))
         {
             ai.split(game);
-            game.advancePhase(Game.SPLIT);
+            // Keep the AI from continuing to play after winning.
+            if (!game.isOver())
+            {
+                game.advancePhase(Game.SPLIT);
+            }
         }
     }
 
@@ -893,7 +897,11 @@ private int mulligansLeft = 99;
         if (game.getServer().getClientOption(name, Options.autoRecruit))
         {
             ai.muster(game);
-            game.advancePhase(Game.MUSTER);
+            // Keep the AI from continuing to play after winning.
+            if (!game.isOver())
+            {
+                game.advancePhase(Game.MUSTER);
+            }
         }
     }
 
