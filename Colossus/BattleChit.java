@@ -370,13 +370,13 @@ class BattleChit extends Chit
     // (fewer dice or higher strike number) in order to be
     // allowed to carry.  Return true if the penalty is taken,
     // or false if it is not.
-    private boolean chooseStrikePenalty(int tmpStrikeNumber, int strikeNumber,
-        int tmpDice, int dice, BattleChit carryTarget)
+    private boolean chooseStrikePenalty(BattleChit carryTarget)
     {
         String yesString = "Take Penalty";
         String noString = "Do Not Take Penalty";
         String promptString = "Take strike penalty to allow carrying to " +
-            carryTarget.getCreature().getName() + "?";
+            carryTarget.getCreature().getName() + " in " +
+            carryTarget.getCurrentHex().getTerrainName().toLowerCase() + "?";
 
         Object[] options = {yesString, noString};
         int optval = JOptionPane.showOptionDialog(map, promptString,
@@ -457,8 +457,7 @@ class BattleChit extends Chit
                             {
                                 // Allow choosing a less effective strike in
                                 // order to possibly carry.
-                                if (chooseStrikePenalty(tmpStrikeNumber,
-                                    strikeNumber, tmpDice, dice, chit))
+                                if (chooseStrikePenalty(chit))
                                 {
                                     strikeNumber = tmpStrikeNumber;
                                     dice = tmpDice;
