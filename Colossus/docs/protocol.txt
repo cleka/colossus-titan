@@ -1,0 +1,306 @@
+Titan multiplayer network protocol 0.3
+
+
+Conventions
+-----------
+
+Everything is case sensitive, unless stated otherwise. Arguments are
+separated by spaces.
+
+<name>:         Limited to 30 characters, restricted to letters,
+                numbers, and '_'.
+<player>:       The name of a player currently in the game
+<colorname>:    One of "Black", "Blue", "Brown", "Gold", "Green",
+                and "Red".
+<colornames>:   One or more of <colorname>.
+<legion>:       A complete marker name like "Feather".
+<legions>:      One or more of <legion>.
+<unit>:         A complete creature name like "Behemoth".
+<units>:        One or more of <unit>.
+<land>:         A number of a masterboard hex, like "127".
+<number>:       A number like "3".
+<numbers>:      One or more of <number>.
+<battlehex>:    A battle hex identifier like "C1"
+<battlehexes>:  One or more of <battlehex>.
+<message>:      Any string of characters.
+<entryside>:    One of "right", "left", "bottom"
+
+
+Requests (client to server)
+--------
+
+NAME <name> <message>
+    Choose a name.  <name> is the short name that will be used in
+    most places.  <message> is the long version, which may be
+    used in some logs.
+
+COLOR <colorname>
+    Choose a color.
+
+OBSERVER <name>
+    Join as an observer.  Observers can only chat, not make game
+    actions.
+
+START
+    Starts the game. No more players can connect.
+
+SPLIT <legion1> <legion2> <units>
+    Split off <units> from <legion1> to a new legion with marker
+    <legion2>.
+
+JOIN <legion1> <legion2>
+    Move all units from child <legion1> back into parent <legion2>.
+
+ROLL
+    Finish splitting.
+
+MULLIGAN
+    Re-roll movement.  In standard Titan, each player gets one
+    Mulligan on the first turn.
+
+MOVE <legion> <land> {<entryside>}
+    Move <legion> to masterboard hex <land> entering on side
+    <entryside>.  If <entryside> is omitted, the server picks.
+
+TELEPORT <legion> <land> <entryside> <unit>
+    Teleport <legion> to <land> entering on <entryside> revealing
+    lord <unit>.
+
+UNDOMOVE <legion>
+    Move <legion> back to its previous location.
+
+RECRUIT <legion> <unit> <units>
+    Recruit a <unit> in legion <legion> using <units>
+
+UNDORECRUIT <legion> <unit>
+    <legion> undoes its recruit of <unit>
+
+ENGAGE <land>
+    Resolve the engagement in <land>.
+
+FLEE <legion>
+    <legion> flees.
+
+DONTFLEE <legion>
+    <legion> does not flee.
+
+CONCEDE <legion>
+    <legion> concedes the battle.
+
+DONTCONCEDE <legion>
+    <legion> does not concede the battle.
+
+NEGOTIATE {<legion> <units>}
+    Offer a negotiated settlement where <legion> wins, and is left
+    with <units>  If <legion> is null, then offer mutual destruction.
+    If a player sends a NEGOTIATE request with arguments identical to
+    those of a NEGOTIATE request previously sent by the opponent, then
+    this signifies accepting the earlier proposal.
+
+FIGHT <land>
+    Cease negotiations in <land> and fight a battle.
+
+MANEUVER <battlehex1> <battlehex2>
+    Move unit in <battlehex1> to <battlehex2>.
+
+UNDOMANEUVER <battlehex>
+    Move unit in <battlehex> back to its previous location.
+
+DONEMANEUVERING
+    All battle moves are finished.  Move on to strike phase, or the
+    opponent's turn, as appropriate.
+
+STRIKE <battlehex1> <battlehex2> <number1> <number2>
+    Unit in <battlehex1> strikes unit in <battlehex2>, rolling
+    <number1> dice with a target number of <number2>.
+
+CARRY <battlehex> <number>
+    Carry <number> hits to the unit in <battlehex>.
+
+DONESTRIKING
+    All battle strikes are finished.  Move on to the opponent's turn.
+
+SUMMON <legion1> <legion2> <unit>
+    <legion1> summons a <unit> from <legion2>
+
+ACQUIRE <legion> <unit>
+    <legion> acquires a <unit>.
+
+NEXTTURN
+    Finish this player's entire game turn.
+
+WITHDRAW
+    This player withdraws from the entire game.
+
+SAY <message>
+    Send message to all players and observers.
+
+TELL <player> <message>
+    Send chat message to one player.
+
+KIBBITZ <message>
+    Send chat message to all observers.
+
+REPLAY
+    Resend the stream of all significant events so far in this game to
+    this client.
+
+
+Messages (server to one or more clients)
+--------
+
+NAK <number>
+    Request <number> (starting from 0) from this client was denied.
+
+NAME <name>
+    A player with name <name> has connected.
+
+COLOR <name> <colorname>
+    Player <name> has chosen color <colorname>.
+
+TOWER <name> <land>
+    Player <name> starts on <land>.
+
+SPLIT <legion1> <legion2> <number> {<units>}
+    A player splits off <number> units from <legion1> to a new
+    legion with marker <legion2>.  The units split off into
+    <legion2> were <units>.  (The units will only be
+    identified if this client is allowed to see the contents
+    of this stack.)
+
+ROLL <number>
+    The active player rolled a <number>.
+
+MULLIGAN
+    The active player took a mulligan.
+
+MOVE <legion> <land> <entryside>
+    Move <legion> to masterboard hex <land> entering via <entryside>.
+
+TELEPORT <legion> <land> <entryside> <unit>
+    Teleport <legion> to <land> entering on <entryside> revealing
+    lord <unit>.
+
+UNDOMOVE <legion>
+    Move <legion> back to its previous location.
+
+ENGAGE <land>
+    Resolve the engagement in <land>.
+
+FLEE <legion> <units>
+    <legion> flees, losing <units>
+
+DONTFLEE <legion>
+    <legion> did not flee.
+
+CONCEDE <legion> <units>
+    <legion> concedes, losing <units>
+
+DONTCONCEDE <legion>
+    <legion> did not concede.
+
+NEGOTIATE <player> {<legion> <units>}
+    <player> offered a negotiated settlement where <legion> would
+    survive and be left with <units>.  (If <legion> and <units>
+    are null, then <player> offered mutual destruction.)
+
+ACCEPT <legion1> <units1> <legion2> <number> {<units2>}
+    A previous offer has been accepted.  <legion1> consisting of
+    <units1> has been eliminated.  <legion2> has <number1>
+    creatures left, and has lost creatures <units2>  (If there
+    was a mutual, then <number> will be 0.  If the winning
+    legion lost no creatures, then <units2> will be null.)
+
+MANEUVER <battlehex1> <battlehex2>
+    Move unit in <battlehex1> to <battlehex>.
+
+UNDOMANEUVER <battlehex>
+    Move unit in <battlehex> back to its previous location.
+
+STRIKE <battlehex1> <battlehex2> <number1> <number2> <number3>
+       <number4> <numbers>
+    Unit in <battlehex1> strikes unit in <battlehex2>, rolling
+    <number1> dice with a target number of <number2>.  There
+    were <number3> hits and <number4> carries.  The die rolls
+    were <numbers>
+
+DRIFT  <battlehex>
+    Unit in <battlehex> takes one point of drift damage.
+
+ELIMINATE <battlehex>
+    Unit in <battlehex> is eliminated.
+
+SUMMON <legion1> <legion2> <unit>
+    <legion1> summons a <unit> from <legion2>
+
+ACQUIRE <legion> <unit> <number>
+    <legion> acquires a <unit>.  Afterwards, there are <number>
+    of <unit> remaining in the stacks.
+
+ENDBATTLE
+    The battle is over.
+
+POINTS <player> <number> <legion>
+    <player> receives <number> points for eliminating <legion>.
+
+ELIMINATEPLAYER <player1> {<player2> <legions>}
+    <player1> has been eliminated from the game by <player2>,
+    who receives legion markers <legions>.  If two players
+    mutually eliminate one another, then <player2> and
+    <legions> will be null.
+
+ENDGAME <player1> {player2}
+    The game is over.  If only one player is listed, then he
+    wins.  If two players are listed, then they draw.
+
+RECRUIT <legion> <unit1> {<units>} <number>
+    Recruit a <unit1> in <legion> using <units>.  After this recruit,
+    there are <number> of <unit1> remaining in the stacks.  <units>
+    will be null if recruiting a basic tower creature in a tower.
+
+UNDORECRUIT <legion> <unit>
+    <legion> undoes its recruit of <unit>
+
+TURN <name>
+    It's <name>'s turn.
+
+SAY <message>
+    Received message to all players and observers.
+
+TELL <player> <message>
+    Received message to one player.
+
+KIBBITZ <message>
+    Received chat message to all observers.
+
+REVEAL <legion> <units>
+    Specify all of the units contained in <legion>.
+
+
+Hints (server to one client)
+-----
+
+COLOR? <colornames>
+    Choose a color from those listed.
+
+FLEE? <legion>
+    <legion> needs to decide whether to flee.
+
+CONCEDE? <legion>
+    <legion> needs to decide whether to concede.
+
+CARRY? <number> <battlehexes>
+    <number> hits of damage can be carried to the units in
+    <battlehexes>
+
+SUMMON? <legion1> <legion2> <units1> {<legion3> <units2>}
+    <legion1> can summon.  Eligible donor legions include
+    <legion2> ... and the types of units that can be summoned
+    include <units1> ...
+
+REINFORCE? <legion> <units>
+    <legion> can summon a reinforcement from <units>
+
+ACQUIRE? <legion> <units>
+    <legion> can acquire one of the listed units.
+
