@@ -34,7 +34,7 @@ public abstract class Hex
     private char terrain;
     protected int scale;
     protected double len;
-    protected String label;
+    protected String label = "";  // Avoid null pointer in stringWidth()
     private int xCoord = -1;
     private int yCoord = -1;
     protected Point center;

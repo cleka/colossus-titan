@@ -32,11 +32,10 @@ public final class Battle
 
     private Game game;
     private BattleMap map;
-    private Legion attacker;
-    private Legion defender;
+    private String attackerId;
+    private String defenderId;
+    private String [] legions = new String[2];
     private int activeLegionNum;
-    private Legion [] legions = new Legion[2];
-    private MasterBoard board;
     private String masterHexLabel;
     private BattleDice battleDice;
     private int turnNumber;
@@ -44,9 +43,6 @@ public final class Battle
     private int summonState = NO_KILLS;
     private int carryDamage;
     private boolean critterSelected;
-    // XXX We should really go through the legions, rather than
-    // keeping track of critters twice.
-    private ArrayList critters = new ArrayList();
     private boolean attackerElim;
     private boolean defenderElim;
     private boolean battleOver;
@@ -57,21 +53,19 @@ public final class Battle
     private LinkedList lastCrittersMoved = new LinkedList();
 
 
-    public Battle(Game game, MasterBoard board, Legion attacker,
-        Legion defender, int activeLegionNum, String masterHexLabel,
-        int turnNumber, int phase)
+    public Battle(Game game, String attackerId, String defenderId,
+        int activeLegionNum, String masterHexLabel, int turnNumber, int phase)
     {
         this.game = game;
-        this.board = board;
         this.masterHexLabel = masterHexLabel;
-        this.defender = defender;
-        this.attacker = attacker;
-        legions[0] = defender;
-        legions[1] = attacker;
+        this.defenderId = defenderId;
+        this.attackerId = attackerId;
+        legions[0] = defenderId;
+        legions[1] = attackerId;
         this.activeLegionNum = activeLegionNum;
         this.turnNumber = turnNumber;
         this.phase = phase;
-        map = new BattleMap(board, masterHexLabel, this);
+        map = new BattleMap(masterHexLabel, this);
     }
 
 
@@ -87,30 +81,31 @@ public final class Battle
         }
     }
 
-
     /** No-arg constructor for AICopy() */
     public Battle()
     {
     }
 
-
     /** Make a deep copy for the AI. */
-    public Battle AICopy()
+    public Battle AICopy(Game game)
     {
         Battle newBattle = new Battle();
 
-        newBattle.game = null;   // Must set this later.
-        newBattle.board = board; // don't need to deep copy
+        newBattle.game = game;
         newBattle.masterHexLabel = masterHexLabel;
-        newBattle.defender = defender.AICopy();
-        newBattle.attacker = attacker.AICopy();
-        newBattle.legions[0] = newBattle.defender;
-        newBattle.legions[1] = newBattle.attacker;
+        newBattle.defenderId = defenderId;
+        newBattle.attackerId = attackerId;
+        newBattle.legions[0] = defenderId;
+        newBattle.legions[1] = attackerId;
         newBattle.activeLegionNum = activeLegionNum;
         newBattle.turnNumber = turnNumber;
         newBattle.phase = phase;
-        //newBattle.game.setOption(Options.showDice, false);
-        newBattle.map = map; // don't need to deep copy
+
+        // XXX We'd really like to not have to copy the map, but its
+        // battle reference needs to point to newBattle.
+        newBattle.map = map.AICopy();
+        newBattle.map.setBattle(newBattle);
+
         newBattle.summonState = summonState;
         newBattle.carryDamage = carryDamage;
         newBattle.critterSelected = critterSelected;
@@ -120,27 +115,7 @@ public final class Battle
         newBattle.conceded = conceded;
         newBattle.driftDamageApplied = driftDamageApplied;
 
-        newBattle.critters = new ArrayList();
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            newBattle.critters.add(critter.AICopy());
-        }
         return newBattle;
-    }
-
-
-    // For AICopy()
-    public void setGame(Game game)
-    {
-        this.game = game;
-        Iterator it = critters.iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            critter.setGame(game);
-        }
     }
 
 
@@ -172,19 +147,19 @@ public final class Battle
 
     public Player getActivePlayer()
     {
-        return legions[activeLegionNum].getPlayer();
+        return game.getPlayerByMarkerId(legions[activeLegionNum]);
     }
 
 
     public Legion getAttacker()
     {
-        return attacker;
+        return game.getLegionByMarkerId(attackerId);
     }
 
 
     public Legion getDefender()
     {
-        return defender;
+        return game.getLegionByMarkerId(defenderId);
     }
 
 
@@ -196,19 +171,58 @@ public final class Battle
 
     public Legion getActiveLegion()
     {
-        return legions[activeLegionNum];
+        return getLegion(activeLegionNum);
+    }
+
+
+    public Legion getInactiveLegion()
+    {
+        return getLegion((activeLegionNum + 1) & 1);
     }
 
 
     public Legion getLegion(int legionNum)
     {
-        return legions[legionNum];
+        if (legionNum == DEFENDER)
+        {
+            return getDefender();
+        }
+        else if (legionNum == ATTACKER)
+        {
+            return getAttacker();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+
+    public Legion getLegionByPlayer(Player player)
+    {
+        Legion attacker = getAttacker();
+        if (attacker != null && attacker.getPlayerName().equals(
+            player.getName()))
+        {
+            return attacker;
+        }
+        else
+        {
+            Legion defender = getDefender();
+            if (defender != null && defender.getPlayerName().equals(
+                player.getName()))
+            return defender;
+            else
+            {
+                return null;
+            }
+        }
     }
 
 
     public MasterHex getMasterHex()
     {
-        return board.getHexFromLabel(masterHexLabel);
+        return MasterBoard.getHexFromLabel(masterHexLabel);
     }
 
 
@@ -280,6 +294,8 @@ public final class Battle
 
         else if (phase == FIGHT)
         {
+            // We switch the active legion between the fight and strikeback
+            // phases, not at the end of the player turn.
             activeLegionNum = (activeLegionNum + 1) & 1;
             driftDamageApplied = false;
             phase = STRIKEBACK;
@@ -310,6 +326,7 @@ public final class Battle
                     if (turnNumber > 7)
                     {
                         Game.logEvent("Time loss");
+                        Legion attacker = getAttacker();
                         // Time loss.  Attacker is eliminated but defender
                         //    gets no points.
                         if (attacker.hasTitan())
@@ -319,7 +336,7 @@ public final class Battle
                             // for his unengaged legions.
                             Player player = attacker.getPlayer();
                             attacker.remove();
-                            player.die(defender.getPlayer(), true);
+                            player.die(getDefender().getPlayer(), true);
                         }
                         else
                         {
@@ -390,7 +407,7 @@ public final class Battle
             Player player = getActivePlayer();
             if (player.getOption(Options.autoBattleMove))
             {
-                player.aiBattleMove(legions[activeLegionNum], this);
+                player.aiBattleMove(getActiveLegion(), this);
             }
         }
     }
@@ -413,7 +430,7 @@ public final class Battle
             Player player = getActivePlayer();
             if (player.getOption(Options.autoStrike))
             {
-                player.aiStrike(legions[activeLegionNum], this, false, false);
+                player.aiStrike(getActiveLegion(), this, false, false);
             }
             else if (player.getOption(Options.autoForcedStrike))
             {
@@ -452,9 +469,9 @@ public final class Battle
     {
         if (summonState == Battle.FIRST_BLOOD)
         {
-            if (attacker.canSummonAngel() && game != null)
+            if (getAttacker().canSummonAngel() && game != null)
             {
-                game.createSummonAngel(attacker);
+                game.createSummonAngel(getAttacker());
             }
 
             // This is the last chance to summon an angel until the
@@ -477,7 +494,7 @@ public final class Battle
     {
         if (placeNewChit)
         {
-            map.placeNewChit(attacker);
+            map.placeNewChit(getAttacker());
         }
 
         if (phase == SUMMON)
@@ -492,6 +509,7 @@ public final class Battle
 
     public void recruitReinforcement()
     {
+        Legion defender = getDefender();
         if (turnNumber == 4 && defender.canRecruit())
         {
             // Allow recruiting a reinforcement.
@@ -529,30 +547,6 @@ public final class Battle
     public void setCarryDamage(int carryDamage)
     {
         this.carryDamage = carryDamage;
-    }
-
-
-    public int getNumCritters()
-    {
-        return critters.size();
-    }
-
-
-    public Collection getCritters()
-    {
-        return critters;
-    }
-
-
-    public Critter getCritter(int i)
-    {
-        return (Critter)critters.get(i);
-    }
-
-
-    public void addCritter(Critter critter)
-    {
-        critters.add(critter);
     }
 
 
@@ -685,7 +679,7 @@ public final class Battle
     {
         critterSelected = false;
 
-        Iterator it = critters.iterator();
+        Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
@@ -704,14 +698,12 @@ public final class Battle
     {
         conceded = true;
 
-        Iterator it = critters.iterator();
+        Legion legion = getLegionByPlayer(player);
+        Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (critter.getPlayer() == player)
-            {
-                critter.setDead(true);
-            }
+            critter.setDead(true);
         }
     }
 
@@ -749,19 +741,16 @@ public final class Battle
     public Set findMovableCritters()
     {
         HashSet set = new HashSet();
-        Player player = getActivePlayer();
+        Legion legion = getActiveLegion();
 
-        Iterator it = critters.iterator();
+        Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (critter.getPlayer() == player)
+            if (!critter.hasMoved() && !critter.isInContact(false))
             {
-                if (!critter.hasMoved() && !critter.isInContact(false))
-                {
-                    BattleHex hex = critter.getCurrentHex();
-                    set.add(hex.getLabel());
-                }
+                BattleHex hex = critter.getCurrentHex();
+                set.add(hex.getLabel());
             }
         }
 
@@ -783,13 +772,12 @@ public final class Battle
     /** Return true if any creatures have been left off-board. */
     private boolean anyOffboardCreatures()
     {
-        Player player = getActivePlayer();
-        Iterator it = critters.iterator();
+        Legion legion = getActiveLegion();
+        Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (critter.getCurrentHex().isEntrance() &&
-                critter.getPlayer() == player)
+            if (critter.getCurrentHex().isEntrance())
             {
                 return true;
             }
@@ -817,13 +805,12 @@ public final class Battle
      *  summoned or recruited, unsummon or unrecruit them instead. */
     private void removeOffboardCreatures()
     {
-        Player player = getActivePlayer();
-        Iterator it = critters.iterator();
+        Legion legion = getActiveLegion();
+        Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (critter.getCurrentHex().isEntrance() &&
-                critter.getPlayer() == player)
+            if (critter.getCurrentHex().isEntrance())
             {
                 critter.setDead(true);
             }
@@ -835,7 +822,8 @@ public final class Battle
     {
         lastCrittersMoved.clear();
 
-        Iterator it = critters.iterator();
+        Legion legion = getActiveLegion();
+        Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
@@ -869,8 +857,10 @@ public final class Battle
         //    during the strike phase.
         if (getTerrain() == 't' && phase == FIGHT &&
             !driftDamageApplied)
+        for (int i = DEFENDER; i <= ATTACKER; i++)
         {
-            Iterator it = critters.iterator();
+            Legion legion = getLegion(i);
+            Iterator it = legion.getCritters().iterator();
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
@@ -901,7 +891,7 @@ public final class Battle
     {
         boolean needToRepaint = false;
 
-        Iterator it = critters.iterator();
+        Iterator it = getInactiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
@@ -920,19 +910,6 @@ public final class Battle
     }
 
 
-    /** Move the passed Critter to the top of the critters array. */
-    public void moveToTop(Critter critter)
-    {
-        if (critters.indexOf(critter) > 0)
-        {
-            critters.remove(critter);
-            critters.add(0, critter);
-            // Repainting just this chit doesn't cut it.
-            critter.getCurrentHex().repaint();
-        }
-    }
-
-
     private void removeDeadCreatures()
     {
         // Initialize these to true, and then set them to false when a
@@ -940,91 +917,99 @@ public final class Battle
         attackerElim = true;
         defenderElim = true;
 
+        Legion attacker = getAttacker();
+        Legion defender = getDefender();
+
         Legion donor = null;
 
-        Iterator it = critters.iterator();
-        while (it.hasNext())
+        for (int i = DEFENDER; i <= ATTACKER; i++)
         {
-            Critter critter = (Critter)it.next();
-            Legion legion = critter.getLegion();
-            if (critter.isDead())
+            Legion legion = getLegion(i);
+            Iterator it = legion.getCritters().iterator();
+            while (it.hasNext())
             {
-                // After turn 1, offboard creatures are returned to the
-                // stacks or the legion they were summoned from, with
-                // no points awarded.
-                if (critter.getCurrentHex().isEntrance() &&
-                    getTurnNumber() > 1)
+                Critter critter = (Critter)it.next();
+                if (critter.isDead())
                 {
-                    if (critter.getName().equals("Angel") ||
-                        critter.getName().equals("Archangel"))
+                    // After turn 1, offboard creatures are returned to the
+                    // stacks or the legion they were summoned from, with
+                    // no points awarded.
+                    if (critter.getCurrentHex().isEntrance() &&
+                        getTurnNumber() > 1)
                     {
-                        Player player = legion.getPlayer();
-                        donor = player.getLastLegionSummonedFrom();
-                        donor.addCreature(critter, false);
-                        donor.getCurrentHex().repaint();
-                        // This summon doesn't count; the player can
-                        // summon again later this turn.
-                        player.setSummoned(false);
+                        if (critter.isAngel())
+                        {
+                            Player player = legion.getPlayer();
+                            donor = player.getLastLegionSummonedFrom();
+                            donor.addCreature(critter, false);
+                            donor.getCurrentHex().repaint();
+                            // This summon doesn't count; the player can
+                            // summon again later this turn.
+                            player.setSummoned(false);
+                        }
+                        else
+                        {
+                            // Reinforcement.
+                            game.getCaretaker().putOneBack(critter);
+                            // This recruit doesn't count.
+                            legion.setRecruited(false);
+                        }
+                    }
+                    else if (legion == attacker)
+                    {
+                        defender.addToBattleTally(critter.getPointValue());
+                    }
+                    else  // legion == defender
+                    {
+                        attacker.addToBattleTally(critter.getPointValue());
+
+                        // Creatures left offboard do not trigger angel
+                        // summoning.
+                        if (summonState == Battle.NO_KILLS &&
+                            !critter.getCurrentHex().isEntrance())
+                        {
+                            summonState = Battle.FIRST_BLOOD;
+                        }
+                    }
+
+                    boolean putBack = true;
+                    // If an angel or archangel was returned to its donor
+                    // instead of the stack, then don't put it back on
+                    // the stack.
+                    if (critter.isAngel() && donor != null)
+                    {
+                        putBack = false;
+                        donor = null;
+                    }
+                    legion.prepareToRemoveCritter(critter, putBack);
+
+                    if (critter.isTitan())
+                    {
+                        legion.getPlayer().eliminateTitan();
+                    }
+
+                    BattleHex hex = critter.getCurrentHex();
+                    hex.removeCritter(critter);
+                    hex.repaint();
+
+                    // Remove critter from iterator rather than list to
+                    // prevent concurrent modification problems.
+                    it.remove();
+                }
+                else  // critter is alive
+                {
+                    if (legion == attacker)
+                    {
+                        attackerElim = false;
                     }
                     else
                     {
-                        // Reinforcement.
-                        game.getCaretaker().putOneBack(critter);
-                        // This recruit doesn't count.
-                        legion.setRecruited(false);
+                        defenderElim = false;
                     }
-                }
-
-                else if (legion == attacker)
-                {
-                    defender.addToBattleTally(critter.getPointValue());
-                }
-                else
-                {
-                    attacker.addToBattleTally(critter.getPointValue());
-
-                    // Creatures left offboard do not trigger angel summoning.
-                    if (summonState == Battle.NO_KILLS &&
-                        !critter.getCurrentHex().isEntrance())
-                    {
-                        summonState = Battle.FIRST_BLOOD;
-                    }
-                }
-
-                legion.removeCreature(critter, true, false);
-                // If an angel or archangel was returned to its donor instead
-                // of the stack, then the count must be adjusted.
-                if (donor != null)
-                {
-                    game.getCaretaker().takeOne(critter);
-                    donor = null;
-                }
-
-                if (critter.isTitan())
-                {
-                    legion.getPlayer().eliminateTitan();
-                }
-
-                BattleHex hex = critter.getCurrentHex();
-                hex.removeCritter(critter);
-                hex.repaint();
-
-                // Remove from iterator rather than list to prevent
-                // concurrent modification problems.
-                it.remove();
-            }
-            else
-            {
-                if (legion == attacker)
-                {
-                    attackerElim = false;
-                }
-                else
-                {
-                    defenderElim = false;
                 }
             }
         }
+
         Player player = attacker.getPlayer();
         if (player == null || player.isTitanEliminated())
         {
@@ -1040,6 +1025,8 @@ public final class Battle
 
     private void checkForElimination()
     {
+        Legion attacker = getAttacker();
+        Legion defender = getDefender();
         Player attackerPlayer = attacker.getPlayer();
         Player defenderPlayer = defender.getPlayer();
 
@@ -1116,7 +1103,7 @@ Game.logDebug("defender eliminated");
 
     private void commitStrikes()
     {
-        Iterator it = critters.iterator();
+        Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
@@ -1128,15 +1115,12 @@ Game.logDebug("defender eliminated");
      *  valid strike targets. */
     public Set findCrittersWithTargets()
     {
-        Player player = getActivePlayer();
         HashSet set = new HashSet();
-
-        Iterator it = critters.iterator();
+        Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (critter.getPlayer() == player &&
-                countStrikes(critter, true) > 0)
+            if (countStrikes(critter, true) > 0)
             {
                 set.add(critter.getCurrentHexLabel());
             }
@@ -1158,20 +1142,15 @@ Game.logDebug("defender eliminated");
 
     private boolean isForcedStrikeRemaining()
     {
-        Player player = getActivePlayer();
-        Iterator it = critters.iterator();
+        Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            if (critter.getPlayer() == player)
+            if (!critter.hasStruck() && critter.isInContact(false))
             {
-                if (!critter.hasStruck() && critter.isInContact(false))
-                {
-                    return true;
-                }
+                return true;
             }
         }
-
         return false;
     }
 
@@ -1191,16 +1170,16 @@ Game.logDebug("defender eliminated");
      *  technically forced. */
     public void makeForcedStrikes(boolean rangestrike)
     {
-        Player player = getActivePlayer();
+        Legion legion = getActiveLegion();
         boolean repeat;
         do
         {
             repeat = false;
-            Iterator it = critters.iterator();
+            Iterator it = legion.getCritters().iterator();
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
-                if (critter.getPlayer() == player && !critter.hasStruck())
+                if (!critter.hasStruck())
                 {
                     Set set = findStrikes(critter, rangestrike);
                     if (set.size() == 1)
@@ -1210,8 +1189,8 @@ Game.logDebug("defender eliminated");
                         critter.strike(target, false);
 
                         // If that strike killed the target, it's possible
-                        // that some other creature that had two adjacent
-                        // enemies now has only one.
+                        // that some other creature that had two targets
+                        // now has only one.
                         if (target.isDead())
                         {
                             repeat = true;
@@ -1287,16 +1266,15 @@ Game.logDebug("defender eliminated");
         // no targets have yet been found.
         if (rangestrike && !adjacentEnemy && critter.isRangestriker() &&
             getPhase() != STRIKEBACK &&
-            critter.getLegion() == legions[activeLegionNum])
+            critter.getLegion() == getActiveLegion())
         {
-            Iterator it = critters.iterator();
+            Iterator it = getInactiveLegion().getCritters().iterator();
             while (it.hasNext())
             {
                 Critter target = (Critter)it.next();
-                if (target.getPlayer() != player && !target.isDead())
+                if (!target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
-
                     if (isRangestrikePossible(critter, target))
                     {
                         set.add(targetHex.getLabel());
@@ -1329,7 +1307,7 @@ Game.logDebug("defender eliminated");
     {
         HashSet set = new HashSet();
 
-        Iterator it = critters.iterator();
+        Iterator it = getInactiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
             Critter target = (Critter)it.next();
@@ -1959,7 +1937,10 @@ Game.logDebug("defender eliminated");
             critterSelected = true;
 
             // Put selected chit at the top of the z-order.
-            moveToTop(critter);
+            if (getActiveLegion().moveToTop(critter));
+            {
+                critter.getCurrentHex().repaint();
+            }
 
             switch (getPhase())
             {
@@ -1975,7 +1956,6 @@ Game.logDebug("defender eliminated");
 
                     // Highlight all legal strikes for this critter.
                     highlightStrikes(critter);
-
                     break;
 
                 default:
@@ -1993,7 +1973,7 @@ Game.logDebug("defender eliminated");
             case MOVE:
                 if (critterSelected)
                 {
-                    doMove(getCritter(0), hex);
+                    doMove(getActiveLegion().getCritter(0), hex);
                 }
                 break;
 
@@ -2005,7 +1985,8 @@ Game.logDebug("defender eliminated");
                 }
                 else if (critterSelected)
                 {
-                    getCritter(0).strike(hex.getCritter(), false);
+                    getActiveLegion().getCritter(0).strike(
+                        hex.getCritter(), false);
                     critterSelected = false;
                 }
 
@@ -2111,8 +2092,8 @@ Game.logDebug("defender eliminated");
         player2.addLegion(defender);
         attacker.setEntrySide(5);
 
-        Battle battle = new Battle(game, null, attacker, defender,
-            DEFENDER, hex.getLabel(), 1, MOVE);
+        Battle battle = new Battle(game, attacker.getMarkerId(),
+            defender.getMarkerId(), DEFENDER, hex.getLabel(), 1, MOVE);
         battle.init();
     }
 }

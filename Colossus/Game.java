@@ -113,19 +113,21 @@ public final class Game
 	Game newGame = new Game();
 	for (int i = 0; i < players.size(); i++)
         {
-            Player player = ((Player)players.get(i)).AICopy();
+            Player player = ((Player)players.get(i)).AICopy(newGame);
             player.clearAllOptions();
 	    newGame.players.add(i, player);
         }
-	newGame.board = board; // don't need to deep copy this
+        // XXX We'd really like to not have to AICopy the board, but
+        // its Game reference needs to be correct.
+	newGame.board = board.AICopy(newGame);
+
 	newGame.activePlayerNum = activePlayerNum;
 	newGame.turnNumber = turnNumber;
 	newGame.statusScreen = null;
 	newGame.applet = null;
         if (battle != null)
 	{
-            newGame.battle = battle.AICopy();
-            newGame.battle.setGame(newGame);
+            newGame.battle = battle.AICopy(newGame);
         }
 	newGame.movementDie = null;
 	newGame.summonAngel = null;
@@ -134,6 +136,7 @@ public final class Game
 	newGame.isApplet = false;
 	newGame.masterFrame = null;
 	newGame.engagementInProgress = engagementInProgress;
+
 	return newGame;
     }
 
@@ -1233,9 +1236,9 @@ public final class Game
                     activeLegionNum = Battle.DEFENDER;
                 }
 
-                battle = new Battle(this, board, attacker, defender,
-                    activeLegionNum, engagementHex.getLabel(), battleTurnNum,
-                    battlePhase);
+                battle = new Battle(this, attacker.getMarkerId(),
+                    defender.getMarkerId(), activeLegionNum,
+                    engagementHex.getLabel(), battleTurnNum, battlePhase);
                 battle.setSummonState(summonState);
                 battle.setCarryDamage(carryDamage);
                 battle.setDriftDamageApplied(driftDamageApplied);
@@ -1268,6 +1271,7 @@ public final class Game
         catch (Exception e)
         {
             logError(e + "Tried to load corrupt savegame.");
+            e.printStackTrace();  // XXX Should log it.
             dispose();
         }
     }
@@ -3159,8 +3163,9 @@ public final class Game
                 // Reveal both legions to all players.
                 attacker.revealAllCreatures();
                 defender.revealAllCreatures();
-                battle = new Battle(this, board, attacker, defender,
-                    Battle.DEFENDER, hex.getLabel(), 1, Battle.MOVE);
+                battle = new Battle(this, attacker.getMarkerId(),
+                    defender.getMarkerId(), Battle.DEFENDER, hex.getLabel(),
+                    1, Battle.MOVE);
                 battle.init();
             }
         }

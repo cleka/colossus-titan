@@ -1,19 +1,9 @@
-To the extent possible, objects further down the game logic hierarchy 
-   should not carry references to objects higher up the hierarchy.
-   Instead, they should carry String descriptors.  For example, 
-   Battle and Player should not have direct references to Game, 
-   Legion should not have a direct reference to Player, and Critter 
-   and Battle should not have a direct reference to Legion.  This would 
-   greatly simplify AICopy() since we'd only have to chase pointers 
-   down the tree, not up it.  We'd have to pass more arguments, but it
-   should be worth it.
-
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
    account.
 
 AI: Consider recruit scarcity (last gargoyle more valuable than troll).  
-   Don't leave non-moved legion highlighted. Don't cheat and peek at the 
+   Don't leave non-moved legion highlighted.  Don't cheat and peek at the 
    opposing stack unless all stacks are visible or some cheat option is set.
    Give some value to sitting in native terrain.  Get scrub snacks out of 
    nearby opponents' good recruiting terrain, and into blocking positions.

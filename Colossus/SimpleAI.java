@@ -1517,33 +1517,27 @@ class SimpleAI implements AI
         // Then create a map containing each target and the likely number
         // of hits it would take if all possible creatures attacked it.
         HashMap map = new HashMap();
-        Collection critters = battle.getCritters();
-        Iterator it = critters.iterator();
+        Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-
-            if (critter.getLegion() == legion)
+            Set set = battle.findStrikes(critter, true);
+            Iterator it2 = set.iterator();
+            while (it2.hasNext())
             {
-                Set set = battle.findStrikes(critter, true);
-                Iterator it2 = set.iterator();
-                while (it2.hasNext())
+                String hexLabel = (String)it2.next();
+                Critter target = battle.getCritterFromHexLabel(hexLabel);
+                int dice = critter.getDice(target);
+                int strikeNumber = critter.getStrikeNumber(target);
+                double h = Probs.meanHits(dice, strikeNumber);
+
+                if (map.containsKey(target))
                 {
-                    String hexLabel = (String)it2.next();
-                    Critter target = battle.getCritterFromHexLabel(hexLabel);
-                    int dice = critter.getDice(target);
-                    int strikeNumber = critter.getStrikeNumber(target);
-                    double h = Probs.meanHits(dice, strikeNumber);
-
-                    if (map.containsKey(target))
-                    {
-                        double d = ((Double)map.get(target)).doubleValue();
-
-                        h += d;
-                    }
-
-                    map.put(target, new Double(h));
+                    double d = ((Double)map.get(target)).doubleValue();
+                    h += d;
                 }
+
+                map.put(target, new Double(h));
             }
         }
 
@@ -1600,11 +1594,10 @@ class SimpleAI implements AI
         // stronger attackers strike.
         Critter bestAttacker = null;
 
-        it = critters.iterator();
+        it = legion.getCritters().iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-
             if (critter.canStrike(bestTarget))
             {
                 if (critter.possibleStrikePenalty(bestTarget))
@@ -1783,34 +1776,34 @@ class SimpleAI implements AI
         Game game;
         // the player for whom we're doing the evaluation.
         // note, this is NOT the same as Game.getActivePlayerNum()
-        int activePlayerNum;
+        int AIPlayerNum;
         HashMap[] enemyAttackMap;
 
-        public MasterBoardPosition(Game game, int activePlayerNum)
+        public MasterBoardPosition(Game game, int AIPlayerNum)
         {
             this.game = game.AICopy();
-            this.activePlayerNum = activePlayerNum;
+            this.AIPlayerNum = AIPlayerNum;
             enemyAttackMap = buildEnemyAttackMap(game,
-                game.getPlayer(activePlayerNum));
+                game.getPlayer(AIPlayerNum));
         }
 
 
         public MasterBoardPosition(MasterBoardPosition position)
         {
             this.game = position.game.AICopy();
-            this.activePlayerNum = position.activePlayerNum;
+            this.AIPlayerNum = position.AIPlayerNum;
             enemyAttackMap = buildEnemyAttackMap(game,
-                game.getPlayer(activePlayerNum));
+                game.getPlayer(AIPlayerNum));
         }
 
 
         public int maximize()
         {
-            if (activePlayerNum < 0)
+            if (AIPlayerNum < 0)
             {
                 return Minimax.AVERAGE;
             }
-            else if (game.getActivePlayerNum() == activePlayerNum)
+            else if (game.getActivePlayerNum() == AIPlayerNum)
             {
                 return Minimax.MAXIMIZE;
             }
@@ -1829,7 +1822,7 @@ class SimpleAI implements AI
             // is not always better.
             // idea: score for legion markers available?
             final Player activePlayer =
-                game.getPlayer(Math.abs(activePlayerNum));
+                game.getPlayer(Math.abs(AIPlayerNum));
 
             // check for loss
             if (activePlayer.isDead())
@@ -1898,7 +1891,7 @@ class SimpleAI implements AI
 
             // check for loss
             final Player activePlayer =
-                game.getPlayer(Math.abs(activePlayerNum));
+                game.getPlayer(Math.abs(AIPlayerNum));
 
             if (activePlayer.isDead())                  // oops! we lost
             {
@@ -1915,10 +1908,10 @@ class SimpleAI implements AI
             }
 
             // dice moves
-            if (activePlayerNum < 0)
+            if (AIPlayerNum < 0)
             {
                 // dice moves
-                int playernum = game.getActivePlayerNum() * -1;
+                int playernum = 0 - game.getActivePlayerNum();
                 ArrayList moves = new ArrayList(6);
 
                 for (int i = 1; i <= 6; i++)
@@ -1970,7 +1963,7 @@ class SimpleAI implements AI
                 MasterBoardPosition position =
                     new MasterBoardPosition(dicemove.position);
 
-                position.activePlayerNum = Math.abs(activePlayerNum);
+                position.AIPlayerNum = Math.abs(AIPlayerNum);
                 int roll = dicemove.roll;
                 position.game.getActivePlayer().setMovementRoll(roll);
                 return position;
@@ -2069,7 +2062,7 @@ class SimpleAI implements AI
                 }
 
                 // set activePlayer negative so that we average over dice rolls
-                position.activePlayerNum = -1 * Math.abs(activePlayerNum);
+                position.AIPlayerNum = -1 * Math.abs(AIPlayerNum);
 
                 return position;
             }
@@ -2131,28 +2124,36 @@ class SimpleAI implements AI
      winning positions are equally good, and not all losing
      positions are equally bad, since the surviving contents of
      the winning stack matter. All results that kill the last
-     enemy titan are equally good, though, and all results that
-     get our titan killed are equally bad.
+     enemy titan while leaving ours alive are equally good, though,
+     and all results that get our titan killed are equally bad.
 
      We can greatly simplify analysis by assuming that every strike
      will score the average number of hits.  This may or may not
      be good enough.  In particular, exposing a titan in a situation
      where a slightly above average number of hits will kill it is
-     probably unwise.
+     probably unwise, so we need to hack in some extra caution for
+     titans.
 
      When finding all possible moves, we need to take into account
-     that friendly creatures can block one another's moves.  Not
-     every creature gets to move first.
+     that friendly creatures can block one another's moves.
+
      There are 27 hexes on each battle map.  A fast creature starting
      near the middle of the map can move to all of them, terrain and
      other creatures permitting.  So the possible number of different
-     positions after one move is huge.
+     positions after one move is huge.  So we can't really iterate over
+     all possible moves.
 
      */
 
 
     public void battleMove(Legion legion, Battle battle, Game game)
     {
+        // Skip until working.
+        if (true)
+        {
+            return;
+        }
+
         debugln("Called battleMove() for legion " + legion.getMarkerId());
 
         int legionNum;
@@ -2292,26 +2293,26 @@ class SimpleAI implements AI
     class BattlePosition implements Minimax.GamePosition
     {
         private Game game;
-        private int activeLegionNum;
+        private int AILegionNum;
         private Battle battle;
 
-        public BattlePosition(Game game, int activeLegionNum)
+        public BattlePosition(Game game, int AILegionNum)
         {
             this.game = game.AICopy();
-            this.activeLegionNum = activeLegionNum;
-            battle = game.getBattle();
+            this.AILegionNum = AILegionNum;
+            battle = this.game.getBattle();
 
             this.game.setOption(Options.showDice, false);
         }
 
         public BattlePosition(BattlePosition position)
         {
-            this(position.game, position.activeLegionNum);
+            this(position.game, position.AILegionNum);
         }
 
         public int maximize()
         {
-            if (battle.getActiveLegionNum() == activeLegionNum)
+            if (battle.getActiveLegionNum() == AILegionNum)
             {
                 return Minimax.MAXIMIZE;
             }
@@ -2328,23 +2329,28 @@ class SimpleAI implements AI
             int value = winLoseOrDraw();
             if (value == BATTLE_NOT_OVER)
             {
-                Legion legion = battle.getLegion(activeLegionNum);
+                Legion thisLegion = battle.getLegion(AILegionNum);
 
                 // Iterate over both players' critters in battle.
-                Iterator it = battle.getCritters().iterator();
-                while (it.hasNext())
+                for (int i = Battle.DEFENDER; i <= Battle.ATTACKER; i++)
                 {
-                    Critter critter = (Critter)it.next();
-                    if (critter.getLegion() == legion)
+                    Legion legion = battle.getLegion(i);
+                    Iterator it = legion.getCritters().iterator();
+                    while (it.hasNext())
                     {
-                        value += evaluateCritterMove(battle, critter, true);
-                    }
-                    else
-                    {
-                        value -= evaluateCritterMove(battle, critter, true);
+                        Critter critter = (Critter)it.next();
+                        if (critter.getLegion() == thisLegion)
+                        {
+                            value += evaluateCritterMove(battle, critter,
+                                true);
+                        }
+                        else
+                        {
+                            value -= evaluateCritterMove(battle, critter,
+                                true);
+                        }
                     }
                 }
-
                 debugln("evaluation: " + value);
             }
             return value;
@@ -2395,7 +2401,7 @@ class SimpleAI implements AI
                 }
                 else if (battle.isAttackerElim())
                 {
-                    if (activeLegionNum == battle.ATTACKER)
+                    if (AILegionNum == battle.ATTACKER)
                     {
                         value = BATTLE_LOSS;
                         debugln("evaluation: battle loss! " + value);
@@ -2408,7 +2414,7 @@ class SimpleAI implements AI
                 }
                 else if (battle.isDefenderElim())
                 {
-                    if (activeLegionNum == battle.DEFENDER)
+                    if (AILegionNum == battle.DEFENDER)
                     {
                         value = BATTLE_LOSS;
                         debugln("evaluation: battle loss! " + value);
@@ -2426,7 +2432,7 @@ class SimpleAI implements AI
 
         /** Limit the number of moves considered for each legion, to
          *  prevent combinatorial explosion. */
-        final int MAX_LEGION_MOVES = 100000;
+        final int MAX_LEGION_MOVES = 10000;
 
 
         /** Generates LegionMoves. */
@@ -2465,18 +2471,10 @@ class SimpleAI implements AI
             // critters in the legion.  Find all possible legion moves
             // using just the N best moves for each legion.
 
-            ArrayList allCritters = (ArrayList)battle.getCritters();
-            // Deep copy only the critters from the active legion.
-            ArrayList critters = new ArrayList();
-            Iterator it = allCritters.iterator();
-            while (it.hasNext())
-            {
-                Critter critter = (Critter)it.next();
-                if (critter.getLegion() == battle.getActiveLegion())
-                {
-                    critters.add(critter);
-                }
-            }
+            ArrayList critters = (ArrayList)
+                battle.getActiveLegion().getCritters();
+
+            debugln("There are " + critters.size() + " critters");
 
             // Sort critters in decreasing order of importance.  Keep
             // identical creatures together with a secondary sort by
@@ -2503,21 +2501,23 @@ class SimpleAI implements AI
 
             // There are about numCritters ** mean moves per critter
             // possible legion moves.  So retrict the number of moves
-            // per critter. 
+            // per critter.
             int maxCritterMoves = (int)Math.floor(Math.pow(MAX_LEGION_MOVES,
                 1.0 / critters.size()));
+            debugln("maxCritterMoves is " + maxCritterMoves);
 
-            it = critters.iterator();
+            Iterator it = critters.iterator();
             String lastCritterName = "";
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
                 String critterName = critter.getName();
                 String currentHexLabel = critter.getCurrentHexLabel();
+debugln(critterName + " is in " + currentHexLabel);
 
                 // Skip this critter if we just figured out the moves
                 // for another entering creature of the same type.
-                if (currentHexLabel.startsWith("entrance") && 
+                if (currentHexLabel.startsWith("entrance") &&
                     critterName.equals(lastCritterName))
                 {
                     continue;
@@ -2530,8 +2530,8 @@ class SimpleAI implements AI
 
                 // Not moving is also an option, unless the
                 // critter is offboard.
-                // XXX Test the situation where some critters are 
-                // forced to stay offboard, e.g. 7 trolls defending in 
+                // XXX Test the situation where some critters are
+                // forced to stay offboard, e.g. 7 trolls in
                 // the desert.
                 if (!currentHexLabel.startsWith("entrance"))
                 {
@@ -2579,16 +2579,15 @@ class SimpleAI implements AI
                 });
 
                 int numMoves = Math.min(maxCritterMoves, moveList.size());
-                debugln("Considering best " + numMoves + " moves for " + 
+                debugln("Considering best " + numMoves + " moves for " +
                     critter.getDescription());
                 List bestMoves = new ArrayList();
-                // XXX Isn't there a public util method for this?
                 for (int i = 0; i < numMoves; i++)
                 {
                     CritterMove cm = (CritterMove)moveList.get(i);
                     bestMoves.add(cm);
                 }
-                allCritterMoves.put(critterName + currentHexLabel, bestMoves);
+                allCritterMoves.put(critter.getCreatureClass(), bestMoves);
             }
 
             // Now we need to create legion moves from critter moves.
@@ -2621,7 +2620,7 @@ class SimpleAI implements AI
             {
                 Critter critter = (Critter)critters.get(j);
                 moveList[j] = (ArrayList)allCritterMoves.get(
-                    critter.getName() + critter.getStartingHexLabel());
+                    critter.getCreatureClass());
                 numMoves[j] = moveList[j].size();
             }
 
@@ -2727,20 +2726,15 @@ class SimpleAI implements AI
             Iterator it = LegionMove.moves.iterator();
             while (it.hasNext())
             {
-                // XXX Does CritterMove need to hold strings instead of
-                // critters and hexes, so that they refer to the new
-                // position rather than the real one?
                 CritterMove cm = (CritterMove)it.next();
                 Critter critter = cm.getCritter(position.battle);
+// XXX Why is critter null?
                 BattleHex hex = cm.getEndingHex(map);
 
                 debugln("applymove: try " + critter + " to " + hex.getLabel());
                 position.battle.doMove(critter, hex);
             }
 
-// XXX Do we really want to advance phases?  We're basically limited to
-// one ply by combinatorics.
-/*
             // advance phases until we reach the next move phase
             do
             {
@@ -2764,11 +2758,10 @@ class SimpleAI implements AI
                         break;
                 }
             }
-            while (!position.battle.isOver() || position.battle.getPhase()
+            while (!position.battle.isOver() && position.battle.getPhase()
                 != Battle.MOVE);
-*/
 
-            position.activeLegionNum = activeLegionNum;
+            position.AILegionNum = AILegionNum;
             return position;
         }
     }

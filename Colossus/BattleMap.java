@@ -14,18 +14,17 @@ public final class BattleMap extends HexMap implements MouseListener,
 {
     private static Point location;
 
-    private MasterBoard board;
     private Battle battle;
 
     private JFrame battleFrame;
     private JMenuBar menuBar;
     private JMenu phaseMenu;
 
-    static final String undoLastMove = "Undo Last Move";
-    static final String undoAllMoves = "Undo All Moves";
-    static final String doneWithMoves = "Done with Moves";
-    static final String doneWithStrikes = "Done with Strikes";
-    static final String concedeBattle = "Concede Battle";
+    public static final String undoLastMove = "Undo Last Move";
+    public static final String undoAllMoves = "Undo All Moves";
+    public static final String doneWithMoves = "Done with Moves";
+    public static final String doneWithStrikes = "Done with Strikes";
+    public static final String concedeBattle = "Concede Battle";
 
     private AbstractAction undoLastMoveAction;
     private AbstractAction undoAllMovesAction;
@@ -34,7 +33,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     private AbstractAction concedeBattleAction;
 
 
-    public BattleMap(MasterBoard board, String masterHexLabel, Battle battle)
+    public BattleMap(String masterHexLabel, Battle battle)
     {
         super(masterHexLabel);
 
@@ -47,9 +46,8 @@ public final class BattleMap extends HexMap implements MouseListener,
             attacker.getPlayerName() + ") attacks " +
             defender.getLongMarkerName() + " (" +
             defender.getPlayerName() + ")" + " in " +
-            board.getHexFromLabel(masterHexLabel).getDescription());
+            MasterBoard.getHexFromLabel(masterHexLabel).getDescription());
 
-        this.board = board;
         this.battle = battle;
 
         Container contentPane = battleFrame.getContentPane();
@@ -83,10 +81,27 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
-    // Simple constructor for testing.
+    // Simple constructor for testing and AICopy()
     public BattleMap(String masterHexLabel)
     {
         super(masterHexLabel);
+        setupEntrances();
+    }
+
+
+    public BattleMap AICopy()
+    {
+        BattleMap newMap = new BattleMap(masterHexLabel);
+
+        // XXX Need to copy hexes? 
+
+        return newMap;
+    }
+
+
+    public void setBattle(Battle battle)
+    {
+        this.battle = battle;
     }
 
 
@@ -248,7 +263,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         BattleHex entrance = getEntrance(legion);
         int height = legion.getHeight();
         Critter critter = legion.getCritter(height - 1);
-        battle.addCritter(critter);
 
         BattleChit chit = new BattleChit(chitScale,
             critter.getImageName(legion == battle.getDefender()), this,
@@ -269,7 +283,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            battle.addCritter(critter);
             BattleChit chit = new BattleChit(chitScale,
                 critter.getImageName(inverted), this, critter);
 
@@ -310,18 +323,20 @@ public final class BattleMap extends HexMap implements MouseListener,
      *  or null if none does. */
     private Critter getCritterAtPoint(Point point)
     {
-        Collection critters = battle.getCritters();
-        Iterator it = critters.iterator();
-        while (it.hasNext())
+        for (int i = Battle.DEFENDER; i <= Battle.ATTACKER; i++)
         {
-            Critter critter = (Critter)it.next();
-            Chit chit = critter.getChit();
-            if (chit.contains(point))
+            Legion legion = battle.getLegion(i);
+            Iterator it = legion.getCritters().iterator();
+            while (it.hasNext())
             {
-                return critter;
+                Critter critter = (Critter)it.next();
+                Chit chit = critter.getChit();
+                if (chit.contains(point))
+                {
+                    return critter;
+                }
             }
         }
-
         return null;
     }
 
@@ -374,15 +389,19 @@ public final class BattleMap extends HexMap implements MouseListener,
         }
 
         // Draw chits from back to front.
-        ArrayList critters = (ArrayList)battle.getCritters();
-        ListIterator lit = critters.listIterator(critters.size());
-        while (lit.hasPrevious())
+        for (int i = Battle.DEFENDER; i <= Battle.ATTACKER; i++)
         {
-            Critter critter = (Critter)lit.previous();
-            Chit chit = critter.getChit();
-            if (rectClip.intersects(chit.getBounds()))
+            Legion legion = battle.getLegion(i);
+            ListIterator lit = legion.getCritters().listIterator(
+                legion.getHeight());
+            while (lit.hasPrevious())
             {
-                chit.paintComponent(g);
+                Critter critter = (Critter)lit.previous();
+                Chit chit = critter.getChit();
+                if (rectClip.intersects(chit.getBounds()))
+                {
+                    chit.paintComponent(g);
+                }
             }
         }
     }

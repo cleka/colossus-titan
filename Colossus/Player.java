@@ -43,7 +43,7 @@ public final class Player implements Comparable
     /**
      *  Deep copy for AI; preserves game state but ignores UI state
      */
-    public Player AICopy()
+    public Player AICopy(Game game)
     {
         Player newPlayer = new Player(name, game);
         newPlayer.color = color;       // Black, Blue, Brown, Gold, Green, Red
@@ -59,11 +59,23 @@ public final class Player implements Comparable
         newPlayer.titanEliminated = titanEliminated;
         for (int i = 0; i < legions.size(); i++)
         {
-            newPlayer.legions.add(i, ((Legion) legions.get(i)).AICopy());
+            newPlayer.legions.add(i, ((Legion)legions.get(i)).AICopy(game));
         }
         // Strings are immutable, so a shallow copy == a deep copy
         newPlayer.markersAvailable = (TreeSet) markersAvailable.clone();
         return newPlayer;
+    }
+
+    // XXX Call after calling AICopy()
+    public void setGame(Game game)
+    {
+        this.game = game;
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            legion.setGame(game);
+        }
     }
 
     public boolean isDead()
@@ -301,11 +313,6 @@ public final class Player implements Comparable
         Collections.sort(legions);
     }
 
-
-    public Game getGame()
-    {
-        return game;
-    }
 
     /** Return the number of this player's legions that have moved. */
     public int legionsMoved()

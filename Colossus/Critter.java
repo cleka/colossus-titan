@@ -38,10 +38,9 @@ public final class Critter extends Creature
 
 
     /** Deep copy for AI. */
-    public Critter AICopy()
+    public Critter AICopy(Game game)
     {
-        Critter newCritter = new Critter(creature, visible, markerId, null);
-        // Caller needs to set the game.
+        Critter newCritter = new Critter(creature, visible, markerId, game);
 
         newCritter.map = map;
         newCritter.battle = battle;
@@ -131,6 +130,22 @@ public final class Critter extends Creature
     public String getDescription()
     {
         return getName() + " in " + getCurrentHex().getDescription();
+    }
+
+
+    /** A creature class is the creature name and the label of its
+     *  current BattleHex.  This is useful when doing AI battle moves,
+     *  since one offboard lion is identical to another. */
+    public String getCreatureClass()
+    {
+        if (currentHexLabel == null)
+        {
+            return getName();
+        }
+        else
+        {
+            return getName() + currentHexLabel;
+        }
     }
 
 

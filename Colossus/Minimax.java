@@ -74,7 +74,7 @@ class Minimax
 
     public Move search(GamePosition position, int maxDepth)
     {
-        if (maxDepth == 0)
+        if (maxDepth <= 0)
         {
             throw new RuntimeException("depth must be > 0");
         }
@@ -238,7 +238,7 @@ class Minimax
 
         public int maximize()
         {
-            if (turn % 2 == 0)
+            if ((turn & 1) == 0)
             {
                 return Minimax.MAXIMIZE;
             }

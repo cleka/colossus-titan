@@ -107,6 +107,7 @@ public final class Legion implements Comparable
         markerNames.put("Rd12", "Torch");
     }
 
+    // XXX Need to eliminate the duplicated code between the constructors.
 
     public Legion(String markerId, String parentId, String currentHexLabel,
         String startingHexLabel, Creature creature0, Creature creature1,
@@ -174,6 +175,46 @@ public final class Legion implements Comparable
     }
 
 
+    // For AICopy()
+    public Legion(String markerId, String parentId, String currentHexLabel,
+        String startingHexLabel, ArrayList critters, String playerName,
+        Game game)
+    {
+        this.markerId = markerId;
+        this.parentId = parentId;
+        // Sanity check
+        if (parentId != null && parentId.equals(markerId))
+        {
+            parentId = null;
+        }
+        this.currentHexLabel = currentHexLabel;
+        this.startingHexLabel = startingHexLabel;
+        this.playerName = playerName;
+        this.game = game;
+
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            Critter myCritter = critter.AICopy(game);
+            this.critters.add(myCritter);
+        }
+
+        // Initial legion contents are public; contents of legions created
+        // by splits are private.
+        if (getHeight() == 8)
+        {
+            revealAllCreatures();
+        }
+        else
+        {
+            // When loading a game, we handle revealing visible creatures
+            // after legion creation.
+            hideAllCreatures();
+        }
+    }
+
+
     public static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
@@ -193,19 +234,10 @@ public final class Legion implements Comparable
 
 
     /** deep copy for AI */
-    public Legion AICopy()
+    public Legion AICopy(Game game)
     {
         Legion newLegion = new Legion(markerId, parentId, currentHexLabel,
-            startingHexLabel,
-            critters.size()>=1?(Creature)critters.get(0):null,
-            critters.size()>=2?(Creature)critters.get(1):null,
-            critters.size()>=3?(Creature)critters.get(2):null,
-            critters.size()>=4?(Creature)critters.get(3):null,
-            critters.size()>=5?(Creature)critters.get(4):null,
-            critters.size()>=6?(Creature)critters.get(5):null,
-            critters.size()>=7?(Creature)critters.get(6):null,
-            critters.size()>=8?(Creature)critters.get(7):null,
-            playerName, game);
+            startingHexLabel, critters, playerName, game);
 
         newLegion.moved = moved;
         newLegion.recruited = recruited;
@@ -218,6 +250,8 @@ public final class Legion implements Comparable
         return newLegion;
     }
 
+    // We could remove this method, and have the various dialogs
+    // that use it take game as an argument.
     public Game getGame()
     {
         return game;
@@ -765,7 +799,27 @@ public final class Legion implements Comparable
     }
 
 
-    public Collection getCritters()
+    /** Do the cleanup associated with removing the critter from this
+     *  legion.  Do not actually remove it, to prevent comodification
+     *  errors.  Do not disband the legion if empty, since the critter
+     *  has not actually been removed. Return the critter if present. */
+    public Creature prepareToRemoveCritter(Critter critter, boolean
+        returnImmortalToStack)
+    {
+        if (critter == null || !critters.contains(critter))
+        {
+            return null;
+        }
+        // If the creature is a lord or demi-lord, put it back in the stacks.
+        if (returnImmortalToStack && critter.isImmortal())
+        {
+            game.getCaretaker().putOneBack(critter);
+        }
+        return critter;
+    }
+
+
+    public List getCritters()
     {
         return critters;
     }
@@ -788,6 +842,25 @@ public final class Legion implements Comparable
     {
         critters.set(i, critter);
         critter.setMarkerId(markerId);
+    }
+
+
+    /** Move critter to the first position in the critters list.
+     *  Return true if it was moved. */
+    public boolean moveToTop(Critter critter)
+    {
+        int i = critters.indexOf(critter);
+        if (i <= 0)
+        {
+            // Not found, or already first in the list.
+            return false;
+        }
+        else
+        {
+            critters.remove(i);
+            critters.add(0, critter);
+            return true;
+        }
     }
 
 

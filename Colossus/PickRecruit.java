@@ -14,7 +14,6 @@ public final class PickRecruit extends JDialog implements MouseListener,
     WindowListener
 {
     private ArrayList recruits = new ArrayList();
-    private Player player;
     private Legion legion;
     private ArrayList recruitChits = new ArrayList();
     private Marker legionMarker;
@@ -25,7 +24,6 @@ public final class PickRecruit extends JDialog implements MouseListener,
     private GridBagConstraints constraints = new GridBagConstraints();
     private static Creature recruit;
     private static boolean active;
-    private Game game;
 
 
     private PickRecruit(JFrame parentFrame, Legion legion)
@@ -42,8 +40,7 @@ public final class PickRecruit extends JDialog implements MouseListener,
 
         this.parentFrame = parentFrame;
         this.legion = legion;
-        player = legion.getPlayer();
-	game = player.getGame();
+	Game game = legion.getGame();
 
         recruits = game.findEligibleRecruits(legion);
         int numEligible = recruits.size();

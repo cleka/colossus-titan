@@ -25,7 +25,7 @@ public class Creature implements Comparable
     private final boolean nativeSlope;
     private final boolean lord;
     private final boolean demilord;
-    private final int maxCount; 
+    private final int maxCount;
 
     // Add various Creature archetypes as class members
     public static final Creature angel = new Creature("Angel", 6, 4,
@@ -136,7 +136,7 @@ public class Creature implements Comparable
         this.pluralName = pluralName;
     }
 
-    
+
     protected Creature(Creature creature)
     {
         this.name = creature.name;
@@ -183,6 +183,11 @@ public class Creature implements Comparable
         return name.equals("Titan");
     }
 
+    public boolean isAngel()
+    {
+        return name.equals("Angel") || name.equals("Archangel");
+    }
+
 
     public String getName()
     {
@@ -227,7 +232,7 @@ public class Creature implements Comparable
     public int getPointValue()
     {
         return getPower() * getSkill();
-    } 
+    }
 
     public boolean isRangestriker()
     {

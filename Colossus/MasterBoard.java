@@ -35,20 +35,20 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {false, false, false, true, true, false, false, false}
     };
 
-
     private static int scale;
-    private static Game game;
 
-    private JFrame masterFrame;
-    private JMenu phaseMenu;
-    private JPopupMenu popupMenu;
+    private Game game;
 
-    private HashMap checkboxes = new HashMap();
+    private static JFrame masterFrame;
+    private static JMenu phaseMenu;
+    private static JPopupMenu popupMenu;
+
+    private static HashMap checkboxes = new HashMap();
 
     /** Last point clicked is needed for popup menus. */
-    private Point lastPoint;
+    private static Point lastPoint;
 
-    private Container contentPane;
+    private static Container contentPane;
 
     public static final String newGame = "New game";
     public static final String loadGame = "Load game";
@@ -96,10 +96,9 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public MasterBoard(Game game)
     {
-        masterFrame = new JFrame("MasterBoard");
-
         this.game = game;
 
+        masterFrame = new JFrame("MasterBoard");
         contentPane = masterFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
         scale = findScale();
@@ -114,17 +113,24 @@ public final class MasterBoard extends JPanel implements MouseListener,
         setupActions();
         setupPopupMenu();
         setupTopMenu();
-
         contentPane.add(new JScrollPane(this), BorderLayout.CENTER);
         masterFrame.pack();
         masterFrame.setVisible(true);
     }
 
 
-    // No-arg constructor for testing.
+    // No-arg constructor for testing and AICopy(), without GUI stuff.
     public MasterBoard()
     {
         setupHexes();
+    }
+
+
+    public MasterBoard AICopy(Game game)
+    {
+        MasterBoard newBoard = new MasterBoard();
+        newBoard.setGame(game);
+        return newBoard;
     }
 
 
@@ -642,7 +648,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 }
             }
         }
-
 
 
         // Add terrain types, id labels, label sides, and exits to hexes.
@@ -1682,8 +1687,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public void removeMarker(Legion legion)
     {
-        Marker marker = legion.getMarker();
-        markers.remove(marker);
+        if (legion != null)
+        {
+            Marker marker = legion.getMarker();
+            markers.remove(marker);
+        }
     }
 
 
@@ -1874,7 +1882,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public static void main(String [] args)
     {
-        game = new Game();
+        Game game = new Game();
         new MasterBoard(game);
     }
 }
