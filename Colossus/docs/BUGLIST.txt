@@ -29,7 +29,8 @@ jar files made in Linux ibmjdk118 won't execute directly on Solaris JDK 1.2.2.
 
 Red Hat 6.1, ibmjdk118: Occasional SIGSEGV javacore in SplitLegion, with 
    native threads on.  Green threads seem okay.  Occasional SIGSEGV 
-   javacore in PickRecruit, even with green threads.
+   javacore in PickRecruit, even with green threads.  One SIGSEGV
+   javacore during battle, with green threads.  AWT thread race condition?
 
 Red Hat 6.1, Sun 1.2.2, Blackdown 1.2.2RC4: ShowDice dialog sometimes 
    moves from upper right corner to upper left corner.  ShowLegion
@@ -78,3 +79,4 @@ Linux, ibmjdk118: Legion with angel in tower did not immediately
    have tower teleport moves highlighted, as if player had already
    teleported.  "Undo All Moves" fixed the problem.
    
+Linux, ibmjdk118: Got a NullPointerException in Concede.<init>
