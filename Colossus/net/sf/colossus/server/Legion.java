@@ -265,7 +265,8 @@ public final class Legion implements Comparable
 
     public static String getMarkerName(String markerId)
     {
-        return net.sf.colossus.server.VariantSupport.getMarkerNamesProperties().getProperty(markerId);
+        return net.sf.colossus.server.VariantSupport.
+            getMarkerNamesProperties().getProperty(markerId);
     }
 
     public static String getLongMarkerName(String markerId)
@@ -311,9 +312,12 @@ public final class Legion implements Comparable
         {
             Critter critter = (Critter)it.next();
             /*
-             * use getName(), not getImageName, as
-             * 1) Chit should be build with actual name to make sure they find the Creature ;
-             * 2) it seems that element in this List somehow find their way to Creature.getCreatureByName(), and if one use the Image Name in there, hell break loose.
+             * Use getName(), not getImageName(), as
+             * 1) Chit should be built with actual name to make sure 
+             * they find the Creature ;
+             * 2) it seems that elements in this List somehow find their 
+             * way to Creature.getCreatureByName(), and if one uses the 
+             * Image Name in there, hell breaks loose.
              */
             imageNames.add(critter.getName());
         }
