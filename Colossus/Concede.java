@@ -212,6 +212,8 @@ class Concede extends Dialog implements ActionListener
 
             // Add points, and angels if necessary.
             enemy.addPoints(points);
+            // Remove any fractional points.
+            enemy.getPlayer().truncScore();
 
             // If this was the titan stack, its owner dies and gives half
             // points to the victor.
