@@ -44,7 +44,7 @@ public final class Constants
     /** Must include trailing slash. */
     public static final String saveDirname = gameDataPath + "/saves/";
     public static final String xmlExtension = ".xml";
-    public static final String xmlSnapshotStart = "ColossusSnapshot_";
+    public static final String xmlSnapshotStart = "snap";
     public static final String xmlSnapshotVersion = "12";
 
     // Phases of a battle turn

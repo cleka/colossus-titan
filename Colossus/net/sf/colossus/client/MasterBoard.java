@@ -384,7 +384,7 @@ public final class MasterBoard extends JPanel
                 int returnVal = chooser.showOpenDialog(masterFrame);
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
-                    client.loadGame(chooser.getSelectedFile().getName());
+                    client.loadGame(chooser.getSelectedFile().getPath());
                 }
             }
         };

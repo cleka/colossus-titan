@@ -411,7 +411,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             options.clearPlayerInfo();
             // Set key to "load game" and value to savegame filename.
             options.setOption(Constants.loadGame, 
-                chooser.getSelectedFile().getName());
+                chooser.getSelectedFile().getPath());
             dispose();
         }
     }

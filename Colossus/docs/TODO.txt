@@ -76,6 +76,13 @@ Bug: 1_LATEST_IS_date is broken in remote_inst.  Can't delete previous
 Bug: Titan teleport onto chaff stack in tower, 1 warlock left, recruitChit
    shows ogre instead of warlock.
 
+Bug: Won battle as defender.  Was offered after-battle reinforcement and
+   acquired angel, but AI players went on playing instead of waiting for
+   angel.  Reinforcing worked (in own split phase!), but then got 
+   "Error: Called advancePhase illegally (reason: oldPhase != phase, 
+   Fight != Recruit)"
+
+
 Have server send marker names.
 
 Toolbar, or at least Done button.
