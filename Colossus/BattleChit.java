@@ -10,6 +10,9 @@ import java.awt.*;
 public class BattleChit extends Chit
 {
     private Critter critter;
+    private static Font font;
+    private static Font oldFont;
+    private static int fontHeight;
 
 
     public BattleChit(int scale, String id, Container container, 
@@ -33,40 +36,46 @@ public class BattleChit extends Chit
     }
 
 
-    //public void paintComponent(Graphics g)
-    public void paint(Graphics g)
+    public void paintComponent(Graphics g)
     {
-        //super.paintComponent(g);
-        super.paint(g);
+        super.paintComponent(g);
 
         if (critter.getHits() > 0 && !isDead())
         {
             String hitString = Integer.toString(critter.getHits());
             Rectangle rect = getBounds();
+            FontMetrics fontMetrics; 
 
             // Construct a font 3 times the size of the current font.
-            Font oldFont = g.getFont();
-            String name = oldFont.getName();
-            int size = oldFont.getSize();
-            int style = oldFont.getStyle();
-            Font font = new Font(name, style, 3 * size);
-            g.setFont(font);
-
-            FontMetrics fontMetrics = g.getFontMetrics();
-            int fontHeight = fontMetrics.getAscent();
+            if (font == null)
+            {
+                oldFont = g.getFont();
+                String name = oldFont.getName();
+                int size = oldFont.getSize();
+                int style = oldFont.getStyle();
+                font = new Font(name, style, 3 * size);
+                g.setFont(font);
+                fontMetrics = g.getFontMetrics();
+                fontHeight = fontMetrics.getAscent();
+            }
+            else
+            {
+                g.setFont(font);
+                fontMetrics = g.getFontMetrics();
+            }
             int fontWidth = fontMetrics.stringWidth(hitString);
 
             // Provide a high-contrast background for the number.
             g.setColor(Color.white);
-            g.fillRect(rect.x + (rect.width - fontWidth) / 2,
-                rect.y + (rect.height - fontHeight) / 2,
+            g.fillRect(rect.x + ((rect.width - fontWidth) >> 1),
+                rect.y + ((rect.height - fontHeight) >> 1),
                 fontWidth, fontHeight);
 
             // Show number of hits taken in red.
             g.setColor(Color.red);
 
-            g.drawString(hitString, rect.x + (rect.width - fontWidth) / 2,
-                rect.y + (rect.height + fontHeight) / 2);
+            g.drawString(hitString, rect.x + ((rect.width - fontWidth) >> 1),
+                rect.y + ((rect.height + fontHeight) >> 1));
 
             // Restore the font.
             g.setFont(oldFont);

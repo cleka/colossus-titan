@@ -11,6 +11,9 @@ public class BattleHex extends Hex
 {
     private BattleMap map;
 
+    private static FontMetrics fontMetrics;
+    private String name;
+
     /** Normal hexes hold only one creature, but entrances can hold up to 7. */
     private ArrayList critters = new ArrayList(7);
 
@@ -96,37 +99,38 @@ public class BattleHex extends Hex
         g.setColor(Color.black);
         g.drawPolygon(hexagon);
 
-        FontMetrics fontMetrics = g.getFontMetrics();
+        if (fontMetrics == null)
+        {
+            fontMetrics = g.getFontMetrics();
+            name = getTerrainName().toUpperCase();
+        }
 
-        String name = getTerrainName().toUpperCase();
-        g.drawString(name, rectBound.x + (rectBound.width -
-            fontMetrics.stringWidth(name)) / 2,
-            rectBound.y + (fontMetrics.getHeight() + rectBound.height) / 2);
+        g.drawString(name, rectBound.x + ((rectBound.width -
+            fontMetrics.stringWidth(name)) >> 1),
+            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 1));
 
         // Show hex label in upper left corner.
         g.drawString(label, rectBound.x + (rectBound.width -
             fontMetrics.stringWidth(label)) / 3,
-            rectBound.y + (fontMetrics.getHeight() + rectBound.height) / 4);
+            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 2));
 
         // Draw hexside features.
         for (int i = 0; i < 6; i++)
         {
             char hexside = hexsides[i];
+            int n;
             if (hexside != ' ')
             {
-                int n = (i + 1) % 6;
+                n = (i + 1) % 6;
                 drawHexside(g, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
                     hexside);
             }
-        }
-
-        // Draw them again from the other side.
-        for (int i = 0; i < 6; i++)
-        {
-            char hexside = getOppositeHexside(i);
+            
+            // Draw them again from the other side.
+            hexside = getOppositeHexside(i);
             if (hexside != ' ')
             {
-                int n = (i + 1) % 6;
+                n = (i + 1) % 6;
                 drawHexside(g, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
                     hexside);
             }
@@ -182,9 +186,9 @@ public class BattleHex extends Hex
 
                     x[0] = (int) Math.round(x0 - len * Math.sin(theta));
                     y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                    x[1] = (int) Math.round((x0 + x1) / 2 + len * 
+                    x[1] = (int) Math.round(((x0 + x1) >> 1) + len * 
                         Math.sin(theta));
-                    y[1] = (int) Math.round((y0 + y1) / 2 - len * 
+                    y[1] = (int) Math.round(((y0 + y1) >> 1) - len * 
                         Math.cos(theta));
                     x[2] = (int) Math.round(x1 - len * Math.sin(theta));
                     y[2] = (int) Math.round(y1 + len * Math.cos(theta));
@@ -213,8 +217,8 @@ public class BattleHex extends Hex
                     x[3] = (int) Math.round(x1 - len * Math.sin(theta));
                     y[3] = (int) Math.round(y1 + len * Math.cos(theta));
 
-                    x2 = (int) Math.round((x0 + x1) / 2);
-                    y2 = (int) Math.round((y0 + y1) / 2);
+                    x2 = (int) Math.round((x0 + x1) >> 1);
+                    y2 = (int) Math.round((y0 + y1) >> 1);
                     Rectangle rect = new Rectangle();
                     rect.x = x2 - (int) Math.round(len);
                     rect.y = y2 - (int) Math.round(len);
@@ -307,12 +311,6 @@ public class BattleHex extends Hex
     {
         critters.remove(critter);
 
-        // Clearing the area is only necessary for entrances.
-        if (isEntrance())
-        {
-            map.setEraseFlag();
-        }
-
         // Reposition all chits within the hex.
         alignChits();
     }
@@ -335,8 +333,8 @@ public class BattleHex extends Hex
         Point point = getCenter();
 
         // Cascade chits diagonally.
-        point.x -= chitScale * (1 + (critters.size())) / 4;
-        point.y -= chitScale * (1 + (critters.size())) / 4;
+        point.x -= chitScale * (1 + (critters.size())) >> 2;
+        point.y -= chitScale * (1 + (critters.size())) >> 2;
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -344,8 +342,8 @@ public class BattleHex extends Hex
             Critter critter = (Critter)it.next();
             BattleChit chit = critter.getChit();
             chit.setLocation(point);
-            point.x += chitScale / 4;
-            point.y += chitScale / 4;
+            point.x += chitScale >> 2;
+            point.y += chitScale >> 2;
         }
 
         repaint();
@@ -449,7 +447,7 @@ public class BattleHex extends Hex
                 xLabel = '?';
         }
 
-        int yLabel = 6 - yCoord - (int) Math.abs(Math.floor((xCoord - 3) / 2));
+        int yLabel = 6 - yCoord - (int) Math.abs(Math.floor((xCoord - 3) >> 1));
         label = new String(xLabel + Integer.toString(yLabel));
     }
 
@@ -462,14 +460,7 @@ public class BattleHex extends Hex
 
     public char getHexside(int i)
     {
-        if (i < 0 || i > 5)
-        {
-            return ' ';
-        }
-        else
-        {
-            return hexsides[i];
-        }
+        return hexsides[i];
     }
 
 

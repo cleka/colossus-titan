@@ -9,7 +9,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class MasterBoard extends JFrame implements MouseListener,
+public class MasterBoard extends JPanel implements MouseListener,
     WindowListener
 {
     // There are a total of 96 hexes
@@ -25,15 +25,10 @@ public class MasterBoard extends JFrame implements MouseListener,
     private static MasterHex[][] h = new MasterHex[15][8];
     private static ArrayList hexes = new ArrayList();
 
-    private Image offImage;
-    private Graphics offGraphics;
-    private Dimension offDimension;
     private static int scale;
     private static Game game;
 
-    /** Used to fix artifacts from legions hanging outside hexes. */
-    private boolean eraseFlag;
-
+    private JFrame masterFrame;
     private JPopupMenu popupMenu;
     private JMenuItem menuItemRecruitInfo; 
     private JMenuItem menuItemBattleMap;
@@ -92,26 +87,20 @@ public class MasterBoard extends JFrame implements MouseListener,
 
     public MasterBoard(Game game)
     {
-        super("MasterBoard");
+        masterFrame = new JFrame("MasterBoard");
 
         this.game = game;
 
-        contentPane = getContentPane();
-
-        contentPane.setLayout(null);
-
-        // XXX This prevents clicking on chits, hexes.
-        //contentPane.setLayout(new BorderLayout());
+        contentPane = masterFrame.getContentPane();
+        contentPane.setLayout(new BorderLayout());
 
         scale = getScale();
-
-        setSize(getPreferredSize());
 
         setupIcon();
 
         setBackground(Color.black);
 
-        addWindowListener(this);
+        masterFrame.addWindowListener(this);
         addMouseListener(this);
 
         setupActions();
@@ -119,6 +108,12 @@ public class MasterBoard extends JFrame implements MouseListener,
         initializeTopMenu();
 
         SetupMasterHexes.setupHexes(h, this, hexes);
+        
+        contentPane.add(this, BorderLayout.CENTER);
+        
+        masterFrame.pack();
+
+        masterFrame.setVisible(true);
     }
 
 
@@ -327,7 +322,7 @@ public class MasterBoard extends JFrame implements MouseListener,
                 MasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowMasterHex(MasterBoard.this, hex, lastPoint);
+                    new ShowMasterHex(masterFrame, hex, lastPoint);
                 }
             }
         };
@@ -339,7 +334,7 @@ public class MasterBoard extends JFrame implements MouseListener,
                 MasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(MasterBoard.this, hex);
+                    new ShowBattleMap(masterFrame, hex);
                 }
             }
         };
@@ -352,6 +347,12 @@ public class MasterBoard extends JFrame implements MouseListener,
     }
     private void setupMoveDialog()
     {
+    }
+
+
+    public JFrame getFrame()
+    {
+        return masterFrame;
     }
 
 
@@ -369,7 +370,7 @@ public class MasterBoard extends JFrame implements MouseListener,
         JMenuItem mi;
 
         menuBar = new JMenuBar();
-        setJMenuBar(menuBar);
+        masterFrame.setJMenuBar(menuBar);
 
         fileMenu = new JMenu("File");
         mi = new JMenuItem(newGame);
@@ -442,7 +443,7 @@ public class MasterBoard extends JFrame implements MouseListener,
         {
             try
             {
-                setIconImage(Toolkit.getDefaultToolkit().getImage(
+                masterFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(
                     getClass().getResource(Chit.getImagePath(
                     Creature.colossus.getImageName()))));
             }
@@ -649,7 +650,7 @@ public class MasterBoard extends JFrame implements MouseListener,
 
     public void deiconify()
     {
-        setState(JFrame.NORMAL);
+        masterFrame.setState(JFrame.NORMAL);
     }
 
 
@@ -672,7 +673,7 @@ public class MasterBoard extends JFrame implements MouseListener,
                 InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
                 InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
             {
-                new ShowLegion(this, legion, point,
+                new ShowLegion(masterFrame, legion, point,
                     game.getAllVisible() || player == game.getActivePlayer());
                 return;
             }
@@ -770,15 +771,9 @@ public class MasterBoard extends JFrame implements MouseListener,
     }
 
 
-    public void setEraseFlag()
+    public void paintComponent(Graphics g)
     {
-        eraseFlag = true;
-    }
-
-
-    public void update(Graphics g)
-    {
-        Dimension d = getSize();
+        super.paintComponent(g);
 
         Rectangle rectClip = g.getClipBounds();
 
@@ -787,31 +782,14 @@ public class MasterBoard extends JFrame implements MouseListener,
         {
             return;
         }
-
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(d.width, d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-
-        // If the erase flag is set, erase the background.
-        if (eraseFlag)
-        {
-            offGraphics.clearRect(0, 0, d.width, d.height);
-            eraseFlag = false;
-        }
-
+        
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
             MasterHex hex = (MasterHex)it.next();
             if (rectClip.intersects(hex.getBounds()))
             {
-                hex.paint(offGraphics);
+                hex.paint(g);
             }
         }
 
@@ -830,25 +808,16 @@ public class MasterBoard extends JFrame implements MouseListener,
                 Marker marker = legion.getMarker();
                 if (marker != null && rectClip.intersects(marker.getBounds()))
                 {
-                    marker.paint(offGraphics);
+                    marker.paintComponent(g);
                 }
             }
         }
-
-        g.drawImage(offImage, 0, 0, this);
     }
     
     
-    /** Double-buffer everything. */
-    public void paint(Graphics g)
-    {
-        update(g);
-    }
-
-
     public Dimension getMinimumSize()
     {
-        return new Dimension(64 * scale, 58 * scale);
+        return new Dimension(64 * scale, 56 * scale);
     }
 
 

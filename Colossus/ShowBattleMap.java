@@ -49,7 +49,6 @@ public class ShowBattleMap extends JDialog implements WindowListener,
         SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), null, hexes);
 
         setVisible(true);
-        repaint();
     }
 
     

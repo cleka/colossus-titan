@@ -56,8 +56,8 @@ public abstract class Hex
 
     public Point getCenter()
     {
-        return new Point((xVertex[0] + xVertex[3]) / 2,
-            (yVertex[0] + yVertex[3]) / 2);
+        return new Point((xVertex[0] + xVertex[3]) >> 1,
+            (yVertex[0] + yVertex[3]) >> 1);
     }  
 
 

@@ -9,7 +9,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class Chit extends Canvas // XXX JPanel
+public class Chit extends JPanel
 {
     private ImageIcon icon;
     private Rectangle rect;
@@ -105,11 +105,9 @@ public class Chit extends Canvas // XXX JPanel
     }
 
 
-    //public void paintComponent(Graphics g)
-    public void paint(Graphics g)
+    public void paintComponent(Graphics g)
     {
-	//super.paintComponent(g);
-	super.paint(g);
+	super.paintComponent(g);
 
         g.drawImage(icon.getImage(), rect.x, rect.y, rect.width, 
             rect.width, container);

@@ -48,7 +48,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
 
     public Turn(Game game, MasterBoard board)
     {
-        super(board, game.getActivePlayer().getName() + " Turn " +
+        super(board.getFrame(), game.getActivePlayer().getName() + " Turn " +
             game.getTurnNumber());
 
         this.game = game;

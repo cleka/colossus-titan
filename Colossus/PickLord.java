@@ -37,6 +37,8 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
 
         setBackground(Color.lightGray);
 
+        // Need to use Critters instead of Creatures to display
+        // titan power correctly.
         if (legion.numCreature(Creature.titan) > 0)
         {
             lords.add(legion.getCritter(Creature.titan));
@@ -79,7 +81,7 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
         int i = chits.indexOf(source);
         if (i != -1)
         {
-            legion.revealCreatures((Critter)lords.get(i), 1);
+            legion.setTeleportingLord((Creature)lords.get(i));
             dispose();
             return;
         }

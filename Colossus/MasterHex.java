@@ -12,6 +12,8 @@ public class MasterHex extends Hex
     private boolean inverted;
     private ArrayList legions = new ArrayList(3);
     private MasterBoard board;
+    private static FontMetrics fontMetrics;
+    private static int halfFontHeight;
 
     private MasterHex [] neighbors = new MasterHex[6];
 
@@ -36,7 +38,7 @@ public class MasterHex extends Hex
 
     // hexsides 0 - 5, though only 1, 3, and 5 are actually used.
     // 1 is right, 3 is bottom, 5 is left
-    private boolean[] entrySide = new boolean[6];
+    private TreeSet entrySides = new TreeSet();
 
     private boolean teleported;
 
@@ -109,61 +111,68 @@ public class MasterHex extends Hex
         g.drawPolygon(hexagon);
 
         // Draw label and terrain name
-        FontMetrics fontMetrics = g.getFontMetrics();
+        if (fontMetrics == null)
+        {
+            fontMetrics = g.getFontMetrics();
+            halfFontHeight = (fontMetrics.getMaxAscent() + 
+                fontMetrics.getLeading()) >> 1;
+        }
         String name = getTerrainName().toUpperCase();
-        int fontHeight = fontMetrics.getMaxAscent() + fontMetrics.getLeading();
 
         switch (getLabelSide())
         {
             case 0:
                 g.drawString(label, rectBound.x +
-                    (rectBound.width - fontMetrics.stringWidth(label)) / 2,
-                    rectBound.y + fontHeight / 2 + rectBound.height / 10);
+                    ((rectBound.width - fontMetrics.stringWidth(label)) >> 1),
+                    rectBound.y + halfFontHeight + rectBound.height / 10);
                 break;
 
             case 1:
                 g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) * 4 / 5,
-                    rectBound.y + fontHeight / 2 + rectBound.height / 5);
+                    rectBound.y + halfFontHeight + rectBound.height / 5);
                 break;
 
             case 2:
                 g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) * 4 / 5,
-                    rectBound.y + fontHeight / 2 + rectBound.height * 4 / 5);
+                    rectBound.y + halfFontHeight + 
+                    rectBound.height * 4 / 5);
                 break;
 
             case 3:
-                g.drawString(label, rectBound.x + (rectBound.width -
-                    fontMetrics.stringWidth(label)) / 2,
-                    rectBound.y + fontHeight / 2 + rectBound.height * 9 / 10);
+                g.drawString(label, rectBound.x + ((rectBound.width -
+                    fontMetrics.stringWidth(label)) >> 1),
+                    rectBound.y + halfFontHeight + 
+                    rectBound.height * 9 / 10);
                 break;
 
             case 4:
                 g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) / 5,
-                    rectBound.y + fontHeight / 2 + rectBound.height * 4 / 5);
+                    rectBound.y + halfFontHeight + 
+                    rectBound.height * 4 / 5);
                 break;
 
             case 5:
                 g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) / 5,
-                    rectBound.y + fontHeight / 2 + rectBound.height / 5);
+                    rectBound.y + halfFontHeight + rectBound.height / 5);
                 break;
         }
 
         // The word "MOUNTAINS" needs to be printed in the wide part of the hex.
         if (name.equals("MOUNTAINS"))
         {
-            g.drawString(name, rectBound.x + (rectBound.width -
-                fontMetrics.stringWidth(name)) / 2,
-                rectBound.y + fontHeight / 2 + rectBound.height * 2 / 3);
+            g.drawString(name, rectBound.x + ((rectBound.width -
+                fontMetrics.stringWidth(name)) >> 1),
+                rectBound.y + halfFontHeight + rectBound.height * 2 / 3);
         }
         else
         {
-            g.drawString(name, rectBound.x + (rectBound.width -
-                fontMetrics.stringWidth(name)) / 2,
-                rectBound.y + fontHeight / 2 + rectBound.height / 2);
+            g.drawString(name, rectBound.x + ((rectBound.width -
+                fontMetrics.stringWidth(name)) >> 1),
+                rectBound.y + halfFontHeight + (rectBound.height >> 1));
         }
 
 
@@ -263,8 +272,8 @@ public class MasterHex extends Hex
                 x[3] = (int) Math.round(x1 - len * Math.sin(theta));
                 y[3] = (int) Math.round(y1 + len * Math.cos(theta));
 
-                x2 = (int) Math.round((x0 + x1) / 2);
-                y2 = (int) Math.round((y0 + y1) / 2);
+                x2 = (int) Math.round((x0 + x1) >> 1);
+                y2 = (int) Math.round((y0 + y1) >> 1);
                 Rectangle rect = new Rectangle();
                 rect.x = x2 - (int) Math.round(len);
                 rect.y = y2 - (int) Math.round(len);
@@ -299,9 +308,9 @@ public class MasterHex extends Hex
             case ARROW:
                 x[0] = (int) Math.round(x0 - len * Math.sin(theta));
                 y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                x[1] = (int) Math.round((x0 + x1) / 2 + len *
+                x[1] = (int) Math.round(((x0 + x1) >> 1) + len *
                     Math.sin(theta));
-                y[1] = (int) Math.round((y0 + y1) / 2 - len *
+                y[1] = (int) Math.round(((y0 + y1) >> 1) - len *
                     Math.cos(theta));
                 x[2] = (int) Math.round(x1 - len * Math.sin(theta));
                 y[2] = (int) Math.round(y1 + len * Math.cos(theta));
@@ -323,9 +332,9 @@ public class MasterHex extends Hex
 
                     x[0] = (int) Math.round(x0 - len * Math.sin(theta));
                     y[0] = (int) Math.round(y0 + len * Math.cos(theta));
-                    x[1] = (int) Math.round((x0 + x1) / 2 + len *
+                    x[1] = (int) Math.round(((x0 + x1) >> 1) + len *
                            Math.sin(theta));
-                    y[1] = (int) Math.round((y0 + y1) / 2 - len *
+                    y[1] = (int) Math.round(((y0 + y1) >> 1) - len *
                            Math.cos(theta));
                     x[2] = (int) Math.round(x1 - len * Math.sin(theta));
                     y[2] = (int) Math.round(y1 + len * Math.cos(theta));
@@ -408,8 +417,8 @@ public class MasterHex extends Hex
     // a bit toward the fat side.
     private Point getOffCenter()
     {
-        return new Point((xVertex[0] + xVertex[1]) / 2, (yVertex[0] +
-            yVertex[3]) / 2 + (inverted ? -(scale / 6) : (scale / 6)));
+        return new Point((xVertex[0] + xVertex[1]) >> 1, ((yVertex[0] +
+            yVertex[3]) >> 1) + (inverted ? -(scale / 6) : (scale / 6)));
     }
 
 
@@ -527,20 +536,20 @@ public class MasterHex extends Hex
         if (numLegions == 1)
         {
             // Place legion in the center of the hex.
-            point.x -= chitScale / 2;
-            point.y -= chitScale / 2;
+            point.x -= chitScale >> 1;
+            point.y -= chitScale >> 1;
             marker.setLocation(point);
         }
         else if (numLegions == 2)
         {
             // Place legions in NW and SE corners.
-            point.x -= 3 * chitScale / 4;
-            point.y -= 3 * chitScale / 4;
+            point.x -= 3 * chitScale >> 2;
+            point.y -= 3 * chitScale >> 2;
             marker.setLocation(point);
 
             point = new Point(startingPoint);
-            point.x -= chitScale / 4;
-            point.y -= chitScale / 4;
+            point.x -= chitScale >> 2;
+            point.y -= chitScale >> 2;
             Legion legion1 = (Legion)legions.get(1);
             marker = legion1.getMarker(); 
             marker.setLocation(point);
@@ -548,19 +557,19 @@ public class MasterHex extends Hex
         else if (numLegions == 3)
         {
             // Place legions in NW, SE, NE corners.
-            point.x -= 3 * chitScale / 4;
-            point.y -= 3 * chitScale / 4;
+            point.x -= 3 * chitScale >> 2;
+            point.y -= 3 * chitScale >> 2;
             marker.setLocation(point);
 
             point = new Point(startingPoint);
-            point.x -= chitScale / 4;
-            point.y -= chitScale / 4;
+            point.x -= chitScale >> 2;
+            point.y -= chitScale >> 2;
             Legion legion1 = (Legion)legions.get(1);
             marker = legion1.getMarker(); 
             marker.setLocation(point);
 
             point = new Point(startingPoint);
-            point.x -= chitScale / 4;
+            point.x -= chitScale >> 2;
             point.y -= chitScale;
             Legion legion2 = (Legion)legions.get(2);
             marker = legion2.getMarker(); 
@@ -589,8 +598,6 @@ public class MasterHex extends Hex
         // the hex boundary.
         if (getNumLegions() >= 1)
         {
-            board.setEraseFlag();
-
             // Reposition all legions within the hex.
             alignLegions();
         }
@@ -682,50 +689,26 @@ public class MasterHex extends Hex
 
     public void setEntrySide(int side)
     {
-        entrySide[side] = true;
+        entrySides.add(new Integer(side));
     }
 
 
     // Return the number of possible entry sides.
     public int getNumEntrySides()
     {
-        int count = 0;
-        for (int i = 0; i < 6; i++)
-        {
-            if (entrySide[i])
-            {
-                count++;
-            }
-        }
-
-        return count;
+        return entrySides.size();
     }
 
 
     public boolean canEnterViaSide(int side)
     {
-        if (0 <= side && side < 6)
-        {
-            return entrySide[side];
-        }
-        else
-        {
-            return false;
-        }
+        return entrySides.contains(new Integer(side));
     }
 
 
     public boolean canEnterViaLand()
     {
-        for (int i = 0; i < 6; i++)
-        {
-            if (entrySide[i])
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return !entrySides.isEmpty();
     }
 
 
@@ -733,15 +716,14 @@ public class MasterHex extends Hex
      *  will be returned.  If there is none, -1 will be returned. */
     public int getEntrySide()
     {
-        for (int i = 0; i < 6; i++)
+        if (entrySides.isEmpty())
         {
-            if (entrySide[i])
-            {
-                return i;
-            }
+            return -1;
         }
-
-        return -1;
+        else
+        {
+            return ((Integer)entrySides.first()).intValue();
+        }
     }
 
 
@@ -759,9 +741,6 @@ public class MasterHex extends Hex
 
     public void clearAllEntrySides()
     {
-        for (int i = 0; i < 6; i++)
-        {
-            entrySide[i] = false;
-        }
+        entrySides.clear();
     }
 }

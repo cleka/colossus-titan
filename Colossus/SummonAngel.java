@@ -27,7 +27,7 @@ public class SummonAngel extends JDialog implements MouseListener,
 
     public SummonAngel(MasterBoard board, Legion legion)
     {
-        super(board, legion.getPlayer().getName() +
+        super(board.getFrame(), legion.getPlayer().getName() +
             ": Summon Angel into Legion " + legion.getMarkerId(), false);
 
         this.legion = legion;

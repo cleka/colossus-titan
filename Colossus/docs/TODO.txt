@@ -1,3 +1,9 @@
+Copy entrySide and teleported from MasterHex to Legion.
+
+Should be able to undo moves until an engagement is resolved.
+   If no engagements, should be able to undo recruits, then
+   undo moves.
+
 Have BattleMap, PickEntrySide, ShowBattleMap extend JPanel
    instead of JFrame.  Separate the map out into a HexMap class
    that can be used in all three.
@@ -32,7 +38,7 @@ Add server menu for save game, load game, new game, autosave, visible
    PickRecruits vs.  always reveal the biggest/smallest possible 
    recruiter.  Read option defaults from a config file.
 
-Improve savegame file.  XML?  Need the ability to save at any time
+Improve savegame file.  XML?  Need the ability to save/load at any time
    during a turn, not just at the end. 
 
 Fix concession timing.

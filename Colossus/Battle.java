@@ -64,7 +64,7 @@ public class Battle
         turn = new BattleTurn(map, this);
         turn.setupMoveDialog();
 
-        showDice = new ShowDice(map);
+        showDice = new ShowDice(map.getFrame());
     }
 
 
@@ -231,7 +231,7 @@ public class Battle
 
                 // Make sure the MasterBoard is visible.
                 board.deiconify();
-                board.show();
+                board.getFrame().show();
 
                 summonAngel = new SummonAngel(board, attacker);
                 board.getGame().setSummonAngel(summonAngel);
@@ -269,7 +269,7 @@ public class Battle
         }
 
         // Bring the BattleMap back to the front.
-        map.show();
+        map.getFrame().show();
     }
 
 
@@ -278,7 +278,7 @@ public class Battle
         if (turnNumber == 4 && defender.canRecruit())
         {
             // Allow recruiting a reinforcement.
-            new PickRecruit(map, defender);
+            new PickRecruit(map.getFrame(), defender);
 
             if (defender.hasRecruited())
             {
@@ -1693,7 +1693,7 @@ public class Battle
                         // Make sure the MasterBoard is visible.
                         board.deiconify();
                         // And bring it to the front.
-                        board.show();
+                        board.getFrame().show();
     
                         SummonAngel summonAngel = new SummonAngel(board,
                             getAttacker());
@@ -1706,7 +1706,7 @@ public class Battle
                 // Recruit reinforcement
                 if (legion.canRecruit())
                 {
-                    new PickRecruit(map, legion);
+                    new PickRecruit(map.getFrame(), legion);
                 }
             }
 

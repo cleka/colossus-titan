@@ -9,7 +9,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class BattleMap extends JFrame implements MouseListener,
+public class BattleMap extends JPanel implements MouseListener,
     WindowListener
 {
     private static BattleHex[][] h = new BattleHex[6][6];
@@ -17,12 +17,6 @@ public class BattleMap extends JFrame implements MouseListener,
 
     // ne, e, se, sw, w, nw
     private BattleHex [] entrances = new BattleHex[6];
-
-    private Image offImage;
-    private Graphics offGraphics;
-    private Dimension offDimension;
-
-    private boolean eraseFlag;
 
     private int scale;
     private int chitScale;
@@ -33,11 +27,13 @@ public class BattleMap extends JFrame implements MouseListener,
 
     private static Point location;
 
+    private JFrame battleFrame;
+
 
     public BattleMap(MasterBoard board, MasterHex masterHex, Battle battle)
     {
-        super(battle.getAttacker().getMarkerId() + " (" +
-            battle.getAttacker().getPlayer().getName() +
+        battleFrame = new JFrame(battle.getAttacker().getMarkerId() + 
+            " (" + battle.getAttacker().getPlayer().getName() +
             ") attacks " + battle.getDefender().getMarkerId() + " (" +
             battle.getDefender().getPlayer().getName() + ")" + " in " +
             masterHex.getDescription());
@@ -54,21 +50,20 @@ public class BattleMap extends JFrame implements MouseListener,
         this.board = board;
         this.battle = battle;
 
-        getContentPane().setLayout(null);
+        Container contentPane = battleFrame.getContentPane();
+        contentPane.setLayout(new BorderLayout());
 
         scale = getScale();
         chitScale = 2 * scale;
 
-        pack();
-        setSize(getPreferredSize());
+        battleFrame.setSize(getPreferredSize());
 
         setupIcon();
 
         setBackground(Color.white);
-        addWindowListener(this);
-        addMouseListener(this);
 
-        validate();
+        battleFrame.addWindowListener(this);
+        addMouseListener(this);
 
         // Initialize the hexmap.
         SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), this, hexes);
@@ -77,17 +72,25 @@ public class BattleMap extends JFrame implements MouseListener,
 
         placeLegion(attacker, false);
         placeLegion(defender, true);
-
-        pack();
-
+        
         if (location == null)
         {
             location = new Point(0, 2 * scale);
         }
-        setLocation(location);
+        battleFrame.setLocation(location);
 
-        setVisible(true);
-        repaint();
+        contentPane.add(this, BorderLayout.CENTER);
+
+        battleFrame.pack();
+
+        battleFrame.setVisible(true);
+        battleFrame.repaint();
+    }
+
+
+    public JFrame getFrame()
+    {
+        return battleFrame;
     }
 
 
@@ -97,7 +100,8 @@ public class BattleMap extends JFrame implements MouseListener,
         {
             try
             {
-                setIconImage(Toolkit.getDefaultToolkit().getImage(
+                battleFrame.setIconImage(
+                    Toolkit.getDefaultToolkit().getImage(
                     getClass().getResource(Chit.getImagePath(
                     Creature.colossus.getImageName()))));
             }
@@ -306,8 +310,8 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    // Do a brute-force search through the hex array, looking for
-    //    a match.  Return the hex, or null.
+    /** Do a brute-force search through the hex array, looking for
+     *  a match.  Return the hex, or null. */
     public BattleHex getHexFromLabel(String label)
     {
         Iterator it = hexes.iterator();
@@ -325,8 +329,8 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    // Return the BattleHex that contains the given point, or
-    //    null if none does.
+    /** Return the BattleHex that contains the given point, or
+     *    null if none does. */
     private BattleHex getHexContainingPoint(Point point)
     {
         Iterator it = hexes.iterator();
@@ -343,8 +347,8 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    // Return the Critter whose chit contains the given point,
-    //   or null if none does.
+    /** Return the Critter whose chit contains the given point,
+     *  or null if none does. */
     private Critter getCritterWithChitContainingPoint(Point point)
     {
         Collection critters = battle.getCritters();
@@ -455,15 +459,9 @@ public class BattleMap extends JFrame implements MouseListener,
     }
 
 
-    // This is used to fix artifacts from chits outside visible hexes.
-    public void setEraseFlag()
+    public void paintComponent(Graphics g)
     {
-        eraseFlag = true;
-    }
-
-
-    public void update(Graphics g)
-    {
+        super.paintComponent(g);
         Rectangle rectClip = g.getClipBounds();
 
         // Abort if called too early.
@@ -474,29 +472,13 @@ public class BattleMap extends JFrame implements MouseListener,
 
         Dimension d = getSize();
 
-        // Create the back buffer only if we don't have a good one.
-        if (offGraphics == null || d.width != offDimension.width ||
-            d.height != offDimension.height)
-        {
-            offDimension = d;
-            offImage = createImage(d.width, d.height);
-            offGraphics = offImage.getGraphics();
-        }
-
-        // If the erase flag is set, erase the background.
-        if (eraseFlag)
-        {
-            offGraphics.clearRect(0, 0, d.width, d.height);
-            eraseFlag = false;
-        }
-
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
             BattleHex hex = (BattleHex)it.next();
             if (rectClip.intersects(hex.getBounds()))
             {
-                hex.paint(offGraphics);
+                hex.paint(g);
             }
         }
 
@@ -509,17 +491,9 @@ public class BattleMap extends JFrame implements MouseListener,
             Chit chit = critter.getChit();
             if (rectClip.intersects(chit.getBounds()))
             {
-                chit.paint(offGraphics);
+                chit.paintComponent(g);
             }
         }
-
-        g.drawImage(offImage, 0, 0, this);
-    }
-
-    /** Double-buffer everything. */
-    public void paint(Graphics g)
-    {
-        update(g);
     }
 
 
@@ -528,7 +502,7 @@ public class BattleMap extends JFrame implements MouseListener,
         // Save location for next object.
         location = getLocation();
 
-        super.dispose();
+        battleFrame.dispose();
     }
 
 

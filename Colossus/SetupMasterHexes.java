@@ -43,7 +43,7 @@ public class SetupMasterHexes
     {
         int scale = MasterBoard.getScale();
         int cx = 3 * scale;
-        int cy = 2 * scale;
+        int cy = 0 * scale;
 
         // Initialize hexes.
         for (int i = 0; i < h.length; i++)
@@ -54,8 +54,8 @@ public class SetupMasterHexes
                 {
                     MasterHex hex = new MasterHex(cx + 4 * i * scale,
                         (int) Math.round(cy + (3 * j + (i & 1) *
-                        (1 + 2 * (j / 2)) + ((i + 1) & 1) * 2 * 
-                        ((j + 1) / 2)) * Hex.SQRT3 * scale), scale, 
+                        (1 + 2 * (j >> 1)) + ((i + 1) & 1) * 2 * 
+                        ((j + 1) >> 1)) * Hex.SQRT3 * scale), scale, 
                         ((i + j) & 1) == 0, board);
 
                     hex.setXCoord(i);

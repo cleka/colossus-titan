@@ -39,6 +39,7 @@ public class Game
 
     private boolean isApplet;
     private boolean disposed;
+    private JFrame masterFrame;
 
     // For debugging, or if the game crashes after movement
     // has been rolled, we can force the next movement roll
@@ -48,6 +49,7 @@ public class Game
     // Constants for savegames
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
+    public static final String xmlSaveExtension = ".xml";
 
     // Per-player client options
     private static boolean autoPickRecruiter;
@@ -91,6 +93,7 @@ public class Game
         {
             statusScreen = new StatusScreen(this);
             board = new MasterBoard(this);
+            masterFrame = board.getFrame();
             Iterator it = players.iterator();
             while (it.hasNext())
             {
@@ -119,6 +122,7 @@ public class Game
         }
 
         board = new MasterBoard(this);
+        masterFrame = board.getFrame();
         loadGame(filename);
         board.loadInitialMarkerImages();
         statusScreen = new StatusScreen(this);
@@ -392,31 +396,36 @@ public class Game
     }
 
 
-    // Create a text file describing this game's state.
-    // Format:
-    //     Number of players
-    //     Turn number
-    //     Whose turn
-    //     Current phase
-    //     Creature counts
-    //     Player 1:
-    //         Name
-    //         Color
-    //         Starting tower
-    //         Score
-    //         Alive?
-    //         Mulligans left
-    //         Players eliminated
-    //         Number of markers left
-    //         Remaining marker ids
-    //         Number of Legions
-    //         Legion 1:
-    //             Marker id
-    //             Height
-    //             Creature 1
-    //             Creature 1 visible?
-    //             ...
-    //     ...
+    /** Create a text file describing this game's state, in
+     *  file saves/<time>.sav
+     *  Format:
+     *     Number of players
+     *     Turn number
+     *     Whose turn
+     *     Current phase
+     *     Creature counts
+     *     Player 1:
+     *         Name
+     *         Color
+     *         Starting tower
+     *         Score
+     *         Alive?
+     *         Mulligans left
+     *         Players eliminated
+     *         Number of markers left
+     *         Remaining marker ids
+     *         Number of Legions
+     *         Legion 1:
+     *             Marker id
+     *             Hex label
+     *             Height
+     *             Creature 1:
+     *                 Creature type
+     *                 Visible?
+     *             ...
+     *         ...
+     *     ...
+     */
     private void saveGame()
     {
         // XXX Need dialog to pick filename.
@@ -433,6 +442,211 @@ public class Game
 
         String filename = saveDirname + File.separator +
             date.getTime() + saveExtension;
+        FileWriter fileWriter;
+        try
+        {
+            fileWriter = new FileWriter(filename);
+        }
+        catch (IOException e)
+        {
+            System.out.println(e.toString());
+            System.out.println("Couldn't open " + filename);
+            return;
+        }
+        PrintWriter out = new PrintWriter(fileWriter);
+
+        out.println(getNumPlayers());
+        out.println(getTurnNumber());
+        out.println(getActivePlayerNum());
+        out.println(getPhase());
+
+        java.util.List creatures = Creature.getCreatures();
+        Iterator it = creatures.iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            out.println(creature.getCount());
+        }
+
+        it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            out.println(player.getName());
+            out.println(player.getColor());
+            out.println(player.getTower());
+            out.println(player.getScore());
+            // Check if the player is alive.
+            out.println(!player.isDead());
+            out.println(player.getMulligansLeft());
+            out.println(player.getPlayersElim());
+            out.println(player.getNumMarkersAvailable());
+
+            Collection markerIds = player.getMarkersAvailable();
+            Iterator it2 = markerIds.iterator();
+            while (it2.hasNext())
+            {
+                String markerId = (String)it2.next();
+                out.println(markerId);
+            }
+
+            out.println(player.getNumLegions());
+
+            Collection legions = player.getLegions();
+            it2 = legions.iterator();
+            while (it2.hasNext())
+            {
+                Legion legion = (Legion)it2.next();
+                out.println(legion.getMarkerId());
+                out.println(legion.getCurrentHex().getLabel());
+
+                out.println(legion.getHeight());
+
+                Collection critters = legion.getCritters();
+                Iterator it3 = critters.iterator();
+                while (it3.hasNext())
+                {
+                    Critter critter = (Critter)it3.next();
+                    out.println(critter.getName());
+                    out.println(critter.isVisible());
+                }
+            }
+        }
+
+        if (out.checkError())
+        {
+            System.out.println("Write error " + filename);
+            // XXX Delete the partial file?
+            return;
+        }
+    }
+
+    /*
+     *     Game name
+     *     Moderator name
+     *     Date/time started
+     *     Date/time of last move
+     *
+     *
+     *     Number of players
+     *     Turn number
+     *     Whose turn
+     *     Current phase
+     *     Creature counts
+     *     Player 1:
+     *         Name
+     *         Color
+     *         Starting tower
+     *         Score
+     *         Alive?
+     *         Mulligans left
+     *         Players eliminated
+     *         Number of markers left
+     *         Remaining marker ids
+     *         Number of Legions
+     *         Legion 1:
+     *             Marker id
+     *             Hex label
+     *             Height
+     *             Creature 1:
+     *                 Creature type
+     *                 Visible?
+     *             ...
+     *         ...
+     *     ...
+     *
+     *     Battle
+               Attacker
+               Defender
+
+     */
+
+    /** Save the game to an xml file, saves/<time>.xml
+     *  This is meant to convey a current game state completely.
+     *  It might also be nice to show recent history.  (Full game
+     *  history would go in a bigger file.)
+     *  Format: (work in progress)
+
+        <?xml version="1.0" standalone="yes"?>
+        <titan_game_state>
+            <gamename>string</gamename>
+            <moderator>string</moderator>
+            <started>datetime</started>
+            <last>datetime</last>
+
+            <turn>number</turn>
+            <active>player</active>
+            <phase>phase</phase>
+
+            <lastevent>string</lastevent>
+
+            <player>
+                <playername>string</playername>
+                <color>color</color>
+                <tower>number</tower>
+                <score>number</score>
+                <mulligans>number</mulligans>
+                <eliminated>player</eliminated>
+                <movementroll>number</movementroll>
+
+                <legion>
+                    <marker>marker id</marker>
+                    <hex>hex id</hex>
+                    <split>boolean</split>
+                    <parent>legion</parent>
+                    <moved>boolean</moved>
+                    <entryside>hexside</entryside>
+                    <teleported>boolean</teleported>
+                    <oldhex>hex id</old hex>
+                    <fought>boolean</fought>
+                    <summoned>boolean</summoned>
+                    <opponent>legion</opponent>
+                    <mustered>boolean</mustered>
+                    <recruit>creature</recruit>
+                    <recruiter>creature</recruiter>
+                    ...
+                    <creature>creature</creature>
+                        <type>creature type</type>
+                        <battlehex>battle hex id</battlehex>
+                        <hits>number</hits>
+                        <battlemoved>boolean</battlemoved>
+                        <struck>boolean</struck>
+                        <strikerolls>numbers</strikerolls>
+                        <targethex>battle hex id</targethex>
+                        <targetnum>number</targetnum>
+                        <carries>number</carries>
+                        <carrytarget>battle hex id</carrytarget>
+                        ...
+                    ...
+                </legion>
+            <player>
+
+            <titan_battle_state>
+                <battleturn>number</battleturn>
+                <battleactive>player</battleactive>
+                <battlephase>phase</battlephase>
+                <attacker>legion</attacker>
+                <defender>legion</defender>
+                <summonstate>angel summoning state</summonstate>
+            </titan_battle_state>
+        </titan_game_state>
+     */
+    private void saveGameXML()
+    {
+        // XXX Need dialog to pick filename.
+        Date date = new Date();
+        File savesDir = new File(saveDirname);
+        if (!savesDir.exists() || !savesDir.isDirectory())
+        {
+             if (!savesDir.mkdir())
+             {
+                 System.out.println("Could not create saves directory");
+                 return;
+             }
+        }
+
+        String filename = saveDirname + File.separator +
+            date.getTime() + xmlSaveExtension;
         FileWriter fileWriter;
         try
         {
@@ -731,12 +945,12 @@ public class Game
                     throw new ClassCastException();
                 }
 
-                return (int)(numberValue((String)o1) - 
+                return (int)(numberValue((String)o1) -
                     numberValue((String)o2));
             }
         }
 
-        return (String)Collections.max(Arrays.asList(filenames), new 
+        return (String)Collections.max(Arrays.asList(filenames), new
             StringNumComparator());
     }
 
@@ -1280,7 +1494,7 @@ public class Game
     /** Return a list of eligible recruits, as Creatures. */
     public static ArrayList findEligibleRecruits(Legion legion)
     {
-        ArrayList recruits; 
+        ArrayList recruits;
 
         MasterHex hex = legion.getCurrentHex();
         char terrain = hex.getTerrain();
@@ -1333,7 +1547,7 @@ public class Game
                 int numCreature = legion.numCreature(creature);
                 if (numCreature >= 1)
                 {
-                    // We already have one of this creature, so we 
+                    // We already have one of this creature, so we
                     // can recruit it and all lesser creatures in
                     // this hex.
                     break;
@@ -1396,9 +1610,9 @@ public class Game
     }
 
 
-    /** Return a list of eligible recruiters. Use Critters instead 
+    /** Return a list of eligible recruiters. Use Critters instead
      *  of Creatures so that Titan power is shown properly. */
-    public static ArrayList findEligibleRecruiters(Legion legion, 
+    public static ArrayList findEligibleRecruiters(Legion legion,
         Creature recruit)
     {
         ArrayList recruiters = new ArrayList();
@@ -1448,7 +1662,7 @@ public class Game
             while (it.hasNext())
             {
                 Creature possibleRecruiter = (Creature)it.next();
-                int needed = numberOfRecruiterNeeded(possibleRecruiter, 
+                int needed = numberOfRecruiterNeeded(possibleRecruiter,
                     recruit, terrain);
                 if (needed < 1 || needed > legion.numCreature(
                     possibleRecruiter))
@@ -1507,9 +1721,9 @@ public class Game
         else if (autoPickRecruiter || numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
-            // If there's only one possible recruiter, or if all 
+            // If there's only one possible recruiter, or if all
             // possible recruiters are already visible, or if
-            // the user has chosen the autoPickRecruiter option, 
+            // the user has chosen the autoPickRecruiter option,
             // then just reveal the first possible recruiter.
             recruiter = (Creature)recruiters.get(0);
         }
@@ -1519,35 +1733,31 @@ public class Game
             recruiter = (Creature)recruiters.get(0);
         }
 
-// XXX Needed?
-//        if (recruiter != null || numEligibleRecruiters == 0)
-//        {
-            legion.addCreature(recruit, true);
+        legion.addCreature(recruit, true);
 
-            int numRecruiters = 0;
-            if (recruiter != null)
+        int numRecruiters = 0;
+        if (recruiter != null)
+        {
+            // Mark the recruiter(s) as visible.
+            numRecruiters = numberOfRecruiterNeeded(recruiter,
+                recruit, legion.getCurrentHex().getTerrain());
+            if (numRecruiters >= 1 && numRecruiters <= 3)
             {
-                // Mark the recruiter(s) as visible.
-                numRecruiters = numberOfRecruiterNeeded(recruiter,
-                    recruit, legion.getCurrentHex().getTerrain());
-                if (numRecruiters >= 1 && numRecruiters <= 3)
-                {
-                    legion.revealCreatures(recruiter, numRecruiters);
-                }
+                legion.revealCreatures(recruiter, numRecruiters);
             }
+        }
 
-            logEvent("Legion " + legion.getMarkerId() + " in " +
-                legion.getCurrentHex().getDescription() +
-                " recruits " + recruit.getName() + " with " +
-                (numRecruiters == 0 ? "nothing" :
-                numRecruiters + " " + (numRecruiters > 1 ?
-                recruiter.getPluralName() : recruiter.getName())));
+        logEvent("Legion " + legion.getMarkerId() + " in " +
+            legion.getCurrentHex().getDescription() +
+            " recruits " + recruit.getName() + " with " +
+            (numRecruiters == 0 ? "nothing" :
+            numRecruiters + " " + (numRecruiters > 1 ?
+            recruiter.getPluralName() : recruiter.getName())));
 
-            // Recruits are one to a customer.
-            legion.markRecruited();
+        // Recruits are one to a customer.
+        legion.markRecruited();
 
-            legion.getPlayer().markLastLegionRecruited(legion);
-//       }
+        legion.getPlayer().markLastLegionRecruited(legion);
     }
 
 
@@ -1589,7 +1799,7 @@ public class Game
         {
             if (board != null)
             {
-                board.dispose();
+                masterFrame.dispose();
             }
             if (map != null)
             {
@@ -1635,7 +1845,7 @@ public class Game
     {
         do
         {
-            new PickMarker(board, player);
+            new PickMarker(masterFrame, player);
         }
         while (player.getSelectedMarker() == null);
 
@@ -1861,7 +2071,6 @@ public class Game
 
         Player player = legion.getPlayer();
 
-        // XXX entry sides
         board.clearAllNonFriendlyOccupiedEntrySides(player);
 
         MasterHex hex = legion.getCurrentHex();
@@ -1900,7 +2109,6 @@ public class Game
                     {
                         set.add(hex.getLabel());
 
-                        // XXX
                         // Mover can choose side of entry.
                         hex.setTeleported(true);
                     }
@@ -1924,7 +2132,6 @@ public class Game
                             if (!hex.isEngagement())
                             {
                                 set.add(hex.getLabel());
-                                // XXX
                                 // Mover can choose side of entry.
                                 hex.setTeleported(true);
                             }
@@ -1997,7 +2204,7 @@ public class Game
 
     public void finishBattle()
     {
-        board.show();
+        masterFrame.show();
 
         if (summoningAngel && summonAngel != null)
         {
@@ -2134,7 +2341,7 @@ public class Game
                 if (!dialogLock)
                 {
                     dialogLock = true;
-                    new SplitLegion(board, legion, player);
+                    new SplitLegion(masterFrame, legion, player);
                     dialogLock = false;
                 }
 
@@ -2167,7 +2374,7 @@ public class Game
                     if (!dialogLock)
                     {
                         dialogLock = true;
-                        new PickRecruit(board, legion);
+                        new PickRecruit(masterFrame, legion);
                         if (!legion.canRecruit())
                         {
                             board.unselectHexByLabel(
@@ -2227,7 +2434,7 @@ public class Game
                         if (!dialogLock)
                         {
                             dialogLock = true;
-                            new PickEntrySide(board, hex);
+                            new PickEntrySide(masterFrame, hex);
                             dialogLock = false;
                         }
                     }
@@ -2239,7 +2446,6 @@ public class Game
                         // If the legion teleported, reveal a lord.
                         if (hex.getTeleported())
                         {
-
                             // If it was a Titan teleport, that
                             // lord must be the titan.
                             if (hex.isOccupied())
@@ -2248,7 +2454,7 @@ public class Game
                             }
                             else
                             {
-                                legion.revealTeleportingLord(board);
+                                legion.revealTeleportingLord(masterFrame);
                             }
                         }
 
@@ -2304,20 +2510,20 @@ public class Game
             {
                 // Fleeing gives half points and denies the
                 // attacker the chance to summon an angel.
-                new Concede(board, defender, attacker, true);
+                new Concede(masterFrame, defender, attacker, true);
             }
 
             if (hex.isEngagement())
             {
                 // The attacker may concede now without
                 // allowing the defender a reinforcement.
-                new Concede(board, attacker, defender, false);
+                new Concede(masterFrame, attacker, defender, false);
 
                 // The players may agree to a negotiated
                 // settlement.
                 if (hex.isEngagement())
                 {
-                    new Negotiate(board, attacker, defender);
+                    new Negotiate(masterFrame, attacker, defender);
                 }
 
 
@@ -2330,7 +2536,7 @@ public class Game
                         if (!dialogLock2)
                         {
                             dialogLock2 = true;
-                            new PickRecruit(board, defender);
+                            new PickRecruit(masterFrame, defender);
                             dialogLock2 = false;
                         }
                     }

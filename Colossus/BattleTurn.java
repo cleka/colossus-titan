@@ -19,7 +19,7 @@ public class BattleTurn extends JDialog implements ActionListener,
 
     public BattleTurn(BattleMap map, Battle battle)
     {
-        super(map, battle.getActivePlayer().getName() + " Turn " + 
+        super(map.getFrame(), battle.getActivePlayer().getName() + " Turn " +
                 battle.getTurnNumber());
 
         this.map = map;

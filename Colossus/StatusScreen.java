@@ -178,12 +178,13 @@ public class StatusScreen extends JFrame implements WindowListener
     {
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
+            Player player = game.getPlayer(i);
             Color color;
             if (game.getActivePlayerNum() == i)
             {
                 color = Color.yellow;
             }
-            else if (game.getPlayer(i).isDead())
+            else if (player.isDead())
             {
                 color = Color.red;
             }
@@ -193,21 +194,18 @@ public class StatusScreen extends JFrame implements WindowListener
             }
             setPlayerLabelBackground(i, color);
 
-            nameLabel[i].setText(game.getPlayer(i).getName());
+            nameLabel[i].setText(player.getName());
             towerLabel[i].setText(String.valueOf(100 * 
-                game.getPlayer(i).getTower()));
-            colorLabel[i].setText(game.getPlayer(i).getColor());
-            elimLabel[i].setText(game.getPlayer(i).getPlayersElim());
-            legionsLabel[i].setText(String.valueOf(
-                game.getPlayer(i).getNumLegions()));
+                player.getTower()));
+            colorLabel[i].setText(player.getColor());
+            elimLabel[i].setText(player.getPlayersElim());
+            legionsLabel[i].setText(String.valueOf(player.getNumLegions()));
             markersLabel[i].setText(String.valueOf(
-                game.getPlayer(i).getNumMarkersAvailable()));
+                player.getNumMarkersAvailable()));
             creaturesLabel[i].setText(String.valueOf(
-                game.getPlayer(i).getNumCreatures()));
-            titanLabel[i].setText(String.valueOf(
-                game.getPlayer(i).getTitanPower()));
-            scoreLabel[i].setText(String.valueOf(
-                game.getPlayer(i).getScore()));
+                player.getNumCreatures()));
+            titanLabel[i].setText(String.valueOf(player.getTitanPower()));
+            scoreLabel[i].setText(String.valueOf(player.getScore()));
         }
 
         repaint();

@@ -22,6 +22,9 @@ public class Legion
     private boolean summoned;
     private Player player;
     private int battleTally;
+    private int entrySide;
+    private boolean teleported;
+    private Creature teleportingLord;
 
 
     public Legion(String markerId, Legion parent, MasterHex hex, 
@@ -102,7 +105,7 @@ public class Legion
         {
             player.addPoints(points);
 
-            MasterBoard board = player.getGame().getBoard();
+            JFrame masterFrame = player.getGame().getBoard().getFrame();
             int score = player.getScore();
             int tmpScore = score;
             boolean didArchangel = false;
@@ -113,14 +116,14 @@ public class Legion
                     !didArchangel)
                 {
                     // Allow Archangel.
-                    new AcquireAngel(board, this, true);
+                    new AcquireAngel(masterFrame, this, true);
                     tmpScore -= 100;
                     didArchangel = true;
                 }
                 else
                 {
                     // Disallow Archangel.
-                    new AcquireAngel(board, this, false);
+                    new AcquireAngel(masterFrame, this, false);
                     tmpScore -= 100;
                 }
             }
@@ -193,6 +196,18 @@ public class Legion
     {
         this.marker = marker;
         marker.setLegion(this);
+    }
+    
+    
+    public Creature getTeleportingLord()
+    {
+        return teleportingLord; 
+    }
+
+
+    public void setTeleportingLord(Creature creature)
+    {
+        teleportingLord = creature;
     }
 
 
@@ -304,10 +319,15 @@ public class Legion
 
     public void moveToHex(MasterHex hex)
     {
-        boolean teleported = hex.getTeleported();
+        teleported = hex.getTeleported();
+        entrySide = hex.getEntrySide();
+
         Game.logEvent("Legion " + getMarkerId() + " in " +
             currentHex.getDescription() +
-            (teleported ? " teleports " : " moves ") +
+            (teleported ? 
+                (hex.isOccupied() ? " titan teleports " :
+                    " tower teleports (" + teleportingLord + ") " ) 
+                : " moves ") +
             "to " + hex.getDescription());
 
         currentHex.removeLegion(this);
@@ -654,45 +674,37 @@ public class Legion
     }
 
 
-    // Reveal the lord who teleported the legion.  Pick one if necessary.
+    /** Reveal the lord who tower teleported the legion.  Pick one if 
+     *  necessary. */
     public void revealTeleportingLord(JFrame parentFrame)
     {
-        // Count how many types of lords are in the stack.  If only one,
-        // reveal it.
+        teleportingLord = null;
+        TreeSet lords = new TreeSet();
 
-        // "There can be only one."
-        int titans = (numCreature(Creature.titan));
-        int angels = (numCreature(Creature.angel));
-        if (angels > 1)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            angels = 1;
+            Critter critter = (Critter)it.next();
+            if (critter.isLord())
+            {
+                lords.add(critter.getCreature());
+            }
         }
-        int archangels = (numCreature(Creature.archangel));
-        if (archangels > 1)
-        {
-            archangels = 1;
-        }
-
-        int lordTypes = titans + angels + archangels;
+        
+        int lordTypes = lords.size();
 
         if (lordTypes == 1)
         {
-            if (titans == 1)
-            {
-                revealCreatures(Creature.titan, 1);
-            }
-            else if (angels == 1)
-            {
-                revealCreatures(Creature.angel, 1);
-            }
-            else if (archangels == 1)
-            {
-                revealCreatures(Creature.archangel, 1);
-            }
+            teleportingLord = (Creature)lords.first();
         }
         else
         {
             new PickLord(parentFrame, this);
+        }
+
+        if (teleportingLord != null)
+        {
+            revealCreatures(teleportingLord, 1);
         }
     }
 }
