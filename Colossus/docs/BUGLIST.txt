@@ -4,8 +4,7 @@ Linux, Sun 1.2.2/1.3beta/1.3betarefresh, Blackdown 1.2.2RC4:
    ShowDice dialog sometimes moves from upper right corner to upper
    left corner.  ShowLegion dialog sometimes pops up in upper left
    corner instead of over mouse position.  These problems don't happen
-   with ibmjdk118.  Seems to be fixed in Solaris 1.3 final.  Try Linux
-   jdk 1.3 final.
+   with ibmjdk118.  Seems to be fixed in Solaris and Linux 1.3 final.
 
 Win98, jdk1.3: setLocation() to keep ShowLegion, ShowMasterHex
    dialogs from displaying past the bottom or right edge of the
@@ -13,8 +12,9 @@ Win98, jdk1.3: setLocation() to keep ShowLegion, ShowMasterHex
    resolution is changed while the application is running.  Works
    fine on other jdks.
 
-Solaris, jdk1.3: JPopupMenu mnemonics don't work.  They work okay in
-   Win98 jdk1.3.  Linux?
+Solaris, jdk1.3; Linux, Blackdown jdk1.3: JPopupMenu mnemonics don't 
+   work.  They work okay in Win98 jdk1.3.
+
 
 
 Current programming bugs:
@@ -39,13 +39,20 @@ Fixed this, but now we again have the problem where a dead
    defender's next turn happens.  ("Battle phase advances to Move,
    Player's battle turn, number 5")
 
-Solaris, jdk1.3: Square (red, black, or white) in NW corner of board
-   and map.  Partial marker?  Doesn't appear on board when
-   board.loadInitialMarkerImages() isn't called.  Is repainted when
+Solaris, Linux, Win98, jdk1.3: Square (red, black, or white) in NW 
+   corner of board and map.  Partial marker?  Doesn't appear on board 
+   when board.loadInitialMarkerImages() isn't called.  Is repainted when
    board is minimized and restored.  In battle, it sometimes looks
    like the color of the attacker's markers, but is sometimes two-toned,
    and sometimes changes color.
 
 Solaris, jdk1.3; Win98, jdk1.3: BattleMap menu is not immediately active.  
    It takes a few seconds to wake up.
+
+Linux, Solaris, jdk1.3: Dialogs sometimes beep for no good reason.
+   Are modal dialogs moving behind other windows before being destroyed?
+   Added setVisible(false) before dispose() calls, which doesn't seem
+   to help.  SplitLegion and PickRecruit (both called from Game) seem
+   to be the main culprits.  Also AcquireAngel.  Doesn't seem to happen
+   in Windows.
 

@@ -39,6 +39,7 @@ public class AcquireAngel extends JDialog implements MouseListener,
         numEligible = Game.findEligibleAngels(legion, recruits, archangel);
         if (numEligible == 0)
         {
+            setVisible(false);
             dispose();
             return;
         }
@@ -82,6 +83,7 @@ public class AcquireAngel extends JDialog implements MouseListener,
                 " acquired an " + creature.getName());
 
             // Then exit.
+            setVisible(false);
             dispose();
             return;
         }
@@ -120,6 +122,7 @@ public class AcquireAngel extends JDialog implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
+        setVisible(false);
         dispose();
     }
 

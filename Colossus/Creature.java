@@ -285,7 +285,7 @@ public class Creature implements Comparable
 
 
     /** Compare by name.  Inconsistent with equals. */
-    public int compareTo(Object object) throws ClassCastException
+    public int compareTo(Object object)
     {
         if (object instanceof Creature)
         {

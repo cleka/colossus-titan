@@ -651,8 +651,6 @@ public class BattleMap extends JPanel implements MouseListener,
             return;
         }
 
-        Dimension d = getSize();
-
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
@@ -683,6 +681,7 @@ public class BattleMap extends JPanel implements MouseListener,
         // Save location for next object.
         location = getLocation();
 
+        battleFrame.setVisible(false);
         battleFrame.dispose();
     }
 

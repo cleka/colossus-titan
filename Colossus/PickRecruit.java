@@ -13,7 +13,6 @@ import java.util.*;
 public class PickRecruit extends JDialog implements MouseListener,
     WindowListener
 {
-    private int numEligible;
     private ArrayList recruits = new ArrayList();
     private Player player;
     private Legion legion;
@@ -35,6 +34,7 @@ public class PickRecruit extends JDialog implements MouseListener,
 
         if (!legion.canRecruit())
         {
+            setVisible(false);
             dispose();
             return;
         }
@@ -136,6 +136,7 @@ public class PickRecruit extends JDialog implements MouseListener,
                 (Creature)recruits.get(i), legion, parentFrame);
 
             // Then exit.
+            setVisible(false);
             dispose();
             return;
         }
@@ -174,6 +175,7 @@ public class PickRecruit extends JDialog implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
+        setVisible(false);
         dispose();
     }
 

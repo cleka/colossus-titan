@@ -63,7 +63,6 @@ public class GetPlayers extends JDialog implements WindowListener,
     
     private void validateInputs()
     {
-        boolean error = false;
         Set playerNames = new TreeSet();
         int numPlayers = 0;
 
@@ -164,6 +163,7 @@ public class GetPlayers extends JDialog implements WindowListener,
         {
             System.exit(0);
         }
+        setVisible(false);
         super.dispose();
     }
 

@@ -116,6 +116,7 @@ public class PickRecruiter extends JDialog implements MouseListener,
             recruiters.set(0, recruiters.get(i));
 
             // Then exit.
+            setVisible(false);
             dispose();
             return;
         }
@@ -154,6 +155,7 @@ public class PickRecruiter extends JDialog implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
+        setVisible(false);
         dispose();
     }
 

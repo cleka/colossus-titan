@@ -676,7 +676,7 @@ public class MasterBoard extends JPanel implements MouseListener,
         else
         {
             masterFrame.setTitle(player.getName() + " Turn " +
-                game.getTurnNumber() + " : Muster Recruits ");;
+                game.getTurnNumber() + " : Muster Recruits ");
 
             setupMusterMenu();
 
@@ -759,7 +759,7 @@ public class MasterBoard extends JPanel implements MouseListener,
 
     public static int getScale()
     {
-        int scale = 17;
+        int scale = 16;
 
         // Make sure that the board fits on the screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();

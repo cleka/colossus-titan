@@ -141,6 +141,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
     public void cleanup()
     {
         Concede.saveLocation(getLocation());
+        setVisible(false);
         dispose();
     }
 

@@ -18,9 +18,6 @@ public class MasterHex extends Hex
 
     private MasterHex [] neighbors = new MasterHex[6];
 
-    /** Constant for each terrain type */
-    private ArrayList recruits = new ArrayList(5);
-
     // Terrain types are:
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
@@ -162,12 +159,26 @@ public class MasterHex extends Hex
                 break;
         }
 
-        // The word "MOUNTAINS" needs to be printed in the wide part of the hex.
+        // The word "MOUNTAINS" needs to be printed in the wide part of the hex,
+        // with a smaller font.
         if (name.equals("MOUNTAINS"))
         {
+            Font oldFont = g.getFont();
+            String fontName = oldFont.getName();
+            int size = oldFont.getSize();
+            int style = oldFont.getStyle();
+
+            Font font = new Font(fontName, style,  9 * size / 10);
+            g.setFont(font);
+            FontMetrics fontMetrics = g.getFontMetrics();
+            halfFontHeight = (fontMetrics.getMaxAscent() +
+                fontMetrics.getLeading()) >> 1;
+
             g.drawString(name, rectBound.x + ((rectBound.width -
                 fontMetrics.stringWidth(name)) >> 1),
                 rectBound.y + halfFontHeight + rectBound.height * 2 / 3);
+
+            g.setFont(oldFont);
         }
         else
         {

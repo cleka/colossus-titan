@@ -40,7 +40,7 @@ public class PenaltyOption implements Comparable
 
     /** Sort first by ascending dice, then by descending strike number.
         This is inconsistent with equals(). */
-    public int compareTo(Object object) throws ClassCastException
+    public int compareTo(Object object)
     {
         PenaltyOption other;
         if (object instanceof PenaltyOption) 

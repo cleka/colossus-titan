@@ -41,6 +41,7 @@ public class SplitLegion extends JDialog implements MouseListener,
 
         if (player.getSelectedMarker() == null)
         {
+            setVisible(false);
             dispose();
             return;
         }
@@ -60,6 +61,7 @@ public class SplitLegion extends JDialog implements MouseListener,
         // If there were no markers left to pick, exit.
         if (player.getSelectedMarker() == null)
         {
+            setVisible(false);
             dispose();
         }
         else
@@ -139,6 +141,7 @@ public class SplitLegion extends JDialog implements MouseListener,
     private void cancel()
     {
         newLegion.recombine(oldLegion, true);
+        setVisible(false);
         dispose();
     }
 
@@ -148,7 +151,7 @@ public class SplitLegion extends JDialog implements MouseListener,
     private void moveCreatureToOtherLegion(Legion fromLegion, Legion toLegion,
         ArrayList fromChits, ArrayList toChits, int oldPosition, int gridy)
     {
-        Creature creature = (Creature)fromLegion.removeCreature(oldPosition,
+        Creature creature = fromLegion.removeCreature(oldPosition,
             false, false);
         toLegion.addCreature(creature, false);
 
@@ -180,7 +183,6 @@ public class SplitLegion extends JDialog implements MouseListener,
         int i = oldChits.indexOf(source);
         if (i != -1)
         {
-            Chit chit = (Chit)source;
             moveCreatureToOtherLegion(oldLegion, newLegion, oldChits, 
                 newChits, i, 1);
             return;
@@ -188,7 +190,6 @@ public class SplitLegion extends JDialog implements MouseListener,
         i = newChits.indexOf(source);
         if (i != -1)
         {
-            Chit chit = (Chit)source;
             moveCreatureToOtherLegion(newLegion, oldLegion, newChits, 
                 oldChits, i, 0);
             return;
@@ -306,6 +307,7 @@ public class SplitLegion extends JDialog implements MouseListener,
             }
 
             // Exit.
+            setVisible(false);
             dispose();
 
             Game.logEvent(newLegion.getHeight() + 

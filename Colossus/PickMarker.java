@@ -28,6 +28,7 @@ public class PickMarker extends JDialog implements MouseListener, WindowListener
         if (player.getNumMarkersAvailable() == 0)
         {
             JOptionPane.showMessageDialog(parentFrame, "No markers available");
+            setVisible(false);
             dispose();
         }
         else
@@ -73,6 +74,7 @@ public class PickMarker extends JDialog implements MouseListener, WindowListener
         if (player.getNumMarkersAvailable() == 0)
         {
             player.clearSelectedMarker();
+            setVisible(false);
             dispose();
             return;
         }
@@ -88,6 +90,7 @@ public class PickMarker extends JDialog implements MouseListener, WindowListener
                 player.selectMarker(marker.getId());
 
                 // Then exit.
+                setVisible(false);
                 dispose();
                 return;
             }
@@ -128,6 +131,7 @@ public class PickMarker extends JDialog implements MouseListener, WindowListener
     public void windowClosing(WindowEvent e)
     {
         player.clearSelectedMarker();
+        setVisible(false);
         dispose();
         return;
     }

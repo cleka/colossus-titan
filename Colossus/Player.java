@@ -127,7 +127,7 @@ public class Player implements Comparable
 
     /** Players are sorted in order of decreasing starting tower. 
         This is inconsistent with equals(). */
-    public int compareTo(Object object) throws ClassCastException
+    public int compareTo(Object object)
     {
         if (object instanceof Player) 
         {
@@ -599,7 +599,7 @@ public class Player implements Comparable
 
     public Collection getMarkersAvailable()
     {
-        return (Collection)markersAvailable;
+        return markersAvailable;
     }
 
 

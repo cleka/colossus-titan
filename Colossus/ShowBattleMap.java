@@ -87,6 +87,7 @@ public class ShowBattleMap extends JPanel implements WindowListener,
 
     public void mouseClicked(MouseEvent e)
     {
+        dialog.setVisible(false);
         dialog.dispose();
     }
 
@@ -103,12 +104,14 @@ public class ShowBattleMap extends JPanel implements WindowListener,
 
     public void mousePressed(MouseEvent e)
     {
+        dialog.setVisible(false);
         dialog.dispose();
     }
 
 
     public void mouseReleased(MouseEvent e)
     {
+        dialog.setVisible(false);
         dialog.dispose();
     }
 
@@ -130,6 +133,7 @@ public class ShowBattleMap extends JPanel implements WindowListener,
 
     public void windowClosing(WindowEvent e)
     {
+        dialog.setVisible(false);
         dialog.dispose();
     }
 

@@ -1,5 +1,4 @@
 import java.io.*;
-import javax.swing.*;
 
 /**
  * Class SaveGameFilter implements a FilenameFilter for savegames.

@@ -51,10 +51,9 @@ Running the game requires the following:
 
    Solaris Sparc: Sun's JDK 1.3 is good.  1.2.x is okay.
 
-   Linux: The Sun and Blackdown 1.2.2 versions are okay.  Sun's
-      1.3 beta refresh is buggier.  (I haven't tried 1.3 final
-      yet; it might be better.)  IBM's JDK 1.3 is buggy.
-      kaffe is not yet fully compatible with JDK 1.2.
+   Linux: Sun 1.3 and Blackdown 1.3 FCS are good.  Sun and 
+      Blackdown 1.2.2 versions are okay.  IBM's JDK 1.3 is 
+      buggy.  kaffe is not yet fully compatible with JDK 1.2.
 
    If you have something else, you might find bugs that I haven't.
    If you manage to get Colossus running on a system I haven't tried,

@@ -82,6 +82,7 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
         if (i != -1)
         {
             legion.setTeleportingLord((Creature)lords.get(i));
+            setVisible(false);
             dispose();
             return;
         }

@@ -348,7 +348,7 @@ public class Battle
 
     public Collection getCritters()
     {
-        return (Collection)critters;
+        return critters;
     }
 
 
@@ -1639,6 +1639,7 @@ public class Battle
     {
         if (battleDice != null)
         {
+            battleDice.setVisible(false);
             battleDice.dispose();
         }
         battleDice = null;
@@ -1737,6 +1738,7 @@ public class Battle
 
     public void cleanup()
     {
+        disposeBattleDice();
         map.dispose();
 
         // Handle any after-battle angel summoning or recruiting.

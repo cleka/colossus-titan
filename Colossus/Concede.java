@@ -143,6 +143,7 @@ public class Concede extends JDialog implements ActionListener
     private void cleanup()
     {
         location = getLocation();
+        setVisible(false);
         dispose();
     }
 

@@ -1,5 +1,4 @@
 import java.awt.*;
-import javax.swing.*;
 
 /**
  * Class Marker implements the GUI for a legion marker.
