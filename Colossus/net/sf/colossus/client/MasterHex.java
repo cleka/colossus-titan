@@ -71,14 +71,6 @@ public class MasterHex extends Hex
         return (TerrainRecruitLoader.getTerrainDisplayName(getTerrain()));
     }
     
-    /**
-     * @deprecated
-     */
-    public static String getTerrainName(String t)
-    {
-        return t;
-    }
-
     public Color getTerrainColor()
     {
         return (TerrainRecruitLoader.getTerrainColor(getTerrain()));

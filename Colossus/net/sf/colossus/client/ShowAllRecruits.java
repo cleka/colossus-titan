@@ -10,6 +10,7 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.KDialog;
 import net.sf.colossus.parser.TerrainRecruitLoader;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -21,11 +22,26 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
 final class ShowAllRecruits extends KDialog implements MouseListener,
     WindowListener
 {
-    ShowAllRecruits(JFrame parentFrame, String[] terrains,
-                    Point point,
+    private boolean allTerrains = false;
+    // Avoid showing multiple allTerrains displays.
+    private static boolean allTerrainsDisplayActive = false;
+
+
+    ShowAllRecruits(JFrame parentFrame, String[] terrains, Point point,
                     String singleTerrainHexLabel)
     {
         super(parentFrame, "Recruits", false);
+
+        if (point == null && singleTerrainHexLabel == null)
+        {
+            allTerrains = true;
+            if (allTerrainsDisplayActive)
+            {
+                super.dispose();
+                return;
+            }
+            allTerrainsDisplayActive = true;
+        }
 
         setBackground(Color.lightGray);
         addWindowListener(this);
@@ -57,7 +73,7 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
         panel.setBorder(BorderFactory.createLineBorder(Color.black));
         panel.setBackground(TerrainRecruitLoader.getTerrainColor(terrain));
 
-        JLabel terrainLabel = new JLabel(MasterHex.getTerrainName(terrain));
+        JLabel terrainLabel = new JLabel(terrain);
         terrainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(terrainLabel);
 
@@ -96,6 +112,8 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
             Chit chit = new Chit(scale, creature.getName(), this);
             panel.add(chit);
             chit.addMouseListener(this);
+
+            chit.repaint();
     
             prevCreature = creature;
         }
@@ -121,5 +139,14 @@ final class ShowAllRecruits extends KDialog implements MouseListener,
     public void windowClosing(WindowEvent e)
     {
         dispose();
+    }
+
+    public void dispose()
+    {
+        if (allTerrains)
+        {
+            allTerrainsDisplayActive = false;
+        }
+        super.dispose();
     }
 }

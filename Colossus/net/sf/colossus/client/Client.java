@@ -1431,9 +1431,14 @@ Log.debug("Called Client.removeLegion() for " + id);
 
     /** Present a dialog allowing the player to enter via land or teleport.
      *  Return true if the player chooses to teleport. */
-    private boolean chooseWhetherToTeleport()
+    private boolean chooseWhetherToTeleport(String hexLabel)
     {
         if (getOption(Options.autoMasterMove))
+        {
+            return false;
+        }
+        // No point in teleporting if entry side is moot.
+        if (!isOccupied(hexLabel))
         {
             return false;
         }
@@ -2766,7 +2771,7 @@ Log.error("Got nak for recruit with " + markerId);
         Set normals = listNormalMoves(moverId);
         if (teleports.contains(hexLabel) && normals.contains(hexLabel))
         {
-            teleport = chooseWhetherToTeleport();
+            teleport = chooseWhetherToTeleport(hexLabel);
         }
         else if (teleports.contains(hexLabel))
         {
