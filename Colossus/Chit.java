@@ -71,31 +71,28 @@ public class Chit extends JPanel
      * TMJF -- made this a utility function for the CreatureCollectionView.
      * It seems a step backwards from some of the code Dave is using now
      */
-    public ImageIcon getImageIcon(String strImageName)
+    public ImageIcon getImageIcon(String imageFilename)
     {
         // The image-loading syntax that works correctly for applications
         // packaged in executable jar files does not work correctly for
         // applets, and vice-versa.
 
         ImageIcon icon = null;
-        Chit oChit = this;
 
         // This syntax works with either images in a jar file or images
         // in the local filesystem.
 
-        Toolkit oToolkit = Toolkit.getDefaultToolkit();
-        Class oClass = oChit.getClass();
-        java.net.URL oURL = oClass.getResource(strImageName);
-        Image image = oToolkit.getImage(oURL);
+        java.net.URL url = getClass().getResource(imageFilename);
+        Image image = Toolkit.getDefaultToolkit().getImage(url);
         icon = new ImageIcon(image);
 
         return icon;
     }
 
     private static Chit s_oChit = new Chit(1, "Angel", null);
-    public static ImageIcon getImageIconUtility(String strImageName)
+    public static ImageIcon getImageIconUtility(String imageFilename)
     {
-        return s_oChit.getImageIcon(strImageName);
+        return s_oChit.getImageIcon(imageFilename);
     }
 
 

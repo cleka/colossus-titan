@@ -913,14 +913,11 @@ public final class Battle
     }
 
 
-    public void clearAllCarries()
+    public void clearCarries()
     {
         carryDamage = 0;
-        if (!carryTargets.isEmpty())
-        {
-            carryTargets.clear();
-            game.getServer().allClearAllCarries();
-        }
+        carryTargets.clear();
+        game.getServer().allClearCarries();
     }
 
 
@@ -1328,12 +1325,11 @@ public final class Battle
 
         if (carryDamage <= 0 || getCarryTargets().isEmpty())
         {
-            clearAllCarries();
+            clearCarries();
         }
         else
         {
-            String label = target.getCurrentHexLabel();
-            game.getServer().allUnselectBattleHexByLabel(label);
+            game.getServer().highlightCarries(getActivePlayerName());
             game.getServer().allSetBattleDiceCarries(carryDamage);
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));

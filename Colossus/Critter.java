@@ -679,7 +679,7 @@ public final class Critter extends Creature implements Comparable
         BattleHex hex = getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
 
-        battle.clearAllCarries();
+        battle.clearCarries();
         boolean carryPossible = true;
         if (numInContact(false) < 2)
         {
@@ -867,7 +867,7 @@ public final class Critter extends Creature implements Comparable
         // Record that this attacker has struck.
         struck = true;
 
-        // Display the rolls in the BattleDice dialog, if enabled.
+        // Display the rolls in the BattleDice dialog.
         if (game != null)
         {
             game.getServer().allSetBattleDiceValues(getName(),

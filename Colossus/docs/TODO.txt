@@ -2,8 +2,6 @@ Eliminate persistent legion.hexInfo and instead return a temporary
    object containing all the entry sides and teleport possibilities
    along with the possible hexes that the legion can move to.
 
-Carry cursor showing number of hits remaining. 
-
 AI needs to be more careful about protecting Titan. 
 
 Legions full of trolls/ogres/clopses should try harder to
@@ -27,7 +25,6 @@ When a stack flees, make the winning stack visible, to the fleeing
 
 Make advance phase delay configurable.
 Add AI time limits.
-Add AI progress indicator, hourglass cursor.
 
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into

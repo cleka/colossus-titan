@@ -2199,7 +2199,8 @@ class SimpleAI implements AI
             // Not moving is also an option.
             moves.add(currentHexLabel);
 
-Log.debug("Found " + moves.size() + " moves for " + critter.getDescription());
+            Log.debug("Found " + moves.size() + " moves for " + 
+                critter.getDescription());
 
             // Move previously considered critters into their preferred
             // position so we can take them into account when evaluating
@@ -2210,7 +2211,8 @@ Log.debug("Found " + moves.size() + " moves for " + critter.getDescription());
                 ArrayList moveList = (ArrayList)it2.next();
                 CritterMove cm = (CritterMove)moveList.get(0);
                 Critter critter2 = cm.getCritter();
-Log.debug("Simulating moving " + critter2.getName() + " to " + cm.getEndingHexLabel());
+                Log.debug("Simulating moving " + critter2.getName() + " to " + 
+                    cm.getEndingHexLabel());
                 critter2.moveToHex(cm.getEndingHex(terrain));
             }
 
@@ -2314,7 +2316,7 @@ Log.debug("Simulating moving " + critter2.getName() + " to " + cm.getEndingHexLa
                 perfectScore += cm.getCritter().getPointValue();
             }
         }
-Log.debug("perfect score is : " + perfectScore);
+        Log.debug("perfect score is : " + perfectScore);
 
         if (perfectScore == 0)
         {
@@ -2331,7 +2333,6 @@ Log.debug("perfect score is : " + perfectScore);
 
         // This is too slow.  TODO Optimize it.  Move it to a separate
         // worker thread if necessary, so that the GUI stays responsive.
-        // Need a progress indicator.
 
         int turn = battle.getTurnNumber();
         int bestScore = 0;
@@ -2360,8 +2361,7 @@ Log.debug("perfect score is : " + perfectScore);
 
             count++;
 
-            // TODO Change cursor to hourglass after N iterations.
-            // Maybe pop up a progress bar or progress monitor.
+            game.getServer().allSetBattleWaitCursor();
 
             int score = testMoveOrder(order, battle);
             if (score > bestScore)
@@ -2370,7 +2370,7 @@ Log.debug("perfect score is : " + perfectScore);
                 bestScore = score;
                 if (score >= perfectScore)
                 {
-Log.debug("got perfect score: " + score);
+                    Log.debug("got perfect score: " + score);
                     break;
                 }
             }
@@ -2383,7 +2383,10 @@ Log.debug("got perfect score: " + score);
                 break;
             }
         }
-Log.debug("Got score " + bestScore + " in " + count + " permutations");
+        // Change cursor back to default.
+        game.getServer().allSetBattleDefaultCursor();
+
+        Log.debug("Got score " + bestScore + " in " + count + " permutations");
         return bestOrder;
     }
 

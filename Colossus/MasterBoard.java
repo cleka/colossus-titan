@@ -357,6 +357,7 @@ public final class MasterBoard extends JPanel
                 {
                     return;
                 }
+                client.clearRecruitChits();
                 player.takeMulligan();
 
                 // Reroll movement die.  Remove Take Mulligan option

@@ -18,6 +18,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     private JMenu phaseMenu;
     private Client client;
     private JLabel playerLabel;
+    private Cursor defaultCursor;
 
     // XXX Remove battle reference
     private Battle battle;
@@ -32,6 +33,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
     private AbstractAction concedeBattleAction;
+
 
 
     public BattleMap(Client client, String masterHexLabel, Battle battle)
@@ -81,6 +83,8 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         setupPlayerLabel();
         contentPane.add(playerLabel, BorderLayout.NORTH);
+
+        defaultCursor = battleFrame.getCursor();
 
         battleFrame.pack();
         battleFrame.setVisible(true);
@@ -507,6 +511,76 @@ public final class BattleMap extends HexMap implements MouseListener,
         Set set = battle.getCarryTargets();
         unselectAllHexes();
         selectHexesByLabels(set);
+        setupCarryCursor();
+    }
+
+    public void clearCarries()
+    {
+        unselectAllHexes();
+        setupCarryCursor();
+    }
+
+
+    private void setupCarryCursor()
+    {
+        int numCarries = battle.getCarryDamage();
+        Cursor cursor = null;
+
+        if (numCarries == 0)
+        {
+            setDefaultCursor();
+        }
+        else
+        {
+            try
+            {
+                Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(
+                    2 * Scale.get(), 2 * Scale.get());
+                int numPixels = d.width * d.height;
+                int [] pixels = new int[numPixels];
+
+                Point point = new Point(0, 0);
+
+                // Use a special image for unlikely huge carries.
+                String basename;
+                if (numCarries > 15)
+                {
+                    basename = "carry";
+                }
+                else
+                {
+                    basename = "carry" + numCarries;
+                }
+                String imageFilename = Chit.getImagePath(basename);
+
+                // This syntax works with either images in a jar file or images
+                // in the local filesystem.
+                java.net.URL url = getClass().getResource(imageFilename);
+                Image image = Toolkit.getDefaultToolkit().getImage(url);
+
+                cursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                    image, point, basename);
+
+                battleFrame.setCursor(cursor);
+            }
+            catch (Exception e)
+            {
+                // If it fails, just use the default cursor.
+                Log.error("Problem creating custom cursor: " + e);
+                return;
+            }
+            battleFrame.setCursor(cursor);
+        }
+    }
+
+    public void setDefaultCursor()
+    {
+        battleFrame.setCursor(defaultCursor);
+    }
+
+    public void setWaitCursor()
+    {
+        battleFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
 
 
@@ -547,7 +621,7 @@ public final class BattleMap extends HexMap implements MouseListener,
                 case Battle.FIGHT:
                 case Battle.STRIKEBACK:
                     // Leave carry mode.
-                    battle.clearAllCarries();
+                    battle.clearCarries();
 
                     // Highlight all legal strikes for this critter.
                     highlightStrikes(critter);
@@ -612,6 +686,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
             case Battle.FIGHT:
             case Battle.STRIKEBACK:
+                battle.clearCarries();
                 critterSelected = false;
                 highlightCrittersWithTargets();
                 break;
@@ -647,7 +722,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             actOnCritter(critter);
         }
 
-        // No hits on chits, so check map.
+        // No hits on friendly chits, so check map.
         else if (hex != null && hex.isSelected())
         {
             actOnHex(hex);

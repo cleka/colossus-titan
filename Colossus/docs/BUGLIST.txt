@@ -133,4 +133,3 @@ When it works, scale is not saved to (and maybe not loaded from) cfg file.
 
 autosave is happening even with autosave option off.
 
-Need to clear legion chits when the player takes a mulligan.

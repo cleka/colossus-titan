@@ -99,13 +99,13 @@ public final class Server
         }
     }
 
-    public void allClearAllCarries()
+    public void allClearCarries()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             Client client = (Client)it.next();
-            client.clearAllCarries();
+            client.clearCarries();
         }
     }
 
@@ -662,6 +662,26 @@ public final class Server
         {
             Client client = (Client)it.next();
             client.setBattleDiceCarries(carries);
+        }
+    }
+
+    public void allSetBattleWaitCursor()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setBattleWaitCursor();
+        }
+    }
+
+    public void allSetBattleDefaultCursor()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.setBattleDefaultCursor();
         }
     }
 

@@ -43,14 +43,14 @@ public final class BattleChit extends Chit
             Rectangle rect = getBounds();
             FontMetrics fontMetrics;
 
-            // Construct a font 3 times the size of the current font.
+            // Construct a font twice the size of the current font.
             if (font == null)
             {
                 oldFont = g.getFont();
                 String name = oldFont.getName();
                 int size = oldFont.getSize();
                 int style = oldFont.getStyle();
-                font = new Font(name, style, 3 * size);
+                font = new Font(name, style, 2 * size);
                 g.setFont(font);
                 fontMetrics = g.getFontMetrics();
                 // XXX Test this 80% fudge factor on multiple platforms.

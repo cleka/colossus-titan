@@ -593,11 +593,11 @@ public final class Client
     }
 
 
-    public void clearAllCarries()
+    public void clearCarries()
     {
         if (map != null)
         {
-            map.unselectAllHexes();
+            map.clearCarries();
         }
     }
 
@@ -1123,6 +1123,23 @@ public final class Client
         if (board != null)
         {
             board.highlightEngagements();
+        }
+    }
+
+
+    public void setBattleWaitCursor()
+    {
+        if (map != null)
+        {
+            map.setWaitCursor();
+        }
+    }
+
+    public void setBattleDefaultCursor()
+    {
+        if (map != null)
+        {
+            map.setDefaultCursor();
         }
     }
 
