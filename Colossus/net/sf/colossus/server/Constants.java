@@ -90,9 +90,11 @@ public final class Constants
        net.sf.colossus.server.Legion, it uses the
        shortened name directly */
     public static final String [] colorNames =
-        {"Black", "Blue", "Brown", "Gold", "Green", "Red"};
+        {"Black", "Blue", "Brown", "Gold", "Green", "Red",
+         "Orange", "Purple"};
     public static final String [] shortColorNames = 
-        { "Bk",   "Bu",   "Br",    "Gd",   "Gr",    "Rd" };
+        { "Bk",   "Bu",   "Br",    "Gd",   "Gr",    "Rd" ,
+         "Or",     "Pu"};
     public static final String noShortName = "XX";
     private static final java.util.HashMap shortNamesMap = new HashMap();
     
@@ -136,7 +138,7 @@ public final class Constants
 
     public static final int DEFAULT_MAX_PLAYERS = 6;
     /* number of available colours/markers */
-    public static final int MAX_MAX_PLAYERS = 6;
+    public static final int MAX_MAX_PLAYERS = 8;
 
     // Player types
     public static final String human = "Human";

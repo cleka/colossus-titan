@@ -121,6 +121,36 @@ public final class Legion implements Comparable
         markerNames.put("Rd10", "Star");
         markerNames.put("Rd11", "Sword");
         markerNames.put("Rd12", "Torch");
+
+        /* Orange */
+        markerNames.put("Or01", "AxesOr");
+        markerNames.put("Or02", "EyeOr");
+        markerNames.put("Or03", "DieOr");
+        markerNames.put("Or04", "FeatherOr");
+        markerNames.put("Or05", "HandOr");
+        markerNames.put("Or06", "LightningOr");
+        markerNames.put("Or07", "PumpkinOr");
+        markerNames.put("Or08", "RoseOr");
+        markerNames.put("Or09", "ScorpionOr");
+        markerNames.put("Or10", "SkullOr");
+        markerNames.put("Or11", "SpearheadOr");
+        markerNames.put("Or12", "TombstoneOr");
+
+        /* Purple */
+        markerNames.put("Pu01", "AxesPu");
+        markerNames.put("Pu02", "EyePu");
+        markerNames.put("Pu03", "DiePu");
+        markerNames.put("Pu04", "FeatherPu");
+        markerNames.put("Pu05", "HandPu");
+        markerNames.put("Pu06", "LightningPu");
+        markerNames.put("Pu07", "PumpkinPu");
+        markerNames.put("Pu08", "RosePu");
+        markerNames.put("Pu09", "ScorpionPu");
+        markerNames.put("Pu10", "SkullPu");
+        markerNames.put("Pu11", "SpearheadPu");
+        markerNames.put("Pu12", "TombstonePu");
+
+
     }
 
 
