@@ -4,7 +4,7 @@
 <!-- $Id$ -->
 
 <!-- To use this you need:
-     Sun JDK 1.2+  http://java.sun.com  (currently recommend 1.3.1)
+     Sun JDK 1.3+  http://java.sun.com  (currently recommend 1.4.0)
      Ant 1.4.1+    http://jakarta.apache.org/ant/
         with corresponding optional.jar installed in $ANT_HOME/lib
      JavaCC 2.1    http://www.webgain.com/trialware/javacc/JavaCC2_1.zip
@@ -18,6 +18,11 @@
         http://www.red-bean.com/cvs2cl/  You also need perl in the path.
         And you need to have ssh-agent set up so that you can do cvs
         commands over ssh without password prompts.
+     To build the docs you need:
+        make
+        LaTeX
+        latex2html
+        dvi2tty    http://www.mesa.nl/pub/dvi2tty/
 -->
 
 <project name="Colossus" default="jar" basedir=".">
@@ -164,7 +169,17 @@
                          **/Colossus.jar,
                          **/.#Colossus.jar*,
                          **/Colossus.*.zip,
-                         javadoc/**"
+                         javadoc/**,
+                         docs/**/*.aux,
+                         docs/**/*.log,
+                         docs/**/*.toc,
+                         docs/**/*.blg,
+                         docs/**/*.bbl,
+                         docs/**/*.dvi,
+                         docs/**/*.ps,
+                         docs/**/*.html,
+                         docs/**/*.css,
+                         docs/**/*.pl"
                 />
         </delete>
 </target>
@@ -257,8 +272,7 @@
 
 <!-- Tasks from here down are only needed for installation on the web site. -->
 
-<!-- TODO Get cvs+plink+pageant working in Windows, and then make a Windows
-     version of this task -->
+<!-- TODO Make a Windows version of this task. -->
 <target name="changelog" depends=""
         description = "Create a ChangeLog file from cvs history">
         <exec executable="cvs2cl.pl" os="Linux,SunOS"> 
@@ -267,6 +281,12 @@
         <delete verbose="yes" file = "ChangeLog.bak"/>
 </target>
 
+<target name="docs" depends=""
+        description = "Generate docs from TeX source">
+        <exec executable="make" dir="docs" os="Linux,SunOS">
+            <arg line=""/>
+        </exec>
+</target>
 
 <target name="dist" depends="init,sign,changelog,tools"
         description = "Make zip file for user download">
@@ -286,8 +306,8 @@
 </target>
 
 
-<!-- TODO Need to build and copy docs. -->
-<target name="inst" depends="init,sign,dist,changelog"
+<!-- TODO Need to copy docs. -->
+<target name="inst" depends="init,sign,dist,changelog,docs"
         description = "Copy files into htdocs tree on SF"> 
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>

@@ -8,7 +8,7 @@ DESTS=$(addsuffix .ps,$(SOURCES))
 DESTSTXT=$(addsuffix .txt,$(SOURCES))
 DESTSHTML=$(addsuffix .html,$(SOURCES))
 
-all: $(DESTS) $(DESTSTXT) all-recursive
+all: $(DESTS) $(DESTSTXT) $(DESTSHTML) all-recursive
 
 clean: clean-recursive
 	rm -f *.aux *.log *.toc *.blg *.bbl *.dvi *~
