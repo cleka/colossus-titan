@@ -357,6 +357,9 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
             oldLegion.hideAllCreatures();
             newLegion.hideAllCreatures();
 
+            // Mark the last legion split.
+            player.markLastLegionSplit(newLegion);
+
             // Exit.
             dispose();
         }

@@ -48,19 +48,22 @@ class Turn extends Dialog implements ActionListener, WindowListener
         else
         {
             removeAll();
-            setLayout(new GridLayout(0, 4));
+            setLayout(new GridLayout(0, 5));
 
             add(new Label(game.getActivePlayer().getName() + 
                 " : Split stacks "));
-            Button button1 = new Button("Undo All Splits");
+            Button button1 = new Button("Undo Last Split");
             add(button1);
             button1.addActionListener(this);
-            Button button2 = new Button("Withdraw from Game");
+            Button button2 = new Button("Undo All Splits");
             add(button2);
             button2.addActionListener(this);
-            Button button3 = new Button("Done with Splits");
+            Button button3 = new Button("Withdraw from Game");
             add(button3);
             button3.addActionListener(this);
+            Button button4 = new Button("Done with Splits");
+            add(button4);
+            button4.addActionListener(this);
 
             pack();
 
@@ -183,11 +186,15 @@ class Turn extends Dialog implements ActionListener, WindowListener
     {
         Player player = game.getActivePlayer();
 
-        if (e.getActionCommand().equals("Undo All Splits"))
+        if (e.getActionCommand().equals("Undo Last Split"))
+        {
+            player.undoLastSplit();
+            board.repaint();
+        }
+        
+        else if (e.getActionCommand().equals("Undo All Splits"))
         {
             player.undoAllSplits();
-
-            // Remove all moves from MasterBoard.
             board.repaint();
         }
 

@@ -23,6 +23,7 @@ class Player
     private int movementRoll;
     private Game game;
     private Legion lastLegionMoved;
+    private Legion lastLegionSplit;
     private boolean titanEliminated = false;
     private Legion lastLegionSummonedFrom;
     private boolean canTeleport = true;
@@ -349,6 +350,12 @@ class Player
     {
         lastLegionMoved = legion;
     }
+    
+    
+    public void markLastLegionSplit(Legion legion)
+    {
+        lastLegionSplit = legion;
+    }
 
 
     public void undoLastMove()
@@ -420,6 +427,29 @@ class Player
                 hex.select();
                 hex.repaint();
             }
+        }
+    }
+    
+    
+    public void undoLastSplit()
+    {
+        if (lastLegionSplit != null)
+        {
+            MasterHex hex = lastLegionSplit.getCurrentHex();
+            hex.getNumLegions();
+            while (hex.getNumLegions() > 1)
+            {
+                Legion parent = hex.getLegion(0);
+                Legion splitoff = hex.getLegion(1);
+                if (parent != splitoff)
+                {
+                    splitoff.recombine(parent);
+                }
+            }
+            
+            lastLegionSplit = null;
+
+            highlightTallLegions();
         }
     }
 
