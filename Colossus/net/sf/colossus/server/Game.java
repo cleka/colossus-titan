@@ -150,7 +150,7 @@ Log.debug("Called Game.initServer()");
         }
         // Quit if values are bogus.
         if (numHumans < 0 || numAIs < 0 || numNetworks < 0 ||
-            numHumans + numAIs + numNetworks > VariantSupport.getMaxPlayers())
+            numHumans + numAIs + numNetworks > Constants.MAX_MAX_PLAYERS)
         {
             Log.error("Illegal number of players");
             options.clear();
