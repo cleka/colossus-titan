@@ -1,3 +1,4 @@
+# Black
 Bk01 = Axes
 Bk02 = Eye
 Bk03 = Die
@@ -10,6 +11,7 @@ Bk09 = Scorpion
 Bk10 = Skull
 Bk11 = Spearhead
 Bk12 = Tombstone
+# Brown
 Br01 = Antlers
 Br02 = Bell
 Br03 = Chest
@@ -22,6 +24,7 @@ Br09 = Scroll
 Br10 = Spider
 Br11 = Tankard
 Br12 = Wheel
+# Blue
 Bu01 = Anchor
 Bu02 = Bat
 Bu03 = Candle
@@ -34,6 +37,7 @@ Bu09 = Octopus
 Bu10 = Padlock
 Bu11 = Tornado
 Bu12 = Trident
+# Gold
 Gd01 = Caduceus
 Gd02 = Claw
 Gd03 = Coins
@@ -46,6 +50,7 @@ Gd09 = Scarab
 Gd10 = Scimitars
 Gd11 = Sun
 Gd12 = Wheat
+# Green
 Gr01 = Cauldron
 Gr02 = Dagger
 Gr03 = Diamond
@@ -58,6 +63,7 @@ Gr09 = Lobster
 Gr10 = Olive
 Gr11 = Scales
 Gr12 = Snake
+# Red
 Rd01 = Cross
 Rd02 = Eagle
 Rd03 = Fist
@@ -70,6 +76,7 @@ Rd09 = Spiral
 Rd10 = Star
 Rd11 = Sword
 Rd12 = Torch
+# Orange
 Or01 = Ankh
 Or02 = Broom
 Or03 = Cat
@@ -82,6 +89,7 @@ Or09 = Potion
 Or10 = Staff
 Or11 = Wand
 Or12 = Wings
+# Purple
 Pu01 = Carriage
 Pu02 = Castle
 Pu03 = Circlet
@@ -94,6 +102,7 @@ Pu09 = Mountain
 Pu10 = Penguin
 Pu11 = Pomegranate
 Pu12 = Violet
+# Silver
 Si01 = Bomb
 Si02 = Buckle
 Si03 = Bullets
