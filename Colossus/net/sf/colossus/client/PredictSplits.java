@@ -998,7 +998,7 @@ class Node implements Comparable
         {
             creatureName = "Titan";
         }
-        Log.debug("removeCreature() " + this + " : " + creatureName);
+        //Log.debug("removeCreature() " + this + " : " + creatureName);
         if (getHeight() <= 0)
         {
             throw new PredictSplitsException(
