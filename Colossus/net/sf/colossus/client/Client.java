@@ -1972,6 +1972,12 @@ public final class Client implements IClient
             else
             {
                 defaultCursor();
+                /* XXX Only if not summoning, acquiring, etc.
+                if (findEngagements().isEmpty())
+                {
+                    doneWithEngagements();
+                }
+                */
             }
         }
     }
@@ -3765,12 +3771,12 @@ public final class Client implements IClient
             int childHeight, List splitoffs, int turn)
     {
         Log.debug("Client.didSplit " + hexLabel + " " + parentId + " " +
-                childId + " " + childHeight + " " + splitoffs + " " + turn);
+                childId + " " + childHeight + " " + turn);
         LegionInfo childInfo = getLegionInfo(childId);
         childInfo.setHexLabel(hexLabel);
 
         LegionInfo parentInfo = getLegionInfo(parentId);
-        parentInfo.split(childHeight, childId, splitoffs, turn);
+        parentInfo.split(childHeight, childId, turn);
 
         if (isMyLegion(childId))
         {
