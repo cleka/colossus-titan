@@ -176,6 +176,18 @@ class CreatureCollectionView extends KDialog implements WindowListener
                 int maxcount = client.getCreatureMaxCount(name);
                 int deadCount = client.getCreatureDeadCount(name);
                 int inGameCount = maxcount - (deadCount + count);
+
+                // safety check
+                if ((inGameCount < 0) || (inGameCount > maxcount))
+                {
+                    throw new RuntimeException("Something went wrong:" +
+                                               " discrepancy between total (" +
+                                               maxcount + "), remaining (" +
+                                               count + ") and dead (" +
+                                               deadCount +
+                                               ") count for creature " + name);
+                }
+                
                 boolean immortal =
                     Creature.getCreatureByName(name).isImmortal();
                 String color;

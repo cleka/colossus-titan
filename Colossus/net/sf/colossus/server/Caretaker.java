@@ -144,15 +144,24 @@ public final class Caretaker implements Cloneable
     
     void putDeadOne(Creature creature)
     {
-        Integer count = (Integer)deadMap.get(creature.getName());
+        String name = creature.getName();
+        Integer deadCount = (Integer)deadMap.get(name);
+        if (deadCount == null)
+        {
+            deadCount = new Integer(0);
+        }
+        deadMap.put(name, new Integer(deadCount.intValue() + 1));
+
+        // safety check
+        Integer count = (Integer)map.get(name);
         if (count == null)
         {
-            count = new Integer(0);
+            Log.warn("A Creature by the name of " + name +
+                     " died before any was taken.");
         }
-        deadMap.put(creature.getName(), new Integer(count.intValue() + 1));
         updateDisplays(creature.getName());
     }
-
+    
     /** Update creatureName's count on all clients. */
     private void updateDisplays(String creatureName)
     {

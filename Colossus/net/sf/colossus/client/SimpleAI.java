@@ -2663,7 +2663,8 @@ Log.debug("Best target is null, aborting");
             // Bail out early
             if (timeIsUp)
             {
-                Log.debug("Time is up figuring move order");
+                Log.warn("Time is up figuring move order, but we ignore it (buggy break)");
+                timeIsUp = false;
                 // XXX Ignore for now -- buggy break;
             }
         }
