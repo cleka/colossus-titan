@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html>
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for Linux/x86 (vers 1st July 2002), see www.w3.org" />
+<!-- $Id$ -->
+    <title>Colossus network play</title>
+  </head>
+  <body>
+    <h2>Networked Colossus</h2>
+    <p>Colossus is now playable over a TCP/IP network. However, the network
+    functionality is still not perfectly stable. And turn-based games are
+    inherently brittle -- if one player stops moving or drops his connection,
+    then the game is ruined for everybody. (For now -- we&#39;ll add the
+    ability to reconnect or have an AI take over later.) So I recommend
+    starting with 2-player games rather than 6-player games.</p>
+    <p>One person needs to run the server. Currently, Colossus servers are
+    short-lived, staying up only for the length of one game.</p>
+    <p>The server operator simply starts the game as usual, using Java Web
+    Start or the 
+    <b>run</b>
+     script for a local copy. The startup dialog should appear, allowing you to
+    set the variant, optional rules, and how many players of which types you
+    want. Human players are local to the server machine. Network players are
+    remote. The game will wait for *exactly* the number of network players you
+    specify, then start the game. If you have a local copy of the game you can
+    use command-line options instead. Use 
+    <b>run -h</b>
+     to see them.</p>
+    <p>Each client needs to wait for the server to be started, then run the 
+    <b>runclient</b>
+     script or start the game from Java Web Start and select &quot;Run
+    client&quot; from the startup dialog. This will pop up a small dialog that
+    lets you enter a player name, hostname, and port. The player name will
+    default to your OS user name. The server host will default to the local
+    machine, which probably isn&#39;t what you want unless you&#39;re doing
+    loopback testing. You can use the IP address instead of the hostname if you
+    prefer. Most servers will use the default port. Again, you can use
+    command-line options instead. 
+    <b>runclient -h</b>
+     to see them.</p>
+    <p>Once all the clients have connected, then the game should start up like
+    a normal Colossus game. When the game ends, kill all the clients and the
+    server and restart from scratch if you want to play again.</p>
+    <p>There is a simple chat client built in, but it&#39;s not very good. I
+    recommend using your favorite IRC or instant messenger client instead.</p>
+    <h2>FAQ</h2>
+    <ul>
+      <li>How do I find opponents? 
+      <p>Try IRC. Network: irc.newnet.net Channel: #Titan</p>
+      </li>
+      <li>What about firewalls? 
+      <p>The server accepts connections from clients on port 26567 (used for
+      game traffic) and 26568 (used to serve files). Return traffic is
+      piggybacked on the same sockets rather than opening more. So client
+      machines only need the ability to connect out on those ports, while
+      server machines need a publicly visible IP address with those ports
+      visible through the firewall.</p>
+      </li>
+      <li>If a network game crashes, can I reload it? 
+      <p>Yes, but the procedure is complicated. The server operator needs to
+      load the game, then the other players need to rejoin in the exact same
+      order as before. This is much easier to coordinate if you use an external
+      chat application, like IRC or an instant messenger client.</p>
+      </li>
+    </ul>
+  </body>
+</html>
+
