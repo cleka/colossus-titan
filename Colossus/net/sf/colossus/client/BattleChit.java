@@ -19,6 +19,8 @@ final class BattleChit extends Chit
     private static int fontHeight;
     private int hits = 0;
     private String hexLabel;
+    private boolean moved;
+    private boolean struck;
 
 
     BattleChit(int scale, String id, Container container, boolean inverted,
@@ -66,7 +68,36 @@ final class BattleChit extends Chit
     {
         this.hexLabel = hexLabel;
     }
-    
+
+    boolean hasMoved()
+    {
+        return moved;
+    }
+
+    void setMoved(boolean moved)
+    {
+        this.moved = moved;
+    }
+
+    boolean hasStruck()
+    {
+        return struck;
+    }
+
+    void setStruck(boolean struck)
+    {
+        this.struck = struck;
+    }
+
+
+    String getCreatureName()
+    {
+        if (getId().startsWith("Titan"))
+        {
+            return "Titan";
+        }
+        return getId();
+    }
 
 
     public void paintComponent(Graphics g)

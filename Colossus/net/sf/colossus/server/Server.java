@@ -679,22 +679,6 @@ Log.debug("called Server.createSummonAngel for " + legion);
 
     // XXX delete add logic to client
     /** Return a set of hexLabels. */
-    public Set findMobileCritters()
-    {
-        Battle battle = game.getBattle();
-        return battle.findMobileCritters();
-    }
-
-    // XXX delete add logic to client
-    /** Return a set of hexLabels. */
-    public Set showBattleMoves(int tag)
-    {
-        Battle battle = game.getBattle();
-        return battle.showMoves(tag);
-    }
-
-    // XXX delete add logic to client
-    /** Return a set of hexLabels. */
     public Set findCrittersWithTargets()
     {
         Battle battle = game.getBattle();

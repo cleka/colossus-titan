@@ -53,6 +53,9 @@ public final class Constants
     //public static final int FIGHT = 3;
     public static final int STRIKEBACK = 4;
 
+    public static final int BIGNUM = 99;
+    public static final int OUT_OF_RANGE = 5;
+
     // Angel-summoning states
     public static final int NO_KILLS = 0;
     public static final int FIRST_BLOOD = 1;

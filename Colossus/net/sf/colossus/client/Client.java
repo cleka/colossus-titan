@@ -40,6 +40,9 @@ public final class Client
     private CreatureCollectionView caretakerDisplay;
     private SummonAngel summonAngel;
     private MovementDie movementDie;
+
+    /** hexLabel of MasterHex for current or last battle. */
+    private String battleSite;
     private BattleMap map;
     private BattleDice battleDice;
     // XXX Will need more than one of each.
@@ -116,6 +119,8 @@ public final class Client
     private String currentLookAndFeel = null;
 
     private Movement movement = new Movement(this);
+    private BattleMovement battleMovement = new BattleMovement(this);
+    private Strike strike = new Strike(this);
 
 
     public Client(Server server, String playerName, boolean primary)
@@ -789,6 +794,16 @@ public final class Client
         return chits;
     }
 
+    BattleChit getBattleChit(String hexLabel)
+    {
+        java.util.List chits = getBattleChits(hexLabel);
+        if (chits.isEmpty())
+        {
+            return null;
+        }
+        return (BattleChit)chits.get(0);
+    }
+
 
     /** Get the BattleChit with this tag. */
     BattleChit getBattleChit(int tag)
@@ -1268,6 +1283,12 @@ Log.debug("called Client.acquireAngelCallback()");
         int damage, boolean killed, boolean wasCarry, int carryDamageLeft,
         Set carryTargetDescriptions)
     {
+        BattleChit chit = getBattleChit(strikerTag);
+        if (chit != null)
+        {
+            chit.setStruck(true);
+        }
+
         if (battleDice != null)
         {
             battleDice.setValues(strikerDesc, targetDesc, strikeNumber, 
@@ -1396,6 +1417,7 @@ Log.debug("called Client.acquireAngelCallback()");
         this.battlePhase = battlePhase;
         this.attackerMarkerId = attackerMarkerId;
         this.defenderMarkerId = defenderMarkerId;
+        this.battleSite = masterHexLabel;
 
         // Do not show map for AI players, except primary client.
         if (!getOption(Options.autoPlay) || primary)
@@ -1683,11 +1705,24 @@ Log.debug("called Client.acquireAngelCallback()");
         }
     }
 
+    private void resetAllBattleMoves()
+    {
+        Iterator it = getBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            chit.setMoved(false);
+            chit.setStruck(false);
+        }
+    }
+
     public void setupBattleMove()
     {
         // Just in case the other player started the battle
         // really quickly.
         cleanupNegotiationDialogs();
+
+        resetAllBattleMoves();
 
         this.battlePhase = Constants.MOVE;
 
@@ -1784,6 +1819,29 @@ Log.debug("called Client.acquireAngelCallback()");
         battleActivePlayerName = name;
     }
 
+    String getBattleActiveMarkerId()
+    {
+        LegionInfo info = getLegionInfo(defenderMarkerId);
+        if (battleActivePlayerName.equals(info.getPlayerName()))
+        {
+            return defenderMarkerId;
+        }
+        else
+        {
+            return attackerMarkerId;
+        }
+    }
+
+    String getDefenderMarkerId()
+    {
+        return defenderMarkerId;
+    }
+
+    String getAttackerMarkerId()
+    {
+        return defenderMarkerId;
+    }
+
     int getBattlePhase()
     {
         return battlePhase;
@@ -1811,6 +1869,7 @@ Log.debug("called Client.acquireAngelCallback()");
         if (chit != null)
         {
             chit.setHexLabel(endingHexLabel);
+            chit.setMoved(!undo);
         }
         if (map != null)
         {
@@ -1855,30 +1914,90 @@ Log.debug("called Client.acquireAngelCallback()");
         }
     }
 
-    // TODO cache
+    char getBattleTerrain()
+    {
+        MasterHex mHex = MasterBoard.getHexByLabel(battleSite);
+        return mHex.getTerrain();
+    }
+
+    /** Return true if there are any enemies adjacent to this chit.
+     *  Dead critters count as being in contact only if countDead is true. */
+    boolean isInContact(BattleChit chit, boolean countDead)
+    {
+        MasterHex mHex = MasterBoard.getHexByLabel(battleSite);
+        BattleHex hex = HexMap.getHexByLabel(getBattleTerrain(),
+            chit.getHexLabel());
+
+        // Offboard creatures are not in contact.
+        if (hex.isEntrance())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not in contact.
+            if (!hex.isCliff(i))
+            {
+                BattleHex neighbor = hex.getNeighbor(i);
+                if (neighbor != null)
+                {
+                    BattleChit other = getBattleChit(neighbor.getLabel());
+                    if (other != null && 
+                        (other.isInverted() != chit.isInverted()) &&
+                        (countDead || !other.isDead()))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    boolean isActive(BattleChit chit)
+    {
+        return battleActivePlayerName.equals(getPlayerNameByTag(
+            chit.getTag()));
+    }
+
+
     /** Return a set of hexLabels. */
     Set findMobileCritters()
     {
-        return server.findMobileCritters();
+        Set set = new HashSet();
+        Iterator it = getBattleChits().iterator();
+        while (it.hasNext())
+        {
+            BattleChit chit = (BattleChit)it.next();
+            if (isActive(chit) && !chit.hasMoved() &&
+                !isInContact(chit, false))
+            {
+                set.add(chit.getHexLabel());
+            }
+        }
+        return set;
     }
 
     /** Return a set of hexLabels. */
     Set showBattleMoves(int tag)
     {
-        return server.showBattleMoves(tag);
-    }
-
-    /** Return a set of hexLabels. */
-    Set findStrikes(int tag)
-    {
-        return server.findStrikes(tag);
+        return battleMovement.showMoves(tag);
     }
 
     /** Return a set of hexLabels. */
     Set findCrittersWithTargets()
     {
-        return server.findCrittersWithTargets();
+        return strike.findCrittersWithTargets();
     }
+
+    /** Return a set of hexLabels. */
+    Set findStrikes(int tag)
+    {
+        return strike.findStrikes(tag);
+    }
+
 
     String getPlayerNameByTag(int tag)
     {
@@ -2796,5 +2915,4 @@ Log.debug("found " + set.size() + " hexes");
         }
         repaintAllWindows();
     }
-
 }

@@ -45,7 +45,6 @@ final class Battle
     private boolean driftDamageApplied = false;
     /** Set of hexLabels for valid carry targets */
     private Set carryTargets = new HashSet();
-    private final int BIGNUM = 99;
     private PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
 
 
@@ -673,10 +672,10 @@ Log.debug("Battle.setupSummon() advance will be " + advance);
                     }
 
                     // Fliers can fly over any hex for 1 movement point,
-                    // but some Hex cannot be flied over by some creatures.
+                    // but some Hex cannot be flown over by some creatures.
                     if (flies &&
                         movesLeft > 1 &&
-                        neighbor.canBeFliedOverBy(critter))
+                        neighbor.canBeFlownOverBy(critter))
                     {
                         set.addAll(findMoves(neighbor, critter, flies,
                             movesLeft - 1, reverseDir, ignoreMobileAllies));
@@ -1337,8 +1336,6 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
     }
 
 
-    private static final int OUT_OF_RANGE = 5;
-
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
     static int getRange(BattleHex hex1, BattleHex hex2,
@@ -1347,7 +1344,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         if (hex1 == null || hex2 == null)
         {
             Log.warn("passed null hex to getRange()");
-            return OUT_OF_RANGE;
+            return Constants.OUT_OF_RANGE;
         }
         if (hex1.isEntrance() || hex2.isEntrance())
         {
@@ -1367,7 +1364,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
             else
             {
                 // It's out of range.  No need to do the math.
-                return OUT_OF_RANGE;
+                return Constants.OUT_OF_RANGE;
             }
         }
 
@@ -1410,7 +1407,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
     /** Return the minimum range from any neighbor of hex1 to hex2. */
     private static int minRangeToNeighbor(BattleHex hex1, BattleHex hex2)
     {
-        int min = OUT_OF_RANGE;
+        int min = Constants.OUT_OF_RANGE;
         for (int i = 0; i < 6; i++)
         {
             BattleHex hex = hex1.getNeighbor(i);
@@ -1432,7 +1429,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
     int minRangeToEnemy(Critter critter)
     {
         BattleHex hex = critter.getCurrentHex();
-        int min = OUT_OF_RANGE;
+        int min = Constants.OUT_OF_RANGE;
 
         Legion enemy = getInactiveLegion();
         Iterator it = enemy.getCritters().iterator();
@@ -1878,7 +1875,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         // Offboard hexes are not allowed.
         if (hex1.getXCoord() == -1 || hex2.getXCoord() == -1)
         {
-            return BIGNUM;
+            return Constants.BIGNUM;
         }
 
         int direction = getDirection(hex1, hex2, left);
@@ -1886,7 +1883,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         BattleHex nextHex = hex1.getNeighbor(direction);
         if (nextHex == null)
         {
-            return BIGNUM;
+            return Constants.BIGNUM;
         }
 
         if (nextHex == hex2)
@@ -1898,14 +1895,14 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         // Trees block LOS.
         if (nextHex.getTerrain() == 't')
         {
-            return BIGNUM;
+            return Constants.BIGNUM;
         }
 
         // All creatures block LOS.  (There are no height differences on
         // maps with bramble.)
         if (isOccupied(nextHex))
         {
-            return BIGNUM;
+            return Constants.BIGNUM;
         }
 
         // Add one if it's bramble.
@@ -1939,7 +1936,7 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
         // Offboard hexes are not allowed.
         if (x1 == -1 || x2 == -1)
         {
-            return BIGNUM;
+            return Constants.BIGNUM;
         }
 
         // Hexes with odd X coordinates are pushed down half a hex.

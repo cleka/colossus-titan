@@ -465,7 +465,7 @@ public class BattleHex extends Hex
      * @param creature The Creature that want to fly over this BattleHex
      * @return If the Creature can fly over here or not.
      */
-    public boolean canBeFliedOverBy(Creature creature)
+    public boolean canBeFlownOverBy(Creature creature)
     {
         char terrain = getTerrain();
         if (!creature.isFlier())

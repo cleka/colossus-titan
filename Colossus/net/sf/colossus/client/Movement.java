@@ -64,10 +64,8 @@ public final class Movement
         // also a friendly legion there, just stop recursing.
         if (client.getNumEnemyLegions(hexLabel, player.getName()) > 0)
         {
-Log.debug("found enemy in " + hexLabel);
             if (client.getNumFriendlyLegions(hexLabel, player.getName()) == 0)
             {
-Log.debug("no friendlies in " + hexLabel);
                 // Set the entry side relative to the hex label.
                 if (cameFrom != -1)
                 {
