@@ -261,7 +261,7 @@ A.  SimpleAI does a straightforward one-ply lookahead for MasterBoard
     will be a more interesting option when there are multiple viable 
     alternatives.
 
-Q.  What's the Load External Variant button do? 
+Q.  What's the 'Load External Variant' button do? 
 
 A.  The maps and recruit trees and stuff used to be hardcoded.  Romain
     has recently pulled them out into data files, which means that you
@@ -273,6 +273,12 @@ A.  The maps and recruit trees and stuff used to be hardcoded.  Romain
     "Load External Variant" allows for loading an external variant
     (not supplied with the game), whereas the pop-up menu allows
     for loading one of the standard variant (supplied with the game).
+
+Q.  Why doesn't the 'Load External Variant' work ?
+
+A.  It does, but for some yet unknown reason, if you select an external
+    variant first, it will not be acknowledged. You need to load it
+    twice, or to select something in the pop-up menu first.
 
 Q.  How can I help?
 

@@ -1,3 +1,5 @@
+Fix 'Load External Variant' so it works the first time.
+
 Highlight appropriate engagement hex while engagement is being resolved.
    (Except during angel summoning.)
 
