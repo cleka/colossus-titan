@@ -77,4 +77,9 @@ class Chit
     {
         return new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
     }
+    
+    public Point topLeft()
+    {
+        return new Point(rect.x, rect.y);
+    }
 }
