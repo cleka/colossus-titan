@@ -38,7 +38,7 @@ public class Chit extends Canvas // XXX JPanel
     public static final String invertedPrefix = "i_";
 
 
-    public Chit(int scale, String imageFilename, Container container)
+    public Chit(int scale, String id, Container container)
     {
         super();
         Point point = getLocation();
@@ -46,6 +46,9 @@ public class Chit extends Canvas // XXX JPanel
         setBounds(rect);
 
         this.container = container;
+        this.id = id;
+
+        String imageFilename = getImagePath(id);
 
         // The image-loading syntax that works correctly for applications
         // packaged in executable jar files does not work correctly for 
@@ -85,12 +88,6 @@ public class Chit extends Canvas // XXX JPanel
     public static void setApplet(boolean isApplet)
     {
         Chit.isApplet = isApplet;
-    }
-
-
-    public void setId(String id)
-    {
-        this.id = id;
     }
 
 

@@ -112,7 +112,7 @@ public class ShowDice extends JDialog implements WindowListener
         }
         basename.append(roll);
 
-        return Chit.getImagePath(basename.toString());
+        return basename.toString();
     }
 
 

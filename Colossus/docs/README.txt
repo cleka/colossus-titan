@@ -24,7 +24,9 @@ Running the game requires the following:
    lets you compile Java programs, not just run them.
 
    (Colossus used to run under JDK 1.1, but I recently made some
-   changes that break backwards compatibility.  Sorry.)
+   changes that break backwards compatibility.  Sorry, but those
+   changes were necessary to plug some major memory leaks, make 
+   popup menus show up properly under Linux and Solaris, etc.)
 
    Colossus will now also run as an applet in a web browser, as long
    as your browser is new enough to support JDK 1.2 applets.  That
@@ -43,19 +45,16 @@ Running the game requires the following:
    general.  All the Java environments have strong and weak points,
    but the AWT is usually a weak point.
 
-   Windows: Sun's 1.3 is good, but there are memory leaks in the
-      HotSpot garbage collector.  1.2.2 is good.  1.2.0 and 1.2.1
-      have very serious memory leaks in the image handling code,
-      so I don't recommend them.
+   Windows: Sun's JDK 1.3 is good.  1.2.2 is okay.  1.2.0 and 
+      1.2.1 have very serious memory leaks in the image handling 
+      code, so I recommend upgrading to 1.3.
 
-   Solaris Sparc: Recent Sun boxes come with a pre-installed
-      1.2.x JDK, which is okay.  1.3 is faster, but has
-      more memory leaks.
+   Solaris Sparc: Sun's JDK 1.3 is good.  1.2.x is okay.
 
    Linux: The Sun and Blackdown 1.2.2 versions are okay.  Sun's
       1.3 beta refresh is buggier.  (I haven't tried 1.3 final
-      yet; it might be better.)  kaffe is buggy.  IBM's JDK 1.3
-      is buggy.
+      yet; it might be better.)  IBM's JDK 1.3 is buggy.
+      kaffe is not yet fully compatible with JDK 1.2.
 
    If you have something else, you might find bugs that I haven't.
    If you manage to get Colossus running on a system I haven't tried,
@@ -77,7 +76,9 @@ Running the game requires the following:
    option-click on a Macintosh and the second mouse button on a PC would
    fire the same Java event.  They don't.  Because I don't have a Mac,
    I don't know if Colossus works correctly on one.  If you have a Mac
-   with a one-button mouse, please let me know how things work.
+   with a one-button mouse, please let me know how things work.  I'm 
+   in the process of adding menus and hotkeys to duplicate right-button
+   functionality.
 
 
 Directions:

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
@@ -15,8 +16,6 @@ public class Concede extends JDialog implements ActionListener
     private boolean flee;
     private Legion ally;
     private Legion enemy;
-    private Chit [] allyChits;
-    private Chit [] enemyChits;
     private Chit allyMarker;
     private Chit enemyMarker;
     private static Point location;
@@ -52,16 +51,16 @@ public class Concede extends JDialog implements ActionListener
         gridbag.setConstraints(allyMarker, constraints);
         contentPane.add(allyMarker);
 
-        // Leave space for angels.
-        allyChits = new Chit[7];
-        for (int i = 0; i < ally.getHeight(); i++)
+        Collection critters = ally.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            allyChits[i] = new Chit(scale, ally.getCritter(i).getImageName(),
-                this);
+            Critter critter = (Critter)it.next();
+            Chit chit = new Chit(scale, critter.getImageName(), this);
             constraints.gridy = 0;
             constraints.gridwidth = 1;
-            gridbag.setConstraints(allyChits[i], constraints);
-            contentPane.add(allyChits[i]);
+            gridbag.setConstraints(chit, constraints);
+            contentPane.add(chit);
         }
 
         enemyMarker = new Marker(scale, enemy.getImageName(), this, enemy);
@@ -70,16 +69,16 @@ public class Concede extends JDialog implements ActionListener
         gridbag.setConstraints(enemyMarker, constraints);
         contentPane.add(enemyMarker);
 
-        // Leave space for angels.
-        enemyChits = new Chit[7];
-        for (int i = 0; i < enemy.getHeight(); i++)
+        critters = enemy.getCritters();
+        it = critters.iterator();
+        while (it.hasNext())
         {
-            enemyChits[i] = new Chit(scale, enemy.getCritter(i).getImageName(),
-                this);
+            Critter critter = (Critter)it.next();
+            Chit chit = new Chit(scale, critter.getImageName(), this);
             constraints.gridy = 1;
             constraints.gridwidth = 1;
-            gridbag.setConstraints(enemyChits[i], constraints);
-            contentPane.add(enemyChits[i]);
+            gridbag.setConstraints(chit, constraints);
+            contentPane.add(chit);
         }
 
         JButton button1 = new JButton(flee ? "Flee" : "Concede");
@@ -166,7 +165,7 @@ public class Concede extends JDialog implements ActionListener
             }
 
             // Remove the dead legion.
-            ally.removeLegion();
+            ally.remove();
 
             // Add points, and angels if necessary.
             enemy.addPoints(points);

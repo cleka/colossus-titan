@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class ShowMasterHex displays the terrain type and recruits for a MasterHex.
@@ -10,19 +11,13 @@ import javax.swing.*;
 
 class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 {
-    private MasterHex hex;
-    private Chit [] chits;
-    private int numChits;
-    private int scale = 60;
+    private static final int scale = 60;
 
 
     public ShowMasterHex(JFrame parentFrame, MasterHex hex, Point point)
     {
         super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(),
             false);
-
-        this.hex = hex;
-        numChits = hex.getNumRecruitTypes();
 
         pack();
         setBackground(Color.lightGray);
@@ -58,21 +53,37 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 
         contentPane.setLayout(new GridLayout(0, 3));
         
-        chits = new Chit[numChits];
-        for (int i = 0; i < numChits; i++)
+        char terrain = hex.getTerrain();
+        ArrayList creatures = Game.getPossibleRecruits(terrain);
+        Iterator it = creatures.iterator();
+        boolean firstTime = true; 
+        Creature prevCreature = Creature.titan;
+        while (it.hasNext())
         {
-            Creature creature = hex.getRecruit(i);
+            Creature creature = (Creature)it.next();
 
-            chits[i] = new Chit(scale, creature.getImageName(), this);
-            contentPane.add(chits[i]);
-            chits[i].addMouseListener(this);
+            Chit chit = new Chit(scale, creature.getImageName(), this);
+            contentPane.add(chit);
+            chit.addMouseListener(this);
 
-            int numToRecruit = hex.getNumToRecruit(i);
+            int numToRecruit;
+            if (firstTime)
+            {
+                numToRecruit = 0;
+                firstTime = false;
+            }
+            else
+            {
+                numToRecruit = Game.numberOfRecruiterNeeded(prevCreature,
+                    creature, terrain);
+            }
+
             JLabel numToRecruitLabel = new JLabel("", JLabel.CENTER);
-            if (numToRecruit > 0)
+            if (numToRecruit > 0 && numToRecruit <= 3)
             {
                 numToRecruitLabel.setText(Integer.toString(numToRecruit));
             }
+
             contentPane.add(numToRecruitLabel);
             numToRecruitLabel.addMouseListener(this);
 
@@ -81,6 +92,8 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
                 JLabel.CENTER);
             contentPane.add(countLabel);
             countLabel.addMouseListener(this);
+
+            prevCreature = creature;
         }
 
         pack();

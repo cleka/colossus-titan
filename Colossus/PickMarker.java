@@ -50,9 +50,7 @@ public class PickMarker extends JDialog implements MouseListener, WindowListener
             while (it.hasNext())
             {
                 String markerId = (String)it.next();
-                Chit marker = new Chit(scale, Chit.getImagePath(markerId),
-                    this);
-                marker.setId(markerId);    
+                Chit marker = new Chit(scale, markerId, this);
                 markers.add(marker);
                 contentPane.add(marker);
                 marker.addMouseListener(this);

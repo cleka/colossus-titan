@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.*;
 
 /**
  * Class BattleHex describes one Battlemap hex.
@@ -10,11 +11,10 @@ public class BattleHex extends Hex
 {
     private BattleMap map;
 
-    // Normal hexes hold only one creature, but entrances can hold up to 7.
-    private int numCritters;
-    private Critter [] critters = new Critter[7];
+    /** Normal hexes hold only one creature, but entrances can hold up to 7. */
+    private ArrayList critters = new ArrayList(7);
 
-    // Valid elevations are 0, 1, and 2.
+    /** Valid elevations are 0, 1, and 2. */
     private int elevation;
 
     // Hex terrain types are:
@@ -35,6 +35,12 @@ public class BattleHex extends Hex
     // Hex labels are:
     // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.  
     // Letters increase left to right; numbers increase bottom to top.
+
+    /** Movement costs */
+    private static final int IMPASSIBLE_COST = 99;
+    private static final int SLOW_COST = 2;
+    private static final int NORMAL_COST = 1;
+
 
 
     public BattleHex(int cx, int cy, int scale, BattleMap map, int xCoord, 
@@ -96,7 +102,7 @@ public class BattleHex extends Hex
         g.drawString(name, rectBound.x + (rectBound.width -
             fontMetrics.stringWidth(name)) / 2,
             rectBound.y + (fontMetrics.getHeight() + rectBound.height) / 2);
-        
+
         // Show hex label in upper left corner.
         g.drawString(label, rectBound.x + (rectBound.width -
             fontMetrics.stringWidth(label)) / 3,
@@ -182,7 +188,7 @@ public class BattleHex extends Hex
                         Math.cos(theta));
                     x[2] = (int) Math.round(x1 - len * Math.sin(theta));
                     y[2] = (int) Math.round(y1 + len * Math.cos(theta));
-                    
+
                     g.setColor(Color.white);
                     g.fillPolygon(x, y, 3);
                     g.setColor(Color.black);
@@ -224,7 +230,7 @@ public class BattleHex extends Hex
                     g.drawArc(rect.x, rect.y, rect.width, rect.height,
                         (int) Math.round((2 * Math.PI - theta) * RAD_TO_DEG),
                         180);
-                    
+
                 }
                 break;
 
@@ -244,7 +250,7 @@ public class BattleHex extends Hex
                     y[2] = (int) Math.round(y1 - len / 3 * Math.cos(theta));
                     x[3] = (int) Math.round(x1 - len / 3 * Math.sin(theta));
                     y[3] = (int) Math.round(y1 + len / 3 * Math.cos(theta));
-                    
+
                     g.setColor(Color.black);
                     g.drawLine(x[0], y[0], x[1], y[1]);
                     g.drawLine(x[2], y[2], x[3], y[3]);
@@ -267,7 +273,7 @@ public class BattleHex extends Hex
                     y[2] = (int) Math.round(y1 - len * Math.cos(theta));
                     x[3] = (int) Math.round(x1 - len * Math.sin(theta));
                     y[3] = (int) Math.round(y1 + len * Math.cos(theta));
-                    
+
                     g.setColor(Color.white);
                     g.fillPolygon(x, y, 4);
                     g.setColor(Color.black);
@@ -278,101 +284,65 @@ public class BattleHex extends Hex
     }
 
 
+    public int getNumCritters()
+    {
+        return critters.size();
+    }
+
+
     public boolean isOccupied()
     {
-        return (numCritters > 0);
+        return (!critters.isEmpty());
     }
 
 
     public void addCritter(Critter critter)
     {
-        if (numCritters < 7)
-        {
-            critters[numCritters] = critter;
-            numCritters++;
-            alignChits();
-        }
-    }
-
-
-    public void removeCritter(int i)
-    {
-        if (i >= 0 && i < numCritters)
-        {
-            for (int j = i; j < numCritters - 1; j++)
-            {
-                critters[j] = critters[j + 1];
-            }
-            critters[numCritters - 1] = null;
-            numCritters--;
-
-            // Clearing the area is only necessary for entrances.
-            if (isEntrance())
-            {
-                map.setEraseFlag();
-            }
-
-            // Reposition all chits within the hex.
-            alignChits();
-        }
+        critters.add(critter);
+        alignChits();
     }
 
 
     public void removeCritter(Critter critter)
     {
-        for (int i = 0; i < numCritters; i++)
+        critters.remove(critter);
+
+        // Clearing the area is only necessary for entrances.
+        if (isEntrance())
         {
-            if (critters[i] == critter)
-            {
-                removeCritter(i);
-            }
+            map.setEraseFlag();
         }
+
+        // Reposition all chits within the hex.
+        alignChits();
     }
 
 
     public Critter getCritter()
     {
-        if (numCritters > 0)
-        {
-            return critters[0];
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-
-    public Critter getCritter(int i)
-    {
-        if (i >= 0 && i < numCritters)
-        {
-            return critters[i];
-        }
-        else
-        {
-            return null;
-        }
+        return (Critter)critters.get(0);
     }
 
 
     public void alignChits()
     {
-        if (numCritters == 0)
+        if (critters.isEmpty())
         {
             return;
         }
 
-        int chitScale = critters[0].getChit().getBounds().width;
+        int chitScale = getCritter().getChit().getBounds().width;
         Point point = getCenter();
 
         // Cascade chits diagonally.
-        point.x -= chitScale * (1 + (numCritters)) / 4;
-        point.y -= chitScale * (1 + (numCritters)) / 4;
+        point.x -= chitScale * (1 + (critters.size())) / 4;
+        point.y -= chitScale * (1 + (critters.size())) / 4;
 
-        for (int i = 0; i < numCritters; i++)
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            BattleChit chit = critters[i].getChit();
+            Critter critter = (Critter)it.next();
+            BattleChit chit = critter.getChit();
             chit.setLocation(point);
             point.x += chitScale / 4;
             point.y += chitScale / 4;
@@ -583,7 +553,7 @@ public class BattleHex extends Hex
             !creature.getName().equals("Dragon")) || (terrain == 'o' && 
             !creature.isNativeBog()))
         {
-            return 5;
+            return IMPASSIBLE_COST;
         }
 
         char hexside = getHexside(cameFrom);
@@ -592,7 +562,7 @@ public class BattleHex extends Hex
         if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') && 
             !creature.isFlier())
         {
-            return 5;
+            return IMPASSIBLE_COST;
         }
 
         // Check for a slowing hexside.
@@ -602,7 +572,7 @@ public class BattleHex extends Hex
         {
             // All hexes where this applies happen to have no
             // additional movement costs.
-            return 2;
+            return SLOW_COST;
         }
 
         // Bramble, drift, and sand slow non-natives, except that sand
@@ -612,10 +582,10 @@ public class BattleHex extends Hex
             (terrain == 's' && !creature.isNativeSandDune() &&
             !creature.isFlier()))
         {
-            return 2;
+            return SLOW_COST;
         }
 
         // Other hexes only cost 1.
-        return 1;
+        return NORMAL_COST;
     }
 }

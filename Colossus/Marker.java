@@ -12,10 +12,9 @@ public class Marker extends Chit
     private Legion legion;
 
 
-    public Marker(int scale, String imageFilename, Container container,
-        Legion legion)
+    public Marker(int scale, String id, Container container, Legion legion)
     {
-        super(scale, imageFilename, container);
+        super(scale, id, container);
         this.legion = legion;
     }
 

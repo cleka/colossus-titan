@@ -13,7 +13,7 @@ public class Legion
 {
     private Marker marker;
     private String markerId;    // Bk03, Rd12, etc.
-    private Legion splitFrom;
+    private Legion parent;
     private ArrayList critters = new ArrayList();
     private MasterHex currentHex;
     private MasterHex startingHex;
@@ -24,13 +24,13 @@ public class Legion
     private int battleTally;
 
 
-    public Legion(String markerId, Legion splitFrom, MasterHex hex, 
+    public Legion(String markerId, Legion parent, MasterHex hex, 
         Creature creature0, Creature creature1, Creature creature2, 
         Creature creature3, Creature creature4, Creature creature5, 
         Creature creature6, Creature creature7, Player player)
     {
         this.markerId = markerId;
-        this.splitFrom = splitFrom;
+        this.parent = parent;
         this.currentHex = hex;
         this.startingHex = hex;
         this.player = player;
@@ -159,6 +159,12 @@ public class Legion
     }
 
 
+    public Legion getParent()
+    {
+        return parent;
+    }
+
+
     public String toString()
     {
         return markerId;
@@ -173,7 +179,7 @@ public class Legion
 
     public String getImageName()
     {
-        return Chit.getImagePath(markerId);
+        return markerId;
     }
 
 
@@ -255,9 +261,44 @@ public class Legion
     }
 
 
-    public void removeLegion()
+    /** Eliminate this legion */
+    public void remove()
     {
-        player.removeLegion(this);
+        prepareToRemove();
+        player.getLegions().remove(this);
+    }
+
+
+    /** Do the cleanup required before this legion can be removed. */
+    public void prepareToRemove()
+    {
+        // Remove the legion from its current hex.
+        currentHex.removeLegion(this);
+
+        StringBuffer log = new StringBuffer("Legion ");
+        log.append(getName());
+        log.append(" (");
+
+        // Return lords and demi-lords to the stacks.
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            log.append(critter.getName());
+            if (it.hasNext())
+            {
+                log.append(", ");
+            }
+            if (critter.isImmortal())
+            {
+                critter.putOneBack();
+            }
+        }
+        log.append(") is eliminated");
+        Game.logEvent(log.toString());
+
+        // Free up the legion marker.
+        player.getMarkersAvailable().add(getMarkerId());
     }
 
 
@@ -317,7 +358,7 @@ public class Legion
     public boolean canRecruit()
     {
         if (recruited || getHeight() > 6 || getPlayer().isDead() ||
-            Game.findEligibleRecruits(this, new Creature[5]) == 0)
+            Game.findEligibleRecruits(this).isEmpty())
         {
             return false;
         }
@@ -357,9 +398,11 @@ public class Legion
             return false;
         }
 
-        for (int i = 0; i < player.getNumLegions(); i++)
+        Collection legions = player.getLegions();
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Legion candidate = player.getLegion(i);
+            Legion candidate = (Legion)it.next();
             if (candidate != this &&
                 (candidate.numCreature(Creature.angel) > 0 ||
                 candidate.numCreature(Creature.archangel) > 0) &&
@@ -435,7 +478,7 @@ public class Legion
         // If there are no critters left, disband the legion.
         if (disbandIfEmpty && getHeight() == 0)
         {
-            removeLegion();
+            remove();
         }
 
         return critter;
@@ -459,6 +502,12 @@ public class Legion
             int i = critters.indexOf(critter);
             return removeCreature(i, returnImmortalToStack, disbandIfEmpty);
         }
+    }
+
+
+    public Collection getCritters()
+    {
+        return critters;
     }
 
 
@@ -493,8 +542,8 @@ public class Legion
 
 
     /** Recombine this legion into another legion. Only remove this
-        legion if remove is true.  If it's false, the caller is
-        responsible for removing the legion, which can avoid
+        legion from the Player if remove is true.  If it's false, the 
+        caller is responsible for removing this legion, which can avoid
         concurrent access problems. */
     public void recombine(Legion legion, boolean remove)
     {
@@ -504,7 +553,7 @@ public class Legion
             Critter critter = (Critter)it.next();
 
             legion.addCreature(critter, false);
-            
+
             // Keep removeLegion from returning lords to stacks.
             if (critter.isLord())
             {
@@ -513,11 +562,11 @@ public class Legion
         }
         if (remove)
         {
-            player.removeLegion(this);
+            remove();
         }
         else
         {
-            player.prepareToRemoveLegion(this);
+            prepareToRemove();
         }
 
         Game.logEvent("Legion " + getMarkerId() +

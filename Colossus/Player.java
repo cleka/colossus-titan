@@ -16,7 +16,7 @@ public class Player implements Comparable
     private String playersEliminated;  // RdBkGr
 
     private TreeSet markersAvailable = new TreeSet();
-    private String markerSelected;
+    private String selectedMarker;
 
     private ArrayList legions = new ArrayList();
     private Legion selectedLegion = null;
@@ -25,7 +25,7 @@ public class Player implements Comparable
     private int movementRoll;
     private Game game;
     private Legion lastLegionMoved;
-    private Legion lastLegionSplit;
+    private Legion lastLegionSplitOff;
     private boolean titanEliminated;
     private Legion lastLegionSummonedFrom;
     private boolean canTeleport = true;
@@ -126,7 +126,7 @@ public class Player implements Comparable
 
 
     /** Players are sorted in order of decreasing starting tower. 
-        This is inconsistent with equals() */
+        This is inconsistent with equals(). */
     public int compareTo(Object object) throws ClassCastException
     {
         if (object instanceof Player) 
@@ -251,7 +251,7 @@ public class Player implements Comparable
     }
 
 
-    public Collection getLegions()
+    public List getLegions()
     {
         return legions;
     }
@@ -394,9 +394,9 @@ public class Player implements Comparable
     }
     
     
-    public void markLastLegionSplit(Legion legion)
+    public void markLastLegionSplitOff(Legion legion)
     {
-        lastLegionSplit = legion;
+        lastLegionSplitOff = legion;
     }
 
 
@@ -462,7 +462,7 @@ public class Player implements Comparable
 
     public void highlightTallLegions()
     {
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -481,21 +481,15 @@ public class Player implements Comparable
     
     public void undoLastSplit()
     {
-        if (lastLegionSplit != null)
+        if (lastLegionSplitOff != null)
         {
-            MasterHex hex = lastLegionSplit.getCurrentHex();
-            hex.getNumLegions();
-            while (hex.getNumLegions() > 1)
+            Legion parent = lastLegionSplitOff.getParent();
+            if (parent.getCurrentHex() == lastLegionSplitOff.getCurrentHex())
             {
-                Legion parent = hex.getLegion(0);
-                Legion splitoff = hex.getLegion(1);
-                if (parent != splitoff)
-                {
-                    splitoff.recombine(parent, true);
-                }
+                lastLegionSplitOff.recombine(parent, true);
             }
-            
-            lastLegionSplit = null;
+
+            lastLegionSplitOff = null;
 
             highlightTallLegions();
         }
@@ -504,21 +498,16 @@ public class Player implements Comparable
 
     public void undoAllSplits()
     {
-        // Run through the legion list backwards, since the newly split 
-        // legions that need to be combined will appear at the end.
-        ListIterator lit = legions.listIterator(legions.size());
-        while (lit.hasPrevious())
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            Legion legion = (Legion)lit.previous();
-            MasterHex hex = legion.getCurrentHex();
-            if (hex.getNumLegions() > 1)
+            Legion legion = (Legion)it.next();
+            Legion parent = legion.getParent();
+            if (parent != null && parent.getCurrentHex() == 
+                legion.getCurrentHex()) 
             {
-                Legion parent = hex.getLegion(0);
-                if (parent != legion)
-                {
-                    legion.recombine(parent, false);
-                    lit.remove();
-                }
+                legion.recombine(parent, false);
+                it.remove();
             }
         }
 
@@ -564,47 +553,6 @@ public class Player implements Comparable
         legions.add(legion);
     }
 
-    /** Do the cleanup required before this legion can be removed. */
-    public void prepareToRemoveLegion(Legion legion)
-    {
-        // Remove the legion from its current hex.
-        legion.getCurrentHex().removeLegion(legion);
-
-        StringBuffer log = new StringBuffer("Legion ");
-        log.append(legion.getName());
-        log.append(" (");
-
-        int height = legion.getHeight();
-        // Return lords and demi-lords to the stacks.
-        for (int j = 0; j < height; j++)
-        {
-            Creature creature = legion.getCreature(j);
-            log.append(creature.getName());
-            if (j < height - 1)
-            {
-                log.append(", ");
-            }
-            if (creature.isImmortal())
-            {
-                creature.putOneBack();
-            }
-        }
-        log.append(") is eliminated");
-        Game.logEvent(log.toString());
-
-        // Free up the legion marker.
-        markersAvailable.add(legion.getMarkerId());
-    }
-
-
-    /** Eliminate this legion */
-    public void removeLegion(Legion legion)
-    {
-        prepareToRemoveLegion(legion);
-
-        legions.remove(legion);
-    }
-
 
     public void selectLegion(Legion legion)
     {
@@ -638,20 +586,13 @@ public class Player implements Comparable
 
     public String getSelectedMarker()
     {
-        return markerSelected;
-    }
-
-
-    public void addSelectedMarker()
-    {
-        markersAvailable.add(new String(markerSelected));
-        markerSelected = null;
+        return selectedMarker;
     }
 
 
     public void clearSelectedMarker()
     {
-        markerSelected = null;
+        selectedMarker = null;
     }
 
 
@@ -661,11 +602,11 @@ public class Player implements Comparable
         boolean found = markersAvailable.remove(markerId);
         if (found)
         {
-            markerSelected = markerId;
+            selectedMarker = markerId;
         }
         else
         {
-            markerSelected = null;
+            selectedMarker = null;
         }
     }
 
@@ -735,14 +676,17 @@ public class Player implements Comparable
             
             // Call the iterator's remove() method rather than 
             // removeLegion() to avoid concurrent modification problems. 
-            prepareToRemoveLegion(legion);
+            legion.prepareToRemove();
             it.remove();
         }
 
         // Truncate every player's score to an integer value.
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        Collection players = game.getPlayers();
+        it = players.iterator();
+        while (it.hasNext())
         {
-            game.getPlayer(i).truncScore();
+            Player player = (Player)it.next();
+            player.truncScore();
         }
 
         // Mark this player as dead.

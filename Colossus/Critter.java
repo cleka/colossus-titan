@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class Critter represents an individual Titan Character.
@@ -31,13 +32,13 @@ public class Critter extends Creature
 
     public Critter(Creature creature, boolean visible, Legion legion)
     {
-        super(creature.name, creature.power, creature.skill, 
-            creature.rangestrikes, creature.flies, creature.nativeBramble, 
-            creature.nativeDrift, creature.nativeBog, 
-            creature.nativeSandDune, creature.nativeSlope, creature.lord, 
+        super(creature.name, creature.power, creature.skill,
+            creature.rangestrikes, creature.flies, creature.nativeBramble,
+            creature.nativeDrift, creature.nativeBog,
+            creature.nativeSandDune, creature.nativeSlope, creature.lord,
             creature.demilord, creature.count, creature.pluralName);
 
-        if (name != null) 
+        if (name != null)
         {
             this.creature = Creature.getCreatureFromName(name);
         }
@@ -46,15 +47,15 @@ public class Critter extends Creature
             this.creature = null;
         }
 
-        this.visible = visible; 
+        this.visible = visible;
         this.legion = legion;
         if (getName().equals("Titan"))
         {
             setPower(getPlayer().getTitanPower());
         }
     }
-    
-    
+
+
     public void addBattleInfo(BattleHex hex, BattleMap map, BattleChit chit,
         Battle battle)
     {
@@ -64,8 +65,8 @@ public class Critter extends Creature
         this.chit = chit;
         this.battle = battle;
     }
-    
-    
+
+
     public boolean isVisible()
     {
         return visible;
@@ -82,14 +83,14 @@ public class Critter extends Creature
     {
         return creature;
     }
-    
-    
+
+
     public Legion getLegion()
     {
         return legion;
     }
-    
-    
+
+
     public BattleChit getChit()
     {
         return chit;
@@ -123,6 +124,7 @@ public class Critter extends Creature
     }
 
 
+    /** Return only the base part of the image name for this critter. */
     public String getImageName(boolean inverted)
     {
         StringBuffer basename = new StringBuffer();
@@ -136,12 +138,12 @@ public class Critter extends Creature
         if (name.equals("Titan") && getPower() >= 6 && getPower() <= 20)
         {
             // Use Titan14.gif for a 14-power titan, etc.  Use the generic
-            // Titan.gif (with X-4) for ridiculously big titans, to avoid 
+            // Titan.gif (with X-4) for ridiculously big titans, to avoid
             // the need for an infinite number of images.
             basename.append(getPower());
         }
 
-        return Chit.getImagePath(basename.toString());
+        return basename.toString();
     }
 
 
@@ -175,7 +177,7 @@ public class Critter extends Creature
     }
 
 
-    /** Apply damage to this critter.  Return the amount of excess damage 
+    /** Apply damage to this critter.  Return the amount of excess damage
      *  done, which may sometimes carry to another target. */
     public int wound(int damage)
     {
@@ -197,7 +199,7 @@ public class Critter extends Creature
             }
 
             // Update damage displayed on chit.
-            // Chit.repaint() doesn't work right after a creature is killed 
+            // Chit.repaint() doesn't work right after a creature is killed
             // by carry damage, so paint the whole hex.
             getCurrentHex().repaint();
         }
@@ -282,7 +284,7 @@ public class Critter extends Creature
 
     public void moveToHex(BattleHex hex)
     {
-        Game.logEvent(getName() + " moves from " + currentHex.getLabel() + 
+        Game.logEvent(getName() + " moves from " + currentHex.getLabel() +
             " to " + hex.getLabel());
 
         currentHex.removeCritter(this);
@@ -301,8 +303,8 @@ public class Critter extends Creature
         currentHex.addCritter(this);
         moved = false;
         battle.clearLastCritterMoved();
-        Game.logEvent(getName() + " undoes move and returns to " + 
-            startingHex.getLabel()); 
+        Game.logEvent(getName() + " undoes move and returns to " +
+            startingHex.getLabel());
         map.repaint();
     }
 
@@ -321,7 +323,7 @@ public class Critter extends Creature
             dice /= 2;
 
             // Dragon rangestriking from volcano: +2
-            if (getName().equals("Dragon") && 
+            if (getName().equals("Dragon") &&
                 currentHex.getTerrain() == 'v')
             {
                 dice += 2;
@@ -331,7 +333,7 @@ public class Critter extends Creature
         {
             // Dice can be modified by terrain.
             // Dragon striking from volcano: +2
-            if (getName().equals("Dragon") && 
+            if (getName().equals("Dragon") &&
                 currentHex.getTerrain() == 'v')
             {
                 dice += 2;
@@ -488,17 +490,19 @@ public class Critter extends Creature
      *  (fewer dice or higher strike number) in order to be
      *  allowed to carry.  Return true if the penalty is taken,
      *  or false if it is not. */
-    private boolean chooseStrikePenalty(Critter [] carryTargets)
+    private boolean chooseStrikePenalty(Collection carryTargets)
     {
         StringBuffer prompt = new StringBuffer(
             "Take strike penalty to allow carrying to ");
 
-        for (int i = 0; i < carryTargets.length; i++)
+        Iterator it = carryTargets.iterator();
+        while (it.hasNext())
         {
-            BattleHex targetHex = carryTargets[i].getCurrentHex();
-            prompt.append(carryTargets[i].getName() + " in " +
+            Critter carryTarget = (Critter)it.next();
+            BattleHex targetHex = carryTarget.getCurrentHex();
+            prompt.append(carryTarget.getName() + " in " +
                 targetHex.getDescription());
-            if (i < carryTargets.length - 1)
+            if (it.hasNext())
             {
                 prompt.append(", ");
             }
@@ -508,7 +512,7 @@ public class Critter extends Creature
         String [] options = new String[2];
         options[0] = "Take Penalty";
         options[1] = "Do Not Take Penalty";
-        int answer = JOptionPane.showOptionDialog(map, prompt.toString(), 
+        int answer = JOptionPane.showOptionDialog(map, prompt.toString(),
             "Take Strike Penalty?", JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         return (answer == JOptionPane.YES_OPTION);
@@ -523,7 +527,7 @@ public class Critter extends Creature
         // Sanity check
         if (target.getPlayer() == getPlayer())
         {
-            System.out.println(getName() + " tried to strike allied " + 
+            System.out.println(getName() + " tried to strike allied " +
                 target.getName());
             return;
         }
@@ -554,10 +558,7 @@ public class Critter extends Creature
             // Count legal carry targets.
             int numCarryTargets = 0;
 
-            // Count strike penalty options
-            int numPenaltyOptions = 0;
-
-            PenaltyOption [] penaltyOptions = new PenaltyOption[5];
+            ArrayList penaltyOptions = new ArrayList();
 
             for (int i = 0; i < 6; i++)
             {
@@ -569,7 +570,7 @@ public class Critter extends Creature
                     if (hex != null && hex != targetHex && hex.isOccupied())
                     {
                         Critter critter = hex.getCritter();
-                        if (critter.getPlayer() != getPlayer() && 
+                        if (critter.getPlayer() != getPlayer() &&
                             !critter.isDead())
                         {
                             int tmpDice = getDice(critter);
@@ -590,11 +591,9 @@ public class Critter extends Creature
                             else if (tmpStrikeNumber > strikeNumber ||
                                 tmpDice < dice)
                             {
-                                // Add this scenario to the list. 
-                                penaltyOptions[numPenaltyOptions] = new 
-                                    PenaltyOption(critter, tmpDice, 
-                                    tmpStrikeNumber);
-                                numPenaltyOptions++;
+                                // Add this scenario to the list.
+                                penaltyOptions.add(new PenaltyOption(critter,
+                                    tmpDice, tmpStrikeNumber));
                             }
 
                             else
@@ -607,41 +606,41 @@ public class Critter extends Creature
                 }
             }
 
-
             // Sort penalty options by number of dice (ascending), then by
             //    strike number (descending).
-            PenaltyOption.sort(penaltyOptions, numPenaltyOptions);
-
+            Collections.sort(penaltyOptions);
 
             // Find the group of PenaltyOptions with identical dice and
             //    strike numbers.
-
-            int last = -1;
-
-            while (++last < numPenaltyOptions)
+            PenaltyOption option;
+            ArrayList critters = new ArrayList();
+            ListIterator lit = penaltyOptions.listIterator();
+            while (lit.hasNext())
             {
-                int first = last; 
-                while (last + 1 < numPenaltyOptions && 
-                    penaltyOptions[last + 1].getDice() == 
-                        penaltyOptions[first].getDice() &&
-                    penaltyOptions[last + 1].getStrikeNumber() ==
-                        penaltyOptions[first].getStrikeNumber())
+                option = (PenaltyOption)lit.next();
+                int tmpDice = option.getDice();
+                int tmpStrikeNumber = option.getStrikeNumber();
+                critters.clear();
+                critters.add(option.getCritter());
+
+                while (lit.hasNext())
                 {
-                    last++;
+                    option = (PenaltyOption)lit.next();
+                    if (option.getDice() == tmpDice &&
+                        option.getStrikeNumber() == tmpStrikeNumber)
+                    {
+                        critters.add(option.getCritter());
+                    }
+                    else
+                    {
+                        lit.previous();
+                        break;
+                    }
                 }
 
-                int tmpDice = penaltyOptions[first].getDice();
-                int tmpStrikeNumber = penaltyOptions[first].getStrikeNumber();
-
                 // Make sure the penalty is still relevant.
-                if (tmpStrikeNumber > strikeNumber || tmpDice < dice) 
+                if (tmpStrikeNumber > strikeNumber || tmpDice < dice)
                 {
-                    Critter [] critters = new Critter[last - first + 1];
-                    for (int i = first; i <= last; i++)
-                    {
-                        critters[i - first] = penaltyOptions[i].getCritter();
-                    }
-                                    
                     if (chooseStrikePenalty(critters))
                     {
                         if (tmpStrikeNumber > strikeNumber)
@@ -652,15 +651,16 @@ public class Critter extends Creature
                         {
                             dice = tmpDice;
                         }
-                        for (int i = 0; i < critters.length; i++)
+                        Iterator it2 = critters.iterator();
+                        while (it2.hasNext())
                         {
-                            critters[i].setCarryFlag(true);
+                            Critter critter = (Critter)it2.next();
+                            critter.setCarryFlag(true);
                             numCarryTargets++;
                         }
                     }
                 }
             }
-
 
             if (numCarryTargets == 0)
             {
@@ -711,10 +711,10 @@ public class Critter extends Creature
         showDice.setCarries(carryDamage);
         showDice.setup();
 
-        Game.logEvent(getName() + " in " + currentHex.getLabel() + 
-            " strikes " + target.getName() + " in " + 
+        Game.logEvent(getName() + " in " + currentHex.getLabel() +
+            " strikes " + target.getName() + " in " +
             targetHex.getLabel() + " with strike number " +
-            strikeNumber + " : " + rollString + ": " + damage + 
+            strikeNumber + " : " + rollString + ": " + damage +
             (damage == 1 ? " hit" : " hits"));
     }
 
@@ -739,7 +739,7 @@ public class Critter extends Creature
 
     public void setDead(boolean dead)
     {
-        if (dead) 
+        if (dead)
         {
             hits = getPower();
         }

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class ShowLegion displays the chits of the Creatures in a Legion
@@ -10,10 +11,6 @@ import javax.swing.*;
 
 public class ShowLegion extends JDialog implements MouseListener, WindowListener
 {
-    private Legion legion;
-    private Chit [] chits;
-
-
     public ShowLegion(JFrame parentFrame, Legion legion, Point point, boolean
         allVisible)
     {
@@ -55,26 +52,24 @@ public class ShowLegion extends JDialog implements MouseListener, WindowListener
 
         contentPane.setLayout(new FlowLayout());
 
-        this.legion = legion;
-
-        chits = new Chit[legion.getHeight()];
-
-        for (int i = 0; i < legion.getHeight(); i++)
+        Collection critters = legion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            Critter critter = legion.getCritter(i);
+            Critter critter = (Critter)it.next();
             String imageName;
             if (!allVisible && !critter.isVisible())
             {
-                imageName = Chit.getImagePath("Question");
+                imageName = "Question";
             }
             else
             {
                 imageName = critter.getImageName();
             }
 
-            chits[i] = new Chit(scale, imageName, this);
-            contentPane.add(chits[i]);
-            chits[i].addMouseListener(this);
+            Chit chit = new Chit(scale, imageName, this);
+            contentPane.add(chit);
+            chit.addMouseListener(this);
         }
 
         pack();

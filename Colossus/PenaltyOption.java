@@ -5,7 +5,7 @@
  * @author David Ripton
  */
 
-public class PenaltyOption
+public class PenaltyOption implements Comparable
 {
     private Critter critter;
     private int dice;
@@ -38,9 +38,20 @@ public class PenaltyOption
     }
 
 
-    // Sort first by ascending dice, then by descending strike number.
-    public int compareTo(PenaltyOption other)
+    /** Sort first by ascending dice, then by descending strike number.
+        This is inconsistent with equals(). */
+    public int compareTo(Object object) throws ClassCastException
     {
+        PenaltyOption other;
+        if (object instanceof PenaltyOption) 
+        {
+            other = (PenaltyOption)object;
+        }
+        else
+        {
+            throw new ClassCastException();
+        }
+
         if (dice < other.getDice())
         {
             return -1;
@@ -60,26 +71,6 @@ public class PenaltyOption
         else
         {
             return 0;
-        }
-    }
-
-
-    // Sort an array of penalty options by number of dice (ascending), then by
-    //    strike number (descending).
-    public static void sort(PenaltyOption [] penaltyOptions, int 
-        numPenaltyOptions)
-    {
-        for (int i = 0; i < numPenaltyOptions - 1; i++)
-        {
-            for (int j = i + 1; j < numPenaltyOptions; j++)
-            {
-                if (penaltyOptions[i].compareTo(penaltyOptions[j]) > 0)
-                {
-                    PenaltyOption temp = penaltyOptions[i];
-                    penaltyOptions[i] = penaltyOptions[j];
-                    penaltyOptions[j] = temp;
-                }
-            }
         }
     }
 }

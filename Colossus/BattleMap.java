@@ -98,7 +98,8 @@ public class BattleMap extends JFrame implements MouseListener,
             try
             {
                 setIconImage(Toolkit.getDefaultToolkit().getImage(
-                    getClass().getResource(Creature.colossus.getImageName())));
+                    getClass().getResource(Chit.getImagePath(
+                    Creature.colossus.getImageName()))));
             }
             catch (NullPointerException e)
             {
@@ -132,9 +133,11 @@ public class BattleMap extends JFrame implements MouseListener,
     private void placeLegion(Legion legion, boolean inverted)
     {
         BattleHex entrance = getEntrance(legion);
-        for (int i = 0; i < legion.getHeight(); i++)
+        Collection critters = legion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            Critter critter = legion.getCritter(i);
+            Critter critter = (Critter)it.next();
             battle.addCritter(critter);
             BattleChit chit = new BattleChit(chitScale,
                 critter.getImageName(inverted), this, critter);

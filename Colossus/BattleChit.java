@@ -12,10 +12,10 @@ public class BattleChit extends Chit
     private Critter critter;
 
 
-    public BattleChit(int scale, String imageFilename, Container container, 
+    public BattleChit(int scale, String id, Container container, 
         Critter critter)
     {
-        super(scale, imageFilename, container);
+        super(scale, id, container);
         this.critter = critter;
     }
 

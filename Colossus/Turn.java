@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class Turn holds control buttons.
@@ -286,6 +287,7 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
     }
     
 
+    // XXX Merge these with the ones in MasterBoard.
     public void actionPerformed(ActionEvent e)
     {
         Player player = game.getActivePlayer();
@@ -367,9 +369,11 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
             {
                 // If two or more legions share the same hex, force a
                 // move if one is legal.  Otherwise, recombine them.
-                for (int i = 0; i < player.getNumLegions(); i++)
+                Collection legions = player.getLegions();
+                Iterator it = legions.iterator();
+                while (it.hasNext())
                 {
-                    Legion legion = player.getLegion(i);
+                    Legion legion = (Legion)it.next();
                     MasterHex hex = legion.getCurrentHex();
                     if (hex.getNumFriendlyLegions(player) > 1)
                     {
@@ -380,9 +384,9 @@ public class Turn extends JDialog implements ActionListener, WindowListener,
                         }
                         else
                         {
-                            // Highlight all unmoved legions, rather than the
-                            // locations to which the forced-to-move legion 
-                            // can move. 
+                            // Highlight all unmoved legions, rather than 
+                            // the locations to which the forced-to-move 
+                            // legion can move. 
                             game.highlightUnmovedLegions();
                             JOptionPane.showMessageDialog(board, 
                                 "Split legions must be separated.");

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 
 /**
@@ -13,7 +14,7 @@ import javax.swing.*;
 public class GetPlayers extends JDialog implements WindowListener,
     ActionListener
 {
-    private TextField [] tf = new TextField[6];
+    private ArrayList textFields = new ArrayList();
     private Game game;
 
 
@@ -34,8 +35,9 @@ public class GetPlayers extends JDialog implements WindowListener,
         {
             String s = "Player " + (i + 1) + " Name";
             contentPane.add(new JLabel(s));
-            tf[i] = new TextField(20);
-            contentPane.add(tf[i]);
+            TextField tf = new TextField(20);
+            contentPane.add(tf);
+            textFields.add(tf);
         }
 
         JButton button1 = new JButton("OK");
@@ -59,41 +61,31 @@ public class GetPlayers extends JDialog implements WindowListener,
     
     private void validateInputs()
     {
-        String [] playerNames = new String[6];
         boolean error = false;
-        String [] s = new String[6];
-
-        for (int i = 0; i < 6; i++)
-        {
-            s[i] = tf[i].getText();
-        }
-
-        // Sort in reverse order so that empties go last.
-        sortStrings(s);
-
-        // Make sure each player has a unique name.
+        Set playerNames = new TreeSet();
         int numPlayers = 0;
-        for (int i = 0; i < 6; i++)
+
+        Iterator it = textFields.iterator();
+        while (it.hasNext())
         {
-            if (s[i].length() > 0)
+            TextField tf = (TextField)it.next();
+            String text = tf.getText();
+            if (text.length() > 0)
             {
-                if (i > 0 && s[i].equals(s[i - 1]))
-                {
-                    error = true;
-                }
-                else
-                {
-                    playerNames[numPlayers] = s[i];
-                    numPlayers++;
-                }
+                numPlayers++;
+                playerNames.add(text);
             }
         }
 
-        if (error || numPlayers == 0)
+        // Make sure that there is at least one player, and
+        // that each player has a unique name.
+        if (numPlayers < 1 || playerNames.size() != numPlayers)
         {
-            for (int i = 0; i < 6; i++)
+            it = textFields.iterator();
+            while (it.hasNext())
             {
-                tf[i].setText("");
+                TextField tf = (TextField)it.next();
+                tf.setText("");
             }
             return;
         }
@@ -101,35 +93,17 @@ public class GetPlayers extends JDialog implements WindowListener,
         // Data is good; send to game.
         if (game != null)
         {
-            for (int i = 0; i < numPlayers; i++)
+            it = playerNames.iterator();
+            while (it.hasNext())
             {
-                // Display player numbers as if they started at 1 not 0.
-                Game.logEvent("Player " + (i + 1) + " is " + playerNames[i]);
-                game.addPlayer(playerNames[i]);
+                String name = (String)it.next();
+                game.addPlayer(name);
+                Game.logEvent("Added player " + name);
             }
         }
 
         dispose();
     }
-
-
-    // Sort string array in reverse order
-    private static void sortStrings(String [] s)
-    {
-        for (int i = 0; i < s.length - 1; i++)
-        {
-            for (int j = i + 1; j < s.length; j++)
-            {
-                if (s[i].compareTo(s[j]) > 0)
-                {
-                    String temp = s[i];
-                    s[i] = s[j];
-                    s[j] = temp;
-                }
-            }
-        }
-    }
-
 
 
     public void windowActivated(WindowEvent e)

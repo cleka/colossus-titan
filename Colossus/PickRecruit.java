@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class PickRecruit allows a player to pick a creature to recruit.
@@ -13,13 +14,13 @@ public class PickRecruit extends JDialog implements MouseListener,
     WindowListener
 {
     private int numEligible;
-    private Creature [] recruits;
+    private ArrayList recruits = new ArrayList();
     private Player player;
     private Legion legion;
-    private Chit [] recruitChits;
+    private ArrayList recruitChits = new ArrayList();
     private Marker legionMarker;
-    private Chit [] legionChits;
-    private int scale = 60;
+    private ArrayList legionChits = new ArrayList();
+    private static final int scale = 60;
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
@@ -40,9 +41,8 @@ public class PickRecruit extends JDialog implements MouseListener,
 
         this.parentFrame = parentFrame;
 
-        recruits = new Creature[5];
-
-        numEligible = Game.findEligibleRecruits(legion, recruits);
+        recruits = Game.findEligibleRecruits(legion);
+        int numEligible = recruits.size();
 
         this.legion = legion;
         player = legion.getPlayer();
@@ -58,8 +58,6 @@ public class PickRecruit extends JDialog implements MouseListener,
 
         setBackground(Color.lightGray);
 
-        int height = legion.getHeight();
-
         setResizable(false);
 
         legionMarker = new Marker(scale, legion.getImageName(), this, legion);
@@ -68,19 +66,19 @@ public class PickRecruit extends JDialog implements MouseListener,
         gridbag.setConstraints(legionMarker, constraints);
         contentPane.add(legionMarker);
 
-        legionChits = new Chit[height];
-        for (int i = 0; i < height; i++)
+        Collection critters = legion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            legionChits[i] = new Chit(scale, 
-                legion.getCritter(i).getImageName(), this);
+            Critter critter = (Critter)it.next();
+            Chit chit = new Chit(scale, critter.getImageName(), this);
+            legionChits.add(chit);
             constraints.gridy = 0;
-            gridbag.setConstraints(legionChits[i], constraints);
-            contentPane.add(legionChits[i]);
+            gridbag.setConstraints(chit, constraints);
+            contentPane.add(chit);
         }
-
-
-        recruitChits = new Chit[numEligible];
-
+        
+        int height = critters.size();
         // There are height + 1 chits in the top row.  There
         // are numEligible chits / labels to place beneath.
         // So we have (height + 1) - numEligible empty 
@@ -91,22 +89,26 @@ public class PickRecruit extends JDialog implements MouseListener,
             leadSpace = 0;
         }
 
-        for (int i = 0; i < numEligible; i++)
+        it = recruits.iterator();
+        int i = 0;
+        while (it.hasNext())
         {
-            recruitChits[i] = new Chit(scale, recruits[i].getImageName(),
-                this);
+            Creature recruit = (Creature)it.next();
+            Chit chit = new Chit(scale, recruit.getImageName(), this);
+            recruitChits.add(chit);
 
             constraints.gridx = leadSpace + i;
             constraints.gridy = 1;
-            gridbag.setConstraints(recruitChits[i], constraints);
-            contentPane.add(recruitChits[i]);
-            recruitChits[i].addMouseListener(this);
-            int count = recruits[i].getCount();
+            gridbag.setConstraints(chit, constraints);
+            contentPane.add(chit);
+            chit.addMouseListener(this);
+            int count = recruit.getCount();
             JLabel countLabel = new JLabel(Integer.toString(count), 
                 JLabel.CENTER);
             constraints.gridy = 2;
             gridbag.setConstraints(countLabel, constraints);
             contentPane.add(countLabel);
+            i++;
         }
 
         pack();
@@ -123,20 +125,18 @@ public class PickRecruit extends JDialog implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
-        for (int i = 0; i < numEligible; i++)
+        int i = recruitChits.indexOf(source);
+        if (i != -1 && !dialogLock)
         {
-            if (recruitChits[i] == source && !dialogLock)
-            {
-                // Prevent multiple clicks from yielding multiple recruits.
-                dialogLock = true;
+            // Prevent multiple clicks from yielding multiple recruits.
+            dialogLock = true;
 
-                // Recruit the chosen creature.
-                Game.doRecruit(recruits[i], legion, parentFrame);
+            // Recruit the chosen creature.
+            Game.doRecruit((Creature)recruits.get(i), legion, parentFrame);
 
-                // Then exit.
-                dispose();
-                return;
-            }
+            // Then exit.
+            dispose();
+            return;
         }
     }
 
@@ -194,5 +194,25 @@ public class PickRecruit extends JDialog implements MouseListener,
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    public static void main(String [] args)
+    {
+        JFrame frame = new JFrame("testing PickRecruit");
+        frame.setSize(new Dimension(20 * scale, 20 * scale));
+        frame.pack();
+        frame.setVisible(true);
+
+        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setTerrain('B');
+
+        Player player = new Player("Test", null);
+        Legion legion = new Legion("Bk01", null, hex,
+            Creature.titan, Creature.gargoyle, Creature.gargoyle, 
+            Creature.cyclops, Creature.cyclops, null, 
+            null, null, player);
+        
+        new PickRecruit(frame, legion);
     }
 }

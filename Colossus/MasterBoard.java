@@ -10,7 +10,7 @@ import javax.swing.*;
  */
 
 public class MasterBoard extends JFrame implements MouseListener,
-    WindowListener, ActionListener
+    WindowListener
 {
     // There are a total of 96 hexes
     // Their Titan labels are:
@@ -30,13 +30,13 @@ public class MasterBoard extends JFrame implements MouseListener,
     private Dimension offDimension;
     private static int scale;
     private static Game game;
-    
+
     /** Used to fix artifacts from legions hanging outside hexes. */
     private boolean eraseFlag;
 
     private JPopupMenu popupMenu;
-    private JMenuItem menuItemHex; 
-    private JMenuItem menuItemMap;
+    private JMenuItem menuItemRecruitInfo; 
+    private JMenuItem menuItemBattleMap;
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
@@ -47,22 +47,47 @@ public class MasterBoard extends JFrame implements MouseListener,
     private JMenu actionMenu;
     private JMenu optionsMenu;
 
-    private static final String newGame = "<html><b>N</b>ew game";
-    private static final String openGame = "<html><b>O</b>pen game";
-    private static final String saveGame = "<html><b>S</b>ave game";
-    private static final String saveGameAs = "<html>Save game as";
-    private static final String undoLast = "<html>Undo <b>l</b>ast";
-    private static final String undoAll = "<html>Undo <b>a</b>ll";
-    private static final String endPhase = "<html><b>E</b>nd phase";
-    private static final String takeMulligan = "<html>Take <b>m</b>ulligan";
-    private static final String concedeBattle = "<html><b>C</b>oncede battle";
-    private static final String withdrawFromGame = 
-        "<html>Withdraw from game";
-    private static final String autosave = "<html>Autosave";
-    private static final String allStacksVisible = "<html>All stacks visible";
-    private static final String autopickRecruiter = "<html>Autopick recruiter";
-    private static final String showGameStatus = "<html>Show game status";
-    private static final String showDice = "<html>Show dice";
+    static final String newGame = "<html><b>N</b>ew game";
+    static final String openGame = "<html><b>O</b>pen game";
+    static final String saveGame = "<html><b>S</b>ave game";
+    static final String saveGameAs = "<html>Save game as";
+    static final String concedeBattle = "<html><b>C</b>oncede battle";
+    static final String autosave = "<html>Autosave";
+    static final String allStacksVisible = "<html>All stacks visible";
+    static final String autopickRecruiter = "<html>Autopick recruiter";
+    static final String showGameStatus = "<html>Show game status";
+    static final String showDice = "<html>Show dice";
+
+    static final String undoLastSplit = "<html>Undo <b>L</b>ast Split";
+    static final String undoAllSplits = "<html>Undo <b>A</b>ll Splits";
+    static final String withdrawFromGame = "<html><b>W</b>ithdraw from Game";
+    static final String doneWithSplits = "<html><b>D</b>one with Splits";
+    static final String undoLastMove = "<html>Undo <b>L</b>ast Move";
+    static final String undoAllMoves = "<html>Undo <b>A</b>ll Moves";
+    static final String takeMulligan = "<html>Take <b>M</b>ulligan";
+    static final String doneWithMoves = "<html><b>D</b>one with Moves";
+    static final String doneWithEngagements = 
+        "<html><b>D</b>one with Engagements";
+    static final String undoLastRecruit = "<html>Undo <b>L</b>ast Recruit";
+    static final String undoAllRecruits = "<html>Undo <b>A</b>ll Recruits";
+    static final String doneWithTurn = "<html><b>D</b>one with Turn";
+    static final String viewRecruitInfo = "<html>View Recruit Info";
+    static final String viewBattleMap = "<html>View Battle Map";
+
+    AbstractAction undoLastSplitAction;
+    AbstractAction undoAllSplitsAction;
+    AbstractAction doneWithSplitsAction;
+    AbstractAction undoLastMoveAction;
+    AbstractAction undoAllMovesAction;
+    AbstractAction takeMulliganAction;
+    AbstractAction doneWithMovesAction;
+    AbstractAction doneWithEngagementsAction;
+    AbstractAction undoLastRecruitAction;
+    AbstractAction undoAllRecruitsAction;
+    AbstractAction doneWithTurnAction;
+    AbstractAction withdrawFromGameAction;
+    AbstractAction viewRecruitInfoAction;
+    AbstractAction viewBattleMapAction;
 
 
     public MasterBoard(Game game)
@@ -75,6 +100,9 @@ public class MasterBoard extends JFrame implements MouseListener,
 
         contentPane.setLayout(null);
 
+        // XXX This prevents clicking on chits, hexes.
+        //contentPane.setLayout(new BorderLayout());
+
         scale = getScale();
 
         setSize(getPreferredSize());
@@ -86,6 +114,7 @@ public class MasterBoard extends JFrame implements MouseListener,
         addWindowListener(this);
         addMouseListener(this);
 
+        setupActions();
         initializePopupMenu();
         initializeTopMenu();
 
@@ -93,16 +122,245 @@ public class MasterBoard extends JFrame implements MouseListener,
     }
 
 
+    public void setupActions()
+    {
+        undoLastSplitAction = new AbstractAction(undoLastSplit)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                player.undoLastSplit();
+                repaint();
+            }
+        };
+
+        undoAllSplitsAction = new AbstractAction(undoAllSplits)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                player.undoAllSplits();
+                repaint();
+            }
+        };
+
+        doneWithSplitsAction = new AbstractAction(doneWithSplits)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                if (player.getMaxLegionHeight() > 7)
+                {
+                    JOptionPane.showMessageDialog(MasterBoard.this, 
+                        "Must split.");
+                    return;
+                }
+                advancePhase();
+            }
+        };
+
+        undoLastMoveAction = new AbstractAction(undoLastMove)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                player.undoLastMove();
+                // Remove all moves from MasterBoard and show unmoved legions.
+                game.highlightUnmovedLegions();
+            }
+        };
+
+        undoAllMovesAction = new AbstractAction(undoAllMoves)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                player.undoAllMoves();
+                // Remove all moves from MasterBoard and show unmoved legions.
+                game.highlightUnmovedLegions();
+            }
+        };
+
+        takeMulliganAction = new AbstractAction(takeMulligan)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                player.takeMulligan();
+                if (player.getMulligansLeft() == 0)
+                {
+                    // Remove the Take Mulligan button, and reroll movement. 
+                    setupMoveDialog();
+                }
+                // Remove all moves from MasterBoard.
+                unselectAllHexes();
+            }
+        };
+
+        doneWithMovesAction = new AbstractAction(doneWithMoves)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                // If any legions has a legal non-teleport move, then the 
+                // player must move at least one legion.
+                if (player.legionsMoved() == 0 && 
+                    player.countMobileLegions() > 0)
+                {
+                    // Highlight all unmoved legions, rather than the
+                    // locations to which the forced-to-move legion can move. 
+                    game.highlightUnmovedLegions();
+                    JOptionPane.showMessageDialog(MasterBoard.this, 
+                        "At least one legion must move.");
+                    return;
+                }
+                else
+                {
+                    // If two or more legions share the same hex, force a
+                    // move if one is legal.  Otherwise, recombine them.
+                    Collection legions = player.getLegions();
+                    Iterator it = legions.iterator();
+                    while (it.hasNext())
+                    {
+                        Legion legion = (Legion)it.next();
+                        MasterHex hex = legion.getCurrentHex();
+                        if (hex.getNumFriendlyLegions(player) > 1)
+                        {
+                            // If there are no legal moves, recombine.
+                            if (game.countConventionalMoves(legion) == 0)
+                            {
+                                hex.recombineAllLegions();
+                            }
+                            else
+                            {
+                                // Highlight all unmoved legions, rather than 
+                                // the locations to which the forced-to-move 
+                                // legion can move. 
+                                game.highlightUnmovedLegions();
+                                JOptionPane.showMessageDialog(MasterBoard.this,
+                                    "Split legions must be separated.");
+                                return;
+                            }
+                        }
+                    }
+                    advancePhase();
+                }
+            }
+        };
+
+        doneWithEngagementsAction = new AbstractAction(doneWithEngagements)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                // Advance only if there are no unresolved engagements.
+                if (game.highlightEngagements() == 0)
+                {
+                    advancePhase();
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(MasterBoard.this, 
+                        "Must Resolve Engagements."); 
+                }
+            }
+        };
+
+        undoLastRecruitAction = new AbstractAction(undoLastRecruit)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                player.undoLastRecruit();
+                game.highlightPossibleRecruits();
+            }
+        };
+
+        undoAllRecruitsAction = new AbstractAction(undoAllRecruits)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                player.undoAllRecruits();
+                game.highlightPossibleRecruits();
+            }
+        };
+
+        doneWithTurnAction = new AbstractAction(doneWithTurn)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                // Commit all moves.
+                player.commitMoves();
+                // Mulligans are only allowed on turn 1.
+                player.setMulligansLeft(0);
+                advancePhase();
+            }
+        };
+
+        withdrawFromGameAction = new AbstractAction(withdrawFromGame)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Player player = game.getActivePlayer();
+                String [] options = new String[2];
+                options[0] = "Yes";
+                options[1] = "No";
+                int answer = JOptionPane.showOptionDialog(MasterBoard.this,
+                    "Are you sure you with to withdraw from the game?",
+                    "Confirm Withdrawal?", 
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[1]);
+    
+                if (answer == JOptionPane.YES_OPTION)
+                {
+                   player.die(null, true);
+                   advancePhase();
+                }
+            }
+        };
+
+        viewRecruitInfoAction = new AbstractAction(viewRecruitInfo)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                MasterHex hex = getHexContainingPoint(lastPoint);
+                if (hex != null)
+                {
+                    new ShowMasterHex(MasterBoard.this, hex, lastPoint);
+                }
+            }
+        };
+        
+        viewBattleMapAction = new AbstractAction(viewBattleMap)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                MasterHex hex = getHexContainingPoint(lastPoint);
+                if (hex != null)
+                {
+                    new ShowBattleMap(MasterBoard.this, hex);
+                }
+            }
+        };
+    }
+
+
+    // XXX temp
+    private void advancePhase()
+    {
+    }
+    private void setupMoveDialog()
+    {
+    }
+
+
     private void initializePopupMenu()
     {
         popupMenu = new JPopupMenu();
-        menuItemHex = new JMenuItem("View Recruit Info");
-        menuItemMap = new JMenuItem("View BattleMap");
-        popupMenu.add(menuItemHex);
-        popupMenu.add(menuItemMap);
+        menuItemRecruitInfo = popupMenu.add(viewRecruitInfoAction);
+        menuItemBattleMap = popupMenu.add(viewBattleMapAction);
         contentPane.add(popupMenu);
-        menuItemHex.addActionListener(this);
-        menuItemMap.addActionListener(this);
     }
 
 
@@ -111,6 +369,7 @@ public class MasterBoard extends JFrame implements MouseListener,
         JMenuItem mi;
 
         menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
 
         fileMenu = new JMenu("File");
         mi = new JMenuItem(newGame);
@@ -123,13 +382,15 @@ public class MasterBoard extends JFrame implements MouseListener,
         fileMenu.add(mi);
         menuBar.add(fileMenu);
 
+        // XXX These change by phase.
         actionMenu = new JMenu("Action");
-        mi = new JMenuItem(undoLast);
+        mi = new JMenuItem(undoLastSplit);
         actionMenu.add(mi);
-        mi = new JMenuItem(undoAll);
+        mi = new JMenuItem(undoAllSplits);
         actionMenu.add(mi);
-        mi = new JMenuItem(endPhase);
+        mi = new JMenuItem(doneWithSplits);
         actionMenu.add(mi);
+
         mi = new JMenuItem(takeMulligan);
         actionMenu.add(mi);
         mi = new JMenuItem(concedeBattle);
@@ -150,8 +411,6 @@ public class MasterBoard extends JFrame implements MouseListener,
         mi = new JCheckBoxMenuItem(showDice);
         optionsMenu.add(mi);
         menuBar.add(optionsMenu);
-
-        setJMenuBar(menuBar);
     }
                 
                 
@@ -184,7 +443,8 @@ public class MasterBoard extends JFrame implements MouseListener,
             try
             {
                 setIconImage(Toolkit.getDefaultToolkit().getImage(
-                    getClass().getResource(Creature.colossus.getImageName())));
+                    getClass().getResource(Chit.getImagePath(
+                    Creature.colossus.getImageName()))));
             }
             catch (NullPointerException e)
             {
@@ -258,12 +518,16 @@ public class MasterBoard extends JFrame implements MouseListener,
      *  if none does. */
     private Legion getLegionWithMarkerContainingPoint(Point point)
     {
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        Collection players = game.getPlayers();
+        Iterator it = players.iterator();
+        while (it.hasNext())
         {
-            Player player = game.getPlayer(i);
-            for (int j = 0; j < player.getNumLegions(); j++)
+            Player player = (Player)it.next();
+            Collection legions = player.getLegions();
+            Iterator it2 = legions.iterator();
+            while (it2.hasNext())
             {
-                Legion legion = player.getLegion(j);
+                Legion legion = (Legion)it2.next();
                 Marker marker = legion.getMarker();
                 if (marker != null && marker.contains(point))
                 {
@@ -506,23 +770,6 @@ public class MasterBoard extends JFrame implements MouseListener,
     }
 
 
-    public void actionPerformed(ActionEvent e)
-    {
-        MasterHex hex = getHexContainingPoint(lastPoint);
-        if (hex != null)
-        {
-            if (e.getActionCommand().equals("View Recruit Info"))
-            {
-                new ShowMasterHex(this, hex, lastPoint);
-            }
-            else if (e.getActionCommand().equals("View BattleMap"))
-            {
-                new ShowBattleMap(this, hex);
-            }
-        }
-    }
-
-
     public void setEraseFlag()
     {
         eraseFlag = true;
@@ -568,17 +815,22 @@ public class MasterBoard extends JFrame implements MouseListener,
             }
         }
 
-        // Paint in reverse order to make visible z-order match clicks.
-        for (int i = game.getNumPlayers() - 1; i >= 0; i--)
+        Collection players = game.getPlayers();
+        it = players.iterator();
+        while (it.hasNext())
         {
-            Player player = game.getPlayer(i);
-            for (int j = player.getNumLegions() - 1; j >= 0; j--)
+            Player player = (Player)it.next();
+            java.util.List legions = player.getLegions();
+
+            // Paint in reverse order to make visible z-order match clicks.
+            ListIterator lit = legions.listIterator(legions.size());
+            while (lit.hasPrevious())
             {
-                Marker marker = player.getLegion(j).getMarker();
-                if (marker != null && rectClip.intersects(
-                    player.getLegion(j).getMarker().getBounds()))
+                Legion legion = (Legion)lit.previous();
+                Marker marker = legion.getMarker();
+                if (marker != null && rectClip.intersects(marker.getBounds()))
                 {
-                    player.getLegion(j).getMarker().paint(offGraphics);
+                    marker.paint(offGraphics);
                 }
             }
         }

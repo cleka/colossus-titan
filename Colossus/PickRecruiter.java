@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class PickRecruiter allows a player to choose which creature(s) recruit.
@@ -12,21 +13,20 @@ import javax.swing.*;
 public class PickRecruiter extends JDialog implements MouseListener,
     WindowListener
 {
-    private int numEligible;
-    private Critter [] recruiters;
+    private ArrayList recruiters;
     private Player player;
     private Legion legion;
-    private Chit [] recruiterChits;
+    private ArrayList recruiterChits = new ArrayList();
     private Marker legionMarker;
-    private Chit [] legionChits;
     private int scale = 60;
     private int height;
     private GridBagLayout gridbag = new GridBagLayout(); 
     private GridBagConstraints constraints = new GridBagConstraints();
 
 
-    public PickRecruiter(JFrame parentFrame, Legion legion, int numEligible,
-        Critter [] recruiters)
+    /** recruiters is a list of Creatures */
+    public PickRecruiter(JFrame parentFrame, Legion legion,
+        ArrayList recruiters)
     {
         super(parentFrame, legion.getPlayer().getName() +
             ": Pick Recruiter", true);
@@ -34,7 +34,6 @@ public class PickRecruiter extends JDialog implements MouseListener,
         this.legion = legion;
         player = legion.getPlayer();
 
-        this.numEligible = numEligible;
         this.recruiters = recruiters;
 
         addMouseListener(this);
@@ -58,38 +57,42 @@ public class PickRecruiter extends JDialog implements MouseListener,
         gridbag.setConstraints(legionMarker, constraints);
         contentPane.add(legionMarker);
         
-        legionChits = new Chit[height];
-        for (int i = 0; i < height; i++)
+        Collection critters = legion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            legionChits[i] = new Chit(scale, 
-                legion.getCritter(i).getImageName(), this);
+            Critter critter = (Critter)it.next();
+            Chit chit = new Chit(scale, critter.getImageName(), this);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 0;
-            gridbag.setConstraints(legionChits[i], constraints);
-            contentPane.add(legionChits[i]);
+            gridbag.setConstraints(chit, constraints);
+            contentPane.add(chit);
         }
-
-        recruiterChits = new Chit[numEligible];
 
         // There are height + 1 chits in the top row.  There
         // are numEligible chits to place beneath.
         // So we have (height + 1) - numEligible empty 
         // columns, half of which we'll put in front.
+        int numEligible = recruiters.size();
         int leadSpace = ((height + 1) - numEligible) / 2;
         if (leadSpace < 0)
         {
             leadSpace = 0;
         }
 
-        for (int i = 0; i < numEligible; i++)
+        int i = 0;
+        it = recruiters.iterator();
+        while (it.hasNext())
         {
-            recruiterChits[i] = new Chit(scale, recruiters[i].getImageName(),
-                this);
+            Creature recruiter = (Creature)it.next();
+            Chit chit = new Chit(scale, recruiter.getImageName(), this);
+            recruiterChits.add(chit);
             constraints.gridx = leadSpace + i;
             constraints.gridy = 1;
-            gridbag.setConstraints(recruiterChits[i], constraints);
-            contentPane.add(recruiterChits[i]);
-            recruiterChits[i].addMouseListener(this);
+            gridbag.setConstraints(chit, constraints);
+            contentPane.add(chit);
+            chit.addMouseListener(this);
+            i++;
         }
 
         pack();
@@ -106,18 +109,15 @@ public class PickRecruiter extends JDialog implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
-        for (int i = 0; i < numEligible; i++)
+        int i = recruiterChits.indexOf(source);
+        if (i != -1)
         {
-            if (recruiterChits[i] == source)
-            {
-                // The selected recruiter will be placed in the 0th 
-                // position of the array.
-                recruiters[0] = recruiters[i];
+            // Place the selected recruiter first in the list.
+            recruiters.set(0, recruiters.get(i));
 
-                // Then exit.
-                dispose();
-                return;
-            }
+            // Then exit.
+            dispose();
+            return;
         }
     }
 

@@ -15,6 +15,9 @@ public class MasterHex extends Hex
 
     private MasterHex [] neighbors = new MasterHex[6];
 
+    /** Constant for each terrain type */
+    private ArrayList recruits = new ArrayList(5);
+
     // Terrain types are:
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
@@ -401,363 +404,6 @@ public class MasterHex extends Hex
     }
 
 
-    // Return the number of types of recruits for this terrain type.
-    public int getNumRecruitTypes()
-    {
-        switch (getTerrain())
-        {
-            case 'B':
-            case 'D':
-            case 'H':
-            case 'M':
-            case 'P':
-            case 'S':
-            case 'W':
-                return 3;
-
-            case 'J':
-            case 'm':
-            case 't':
-                return 4;
-
-            case 'T':
-                return 5;
-
-            default:
-                return -1;
-        }
-    }
-
-
-    // Return the ith recruit possible in this terrain type.
-    public Creature getRecruit(int i)
-    {
-        switch (getTerrain())
-        {
-            case 'B':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.gargoyle;
-                    case 1:
-                        return Creature.cyclops;
-                    case 2:
-                        return Creature.gorgon;
-                    default:
-                        return null;
-                }
-
-            case 'D':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.lion;
-                    case 1:
-                        return Creature.griffon;
-                    case 2:
-                        return Creature.hydra;
-                    default:
-                        return null;
-                }
-
-            case 'H':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.ogre;
-                    case 1:
-                        return Creature.minotaur;
-                    case 2:
-                        return Creature.unicorn;
-                    default:
-                        return null;
-                }
-
-            case 'J':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.gargoyle;
-                    case 1:
-                        return Creature.cyclops;
-                    case 2:
-                        return Creature.behemoth;
-                    case 3:
-                        return Creature.serpent;
-                    default:
-                        return null;
-                }
-
-            case 'm':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.lion;
-                    case 1:
-                        return Creature.minotaur;
-                    case 2:
-                        return Creature.dragon;
-                    case 3:
-                        return Creature.colossus;
-                    default:
-                        return null;
-                }
-
-            case 'M':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.ogre;
-                    case 1:
-                        return Creature.troll;
-                    case 2:
-                        return Creature.ranger;
-                    default:
-                        return null;
-                }
-
-            case 'P':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.centaur;
-                    case 1:
-                        return Creature.lion;
-                    case 2:
-                        return Creature.ranger;
-                    default:
-                        return null;
-                }
-
-            case 'S':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.troll;
-                    case 1:
-                        return Creature.wyvern;
-                    case 2:
-                        return Creature.hydra;
-                    default:
-                        return null;
-                }
-
-            case 'T':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.centaur;
-                    case 1:
-                        return Creature.gargoyle;
-                    case 2:
-                        return Creature.ogre;
-                    case 3:
-                        return Creature.guardian;
-                    case 4:
-                        return Creature.warlock;
-                    default:
-                        return null;
-                }
-
-            case 't':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.troll;
-                    case 1:
-                        return Creature.warbear;
-                    case 2:
-                        return Creature.giant;
-                    case 3:
-                        return Creature.colossus;
-                    default:
-                        return null;
-                }
-
-            case 'W':
-                switch (i)
-                {
-                    case 0:
-                        return Creature.centaur;
-                    case 1:
-                        return Creature.warbear;
-                    case 2:
-                        return Creature.unicorn;
-                    default:
-                        return null;
-                }
-
-            default:
-                return null;
-        }
-    }
-
-
-    // Return the number of the next lower creature needed to muster the ith
-    // recruit possible in this terrain type. If not applicable, return 0.
-    public int getNumToRecruit(int i)
-    {
-        switch (getTerrain())
-        {
-            case 'B':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 2;
-                    case 2:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            case 'D':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 3;
-                    case 2:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            case 'H':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 3;
-                    case 2:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            case 'J':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 2;
-                    case 2:
-                        return 3;
-                    case 3:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            case 'm':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 2;
-                    case 2:
-                        return 2;
-                    case 3:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            case 'M':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 2;
-                    case 2:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            case 'P':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 2;
-                    case 2:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            case 'S':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 3;
-                    case 2:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            case 'T':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 0;
-                    case 2:
-                        return 0;
-                    case 3:
-                        return 0;
-                    case 4:
-                        return 0;
-                    default:
-                        return 0;
-                }
-
-            case 't':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 2;
-                    case 2:
-                        return 2;
-                    case 3:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            case 'W':
-                switch (i)
-                {
-                    case 0:
-                        return 0;
-                    case 1:
-                        return 3;
-                    case 2:
-                        return 2;
-                    default:
-                        return 0;
-                }
-
-            default:
-                return 0;
-        }
-    }
-
-
     // Return a point near the center of the hex, vertically offset
     // a bit toward the fat side.
     private Point getOffCenter()
@@ -803,17 +449,7 @@ public class MasterHex extends Hex
 
     public int getNumEnemyLegions(Player player)
     {
-        int count = 0;
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            if (legion.getPlayer() != player)
-            {
-                count++;
-            }
-        }
-        return count;
+        return legions.size() - getNumFriendlyLegions(player);
     }
 
 
@@ -838,6 +474,7 @@ public class MasterHex extends Hex
     }
 
 
+    /** Return the first legion belonging to player. */
     public Legion getFriendlyLegion(Player player)
     {
         Iterator it = legions.iterator();
@@ -853,6 +490,7 @@ public class MasterHex extends Hex
     }
 
 
+    /** Return the first legion not belonging to player. */
     public Legion getEnemyLegion(Player player)
     {
         Iterator it = legions.iterator();
@@ -958,13 +596,19 @@ public class MasterHex extends Hex
         }
     }
 
-    /** Combines all the legions in the hex into the first legion.  Do
-        not call this unless all legions in the hex are friendly. */
+    /** Combines all split-off legions in the hex into the parent legion. */
     public void recombineAllLegions()
     {
-        for (int j = getNumLegions() - 1; j >= 1; j--)
+        Iterator it = legions.iterator();
+        while (it.hasNext())
         {
-            getLegion(j).recombine(getLegion(0), true);
+            Legion legion = (Legion)it.next();
+            Legion parent = legion.getParent();
+            if (legions.contains(parent))
+            {
+                legion.recombine(parent, false);
+                it.remove();
+            }
         }
     }
 
@@ -1085,8 +729,8 @@ public class MasterHex extends Hex
     }
 
 
-    // Return a possible entry side.  If there is more than one, only one
-    // will be returned.  If there is none, -1 will be returned.
+    /** Return a possible entry side.  If there is more than one, only one
+     *  will be returned.  If there is none, -1 will be returned. */
     public int getEntrySide()
     {
         for (int i = 0; i < 6; i++)

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class AcquireAngel allows a player to acquire an angel or archangel.
@@ -13,10 +14,10 @@ public class AcquireAngel extends JDialog implements MouseListener,
     WindowListener
 {
     private int numEligible;
-    private Creature [] recruits;
+    private ArrayList recruits = new ArrayList();
     private Player player;
     private Legion legion;
-    private Chit [] chits;
+    private ArrayList chits = new ArrayList();
 
 
     public AcquireAngel(JFrame parentFrame, Legion legion, boolean archangel)
@@ -26,9 +27,6 @@ public class AcquireAngel extends JDialog implements MouseListener,
 
         this.legion = legion;
         player = legion.getPlayer();
-
-        recruits = new Creature[2];
-        chits = new Chit[2];
 
         addMouseListener(this);
         addWindowListener(this);
@@ -49,11 +47,14 @@ public class AcquireAngel extends JDialog implements MouseListener,
         setBackground(Color.lightGray);
         setResizable(false);
 
-        for (int i = 0; i < numEligible; i++)
+        Iterator it = recruits.iterator();
+        while (it.hasNext())
         {
-            chits[i] = new Chit(scale, recruits[i].getImageName(), this);
-            contentPane.add(chits[i]);
-            chits[i].addMouseListener(this);
+            Creature recruit = (Creature)it.next();
+            Chit chit = new Chit(scale, recruit.getImageName(), this);
+            chits.add(chit);
+            contentPane.add(chit);
+            chit.addMouseListener(this);
         }
 
         pack();
@@ -70,21 +71,19 @@ public class AcquireAngel extends JDialog implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
-        for (int i = 0; i < numEligible; i++)
+        int i = chits.indexOf(source);
+        if (i != -1)
         {
-            if (chits[i] == source)
-            {
-                // Select that marker.
-                Creature creature = recruits[i];
-                legion.addCreature(creature, true);
+            // Select that marker.
+            Creature creature = (Creature)recruits.get(i);
+            legion.addCreature(creature, true);
 
-                Game.logEvent("Legion " + legion.getMarkerId() +
-                    " acquired an " + creature.getName());
+            Game.logEvent("Legion " + legion.getMarkerId() +
+                " acquired an " + creature.getName());
 
-                // Then exit.
-                dispose();
-                return;
-            }
+            // Then exit.
+            dispose();
+            return;
         }
     }
 

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class Negotiate allows two players to settle an engagement.
@@ -12,8 +13,8 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
 {
     private Legion attacker;
     private Legion defender;
-    private Chit [] attackerChits;
-    private Chit [] defenderChits;
+    private ArrayList attackerChits = new ArrayList();
+    private ArrayList defenderChits = new ArrayList();
     private Marker attackerMarker;
     private Marker defenderMarker;
     private static final int scale = 60;
@@ -51,17 +52,19 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         gridbag.setConstraints(attackerMarker, constraints);
         contentPane.add(attackerMarker);
 
-        attackerChits = new Chit[attacker.getHeight()];
-        for (int i = 0; i < attacker.getHeight(); i++)
+        Collection critters = attacker.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            attackerChits[i] = new Chit(scale, 
-                attacker.getCritter(i).getImageName(), this);
+            Critter critter = (Critter)it.next();
+            Chit chit = new Chit(scale, critter.getImageName(), this);
+            attackerChits.add(chit);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 0;
             constraints.gridwidth = 1;
-            gridbag.setConstraints(attackerChits[i], constraints);
-            contentPane.add(attackerChits[i]);
-            attackerChits[i].addMouseListener(this);
+            gridbag.setConstraints(chit, constraints);
+            contentPane.add(chit);
+            chit.addMouseListener(this);
         }
         
         defenderMarker = new Marker(scale, defender.getImageName(), this, 
@@ -72,17 +75,19 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         gridbag.setConstraints(defenderMarker, constraints);
         contentPane.add(defenderMarker);
 
-        defenderChits = new Chit[defender.getHeight()];
-        for (int i = 0; i < defender.getHeight(); i++)
+        critters = defender.getCritters();
+        it = critters.iterator();
+        while (it.hasNext())
         {
-            defenderChits[i] = new Chit(scale,
-                defender.getCritter(i).getImageName(), this);
+            Critter critter = (Critter)it.next();
+            Chit chit = new Chit(scale, critter.getImageName(), this);
+            defenderChits.add(chit);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 1;
             constraints.gridwidth = 1;
-            gridbag.setConstraints(defenderChits[i], constraints);
-            contentPane.add(defenderChits[i]);
-            defenderChits[i].addMouseListener(this);
+            gridbag.setConstraints(chit, constraints);
+            contentPane.add(chit);
+            chit.addMouseListener(this);
         }
 
         JButton button1 = new JButton("Agree");
@@ -141,25 +146,11 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
-        for (int i = 0; i < attacker.getHeight(); i++)
+        if (attackerChits.contains(source) || defenderChits.contains(source))
         {
-            Chit chit = attackerChits[i];
-            if (chit == source)
-            {
-                chit.toggleDead();
-                chit.repaint();
-                return;
-            }
-        }
-        for (int i = 0; i < defender.getHeight(); i++)
-        {
-            Chit chit = defenderChits[i];
-            if (chit == source)
-            {
-                chit.toggleDead();
-                chit.repaint();
-                return;
-            }
+            Chit chit = (Chit)source;
+            chit.toggleDead();
+            chit.repaint();
         }
     }
 
@@ -190,17 +181,23 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
         {
             // Count remaining chits.
             int attackersLeft = 0;
-            for (int i = 0; i < attacker.getHeight(); i++)
+
+            Iterator it = attackerChits.iterator();
+            while (it.hasNext())
             {
-                if (!attackerChits[i].isDead())
+                Chit chit = (Chit)it.next();
+                if (!chit.isDead())
                 {
                     attackersLeft++;
                 }
             }
+
             int defendersLeft = 0;
-            for (int i = 0; i < defender.getHeight(); i++)
+            it = defenderChits.iterator();
+            while (it.hasNext())
             {
-                if (!defenderChits[i].isDead())
+                Chit chit = (Chit)it.next();
+                if (!chit.isDead())
                 {
                     defendersLeft++;
                 }
@@ -220,8 +217,8 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
             // give no points.
             if (attackersLeft == 0 && defendersLeft == 0)
             {
-                attacker.removeLegion();
-                defender.removeLegion();
+                attacker.remove();
+                defender.remove();
                 
                 Game.logEvent(attacker.getMarkerId() + " and " +
                     defender.getMarkerId() + 
@@ -255,7 +252,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
             {
                 Legion winner;
                 Legion loser;
-                Chit [] winnerChits;
+                ArrayList winnerChits;
 
                 if (defendersLeft == 0)
                 {
@@ -272,10 +269,11 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
 
                 // Ensure that the winning legion doesn't contain a dead
                 // Titan.
-                for (int i = winner.getHeight() - 1; i >= 0; i--)
+                it = winnerChits.iterator();
+                while (it.hasNext())
                 {
-                    if (winnerChits[i].isDead() && winner.getCreature(i) ==
-                        Creature.titan)
+                    Chit chit = (Chit)it.next();
+                    if (chit.isDead() && chit.getId().startsWith("Titan"))
                     {
                         JOptionPane.showMessageDialog(parentFrame,
                             "Titan cannot die unless his whole stack dies.");
@@ -288,16 +286,24 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
                 log.append(" loses creatures ");
 
                 // Remove all dead creatures from the winning legion.
-                for (int i = winner.getHeight() - 1; i >= 0; i--)
+                it = winnerChits.iterator();
+                while (it.hasNext())
                 {
-                    if (winnerChits[i].isDead())
+                    Chit chit = (Chit)it.next();
+                    if (chit.isDead())
                     {
-                        log.append(winner.getCreature(i).getName());
-                        if (i > 0)
+                        String name = chit.getId();
+                        if (name.startsWith("Titan"))
+                        {
+                            name = "Titan";
+                        }
+                        log.append(name);
+                        if (!it.hasNext())
                         {
                             log.append(", ");
                         }
-                        winner.removeCreature(i, true, true);
+                        winner.removeCreature(
+                            Creature.getCreatureFromName(name), true, true);
                     }
                 }
                 Game.logEvent(log.toString());
@@ -305,7 +311,7 @@ public class Negotiate extends JDialog implements MouseListener, ActionListener
                 int points = loser.getPointValue();
 
                 // Remove the losing legion.
-                loser.removeLegion();
+                loser.remove();
 
                 // Add points, and angels if necessary.
                 winner.addPoints(points);

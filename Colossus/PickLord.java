@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
 /**
  * Class PickLord allows a player to choose which lord tower teleports.
@@ -13,9 +14,9 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
 {
     private Player player;
     private Legion legion;
-    private Chit [] chits;
+    private ArrayList chits = new ArrayList();
     private static final int scale = 60;
-    private Creature [] lords;
+    private ArrayList lords = new ArrayList();
 
 
     public PickLord(JFrame parentFrame, Legion legion)
@@ -36,34 +37,29 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
 
         setBackground(Color.lightGray);
 
-        lords = new Critter[3];
-
-        int numLordTypes = 0;
         if (legion.numCreature(Creature.titan) > 0)
         {
-            lords[numLordTypes] = legion.getCritter(Creature.titan);
-            numLordTypes++;
+            lords.add(legion.getCritter(Creature.titan));
         }
         if (legion.numCreature(Creature.archangel) > 0)
         {
-            lords[numLordTypes] = legion.getCritter(Creature.archangel);
-            numLordTypes++;
+            lords.add(legion.getCritter(Creature.archangel));
         }
         if (legion.numCreature(Creature.angel) > 0)
         {
-            lords[numLordTypes] = legion.getCritter(Creature.angel);
-            numLordTypes++;
+            lords.add(legion.getCritter(Creature.angel));
         }
         
         setResizable(false);
 
-        chits = new Chit[numLordTypes];
-
-        for (int i = 0; i < chits.length; i++)
+        Iterator it = lords.iterator();
+        while (it.hasNext())
         {
-            chits[i] = new Chit(scale, lords[i].getImageName(), this);
-            contentPane.add(chits[i]);
-            chits[i].addMouseListener(this);
+            Critter critter = (Critter)it.next();
+            Chit chit = new Chit(scale, critter.getImageName(), this);
+            chits.add(chit);
+            contentPane.add(chit);
+            chit.addMouseListener(this);
         }
         
         pack();
@@ -80,14 +76,12 @@ public class PickLord extends JDialog implements MouseListener, WindowListener
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
-        for (int i = 0; i < chits.length; i++)
+        int i = chits.indexOf(source);
+        if (i != -1)
         {
-            if (chits[i] == source)
-            {
-                legion.revealCreatures(lords[i], 1);
-                dispose();
-                return;
-            }
+            legion.revealCreatures((Critter)lords.get(i), 1);
+            dispose();
+            return;
         }
     }
 

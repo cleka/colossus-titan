@@ -50,10 +50,10 @@ public class Game
     public static final String saveExtension = ".sav";
 
     // Per-player client options
-    private static boolean autoPickRecruiter; 
+    private static boolean autoPickRecruiter;
     private static boolean showDice = true;
     private static boolean showGameStatus = true;
-    
+
     // Server options
     private static boolean autosaveEveryTurn = true;
     private static boolean allVisible;
@@ -91,10 +91,12 @@ public class Game
         {
             statusScreen = new StatusScreen(this);
             board = new MasterBoard(this);
-            for (int i = 0; i < getNumPlayers(); i++)
+            Iterator it = players.iterator();
+            while (it.hasNext())
             {
-                pickInitialMarker(getPlayer(i));
-                placeInitialLegion(getPlayer(i));
+                Player player = (Player)it.next();
+                pickInitialMarker(player);
+                placeInitialLegion(player);
                 updateStatusScreen();
             }
             board.loadInitialMarkerImages();
@@ -187,7 +189,7 @@ public class Game
 
             for (int i = 0; i < numPlayers; i++)
             {
-                if (playerTower[i] == 0)
+                if (playerTower[i] == UNASSIGNED)
                 {
                     boolean unique = true;
                     for (int j = 0; j < numPlayers; j++)
@@ -306,7 +308,7 @@ public class Game
 
             case 1:
                 logEvent(winner.getName() + " wins");
-                JOptionPane.showMessageDialog(board, 
+                JOptionPane.showMessageDialog(board,
                     winner.getName() + " wins");
                 dispose();
                 break;
@@ -429,7 +431,7 @@ public class Game
              }
         }
 
-        String filename = saveDirname + File.separator + 
+        String filename = saveDirname + File.separator +
             date.getTime() + saveExtension;
         FileWriter fileWriter;
         try
@@ -449,14 +451,18 @@ public class Game
         out.println(getActivePlayerNum());
         out.println(getPhase());
 
-        for (int i = 0; i < Creature.creatures.length; i++)
+        java.util.List creatures = Creature.getCreatures();
+        Iterator it = creatures.iterator();
+        while (it.hasNext())
         {
-            out.println(Creature.creatures[i].getCount());
+            Creature creature = (Creature)it.next();
+            out.println(creature.getCount());
         }
 
-        for (int i = 0; i < getNumPlayers(); i++)
+        it = players.iterator();
+        while (it.hasNext())
         {
-            Player player = getPlayer(i);
+            Player player = (Player)it.next();
             out.println(player.getName());
             out.println(player.getColor());
             out.println(player.getTower());
@@ -468,26 +474,32 @@ public class Game
             out.println(player.getNumMarkersAvailable());
 
             Collection markerIds = player.getMarkersAvailable();
-            Iterator it = markerIds.iterator();
-            while (it.hasNext())
+            Iterator it2 = markerIds.iterator();
+            while (it2.hasNext())
             {
-                String markerId = (String)it.next();
+                String markerId = (String)it2.next();
                 out.println(markerId);
             }
 
             out.println(player.getNumLegions());
 
-            for (int j = 0; j < player.getNumLegions(); j++)
+            Collection legions = player.getLegions();
+            it2 = legions.iterator();
+            while (it2.hasNext())
             {
-                Legion legion = player.getLegion(j);
+                Legion legion = (Legion)it2.next();
                 out.println(legion.getMarkerId());
                 out.println(legion.getCurrentHex().getLabel());
 
                 out.println(legion.getHeight());
-                for (int k = 0; k < legion.getHeight(); k++)
+
+                Collection critters = legion.getCritters();
+                Iterator it3 = critters.iterator();
+                while (it3.hasNext())
                 {
-                    out.println(legion.getCritter(k).getName());
-                    out.println(legion.getCritter(k).isVisible());
+                    Critter critter = (Critter)it3.next();
+                    out.println(critter.getName());
+                    out.println(critter.isVisible());
                 }
             }
         }
@@ -540,7 +552,7 @@ public class Game
                 System.out.println("No savegames found in saves directory");
                 dispose();
             }
-            file = new File(saveDirname + File.separator + 
+            file = new File(saveDirname + File.separator +
                 latestSaveFilename(filenames));
         }
         else
@@ -570,11 +582,14 @@ public class Game
             buf = in.readLine();
             phase = Integer.parseInt(buf);
 
-            for (int i = 0; i < Creature.creatures.length; i++)
+            java.util.List creatures = Creature.getCreatures();
+            Iterator it = creatures.iterator();
+            while (it.hasNext())
             {
+                Creature creature = (Creature)it.next();
                 buf = in.readLine();
                 int count = Integer.parseInt(buf);
-                Creature.creatures[i].setCount(count);
+                creature.setCount(count);
             }
 
             for (int i = 0; i < numPlayers; i++)
@@ -632,21 +647,21 @@ public class Game
                     buf = in.readLine();
                     int height = Integer.parseInt(buf);
 
-                    Creature [] creatures = new Creature[8];
+                    Creature [] critters = new Creature[8];
                     boolean [] visibles = new boolean[height];
 
                     for (int k = 0; k < height; k++)
                     {
                         buf = in.readLine();
-                        creatures[k] = Creature.getCreatureFromName(buf);
+                        critters[k] = Creature.getCreatureFromName(buf);
                         buf = in.readLine();
                         visibles[k] = Boolean.valueOf(buf).booleanValue();
                     }
 
                     Legion legion = new Legion(markerId, null,
-                        MasterBoard.getHexFromLabel(hexLabel), creatures[0],
-                        creatures[1], creatures[2], creatures[3], creatures[4],
-                        creatures[5], creatures[6], creatures[7], player);
+                        MasterBoard.getHexFromLabel(hexLabel), critters[0],
+                        critters[1], critters[2], critters[3], critters[4],
+                        critters[5], critters[6], critters[7], player);
 
                     for (int k = 0; k < height; k++)
                     {
@@ -687,6 +702,10 @@ public class Game
             {
                 numberPart.append(ch);
             }
+            else
+            {
+                break;
+            }
         }
         try
         {
@@ -699,29 +718,118 @@ public class Game
     }
 
 
-    /** Find the save filename with the highest numerical value. 
+    /** Find the save filename with the highest numerical value.
         (1000000000.sav comes after 999999999.sav) */
     private String latestSaveFilename(String [] filenames)
     {
-        String bestFilename = "";
-        long bestNum = -1L;
-        for (int i = 0; i < filenames.length; i++)
+        class StringNumComparator implements Comparator
         {
-            String filename = filenames[i];
-            long num = numberValue(filename);
-            if (num > bestNum)
+            public int compare(Object o1, Object o2) throws ClassCastException
             {
-                bestNum = num;
-                bestFilename = filename;
+                if (!(o1 instanceof String) || !(o2 instanceof String))
+                {
+                    throw new ClassCastException();
+                }
+
+                return (int)(numberValue((String)o1) - 
+                    numberValue((String)o2));
             }
         }
-        return bestFilename;
+
+        return (String)Collections.max(Arrays.asList(filenames), new 
+            StringNumComparator());
     }
 
 
-    // Returns the number of the given recruiter needed to muster the given
-    // recruit in the given terrain.  Returns -1 on error.
-    public static int numberOfRecruiterNeeded(Critter recruiter, Creature
+    /** Return a list of creatures that can be recruited in
+     *  the given terrain, ordered from lowest to highest. */
+    public static ArrayList getPossibleRecruits(char terrain)
+    {
+        ArrayList recruits = new ArrayList(5);
+
+        switch (terrain)
+        {
+            case 'B':
+                recruits.add(Creature.gargoyle);
+                recruits.add(Creature.cyclops);
+                recruits.add(Creature.gorgon);
+                break;
+
+            case 'D':
+                recruits.add(Creature.lion);
+                recruits.add(Creature.griffon);
+                recruits.add(Creature.hydra);
+                break;
+
+            case 'H':
+                recruits.add(Creature.ogre);
+                recruits.add(Creature.minotaur);
+                recruits.add(Creature.unicorn);
+                break;
+
+            case 'J':
+                recruits.add(Creature.gargoyle);
+                recruits.add(Creature.cyclops);
+                recruits.add(Creature.behemoth);
+                recruits.add(Creature.serpent);
+                break;
+
+            case 'm':
+                recruits.add(Creature.lion);
+                recruits.add(Creature.minotaur);
+                recruits.add(Creature.dragon);
+                recruits.add(Creature.colossus);
+                break;
+
+            case 'M':
+                recruits.add(Creature.ogre);
+                recruits.add(Creature.troll);
+                recruits.add(Creature.ranger);
+                break;
+
+            case 'P':
+                recruits.add(Creature.centaur);
+                recruits.add(Creature.lion);
+                recruits.add(Creature.ranger);
+                break;
+
+            case 'S':
+                recruits.add(Creature.troll);
+                recruits.add(Creature.wyvern);
+                recruits.add(Creature.hydra);
+                break;
+
+            case 'T':
+                recruits.add(Creature.centaur);
+                recruits.add(Creature.gargoyle);
+                recruits.add(Creature.ogre);
+                recruits.add(Creature.guardian);
+                recruits.add(Creature.warlock);
+                break;
+
+            case 't':
+                recruits.add(Creature.troll);
+                recruits.add(Creature.warbear);
+                recruits.add(Creature.giant);
+                recruits.add(Creature.colossus);
+                break;
+
+            case 'W':
+                recruits.add(Creature.centaur);
+                recruits.add(Creature.warbear);
+                recruits.add(Creature.unicorn);
+                break;
+        }
+
+        return recruits;
+    }
+
+
+
+    /** Return the number of the given recruiter needed to muster the given
+      * recruit in the given terrain.  Return an impossible big number
+      * if the recruiter can't muster that recruit in that terrain. */
+    public static int numberOfRecruiterNeeded(Creature recruiter, Creature
         recruit, char terrain)
     {
         switch (terrain)
@@ -1163,37 +1271,28 @@ public class Game
                     }
                 }
                 break;
-
-            default:
-                return -1;
         }
-        return -1;
+
+        return 99;
     }
 
 
-    // Returns the number of eligible recruits.  The passed-in recruits array
-    // should be of length 5, and will be filled with the eligible recruits.
-    public static int findEligibleRecruits(Legion legion, Creature [] recruits)
+    /** Return a list of eligible recruits, as Creatures. */
+    public static ArrayList findEligibleRecruits(Legion legion)
     {
-        // Paranoia
-        if (recruits.length != 5)
-        {
-            System.out.println("Bad arg passed to findEligibleRecruits()");
-            return 0;
-        }
-        for (int i = 0; i < recruits.length; i++)
-        {
-            recruits[i] = null;
-        }
+        ArrayList recruits; 
 
         MasterHex hex = legion.getCurrentHex();
+        char terrain = hex.getTerrain();
 
         // Towers are a special case.
         if (hex.getTerrain() == 'T')
         {
-            recruits[0] = Creature.centaur;
-            recruits[1] = Creature.gargoyle;
-            recruits[2] = Creature.ogre;
+            recruits = new ArrayList();
+
+            recruits.add(Creature.centaur);
+            recruits.add(Creature.gargoyle);
+            recruits.add(Creature.ogre);
             if (legion.numCreature(Creature.behemoth) >= 3 ||
                 legion.numCreature(Creature.centaur) >= 3 ||
                 legion.numCreature(Creature.colossus) >= 3 ||
@@ -1215,117 +1314,118 @@ public class Game
                 legion.numCreature(Creature.warbear) >= 3 ||
                 legion.numCreature(Creature.wyvern) >= 3)
             {
-                recruits[3] = Creature.guardian;
+                recruits.add(Creature.guardian);
             }
             if (legion.numCreature(Creature.titan) >= 1 ||
                 legion.numCreature(Creature.warlock) >= 1)
             {
-                recruits[4] = Creature.warlock;
+                recruits.add(Creature.warlock);
             }
         }
         else
         {
-            int numRecruitTypes = hex.getNumRecruitTypes();
-            Creature [] recruitTypes = new Creature[numRecruitTypes];
-            for (int i = 0; i < numRecruitTypes; i++)
-            {
-                recruitTypes[i] = hex.getRecruit(i);
-            }
+            recruits = getPossibleRecruits(hex.getTerrain());
 
-            for (int i = numRecruitTypes - 1; i >= 0; i--)
+            ListIterator lit = recruits.listIterator(recruits.size());
+            while (lit.hasPrevious())
             {
-                int numCreature = legion.numCreature(recruitTypes[i]);
+                Creature creature = (Creature)lit.previous();
+                int numCreature = legion.numCreature(creature);
                 if (numCreature >= 1)
                 {
-                    int numToRecruit = hex.getNumToRecruit(i + 1);
-                    if (numToRecruit > 0 && numCreature >= numToRecruit)
-                    {
-                        // We can recruit the next highest creature.
-                        recruits[i + 1] = recruitTypes[i + 1];
-                    }
-                    for (int j = i; j >= 0; j--)
-                    {
-                        // We can recruit this creature and all below it.
-                        recruits[j] = recruitTypes[j];
-                    }
+                    // We already have one of this creature, so we 
+                    // can recruit it and all lesser creatures in
+                    // this hex.
                     break;
                 }
-            }
-        }
-
-
-        // Check for availability of chits.
-        int count = 0;
-
-        for (int i = 0; i < recruits.length; i++)
-        {
-            if (recruits[i] != null && recruits[i].getCount() < 1)
-            {
-                recruits[i] = null;
-            }
-            if (recruits[i] != null)
-            {
-                count++;
-            }
-        }
-
-        // Pack the recruits array for display.
-        for (int i = 0; i < count; i++)
-        {
-            while (recruits[i] == null)
-            {
-                for (int j = i; j < recruits.length - 1; j++)
+                else
                 {
-                    recruits[j] = recruits[j + 1];
+                    if (lit.hasPrevious())
+                    {
+                        Creature lesser = (Creature)lit.previous();
+                        int numLesser = legion.numCreature(lesser);
+                        if (numLesser >= numberOfRecruiterNeeded(lesser,
+                            creature, terrain))
+                        {
+                            // We have enough of the previous creature
+                            // to recruit this and all lesser creatures
+                            // in this hex.
+                            break;
+                        }
+                        else if (numLesser >= 1)
+                        {
+                            // We can't recruit this creature, but
+                            // we have at least one of the previous
+                            // creature, so we can recruit all lesser
+                            // creatures in this hex.
+                            lit.next();
+                            lit.next();
+                            lit.remove();
+                            break;
+                        }
+                        else
+                        {
+                            // We can't recruit this creature.  Continue.
+                            lit.next();
+                            lit.next();
+                            lit.remove();
+                        }
+                    }
+                    else
+                    {
+                        // This is the lowest creature in this hex,
+                        // so we can't recruit it with a lesser creature.
+                        lit.remove();
+                    }
                 }
-                recruits[recruits.length - 1] = null;
             }
         }
 
-        return count;
+        // Make sure that the potential recruits are available.
+        Iterator it = recruits.iterator();
+        while (it.hasNext())
+        {
+            Creature recruit = (Creature)it.next();
+            if (recruit.getCount() < 1)
+            {
+                it.remove();
+            }
+        }
+
+        return recruits;
     }
 
 
-    // Returns the number of eligible recruiters.  The passed-in recruiters
-    // array should be of length 4 and will be filled in with recruiters.
-    // We use a Critter array instead of a Creature array so that Titan
-    // power is shown properly.
-    public static int findEligibleRecruiters(Legion legion, Creature recruit,
-        Critter [] recruiters)
+    /** Return a list of eligible recruiters. Use Critters instead 
+     *  of Creatures so that Titan power is shown properly. */
+    public static ArrayList findEligibleRecruiters(Legion legion, 
+        Creature recruit)
     {
-        // Paranoia
-        if (recruiters.length != 4)
-        {
-            System.out.println("Bad arg passed to findEligibleRecruiters()");
-            return 0;
-        }
-        for (int i = 0; i < recruiters.length; i++)
-        {
-            recruiters[i] = null;
-        }
+        ArrayList recruiters = new ArrayList();
 
         MasterHex hex = legion.getCurrentHex();
+        char terrain = hex.getTerrain();
 
-        int count = 0;
-
-        if (hex.getTerrain() == 'T')
+        if (terrain == 'T')
         {
             // Towers are a special case.  The recruiter of tower creatures
             // remains anonymous, so we only deal with guardians and warlocks.
             if (recruit.getName().equals("Guardian"))
             {
-                for (int i = 0; i < Creature.creatures.length; i++)
+                java.util.List creatures = Creature.getCreatures();
+                Iterator it = creatures.iterator();
+                while (it.hasNext())
                 {
-                    Creature creature = Creature.creatures[i];
+                    Creature creature = (Creature)it.next();
                     if (creature.getName().equals("Guardian") &&
                         legion.numCreature(creature) >= 1)
                     {
-                        recruiters[count++] = legion.getCritter(creature);
+                        recruiters.add(legion.getCritter(creature));
                     }
                     else if (!creature.isImmortal() &&
                         legion.numCreature(creature) >= 3)
                     {
-                        recruiters[count++] = legion.getCritter(creature);
+                        recruiters.add(legion.getCritter(creature));
                     }
                 }
             }
@@ -1333,74 +1433,53 @@ public class Game
             {
                 if (legion.numCreature(Creature.titan) >= 1)
                 {
-                    recruiters[count++] = legion.getCritter(Creature.titan);
+                    recruiters.add(legion.getCritter(Creature.titan));
                 }
                 if (legion.numCreature(Creature.warlock) >= 1)
                 {
-                    recruiters[count++] = legion.getCritter(Creature.warlock);
+                    recruiters.add(legion.getCritter(Creature.warlock));
                 }
             }
         }
         else
         {
-            int numRecruitTypes = hex.getNumRecruitTypes();
-
-            for (int i = 0; i < numRecruitTypes; i++)
+            recruiters = getPossibleRecruits(terrain);
+            Iterator it = recruiters.iterator();
+            while (it.hasNext())
             {
-                if (recruit.getName().equals(hex.getRecruit(i).getName()))
+                Creature possibleRecruiter = (Creature)it.next();
+                int needed = numberOfRecruiterNeeded(possibleRecruiter, 
+                    recruit, terrain);
+                if (needed < 1 || needed > legion.numCreature(
+                    possibleRecruiter))
                 {
-                    int numToRecruit = hex.getNumToRecruit(i);
-                    if (numToRecruit > 0 &&
-                        legion.numCreature(hex.getRecruit(i - 1)) >=
-                        numToRecruit)
-                    {
-                        // Can recruit up.
-                        recruiters[count++] = legion.getCritter(
-                            hex.getRecruit(i - 1));
-                    }
-                    for (int j = i; j < numRecruitTypes; j++)
-                    {
-                        if (legion.numCreature(hex.getRecruit(j)) >= 1)
-                        {
-                            // Can recruit down or level.
-                            recruiters[count++] = legion.getCritter(
-                                hex.getRecruit(j));
-                        }
-                    }
-                    break;
+                    // Zap this possible recruiter.
+                    it.remove();
                 }
             }
         }
 
-        return count;
+        return recruiters;
     }
 
 
-    // Return true if all members of legion who are in recruiters are
-    // already visible.  The passed-in recruiters array must be of
-    // length 4.
+    /** Return true if all members of legion who are in recruiters are
+     *  already visible. */
     public static boolean allRecruitersVisible(Legion legion,
-        Creature [] recruiters)
+        ArrayList recruiters)
     {
-        // Paranoia
-        if (recruiters.length != 4)
+        Collection critters = legion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            System.out.println("Bad arg passed to allRecruitersVisible()");
-            return false;
-        }
-
-        int height = legion.getHeight();
-
-        for (int i = 0; i < height; i++)
-        {
-            Critter critter = legion.getCritter(i);
+            Critter critter = (Critter)it.next();
             if (!critter.isVisible())
             {
-                for (int j = 0; j < recruiters.length; j++)
+                Iterator it2 = recruiters.iterator();
+                while (it2.hasNext())
                 {
-                    Creature recruiter = recruiters[j];
-                    if (recruiter != null && recruiter.getName().equals(
-                        critter.getName()))
+                    Creature recruiter = (Creature)it2.next();
+                    if (recruiter.getName().equals(critter.getName()))
                     {
                         return false;
                     }
@@ -1416,50 +1495,45 @@ public class Game
         JFrame parentFrame)
     {
         // Pick the recruiter(s) if necessary.
-        Critter [] recruiters = new Critter[4];
-        Critter recruiter;
+        ArrayList recruiters = findEligibleRecruiters(legion, recruit);
+        Creature recruiter;
 
-        int numEligibleRecruiters = findEligibleRecruiters(legion, recruit,
-            recruiters);
-
-        if (numEligibleRecruiters == 1)
-        {
-            recruiter = recruiters[0];
-        }
-        else if (numEligibleRecruiters == 0)
+        int numEligibleRecruiters = recruiters.size();
+        if (numEligibleRecruiters == 0)
         {
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (allRecruitersVisible(legion, recruiters))
+        else if (autoPickRecruiter || numEligibleRecruiters == 1 ||
+            allRecruitersVisible(legion, recruiters))
         {
-            // If all possible recruiters are already visible, don't
-            // bother picking which ones to reveal.
-            recruiter = recruiters[0];
+            // If there's only one possible recruiter, or if all 
+            // possible recruiters are already visible, or if
+            // the user has chosen the autoPickRecruiter option, 
+            // then just reveal the first possible recruiter.
+            recruiter = (Creature)recruiters.get(0);
         }
         else
         {
-            // Only use the PickRecruiter dialog if the autoPickRecruiter
-            // option is false.  If it's true, just use the first one.
-            if (!autoPickRecruiter)
-            {
-                new PickRecruiter(parentFrame, legion, numEligibleRecruiters,
-                    recruiters);
-            }
-            recruiter = recruiters[0];
+            new PickRecruiter(parentFrame, legion, recruiters);
+            recruiter = (Creature)recruiters.get(0);
         }
 
-        if (recruit != null && (recruiter != null ||
-            numEligibleRecruiters == 0))
-        {
+// XXX Needed?
+//        if (recruiter != null || numEligibleRecruiters == 0)
+//        {
             legion.addCreature(recruit, true);
 
-            // Mark the recruiter(s) as visible.
-            int numRecruiters = numberOfRecruiterNeeded(recruiter,
-                recruit, legion.getCurrentHex().getTerrain());
-            if (numRecruiters >= 1)
+            int numRecruiters = 0;
+            if (recruiter != null)
             {
-                legion.revealCreatures(recruiter, numRecruiters);
+                // Mark the recruiter(s) as visible.
+                numRecruiters = numberOfRecruiterNeeded(recruiter,
+                    recruit, legion.getCurrentHex().getTerrain());
+                if (numRecruiters >= 1 && numRecruiters <= 3)
+                {
+                    legion.revealCreatures(recruiter, numRecruiters);
+                }
             }
 
             logEvent("Legion " + legion.getMarkerId() + " in " +
@@ -1473,13 +1547,12 @@ public class Game
             legion.markRecruited();
 
             legion.getPlayer().markLastLegionRecruited(legion);
-        }
-
+//       }
     }
 
 
-    // Returns the number of types of angels that can be acquired.
-    public static int findEligibleAngels(Legion legion, Creature [] recruits,
+    // Return the number of types of angels that can be acquired.
+    public static int findEligibleAngels(Legion legion, ArrayList recruits,
         boolean archangel)
     {
         if (legion.getHeight() >= 7)
@@ -1487,43 +1560,24 @@ public class Game
             return 0;
         }
 
-        recruits[0] = Creature.angel;
+        recruits.add(Creature.angel);
         if (archangel)
         {
-            recruits[1] = Creature.archangel;
+            recruits.add(Creature.archangel);
         }
 
         // Check for availability of chits.
-        for (int i = 0; i < recruits.length; i++)
+        Iterator it = recruits.iterator();
+        while (it.hasNext())
         {
-            if (recruits[i] != null && recruits[i].getCount() < 1)
+            Creature recruit = (Creature)it.next();
+            if (recruit.getCount() < 1)
             {
-                recruits[i] = null;
+                it.remove();
             }
         }
 
-        // Pack the recruits array for display.
-        for (int i = 0; i < recruits.length - 1; i++)
-        {
-            if (recruits[i] == null)
-            {
-                for (int j = i; j < recruits.length - 1; j++)
-                {
-                    recruits[j] = recruits[j + 1];
-                }
-                recruits[recruits.length - 1] = null;
-            }
-        }
-
-        int count = 0;
-        for (int i = 0; i < recruits.length; i++)
-        {
-            if (recruits[i] != null)
-            {
-                count++;
-            }
-        }
-        return count;
+        return recruits.size();
     }
 
 
@@ -1569,8 +1623,8 @@ public class Game
     }
 
 
-    // Put all die rolling in one place, in case we decide to change random
-    // number algorithms, use an external dice server, etc.
+    /** Put all die rolling in one place, in case we decide to change random
+     *  number algorithms, use an external dice server, etc. */
     public static int rollDie()
     {
         return random.nextInt(6) + 1;
@@ -1603,9 +1657,9 @@ public class Game
         Creature.gargoyle.takeOne();
         Creature.gargoyle.takeOne();
 
-        Legion legion = new Legion(player.getSelectedMarker(), null, hex, 
-            Creature.titan, Creature.angel, Creature.ogre, Creature.ogre, 
-            Creature.centaur, Creature.centaur, Creature.gargoyle, 
+        Legion legion = new Legion(player.getSelectedMarker(), null, hex,
+            Creature.titan, Creature.angel, Creature.ogre, Creature.ogre,
+            Creature.centaur, Creature.centaur, Creature.gargoyle,
             Creature.gargoyle, player);
 
         player.addLegion(legion);
@@ -1620,7 +1674,7 @@ public class Game
         Player player = getActivePlayer();
         player.unselectLegion();
 
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
@@ -1665,7 +1719,7 @@ public class Game
     private Set findMoves(MasterHex hex, Player player, Legion legion,
         int roll, int block, int cameFrom)
     {
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         // If there are enemy legions in this hex, mark it
         // as a legal move and stop recursing.  If there is
@@ -1748,7 +1802,7 @@ public class Game
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
 
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         if (!hex.isOccupied())
         {
@@ -1798,7 +1852,7 @@ public class Game
      *  Include teleport moves only if teleport is true. */
     private Set showMoves(Legion legion, boolean teleport)
     {
-        Set set = new TreeSet();
+        HashSet set = new HashSet();
 
         if (legion.hasMoved())
         {
@@ -1890,8 +1944,8 @@ public class Game
         String [] options = new String[2];
         options[0] = "Teleport";
         options[1] = "Move Normally";
-        int answer = JOptionPane.showOptionDialog(board, "Teleport?", 
-            "Teleport?", JOptionPane.YES_NO_OPTION, 
+        int answer = JOptionPane.showOptionDialog(board, "Teleport?",
+            "Teleport?", JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
         // If Teleport, then leave teleported set.
@@ -1910,7 +1964,7 @@ public class Game
 
         board.unselectAllHexes();
 
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
@@ -1965,7 +2019,7 @@ public class Game
     }
 
 
-    // Returns number of legions with summonable angels.
+    // Return number of legions with summonable angels.
     public int highlightSummonableAngels(Legion legion)
     {
         board.unselectAllHexes();
@@ -1975,7 +2029,7 @@ public class Game
 
         int count = 0;
 
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
@@ -2016,21 +2070,21 @@ public class Game
     }
 
 
-    // Returns number of legions that can recruit.
+    // Return number of legions that can recruit.
     public int highlightPossibleRecruits()
     {
         int count = 0;
         Player player = getActivePlayer();
 
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
             Legion legion = player.getLegion(i);
             if (legion.hasMoved() && legion.canRecruit())
             {
-                Creature [] recruits = new Creature[5];
-                if (findEligibleRecruits(legion, recruits) >= 1)
+                ArrayList recruits = findEligibleRecruits(legion);
+                if (!recruits.isEmpty())
                 {
                     MasterHex hex = legion.getCurrentHex();
                     set.add(hex.getLabel());
@@ -2058,14 +2112,22 @@ public class Game
                 // Need a legion marker to split.
                 if (player.getNumMarkersAvailable() == 0)
                 {
-                    JOptionPane.showMessageDialog(board, 
+                    JOptionPane.showMessageDialog(board,
                         "No markers are available.");
+                    return;
+                }
+                // A legion must be at least 4 high to split.
+                if (legion.getHeight() < 4)
+                {
+                    JOptionPane.showMessageDialog(board,
+                        "Legion is too short to split.");
                     return;
                 }
                 // Don't allow extra splits in turn 1.
                 if (getTurnNumber() == 1 && player.getNumLegions() > 1)
                 {
-                    JOptionPane.showMessageDialog(board, "Cannot split twice on Turn 1.");
+                    JOptionPane.showMessageDialog(board,
+                        "Cannot split twice on Turn 1.");
                     return;
                 }
 

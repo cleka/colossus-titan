@@ -187,12 +187,12 @@ public class Battle
                             // defender gets his markers plus half points 
                             // for his unengaged legions.
                             Player player = attacker.getPlayer();
-                            attacker.removeLegion();
+                            attacker.remove();
                             player.die(defender.getPlayer(), true);
                         }
                         else
                         {
-                            attacker.removeLegion();
+                            attacker.remove();
                         }
                         cleanup();
                     }
@@ -349,7 +349,7 @@ public class Battle
     private Set findMoves(BattleHex hex, Creature creature,
         boolean flies, int movesLeft, int cameFrom)
     {
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         for (int i = 0; i < 6; i++)
         {
@@ -396,7 +396,7 @@ public class Battle
 
     private static Set findUnoccupiedTowerHexes()
     {
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         BattleHex centerHex = BattleMap.getCenterTowerHex();
 
@@ -420,7 +420,7 @@ public class Battle
     /** Find all legal moves for this critter. */
     private Set showMoves(Critter critter)
     {
-        Set set = new TreeSet();
+        Set set = new HashSet();
 
         if (!critter.hasMoved() && !critter.isInContact(false))
         {
@@ -538,7 +538,7 @@ public class Battle
      *  to move. */
     public Set findMovableChits()
     {
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
         Player player = getActivePlayer();
 
         Iterator it = critters.iterator();
@@ -770,7 +770,7 @@ public class Battle
         {
             if (defenderElim)
             {
-                defender.removeLegion();
+                defender.remove();
             }
             else
             {
@@ -783,7 +783,7 @@ public class Battle
         {
             if (attackerElim)
             {
-                attacker.removeLegion();
+                attacker.remove();
             }
             else
             {
@@ -796,8 +796,8 @@ public class Battle
         // Check for mutual legion elimination.
         else if (attackerElim && defenderElim)
         {
-            attacker.removeLegion();
-            defender.removeLegion();
+            attacker.remove();
+            defender.remove();
             cleanup();
         }
 
@@ -805,13 +805,13 @@ public class Battle
         else if (attackerElim)
         {
             defender.addBattleTallyToPoints();
-            attacker.removeLegion();
+            attacker.remove();
             cleanup();
         }
         else if (defenderElim)
         {
             attacker.addBattleTallyToPoints();
-            defender.removeLegion();
+            defender.remove();
             cleanup();
         }
     }
@@ -832,7 +832,7 @@ public class Battle
     public Set findChitsWithTargets()
     {
         Player player = getActivePlayer();
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -903,7 +903,7 @@ public class Battle
      */
     private Set findStrikes(Critter critter)
     {
-        TreeSet set = new TreeSet(); 
+        HashSet set = new HashSet(); 
 
         // Each creature may strike only once per turn.
         if (critter.hasStruck())
@@ -983,7 +983,7 @@ public class Battle
     /** Return the set of hex labels for hexes with valid carry targets. */
     public Set findCarries()
     {
-        TreeSet set = new TreeSet();
+        HashSet set = new HashSet();
         
         Iterator it = critters.iterator();
         while (it.hasNext())

@@ -144,7 +144,8 @@ public class StatusScreen extends JFrame implements WindowListener
             try
             {
                 setIconImage(Toolkit.getDefaultToolkit().getImage(
-                    getClass().getResource(Creature.colossus.getImageName())));
+                    getClass().getResource(Chit.getImagePath(
+                    Creature.colossus.getImageName()))));
             }
             catch (NullPointerException e)
             {

@@ -50,7 +50,7 @@ public class SplitLegion extends JDialog implements MouseListener,
         newLegion = new Legion(player.getSelectedMarker(), oldLegion,
             oldLegion.getCurrentHex(), null, null, null, null, null,
             null, null, null, player);
-        String imageName = Chit.getImagePath(player.getSelectedMarker());
+        String imageName = player.getSelectedMarker();
         newMarker = new Marker(scale, imageName, this, null);
         newLegion.setMarker(newMarker);
 
@@ -75,10 +75,12 @@ public class SplitLegion extends JDialog implements MouseListener,
             gridbag.setConstraints(oldMarker, constraints);
             contentPane.add(oldMarker);
 
-            for (int i = 0; i < oldLegion.getHeight(); i++)
+            Collection critters = oldLegion.getCritters();
+            Iterator it = critters.iterator();
+            while (it.hasNext())
             {
-                Chit chit = new Chit(scale,
-                    oldLegion.getCritter(i).getImageName(), this);
+                Critter critter = (Critter)it.next();
+                Chit chit = new Chit(scale, critter.getImageName(), this);
                 oldChits.add(chit);
                 gridbag.setConstraints(chit, constraints);
                 contentPane.add(chit);
@@ -90,11 +92,6 @@ public class SplitLegion extends JDialog implements MouseListener,
             constraints.gridwidth = 1;
             gridbag.setConstraints(newMarker, constraints);
             contentPane.add(newMarker);
-
-            for (int i = 0; i < oldLegion.getHeight(); i++)
-            {
-                Chit chit = (Chit)oldChits.get(i);
-            }
 
             JButton button1 = new JButton("Done");
             JButton button2 = new JButton("Cancel");
@@ -139,13 +136,7 @@ public class SplitLegion extends JDialog implements MouseListener,
 
     private void cancel()
     {
-        player.addSelectedMarker();
-
-        for (int i = 0; i < newLegion.getHeight(); i++)
-        {
-            oldLegion.addCreature(newLegion.getCreature(i), false);
-        }
-
+        newLegion.recombine(oldLegion, true);
         dispose();
     }
 
@@ -184,26 +175,21 @@ public class SplitLegion extends JDialog implements MouseListener,
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
-        for (int i = 0; i < oldLegion.getHeight(); i++)
+        int i = oldChits.indexOf(source);
+        if (i != -1)
         {
-            Chit chit = (Chit)oldChits.get(i);
-            if (chit == source)
-            {
-                moveCreatureToOtherLegion(oldLegion, newLegion,
-                    oldChits, newChits, i, 1);
-                return;
-            }
+            Chit chit = (Chit)source;
+            moveCreatureToOtherLegion(oldLegion, newLegion, oldChits, 
+                newChits, i, 1);
+            return;
         }
-
-        for (int i = 0; i < newLegion.getHeight(); i++)
+        i = newChits.indexOf(source);
+        if (i != -1)
         {
-            Chit chit = (Chit)newChits.get(i);
-            if (chit == source)
-            {
-                moveCreatureToOtherLegion(newLegion, oldLegion,
-                    newChits, oldChits, i, 0);
-                return;
-            }
+            Chit chit = (Chit)source;
+            moveCreatureToOtherLegion(newLegion, oldLegion, newChits, 
+                oldChits, i, 0);
+            return;
         }
     }
 
@@ -266,14 +252,16 @@ public class SplitLegion extends JDialog implements MouseListener,
             // must have height 4 and one lord.
             if (oldLegion.getHeight() < 2 || newLegion.getHeight() < 2)
             {
-                JOptionPane.showMessageDialog(parentFrame, "Legion too short.");
+                JOptionPane.showMessageDialog(parentFrame, 
+                    "Legion too short.");
                 return;
             }
             if (oldLegion.getHeight() + newLegion.getHeight() == 8)
             {
                 if (oldLegion.getHeight() != newLegion.getHeight())
                 {
-                    JOptionPane.showMessageDialog(parentFrame, "Initial split must be 4-4.");
+                    JOptionPane.showMessageDialog(parentFrame, 
+                        "Initial split must be 4-4.");
                     return;
                 }
                 else
@@ -309,10 +297,10 @@ public class SplitLegion extends JDialog implements MouseListener,
             oldLegion.hideAllCreatures();
             newLegion.hideAllCreatures();
 
-            // Mark the last legion split.
+            // Mark the last legion split off.
             if (player != null)
             {
-                player.markLastLegionSplit(newLegion);
+                player.markLastLegionSplitOff(newLegion);
             }
 
             // Exit.
@@ -354,8 +342,8 @@ public class SplitLegion extends JDialog implements MouseListener,
             Creature.titan, Creature.angel, Creature.ogre, Creature.ogre, 
             Creature.centaur, Creature.centaur, Creature.gargoyle, 
             Creature.gargoyle, player);
-        Marker marker = new Marker(scale, Chit.getImagePath(
-            player.getSelectedMarker()), frame, null);
+        Marker marker = new Marker(scale, player.getSelectedMarker(), 
+            frame, null);
         legion.setMarker(marker);
         
         new SplitLegion(frame, legion, player);
