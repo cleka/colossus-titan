@@ -2,7 +2,7 @@
      <!-- JNLP File for Colossus local testing -->
      <!-- TODO Find a way to make the codebase path relative -->
      <jnlp
-       codebase="file:///c:/src/Colossus/test"
+       codebase="file:///c:/src/Colossus"
        href="win.jnlp">
        <application-desc main-class="net.sf.colossus.server.Start"/>
        <information>
@@ -14,6 +14,8 @@
        </information>
        <resources>
          <jar href="Colossus.jar"/>
+         <jar href="libs/werken.opt.jar"/>
+         <jar href="libs/jdom.jar"/>
          <jar href="libs/batik-awt-util.jar"/>
          <jar href="libs/batik-bridge.jar"/>
          <jar href="libs/batik-css.jar"/>
