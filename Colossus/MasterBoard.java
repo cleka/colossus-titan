@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
@@ -8,7 +7,7 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-class MasterBoard extends JFrame implements MouseListener,
+class MasterBoard extends Frame implements MouseListener,
     MouseMotionListener, WindowListener
 {
     // There are a total of 96 hexes
@@ -53,7 +52,6 @@ class MasterBoard extends JFrame implements MouseListener,
     private boolean summoningAngel = false;
     private SummonAngel summonAngel;
     private BattleMap map;
-    private Container contentPane;
     private Turn turn;
 
 
@@ -63,8 +61,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
         this.game = game;
 
-        contentPane = getContentPane();
-        contentPane.setLayout(null);
+        setLayout(null);
 
         // Make sure that the board fits on the screen.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -159,7 +156,7 @@ class MasterBoard extends JFrame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            JOptionPane.showMessageDialog(this, "waitForAll was interrupted");
+            new MessageBox(this, "waitForAll was interrupted");
         }
 
         imagesLoaded = true;
@@ -463,7 +460,8 @@ class MasterBoard extends JFrame implements MouseListener,
             if (player.canTitanTeleport() &&
                 legion.numCreature(Creature.titan) > 0)
             {
-                // Mark every hex containing an enemy unit.
+                // Mark every hex containing an enemy stack that does not
+                // already contain a friendly stack.
                 for (int i = 0; i < game.getNumPlayers(); i++)
                 {
                     if (game.getPlayer(i) != player)
@@ -473,10 +471,13 @@ class MasterBoard extends JFrame implements MouseListener,
                         {
                             hex = game.getPlayer(i).getLegion(j).
                                 getCurrentHex();
-                            hex.select();
-                            hex.repaint();
-                            // Mover can choose side of entry.
-                            hex.setTeleported();
+                            if (!hex.isEngagement())
+                            {
+                                hex.select();
+                                hex.repaint();
+                                // Mover can choose side of entry.
+                                hex.setTeleported();
+                            }
                         }
                     }
                 }
@@ -1274,7 +1275,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                     // Need a legion marker to split.
                                     if (player.getNumMarkersAvailable() == 0)
                                     {
-                                        JOptionPane.showMessageDialog(this,
+                                        new MessageBox(this,
                                             "No markers are available.");
                                         return;
                                     }
@@ -1282,7 +1283,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                     if (game.getTurnNumber() == 1 &&
                                         player.getNumLegions() > 1)
                                     {
-                                        JOptionPane.showMessageDialog(this,
+                                        new MessageBox(this,
                                             "Cannot split twice on Turn 1.");
                                         return;
                                     }
@@ -1295,9 +1296,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                     {
                                         MasterHex hex = legion.getCurrentHex();
                                         hex.unselect();
-                                        // XXX: This repaint is failing.
                                         hex.repaint();
-                                        Thread.yield();
                                     }
                                     return;
 
@@ -1316,7 +1315,8 @@ class MasterBoard extends JFrame implements MouseListener,
                                     break;
 
                                 case Game.MUSTER:
-                                    if (legion.hasMoved() && legion.canRecruit())
+                                    if (legion.hasMoved() && 
+                                        legion.canRecruit())
                                     {
                                         new PickRecruit(this, legion);
                                     }
@@ -1324,9 +1324,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                     if (!legion.canRecruit())
                                     {
                                         legion.getCurrentHex().unselect();
-                                        // XXX This repaint is failing.
                                         legion.getCurrentHex().repaint();
-                                        Thread.yield();
 
                                         // Update status window.
                                         game.updateStatusScreen();
@@ -1408,6 +1406,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                     // If the legion teleported, reveal a lord.
                                     if (hex.teleported())
                                     {
+
                                         // If it was a Titan teleport, that 
                                         // lord must be the titan.
                                         if (hex.isOccupied())
@@ -1417,26 +1416,7 @@ class MasterBoard extends JFrame implements MouseListener,
                                         }
                                         else
                                         {
-                                            // XXX Need a dialog for this.
-                                            // For now, reveal angels then
-                                            // archangels than titan.
-                                            if (legion.numCreature(
-                                                Creature.angel) > 0)
-                                            {
-                                                legion.revealCreatures(
-                                                    Creature.angel, 1);
-                                            }
-                                            else if (legion.numCreature(
-                                                Creature.archangel) > 0)
-                                            {
-                                                legion.revealCreatures(
-                                                    Creature.archangel, 1);
-                                            }
-                                            else
-                                            {
-                                                legion.revealCreatures(
-                                                    Creature.titan, 1);
-                                            }
+                                            legion.revealTeleportingLord();
                                         }
                                     }
 
@@ -1444,7 +1424,6 @@ class MasterBoard extends JFrame implements MouseListener,
                                     legion.getStartingHex().repaint();
                                     hex.repaint();
                                 }
-
 
                                 highlightUnmovedLegions();
                             }
