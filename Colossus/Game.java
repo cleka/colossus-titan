@@ -393,6 +393,20 @@ public class Game extends Frame implements WindowListener, ActionListener
     }
 
 
+    int getNumLivingPlayers()
+    {
+        int count = 0;
+        for (int i = 0; i < numPlayers; i++)
+        {
+            if (players[i].isAlive())
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+
     Player getActivePlayer()
     {
         return players[activePlayerNum];
@@ -472,15 +486,12 @@ System.out.println("advanceTurn");
         }
         phase = SPLIT;
 System.out.println("phase = SPLIT  activePlayerNum = " + activePlayerNum);
-        if (!getActivePlayer().isAlive())
+        if (!getActivePlayer().isAlive() && getNumLivingPlayers() > 0)
         {
             advanceTurn();
         }
-        else
-        {
-            // Update the status screen to show whose turn it is.
-            updateStatusScreen();
-        }
+
+        updateStatusScreen();
     }
 
 
