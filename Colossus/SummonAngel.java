@@ -19,7 +19,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     private MasterBoard board;
     private Button button1;
     private Button button2;
-    private final int scale = 60;
+    private static final int scale = 60;
     private boolean laidOut = false;
     private Chit angelChit;
     private Chit archangelChit;
