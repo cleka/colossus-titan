@@ -8,7 +8,7 @@ import java.awt.event.*;
  */
 
 public class MasterBoard extends Frame implements MouseListener,
-    WindowListener
+    WindowListener, ActionListener
 {
     // There are a total of 96 hexes
     // Their Titan labels are:
@@ -61,6 +61,13 @@ public class MasterBoard extends Frame implements MouseListener,
     // of the same dialog.
     private boolean dialogLock = false;
 
+    private PopupMenu popupMenu;
+    private MenuItem menuItemHex; 
+    private MenuItem menuItemMap;
+
+    // Last point clicked is needed for popup menus.
+    private Point lastPoint;
+
 
     public MasterBoard(Game game, boolean newgame)
     {
@@ -87,6 +94,16 @@ public class MasterBoard extends Frame implements MouseListener,
         addMouseListener(this);
 
         imagesLoaded = false;
+
+        // Initialize the popup menu.
+        popupMenu = new PopupMenu("View Hex Info or BattleMap?");
+        menuItemHex = new MenuItem("View Hex Info");
+        menuItemMap = new MenuItem("View BattleMap");
+        popupMenu.add(menuItemHex);
+        popupMenu.add(menuItemMap);
+        add(popupMenu);
+        menuItemHex.addActionListener(this);
+        menuItemMap.addActionListener(this);
 
         // Initialize the hexmap.
         setupHexes();
@@ -259,6 +276,46 @@ public class MasterBoard extends Frame implements MouseListener,
         // Error, so return a bogus hex.
         System.out.println("Could not find hex " + label);
         return new MasterHex(-1, -1, -1, false, null);
+    }
+
+
+    // Return the MasterHex that contains the given point, or
+    //    null if none does.
+    private MasterHex getHexContainingPoint(Point point)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j] && h[i][j].contains(point))
+                {
+                    return h[i][j];
+                }
+            }
+        }
+
+        return null;
+    }
+    
+    
+    // Return the Legion whose marker contains the given
+    //    point, or null if none does.
+    private Legion getLegionContainingPoint(Point point)
+    {
+        for (int i = 0; i < game.getNumPlayers(); i++)
+        {
+            Player player = game.getPlayer(i);
+            for (int j = 0; j < player.getNumLegions(); j++)
+            {
+                Legion legion = player.getLegion(j);
+                if (legion.getMarker().select(point))
+                {
+                    return legion;
+                }
+            }
+        }
+
+        return null;
     }
 
 
@@ -1398,111 +1455,104 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
-    // XXX This really needs to be split up.
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
 
-        for (int i = 0; i < game.getNumPlayers(); i++)
+        Legion legion = getLegionContainingPoint(point);
+
+        if (legion != null)
         {
-            Player player = game.getPlayer(i);
-            for (int j = 0; j < player.getNumLegions(); j++)
+            Player player = legion.getPlayer();
+
+            // What to do depends on which mouse button was used
+            // and the current phase of the turn.
+
+            // Right-click means to show the contents of the 
+            // legion.
+            if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
+                InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
+                InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
             {
-                Legion legion = player.getLegion(j);
-                if (legion.getMarker().select(point))
+                new ShowLegion(this, legion, point, 
+                    allVisible || player == game.getActivePlayer());
+                return;
+            }
+            else
+            {
+                // Only the current player can manipulate his legions.
+                if (player == game.getActivePlayer())
                 {
-                    // What to do depends on which mouse button was used
-                    // and the current phase of the turn.
-
-                    // Right-click means to show the contents of the 
-                    // legion.
-                    if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
-                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
-                        InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
+                    switch (game.getPhase())
                     {
-                        new ShowLegion(this, legion, point, 
-                            allVisible || i == game.getActivePlayerNum());
-                        return;
-                    }
-                    else
-                    {
-                        // Only the current player can manipulate his legions.
-                        if (i == game.getActivePlayerNum())
-                        {
-                            switch (game.getPhase())
+                        case Game.SPLIT:
+                            // Need a legion marker to split.
+                            if (player.getNumMarkersAvailable() == 0)
                             {
-                                case Game.SPLIT:
-                                    // Need a legion marker to split.
-                                    if (player.getNumMarkersAvailable() == 0)
-                                    {
-                                        new MessageBox(this,
-                                            "No markers are available.");
-                                        return;
-                                    }
-                                    // Don't allow extra splits in turn 1.
-                                    if (game.getTurnNumber() == 1 &&
-                                        player.getNumLegions() > 1)
-                                    {
-                                        new MessageBox(this,
-                                            "Cannot split twice on Turn 1.");
-                                        return;
-                                    }
-
-                                    if (!dialogLock)
-                                    {
-                                        dialogLock = true;
-                                        new SplitLegion(this, legion, player);
-                                        dialogLock = false;
-                                    }
-                                        
-                                    // Update status window.
-                                    game.updateStatusScreen();
-                                    // If we split, unselect this hex.
-                                    if (legion.getHeight() < 7)
-                                    {
-                                        MasterHex hex = legion.getCurrentHex();
-                                        hex.unselect();
-                                        hex.repaint();
-                                    }
-                                    return;
-
-                                case Game.MOVE:
-                                    // Mark this legion as active.
-                                    player.selectLegion(legion);
-
-                                    // Highlight all legal destinations
-                                    // for this legion.
-                                    showMoves(legion);
-                                    return;
-
-                                case Game.FIGHT:
-                                    // Fall through, to allow clicking on
-                                    // either engaged legion or the hex.
-                                    break;
-
-                                case Game.MUSTER:
-                                    if (legion.hasMoved() && 
-                                        legion.canRecruit())
-                                    {
-                                        if (!dialogLock)
-                                        {
-                                            dialogLock = true;
-                                            new PickRecruit(this, legion);
-                                            if (!legion.canRecruit())
-                                            {
-                                                legion.getCurrentHex().
-                                                    unselect();
-                                                legion.getCurrentHex().
-                                                    repaint();
-
-                                                game.updateStatusScreen();
-                                            }
-                                            dialogLock = false;
-                                        }
-                                    }
-                                    return;
+                                new MessageBox(this,
+                                    "No markers are available.");
+                                return;
                             }
-                        }
+                            // Don't allow extra splits in turn 1.
+                            if (game.getTurnNumber() == 1 &&
+                                player.getNumLegions() > 1)
+                            {
+                                new MessageBox(this,
+                                    "Cannot split twice on Turn 1.");
+                                return;
+                            }
+
+                            if (!dialogLock)
+                            {
+                                dialogLock = true;
+                                new SplitLegion(this, legion, player);
+                                dialogLock = false;
+                            }
+                                        
+                            // Update status window.
+                            game.updateStatusScreen();
+                            // If we split, unselect this hex.
+                            if (legion.getHeight() < 7)
+                            {
+                                MasterHex hex = legion.getCurrentHex();
+                                hex.unselect();
+                                hex.repaint();
+                            }
+                            return;
+
+                        case Game.MOVE:
+                            // Mark this legion as active.
+                            player.selectLegion(legion);
+
+                            // Highlight all legal destinations
+                            // for this legion.
+                            showMoves(legion);
+                            return;
+
+                        case Game.FIGHT:
+                            // Fall through, to allow clicking on
+                            // either engaged legion or the hex.
+                            break;
+
+                        case Game.MUSTER:
+                            if (legion.hasMoved() && legion.canRecruit())
+                            {
+                                if (!dialogLock)
+                                {
+                                    dialogLock = true;
+                                    new PickRecruit(this, legion);
+                                    if (!legion.canRecruit())
+                                    {
+                                        legion.getCurrentHex().unselect();
+                                        legion.getCurrentHex().repaint();
+
+                                        game.updateStatusScreen();
+                                    }
+                                    dialogLock = false;
+                                }
+                            }
+
+                            return;
                     }
                 }
             }
@@ -1510,221 +1560,204 @@ public class MasterBoard extends Frame implements MouseListener,
 
         // No hits on chits, so check map.
 
-        Player player = game.getActivePlayer();
-        for (int i = 0; i < h.length; i++)
+        MasterHex hex = getHexContainingPoint(point);
+        if (hex != null)
         {
-            for (int j = 0; j < h[0].length; j++)
+            if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
+                InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
+                InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
             {
-                if (show[i][j] && h[i][j].contains(point))
-                {
-                    MasterHex hex = h[i][j];
+                lastPoint = point;
+                popupMenu.show(e.getComponent(), point.x, point.y);
 
-                    // Single-right-click means to show the contents of the hex.
-                    // Double-right-click means to show the hex's battlemap.
-                    if (((e.getModifiers() & InputEvent.BUTTON2_MASK) ==
-                        InputEvent.BUTTON2_MASK) || ((e.getModifiers() &
-                        InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK))
+                return;
+            }
+            
+            Player player = game.getActivePlayer();
+
+            // Otherwise, the action to take depends on the phase.
+            switch (game.getPhase())
+            {
+                // If we're moving, and have selected a legion which
+                // has not yet moved, and this hex is a legal
+                // destination, move the legion here.
+                case Game.MOVE:
+                    legion = player.getSelectedLegion();
+                    if (legion != null && hex.isSelected())
                     {
-                        // XXX On fast machines, this doesn't work.
-                        if (e.getClickCount() > 1)
+                        // Pick teleport or normal move if necessary.
+                        if (hex.teleported() && hex.canEnterViaLand())
                         {
-                            new ShowBattleMap(this, hex);
+                            hex.chooseWhetherToTeleport();
                         }
-                        else
+
+                        // If this is a tower hex, set the entry side
+                        // to '3', regardless.
+                        if (hex.getTerrain() == 'T')
                         {
-                            new ShowMasterHex(this, hex, point);
+                            hex.clearAllEntrySides();
+                            hex.setEntrySide(3);
                         }
-                        return;
+                        // If this is a teleport to a non-tower hex,
+                        // then allow entry from all three sides.
+                        else if (hex.teleported())
+                        {
+                            hex.setEntrySide(1);
+                            hex.setEntrySide(3);
+                            hex.setEntrySide(5);
+                        }
+
+                        // Pick entry side if hex is enemy-occupied
+                        // and there is more than one possibility.
+                        if (hex.isOccupied() &&
+                            hex.getNumEntrySides() > 1)
+                        {
+                            // Only allow one PickEntrySide dialog.
+                            if (!dialogLock)
+                            {
+                                dialogLock = true;
+                                new PickEntrySide(this, hex);
+                                dialogLock = false;
+                            }
+                        }
+
+                        // Unless a PickEntrySide was cancelled or
+                        // disallowed, execute the move.
+                        if (!hex.isOccupied() ||
+                            hex.getNumEntrySides() == 1)
+                        {
+                            // If the legion teleported, reveal a lord.
+                            if (hex.teleported())
+                            {
+
+                                // If it was a Titan teleport, that 
+                                // lord must be the titan.
+                                if (hex.isOccupied())
+                                {
+                                    legion.revealCreatures(
+                                        Creature.titan, 1);
+                                }
+                                else
+                                {
+                                    legion.revealTeleportingLord(this);
+                                }
+                            }
+
+                            legion.moveToHex(hex);
+                            legion.getStartingHex().repaint();
+                            hex.repaint();
+                        }
+
+                        highlightUnmovedLegions();
+                    }
+                    else
+                    {
+                        highlightUnmovedLegions();
+                    }
+                    break;
+
+                // If we're fighting and there is an engagement here,
+                // resolve it.  If an angel is being summoned, mark
+                // the donor legion instead.
+                case Game.FIGHT:
+                    if (summoningAngel)
+                    {
+                        Legion donor =
+                            hex.getFriendlyLegion(player);
+                        player.selectLegion(donor);
+                        if (summonAngel == null)
+                        {
+                            summonAngel =
+                                map.getTurn().getSummonAngel();
+                        }
+                        summonAngel.repaint();
+                        donor.getMarker().repaint();
                     }
 
-                    // Otherwise, the action to take depends on the phase.
-                    switch (game.getPhase())
+                    // Do not allow clicking on engagements if one is
+                    // already being resolved.
+                    else if (hex.isEngagement() && !dialogLock)
                     {
-                        // If we're moving, and have selected a legion which
-                        // has not yet moved, and this hex is a legal
-                        // destination, move the legion here.
-                        case Game.MOVE:
-                            Legion legion = player.getSelectedLegion();
-                            if (legion != null && hex.isSelected())
+                        dialogLock = true;
+                        Legion attacker =
+                            hex.getFriendlyLegion(player);
+                        Legion defender =
+                            hex.getEnemyLegion(player);
+
+                        if (defender.canFlee())
+                        {
+                            // Fleeing gives half points and denies the
+                            // attacker the chance to summon an angel.
+                            new Concede(this, defender, attacker,
+                                true);
+                        }
+
+                        if (hex.isEngagement())
+                        {
+                            // The attacker may concede now without
+                            // allowing the defender a reinforcement.
+                            new Concede(this, attacker, defender, false);
+
+                            // The players may agree to a negotiated 
+                            // settlement.
+                            if (hex.isEngagement())
                             {
-                                // Pick teleport or normal move if necessary.
-                                if (hex.teleported() && hex.canEnterViaLand())
-                                {
-                                    hex.chooseWhetherToTeleport();
-                                }
+                                new Negotiate(this, attacker, defender);
+                            }
 
-                                // If this is a tower hex, set the entry side
-                                // to '3', regardless.
-                                if (hex.getTerrain() == 'T')
-                                {
-                                    hex.clearAllEntrySides();
-                                    hex.setEntrySide(3);
-                                }
-                                // If this is a teleport to a non-tower hex,
-                                // then allow entry from all three sides.
-                                else if (hex.teleported())
-                                {
-                                    hex.setEntrySide(1);
-                                    hex.setEntrySide(3);
-                                    hex.setEntrySide(5);
-                                }
 
-                                // Pick entry side if hex is enemy-occupied
-                                // and there is more than one possibility.
-                                if (hex.isOccupied() &&
-                                    hex.getNumEntrySides() > 1)
+                            if (!hex.isEngagement())
+                            {
+                                if (hex.getLegion(0) == defender &&
+                                    defender.canRecruit())
                                 {
-                                    // Only allow one PickEntrySide dialog.
+                                    // If the defender won the battle
+                                    // by agreement, he may recruit.
                                     if (!dialogLock)
                                     {
                                         dialogLock = true;
-                                        new PickEntrySide(this, hex);
+                                        new PickRecruit(this, defender);
                                         dialogLock = false;
                                     }
                                 }
-
-                                // Unless a PickEntrySide was cancelled or
-                                // disallowed, execute the move.
-                                if (!hex.isOccupied() ||
-                                    hex.getNumEntrySides() == 1)
+                                else if (hex.getLegion(0) == attacker
+                                    && attacker.getHeight() < 7
+                                    && player.canSummonAngel())
                                 {
-                                    // If the legion teleported, reveal a lord.
-                                    if (hex.teleported())
-                                    {
-
-                                        // If it was a Titan teleport, that 
-                                        // lord must be the titan.
-                                        if (hex.isOccupied())
-                                        {
-                                            legion.revealCreatures(
-                                                Creature.titan, 1);
-                                        }
-                                        else
-                                        {
-                                            legion.revealTeleportingLord(this);
-                                        }
-                                    }
-
-                                    legion.moveToHex(hex);
-                                    legion.getStartingHex().repaint();
-                                    hex.repaint();
+                                    // If the attacker won the battle
+                                    // by agreement, he may summon an
+                                    // angel.
+                                    summonAngel = new SummonAngel(this, 
+                                        attacker);
                                 }
-
-                                highlightUnmovedLegions();
                             }
-                            else
+
+                            // Battle
+                            if (hex.isEngagement())
                             {
-                                highlightUnmovedLegions();
+                                // Hide turn to keep it out of the way.
+                                turn.setVisible(false);
+                                turn.setEnabled(false);
+
+                                // Reveal both legions to all players.
+                                attacker.revealAllCreatures();
+                                defender.revealAllCreatures();
+                                map = new BattleMap(this, attacker, defender, 
+                                    hex, hex.getEntrySide());
                             }
-                            break;
+                        }
 
-                        // If we're fighting and there is an engagement here,
-                        // resolve it.  If an angel is being summoned, mark
-                        // the donor legion instead.
-                        case Game.FIGHT:
-                            if (summoningAngel)
-                            {
-                                Legion donor =
-                                    hex.getFriendlyLegion(player);
-                                player.selectLegion(donor);
-                                if (summonAngel == null)
-                                {
-                                    summonAngel =
-                                        map.getTurn().getSummonAngel();
-                                }
-                                summonAngel.repaint();
-                                donor.getMarker().repaint();
-                            }
-
-                            // Do not allow clicking on engagements if one is
-                            // already being resolved.
-                            else if (hex.isEngagement() && !dialogLock)
-                            {
-                                dialogLock = true;
-                                Legion attacker =
-                                    hex.getFriendlyLegion(player);
-                                Legion defender =
-                                    hex.getEnemyLegion(player);
-
-                                if (defender.canFlee())
-                                {
-                                    // Fleeing gives half points and denies the
-                                    // attacker the chance to summon an angel.
-                                    new Concede(this, defender, attacker,
-                                        true);
-                                }
-
-                                if (hex.isEngagement())
-                                {
-                                    // The attacker may concede now without
-                                    // allowing the defender a reinforcement.
-                                    new Concede(this, attacker, defender,
-                                        false);
-
-                                    // The players may agree to a negotiated
-                                    // settlement.
-                                    if (hex.isEngagement())
-                                    {
-                                        new Negotiate(this, attacker,
-                                            defender);
-                                    }
-
-
-                                    if (!hex.isEngagement())
-                                    {
-                                        if (hex.getLegion(0) == defender &&
-                                            defender.canRecruit())
-                                        {
-                                            // If the defender won the battle
-                                            // by agreement, he may recruit.
-                                            if (!dialogLock)
-                                            {
-                                                dialogLock = true;
-                                                new PickRecruit(this, 
-                                                    defender);
-                                                dialogLock = false;
-                                            }
-                                        }
-                                        else if (hex.getLegion(0) == attacker
-                                            && attacker.getHeight() < 7
-                                            && player.canSummonAngel())
-                                        {
-                                            // If the attacker won the battle
-                                            // by agreement, he may summon an
-                                            // angel.
-                                            summonAngel = new
-                                                SummonAngel(this, attacker);
-                                        }
-                                    }
-
-                                    // Battle
-                                    if (hex.isEngagement())
-                                    {
-                                        // Hide turn to keep it out of the way.
-                                        turn.setVisible(false);
-                                        turn.setEnabled(false);
-
-                                        // Reveal both legions to all players.
-                                        attacker.revealAllCreatures();
-                                        defender.revealAllCreatures();
-                                        map = new BattleMap(this, attacker,
-                                            defender, hex, hex.getEntrySide());
-                                    }
-                                }
-
-                                highlightEngagements();
-                                dialogLock = false;
-                            }
-                            break;
-
-                        default:
-                            break;
+                        highlightEngagements();
+                        dialogLock = false;
                     }
+                    break;
 
-                    hex.repaint();
-                    return;
-                }
+                default:
+                    break;
             }
+
+            hex.repaint();
+            return;
         }
 
         // No hits on chits or map, so re-highlight.
@@ -1805,6 +1838,23 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public void windowOpened(WindowEvent e)
     {
+    }
+
+
+    public void actionPerformed(ActionEvent e)
+    {
+        MasterHex hex = getHexContainingPoint(lastPoint);
+        if (hex != null)
+        {
+            if (e.getActionCommand().equals("View Hex Info"))
+            {
+                new ShowMasterHex(this, hex, lastPoint);
+            }
+            else if (e.getActionCommand().equals("View BattleMap"))
+            {
+                new ShowBattleMap(this, hex);
+            }
+        }
     }
 
 

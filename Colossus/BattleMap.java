@@ -16,7 +16,7 @@ public class BattleMap extends Frame implements MouseListener,
     private BattleHex [] entrances = new BattleHex[6];
 
     private int numCritters;
-    private BattleChit[] chits = new BattleChit[14];
+    private Critter [] critters = new Critter[14];
     private Critter lastCritterMoved;
 
     private static final boolean[][] show =
@@ -124,11 +124,12 @@ public class BattleMap extends Frame implements MouseListener,
         for (int i = 0; i < attackerHeight; i++)
         {
             Critter critter = attacker.getCritter(i);
-            chits[i] = new BattleChit(chitScale, critter.getImageName(false),
-                this, critter);
-            tracker.addImage(chits[i].getImage(), 0);
-            critter.addBattleInfo(entrance, this, chits[i]);
-            entrance.addCritter(chits[i].getCritter());
+            critters[i] = critter;
+            BattleChit chit = new BattleChit(chitScale, 
+                critter.getImageName(false), this, critter);
+            tracker.addImage(chit.getImage(), 0);
+            critter.addBattleInfo(entrance, this, chit);
+            entrance.addCritter(critter);
         }
         entrance.alignChits();
 
@@ -136,11 +137,12 @@ public class BattleMap extends Frame implements MouseListener,
         for (int i = attackerHeight; i < numCritters; i++)
         {
             Critter critter = defender.getCritter(i - attackerHeight);
-            chits[i] = new BattleChit(chitScale, critter.getImageName(true),
-                this, critter);
-            tracker.addImage(chits[i].getImage(), 0);
-            critter.addBattleInfo(entrance, this, chits[i]);
-            entrance.addCritter(chits[i].getCritter());
+            critters[i] = critter;
+            BattleChit chit = new BattleChit(chitScale, 
+                critter.getImageName(true), this, critter);
+            tracker.addImage(chit.getImage(), 0);
+            critter.addBattleInfo(entrance, this, chit);
+            entrance.addCritter(critter);
         }
         entrance.alignChits();
 
@@ -200,14 +202,13 @@ public class BattleMap extends Frame implements MouseListener,
         BattleHex entrance = getEntrance(legion);
         int height = legion.getHeight();
         Critter critter = legion.getCritter(height - 1);
+        critters[numCritters++] = critter;
 
-        chits[numCritters] = new BattleChit(chitScale,
+        BattleChit chit = new BattleChit(chitScale,
             critter.getImageName(legion == defender), this, critter);
-        tracker.addImage(chits[numCritters].getImage(), 0);
-        critter.addBattleInfo(entrance, this, chits[numCritters]);
-        entrance.addCritter(chits[numCritters].getCritter());
-
-        numCritters++;
+        tracker.addImage(chit.getImage(), 0);
+        critter.addBattleInfo(entrance, this, chit);
+        entrance.addCritter(critter);
 
         entrance.alignChits();
 
@@ -259,7 +260,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = 0; i < numCritters; i++)
         {
-            Critter critter = chits[i].getCritter();
+            Critter critter = critters[i];
             if (critter.getPlayer() == player)
             {
                 if (!critter.hasMoved() && !critter.inContact(false))
@@ -393,7 +394,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = 0; i < numCritters; i++)
         {
-            Critter critter = chits[i].getCritter();
+            Critter critter = critters[i];
             if (critter.hasMoved())
             {
                 critter.undoMove();
@@ -409,7 +410,7 @@ public class BattleMap extends Frame implements MouseListener,
         Player player = turn.getActivePlayer();
         for (int i = 0; i < numCritters; i++)
         {
-            Critter critter = chits[i].getCritter();
+            Critter critter = critters[i];
             if (critter.getCurrentHex().isEntrance() &&
                 critter.getPlayer() == player)
             {
@@ -424,7 +425,7 @@ public class BattleMap extends Frame implements MouseListener,
     {
         for (int i = 0; i < numCritters; i++)
         {
-            Critter critter = chits[i].getCritter();
+            Critter critter = critters[i];
             if (critter.getPlayer() == player)
             {
                 critter.setDead(true);
@@ -439,7 +440,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = 0; i < numCritters; i++)
         {
-            Critter critter = chits[i].getCritter();
+            Critter critter = critters[i];
             critter.commitMove();
         }
     }
@@ -452,7 +453,7 @@ public class BattleMap extends Frame implements MouseListener,
         {
             for (int i = 0; i < numCritters; i++)
             {
-                Critter critter = chits[i].getCritter();
+                Critter critter = critters[i];
                 if (critter.getCurrentHex().getTerrain() == 'd' &&
                     !critter.isNativeDrift())
                 {
@@ -473,7 +474,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = 0; i < numCritters; i++)
         {
-            Critter critter = chits[i].getCritter();
+            Critter critter = critters[i];
             if (critter.getPlayer() == player)
             {
                 if (countStrikes(critter) > 0)
@@ -542,7 +543,7 @@ public class BattleMap extends Frame implements MouseListener,
         {
             for (int i = 0; i < numCritters; i++)
             {
-                Critter target = chits[i].getCritter();
+                Critter target = critters[i];
                 if (target.getPlayer() != player && !target.isDead())
                 {
                     BattleHex targetHex = target.getCurrentHex();
@@ -600,7 +601,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = 0; i < numCritters; i++)
         {
-            Critter target = chits[i].getCritter();
+            Critter target = critters[i];
             if (target.getCarryFlag())
             {
                 BattleHex targetHex = target.getCurrentHex();
@@ -638,7 +639,7 @@ public class BattleMap extends Frame implements MouseListener,
     {
         for (int i = 0; i < numCritters; i++)
         {
-            Critter critter = chits[i].getCritter();
+            Critter critter = critters[i];
             if (critter.getCarryFlag())
             {
                 critter.setCarryFlag(false);
@@ -656,7 +657,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = 0; i < numCritters; i++)
         {
-            Critter critter = chits[i].getCritter();
+            Critter critter = critters[i];
             if (critter.getPlayer() == player)
             {
                 if (critter.inContact(false) && !critter.hasStruck())
@@ -1223,7 +1224,7 @@ public class BattleMap extends Frame implements MouseListener,
     {
         for (int i = 0; i < numCritters; i++)
         {
-            chits[i].getCritter().commitStrike();
+            critters[i].commitStrike();
         }
     }
 
@@ -1311,7 +1312,7 @@ public class BattleMap extends Frame implements MouseListener,
 
         for (int i = numCritters - 1; i >= 0; i--)
         {
-            Critter critter = chits[i].getCritter();
+            Critter critter = critters[i];
             Legion legion = critter.getLegion();
             if (critter.isDead())
             {
@@ -1372,10 +1373,9 @@ public class BattleMap extends Frame implements MouseListener,
 
                 for (int j = i; j < numCritters - 1; j++)
                 {
-                    chits[j] = chits[j + 1];
+                    critters[j] = critters[j + 1];
                 }
-                chits[numCritters - 1] = null;
-                numCritters--;
+                critters[numCritters--] = null;
             }
             else
             {
@@ -1848,148 +1848,187 @@ public class BattleMap extends Frame implements MouseListener,
     }
 
 
+    // Return the BattleHex that contains the given point, or
+    //    null if none does.
+    private BattleHex getHexContainingPoint(Point point)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j] && h[i][j].contains(point))
+                {
+                    return h[i][j];
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    // Return the Critter whose chit contains the given point,
+    //   or null if none does.
+    private Critter getCritterContainingPoint(Point point)
+    {
+        for (int i = 0; i < numCritters; i++)
+        {
+            if (critters[i].getChit().select(point)) 
+            {
+                return critters[i];
+            }
+        }
+
+        return null;
+    }
+
+
+    // Move the passed Critter to the top of the critters array.
+    // Shift the other critters up. 
+    private void moveToTop(Critter critter)
+    {
+        int i = 0;
+        while (critters[i] != critter)
+        {
+            i++;
+        }
+
+        if (i != 0)
+        {
+            for (int j = i; j > 0; j--)
+            {
+                critters[j] = critters[j - 1];
+            }
+            critters[0] = critter;
+            critter.getChit().repaint();
+        }
+    }
+
+
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
         Player player = turn.getActivePlayer();
 
-        for (int i = 0; i < numCritters; i++)
+        Critter critter = getCritterContainingPoint(point);
+
+        // Only the active player can move or strike.
+        if (critter != null && critter.getPlayer() == player)
         {
-            // Only the active player can move or strike.
-            if (chits[i].select(point) && 
-                chits[i].getCritter().getPlayer() == player)
+            chitSelected = true;
+
+            // Put selected chit at the top of the Z-order.
+            moveToTop(critter);
+
+            switch (turn.getPhase())
             {
-                chitSelected = true;
+                case BattleTurn.MOVE:
+                    // Highlight all legal destinations for this chit.
+                    showMoves(critter);
+                    break;
 
-                // Put selected chit at the top of the Z-order.
+                case BattleTurn.FIGHT:
+                case BattleTurn.STRIKEBACK:
+                    // Highlight all legal strikes for this chit.
+                    highlightStrikes(critter);
 
-                if (i != 0)
-                {
-                    BattleChit tmpchit = chits[i];
-                    for (int j = i; j > 0; j--)
-                    {
-                        chits[j] = chits[j - 1];
-                    }
-                    chits[0] = tmpchit;
-                    chits[0].repaint();
-                }
+                    // Leave carry mode.
+                    clearAllCarries();
+                    break;
 
-                switch (turn.getPhase())
-                {
-                    case BattleTurn.MOVE:
-                        // Highlight all legal destinations for this chit.
-                        showMoves(chits[0].getCritter());
-                        break;
-
-                    case BattleTurn.FIGHT:
-                    case BattleTurn.STRIKEBACK:
-                        // Highlight all legal strikes for this chit.
-                        highlightStrikes(chits[0].getCritter());
-
-                        // Leave carry mode.
-                        clearAllCarries();
-                        break;
-
-                    default:
-                        break;
-                }
-
-                return;
+                default:
+                    break;
             }
-        }
 
+            return;
+        }
+    
         // No hits on chits, so check map.
-        for (int i = 0; i < h.length; i++)
+        BattleHex hex = getHexContainingPoint(point);
+        if (hex != null && hex.isSelected())
         {
-            for (int j = 0; j < h[0].length; j++)
+            switch (turn.getPhase())
             {
-                if (show[i][j] && h[i][j].isSelected(point))
-                {
-                    switch (turn.getPhase())
+                case BattleTurn.MOVE:
+                    if (chitSelected)
                     {
-                        case BattleTurn.MOVE:
-                            if (chitSelected)
-                            {
-                                chits[0].getCritter().moveToHex(h[i][j]);
-                                chitSelected = false;
-                            }
-                            highlightMovableChits();
-                            return;
-
-                        case BattleTurn.FIGHT:
-                        case BattleTurn.STRIKEBACK:
-                            if (getCarryDamage() > 0)
-                            {
-                                applyCarries(h[i][j].getCritter());
-                            }
-                            else if (chitSelected)
-                            {
-                                chits[0].getCritter().strike(
-                                    h[i][j].getCritter());
-                                chitSelected = false;
-                            }
-
-                            if (getCarryDamage() == 0)
-                            {
-                                highlightChitsWithTargets();
-                            }
-                            return;
-
-                        default:
-                            return;
+                        critters[0].moveToHex(hex);
+                        chitSelected = false;
                     }
-                }
+                    highlightMovableChits();
+                    return;
+    
+                case BattleTurn.FIGHT:
+                case BattleTurn.STRIKEBACK:
+                    if (getCarryDamage() > 0)
+                    {
+                        applyCarries(hex.getCritter());
+                    }
+                    else if (chitSelected)
+                    {
+                        critters[0].strike(hex.getCritter());
+                        chitSelected = false;
+                    }
+    
+                    if (getCarryDamage() == 0)
+                    {
+                        highlightChitsWithTargets();
+                    }
+                    return;
+    
+                default:
+                    return;
             }
         }
-
+    
         // No hits on selected hexes, so clean up.
         switch (turn.getPhase())
         {
             case BattleTurn.MOVE:
                 highlightMovableChits();
                 break;
-
+    
             case BattleTurn.FIGHT:
             case BattleTurn.STRIKEBACK:
                 highlightChitsWithTargets();
                 break;
-
+    
             default:
                 break;
        }
     }
-
-
+    
+    
     public void mouseReleased(MouseEvent e)
     {
     }
-
-
+    
+    
     public void mouseClicked(MouseEvent e)
     {
     }
-
-
+    
+    
     public void mouseEntered(MouseEvent e)
     {
     }
-
-
+    
+    
     public void mouseExited(MouseEvent e)
     {
     }
-
-
+    
+    
     public void windowActivated(WindowEvent e)
     {
     }
-
-
+    
+    
     public void windowClosed(WindowEvent e)
     {
     }
-
-
+    
+    
     public void windowClosing(WindowEvent e)
     {
         if (board != null)
@@ -1998,42 +2037,42 @@ public class BattleMap extends Frame implements MouseListener,
         }
         dispose();
     }
-
-
+    
+    
     public void windowDeactivated(WindowEvent e)
     {
     }
-
-
+    
+    
     public void windowDeiconified(WindowEvent e)
     {
     }
-
-
+    
+    
     public void windowIconified(WindowEvent e)
     {
     }
-
-
+    
+    
     public void windowOpened(WindowEvent e)
     {
     }
-
-
+    
+    
     // This is used to fix artifacts from chits outside visible hexes.
     public void setEraseFlag()
     {
         eraseFlag = true;
     }
-
-
+    
+    
     public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
-
+    
         // Abort if called too early.
         rectClip = g.getClipBounds();
         if (rectClip == null)
@@ -2042,7 +2081,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         
         Dimension d = getSize();
-
+    
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
             d.height != offDimension.height)
@@ -2051,14 +2090,14 @@ public class BattleMap extends Frame implements MouseListener,
             offImage = createImage(2 * d.width, 2 * d.height);
             offGraphics = offImage.getGraphics();
         }
-
+    
         // If the erase flag is set, erase the background.
         if (eraseFlag)
         {
             offGraphics.clearRect(0, 0, d.width, d.height);
             eraseFlag = false;
         }
-
+    
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
@@ -2069,47 +2108,48 @@ public class BattleMap extends Frame implements MouseListener,
                 }
             }
         }
-
+    
         // Draw chits from back to front.
         for (int i = numCritters - 1; i >= 0; i--)
         {
-            if (rectClip.intersects(chits[i].getBounds()))
+            Chit chit = critters[i].getChit();
+            if (rectClip.intersects(chit.getBounds()))
             {
-                chits[i].paint(offGraphics);
+                chit.paint(offGraphics);
             }
         }
-
+    
         g.drawImage(offImage, 0, 0, this);
     }
-
-
+    
+    
     public void paint(Graphics g)
     {
         // Double-buffer everything.
         update(g);
     }
-
-
+    
+    
     public Dimension getMinimumSize()
     {
         return new Dimension(30 * scale, 28 * scale);
     }
-
-
+    
+    
     public Dimension getPreferredSize()
     {
         return new Dimension(30 * scale, 30 * scale);
     }
-
-
+    
+    
     public Dimension getMapSize()
     {
         Rectangle xRect = h[5][3].getBounds();
         Rectangle yRect = h[3][5].getBounds();
         return new Dimension(xRect.x + xRect.width, yRect.y + yRect.height);
     }
-
-
+    
+    
     public static void main(String [] args)
     {
         Player player1 = new Player("Attacker", null);

@@ -1,4 +1,4 @@
-Colossus alpha     February 8, 2000    Copyright 2000 David Ripton
+Colossus alpha     August 11, 2000    Copyright 2000 David Ripton
 
 This is Colossus.  It's an attempt at a Java clone of Avalon Hill's
 Titan(tm) boardgame.
@@ -29,45 +29,43 @@ Running the game requires the following:
    Java virtual machines in current web browsers are buggy and out of 
    date, so I don't really recommend this.
 
-   Win32 and Solaris versions of the JDK and JRE are freely 
-   downloadable from java.sun.com.  A Linux port is available from
-   www.blackdown.org.  Info on other ports is available here:
+   Win32, Solaris, and Linux versions of the JDK and JRE are freely 
+   downloadable from java.sun.com.  Another Linux port is available 
+   from www.blackdown.org.  Info on other ports is available here:
    http://java.sun.com/cgi-bin/java-ports.cgi
 
-   IBM has its own JDK, based on Sun's.  And there's a free JVM called 
-   kaffe that works okay.
+   Here's my impression of how well various Java environments run
+   Colossus.  When I say that one is buggy, I mean that it has 
+   obvious problems running Colossus, not that it's worthless in
+   general.  All the Java environments have strong and weak points,
+   but the AWT is usually a weak point.
 
-   I've developed on and tested with the following:
+   Windows: IBM's 1.1.8 is excellent.  Sun's 1.3 is very good,
+      but somewhat buggy.  Pre-1.1.8 versions have horrible 
+      image memory leaks that cause Colossus to crash on a 
+      regular basis, so upgrade to 1.1.8 if possible.
 
-   Sun's JDK 1.1.6, 1.1.7, 1.1.7a, 1.1.8, 1.2, 1.2.1, 1.2.2, and 1.3beta
-       for Win32, on Windows 95 OSR2, Windows 98, NT 4.0, and NT 5 beta 1.
-       1.1.8 works best; later versions are somewhat buggier.  Sun's
-       HotSpot VM works but doesn't make a real difference.
+   Solaris Sparc: Recent Sun boxes come with a pre-installed 
+      1.2.x JDK.  If you want to update it, 1.2.2 is less buggy 
+      than 1.3 beta refresh.
 
-   IBM's JDK 1.1.7 and 1.1.8 on Windows 98.
-
-   Sun's JDK 1.1.6 and 1.1.7 for Solaris x86 and 1.2.x for Solaris Sparc
-
-   www.blackdown.org JDK 1.1.6 v2 and v4, 1.1.7v1 and v3, and 1.2pre1 and
-       1.2pre2 for Linux, on Red Hat Linux 5.1 - 6.1 running kde.  
-       1.1.7v3 works best.
-
-   IBM's JDK 1.1.6, 1.1.8, and 1.3 beta on Red Hat 6.0 - 6.2.  1.1.8 
-       works great.  1.3 beta is not there yet.
-
-   kaffe 1.0b4 and b5 under Linux.  Works pretty well, but there are 
-      repaint and color differences from Sun's environment, and some
-      hit testing problems.
+   Linux: IBM's 1.1.8 is the most stable, but not perfect.  
+      The Sun and Blackdown 1.1.8 versions are pretty good.  
+      The Sun and Blackdown 1.2.2 versions are okay.  Sun's 
+      1.3 beta refresh is buggy.  kaffe is buggy.
 
    If you have something else, you might find bugs that I haven't.  
    If you manage to get Colossus running on a system I haven't tried, 
-   please email me.
+   please email me.  (In particular, I'd like to know if it works on
+   a Mac.)
 
 2. A reasonably fast computer capable of displaying high resolution graphics,
    with a two-button mouse.
    
    What is reasonably fast?  It depends.  I think Colossus runs acceptably
    on a Pentium 133 with 64 MB and a JVM with a JIT.  Your opinion may vary.
+   The client-side HotSpot JVM in JDK 1.3 for Windows seems to help, so
+   if you have a slower machine, you might want to upgrade your JRE.
 
    The game looks best in 1280x960 or higher, but I've added some scaling
    so you should be able to get by in 1024x768.  Less should work but will
@@ -79,8 +77,8 @@ Running the game requires the following:
    Java handles mouse buttons beyond the first badly.  In a perfect world,
    option-click on a Macintosh and the second mouse button on a PC would
    fire the same Java event.  They don't.  Because I don't have a Mac,
-   I don't know if Colossus works correctly on one.  If you have a Mac,
-   please let me know.
+   I don't know if Colossus works correctly on one.  If you have a Mac
+   with a one-button mouse, please let me know how things work.
 
 
 Directions:
@@ -136,9 +134,8 @@ click.
 You can right-click on a legion to see its contents (note that the contents
 of other players' legions are hidden, except for those creatures which have
 recently been revealed via fighting, recruiting, or teleporting).  You can 
-right-click on a hex to see what kind of hex it is, what you can recruit 
-there, and how many of each type of recruit is left in the stacks.  You
-can double-right-click on a hex to see its battle map.
+right-click on a hex to call up a menu, which lets you either see what you
+can recruit in that hex, or its battle map.
 
 The active player first needs to split his initial 8-high legion.  You'll 
 notice that the hex containing the active player's legion is lit up as a 
