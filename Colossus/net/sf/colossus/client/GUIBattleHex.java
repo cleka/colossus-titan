@@ -95,7 +95,6 @@ public class GUIBattleHex extends BattleHex
                 RenderingHints.VALUE_ANTIALIAS_OFF);
         }
 
-
         if (isSelected())
         {
             g2.setColor(Color.red);
@@ -116,31 +115,40 @@ public class GUIBattleHex extends BattleHex
         g2.setColor(Color.black);
         g2.draw(hexagon);
 
-        // Draw hexside features.
-        for (int i = 0; i < 6; i++)
-        {
-            char hexside = getHexside(i);
-            int n;
-            if (hexside != ' ')
-            {
-                n = (i + 1) % 6;
-                drawHexside(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
-                    hexside);
-            }
 
-            // Draw them again from the other side.
-            hexside = getOppositeHexside(i);
-            if (hexside != ' ')
+        if ((useOverlay) && (paintOverlay(g2)))
+        {
+            // well, ok...
+        }
+        else
+        {
+            // Draw hexside features.
+            for (int i = 0; i < 6; i++)
             {
-                n = (i + 1) % 6;
-                drawHexside(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
-                    hexside);
+                char hexside = getHexside(i);
+                int n;
+                if (hexside != ' ')
+                {
+                    n = (i + 1) % 6;
+                    drawHexside(g2,
+                                xVertex[i], yVertex[i],
+                                xVertex[n], yVertex[n],
+                                hexside);
+                }
+                
+                // Draw them again from the other side.
+                hexside = getOppositeHexside(i);
+                if (hexside != ' ')
+                {
+                    n = (i + 1) % 6;
+                    drawHexside(g2,
+                                xVertex[n], yVertex[n],
+                                xVertex[i], yVertex[i],
+                                hexside);
+                }
             }
         }
-
-        if (useOverlay)
-            paintOverlay(g2);
-
+            
         // Do not anti-alias text.
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -354,7 +362,7 @@ public class GUIBattleHex extends BattleHex
         }
     }
 
-    public void paintOverlay(Graphics2D g)
+    public boolean paintOverlay(Graphics2D g)
     {
         if (hexOverlay == null)
             loadOverlay();
@@ -368,8 +376,11 @@ public class GUIBattleHex extends BattleHex
                         rectBound.height,
                     map);
         }
-        /* DISABLED ; work but doesn't look nice...
+        boolean didAllHexside = true;
         Shape oldClip = g.getClip();
+        //make sure we draw only inside our hex
+        g.setClip(null);
+        g.clip(hexagon);
         // second, draw the opposite Hex HexSide
         for (int i = 0; i < 6; i++)
         {
@@ -390,28 +401,12 @@ public class GUIBattleHex extends BattleHex
                     sourceWidth = sideOverlay.getWidth(map);
                     sourceHeight = sideOverlay.getHeight(map);
 
-                    GeneralPath myClip = new GeneralPath();
-                    float xm;
-                    float ym;
-                    xm = (float)findCenter2D().x;
-                    ym = (float)findCenter2D().y;
-                    myClip.moveTo(xm, ym);
-                    float xi,yi;
-                    xi = (float)xVertex[firstVertex];
-                    yi = (float)yVertex[firstVertex];
-                    myClip.lineTo(xi,yi);
-                    xi = (float)xVertex[secondVertex];
-                    yi = (float)yVertex[secondVertex];
-                    myClip.lineTo(xi,yi);
-                    myClip.lineTo(xm,ym);
-                    g.setClip(null);
-                    g.clip(myClip);
-
                     sx1 = 0;
                     sy1 = 0;
                     sx2 = sideOverlay.getWidth(map);
                     sy2 = sideOverlay.getHeight(map);
-
+                    float xm,ym;
+                    float xi,yi;
                     xm = (float)neighbor.findCenter2D().x;
                     ym = (float)neighbor.findCenter2D().y;
                     xi = (float)neighbor.xVertex[5] - xm;
@@ -436,9 +431,14 @@ public class GUIBattleHex extends BattleHex
                                 sx1, sy1, sx2, sy2,
                                 map);
                 }
+                else
+                {
+                    didAllHexside = false;
+                }
             }
         }
         g.setClip(oldClip);
-        */
+        return didAllHexside;
     }
 }
+
