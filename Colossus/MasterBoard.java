@@ -91,10 +91,9 @@ public class MasterBoard extends Frame implements MouseListener,
 
             Legion legion = new Legion(0, 0, 3 * scale, 
                 game.player[i].getSelectedMarker(), null, this, 8, 
-                100 * game.player[i].getTower(), Creature.titan, 
-                Creature.angel, Creature.ogre, Creature.ogre, 
-                Creature.centaur, Creature.centaur, Creature.gargoyle, 
-                Creature.gargoyle, game.player[i]);
+                hex, Creature.titan, Creature.angel, Creature.ogre, 
+                Creature.ogre, Creature.centaur, Creature.centaur, 
+                Creature.gargoyle, Creature.gargoyle, game.player[i]);
 
             game.player[i].addLegion(legion);
             hex.addLegion(legion);
@@ -193,7 +192,7 @@ public class MasterBoard extends Frame implements MouseListener,
             for (int i = 0; i < player.getNumLegions(); i++)
             {
                 // Account for spin cycles.
-                if (player.legions[i].getCurrentHex() == hex.label &&
+                if (player.legions[i].getCurrentHex() == hex &&
                     player.legions[i] != legion)
                 {
                     return;
@@ -276,7 +275,7 @@ public class MasterBoard extends Frame implements MouseListener,
             return;
         }
 
-        MasterHex hex = getHexFromLabel(legion.getCurrentHex());
+        MasterHex hex = legion.getCurrentHex();
 
         // Conventional moves
 
@@ -328,8 +327,7 @@ public class MasterBoard extends Frame implements MouseListener,
                         for (int j = 0; j < game.player[i].getNumLegions(); 
                             j++)
                         {
-                            getHexFromLabel(game.player[i].legions[j].
-                                getCurrentHex()).select();
+                            game.player[i].legions[j].getCurrentHex().select();
                             Rectangle clip = new Rectangle(h[i][j].
                                 getBounds());
                             repaint(clip.x, clip.y, clip.width, clip.height);
@@ -992,8 +990,7 @@ public class MasterBoard extends Frame implements MouseListener,
                                     // If we split, unselect this hex.
                                     if (legion.getHeight() < 7)
                                     {
-                                        MasterHex hex = getHexFromLabel(
-                                            legion.getCurrentHex());
+                                        MasterHex hex = legion.getCurrentHex();
                                         hex.unselect();
                                     }
                                     // XXX Repaint only affected areas?
@@ -1002,7 +999,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
                                 case Game.MOVE:
                                     // Mark this legion as active.
-                                    player.selectLegion(j);
+                                    player.selectLegion(legion);
 
                                     // Find all legal destinations for this 
                                     // legion and highlight them.
@@ -1010,7 +1007,9 @@ public class MasterBoard extends Frame implements MouseListener,
                                     return;
 
                                 case Game.FIGHT:
-                                    return;
+                                    // Fall through, to allow clicking on 
+                                    // either engaged legion or the hex.
+                                    break;
 
                                 case Game.MUSTER:
                                     if (legion.getHeight() < 7 && 
@@ -1022,8 +1021,7 @@ public class MasterBoard extends Frame implements MouseListener,
                                     // If we recruited, unselect this hex.
                                     if (legion.hasMoved() == false)
                                     {
-                                        MasterHex hex = getHexFromLabel(
-                                            legion.getCurrentHex());
+                                        MasterHex hex = legion.getCurrentHex();
                                         hex.unselect();
                                     }
                                     // XXX Repaint only affected areas?
@@ -1037,8 +1035,8 @@ public class MasterBoard extends Frame implements MouseListener,
         }
 
         // No hits on chits, so check map.
-        Player player = game.getActivePlayer();
 
+        Player player = game.getActivePlayer();
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
@@ -1064,10 +1062,25 @@ public class MasterBoard extends Frame implements MouseListener,
                         // If we're fighting and there is an engagement here,
                         // resolve it.
                         case Game.FIGHT:
+                            if (h[i][j].getNumFriendlyLegions(player) > 0 &&
+                                h[i][j].getNumEnemyLegions(player) > 0)
+                            {
+                                Legion attacker = 
+                                    h[i][j].getFriendlyLegion(player);
+                                Legion defender = 
+                                    h[i][j].getEnemyLegion(player);
+
+                                if (defender.canFlee()) 
+                                {
+                                
+                                }
+
+                                // Either player may concede.
+                                
+                                // XXX: Add negotiation and battle
+                            }
                             break;
 
-                        // If we're mustering and there is a legion here that 
-                        // is eligible to muster a recruit, do so. 
                         case Game.MUSTER:
                             break;
 
