@@ -87,6 +87,12 @@ public class Creature implements Comparable
         this.maxCount = maxCount;
         this.pluralName = pluralName;
         this.baseColor = baseColor;
+
+        /* warn about likely inapropriate combinations */
+        if (waterDwelling && nativeSandDune)
+        {
+            Log.warn("Creature " + name + " is both a Water Dweller and native to Sand and Dune.");
+        }
     }
 
 
