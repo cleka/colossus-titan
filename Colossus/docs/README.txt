@@ -52,7 +52,8 @@ Running the game requires the following:
        1.2pre2 for Linux, on Red Hat Linux 5.1 - 6.1 running kde.  
        1.1.7v3 works best.
 
-   IBM's JDK 1.1.6 and 1.1.8 on Red Hat 6.0.  1.1.8 works great.  
+   IBM's JDK 1.1.6, 1.1.8, and 1.3 beta on Red Hat 6.0 - 6.2.  1.1.8 
+       works great.  1.3 beta is not there yet.
 
    kaffe 1.0b4 and b5 under Linux.  Works pretty well, but there are 
       repaint and color differences from Sun's environment, and some

@@ -45,7 +45,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
 
         addMouseListener(this);
 
-        attackerMarker = new Marker(-1, -1, scale, attacker.getImageName(), 
+        attackerMarker = new Marker(scale, attacker.getImageName(), 
             this, attacker);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
@@ -56,7 +56,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         attackerChits = new Chit[attacker.getHeight()];
         for (int i = 0; i < attacker.getHeight(); i++)
         {
-            attackerChits[i] = new Chit(-1, -1, scale, 
+            attackerChits[i] = new Chit(scale, 
                 attacker.getCritter(i).getImageName(), this);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 0;
@@ -66,8 +66,8 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
             attackerChits[i].addMouseListener(this);
         }
         
-        defenderMarker = new Marker(-1, -1, scale, defender.getImageName(), 
-            this, defender);
+        defenderMarker = new Marker(scale, defender.getImageName(), this, 
+            defender);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 1;
         constraints.gridwidth = 1;
@@ -77,7 +77,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         defenderChits = new Chit[defender.getHeight()];
         for (int i = 0; i < defender.getHeight(); i++)
         {
-            defenderChits[i] = new Chit(-1, -1, scale,
+            defenderChits[i] = new Chit(scale,
                 defender.getCritter(i).getImageName(), this);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 1;

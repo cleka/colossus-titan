@@ -268,7 +268,7 @@ class BattleTurn extends Dialog implements ActionListener, WindowListener
 
         else if (phase == STRIKEBACK)
         {
-            map.removeDeadChits();
+            map.removeDeadCreatures();
 
             // Make sure the battle isn't over before continuing.
             if (attacker.getHeight() >= 1 && defender.getHeight() >= 1)

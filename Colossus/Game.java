@@ -192,7 +192,7 @@ public class Game
         switch (remaining)
         {
             case 0:
-                new MessageBox(board, "draw");
+                new MessageBox(board, "Draw");
                 dispose();
                 break;
 

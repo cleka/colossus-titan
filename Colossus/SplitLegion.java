@@ -66,8 +66,8 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
             addMouseListener(this);
             addWindowListener(this);
 
-            oldMarker = new Marker(-1, -1, scale,
-                oldLegion.getImageName(), this, oldLegion);
+            oldMarker = new Marker(scale, oldLegion.getImageName(), this,
+                oldLegion);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 0;
             constraints.gridwidth = 1;
@@ -77,7 +77,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener,
             oldChits = new Chit[oldLegion.getHeight()];
             for (int i = 0; i < oldLegion.getHeight(); i++)
             {
-                oldChits[i] = new Chit(-1, -1, scale,
+                oldChits[i] = new Chit(scale,
                     oldLegion.getCritter(i).getImageName(), this);
                 gridbag.setConstraints(oldChits[i], constraints);
                 add(oldChits[i]);

@@ -23,19 +23,10 @@ class Chit extends Canvas
     protected static boolean isApplet = false;
 
 
-    Chit(int cx, int cy, int scale, String imageFilename,
-        Container container)
+    Chit(int scale, String imageFilename, Container container)
     {
-        // If cx or cy is set to -1, that means that the Chit
-        // should allow the layout manager to place it.
-        if (cx == -1 || cy == -1)
-        {
-            Point point = getLocation();
-            cx = point.x;
-            cy = point.y;
-        }
-
-        rect = new Rectangle(cx, cy, scale, scale);
+        Point point = getLocation();
+        rect = new Rectangle(point.x, point.y, scale, scale);
         setBounds(rect);
 
         this.container = container;
@@ -89,7 +80,7 @@ class Chit extends Canvas
     public void paint(Graphics g)
     {
         g.drawImage(image, rect.x, rect.y, rect.width, rect.width, container);
-        if (dead)
+        if (isDead())
         {
             // Draw a triple-wide red X.
             g.setColor(Color.red);

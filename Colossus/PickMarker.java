@@ -47,7 +47,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
 
             for (int i = 0; i < player.getNumMarkersAvailable(); i++)
             {
-                markers[i] = new Chit(-1, -1, scale,  
+                markers[i] = new Chit(scale,  
                     "images/" + player.getMarker(i) + ".gif", this);
                 add(markers[i]);
                 markers[i].addMouseListener(this);

@@ -80,3 +80,13 @@ Linux, ibmjdk118: Legion with angel in tower did not immediately
    teleported.  "Undo All Moves" fixed the problem.
    
 Linux, ibmjdk118: Got a NullPointerException in Concede.<init>
+
+Linux, ibmjdk13: Repainting of stacked chits in battlemap entry
+   hex is ugly.  Chits in front are not fully redrawn.
+
+Linux, ibmjdk118: Angel summoned into battle can move on top of
+   any of its allies which has not moved yet, because their hexes 
+   are highlighted.
+
+Linux, ibmjdk118: Tried to strike own creature!
+

@@ -52,8 +52,7 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
 
         for (int i = 0; i < numEligible; i++)
         {
-            chits[i] = new Chit(-1, -1, scale, recruits[i].getImageName(), 
-                this);
+            chits[i] = new Chit(scale, recruits[i].getImageName(), this);
             add(chits[i]);
             chits[i].addMouseListener(this);
         }

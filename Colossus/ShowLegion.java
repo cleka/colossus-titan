@@ -74,7 +74,7 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
                 imageName = critter.getImageName();
             }
 
-            chits[i] = new Chit(-1, -1, scale, imageName, this);
+            chits[i] = new Chit(scale, imageName, this);
             add(chits[i]);
             chits[i].addMouseListener(this);
         }

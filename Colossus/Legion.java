@@ -31,8 +31,7 @@ class Legion
     {
         this.markerId = markerId;
         this.splitFrom = splitFrom;
-        this.marker = new Marker(-1, -1, scale, getImageName(), container,
-            this);
+        this.marker = new Marker(scale, getImageName(), container, this);
         this.height = height;
         this.currentHex = hex;
         this.startingHex = hex;
@@ -506,6 +505,15 @@ class Legion
         for (int i = 0; i < height; i++)
         {
             critters[i].setVisible(true);
+        }
+    }
+    
+    
+    public void healAllCreatures()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            critters[i].heal();
         }
     }
     

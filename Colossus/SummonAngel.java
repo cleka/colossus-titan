@@ -61,15 +61,14 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         setBackground(Color.lightGray);
         setResizable(false);
 
-        angelChit = new Chit(-1, -1, scale, 
-            Creature.angel.getImageName(), this);
+        angelChit = new Chit(scale, Creature.angel.getImageName(), this);
         constraints.gridy = 0;
         gridbag.setConstraints(angelChit, constraints);
         add(angelChit);
         angelChit.addMouseListener(this);
 
-        archangelChit = new Chit(-1, -1, scale, 
-            Creature.archangel.getImageName(), this);
+        archangelChit = new Chit(scale, Creature.archangel.getImageName(),
+            this);
         constraints.gridy = 0;
         gridbag.setConstraints(archangelChit, constraints);
         add(archangelChit);

@@ -49,8 +49,7 @@ class Concede extends Dialog implements ActionListener
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 
-        allyMarker = new Marker(-1, -1, scale, ally.getImageName(), this, 
-            ally);
+        allyMarker = new Marker(scale, ally.getImageName(), this, ally);
         constraints.gridy = 0;
         constraints.gridwidth = 1;
         gridbag.setConstraints(allyMarker, constraints);
@@ -60,16 +59,15 @@ class Concede extends Dialog implements ActionListener
         allyChits = new Chit[7];
         for (int i = 0; i < ally.getHeight(); i++)
         {
-            allyChits[i] = new Chit(-1, -1, scale, 
-                ally.getCritter(i).getImageName(), this);
+            allyChits[i] = new Chit(scale, ally.getCritter(i).getImageName(),
+                this);
             constraints.gridy = 0;
             constraints.gridwidth = 1;
             gridbag.setConstraints(allyChits[i], constraints);
             add(allyChits[i]);
         }
 
-        enemyMarker = new Marker(-1, -1, scale, enemy.getImageName(), 
-            this, enemy);
+        enemyMarker = new Marker(scale, enemy.getImageName(), this, enemy);
         constraints.gridy = 1;
         constraints.gridwidth = 1;
         gridbag.setConstraints(enemyMarker, constraints);
@@ -79,8 +77,8 @@ class Concede extends Dialog implements ActionListener
         enemyChits = new Chit[7];
         for (int i = 0; i < enemy.getHeight(); i++)
         {
-            enemyChits[i] = new Chit(-1, -1, scale, 
-                enemy.getCritter(i).getImageName(), this);
+            enemyChits[i] = new Chit(scale, enemy.getCritter(i).getImageName(),
+                this);
             constraints.gridy = 1;
             constraints.gridwidth = 1;
             gridbag.setConstraints(enemyChits[i], constraints);

@@ -63,7 +63,7 @@ class PickLord extends Dialog implements MouseListener, WindowListener
 
         for (int i = 0; i < chits.length; i++)
         {
-            chits[i] = new Chit(-1, -1, scale, lords[i].getImageName(), this);
+            chits[i] = new Chit(scale, lords[i].getImageName(), this);
             add(chits[i]);
             chits[i].addMouseListener(this);
         }

@@ -11,10 +11,9 @@ class Marker extends Chit
     Legion legion;
 
 
-    Marker(int cx, int cy, int scale, String imageFilename,
-        Container container, Legion legion)
+    Marker(int scale, String imageFilename, Container container, Legion legion)
     {
-        super(cx, cy, scale, imageFilename, container);
+        super(scale, imageFilename, container);
 
         this.legion = legion;
     }

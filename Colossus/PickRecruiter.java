@@ -53,8 +53,7 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
 
         setResizable(false);
 
-        legionMarker = new Marker(-1, -1, scale, legion.getImageName(), 
-            this, legion);
+        legionMarker = new Marker(scale, legion.getImageName(), this, legion);
         constraints.gridx = GridBagConstraints.RELATIVE;
         constraints.gridy = 0;
         gridbag.setConstraints(legionMarker, constraints);
@@ -63,7 +62,7 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
         legionChits = new Chit[height];
         for (int i = 0; i < height; i++)
         {
-            legionChits[i] = new Chit(-1, -1, scale, 
+            legionChits[i] = new Chit(scale, 
                 legion.getCritter(i).getImageName(), this);
             constraints.gridx = GridBagConstraints.RELATIVE;
             constraints.gridy = 0;
@@ -85,8 +84,8 @@ class PickRecruiter extends Dialog implements MouseListener, WindowListener
 
         for (int i = 0; i < numEligible; i++)
         {
-            recruiterChits[i] = new Chit(-1, -1, scale, 
-                recruiters[i].getImageName(), this);
+            recruiterChits[i] = new Chit(scale, recruiters[i].getImageName(),
+                this);
             constraints.gridx = leadSpace + i;
             constraints.gridy = 1;
             gridbag.setConstraints(recruiterChits[i], constraints);

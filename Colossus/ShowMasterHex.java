@@ -65,7 +65,7 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         {
             Creature creature = hex.getRecruit(i);
 
-            chits[i] = new Chit(-1, -1, scale, creature.getImageName(), this);
+            chits[i] = new Chit(scale, creature.getImageName(), this);
             add(chits[i]);
             chits[i].addMouseListener(this);
 

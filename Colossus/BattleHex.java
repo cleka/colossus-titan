@@ -10,9 +10,9 @@ class BattleHex extends Hex
 {
     private BattleMap map;
 
-    // Normal hexes hold only one chit, but entrances can hold up to 7.
-    int numChits = 0;
-    private BattleChit [] chits = new BattleChit[7];
+    // Normal hexes hold only one creature, but entrances can hold up to 7.
+    int numCritters = 0;
+    private Critter [] critters = new Critter[7];
 
     // Valid elevations are 0, 1, and 2.
     private int elevation = 0;
@@ -297,39 +297,33 @@ class BattleHex extends Hex
     }
 
 
-    int getNumChits()
-    {
-        return numChits;
-    }
-
-
     boolean isOccupied()
     {
-        return (numChits > 0);
+        return (numCritters > 0);
     }
 
 
-    void addChit(BattleChit chit)
+    void addCritter(Critter critter)
     {
-        if (numChits < 7)
+        if (numCritters < 7)
         {
-            chits[numChits] = chit;
-            numChits++;
+            critters[numCritters] = critter;
+            numCritters++;
             alignChits();
         }
     }
 
 
-    void removeChit(int i)
+    void removeCritter(int i)
     {
-        if (i >= 0 && i < numChits)
+        if (i >= 0 && i < numCritters)
         {
-            for (int j = i; j < numChits - 1; j++)
+            for (int j = i; j < numCritters - 1; j++)
             {
-                chits[j] = chits[j + 1];
+                critters[j] = critters[j + 1];
             }
-            chits[numChits - 1] = null;
-            numChits--;
+            critters[numCritters - 1] = null;
+            numCritters--;
 
             // Clearing the area is only necessary for entrances.
             if (isEntrance())
@@ -343,23 +337,23 @@ class BattleHex extends Hex
     }
 
 
-    void removeChit(Chit chit)
+    void removeCritter(Critter critter)
     {
-        for (int i = 0; i < numChits; i++)
+        for (int i = 0; i < numCritters; i++)
         {
-            if (chits[i] == chit)
+            if (critters[i] == critter)
             {
-                removeChit(i);
+                removeCritter(i);
             }
         }
     }
 
 
-    BattleChit getChit()
+    Critter getCritter()
     {
-        if (numChits > 0)
+        if (numCritters > 0)
         {
-            return chits[0];
+            return critters[0];
         }
         else
         {
@@ -368,11 +362,11 @@ class BattleHex extends Hex
     }
 
 
-    BattleChit getChit(int i)
+    Critter getCritter(int i)
     {
-        if (i >= 0 && i < numChits)
+        if (i >= 0 && i < numCritters)
         {
-            return chits[i];
+            return critters[i];
         }
         else
         {
@@ -383,21 +377,22 @@ class BattleHex extends Hex
 
     void alignChits()
     {
-        if (numChits == 0)
+        if (numCritters == 0)
         {
             return;
         }
 
-        int chitScale = chits[0].getBounds().width;
+        int chitScale = critters[0].getChit().getBounds().width;
         Point point = getCenter();
 
         // Cascade chits diagonally.
-        point.x -= chitScale * (1 + (numChits)) / 4;
-        point.y -= chitScale * (1 + (numChits)) / 4;
+        point.x -= chitScale * (1 + (numCritters)) / 4;
+        point.y -= chitScale * (1 + (numCritters)) / 4;
 
-        for (int i = 0; i < numChits; i++)
+        for (int i = 0; i < numCritters; i++)
         {
-            chits[i].setLocationAbs(point);
+            BattleChit chit = critters[i].getChit();
+            chit.setLocationAbs(point);
             point.x += chitScale / 4;
             point.y += chitScale / 4;
         }

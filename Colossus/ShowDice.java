@@ -21,8 +21,8 @@ class ShowDice extends Dialog implements WindowListener
     private GridBagConstraints constraints = new GridBagConstraints();
     private Insets insets = new Insets(5, 5, 5, 5);
     private static Point location;
-    private BattleChit attacker;
-    private BattleChit defender;
+    private Critter attacker;
+    private Critter defender;
     private int numDice;
     private int targetNumber;
     private int [] rolls;
@@ -64,13 +64,13 @@ class ShowDice extends Dialog implements WindowListener
     }
 
 
-    public void setAttacker(BattleChit attacker) 
+    public void setAttacker(Critter attacker) 
     {
         this.attacker = attacker;
     }
     
     
-    public void setDefender(BattleChit defender) 
+    public void setDefender(Critter defender) 
     {
         this.defender = defender;
     }
@@ -129,9 +129,9 @@ class ShowDice extends Dialog implements WindowListener
         setEnabled(false);
         removeAll();
 
-        label1.setText(attacker.getCritter().getName() + " in " + 
+        label1.setText(attacker.getName() + " in " + 
             attacker.getCurrentHex().getTerrainName().toLowerCase() + 
-            " attacks " + defender.getCritter().getName() + " in " +
+            " attacks " + defender.getName() + " in " +
             defender.getCurrentHex().getTerrainName().toLowerCase());
         label1.setAlignment(Label.LEFT);
         constraints.gridy = 0;
@@ -157,8 +157,7 @@ class ShowDice extends Dialog implements WindowListener
         dice = new Chit[numDice];
         for (int i = 0; i < numDice; i++)
         {
-            dice[i] = new Chit(-1, -1, scale, getDieImageName(rolls[i]), 
-                this);
+            dice[i] = new Chit(scale, getDieImageName(rolls[i]), this);
             constraints.gridy = 2 + (i / 6); 
             constraints.gridwidth = 1;
             constraints.ipadx = 5;

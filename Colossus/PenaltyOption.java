@@ -7,22 +7,22 @@
 
 class PenaltyOption
 {
-    private BattleChit chit;
+    private Critter critter;
     private int dice;
     private int strikeNumber;
 
 
-    PenaltyOption(BattleChit chit, int dice, int strikeNumber)
+    PenaltyOption(Critter critter, int dice, int strikeNumber)
     {
-        this.chit = chit;
+        this.critter = critter;
         this.dice = dice;
         this.strikeNumber = strikeNumber;
     }
 
 
-    public BattleChit getChit()
+    public Critter getCritter()
     {
-        return chit;
+        return critter;
     }
     
     
