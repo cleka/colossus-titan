@@ -344,8 +344,8 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * To obtain all the Creature that can be recruited as Acquirable.
-     * @return The list of name (as String) that can be recruited as Acquirable
+     * To obtain all the Creature that can be Acquired.
+     * @return The list of name (as String) that can be Acquired
      */
     public List getAcquirableList()
     {
@@ -360,9 +360,9 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * To obtain the base amount of points needed for Acquirable recruitement.
-     * All Acquirable recruitements must occur at even multiple of this.
-     * @return The base amount of points needed for Acquirable recruitement.
+     * To obtain the base amount of points needed for Acquirement.
+     * All Acquirements must occur at even multiple of this.
+     * @return The base amount of points needed for Acquirement.
      */
     public int getAcquirableRecruitmentsValue()
     {
@@ -371,10 +371,10 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * To obtain all the Creature that can be recruited as Acquirable at the given amount of points in the given terrain.
+     * To obtain all the Creature that can be acquired at the given amount of points in the given terrain.
      * @param t The Terrain in which the recruitement occurs.
      * @param value The number of points at which the recruitement occurs. Valid values are constrained.
-     * @return The list of name (as String) that can be recruited as Acquirable in this terrain, for this amount of points.
+     * @return The list of name (as String) that can be acquired in this terrain, for this amount of points.
      * @see #getAcquirableRecruitmentsValue()
      */
     public List getRecruitableAcquirableList(char t, int value)

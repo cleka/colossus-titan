@@ -1358,6 +1358,56 @@ public final class Game
         return trl.numberOfRecruiterNeeded(recruiter,recruit,terrain);
     }
 
+    /**
+     * To obtain all the Creature that can be Acquired.
+     * @return The list of name (as String) that can be Acquired
+     */
+    public static java.util.List getAcquirableList()
+    {
+        return trl.getAcquirableList();
+    }
+
+    /**
+     * Check if the Creature whose name is in parameter is an Acquirable creature or not.
+     * @param name The name of the Creature inquired.
+     * @return If the creature is Acquirable.
+     */
+    public static boolean isAcquirable(String name)
+    {
+        return trl.isAcquirable(name);
+    }
+
+    /**
+     * Check if the Creature in parameter is an Acquirable creature or not.
+     * @param c The Creature inquired.
+     * @return If the creature is Acquirable.
+     */
+    public static boolean isAcquirable(Creature c)
+    {
+        return isAcquirable(c.getName());
+    }
+
+    /**
+     * To obtain all the Creature that can be acquired at the given amount of points in the given terrain.
+     * @param t The Terrain in which the recruitement occurs.
+     * @param value The number of points at which the recruitement occurs. Valid values are constrained.
+     * @return The list of name (as String) that can be acquired in this terrain, for this amount of points.
+     * @see #getAcquirableRecruitmentsValue()
+     */
+    public static java.util.List getRecruitableAcquirableList(char t, int value)
+    {
+        return trl.getRecruitableAcquirableList(t,value);
+    }
+
+    /**
+     * To obtain the base amount of points needed for Acquirement.
+     * All Acquirements must occur at even multiple of this.
+     * @return The base amount of points needed for Acquirement.
+     */
+    public static int getAcquirableRecruitmentsValue()
+    {
+        return trl.getAcquirableRecruitmentsValue();
+    }
 
     /** Return a list of eligible recruits, as Creatures. */
     java.util.List findEligibleRecruits(String markerId, String hexLabel)
