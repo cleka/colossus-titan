@@ -1,10 +1,10 @@
-Colossus alpha     June 19, 2001    Copyright 2001 David Ripton
+Colossus alpha     June 27, 2001    Copyright 2001 David Ripton
 
 Colossus is an attempt at a Java clone of Avalon Hill's Titan(tm) boardgame.
 
 It's not done yet.  Right now it allows hotseat play, and play against a
 mostly working but not-quite-ready-for-prime-time AI.  Client/server 
-networking will eventually follow.
+networking is in development.
 
 This program is freeware, distributed under the GNU public license, which
 is included in the file COPYING.GPL.  This means that you have the right to
@@ -66,9 +66,8 @@ Running the game requires the following:
 
    The game looks best in 1280x960 or higher, but I've added some scaling
    so you should be able to get by in 1024x768.  Less should work but will
-   be really ugly.  (Fixing the scaling to make things look better on 
-   low-res displays is on the to-do list.)  The Java AWT requires at least 
-   a 256-color display; it might work with less, but colors will be off.
+   be really ugly.  The Java AWT requires at least a 256-color display; it 
+   might work with less, but colors will be off.
 
    Java handles mouse buttons beyond the first badly.  In a perfect world,
    option-click on a Macintosh and the second mouse button on a PC would

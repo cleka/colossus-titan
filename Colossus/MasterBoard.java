@@ -13,9 +13,17 @@ import java.io.*;
 public final class MasterBoard extends JPanel implements MouseListener,
     WindowListener, ItemListener
 {
+    /** For easy of mapping to the GUI, hexes will be stored
+     *  in a 15x8 array, with some empty elements. */
+    private MasterHex[][] h = new MasterHex[15][8];
+
+    /** For ease of iterating through all hexes, they'll also be
+     *  stored in an ArrayList. */
     private ArrayList hexes = new ArrayList();
 
-    public static final boolean[][] show =
+    /** The hexes in the 15x8 array that actually exist are
+     *  represented by true. */
+    private static final boolean[][] show =
     {
         {false, false, false, true, true, false, false, false},
         {false, false, true, true, true, true, false, false},
@@ -34,12 +42,16 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {false, false, false, true, true, false, false, false}
     };
 
+    // XXX This direct Game reference needs to be eliminated.  The
+    // board should have a reference to a Client instead,
+    // which has a reference (later a network connection) to
+    // a Server, which has a reference to the game.
     private Game game;
+    private Client client;
 
     private static JFrame masterFrame;
     private static JMenu phaseMenu;
     private static JPopupMenu popupMenu;
-
     private static HashMap checkboxes = new HashMap();
 
     /** Last point clicked is needed for popup menus. */
@@ -136,11 +148,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public void setGame(Game game)
     {
         this.game = game;
-    }
-
-    public Game getGame()
-    {
-        return game;
     }
 
 
@@ -630,6 +637,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     private void setupHexes()
     {
+        setupHexesGUI();
+        setupHexesGameState();
+    }
+
+    private void setupHexesGUI()
+    {
         // There are a total of 96 hexes
         // Their Titan labels are:
         // Middle ring: 1-42
@@ -637,10 +650,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         // Towers: 100, 200, 300, 400, 500, 600
         // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
 
-        // For easy of mapping to the GUI, they'll be stored
+        // For easy of mapping to the GUI, they'll initially be stored
         // in a 15x8 array, with some empty elements.
-
-        MasterHex[][] h = new MasterHex[15][8];
+        // For ease of iterating through all hexes, they'll then be
+        // stored in an ArrayList.
 
         int scale = Scale.get();
 
@@ -669,6 +682,20 @@ public final class MasterBoard extends JPanel implements MouseListener,
                     hexes.add(hex);
                 }
             }
+        }
+    }
+
+    /** This method only needs to be run once, since the attributes it
+     *  sets up are constant for the game. */
+    private void setupHexesGameState()
+    {
+        // Check to see if this method has already been run, and
+        // abort early if it has.
+        // XXX The real solution is to split the GUI part of MasterHex
+        // from the game state, and make the game state part static.
+        if (h[0][3].getTerrain() == 'S')
+        {
+            return;
         }
 
 
@@ -1607,6 +1634,9 @@ public final class MasterBoard extends JPanel implements MouseListener,
      *  null if none does. */
     private MasterHex getHexContainingPoint(Point point)
     {
+        // XXX This is completely inefficient.  We could easily store the
+        // bounding rectangle for each hex and narrow down which hexes we
+        // need to check greatly.
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
@@ -1616,7 +1646,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
                 return hex;
             }
         }
-
         return null;
     }
 
@@ -1665,7 +1694,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
         }
     }
 
-
     public void unselectHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
@@ -1681,7 +1709,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
         }
     }
 
-
     public void unselectHexesByLabels(Set labels)
     {
         Iterator it = hexes.iterator();
@@ -1695,7 +1722,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
         }
     }
-
 
     public void selectHexByLabel(String label)
     {
@@ -1711,7 +1737,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
             }
         }
     }
-
 
     public void selectHexesByLabels(Set labels)
     {
@@ -1751,6 +1776,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             Player player = legion.getPlayer();
 
             // Move the clicked-on legion to the top of the z-order.
+            // XXX This should be tracked on the client side only.
             player.moveToTop(legion);
 
             // What to do depends on which mouse button was used
@@ -1801,26 +1827,21 @@ public final class MasterBoard extends JPanel implements MouseListener,
         game.actOnMisclick();
     }
 
-
     public void mouseReleased(MouseEvent e)
     {
     }
-
 
     public void mouseClicked(MouseEvent e)
     {
     }
 
-
     public void mouseEntered(MouseEvent e)
     {
     }
 
-
     public void mouseExited(MouseEvent e)
     {
     }
-
 
     public void itemStateChanged(ItemEvent e)
     {
@@ -1830,37 +1851,30 @@ public final class MasterBoard extends JPanel implements MouseListener,
         game.setOption(text, selected);
     }
 
-
     public void windowActivated(WindowEvent e)
     {
     }
 
-
     public void windowClosed(WindowEvent e)
     {
     }
-
 
     public void windowClosing(WindowEvent e)
     {
         game.dispose();
     }
 
-
     public void windowDeactivated(WindowEvent e)
     {
     }
-
 
     public void windowDeiconified(WindowEvent e)
     {
     }
 
-
     public void windowIconified(WindowEvent e)
     {
     }
-
 
     public void windowOpened(WindowEvent e)
     {

@@ -26,37 +26,34 @@ public abstract class Hex
     //             \           /
     //              4---------3
 
+    // GUI variables
     protected double[] xVertex = new double[6];
     protected double[] yVertex = new double[6];
+    protected double len;
     protected GeneralPath hexagon;
     protected Rectangle rectBound;
-    private boolean selected;
-    private char terrain;
-    protected double len;
-    protected String label = "";  // Avoid null pointer in stringWidth()
-    private int xCoord = -1;
-    private int yCoord = -1;
     protected Point center;
-
     /** Globally turns antialiasing on or off for all hexes. */
     protected static boolean antialias;
 
+    // Selection is in-between GUI and game state.
+    private boolean selected;
 
-    public void select()
+    // Game state variables
+    private char terrain;
+    protected String label = "";  // Avoid null pointer in stringWidth()
+    private int xCoord = -1;
+    private int yCoord = -1;
+
+
+    public char getTerrain()
     {
-        selected = true;
+        return terrain;
     }
 
-
-    public void unselect()
+    public void setTerrain(char terrain)
     {
-        selected = false;
-    }
-
-
-    public boolean isSelected()
-    {
-        return selected;
+        this.terrain = terrain;
     }
 
 
@@ -65,45 +62,22 @@ public abstract class Hex
         return rectBound;
     }
 
-
     public boolean contains(Point point)
     {
         return (hexagon.contains(point));
     }
-
-
-    public char getTerrain()
-    {
-        return terrain;
-    }
-
-
-    public void setTerrain(char terrain)
-    {
-        this.terrain = terrain;
-    }
-
 
     public String getLabel()
     {
         return label;
     }
 
-
-    public String getName()
-    {
-        return label;
-    }
-
-
     public void setLabel(String label)
     {
         this.label = label;
     }
 
-
     public abstract String getTerrainName();
-
 
     public String getDescription()
     {
@@ -115,14 +89,19 @@ public abstract class Hex
         return getDescription();
     }
 
+    public int getXCoord()
+    {
+        return xCoord;
+    }
+
     public void setXCoord(int xCoord)
     {
         this.xCoord = xCoord;
     }
 
-    public int getXCoord()
+    public int getYCoord()
     {
-        return xCoord;
+        return yCoord;
     }
 
     public void setYCoord(int yCoord)
@@ -130,10 +109,22 @@ public abstract class Hex
         this.yCoord = yCoord;
     }
 
-    public int getYCoord()
+
+    public void select()
     {
-        return yCoord;
+        selected = true;
     }
+
+    public void unselect()
+    {
+        selected = false;
+    }
+
+    public boolean isSelected()
+    {
+        return selected;
+    }
+
 
     public static boolean getAntialias()
     {
@@ -167,8 +158,8 @@ public abstract class Hex
     }
 
 
-    /** Return the Point closest to the center of the passed polygon */
-    protected Point findCenter()
+    /** Return the Point closest to the center of the polygon. */
+    public Point findCenter()
     {
         return new Point((int)Math.round((xVertex[0] + xVertex[3]) / 2),
             (int)Math.round((yVertex[0] + yVertex[3]) / 2));

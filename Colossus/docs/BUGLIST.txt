@@ -69,3 +69,10 @@ Win98, 1.4b: Turn 1, player started in tower 300.  Rolled a 6.  Titan
 Solaris, 1.3.1: MovementDie is appearing mostly off right edge of the
    screen.  StatusScreen is appearing with its bottom edge off the
    bottom of the screen.
+
+Win98, 1.4b: Some creatures are visible that shouldn't be.
+
+Win98, 1.4b: Attacking AI creatures aren't aggressive enough near the end
+   of battles, which causes time losses. 
+
+Win98, 1.4b: Chits are placed slightly off-center in battle hexes.

@@ -3,6 +3,11 @@ Stuff to move out of Game:
    Applet stuff.
    Startup code.
 
+Split GUI parts of MasterBoard and the logical arrangement of the board into
+   separate classes.  The GUI class only goes on the client side, but the
+   other stuff is needed on both sides.  Or have MasterBoard classes on both
+   sides but only use the GUI stuff in the client version?
+
 Add UI for players to specify favorite colors.
 
 Get minimax masterboard moves working.

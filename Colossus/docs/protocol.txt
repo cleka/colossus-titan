@@ -1,4 +1,4 @@
-Titan multiplayer network protocol version 0.5
+Titan multiplayer network protocol version 0.6
 
 Falk Hueffner and David Ripton
 
@@ -55,8 +55,8 @@ SPLIT <legion1> <legion2> <units>
 
 JOIN <legion1> <legion2>
     Move all units from child <legion1> back into parent <legion2>.
-    (This is only allowed to cancel a split before movement is rolled,
-    or if neither legion has a legal move.)
+    Used to cancel a split before movement is rolled, or just before
+    DONEWITHMOVES if neither legion can move.
 
 ROLL
     Finish splitting and wait for the movement roll.
@@ -76,6 +76,10 @@ TELEPORT <legion> <land> {<entryside>} {<unit>}
 
 UNDOMOVE <legion>
     Move <legion> back to its previous location.
+
+DONEMOVING
+    Finished with movement phase.  Should not technically be necessary,
+    since engaging or recruiting implies it, but simplifies things a bit.
 
 RECRUIT <legion> <unit> <units>
     Recruit a <unit> in legion <legion> using <units>
@@ -236,6 +240,9 @@ TELEPORT <legion> <land> <entryside> <unit>
 
 UNDOMOVE <legion>
     Move <legion> back to its previous location.
+
+DONEMOVING
+    The player is done with his movement phase.
 
 ENGAGE <land>
     Resolve the engagement in <land>.

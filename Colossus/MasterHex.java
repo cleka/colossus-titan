@@ -14,8 +14,9 @@ public final class MasterHex extends Hex
     private MasterBoard board;
     private FontMetrics fontMetrics;
     private int halfFontHeight;
-    private String name;
     private Point offCenter;
+
+    private String name;
 
     private MasterHex [] neighbors = new MasterHex[6];
 
@@ -35,6 +36,7 @@ public final class MasterHex extends Hex
     private int[] exitType = new int[6];
     private int[] entranceType = new int[6];
 
+    // Constants for hexside gates.
     public static final int NONE = 0;
     public static final int BLOCK = 1;
     public static final int ARCH = 2;

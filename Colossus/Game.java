@@ -13,27 +13,31 @@ import javax.swing.*;
 public final class Game
 {
     private ArrayList players = new ArrayList(6);
-    private MasterBoard board;
     private int activePlayerNum;
     private int turnNumber = 1;  // Advance when every player has a turn
-    private StatusScreen statusScreen;
-    private GameApplet applet;
+    private boolean engagementInProgress;
     private Battle battle;
     private static Random random = new Random();
-    private MovementDie movementDie;
-    private SummonAngel summonAngel;
     private Caretaker caretaker = new Caretaker();
     private Properties options = new Properties();
 
+    // Constants for phases of a turn.
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
     public static final int FIGHT = 3;
     public static final int MUSTER = 4;
     private int phase = SPLIT;
 
+
+    // Stuff that needs to move to the client side.
+    private MasterBoard board;  // Needs to be split up.
+    private StatusScreen statusScreen;
+    private GameApplet applet;
+    private MovementDie movementDie;
+    private SummonAngel summonAngel;
     private boolean isApplet;
     private JFrame masterFrame;
-    private boolean engagementInProgress;
+
 
     // Constants for savegames
     public static final String saveDirname = "saves";
@@ -136,6 +140,7 @@ public final class Game
 
         caretaker.resetAllCounts();
         players.clear();
+        // XXX client
         statusScreen = null;
 
         JFrame frame = new JFrame();
@@ -445,6 +450,7 @@ public final class Game
     }
 
 
+    // XXX This should be moved down to Client.
     public void repaintAllWindows()
     {
         if (statusScreen != null)
@@ -474,6 +480,7 @@ public final class Game
         }
     }
 
+    // XXX This should be moved down to Client.
     public void rescaleAllWindows()
     {
         if (statusScreen != null)
@@ -3032,6 +3039,7 @@ public final class Game
                 break;
 
             case Game.MOVE:
+                // XXX Mover should be tracked on client side.
                 selectMover(legion);
                 break;
 
@@ -3679,32 +3687,5 @@ public final class Game
             }
         }
         return null;
-    }
-
-
-    public static void main(String [] args)
-    {
-        // Set look and feel to native, since Metal does not show titles
-        // for popup menus.
-        try
-        {
-            UIManager.setLookAndFeel(
-                UIManager.getSystemLookAndFeelClassName());
-        }
-        catch (Exception e)
-        {
-            Log.error(e + "Could not set look and feel.");
-        }
-
-        if (args.length == 0)
-        {
-            // Start a new game.
-            new Game(null);
-        }
-        else
-        {
-            // Load a game.
-            new Game(null, args[0]);
-        }
     }
 }
