@@ -485,13 +485,11 @@ public class Game extends JFrame implements WindowListener, ActionListener
     {
         board.unselectAllHexes();
         phase++;
-System.out.println("advancePhase to phase " + phase);
     }
 
 
     void advanceTurn()
     {
-System.out.println("advanceTurn");
         board.unselectAllHexes();
         activePlayerNum++;
         if (activePlayerNum == numPlayers)
@@ -500,7 +498,6 @@ System.out.println("advanceTurn");
             turnNumber++;
         }
         phase = SPLIT;
-System.out.println("phase = SPLIT  activePlayerNum = " + activePlayerNum);
         if (!getActivePlayer().isAlive() && getNumLivingPlayers() > 0)
         {
             advanceTurn();
