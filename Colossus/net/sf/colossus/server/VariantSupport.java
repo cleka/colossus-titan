@@ -325,16 +325,8 @@ public final class VariantSupport
             Log.error("Recruit-per-terrain loading failed : " + e);
             System.exit(1);
         }
-        //try
-        {
-            // initialize the static bits of the MasterBoard
-            net.sf.colossus.client.MasterBoard.staticMasterboardInit();
-        }
-        //catch (Exception e) 
-        //{
-        //    Log.error("Masterboard loading failed : " + e);
-        //    System.exit(1);
-        //}
+        // initialize the static bits of the MasterBoard
+        net.sf.colossus.client.MasterBoard.staticMasterboardInit();
     }
 
     private static java.util.Properties loadMarkerNamesProperties()

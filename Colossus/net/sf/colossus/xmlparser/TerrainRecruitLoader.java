@@ -280,6 +280,7 @@ public class TerrainRecruitLoader
         if (this.terrains == null)
         {
             this.terrains = new String[1];
+            this.terrains[0] = name;
         }
         else
         {
