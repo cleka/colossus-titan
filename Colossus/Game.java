@@ -7,22 +7,23 @@ import javax.swing.*;
  * Class Game gets and holds high-level data about a Titan game.
  * @version $Id$
  * @author David Ripton
- * @author Bruce Sherrod
+ * @author Bruce Sherrod <bruce@thematrix.com>
  */
 
 
 public final class Game
 {
     private ArrayList players = new ArrayList(6);
-    private MasterBoard board;
+    public MasterBoard board;
     private int activePlayerNum;
     private int turnNumber = 1;  // Advance when every player has a turn
     private StatusScreen statusScreen;
     private GameApplet applet;
     private Battle battle;
-    private static Random random = new Random();
+    public static Random random = new Random();
     private MovementDie movementDie;
     private SummonAngel summonAngel;
+    private AI ai = new SimpleAI();
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -31,7 +32,7 @@ public final class Game
     private int phase = SPLIT;
 
     private boolean isApplet;
-    private JFrame masterFrame;
+    public JFrame masterFrame;
 
     private boolean engagementInProgress;
 
@@ -53,7 +54,6 @@ public final class Game
     public static final String autoPickMarker = "Autopick marker";
     public static final String autoPickEntrySide = "Autopick entry side";
     public static final String autoForcedStrike = "Auto forced strike";
-    public static final String autoMove = "Auto move";  // masterboard only
     public static final String showStatusScreen = "Show game status";
     public static final String showDice = "Show dice";
     public static final String antialias = "Antialias";
@@ -61,10 +61,12 @@ public final class Game
     public static final String chooseHits= "Choose number of hits";
     public static final String chooseTowers = "Choose towers";
     public static final String chooseCreatures = "Choose creatures";
-
+    public static final String autoSplit = "Auto split";
+    public static final String autoMove = "Auto move"; // masterboard movement
 
     /** Preference file */
-    private static final String optionsPath = "Colossus.cfg";
+    private static final String optionsPath = "Colossus";
+    private static final String optionsExtension = ".cfg";
     private Properties options = new Properties();
 
 
@@ -185,7 +187,6 @@ public final class Game
         }
     }
 
-
     private static String getPhaseName(int phase)
     {
         switch (phase)
@@ -282,7 +283,7 @@ public final class Game
     }
 
 
-    private int getNumLivingPlayers()
+    public int getNumLivingPlayers()
     {
         int count = 0;
         Iterator it = players.iterator();
@@ -347,7 +348,7 @@ public final class Game
     }
 
 
-    private void repaintAllWindows()
+    public void repaintAllWindows()
     {
         if (statusScreen != null)
         {
@@ -497,6 +498,8 @@ public final class Game
 
     public void advancePhase()
     {
+	saveOptions(); // save this players options
+
         phase++;
 
         if (phase > MUSTER ||
@@ -510,12 +513,15 @@ public final class Game
             logEvent("Phase advances to " + getPhaseName(phase));
         }
 
+	loadOptions(); // load next players options
+
         setupPhase();
     }
 
 
     public void setupPhase()
     {
+
         switch (getPhase())
         {
             case Game.SPLIT:
@@ -553,6 +559,11 @@ public final class Game
             // Highlight hexes with legions that are 7 high.
             player.highlightTallLegions();
         }
+
+	if (getOption(autoSplit))
+	{
+	    ai.split(this);
+	}
     }
 
 
@@ -568,136 +579,9 @@ public final class Game
 
         if (getOption(autoMove))
         {
-            doAutoMove();
+            ai.move(this);
         }
     }
-
-
-    private void doAutoMove()
-    {
-        Player player = getActivePlayer();
-        List legions = player.getLegions();
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion) it.next();
-
-            // null hypothesis: sit still
-            int bestRecruitValue = getEvaluationOfMove(legion,
-                legion.getCurrentHex(), false);
-            MasterHex bestHex = legion.getCurrentHex();
-
-            // hard-coded 1-ply search
-            Set set = listMoves(legion, true);
-            for (Iterator moveIterator = set.iterator();
-                moveIterator.hasNext();)
-            {
-                String hexLabel = (String) moveIterator.next();
-                MasterHex hex = board.getHexFromLabel(hexLabel);
-                int value = getEvaluationOfMove(legion, hex, true);
-                if (value > bestRecruitValue)
-                {
-                    bestRecruitValue = value;
-                    bestHex = hex;
-                }
-            }
-
-            // move legion to hex
-            if (bestHex != null)
-            {
-                MasterHex hex = bestHex;
-                actOnLegion(legion);
-                actOnHex(hex);
-            }
-        }
-    }
-
-
-    private int getEvaluationOfMove(Legion legion, MasterHex hex,
-        boolean canRecruitHere)
-    {
-        int value = 0;
-
-        // consider making an attack
-        Legion enemyLegion = hex.getEnemyLegion(legion.getPlayer());
-        if (enemyLegion != null)
-        {
-            int discountedPointValue = (3 * legion.getPointValue()) / 4;
-            if (legion.numCreature(Creature.titan) > 0)
-            {
-                // be a bit cautious attacking w/titan
-                discountedPointValue -= 10; 
-            }
-            // todo: add our angel call
-            int enemyPointValue = enemyLegion.getPointValue();
-            // todo: add in enemy's turn 4 recruit
-            if (discountedPointValue > enemyPointValue)
-            {
-                // we can win
-                value += (40 * enemyPointValue) / 100;
-            }
-            else
-            {
-                // we'll lose
-                value = Integer.MIN_VALUE;
-            }
-        }
-
-        // consider what we can recruit
-        if (canRecruitHere)
-        {
-            List recruits = findEligibleRecruits(legion, hex);
-            if (recruits.size() > 0)
-            {
-                Creature recruit = (Creature)recruits.get(recruits.size() - 1);
-                value += recruit.getSkill() * recruit.getPower();
-            }
-        }
-
-        // consider what we might be able to recruit next turn, from here
-        for (int roll = 1; roll <= 6; roll++)
-        {
-            Set moves = listMoves(legion, true, hex, roll);
-            int bestRecruitVal = 0;
-            Creature bestRecruit = null;
-            for (Iterator nextMoveIt = moves.iterator(); nextMoveIt.hasNext();)
-            {
-                String nextLabel = (String) nextMoveIt.next();
-                MasterHex nextHex = board.getHexFromLabel(nextLabel);
-                List nextRecruits = findEligibleRecruits(legion, nextHex);
-                if (nextRecruits.size() == 0)
-                {
-                    continue;
-                }
-                Creature nextRecruit =
-                    (Creature)nextRecruits.get(nextRecruits.size() - 1);
-                int val = nextRecruit.getSkill() * nextRecruit.getPower();
-                if (val > bestRecruitVal)
-                {
-                    bestRecruitVal = val;
-                    bestRecruit = nextRecruit;
-                }
-            }
-            // 1/6 chance of rolling "roll" to get this
-            value += bestRecruitVal / 6; 
-            if (bestRecruit != null)
-            {
-                System.out.println("--- if " + legion
-                   + " moves to " + hex
-                   + " then it could recruit "
-                   +  bestRecruit.toString()
-                   + " on a " + roll +  " next turn..."
-                   + " (adding " + (bestRecruitVal / 6) + " to score)"
-                   );
-            }
-        }
-
-        // consider mobility?
-        // suckdown squares penalty
-        // next to tower bonus
-        return value;
-    }
-
 
     private void setupFight()
     {
@@ -711,8 +595,7 @@ public final class Game
         {
             board.setupFightMenu();
         }
-    }
-
+    } 
 
     private void setupMuster()
     {
@@ -731,7 +614,7 @@ public final class Game
 
             if (getOption(autoRecruit))
             {
-                doAutoRecruit();
+                ai.muster(this);
             }
         }
     }
@@ -1374,14 +1257,16 @@ public final class Game
      *  java.util.Properties keyword=value. */
     public void saveOptions()
     {
+	final String optionsFile = optionsPath  + getActivePlayer().getName()
+	    + optionsExtension;
         try
         {
-            FileOutputStream out = new FileOutputStream(optionsPath);
+            FileOutputStream out = new FileOutputStream(optionsFile);
             options.store(out, configVersion);
         }
         catch (IOException e)
         {
-            System.out.println("Couldn't write options to " + optionsPath);
+            System.out.println("Couldn't write options to " + optionsFile);
         }
     }
 
@@ -1390,14 +1275,28 @@ public final class Game
      *  java.util.Properties keyword=value */
     public void loadOptions()
     {
+	final String optionsFile = optionsPath  + getActivePlayer().getName()
+	    + optionsExtension;
+	final String defaultOptionsFile = optionsPath + optionsExtension;
         try
         {
-            FileInputStream in = new FileInputStream(optionsPath);
-            options.load(in);
+	    File of = new File(optionsFile);
+	    if (of.exists())
+	    {
+		FileInputStream in = new FileInputStream(optionsFile);
+		options.load(in);
+	    }
+	    else
+	    {
+		System.out.println("Loading default options for " 
+				   + getActivePlayer().getColor());
+		FileInputStream in = new FileInputStream(defaultOptionsFile);
+		options.load(in);
+	    }
         }
         catch (IOException e)
         {
-            System.out.println("Couldn't read options from " + optionsPath);
+            System.out.println("Couldn't read options from " + optionsFile);
             return;
         }
 
@@ -2172,8 +2071,7 @@ public final class Game
     }
 
 
-    public void doRecruit(Creature recruit, Legion legion,
-        JFrame parentFrame)
+    public void doRecruit(Creature recruit, Legion legion, JFrame parentFrame)
     {
         // Pick the recruiter(s) if necessary.
         ArrayList recruiters = findEligibleRecruiters(legion, recruit);
@@ -2229,44 +2127,8 @@ public final class Game
         legion.getPlayer().setLastLegionRecruited(legion);
     }
 
-
-    public void doAutoRecruit()
-    {
-        Player player = getActivePlayer();
-        List legions = player.getLegions();
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            if (legion.hasMoved() && legion.canRecruit())
-            {
-                List recruits = findEligibleRecruits(legion);
-
-                // The last recruit is the biggest.
-                Creature recruit = (Creature)recruits.get(recruits.size() - 1);
-
-                // Recruit a third cyclops instead of a gorgon.
-                if (recruit == Creature.gorgon &&
-                    recruits.contains(Creature.cyclops) &&
-                    legion.numCreature(Creature.cyclops) == 2)
-                {
-                    recruit = Creature.cyclops;
-                }
-
-                if (recruit != null)
-                {
-                    doRecruit(recruit, legion, masterFrame);
-                }
-            }
-        }
-        board.unselectAllHexes();
-        updateStatusScreen();
-    }
-
-
     /** Return a list of names of angel types that can be acquired. */
-    public static ArrayList findEligibleAngels(Legion legion,
-        boolean archangel)
+    public static ArrayList findEligibleAngels(Legion legion, boolean archangel)
     {
         if (legion.getHeight() >= 7)
         {
@@ -2412,10 +2274,9 @@ public final class Game
     }
 
 
-    private static final int ARCHES_AND_ARROWS = -1;
-    private static final int ARROWS_ONLY = -2;
-
-    private static final int NOWHERE = -1;
+    public static final int ARCHES_AND_ARROWS = -1;
+    public static final int ARROWS_ONLY = -2; 
+    public static final int NOWHERE = -1;
 
 
     /** Recursively find conventional moves from this hex.  Select
@@ -2424,7 +2285,7 @@ public final class Game
      *  block == -2, use only arrows.  Do not double back in
      *  the direction you just came from.
      */
-    private Set findNormalMoves(MasterHex hex, Player player, Legion legion,
+    public Set findNormalMoves(MasterHex hex, Player player, Legion legion,
         int roll, int block, int cameFrom)
     {
         HashSet set = new HashSet();
@@ -2503,7 +2364,7 @@ public final class Game
     /** Recursively find tower teleport moves from this hex.  That's
      *  all unoccupied hexes within 6 hexes.  Teleports to towers
      *  are handled separately.  Do not double back. */
-    private Set findTowerTeleportMoves(MasterHex hex, Player player,
+    public Set findTowerTeleportMoves(MasterHex hex, Player player,
         Legion legion, int roll, int cameFrom)
     {
         // This hex is the final destination.  Mark it as legal if
@@ -2556,7 +2417,7 @@ public final class Game
 
     /** Return set of hex labels where this legion can move.
      *  Include teleport moves only if teleport is true. */
-    private Set listMoves(Legion legion, boolean teleport)
+    public Set listMoves(Legion legion, boolean teleport)
     {
         return listMoves(legion, teleport, legion.getCurrentHex(),
              legion.getPlayer().getMovementRoll());
@@ -2566,7 +2427,7 @@ public final class Game
 
     /** Return set of hex labels where this legion can move.
      *  Include teleport moves only if teleport is true. */
-    private Set listMoves(Legion legion, boolean teleport, MasterHex hex,
+    public Set listMoves(Legion legion, boolean teleport, MasterHex hex,
         int movementRoll)
     {
         HashSet set = new HashSet();
@@ -2651,7 +2512,7 @@ public final class Game
 
     /** Present a dialog allowing the player to enter via land or teleport.
      *  Return true if the player chooses to teleport. */
-    private boolean chooseWhetherToTeleport(MasterHex hex)
+    public boolean chooseWhetherToTeleport(MasterHex hex)
     {
         String [] options = new String[2];
         options[0] = "Teleport";
@@ -3014,7 +2875,7 @@ public final class Game
     }
 
 
-    private void doFight(MasterHex hex, Player player)
+    public void doFight(MasterHex hex, Player player)
     {
         if (summonAngel != null)
         {
@@ -3084,7 +2945,7 @@ public final class Game
     }
 
 
-    private void handleConcession(Legion loser, Legion winner, boolean fled)
+    public void handleConcession(Legion loser, Legion winner, boolean fled)
     {
         // Figure how many points the victor receives.
         int points = loser.getPointValue();
@@ -3127,7 +2988,7 @@ public final class Game
     }
 
 
-    private void handleNegotiation(NegotiationResults results, Legion
+    public void handleNegotiation(NegotiationResults results, Legion
         attacker, Legion defender)
     {
         if (results.isMutual())
