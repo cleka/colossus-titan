@@ -430,13 +430,13 @@ public final class GUIMasterHex extends MasterHex
         this.selectColor = color;
     }
 
-    void select()
+    public void select()
     {
         super.select();
         selectColor = Color.white;
     }
 
-    void unselect()
+    public void unselect()
     {
         super.unselect();
         selectColor = Color.white;
