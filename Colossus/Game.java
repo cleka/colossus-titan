@@ -770,6 +770,15 @@ public class Game extends Frame implements WindowListener, ActionListener
                         board.getHexFromLabel(hexLabel), creatures[0], 
                         creatures[1], creatures[2], creatures[3], creatures[4],
                         creatures[5], creatures[6], creatures[7], players[i]);
+
+                    for (int k = 0; k < height; k++)
+                    {
+                        if (visibles[k])
+                        {
+                            legion.revealCreature(k);
+                        }
+                    }
+
                     players[i].addLegion(legion);
                 }
             }
