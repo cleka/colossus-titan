@@ -15,14 +15,15 @@ class Player
     private int numMarkersAvailable = 12;
     private String [] markersAvailable = new String[72];
     private String markerSelected;
-    int numLegions = 0;
-    Legion [] legions = new Legion[72];
+    private int numLegions = 0;
+    private Legion [] legions = new Legion[72];
     private Legion selectedLegion = null;
     private boolean alive = true;
     private int mulligansLeft = 1;
     private int movementRoll;
     private Game game;
     private Legion lastLegionMoved = null;
+
 
     Player(String name, Game game)
     {
@@ -155,6 +156,12 @@ class Player
     int getNumLegions()
     {
         return numLegions;
+    }
+
+
+    Legion getLegion(int i)
+    {
+        return legions[i];
     }
 
 
@@ -304,9 +311,9 @@ class Player
                 // Return lords and demi-lords to the stacks.
                 for (int j = 0; j < legion.getHeight(); j++)
                 {
-                    if (legion.creatures[j].isImmortal())
+                    if (legion.getCreature(j).isImmortal())
                     {
-                        legion.creatures[j].putOneBack();
+                        legion.getCreature(j).putOneBack();
                     }
                 }
 
@@ -454,7 +461,7 @@ class Player
         // Truncate every player's score to an integer value.
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
-            game.player[i].truncScore();
+            game.getPlayer(i).truncScore();
         }
 
 
