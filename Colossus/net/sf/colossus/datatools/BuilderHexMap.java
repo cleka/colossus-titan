@@ -39,6 +39,8 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         {false,true,true,true,true,false}
     };
 
+    protected boolean isTower = false;
+
     int scale = 2 * 15;
     int cx = 6 * scale;
     int cy = 2 * scale;
@@ -497,6 +499,12 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
                 }
             }
         }
+        
+        if (isTower)
+        {
+            buf.append("# This is a Tower\nTOWER\n");
+        }
+
         return(buf.toString());
     }
 

@@ -25,6 +25,9 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     private Point lastPoint;
     private Component lastComponent;
     private int lastSide;
+    private JCheckBoxMenuItem towerItem;
+
+    private AbstractAction towerAction;
 
     class rndFileFilter extends javax.swing.filechooser.FileFilter 
     {
@@ -95,6 +98,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
                     new net.sf.colossus.parser.BattlelandLoader(inputFile);
                 try {
                     while (parser.oneBattlelandCase(h) >= 0) {}
+                    towerItem.setState(parser.isTower());
                 } catch (Exception e) { System.err.println(e); }
             }
         }
@@ -278,6 +282,19 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         mi = fileMenu.add(fillWithSlopeAction);
         mi = fileMenu.add(quitAction);
         mi.setMnemonic(KeyEvent.VK_Q);
+
+        JMenu specialMenu = new JMenu("Special");
+        menuBar.add(specialMenu);
+
+        towerAction = new AbstractAction("Terrain is a Tower") {
+                public void actionPerformed(ActionEvent e) {
+                    JCheckBoxMenuItem mi = (JCheckBoxMenuItem)e.getSource();
+                    isTower = !isTower;
+                    mi.setState(isTower);
+                }
+            };
+
+        towerItem = (JCheckBoxMenuItem)specialMenu.add(new JCheckBoxMenuItem(towerAction));
 
         dialog = new JDialog();
 
