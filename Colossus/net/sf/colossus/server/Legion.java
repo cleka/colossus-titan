@@ -465,38 +465,20 @@ public final class Legion implements Comparable
     {
         // XXX Use critters.toString() rather than doing it manually.
         StringBuffer log = new StringBuffer("Legion ");
-        log.append(getLongMarkerName());
-        log.append(" ");
+        log.append(critters.toString());
+        log.append(" is eliminated");
+        Log.event(log.toString());
         if (getHeight() > 0)
         {
-            log.append("[");
-            // Return immortals to the stacks,
-            // others to the Graveyard
+            // Return immortals to the stacks, others to the Graveyard
             Iterator it = critters.iterator();
             while (it.hasNext())
             {
                 Critter critter = (Critter)it.next();
-                log.append(critter.getName());
-                if (it.hasNext())
-                {
-                    log.append(", ");
-                }
-                if (returnCrittersToStacks)
-                {
-                    if (critter.isImmortal())
-                    {
-                        game.getCaretaker().putOneBack(critter.getCreature());
-                    }
-                    else
-                    {
-                        game.getCaretaker().putDeadOne(critter.getCreature());
-                    }
-                }
+                prepareToRemoveCritter(critter, returnCrittersToStacks);
+                it.remove();
             }
-            log.append("] ");
         }
-        log.append("is eliminated");
-        Log.event(log.toString());
 
         // Let the clients clean up the legion marker, etc.
         game.getServer().allRemoveLegion(markerId);
@@ -757,8 +739,7 @@ public final class Legion implements Comparable
      *  legion.  Do not actually remove it, to prevent comodification
      *  errors.  Do not disband the legion if empty, since the critter
      *  has not actually been removed. */
-    void prepareToRemoveCritter(Critter critter, boolean
-        returnToStacks)
+    void prepareToRemoveCritter(Critter critter, boolean returnToStacks)
     {
         if (critter == null || !critters.contains(critter))
         {
