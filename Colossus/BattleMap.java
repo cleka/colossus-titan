@@ -1,11 +1,13 @@
 /** Attempted port of hexmap from MFC to Java dripton  12/10/97 */
 
 // TODO: Add the dragon and hydra.
+// TODO: Restrict chit dragging to within window
 
 import java.awt.*;
+import java.awt.event.*;
 
 
-class Hex implements Shape
+class Hex
 {
     private boolean selected;
     private int[] x_vertex = new int[6];
@@ -69,7 +71,6 @@ class Hex implements Shape
         return false;
     }
 
-    // Required by interface Shape
     public Rectangle getBounds()
     {
         return rectBound;
@@ -84,7 +85,7 @@ class Hex implements Shape
 
 
 
-class Chit implements Shape
+class Chit
 {
     private boolean selected;
     private Rectangle rect;
@@ -131,14 +132,13 @@ class Chit implements Shape
     }
 
 
-    void move(Point point)
+    void setLocation(Point point)
     {
         point.x -= dx;
         point.y -= dy;
         rect.setLocation(point);
     }
 
-    // Required by interface Shape
     public Rectangle getBounds()
     {
         return rect;
@@ -148,7 +148,8 @@ class Chit implements Shape
 
 
 
-public class BattleMap extends Frame
+public class BattleMap extends Frame implements MouseListener,
+    MouseMotionListener
 {
     private Hex[][] h = new Hex[6][6];
     private Chit[] chits = new Chit[22];
@@ -178,12 +179,15 @@ public class BattleMap extends Frame
         int cy=80;
         int scale=25;
         
-        System.out.println("Creating a BattleMap.");
+        //System.out.println("Creating a BattleMap.");
 
         pack();
-        resize(700, 700);
+        setSize(700, 700);
         setBackground(java.awt.Color.white);
         setVisible(true);
+        addWindowListener(new InnerWindowAdapter());
+        addMouseListener(this);
+        addMouseMotionListener(this);
         
         tracking = -1;
         needToClear = false;
@@ -248,43 +252,42 @@ public class BattleMap extends Frame
         repaint();
     }
 
-    public boolean handleEvent(Event event)
+
+    class InnerWindowAdapter extends WindowAdapter 
     {
-        if (event.id == Event.WINDOW_DESTROY)
+        public void windowClosing(WindowEvent event)
         {
             System.exit(0);
         }
-        return super.handleEvent(event);
     }
+    
 
-    public boolean mouseDrag(Event event, int x, int y)
+    public void mouseDragged(MouseEvent e)
     {
-        Point point = new Point(x,y);
+        Point point = e.getPoint();
         if (tracking != -1)
         {
             Rectangle clip = new Rectangle(chits[tracking].getBounds());
-            chits[tracking].move(point);
+            chits[tracking].setLocation(point);
             clip.add(chits[tracking].getBounds());
             needToClear = true;
             repaint(clip.x, clip.y, clip.width, clip.height);
         }
-        return false;
     }
 
-    public boolean mouseUp(Event event, int x, int y)
+    public void mouseReleased(MouseEvent e)
     {
         tracking = -1;
-        return false;
     }
     
-    public boolean mouseDown(Event event, int x, int y)
+    public void mousePressed(MouseEvent e)
     {
-        Point point = new Point(x,y);
+        Point point = e.getPoint();
         for (int i=0; i < chits.length; i++)
         {
             if (chits[i].select(point))
             {
-                System.out.println("Selected chits[" + i +"]");
+                //System.out.println("Selected chits[" + i +"]");
                 // Move selected chit to top of Z-order
                 tracking = 0;
 
@@ -300,7 +303,7 @@ public class BattleMap extends Frame
                     Rectangle clip = new Rectangle(chits[0].getBounds());
                     repaint(clip.x, clip.y, clip.width, clip.height);
                 }
-                return false;
+                return;
             }
         }
 
@@ -311,31 +314,48 @@ public class BattleMap extends Frame
             {
                 if (show[i][j] && h[i][j].contains(point))
                 {
-                    System.out.println("Calling select for h[" + i + "]["
-                        + j +"]");
+                    //System.out.println("Calling select for h[" + i + 
+                    //    "][" + j +"]");
                     h[i][j].select(point);
                     Rectangle clip = new Rectangle(h[i][j].getBounds());
                     repaint(clip.x, clip.y, clip.width, clip.height);
-                    return false;
+                    return;
                 }
             }
         }
-
-        return false;
     }
+
+    public void mouseMoved(MouseEvent e)
+    {
+    }
+
+    public void mouseClicked(MouseEvent e)
+    {
+    }
+
+    public void mouseEntered(MouseEvent e)
+    {
+    }
+
+    public void mouseExited(MouseEvent e)
+    {
+    }
+    
+
+
 
     public void paint(Graphics g)
     {
-        System.out.println("Called BattleMap.paint()");
+        //System.out.println("Called BattleMap.paint()");
         if (!imagesLoaded)
         {
-            System.out.println("Images are not loaded yet");
+            //System.out.println("Images are not loaded yet");
             return;
         }
 
         rectClip = g.getClipBounds();
-        System.out.println("rectClip: " + rectClip.x + " " + rectClip.y 
-            + " " + rectClip.width + " " + rectClip.height);
+        //System.out.println("rectClip: " + rectClip.x + " " + rectClip.y 
+        //    + " " + rectClip.width + " " + rectClip.height);
 
         for (int i = 0; i < 6; i++)
         {
@@ -343,7 +363,7 @@ public class BattleMap extends Frame
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
-                    System.out.println("drawing h[" + i + "][" + j + "]");
+                    //System.out.println("drawing h[" + i + "][" + j + "]");
                     h[i][j].paint(g);
                 }
             }
@@ -354,7 +374,7 @@ public class BattleMap extends Frame
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
-                System.out.println("Drawing chits[" + i + "]");
+                //System.out.println("Drawing chits[" + i + "]");
                 chits[i].paint(g);
             }
         }
@@ -363,7 +383,7 @@ public class BattleMap extends Frame
 
     public void update(Graphics g)
     {
-        System.out.println("Called BattleMap.update()");
+        //System.out.println("Called BattleMap.update()");
 
         Dimension d = getSize();
         rectClip = g.getClipBounds();
@@ -372,7 +392,7 @@ public class BattleMap extends Frame
         if (offGraphics == null || d.width != offDimension.width || 
             d.height != offDimension.height)
         {
-            System.out.println("Creating a new back buffer");
+            //System.out.println("Creating a new back buffer");
             offDimension = d;
             offImage = createImage(d.width, d.height);
             offGraphics = offImage.getGraphics();
@@ -397,7 +417,7 @@ public class BattleMap extends Frame
             {
                 if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
                 {
-                    System.out.println("drawing h[" + i + "][" + j + "]");
+                    //System.out.println("drawing h[" + i + "][" + j + "]");
                     h[i][j].paint(offGraphics);
                 }
             }
@@ -408,7 +428,7 @@ public class BattleMap extends Frame
         {
             if (rectClip.intersects(chits[i].getBounds()))
             {
-                System.out.println("Drawing chits[" + i + "]");
+                //System.out.println("Drawing chits[" + i + "]");
                 chits[i].paint(offGraphics);
             }
         }
