@@ -308,7 +308,11 @@ class SimpleAI implements AI
 
             // Hide all creatures in both legions.
             legion.hideAllCreatures();
-            newLegion.hideAllCreatures();
+            // XXX How did this end up null?
+            if (newLegion != null)
+            {
+                newLegion.hideAllCreatures();
+            }
         }
     }
 

@@ -84,9 +84,8 @@ Solaris, 1.3.1: Need to bring map back to front after recruiting a
    reinforcement in battle.  Fixed?
 
 Solaris, 1.3.1: Post-battle angel summoning is broken because the game
-   automatically advances to the next phase.  Got summon and acquire
-   dialogs at the same time, then summon again in the next turn's split 
-   phase.
+   automatically advances to the next phase.  Summon dialog shows up
+   in the muster phase, when it no longer works.
 
 Solaris, 1.3.1: All enemy creatures are invisible after loading a game.
 
@@ -97,3 +96,4 @@ Need prettier question.gif
 Attacking AI is way too happy to take a time loss.  Need to crank up
    aggression in the last few turns of battle.
 
+Need to sort legion before recruiting a reinforcement in battle.

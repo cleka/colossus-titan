@@ -502,7 +502,7 @@ public final class Game
         // timer for compatibility.
         javax.swing.Timer timer = new javax.swing.Timer(delay, phaseAdvancer);
         timer.setRepeats(false);
-        // XXX Trying to work around excess advancePhase() calls.
+        // Restart rather than start, to throw away excess advances.
         timer.restart();
     }
 
@@ -586,6 +586,7 @@ public final class Game
         Client.clearUndoStack();
         if (!summoningAngel && findEngagements().size() == 0)
         {
+Log.debug("calling advancePhase() from setupFight()");
             advancePhase(FIGHT);
         }
         else
@@ -905,6 +906,7 @@ public final class Game
 
             // Reset flags that are not in the savegame file.
             pendingAdvancePhase = false;
+            summoningAngel = false;
 
 
             buf = in.readLine();
@@ -2384,13 +2386,15 @@ public final class Game
         }
         else
         {
-            summoningAngel = false;
+Log.debug("calling server.createSummonAngel()");
+            summoningAngel = true;
             server.createSummonAngel(attacker);
         }
     }
 
     public void doSummon(Legion legion, Legion donor, Creature angel)
     {
+Log.debug("called Game.doSummon()");
         Player player = getActivePlayer();
 
         if (angel != null && donor != null && legion.canSummonAngel())
