@@ -15,7 +15,7 @@ import org.apache.log4j.*;
 public final class Game
 {
     private ArrayList players = new ArrayList(6);
-    public MasterBoard board;
+    private MasterBoard board;
     private int activePlayerNum;
     private int turnNumber = 1;  // Advance when every player has a turn
     private StatusScreen statusScreen;
@@ -34,7 +34,7 @@ public final class Game
     private int phase = SPLIT;
 
     private boolean isApplet;
-    public JFrame masterFrame;
+    private JFrame masterFrame;
 
     private boolean engagementInProgress;
 
@@ -2691,16 +2691,52 @@ public final class Game
     }
 
 
-    public void finishBattle()
+    public void finishBattle(MasterHex hex, boolean attackerEntered)
     {
         masterFrame.show();
 
-        if (summonAngel != null)
+        // Handle any after-battle angel summoning or recruiting.
+        if (hex.getNumLegions() == 1)
         {
-            highlightSummonableAngels(summonAngel.getLegion());
-            summonAngel.repaint();
+            Legion legion = hex.getLegion(0);
+            // Make all creatures in the victorious legion visible.
+            legion.revealAllCreatures();
+            // Remove battle info from legion and its creatures.
+            legion.clearBattleInfo();
+
+            if (legion.getPlayer() == getActivePlayer())
+            {
+                // Attacker won, so possibly summon angel.
+                if (legion.canSummonAngel())
+                {
+                    createSummonAngel(legion);
+                }
+            }
+            else
+            {
+                // Defender won, so possibly recruit reinforcement.
+                if (legion.canRecruit() && attackerEntered)
+                {
+                    Creature recruit;
+                    Player player = legion.getPlayer();
+                    if (player.getOption(Options.autoRecruit))
+                    {
+                        recruit = player.aiReinforce(legion);
+                    }
+                    else
+                    {
+                        recruit = PickRecruit.pickRecruit(board.getFrame(),
+                            legion);
+                    }
+                    if (recruit != null)
+                    {
+                        doRecruit(recruit, legion, board.getFrame());
+                    }
+                }
+            }
         }
-        else
+
+        if (summonAngel == null)
         {
             highlightEngagements();
         }
@@ -2844,14 +2880,7 @@ public final class Game
                 break;
 
             case Game.MOVE:
-                // Select this legion.
-                player.setMover(legion);
-                // Just painting the marker doesn't always do the trick.
-                legion.getCurrentHex().repaint();
-
-                // Highlight all legal destinations
-                // for this legion.
-                highlightMoves(legion);
+                selectMover(legion);
                 break;
 
             case Game.FIGHT:
@@ -2891,7 +2920,7 @@ public final class Game
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
             case Game.MOVE:
-                doMove(hex, player, player.getMover());
+                doMove(player.getMover(), hex);
                 break;
 
             // If we're fighting and there is an engagement here,
@@ -2907,12 +2936,27 @@ public final class Game
     }
 
 
-    private void doMove(MasterHex hex, Player player, Legion legion)
+    public void selectMover(Legion legion)
+    {
+        // Select this legion.
+        legion.getPlayer().setMover(legion);
+
+        // Just painting the marker doesn't always do the trick.
+        legion.getCurrentHex().repaint();
+
+        // Highlight all legal destinations for this legion.
+        highlightMoves(legion);
+    }
+
+
+    public void doMove(Legion legion, MasterHex hex)
     {
         // Verify that the move is legal, rather than trusting
         // hex.isSelected().
         if (legion != null && listMoves(legion, true).contains(hex.getLabel()))
         {
+            Player player = legion.getPlayer();
+
             // Pick teleport or normal move if necessary.
             if (hex.getTeleported() && hex.canEnterViaLand())
             {

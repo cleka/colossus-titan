@@ -258,7 +258,7 @@ public final class Battle
 
         else if (phase == FIGHT)
         {
-            activeLegionNum = ~activeLegionNum;
+            activeLegionNum = (activeLegionNum + 1) & 1;
             driftDamageApplied = false;
             phase = STRIKEBACK;
             Game.logEvent("Battle phase advances to " + getPhaseName(phase));
@@ -1952,10 +1952,8 @@ Game.logDebug("defender eliminated");
             case MOVE:
                 if (critterSelected)
                 {
-                    getCritter(0).moveToHex(hex);
-                    critterSelected = false;
+                    doMove(getCritter(0), hex);
                 }
-                highlightMovableCritters();
                 break;
 
             case FIGHT:
@@ -1990,6 +1988,15 @@ Game.logDebug("defender eliminated");
     }
 
 
+    // XXX Should this check the legality of the move?
+    public void doMove(Critter critter, BattleHex hex)
+    {
+        critter.moveToHex(hex);
+        critterSelected = false;
+        highlightMovableCritters();
+    }
+
+
     public void actOnMisclick()
     {
         switch (getPhase())
@@ -2015,56 +2022,9 @@ Game.logDebug("defender eliminated");
     {
         disposeBattleDice();
         map.dispose();
-
-        // Handle any after-battle angel summoning or recruiting.
-        // XXX Do this from Game instead?
-        if (masterHex.getNumLegions() == 1)
-        {
-            Legion legion = masterHex.getLegion(0);
-            if (legion == getAttacker())
-            {
-                // Summon angel
-                if (legion.canSummonAngel())
-                {
-                    if (game != null)
-                    {
-                        game.createSummonAngel(attacker);
-                    }
-                }
-            }
-            else
-            {
-                // Recruit reinforcement
-                if (legion.canRecruit() && attackerEntered)
-                {
-                    Creature recruit;
-                    Player player = legion.getPlayer();
-                    if (player.getOption(Options.autoRecruit))
-                    {
-                        recruit = player.aiReinforce(legion);
-                    }
-                    else
-                    {
-                        recruit = PickRecruit.pickRecruit(board.getFrame(),
-                            legion);
-                    }
-                    if (recruit != null && game != null)
-                    {
-                        game.doRecruit(recruit, legion, board.getFrame());
-                    }
-                }
-            }
-
-            // Make all creatures in the victorious legion visible.
-            legion.revealAllCreatures();
-
-            // Remove battle info from legion and its creatures.
-            legion.clearBattleInfo();
-        }
-
         if (game != null)
         {
-            game.finishBattle();
+            game.finishBattle(masterHex, attackerEntered);
         }
     }
 

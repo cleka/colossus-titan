@@ -8,7 +8,7 @@ import java.util.*;
  * @author David Ripton
  */
 
-public final class Legion
+public final class Legion implements Comparable
 {
     private Marker marker;
     private String markerId;    // Bk03, Rd12, etc.
@@ -193,16 +193,16 @@ public final class Legion
     /** deep copy for AI */
     public Legion AICopy()
     {
-        Legion newLegion = new Legion(markerId, parentId, currentHex, startingHex,
-                                      critters.size()>=1?(Creature)critters.get(0):null,
-                                      critters.size()>=2?(Creature)critters.get(1):null,
-                                      critters.size()>=3?(Creature)critters.get(2):null,
-                                      critters.size()>=4?(Creature)critters.get(3):null,
-                                      critters.size()>=5?(Creature)critters.get(4):null,
-                                      critters.size()>=6?(Creature)critters.get(5):null,
-                                      critters.size()>=7?(Creature)critters.get(6):null,
-                                      critters.size()>=8?(Creature)critters.get(7):null,
-                                      player);
+        Legion newLegion = new Legion(markerId, parentId, currentHex, 
+            startingHex, critters.size()>=1?(Creature)critters.get(0):null,
+            critters.size()>=2?(Creature)critters.get(1):null,
+            critters.size()>=3?(Creature)critters.get(2):null,
+            critters.size()>=4?(Creature)critters.get(3):null,
+            critters.size()>=5?(Creature)critters.get(4):null,
+            critters.size()>=6?(Creature)critters.get(5):null,
+            critters.size()>=7?(Creature)critters.get(6):null,
+            critters.size()>=8?(Creature)critters.get(7):null, player);
+
         newLegion.moved = moved;
         newLegion.recruited = recruited;
         newLegion.battleTally = battleTally;
@@ -970,6 +970,34 @@ public final class Legion
         if (teleportingLord != null)
         {
             revealCreatures(teleportingLord, 1);
+        }
+    }
+
+
+    /** Legions are sorted in descending order of total point value,
+        with the titan legion always coming first.  This is inconsistent
+        with equals(). */
+    public int compareTo(Object object)
+    {
+        if (object instanceof Legion)
+        {
+            Legion other = (Legion)object;
+            if (this.numCreature(Creature.titan) > 0)
+            {
+                return Integer.MIN_VALUE;
+            }
+            else if (other.numCreature(Creature.titan) > 0)
+            {
+                return Integer.MAX_VALUE;
+            }
+            else
+            {
+                return (other.getPointValue() - this.getPointValue());
+            }
+        }
+        else
+        {
+            throw new ClassCastException();
         }
     }
 }

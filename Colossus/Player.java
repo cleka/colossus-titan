@@ -58,7 +58,9 @@ public final class Player implements Comparable
         newPlayer.ai = ai;
         newPlayer.titanEliminated = titanEliminated;
         for (int i = 0; i < legions.size(); i++)
+        {
             newPlayer.legions.add(i, ((Legion) legions.get(i)).AICopy());
+        }
         // Strings are immutable, so a shallow copy == a deep copy
         newPlayer.markersAvailable = (TreeSet) markersAvailable.clone();
         return newPlayer;
@@ -68,7 +70,6 @@ public final class Player implements Comparable
     {
         return dead;
     }
-
 
     public void setDead(boolean dead)
     {
@@ -80,7 +81,6 @@ public final class Player implements Comparable
     {
         return color;
     }
-
 
     public void setColor(String color)
     {
@@ -142,7 +142,6 @@ public final class Player implements Comparable
     {
         this.startingTower = startingTower;
     }
-
 
     public int getTower()
     {
@@ -292,6 +291,14 @@ public final class Player implements Comparable
     public List getLegions()
     {
         return legions;
+    }
+
+
+    /** Sort legions into order of descending importance.  Titan legion
+     *  first, then others by point value. */
+    public void sortLegions()
+    {
+        Collections.sort(legions);
     }
 
 
