@@ -12,9 +12,22 @@ import net.sf.colossus.client.HexMap;
 
 public class CarryTest extends TestCase
 {
+    Game game;
     Battle battle;
     Legion attacker;
     Legion defender;
+    Creature cyclops;
+    Creature troll;
+    Creature ogre;
+    Creature ranger;
+    Creature gorgon;
+    Creature lion;
+    Creature griffon;
+    Creature hydra;
+    Creature centaur;
+    Creature colossus;
+    Creature gargoyle;
+    Creature warlock;
 
 
     public CarryTest(String name)
@@ -24,7 +37,7 @@ public class CarryTest extends TestCase
 
     protected void setUp()
     {
-        Game game = new Game();
+        game = new Game();
         VariantSupport.loadVariant("Default");
         game.initAndLoadData();  // Will load creatures
 
@@ -34,18 +47,22 @@ public class CarryTest extends TestCase
         // Need a non-GUI board so we can look up hexes.
         MasterBoard board = new MasterBoard();
 
-        Creature cyclops = Creature.getCreatureByName("Cyclops");
-        Creature troll = Creature.getCreatureByName("Troll");
-        Creature ogre = Creature.getCreatureByName("Ogre");
-        Creature ranger = Creature.getCreatureByName("Ranger");
-        Creature gorgon = Creature.getCreatureByName("Gorgon");
-        Creature lion = Creature.getCreatureByName("Lion");
-        Creature griffon = Creature.getCreatureByName("Griffon");
-        Creature hydra = Creature.getCreatureByName("Hydra");
-        Creature centaur = Creature.getCreatureByName("Centaur");
-        Creature colossus = Creature.getCreatureByName("Colossus");
-        Creature gargoyle = Creature.getCreatureByName("Gargoyle");
+        cyclops = Creature.getCreatureByName("Cyclops");
+        troll = Creature.getCreatureByName("Troll");
+        ogre = Creature.getCreatureByName("Ogre");
+        ranger = Creature.getCreatureByName("Ranger");
+        gorgon = Creature.getCreatureByName("Gorgon");
+        lion = Creature.getCreatureByName("Lion");
+        griffon = Creature.getCreatureByName("Griffon");
+        hydra = Creature.getCreatureByName("Hydra");
+        centaur = Creature.getCreatureByName("Centaur");
+        colossus = Creature.getCreatureByName("Colossus");
+        gargoyle = Creature.getCreatureByName("Gargoyle");
+        warlock = Creature.getCreatureByName("Warlock");
+    }
 
+    public void testCarries()
+    {
         String hexLabel = "35";  // Desert
 
         attacker = new Legion("Rd03", "Rd01", hexLabel, null,
@@ -64,52 +81,121 @@ public class CarryTest extends TestCase
             defender.getMarkerId(), Constants.DEFENDER, hexLabel,
             2, Constants.FIGHT);
 
-        defender.getCritter(0).setCurrentHexLabel("D5");
-
-        attacker.getCritter(0).setCurrentHexLabel("C5");
-        attacker.getCritter(1).setCurrentHexLabel("D6");
-        attacker.getCritter(2).setCurrentHexLabel("E4");
-        attacker.getCritter(3).setCurrentHexLabel("C4");
-    }
-
-    public void testCarries()
-    {
-        Critter hydra = defender.getCritter(0);
-
         Critter centaur1 = attacker.getCritter(0);
         Critter centaur2 = attacker.getCritter(1);
-        Critter lion = attacker.getCritter(2);
-        Critter colossus = attacker.getCritter(3);
+        Critter lion1 = attacker.getCritter(2);
+        Critter colossus1 = attacker.getCritter(3);
 
-        assertTrue(hydra.canStrike(centaur1));
-        assertTrue(hydra.canStrike(centaur2));
-        assertTrue(hydra.canStrike(lion));
-        assertTrue(hydra.canStrike(colossus));
+        Critter hydra1 = defender.getCritter(0);
 
-        assertTrue(hydra.getDice(centaur1) == 10);
-        assertTrue(hydra.getDice(centaur2) == 10);
-        assertTrue(hydra.getDice(lion) == 10);
-        assertTrue(hydra.getDice(colossus) == 12);
+        centaur1.setCurrentHexLabel("C5");
+        centaur2.setCurrentHexLabel("D6");
+        lion1.setCurrentHexLabel("E4");
+        colossus1.setCurrentHexLabel("C4");
 
-        assertTrue(hydra.getStrikeNumber(centaur1) == 5);
-        assertTrue(hydra.getStrikeNumber(centaur2) == 5);
-        assertTrue(hydra.getStrikeNumber(lion) == 4);
-        assertTrue(hydra.getStrikeNumber(colossus) == 5);
+        hydra1.setCurrentHexLabel("D5");
 
-        hydra.findCarries(centaur1);
+        assertTrue(hydra1.canStrike(centaur1));
+        assertTrue(hydra1.canStrike(centaur2));
+        assertTrue(hydra1.canStrike(lion1));
+        assertTrue(hydra1.canStrike(colossus1));
+
+        assertTrue(hydra1.getDice(centaur1) == 10);
+        assertTrue(hydra1.getDice(centaur2) == 10);
+        assertTrue(hydra1.getDice(lion1) == 10);
+        assertTrue(hydra1.getDice(colossus1) == 12);
+
+        assertTrue(hydra1.getStrikeNumber(centaur1) == 5);
+        assertTrue(hydra1.getStrikeNumber(centaur2) == 5);
+        assertTrue(hydra1.getStrikeNumber(lion1) == 4);
+        assertTrue(hydra1.getStrikeNumber(colossus1) == 5);
+
+        hydra1.findCarries(centaur1);
         assertTrue(battle.getCarryTargets().size() == 3);
-        assertTrue(hydra.getPenaltyOptions().size() == 0);
+        assertTrue(hydra1.getPenaltyOptions().size() == 0);
 
-        hydra.findCarries(centaur2);
+        hydra1.findCarries(centaur2);
         assertTrue(battle.getCarryTargets().size() == 3);
-        assertTrue(hydra.getPenaltyOptions().size() == 0);
+        assertTrue(hydra1.getPenaltyOptions().size() == 0);
 
-        hydra.findCarries(lion);
+        hydra1.findCarries(lion1);
         assertTrue(battle.getCarryTargets().size() == 0);
-        assertTrue(hydra.getPenaltyOptions().size() == 1);
+        assertTrue(hydra1.getPenaltyOptions().size() == 2);
 
-        hydra.findCarries(colossus);
+        hydra1.findCarries(colossus1);
         assertTrue(battle.getCarryTargets().size() == 0);
-        assertTrue(hydra.getPenaltyOptions().size() == 0);
+        assertTrue(hydra1.getPenaltyOptions().size() == 0);
+    }
+
+
+    public void testCarries2()
+    {
+        String hexLabel = "1";  // Plains
+
+        attacker = new Legion("Rd03", "Rd01", hexLabel, null,
+            warlock, warlock, colossus, null, null, null, null, null,
+            "Red", game);
+        defender = new Legion("Bu03", "Bu01", hexLabel, null,
+            gargoyle, ogre, ogre, null, null, null, null, null,
+            "Blue", game);
+
+        game.getPlayer("Red").addLegion(attacker);
+        game.getPlayer("Blue").addLegion(defender);
+
+        attacker.setEntrySide(5);
+
+        battle = new Battle(game, attacker.getMarkerId(), 
+            defender.getMarkerId(), Constants.ATTACKER, hexLabel,
+            3, Constants.FIGHT);
+
+        Critter warlock1 = attacker.getCritter(0);
+        Critter warlock2 = attacker.getCritter(1);
+        Critter colossus1 = attacker.getCritter(2);
+
+        Critter gargoyle1 = defender.getCritter(0);
+        Critter ogre1 = defender.getCritter(1);
+        Critter ogre2 = defender.getCritter(2);
+
+        gargoyle1.setHits(3);
+        ogre1.setHits(5);
+        ogre2.setHits(5);
+
+        warlock1.setCurrentHexLabel("A3");
+        warlock2.setCurrentHexLabel("B4");
+        colossus1.setCurrentHexLabel("E3");
+
+        gargoyle1.setCurrentHexLabel("D3");
+        ogre1.setCurrentHexLabel("E2");
+        ogre2.setCurrentHexLabel("F2");
+
+        assertTrue(colossus1.canStrike(gargoyle1));
+        assertTrue(colossus1.canStrike(ogre1));
+        assertTrue(colossus1.canStrike(ogre2));
+
+        assertTrue(colossus1.getDice(gargoyle1) == 10);
+        assertTrue(colossus1.getDice(ogre1) == 10);
+        assertTrue(colossus1.getDice(ogre2) == 10);
+
+        assertTrue(colossus1.getStrikeNumber(gargoyle1) == 3);
+        assertTrue(colossus1.getStrikeNumber(ogre1) == 2);
+        assertTrue(colossus1.getStrikeNumber(ogre2) == 2);
+
+        colossus1.findCarries(gargoyle1);
+        assertTrue(battle.getCarryTargets().size() == 2);
+        assertTrue(colossus1.getPenaltyOptions().size() == 0);
+
+        colossus1.findCarries(ogre1);
+        assertTrue(battle.getCarryTargets().size() == 1);
+        assertTrue(colossus1.getPenaltyOptions().size() == 2);
+        Iterator it = colossus1.getPenaltyOptions().iterator();
+        PenaltyOption po = (PenaltyOption)it.next();
+        assertTrue(po.getCarryTargets().size() == 2);
+
+        colossus1.findCarries(ogre2);
+        assertTrue(battle.getCarryTargets().size() == 1);
+        assertTrue(colossus1.getPenaltyOptions().size() == 2);
+        it = colossus1.getPenaltyOptions().iterator();
+        po = (PenaltyOption)it.next();
+        assertTrue(po.getCarryTargets().size() == 2);
     }
 }

@@ -602,36 +602,34 @@ final class Critter extends Creature implements Comparable
 
             if (!penaltyOptions.isEmpty())
             {
-                // Add the non-penalty option as a choice.
-                PenaltyOption po = new PenaltyOption(this, target, dice, 
-                    strikeNumber);
-                po.addCarryTargets(battle.getCarryTargets());
-                penaltyOptions.add(po);
-
-                if (getPlayer().isAI())
-                {
-                    po = getPlayer().aiChooseStrikePenalty(
-                        Collections.unmodifiableSortedSet(penaltyOptions));
-                    if (po == null)
-                    {
-                        Log.error("aiChooseStrikePenalty returned null!");
-                    }
-                    else
-                    {
-Log.debug("aiChooseStrikePenalty returned: " + po.toString()); 
-                        assignStrikePenalty(po.toString());
-                        return;
-                    }
-                }
-                else
-                {
-                    game.getServer().askChooseStrikePenalty(penaltyOptions);
-                    return;
-                }
+                chooseStrikePenalty();
+                return;
             }
         }
 
         strike2(target, dice, strikeNumber);
+    }
+
+    private void chooseStrikePenalty()
+    {
+        if (getPlayer().isAI())
+        {
+            PenaltyOption po = getPlayer().aiChooseStrikePenalty(
+                Collections.unmodifiableSortedSet(penaltyOptions));
+            if (po == null)
+            {
+                Log.error("aiChooseStrikePenalty returned null!");
+            }
+            else
+            {
+Log.debug("aiChooseStrikePenalty returned: " + po.toString()); 
+                assignStrikePenalty(po.toString());
+            }
+        }
+        else
+        {
+            game.getServer().askChooseStrikePenalty(penaltyOptions);
+        }
     }
 
     void assignStrikePenalty(String prompt)
@@ -704,6 +702,22 @@ Log.debug("findCarries " + this.getDescription() + " striking " + target.getDesc
             if (possibleCarryToDir(target.getCurrentHex(), i))
             {
                 findCarry(target, getCurrentHex().getNeighbor(i));
+            }
+        }
+
+        if (!penaltyOptions.isEmpty())
+        {
+            // Add the non-penalty option as a choice.
+            PenaltyOption po = new PenaltyOption(this, target, getDice(target), 
+                getStrikeNumber(target));
+            penaltyOptions.add(po);
+
+            // Add all non-penalty carries to every PenaltyOption.
+            Iterator it = penaltyOptions.iterator();
+            while (it.hasNext())
+            {
+                po = (PenaltyOption)it.next();
+                po.addCarryTargets(battle.getCarryTargets());
             }
         }
     }
@@ -792,7 +806,7 @@ Log.debug("existing penalty option: " + po.toString());
                     return;
                 }
             }
-            // No match, so create a new one.
+            // No match, so create a new PenaltyOption.
             PenaltyOption po =  new PenaltyOption(this, target,
                 tmpDice, tmpStrikeNumber);
             po.addCarryTarget(neighbor.getLabel());
