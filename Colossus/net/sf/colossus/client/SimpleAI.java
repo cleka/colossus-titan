@@ -23,7 +23,7 @@ import net.sf.colossus.server.VariantSupport;
 
 public class SimpleAI implements AI
 {
-    private Client client;
+    Client client;
     private int timeLimit = Constants.DEFAULT_AI_TIME_LIMIT;  // in s
     private boolean timeIsUp;
     private Random random = new Random();
@@ -133,7 +133,7 @@ public class SimpleAI implements AI
     }
 
 
-    private Creature chooseRecruit(LegionInfo legion, String hexLabel)
+    Creature chooseRecruit(LegionInfo legion, String hexLabel)
     {
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
 
@@ -757,7 +757,7 @@ public class SimpleAI implements AI
         return splitoffs;
     }
 
-    private static List getInitialSplitHint(String label)
+    static List getInitialSplitHint(String label)
     {
         List byName = VariantSupport.getInitialSplitHint(label);
 
@@ -1866,7 +1866,7 @@ public class SimpleAI implements AI
         }
     }
 
-    private Creature getVariantRecruitHint(LegionInfo legion,
+    Creature getVariantRecruitHint(LegionInfo legion,
                                            MasterHex hex,
                                            List recruits)
     {
