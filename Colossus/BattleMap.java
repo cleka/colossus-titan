@@ -57,6 +57,8 @@ public class BattleMap extends Frame implements MouseListener,
 
     private boolean summonedAngel = false;
     private boolean recruitedReinforcement = false;
+    private boolean chitSelected = false;
+    private int numCarries = 0;
 
 
     public BattleMap(Legion attacker, Legion defender, char terrain, char side)
@@ -291,6 +293,8 @@ public class BattleMap extends Frame implements MouseListener,
 
     void undoLastMove()
     {
+        chitSelected = false;
+
         for (int i = 0; i < numChits; i++)
         {
             if (chits[i] == lastChitMoved)
@@ -303,6 +307,8 @@ public class BattleMap extends Frame implements MouseListener,
 
     void undoAllMoves()
     {
+        chitSelected = false;
+
         for (int i = 0; i < numChits; i++)
         {
             if (chits[i].hasMoved())
@@ -413,7 +419,8 @@ public class BattleMap extends Frame implements MouseListener,
         for (int i = 0; i < 6; i++)
         {
             // Adjacent creatures separated by a cliff are not engaged.
-            if (currentHex.getHexside(i) != 'c')
+            if (currentHex.getHexside(i) != 'c' && 
+                currentHex.getOppositeHexside(i) != 'c')
             {
                 Hex hex = currentHex.getNeighbor(i);
                 if (hex != null)
@@ -438,8 +445,8 @@ public class BattleMap extends Frame implements MouseListener,
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally.
         Creature creature = chit.getCreature();
-        if (count == 0 && creature.rangeStrikes() && turn.getPhase() !=
-            turn.STRIKEBACK)
+        if (!chit.inContact(true) && creature.rangeStrikes() && 
+            turn.getPhase() != turn.STRIKEBACK)
         {
             int skill = creature.getSkill();
 
@@ -480,6 +487,64 @@ public class BattleMap extends Frame implements MouseListener,
     int highlightStrikes(BattleChit chit)
     {
         return countAndMaybeHighlightStrikes(chit, true);
+    }
+
+
+    int highlightCarries(BattleChit chit, int numCarries)
+    {
+        unselectAllHexes();
+
+        int count = 0;
+
+        for (int i = 0; i < numChits; i++)
+        {
+            BattleChit target = chits[i];
+            if (target.getCarryFlag())
+            {
+                Hex targetHex = target.getCurrentHex();
+                targetHex.select();
+                targetHex.repaint();
+                count++;
+            }
+        }
+
+        if (count > 0)
+        {
+            this.numCarries = numCarries;
+        }
+
+        return count;
+    }
+    
+    
+    void applyCarries(BattleChit target)
+    {
+        int totalDamage = target.getHits();
+        totalDamage += numCarries;
+        int power = target.getPower();
+        if (totalDamage > power)
+        {
+            numCarries = totalDamage - power;
+            totalDamage = power;
+            target.setCarryFlag(false);
+        }
+        else
+        {
+            clearAllCarries();
+        }
+        target.setHits(totalDamage);
+        target.checkForDeath();
+        target.repaint();
+    }
+
+
+    void clearAllCarries()
+    {
+        for (int i = 0; i < numChits; i++)
+        {
+            chits[i].setCarryFlag(false);
+        }
+        numCarries = 0;
     }
 
 
@@ -651,6 +716,14 @@ public class BattleMap extends Frame implements MouseListener,
             //     be atop one.
             if (totalObstacles >= 3 && (!strikerAtop || !targetAtop) &&
                 (!strikerAtopCliff && !targetAtopCliff))
+            {
+                return true;
+            }
+
+            // If there are two walls, striker or target must be at elevation
+            //     2 and range must not be 3.
+            if (terrain == 'T' && totalObstacles >= 2 && 
+                getRange(initialHex, finalHex) == 3)
             {
                 return true;
             }
@@ -1585,6 +1658,8 @@ public class BattleMap extends Frame implements MouseListener,
             // Only the active player can move or strike.
             if (chits[i].select(point) && chits[i].getPlayer() == player)
             {
+                chitSelected = true;
+
                 // Put selected chit at the top of the Z-order.
                 if (i != 0)
                 {
@@ -1608,6 +1683,9 @@ public class BattleMap extends Frame implements MouseListener,
                     case BattleTurn.STRIKEBACK:
                         // Highlight all legal strikes for this chit.
                         highlightStrikes(chits[0]);
+
+                        // Leave carry mode.
+                        clearAllCarries();
                         break;
 
                     default:
@@ -1628,14 +1706,29 @@ public class BattleMap extends Frame implements MouseListener,
                     switch (turn.getPhase())
                     {
                         case BattleTurn.MOVE:
-                            chits[0].moveToHex(h[i][j]);
+                            if (chitSelected)
+                            {
+                                chits[0].moveToHex(h[i][j]);
+                                chitSelected = false;
+                            }
                             highlightMovableChits();
                             return;
 
                         case BattleTurn.FIGHT:
                         case BattleTurn.STRIKEBACK:
-                            chits[0].strike(h[i][j].getChit());
-                            highlightChitsWithTargets();
+                            if (numCarries > 0)
+                            {
+                                applyCarries(h[i][j].getChit());
+                            }
+                            else if (chitSelected)
+                            {
+                                chits[0].strike(h[i][j].getChit());
+                                chitSelected = false;
+                            }
+                            if (numCarries == 0)
+                            {
+                                highlightChitsWithTargets();
+                            }
                             return;
 
                         default:
@@ -1808,10 +1901,10 @@ public class BattleMap extends Frame implements MouseListener,
             null, Creature.ogre, Creature.troll, Creature.ranger,
             Creature.hydra, Creature.griffon, Creature.angel,
             Creature.warlock, null, player1);
-        Legion defender = new Legion(0, 0, chitScale, null, null, null, 6,
+        Legion defender = new Legion(0, 0, chitScale, null, null, null, 7,
             null, Creature.centaur, Creature.lion, Creature.gargoyle,
-            Creature.cyclops, Creature.gorgon, Creature.guardian, null, null,
-            player2);
-        new BattleMap(attacker, defender, 't', 'b');
+            Creature.cyclops, Creature.gorgon, Creature.guardian, 
+            Creature.minotaur, null, player2);
+        new BattleMap(attacker, defender, 'D', 'b');
     }
 }
