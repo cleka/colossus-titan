@@ -225,6 +225,11 @@ public final class GUIMasterHex extends MasterHex
         g2.setFont(oldFont);
     }
 
+    private int stringWidth(String s, Graphics2D g2)
+    {
+        return (int)Math.round(fontMetrics.getStringBounds(s, g2).getWidth());
+    }
+
     private void paintLabel(Graphics2D g2) 
     {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -235,41 +240,38 @@ public final class GUIMasterHex extends MasterHex
         {
         case 0:
             g2.drawString(label, rectBound.x +
-                ((rectBound.width - fontMetrics.stringWidth(label)) / 2),
+                ((rectBound.width - stringWidth(label, g2)) / 2), 
                 rectBound.y + halfFontHeight + rectBound.height / 10);
             break;
 
         case 1:
-            g2.drawString(label, rectBound.x + (rectBound.width -
-                fontMetrics.stringWidth(label)) * 5 / 6,
-                rectBound.y + halfFontHeight + rectBound.height / 8);
+            g2.drawString(label, rectBound.x + ((rectBound.width -
+                stringWidth(label, g2)) * 5 / 6), rectBound.y + halfFontHeight +
+                rectBound.height / 8);
             break;
 
         case 2:
             g2.drawString(label, rectBound.x + (rectBound.width -
-                fontMetrics.stringWidth(label)) * 5 / 6,
-                rectBound.y + halfFontHeight +
+                stringWidth(label, g2)) * 5 / 6, rectBound.y + halfFontHeight +
                 rectBound.height * 7 / 8);
             break;
 
         case 3:
             g2.drawString(label, rectBound.x + ((rectBound.width -
-                fontMetrics.stringWidth(label)) / 2),
-                rectBound.y + halfFontHeight +
+                stringWidth(label, g2)) / 2), rectBound.y + halfFontHeight +
                 rectBound.height * 9 / 10);
             break;
 
         case 4:
             g2.drawString(label, rectBound.x + (rectBound.width -
-                fontMetrics.stringWidth(label)) / 6,
-                rectBound.y + halfFontHeight +
+                stringWidth(label, g2)) / 6, rectBound.y + halfFontHeight +
                 rectBound.height * 5 / 6);
             break;
 
         case 5:
             g2.drawString(label, rectBound.x + (rectBound.width -
-                fontMetrics.stringWidth(label)) / 6,
-                rectBound.y + halfFontHeight + rectBound.height / 8);
+                stringWidth(label, g2)) / 6, rectBound.y + halfFontHeight + 
+                rectBound.height / 8);
             break;
         }
 
@@ -289,23 +291,12 @@ public final class GUIMasterHex extends MasterHex
             name = getTerrainDisplayName().toUpperCase();
         }
 
-        // Long names like "MOUNTAINS" need to be printed in the wide part of
-        // the hex, with a smaller font.
-        if (name.length() >= 8)
-        {
-            shrinkFont(g2); 
-            g2.drawString(name, rectBound.x + ((rectBound.width -
-                fontMetrics.stringWidth(name)) / 2),
-                rectBound.y + halfFontHeight + rectBound.height * 
+        shrinkFont(g2); 
+        g2.drawString(name, 
+            rectBound.x + ((rectBound.width - stringWidth(name, g2)) / 2), 
+            rectBound.y + halfFontHeight + rectBound.height * 
                 (isInverted() ? 1 : 2) / 3);
-            restoreFont(g2);
-        }
-        else
-        {
-            g2.drawString(name, rectBound.x + ((rectBound.width -
-                fontMetrics.stringWidth(name)) / 2),
-                rectBound.y + halfFontHeight + (rectBound.height / 2));
-        }
+        restoreFont(g2);
     }
 
 
@@ -489,7 +480,8 @@ public final class GUIMasterHex extends MasterHex
     {
         if (overlay == null)
         {
-            java.util.List directories = VariantSupport.getImagesDirectoriesList();
+            java.util.List directories = 
+                VariantSupport.getImagesDirectoriesList();
             overlay = ResourceLoader.getImage(getTerrainDisplayName() +
                                            (!inverted ? invertedPostfix : ""),
                                            directories);
@@ -527,7 +519,9 @@ public final class GUIMasterHex extends MasterHex
     private void paintOverlay(Graphics2D g)
     {
         if (overlay == null)
+        {
             return;
+        }
 
         g.drawImage(overlay,
                     rectBound.x,

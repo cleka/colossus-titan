@@ -1240,6 +1240,9 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_F);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         }
+
+        // Force showing the updated movement die.
+        repaint();
     }
 
     void setupFightMenu()
