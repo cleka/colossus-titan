@@ -520,10 +520,8 @@ public final class BattleMap extends HexMap implements MouseListener,
                 }
                 String imageFilename = Chit.getImagePath(basename);
 
-                // This syntax works with either images in a jar file or images
-                // in the local filesystem.
-                java.net.URL url = getClass().getResource(imageFilename);
-                Image image = Toolkit.getDefaultToolkit().getImage(url);
+                ImageIcon icon = Chit.getImageIcon(imageFilename);
+                Image image = icon.getImage();
 
                 cursor = Toolkit.getDefaultToolkit().createCustomCursor(
                     image, point, basename);
