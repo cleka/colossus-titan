@@ -249,10 +249,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                if (client.mulligan() == -1)
-                {
-                    Log.error("Illegal mulligan.");
-                }
+                client.mulligan(); 
             }
         };
 
@@ -628,11 +625,15 @@ public final class MasterBoard extends JPanel
     private void setupHexes()
     {
         if (plain == null) /* if static array not yet defined */
+        {
             setupHexesGameState(false);
+        }
         setupHexesGameState(true);
         setupHexesGUI();
         if (towerSet == null) /* if static Set not yet defined */
+        {
             setupTowerSet();
+        }
     }
 
     private void setupHexesGUI()
@@ -1204,6 +1205,13 @@ public final class MasterBoard extends JPanel
     }
 
 
+    void highlightPossibleRecruits()
+    {
+        unselectAllHexes();
+        selectHexesByLabels(client.getPossibleRecruitHexes());
+    }
+
+
     JFrame getFrame()
     {
         return masterFrame;
@@ -1217,11 +1225,7 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        java.util.List markerIds = client.getLegionMarkerIds(hexLabel);
-
-        // Put the current player's legions first.
-        Collections.sort(markerIds, MarkerComparator.getMarkerComparator(
-            client.getShortColor()));
+        java.util.List markerIds = client.getLegionsByHex(hexLabel);
 
         int numLegions = markerIds.size();
         if (numLegions == 0)
@@ -1386,12 +1390,6 @@ public final class MasterBoard extends JPanel
         return set.size();
     }
 
-
-    void highlightPossibleRecruits()
-    {
-        unselectAllHexes();
-        selectHexesByLabels(client.findAllEligibleRecruitHexes());
-    }
 
 
     private void setupIcon()
@@ -1709,7 +1707,7 @@ public final class MasterBoard extends JPanel
                 break;
 
             case Constants.MUSTER:
-                client.doMuster(markerId);
+                client.doRecruit(markerId);
                 break;
         }
     }

@@ -1,0 +1,215 @@
+We need to teach the AI to predict enemy stack contents, without peeking.
+
+The general stack prediction algorithm will use one binary tree per enemy 
+player.  (Binary because all splits in Colossus are binary -- Titan allows 
+a 3-way split but Colossus models it as two splits.)  Each parent loosely 
+represents a pre-split legion.  Each child node represents a post-split legion.  
+Each node contains a legion ID string and a list of creature names.
+
+Each creature has two flags.  The first says whether its presence in this 
+legion is certain or a guess.  The second says whether this legion was in 
+this stack at the time it was split, or was added to one of its children later.  
+(We need a historical record of stack contents at the time of splits so that 
+we can re-predict splits later.  The alternative is always generating and 
+saving an exhaustive list of all possible splits.  But that's just not 
+practical because sometimes we don't know all contents of a splitting legion.)
+The leaf legions are the legions currently on the board -- the rest are legions
+that used to exist.  Note that because one of the split legions keeps the
+parent's legion marker, we need to use tree position not just marker id to
+refer to legions.
+
+The creatures in a parent node must match the creatures in its child nodes.  
+(In name, but not necessarily in visibility.)  Each time a creature is added 
+or removed, this is done in both places.  Angel summoning is a special case, 
+but to keep things consistent we move the angel in the parents as well.
+
+Whenever an opponent splits, the AI uses its split function to predict the split.  
+So after Black's opening split, another player's tree for Black might look like:
+
+(Notation: ? means we're not certain about this creature's location.  * means
+that this creature has been added since this legion was split off -- its location
+is known and it wasn't in the parent so we don't need to consider it when we
+redo split predictions.)
+
+                        Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+                Bk01 Tit?,Ogr?,Ogr?,Gar?     Bk02   Ang?,Cen?,Cen?,Gar?
+
+Black rolls a 6.  Bk02 teleports to another tower, showing a Titan.  Oops -- we 
+guessed wrong.  The AI split function needs to be modified to return multiple 
+possible splits in descending order of how "good" they are, not just one split.
+(We'll use a permutation generator to find all of them, then score each one
+and sort them by score.  Luckily there aren't very many -- for the worst case 
+where a 7-high legion with all the creatures different splits 4-3 there are 
+only 7 * 6 * 5 = 210 possible splits.)
+
+Then we can iterate through them until we find the first/best one that puts the 
+Titan in Bk02, and use that for our current prediction.
+
+                        Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+                Bk01 Ang,Ogr?,Ogr?,Gar?     Bk02   Tit,Cen?,Cen?,Gar?
+
+Bk02 recruits a warlock in the tower, with the Titan.  This is consistent with the 
+current expected contents of the legion, so all we do is add the warlock to the
+child.  (Again, the * shows that the creature was added since the last split.)
+
+                        Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+                Bk01 Ang,Ogr?,Ogr?,Gar?  Bk02  Tit,Cen?,Cen?,Gar?,Wlk*
+
+Bk01 recruits a lion in the plains with two centaurs.  Oops, we didn't think Bk01 
+had any centaurs.  Back through the possible splits again, until we find one that 
+matches all known creatures.
+
+                      Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+                Bk01 Ang,Cen,Cen,Lio*,Gar?  Bk02  Tit,Ogr?,Ogr?,Gar?,Wlk*
+
+Now here's where we gain information by simple subtraction.  There are two ogres 
+and two gargoyles unaccounted for.  One of those creatures is in Bk01; the other 
+three are in Bk02.  It should be obvious that Bk02 must contain at least one Ogr 
+and one Gar.  (We need to either explicitly code this subtractive logic, or else 
+iterate through all possible splits that fit the known facts and mark things that
+are common to all of them as known.)  So:
+
+                        Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+                Bk01 Ang,Cen,Cen,Lio*,Gar?  Bk02  Tit,Ogr,Ogr?,Gar,Wlk*
+
+In Black's second turn, Bk01 moves to a plains and recruits another Lion.  Bk02 
+moves to the brush and recruits a Cyclops with two gargoyles.  So we need to 
+re-predict the split again and find one where Bk02 contained two gargoyles.
+There is only one possibility, so the location of all creatures is now known:
+
+                  Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr  Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*
+
+At this point the parent node's split is definitely known.  We should never
+need to refer back to the parent node again.  Deleting it would leave our
+tree headless, though, and these nodes don't use much memory, so we probably
+just keep it around.
+
+In Black's third turn, nothing splits.  Bk01 recruits a Ranger, and Bk02
+recruits another Clops.
+
+                  Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran*  Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc*
+
+In Black's fourth turn, each legion splits 5-2.  We predict:
+
+                              Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran*                         Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc*
+
+Bk01 Ang?,Ran?,Lio?,Lio?,Ogr?    Bk03 Cen?,Cen?         Bk02 Tit?,Wlk?,Cyc?,Cyc?,Ogr?    Bk04  Gar?,Gar?
+
+
+Bk01 jumps onto one of our 2-high splitoffs in the plains.  It is revealed 
+(to us, but not to other players) as Ang,Ran,Lio,Lio,Ogr.  We mark both Bk01
+and Bk03 as fully known.  We flee, so other players don't have this info.
+
+                              Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran*                         Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc*
+
+Bk01 Ang,Ran,Lio,Lio,Ogr    Bk03 Cen,Cen                   Bk02 Tit?,Wlk?,Cyc?,Cyc?,Ogr?    Bk04  Gar?,Gar?
+
+Bk02 also gets aggressive, jumping onto another player's 4-high legion in the brush.
+This player does not flee and a battle starts.  Both combatant legions are shown to
+all players -- we see that Bk02 actually contained a Gar not an Ogr.  This leaves only
+one possible split, so we also know the contents of Bk04.
+
+
+                                    Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran*                         Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc*
+
+Bk01 Ang,Ran,Lio,Lio,Ogr    Bk03 Cen,Cen                        Bk02 Tit,Wlk,Cyc,Cyc,Gar    Bk04  Gar,Ogr
+
+During the fight, Bk02 loses one Clops and one Gargoyle, and summons the Angel.
+
+                                    Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran*                         Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc*
+
+Bk01 Ran,Lio,Lio,Ogr       Bk03 Cen,Cen                          Bk02 Tit,Wlk,Cyc,Ang*    Bk04  Gar,Ogr
+
+Note that the summoned angel and dead creatures are no longer in the legions where
+they used to live.  But if we ever needed to predict those splits (we don't in this
+case because all legions are fully known), we'd need to account for them.  There
+is almost enough information here to do that -- we can tell which creatures split
+and then were eliminated by comparing the contents of the parent legion to the
+sum of its children's contents.  We also need to note that each split was 5-2, and
+which marker got which number of creatures.  This infomation goes in the parent, not
+the children, because that way if a child legion is eliminated we can remove it from
+the tree without losing this information.
+
+Black recruits in the two larger legions:
+
+                              Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran*                         Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc*
+
+Bk01 Ran,Lio,Lio,Ogr,Ran*    Bk03 Cen,Cen                          Bk02 Tit,Wlk,Cyc,Ang*,Cyc*  Bk04  Gar,Ogr
+
+
+Two turns and a few recruits later, Black has:
+
+
+                              Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar (4-4)
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran* (5-2)                     Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc* (5-2)
+
+Bk01 Ran,Lio,Lio,Ogr,Ran*,Lio*,Ran*    Bk03 Cen,Cen,Lio*            Bk02 Tit,Wlk,Cyc,Ang*,Cyc*,Cyc*  Bk04  Gar,Ogr,Ogr*,Tro*
+
+On the next turn Bk01 splits:
+
+                              Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar (4-4)
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran* (5-2)                     Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc* (5-2)
+
+Bk01 Ran,Lio,Lio,Ogr,Ran*,Lio*,Ran* (5-2)   Bk03 Cen,Cen,Lio*      Bk02 Tit,Wlk,Cyc,Ang*,Cyc*,Cyc*  Bk04  Gar,Ogr,Ogr*,Tro*
+
+Bk01 Ran?,Ran?,Ran?,Lio?,Lio?   Bk05 Lio?,Ogr?
+
+
+Bk01 recruits a Griffon with 3 lions.  We re-predict and get:
+
+
+                              Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar (4-4)
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran* (5-2)                     Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc* (5-2)
+
+Bk01 Ran,Lio,Lio,Ogr,Ran*,Lio*,Ran* (5-2)   Bk03 Cen,Cen,Lio*      Bk02 Tit,Wlk,Cyc,Ang*,Cyc*,Cyc*  Bk04  Gar,Ogr,Ogr*,Tro*
+
+Bk01 Ran?,Ran?,Lio,Lio,Lio,Gri*  Bk05 Ran?,Ogr?
+
+But note that with 3 rangers and an ogre uncertain and Bk05 only 2-high, each 
+of Bk01 and Bk05 must contain a ranger.
+
+
+                              Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar (4-4)
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran* (5-2)                     Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc* (5-2)
+
+Bk01 Ran,Lio,Lio,Ogr,Ran*,Lio*,Ran* (5-2)   Bk03 Cen,Cen,Lio*      Bk02 Tit,Wlk,Cyc,Ang*,Cyc*,Cyc*  Bk04  Gar,Ogr,Ogr*,Tro*
+
+Bk01 Ran,Ran?,Lio,Lio,Lio,Gri*  Bk05 Ran,Ogr?
+
+
+A 7-high stack jumps on Bk05, and it flees, revealing that it indeed 
+contained Ran,Ogr.  Now Bk01's contents are known:
+
+
+                              Bk01 Tit,Ang,Ogr,Ogr,Cen,Cen,Gar,Gar (4-4)
+
+         Bk01 Ang,Cen,Cen,Lio*,Lio*,Ogr,Ran* (5-2)                     Bk02  Tit,Ogr,Gar,Gar,Wlk*,Cyc*,Cyc* (5-2)
+
+Bk01 Ran,Lio,Lio,Ogr,Ran*,Lio*,Ran* (5-2)   Bk03 Cen,Cen,Lio*      Bk02 Tit,Wlk,Cyc,Ang*,Cyc*,Cyc*  Bk04  Gar,Ogr,Ogr*,Tro*
+
+Bk01 Ran,Ran,Lio,Lio,Lio,Gri*
+
+

@@ -192,8 +192,6 @@ public final class Game
         initAndLoadData();
         initServerAndClients();
 
-        server.loadOptions();
-
         syncAutoPlay();
 
         server.allInitBoard();
@@ -205,8 +203,6 @@ public final class Game
         activePlayerNum = 0;
 
         assignColors();
-
-        fixMulligans();
     }
 
     private void syncAutoPlay()
@@ -314,22 +310,6 @@ public final class Game
         server.allUpdateCaretakerDisplay();
     }
 
-    // XXX Hack for debugging.  We should add clean support for handicap 
-    // mulligans, after we add support for server-side options.
-    private void fixMulligans()
-    {
-        Iterator it = players.iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            if (player.isHuman() && server.getClientOption(
-                Options.debugMulligans))
-            {
-                player.setMulligansLeft(99);
-                Log.warn(player.getName() + " is cheating");
-            }
-        }
-    }
 
     private static String getPhaseName(int phase)
     {
@@ -1173,8 +1153,6 @@ public final class Game
                 battle.init();
             }
 
-            server.loadOptions();
-
             // Setup MasterBoard
             server.allInitBoard();
             server.allAddMarkers();
@@ -1190,8 +1168,6 @@ public final class Game
             e.printStackTrace();
             dispose();
         }
-
-        fixMulligans();
     }
 
     Legion readLegion(BufferedReader in, Player player,

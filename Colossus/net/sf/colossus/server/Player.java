@@ -6,7 +6,6 @@ import java.io.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.client.MarkerComparator;
 
 
 /**
@@ -144,8 +143,6 @@ public final class Player implements Comparable
     void setColor(String color)
     {
         this.color = color;
-        markersAvailable = new TreeSet(
-            MarkerComparator.getMarkerComparator(getShortColor()));
     }
 
 
@@ -524,8 +521,7 @@ public final class Player implements Comparable
 
         movementRoll = Game.rollDie();
         Log.event(getName() + " rolls a " + movementRoll + " for movement");
-        Server server = game.getServer();
-        server.allTellMovementRoll(movementRoll);
+        game.getServer().allTellMovementRoll(movementRoll);
     }
 
 
@@ -601,7 +597,9 @@ public final class Player implements Comparable
         Legion legion = getLegionByMarkerId(markerId);
         legion.undoRecruit();
         // Update number of creatures in status window.
-        game.getServer().allUpdateStatusScreen();
+        // game.getServer().allUpdateStatusScreen();
+        // XXX Need to tell all clients that this recruit was undone.
+        game.getServer().undidRecruit(legion);
     }
 
 
@@ -610,14 +608,12 @@ public final class Player implements Comparable
         Legion splitoff = getLegionByMarkerId(splitoffId);
         String hexLabelToAlign = splitoff.getCurrentHexLabel();
         splitoff.recombine(splitoff.getParent(), true);
-        game.getServer().allAlignLegions(hexLabelToAlign);
         game.getServer().allUpdateStatusScreen();
     }
 
 
     void recombineIllegalSplits()
     {
-        Set hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -627,12 +623,11 @@ public final class Player implements Comparable
                 parent.getCurrentHexLabel().equals(
                 legion.getCurrentHexLabel()))
             {
-                hexLabelsToAlign.add(legion.getCurrentHexLabel());
+                game.getServer().undidSplit(legion.getMarkerId());
                 legion.recombine(parent, false);
                 it.remove();
             }
         }
-        game.getServer().allAlignLegions(hexLabelsToAlign);
         game.getServer().allUpdateStatusScreen();
     }
 
@@ -655,11 +650,6 @@ public final class Player implements Comparable
     void addLegion(Legion legion)
     {
         legions.add(legion);
-        Server server = game.getServer();
-        if (server != null)
-        {
-            server.allAlignLegions(legion.getCurrentHexLabel());
-        }
     }
 
 
@@ -745,7 +735,6 @@ public final class Player implements Comparable
 
         Player slayer = game.getPlayer(slayerName);
 
-        Set hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -771,7 +760,6 @@ public final class Player implements Comparable
 
             // Call the iterator's remove() method rather than
             // removeLegion() to avoid concurrent modification problems.
-            hexLabelsToAlign.add(legion.getCurrentHexLabel());
             legion.prepareToRemove();
             it.remove();
         }
@@ -795,7 +783,6 @@ public final class Player implements Comparable
             slayer.takeLegionMarkers(this);
         }
 
-        game.getServer().allAlignLegions(hexLabelsToAlign);
         game.getServer().allUpdateStatusScreen();
 
         Log.event(getName() + " dies");

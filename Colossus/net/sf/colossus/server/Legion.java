@@ -601,12 +601,8 @@ final class Legion implements Comparable
     {
         String hexLabel = currentHexLabel;
         prepareToRemove();
-
-        Player player = getPlayer();
-        player.getLegions().remove(this);
-
+        getPlayer().getLegions().remove(this);
         game.getServer().allRemoveMarker(markerId);
-        game.getServer().allAlignLegions(hexLabel);
     }
 
 
@@ -641,8 +637,7 @@ final class Legion implements Comparable
 
         // Free up the legion marker.
         game.getServer().allRemoveMarker(markerId);
-        Player player = getPlayer();
-        player.addLegionMarker(getMarkerId());
+        getPlayer().addLegionMarker(getMarkerId());
     }
 
 
@@ -663,11 +658,6 @@ final class Legion implements Comparable
             setTeleported(true);
             player.setTeleported(true);
         }
-
-        Set set = new HashSet();
-        set.add(currentHexLabel);
-        set.add(startingHexLabel);
-        game.getServer().allAlignLegions(set);
 
         Log.event("Legion " + getLongMarkerName() + " in " +
             getStartingHexLabel() + (teleported ?
@@ -704,7 +694,6 @@ final class Legion implements Comparable
             Set set = new HashSet();
             set.add(currentHexLabel);
             set.add(formerHexLabel);
-            game.getServer().allAlignLegions(set);
         }
     }
 
@@ -1107,8 +1096,6 @@ final class Legion implements Comparable
             newLegion.addCreature(creature);
         }
 
-        game.getServer().allAddMarker(newMarkerId);
-
         player.addLegion(newLegion);
 
         game.getServer().allUpdateStatusScreen();
@@ -1118,6 +1105,8 @@ final class Legion implements Comparable
 
         sortCritters();
         newLegion.sortCritters();
+
+        game.getServer().allAddMarker(newMarkerId);
 
         return newLegion;
     }

@@ -86,7 +86,7 @@ public class SimpleAI implements AI
                         // Just take the first one.
                         Creature recruiter = (Creature)recruiters.get(0);
                         game.doRecruit(legion, recruit, recruiter);
-                        game.getServer().didMuster(legion);
+                        game.getServer().didRecruit(legion);
                     }
                 }
             }
@@ -813,6 +813,9 @@ public class SimpleAI implements AI
                     if (game.doMove(legion.getMarkerId(), bestHex.getLabel()))
                     {
                         moved = true;
+                        game.getServer().allTellDidMove(legion.getMarkerId(),
+                            legion.getStartingHexLabel(), 
+                            legion.getCurrentHexLabel());
                         // Break out of the move loop and start over with
                         // the highest-priority unmoved legion.
                         break;

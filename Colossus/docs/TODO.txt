@@ -1,5 +1,8 @@
-Document build and test procedures.  Copy all docs to web page from
-   inst target.
+Document test procedures.  
+
+Add some JUnit tests.
+
+Copy all docs to web page from inst target.
 
 Put web page under CVS.
 
@@ -26,11 +29,8 @@ Move code to center a dialog on screen to one place.  Maybe add a
 
 Change StatusScreen to use a JTable.
 
-Maybe add NullMap and NullBoard instances for AI clients, to reduce
-    the number of null checks.
-
-Cache known legion contents in Client.
 Cache hex location of each legion in Client.
+Cache known legion contents in Client.
 Both require sending events to all clients when a legion is formed
     (game start or load), splits/joins, moves/unmoves, recruits/unrecruits, 
     reinforces, acquires, summons, dies (flees/concedes/negotiates/battles), 
@@ -108,3 +108,28 @@ Chat window.
 
 Add movement and recruit animation.  Requires returning full paths for
    moves, not just destination hex.
+
+Bug: Can't change player options during battle when attacked by another
+     player, only during own turn.
+Bug: AI player rolls 6 on turn 1, fails several teleport moves, takes normal
+     move.  Not passing teleport=true to Game.doMove() ? 
+Bug: Angel acquiring is broken.  Default variant.
+     dripton's turn, number 7
+     2 creatures are split off from legion Rd01 (Cross) into new legion Br01 (Antlers)
+     2 creatures are split off from legion Rd02 (Eagle) into new legion Br02 (Bell)
+     Phase advances to Move
+     dripton rolls a 1 for movement
+     Legion Rd01 (Cross) in 115 moves to Tower hex 300 entering on Bottom
+     Legion Rd04 (Gong) in 118 moves to Marsh hex 117 entering on Left
+     Legion Rd03 (Fist) in 113 moves to Marsh hex 112 entering on Right
+     Legion Rd02 (Eagle) in 108 moves to Tower hex 200 entering on Bottom
+     Phase advances to Fight
+     in kickEngagements() summoning=false reinforcing=false acquiring=false
+     Legion Bk04 (Feather) flees from legion Rd01 (Cross)
+     Legion Bk04 (Feather) [Gargoyle, Gargoyle] is eliminated
+     dripton earns 12.0 points
+     in kickEngagements() summoning=false reinforcing=false acquiring=false
+     Phase advances to Muster
+     Legion Rd01 (Cross) in Tower hex 300 recruits Warlock with 1 Titan
+     Legion Rd03 (Fist) in Marsh hex 112 recruits Troll with 2 Ogres
+     Legion Rd02 (Eagle) in Tower hex 200 recruits Centaur with 1 Angel

@@ -1357,7 +1357,8 @@ Log.debug("called Battle.applyCarries() for " + target.getDescription());
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
         }
-        server.allTellCarryResults(dealt, carryDamage, getCarryTargets());
+        server.allTellCarryResults(target, dealt, carryDamage, 
+            getCarryTargets());
     }
 
 

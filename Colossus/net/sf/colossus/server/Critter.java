@@ -179,8 +179,6 @@ final class Critter extends Creature implements Comparable
     void setHits(int hits)
     {
         this.hits = hits;
-        // TODO remove
-        battle.getGame().getServer().allSetBattleChitHits(tag, hits);
     }
 
 
@@ -204,7 +202,7 @@ final class Critter extends Creature implements Comparable
 
         if (damage > 0)
         {
-            setHits(hits + damage);
+            hits = hits + damage;
             if (hits > getPower())
             {
                 excess = hits - getPower();
@@ -840,7 +838,7 @@ Log.debug("new penalty option: " + po.toString());
 
         if (game != null)
         {
-            game.getServer().allTellStrikeResults(this, target, 
+            game.getServer().allTellStrikeResults(this, target,
                 strikeNumber, rolls, damage, carryDamage,
                 battle.getCarryTargetDescriptions());
         }
@@ -857,8 +855,6 @@ Log.debug("new penalty option: " + po.toString());
         if (dead)
         {
             hits = getPower();
-            // XXX Remove
-            battle.getGame().getServer().allSetBattleChitDead(tag);
         }
     }
 

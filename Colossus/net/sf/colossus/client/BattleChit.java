@@ -46,6 +46,15 @@ final class BattleChit extends Chit
         repaint();
     }
 
+    void setDead(boolean dead)
+    {
+        super.setDead(dead);
+        if (dead)
+        {
+            setHits(0);
+        }
+    }
+
 
     public void paintComponent(Graphics g)
     {

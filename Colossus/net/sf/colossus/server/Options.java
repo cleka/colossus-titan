@@ -26,7 +26,6 @@ public final class Options
     public static final String autosave = "Autosave";
     public static final String logDebug = "Log debug messages";
     public static final String allStacksVisible = "All stacks visible";
-    public static final String debugMulligans = "Debug mulligans";
     public static final String aiDelay = "AI delay";
 
     // Display options (client)

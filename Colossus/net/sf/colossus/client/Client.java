@@ -65,7 +65,10 @@ public final class Client
     private Properties options = new Properties();
 
     /** Player who owns this client. */
-    String playerName;
+    private String playerName;
+
+    /** Marker color of player who owns this client. */
+    private String color;
 
     /** Last movement roll for any player. */
     private int movementRoll = -1;
@@ -78,6 +81,11 @@ public final class Client
     /** Gradually moving AI to client side. */
     private AI ai = new SimpleAI();
 
+    private Set possibleRecruitHexes;
+
+    /** Map of markerId to hexLabel */
+    private Map legionToHex = new HashMap();
+
 
     public Client(Server server, String playerName)
     {
@@ -86,12 +94,12 @@ public final class Client
     }
 
 
-    /** Take a mulligan. Returns the roll, or -1 on error. */
-    int mulligan()
+    /** Take a mulligan. */
+    void mulligan()
     {
         clearUndoStack();
         clearRecruitChits();
-        return server.mulligan(playerName);
+        server.mulligan(playerName);
     }
 
 
@@ -123,8 +131,21 @@ public final class Client
         summonAngel = null;
         // TODO Make this consistent.
         board.highlightEngagements();
-        // XXX Repaint just the two legions' hexes.
-        board.repaint();
+
+        repaintHexByMarkerId(summoner);
+        repaintHexByMarkerId(donor);
+    }
+
+
+    private void repaintHexByMarkerId(String markerId)
+    {
+        if (board == null)
+        {
+            return;
+        }
+        String hexLabel = getHexForLegion(markerId);
+        GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+        hex.repaint();
     }
 
 
@@ -342,7 +363,7 @@ public final class Client
 
     /** Load player options from a file. The current format is standard
      *  java.util.Properties keyword=value */
-    public void loadOptions()
+    private void loadOptions()
     {
         final String optionsFile = Options.optionsPath + Options.optionsSep +
             playerName + Options.optionsExtension;
@@ -565,22 +586,30 @@ Log.debug("Client.makeForcedStrikes()");
      *  in the list, remove the earlier entry. */
     void setMarker(String id, Marker marker)
     {
-        removeMarker(id);
+        markers.remove(marker);
         markers.add(marker);
     }
 
-    // TODO Rename, align legions in this hex.
-    /** Remove the first marker with this id from the list. Return
-     *  the removed marker. */
+    /** Remove the first marker with this id from the list. */
     public void removeMarker(String id)
     {
+Log.debug("called Client.removeMarker() for " + id);
         Iterator it = markers.iterator();
         while (it.hasNext())
         {
             Marker marker = (Marker)it.next();
-            if (marker.getId() == id)
+            if (marker.getId().equals(id))
             {
+                // Ordering of deleting stuff is tricky.  Test.
+                String hexLabel = getHexForLegion(id);
                 it.remove();
+                legionToHex.remove(id);
+Log.debug("removed marker from iterator and legionToHex");
+                if (board != null)
+                {
+                    board.alignLegions(hexLabel);
+Log.debug("called board.alignLegions() for " + hexLabel);
+                }
                 return;
             }
         }
@@ -647,7 +676,7 @@ Log.debug("Client.makeForcedStrikes()");
 
     java.util.List getRecruitChits()
     {
-        return recruitChits;
+        return Collections.unmodifiableList(recruitChits);
     }
 
     void addRecruitChit(String imageName, String hexLabel)
@@ -664,9 +693,26 @@ Log.debug("Client.makeForcedStrikes()");
         recruitChits.add(chit);
     }
 
+    void removeRecruitChit(String hexLabel)
+    {
+        Iterator it = recruitChits.iterator();
+        while (it.hasNext())
+        {
+            Chit chit = (Chit)it.next();
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            if (hex.contains(chit.getCenter()))
+            {
+                it.remove();
+                return;
+            }
+        }
+    }
+
     void clearRecruitChits()
     {
         recruitChits.clear();
+        // TODO Only repaint the hexes that had recruitChits.
+        board.repaint();
     }
 
 
@@ -724,6 +770,10 @@ Log.debug("Client.makeForcedStrikes()");
             board = new MasterBoard(this);
             board.requestFocus();
         }
+
+        // Waiting until the board is loaded to load options makes
+        // it easier to sync the option checkboxes.
+        loadOptions();
     }
 
 
@@ -770,7 +820,8 @@ Log.debug("Client.makeForcedStrikes()");
     {
         return server.donorHas(playerName, name);
     }
-    
+
+
     public void askAcquireAngel(String markerId, java.util.List recruits)
     {
         if (getOption(Options.autoAcquireAngels))
@@ -973,7 +1024,7 @@ Log.debug("Client.makeForcedStrikes()");
 
     public void tellStrikeResults(String strikerDesc, int strikerTag,
         String targetDesc, int targetTag, int strikeNumber, int [] rolls, 
-        int damage, boolean wasCarry, int carryDamageLeft, 
+        int damage, boolean killed, boolean wasCarry, int carryDamageLeft,
         Set carryTargetDescriptions)
     {
         if (battleDice != null)
@@ -997,9 +1048,26 @@ Log.debug("Client.makeForcedStrikes()");
         {
             // TODO Reduce round trips by doing this on the server.
             makeForcedStrikes();
+
             if (map != null)
             {
                 map.highlightCrittersWithTargets();
+            }
+        }
+
+        BattleChit targetChit = getBattleChit(targetTag);
+        if (targetChit != null)
+        {
+            if (killed)
+            {
+                targetChit.setDead(true);
+            }
+            else
+            {
+                if (damage > 0)
+                {
+                    targetChit.setHits(targetChit.getHits() + damage);
+                }
             }
         }
     }
@@ -1038,7 +1106,7 @@ Log.debug("new PickCarry");
     }
 
     // TODO Handle this from tellStrikeResults()
-    public void setBattleChitDead(int tag)
+    void setBattleChitDead(int tag)
     {
         Iterator it = battleChits.iterator();
         while (it.hasNext())
@@ -1053,7 +1121,7 @@ Log.debug("new PickCarry");
     }
 
     // TODO Handle this from tellStrikeResults()
-    public void setBattleChitHits(int tag, int hits)
+    void setBattleChitHits(int tag, int hits)
     {
         Iterator it = battleChits.iterator();
         while (it.hasNext())
@@ -1095,8 +1163,8 @@ Log.debug("new PickCarry");
             battleDice = new BattleDice();
             frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
             frame.pack();
-            map.requestFocus();
             frame.setVisible(true);
+            map.requestFocus();
             map.getFrame().toFront();
         }
     }
@@ -1140,14 +1208,14 @@ Log.debug("new PickCarry");
     }
 
     /** Currently used for human players only. */
-    public void doMuster(String markerId)
+    void doRecruit(String markerId)
     {
+        // TODO Cache this on client
         if (!server.canRecruit(markerId))
         {
             return;
         }
-        // TODO Cache this on the client side.
-        String hexLabel = server.getHexForLegion(markerId);
+        String hexLabel = getHexForLegion(markerId);
 
         java.util.List recruits = server.findEligibleRecruits(markerId, 
             hexLabel);
@@ -1170,17 +1238,16 @@ Log.debug("new PickCarry");
             return;
         }
 
-        server.doMuster(markerId, recruitName, recruiterName);
+        server.doRecruit(markerId, recruitName, recruiterName);
     }
 
     /** Currently used for human players only.  Always needs to call
-     *  server.doMuster(), even if no recruit is wanted, to get past
+     *  server.doRecruit(), even if no recruit is wanted, to get past
      *  the reinforcing phase. */
     public void doReinforce(String markerId)
     {
 Log.debug("Called Client.reinforce for " + markerId);
-        // TODO Cache this on the client side.
-        String hexLabel = server.getHexForLegion(markerId);
+        String hexLabel = getHexForLegion(markerId);
 
         java.util.List recruits = server.findEligibleRecruits(markerId, 
             hexLabel);
@@ -1198,21 +1265,36 @@ Log.debug("Called Client.reinforce for " + markerId);
                 imageNames, hexDescription);
         }
 
-        server.doMuster(markerId, recruitName, recruiterName);
+        server.doRecruit(markerId, recruitName, recruiterName);
     }
 
-    // TODO Remember remaining recruiting hexes.
-    public void didMuster(String markerId)
+    public void didRecruit(String markerId, String recruitName)
     {
+        String hexLabel = getHexForLegion(markerId);
+        possibleRecruitHexes.remove(hexLabel);
         if (isMyLegion(markerId))
         {
             pushUndoStack(markerId);
         }
         if (board != null)
         {
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            addRecruitChit(recruitName, hexLabel);
+            hex.repaint();
             board.highlightPossibleRecruits();
-            // TODO Repaint only markerId's hex.
-            board.repaint();
+        }
+    }
+
+    public void undidRecruit(String markerId)
+    {
+        String hexLabel = getHexForLegion(markerId);
+        possibleRecruitHexes.add(hexLabel);
+        if (board != null)
+        {
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            removeRecruitChit(hexLabel);
+            hex.repaint();
+            board.highlightPossibleRecruits();
         }
     }
 
@@ -1247,11 +1329,11 @@ Log.debug("Called Client.reinforce for " + markerId);
         return recruiterName;
     }
 
-
-    public void setupSplitMenu()
+    // TODO Update markersAvailable more often.
+    public void setupSplitMenu(Set markersAvailable)
     {
-        // XXX Should track this better.
-        initMarkersAvailable();
+        this.markersAvailable = new TreeSet();
+        this.markersAvailable.addAll(markersAvailable);
 
         numSplitsThisTurn = 0;
 
@@ -1277,8 +1359,10 @@ Log.debug("Called Client.reinforce for " + markerId);
         }
     }
 
-    public void setupMusterMenu()
+    public void setupMusterMenu(Set possibleRecruitHexes)
     {
+        this.possibleRecruitHexes = new HashSet(possibleRecruitHexes);
+
         if (board != null)
         {
             board.setupMusterMenu();
@@ -1286,6 +1370,7 @@ Log.debug("Called Client.reinforce for " + markerId);
     }
 
 
+    // Temp  Should be handled on client side.
     public void alignLegions(Set hexLabels)
     {
         if (board != null)
@@ -1344,46 +1429,32 @@ Log.debug("Called Client.reinforce for " + markerId);
     }
 
 
-    // TODO This should happen based on notification of a split.
     /** Create a new marker and add it to the end of the list. */
-    public void addMarker(String markerId)
+    public void addMarker(String markerId, String hexLabel)
     {
         if (board != null)
         {
             Marker marker = new Marker(3 * Scale.get(), markerId,
                 board.getFrame(), this);
             setMarker(markerId, marker);
+
+            legionToHex.put(markerId, hexLabel);
+            board.alignLegions(hexLabel);
         }
     }
 
-    /** Create new markers for all passed legions ids. */
-    public void addMarkers(Collection markerIds)
-    {
-        if (board != null)
-        {
-            Iterator it = markerIds.iterator();
-            while (it.hasNext())
-            {
-                String markerId = (String)it.next();
-                addMarker(markerId);
-            }
-            board.alignAllLegions();
-            board.getFrame().setVisible(true);
-            board.repaint();
-        }
-    }
-
+    // XXX Test rescales.  A bugfix and a redesign collided.
     /** Create new markers in response to a rescale. */
     void recreateMarkers()
     {
-        java.util.List oldId = new ArrayList();
         Iterator it = markers.iterator();
         while (it.hasNext())
         {
-            oldId.add(((Marker)it.next()).getId());
+            Marker marker = (Marker)it.next();
+            String markerId = marker.getId();
+            String hexLabel = (String)legionToHex.get(markerId);
+            addMarker(markerId, hexLabel);
         }
-        markers.clear();
-        addMarkers(oldId);
     }
 
     private void setupPlayerLabel()
@@ -1396,7 +1467,7 @@ Log.debug("Called Client.reinforce for " + markerId);
 
     String getColor()
     {
-        return server.getPlayerColor(playerName);
+        return color;
     }
 
     String getShortColor()
@@ -1595,11 +1666,32 @@ Log.debug("Client.getCarryTargets()");
             entrySide.equals(Constants.right)));
     }
 
-    public void didMove(String markerId)
+    public void didMove(String markerId, String startingHexLabel,
+        String currentHexLabel)
     {
+        removeRecruitChit(startingHexLabel);
         if (isMyLegion(markerId))
         {
             pushUndoStack(markerId);
+        }
+        legionToHex.put(markerId, currentHexLabel);
+        if (board != null)
+        {
+            board.alignLegions(startingHexLabel);
+            board.alignLegions(currentHexLabel);
+        }
+    }
+
+    public void undidMove(String markerId, String formerHexLabel,
+        String currentHexLabel)
+    {
+        removeRecruitChit(formerHexLabel);
+        removeRecruitChit(currentHexLabel);
+        legionToHex.put(markerId, currentHexLabel);
+        if (board != null)
+        {
+            board.alignLegions(formerHexLabel);
+            board.alignLegions(currentHexLabel);
         }
     }
 
@@ -1610,9 +1702,9 @@ Log.debug("Client.getCarryTargets()");
     }
 
     /** Return a set of hexLabels. */
-    Set findAllEligibleRecruitHexes()
+    Set getPossibleRecruitHexes()
     {
-        return server.findAllEligibleRecruitHexes();
+        return Collections.unmodifiableSet(possibleRecruitHexes);
     }
 
     /** Return a set of hexLabels. */
@@ -1643,10 +1735,19 @@ Log.debug("Client.getCarryTargets()");
         return server.getCreatureCount(creatureName);
     }
 
-    // TODO cache this
-    java.util.List getLegionMarkerIds(String hexLabel)
+    java.util.List getLegionsByHex(String hexLabel)
     {
-        return server.getLegionMarkerIds(hexLabel);
+        java.util.List markerIds = new ArrayList();
+        Iterator it = legionToHex.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Map.Entry entry = (Map.Entry)it.next();
+            if (hexLabel.equals((String)entry.getValue()))
+            {
+                markerIds.add((String)entry.getKey());
+            }
+        }
+        return markerIds;
     }
 
     Set findAllUnmovedLegionHexes()
@@ -1654,6 +1755,7 @@ Log.debug("Client.getCarryTargets()");
         return server.findAllUnmovedLegionHexes();
     }
 
+    // TODO Cache legion heights.
     Set findTallLegionHexes()
     {
         return server.findTallLegionHexes();
@@ -1691,6 +1793,7 @@ Log.debug("Client.getCarryTargets()");
         return server.getLongMarkerName(markerId);
     }
 
+    // TODO Cache this on client. */
     /** Return a list of Strings. */
     java.util.List getLegionImageNames(String markerId)
     {
@@ -1703,6 +1806,7 @@ Log.debug("Client.getCarryTargets()");
         {
             String splitoffId = (String)popUndoStack();
             server.undoSplit(playerName, splitoffId);
+            markersAvailable.add(splitoffId);
             numSplitsThisTurn--;
         }
     }
@@ -1716,14 +1820,26 @@ Log.debug("Client.getCarryTargets()");
         }
     }
 
+    public void undidSplit(String splitoffId)
+    {
+        String hexLabel = getHexForLegion(splitoffId);
+        legionToHex.remove(splitoffId);
+        if (board != null)
+        {
+            board.alignLegions(hexLabel);
+        }
+    }
+
     void undoLastRecruit()
     {
         if (!isUndoStackEmpty())
         {
             String markerId = (String)popUndoStack();
             server.undoRecruit(playerName, markerId);
-            // XXX Repaint just markerId's hex
-            board.repaint();
+            String hexLabel = getHexForLegion(markerId);
+            GUIMasterHex hex = board.getGUIHexByLabel(hexLabel);
+            hex.repaint();
+            possibleRecruitHexes.add(hexLabel);
         }
     }
 
@@ -1764,6 +1880,7 @@ Log.debug("Client.getCarryTargets()");
             return;
         }
         clearUndoStack();
+        clearRecruitChits();
     }
 
     void doneWithMoves()
@@ -1824,14 +1941,6 @@ Log.debug("Client.getCarryTargets()");
         return server.getMulligansLeft(playerName);
     }
 
-    // XXX Stringify
-    /** Initialize this player's available legion markers from the server. */
-    void initMarkersAvailable()
-    {
-        markersAvailable = new TreeSet(
-            MarkerComparator.getMarkerComparator(getShortColor()));
-        markersAvailable.addAll(server.getMarkersAvailable(playerName));
-    }
 
     // XXX markersAvailable needs to be up to date before this is called.
     void doSplit(String parentId)
@@ -1896,19 +2005,20 @@ Log.debug("Client.getCarryTargets()");
     }
 
     /** Callback from server after any successful split. */
-    public void didSplit(String childId)
+    public void didSplit(String childId, String hexLabel)
     {
         if (isMyLegion(childId))
         {
+            clearRecruitChits();
             pushUndoStack(childId);
             markersAvailable.remove(childId);
         }
         numSplitsThisTurn++;
 
+        legionToHex.put(childId, hexLabel);
         if (board != null)
         {
-            // XXX Align only the split hex.
-            board.alignAllLegions();
+            board.alignLegions(hexLabel);
             board.highlightTallLegions();
         }
     }
@@ -1939,7 +2049,14 @@ Log.debug("Client.getCarryTargets()");
         }
         while (color == null);
 
+        this.color = color;
+
         server.assignColor(playerName, color);
+    }
+
+    private String getHexForLegion(String markerId)
+    {
+        return (String)legionToHex.get(markerId);
     }
 }
 

@@ -174,6 +174,10 @@ class Chit extends JPanel
         return rect;
     }
 
+    public Point getCenter()
+    {
+        return new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
+    }
 
     public Dimension getPreferredSize()
     {
