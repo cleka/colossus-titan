@@ -4,7 +4,7 @@
 # Make sure to save this file in Unix rather than DOS endline format, so that
 #    it will continue to work portably.
 
-# compiler
+# Compiler
 
 JCC = jikes -g -depend +P
 #JCC = javac -J-Djavac.pipe.output=true -g -deprecation -Xdepend
@@ -14,21 +14,21 @@ JCC = jikes -g -depend +P
 
 all: classes
 
-
-# New rule for Java
-.SUFFIXES:
-.SUFFIXES: .java .class
+.PHONY : all classes jar clean dist
 
 
-# Compile command
-.java.class:
+# New implicit rule for Java
+%.class : %.java
 	$(JCC) $<
 
 
 # Find target files
 
-FILES = $(wildcard *.java)
-classes: $(FILES:.java=.class)
+sources = $(wildcard *.java)
+
+classes: $(sources:%.java=%.class)
+
+
 
 # Create jar file
 jar: classes
@@ -37,11 +37,9 @@ jar: classes
 
 # Clean up
 clean:
-	@@ echo 'rm -f *~ *.class core *.bak *.jar'
-	@@rm -f *~ *.class core *.bak *.jar
+	rm -f *~ *.class core *.bak *.jar
 
 # Make zip file
 dist:
-	@@ echo 'zip -pr Colossus.`date +%Y%m%d`.zip *'
-	@@zip -pr Colossus.`date +%Y%m%d`.zip *
+	zip -pr Colossus.`date +%Y%m%d`.zip *
 
