@@ -1,5 +1,3 @@
-Change booleanValue() logic to cleaner getBoolean() 
-
 Bug: Need another full repaint after loading game to show updated heights.
 Bug: Make colorized / powered titans work everywhere.
 

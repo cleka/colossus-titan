@@ -1069,7 +1069,7 @@ public final class Game
                 player.setScore(score);
 
                 buf = in.readLine();
-                player.setDead(Boolean.valueOf(buf).booleanValue());
+                player.setDead(Boolean.getBoolean(buf));
 
                 buf = in.readLine();
                 int mulligansLeft = Integer.parseInt(buf);
@@ -1095,10 +1095,10 @@ public final class Game
                 player.setMovementRoll(Integer.parseInt(buf));
 
                 buf = in.readLine();
-                player.setTeleported(Boolean.valueOf(buf).booleanValue());
+                player.setTeleported(Boolean.getBoolean(buf));
 
                 buf = in.readLine();
-                player.setSummoned(Boolean.valueOf(buf).booleanValue());
+                player.setSummoned(Boolean.getBoolean(buf));
 
                 buf = in.readLine();
                 int numLegions = Integer.parseInt(buf);
@@ -1138,7 +1138,7 @@ public final class Game
 
                 buf = in.readLine();
                 boolean driftDamageApplied =
-                    Boolean.valueOf(buf).booleanValue();
+                    Boolean.getBoolean(buf);
 
                 buf = in.readLine();
                 int numCarryTargets = Integer.parseInt(buf);
@@ -1212,7 +1212,7 @@ public final class Game
         String startingHexLabel = in.readLine();
 
         String buf = in.readLine();
-        boolean moved = Boolean.valueOf(buf).booleanValue();
+        boolean moved = Boolean.getBoolean(buf);
 
         buf = in.readLine();
         int entrySide = Integer.valueOf(buf).intValue();
@@ -1252,7 +1252,7 @@ public final class Game
                 critter.setStartingHexLabel(buf);
 
                 buf = in.readLine();
-                boolean struck = Boolean.valueOf(buf).booleanValue();
+                boolean struck = Boolean.getBoolean(buf);
                 critter.setStruck(struck);
             }
 

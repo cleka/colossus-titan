@@ -462,7 +462,7 @@ public final class Client
             String value = options.getProperty(name);
             if (value.equals("true") || value.equals("false"))
             {
-                setOption(name, Boolean.valueOf(value).booleanValue());
+                setOption(name, Boolean.getBoolean(value));
             }
         }
     }
