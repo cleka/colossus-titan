@@ -16,7 +16,6 @@ final class Marker extends Chit
     private Font oldFont;
     private int fontHeight;
     private int fontWidth;
-    private Client client;
 
 
     Marker(int scale, String id, Container container, Client client)

@@ -61,6 +61,8 @@ public final class Options
     public static final String noBaseColor = "Use black overlay on Chits";
     public static final String useColoredBorders = 
         "Use colored borders on Battle Chits";
+    public static final String doNotInvertDefender = 
+        "Do not invert defender's Battle Chits";
     public static final String showAllRecruitChits = "Show all recruit Chits";
     public static final String antialias = "Antialias";
     public static final String scale = "Scale";

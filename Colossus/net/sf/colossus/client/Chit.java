@@ -10,6 +10,7 @@ import java.awt.image.*;
 import java.net.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.Log;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.VariantSupport;
 
@@ -27,6 +28,8 @@ class Chit extends JPanel
     private ImageIcon invertedIcon;
     Rectangle rect;
     private Container container;
+    Client client;  // may be null; set for some subclasses
+
 
     /** Flag to mark chit as dead and paint it with an "X" through it. */
     private boolean dead;
@@ -202,7 +205,8 @@ class Chit extends JPanel
         super.paintComponent(g2);
         Image image = icon.getImage();
 
-        if (inverted)
+        if (inverted && 
+            (client == null || !client.getOption(Options.doNotInvertDefender)))
         {
             if (invertedIcon == null)
             {

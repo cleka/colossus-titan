@@ -40,13 +40,14 @@ final class BattleChit extends Chit
     private static boolean useColoredBorders = false;
 
     BattleChit(int scale, String id, Container container, boolean inverted,
-        int tag, String currentHexLabel, String colorName)
+        int tag, String currentHexLabel, String colorName, Client client)
     {
         super(scale, id, container, inverted);
         this.scale = scale;
         this.tag = tag;
         this.currentHexLabel = currentHexLabel;
         this.colorName = colorName;
+        this.client = client;
         color = HTMLColor.stringToColor(colorName + "Colossus");
         setBackground(Color.white);
     }
