@@ -104,6 +104,9 @@ public final class MasterBoard extends JPanel
 
     private AbstractAction aboutAction;
 
+    /* a Set of label (String) of all Tower hex */
+    private static Set towerSet;
+
     /*
     static
     {
@@ -639,6 +642,8 @@ public final class MasterBoard extends JPanel
             setupHexesGameState(false);
         setupHexesGameState(true);
         setupHexesGUI();
+        if (towerSet == null) /* if static Set not yet defined */
+            setupTowerSet();
     }
 
     private void setupHexesGUI()
@@ -1883,5 +1888,23 @@ public final class MasterBoard extends JPanel
         masterFrame.setVisible(false);
         masterFrame.setEnabled(false);
         masterFrame.dispose();
+    }
+
+
+    public static Set getTowerSet()
+    {
+        return Collections.unmodifiableSet(towerSet);
+    }
+
+    private static void setupTowerSet()
+    {
+        towerSet = new HashSet();
+        Iterator it = plainHexes.iterator();
+        while (it.hasNext())
+        {
+            Hex bh = (Hex)it.next();
+            if (bh.getTerrain() == 't')
+                towerSet.add(bh.getLabel());
+        }
     }
 }

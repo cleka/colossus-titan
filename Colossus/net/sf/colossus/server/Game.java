@@ -1822,12 +1822,11 @@ public final class Game
                 Constants.NOWHERE, ignoreFriends));
 
             // Mark every unoccupied tower.
-            // only 9 towers are allowed, numbered from 100 to 900
-            // by increment of 100. Label '1000' is on the
-            // inner circle.
-            for (int tower = 100; tower <= 900; tower += 100)
+            Set towerSet = MasterBoard.getTowerSet();
+            Iterator it = towerSet.iterator();
+            while (it.hasNext())
             {
-                String hexLabel = String.valueOf(tower);
+                String hexLabel = (String)it.next();
                 if (MasterBoard.getHexByLabel(hexLabel) != null)
                 {
                     if (!isOccupied(hexLabel) || ignoreFriends)  // XXX bug?
