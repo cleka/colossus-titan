@@ -217,6 +217,9 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
                 // Select that marker.
                 legion.addCreature(recruits[i]);
 
+                // Mark the angel as visible.
+                legion.revealCreatures(recruits[i], 1);
+
                 // Then exit.
                 cleanup();
                 return;
