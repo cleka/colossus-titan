@@ -191,7 +191,7 @@ class Node:
             return True
         else:
             return (self.child1.allCertain() and self.child2.allCertain()
-              and self.child2.allDescendentsCertain() 
+              and self.child1.allDescendentsCertain() 
               and self.child2.allDescendentsCertain())
 
     def getAtSplitOrRemovedCreatures(self):

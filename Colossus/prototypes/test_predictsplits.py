@@ -972,7 +972,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gd12").revealCreatures(['Cyclops', 'Cyclops'])
         ps.getLeaf("Gd12").addCreature("Gorgon")
         assert(ps.getLeaf("Gd03").allCertain())
-        assert(not ps.getLeaf("Gd04").allCertain())
+        assert(ps.getLeaf("Gd04").allCertain())
         assert(not ps.getLeaf("Gd07").allCertain())
         assert(not ps.getLeaf("Gd07").allCertain())
         assert(not ps.getLeaf("Gd09").allCertain())
