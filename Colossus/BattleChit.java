@@ -216,7 +216,8 @@ class BattleChit extends Chit
 
             if (currentHex.getElevation() > targetHex.getElevation())
             {
-                int direction = map.getDirection(currentHex, targetHex);
+                // Adjacent hex, so only one possible direction.
+                int direction = map.getDirection(currentHex, targetHex, false);
                 char hexside = currentHex.getHexside(direction);
                 // Native striking down a dune hexside: +2
                 if (hexside == 'd' && creature.isNativeSandDune())
@@ -231,7 +232,8 @@ class BattleChit extends Chit
             }
             else if (targetHex.getElevation() > currentHex.getElevation())
             {
-                int direction = map.getDirection(targetHex, currentHex);
+                // Adjacent hex, so only one possible direction.
+                int direction = map.getDirection(targetHex, currentHex, false);
                 char hexside = targetHex.getHexside(direction);
                 // Non-native striking up a dune hexside: -1
                 if (hexside == 'd' && !creature.isNativeSandDune())
@@ -260,7 +262,8 @@ class BattleChit extends Chit
         
             if (currentHex.getElevation() > targetHex.getElevation())
             {
-                int direction = map.getDirection(currentHex, targetHex);
+                // Adjacent hex, so only one possible direction.
+                int direction = map.getDirection(currentHex, targetHex, false);
                 char hexside = currentHex.getHexside(direction);
                 // Striking down across wall: +1
                 if (hexside == 'w') 
@@ -270,7 +273,8 @@ class BattleChit extends Chit
             }
             else if (currentHex.getElevation() < targetHex.getElevation())
             {
-                int direction = map.getDirection(targetHex, currentHex);
+                // Adjacent hex, so only one possible direction.
+                int direction = map.getDirection(targetHex, currentHex, false);
                 char hexside = targetHex.getHexside(direction);
                 // Non-native striking up slope: -1
                 // Striking up across wall: -1
@@ -284,11 +288,16 @@ class BattleChit extends Chit
         }
         else if (creature != Creature.warlock)
         {
+            // Range penalty
+            if (map.getRange(currentHex, targetHex) == 4)
+            {
+                attackerSkill--;
+            }
+
             // Non-native rangestrikes: -1 per intervening bramble hex
             if (!creature.isNativeBramble())
             {
-                attackerSkill -= map.countInterveningBrambleHexes(currentHex,
-                    targetHex);
+                attackerSkill -= map.countBrambleHexes(currentHex, targetHex);
             }
 
             // Rangestrike up across wall: -1 per wall
