@@ -74,4 +74,30 @@ public class MultiSet
         Integer val = (Integer)map.get(key);
         return val.intValue();
     }
+
+    public Collection keySet()
+    {
+        return map.keySet();
+    }
+
+    public Collection values()
+    {
+        return map.values();
+    }
+
+    public boolean isEmpty()
+    {
+        return map.isEmpty();
+    }
+
+    public int max()
+    {
+        if (isEmpty())
+        {
+            return 0;
+        }
+        SortedSet sorted = new TreeSet(values());
+        Integer val = (Integer)sorted.last();
+        return val.intValue();
+    }
 }
