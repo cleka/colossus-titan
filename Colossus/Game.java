@@ -12,7 +12,7 @@ class Game extends Frame implements WindowListener, ActionListener
 {
     int numPlayers;
     Player [] player;
-    MasterBoard masterboard;
+    private MasterBoard board;
     int activePlayer = 0;
     int turnNumber = 1;
 
@@ -165,7 +165,7 @@ class Game extends Frame implements WindowListener, ActionListener
                 if (player[j].startingTower == i)
                 {
                     add(new Label(String.valueOf(100 * i)));
-                    add(new Label(player[j].name));
+                    add(new Label(player[j].getName()));
                     colorLabel[j] = new Label("");
                     add(colorLabel[j]);
                 }
@@ -298,9 +298,9 @@ class Game extends Frame implements WindowListener, ActionListener
         {
             activeLabel[i] = new Label(" ");
             add(activeLabel[i]);
-            add(new Label(player[i].name));
+            add(new Label(player[i].getName()));
             add(new Label(String.valueOf(100 * player[i].startingTower)));
-            add(new Label(player[i].color));
+            add(new Label(player[i].getColor()));
             elimLabel[i] = new Label("");
             add(elimLabel[i]); 
             legionsLabel[i] = new Label("");
@@ -320,7 +320,7 @@ class Game extends Frame implements WindowListener, ActionListener
 
         setVisible(true);
 
-        masterboard = new MasterBoard(this);
+        board = new MasterBoard(this);
     }
 
 
@@ -384,6 +384,27 @@ class Game extends Frame implements WindowListener, ActionListener
     }
 
 
+    public Player getActivePlayer()
+    {
+        return player[activePlayer];
+    }
+
+
+    void advancePhase()
+    {
+        phase++;
+    }
+
+
+    void advanceTurn()
+    {
+        activePlayer++;
+        activePlayer %= numPlayers;
+        turnNumber++;
+        phase = SPLIT;
+    }
+
+
     public void windowActivated(WindowEvent event)
     {
     }
@@ -432,7 +453,7 @@ class Game extends Frame implements WindowListener, ActionListener
             // Make sure all colors are assigned before continuing.
             for (int i = 0; i < numPlayers; i++)
             {
-                if (player[i].color == null) 
+                if (player[i].getColor() == null)
                 {
                     return;
                 }
