@@ -51,6 +51,7 @@ public final class Game
     public static final String sAutoPickRecruiter = "Autopick recruiter";
     public static final String sAutoPickMarker = "Autopick marker";
     public static final String sAutoPickEntrySide = "Autopick entry side";
+    public static final String sAutoForcedStrike = "Auto forced strike";
     public static final String sShowStatusScreen = "Show game status";
     public static final String sShowDice = "Show dice";
     public static final String sAntialias = "Antialias";
@@ -64,6 +65,7 @@ public final class Game
     private static boolean autoPickRecruiter;
     private static boolean autoPickMarker;
     private static boolean autoPickEntrySide;
+    private static boolean autoForcedStrike;
     private static boolean showDice = true;
     private static boolean showStatusScreen = true;
     private static boolean antialias = false;
@@ -429,6 +431,18 @@ public final class Game
     public void setAutoPickEntrySide(boolean autoPickEntrySide)
     {
         this.autoPickEntrySide = autoPickEntrySide;
+    }
+
+
+    public boolean getAutoForcedStrike()
+    {
+        return autoForcedStrike;
+    }
+
+
+    public void setAutoForcedStrike(boolean autoForcedStrike)
+    {
+        this.autoForcedStrike = autoForcedStrike;
     }
 
 
@@ -1252,6 +1266,8 @@ public final class Game
             autoPickMarker));
         options.setProperty(sAutoPickEntrySide, String.valueOf(
             autoPickEntrySide));
+        options.setProperty(sAutoForcedStrike, String.valueOf(
+            autoForcedStrike));
         options.setProperty(sShowDice, String.valueOf(showDice));
         options.setProperty(sShowStatusScreen, String.valueOf(
             showStatusScreen));
@@ -1295,6 +1311,8 @@ public final class Game
             "false").equals( "true"));
         autoPickEntrySide = (options.getProperty(sAutoPickEntrySide,
             "false").equals( "true"));
+        autoForcedStrike = (options.getProperty(sAutoForcedStrike,
+            "false").equals( "true"));
         showDice = (options.getProperty(sShowDice, "true").equals("true"));
         showStatusScreen = (options.getProperty(sShowStatusScreen,
             "true").equals("true"));
@@ -1307,6 +1325,7 @@ public final class Game
         board.twiddleAutoPickRecruiter(autoPickRecruiter);
         board.twiddleAutoPickMarker(autoPickMarker);
         board.twiddleAutoPickEntrySide(autoPickEntrySide);
+        board.twiddleAutoForcedStrike(autoForcedStrike);
         board.twiddleShowStatusScreen(showStatusScreen);
         board.twiddleShowDice(showDice);
         board.twiddleAntialias(antialias);

@@ -1,8 +1,8 @@
 Suspected Java bugs:
 
 Linux, Sun 1.2.2/1.3beta/1.3betarefresh, Blackdown 1.2.2RC4:
-   BattleDice and ShowLegion dialogs sometimes appear in the upper 
-   left corner of the screen, instead of in the correct location. 
+   BattleDice and ShowLegion dialogs sometimes appear in the upper
+   left corner of the screen, instead of in the correct location.
    Seems to be fixed in Solaris and Linux 1.3 final.
 
 Win98, jdk1.3: setLocation() to keep ShowLegion, ShowMasterHex
@@ -11,7 +11,7 @@ Win98, jdk1.3: setLocation() to keep ShowLegion, ShowMasterHex
    resolution is changed while the application is running.  Works
    fine on other jdks, Solaris, Linux.
 
-Solaris, jdk1.3; Linux, Blackdown jdk1.3: JPopupMenu mnemonics don't 
+Solaris, jdk1.3; Linux, Blackdown jdk1.3: JPopupMenu mnemonics don't
    work.  They work okay in Win98 jdk1.3.
 
 Win98, jdk1.3: Popup menus are not erased properly.  They erase fine
@@ -42,17 +42,27 @@ Split.  Left click on small stack.  Right click on large stack.  Click
 --latest finds savegames with non-numeric filenames, and always uses
    them in preference to those with normal numeric filenames.
 
-All creatures are invisible after loading a game.
+All creatures are invisible after loading a game.  Is
+   Player.resetTurnState() being called inappropriately?
 
-Defender dies.  Battle phase advances to Move.  
+Defender dies.  Battle phase advances to Move.
    Battle phase advances to Fight.  Defender's battle turn, number X
 Attacking titan dies.  Attacker's battle turn, number X.
    Battle phase advances to Move.
 
-Post-battle angel summoning is messed up.  Usually hexes with eligible 
+Post-battle angel summoning is messed up.  Usually hexes with eligible
    donor legions are highlighted, but the SummonAngel dialog does not
-   appear unless the donor is clicked.  Once the donor highlighting
+   appear unless the donor is right-clicked.  Once the donor highlighting
    interfered with recruit highlighting, which was fixed with undo
-   all recruits.  Is the SummonAngel dialog showing up being the
+   all recruits.  Is the SummonAngel dialog showing up behind the
    MasterBoard?
+
+With auto forced strikes on, an opposing cyclops and lion sat adjacent
+   to each other, neither striking, and players were allowed to
+   advance past strike phases.
+With auto forced strikes on, the last defending creature was killed,
+   and the battle ended before it got a chance to strike back.
+With auto forced strikes on, a Titan moved next to an enemy
+   angel, but the strike phase was skipped.  The angel auto-struck
+   back.
 

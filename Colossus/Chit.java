@@ -34,9 +34,9 @@ public class Chit extends JPanel
     // JavaPureCheck's opinion and using a forward slash.
     // XXX Is there a way to detect whether a program is running from a
     // jar file?
-    public static final String pathSeparator = "/";
-    public static String imageDirName = "images";
-    public static final String imageExtension = ".gif";
+    private static final String pathSeparator = "/";
+    private static String imageDirName = "images";
+    private static final String imageExtension = ".gif";
     public static final String invertedPrefix = "i_";
 
     private static BasicStroke threeWide = new BasicStroke(3);

@@ -40,7 +40,9 @@ public final class Battle
     private int carryDamage;
     private boolean chitSelected;
     private ArrayList critters = new ArrayList();
-    private Critter lastCritterMoved;
+
+    /** Stack of critters moved, to allow multiple levels of undo. */
+    private LinkedList lastCrittersMoved = new LinkedList();
 
     private boolean attackerElim;
     private boolean defenderElim;
@@ -468,7 +470,7 @@ public final class Battle
 
     public void setLastCritterMoved(Critter critter)
     {
-        lastCritterMoved = critter;
+        lastCrittersMoved.addFirst(critter);
     }
 
 
@@ -476,9 +478,10 @@ public final class Battle
     {
         chitSelected = false;
 
-        if (lastCritterMoved != null)
+        if (!lastCrittersMoved.isEmpty())
         {
-            lastCritterMoved.undoMove();
+            Critter critter = (Critter)lastCrittersMoved.removeFirst();
+            critter.undoMove();
         }
 
         highlightMovableChits();
@@ -604,7 +607,7 @@ public final class Battle
 
     private void commitMoves()
     {
-        lastCritterMoved = null;
+        lastCrittersMoved.clear();
 
         Iterator it = critters.iterator();
         while (it.hasNext())
@@ -900,14 +903,13 @@ public final class Battle
     private boolean isForcedStrikeRemaining()
     {
         Player player = getActivePlayer();
-
         Iterator it = critters.iterator();
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
             if (critter.getPlayer() == player)
             {
-                if (critter.isInContact(false) && !critter.hasStruck())
+                if (!critter.hasStruck() && critter.isInContact(false))
                 {
                     return true;
                 }
@@ -915,6 +917,45 @@ public final class Battle
         }
 
         return false;
+    }
+
+
+    /** Perform strikes for any creature that is forced to strike
+     *  and has only one legal target. Forced strikes will never
+     *  generate carries, since there's only one target. */
+    public void makeForcedStrikes()
+    {
+        Player player = getActivePlayer();
+        boolean repeat = false;
+
+        Iterator it = critters.iterator();
+        while (it.hasNext())
+        {
+            Critter critter = (Critter)it.next();
+            if (critter.getPlayer() == player)
+            {
+                if (!critter.hasStruck())
+                {
+                    Critter target = critter.getForcedStrikeTarget();
+                    if (target != null)
+                    {
+                        critter.strike(target);
+
+                        // If that strike killed the target, it's possible
+                        // that some other creature that had two adjacent
+                        // enemies now has only one.
+                        if (target.isDead())
+                        {
+                            repeat = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (repeat)
+        {
+            makeForcedStrikes();
+        }
     }
 
 
@@ -936,8 +977,7 @@ public final class Battle
 
 
     /** Return a set of hex labels for hexes containing targets that the
-     *  critter may strike.
-     */
+     *  critter may strike. */
     private Set findStrikes(Critter critter)
     {
         HashSet set = new HashSet();
@@ -1007,6 +1047,7 @@ public final class Battle
         return findStrikes(critter).size();
     }
 
+
     /** Highlight all hexes with targets that the critter can strike.
      *  Return the number of hexes highlighted. */
     public int highlightStrikes(Critter critter)
@@ -1045,7 +1086,7 @@ public final class Battle
     }
 
 
-    public void applyCarries(Critter target)
+    private void applyCarries(Critter target)
     {
         int dealt = carryDamage;
         carryDamage = target.wound(carryDamage);
@@ -1714,6 +1755,10 @@ public final class Battle
 
                 if (getCarryDamage() == 0)
                 {
+                    if (game.getAutoForcedStrike())
+                    {
+                        makeForcedStrikes();
+                    }
                     highlightChitsWithTargets();
                 }
                 break;

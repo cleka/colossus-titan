@@ -40,9 +40,17 @@ public final class Marker extends Chit
     {
         super.paintComponent(g);
 
-        // Draw a one-pixel-wide black border around the outside
-        // edge of the marker.
-        g.setColor(Color.black);
+        // Draw a one-pixel-wide border around the outside
+        // edge of the marker.  Use black, unless the marker
+        // is black, in which case use white.
+        if (getId().startsWith("Bk"))
+        {
+            g.setColor(Color.white);
+        }
+        else
+        {
+            g.setColor(Color.black);
+        }
         Rectangle rect = getBounds();
         g.drawRect(rect.x, rect.y, rect.width, rect.height);
 

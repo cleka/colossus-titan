@@ -24,10 +24,11 @@ public final class Player implements Comparable
     private boolean titanEliminated;
     private Legion donor;
     private Legion mover;
-    private Legion lastLegionMoved;
-    private Legion lastLegionSplitOff;
     private Legion lastLegionSummonedFrom;
-    private Legion lastLegionRecruited;
+
+    /** Stack of legions, to allow multiple levels of undo for splits,
+     *  moves, and recruits. */
+    private LinkedList undoStack = new LinkedList();
 
 
     public Player(String name, Game game)
@@ -353,6 +354,8 @@ public final class Player implements Comparable
         teleported = false;
         movementRoll = 0;
 
+        clearUndoStack();
+
         // Make sure that all legions are allowed to move and recruit.
         commitMoves();
 
@@ -402,25 +405,33 @@ public final class Player implements Comparable
     }
 
 
+    /** Clear the legion undo stack.  This should be called at the
+     *  beginning of each phase. */
+    public void clearUndoStack()
+    {
+        undoStack.clear();
+    }
+
+
     public void setLastLegionMoved()
     {
-        lastLegionMoved = mover;
+        undoStack.addFirst(mover);
         mover = null;
     }
 
 
     public void setLastLegionSplitOff(Legion legion)
     {
-        lastLegionSplitOff = legion;
+        undoStack.addFirst(legion);
     }
 
 
     public void undoLastMove()
     {
-        if (lastLegionMoved != null)
+        if (!undoStack.isEmpty())
         {
-            lastLegionMoved.undoMove();
-            lastLegionMoved = null;
+            Legion legion = (Legion)undoStack.removeFirst();
+            legion.undoMove();
         }
     }
 
@@ -457,10 +468,10 @@ public final class Player implements Comparable
 
     public void undoLastRecruit()
     {
-        if (lastLegionRecruited != null)
+        if (!undoStack.isEmpty())
         {
-            lastLegionRecruited.undoRecruit();
-            lastLegionRecruited = null;
+            Legion legion = (Legion)undoStack.removeFirst();
+            legion.undoRecruit();
         }
 
         // Update number of creatures in status window.
@@ -470,7 +481,7 @@ public final class Player implements Comparable
 
     public void setLastLegionRecruited(Legion legion)
     {
-        lastLegionRecruited = legion;
+        undoStack.addFirst(legion);
     }
 
 
@@ -509,16 +520,10 @@ public final class Player implements Comparable
 
     public void undoLastSplit()
     {
-        if (lastLegionSplitOff != null)
+        if (!undoStack.isEmpty())
         {
-            Legion parent = lastLegionSplitOff.getParent();
-            if (parent.getCurrentHex() == lastLegionSplitOff.getCurrentHex())
-            {
-                lastLegionSplitOff.recombine(parent, true);
-            }
-
-            lastLegionSplitOff = null;
-
+            Legion splitoff = (Legion)undoStack.removeFirst();
+            splitoff.recombine(splitoff.getParent(), true);
             highlightTallLegions();
         }
     }

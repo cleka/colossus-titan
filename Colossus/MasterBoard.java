@@ -55,6 +55,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private JCheckBoxMenuItem miAutoPickRecruiter;
     private JCheckBoxMenuItem miAutoPickMarker;
     private JCheckBoxMenuItem miAutoPickEntrySide;
+    private JCheckBoxMenuItem miAutoForcedStrike;
     private JCheckBoxMenuItem miAutosave;
     private JCheckBoxMenuItem miAntialias;
     private JCheckBoxMenuItem miChooseMovement;
@@ -562,6 +563,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
         miAutoPickEntrySide.addItemListener(this);
         optionsMenu.add(miAutoPickEntrySide);
 
+        miAutoForcedStrike = new JCheckBoxMenuItem(Game.sAutoForcedStrike);
+        miAutoForcedStrike.setMnemonic(KeyEvent.VK_F);
+        miAutoForcedStrike.setSelected(game.getAutoForcedStrike());
+        miAutoForcedStrike.addItemListener(this);
+        optionsMenu.add(miAutoForcedStrike);
+
         optionsMenu.addSeparator();
 
         // Then per-client GUI options
@@ -655,6 +662,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public void twiddleAutoPickEntrySide(boolean enable)
     {
         miAutoPickEntrySide.setSelected(enable);
+    }
+
+
+    public void twiddleAutoForcedStrike(boolean enable)
+    {
+        miAutoForcedStrike.setSelected(enable);
     }
 
 
@@ -1461,6 +1474,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private void setupMove()
     {
         Player player = game.getActivePlayer();
+        player.clearUndoStack();
 
         player.rollMovement();
 
@@ -1551,7 +1565,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         {
             masterFrame.setTitle(player.getName() + " Turn " +
                 game.getTurnNumber() + " : Muster Recruits ");
-
+            player.clearUndoStack();
             setupMusterMenu();
 
             // Highlight hexes with legions eligible to muster.
@@ -1975,6 +1989,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         else if (text.equals(Game.sAutoPickEntrySide))
         {
             game.setAutoPickEntrySide(selected);
+        }
+        else if (text.equals(Game.sAutoForcedStrike))
+        {
+            game.setAutoForcedStrike(selected);
         }
         else if (text.equals(Game.sShowStatusScreen))
         {

@@ -290,7 +290,8 @@ public final class Critter extends Creature
     }
 
 
-    /** Dead critters count as being in contact only if countDead is true. */
+    /** Return the number of enemy creatures in contact with this critter.
+     *  Dead critters count as being in contact only if countDead is true. */
     public int numInContact(boolean countDead)
     {
         // Offboard creatures are not in contact.
@@ -323,10 +324,76 @@ public final class Critter extends Creature
     }
 
 
-    /** Dead critters count as being in contact only if countDead is true. */
+    /** Return true if there are any enemies adjacent to this critter.
+     *  Dead critters count as being in contact only if countDead is true. */
     public boolean isInContact(boolean countDead)
     {
-        return (numInContact(countDead) > 0);
+        // Offboard creatures are not in contact.
+        if (currentHex.isEntrance())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not in contact.
+            if (currentHex.getHexside(i) != 'c' &&
+                currentHex.getOppositeHexside(i) != 'c')
+            {
+                BattleHex hex = currentHex.getNeighbor(i);
+                if (hex != null)
+                {
+                    Critter other = hex.getCritter();
+                    if (other != null && other.getPlayer() != getPlayer() &&
+                        (countDead || !other.isDead()))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    /** If there is exactly one live enemy critter in contact, return it.
+     *  Otherwise return null. */
+    public Critter getForcedStrikeTarget()
+    {
+        // Offboard creatures are not in contact.
+        if (currentHex.isEntrance())
+        {
+            return null;
+        }
+
+        Critter target = null;
+        int count = 0;
+        for (int i = 0; i < 6; i++)
+        {
+            // Adjacent creatures separated by a cliff are not in contact.
+            if (currentHex.getHexside(i) != 'c' &&
+                currentHex.getOppositeHexside(i) != 'c')
+            {
+                BattleHex hex = currentHex.getNeighbor(i);
+                if (hex != null)
+                {
+                    Critter other = hex.getCritter();
+                    if (other != null && other.getPlayer() != getPlayer() &&
+                        !other.isDead())
+                    {
+                        count++;
+                        if (count >= 2)
+                        {
+                            return null;
+                        }
+                        target = other;
+                    }
+                }
+            }
+        }
+
+        return target;
     }
 
 
@@ -348,7 +415,6 @@ public final class Critter extends Creature
         currentHex.removeCritter(this);
         currentHex = startingHex;
         currentHex.addCritter(this);
-        battle.setLastCritterMoved(null);
         Game.logEvent(name + " undoes move and returns to " +
             startingHex.getLabel());
         map.repaint();

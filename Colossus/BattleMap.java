@@ -223,9 +223,6 @@ public final class BattleMap extends HexMap implements MouseListener,
 
     public void setupFight()
     {
-        // XXX Record whether this has already been done, so if the
-        // game is loaded in the middle of the strike phase it
-        // won't be applied twice.
         battle.applyDriftDamage();
 
         // If there are no possible strikes, move on.
@@ -250,6 +247,17 @@ public final class BattleMap extends HexMap implements MouseListener,
             mi = phaseMenu.add(concedeBattleAction);
             mi.setMnemonic(KeyEvent.VK_C);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
+
+            // Automatically perform forced strikes if applicable.
+            if (board.getGame().getAutoForcedStrike())
+            {
+                battle.makeForcedStrikes();
+                // If there are no possible strikes left, move on.
+                if (battle.highlightChitsWithTargets() < 1)
+                {
+                    battle.advancePhase();
+                }
+            }
         }
     }
 

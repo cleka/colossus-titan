@@ -1,16 +1,15 @@
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.
 
-Black legions markers should use a white border to provide some contrast.
-   But white shows up badly on selected hexes.
-
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 
 Centralize scale handling.  Add a global rescale option.
 
-Allow an arbitrary number of undo operations, rather than just one.
-   Allow redo?
+Should be able to undo moves until an engagement is resolved.
+   If no engagements, should be able to undo recruits, then
+   undo moves.  "Done with Engagements" shouldn't be necessary.
+   Basically, phases should be less rigid.
 
 Add an option to show information about MasterBoard hexes when a
    mover is selected, such as whether that legion can recruit
@@ -37,7 +36,7 @@ Test optimizations (strength reduction of divides, and substitution
    measurable difference.  Get rid of them if they don't.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
-Add auto-forced-strike option.
+
 Add auto-MasterBoard-move option.
 Add auto-BattleMap-move option.
 Add auto-strike option.
@@ -52,10 +51,6 @@ Skip strikes that can't matter.
 Add keyboard legion selection?
 Add toolbars?
 Add tooltips?
-
-Should be able to undo moves until an engagement is resolved.
-   If no engagements, should be able to undo recruits, then
-   undo moves.  "Done with Engagements" shouldn't be necessary.
 
 Highlight selected legion better.
 Highlight teleport and normal moves differently.
@@ -89,9 +84,6 @@ Add SetupBattle class, to allow setting up standalone battles.
 Fix concession timing.
 
 Client-server networking.
-
-Add client config file to store default name, favorite colors,
-   favorite servers, etc.
 
 Chat window.
 
