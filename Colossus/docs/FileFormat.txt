@@ -175,12 +175,12 @@ They should be named after the Creature they represent, with a '.gif'
 extension. If the files doesn't exist, troubles may occur.
 
 Two version of the file should be supplied, one with and one without
-the '_i' postfix to the name (i.e 'MyCreature.gif' and 'MyCreature_i.png').
+the '_i' postfix to the name (i.e 'MyCreature.gif' and 'MyCreature_i.gif').
 The first is used for upside-up Creature, the second for upside-down
 Creature.
 
 # Graphical Overlay for the Hexes on the Masterboard should be
-transparent PNG file, of size whatever-you-want (they are resized
+transparent GIF file, of size whatever-you-want (they are resized
 to the same size as the Hex the represent). Default supplied
 files are 255x255. Use them as examples of what is possible to do.
 If the file doesn't exist, the non-overlayed display is used
@@ -188,6 +188,6 @@ instead (i.e. name of the terrain and the label in the proper
 corner).
 
 Two version of the file should be supplied, one with and one without
-the '_i' postfix to the name (i.e 'MyTerrain.png' and 'MyTerrain_i.png').
+the '_i' postfix to the name (i.e 'MyTerrain.gif' and 'MyTerrain_i.gif').
 The first is used when the biggest part of the hexagon is down,
 the second when the biggest part is up.

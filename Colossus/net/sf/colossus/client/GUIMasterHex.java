@@ -459,7 +459,7 @@ public final class GUIMasterHex extends MasterHex
     // overlay picture support
     private static final String pathSeparator = "/";
     private static String imageDirName = "images";
-    private static final String imageExtension = ".png";
+    private static final String imageExtension = ".gif";
     private static final String invertedPostfix = "_i";
     private Image overlay;
 
