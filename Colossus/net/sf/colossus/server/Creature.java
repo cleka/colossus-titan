@@ -10,8 +10,9 @@ import net.sf.colossus.parser.CreatureLoader;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
 /**
- * Class Creature represents the CONSTANT information about a Titan
- * Creature.
+ * Class Creature represents the CONSTANT information about a
+ * Titan (the game) Creature. Titan (the creature) use
+ * class CreatureTitan.
  *
  * Game related info is in Critter.  Counts of
  * recruited/available/dead are in Caretaker.
@@ -19,7 +20,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  * @version $Id$
  * @author David Ripton, Bruce Sherrod
  * @author Romain Dolbeau
-*/
+ */
 
 public class Creature implements Comparable
 {
@@ -196,12 +197,12 @@ public class Creature implements Comparable
 
     public boolean isImmortal()
     { // might not the same for derived class
-        return isLordOrDemiLord() && !isTitan();
+        return isLordOrDemiLord();
     }
 
     public boolean isTitan()
-    {
-        return name.equals(Constants.titan);
+    { // Titan use class CreatureTitan
+        return false;
     }
 
     /* The name is an unique identifier and must not be changed,
@@ -228,10 +229,6 @@ public class Creature implements Comparable
 
     public String[] getImageNames()
     {
-        if (isTitan())
-        {
-            Log.warn("Calling getImageNames() for Titan, this is broken.");
-        }
         String[] tempNames;
         if (baseColor != null)
         {
@@ -271,29 +268,17 @@ public class Creature implements Comparable
 
     public int getPointValue()
     { // this function is replicated in Critter
-        if (isTitan())
-        {
-            Log.warn("Calling getPointValue() on Titan Creature (should only be called on Titan Critter)");
-        }
         return getPower() * getSkill();
     }
     
     public int getHintedRecruitmentValue()
     { // this function is replicated in Critter
-        if (isTitan())
-        {
-            Log.warn("Calling getHintedRecruitmentValue() on Titan Creature (should only be called on Titan Critter)");
-        }
         return getPointValue() +
             VariantSupport.getHintedRecruitmentValueOffset(name);
     }
     
     public int getHintedRecruitmentValue(String[] section)
     { // this function is replicated in Critter
-        if (isTitan())
-        {
-            Log.warn("Calling getHintedRecruitmentValue() on Titan Creature (should only be called on Titan Critter)");
-        }
         return getPointValue() +
             VariantSupport.getHintedRecruitmentValueOffset(name, section);
     }

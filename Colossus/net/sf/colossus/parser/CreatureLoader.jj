@@ -172,6 +172,15 @@ int oneCreature(List lc) :
     (baseColor = c_chaine())?
     (classtouse = c_specialchaine())?
     {
+        if (name.equals(net.sf.colossus.server.Constants.titan))
+        {
+            if (classtouse != null)
+            {
+                Log.warn("Can't specify a custom class for Titan, ignoring \""
+                         + classtouse + "\"");
+            }
+            classtouse = "Special:net.sf.colossus.server.CreatureTitan";
+        }
         if (classtouse == null) // nice and easy way
         {
             lc.add(new Creature(name, power, skill, rangestrikes,
@@ -212,9 +221,14 @@ int oneCreature(List lc) :
             Object cre = net.sf.colossus.util.ResourceLoader.getNewObject(classtouse.substring(8), VariantSupport.getVarDirectoriesList(), o);
             if (!(cre instanceof Creature))
             {
-                Log.error("CUSTOM: Class " + classtouse +
-                          " cannot be used to make a Creature !");
+                Log.error("CUSTOM: Class \"" + classtouse +
+                          "\" cannot be used to make a Creature !");
                 return 0;
+            }
+            else
+            {
+                Log.debug("CUSTOM: Class \"" + classtouse +
+                          "\" successfully loaded for creature " + name);
             }
             lc.add((Creature)cre);
         }
