@@ -2680,14 +2680,25 @@ public class Game
             {
                 // Fleeing gives half points and denies the
                 // attacker the chance to summon an angel.
-                new Concede(masterFrame, defender, attacker, true);
+                boolean flees = Concede.flee(masterFrame, defender, 
+                    attacker);
+                if (flees)
+                {
+                    handleConcession(defender, attacker, true);
+                }
             }
 
             if (hex.isEngagement())
             {
                 // The attacker may concede now without
                 // allowing the defender a reinforcement.
-                new Concede(masterFrame, attacker, defender, false);
+                boolean concedes = Concede.concede(masterFrame, attacker, 
+                    defender);
+
+                if (concedes)
+                {
+                    handleConcession(attacker, defender, false);
+                }
 
                 // The players may agree to a negotiated
                 // settlement.
@@ -2735,6 +2746,43 @@ public class Game
             highlightEngagements();
             dialogLock = false;
         }
+    }
+
+
+    void handleConcession(Legion loser, Legion winner, boolean fled)
+    {
+        // Figure how many points the victor receives.
+        int points = loser.getPointValue();
+        if (fled)
+        {
+            points /= 2;
+            Game.logEvent("Legion " + loser.getMarkerId() +
+                " flees from legion " + winner.getMarkerId());
+        }
+        else
+        {
+            Game.logEvent("Legion " + loser.getMarkerId() +
+                " concedes to legion " + winner.getMarkerId());
+        }
+
+        // Remove the dead legion.
+        loser.remove();
+
+        // Add points, and angels if necessary.
+        winner.addPoints(points);
+        // Remove any fractional points.
+        winner.getPlayer().truncScore();
+
+        // If this was the titan stack, its owner dies and gives half
+        // points to the victor.
+        if (loser.numCreature(Creature.titan) == 1)
+        {
+            loser.getPlayer().die(winner.getPlayer(), true);
+        }
+
+        // Unselect and repaint the hex.
+        MasterHex hex = winner.getCurrentHex();
+        MasterBoard.unselectHexByLabel(hex.getLabel());
     }
 
 

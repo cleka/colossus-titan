@@ -31,7 +31,8 @@ Add auto-recruit option.
 Add auto-forced-strike option.
 Add auto-pick-legion-markers option.
 Add auto-pick-entry-side option.
-Add auto-move option.
+Add auto-MasterBoard-move option.
+Add auto-BattleMap-move option.
 Add auto-strike option.
 Add auto-split option.
 Add auto-flee option.

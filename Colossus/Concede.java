@@ -21,16 +21,17 @@ public class Concede extends JDialog implements ActionListener
     private static Point location;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
+    private static boolean answer;
 
 
-    public Concede(JFrame parentFrame, Legion ally, Legion enemy, boolean flee)
+    private Concede(JFrame parentFrame, Legion ally, Legion enemy, 
+        boolean flee)
     {
         super(parentFrame, ally.getPlayer().getName() + ": " + (flee ?
             "Flee" : "Concede") + " with Legion "  + ally.getMarkerId() +
             " in " + ally.getCurrentHex().getDescription() + "?", true);
 
         Container contentPane = getContentPane();
-
         contentPane.setLayout(gridbag);
 
         this.parentFrame = parentFrame;
@@ -128,6 +129,24 @@ public class Concede extends JDialog implements ActionListener
     }
 
 
+    /** Return true if the player concedes. */
+    public static boolean concede(JFrame parentFrame, Legion ally, 
+        Legion enemy)
+    {
+        new Concede(parentFrame, ally, enemy, false);
+        return answer;
+    }
+
+
+    /** Return true if the player flees. */
+    public static boolean flee(JFrame parentFrame, Legion ally, 
+        Legion enemy)
+    {
+        new Concede(parentFrame, ally, enemy, true);
+        return answer;
+    }
+
+
     public static void saveLocation(Point point)
     {
         location = point;
@@ -143,7 +162,6 @@ public class Concede extends JDialog implements ActionListener
     private void cleanup()
     {
         location = getLocation();
-        setVisible(false);
         dispose();
     }
 
@@ -153,47 +171,13 @@ public class Concede extends JDialog implements ActionListener
         if (e.getActionCommand().equals("Flee") ||
             e.getActionCommand().equals("Concede"))
         {
-            // Figure how many points the victor receives.
-            int points = ally.getPointValue();
-            if (flee)
-            {
-                points /= 2;
-                Game.logEvent("Legion " + ally.getMarkerId() +
-                    " flees from legion " + enemy.getMarkerId());
-            }
-            else
-            {
-                Game.logEvent("Legion " + ally.getMarkerId() +
-                    " concedes to legion " + enemy.getMarkerId());
-            }
-
-            // Remove the dead legion.
-            ally.remove();
-
-            // Add points, and angels if necessary.
-            enemy.addPoints(points);
-            // Remove any fractional points.
-            enemy.getPlayer().truncScore();
-
-            // If this was the titan stack, its owner dies and gives half
-            // points to the victor.
-            if (ally.numCreature(Creature.titan) == 1)
-            {
-                ally.getPlayer().die(enemy.getPlayer(), true);
-            }
-
-            // Exit this dialog.
-            cleanup();
-
-            // Unselect and repaint the hex.
-            MasterHex hex = enemy.getCurrentHex();
-            MasterBoard.unselectHexByLabel(hex.getLabel());
+            answer = true; 
         }
-
         else
         {
-            cleanup();
+            answer = false;
         }
+        cleanup();
     }
 
 
@@ -233,7 +217,9 @@ public class Concede extends JDialog implements ActionListener
             frame, null);
         defender.setMarker(marker);
 
-        new Concede(frame, defender, attacker, true);
-        new Concede(frame, attacker, defender, false);
+        boolean answer = Concede.flee(frame, defender, attacker);
+        System.out.println(answer);
+        answer = Concede.concede(frame, attacker, defender);
+        System.out.println(answer);
     }
 }
