@@ -9,7 +9,7 @@ import javax.swing.*;
 import net.sf.colossus.parser.BattlelandLoader;
 import net.sf.colossus.client.Hex;
 import net.sf.colossus.client.BattleHex;
-import net.sf.colossus.client.BasicGUIBattleHex;
+import net.sf.colossus.client.GUIBattleHex;
 
 /**
  * Class BuilderHexMap displays a basic battle map.
@@ -23,11 +23,11 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
     String filename = null;
     
     // GUI hexes need to be recreated for each object, since scale varies.
-    private GUIBuilderHex [][] h = new GUIBuilderHex[6][6];
+    private GUIBattleHex [][] h = new GUIBattleHex[6][6];
     private java.util.List hexes = new ArrayList(33);
 
     /** ne, e, se, sw, w, nw */
-    private GUIBuilderHex [] entrances = new GUIBuilderHex[6];
+    private GUIBattleHex [] entrances = new GUIBattleHex[6];
 
     private static final boolean[][] show =
     {
@@ -70,7 +70,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
             {
                 if (show[i][j])
                 {
-                    GUIBuilderHex hex = new GUIBuilderHex
+                    GUIBattleHex hex = new GUIBattleHex
                         ((int) Math.round(cx + 3 * i * scale),
                         (int) Math.round(cy + (2 * j + (i & 1)) *
                         Hex.SQRT3 * scale), scale, this, i, j);
@@ -167,17 +167,17 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
     private void setupEntrancesGUI()
     {
         // Initialize entrances.
-        entrances[0] = new GUIBuilderHex(cx + 15 * scale,
+        entrances[0] = new GUIBattleHex(cx + 15 * scale,
             (int) Math.round(cy + 1 * scale), scale, this, -1, 0);
-        entrances[1] = new GUIBuilderHex(cx + 21 * scale,
+        entrances[1] = new GUIBattleHex(cx + 21 * scale,
             (int) Math.round(cy + 10 * scale), scale, this, -1, 1);
-        entrances[2] = new GUIBuilderHex(cx + 17 * scale,
+        entrances[2] = new GUIBattleHex(cx + 17 * scale,
             (int) Math.round(cy + 22 * scale), scale, this, -1, 2);
-        entrances[3] = new GUIBuilderHex(cx + 2 * scale,
+        entrances[3] = new GUIBattleHex(cx + 2 * scale,
             (int) Math.round(cy + 21 * scale), scale, this, -1, 3);
-        entrances[4] = new GUIBuilderHex(cx - 3 * scale,
+        entrances[4] = new GUIBattleHex(cx - 3 * scale,
             (int) Math.round(cy + 10 * scale), scale, this, -1, 4);
-        entrances[5] = new GUIBuilderHex(cx + 1 * scale,
+        entrances[5] = new GUIBattleHex(cx + 1 * scale,
             (int) Math.round(cy + 1 * scale), scale, this, -1, 5);
 
         hexes.add(entrances[0]);
@@ -226,7 +226,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBuilderHex hex = (GUIBuilderHex)it.next();
+            GUIBattleHex hex = (GUIBattleHex)it.next();
             if (hex.isSelected())
             {
                 hex.unselect();
@@ -240,7 +240,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBuilderHex hex = (GUIBuilderHex)it.next();
+            GUIBattleHex hex = (GUIBattleHex)it.next();
             if (hex.isSelected() && label.equals(hex.getLabel()))
             {
                 hex.unselect();
@@ -255,7 +255,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBuilderHex hex = (GUIBuilderHex)it.next();
+            GUIBattleHex hex = (GUIBattleHex)it.next();
             if (hex.isSelected() && labels.contains(hex.getLabel()))
             {
                 hex.unselect();
@@ -269,7 +269,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBuilderHex hex = (GUIBuilderHex)it.next();
+            GUIBattleHex hex = (GUIBattleHex)it.next();
             if (!hex.isSelected() && label.equals(hex.getLabel()))
             {
                 hex.select();
@@ -284,7 +284,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBuilderHex hex = (GUIBuilderHex)it.next();
+            GUIBattleHex hex = (GUIBattleHex)it.next();
             if (!hex.isSelected() && labels.contains(hex.getLabel()))
             {
                 hex.select();
@@ -296,12 +296,12 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
 
     /** Do a brute-force search through the hex array, looking for
      *  a match.  Return the hex, or null. */
-    GUIBuilderHex getGUIHexByLabel(String label)
+    GUIBattleHex getGUIHexByLabel(String label)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBuilderHex hex = (GUIBuilderHex)it.next();
+            GUIBattleHex hex = (GUIBattleHex)it.next();
             if (hex.getLabel().equals(label))
             {
                 return hex;
@@ -312,14 +312,14 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         return null;
     }
 
-    /** Return the GUIBuilderHex that contains the given point, or
+    /** Return the GUIBattleHex that contains the given point, or
      *  null if none does. */
-    GUIBuilderHex getHexContainingPoint(Point point)
+    GUIBattleHex getHexContainingPoint(Point point)
     {
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBuilderHex hex = (GUIBuilderHex)it.next();
+            GUIBattleHex hex = (GUIBattleHex)it.next();
             if (hex.contains(point))
             {
                 return hex;
@@ -404,7 +404,7 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {
-            GUIBuilderHex hex = (GUIBuilderHex)it.next();
+            GUIBattleHex hex = (GUIBattleHex)it.next();
             if (!hex.isEntrance() && rectClip.intersects(hex.getBounds()))
             {
                 hex.paint(g);

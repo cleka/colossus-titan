@@ -130,11 +130,9 @@ javadoc:
 BBJAR=BattlelandsBuilder.jar
 BBSRC=net/sf/colossus/datatools/BattlelandsBuilder.java \
       net/sf/colossus/datatools/BuilderHexMap.java \
-      net/sf/colossus/datatools/GUIBuilderHex.java \
       net/sf/colossus/datatools/ShowBuilderHexMap.java \
       net/sf/colossus/client/Hex.java \
       net/sf/colossus/client/BattleHex.java \
-      net/sf/colossus/client/BasicGUIBattleHex.java \
       net/sf/colossus/util/HTMLColor.java \
       net/sf/colossus/parser/BattlelandLoader.java
 BBCLASS=$(addsuffix .class,$(basename $(BBSRC)))

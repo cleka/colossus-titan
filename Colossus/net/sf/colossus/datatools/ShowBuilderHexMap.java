@@ -7,7 +7,7 @@ import java.util.*;
 import javax.swing.*;
 
 import net.sf.colossus.client.BattleHex;
-import net.sf.colossus.client.BasicGUIBattleHex;
+import net.sf.colossus.client.GUIBattleHex;
 
 /**
  * Class ShowBuilderHexMap displays a battle map.
@@ -35,7 +35,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             this.c = c;
         }
         public void actionPerformed(ActionEvent e) {
-            GUIBuilderHex h = getHexContainingPoint(lastPoint);
+            GUIBattleHex h = getHexContainingPoint(lastPoint);
             h.setTerrain(c);
             h.repaint();
         }
@@ -50,7 +50,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             this.el = el;
         }
         public void actionPerformed(ActionEvent e) {
-            GUIBuilderHex h = getHexContainingPoint(lastPoint);
+            GUIBattleHex h = getHexContainingPoint(lastPoint);
             h.setElevation(el);
             h.repaint();
         }
@@ -65,10 +65,10 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
             this.c = c;
         }
         public void actionPerformed(ActionEvent e) {
-            GUIBuilderHex h = getHexContainingPoint(lastPoint);
+            GUIBattleHex h = getHexContainingPoint(lastPoint);
             h.setHexside(lastSide, c);
             h.repaint();
-            ((GUIBuilderHex)h.getNeighbor(lastSide)).repaint();
+            ((GUIBattleHex)h.getNeighbor(lastSide)).repaint();
         }
     }
 
@@ -133,7 +133,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         popupMenuTerrain = new JPopupMenu("Choose Terrain");
         contentPane.add(popupMenuTerrain);
         char[] terrains = BattleHex.getTerrains();
-        BasicGUIBattleHex tempH = new BasicGUIBattleHex(0,0,1,0,0);
+        GUIBattleHex tempH = new GUIBattleHex(0,0,1,this,0,0);
 
         for (int i = 0 ; i < terrains.length ; i++)
         {
@@ -169,7 +169,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     {
         lastPoint = e.getPoint();
         lastComponent = e.getComponent();
-        GUIBuilderHex h = getHexContainingPoint(lastPoint);
+        GUIBattleHex h = getHexContainingPoint(lastPoint);
         if (h != null)
         {
             Point c = h.findCenter();
