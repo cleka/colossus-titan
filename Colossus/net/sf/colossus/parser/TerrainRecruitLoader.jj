@@ -16,8 +16,6 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.client.LegionInfo;
 
 import net.sf.colossus.util.RecruitGraph;
-import net.sf.colossus.util.RecruitEdge;
-import net.sf.colossus.util.RecruitVertex;
 import net.sf.colossus.client.CaretakerInfo;
 
 /**
@@ -614,114 +612,11 @@ public class TerrainRecruitLoader
     }
 
     /**
-     * What is the maximum "useful" number of a given creature for
-     * recruitment purpose (excluding "Any" or "AnyNonLord").
-     * return value of -1 or 0 means the Creature cannot recruit except itself.
-     * @param name Name of the creature considered.
-     * @return The higher number of creatures needed to recruit something.
+     * to obtain the recruit graph
      */
-    public static int getMaximumUsefulNumber(String name)
+    public static RecruitGraph getRecruitGraph()
     {
-        int mun = -1;
-            
-        java.util.List outgoing = graph.getOutgoingEdges(name);
-        Iterator it = outgoing.iterator();
-        while (it.hasNext())
-        {
-            RecruitEdge e = (RecruitEdge)it.next();
-            
-            if (e.getNumber() > mun)
-                mun = (int)e.getNumber();
-        }
-        return mun;
-    }
-
-    /**
-     * What is the maximum "useful" number of a given creature for
-     * recruitment purpose (excluding "Any" or "AnyNonLord").
-     * return value of -1 or 0 means the Creature cannot recruit except itself.
-     * @param creature Creature considered.
-     * @return The higher number of creatures needed to recruit something.
-     */
-    public static int getMaximumUsefulNumber(Creature creature)
-    {
-        return getMaximumUsefulNumber(creature.getName());
-    }
-
-    /**
-     * Return all the terrains (as Character in a List) where the given
-     * number of creature of the given name can recruit.
-     * @param name Name of the recruiting creature.
-     * @param number Number of creature
-     * @return A List of Character representing all Terrains where recruitment is possible.
-     */
-    public static java.util.List getAllTerrainsWhereThisNumberOfCreatureRecruit(String name, int number)
-    {
-        java.util.List at = new ArrayList();
-            
-        java.util.List outgoing = graph.getOutgoingEdges(name);
-        Iterator it = outgoing.iterator();
-        while (it.hasNext())
-        {
-            RecruitEdge e = (RecruitEdge)it.next();
-            
-            if (e.getNumber() == number)
-                at.add(new Character(e.getTerrain()));
-        }
-        return at;
-    }
-
-    /**
-     * Return the name of the recruit for the given number of the given recruiter in the given terrain, or null if there's none.
-     * @param name Name of the recruiting creature.
-     * @param number Number of creature
-     * @param t Terrain in which the recruiting may occur.
-     * @return Name of the recruit.
-     */
-    public static String getRecruitFromRecruiterTerrainNumber(String name, char t, int number)
-    {
-        java.util.List outgoing = graph.getOutgoingEdges(name);
-        String v2 = null;
-
-        Iterator it = outgoing.iterator();
-
-        while (it.hasNext())
-        {
-            RecruitEdge e = (RecruitEdge)it.next();
-            
-            if ((e.getNumber() == number) &&
-                (e.getTerrain() == t))
-            {
-                v2 = e.getDestination().getCreatureName();
-            }
-        }
-        return v2;
-    }
-
-    /**
-     * Return the name of the best possible creature that is reachable trough the given creature from the given LegionInfo (can be null).
-     * @param name Name of the recruiting creature.
-     * @param legion The recruiting legion or null.
-     * @return Name of the best possible recruit.
-     */
-    public static String getBestPossibleRecruitEver(String name,
-                                                    LegionInfo legion)
-    {
-        String best = name;
-        int maxVP = -1;
-        List all = graph.traverse(name, legion);
-        Iterator it = all.iterator();
-        while (it.hasNext())
-        {
-            RecruitVertex v2 = (RecruitVertex)it.next();
-            int vp = v2.getCreature().getPointValue();
-            if (vp > maxVP)
-            {
-                maxVP = vp;
-                best = v2.getCreatureName();
-            }
-        }
-        return best;
+        return graph;
     }
 }
 

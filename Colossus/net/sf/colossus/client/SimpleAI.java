@@ -1629,21 +1629,21 @@ public class SimpleAI implements AI
                                                     MasterHex hex,
                                                     Creature base)
     {
-        int mun = TerrainRecruitLoader.getMaximumUsefulNumber(base);
+        int mun = TerrainRecruitLoader.getRecruitGraph().getMaximumUsefulNumber(base);
         int already = legion.numCreature(base);
         int maxPV = -1;
         int num = 0;
         
         for (int i = 1; i <= mun ; i++)
         {
-            List all = TerrainRecruitLoader.getAllTerrainsWhereThisNumberOfCreatureRecruit(base.getName(), i);
+            List all = TerrainRecruitLoader.getRecruitGraph().getAllTerrainsWhereThisNumberOfCreatureRecruit(base.getName(), i);
             
             Iterator it = all.iterator();
             while (it.hasNext())
             {
                 char t = ((Character)it.next()).charValue();
                 
-                String dest = TerrainRecruitLoader.getRecruitFromRecruiterTerrainNumber(base.getName(), t, i);
+                String dest = TerrainRecruitLoader.getRecruitGraph().getRecruitFromRecruiterTerrainNumber(base.getName(), t, i);
 
                 if ((dest != null) &&
                     (getNumberOfWaysToTerrain(legion,hex,t) > 0))
@@ -1728,7 +1728,7 @@ public class SimpleAI implements AI
         {
             Creature recruit = (Creature)it.previous();
 
-            String temp = TerrainRecruitLoader.getBestPossibleRecruitEver(recruit.getName(), legion);
+            String temp = TerrainRecruitLoader.getRecruitGraph().getBestPossibleRecruitEver(recruit.getName(), legion);
 
             int vp = (Creature.getCreatureByName(temp)).getPointValue();
 
@@ -1765,7 +1765,7 @@ public class SimpleAI implements AI
             Creature recruit = (Creature)it.previous();
 
             int rnum = legion.numCreature(recruit);
-            java.util.List tl = TerrainRecruitLoader.getAllTerrainsWhereThisNumberOfCreatureRecruit(recruit.getName(), rnum + 1);
+            java.util.List tl = TerrainRecruitLoader.getRecruitGraph().getAllTerrainsWhereThisNumberOfCreatureRecruit(recruit.getName(), rnum + 1);
             int wnum = getNumberOfWaysToTerrains(legion, hex, tl);
             if (wnum > maxwnum)
             {
