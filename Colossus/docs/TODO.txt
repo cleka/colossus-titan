@@ -1,12 +1,10 @@
-Bug: Need another full repaint after loading game to show updated heights.
-Bug: Make colorized / powered titans work everywhere.
-
 Bug: Non-displayed carry hits.  Only when strike penalty?
 2 carries available
 2 hits carry to Ranger in Plains hex E4
 Error: Called allTellCarryResults() without setup.
 Error: null striker
 
+Bug: Dead players not red in StatusScreen.
 
 Copy various new docs to web page from inst.  tex -> html first when possible.
 Put old, new web pages under CVS.

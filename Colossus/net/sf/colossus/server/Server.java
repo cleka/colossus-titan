@@ -31,12 +31,16 @@ public final class Server
      *  authenticate reconnects.  Do not share these references. */
     private List clients = new ArrayList();
 
+    /** Map of player name to client. */
+    private Map clientMap = new HashMap();
+
     // Cached strike information.
     Critter striker; 
     Critter target;
     int strikeNumber; 
     int damage; 
     int [] rolls;
+
 
 
     Server(Game game)
@@ -48,7 +52,9 @@ public final class Server
     /** Temporary.  We will not use direct client refs later. */
     void addClient(String playerName, boolean primary)
     {
-        clients.add(new Client(this, playerName, primary));
+        Client client = new Client(this, playerName, primary);
+        clients.add(client);
+        clientMap.put(playerName, client);
     }
 
 
@@ -140,19 +146,17 @@ public final class Server
     }
 
 
-    // TODO Keep a playerName / client map on the server side.
     private Client getClient(String playerName)
     {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
+        if (clientMap.containsKey(playerName))
         {
-            Client client = (Client)it.next();
-            if (playerName.equals(client.getPlayerName()))
-            {
-                return client;
-            }
+            return (Client)clientMap.get(playerName);
         }
-        return null;
+        else
+        {
+            Log.error("No client in clientMap for " + playerName);
+            return null;
+        }
     }
 
 
@@ -215,8 +219,7 @@ public final class Server
         return -1;
     }
 
-    void setClientOption(String playerName, String optname,
-        boolean value)
+    void setClientOption(String playerName, String optname, boolean value)
     {
         Client client = getClient(playerName);
         if (client != null)
@@ -301,22 +304,15 @@ public final class Server
 
     void allSetupSplit()
     {
-        Iterator it = clients.iterator();
+        Iterator it = game.getPlayers().iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
-            setupSplit(client);
+            Player player = (Player)it.next();
+            Client client = getClient(player.getName());
+            client.setupSplit(player.getMarkersAvailable(), 
+                game.getActivePlayerName(), game.getTurnNumber());
         }
         allUpdatePlayerInfo();
-    }
-
-    private void setupSplit(Client client)
-    {
-        // TODO Keep a map on the server side.
-        String playerName = client.getPlayerName();
-        Player player = game.getPlayer(playerName);
-        client.setupSplit(player.getMarkersAvailable(), 
-            game.getActivePlayerName(), game.getTurnNumber());
     }
 
 
@@ -614,8 +610,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
             Client client = getClient(ally.getPlayerName());
             client.askConcede(ally.getLongMarkerName(),
                 ally.getCurrentHex().getDescription(), ally.getMarkerId(),
-                ally.getImageNames(), enemy.getMarkerId(), 
-                enemy.getImageNames());
+                enemy.getMarkerId());
         }
     }
 
@@ -648,8 +643,7 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
             Client client = getClient(ally.getPlayerName());
             client.askFlee(ally.getLongMarkerName(),
                 ally.getCurrentHex().getDescription(), ally.getMarkerId(),
-                ally.getImageNames(), enemy.getMarkerId(), 
-                enemy.getImageNames());
+                enemy.getMarkerId());
         }
     }
 
@@ -675,14 +669,12 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         Client client1 = getClient(defender.getPlayerName());
         client1.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
-            defender.getMarkerId(), attacker.getImageNames(),
-            defender.getImageNames(), attacker.getCurrentHexLabel());
+            defender.getMarkerId(), attacker.getCurrentHexLabel());
 
         Client client2 = getClient(attacker.getPlayerName());
         client2.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
-            defender.getMarkerId(), attacker.getImageNames(),
-            defender.getImageNames(), attacker.getCurrentHexLabel());
+            defender.getMarkerId(), attacker.getCurrentHexLabel());
     }
 
     // XXX Stringify the proposal.
@@ -941,7 +933,8 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         {
             Client client = (Client)it.next();
             client.initBattle(masterHexLabel, battle.getTurnNumber(),
-                battle.getActivePlayerName(), battle.getPhase());
+                battle.getActivePlayerName(), battle.getPhase(),
+                battle.getAttackerId(), battle.getDefenderId());
         }
     }
 
@@ -1438,11 +1431,13 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         game.saveGame(filename);
     }
 
-
-    void setPlayerName(String playerName, String name)
+    /** Used to change a player name after color is assigned. */
+    void setPlayerName(String playerName, String newName)
     {
         Client client = getClient(playerName);
-        client.setPlayerName(name);
+        client.setPlayerName(newName);
+        clientMap.remove(playerName);
+        clientMap.put(newName, client);
     }
 
     void askPickColor(String playerName, Set colorsLeft)

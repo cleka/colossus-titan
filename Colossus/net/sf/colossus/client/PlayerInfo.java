@@ -4,6 +4,7 @@ package net.sf.colossus.client;
 import java.util.*;
 
 import net.sf.colossus.util.Split;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -15,7 +16,7 @@ import net.sf.colossus.util.Split;
 
 final class PlayerInfo
 {
-    private boolean isDead;
+    private boolean dead;
     private String name;
     private int tower;
     private String color;
@@ -42,7 +43,7 @@ final class PlayerInfo
         String buf;
 
         buf = (String)data.get(0);
-        isDead = Boolean.getBoolean(buf);
+        dead = Boolean.valueOf(buf).booleanValue();
 
         name = ((String)data.get(1));
 
@@ -75,7 +76,7 @@ final class PlayerInfo
 
     boolean isDead()
     {
-        return isDead;
+        return dead;
     }
 
     String getName()

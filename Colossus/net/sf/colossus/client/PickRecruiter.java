@@ -29,15 +29,13 @@ final class PickRecruiter extends KDialog implements MouseListener,
 
     /** recruiters is a list of creature name strings */
     private PickRecruiter(JFrame parentFrame, java.util.List recruiters, 
-        java.util.List imageNames, String hexDescription, String markerId,
-        Client client)
+        String hexDescription, String markerId, Client client)
     {
         super(parentFrame, client.getPlayerName() + ": Pick Recruiter in " +
             hexDescription, true);
 
         recruiterName = null;
         this.recruiters = recruiters;
-        height = imageNames.size();
 
         addMouseListener(this);
         addWindowListener(this);
@@ -53,6 +51,7 @@ final class PickRecruiter extends KDialog implements MouseListener,
         gridbag.setConstraints(legionMarker, constraints);
         contentPane.add(legionMarker);
 
+        java.util.List imageNames = client.getLegionImageNames(markerId);
         Iterator it = imageNames.iterator();
         while (it.hasNext())
         {
@@ -63,6 +62,8 @@ final class PickRecruiter extends KDialog implements MouseListener,
             gridbag.setConstraints(chit, constraints);
             contentPane.add(chit);
         }
+
+        height = imageNames.size();
 
         // There are height + 1 chits in the top row.  There
         // are numEligible chits to place beneath.
@@ -97,12 +98,11 @@ final class PickRecruiter extends KDialog implements MouseListener,
     }
 
 
-    static String pickRecruiter(JFrame parentFrame, 
-        java.util.List recruiters, java.util.List imageNames, 
+    static String pickRecruiter(JFrame parentFrame, java.util.List recruiters, 
         String hexDescription, String markerId, Client client)
     {
-        new PickRecruiter(parentFrame, recruiters, imageNames, 
-            hexDescription, markerId, client);
+        new PickRecruiter(parentFrame, recruiters, hexDescription, markerId, 
+            client);
         return recruiterName;
     }
 

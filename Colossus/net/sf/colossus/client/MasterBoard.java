@@ -1524,7 +1524,7 @@ public final class MasterBoard extends JPanel
         
         if (image == null)
         {
-            Log.error("ERROR: Couldn't find Colossus icon");
+            Log.error("Couldn't find Colossus icon");
             System.exit(1);
         }
         else

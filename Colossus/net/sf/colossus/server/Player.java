@@ -778,7 +778,7 @@ public final class Player implements Comparable
         }
 
         // Mark this player as dead.
-        dead = true;
+        setDead(true);
 
         // Record the slayer and give him this player's legion markers.
         if (slayer != null)

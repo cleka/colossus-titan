@@ -32,8 +32,7 @@ final class PickRecruit extends KDialog implements MouseListener,
 
 
     private PickRecruit(JFrame parentFrame, java.util.List recruits, 
-        java.util.List imageNames, String hexDescription, String markerId,
-        Client client)
+        String hexDescription, String markerId, Client client)
     {
         super(parentFrame, client.getPlayerName() +
             ": Pick Recruit in " + hexDescription, true);
@@ -56,6 +55,7 @@ final class PickRecruit extends KDialog implements MouseListener,
         gridbag.setConstraints(legionMarker, constraints);
         contentPane.add(legionMarker);
 
+        java.util.List imageNames = client.getLegionImageNames(markerId);
         Iterator it = imageNames.iterator();
         while (it.hasNext())
         {
@@ -111,15 +111,14 @@ final class PickRecruit extends KDialog implements MouseListener,
 
     /** Return the creature recruited, or null if none. */
     static String pickRecruit(JFrame parentFrame, java.util.List recruits,
-        java.util.List imageNames, String hexDescription, String markerId,
-        Client client)
+        String hexDescription, String markerId, Client client)
     {
         recruit = null;
         if (!active)
         {
             active = true;
-            new PickRecruit(parentFrame, recruits, imageNames,
-                hexDescription, markerId, client);
+            new PickRecruit(parentFrame, recruits, hexDescription, 
+                markerId, client);
             active = false;
         }
         return recruit;

@@ -28,8 +28,7 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
 
     private Concede(Client client, JFrame parentFrame, String longMarkerName,
-        String hexDescription, String allyMarkerId, java.util.List
-        allyImageNames, String enemyMarkerId, java.util.List enemyImageNames,
+        String hexDescription, String allyMarkerId, String enemyMarkerId, 
         boolean flee)
     {
         super(parentFrame, (flee ? "Flee" : "Concede") + " with Legion " +
@@ -57,6 +56,8 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         gridbag.setConstraints(allyMarker, constraints);
         contentPane.add(allyMarker);
 
+        java.util.List allyImageNames = client.getLegionImageNames(
+            allyMarkerId);
         Iterator it = allyImageNames.iterator();
         while (it.hasNext())
         {
@@ -74,6 +75,8 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         gridbag.setConstraints(enemyMarker, constraints);
         contentPane.add(enemyMarker);
 
+        java.util.List enemyImageNames = client.getLegionImageNames(
+            enemyMarkerId);
         it = enemyImageNames.iterator();
         while (it.hasNext())
         {
@@ -135,23 +138,19 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
     static void concede(Client client, JFrame parentFrame,
         String longMarkerName, String hexDescription, String allyMarkerId, 
-        java.util.List allyImageNames, String enemyMarkerId, 
-        java.util.List enemyImageNames)
+        String enemyMarkerId)
     {
         new Concede(client, parentFrame, longMarkerName, hexDescription,
-            allyMarkerId, allyImageNames, enemyMarkerId, enemyImageNames,
-            false);
+            allyMarkerId, enemyMarkerId, false);
     }
 
 
     static void flee(Client client, JFrame parentFrame,
         String longMarkerName, String hexDescription, String allyMarkerId, 
-        java.util.List allyImageNames, String enemyMarkerId, 
-        java.util.List enemyImageNames)
+        String enemyMarkerId)
     {
         new Concede(client, parentFrame, longMarkerName, hexDescription,
-            allyMarkerId, allyImageNames, enemyMarkerId, enemyImageNames,
-            true);
+            allyMarkerId, enemyMarkerId, true);
     }
 
 
@@ -194,32 +193,8 @@ final class Concede extends KDialog implements ActionListener, WindowListener
         }
     }
 
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
     public void windowClosing(WindowEvent e)
     {
         cleanup(false);
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
     }
 }

@@ -98,12 +98,15 @@ public final class Client
     private Map legionContents = new HashMap();
 
 
-    int turnNumber = -1;
-    String activePlayerName = "none";
-    int phase = -1;
-    int battleTurnNumber = -1;
-    String battleActivePlayerName = "none";
-    int battlePhase = -1;
+    private int turnNumber = -1;
+    private String activePlayerName = "none";
+    private int phase = -1;
+
+    private int battleTurnNumber = -1;
+    private String battleActivePlayerName = "none";
+    private int battlePhase = -1;
+    private String attackerMarkerId = "none";
+    private String defenderMarkerId = "none";
 
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
@@ -294,17 +297,17 @@ public final class Client
     }
 
     // XXX All the public option methods need to be non-public.
-    public boolean getOption(String name)
+    public boolean getOption(String optname)
     {
         // If autoplay is set, then return true for all other auto* options.
-        if (name.startsWith("Auto") && !name.equals(Options.autoPlay))
+        if (optname.startsWith("Auto") && !optname.equals(Options.autoPlay))
         {
             if (getOption(Options.autoPlay))
             {
                 return true;
             }
         }
-        String value = options.getProperty(name);
+        String value = options.getProperty(optname);
         return (value != null && value.equals("true"));
     }
 
@@ -314,36 +317,36 @@ public final class Client
         return value;
     }
 
-    public void setOption(String name, boolean value)
+    public void setOption(String optname, boolean value)
     {
-        options.setProperty(name, String.valueOf(value));
+        options.setProperty(optname, String.valueOf(value));
 
         // Side effects
-        if (name.equals(Options.antialias))
+        if (optname.equals(Options.antialias))
         {
             Hex.setAntialias(value);
             repaintAllWindows();
         }
-        else if (name.equals(Options.useOverlay))
+        else if (optname.equals(Options.useOverlay))
         {
             Hex.setOverlay(value);
             repaintAllWindows();
         }
-        else if (name.equals(Options.noBaseColor))
+        else if (optname.equals(Options.noBaseColor))
         {
             Creature.setNoBaseColor(value);
             net.sf.colossus.util.ResourceLoader.purgeCache();
             repaintAllWindows();
         }
-        else if (name.equals(Options.logDebug))
+        else if (optname.equals(Options.logDebug))
         {
             Log.setShowDebug(value);
         }
-        else if (name.equals(Options.showCaretaker))
+        else if (optname.equals(Options.showCaretaker))
         {
             updateCreatureCountDisplay();
         }
-        else if (name.equals(Options.showLogWindow))
+        else if (optname.equals(Options.showLogWindow))
         {
             Log.setToWindow(value);
             if (value)
@@ -421,7 +424,7 @@ public final class Client
             return;
         }
         syncCheckboxes();
-        setBooleanOptions();
+        // XXX No longer needed? setBooleanOptions();
     }
 
 
@@ -458,11 +461,11 @@ public final class Client
         Enumeration en = options.propertyNames();
         while (en.hasMoreElements())
         {
-            String name = (String)en.nextElement();
-            String value = options.getProperty(name);
+            String optname = (String)en.nextElement();
+            String value = options.getProperty(optname);
             if (value.equals("true") || value.equals("false"))
             {
-                setOption(name, Boolean.getBoolean(value));
+                setOption(optname, Boolean.valueOf(value).booleanValue());
             }
         }
     }
@@ -878,13 +881,6 @@ public final class Client
     }
 
 
-    // TODO Remove cross-network static call.
-    static int getTitanPower(int score)
-    {
-        return (int)(6 + score / Game.getTitanImprovementValue());
-    }
-
-
     java.util.List getBattleChits()
     {
         return battleChits;
@@ -906,8 +902,20 @@ public final class Client
     }
 
     /** Create a new BattleChit and add it to the end of the list. */
-    void addBattleChit(String imageName, boolean inverted, int tag)
+    void addBattleChit(final String bareImageName, boolean inverted, int tag)
     {
+        String imageName = bareImageName;
+        if (imageName.equals("Titan"))
+        {
+            if (inverted)
+            {
+                imageName = getTitanBasename(defenderMarkerId);
+            }
+            else
+            {
+                imageName = getTitanBasename(attackerMarkerId);
+            }
+        }
         BattleChit chit = new BattleChit(4 * Scale.get(), imageName,
             map, inverted, tag);
         battleChits.add(chit);
@@ -932,7 +940,6 @@ public final class Client
         }
     }
 
-    // Rename
     public void placeNewChit(String imageName, boolean inverted, int tag, 
         String hexLabel)
     {
@@ -1060,8 +1067,7 @@ public final class Client
     }
 
 
-    // TODO Make this non-public.  Have Server track client IDs itself.
-    public String getPlayerName()
+    String getPlayerName()
     {
         return playerName;
     }
@@ -1223,21 +1229,17 @@ Log.debug("called Client.acquireAngelCallback()");
 
 
     public void askConcede(String longMarkerName, String hexDescription,
-        String allyMarkerId, java.util.List allyImageNames, String
-        enemyMarkerId, java.util.List enemyImageNames)
+        String allyMarkerId, String enemyMarkerId)
     {
         Concede.concede(this, board.getFrame(), longMarkerName,
-            hexDescription, allyMarkerId, allyImageNames,
-            enemyMarkerId, enemyImageNames);
+            hexDescription, allyMarkerId, enemyMarkerId);
     }
 
     public void askFlee(String longMarkerName, String hexDescription,
-        String allyMarkerId, java.util.List allyImageNames, String
-        enemyMarkerId, java.util.List enemyImageNames)
+        String allyMarkerId, String enemyMarkerId)
     {
         Concede.flee(this, board.getFrame(), longMarkerName,
-            hexDescription, allyMarkerId, allyImageNames,
-            enemyMarkerId, enemyImageNames);
+            hexDescription, allyMarkerId, enemyMarkerId);
     }
 
     void answerFlee(String markerId, boolean answer)
@@ -1267,7 +1269,6 @@ Log.debug("called Client.acquireAngelCallback()");
 
     public void askNegotiate(String attackerLongMarkerName, 
         String defenderLongMarkerName, String attackerId, String defenderId, 
-        java.util.List attackerImageNames, java.util.List defenderImageNames, 
         String hexLabel)
     {
         Proposal proposal = null;
@@ -1283,7 +1284,7 @@ Log.debug("called Client.acquireAngelCallback()");
         /* TODO Finish
             negotiate = new Negotiate(this, attackerLongMarkerName, 
                 defenderLongMarkerName, attackerId, defenderId,
-                attackerImageNames, defenderImageNames, hexLabel);
+                hexLabel);
         */
         }
     }
@@ -1443,13 +1444,16 @@ Log.debug("called Client.acquireAngelCallback()");
 
 
     public void initBattle(String masterHexLabel, int battleTurnNumber,
-        String battleActivePlayerName, int battlePhase)
+        String battleActivePlayerName, int battlePhase, 
+        String attackerMarkerId, String defenderMarkerId)
     {
         cleanupNegotiationDialogs();
 
         this.battleTurnNumber = battleTurnNumber;
         setBattleActivePlayerName(battleActivePlayerName);
         this.battlePhase = battlePhase;
+        this.attackerMarkerId = attackerMarkerId;
+        this.defenderMarkerId = defenderMarkerId;
 
         // Do not show map for AI players, except primary client.
         if (!getOption(Options.autoPlay) || primary)
@@ -1515,12 +1519,11 @@ Log.debug("called Client.acquireAngelCallback()");
 
         java.util.List recruits = server.findEligibleRecruits(markerId, 
             hexLabel);
-        java.util.List imageNames = getLegionImageNames(markerId);
         String hexDescription =
             MasterBoard.getHexByLabel(hexLabel).getDescription();
 
         String recruitName = PickRecruit.pickRecruit(board.getFrame(), 
-            recruits, imageNames, hexDescription, markerId, this);
+            recruits, hexDescription, markerId, this);
 
         if (recruitName == null)
         {
@@ -1528,7 +1531,7 @@ Log.debug("called Client.acquireAngelCallback()");
         }
 
         String recruiterName = findRecruiterName(hexLabel, markerId,
-            recruitName, imageNames, hexDescription);
+            recruitName, hexDescription);
         if (recruiterName == null)
         {
             return;
@@ -1546,18 +1549,17 @@ Log.debug("called Client.acquireAngelCallback()");
 
         java.util.List recruits = server.findEligibleRecruits(markerId, 
             hexLabel);
-        java.util.List imageNames = getLegionImageNames(markerId);
         String hexDescription =
             MasterBoard.getHexByLabel(hexLabel).getDescription();
 
         String recruitName = PickRecruit.pickRecruit(board.getFrame(), 
-            recruits, imageNames, hexDescription, markerId, this);
+            recruits, hexDescription, markerId, this);
 
         String recruiterName = null;
         if (recruitName != null)
         {
             recruiterName = findRecruiterName(hexLabel, markerId, recruitName,
-                imageNames, hexDescription);
+                hexDescription);
         }
 
         server.doRecruit(markerId, recruitName, recruiterName);
@@ -1609,7 +1611,7 @@ Log.debug("called Client.acquireAngelCallback()");
 
     /** null means cancel.  "none" means no recruiter (tower creature). */
     private String findRecruiterName(String hexLabel, String markerId, String
-        recruitName, java.util.List imageNames, String hexDescription)
+        recruitName, String hexDescription)
     {
         String recruiterName = null;
 
@@ -1633,7 +1635,7 @@ Log.debug("called Client.acquireAngelCallback()");
         else
         {
             recruiterName = PickRecruiter.pickRecruiter(board.getFrame(),
-                recruiters, imageNames, hexDescription, markerId, this);
+                recruiters, hexDescription, markerId, this);
         }
         return recruiterName;
     }
@@ -2358,8 +2360,7 @@ Log.debug("called Client.acquireAngelCallback()");
             return;
         }
 
-        String results = SplitLegion.splitLegion(this, parentId,
-            childId, getLegionImageNames(parentId));
+        String results = SplitLegion.splitLegion(this, parentId, childId);
 
         if (results != null)
         {

@@ -216,15 +216,12 @@ public final class Game
         // so that we can avoid showing boards for non-primary AI players.
 
         syncAutoPlay();
-
         server.allInitBoard();
-
         assignTowers();
 
         // Renumber players in descending tower order.
         Collections.sort(players);
         activePlayerNum = 0;
-
         assignColors();
     }
 
@@ -285,7 +282,6 @@ public final class Game
         }
     }
 
-    /** playerNum chooses color */
     void assignColor(String playerName, String color)
     {
         // XXX Only let the player whose turn it is pick.
@@ -1069,7 +1065,7 @@ public final class Game
                 player.setScore(score);
 
                 buf = in.readLine();
-                player.setDead(Boolean.getBoolean(buf));
+                player.setDead(Boolean.valueOf(buf).booleanValue());
 
                 buf = in.readLine();
                 int mulligansLeft = Integer.parseInt(buf);
@@ -1095,10 +1091,10 @@ public final class Game
                 player.setMovementRoll(Integer.parseInt(buf));
 
                 buf = in.readLine();
-                player.setTeleported(Boolean.getBoolean(buf));
+                player.setTeleported(Boolean.valueOf(buf).booleanValue());
 
                 buf = in.readLine();
-                player.setSummoned(Boolean.getBoolean(buf));
+                player.setSummoned(Boolean.valueOf(buf).booleanValue());
 
                 buf = in.readLine();
                 int numLegions = Integer.parseInt(buf);
@@ -1138,7 +1134,7 @@ public final class Game
 
                 buf = in.readLine();
                 boolean driftDamageApplied =
-                    Boolean.getBoolean(buf);
+                    Boolean.valueOf(buf).booleanValue();
 
                 buf = in.readLine();
                 int numCarryTargets = Integer.parseInt(buf);
@@ -1180,6 +1176,10 @@ public final class Game
             server.allInitBoard();
             server.allAddMarkers();
 
+            setupPhase();
+
+            server.allUpdatePlayerInfo();
+
             if (server.getClientOption(Options.allStacksVisible))
             {
                 server.allFullyUpdateAllLegionContents();
@@ -1190,9 +1190,6 @@ public final class Game
                 server.allFullyUpdateOwnLegionContents();
             }
 
-            setupPhase();
-
-            server.allUpdatePlayerInfo();
             caretaker.fullySyncDisplays();
         }
         // FileNotFoundException, IOException, NumberFormatException
@@ -1212,7 +1209,7 @@ public final class Game
         String startingHexLabel = in.readLine();
 
         String buf = in.readLine();
-        boolean moved = Boolean.getBoolean(buf);
+        boolean moved = Boolean.valueOf(buf).booleanValue();
 
         buf = in.readLine();
         int entrySide = Integer.valueOf(buf).intValue();
@@ -1252,7 +1249,7 @@ public final class Game
                 critter.setStartingHexLabel(buf);
 
                 buf = in.readLine();
-                boolean struck = Boolean.getBoolean(buf);
+                boolean struck = Boolean.valueOf(buf).booleanValue();
                 critter.setStruck(struck);
             }
 
