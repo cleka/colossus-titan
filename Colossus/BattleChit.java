@@ -12,6 +12,7 @@ class BattleChit extends Chit
 {
     private Player player;
     private Creature creature;
+    private BattleMap map;
     private boolean moved = false;
 
     private Hex currentHex;
@@ -23,13 +24,14 @@ class BattleChit extends Chit
 
     BattleChit(int cx, int cy, int scale, String imageFilename,
         Container container, Creature creature, Hex hex, Player player,
-        boolean inverted)
+        boolean inverted, BattleMap map)
     {
         super(cx, cy, scale, imageFilename, container, inverted);
         this.creature = creature;
         this.currentHex = hex;
         this.startingHex = hex;
         this.player = player;
+        this.map = map;
     }
 
 
@@ -79,6 +81,12 @@ class BattleChit extends Chit
     }
 
 
+    void commitMove()
+    {
+        moved = false;
+    }
+
+
     Hex getCurrentHex()
     {
         return currentHex;
@@ -91,12 +99,31 @@ class BattleChit extends Chit
     }
 
 
+    boolean isEngaged()
+    {
+        // XXX Need to use map to figure this out.
+        return false;
+    }
+
+
     void moveToHex(Hex hex)
     {
         currentHex.removeChit(this);
         currentHex = hex;
         currentHex.addChit(this);
         moved = true;
-        // legion.markLastChitMoved(this);
+        map.markLastChitMoved(this);
+        map.repaint();
+    }
+
+
+    void undoMove()
+    {
+        currentHex.removeChit(this);
+        currentHex = startingHex;
+        currentHex.addChit(this);
+        moved = false;
+        map.clearLastChitMoved();
+        map.repaint();
     }
 }
