@@ -14,9 +14,7 @@ class Legion
     private int height;
     private String markerId;    // Bk03, Rd12, etc.
     private Legion splitFrom;
-    private Creature [] creatures = new Creature[8];  // 8 before initial splits
-    int numVisibleCreatures;
-    private Creature [] visibleCreatures = new Creature[8];
+    private Critter [] critters = new Critter[8];  // 8 before initial splits
     private MasterHex currentHex;
     private MasterHex startingHex;
     private boolean moved = false;
@@ -38,14 +36,40 @@ class Legion
         this.currentHex = hex;
         this.startingHex = hex;
         this.player = player;
-        creatures[0] = creature0;
-        creatures[1] = creature1;
-        creatures[2] = creature2;
-        creatures[3] = creature3;
-        creatures[4] = creature4;
-        creatures[5] = creature5;
-        creatures[6] = creature6;
-        creatures[7] = creature7;
+
+        if (creature0 != null)
+        {
+            critters[0] = new Critter(creature0, false);
+        }
+        if (creature1 != null)
+        {
+            critters[1] = new Critter(creature1, false);
+        }
+        if (creature2 != null)
+        {
+            critters[2] = new Critter(creature2, false);
+        }
+        if (creature3 != null)
+        {
+            critters[3] = new Critter(creature3, false);
+        }
+        if (creature4 != null)
+        {
+            critters[4] = new Critter(creature4, false);
+        }
+        if (creature5 != null)
+        {
+            critters[5] = new Critter(creature5, false);
+        }
+        if (creature6 != null)
+        {
+            critters[6] = new Critter(creature6, false);
+        }
+        if (creature7 != null)
+        {
+            critters[7] = new Critter(creature7, false);
+        }
+
         // Initial legion contents are public; contents of legions created 
         // by splits are private.
         if (height == 8)
@@ -54,6 +78,7 @@ class Legion
         }
         else
         {
+            // XXX Skip this when loading game
             hideAllCreatures();
         }
     }
@@ -64,7 +89,7 @@ class Legion
         int pointValue = 0;
         for (int i = 0; i < height; i++)
         {
-            pointValue += creatures[i].getPointValue();
+            pointValue += critters[i].getPointValue();
         }
         return pointValue;
     }
@@ -122,7 +147,7 @@ class Legion
     {
         for (int i = 0; i < height; i++)
         {
-            if (creatures[i].isLord())
+            if (critters[i].isLord())
             {
                 return false;
             }
@@ -136,7 +161,7 @@ class Legion
         int count = 0;
         for (int i = 0; i < height; i++)
         {
-            if (creatures[i] == creature)
+            if (critters[i].getCreature() == creature)
             {
                 count++;
             }
@@ -150,7 +175,7 @@ class Legion
         int count = 0;
         for (int i = 0; i < height; i++)
         {
-            if (creatures[i].isLord())
+            if (critters[i].isLord())
             {
                 count++;
             }
@@ -263,13 +288,13 @@ class Legion
     {
         if (recruited())
         {
-            Creature creature = creatures[height - 1];
+            Critter critter = critters[height - 1];
 
-            // removeCreature() will automatically put immortal creatures back
+            // removeCreature() will automatically put immortal critters back
             // on the stack, but mortal ones must be handled manually.
-            if (!creature.isImmortal())
+            if (!critter.isImmortal())
             {
-                creature.putOneBack();
+                critter.putOneBack();
             }
             removeCreature(height - 1);
 
@@ -332,7 +357,8 @@ class Legion
         {
             creature.takeOne();
             height++;
-            creatures[height - 1] = creature;
+            // Newly added critters are visible.
+            critters[height - 1] = new Critter(creature, true);
         }
     }
 
@@ -345,19 +371,19 @@ class Legion
         }
 
         // If the creature is a lord or demi-lord, put it back in the stacks.
-        if (creatures[i].isImmortal())
+        if (critters[i].isImmortal())
         {
-            creatures[i].putOneBack();
+            critters[i].putOneBack();
         }
 
         for (int j = i; j < height - 1; j++)
         {
-            creatures[j] = creatures[j + 1];
+            critters[j] = critters[j + 1];
         }
-        creatures[height - 1] = null;
+        critters[height - 1] = null;
         height--;
 
-        // If there are no creatures left, disband the legion.
+        // If there are no critters left, disband the legion.
         if (height == 0)
         {
             removeLegion();
@@ -369,7 +395,7 @@ class Legion
     {
         for (int i = 0; i < height; i++)
         {
-            if (creatures[i] == creature)
+            if (critters[i].getCreature() == creature)
             {
                 removeCreature(i);
                 return;
@@ -386,14 +412,35 @@ class Legion
         }
         else
         {
-            return creatures[i];
+            return critters[i].getCreature();
+        }
+    }
+    
+    
+    public Critter getCritter(int i)
+    {
+        if (i > height - 1)
+        {
+            return null;
+        }
+        else
+        {
+            return critters[i];
         }
     }
 
 
     public void setCreature(int i, Creature creature)
     {
-        creatures[i] = creature;
+        // This is called from SplitLegion, so critter will be invisible.
+        if (creature == null)
+        {
+            critters[i] = null;
+        }
+        else
+        {
+            critters[i] = new Critter(creature, false);
+        }
     }
 
 
@@ -402,8 +449,8 @@ class Legion
     {
         for (int i = 0; i < height; i++)
         {
-            creatures[i].putOneBack();
-            legion.addCreature(creatures[i]);
+            critters[i].putOneBack();
+            legion.addCreature(critters[i]);
         }
         // Prevent double-returning lords to stacks.
         height = 0;
@@ -413,11 +460,10 @@ class Legion
 
     public void hideAllCreatures()
     {
-        for (int i = 0; i < visibleCreatures.length; i++)
+        for (int i = 0; i < height; i++)
         {
-            visibleCreatures[i] = null;
+            critters[i].setVisible(false);
         }
-        numVisibleCreatures = 0;
     }
     
     
@@ -425,27 +471,18 @@ class Legion
     {
         for (int i = 0; i < height; i++)
         {
-            visibleCreatures[i] = creatures[i];
+            critters[i].setVisible(true);
         }
-        numVisibleCreatures = height;
     }
 
 
     public void revealCreatures(Creature creature, int numberToReveal)
     {
-        // Sanity check, in case numVisibleCreatures is set too high.
-        if (numVisibleCreatures >= height)
-        {
-            System.out.println("numVisibleCreatures was " + 
-                numVisibleCreatures + " but height was only " + height);
-            revealAllCreatures();
-            return;
-        }
-
         int numberAlreadyRevealed = 0;
-        for (int i = 0; i < numVisibleCreatures; i++)
+        for (int i = 0; i < height; i++)
         {
-            if (visibleCreatures[i] == creature)
+            if (critters[i].getCreature() == creature && 
+                critters[i].isVisible())
             {
                 numberAlreadyRevealed++;
             }
@@ -457,56 +494,18 @@ class Legion
             numberToReveal -= excess;
         }
 
-        // Added a hard bounds check here after getting an
-        // ArrayIndexOutOfBoundsException when called from
-        // AcquireAngel
-        for (int i = numVisibleCreatures; i < 7 && i < 
-            numVisibleCreatures + numberToReveal; i++)
+        for (int i = 0; i < height; i++)
         {
-            visibleCreatures[i] = creature;
-        }
-        if (numberToReveal > 0)
-        {
-            numVisibleCreatures += numberToReveal;
-        }
-    }
-
-
-    // Remove one creature from the visible list.  This is needed to
-    // remove summoned-out angels.
-    public void hideCreature(Creature creature)
-    {
-        for (int i = 0; i < numVisibleCreatures; i++)
-        {
-            if (visibleCreatures[i] == creature)
+            if (critters[i].getCreature() == creature && 
+                ! critters[i].isVisible())
             {
-                for (int j = i; j < numVisibleCreatures - 1; j++)
+                critters[i].setVisible(true);
+                numberToReveal--;
+                if (numberToReveal == 0)
                 {
-                    visibleCreatures[j] = visibleCreatures[j + 1];
+                    return;
                 }
-                visibleCreatures[numVisibleCreatures - 1] = null;
-                numVisibleCreatures--;
-                return;
             }
-        }
-    }
-
-
-    public int getNumVisibleCreatures()
-    {
-        return numVisibleCreatures;
-    }
-    
-    
-    public String getVisibleCreatureImageName(int i)
-    {
-        if (i > numVisibleCreatures - 1)
-        {
-            return "images" + File.separator + "Question.gif";
-        }
-        else
-        {
-            return visibleCreatures[i].getImageName();
         }
     }
 }
