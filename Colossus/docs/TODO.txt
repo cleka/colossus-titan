@@ -1,3 +1,6 @@
+Create a list of options to save/load, rather than hardcoding
+   each one.
+
 Add per-player option menu, with results saved to playername.cfg
 
 Change more modal dialogs to use a factory that returns a value,
@@ -40,6 +43,13 @@ Differently-highlight hexes where a legion could move if
    a friendly stack were not already there?
 
 Color code StatusScreen better.
+Add the ability to choose towers, movement die rolls, and number of
+   hits in combat, rather than rolling, for debug and tracking
+   PBEM games.
+
+Add the ability to change the creature type of a creature in a legion,
+   and to specify "unknown" as a creature type, for tracking PBEM
+   games.
 
 All GUI method calls need to be moved out of non-GUI classes.
 Split GUI classes from model classes.

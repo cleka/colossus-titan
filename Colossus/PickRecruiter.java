@@ -30,7 +30,8 @@ public final class PickRecruiter extends JDialog implements MouseListener,
         ArrayList recruiters)
     {
         super(parentFrame, legion.getPlayer().getName() +
-            ": Pick Recruiter", true);
+            ": Pick Recruiter in " + legion.getCurrentHex().getDescription(),
+            true);
 
         recruiter = null;
 

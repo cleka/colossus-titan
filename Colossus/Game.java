@@ -1012,15 +1012,14 @@ public final class Game
         catch (Exception e)
         {
             e.printStackTrace();
-            // XXX Ask for another file?  Start new game?
+            System.out.println("Tried to load corrupt savegame.");
             dispose();
         }
     }
 
 
-    // XXX Enumerate possible Exception types
     public Legion readLegion(BufferedReader in, Player player,
-        boolean inBattle) throws Exception
+        boolean inBattle) throws IOException
     {
         String markerId = in.readLine();
         String currentHexLabel = in.readLine();
@@ -1176,14 +1175,14 @@ public final class Game
         options.setProperty(sShowStatusScreen, String.valueOf(
             showStatusScreen));
         options.setProperty(sAntialias, String.valueOf(antialias));
+        options.setProperty(sAutoRecruit, String.valueOf(autoRecruit));
         try
         {
             FileOutputStream out = new FileOutputStream(optionsPath);
             String header = "Colossus config file version 1.0";
             options.store(out, header);
         }
-        // XXX Enumerate exception types
-        catch (Exception e)
+        catch (IOException e)
         {
             System.out.println("Couldn't write options to " + optionsPath);
         }
@@ -1201,8 +1200,7 @@ public final class Game
             FileInputStream in = new FileInputStream(optionsPath);
             options.load(in);
         }
-        // XXX Enumerate exception types
-        catch (Exception e)
+        catch (IOException e)
         {
             System.out.println("Couldn't read options from " + optionsPath);
             return;
@@ -1218,6 +1216,8 @@ public final class Game
         showStatusScreen = (options.getProperty(sShowStatusScreen,
             "true").equals("true"));
         antialias = (options.getProperty(sAntialias, "false").equals("true"));
+        autoRecruit = (options.getProperty(sAutoRecruit, 
+            "false").equals("true"));
 
         board.twiddleAutosave(autosave);
         board.twiddleAllStacksVisible(allStacksVisible);
@@ -1225,6 +1225,7 @@ public final class Game
         board.twiddleShowStatusScreen(showStatusScreen);
         board.twiddleShowDice(showDice);
         board.twiddleAntialias(antialias);
+        board.twiddleAutoRecruit(autoRecruit);
     }
 
 
@@ -2038,6 +2039,32 @@ public final class Game
         legion.setRecruited(true);
 
         legion.getPlayer().setLastLegionRecruited(legion);
+    }
+
+
+    public void doAutoRecruit()
+    {
+        Player player = getActivePlayer();
+        List legions = player.getLegions();
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            if (legion.hasMoved() && legion.canRecruit())
+            {
+                List recruits = findEligibleRecruits(legion);
+
+                // The last recruit is the biggest.
+                Creature recruit = (Creature)recruits.get(recruits.size() - 1);
+
+                if (recruit != null)
+                {
+                    doRecruit(recruit, legion, masterFrame);
+                }
+            }
+        }
+        board.unselectAllHexes();
+        updateStatusScreen();
     }
 
 
@@ -2923,6 +2950,19 @@ public final class Game
 
     public static void main(String [] args)
     {
+        // Set look and feel to native, since Metal does not show titles
+        // for popup menus.
+        try
+        {
+            UIManager.setLookAndFeel(
+                UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.out.println("Could not set look and feel.");
+        };
+
         if (args.length == 0)
         {
             // Start a new game.

@@ -1505,6 +1505,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
             // Highlight hexes with legions eligible to muster.
             game.highlightPossibleRecruits();
+
+            if (game.getAutoRecruit())
+            {
+                game.doAutoRecruit();
+            }
         }
     }
 
