@@ -177,7 +177,7 @@ public final class Battle
     }
 
 
-    Player getActivePlayer()
+    private Player getActivePlayer()
     {
         return game.getPlayerByMarkerId(legions[activeLegionNum]);
     }
@@ -212,25 +212,19 @@ public final class Battle
     }
 
 
-    int getActiveLegionNum()
-    {
-        return activeLegionNum;
-    }
-
-
     Legion getActiveLegion()
     {
         return getLegion(activeLegionNum);
     }
 
 
-    Legion getInactiveLegion()
+    private Legion getInactiveLegion()
     {
         return getLegion((activeLegionNum + 1) & 1);
     }
 
 
-    Legion getLegion(int legionNum)
+    private Legion getLegion(int legionNum)
     {
         if (legionNum == Constants.DEFENDER)
         {
@@ -247,7 +241,7 @@ public final class Battle
     }
 
 
-    Legion getLegionByPlayerName(String playerName)
+    private Legion getLegionByPlayerName(String playerName)
     {
         Legion attacker = getAttacker();
         if (attacker != null && attacker.getPlayerName().equals(
@@ -270,7 +264,7 @@ public final class Battle
         return masterHexLabel;
     }
 
-    MasterHex getMasterHex()
+    private MasterHex getMasterHex()
     {
         return MasterBoard.getHexByLabel(masterHexLabel);
     }
@@ -293,25 +287,13 @@ public final class Battle
     }
 
 
-    boolean isAttackerElim()
-    {
-        return attackerElim;
-    }
-
-
-    boolean isDefenderElim()
-    {
-        return defenderElim;
-    }
-
-
-    boolean isOver()
+    private boolean isOver()
     {
         return battleOver;
     }
 
 
-    void advancePhase()
+    private void advancePhase()
     {
         phaseAdvancer.advancePhase();
     }
@@ -640,7 +622,7 @@ Log.debug("Called Battle.doneReinforcing()");
     }
 
 
-    Set showMoves(int tag)
+    private Set showMoves(int tag)
     {
         Critter critter = getActiveLegion().getCritterByTag(tag);
         return showMoves(critter, false);
@@ -648,7 +630,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
     /** Find all legal moves for this critter. The returned list
      *  contains hex IDs, not hexes. */
-    Set showMoves(Critter critter, boolean ignoreMobileAllies)
+    private Set showMoves(Critter critter, boolean ignoreMobileAllies)
     {
         Set set = new HashSet();
         if (!critter.hasMoved() && !critter.isInContact(false))
@@ -683,20 +665,6 @@ Log.debug("Called Battle.doneReinforcing()");
         }
     }
 
-    void undoAllMoves()
-    {
-        Iterator it = getActiveLegion().getCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (critter.hasMoved())
-            {
-                critter.undoMove();
-            }
-        }
-    }
-
-
 
     /** Mark all of the conceding player's critters as dead. */
     void concede(String playerName)
@@ -717,28 +685,6 @@ Log.debug("Called Battle.doneReinforcing()");
         {
             advancePhase();
         }
-    }
-
-
-    /** Return a set of hex labels for hex labels with critters eligible
-     *  to move. */
-    Set findMobileCritters()
-    {
-        Set set = new HashSet();
-        Legion legion = getActiveLegion();
-
-        Iterator it = legion.getCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (!critter.hasMoved() && !critter.isInContact(false))
-            {
-                BattleHex hex = critter.getCurrentHex();
-                set.add(hex.getLabel());
-            }
-        }
-
-        return set;
     }
 
 
@@ -778,7 +724,7 @@ Log.debug("Called Battle.doneReinforcing()");
     }
 
 
-    void applyDriftDamage()
+    private void applyDriftDamage()
     {
         // Drift damage is applied only once per player turn,
         //    during the strike phase.
@@ -1040,26 +986,8 @@ Log.debug("Called Battle.doneReinforcing()");
         }
     }
 
-    /** Return the set of hex labels for hexes with critters that have
-     *  valid strike targets. */
-    Set findCrittersWithTargets()
-    {
-        Set set = new HashSet();
-        Iterator it = getActiveLegion().getCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (countStrikes(critter, true) > 0)
-            {
-                set.add(critter.getCurrentHexLabel());
-            }
-        }
 
-        return set;
-    }
-
-
-    boolean isForcedStrikeRemaining()
+    private boolean isForcedStrikeRemaining()
     {
         Legion legion = getActiveLegion();
         if (legion != null)
@@ -1075,52 +1003,6 @@ Log.debug("Called Battle.doneReinforcing()");
             }
         }
         return false;
-    }
-
-    /** Perform strikes for any creature that is forced to strike
-     *  and has only one legal target. Forced strikes will never
-     *  generate carries, since there's only one target. If
-     *  rangestrike is true, also perform rangestrikes for
-     *  creatures with only one target, even though they're not
-     *  technically forced. */
-    synchronized void makeForcedStrikes(boolean rangestrike)
-    {
-        if (getPhase() != Constants.FIGHT && 
-            getPhase() != Constants.STRIKEBACK)
-        {
-            Log.error("Called Battle.makeForcedStrikes() in wrong phase");
-            return;
-        }
-        Legion legion = getActiveLegion();
-        boolean repeat;
-        do
-        {
-            repeat = false;
-            Iterator it = legion.getCritters().iterator();
-            while (it.hasNext())
-            {
-                Critter critter = (Critter)it.next();
-                if (!critter.hasStruck())
-                {
-                    Set set = findStrikes(critter, rangestrike);
-                    if (set.size() == 1)
-                    {
-                        String hexLabel = (String)(set.iterator().next());
-                        Critter target = getCritter(hexLabel);
-                        critter.strike(target);
-
-                        // If that strike killed the target, it's possible
-                        // that some other creature that had two targets
-                        // now has only one.
-                        if (target.isDead())
-                        {
-                            repeat = true;
-                        }
-                    }
-                }
-            }
-        }
-        while (repeat);
     }
 
     /** Return true if okay, or false if forced strikes remain. */
@@ -1141,12 +1023,6 @@ Log.debug("Called Battle.doneReinforcing()");
         }
     }
 
-
-    Set findStrikes(int tag)
-    {
-        Critter critter = getActiveLegion().getCritterByTag(tag);
-        return findStrikes(critter, true);
-    }
 
     /** Return a set of hex labels for hexes containing targets that the
      *  critter may strike.  Only include rangestrikes if rangestrike
@@ -1213,12 +1089,6 @@ Log.debug("Called Battle.doneReinforcing()");
     }
 
 
-    int countStrikes(Critter critter, boolean rangestrike)
-    {
-        return findStrikes(critter, rangestrike).size();
-    }
-
-
     /** Return the set of hex labels for hexes with valid carry targets. */
     Set getCarryTargets()
     {
@@ -1254,11 +1124,6 @@ Log.debug("Called Battle.doneReinforcing()");
         carryTargets.add(hexLabel);
     }
 
-    void removeCarryTarget(String hexLabel)
-    {
-        carryTargets.remove(hexLabel);
-    }
-
     void applyCarries(Critter target)
     {
         if (!carryTargets.contains(target.getCurrentHexLabel()))
@@ -1290,7 +1155,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
     /** Return the range in hexes from hex1 to hex2.  Titan ranges are
      *  inclusive at both ends. */
-    public static int getRange(BattleHex hex1, BattleHex hex2,
+    public static int getRange(BattleHex hex1, BattleHex hex2, 
         boolean allowEntrance)
     {
         if (hex1 == null || hex2 == null)
@@ -1376,33 +1241,6 @@ Log.debug("Called Battle.doneReinforcing()");
     }
 
 
-    /** Return the titan range (inclusive at both ends) from the critter to the
-     *  closest enemy critter.  Return OUT_OF_RANGE if there are none. */
-    int minRangeToEnemy(Critter critter)
-    {
-        BattleHex hex = critter.getCurrentHex();
-        int min = Constants.OUT_OF_RANGE;
-
-        Legion enemy = getInactiveLegion();
-        Iterator it = enemy.getCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter target = (Critter)it.next();
-            BattleHex targetHex = target.getCurrentHex();
-            int range = getRange(hex, targetHex, false);
-            // Exit early if adjacent.
-            if (range == 2)
-            {
-                return range;
-            }
-            else if (range < min)
-            {
-                 min = range;
-            }
-        }
-        return min;
-    }
-
     /** Caller must ensure that yDist != 0 */
     private static boolean toLeft(double xDist, double yDist)
     {
@@ -1418,7 +1256,7 @@ Log.debug("Called Battle.doneReinforcing()");
         }
     }
 
-    static boolean isObstacle(char hexside)
+    private static boolean isObstacle(char hexside)
     {
         return (hexside != ' ') && (hexside != 'r');
     }
@@ -1913,21 +1751,8 @@ Log.debug("Called Battle.doneReinforcing()");
         }
     }
 
-    /** A streamlined version of doMove for the AI. If legal, move critter
-     *  to hex and return true. Else return false.  Do not allow null moves.
-     */
-    boolean testMove(Critter critter, String hexLabel)
-    {
-        if (showMoves(critter, false).contains(hexLabel))
-        {
-            critter.moveToHex(hexLabel, false);
-            return true;
-        }
-        return false;
-    }
 
-
-    void cleanup()
+    private void cleanup()
     {
         battleOver = true;
         game.finishBattle(masterHexLabel, attackerEntered, pointsScored);
@@ -1935,7 +1760,7 @@ Log.debug("Called Battle.doneReinforcing()");
 
 
     /** Return a list of all critters in the battle. */
-    List getAllCritters()
+    private List getAllCritters()
     {
         List critters = new ArrayList();
         Legion defender = getDefender();
@@ -1952,7 +1777,7 @@ Log.debug("Called Battle.doneReinforcing()");
     }
 
 
-    boolean isOccupied(String hexLabel)
+    private boolean isOccupied(String hexLabel)
     {
         Iterator it = getAllCritters().iterator();
         while (it.hasNext())
@@ -1966,7 +1791,7 @@ Log.debug("Called Battle.doneReinforcing()");
         return false;
     }
 
-    boolean isOccupied(BattleHex hex)
+    private boolean isOccupied(BattleHex hex)
     {
         return isOccupied(hex.getLabel());
     }
@@ -1989,19 +1814,4 @@ Log.debug("Called Battle.doneReinforcing()");
         }
         return null;
     }
-
-    Critter getCritter(int tag)
-    {
-        Iterator it = getAllCritters().iterator();
-        while (it.hasNext())
-        {
-            Critter critter = (Critter)it.next();
-            if (critter.getTag() == tag)
-            {
-                return critter;
-            }
-        }
-        return null;
-    }
 }
-
