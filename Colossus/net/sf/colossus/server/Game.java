@@ -855,12 +855,8 @@ public final class Game
         return turnNumber;
     }
 
-    void saveGame(final String filename)
-    {
-        saveGameXML(filename);
-    }
 
-    synchronized void saveGameXML(final String filename)
+    synchronized void saveGame(final String filename)
     {
         String fn = null;
 
@@ -974,7 +970,7 @@ public final class Game
                 {
                     Legion legion = (Legion)it2.next();
 
-                    el.addContent(dumpLegionXML(doc, legion, battle != null
+                    el.addContent(dumpLegion(doc, legion, battle != null
                             && (legion == battle.getAttacker() ||
                                 legion == battle.getDefender())));
                 }
@@ -1027,8 +1023,7 @@ public final class Game
         return in;
     }
 
-    private Element dumpLegionXML(Document doc, Legion legion,
-        boolean inBattle)
+    private Element dumpLegion(Document doc, Legion legion, boolean inBattle)
     {
         Element leg = new Element("Legion");
 

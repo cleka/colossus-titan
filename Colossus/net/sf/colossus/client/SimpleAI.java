@@ -2645,7 +2645,7 @@ Log.debug("Best target is null, aborting");
             if (timeIsUp)
             {
                 Log.debug("Time is up figuring move order");
-                break;
+                // XXX Ignore for now -- buggy break;
             }
         }
         Log.debug("Got score " + bestScore + " in " + count + " permutations");
