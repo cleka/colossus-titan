@@ -97,7 +97,7 @@
         <recruit name="Titan" number="-1" />
         <recruit name="Warlock" number="1" />
     </terrain>
-    <terrain name="Castle" color="white" regular_recruit="False" >
+    <terrain name="Castle" color="lightGray" regular_recruit="False" >
         <recruit name="Anything" number="0" />
         <recruit name="Skeleton" number="0" />
         <recruit name="AnyNonLord" number="0" />
