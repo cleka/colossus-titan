@@ -17,7 +17,6 @@ all: BattleMap.class \
      Legion.class \
      MasterBoard.class \
      MasterHex.class \
-     MessageBox.class \
      Negotiate.class \
      PickMarker.class \
      PickRecruit.class \
@@ -59,9 +58,6 @@ MasterBoard.class: MasterBoard.java
 
 MasterHex.class: MasterHex.java
 	$(JC) MasterHex.java
-
-MessageBox.class: MessageBox.java
-	$(JC) MessageBox.java
 
 Negotiate.class: Negotiate.java
 	$(JC) Negotiate.java
