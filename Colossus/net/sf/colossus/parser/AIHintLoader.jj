@@ -22,11 +22,24 @@ import net.sf.colossus.server.HintOracleInterface;
  */
 public class AIHintLoader
 {
+    public static final String sectionAllAI = "AllAI:";
+    public static final String sectionOffensiveAI = "OffensiveAI:";
+    public static final String sectionDefensiveAI = "DefensiveAI:";
+    
+    String currentSection = sectionAllAI;
+
     Map terrainToRecruitHintList = new HashMap();
     Map labelToInitialSplitList = new HashMap();
     Map nameToRecruitmentValueOffset = new HashMap();
     java.util.Stack argStack = new java.util.Stack();
     Random rnd = new Random();
+
+    /* make sure the default entry is present, to avoid null pointer exception */
+    {
+        terrainToRecruitHintList.put(sectionAllAI, new HashMap());
+        labelToInitialSplitList.put(sectionAllAI, new HashMap());
+        nameToRecruitmentValueOffset.put(sectionAllAI, new HashMap());
+    }
 
     private class initialSplitHintData
     {
@@ -475,107 +488,127 @@ public class AIHintLoader
         char terrain,
         LegionInfo legion,
         List recruits,
-        HintOracleInterface oracle)
+        HintOracleInterface oracle,
+        String[] section)
     {
-        Character index = new Character(terrain);
-        
-        List temp = (List)terrainToRecruitHintList.get(index);
         String hint = null;
         
-        if (temp == null)
-        { // no hint for this terrain
-            //Log.debug("HINT: none found for terrain type " + terrain);
-            return null;
-        }
-        
-        Iterator hintIt = temp.iterator();
-        while (hintIt.hasNext() && (hint == null))
-        {
-            recruitHintData th = (recruitHintData)hintIt.next();
-            //Log.debug("HINT: checking " + th);
-            synchronized (th)
-            {
-                th.setOracle(oracle);
-                    
-                // first, try with all the creatures in the Legion
-                Iterator legionIt = legion.getContents().iterator();
-                while (legionIt.hasNext() && (hint == null))
-                { // this will try creatures as many times as they exist. yuck !
-                    String creature = (String)legionIt.next();
-                    int num = legion.numCreature(creature);
-                    /* Log.debug("HINT: trying to match [1] " + terrain +
-                              " / " + creature +
-                              " / " + num); */
-                    if (th.match(terrain, creature, num))
-                    {
-                        hint = th.getRecruitee();
-                    }
-                }
-                // second, try with all recruitable creature (so that
-                // hint with (number == 0) are tried)
-                Iterator recruitsIt = recruits.iterator();
-                while (recruitsIt.hasNext() && (hint == null))
-                { // this will try creatures as many times as they exist. yuck !
-                    String creature = ((Creature)recruitsIt.next()).getName();
-                    int num = legion.numCreature(creature);
-                    /* Log.debug("HINT: trying to match [2] " + terrain +
-                              " / " + creature +
-                              " / " + num); */
-                    if (th.match(terrain, creature, num))
-                    {
-                        hint = th.getRecruitee();
-                    }
-                }
+        Character index = new Character(terrain);
 
-                // remove the Oracle, just in case
-                th.setOracle(null);
+        for (int i = 0; i < section.length; i++)
+        {
+            HashMap sectionTerrainToRecruitHintList =
+                (HashMap)terrainToRecruitHintList.get(section[i]);
+            List temp = (List)sectionTerrainToRecruitHintList.get(index);
+        
+            if (temp == null)
+            { // no hint for this terrain
+                //Log.debug("HINT: none found for terrain type " + terrain);
+            }
+            else
+            {
+        
+                Iterator hintIt = temp.iterator();
+                while (hintIt.hasNext() && (hint == null))
+                {
+                    recruitHintData th = (recruitHintData)hintIt.next();
+                    //Log.debug("HINT: checking " + th);
+                    synchronized (th)
+                    {
+                        th.setOracle(oracle);
+                    
+                        // first, try with all the creatures in the Legion
+                        Iterator legionIt = legion.getContents().iterator();
+                        while (legionIt.hasNext() && (hint == null))
+                        { // this will try creatures as many times as they exist. yuck !
+                            String creature = (String)legionIt.next();
+                            int num = legion.numCreature(creature);
+                            /* Log.debug("HINT: trying to match [1] " + terrain +
+                               " / " + creature +
+                               " / " + num); */
+                            if (th.match(terrain, creature, num))
+                            {
+                                hint = th.getRecruitee();
+                            }
+                        }
+                        // second, try with all recruitable creature (so that
+                        // hint with (number == 0) are tried)
+                        Iterator recruitsIt = recruits.iterator();
+                        while (recruitsIt.hasNext() && (hint == null))
+                        { // this will try creatures as many times as they exist. yuck !
+                            String creature = ((Creature)recruitsIt.next()).getName();
+                            int num = legion.numCreature(creature);
+                            /* Log.debug("HINT: trying to match [2] " + terrain +
+                               " / " + creature +
+                               " / " + num); */
+                            if (th.match(terrain, creature, num))
+                            {
+                                hint = th.getRecruitee();
+                            }
+                        }
+
+                        // remove the Oracle, just in case
+                        th.setOracle(null);
+                    }
+                }
             }
         }
         return hint;
     }
 
-    public synchronized List getInitialSplitHint(String label)
+    public synchronized List getInitialSplitHint(String label,
+                                                 String[] section)
     {
-        List allHints = (List)labelToInitialSplitList.get(label);
         List legion = null;
 
-        if (allHints == null)
+        for (int i = 0; i < section.length; i++)
         {
-            return null;
-        }
+            HashMap sectionLabelToInitialSplitList = 
+                (HashMap)labelToInitialSplitList.get(section[i]);
+            List allHints = (List)sectionLabelToInitialSplitList.get(label);
 
-        Iterator it = allHints.iterator();
-        boolean done = false;
-
-        while (it.hasNext() && !done)
-        {
-            initialSplitHintData ishd = (initialSplitHintData)it.next();
-
-            if (rnd.nextDouble() < ishd.getProbability())
+            if (allHints == null)
             {
-                List legions = ishd.getLegions();
-
-                legion = (List)legions.get(rnd.nextInt(legions.size()));
-
-                done = true;
+                
+            }
+            else
+            {
+                Iterator it = allHints.iterator();
+                boolean done = false;
+                
+                while (it.hasNext() && !done)
+                {
+                    initialSplitHintData ishd = (initialSplitHintData)it.next();
+                    
+                    if (rnd.nextDouble() < ishd.getProbability())
+                    {
+                        List legions = ishd.getLegions();
+                        
+                        legion = (List)legions.get(rnd.nextInt(legions.size()));
+                        
+                        done = true;
+                    }
+                }
             }
         }
 
         return legion;
     }
 
-    public int getHintedRecruitmentValueOffset(String name)
+    public int getHintedRecruitmentValueOffset(String name,
+                                               String[] section)
     {
-        Integer i = (Integer)nameToRecruitmentValueOffset.get(name);
-        
-        if (i == null)
+        for (int i = 0; i < section.length; i++)
         {
-            return 0;
+            HashMap sectionNameToRecruitmentValueOffset =
+                (HashMap)nameToRecruitmentValueOffset.get(section[i]);
+            Integer offset = (Integer)sectionNameToRecruitmentValueOffset.get(name);
+            if (offset != null)
+            {
+                return offset.intValue();
+            }
         }
-        else
-        {
-            return i.intValue();
-        }
+        return 0;
     }
 }
 
@@ -630,6 +663,11 @@ TOKEN :
 TOKEN :
 {
     < RECRUITVALUE: "RECRUITVALUE" >
+}
+
+TOKEN :
+{
+    < SECTIONNAME: (["a"-"z","A"-"Z","0"-"9","_"])+ "AI:" >
 }
 
 TOKEN :
@@ -847,12 +885,14 @@ int oneHint() :
             ctn = (ConditionTreeNode)argStack.pop();
         }
 
-        List temp = (List)terrainToRecruitHintList.get(index);
+        HashMap sectionTerrainToRecruitHintList =
+                (HashMap)terrainToRecruitHintList.get(currentSection);
+        List temp = (List)sectionTerrainToRecruitHintList.get(index);
 
         if (temp == null)
         {
             temp = new ArrayList();
-            terrainToRecruitHintList.put(index, temp);
+            sectionTerrainToRecruitHintList.put(index, temp);
         }
         
         if (ctn != null)
@@ -871,12 +911,14 @@ int oneHint() :
     }
 |   <INITIALSPLIT> (label = h_chaine()) (ishd = h_initialsplit_hint())
     {
-        List isl = (List)labelToInitialSplitList.get(label);
+        HashMap sectionLabelToInitialSplitList = 
+                (HashMap)labelToInitialSplitList.get(currentSection);
+        List isl = (List)sectionLabelToInitialSplitList.get(label);
 
         if (isl == null)
         {
             isl = new ArrayList();
-            labelToInitialSplitList.put(label, isl);
+            sectionLabelToInitialSplitList.put(label, isl);
         }
         Log.debug("HINT: Initial Split hint for hex " + label + " is " + ishd);
         
@@ -886,9 +928,29 @@ int oneHint() :
     }
 |   <RECRUITVALUE> (name = h_chaine()) (offset = h_number())
     {
-        nameToRecruitmentValueOffset.put(name, new Integer(offset));
+        HashMap sectionNameToRecruitmentValueOffset =
+                (HashMap)nameToRecruitmentValueOffset.get(currentSection);
+        sectionNameToRecruitmentValueOffset.put(name, new Integer(offset));
 
         return 1;
+    }
+|   <SECTIONNAME>
+    {
+        Log.debug("HINT: Entering section " + token.image);
+        currentSection = token.image;
+        if (terrainToRecruitHintList.get(currentSection) == null)
+        {
+            terrainToRecruitHintList.put(currentSection, new HashMap());
+        }
+        if (labelToInitialSplitList.get(currentSection) == null)
+        {
+            labelToInitialSplitList.put(currentSection, new HashMap());
+        }
+        if (nameToRecruitmentValueOffset.get(currentSection) == null)
+        {
+            nameToRecruitmentValueOffset.put(currentSection, new HashMap());
+        }
+        return(0);
     }
 |   (s = h_comment())
     {

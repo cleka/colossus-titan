@@ -255,6 +255,12 @@ public class Creature implements Comparable
         return getPointValue() +
             VariantSupport.getHintedRecruitmentValueOffset(name);
     }
+
+    public int getHintedRecruitmentValue(String[] section)
+    {
+        return getPointValue() +
+            VariantSupport.getHintedRecruitmentValueOffset(name, section);
+    }
     
     public boolean isRangestriker()
     {

@@ -353,9 +353,21 @@ public final class VariantSupport
         java.util.List recruits,
         net.sf.colossus.server.HintOracleInterface oracle)
     {
+        String[] section = new String[1];
+        section[0] = AIHintLoader.sectionAllAI;
+        return getRecruitHint(terrain, legion, recruits, oracle, section);
+    }
+
+    public synchronized static String getRecruitHint(
+        char terrain,
+        net.sf.colossus.client.LegionInfo legion,
+        java.util.List recruits,
+        net.sf.colossus.server.HintOracleInterface oracle,
+        String[] section)
+    {
         if (aihl != null)
         {
-            return aihl.getRecruitHint(terrain,legion,recruits,oracle);
+            return aihl.getRecruitHint(terrain,legion,recruits,oracle, section);
         }
         else
         {
@@ -366,16 +378,31 @@ public final class VariantSupport
 
     public synchronized static java.util.List getInitialSplitHint(String label)
     {
+        String[] section = new String[1];
+        section[0] = AIHintLoader.sectionAllAI;
+        return getInitialSplitHint(label, section);
+    }
+    public synchronized static java.util.List getInitialSplitHint(String label,
+                                                                  String[] section)
+    {
         if (aihl != null)
         {
-            return aihl.getInitialSplitHint(label);
+            return aihl.getInitialSplitHint(label, section);
         }
         return null;
     }
 
     public synchronized static int getHintedRecruitmentValueOffset(String name)
     {
-        return aihl.getHintedRecruitmentValueOffset(name);
+        String[] section = new String[1];
+        section[0] = AIHintLoader.sectionAllAI;
+        return getHintedRecruitmentValueOffset(name, section);
+    }
+
+    public synchronized static int getHintedRecruitmentValueOffset(String name,
+                                                                  String[] section)
+    {
+        return aihl.getHintedRecruitmentValueOffset(name, section);
     }
     
     /** get maximum number of players in that variant */

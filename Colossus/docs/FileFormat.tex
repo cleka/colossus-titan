@@ -200,6 +200,8 @@ Towers are denoted by the keyword \texttt{TOWER} by itself on a line. The terrai
 
 This file lists some hints to the Colossus AI on how to play the game.
 
+The file is cut off into sections, each specifying behavior for one kind of AI. Any hints appearing before a section name is assumed to belong to section ``AllAI:''. A section name is a name ending in ``AI:'' ; known values are ``AllAI:'', ``OffensiveAI:'' and ``DefensiveAI:''. Any section name can be used, but if none of the AI is aware of a section, it won't be used. All AI will used hints from section ``AllAI'' as a last resort, after trying zero, one or more other section(s). Note that some AIs may ignore hints entirely, and some may decide to change the used sections in the middle of the game :-) A hint belongs to the last section whose name appears before the hint.
+
 Each hint is a line of one of the forms:
 
 \texttt{RECRUIT $\langle$terrain\_letter$\rangle$ $\langle$recruiter\_name$\rangle$ $\langle$recruiter\_number$\rangle$  $\langle$recruitee\_name$\rangle$ $\langle$optional\_condition$\rangle$}

@@ -17,5 +17,10 @@ public class CowardSimpleAI extends SimpleAI
         RATIO_WIN_HEAVY_LOSS = 1.25; // 1.15;
         RATIO_DRAW = 0.90; // 0.85;
         RATIO_LOSE_HEAVY_LOSS = 0.75; // 0.70;
+
+        /* this is a defensive AI, not an offensive one, so use
+           the proper hints section */
+        hintSectionUsed[0] = 
+            net.sf.colossus.parser.AIHintLoader.sectionDefensiveAI;
     }
 }
