@@ -2917,31 +2917,15 @@ public final class Game
             }
 
             // The players may agree to a negotiated settlement.
-            Negotiate.negotiate(masterFrame, attacker, defender);
-            if (!hex.isEngagement())
+            NegotiationResults results = Negotiate.negotiate(masterFrame,
+                attacker, defender);
+
+            if (results.isSettled())
             {
-                // Negotiated settlement.
-                if (hex.getLegion(0) == defender && defender.canRecruit())
-                {
-                    // If the defender won the battle by agreement,
-                    // he may recruit.
-                    Creature recruit = PickRecruit.pickRecruit(
-                        masterFrame, defender);
-                    if (recruit != null)
-                    {
-                        doRecruit(recruit, defender, masterFrame);
-                    }
-                }
-                else if (hex.getLegion(0) == attacker &&
-                    attacker.getHeight() < 7 && !player.hasSummoned())
-                {
-                    // If the attacker won the battle by agreement,
-                    // he may summon an angel.
-                    createSummonAngel(attacker);
-                }
-                highlightEngagements();
-                engagementInProgress = false;
+                handleNegotiation(results, attacker, defender);
+                return;
             }
+
             else
             {
                 // Battle
@@ -2993,6 +2977,123 @@ public final class Game
         // No recruiting or angel summoning is allowed after the
         // defender flees or the attacker concedes before entering
         // the battle.
+        highlightEngagements();
+        engagementInProgress = false;
+    }
+
+
+    private void handleNegotiation(NegotiationResults results, Legion
+        attacker, Legion defender)
+    {
+        if (results.isMutual())
+        {
+             // Remove both legions and give no points.
+             attacker.remove();
+             defender.remove();
+
+             Game.logEvent(attacker.getLongMarkerName() + " and " +
+                 defender.getLongMarkerName() +
+                 " agree to mutual elimination");
+
+             // If both Titans died, eliminate both players.
+             if (attacker.numCreature(Creature.titan) == 1 &&
+                 defender.numCreature(Creature.titan) == 1)
+             {
+                 // Make defender die first, to simplify turn advancing.
+                 defender.getPlayer().die(null, false);
+                 attacker.getPlayer().die(null, true);
+             }
+
+             // If either was the titan stack, its owner dies and gives
+             // half points to the victor.
+             else if (attacker.numCreature(Creature.titan) == 1)
+             {
+                 attacker.getPlayer().die(defender.getPlayer(), true);
+             }
+
+             else if (defender.numCreature(Creature.titan) == 1)
+             {
+                 defender.getPlayer().die(attacker.getPlayer(), true);
+             }
+        }
+        else
+        {
+            // One legion was eliminated during negotiations.
+            Legion winner = results.getWinner();
+            Legion loser;
+            if (winner == defender)
+            {
+                loser = attacker;
+            }
+            else
+            {
+                loser = defender;
+            }
+
+            StringBuffer log = new StringBuffer("Winning legion ");
+            log.append(winner.getLongMarkerName());
+            log.append(" loses creatures ");
+
+            // Remove all dead creatures from the winning legion.
+            ArrayList winnerLosses = results.getWinnerLosses();
+            Iterator it = winnerLosses.iterator();
+            while (it.hasNext())
+            {
+                Creature creature = (Creature)it.next();
+                log.append(creature.getName());
+                if (it.hasNext())
+                {
+                    log.append(", ");
+                }
+                winner.removeCreature(creature, true, true);
+            }
+            Game.logEvent(log.toString());
+
+            int points = loser.getPointValue();
+
+            // Remove the losing legion.
+            loser.remove();
+
+            // Add points, and angels if necessary.
+            winner.addPoints(points);
+
+            Game.logEvent("Legion " + loser.getLongMarkerName() +
+               " is eliminated by legion " + winner.getLongMarkerName() +
+               " via negotiation");
+
+            // If this was the titan stack, its owner dies and gives half
+            // points to the victor.
+            if (loser.numCreature(Creature.titan) == 1)
+            {
+                loser.getPlayer().die(winner.getPlayer(), true);
+            }
+
+            if (winner == defender)
+            {
+                if (defender.canRecruit())
+                {
+                    // If the defender won the battle by agreement,
+                    // he may recruit.
+                    Creature recruit = PickRecruit.pickRecruit(
+                        masterFrame, defender);
+                    if (recruit != null)
+                    {
+                        doRecruit(recruit, defender, masterFrame);
+                    }
+                }
+            }
+            else
+            {
+                if (attacker.getHeight() < 7 &&
+                    !attacker.getPlayer().hasSummoned())
+                {
+                    // If the attacker won the battle by agreement,
+                    // he may summon an angel.
+                    createSummonAngel(attacker);
+                }
+            }
+        }
+
         highlightEngagements();
         engagementInProgress = false;
     }

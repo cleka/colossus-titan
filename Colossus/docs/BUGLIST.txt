@@ -73,7 +73,6 @@ Post-battle angel summoning is messed up.  Usually hexes with eligible
 Cyclops entered battle map with 4 hits already.  Failed to heal after
    last battle?
 
-Win98, jdk 1.3: Focus keeps moving to MovementDie and BattleDice, which 
+Win98, jdk1.3: Focus keeps moving to MovementDie and BattleDice, which 
    disrupts keyboard shortcuts.  Doesn't happen with StatusScreen.
    Doesn't happen in Unix.
-

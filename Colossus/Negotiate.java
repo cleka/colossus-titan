@@ -22,7 +22,7 @@ public final class Negotiate extends JDialog implements MouseListener,
     private JFrame parentFrame;
     private GridBagLayout gridbag = new GridBagLayout();
     private GridBagConstraints constraints = new GridBagConstraints();
-    private static boolean active;
+    private static NegotiationResults results;
 
 
     private Negotiate(JFrame parentFrame, Legion attacker, Legion defender)
@@ -140,15 +140,16 @@ public final class Negotiate extends JDialog implements MouseListener,
     }
 
 
-    public static void negotiate(JFrame parentFrame, Legion attacker,
-        Legion defender)
+    /** Display a dialog allowing players to settle an engagement.
+        Return a NegotiationResults class, which says if there was
+        an agreement, if there was a mutual, the winner if any,
+        and the winner's losses if applicable.
+     */
+    public static NegotiationResults negotiate(JFrame parentFrame,
+        Legion attacker, Legion defender)
     {
-        if (!active)
-        {
-            active = true;
-            new Negotiate(parentFrame, attacker, defender);
-            active = false;
-        }
+        new Negotiate(parentFrame, attacker, defender);
+        return results;
     }
 
 
@@ -196,70 +197,42 @@ public final class Negotiate extends JDialog implements MouseListener,
         if (e.getActionCommand().equals("Agree"))
         {
             // Count remaining chits.
-            int attackersLeft = 0;
-
+            boolean attackersLeft = false;
             Iterator it = attackerChits.iterator();
             while (it.hasNext())
             {
                 Chit chit = (Chit)it.next();
                 if (!chit.isDead())
                 {
-                    attackersLeft++;
+                    attackersLeft = true;
+                    break;
                 }
             }
 
-            int defendersLeft = 0;
+            boolean defendersLeft = false;
             it = defenderChits.iterator();
             while (it.hasNext())
             {
                 Chit chit = (Chit)it.next();
                 if (!chit.isDead())
                 {
-                    defendersLeft++;
+                    defendersLeft = true;
+                    break;
                 }
             }
 
             // Ensure that at least one legion is completely eliminated.
-            if (attackersLeft > 0 && defendersLeft > 0)
+            if (attackersLeft && defendersLeft)
             {
                 JOptionPane.showMessageDialog(parentFrame,
                     "At least one legion must be eliminated.");
                 return;
             }
 
-            MasterHex hex = attacker.getCurrentHex();
-
-            // If this is a mutual elimination, remove both legions and
-            // give no points.
-            if (attackersLeft == 0 && defendersLeft == 0)
+            if (!attackersLeft && !defendersLeft)
             {
-                attacker.remove();
-                defender.remove();
-
-                Game.logEvent(attacker.getLongMarkerName() + " and " +
-                    defender.getLongMarkerName() +
-                    " agree to mutual elimination");
-
-                // If both Titans died, eliminate both players.
-                if (attacker.numCreature(Creature.titan) == 1 &&
-                    defender.numCreature(Creature.titan) == 1)
-                {
-                    // Make defender die first, to simplify turn advancing.
-                    defender.getPlayer().die(null, false);
-                    attacker.getPlayer().die(null, true);
-                }
-
-                // If either was the titan stack, its owner dies and gives
-                // half points to the victor.
-                else if (attacker.numCreature(Creature.titan) == 1)
-                {
-                    attacker.getPlayer().die(defender.getPlayer(), true);
-                }
-
-                else if (defender.numCreature(Creature.titan) == 1)
-                {
-                    defender.getPlayer().die(attacker.getPlayer(), true);
-                }
+                // Mutual destruction.
+                results = new NegotiationResults(true, true, null, null);
             }
 
             // If this is not a mutual elimination, figure out how many
@@ -270,7 +243,7 @@ public final class Negotiate extends JDialog implements MouseListener,
                 Legion loser;
                 ArrayList winnerChits;
 
-                if (defendersLeft == 0)
+                if (!defendersLeft)
                 {
                     winner = attacker;
                     loser = defender;
@@ -297,11 +270,8 @@ public final class Negotiate extends JDialog implements MouseListener,
                     }
                 }
 
-                StringBuffer log = new StringBuffer("Winning legion ");
-                log.append(winner.getLongMarkerName());
-                log.append(" loses creatures ");
-
                 // Remove all dead creatures from the winning legion.
+                ArrayList winnerLosses = new ArrayList();
                 it = winnerChits.iterator();
                 while (it.hasNext())
                 {
@@ -313,46 +283,21 @@ public final class Negotiate extends JDialog implements MouseListener,
                         {
                             name = "Titan";
                         }
-                        log.append(name);
-                        if (it.hasNext())
-                        {
-                            log.append(", ");
-                        }
-                        winner.removeCreature(
-                            Creature.getCreatureFromName(name), true, true);
+                        winnerLosses.add(Creature.getCreatureFromName(name));
                     }
                 }
-                Game.logEvent(log.toString());
-
-                int points = loser.getPointValue();
-
-                // Remove the losing legion.
-                loser.remove();
-
-                // Add points, and angels if necessary.
-                winner.addPoints(points);
-
-                Game.logEvent("Legion " + loser.getLongMarkerName() +
-                   " is eliminated by legion " + winner.getLongMarkerName() +
-                   " via negotiation");
-
-                // If this was the titan stack, its owner dies and gives half
-                // points to the victor.
-                if (loser.numCreature(Creature.titan) == 1)
-                {
-                    loser.getPlayer().die(winner.getPlayer(), true);
-                }
+                results = new NegotiationResults(true, false, winner,
+                    winnerLosses);
             }
 
             // Exit this dialog.
             cleanup();
-
-            // Unselect and repaint the hex.
-            MasterBoard.unselectHexByLabel(hex.getLabel());
         }
 
         else if (e.getActionCommand().equals("Fight"))
         {
+            results = new NegotiationResults(false, false, null, null);
+
             // Exit this dialog.
             cleanup();
         }
