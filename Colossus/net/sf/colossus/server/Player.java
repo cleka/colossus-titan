@@ -70,7 +70,7 @@ public final class Player implements Comparable
         }
 
         // Strings are immutable, so a shallow copy == a deep copy
-        newPlayer.markersAvailable = (TreeSet) markersAvailable.clone();
+        newPlayer.markersAvailable = (TreeSet)markersAvailable.clone();
 
         return newPlayer;
     }
@@ -621,7 +621,7 @@ public final class Player implements Comparable
 
     void recombineIllegalSplits()
     {
-        HashSet hexLabelsToAlign = new HashSet();
+        Set hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
@@ -749,7 +749,7 @@ public final class Player implements Comparable
 
         Player slayer = game.getPlayer(slayerName);
 
-        HashSet hexLabelsToAlign = new HashSet();
+        Set hexLabelsToAlign = new HashSet();
         Iterator it = legions.iterator();
         while (it.hasNext())
         {

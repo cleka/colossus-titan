@@ -52,7 +52,7 @@ class CreatureCollectionView extends JDialog
     }
 
     /** hash by creature name to the label that displays the count */
-    HashMap m_oCountHash = new HashMap();
+    Map countMap = new HashMap();
 
     /** the count for an individual creature */
     class CreatureCount extends JPanel
@@ -73,7 +73,7 @@ class CreatureCollectionView extends JDialog
             JLabel lblCreatureIcon = new JLabel(oIcon);
             JLabel lblCreatureCount = new JLabel(Integer.toString(
                 client.getCreatureCount(strName)), SwingConstants.CENTER);
-            m_oCountHash.put(strName, lblCreatureCount);
+            countMap.put(strName, lblCreatureCount);
 
             // jikes whines because add is defined in both JPanel
             // and JDialog.
@@ -105,7 +105,7 @@ class CreatureCollectionView extends JDialog
 
     public void update()
     {
-        Iterator it = m_oCountHash.entrySet().iterator();
+        Iterator it = countMap.entrySet().iterator();
         while(it.hasNext())
         {
             Map.Entry entry = (Map.Entry)it.next();

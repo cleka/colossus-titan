@@ -59,7 +59,7 @@ class MinimaxAI extends SimpleAI implements AI
         // the player for whom we're doing the evaluation.
         // note, this is NOT the same as Game.getActivePlayerNum()
         int AIPlayerNum;
-        HashMap[] enemyAttackMap;
+        Map[] enemyAttackMap;
 
         MasterBoardPosition(Game game, int AIPlayerNum)
         {
@@ -231,7 +231,7 @@ class MinimaxAI extends SimpleAI implements AI
                 {
                     String hexLabel = (String)it2.next();
                     MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
-                    HashMap moves = new HashMap();
+                    Map moves = new HashMap();
                     moves.put(legion, hex);
                     PlayerMove move = new PlayerMove(moves, this);
                     allmoves.add(move);
@@ -401,9 +401,9 @@ class MinimaxAI extends SimpleAI implements AI
 
     class PlayerMove extends MasterBoardPositionMove
     {
-        HashMap moves;
+        Map moves;
 
-        PlayerMove(HashMap moves, MasterBoardPosition position)
+        PlayerMove(Map moves, MasterBoardPosition position)
         {
             this.position = position;
             this.moves = moves;

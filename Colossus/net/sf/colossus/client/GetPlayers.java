@@ -190,7 +190,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
     private void validateInputs()
     {
         playerInfo.clear();
-        HashSet namesTaken = new HashSet();
+        Set namesTaken = new HashSet();
         int numPlayers = 0;
         Random aiRand = new Random();
 

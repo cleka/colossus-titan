@@ -32,8 +32,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     // The game state hexes can be set up once for each terrain type.
     // XXX Also Need entrances in non-GUI maps.
-    private static HashMap terrainH = new HashMap();
-    private static HashMap terrainHexes = new HashMap();
+    private static Map terrainH = new HashMap();
+    private static Map terrainHexes = new HashMap();
 
 
     /** ne, e, se, sw, w, nw */
@@ -92,7 +92,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
             setupEntrancesGameState(gameEntrances, gameH);
 
-            // Add hexes to both the [][] and ArrayList hashmaps.
+            // Add hexes to both the [][] and ArrayList maps.
             terrainH.put(new Character(terrain), gameH);
             terrainHexes.put(new Character(terrain), gameHexes);
         }
@@ -435,7 +435,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
     Set getAllHexLabels()
     {
-        HashSet set = new HashSet();
+        Set set = new HashSet();
         Iterator it = hexes.iterator();
         while (it.hasNext())
         {

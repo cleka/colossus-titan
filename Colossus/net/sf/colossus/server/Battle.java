@@ -42,7 +42,7 @@ final class Battle
     private boolean conceded;
     private boolean driftDamageApplied;
     /** Set of hexLabels for valid carry targets */
-    private HashSet carryTargets = new HashSet();
+    private Set carryTargets = new HashSet();
 
     private final int BIGNUM = 99;
 
@@ -655,7 +655,7 @@ final class Battle
     private Set findMoves(BattleHex hex, Critter critter, boolean flies,
         int movesLeft, int cameFrom, boolean ignoreMobileAllies)
     {
-        HashSet set = new HashSet();
+        Set set = new HashSet();
         for (int i = 0; i < 6; i++)
         {
             // Do not double back.
@@ -714,7 +714,7 @@ final class Battle
      *  are mobile. */
     private Set findUnoccupiedTowerHexes(boolean ignoreMobileAllies)
     {
-        HashSet set = new HashSet();
+        Set set = new HashSet();
         BattleHex centerHex = HexMap.getCenterTowerHex();
         if (ignoreMobileAllies || !isOccupied(centerHex))
         {
@@ -819,7 +819,7 @@ final class Battle
      *  to move. */
     Set findMobileCritters()
     {
-        HashSet set = new HashSet();
+        Set set = new HashSet();
         Legion legion = getActiveLegion();
 
         Iterator it = legion.getCritters().iterator();
@@ -1136,7 +1136,7 @@ final class Battle
      *  valid strike targets. */
     Set findCrittersWithTargets()
     {
-        HashSet set = new HashSet();
+        Set set = new HashSet();
         Iterator it = getActiveLegion().getCritters().iterator();
         while (it.hasNext())
         {
@@ -1238,7 +1238,7 @@ final class Battle
      *  is true. */
     Set findStrikes(Critter critter, boolean rangestrike)
     {
-        HashSet set = new HashSet();
+        Set set = new HashSet();
 
         // Each creature may strike only once per turn.
         if (critter.hasStruck())
@@ -1311,7 +1311,7 @@ final class Battle
         return carryTargets;
     }
 
-    void setCarryTargets(HashSet carryTargets)
+    void setCarryTargets(Set carryTargets)
     {
         this.carryTargets = carryTargets;
     }

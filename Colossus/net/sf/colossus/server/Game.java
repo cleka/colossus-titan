@@ -1145,7 +1145,7 @@ public final class Game
 
                 buf = in.readLine();
                 int numCarryTargets = Integer.parseInt(buf);
-                HashSet carryTargets = new HashSet();
+                Set carryTargets = new HashSet();
                 for (int i = 0; i < numCarryTargets; i++)
                 {
                     buf = in.readLine();
@@ -1706,13 +1706,12 @@ public final class Game
      *  all legal final destinations.  If block >= 0, go only
      *  that way.  If block == -1, use arches and arrows.  If
      *  block == -2, use only arrows.  Do not double back in
-     *  the direction you just came from.
-     */
+     *  the direction you just came from.  */
     private Set findNormalMoves(MasterHex hex, Player player, Legion legion,
         int roll, int block, int cameFrom, boolean affectEntrySides,
         boolean ignoreFriends)
     {
-        HashSet set = new HashSet();
+        Set set = new HashSet();
         String hexLabel = hex.getLabel();
 
         // If there are enemy legions in this hex, mark it
@@ -1803,7 +1802,7 @@ public final class Game
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
         String hexLabel = hex.getLabel();
-        HashSet set = new HashSet();
+        Set set = new HashSet();
 
         if (!isOccupied(hexLabel))
         {
@@ -1864,7 +1863,7 @@ public final class Game
         {
             legion.clearAllHexInfo();
         }
-        HashSet set = new HashSet();
+        Set set = new HashSet();
         if (legion.hasMoved())
         {
             return set;
@@ -1961,7 +1960,7 @@ public final class Game
     /** Return set of hexLabels for engagements found. */
     Set findEngagements()
     {
-        HashSet set = new HashSet();
+        Set set = new HashSet();
         Player player = getActivePlayer();
 
         Iterator it = player.getLegions().iterator();
@@ -2116,7 +2115,7 @@ public final class Game
     Set findSummonableAngels(String markerId)
     {
         Legion legion = getLegionByMarkerId(markerId);
-        HashSet set = new HashSet();
+        Set set = new HashSet();
         Iterator it = legion.getPlayer().getLegions().iterator();
         while (it.hasNext())
         {
@@ -2881,7 +2880,7 @@ public final class Game
     Set findAllEligibleRecruitHexes()
     {
         Player player = getActivePlayer();
-        HashSet set = new HashSet();
+        Set set = new HashSet();
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
@@ -2903,7 +2902,7 @@ public final class Game
     Set findAllUnmovedLegionHexes()
     {
         Player player = getActivePlayer();
-        HashSet set = new HashSet();
+        Set set = new HashSet();
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {
@@ -2919,7 +2918,7 @@ public final class Game
     Set findTallLegionHexes()
     {
         Player player = getActivePlayer();
-        HashSet set = new HashSet();
+        Set set = new HashSet();
 
         for (int i = 0; i < player.getNumLegions(); i++)
         {

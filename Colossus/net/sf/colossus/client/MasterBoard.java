@@ -64,7 +64,7 @@ public final class MasterBoard extends JPanel
     private JFrame masterFrame;
     private JMenu phaseMenu;
     private JPopupMenu popupMenu;
-    private HashMap checkboxes = new HashMap();
+    private Map checkboxes = new HashMap();
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;

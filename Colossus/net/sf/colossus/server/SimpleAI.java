@@ -704,12 +704,12 @@ class SimpleAI implements AI
         handleMulligans(game, player);
 
         /** cache all places enemies can move to, for use in risk analysis. */
-        HashMap[] enemyAttackMap = buildEnemyAttackMap(game, player);
+        Map[] enemyAttackMap = buildEnemyAttackMap(game, player);
 
         // A mapping from Legion to List of MoveInfo objects,
         // listing all moves that we've evaluated.  We use this if
         // we're forced to move.
-        HashMap moveMap = new HashMap();
+        Map moveMap = new HashMap();
 
         // Sort legions into order of decreasing importance, so that
         // the important ones get the first chance to move to good hexes.
@@ -746,7 +746,7 @@ class SimpleAI implements AI
     }
 
     private void handleVoluntaryMoves(Game game, Player player,
-        HashMap moveMap, HashMap [] enemyAttackMap)
+        Map moveMap, Map [] enemyAttackMap)
     {
         boolean moved;
         List legions = player.getLegions();
@@ -819,7 +819,7 @@ class SimpleAI implements AI
     }
 
     private static void handleForcedSplitMoves(Game game, Player player,
-        HashMap moveMap)
+        Map moveMap)
     {
         List legions = player.getLegions();
         Iterator it = legions.iterator();
@@ -897,7 +897,7 @@ class SimpleAI implements AI
 
     /** Return true if something was moved. */
     private void handleForcedSingleMove(Game game, Player player,
-        HashMap moveMap)
+        Map moveMap)
     {
         Log.debug("Ack! forced to move someone");
 
@@ -950,9 +950,9 @@ class SimpleAI implements AI
         }
     }
 
-    static HashMap[] buildEnemyAttackMap(Game game, Player player)
+    static Map[] buildEnemyAttackMap(Game game, Player player)
     {
-        HashMap[] enemyMap = new HashMap[7];
+        Map[] enemyMap = new HashMap[7];
 
         for (int i = 1; i <= 6; i++)
         {
@@ -1030,7 +1030,7 @@ class SimpleAI implements AI
     // TODO: should be parameterized with weights
     //
     static int evaluateMove(Game game, Legion legion, MasterHex hex,
-        boolean canRecruitHere, HashMap[] enemyAttackMap)
+        boolean canRecruitHere, Map[] enemyAttackMap)
     {
         // Avoid using MIN_VALUE and MAX_VALUE because of possible overflow.
         final int WIN_GAME = Integer.MAX_VALUE / 2;
@@ -1337,7 +1337,7 @@ class SimpleAI implements AI
                     hex);
             }
 
-            HashMap[] enemiesThatCanAttackOnA = enemyAttackMap;
+            Map[] enemiesThatCanAttackOnA = enemyAttackMap;
             int roll;
 
             for (roll = 1; roll <= 6; roll++)
@@ -1871,7 +1871,7 @@ class SimpleAI implements AI
 
         // Then create a map containing each target and the likely number
         // of hits it would take if all possible creatures attacked it.
-        HashMap map = new HashMap();
+        Map map = new HashMap();
         Iterator it = legion.getCritters().iterator();
         while (it.hasNext())
         {
@@ -2228,7 +2228,7 @@ class SimpleAI implements AI
 
         // allCritterMoves is an ArrayList (for clone()) of moveLists.
         final ArrayList allCritterMoves = new ArrayList();
-        HashSet hexesTaken = new HashSet();
+        Set hexesTaken = new HashSet();
 
         Iterator it = critters.iterator();
         while (it.hasNext())

@@ -28,10 +28,10 @@ final class Legion implements Comparable
     private String playerName;
     private int battleTally;
     private Creature teleportingLord; // XXX Move into HexInfo?
-    private static HashMap markerNames = new HashMap();
+    private static Map markerNames = new HashMap();
     private Game game;
     /** Maps hex labels to HexInfo classes. */
-    private HashMap hexInfoMap = new HashMap();
+    private Map hexInfoMap = new HashMap();
 
     static
     {
