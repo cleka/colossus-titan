@@ -305,10 +305,70 @@
         <chmod file="BattlelandsRandomizer.jar" perm="755"/>
 </target>
 
-<!-- TODO If jar is already signed, don't sign it again. -->
+<!-- TODO If a jar is already signed, don't sign it again. -->
 <target name="sign" depends="jar"
         description = "Sign jar file">
         <signjar jar="Colossus.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-awt-util.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-bridge.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-css.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-dom.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-ext.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-gvt.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-parser.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-script.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-svg-dom.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-transcoder.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-util.jar"
+                 alias="${user.name}"
+                 keystore="${user.name}Keystore"
+                 storepass="${env.JARPASSWORD}"
+        />
+        <signjar jar="libs/batik-xml.jar"
                  alias="${user.name}"
                  keystore="${user.name}Keystore"
                  storepass="${env.JARPASSWORD}"
