@@ -172,6 +172,13 @@ public final class Game extends GameSource
         // We need to set the autoPlay option before loading the board,
         // so that we can avoid showing boards for AI players.
 
+        // Remove caretaker displays.
+        if (server != null)
+        {
+            server.saveOptions();
+            server.setAllClientsOption(Options.showCaretaker, false);
+        }
+
         // XXX temp
         initServerAndClients();
 
@@ -1056,6 +1063,13 @@ public final class Game extends GameSource
                 {
                     Legion legion = readLegion(in, player, false);
                 }
+            }
+
+            // Remove caretaker displays.
+            if (server != null)
+            {
+                server.saveOptions();
+                server.setAllClientsOption(Options.showCaretaker, false);
             }
 
             initServerAndClients();

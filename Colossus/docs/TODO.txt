@@ -98,3 +98,4 @@ Client-server networking.
 
 Chat window.  (From Prometheus.)
 
+Move BattleDice into BattleMap rather than using a separate frame.

@@ -22,6 +22,9 @@ public class Chit extends JPanel
     /** Flag to mark chit as dead and paint it with an "X" through it. */
     private boolean dead;
 
+    /** Flag to paint a border around the chit. */
+    private boolean border;
+
     private String id;
 
     // Constants describing where to find image files.
@@ -79,13 +82,13 @@ public class Chit extends JPanel
 
         // This syntax works with either images in a jar file or images
         // in the local filesystem.
-                        
+
         Toolkit oToolkit = Toolkit.getDefaultToolkit();
         Class oClass = oChit.getClass();
         java.net.URL oURL = oClass.getResource(strImageName);
         Image image = oToolkit.getImage(oURL);
         icon = new ImageIcon(image);
-                
+
         return icon;
     }
 
@@ -132,6 +135,13 @@ public class Chit extends JPanel
                 rect.y + rect.height);
             g2.drawLine(rect.x + rect.width, rect.y, rect.x,
                 rect.y + rect.height);
+        }
+
+        if (border)
+        {
+            g2.setColor(Color.black);
+            Rectangle rect = getBounds();
+            g.drawRect(rect.x, rect.y, rect.width, rect.height);
         }
     }
 
@@ -184,6 +194,12 @@ public class Chit extends JPanel
     public void toggleDead()
     {
         dead = !dead;
+    }
+
+
+    public void setBorder(boolean border)
+    {
+        this.border = border;
     }
 
 

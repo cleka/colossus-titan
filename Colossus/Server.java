@@ -120,6 +120,16 @@ public final class Server
         }
     }
 
+    public void saveOptions()
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
+            client.saveOptions();
+        }
+    }
+
     /** XXX do not use */
     public Client getClient(String playerName)
     {
@@ -194,6 +204,16 @@ public final class Server
         Client client = getClient(playerNum);
         if (client != null)
         {
+            client.setOption(optname, value);
+        }
+    }
+
+    public void setAllClientsOption(String optname, boolean value)
+    {
+        Iterator it = clients.iterator();
+        while (it.hasNext())
+        {
+            Client client = (Client)it.next();
             client.setOption(optname, value);
         }
     }

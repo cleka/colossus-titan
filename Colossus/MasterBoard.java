@@ -2298,6 +2298,17 @@ public final class MasterBoard extends JPanel
                 chit.paintComponent(g);
             }
         }
+
+        // Paint MovementDie
+        if (client != null)
+        {
+            MovementDie die = client.getMovementDie();
+            if (die != null)
+            {
+                die.setLocation(0, 0);
+                die.paintComponent(g);
+            }
+        }
     }
 
 

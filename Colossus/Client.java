@@ -287,7 +287,6 @@ public final class Client
     {
         if (enable)
         {
-            initMovementDie();
             initBattleDice();
         }
         else
@@ -311,10 +310,6 @@ public final class Client
         {
             caretakerDisplay.repaint();
         }
-        if (movementDie != null)
-        {
-            movementDie.repaint();
-        }
         if (board != null)
         {
             board.getFrame().repaint();
@@ -335,10 +330,6 @@ public final class Client
         {
             statusScreen.rescale();
         }
-        if (movementDie != null)
-        {
-            movementDie.rescale();
-        }
         if (board != null)
         {
             board.rescale();
@@ -356,27 +347,48 @@ public final class Client
 
     public void showMovementRoll(int roll)
     {
-        if (movementDie != null)
+        if (getOption(Options.showDice))
         {
-            movementDie.showRoll(roll);
+            if (movementDie == null || roll != movementDie.getLastRoll())
+            {
+                initMovementDie(roll);
+                if (board != null)
+                {
+                    board.repaint();
+                }
+            }
+        }
+        else
+        {
+                movementDie = null;
+                if (board != null)
+                {
+                    board.repaint();
+                }
         }
     }
 
 
-
-    private void initMovementDie()
+    private void initMovementDie(int roll)
     {
-        movementDie = new MovementDie(this);
+        if (board != null)
+        {
+            movementDie = new MovementDie(4 * Scale.get(), 
+                MovementDie.getDieImageName(roll), board);
+        }
     }
-
 
     private void disposeMovementDie()
     {
         if (movementDie != null)
         {
-            movementDie.dispose();
             movementDie = null;
         }
+    }
+
+    public MovementDie getMovementDie()
+    {
+        return movementDie;
     }
 
 
@@ -774,6 +786,7 @@ public final class Client
         point.x -= scale / 2;
         point.y -= scale / 2;
         chit.setLocation(point);
+        chit.setBorder(true);
         recruitChits.add(chit);
     }
 
@@ -844,12 +857,6 @@ public final class Client
 
             board = new MasterBoard(this);
             board.requestFocus();
-
-            // XXX Should this be in a different method?
-            if (getOption(Options.showDice))
-            {
-                initMovementDie();
-            }
         }
     }
 
