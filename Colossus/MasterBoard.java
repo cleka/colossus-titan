@@ -24,8 +24,6 @@ public class MasterBoard extends Frame implements MouseListener,
 
     private MasterHex[][] h = new MasterHex[15][8];
 
-//    private int tracking;
-
     final private boolean[][] show =
     {
         {false, false, false, true, true, false, false, false},
@@ -48,7 +46,6 @@ public class MasterBoard extends Frame implements MouseListener,
     private Image offImage;
     private Graphics gBack;
     private Dimension offDimension;
-//    private boolean needToClear;
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private int scale;
@@ -70,11 +67,9 @@ public class MasterBoard extends Frame implements MouseListener,
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        // tracking = -1;
-        // needToClear = false;
         imagesLoaded = false;
 
-        // Initialize the hexmap
+        // Initialize the hexmap.
         setupHexes();
 
         // Each player needs to pick his first legion marker.
@@ -90,10 +85,12 @@ public class MasterBoard extends Frame implements MouseListener,
         for (int i = 0; i < game.numPlayers; i++)
         {
             // Lookup coords for chit starting from player[i].startingTower
-            Point point = getOffCenterFromLabel(100 * game.player[i].startingTower);
+            Point point = getOffCenterFromLabel(100 * 
+                game.player[i].startingTower);
 
             game.player[i].legions[0] = new Legion(point.x - (3 * scale / 2), 
-                point.y - (3 * scale / 2), 3 * scale, game.player[i].markerSelected, 
+                point.y - (3 * scale / 2), 3 * scale, 
+                game.player[i].markerSelected, 
                 this, 8, Creature.titan, Creature.angel, Creature.ogre, 
                 Creature.ogre, Creature.centaur, Creature.centaur, 
                 Creature.gargoyle, Creature.gargoyle);
@@ -137,13 +134,14 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 if (show[i][j] && h[i][j].label == label)
                 {
-                    return new Point((h[i][j].xVertex[0] + h[i][j].xVertex[1]) / 2, 
+                    return new Point((h[i][j].xVertex[0] + 
+                        h[i][j].xVertex[1]) / 2, 
                         (h[i][j].yVertex[0] + h[i][j].yVertex[3]) / 2 +
                         (h[i][j].inverted ? -(scale / 2) : (scale / 2)));
                 }
             }
         }
-        // no match
+        // No match
         return new Point(-1, -1);
     }
 
@@ -153,7 +151,7 @@ public class MasterBoard extends Frame implements MouseListener,
         int cx = 3 * scale;
         int cy = 2 * scale;
 
-        // Initialize hexes 
+        // Initialize hexes. 
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
@@ -169,7 +167,7 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 
-        // Add terrain types, id labels, and exits to hexes
+        // Add terrain types, id labels, and exits to hexes.
         h[0][3].terrain='S';
         h[0][3].label=132;
         h[0][3].exitType[1]=4;
@@ -638,7 +636,7 @@ public class MasterBoard extends Frame implements MouseListener,
         h[14][4].label=111;
         h[14][4].exitType[4]=4;
 
-        // Derive entrances from exits
+        // Derive entrances from exits.
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
@@ -687,7 +685,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
         setSize(69 * scale, 69 * scale);
 
-        // Initialize hexes
+        // Initialize hexes.
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
@@ -703,56 +701,15 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public void mouseDragged(MouseEvent e)
     {
-/*
-        if (tracking != -1)
-        {
-            Point point = e.getPoint();
-            point.x = Math.max(point.x, 30);
-            point.y = Math.max(point.y, 60);
-            point.x = Math.min(point.x, getSize().width - 30);
-            point.y = Math.min(point.y, getSize().height - 30);
-        
-            Rectangle clip = new Rectangle(chits[tracking].getBounds());
-            chits[tracking].setLocation(point);
-            clip.add(chits[tracking].getBounds());
-            needToClear = true;
-            repaint(clip.x, clip.y, clip.width, clip.height);
-        }
-*/
     }
 
     public void mouseReleased(MouseEvent e)
     {
-//        tracking = -1;
     }
 
     public void mousePressed(MouseEvent e)
     {
         Point point = e.getPoint();
-/*
-        for (int i=0; i < chits.length; i++)
-        {
-            if (chits[i].select(point))
-            {
-                // Move selected chit to top of Z-order
-                tracking = 0;
-
-                // Don't swap if it's already on top.
-                if (i != 0)
-                {
-                    Chit tmpchit = chits[i];
-                    for (int j = i; j > 0; j--)
-                    {
-                        chits[j] = chits[j - 1];
-                    }
-                    chits[0] = tmpchit;
-                    Rectangle clip = new Rectangle(chits[0].getBounds());
-                    repaint(clip.x, clip.y, clip.width, clip.height);
-                }
-                return;
-            }
-        }
-*/
 
         for (int i = 0; i < game.numPlayers; i++)
         {
@@ -760,7 +717,7 @@ public class MasterBoard extends Frame implements MouseListener,
             {
                 if (game.player[i].legions[j].chit.select(point))
                 {
-                    // Show info about this legion
+                    // Show info about this legion.
                     ShowLegion showlegion = new ShowLegion(this, 
                         game.player[i].legions[j], point);
                     return;
@@ -831,52 +788,20 @@ public class MasterBoard extends Frame implements MouseListener,
     }
 
 
+    // Double-buffer everything.
     public void paint(Graphics g)
+    {
+        update(g);
+    }
+
+
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
 
-        rectClip = g.getClipBounds();
-
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[0].length; j++)
-            {
-                if (show[i][j] && rectClip.intersects(h[i][j].getBounds()))
-                {
-                    h[i][j].paint(g);
-                }
-            }
-        }
-
-/*
-        // Draw chits from back to front.
-        for (int i = chits.length - 1; i >= 0; i--)
-        {
-            if (rectClip.intersects(chits[i].getBounds()))
-            {
-                chits[i].paint(g);
-            }
-        }
-*/
-
-        for (int i = 0; i < game.numPlayers; i++)
-        {
-            for (int j = 0; j < game.player[i].numLegions; j++)
-            {
-                if (rectClip.intersects(game.player[i].legions[j].chit.getBounds()))
-                {
-                    game.player[i].legions[j].chit.paint(g);
-                }
-            }
-        }
-                
-    }
-
-    public void update(Graphics g)
-    {
         Dimension d = getSize();
         rectClip = g.getClipBounds();
 
@@ -889,18 +814,6 @@ public class MasterBoard extends Frame implements MouseListener,
             gBack = offImage.getGraphics();
         }
 
-/*
-        // Clear the background only when chits are dragged.
-        if (needToClear)
-        {
-            gBack.setColor(getBackground());
-            gBack.fillRect(rectClip.x, rectClip.y, rectClip.width,
-                rectClip.height);
-            gBack.setColor(getForeground());
-            needToClear = false;
-        }
-*/
-
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
@@ -912,12 +825,12 @@ public class MasterBoard extends Frame implements MouseListener,
             }
         }
 
-
         for (int i = 0; i < game.numPlayers; i++)
         {
             for (int j = 0; j < game.player[i].numLegions; j++)
             {
-                if (rectClip.intersects(game.player[i].legions[j].chit.getBounds()))
+                if (rectClip.intersects(
+                    game.player[i].legions[j].chit.getBounds()))
                 {
                     game.player[i].legions[j].chit.paint(gBack);
                 }
@@ -943,6 +856,5 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         game = new Game();
         MasterBoard masterboard = new MasterBoard(game);
-        //MasterBoard masterboard = new MasterBoard();
     }
 }
