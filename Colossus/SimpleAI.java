@@ -14,7 +14,7 @@ import java.util.*;
 
 class SimpleAI implements AI
 {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private Minimax minimax = new Minimax();
 
     public void muster (Game game)
@@ -168,8 +168,7 @@ class SimpleAI implements AI
 			    int result = estimateBattleResults(legion,true,enemy,hex);
 			    if (result == WIN_WITH_MINIMAL_LOSSES)
 			    {
-				debugln("We can safely split AND attack with " +
-					legion );
+				//debugln("We can safely split AND attack with " + legion );
 				safeMoves++;
 			    }
 			    int result2 = estimateBattleResults(legion,false,enemy,hex);
@@ -178,9 +177,8 @@ class SimpleAI implements AI
 				&& roll <= 4)
 			    {
 				// don't split so that we can attack!
-				debugln("Not splitting " 
-					+ legion 
-					+ "because we want the muscle to attack");
+				//debugln("Not splitting " + legion 
+				//+ "because we want the muscle to attack");
 				forcedToAttack = 999;
 			    }
 			}
@@ -441,21 +439,17 @@ class SimpleAI implements AI
 	}
 	else
 	{
-	    debugln("minimax..");
 	    PlayerMove playermove = (PlayerMove) minimax.search
 		( new MasterBoardPosition(game,game.getActivePlayerNum()),1);
 	    // apply the PlayerMove 
-	    debugln("applying minimax moves..");
 	    for (Iterator it = playermove.moves.entrySet().iterator(); it.hasNext();)
 	    {
 		Map.Entry entry = (Map.Entry) it.next();
 		Legion legion = (Legion) entry.getKey();
 		MasterHex hex = (MasterHex) entry.getValue();
-		debugln("moving " + legion + " to " + hex);
 		game.actOnLegion(legion);
 		game.actOnHex(hex);
 	    }
-	    debugln("done applying minimax moves..");
 	}
     }
 
@@ -553,7 +547,7 @@ class SimpleAI implements AI
 		// pick the legion in this hex whose best move has the
 		// least difference with its sitStillValue, and force
 		// it to move.
-		debugln("Ack! forced to move split group"); 
+		debugln("Ack! forced to move a split group"); 
 
 		// first, concatenate all the moves for all the
 		// legions that are here, and sort them by their
@@ -661,8 +655,6 @@ class SimpleAI implements AI
 	for (int i = 1; i <= 6; i++)
 	    enemyMap[i] = new HashMap();
 
-	//debugln("building attack map...");
-
 	// for each enemy player
 	Collection players = game.getPlayers();
         Iterator playerIt = players.iterator();
@@ -722,6 +714,8 @@ class SimpleAI implements AI
 				     boolean canRecruitHere,
 				     HashMap[] enemyAttackMap )
     {
+	// some big negative number bigger than any other factor
+	final int LOSE_LEGION = -10000;
 	int value =0;
 
 	// consider making an attack
@@ -733,11 +727,11 @@ class SimpleAI implements AI
 	    switch (result)
 	    {
 		case WIN_WITH_MINIMAL_LOSSES:
-		    debugln("legion " + legion + " can move to " 
-			  + hex + " and CRUSH " + enemyLegion);
+		    debugln("legion " + legion + " can attack " + enemyLegion +
+			    " in " + hex + " and WIN_WITH_MINIMAL_LOSSES");
 		    // we score a fraction of an angel
 		    value += (24 * enemyPointValue) / 100; 
-		    // plus a fraction of a titan
+		    // plus a fraction of a titan strength
 		    value += (6 * enemyPointValue) / 100; 
 		    // plus some more for killing a group (this is arbitrary)
 		    value += (10 * enemyPointValue) / 100; 
@@ -745,14 +739,47 @@ class SimpleAI implements AI
 		    // (this may make the AI unfairly gun for your titan)
 		    break;
 		case WIN_WITH_HEAVY_LOSSES:
-		    debugln("legion " + legion + " can move to " 
-			  + hex + " and barely win vs " + enemyLegion);
+		    debugln("legion " + legion + " can attack " + enemyLegion + 
+			    " in " + hex + " and WIN_WITH_HEAVY_LOSSES");
 		    // don't do this with our titan unless we can win the game
 		    {
-			if (legion.numCreature(Creature.titan) > 0
-			    && game.getNumLivingPlayers() > 2)
-			    // ack! we'll fuck up our titan group
-			    value = Integer.MIN_VALUE;
+			Player player = legion.getPlayer();
+			List legions = player.getLegions();
+			boolean haveOtherAngels = false;
+			Iterator it = legions.iterator();
+			while (it.hasNext())
+			{
+			    Legion l = (Legion) it.next();
+			    if (l == legion) continue;
+			    if (l.numCreature(Creature.angel) == 0)
+				continue;
+			    haveOtherAngels = true;
+			    break;
+			}
+
+			if (legion.numCreature(Creature.titan) > 0)
+			{
+			    // unless we can win the game with this attack
+			    if (enemyLegion.numCreature(Creature.titan) > 0
+				&& game.getNumLivingPlayers() == 2)
+			    {
+				// do it and win the game
+				value += enemyPointValue;
+			    }
+			    else
+			    {	
+				// ack! we'll fuck up our titan group
+				value += LOSE_LEGION + 10;
+			    }
+			}
+			// don't do this if we'll lose our only angel group
+			// and won't score enough points to make up for it
+			else if (legion.numCreature(Creature.angel) > 0
+				 && !haveOtherAngels
+				 && enemyPointValue < 88) 
+			{
+				value += LOSE_LEGION+5;
+			}
 			else
 			{
 			    // we score a fraction of an angel & titan strength
@@ -767,8 +794,8 @@ class SimpleAI implements AI
 		    break;
 		case DRAW:
 		    {
-			debugln("legion " + legion + " can move to " 
-			      + hex + " and mutual with " + enemyLegion);
+			debugln("legion " + legion + " can attack " + enemyLegion + 
+				" in " + hex + " and DRAW");
 			// If this is an unimportant group for us, but
 			// is enemy titan, do it.  This might be an
 			// unfair use of information for the AI
@@ -785,25 +812,25 @@ class SimpleAI implements AI
 			}
 			else
 			{
-			    // otherwise no thanks
-			    value = Integer.MIN_VALUE;
+			    // otherwise no thanks 
+			    value += LOSE_LEGION + 2; 
 			}
 		    }
 		    break;
 		case LOSE_BUT_INFLICT_HEAVY_LOSSES:
 		    {
-			debugln("legion " + legion + " can move to " 
-			      + hex + " and barely lose to " + enemyLegion);
+			debugln("legion " + legion + " can attack " + enemyLegion + 
+				" in " + hex + " and LOSE_BUT_INFLICT_HEAVY_LOSSES");
 			// TODO: how important is it that we damage
 			// his group?
-			value = Integer.MIN_VALUE; 
+			value += LOSE_LEGION + 1; 
 		    }
 		    break;
 		case LOSE:
 		    {
-			debugln("legion " + legion + " can move to " 
-			      + hex + " and get stomped by " + enemyLegion);
-			value = Integer.MIN_VALUE; 
+			debugln("legion " + legion + " can attack " + enemyLegion + 
+				" in " + hex + " and LOSE");
+			value += LOSE_LEGION; 
 		    }
 		    break;
 	    }
@@ -919,51 +946,33 @@ class SimpleAI implements AI
 	// consider risk of being attacked
 	if (enemyAttackMap != null)
 	{
-	    debugln("considering risk of moving " + legion + " to "  + hex );
+	    //debugln("considering risk of moving " + legion + " to "  + hex );
 	    HashMap[] enemiesThatCanAttackOnA = enemyAttackMap;
-	    double totalrisk = 0;
 	    for (int roll = 1; roll <= 6; roll++)
 	    {
 		List enemies = (List) enemiesThatCanAttackOnA[roll].get(hex.getLabel());
 		//debugln("got enemies that can attack on a " + roll + " :" + enemies);
 		if (enemies == null) continue;
 		Iterator it = enemies.iterator();
-		double risk = 0.0;
 		while (it.hasNext())
 		{
 		    Legion enemy = (Legion) it.next();
 		    final int result = estimateBattleResults(enemy, legion, hex);
-		    switch (result)
-		    {
-			case WIN_WITH_MINIMAL_LOSSES:
-			    if (legion.numCreature(Creature.titan)>0)
-				risk = Integer.MIN_VALUE;
-			    else
-				risk = -legion.getPointValue()/2;
-			    break;
-			    //case WIN_WITH_HEAVY_LOSSES:
-			    //risk = Integer.MIN_VALUE/2;
-			    //break;
-			    //case DRAW:
-			    // if this is my titan, then there is some risk
-			    // to moving here; otherwise, don't care
-			    //if (legion.numCreature(Creature.titan)>0)
-			    //risk = -legion.getPointValue()/2;
-			    //break;
-		    }
-		    if (risk != 0.0)
-			debugln("risk of " + legion 
-				+ " being attacked by " + enemy
-				+ " on a " + roll 
-				+ " is " + risk );
+		    if (result == WIN_WITH_MINIMAL_LOSSES)
+			break;
+		    // break on the lowest roll from which we can be attacked and killed
+		}
+		if (roll < 7)
+		{
+		    final double chanceToAttack = (7.0 - roll) / 6.0;
+		    final double risk;
+		    if (legion.numCreature(Creature.titan)>0)
+			risk = LOSE_LEGION * chanceToAttack;
+		    else
+			risk = -legion.getPointValue()/2 * chanceToAttack;
+		    value += risk;
 		} 
-		final double chanceToAttack = (7.0 - roll) / 6.0;
-		totalrisk += risk * chanceToAttack;
 	    }
-	    if (totalrisk > 0.0)
-		debugln("total risk of  " + legion + " in " + hex 
-			+ " being attacked is " + totalrisk);
-	    value += totalrisk;
 	}
 
 	// TODO: consider mobility.  e.g., penalty for suckdown
@@ -983,6 +992,11 @@ class SimpleAI implements AI
 	// (i.e. if another legion has warbears under the top that
 	// recruit on 1,3,5, and we have a behemoth with choice of 3/5
 	// to jungle or 4/6 to jungle, prefer the 4/6 location).
+
+	debugln("EVAL " + legion 
+		+ (canRecruitHere?" move to ":" stay in ") 
+		+ hex
+		+ " = " + value);
 	return value;
     }
 
@@ -1024,10 +1038,44 @@ class SimpleAI implements AI
 		attackerPointValue -= creature.getPointValue();
 	    }
 	}
-	// TODO: reduce PV slightly if titan is present and weak (and thus can't fight)
+	// reduce PV slightly if titan is present and weak (and thus can't fight)
+	Critter attackerTitan  = attacker.getCritter(Creature.titan);
+	if (attackerTitan != null) 
+	{
+	    switch (attackerTitan.getPower())
+	    {
+		case 6:   
+		    attackerPointValue -= 12;  
+		    break;
+		case 7:
+		    attackerPointValue -= 10;
+		    break;
+		case 8:
+		    attackerPointValue -= 8;
+		    break;
+		    // 9 or above is worth full strength
+	    }
+	}
 	// TODO: add angel call 
 	double defenderPointValue = defender.getPointValue();
-	// TODO: reduce PV slightly if titan is present and weak (and thus cant' fight)
+	// reduce PV slightly if titan is present and weak (and thus cant' fight)
+	Critter defenderTitan  = defender.getCritter(Creature.titan);
+	if (defenderTitan != null) 
+	{
+	    switch (defenderTitan.getPower())
+	    {
+		case 6:   
+		    defenderPointValue -= 12;  
+		    break;
+		case 7:
+		    defenderPointValue -= 10;
+		    break;
+		case 8:
+		    defenderPointValue -= 8;
+		    break;
+		    // 9 or above is worth full strength
+	    }
+	} 
 	// TODO: add in enemy's most likely turn 4 recruit
 
 	// TODO: adjust for natives / terrain type
