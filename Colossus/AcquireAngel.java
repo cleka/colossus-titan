@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class AcquireAngel allows a player to acquire an angel or archangel.
@@ -8,7 +9,7 @@ import java.awt.event.*;
  */
 
 
-class AcquireAngel extends Dialog implements MouseListener, WindowListener
+class AcquireAngel extends JDialog implements MouseListener, WindowListener
 {
     private int numEligible = 0;
     private Creature [] recruits;
@@ -17,9 +18,10 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
     private Player player;
     private Legion legion;
     private Chit [] markers;
+    private Container contentPane;
 
 
-    AcquireAngel(Frame parentFrame, Legion legion, boolean archangel)
+    AcquireAngel(JFrame parentFrame, Legion legion, boolean archangel)
     {
         super(parentFrame, legion.getPlayer().getName() + 
             ": Acquire Angel", true);
@@ -36,7 +38,8 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
         addWindowListener(this);
 
         int scale = 60;
-        setLayout(null);
+        contentPane = getContentPane();
+        contentPane.setLayout(null);
         setBackground(java.awt.Color.lightGray);
 
         numEligible = findEligibleRecruits(legion, recruits, archangel);
@@ -46,6 +49,7 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
             return;
         }
 
+        pack();
         setSize(scale * (numEligible + 1), (21 * scale / 10));
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -75,10 +79,10 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(parentFrame, 
+                "waitForAll was interrupted");
         }
 
-        pack();
         imagesLoaded = true;
         setVisible(true);
         repaint();

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class ShowLegion displays the chits of the Creatures in a Legion
@@ -7,7 +8,7 @@ import java.awt.event.*;
  * author David Ripton
  */
 
-class ShowLegion extends Dialog implements MouseListener, WindowListener
+class ShowLegion extends JDialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded;
@@ -15,11 +16,12 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
     private Chit [] chits;
 
 
-    ShowLegion(Frame parentFrame, Legion legion, Point point)
+    ShowLegion(JFrame parentFrame, Legion legion, Point point)
     {
         super(parentFrame, "Contents of Legion " + legion.getMarkerId(), true);
 
         int scale = 60;
+        pack();
         setSize(2 * scale / 5 + scale * legion.getHeight(), 8 * scale / 5);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
@@ -47,10 +49,9 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
         }
         setLocation(origin);
         
-        setLayout(null);
+        getContentPane().setLayout(null);
         setBackground(java.awt.Color.lightGray);
 
-        pack();
         addMouseListener(this);
 
         this.legion = legion;
@@ -77,7 +78,8 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(parentFrame, 
+                "waitForAll was interrupted");
         }
 
         imagesLoaded = true;

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
@@ -7,14 +8,14 @@ import java.awt.event.*;
  * author David Ripton
  */
 
-class Concede extends Dialog implements ActionListener
+class Concede extends JDialog implements ActionListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded = false;
     private static final int scale = 60;
-    private Frame parentFrame;
-    private Button button1;
-    private Button button2;
+    private JFrame parentFrame;
+    private JButton button1;
+    private JButton button2;
     private boolean laidOut = false;
     private boolean flee;
     private Legion friend;
@@ -23,16 +24,18 @@ class Concede extends Dialog implements ActionListener
     private Chit [] enemyChits;
     private Chit friendMarker;
     private Chit enemyMarker;
+    private Container contentPane;
 
 
-    Concede(Frame parentFrame, Legion friend, Legion enemy, boolean flee)
+    Concede(JFrame parentFrame, Legion friend, Legion enemy, boolean flee)
     {
         super(parentFrame, friend.getPlayer().getName() + ": " + (flee ? 
             "Flee" : "Concede") + " with Legion "  + friend.getMarkerId() 
             + "?", true);
 
         setResizable(false);
-        setLayout(null);
+        contentPane = getContentPane();
+        contentPane.setLayout(null);
         setBackground(java.awt.Color.lightGray);
 
         this.parentFrame = parentFrame;
@@ -40,6 +43,7 @@ class Concede extends Dialog implements ActionListener
         this.enemy = enemy;
         this.flee = flee;
 
+        pack();
         setSize(getPreferredSize());
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -88,18 +92,17 @@ class Concede extends Dialog implements ActionListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(parentFrame, 
+                "waitForAll was interrupted");
         }
 
 
-        button1 = new Button(flee ? "Flee" : "Concede");
-        button2 = new Button(flee ? "Don't Flee" : "Don't Concede");
-        add(button1);
-        add(button2);
+        button1 = new JButton(flee ? "Flee" : "Concede");
+        button2 = new JButton(flee ? "Don't Flee" : "Don't Concede");
+        contentPane.add(button1);
+        contentPane.add(button2);
         button1.addActionListener(this);
         button2.addActionListener(this);
-
-        pack();
 
         imagesLoaded = true;
         setVisible(true);
@@ -146,10 +149,11 @@ class Concede extends Dialog implements ActionListener
         {
             Insets insets = getInsets();
             Dimension d = getSize();
-            button1.setBounds(insets.left + d.width / 9, 7 * d.height / 8 - 
+            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right, 
-                7 * d.height / 8 - insets.bottom, d.width / 3, d.height / 8);
+                3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
+            laidOut = true;
         }
 
     }

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class Negotiate allows two players to settle an engagement.
@@ -7,7 +8,7 @@ import java.awt.event.*;
  * author David Ripton
  */
 
-class Negotiate extends Dialog implements MouseListener, ActionListener
+class Negotiate extends JDialog implements MouseListener, ActionListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded;
@@ -18,19 +19,21 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
     private Chit attackerMarker;
     private Chit defenderMarker;
     private static final int scale = 60;
-    private Frame parentFrame;
-    private Button button1;
-    private Button button2;
+    private JFrame parentFrame;
+    private JButton button1;
+    private JButton button2;
     private boolean laidOut = false;
+    private Container contentPane;
 
 
-    Negotiate(Frame parentFrame, Legion attacker, Legion defender)
+    Negotiate(JFrame parentFrame, Legion attacker, Legion defender)
     {
         super(parentFrame, attacker.getMarkerId() + " Negotiates with " + 
             defender.getMarkerId(), true);
 
         setResizable(false);
-        setLayout(null);
+        contentPane = getContentPane();
+        contentPane.setLayout(null);
         setBackground(java.awt.Color.lightGray);
 
         this.attacker = attacker;
@@ -39,6 +42,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
 
         imagesLoaded = false;
 
+        pack();
         setSize(getPreferredSize());
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -88,17 +92,16 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(parentFrame, 
+                "waitForAll was interrupted");
         }
 
-        button1 = new Button("Agree");
-        button2 = new Button("Fight");
-        add(button1);
-        add(button2);
+        button1 = new JButton("Agree");
+        button2 = new JButton("Fight");
+        contentPane.add(button1);
+        contentPane.add(button2);
         button1.addActionListener(this);
         button2.addActionListener(this);
-
-        pack();
 
         imagesLoaded = true;
         setVisible(true);
@@ -130,10 +133,11 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
         {
             Insets insets = getInsets(); 
             Dimension d = getSize();
-            button1.setBounds(insets.left + d.width / 9, 7 * d.height / 8 - 
+            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right, 
-                7 * d.height / 8 - insets.bottom, d.width / 3, d.height / 8);
+                3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
+            laidOut = true;
         }
     }
 
@@ -208,7 +212,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
             // Ensure that at least one legion is completely eliminated.
             if (attackersLeft > 0 && defendersLeft > 0)
             {
-                new MessageBox(parentFrame, 
+                JOptionPane.showMessageDialog(parentFrame, 
                     "At least one legion must be eliminated.");
                 return;
             }
@@ -263,7 +267,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
                     if (winnerChits[i].isDead() && winner.getCreature(i) ==
                         Creature.titan)
                     {
-                        new MessageBox(parentFrame, 
+                        JOptionPane.showMessageDialog(parentFrame, 
                             "Titan cannot die unless his whole stack dies.");
                         return;
                     }

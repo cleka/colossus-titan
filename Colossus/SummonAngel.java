@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class SummonAngel allows a player to Summon an angel or archangel.
@@ -8,7 +9,7 @@ import java.awt.event.*;
  */
 
 
-class SummonAngel extends Dialog implements MouseListener, ActionListener,
+class SummonAngel extends JDialog implements MouseListener, ActionListener,
     WindowListener
 {
     private int numEligible = 0;
@@ -17,8 +18,8 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
     private Player player;
     private Legion legion;
     private MasterBoard board;
-    private Button button1;
-    private Button button2;
+    private JButton button1;
+    private JButton button2;
     private static final int scale = 60;
     private boolean laidOut = false;
     private Chit angelChit;
@@ -53,9 +54,12 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         setResizable(false);
         addMouseListener(this);
         addWindowListener(this);
-        setLayout(null);
+
+        Container contentPane = getContentPane();
+        contentPane.setLayout(null);
         setBackground(java.awt.Color.lightGray);
 
+        pack();
         setSize(getPreferredSize());
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -80,17 +84,16 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(board, "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(board, "waitForAll was interrupted");
         }
 
-        button1 = new Button("Summon");
-        button2 = new Button("Cancel");
-        add(button1);
-        add(button2);
+        button1 = new JButton("Summon");
+        button2 = new JButton("Cancel");
+        contentPane.add(button1);
+        contentPane.add(button2);
         button1.addActionListener(this);
         button2.addActionListener(this);
 
-        pack();
         imagesLoaded = true;
         setVisible(true);
         repaint();
@@ -143,10 +146,10 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         {
             Insets insets = getInsets();
             Dimension d = getSize();
-            button1.setBounds(insets.left + d.width / 9, 7 * d.height / 8 - 
+            button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right, 
-                7 * d.height / 8 - insets.bottom, d.width / 3, d.height / 8);
+                3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
             laidOut = true;
         }
     }
@@ -231,7 +234,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             donor = player.getSelectedLegion();
             if (donor == null) 
             {
-                new MessageBox(board, "Must select a legion.");
+                JOptionPane.showMessageDialog(board, "Must select a legion.");
                 return;
             }
 
@@ -240,7 +243,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
 
             if (angels == 0 && archangels == 0)
             {
-                new MessageBox(board, "No angels are available.");
+                JOptionPane.showMessageDialog(board, "No angels are available.");
                 return;
             }
 
@@ -259,7 +262,8 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             else
             {
                 // If both are available, make the player click on one.
-                new MessageBox(board, "Select angel or archangel.");
+                JOptionPane.showMessageDialog(board, 
+                    "Select angel or archangel.");
                 return;
             }
 

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class MasterBoard implements the GUI for a Titan masterboard.
@@ -7,7 +8,7 @@ import java.awt.event.*;
  * @author David Ripton
  */
 
-class MasterBoard extends Frame implements MouseListener,
+class MasterBoard extends JFrame implements MouseListener,
     MouseMotionListener, WindowListener
 {
     // There are a total of 96 hexes
@@ -52,6 +53,7 @@ class MasterBoard extends Frame implements MouseListener,
     private boolean summoningAngel = false;
     private SummonAngel summonAngel;
     private BattleMap map;
+    private Container contentPane;
 
 
     public MasterBoard(Game game)
@@ -60,7 +62,8 @@ class MasterBoard extends Frame implements MouseListener,
 
         this.game = game;
 
-        setLayout(null);
+        contentPane = getContentPane();
+        contentPane.setLayout(null);
         setSize(getPreferredSize());
         setBackground(java.awt.Color.black);
         addWindowListener(this);
@@ -128,7 +131,7 @@ class MasterBoard extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            new MessageBox(this, "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(this, "waitForAll was interrupted");
         }
 
         imagesLoaded = true;
@@ -1159,7 +1162,7 @@ System.out.println("MasterBoard.finishSummoningAngel");
                                     // Need a legion marker to split.
                                     if (player.getNumMarkersAvailable() == 0)
                                     {
-                                        new MessageBox(this, 
+                                        JOptionPane.showMessageDialog(this, 
                                             "No markers are available.");
                                         return;
                                     }
@@ -1167,7 +1170,7 @@ System.out.println("MasterBoard.finishSummoningAngel");
                                     if (game.getTurnNumber() == 1 &&
                                         player.getNumLegions() > 1)
                                     {
-                                        new MessageBox(this,
+                                        JOptionPane.showMessageDialog(this,
                                             "Cannot split twice on Turn 1.");
                                         return;
                                     }
@@ -1181,7 +1184,6 @@ System.out.println("MasterBoard.finishSummoningAngel");
                                         MasterHex hex = legion.getCurrentHex();
                                         hex.unselect();
                                     }
-                                    // XXX Repaint only affected areas?
                                     repaint();
                                     return;
 
@@ -1209,7 +1211,6 @@ System.out.println("MasterBoard.finishSummoningAngel");
                                     {
                                         legion.getCurrentHex().unselect();
                                     }
-                                    // XXX Repaint only affected areas?
                                     repaint();
                                     return;
                             }
@@ -1220,7 +1221,6 @@ System.out.println("MasterBoard.finishSummoningAngel");
         }
 
         // No hits on chits, so check map.
-
 
         Player player = game.getActivePlayer();
         for (int i = 0; i < h.length; i++)

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 import java.io.*;
 
 /**
@@ -9,7 +10,7 @@ import java.io.*;
  */
 
 
-class PickMarker extends Dialog implements MouseListener, WindowListener
+class PickMarker extends JDialog implements MouseListener, WindowListener
 {
     private Chit [] markers;
     private MediaTracker tracker;
@@ -17,7 +18,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
     private Player player;
 
 
-    PickMarker(Frame parentFrame, Player player)
+    PickMarker(JFrame parentFrame, Player player)
     {
         super(parentFrame, player.getName() + ": Pick Legion Marker", true);
         
@@ -31,16 +32,16 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
 
         if (player.getNumMarkersAvailable() == 0)
         {
-            new MessageBox(parentFrame, "No markers available");
+            JOptionPane.showMessageDialog(parentFrame, "No markers available");
             dispose();
         }
         else
         {
-
             int scale = 60;
-            setLayout(null);
+            getContentPane().setLayout(null);
             setBackground(java.awt.Color.lightGray);
 
+            pack();
             setSize((21 * scale / 20) * (Math.min(12, 
                 player.getNumMarkersAvailable()) + 1), (21 * scale / 20) * 
                 ((player.getNumMarkersAvailable() - 1) / 12 + 2));
@@ -74,11 +75,11 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
             }
             catch (InterruptedException e)
             {
-                new MessageBox(parentFrame, "waitForAll was interrupted");
+                JOptionPane.showMessageDialog(parentFrame, 
+                    "waitForAll was interrupted");
             }
         }
 
-        pack();
         imagesLoaded = true;
         setVisible(true);
         repaint();

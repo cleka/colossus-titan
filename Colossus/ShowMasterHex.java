@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import com.sun.java.swing.*;
 
 /**
  * Class ShowMasterHex displays the terrain type and recruits for a MasterHex.
@@ -7,7 +8,7 @@ import java.awt.event.*;
  * author David Ripton
  */
 
-class ShowMasterHex extends Dialog implements MouseListener, WindowListener
+class ShowMasterHex extends JDialog implements MouseListener, WindowListener
 {
     private MediaTracker tracker;
     private boolean imagesLoaded;
@@ -19,13 +20,14 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
     int scale = 60;
 
 
-    ShowMasterHex(Frame parentFrame, MasterHex hex, Point point)
+    ShowMasterHex(JFrame parentFrame, MasterHex hex, Point point)
     {
         super(parentFrame, hex.getTerrainName() + " Hex " + hex.getLabel(), 
             true);
 
         numChits = hex.getNumRecruitTypes();
         
+        pack();
         setSize(3 * scale, numChits * scale + 3 * scale / 4);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
@@ -53,10 +55,9 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         }
         setLocation(origin);
         
-        setLayout(null);
+        getContentPane().setLayout(null);
         setBackground(java.awt.Color.lightGray);
 
-        pack();
         addMouseListener(this);
 
         this.hex = hex;
@@ -89,7 +90,8 @@ class ShowMasterHex extends Dialog implements MouseListener, WindowListener
         }
         catch (InterruptedException e)
         {
-            new MessageBox(parentFrame, "waitForAll was interrupted");
+            JOptionPane.showMessageDialog(parentFrame, 
+                "waitForAll was interrupted");
         }
 
         imagesLoaded = true;
