@@ -71,7 +71,7 @@ public final class Server
     }
 
 
-    public void allUpdatePlayerInfo()
+    void allUpdatePlayerInfo()
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
@@ -1144,45 +1144,20 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         return player.getMulligansLeft();
     }
 
-    public void setDonor(String hexLabel)
+    public void setDonor(String markerId)
     {
         Player player = game.getActivePlayer();
-        Legion donor = game.getFirstFriendlyLegion(hexLabel, player);
-        if (donor != null)
+        Legion donor = game.getLegionByMarkerId(markerId);
+        if (donor != null && donor.getPlayer() == player)
         {
             player.setDonor(donor);
         }
-    }
-
-    public String getDonorId(String playerName)
-    {
-        Player player = game.getPlayer(playerName);
-        Legion donor = player.getDonor();
-        if (donor != null)
-        {
-            return donor.getMarkerId();
-        }
         else
         {
-            return null;
+            Log.error("Bad arg to Server.getDonor() for " + markerId);
         }
     }
 
-    // TODO Move logic to client side once legion contents are tracked.
-    public boolean donorHas(String playerName, String name)
-    {
-        Player player = game.getPlayer(playerName);
-        Legion donor = player.getDonor();
-        if (donor != null)
-        {
-            return (donor.numCreature(Creature.getCreatureByName(name)) 
-                    >= 1);
-        }
-        else
-        {
-            return false;
-        }
-    }
 
     // XXX Stringify the return value.
     private String [] getPlayerInfo()
@@ -1365,12 +1340,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
 
 
     /** Return a set of hexLabels. */
-    public Set findSummonableAngels(String markerId)
-    {
-        return game.findSummonableAngels(markerId);
-    }
-
-    /** Return a set of hexLabels. */
     public Set listTeleportMoves(String markerId)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
@@ -1408,15 +1377,6 @@ Log.debug("Called Server.acquireAngel() for " + markerId + " " + angelType);
         return game.findAllUnmovedLegionHexes();
     }
 
-    public Set findTallLegionHexes()
-    {
-        return game.findTallLegionHexes();
-    }
-
-    public Set findEngagements()
-    {
-        return game.findEngagements();
-    }
 
     public void newGame()
     {

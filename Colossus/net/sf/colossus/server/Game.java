@@ -303,6 +303,8 @@ public final class Game
 
     private void newGame2()
     {
+        server.allUpdatePlayerInfo();
+
         Iterator it = players.iterator();
         while (it.hasNext())
         {
@@ -311,14 +313,12 @@ public final class Game
             placeInitialLegion(player, player.getFirstAvailableMarker());
             server.allUpdatePlayerInfo();
         }
+
         server.allAddMarkers();
-
         autoSave();
-
         setupPhase();
-
-        server.allUpdatePlayerInfo();
         caretaker.fullySyncDisplays();
+        server.allUpdatePlayerInfo();
     }
 
 

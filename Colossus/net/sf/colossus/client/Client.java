@@ -57,10 +57,6 @@ public final class Client
     private int entrySide;
     private boolean teleport;
 
-    // XXX Somewhat redundant since we also track the marker in LegionInfo.
-    // But we need to resort this list to reflect z-order, and we want to
-    // keep LegionInfo sorted alphabetically by markerId, so I think we
-    // can live with the double maintenance.
     /** The end of the list is on top in the z-order. */
     private java.util.List markers = new ArrayList();
 
@@ -103,6 +99,9 @@ public final class Client
     private String attackerMarkerId = "none";
     private String defenderMarkerId = "none";
 
+    /** Summon angel donor legion, for this client's player only. */
+    private String donorId;
+
     /** If the game is over, then quitting does not require confirmation. */
     private boolean gameOver;
 
@@ -117,6 +116,8 @@ public final class Client
     private SortedMap legionInfo = new TreeMap();
 
     private int numPlayers;
+
+    private String [] summonables = { "Angel", "Archangel"};
 
 
     public Client(Server server, String playerName, boolean primary)
@@ -182,6 +183,10 @@ public final class Client
 
     private void repaintHexByMarkerId(String markerId)
     {
+        if (markerId == null)
+        {
+            Log.error("called Client.repaintHexByMarkerId(null)");
+        }
         if (board == null)
         {
             return;
@@ -422,7 +427,6 @@ public final class Client
             return;
         }
         syncCheckboxes();
-        // XXX No longer needed? setBooleanOptions();
     }
 
 
@@ -449,22 +453,6 @@ public final class Client
             String name = (String)en.nextElement();
             boolean value = getOption(name);
             board.twiddleOption(name, value);
-        }
-    }
-
-    /** Trigger all option-setting side effects by setting all
-     *  options to their just-loaded values. */
-    private void setBooleanOptions()
-    {
-        Enumeration en = options.propertyNames();
-        while (en.hasMoreElements())
-        {
-            String optname = (String)en.nextElement();
-            String value = options.getProperty(optname);
-            if (value.equals("true") || value.equals("false"))
-            {
-                setOption(optname, Boolean.valueOf(value).booleanValue());
-            }
         }
     }
 
@@ -642,6 +630,7 @@ public final class Client
         server.doneWithBattleMoves();
     }
 
+    // TODO cache
     boolean anyOffboardCreatures()
     {
         return server.anyOffboardCreatures();
@@ -668,7 +657,6 @@ public final class Client
     {
         return Collections.unmodifiableList(markers);
     }
-
 
 
     /** Get this legion's info.  Create it first if necessary. */
@@ -712,14 +700,16 @@ public final class Client
 
         LegionInfo info = getLegionInfo(id);
         String hexLabel = info.getHexLabel();
-        if (board != null)
-        {
-            board.alignLegions(hexLabel);
-        }
+
         // XXX Not perfect -- Need to track recruitChits by legion.
         removeRecruitChit(hexLabel);
 
         legionInfo.remove(id);
+
+        if (board != null)
+        {
+            board.alignLegions(hexLabel);
+        }
     }
 
 
@@ -996,12 +986,17 @@ public final class Client
 
     String getDonorId()
     {
-        return server.getDonorId(playerName);
+        return donorId;
     }
 
     boolean donorHas(String name)
     {
-        return server.donorHas(playerName, name);
+        if (donorId == null)
+        {
+            return false;
+        }
+        LegionInfo info = getLegionInfo(donorId);
+        return info.getContents().contains(name);
     }
 
 
@@ -1114,10 +1109,18 @@ Log.debug("called Client.acquireAngelCallback()");
     {
         if (summonAngel != null)
         {
-            server.setDonor(hexLabel);
+            java.util.List legions = getLegionsByHex(hexLabel);
+            if (legions.size() != 1)
+            {
+                Log.error("Not exactly one legion in donor hex");
+                return;
+            }
+            String markerId = (String)legions.get(0);
+            donorId = markerId;
+            server.setDonor(markerId);
             summonAngel.updateChits();
             summonAngel.repaint();
-            getMarker(server.getDonorId(playerName)).repaint();
+            getLegionInfo(markerId).getMarker().repaint();
         }
         else
         {
@@ -1600,16 +1603,6 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    // TODO  Should be handled fully on client side.
-    public void alignLegions(Set hexLabels)
-    {
-        if (board != null)
-        {
-            board.alignLegions(hexLabels);
-        }
-    }
-
-
     public void setupBattleSummon(String battleActivePlayerName,
         int battleTurnNumber)
     {
@@ -1688,7 +1681,6 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
-    // XXX Rename?
     /** Create a new marker and add it to the end of the list. */
     public void addMarker(String markerId, String hexLabel)
     {
@@ -1816,12 +1808,13 @@ Log.debug("called Client.acquireAngelCallback()");
         }
     }
 
-
+    // TODO cache
     int [] getCritterTags(String hexLabel)
     {
         return server.getCritterTags(hexLabel);
     }
 
+    // TODO cache
     /** Return a set of hexLabels. */
     Set findMobileCritters()
     {
@@ -1852,7 +1845,6 @@ Log.debug("called Client.acquireAngelCallback()");
         return server.getPlayerNameByTag(tag);
     }
 
-
     boolean isMyCritter(int tag)
     {
         return (playerName.equals(getPlayerNameByTag(tag)));
@@ -1874,6 +1866,7 @@ Log.debug("called Client.acquireAngelCallback()");
     }
 
 
+    // TODO cache, after getting list of lords
     private String figureTeleportingLord(String hexLabel)
     {
         java.util.List lords = server.listTeleportingLords(moverId, hexLabel);
@@ -1984,10 +1977,39 @@ Log.debug("called Client.acquireAngelCallback()");
         return Collections.unmodifiableSet(possibleRecruitHexes);
     }
 
-    /** Return a set of hexLabels. */
-    Set findSummonableAngels(String markerId)
+
+    /** Return true if the legion has a summonable. */
+    private boolean hasSummonable(String markerId)
     {
-        return server.findSummonableAngels(markerId);
+        LegionInfo info = getLegionInfo(markerId);
+        for (int i = 0; i < summonables.length; i++)
+        {
+            if (info.contains(summonables[i]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Return a set of hexLabels for all other unengaged legions of 
+     *  markerId's player that have summonables. */
+    Set findSummonableAngelHexes(String summonerId)
+    {
+        Set set = new HashSet();
+        LegionInfo summonerInfo = getLegionInfo(summonerId);
+        String playerName = summonerInfo.getPlayerName();
+        Iterator it = getLegionsByPlayer(playerName).iterator();
+        while (it.hasNext())
+        {
+            String markerId = (String)it.next();
+            if (!markerId.equals(summonerId) && hasSummonable(markerId))
+            {
+                LegionInfo info = getLegionInfo(markerId);
+                set.add(info.getHexLabel());
+            }
+        }
+        return set;
     }
 
     /** Return a set of hexLabels. */
@@ -2030,21 +2052,76 @@ Log.debug("called Client.acquireAngelCallback()");
         return markerIds;
     }
 
+    private java.util.List getLegionsByPlayer(String name)
+    {
+        java.util.List markerIds = new ArrayList();
+        Iterator it = legionInfo.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Map.Entry entry = (Map.Entry)it.next();
+            LegionInfo info = (LegionInfo)entry.getValue();
+            if (name.equals(info.getPlayerName()))
+            {
+                markerIds.add(info.getMarkerId());
+            }
+        }
+        return markerIds;
+    }
+
+    // TODO store moved status in LegionInfo
     Set findAllUnmovedLegionHexes()
     {
         return server.findAllUnmovedLegionHexes();
     }
 
-    // TODO Cache legion heights.
+    /** Return a set of hexLabels for the active player's legions with
+     *  7 or more creatures. */
     Set findTallLegionHexes()
     {
-        return server.findTallLegionHexes();
+        Set set = new HashSet();
+
+        Iterator it = legionInfo.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Map.Entry entry = (Map.Entry)it.next();
+            LegionInfo info = (LegionInfo)entry.getValue();
+            if (info.getHeight() >= 7 && 
+                activePlayerName.equals(info.getPlayerName()))
+            {
+                set.add(info.getHexLabel());
+            }
+        }
+        return set;
     }
 
+    /** Return a set of hexLabels for all hexes with engagements. */
     Set findEngagements()
     {
-        return server.findEngagements();
+        Set set = new HashSet();
+        Iterator it = MasterBoard.getAllHexLabels().iterator();
+        while (it.hasNext())
+        {
+            String hexLabel = (String)it.next();
+            java.util.List markerIds = getLegionsByHex(hexLabel);
+            if (markerIds.size() == 2)
+            {
+                String marker0 = (String)markerIds.get(0);
+                LegionInfo info0 = getLegionInfo(marker0);
+                String playerName0 = info0.getPlayerName();
+
+                String marker1 = (String)markerIds.get(1);
+                LegionInfo info1 = getLegionInfo(marker1);
+                String playerName1 = info1.getPlayerName();
+
+                if (!playerName0.equals(playerName1))
+                {
+                    set.add(hexLabel);
+                }
+            }
+        }
+        return set;
     }
+
 
     void newGame()
     {
@@ -2194,10 +2271,6 @@ Log.debug("called Client.acquireAngelCallback()");
     String getPlayerNameByMarkerId(String markerId)
     {
         String shortColor = markerId.substring(0, 2);
-        if (playerInfo == null)
-        {
-            server.allUpdatePlayerInfo();
-        }
         for (int i = 0; i < playerInfo.length; i++)
         {
             PlayerInfo info = playerInfo[i];
@@ -2221,13 +2294,13 @@ Log.debug("called Client.acquireAngelCallback()");
         return movementRoll;
     }
 
+    // TODO cache
     int getMulligansLeft()
     {
         return server.getMulligansLeft(playerName);
     }
 
 
-    // XXX markersAvailable needs to be up to date before this is called.
     void doSplit(String parentId)
     {
         this.parentId = null;

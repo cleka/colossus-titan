@@ -3,11 +3,10 @@ Bug: SplitLegion still resizes slightly in Solaris/CDE/1.4.0
 Bug: Winning legion's marker not aligned after winning engagement (by
    battle or flee).
 
+Send creature list, summonable list, recruit tree, etc. to client at load time.
 
 Put old, new web pages under CVS.
 Switch to new web page.
-
-Do some sorting of chits within legions on client side.
 
 Document Javadepend in build.tex
 

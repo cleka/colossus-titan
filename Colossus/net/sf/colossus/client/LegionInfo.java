@@ -17,7 +17,6 @@ import net.sf.colossus.server.SimpleAI;
 
 final class LegionInfo
 {
-    // TODO Find a way to eliminate this reference.
     private Client client;
 
     /** immutable */
@@ -86,9 +85,14 @@ final class LegionInfo
 
 
     /** Return an immutable copy of the legion's contents. */
-    private List getContents()
+    List getContents()
     {
         return Collections.unmodifiableList(contents);
+    }
+
+    boolean contains(String creatureName)
+    {
+       return getContents().contains(creatureName);
     }
 
     /** Return a list of Strings.  Use the proper string for titans and

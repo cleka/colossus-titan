@@ -867,7 +867,7 @@ public final class MasterBoard extends JPanel
             {
                 if (show[x][y] && show[x][y+1])
                 {
-                    boardParity = 1 - ((x+y) % 2);
+                    boardParity = 1 - ((x+y) & 1);
                     return;
                 }
             }
@@ -1196,7 +1196,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     void setupMoveMenu()
     {
         unselectAllHexes();
@@ -1255,7 +1254,6 @@ public final class MasterBoard extends JPanel
         }
     }
 
-
     void setupFightMenu()
     {
         unselectAllHexes();
@@ -1297,7 +1295,6 @@ public final class MasterBoard extends JPanel
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         }
     }
-
 
     void setupMusterMenu()
     {
@@ -1529,7 +1526,7 @@ public final class MasterBoard extends JPanel
     /** Return number of legions with summonable angels. */
     int highlightSummonableAngels(String markerId)
     {
-        Set set = client.findSummonableAngels(markerId);
+        Set set = client.findSummonableAngelHexes(markerId);
         unselectAllHexes();
         selectHexesByLabels(set);
         return set.size();
@@ -2029,5 +2026,18 @@ public final class MasterBoard extends JPanel
     MediaTracker getBoardTracker()
     {
         return boardTracker;
+    }
+
+    /** Return a set of all hex labels. */
+    static Set getAllHexLabels()
+    {
+        Set set = new HashSet();
+        Iterator it = plainHexes.iterator();
+        while (it.hasNext())
+        {
+            MasterHex hex = (MasterHex)it.next();
+            set.add(hex.getLabel());
+        }
+        return set;
     }
 }
