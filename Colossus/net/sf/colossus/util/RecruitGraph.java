@@ -11,8 +11,6 @@ import net.sf.colossus.client.CaretakerInfo;
  * graph, not a tree, as we can have cycle in theory).
  * @version $Id$
  * @author Romain Dolbeau
- * @see net.sf.colossus.util.RecruitVertex
- * @see net.sf.colossus.util.RecruitEdge
  */
 
 public class RecruitGraph
@@ -27,7 +25,7 @@ public class RecruitGraph
      * @version $Id$
      * @author Romain Dolbeau
      */
-    class RecruitVertex
+    private class RecruitVertex
     {
         private final Creature cre;
         private final RecruitGraph graph;
@@ -108,7 +106,7 @@ public class RecruitGraph
      * @version $Id$
      * @author Romain Dolbeau
      */
-    class RecruitEdge
+    private class RecruitEdge
     {
         private final RecruitVertex src;
         private final RecruitVertex dst;
