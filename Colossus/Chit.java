@@ -10,9 +10,7 @@ import java.util.*;
 
 class Chit
 {
-    // The container's MediaTracker needs to access the image.
-    Image image;
-
+    private Image image;
     private boolean selected;
     private Rectangle rect;
     private Container container;
@@ -94,5 +92,11 @@ class Chit
     public Point topLeft()
     {
         return new Point(rect.x, rect.y);
+    }
+
+
+    public Image getImage()
+    {
+        return image;
     }
 }
