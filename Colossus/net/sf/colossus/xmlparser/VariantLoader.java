@@ -8,8 +8,6 @@ import org.jdom.*;
 import org.jdom.input.*;
 
 import net.sf.colossus.util.Log;
-import net.sf.colossus.client.MasterHex;
-import net.sf.colossus.server.Constants;
 
 
 /**
