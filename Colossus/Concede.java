@@ -245,7 +245,7 @@ class Concede extends JDialog implements ActionListener
             // points to the victor.
             if (friend.numCreature(Creature.titan) == 1)
             {
-                friend.getPlayer().die(enemy.getPlayer());
+                friend.getPlayer().die(enemy.getPlayer(), true);
             }
 
             // Exit this dialog.
