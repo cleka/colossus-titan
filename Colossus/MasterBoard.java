@@ -183,14 +183,15 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
-    // Clear all entry side and teleport information from all unoccupied hexes.
-    public void clearAllUnoccupiedEntrySides()
+    // Clear all entry side and teleport information from all hexes occupied
+    // by one or fewer legions.
+    public void clearAllNonengagementEntrySides()
     {
         for (int i = 0; i < h.length; i++)
         {
             for (int j = 0; j < h[0].length; j++)
             {
-                if (show[i][j] && !h[i][j].isOccupied())
+                if (show[i][j] && h[i][j].getNumLegions() <= 1)
                 {
                     h[i][j].clearAllEntrySides();
                     h[i][j].clearTeleported();
@@ -355,7 +356,7 @@ class MasterBoard extends JFrame implements MouseListener,
             return 0;
         }
 
-        clearAllUnoccupiedEntrySides();
+        clearAllNonengagementEntrySides();
         
         int count = 0;
 
@@ -1428,6 +1429,8 @@ class MasterBoard extends JFrame implements MouseListener,
                                             defender, hex, hex.getEntrySide());
                                     }
                                 }
+
+                                highlightEngagements();
                             }
                             break;
 
