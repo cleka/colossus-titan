@@ -202,6 +202,7 @@ public class RationalAI implements AI
     /** Return true if done with all splits and callbacks */
     private boolean fireSplits()
     {
+        Log.debug("RationalAI.fireSplits " + legionsToSplit);
         if (legionsToSplit.isEmpty())
         {
             return true;
@@ -221,6 +222,7 @@ public class RationalAI implements AI
      * an undo split */
     public boolean splitCallback(String parentId, String childId)
     {
+        Log.debug("RationalAI.splitCallback " + parentId + " " + childId);
         if (parentId == null && childId == null)
         {
             // Undo split is done; fire off the next split
@@ -1905,9 +1907,7 @@ public class RationalAI implements AI
                 return false;
             }
         }
-
         return true;
-
     }
 
     private class BattleResults

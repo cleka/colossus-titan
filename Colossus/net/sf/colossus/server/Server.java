@@ -1323,6 +1323,8 @@ public final class Server implements IServer
 
     public void doSplit(String parentId, String childId, String results)
     {
+        Log.debug("Server.doSplit " + parentId + " " + childId + " " + 
+                results);
         IClient client = getClient(getPlayerName());
         if (!isActivePlayer())
         {
@@ -1340,6 +1342,8 @@ public final class Server implements IServer
     /** Callback from game after this legion was split off. */
     void didSplit(String hexLabel, String parentId, String childId, int height)
     {
+        Log.debug("Server.didSplit " + hexLabel + " " + parentId + " " + 
+                childId + " " + height);
         allUpdatePlayerInfo();
 
         IClient activeClient = getClient(game.getActivePlayerName());

@@ -3768,6 +3768,8 @@ public final class Client implements IClient
     public synchronized void didSplit(String hexLabel, String parentId,
             String childId, int childHeight, List splitoffs, int turn)
     {
+        Log.debug("Client.didSplit " + hexLabel + " " + parentId + " " +
+                childId + " " + childHeight + " " + splitoffs + " " + turn);
         nakable = null;
         LegionInfo childInfo = getLegionInfo(childId);
         childInfo.setHexLabel(hexLabel);
