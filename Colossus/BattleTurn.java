@@ -46,7 +46,12 @@ class BattleTurn extends JDialog implements ActionListener
         setupMoveDialog();
 
         pack();
+
+        // Place this window in the upper left corner.
+        setLocation(new Point(0, 0));
+
         setVisible(true);
+
         // Make sure that this window is in front of the Turn window.
         toFront();
     }
@@ -184,9 +189,6 @@ System.out.println("No legal moves; advancing to strike phase");
 
             pack();
 
-            // Place this window in the upper right corner.
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width - getSize().width, 0));
         }
     }
 
@@ -223,10 +225,6 @@ System.out.println("setupFightDialog");
             button2.addActionListener(this);
 
             pack();
-
-            // Place this window in the upper right corner.
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width - getSize().width, 0));
         }
     }
 
