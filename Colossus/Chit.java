@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.util.*;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing

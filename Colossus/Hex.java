@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.event.*;
 
 /**
  * Class Hex describes one general hex.

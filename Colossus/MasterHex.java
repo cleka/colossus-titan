@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.event.*;
 
 /**
  * Class MasterHex describes one Masterboard hex

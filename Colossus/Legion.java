@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.io.*;
 
 /**
  * Class Legion represents a Titan stack of Creatures and its
