@@ -74,7 +74,8 @@ public final class MasterBoard extends JPanel
     private JScrollPane scrollPane;
 
     private Container contentPane;
-    private JLabel playerLabel;
+    /** our own little bar implementation */
+       private BottomBar bottomBar;
 
     public static final String saveGameAs = "Save game as";
 
@@ -91,6 +92,10 @@ public final class MasterBoard extends JPanel
     public static final String viewFullRecruitTree = "View Full Recruit Tree";
     public static final String viewHexRecruitTree = "View Hex Recruit Tree";
     public static final String viewBattleMap = "View Battle Map";
+    public static final String 
+        viewEngagementResults = "View Engagement Results";
+    public static final String 
+        viewCreatureDetails = "View Creature:Ranger Details";
     public static final String changeScale = "Change Scale";
 
     public static final String chooseScreen = "Choose Screen For Info Windows";
@@ -115,7 +120,9 @@ public final class MasterBoard extends JPanel
     private AbstractAction viewFullRecruitTreeAction;
     private AbstractAction viewHexRecruitTreeAction;
     private AbstractAction viewBattleMapAction;
+    private AbstractAction viewEngagementResultsAction;
     private AbstractAction changeScaleAction;
+    private AbstractAction viewCreatureDetailsAction;
 
     private AbstractAction chooseScreenAction;
 
@@ -327,18 +334,22 @@ public final class MasterBoard extends JPanel
                 switch (phase)
                 {
                     case Constants.SPLIT:
+                        bottomBar.disableDoneButton();
                         client.doneWithSplits();
                         break;
 
                     case Constants.MOVE:
+                        bottomBar.disableDoneButton();
                         client.doneWithMoves();
                         break;
 
                     case Constants.FIGHT:
+                        bottomBar.disableDoneButton();
                         client.doneWithEngagements();
                         break;
 
                     case Constants.MUSTER:
+                        bottomBar.disableDoneButton();
                         client.doneWithRecruits();
                         break;
 
@@ -376,6 +387,14 @@ public final class MasterBoard extends JPanel
             }
         };
 
+        viewEngagementResultsAction = new AbstractAction(viewEngagementResults)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                client.showEngagementResults();
+            }
+        };
+
         viewFullRecruitTreeAction = new AbstractAction(viewFullRecruitTree)
         {
             public void actionPerformed(ActionEvent e)
@@ -383,6 +402,18 @@ public final class MasterBoard extends JPanel
                 new ShowAllRecruits(masterFrame,
                         TerrainRecruitLoader.getTerrains(), null, null,
                         scrollPane);
+            }
+        };
+
+        viewCreatureDetailsAction = new AbstractAction(viewCreatureDetails)
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Creature creature = Creature.getCreatureByName("Ranger");
+                new net.sf.colossus.client.ShowCreatureDetails(
+                        masterFrame,        // daddy
+                        creature,           // about what creature
+                        null, scrollPane);  // relative position
             }
         };
 
@@ -465,7 +496,7 @@ public final class MasterBoard extends JPanel
 
         saveGameAsAction = new AbstractAction(saveGameAs)
         {
-            // XXX Need a confirmation dialog on overwrite?
+            // TODO: Need a confirmation dialog on overwrite?
             public void actionPerformed(ActionEvent e)
             {
                 JFileChooser chooser = new JFileChooser(Constants.saveDirname);
@@ -541,11 +572,11 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 client.showMessageDialog(
-                        "Colossus build: " + Client.getVersion() +
-                        "\n" +
-                        "user.home:      " + System.getProperty("user.home") +
-                        "\n" +
-                        "java.version:   " + System.getProperty("java.version"));
+                    "Colossus build: " + Client.getVersion() +
+                    "\n" +
+                    "user.home:      " + System.getProperty("user.home") +
+                    "\n" +
+                    "java.version:   " + System.getProperty("java.version"));
             }
         };
     }
@@ -638,13 +669,21 @@ public final class MasterBoard extends JPanel
         addCheckBox(graphicsMenu, Options.useColoredBorders, 0);
         addCheckBox(graphicsMenu, Options.doNotInvertDefender, 0);
         addCheckBox(graphicsMenu, Options.showAllRecruitChits, 0);
+        // change scale
         mi = graphicsMenu.add(changeScaleAction);
         mi.setMnemonic(KeyEvent.VK_S);
+        // full recruit tree
         mi = graphicsMenu.add(viewFullRecruitTreeAction);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         mi.setMnemonic(KeyEvent.VK_R);
-        if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length >
-                1)
+        // engagement results
+        mi = graphicsMenu.add(viewEngagementResultsAction);
+        mi.setMnemonic(KeyEvent.VK_E);
+        // creature details
+        mi = graphicsMenu.add(viewCreatureDetailsAction);
+        mi.setMnemonic(KeyEvent.VK_E);
+        if (GraphicsEnvironment.getLocalGraphicsEnvironment()
+            .getScreenDevices().length > 1)
         {
             mi = graphicsMenu.add(chooseScreenAction);
         }
@@ -717,16 +756,16 @@ public final class MasterBoard extends JPanel
             return;
         }
         String playerName = client.getPlayerName();
-        if (playerLabel == null)
+        if (bottomBar == null)
         {
-            playerLabel = new JLabel(playerName);
-            contentPane.add(playerLabel, BorderLayout.SOUTH);
+            // add a bottom bar 
+            bottomBar = new BottomBar();
+            contentPane.add(bottomBar, BorderLayout.SOUTH);
+            
+            // notify
             masterFrame.pack();
         }
-        else
-        {
-            playerLabel.setText(playerName);
-        }
+        bottomBar.setPlayerName(playerName);
 
         String colorName = client.getColor();
         // If we call this before player colors are chosen, just use
@@ -734,7 +773,7 @@ public final class MasterBoard extends JPanel
         if (colorName != null)
         {
             Color color = PickColor.getBackgroundColor(colorName);
-            playerLabel.setForeground(color);
+            bottomBar.setPlayerColor(color);
             // Don't do this again.
             playerLabelDone = true;
         }
@@ -779,23 +818,61 @@ public final class MasterBoard extends JPanel
         return (((i + j) & 1) == boardParity);
     }
 
+
+    /** reference to the 'h' the cache was built for.
+     * we have to rebuild the cache for a new 'h' 
+     */ 
+    private static MasterHex[][] _hexByLabel_last_h = null;
+    /** the cache used inside 'hexByLabel'. */
+    private static java.util.Vector _hexByLabel_cache = null;
+
+    /**
+     * towi changes: here is now a cache implemented so that the nested 
+     *   loop is not executed at every call. the cache is implemented with
+     *   an array. it will work as long as the hex-labels-strings can be 
+     *   converted to int. this must be the case anyway since the 
+     *   param 'label' is an int here.
+     */
     static MasterHex hexByLabel(MasterHex[][] h, int label)
     {
-        for (int i = 0; i < h.length; i++)
-        {
-            for (int j = 0; j < h[i].length; j++)
+        // if the 'h' was the same last time we can use the cache
+        if(_hexByLabel_last_h != h)
+        { 
+            // alas, we have to rebuild the cache          
+            Log.warn("TOWI: new 'MasterHex[][] h' "
+                + "in MasterBoard.hexByLabel()");
+            _hexByLabel_last_h = h;
+            // write all 'h' elements by their int-value into an Array.
+            // we can do that here, because the 'label' arg is an int. if it
+            // were a string we could not rely on that all h-entries are ints.
+            //  (Vector: lots of unused space, i am afraid. about 80kB...)
+            _hexByLabel_cache = new java.util.Vector(1000); 
+            for (int i = 0; i < h.length; i++)
             {
-                if (show[i][j])
+                for (int j = 0; j < h[i].length; j++)
                 {
-                    if (h[i][j].getLabel().equals(Integer.toString(label)))
+                    if (show[i][j])
                     {
-                        return h[i][j];
+                        final int iLabel = 
+                            Integer.parseInt(h[i][j].getLabel());
+                        if(_hexByLabel_cache.size() <= iLabel)
+                        {
+                            _hexByLabel_cache.setSize(iLabel + 1);
+                        }
+                        _hexByLabel_cache.set(iLabel, h[i][j]);
                     }
                 }
             }
         }
-        Log.warn("Couldn't find Masterhex labeled " + label);
-        return null;
+        // the cache is built and looks like this:
+        //   _hexByLabel_cache[0...] = 
+        //      [ h00,h01,h02, ..., null, null, ..., h30,h31,... ]
+        final MasterHex found = (MasterHex) _hexByLabel_cache.get(label);
+        if(found == null)
+        {
+            Log.warn("Couldn't find Masterhex labeled " + label);
+        }
+        return found;
     }
 
     private static synchronized void readMapData()
@@ -1132,6 +1209,8 @@ public final class MasterBoard extends JPanel
 
         if (client.getPlayerName().equals(activePlayerName))
         {
+            bottomBar.setOwnPhase("Split stacks");
+
             JMenuItem mi;
 
             mi = phaseMenu.add(clearRecruitChitsAction);
@@ -1159,6 +1238,10 @@ public final class MasterBoard extends JPanel
 
             highlightTallLegions();
         }
+        else
+        {
+            bottomBar.setForeignPhase("(" + activePlayerName + " splits)");
+        }
     }
 
     void setupMoveMenu()
@@ -1175,6 +1258,8 @@ public final class MasterBoard extends JPanel
 
         if (client.getPlayerName().equals(activePlayerName))
         {
+            bottomBar.setOwnPhase("Movement");
+            
             JMenuItem mi;
 
             mi = phaseMenu.add(clearRecruitChitsAction);
@@ -1210,6 +1295,10 @@ public final class MasterBoard extends JPanel
 
             highlightUnmovedLegions();
         }
+        else
+        {
+            bottomBar.setForeignPhase("(" + activePlayerName + " moves)");
+        }
 
         // Force showing the updated movement die.
         repaint();
@@ -1229,6 +1318,9 @@ public final class MasterBoard extends JPanel
 
         if (client.getPlayerName().equals(activePlayerName))
         {
+            bottomBar.setOwnPhase("Resolve Engagements");
+            bottomBar.disableDoneButton();
+
             JMenuItem mi;
 
             mi = phaseMenu.add(clearRecruitChitsAction);
@@ -1248,6 +1340,10 @@ public final class MasterBoard extends JPanel
 
             highlightEngagements();
         }
+        else
+        {
+            bottomBar.setForeignPhase("(" + activePlayerName + " fights)");
+        }
     }
 
     void setupMusterMenu()
@@ -1264,6 +1360,8 @@ public final class MasterBoard extends JPanel
 
         if (client.getPlayerName().equals(activePlayerName))
         {
+            bottomBar.setOwnPhase("Muster Recruits");
+            
             JMenuItem mi;
 
             mi = phaseMenu.add(clearRecruitChitsAction);
@@ -1290,6 +1388,10 @@ public final class MasterBoard extends JPanel
             mi.setMnemonic(KeyEvent.VK_W);
 
             highlightPossibleRecruits();
+        }
+        else
+        {
+            bottomBar.setForeignPhase("(" + activePlayerName + " musters)");
         }
     }
 
@@ -2129,4 +2231,65 @@ public final class MasterBoard extends JPanel
             getFrame().toFront();
         }
     }
+    
+    //
+    // class Bottom Bar 
+    // {{{
+    class BottomBar extends JPanel
+    {
+        
+        private JLabel playerLabel;
+        /** quick access button to the doneWithPhase action.
+         *  must be en- and disabled often.
+         */
+        private JButton doneButton;
+        /** display the current phase in the bottom bar, near the done button */
+        private JLabel phaseLabel;
+
+        void setPlayerName(String s)
+        {
+            playerLabel.setText(s);
+        }
+        void setPlayerColor(Color color)
+        {
+            playerLabel.setForeground(color);
+        }
+
+        void setOwnPhase(String s)
+        {
+            phaseLabel.setText(s);
+            doneButton.setEnabled(true);
+        }
+        void setForeignPhase(String s)
+        {
+            phaseLabel.setText(s);
+            doneButton.setEnabled(false);
+        }
+        void disableDoneButton()
+        {
+            doneButton.setEnabled(false);
+        }
+
+        BottomBar()
+        {
+            super();
+
+            setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+            // add elements to bottom bar
+            playerLabel = new JLabel("- player -");
+            add(playerLabel);
+
+            // useful buttons
+            doneButton = new JButton(doneWithPhaseAction);
+            add(doneButton);
+
+            phaseLabel = new JLabel("- phase -");
+            add(phaseLabel);
+        
+        }
+    } 
+    // end of class Bottom Bar
+    // }}}
+    
 }
