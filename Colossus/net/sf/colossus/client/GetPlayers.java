@@ -43,7 +43,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
     private JComboBox [] playerTypes = new JComboBox[6];
     private JComboBox [] playerNames = new JComboBox[6];
-    private TextArea readme = null;
+    private JTextArea readme = null;
 
     /** List of Map.Entry objects that map player names to player types */
     private static java.util.List playerInfo = new ArrayList();
@@ -178,10 +178,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         JPanel readmePane = new JPanel();
         readmePane.setLayout(new GridLayout(0, 1));
-        readmePane.setMinimumSize(new Dimension(200, 100));
-        readme = new TextArea("", 12, 60, TextArea.SCROLLBARS_VERTICAL_ONLY);
+        readme = new JTextArea("", 12, 60);
         readme.setEditable(false);
-        readmePane.add(readme);
+        readmePane.add(new JScrollPane(readme));
         contentPane.add(readmePane);
 
         readme.setText(VariantSupport.loadVariant(variantArray[0] + ".var",
