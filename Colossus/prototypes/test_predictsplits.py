@@ -1467,7 +1467,7 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.printLeaves()
         assert(not ps.getLeaf("Gr04").allCertain())
         assert(not ps.getLeaf("Gr06").allCertain())
-        assert(not ps.getLeaf("Gr07").allCertain())
+        assert(not ps.getLeaf("Gr07").allCertain())  # XXX
         assert(not ps.getLeaf("Gr08").allCertain())
 
         turn = 8
@@ -1628,6 +1628,10 @@ class PredictSplitsTestCase(unittest.TestCase):
         ps.getLeaf("Gr12").revealCreatures(["Cyclops"])
         ps.getLeaf("Gr12").addCreature("Cyclops")
         ps.printLeaves()
+        assert(not ps.getLeaf("Gr04").allCertain())
+        assert(ps.getLeaf("Gr07").allCertain())
+        assert(ps.getLeaf("Gr08").allCertain())
+        assert(not ps.getLeaf("Gr12").allCertain())
 
         turn = 21
         print "Turn", turn

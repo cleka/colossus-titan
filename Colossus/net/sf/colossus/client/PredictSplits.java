@@ -31,8 +31,7 @@ public final class PredictSplits
             List creatureNames)
     {
         CreatureInfoList infoList = new CreatureInfoList();
-        Iterator it = creatureNames.iterator();
-        while (it.hasNext())
+        for (Iterator it = creatureNames.iterator(); it.hasNext(); )
         {
             String name = (String)it.next();
             CreatureInfo ci = new CreatureInfo(name, true, true);
@@ -90,8 +89,7 @@ public final class PredictSplits
             }
         }
         // Remove in reverse order to keep indexes consistent.
-        Iterator it = prunes.iterator();
-        while (it.hasNext())
+        for (Iterator it = prunes.iterator(); it.hasNext(); )
         {
             Integer in = (Integer)it.next();
             leaves.remove(in.intValue());
@@ -131,39 +129,36 @@ public final class PredictSplits
     /** Print all childless nodes in tree. */
     void printLeaves()
     {
-        Log.debug("*** leaves ***");
+        Log.debug("");
         List leaves = getLeaves(root);
         Collections.sort(leaves);
-        Iterator it = leaves.iterator();
-        while (it.hasNext())
+        for (Iterator it = leaves.iterator(); it.hasNext(); )
         {
             Node leaf = (Node)it.next();
             Log.debug(leaf.toString());
         }
-        Log.debug("**************");
+        Log.debug("");
     }
 
     /** Print all nodes in tree. */
     void printNodes()
     {
-        Log.debug("*** nodes ***");
+        Log.debug("");
         List nodes = getNodes(root);
         Collections.sort(nodes, nodeTurnComparator);
-        Iterator it = nodes.iterator();
-        while (it.hasNext())
+        for (Iterator it = nodes.iterator(); it.hasNext(); )
         {
             Node node = (Node)it.next();
             Log.debug(node.toString());
         }
-        Log.debug("*************");
+        Log.debug("");
     }
 
     /** Return the leaf node with matching markerId. */
     Node getLeaf(String markerId)
     {
         List leaves = getLeaves(root);
-        Iterator it = leaves.iterator();
-        while (it.hasNext())
+        for (Iterator it = leaves.iterator(); it.hasNext(); )
         {
             Node leaf = (Node)it.next();
             if (markerId.equals(leaf.getMarkerId()))
@@ -244,18 +239,15 @@ class Node implements Comparable
     public String toString()
     {
         StringBuffer sb = new StringBuffer(getFullName() + ":");
-        Iterator it = getCreatures().iterator();
-        while (it.hasNext())
+        for (Iterator it = getCreatures().iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             sb.append(" " + ci.toString());
         }
-        if (child1 != null)
+        for (Iterator it = getRemovedCreatures().iterator(); it.hasNext(); )
         {
-            sb.append(" : ");
-            sb.append(child1.getFullName());
-            sb.append(", ");
-            sb.append(child2.getFullName());
+            CreatureInfo ci = (CreatureInfo)it.next();
+            sb.append(" " + ci.toString() + "-");
         }
         return sb.toString();
     }
@@ -284,8 +276,7 @@ class Node implements Comparable
     CreatureInfoList getCertainCreatures()
     {
         CreatureInfoList list = new CreatureInfoList();
-        Iterator it = getCreatures().iterator();
-        while (it.hasNext())
+        for (Iterator it = getCreatures().iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (ci.isCertain())
@@ -298,8 +289,7 @@ class Node implements Comparable
 
     boolean allCertain()
     {
-        Iterator it = getCreatures().iterator();
-        while (it.hasNext())
+        for (Iterator it = getCreatures().iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (!ci.isCertain())
@@ -310,28 +300,40 @@ class Node implements Comparable
         return true;
     }
 
-    void setAllCertain()
+    /** Return true if all of this node's children, grandchildren, etc.
+     *  have no uncertain creatures */
+    boolean allDescendentsCertain()
     {
-        Iterator it = getCreatures().iterator();
-        while (it.hasNext())
+        if (child1 == null)
         {
-            CreatureInfo ci = (CreatureInfo)it.next();
-            ci.setCertain(true);
+            return true;
+        }
+        else
+        {
+            return child1.allCertain() && child2.allCertain() &&
+                child1.allDescendentsCertain() &&
+                child2.allDescendentsCertain();
         }
     }
 
-    /** Return list of CreatureInfo where atSplit == true. */
-    CreatureInfoList getAtSplitCreatures()
+
+    /** Return list of CreatureInfo where atSplit == true, plus removed
+     *  creatures. */
+    CreatureInfoList getAtSplitOrRemovedCreatures()
     {
         CreatureInfoList list = new CreatureInfoList();
-        Iterator it = getCreatures().iterator();
-        while (it.hasNext())
+        for (Iterator it = getCreatures().iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (ci.isAtSplit())
             {
                 list.add(ci);
             }
+        }
+        for (Iterator it = getRemovedCreatures().iterator(); it.hasNext(); )
+        {
+            CreatureInfo ci = (CreatureInfo)it.next();
+            list.add(ci);
         }
         return list;
     }
@@ -340,8 +342,7 @@ class Node implements Comparable
     CreatureInfoList getAfterSplitCreatures()
     {
         CreatureInfoList list = new CreatureInfoList();
-        Iterator it = getCreatures().iterator();
-        while (it.hasNext())
+        for (Iterator it = getCreatures().iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (!ci.isAtSplit())
@@ -352,18 +353,23 @@ class Node implements Comparable
         return list;
     }
 
-    /** Return list of CreatureInfo where both certain and atSplit are true. */
-    CreatureInfoList getCertainAtSplitCreatures()
+    /** Return list of CreatureInfo where both certain and atSplit are true,
+     *  plus removed creatures. */
+    CreatureInfoList getCertainAtSplitOrRemovedCreatures()
     {
         CreatureInfoList list = new CreatureInfoList();
-        Iterator it = getCreatures().iterator();
-        while (it.hasNext())
+        for (Iterator it = getCreatures().iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (ci.isCertain() && ci.isAtSplit())
             {
                 list.add(ci);
             }
+        }
+        for (Iterator it = getRemovedCreatures().iterator(); it.hasNext(); )
+        {
+            CreatureInfo ci = (CreatureInfo)it.next();
+            list.add(ci);
         }
         return list;
     }
@@ -382,7 +388,7 @@ class Node implements Comparable
         else
         {
             throw new PredictSplitsException(
-                    "Node.tellChildContents() Not my child");
+                    "Node.updateChildContents() Not my child");
         }
         return otherChild;
     }
@@ -404,12 +410,32 @@ class Node implements Comparable
         return creatures.size();
     }
 
+    /** Return true if big is a superset of little. */
+    static boolean superset(List big, List little)
+    {
+        List bigclone = new ArrayList(big);
+        for (Iterator it = little.iterator(); it.hasNext(); )
+        {
+            Object ob = it.next();
+            if (!bigclone.remove(ob))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     void revealCreatures(List cnl)
     {
-        Log.debug("PS revealCreatures() for " + this + " ^ " + cnl);
+        List names = getCertainCreatures().getCreatureNames();
+        if (cnl.isEmpty() || 
+            (superset(names, cnl) && allDescendentsCertain()))
+        {
+            return;
+        }
+
         CreatureInfoList cil = new CreatureInfoList();
-        Iterator it = cnl.iterator();
-        while (it.hasNext())
+        for (Iterator it = cnl.iterator(); it.hasNext(); )
         {
             String name = (String)it.next();
             cil.add(new CreatureInfo(name, true, true));
@@ -422,8 +448,7 @@ class Node implements Comparable
         // with the revealed creatures.
         int count = dupe.size();
         CreatureInfoList certain = getCertainCreatures();
-        it = certain.iterator();
-        while (it.hasNext())
+        for (Iterator it = certain.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (dupe.contains(ci))
@@ -436,7 +461,7 @@ class Node implements Comparable
             }
         }
 
-        if (count > getHeight()) // BUG: it happend! why?
+        if (count > getHeight())
         {
             throw new PredictSplitsException(
                     "Certainty error in revealCreatures -- count is " +
@@ -446,16 +471,9 @@ class Node implements Comparable
         // Mark passed creatures as certain and then communicate this to
         // parent, to adjust other legions.
 
-        if (getCertainCreatures().size() == getHeight())
-        {
-            // We already know everything.
-            return;
-        }
-
         dupe = (CreatureInfoList)cil.clone();
         count = 0;
-        it = dupe.iterator();
-        while (it.hasNext())
+        for (Iterator it = dupe.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             ci.setCertain(true);
@@ -471,8 +489,7 @@ class Node implements Comparable
         // Ensure that the creatures in cnl are now marked certain.
         dupe = (CreatureInfoList)cil.clone();
         certain = getCertainCreatures();
-        it = certain.iterator();
-        while (it.hasNext())
+        for (Iterator it = certain.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (dupe.contains(ci))
@@ -480,12 +497,10 @@ class Node implements Comparable
                 dupe.remove(ci);
             }
         }
-        it = dupe.iterator();
-        while (it.hasNext())
+        for (Iterator it = dupe.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
-            Iterator it2 = creatures.iterator();
-            while (it2.hasNext())
+            for (Iterator it2 = creatures.iterator(); it2.hasNext(); )
             {
                 CreatureInfo ci2 = (CreatureInfo)it2.next();
                 if (!ci2.isCertain() && ci2.getName().equals(ci.getName()))
@@ -504,7 +519,7 @@ class Node implements Comparable
 
         if (parent != null)
         {
-            parent.tellChildContents(this);
+            parent.updateChildContents();
         }
     }
 
@@ -517,13 +532,10 @@ class Node implements Comparable
         }
 
         CreatureInfoList allCreatures = new CreatureInfoList();
-        allCreatures.addAll(child1.getAtSplitCreatures());
-        allCreatures.addAll(child1.getRemovedCreatures());
-        allCreatures.addAll(child2.getAtSplitCreatures());
-        allCreatures.addAll(child2.getRemovedCreatures());
+        allCreatures.addAll(child1.getAtSplitOrRemovedCreatures());
+        allCreatures.addAll(child2.getAtSplitOrRemovedCreatures());
 
-        Iterator it = allCreatures.iterator();
-        while (it.hasNext())
+        for (Iterator it = allCreatures.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             if (allCreatures.numCreature(ci.getName()) !=
@@ -543,9 +555,8 @@ class Node implements Comparable
             return false;
         }
         List names = creatures.getCreatureNames();
-        Iterator it = names.iterator();
         int count = 0;
-        while (it.hasNext())
+        for (Iterator it = names.iterator(); it.hasNext(); )
         {
             String name = (String)it.next();
             if (name.equals("Titan") || name.equals("Angel"))
@@ -589,15 +600,14 @@ class Node implements Comparable
         CreatureInfoList knownCombo = new CreatureInfoList();
         knownCombo.addAll(knownSplit);
         knownCombo.addAll(knownKeep);
-        if (!creatures.isSupersetOf(knownCombo))
+        if (!superset(creatures, knownCombo))
         {
             revealCreatures(knownCombo.getCreatureNames());
-            split(childSize, getOtherChildMarkerId(), REUSE_EXISTING_TURN);
+            return findAllPossibleSplits(childSize, knownKeep, knownSplit);
         }
 
         CreatureInfoList unknowns = (CreatureInfoList)creatures.clone();
-        Iterator it = knownCombo.iterator();
-        while (it.hasNext())
+        for (Iterator it = knownCombo.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             unknowns.remove(ci);
@@ -608,8 +618,7 @@ class Node implements Comparable
         Combos combos = new Combos(unknowns, numUnknownsToSplit);
 
         CreatureInfoList possibleSplits = new CreatureInfoList();
-        it = combos.iterator();
-        while (it.hasNext())
+        for (Iterator it = combos.iterator(); it.hasNext(); )
         {
             List combo = (List)it.next();
             CreatureInfoList pos = new CreatureInfoList();
@@ -640,13 +649,11 @@ class Node implements Comparable
         boolean maximize = (2 * firstElement.size() > getHeight());
         int bestKillValue = -1;
         CreatureInfoList creaturesToRemove = new CreatureInfoList();
-        Iterator it = pos.iterator();
-        while (it.hasNext())
+        for (Iterator it = pos.iterator(); it.hasNext(); )
         {
             CreatureInfoList li = (CreatureInfoList)it.next();
-            Iterator it2 = li.iterator();
             int totalKillValue = 0;
-            while (it2.hasNext())
+            for (Iterator it2 = li.iterator(); it2.hasNext(); )
             {
                 CreatureInfo ci = (CreatureInfo)it2.next();
                 Creature creature = Creature.getCreatureByName(ci.getName());
@@ -672,13 +679,6 @@ class Node implements Comparable
 
     void split(int childSize, String otherMarkerId, int turn, List splitoffs)
     {
-        Log.debug("PS split() for " + this + " " + childSize + " " +
-                otherMarkerId + " " + turn);
-        if (childSize == 0)
-        {
-            Log.warn("childSize is 0; aborting");
-            return;
-        }
         if (creatures.size() > 8)
         {
             throw new PredictSplitsException("> 8 creatures in legion");
@@ -695,12 +695,19 @@ class Node implements Comparable
 
         CreatureInfoList knownKeep = new CreatureInfoList();
         CreatureInfoList knownSplit = new CreatureInfoList();
-        if (child1 != null)
+        if (splitoffs != null)
         {
-            knownKeep.addAll(child1.getCertainAtSplitCreatures());
-            knownKeep.addAll(child1.getRemovedCreatures());
-            knownSplit.addAll(child2.getCertainAtSplitCreatures());
-            knownSplit.addAll(child2.getRemovedCreatures());
+            for (Iterator it = splitoffs.iterator(); it.hasNext(); )
+            {
+                String name = (String)it.next();
+                CreatureInfo ci = new CreatureInfo(name, true, true);
+                knownSplit.add(ci);
+            }
+        }
+        else if (child1 != null)
+        {
+            knownKeep.addAll(child1.getCertainAtSplitOrRemovedCreatures());
+            knownSplit.addAll(child2.getCertainAtSplitOrRemovedCreatures());
         }
 
         CreatureInfoList pos = findAllPossibleSplits(childSize, knownKeep,
@@ -715,16 +722,14 @@ class Node implements Comparable
             List creatureNames = creatures.getCreatureNames();
             List posSplitNames = new ArrayList();
             List posKeepNames = new ArrayList();
-            Iterator it = pos.iterator();
-            while (it.hasNext())
+            for (Iterator it = pos.iterator(); it.hasNext(); )
             {
                 CreatureInfoList cil = (CreatureInfoList)it.next();
                 List names = cil.getCreatureNames();
                 posSplitNames.add(names);
                 posKeepNames.add(subtractLists(creatureNames, names));
             }
-            it = creatureNames.iterator();
-            while (it.hasNext())
+            for (Iterator it = creatureNames.iterator(); it.hasNext(); )
             {
                 String name = (String)it.next();
                 if (!knownKeepNames.contains(name))
@@ -745,16 +750,39 @@ class Node implements Comparable
                 }
             }
         }
+        /* If either knownKeep or knownSplit is the full size of that
+           child legion, then the certainty of creatures in the other
+           child legion is the same as in the parent. */
         else
         {
+            if (knownSplit.size() == childSize)
+            {
+                List certain = getCertainCreatures();
+                for (Iterator it = knownSplit.iterator(); it.hasNext(); )
+                {
+                    CreatureInfo ci = (CreatureInfo)it.next();
+                    certain.remove(ci);
+                }
+                knownKeep = (CreatureInfoList)certain;
+            }
+            else if (knownKeep.size() == childSize)
+            {
+                List certain = getCertainCreatures();
+                for (Iterator it = knownKeep.iterator(); it.hasNext(); )
+                {
+                    CreatureInfo ci = (CreatureInfo)it.next();
+                    certain.remove(ci);
+                }
+                knownSplit = (CreatureInfoList)certain;
+            }
+
             knownKeepNames = knownKeep.getCreatureNames();
             knownSplitNames = knownSplit.getCreatureNames();
         }
 
         CreatureInfoList strongList = new CreatureInfoList();
         CreatureInfoList weakList = new CreatureInfoList();
-        Iterator it = creatures.iterator();
-        while (it.hasNext())
+        for (Iterator it = creatures.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
             String name = ci.getName();
@@ -797,34 +825,32 @@ class Node implements Comparable
         String marker1 = markerId;
         String marker2 = otherMarkerId;
 
-        CreatureInfoList li1 = new CreatureInfoList();
-        li1.addAll(strongList);
-        li1.addAll(afterSplit1);
-        it = removed1.iterator();
-        while (it.hasNext())
+        CreatureInfoList strongFinal = new CreatureInfoList();
+        strongFinal.addAll(strongList);
+        strongFinal.addAll(afterSplit1);
+        for (Iterator it = removed1.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
-            li1.remove(ci);
+            strongFinal.remove(ci);
         }
-        CreatureInfoList li2 = new CreatureInfoList();
-        li2.addAll(weakList);
-        li2.addAll(afterSplit2);
-        it = removed2.iterator();
-        while (it.hasNext())
+        CreatureInfoList weakFinal = new CreatureInfoList();
+        weakFinal.addAll(weakList);
+        weakFinal.addAll(afterSplit2);
+        for (Iterator it = removed2.iterator(); it.hasNext(); )
         {
             CreatureInfo ci = (CreatureInfo)it.next();
-            li2.remove(ci);
+            weakFinal.remove(ci);
         }
 
         if (child1 == null)
         {
-            child1 = new Node(marker1, turn, li1, this);
-            child2 = new Node(marker2, turn, li2, this);
+            child1 = new Node(marker1, turn, strongFinal, this);
+            child2 = new Node(marker2, turn, weakFinal, this);
         }
         else
         {
-            child1.setCreatures(li1);
-            child2.setCreatures(li2);
+            child1.setCreatures(strongFinal);
+            child2.setCreatures(weakFinal);
         }
 
         if (childSize1 == 0)
@@ -832,6 +858,9 @@ class Node implements Comparable
             childSize1 = child1.getHeight();
             childSize2 = child2.getHeight();
         }
+
+        child1.resplitDescendents();
+        child2.resplitDescendents();
     }
 
     /** Recombine this legion and other, because it was not possible to
@@ -840,7 +869,6 @@ class Node implements Comparable
      *  will remain.  Also used to undo splits.*/
     void merge(Node other, int turn)
     {
-        Log.debug("PS merge() for " + this + " and " + other + " " + turn);
         if (other == null)
         {
             return;
@@ -864,17 +892,24 @@ class Node implements Comparable
         }
     }
 
-    /** Tell this parent legion the known contents of one of its
-     *  children.  Based on this info, it may be able to tell its
-     *  other child and/or its parent something. */
-    void tellChildContents(Node child)
+    /** Tell this parent legion the updated contents of its children. */
+    void updateChildContents()
     {
-        Log.debug("PS tellChildContents() for node " + this + " from " + 
-                child);
-        CreatureInfoList childCertainAtSplit =
-                child.getCertainAtSplitCreatures();
-        revealCreatures(childCertainAtSplit.getCreatureNames());
+        List cnl = new ArrayList();
+        cnl.addAll(child1.getCertainAtSplitOrRemovedCreatures().
+                getCreatureNames());
+        cnl.addAll(child2.getCertainAtSplitOrRemovedCreatures().
+                getCreatureNames());
+        revealCreatures(cnl);
         split(childSize2, getOtherChildMarkerId(), REUSE_EXISTING_TURN);
+    }
+
+    void resplitDescendents()
+    {
+        if (child1 != null)
+        {
+            split(childSize2, getOtherChildMarkerId(), REUSE_EXISTING_TURN);
+        }
     }
 
     void addCreature(String creatureName)
@@ -883,7 +918,6 @@ class Node implements Comparable
         {
             creatureName = "Titan";
         }
-        Log.debug("PS addCreature() " + this + " : " + creatureName);
         if (getHeight() >= 7 && child1 == null)
         {
             throw new PredictSplitsException("Tried adding to 7-high legion");
@@ -898,7 +932,6 @@ class Node implements Comparable
         {
             creatureName = "Titan";
         }
-        Log.debug("PS removeCreature() " + this + " : " + creatureName);
         if (getHeight() <= 0)
         {
             throw new PredictSplitsException(
@@ -926,8 +959,7 @@ class Node implements Comparable
 
     void removeCreatures(List creatureNames)
     {
-        Iterator it = creatureNames.iterator();
-        while (it.hasNext())
+        for (Iterator it = creatureNames.iterator(); it.hasNext(); )
         {
             String name = (String)it.next();
             removeCreature(name);
@@ -951,8 +983,7 @@ class Node implements Comparable
     {
         ArrayList li = new ArrayList();
         li.addAll(big);
-        Iterator it = little.iterator();
-        while (it.hasNext())
+        for (Iterator it = little.iterator(); it.hasNext(); )
         {
             Object el = it.next();
             li.remove(el);
@@ -964,8 +995,7 @@ class Node implements Comparable
     static int count(List li, String name)
     {
         int num = 0;
-        Iterator it = li.iterator();
-        while (it.hasNext())
+        for (Iterator it = li.iterator(); it.hasNext(); )
         {
             String s = (String)it.next();
             if (s.equals(name))
@@ -981,8 +1011,7 @@ class Node implements Comparable
     static int minCount(List lili, String name)
     {
         int min = Integer.MAX_VALUE;
-        Iterator it = lili.iterator();
-        while (it.hasNext())
+        for (Iterator it = lili.iterator(); it.hasNext(); )
         {
             List li = (List)it.next();
             min = Math.min(min, count(li, name));

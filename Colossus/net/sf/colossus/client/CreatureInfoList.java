@@ -59,20 +59,6 @@ class CreatureInfoList extends ArrayList
         Log.error("No uncertain creatures");
     }
 
-    boolean isSupersetOf(CreatureInfoList other)
-    {
-        for (Iterator it = other.iterator(); it.hasNext(); )
-        {
-            CreatureInfo ci = (CreatureInfo)it.next();
-            if (numCreature(ci.getName()) <
-                    other.numCreature(ci.getName()))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /** Remove the first element matching name.  Return true if found. */
     boolean removeCreatureByName(String name)
     {
