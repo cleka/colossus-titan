@@ -674,11 +674,6 @@ class Node implements Comparable
 
     void split(int childSize, String otherMarkerId, int turn)
     {
-        split(childSize, otherMarkerId, turn, null);
-    }
-
-    void split(int childSize, String otherMarkerId, int turn, List splitoffs)
-    {
         if (creatures.size() > 8)
         {
             throw new PredictSplitsException("> 8 creatures in legion");
@@ -695,16 +690,7 @@ class Node implements Comparable
 
         CreatureInfoList knownKeep = new CreatureInfoList();
         CreatureInfoList knownSplit = new CreatureInfoList();
-        if (splitoffs != null)
-        {
-            for (Iterator it = splitoffs.iterator(); it.hasNext(); )
-            {
-                String name = (String)it.next();
-                CreatureInfo ci = new CreatureInfo(name, true, true);
-                knownSplit.add(ci);
-            }
-        }
-        else if (child1 != null)
+        if (child1 != null)
         {
             knownKeep.addAll(child1.getCertainAtSplitOrRemovedCreatures());
             knownSplit.addAll(child2.getCertainAtSplitOrRemovedCreatures());
