@@ -1503,17 +1503,20 @@ Log.debug("Called Client.reinforce for " + markerId);
         }
     }
 
-    // XXX Test rescales.  A bugfix and a redesign collided.
     /** Create new markers in response to a rescale. */
     void recreateMarkers()
     {
-        Iterator it = markers.iterator();
+        ListIterator it = markers.listIterator();
         while (it.hasNext())
         {
             Marker marker = (Marker)it.next();
             String markerId = marker.getId();
             String hexLabel = (String)legionToHex.get(markerId);
-            addMarker(markerId, hexLabel);
+            marker = new Marker(3 * Scale.get(), markerId,
+                                board.getFrame(), this);
+            it.set(marker);
+            legionToHex.put(markerId, hexLabel);
+            board.alignLegions(hexLabel);
         }
     }
 
