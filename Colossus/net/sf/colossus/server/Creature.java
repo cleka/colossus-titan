@@ -126,6 +126,7 @@ public class Creature implements Comparable
             System.out.println("Creatures def. loading failed : " + e);
             System.exit(1);
         }
+        summonablesCreatures.clear();
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
