@@ -669,7 +669,7 @@ public final class Player implements Comparable
 
     Set getMarkersAvailable()
     {
-        return markersAvailable;
+        return Collections.unmodifiableSet(markersAvailable);
     }
 
     String getFirstAvailableMarker()
@@ -705,10 +705,10 @@ public final class Player implements Comparable
         markersAvailable.add(markerId);
     }
 
-    void addLegionMarkers(Player player)
+    private void takeLegionMarkers(Player victim)
     {
-        Set newMarkers = player.getMarkersAvailable();
-        markersAvailable.addAll(newMarkers);
+        markersAvailable.addAll(victim.getMarkersAvailable());
+        victim.markersAvailable.clear();
     }
 
 
@@ -791,7 +791,7 @@ public final class Player implements Comparable
         if (slayer != null)
         {
             slayer.addPlayerElim(this);
-            slayer.addLegionMarkers(this);
+            slayer.takeLegionMarkers(this);
         }
 
         game.getServer().allAlignLegions(hexLabelsToAlign);
@@ -861,13 +861,12 @@ public final class Player implements Comparable
     }
 
 
-    Creature aiReinforce(Legion legion)
+    void aiReinforce(Legion legion)
     {
         if (game.getServer().getClientOption(name, Options.autoRecruit))
         {
-            return ai.reinforce(legion, game);
+            ai.reinforce(legion, game);
         }
-        return null;
     }
 
 
@@ -951,7 +950,7 @@ public final class Player implements Comparable
         return null;
     }
 
-    // XXX Need to not allow colons in player names.
+    // XXX Prohibit colons in player names.
     /** Return a colon:separated string with a bunch of info for
      *  the status screen. */
     String getStatusInfo()
@@ -976,7 +975,22 @@ public final class Player implements Comparable
         buf.append(getTitanPower());
         buf.append(':');
         buf.append(getScore());
+        buf.append(':');
+        buf.append(getTotalPointValue());
 
         return buf.toString();
+    }
+
+    /** Return the total value of all of this player's creatures. */
+    int getTotalPointValue()
+    {
+        int total = 0;
+        Iterator it = getLegions().iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            total += legion.getPointValue();
+        }
+        return total;
     }
 }

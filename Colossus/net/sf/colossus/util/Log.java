@@ -31,7 +31,6 @@ public final class Log
         Log.showDebug = showDebug;
     }
 
-
     public static boolean isToStdout()
     {
         return toStdout;
@@ -41,7 +40,6 @@ public final class Log
     {
         Log.toStdout = toStdout;
     }
-
 
     public static boolean isToWindow()
     {
@@ -83,27 +81,30 @@ public final class Log
     /** Log an event. */
     public static void event(String s)
     {
-        out(s);
+        out(s.trim());
     }
 
     /** Log an error. */
     public static void error(String s)
     {
-        out("Error: " + s);
+        out("Error: " + s.trim());
     }
 
     /** Log a warning. */
     public static void warn(String s)
     {
-        out("Warn: " + s);
+        out("Warn: " + s.trim());
     }
 
-    /** Log a debug message. */
+    /** Log a debug message, to stdout only. */
     public static void debug(String s)
     {
+        boolean wasToWindow = isToWindow();
+        setToWindow(false);
         if (showDebug)
         {
-            out(s);
+            out(s.trim());
         }
+        setToWindow(wasToWindow);
     }
 }

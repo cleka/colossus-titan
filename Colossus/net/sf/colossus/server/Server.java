@@ -61,17 +61,6 @@ public final class Server
         clients.clear();
     }
 
-    // TODO Set up one thread per client?
-
-    // TODO Need a scheme to broadcast a message to all clients, versus
-    // sending one to one client.  Use a list of client numbers for each
-    // message, so that we can send a message to two players, not just
-    // one or all?
-
-    // TODO Event handling scheme to catch messages from clients.  Parsing
-    // scheme to turn them into method calls.
-
-
 
     void allUpdateStatusScreen()
     {
@@ -155,16 +144,6 @@ public final class Server
         {
             Client client = (Client)it.next();
             client.loadOptions();
-        }
-    }
-
-    void saveOptions()
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
-            client.saveOptions();
         }
     }
 
@@ -294,16 +273,6 @@ public final class Server
         Client client = getClient(playerNum);
         if (client != null)
         {
-            client.setOption(optname, value);
-        }
-    }
-
-    void setAllClientsOption(String optname, boolean value)
-    {
-        Iterator it = clients.iterator();
-        while (it.hasNext())
-        {
-            Client client = (Client)it.next();
             client.setOption(optname, value);
         }
     }
@@ -639,28 +608,14 @@ public final class Server
 
     void reinforce(Legion legion)
     {
-        Client client = getClient(legion.getPlayerName());
         if (getClientOption(legion.getPlayerName(), Options.autoRecruit))
         {
-            Creature recruit = legion.getPlayer().aiReinforce(legion);
-            if (recruit != null)
-            {
-                java.util.List recruiters = game.findEligibleRecruiters(
-                    legion.getMarkerId(), recruit.getName());
-                if (!recruiters.isEmpty())
-                {
-                    Creature recruiter = (Creature)recruiters.get(0);
-                    game.doRecruit(legion, recruit, recruiter);
-                }
-            }
-            if (game.getBattle() != null)
-            {
-                game.getBattle().reinforceCallback();
-            }
+            legion.getPlayer().aiReinforce(legion);
         }
         else
         {
-            client.doMuster(legion.getMarkerId());
+            Client client = getClient(legion.getPlayerName());
+            client.doReinforce(legion.getMarkerId());
         }
     }
 
@@ -700,13 +655,13 @@ public final class Server
         return strings;
     }
 
-    /** Handle mustering for legion.  Return true if the legion 
-     *  mustered something. */
+    /** Handle mustering for legion. */ 
     public void doMuster(String markerId, String recruitName,
         String recruiterName)
     {
         Legion legion = game.getLegionByMarkerId(markerId);
-        if (legion != null && legion.hasMoved() && legion.canRecruit())
+        if (legion != null && (legion.hasMoved() || game.getPhase() ==
+            Constants.FIGHT) && legion.canRecruit())
         {
             legion.sortCritters();
             if (recruitName != null)
@@ -723,10 +678,14 @@ public final class Server
             if (!legion.canRecruit())
             {
                 didMuster(legion);
-                if (game.getPhase() == Constants.FIGHT)
-                {
-                    game.getBattle().reinforceCallback();
-                }
+            }
+        }
+        // XXX Need to always call this to keep game from hanging.
+        if (game.getPhase() == Constants.FIGHT)
+        {
+            if (game.getBattle() != null)
+            {
+                game.getBattle().doneReinforcing();
             }
         }
     }

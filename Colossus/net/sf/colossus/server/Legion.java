@@ -640,7 +640,7 @@ final class Legion implements Comparable
         // Free up the legion marker.
         game.getServer().allRemoveMarker(markerId);
         Player player = getPlayer();
-        player.getMarkersAvailable().add(getMarkerId());
+        player.addLegionMarker(getMarkerId());
     }
 
 

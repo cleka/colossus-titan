@@ -7,7 +7,7 @@ import javax.swing.*;
 
 
 /**
- * Class SummonAngel allows a player to Summon an angel or archangel.
+ * Allows a player to summon an angel or archangel.
  * @version $Id$
  * @author David Ripton
  */
@@ -19,10 +19,7 @@ final class SummonAngel extends JDialog implements MouseListener,
     private String markerId;
     private Chit angelChit;
     private Chit archangelChit;
-    private GridBagLayout gridbag = new GridBagLayout();
-    private GridBagConstraints constraints = new GridBagConstraints();
-    private JButton button1;
-    private JButton button2;
+    private JButton cancelButton;
     private static boolean active;
     private Client client;
 
@@ -47,8 +44,7 @@ final class SummonAngel extends JDialog implements MouseListener,
         addWindowListener(this);
 
         Container contentPane = getContentPane();
-
-        contentPane.setLayout(gridbag);
+        contentPane.setLayout(new FlowLayout());
 
         pack();
 
@@ -57,14 +53,10 @@ final class SummonAngel extends JDialog implements MouseListener,
         int scale = 4 * Scale.get();
 
         angelChit = new Chit(scale, "Angel", this);
-        constraints.gridy = 0;
-        gridbag.setConstraints(angelChit, constraints);
         contentPane.add(angelChit);
         angelChit.addMouseListener(this);
 
         archangelChit = new Chit(scale, "Archangel", this);
-        constraints.gridy = 0;
-        gridbag.setConstraints(archangelChit, constraints);
         contentPane.add(archangelChit);
         archangelChit.addMouseListener(this);
 
@@ -72,17 +64,10 @@ final class SummonAngel extends JDialog implements MouseListener,
         angelChit.setDead(true);
         archangelChit.setDead(true);
 
-        button1 = new JButton("Summon");
-        button1.setMnemonic(KeyEvent.VK_S);
-        button2 = new JButton("Cancel");
-        button2.setMnemonic(KeyEvent.VK_C);
-        constraints.gridy = 1;
-        gridbag.setConstraints(button1, constraints);
-        contentPane.add(button1);
-        button1.addActionListener(this);
-        gridbag.setConstraints(button2, constraints);
-        contentPane.add(button2);
-        button2.addActionListener(this);
+        cancelButton = new JButton("Cancel");
+        cancelButton.setMnemonic(KeyEvent.VK_C);
+        contentPane.add(cancelButton);
+        cancelButton.addActionListener(this);
 
         pack();
 
@@ -199,42 +184,7 @@ final class SummonAngel extends JDialog implements MouseListener,
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand().equals("Summon"))
-        {
-            String donorId = client.getDonorId();
-            if (donorId == null)
-            {
-                client.showMessageDialog("Must select a legion.");
-                return;
-            }
-
-            boolean angels = client.donorHasAngel();
-            boolean archangels = client.donorHasArchangel();
-
-            if (!angels && !archangels)
-            {
-                client.showMessageDialog("No angels are available.");
-                return;
-            }
-
-            if (!archangels)
-            {
-                // Must take an angel.
-                cleanup(donorId, "Angel");
-            }
-            else if (!angels)
-            {
-                // Must take an archangel.
-                cleanup(donorId, "Archangel");
-            }
-            else
-            {
-                // If both are available, make the player click on one.
-                client.showMessageDialog("Select angel or archangel.");
-            }
-        }
-
-        else if (e.getActionCommand().equals("Cancel"))
+        if (e.getActionCommand().equals("Cancel"))
         {
             cleanup(null, null);
         }

@@ -39,7 +39,7 @@ public final class LogWindow extends JTextArea
 
     public Dimension getMinimumSize()
     {
-        return new Dimension(600, 100);
+        return new Dimension(640, 100);
     }
 
 

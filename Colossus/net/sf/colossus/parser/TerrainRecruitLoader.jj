@@ -109,24 +109,25 @@ public class TerrainRecruitLoader
         return((java.awt.Color)carToColor.get(new Character(tc)));
     }
     /**
-     * Give a list of the possible recruits in a terrain.
+     * Give a modifiable list of the possible recruits in a terrain.
      * @param terrain Character representing a terrain.
      * @return List of Creature that can be recruited in the terrain.
      * @see net.sf.colossus.server.Creature
      */
     public ArrayList getPossibleRecruits(char terrain)
     {
-        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
         ArrayList re = new ArrayList();
-        for (int i = 0; i < al.size() ; i++)
+        ArrayList al = (ArrayList)carToRecruits.get(new Character(terrain));
+        Iterator it = al.iterator();
+        while (it.hasNext())
         {
-            recruitNumber tr = (recruitNumber)al.get(i);
+            recruitNumber tr = (recruitNumber)it.next();
             if (tr.number > 0)
             {
                 re.add(Creature.getCreatureByName(tr.name));
             }
         }
-        return(re);
+        return re;
     }
     /**
      * Give the number of a given recruiters needed to recruit a given Creature.

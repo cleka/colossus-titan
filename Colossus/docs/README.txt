@@ -278,9 +278,10 @@ Q.  What are all those load map, load terrain, load recruit, etc. buttons?
 A.  The maps and recruit trees and stuff used to be hardcoded.  Romain
     has recently pulled them out into data files, which means that you
     can customize parts of the game by making new data files instead of
-    changing code.  If that interests you, see docs/FileFormat.txt   We'll
-    include some variant data files in the package at some point.  Note that
-    the AI has not been fully tested with variant maps.
+    changing code.  If that interests you, see FileFormat.txt and
+    Variant-HOWTO.txt.  We'll include some variant data files in the 
+    package at some point.  Note that the AI has not been fully tested 
+    with variant maps.
 
 Q.  How can I help?
 

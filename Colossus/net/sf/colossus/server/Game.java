@@ -47,7 +47,7 @@ public final class Game
     private static TerrainRecruitLoader trl;
     private LinkedList colorPickOrder = new LinkedList();
     private Set colorsLeft;
-    private PhaseAdvancer phaseAdvancer = new PhaseAdvancer();
+    private PhaseAdvancer phaseAdvancer = new GamePhaseAdvancer();
 
     Game()
     {
@@ -96,15 +96,6 @@ public final class Game
             Player player = (Player)players.get(i);
             server.addClient(i, player.getName());
         }
-    }
-
-
-    /** Temporary to avoid having to rename this everywhere.*/
-    void initBoard()
-    {
-        initAndLoadData();
-        initServerAndClients();
-        server.allInitBoard();
     }
 
 
@@ -205,13 +196,6 @@ public final class Game
 
         // We need to set the autoPlay option before loading the board,
         // so that we can avoid showing boards for AI players.
-
-        // Remove caretaker displays.
-        if (server != null)
-        {
-            server.saveOptions();
-            server.setAllClientsOption(Options.showCaretaker, false);
-        }
 
         initAndLoadData();
         initServerAndClients();
@@ -487,7 +471,7 @@ public final class Game
 
     Collection getPlayers()
     {
-        return players;
+        return Collections.unmodifiableCollection(players);
     }
 
     Player getPlayer(String name)
@@ -603,63 +587,29 @@ public final class Game
      *  are current. */
     void advancePhase(final int oldPhase, final String playerName)
     {
-        phaseAdvancer.advancePhase(oldPhase, playerName);
+        if (oldPhase != phase || pendingAdvancePhase ||
+            !playerName.equals(getActivePlayerName()))
+        {
+            Log.error("Called advancePhase illegally");
+            return;
+        }
+        phaseAdvancer.advancePhase();
     }
 
     /** Wrap the complexity of phase advancing. */
-    class PhaseAdvancer
+    class GamePhaseAdvancer extends PhaseAdvancer
     {
-        // java.util.Timer is not present in JDK 1.2
-        private javax.swing.Timer timer;
-
-        class AdvancePhaseListener implements ActionListener
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                advancePhaseInternal();
-            }
-        }
-
-        private int getDelay()
-        {
-            int delay = Constants.MIN_DELAY;
-            if (server != null)
-            {
-                delay = server.getClientIntOption(Options.aiDelay);
-            }
-            if (getActivePlayer().isHuman() || delay < Constants.MIN_DELAY)
-            {
-                delay = Constants.MIN_DELAY;
-            }
-            if (delay > Constants.MAX_DELAY)
-            {
-                delay = Constants.MAX_DELAY;
-            }
-            return delay;
-        }
-
         /** Advance to the next phase, only if the passed oldPhase and 
          *  playerName are current. */
-        private void advancePhase(final int oldPhase, final String playerName)
+        void advancePhase()
         {
-            if (oldPhase != phase || pendingAdvancePhase ||
-                !playerName.equals(getActivePlayerName()))
-            {
-                Log.error("Called advancePhase illegally");
-            }
-            else
-            {
-                pendingAdvancePhase = true;
-                // Need a new timer object each time.
-                timer = new javax.swing.Timer(getDelay(), 
-                    new AdvancePhaseListener());
-                timer.setRepeats(false);
-                timer.start();
-            }
+            pendingAdvancePhase = true;
+            int delay = getDelay(server, getActivePlayer().isHuman());
+            startTimer(delay);
         }
 
         /** Advance to the next phase, with no error checking. */
-        private void advancePhaseInternal()
+        void advancePhaseInternal()
         {
             phase++;
             if (phase > Constants.MUSTER ||
@@ -675,7 +625,7 @@ public final class Game
             setupPhase();
         }
 
-        private void advanceTurn()
+        void advanceTurn()
         {
             activePlayerNum++;
             if (activePlayerNum == getNumPlayers())
@@ -1159,13 +1109,6 @@ public final class Game
                 }
             }
 
-            // Remove caretaker displays.
-            if (server != null)
-            {
-                server.saveOptions();
-                server.setAllClientsOption(Options.showCaretaker, false);
-            }
-
             initServerAndClients();
 
             // Set up autoPlay options from player type.
@@ -1405,12 +1348,11 @@ public final class Game
     }
 
 
-    /** Return a list of creatures that can be recruited in
+    /** Return a modifiable list of creatures that can be recruited in
      *  the given terrain, ordered from lowest to highest. */
     public static java.util.List getPossibleRecruits(char terrain)
     {
-        java.util.List recruits = trl.getPossibleRecruits(terrain);
-        return recruits;
+        return trl.getPossibleRecruits(terrain);
     }
 
     /** Return the number of the given recruiter needed to muster the given
@@ -1419,7 +1361,7 @@ public final class Game
     public static int numberOfRecruiterNeeded(Creature recruiter, Creature
         recruit, char terrain)
     {
-        return(trl.numberOfRecruiterNeeded(recruiter,recruit,terrain));
+        return trl.numberOfRecruiterNeeded(recruiter,recruit,terrain);
     }
 
 
@@ -1641,6 +1583,8 @@ public final class Game
         legion.setRecruitName(recruit.getName());
         // XXX Handle repaints on client side.
         server.allRepaintHex(legion.getCurrentHexLabel());
+
+        reinforcing = false;
     }
 
 
@@ -2695,11 +2639,10 @@ reinforcing + " acquiring=" + acquiring);
 
     void doneAcquiringAngels()
     {
-Log.debug("called Game.doneAcquiringAngels()");
         acquiring = false;
         if (!summoning && !reinforcing)
         {
-Log.debug("called kickEngagements() from doneAcquiringAngels()");
+            server.allHighlightEngagements();
             kickEngagements();
         }
     }

@@ -100,9 +100,23 @@ public class SimpleAI implements AI
     }
 
 
-    public Creature reinforce(Legion legion, Game game)
+    public void reinforce(Legion legion, Game game)
     {
-        return chooseRecruit(game, legion, legion.getCurrentHex());
+        Creature recruit = chooseRecruit(game, legion, legion.getCurrentHex());
+        if (recruit != null)
+        {
+            java.util.List recruiters = game.findEligibleRecruiters(
+                legion.getMarkerId(), recruit.getName());
+            if (!recruiters.isEmpty())
+            {
+                Creature recruiter = (Creature)recruiters.get(0);
+                game.doRecruit(legion, recruit, recruiter);
+            }
+        }
+        if (game.getBattle() != null)
+        {
+            game.getBattle().doneReinforcing();
+        }
     }
 
 

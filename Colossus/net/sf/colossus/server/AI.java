@@ -20,8 +20,8 @@ public interface AI
     /** make recruits for current player */
     void muster(Game game);
 
-    /** pick one reinforcement */
-    Creature reinforce(Legion legion, Game game);
+    /** pick one reinforcement for legion */
+    void reinforce(Legion legion, Game game);
 
     /** choose whether legion should flee from enemy */
     boolean flee(Legion legion, Legion enemy, Game game);

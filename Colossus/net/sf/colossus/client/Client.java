@@ -93,17 +93,6 @@ public final class Client
     }
 
 
-
-    // Add all methods that GUI classes need to call against server classes.
-    // Use boolean return type for voids so we can tell if they succeeded.
-
-    // XXX How to distinguish things that failed because they were out
-    // of sequence or the network packet was dropped, versus illegal in
-    // the game?  Maybe change all boolean returns to ints and set up
-    // some constants?
-
-
-
     /** Take a mulligan. Returns the roll, or -1 on error. */
     int mulligan()
     {
@@ -292,7 +281,7 @@ public final class Client
         else if (name.equals(Options.showLogWindow))
         {
             Log.setToWindow(value);
-            if (value == false)
+            if (!value)
             {
                 Log.disposeLogWindow();
             }
@@ -331,7 +320,7 @@ public final class Client
 
     /** Save player options to a file.  The current format is standard
      *  java.util.Properties keyword=value. */
-    public void saveOptions()
+    void saveOptions()
     {
         final String optionsFile = Options.optionsPath + Options.optionsSep +
             playerName + Options.optionsExtension;
@@ -370,15 +359,16 @@ public final class Client
     /** Ensure that Player menu checkboxes reflect the correct state. */
     private void syncCheckboxes()
     {
+        if (board == null)
+        {
+            return;
+        }
         Enumeration en = options.propertyNames();
         while (en.hasMoreElements())
         {
             String name = (String)en.nextElement();
             boolean value = getOption(name);
-            if (board != null)
-            {
-                board.twiddleOption(name, value);
-            }
+            board.twiddleOption(name, value);
         }
     }
 
@@ -811,7 +801,6 @@ public final class Client
 
     void acquireAngelCallback(String markerId, String angelType)
     {
-Log.debug("Client.acquireAngelCallback: " + markerId + " " + angelType);
         server.acquireAngel(markerId, angelType);
         // XXX repaint just the one hex.
         if (board != null)
@@ -1053,10 +1042,9 @@ Log.debug("Client.acquireAngelCallback: " + markerId + " " + angelType);
             battleDice = new BattleDice();
             frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
             frame.pack();
-            // XXX Does not seem to work.
-            frame.toFront();
             map.requestFocus();
             frame.setVisible(true);
+            map.getFrame().toFront();
         }
     }
 
@@ -1126,6 +1114,33 @@ Log.debug("Client.acquireAngelCallback: " + markerId + " " + angelType);
         if (recruiterName == null)
         {
             return;
+        }
+
+        server.doMuster(markerId, recruitName, recruiterName);
+    }
+
+    /** Currently used for human players only.  Always needs to call
+     *  server.doMuster(), even if no recruit is wanted, to get past
+     *  the reinforcing phase. */
+    public void doReinforce(String markerId)
+    {
+        // TODO Cache this on the client side.
+        String hexLabel = server.getHexForLegion(markerId);
+
+        java.util.List recruits = server.findEligibleRecruits(markerId, 
+            hexLabel);
+        java.util.List imageNames = getLegionImageNames(markerId);
+        String hexDescription =
+            MasterBoard.getHexByLabel(hexLabel).getDescription();
+
+        String recruitName = PickRecruit.pickRecruit(board.getFrame(), 
+            recruits, imageNames, hexDescription, markerId, this);
+
+        String recruiterName = null;
+        if (recruitName != null)
+        {
+            recruiterName = findRecruiterName(hexLabel, markerId, recruitName,
+                imageNames, hexDescription);
         }
 
         server.doMuster(markerId, recruitName, recruiterName);
@@ -1515,6 +1530,11 @@ Log.debug("Client.acquireAngelCallback: " + markerId + " " + angelType);
         String entrySide = PickEntrySide.pickEntrySide(board.getFrame(),
             hexLabel, entrySides);
 
+        if (!goodEntrySide(entrySide))
+        {
+            return;
+        }
+
         String teleportingLord = null;
         if (teleport)
         {
@@ -1522,6 +1542,12 @@ Log.debug("Client.acquireAngelCallback: " + markerId + " " + angelType);
         }
 
         server.doMove(moverId, hexLabel, entrySide, teleport, teleportingLord);
+    }
+
+    boolean goodEntrySide(String entrySide)
+    {
+        return (entrySide != null && (entrySide.equals("Left") || 
+            entrySide.equals("Bottom") || entrySide.equals("Right")));
     }
 
     public void didMove(String markerId)
@@ -1577,7 +1603,7 @@ Log.debug("Client.acquireAngelCallback: " + markerId + " " + angelType);
         return server.getCreatureCount(creatureName);
     }
 
-
+    // TODO cache this
     java.util.List getLegionMarkerIds(String hexLabel)
     {
         return server.getLegionMarkerIds(hexLabel);

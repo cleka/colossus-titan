@@ -105,4 +105,17 @@ public final class Proposal
         }
         return true;
     }
+
+    public int hashCode()
+    {
+        if (fight)
+        {
+            return 1;
+        }
+        if (mutual)
+        {
+            return 2;
+        }
+        return winnerId.hashCode() + winnerLosses.hashCode();
+    }
 }

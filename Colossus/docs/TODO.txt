@@ -1,3 +1,12 @@
+Make most returned collections unmodifiable. 
+
+Cache known legion contents in Client.
+Cache hex location of each legion in Client.
+Both require sending events to all clients when a legion is formed
+    (game start or load), splits/joins, moves/unmoves, recruits/unrecruits, 
+    reinforces, acquires, summons, dies (flees/concedes/negotiates/battles), 
+    or gets reduced (by negotiation or battle).
+
 Always show the current turn, player, and phase in a panel somewhere.
 
 If there is more than one human player, move the active player's
@@ -5,8 +14,12 @@ If there is more than one human player, move the active player's
 Call toBack() on the map/board to move the other one to the front.
    (Less obnoxious than toFront() when other applications are running.)
 
+Make BattleMap less tall.
+Highlight entrances somehow.  Maybe use fixed boxes with an arrow to
+   show entry side, instead of cascading.
+
 Add display of dead creatures / total creatures / creatures in play to
-   CreatureCollectionView.
+   CreatureCollectionView, and some way to toggle between these values.
 Add total value of all a player's creatures to StatusScreen.
 
 Reveal all stacks at game end.
@@ -16,7 +29,8 @@ Optionally show the contents of a legion that flees or concedes.
 Allow players to specify that they automatically refuse to negotiate.  
    Check for this before showing negotiation dialog to opponent.
 
-Prompt player whether to continue game after last human player dies.
+Prompt player whether to continue game after last human player dies
+   if AIs remain.
 
 Reduce imports between client and server packages.  Document remaining 
    public classes, which are those that need to be included in the 

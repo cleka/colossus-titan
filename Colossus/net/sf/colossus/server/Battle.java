@@ -25,6 +25,7 @@ import net.sf.colossus.client.BattleMap;
 final class Battle
 {
     private Game game;
+    private Server server;
     private String attackerId;
     private String defenderId;
     private String [] legions = new String[2];
@@ -44,13 +45,14 @@ final class Battle
     /** Set of hexLabels for valid carry targets */
     private Set carryTargets = new HashSet();
     private final int BIGNUM = 99;
-    private BattlePhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
+    private PhaseAdvancer phaseAdvancer = new BattlePhaseAdvancer();
 
 
     Battle(Game game, String attackerId, String defenderId,
         int activeLegionNum, String masterHexLabel, int turnNumber, int phase)
     {
         this.game = game;
+        server = game.getServer();
         this.masterHexLabel = masterHexLabel;
         this.defenderId = defenderId;
         this.attackerId = attackerId;
@@ -126,7 +128,7 @@ final class Battle
         while (it.hasNext())
         {
             Critter critter = (Critter)it.next();
-            game.getServer().allPlaceNewChit(critter, inverted);
+            server.allPlaceNewChit(critter, inverted);
         }
     }
 
@@ -135,7 +137,7 @@ final class Battle
      *  is non-null earlier. */
     void init()
     {
-        game.getServer().allInitBattleMap(masterHexLabel);
+        server.allInitBattleMap(masterHexLabel);
         initBattleChits(getAttacker(), false);
         initBattleChits(getDefender(), true);
 
@@ -357,54 +359,22 @@ final class Battle
         phaseAdvancer.advancePhase();
     }
 
-    // TODO Try to merge duplicate code with Game.PhaseAdvancer.
-    class BattlePhaseAdvancer
+    class BattlePhaseAdvancer extends PhaseAdvancer
     {
         private boolean again = false;
     
-        // java.util.Timer is not present in JDK 1.2
-        private javax.swing.Timer timer;
-
-        class AdvancePhaseListener implements ActionListener
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                advancePhaseInternal();
-            }
-        }
-
-        private int getDelay()
-        {
-            int delay = Constants.MIN_DELAY;
-            if (game.getServer() != null)
-            {
-                delay = game.getServer().getClientIntOption(Options.aiDelay);
-            }
-            if (getActivePlayer().isHuman() || delay < Constants.MIN_DELAY)
-            {
-                delay = Constants.MIN_DELAY;
-            }
-            if (delay > Constants.MAX_DELAY)
-            {
-                delay = Constants.MAX_DELAY;
-            }
-            return delay;
-        }
 
         /** Advance to the next battle phase. */
-        private void advancePhase()
+        void advancePhase()
         {
             if (!isOver())
             {
-                // Need a new timer object each time.
-                timer = new javax.swing.Timer(getDelay(), 
-                    new AdvancePhaseListener());
-                timer.setRepeats(false);
-                timer.start();
+                int delay = getDelay(server, getActivePlayer().isHuman());
+                startTimer(delay);
             }
         }
     
-        private void advancePhaseInternal()
+        void advancePhaseInternal()
         {
             if (phase == Constants.SUMMON)
             {
@@ -458,7 +428,7 @@ final class Battle
             }
         }
 
-        private void advanceTurn()
+        void advanceTurn()
         {
             if (isOver())
             {
@@ -518,7 +488,7 @@ final class Battle
 
     private boolean setupSummon()
     {
-        game.getServer().allSetupBattleSummonMenu();
+        server.allSetupBattleSummonMenu();
         boolean advance = true;
         if (summonState == Constants.FIRST_BLOOD)
         {
@@ -537,7 +507,7 @@ final class Battle
 
     private boolean setupRecruit()
     {
-        game.getServer().allSetupBattleRecruitMenu();
+        server.allSetupBattleRecruitMenu();
         return recruitReinforcement();
     }
 
@@ -550,9 +520,9 @@ final class Battle
         }
         else
         {
-            game.getServer().allSetupBattleMoveMenu();
+            server.allSetupBattleMoveMenu();
             Player player = getActivePlayer();
-            if (game.getServer().getClientOption(player.getName(),
+            if (server.getClientOption(player.getName(),
                 Options.autoBattleMove))
             {
                 player.aiBattleMove();
@@ -574,12 +544,12 @@ final class Battle
         {
             // Automatically perform forced strikes if applicable.
             Player player = getActivePlayer();
-            if (game.getServer().getClientOption(player.getName(),
+            if (server.getClientOption(player.getName(),
                 Options.autoStrike))
             {
                 player.aiStrike(getActiveLegion(), this, false, false);
             }
-            else if (game.getServer().getClientOption(player.getName(),
+            else if (server.getClientOption(player.getName(),
                 Options.autoForcedStrike))
             {
                 makeForcedStrikes(false);
@@ -592,7 +562,7 @@ final class Battle
                 return true;
             }
 
-            game.getServer().allSetupBattleFightMenu();
+            server.allSetupBattleFightMenu();
         }
         return false;
     }
@@ -617,7 +587,7 @@ final class Battle
             Legion attacker = getAttacker();
             Critter critter = attacker.getCritter(attacker.getHeight() - 1);
             placeCritter(critter);
-            game.getServer().allPlaceNewChit(critter, false);
+            server.allPlaceNewChit(critter, false);
         }
         if (phase == Constants.SUMMON)
         {
@@ -631,9 +601,6 @@ final class Battle
         Legion defender = getDefender();
         if (turnNumber == 4 && defender.canRecruit())
         {
-            // Allow recruiting a reinforcement.
-            Creature recruit = null;
-
             game.reinforce(defender);
             return false;
         }
@@ -641,14 +608,14 @@ final class Battle
     }
 
     /** Needs to be called when reinforcement is done. */
-    void reinforceCallback()
+    void doneReinforcing()
     {
         Legion defender = getDefender();
         if (defender.hasRecruited())
         {
             Critter newCritter = defender.getCritter(defender.getHeight() - 1);
             placeCritter(newCritter);
-            game.getServer().allPlaceNewChit(newCritter, true);
+            server.allPlaceNewChit(newCritter, true);
         }
         advancePhase();
     }
@@ -943,7 +910,7 @@ final class Battle
     {
         carryDamage = 0;
         carryTargets.clear();
-        game.getServer().allClearCarries();
+        server.allClearCarries();
     }
 
 
@@ -978,7 +945,7 @@ final class Battle
                             Player player = legion.getPlayer();
                             donor = player.getDonor();
                             donor.addCreature(critter, false);
-                            game.getServer().allRepaintHex(
+                            server.allRepaintHex(
                                 donor.getCurrentHexLabel());
                             // This summon doesn't count; the player can
                             // summon again later this turn.
@@ -1029,8 +996,8 @@ final class Battle
                     // Remove critter from iterator rather than list to
                     // prevent concurrent modification problems.
                     it.remove();
-                    game.getServer().allRemoveBattleChit(critter.getTag());
-                    game.getServer().allRepaintBattleHex(hexLabel);
+                    server.allRemoveBattleChit(critter.getTag());
+                    server.allRepaintBattleHex(hexLabel);
                 }
                 else  // critter is alive
                 {
@@ -1369,8 +1336,8 @@ final class Battle
         }
         else
         {
-            game.getServer().highlightCarries(getActivePlayerName());
-            game.getServer().allSetBattleDiceCarries(carryDamage);
+            server.highlightCarries(getActivePlayerName());
+            server.allSetBattleDiceCarries(carryDamage);
             Log.event(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
         }

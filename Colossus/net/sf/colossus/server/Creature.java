@@ -270,4 +270,9 @@ public class Creature implements Comparable
         Creature other = (Creature)object;
         return name.equals(other.getName());
     }
+
+    public int hashCode()
+    {
+        return name.hashCode();
+    }
 }

@@ -26,6 +26,7 @@ final class StatusScreen extends JDialog implements WindowListener
     private JLabel [] legionsLabel;
     private JLabel [] markersLabel;
     private JLabel [] creaturesLabel;
+    private JLabel [] valueLabel;
     private JLabel [] titanLabel;
     private JLabel [] scoreLabel;
 
@@ -46,7 +47,7 @@ final class StatusScreen extends JDialog implements WindowListener
         addWindowListener(this);
 
         Container contentPane = getContentPane();
-        contentPane.setLayout(new GridLayout(9, 0));
+        contentPane.setLayout(new GridLayout(10, 0));
 
         nameLabel = new JLabel[numPlayers];
         towerLabel = new JLabel[numPlayers];
@@ -57,6 +58,7 @@ final class StatusScreen extends JDialog implements WindowListener
         creaturesLabel = new JLabel[numPlayers];
         titanLabel = new JLabel[numPlayers];
         scoreLabel = new JLabel[numPlayers];
+        valueLabel = new JLabel[numPlayers];
 
         contentPane.add(new JLabel("Player"));
         for (int i = 0; i < numPlayers; i++)
@@ -114,6 +116,14 @@ final class StatusScreen extends JDialog implements WindowListener
             contentPane.add(creaturesLabel[i]);
         }
 
+        contentPane.add(new JLabel("Value"));
+        for (int i = 0; i < numPlayers; i++)
+        {
+            valueLabel[i] = new JLabel();
+            valueLabel[i].setOpaque(true);
+            contentPane.add(valueLabel[i]);
+        }
+
         contentPane.add(new JLabel("Titan Size"));
         for (int i = 0; i < numPlayers; i++)
         {
@@ -162,6 +172,7 @@ final class StatusScreen extends JDialog implements WindowListener
             legionsLabel[i].setBackground(color);
             markersLabel[i].setBackground(color);
             creaturesLabel[i].setBackground(color);
+            valueLabel[i].setBackground(color);
             titanLabel[i].setBackground(color);
             scoreLabel[i].setBackground(color);
         }
@@ -196,6 +207,7 @@ final class StatusScreen extends JDialog implements WindowListener
             legionsLabel[i].setText((String)data.get(5));
             markersLabel[i].setText((String)data.get(6));
             creaturesLabel[i].setText((String)data.get(7));
+            valueLabel[i].setText((String)data.get(10));
             titanLabel[i].setText((String)data.get(8));
             scoreLabel[i].setText((String)data.get(9));
         }

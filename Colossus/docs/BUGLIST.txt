@@ -49,9 +49,6 @@ A doomed lion with no allies left struck back against an unwounded
    cyclops (which it can't kill) instead of a gargoyle (which it can).
    AI needs to understand when it's in its last phase.
 
-AI does not recruit post-battle reinforcements.  AI sometimes skips
-   reinforcements during battle?
-
 6-high AI legion next to top circle with colossi did not grab another
    colossus, for no good reason.
 
@@ -106,7 +103,7 @@ Consider recruit scarcity (last gargoyle possibly more valuable than
    native terrain.  Get scrub snacks out of nearby opponents' good 
    recruiting terrain and into blocking positions.
 
-AI is not titan teleporting anymore.
+AI is not titan teleporting anymore.  Fixed?  Tower teleport works.
 
 
 PROGRAMMING BUGS:
@@ -213,9 +210,5 @@ Did file/new game while game was being set up.  Got comodification exception.
 
 When run from JWS in Windows, cfg files for AI players are created on desktop.
 
-AI teleports are still failing.
-
-Summoned angel after battle, then acquired angel.  Backwards?
-
-If PickEntrySide is aborted, PickLord is still shown.
-
+MinimaxAI advances phases and turns illegally while a human player is trying
+   to enter the battle map.
