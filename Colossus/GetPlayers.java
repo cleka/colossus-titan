@@ -354,7 +354,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
     
     private static String chooseMap() 
     {
-        javax.swing.JFileChooser mapChooser = new JFileChooser();
+        javax.swing.JFileChooser mapChooser = new JFileChooser(".");
         mapChooser.setFileFilter(new mapFileFilter());
         mapChooser.setDialogTitle(
             "Choose your map (or cancel for default map)");
@@ -369,7 +369,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     private static String chooseRec() 
     {
-        javax.swing.JFileChooser recChooser = new JFileChooser();
+        javax.swing.JFileChooser recChooser = new JFileChooser(".");
         recChooser.setFileFilter(new recFileFilter());
         recChooser.setDialogTitle(
             "Choose your recruiters base (or cancel for default base)");
@@ -384,7 +384,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     private static String chooseCre() 
     {
-        javax.swing.JFileChooser creChooser = new JFileChooser();
+        javax.swing.JFileChooser creChooser = new JFileChooser(".");
         creChooser.setFileFilter(new creFileFilter());
         creChooser.setDialogTitle(
             "Choose your creatures base (or cancel for default base)");
@@ -419,7 +419,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
 
     private static void doLoadVariant()
     {
-        javax.swing.JFileChooser varChooser = new JFileChooser();
+        javax.swing.JFileChooser varChooser = new JFileChooser(".");
         varChooser.setFileFilter(new varFileFilter());
         varChooser.setDialogTitle(
             "Choose your variant (or cancel for default game)");
