@@ -54,6 +54,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private JCheckBoxMenuItem miAutoRecruit;
     private JCheckBoxMenuItem miAutoPickRecruiter;
     private JCheckBoxMenuItem miAutoPickMarker;
+    private JCheckBoxMenuItem miAutoPickEntrySide;
     private JCheckBoxMenuItem miAutosave;
     private JCheckBoxMenuItem miAntialias;
     private JCheckBoxMenuItem miChooseMovement;
@@ -555,6 +556,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
         miAutoPickMarker.addItemListener(this);
         optionsMenu.add(miAutoPickMarker);
 
+        miAutoPickEntrySide = new JCheckBoxMenuItem(Game.sAutoPickEntrySide);
+        miAutoPickEntrySide.setMnemonic(KeyEvent.VK_E);
+        miAutoPickEntrySide.setSelected(game.getAutoPickEntrySide());
+        miAutoPickEntrySide.addItemListener(this);
+        optionsMenu.add(miAutoPickEntrySide);
+
         optionsMenu.addSeparator();
 
         // Then per-client GUI options
@@ -642,6 +649,12 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public void twiddleAutoPickMarker(boolean enable)
     {
         miAutoPickMarker.setSelected(enable);
+    }
+
+
+    public void twiddleAutoPickEntrySide(boolean enable)
+    {
+        miAutoPickEntrySide.setSelected(enable);
     }
 
 
@@ -1958,6 +1971,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         else if (text.equals(Game.sAutoPickMarker))
         {
             game.setAutoPickMarker(selected);
+        }
+        else if (text.equals(Game.sAutoPickEntrySide))
+        {
+            game.setAutoPickEntrySide(selected);
         }
         else if (text.equals(Game.sShowStatusScreen))
         {

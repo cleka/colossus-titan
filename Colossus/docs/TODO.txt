@@ -1,6 +1,9 @@
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.
 
+Black legions markers should use a white border to provide some contrast.
+   But white shows up badly on selected hexes.
+
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
 
@@ -35,7 +38,6 @@ Test optimizations (strength reduction of divides, and substitution
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 Add auto-forced-strike option.
-Add auto-pick-entry-side option.
 Add auto-MasterBoard-move option.
 Add auto-BattleMap-move option.
 Add auto-strike option.

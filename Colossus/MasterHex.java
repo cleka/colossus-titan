@@ -48,6 +48,23 @@ public final class MasterHex extends Hex
     public static final int ARROW = 3;
     public static final int ARROWS = 4;
 
+    // The hex vertexes are numbered like this:
+    //
+    //               normal                     inverted
+    //
+    //              0------1                  0------------1
+    //             /        \                /              \
+    //            /          \              /                \
+    //           /            \            /                  \
+    //          /              \          5                    2
+    //         /                \          \                  /
+    //        /                  \          \                /
+    //       5                    2          \              /
+    //        \                  /            \            /
+    //         \                /              \          /
+    //          \              /                \        /
+    //           4------------3                  4------3
+
 
     public MasterHex(int cx, int cy, int scale, boolean inverted,
         MasterBoard board)
@@ -765,7 +782,7 @@ public final class MasterHex extends Hex
 
 
     /** Return a possible entry side.  If there is more than one, only one
-     *  will be returned.  If there is none, -1 will be returned. */
+     *  will be returned.  If there are none, -1 will be returned. */
     public int getEntrySide()
     {
         if (entrySides.isEmpty())

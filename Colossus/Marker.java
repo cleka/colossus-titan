@@ -40,13 +40,18 @@ public final class Marker extends Chit
     {
         super.paintComponent(g);
 
+        // Draw a one-pixel-wide black border around the outside
+        // edge of the marker.
+        g.setColor(Color.black);
+        Rectangle rect = getBounds();
+        g.drawRect(rect.x, rect.y, rect.width, rect.height);
+
         if (legion == null)
         {
             return;
         }
 
         String height = Integer.toString(legion.getHeight());
-        Rectangle rect = getBounds();
 
         // Construct a font 1.5 times the size of the current font.
         if (font == null)
@@ -81,10 +86,6 @@ public final class Marker extends Chit
 
         // Restore the font.
         g.setFont(oldFont);
-
-        // Draw a one-pixel-wide black border around the outside
-        // edge of the marker.
-        g.drawRect(rect.x, rect.y, rect.width, rect.height);
     }
 
 

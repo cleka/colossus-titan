@@ -50,6 +50,7 @@ public final class Game
     public static final String sAutoRecruit = "Auto recruit";
     public static final String sAutoPickRecruiter = "Autopick recruiter";
     public static final String sAutoPickMarker = "Autopick marker";
+    public static final String sAutoPickEntrySide = "Autopick entry side";
     public static final String sShowStatusScreen = "Show game status";
     public static final String sShowDice = "Show dice";
     public static final String sAntialias = "Antialias";
@@ -62,6 +63,7 @@ public final class Game
     private static boolean autoRecruit;
     private static boolean autoPickRecruiter;
     private static boolean autoPickMarker;
+    private static boolean autoPickEntrySide;
     private static boolean showDice = true;
     private static boolean showStatusScreen = true;
     private static boolean antialias = false;
@@ -415,6 +417,18 @@ public final class Game
     public void setAutoPickMarker(boolean autoPickMarker)
     {
         this.autoPickMarker = autoPickMarker;
+    }
+
+
+    public boolean getAutoPickEntrySide()
+    {
+        return autoPickEntrySide;
+    }
+
+
+    public void setAutoPickEntrySide(boolean autoPickEntrySide)
+    {
+        this.autoPickEntrySide = autoPickEntrySide;
     }
 
 
@@ -1236,6 +1250,8 @@ public final class Game
             autoPickRecruiter));
         options.setProperty(sAutoPickMarker, String.valueOf(
             autoPickMarker));
+        options.setProperty(sAutoPickEntrySide, String.valueOf(
+            autoPickEntrySide));
         options.setProperty(sShowDice, String.valueOf(showDice));
         options.setProperty(sShowStatusScreen, String.valueOf(
             showStatusScreen));
@@ -1277,6 +1293,8 @@ public final class Game
             "false").equals( "true"));
         autoPickMarker = (options.getProperty(sAutoPickMarker,
             "false").equals( "true"));
+        autoPickEntrySide = (options.getProperty(sAutoPickEntrySide,
+            "false").equals( "true"));
         showDice = (options.getProperty(sShowDice, "true").equals("true"));
         showStatusScreen = (options.getProperty(sShowStatusScreen,
             "true").equals("true"));
@@ -1288,6 +1306,7 @@ public final class Game
         board.twiddleAllStacksVisible(allStacksVisible);
         board.twiddleAutoPickRecruiter(autoPickRecruiter);
         board.twiddleAutoPickMarker(autoPickMarker);
+        board.twiddleAutoPickEntrySide(autoPickEntrySide);
         board.twiddleShowStatusScreen(showStatusScreen);
         board.twiddleShowDice(showDice);
         board.twiddleAntialias(antialias);
@@ -2339,7 +2358,7 @@ public final class Game
             set.add(hex.getLabel());
 
             // Need to set entry sides even if no possible engagement,
-            // for MasterHex.chooseWhetherToTeleport()
+            // for chooseWhetherToTeleport()
             hex.setEntrySide(Hex.hexsideNum(cameFrom - hex.getLabelSide()));
 
             return set;
@@ -2520,8 +2539,9 @@ public final class Game
     }
 
 
-    /** Present a dialog allowing the player to enter via land or teleport. */
-    private void chooseWhetherToTeleport(MasterHex hex)
+    /** Present a dialog allowing the player to enter via land or teleport.
+     *  Return true if the player chooses to teleport. */
+    private boolean chooseWhetherToTeleport(MasterHex hex)
     {
         String [] options = new String[2];
         options[0] = "Teleport";
@@ -2531,9 +2551,13 @@ public final class Game
             JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
         // If Teleport, then leave teleported set.
-        if (answer == JOptionPane.NO_OPTION)
+        if (answer == JOptionPane.YES_OPTION)
         {
-            hex.setTeleported(false);
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -2782,7 +2806,18 @@ public final class Game
                     // Pick teleport or normal move if necessary.
                     if (hex.getTeleported() && hex.canEnterViaLand())
                     {
-                        chooseWhetherToTeleport(hex);
+                        boolean answer;
+                        if (autoPickEntrySide)
+                        {
+                            // Always choose to move normally rather
+                            // than teleport if auto-picking entry sides.
+                            answer = false;
+                        }
+                        else
+                        {
+                            answer = chooseWhetherToTeleport(hex);
+                        }
+                        hex.setTeleported(answer);
                     }
 
                     // If this is a tower hex, set the entry side
@@ -2805,8 +2840,16 @@ public final class Game
                     // and there is more than one possibility.
                     if (hex.isOccupied() && hex.getNumEntrySides() > 1)
                     {
-                        int side = PickEntrySide.pickEntrySide(masterFrame,
-                            hex);
+                        int side;
+                        if (autoPickEntrySide)
+                        {
+                            side = hex.getEntrySide();
+                        }
+                        else
+                        {
+                            side = PickEntrySide.pickEntrySide(masterFrame,
+                                hex);
+                        }
                         hex.clearAllEntrySides();
                         if (side == 1 || side == 3 || side == 5)
                         {

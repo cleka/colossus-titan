@@ -40,7 +40,7 @@ public final class PickMarker extends JDialog implements MouseListener,
         while (it.hasNext())
         {
             String markerId = (String)it.next();
-            Chit marker = new Chit(scale, markerId, this);
+            Marker marker = new Marker(scale, markerId, this, null);
             markers.add(marker);
             contentPane.add(marker);
             marker.addMouseListener(this);

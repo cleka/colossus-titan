@@ -12,6 +12,20 @@ public abstract class Hex
     public static final double SQRT3 = Math.sqrt(3.0);
     public static final double RAD_TO_DEG = 180 / Math.PI;
 
+    // The hex vertexes are numbered like this:
+    //
+    //              0---------1
+    //             /           \
+    //            /             \
+    //           /               \
+    //          /                 \
+    //         5                   2
+    //          \                 /
+    //           \               /
+    //            \             /
+    //             \           /
+    //              4---------3
+
     protected double[] xVertex = new double[6];
     protected double[] yVertex = new double[6];
     protected GeneralPath hexagon;
