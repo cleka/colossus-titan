@@ -280,8 +280,12 @@ public class TerrainRecruitLoader
                 return 0;
         }
         if ((iReer > iRe) && regularRecruit)
-        { // only one to recruit below if possible
-            return 1;
+        { // only one to recruit below if possible, except if it is a 0-type recruit.
+            int num = (((recruitNumber)al.get(iReFake)).getNumber());
+            if (num > 0)
+                return 1;
+            else
+                return 0;
         }
         if ((iReer != -1) && ((iReer+1) == iRe) && regularRecruit)
         { // regular recruitments if possible

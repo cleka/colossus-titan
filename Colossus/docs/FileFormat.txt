@@ -105,7 +105,8 @@ needed.
 
 When <recruiter_needed> is 0 (zero), then the creature
 can be recruited, but the recruiter will remain anonymous.
-This is useful only if the recruiter is 'Anything', of course.
+This is useful only if the recruiter is 'Anything' or
+'AnyNonLord', of course. Don't use with a regular recruiter.
 
 When <recruiter_needed> is -1 (minus one), then the creature can
 recruit, but cannot be recruited. Such creature, and the
