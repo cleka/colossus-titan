@@ -10,6 +10,8 @@ Add remaining command-line options.
 
 Save/load/test scale.
 
+Force cfg files and savegames to load from user.home/Colossus
+
 Bug: Titan teleport allowed in ExtTitan at 400 points, not 700.
 
 Bug: All stacks visible is broken.
