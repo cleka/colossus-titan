@@ -1903,7 +1903,7 @@ public final class MasterBoard extends JPanel
         while (it.hasNext())
         {
             Hex bh = (Hex)it.next();
-            if (bh.getTerrain() == 't')
+            if (bh.getTerrain() == 'T')
                 towerSet.add(bh.getLabel());
         }
     }
