@@ -593,13 +593,22 @@ Log.debug("revealSomeCreatures() " + this);
             clones.add(0, ci);
         }
 
-        // If initial split, move angel to the end.
+        // If initial split, move angel or titan to the end.
         if (getHeight() == 8)
         {
+            CreatureInfo lord = null;
             // Maintain flags.
-            CreatureInfo angel = clones.getCreatureInfo(Constants.angel);
-            clones.remove(angel);
-            clones.add(angel);
+            if (knownSplit.contains(Constants.titan) || 
+                knownKeep.contains(Constants.angel))
+            {
+                lord = clones.getCreatureInfo(Constants.titan);
+            }
+            else
+            {
+                lord = clones.getCreatureInfo(Constants.angel);
+            }
+            clones.remove(lord);
+            clones.add(lord);
         }
 
         CreatureInfoList creaturesToRemove = new CreatureInfoList();
@@ -843,10 +852,11 @@ Log.debug("Re-predicting parent split");
             throw new PredictSplitsException(
                 "Tried removing from 0-high legion");
         }
-        CreatureInfo ci = creatures.getCreatureInfo(creatureName);
         CreatureNameList cnl = new CreatureNameList();
-        cnl.add(ci.getName());
+        cnl.add(creatureName);
         revealSomeCreatures(cnl);
+
+        CreatureInfo ci = creatures.getCreatureInfo(creatureName);
 
         // Only need to track the removed creature for future parent split
         // predictions if it was here at the time of the split.
@@ -865,18 +875,6 @@ Log.debug("Re-predicting parent split");
             String name = (String)it.next();
             removeCreature(name);
         }
-    }
-
-    void removeAllCreatures()
-    {
-        CreatureNameList cnl = new CreatureNameList();
-        Iterator it = creatures.iterator();
-        while (it.hasNext())
-        {
-            CreatureInfo ci = (CreatureInfo)it.next();
-            cnl.add(ci.getName());
-        }
-        removeCreatures(cnl);
     }
 }
 

@@ -84,10 +84,9 @@ public class CreatureTitan extends Creature
     
     public int getPointValue()
     {
-        Log.warn("Calling getPointValue() on Titan Creature"); 
+        // Log.warn("Calling getPointValue() on Titan Creature"); 
         // XXX This is wrong, but 24 is better than -4.
         int val = 6 * getSkill();
-        Log.debug("getPointValue() is " + val);
         return val;
     }
 
