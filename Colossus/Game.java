@@ -51,7 +51,7 @@ public class Game extends Frame implements WindowListener, ActionListener
         }
         catch (NullPointerException e)
         {
-            System.out.println("Couldn't find " + 
+            System.out.println(e.toString() + " Couldn't find " + 
                 Creature.colossus.getImageName());
             System.exit(1);
         }
@@ -96,7 +96,7 @@ public class Game extends Frame implements WindowListener, ActionListener
         }
         catch (NullPointerException e)
         {
-            System.out.println("Couldn't find " + 
+            System.out.println(e.toString() + " Couldn't find " + 
                 Creature.colossus.getImageName());
             System.exit(1);
         }
@@ -795,32 +795,32 @@ public class Game extends Frame implements WindowListener, ActionListener
     }
 
 
-    public void windowActivated(WindowEvent event)
+    public void windowActivated(WindowEvent e)
     {
     }
 
-    public void windowClosed(WindowEvent event)
+    public void windowClosed(WindowEvent e)
     {
     }
 
-    public void windowClosing(WindowEvent event)
+    public void windowClosing(WindowEvent e)
     {
         System.exit(0);
     }
 
-    public void windowDeactivated(WindowEvent event)
+    public void windowDeactivated(WindowEvent e)
     {
     }
 
-    public void windowDeiconified(WindowEvent event)
+    public void windowDeiconified(WindowEvent e)
     {
     }
 
-    public void windowIconified(WindowEvent event)
+    public void windowIconified(WindowEvent e)
     {
     }
 
-    public void windowOpened(WindowEvent event)
+    public void windowOpened(WindowEvent e)
     {
     }
 
@@ -861,15 +861,15 @@ public class Game extends Frame implements WindowListener, ActionListener
     }
 
 
-    public static void main(String args[])
+    public static void main(String [] args)
     {
         if (args.length == 0)
         {
-            Game game = new Game();
+            new Game();
         }
         else
         {
-            Game game = new Game(args[0]);
+            new Game(args[0]);
         }
     }
 }
