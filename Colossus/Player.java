@@ -377,7 +377,7 @@ public final class Player implements Comparable
     {
         // It's a new turn, so once-per-turn things are allowed again.
 
-        if (game.getChooseMovement())
+        if (Game.getOption(Game.chooseMovement))
         {
             movementRoll = PickRoll.pickRoll(game.getMasterFrame(),
                 "Pick movement roll");
@@ -748,20 +748,6 @@ public final class Player implements Comparable
     }
 
 
-    /** This will eventually be a per-player option.  Right now it's
-     *  global for the whole game. */
-    public boolean getAutoPickRecruiter()
-    {
-        if (game != null)
-        {
-            return game.getAutoPickRecruiter();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    
     /** Comparator that forces this player's legion markers to come
      *  before captured markers in sort order. */
     final class markerComparator implements Comparator

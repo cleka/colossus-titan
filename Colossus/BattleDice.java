@@ -205,7 +205,7 @@ public final class BattleDice extends JFrame implements WindowListener
     {
         if (game != null)
         {
-            game.setShowDice(false);
+            Game.setOption(Game.showDice, false);
         }
     }
 

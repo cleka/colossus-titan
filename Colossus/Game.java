@@ -45,45 +45,25 @@ public final class Game
         "Colossus config file version 2";
 
     // Option names
-    public static final String sAutosave = "Autosave";
-    public static final String sAllStacksVisible = "All stacks visible";
-    public static final String sAutoRecruit = "Auto recruit";
-    public static final String sAutoPickRecruiter = "Autopick recruiter";
-    public static final String sAutoPickMarker = "Autopick marker";
-    public static final String sAutoPickEntrySide = "Autopick entry side";
-    public static final String sAutoForcedStrike = "Auto forced strike";
-    public static final String sShowStatusScreen = "Show game status";
-    public static final String sShowDice = "Show dice";
-    public static final String sAntialias = "Antialias";
-    public static final String sChooseMovement = "Choose movement roll";
-    public static final String sChooseHits= "Choose number of hits";
-    public static final String sChooseTowers = "Choose towers";
-    public static final String sChooseCreatures = "Choose creatures";
-
-    // Per-player client options
-    private static boolean autoRecruit;
-    private static boolean autoPickRecruiter;
-    private static boolean autoPickMarker;
-    private static boolean autoPickEntrySide;
-    private static boolean autoForcedStrike;
-    private static boolean showDice = true;
-    private static boolean showStatusScreen = true;
-    private static boolean antialias = false;
-    // XXX Add default name, favorite colors by player name.
-
-    // Server options
-    private static boolean autosave = true;
-    private static boolean allStacksVisible;
-
-    // Debug options
-    private static boolean chooseMovement;
-    private static boolean chooseHits;
-    private static boolean chooseTowers;
-    private static boolean chooseCreatures;
+    public static final String autosave = "Autosave";
+    public static final String allStacksVisible = "All stacks visible";
+    public static final String autoRecruit = "Auto recruit";
+    public static final String autoPickRecruiter = "Autopick recruiter";
+    public static final String autoPickMarker = "Autopick marker";
+    public static final String autoPickEntrySide = "Autopick entry side";
+    public static final String autoForcedStrike = "Auto forced strike";
+    public static final String showStatusScreen = "Show game status";
+    public static final String showDice = "Show dice";
+    public static final String antialias = "Antialias";
+    public static final String chooseMovement = "Choose movement roll";
+    public static final String chooseHits= "Choose number of hits";
+    public static final String chooseTowers = "Choose towers";
+    public static final String chooseCreatures = "Choose creatures";
 
 
     /** Preference file */
     private static final String optionsPath = "Colossus.cfg";
+    private static Properties options = new Properties();
 
 
     /** Start a new game. */
@@ -195,7 +175,7 @@ public final class Game
 
         updateStatusScreen();
 
-        if (showDice)
+        if (getOption(showDice))
         {
             initMovementDie();
         }
@@ -240,7 +220,7 @@ public final class Game
             {
                 if (playerTower[i] == UNASSIGNED)
                 {
-                    if (chooseTowers)
+                    if (getOption(chooseTowers))
                     {
                         Player player = getPlayer(i);
                         rolls[i] = PickRoll.pickRoll(masterFrame,
@@ -277,54 +257,6 @@ public final class Game
             logEvent(player.getName() + " gets tower " + playerTower[i]);
             player.setTower(playerTower[i]);
         }
-    }
-
-
-    public boolean getAllStacksVisible()
-    {
-        return allStacksVisible;
-    }
-
-
-    public void setAllStacksVisible(boolean allStacksVisible)
-    {
-        this.allStacksVisible = allStacksVisible;
-    }
-
-
-    public boolean getChooseMovement()
-    {
-        return chooseMovement;
-    }
-
-
-    public void setChooseMovement(boolean chooseMovement)
-    {
-        this.chooseMovement = chooseMovement;
-    }
-
-
-    public boolean getChooseHits()
-    {
-        return chooseHits;
-    }
-
-
-    public void setChooseHits(boolean chooseHits)
-    {
-        this.chooseHits = chooseHits;
-    }
-
-
-    public boolean getChooseTowers()
-    {
-        return chooseTowers;
-    }
-
-
-    public void setChooseTowers(boolean chooseTowers)
-    {
-        this.chooseTowers = chooseTowers;
     }
 
 
@@ -386,144 +318,26 @@ public final class Game
     }
 
 
-    public boolean getAutoRecruit()
+    private void setupDice(boolean enable)
     {
-        return autoRecruit;
-    }
-
-
-    public void setAutoRecruit(boolean autoRecruit)
-    {
-        this.autoRecruit = autoRecruit;
-    }
-
-
-    public boolean getAutoPickRecruiter()
-    {
-        return autoPickRecruiter;
-    }
-
-
-    public void setAutoPickRecruiter(boolean autoPickRecruiter)
-    {
-        this.autoPickRecruiter = autoPickRecruiter;
-    }
-
-
-    public boolean getAutoPickMarker()
-    {
-        return autoPickMarker;
-    }
-
-
-    public void setAutoPickMarker(boolean autoPickMarker)
-    {
-        this.autoPickMarker = autoPickMarker;
-    }
-
-
-    public boolean getAutoPickEntrySide()
-    {
-        return autoPickEntrySide;
-    }
-
-
-    public void setAutoPickEntrySide(boolean autoPickEntrySide)
-    {
-        this.autoPickEntrySide = autoPickEntrySide;
-    }
-
-
-    public boolean getAutoForcedStrike()
-    {
-        return autoForcedStrike;
-    }
-
-
-    public void setAutoForcedStrike(boolean autoForcedStrike)
-    {
-        this.autoForcedStrike = autoForcedStrike;
-    }
-
-
-    public boolean getShowStatusScreen()
-    {
-        return showStatusScreen;
-    }
-
-
-    public void setShowStatusScreen(boolean showStatusScreen)
-    {
-        boolean previous = this.showStatusScreen;
-        if (showStatusScreen != previous)
+        if (enable)
         {
-            this.showStatusScreen = showStatusScreen;
-            updateStatusScreen();
-        }
-    }
-
-
-    public boolean getShowDice()
-    {
-        return showDice;
-    }
-
-
-    public void setShowDice(boolean showDice)
-    {
-        boolean previous = this.showDice;
-        if (showDice != previous)
-        {
-            this.showDice = showDice;
-
-            if (showDice)
-            {
-                initMovementDie();
-                if (battle != null)
-                {
-                    battle.initBattleDice();
-                }
-            }
-            else
-            {
-                disposeMovementDie();
-                if (battle != null)
-                {
-                    battle.disposeBattleDice();
-                }
-                if (board != null)
-                {
-                    board.twiddleShowDice(false);
-                }
-            }
-        }
-    }
-
-
-    public static boolean getAntialias()
-    {
-        return antialias;
-    }
-
-
-    public void setAntialias(boolean antialias)
-    {
-        if (this.antialias != antialias)
-        {
-            this.antialias = antialias;
-
-            // Repaint board and map.
-            if (board != null)
-            {
-                board.repaint();
-            }
+            initMovementDie();
             if (battle != null)
             {
-                BattleMap map = battle.getBattleMap();
-                if (map != null)
-                {
-                    map.repaint();
-                }
+                battle.initBattleDice();
+            }
+        }
+        else
+        {
+            disposeMovementDie();
+            if (battle != null)
+            {
+                battle.disposeBattleDice();
+            }
+            if (board != null)
+            {
+                board.twiddleOption(showDice, false);
             }
         }
     }
@@ -584,15 +398,46 @@ public final class Game
     }
 
 
-    public boolean getAutosave()
+    /** Return the value of the boolean option given by name. Default
+     *  to false if there is no such option. */
+    public static boolean getOption(String name)
     {
-        return autosave;
+        String value = options.getProperty(name);
+        if (value == null)
+        {
+            return false;
+        }
+        else if (value.equals("true"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 
-    public void setAutosave(boolean autosave)
+    /** Set option name to (a string version of) the given boolean value. */
+    public static void setOption(String name, boolean value)
     {
-        this.autosave = autosave;
+        options.setProperty(name, String.valueOf(value));
+
+        /* XXX These won't work in a static method.
+        // Side effects
+        if (name.equals(showStatusScreen)) 
+        {
+            updateStatusScreen();
+        }
+        else if (name.equals(antialias))
+        {
+            repaintAllWindows();
+        }
+        else if (name.equals(showDice))
+        {
+            setupDice(value);
+        }
+        */ 
     }
 
 
@@ -754,7 +599,7 @@ public final class Game
             // Highlight hexes with legions eligible to muster.
             highlightPossibleRecruits();
 
-            if (getAutoRecruit())
+            if (getOption(autoRecruit))
             {
                 doAutoRecruit();
             }
@@ -783,7 +628,7 @@ public final class Game
 
             updateStatusScreen();
 
-            if (!isApplet && getAutosave())
+            if (!isApplet && getOption(autosave))
             {
                 saveGame();
             }
@@ -793,7 +638,7 @@ public final class Game
 
     public void updateStatusScreen()
     {
-        if (getShowStatusScreen())
+        if (getOption(showStatusScreen))
         {
             if (statusScreen != null)
             {
@@ -806,7 +651,7 @@ public final class Game
         }
         else
         {
-            board.twiddleShowStatusScreen(false);
+            board.twiddleOption(showStatusScreen, false);
             statusScreen.dispose();
             this.statusScreen = null;
         }
@@ -1229,7 +1074,7 @@ public final class Game
 
             loadOptions();
 
-            if (showDice)
+            if (getOption(showDice))
             {
                 initMovementDie();
                 Player player = getActivePlayer();
@@ -1396,24 +1241,6 @@ public final class Game
      *  java.util.Properties keyword=value. */
     public void saveOptions()
     {
-        Properties options = new Properties();
-
-        options.setProperty(sAutosave, String.valueOf(autosave));
-        options.setProperty(sAllStacksVisible, String.valueOf(
-            allStacksVisible));
-        options.setProperty(sAutoPickRecruiter, String.valueOf(
-            autoPickRecruiter));
-        options.setProperty(sAutoPickMarker, String.valueOf(
-            autoPickMarker));
-        options.setProperty(sAutoPickEntrySide, String.valueOf(
-            autoPickEntrySide));
-        options.setProperty(sAutoForcedStrike, String.valueOf(
-            autoForcedStrike));
-        options.setProperty(sShowDice, String.valueOf(showDice));
-        options.setProperty(sShowStatusScreen, String.valueOf(
-            showStatusScreen));
-        options.setProperty(sAntialias, String.valueOf(antialias));
-        options.setProperty(sAutoRecruit, String.valueOf(autoRecruit));
         try
         {
             FileOutputStream out = new FileOutputStream(optionsPath);
@@ -1430,8 +1257,6 @@ public final class Game
      *  java.util.Properties keyword=value */
     public void loadOptions()
     {
-        Properties options = new Properties();
-
         try
         {
             FileInputStream in = new FileInputStream(optionsPath);
@@ -1443,34 +1268,13 @@ public final class Game
             return;
         }
 
-        autosave = (options.getProperty(sAutosave, "false").equals("true"));
-        allStacksVisible = (options.getProperty(sAllStacksVisible,
-            "false").equals( "true"));
-        autoPickRecruiter = (options.getProperty(sAutoPickRecruiter,
-            "false").equals( "true"));
-        autoPickMarker = (options.getProperty(sAutoPickMarker,
-            "false").equals( "true"));
-        autoPickEntrySide = (options.getProperty(sAutoPickEntrySide,
-            "false").equals( "true"));
-        autoForcedStrike = (options.getProperty(sAutoForcedStrike,
-            "false").equals( "true"));
-        showDice = (options.getProperty(sShowDice, "true").equals("true"));
-        showStatusScreen = (options.getProperty(sShowStatusScreen,
-            "true").equals("true"));
-        antialias = (options.getProperty(sAntialias, "false").equals("true"));
-        autoRecruit = (options.getProperty(sAutoRecruit,
-            "false").equals("true"));
-
-        board.twiddleAutosave(autosave);
-        board.twiddleAllStacksVisible(allStacksVisible);
-        board.twiddleAutoPickRecruiter(autoPickRecruiter);
-        board.twiddleAutoPickMarker(autoPickMarker);
-        board.twiddleAutoPickEntrySide(autoPickEntrySide);
-        board.twiddleAutoForcedStrike(autoForcedStrike);
-        board.twiddleShowStatusScreen(showStatusScreen);
-        board.twiddleShowDice(showDice);
-        board.twiddleAntialias(antialias);
-        board.twiddleAutoRecruit(autoRecruit);
+        Enumeration it = options.propertyNames();
+        while (it.hasMoreElements())
+        {
+            String name = (String)it.nextElement();
+            boolean value = getOption(name);
+            board.twiddleOption(name, value);
+        }
     }
 
 
@@ -2201,7 +2005,7 @@ public final class Game
     public static boolean allRecruitersVisible(Legion legion,
         ArrayList recruiters)
     {
-        if (allStacksVisible)
+        if (getOption(allStacksVisible))
         {
             return true;
         }
@@ -2244,7 +2048,7 @@ public final class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (player.getAutoPickRecruiter() || numEligibleRecruiters == 1 ||
+        else if (getOption(autoPickRecruiter) || numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
             // If there's only one possible recruiter, or if all
@@ -2406,7 +2210,7 @@ public final class Game
     {
         String name = player.getName();
         String selectedMarkerId;
-        if (autoPickMarker)
+        if (getOption(autoPickMarker))
         {
             selectedMarkerId = player.getFirstAvailableMarker();
         }
@@ -2897,7 +2701,8 @@ public final class Game
                     return;
                 }
 
-                SplitLegion.splitLegion(masterFrame, legion, autoPickMarker);
+                SplitLegion.splitLegion(masterFrame, legion,
+                    getOption(autoPickMarker));
 
                 updateStatusScreen();
                 // If we split, unselect this hex.
@@ -2967,7 +2772,7 @@ public final class Game
                     if (hex.getTeleported() && hex.canEnterViaLand())
                     {
                         boolean answer;
-                        if (autoPickEntrySide)
+                        if (getOption(autoPickEntrySide))
                         {
                             // Always choose to move normally rather
                             // than teleport if auto-picking entry sides.
@@ -3001,7 +2806,7 @@ public final class Game
                     if (hex.isOccupied() && hex.getNumEntrySides() > 1)
                     {
                         int side;
-                        if (autoPickEntrySide)
+                        if (getOption(autoPickEntrySide))
                         {
                             side = hex.getEntrySide();
                         }
@@ -3022,7 +2827,8 @@ public final class Game
                     if (!hex.isOccupied() || hex.getNumEntrySides() == 1)
                     {
                         // If the legion teleported, reveal a lord.
-                        if (hex.getTeleported() && !allStacksVisible)
+                        if (hex.getTeleported() &&
+                            !getOption(allStacksVisible))
                         {
                             // If it was a Titan teleport, that
                             // lord must be the titan.

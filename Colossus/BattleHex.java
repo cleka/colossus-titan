@@ -88,7 +88,8 @@ public final class BattleHex extends Hex
     public void paint(Graphics g)
     {
         Graphics2D g2 = (Graphics2D)g;
-        if (Game.getAntialias())
+        // XXX Cache this?
+        if (Game.getOption(Game.antialias))
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);

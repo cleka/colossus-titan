@@ -78,7 +78,7 @@ public final class Battle
 
         setupPhase();
 
-        if (getShowDice())
+        if (Game.getOption(Game.showDice))
         {
             initBattleDice();
         }
@@ -310,7 +310,7 @@ public final class Battle
             map.setupFightMenu();
 
             // Automatically perform forced strikes if applicable.
-            if (board.getGame().getAutoForcedStrike())
+            if (Game.getOption(Game.autoForcedStrike))
             {
                 makeForcedStrikes();
                 // If there are no possible strikes left, move on.
@@ -1185,7 +1185,7 @@ public final class Battle
             map.unselectHexByLabel(label);
             Game.logEvent(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
-            if (game.getShowDice())
+            if (Game.getOption(Game.showDice))
             {
                 battleDice.setCarries(carryDamage);
                 battleDice.setup();
@@ -1737,19 +1737,6 @@ public final class Battle
     }
 
 
-    public boolean getShowDice()
-    {
-        if (game != null)
-        {
-            return game.getShowDice();
-        }
-        else
-        {
-            return true;
-        }
-    }
-
-
     public BattleDice getBattleDice()
     {
         return battleDice;
@@ -1833,7 +1820,7 @@ public final class Battle
 
                 if (getCarryDamage() == 0)
                 {
-                    if (game.getAutoForcedStrike())
+                    if (Game.getOption(Game.autoForcedStrike))
                     {
                         makeForcedStrikes();
                     }

@@ -72,7 +72,7 @@ public final class MovementDie extends JFrame implements WindowListener
     {
         if (game != null)
         {
-            game.setShowDice(false);
+            Game.setOption(Game.showDice, false);
         }
     }
 

@@ -781,7 +781,7 @@ System.out.println("DENIED CARRY UP DUNE HEXSIDE");
         StringBuffer rollString = new StringBuffer(36);
 
         Game game = battle.getGame();
-        if (game != null && game.getChooseHits())
+        if (game != null && Game.getOption(Game.chooseHits))
         {
             do
             {
@@ -847,7 +847,7 @@ System.out.println("DENIED CARRY UP DUNE HEXSIDE");
         struck = true;
 
         // Display the rolls in the BattleDice dialog, if enabled.
-        if (battle.getShowDice())
+        if (Game.getOption(Game.showDice))
         {
             BattleDice battleDice = battle.getBattleDice();
             battleDice.setValues(this, target, strikeNumber,

@@ -40,29 +40,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
     private static Game game;
 
     private JFrame masterFrame;
-    private JMenuItem mi;
-    private JMenuBar menuBar;
-    private JMenu fileMenu;
     private JMenu phaseMenu;
-    private JMenu gameMenu;
-    private JMenu playerMenu;
-    private JMenu graphicsMenu;
-    private JMenu debugMenu;
     private JPopupMenu popupMenu;
 
-    private JCheckBoxMenuItem miShowStatusScreen;
-    private JCheckBoxMenuItem miShowDice;
-    private JCheckBoxMenuItem miAllStacksVisible;
-    private JCheckBoxMenuItem miAutoRecruit;
-    private JCheckBoxMenuItem miAutoPickRecruiter;
-    private JCheckBoxMenuItem miAutoPickMarker;
-    private JCheckBoxMenuItem miAutoPickEntrySide;
-    private JCheckBoxMenuItem miAutoForcedStrike;
-    private JCheckBoxMenuItem miAutosave;
-    private JCheckBoxMenuItem miAntialias;
-    private JCheckBoxMenuItem miChooseMovement;
-    private JCheckBoxMenuItem miChooseHits;
-    private JCheckBoxMenuItem miChooseTowers;
+    private HashMap checkboxes = new HashMap();
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
@@ -479,7 +460,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         popupMenu = new JPopupMenu();
         contentPane.add(popupMenu);
 
-        mi = popupMenu.add(viewRecruitInfoAction);
+        JMenuItem mi = popupMenu.add(viewRecruitInfoAction);
         mi.setMnemonic(KeyEvent.VK_R);
 
         mi = popupMenu.add(viewBattleMapAction);
@@ -487,16 +468,29 @@ public final class MasterBoard extends JPanel implements MouseListener,
     }
 
 
+    private void addCheckBox(JMenu menu, String name, int mnemonic)
+    {
+        JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name);
+        cbmi.setMnemonic(mnemonic);
+        cbmi.setSelected(Game.getOption(name));
+        cbmi.addItemListener(this);
+        menu.add(cbmi);
+        checkboxes.put(name, cbmi);
+    }
+
+
     private void setupTopMenu()
     {
-        menuBar = new JMenuBar();
+        JMenuBar menuBar = new JMenuBar();
         masterFrame.setJMenuBar(menuBar);
 
         // File menu
 
-        fileMenu = new JMenu("File");
+        JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
+        JMenuItem mi;
+
         mi = fileMenu.add(newGameAction);
         mi.setMnemonic(KeyEvent.VK_N);
         mi = fileMenu.add(loadGameAction);
@@ -520,183 +514,68 @@ public final class MasterBoard extends JPanel implements MouseListener,
         phaseMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(phaseMenu);
 
-        gameMenu = new JMenu("Game");
+        JMenu gameMenu = new JMenu("Game");
         gameMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(gameMenu);
 
         // Game-wide options first
 
-        miAutosave = new JCheckBoxMenuItem(Game.sAutosave);
-        miAutosave.setMnemonic(KeyEvent.VK_A);
         // Do not allow autosave if running as an applet.
         if (game.isApplet())
         {
-            game.setAutosave(false);
-            miAutosave.setEnabled(false);
+            Game.setOption(Game.autosave, false);
         }
-        miAutosave.setSelected(game.getAutosave());
-        miAutosave.addItemListener(this);
-        gameMenu.add(miAutosave);
-
-        miAllStacksVisible = new JCheckBoxMenuItem(Game.sAllStacksVisible);
-        miAllStacksVisible.setMnemonic(KeyEvent.VK_S);
-        miAllStacksVisible.setSelected(game.getAllStacksVisible());
-        miAllStacksVisible.addItemListener(this);
-        gameMenu.add(miAllStacksVisible);
+        addCheckBox(gameMenu, Game.autosave, KeyEvent.VK_A);
+        addCheckBox(gameMenu, Game.allStacksVisible, KeyEvent.VK_S);
 
         // Then per-player options
         
-        playerMenu = new JMenu("Player");
+        JMenu playerMenu = new JMenu("Player");
         playerMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(playerMenu);
 
-        miAutoRecruit = new JCheckBoxMenuItem(Game.sAutoRecruit);
-        miAutoRecruit.setMnemonic(KeyEvent.VK_R);
-        miAutoRecruit.setSelected(game.getAutoRecruit());
-        miAutoRecruit.addItemListener(this);
-        playerMenu.add(miAutoRecruit);
-
-        miAutoPickRecruiter = new JCheckBoxMenuItem(Game.sAutoPickRecruiter);
-        miAutoPickRecruiter.setMnemonic(KeyEvent.VK_P);
-        miAutoPickRecruiter.setSelected(game.getAutoPickRecruiter());
-        miAutoPickRecruiter.addItemListener(this);
-        playerMenu.add(miAutoPickRecruiter);
-
-        miAutoPickMarker = new JCheckBoxMenuItem(Game.sAutoPickMarker);
-        miAutoPickMarker.setMnemonic(KeyEvent.VK_M);
-        miAutoPickMarker.setSelected(game.getAutoPickMarker());
-        miAutoPickMarker.addItemListener(this);
-        playerMenu.add(miAutoPickMarker);
-
-        miAutoPickEntrySide = new JCheckBoxMenuItem(Game.sAutoPickEntrySide);
-        miAutoPickEntrySide.setMnemonic(KeyEvent.VK_E);
-        miAutoPickEntrySide.setSelected(game.getAutoPickEntrySide());
-        miAutoPickEntrySide.addItemListener(this);
-        playerMenu.add(miAutoPickEntrySide);
-
-        miAutoForcedStrike = new JCheckBoxMenuItem(Game.sAutoForcedStrike);
-        miAutoForcedStrike.setMnemonic(KeyEvent.VK_F);
-        miAutoForcedStrike.setSelected(game.getAutoForcedStrike());
-        miAutoForcedStrike.addItemListener(this);
-        playerMenu.add(miAutoForcedStrike);
+        addCheckBox(playerMenu, Game.autoRecruit, KeyEvent.VK_R);
+        addCheckBox(playerMenu, Game.autoPickRecruiter, KeyEvent.VK_P);
+        addCheckBox(playerMenu, Game.autoPickMarker, KeyEvent.VK_M);
+        addCheckBox(playerMenu, Game.autoPickEntrySide, KeyEvent.VK_E);
+        addCheckBox(playerMenu, Game.autoForcedStrike, KeyEvent.VK_F);
 
 
         // Then per-client GUI options
-        graphicsMenu = new JMenu("Graphics");
+        JMenu graphicsMenu = new JMenu("Graphics");
         graphicsMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(graphicsMenu);
 
-        miShowStatusScreen = new JCheckBoxMenuItem(Game.sShowStatusScreen);
-        miShowStatusScreen.setMnemonic(KeyEvent.VK_G);
-        miShowStatusScreen.setSelected(game.getShowStatusScreen());
-        miShowStatusScreen.addItemListener(this);
-        graphicsMenu.add(miShowStatusScreen);
-
-        miShowDice = new JCheckBoxMenuItem(Game.sShowDice);
-        miShowDice.setMnemonic(KeyEvent.VK_D);
-        miShowDice.setSelected(game.getShowDice());
-        miShowDice.addItemListener(this);
-        graphicsMenu.add(miShowDice);
-
-        miAntialias = new JCheckBoxMenuItem(Game.sAntialias);
-        miAntialias.setMnemonic(KeyEvent.VK_N);
-        miAntialias.setSelected(game.getAntialias());
-        miAntialias.addItemListener(this);
-        graphicsMenu.add(miAntialias);
-
-        graphicsMenu.addSeparator();
-
+        addCheckBox(graphicsMenu, Game.showStatusScreen, KeyEvent.VK_G);
+        addCheckBox(graphicsMenu, Game.showDice, KeyEvent.VK_D);
+        addCheckBox(graphicsMenu, Game.antialias, KeyEvent.VK_N);
 
         // Debug menu
-
-        debugMenu = new JMenu("Debug");
+        JMenu debugMenu = new JMenu("Debug");
         debugMenu.setMnemonic(KeyEvent.VK_D);
         menuBar.add(debugMenu);
 
-        miChooseMovement = new JCheckBoxMenuItem(Game.sChooseMovement);
-        miChooseMovement.setMnemonic(KeyEvent.VK_M);
-        miChooseMovement.setSelected(game.getChooseMovement());
-        miChooseMovement.addItemListener(this);
-        debugMenu.add(miChooseMovement);
+        addCheckBox(debugMenu, Game.chooseMovement, KeyEvent.VK_M);
+        addCheckBox(debugMenu, Game.chooseHits, KeyEvent.VK_H);
+        addCheckBox(debugMenu, Game.chooseTowers, KeyEvent.VK_T);
 
-        miChooseHits = new JCheckBoxMenuItem(Game.sChooseHits);
-        miChooseHits.setMnemonic(KeyEvent.VK_H);
-        miChooseHits.setSelected(game.getChooseHits());
-        miChooseHits.addItemListener(this);
-        debugMenu.add(miChooseHits);
-
-        miChooseTowers = new JCheckBoxMenuItem(Game.sChooseTowers);
-        miChooseTowers.setMnemonic(KeyEvent.VK_T);
-        miChooseTowers.setSelected(game.getChooseTowers());
-        miChooseTowers.addItemListener(this);
-        debugMenu.add(miChooseTowers);
-
-        // Allow changing creature types
+        // XXX Allow changing creature types
     }
 
 
-    public void twiddleAutosave(boolean enable)
+    public void twiddleOption(String name, boolean enable)
     {
-        // Do not allow autosave if running as an applet.
-        if (game.isApplet())
+        // Handle special cases.
+        if (name.equals(Game.autosave) && game.isApplet())
         {
             enable = false;
         }
-        miAutosave.setSelected(enable);
-    }
 
-
-    public void twiddleAllStacksVisible(boolean enable)
-    {
-        miAllStacksVisible.setSelected(enable);
-    }
-
-
-    public void twiddleAutoRecruit(boolean enable)
-    {
-        miAutoRecruit.setSelected(enable);
-    }
-
-
-    public void twiddleAutoPickRecruiter(boolean enable)
-    {
-        miAutoPickRecruiter.setSelected(enable);
-    }
-
-
-    public void twiddleAutoPickMarker(boolean enable)
-    {
-        miAutoPickMarker.setSelected(enable);
-    }
-
-
-    public void twiddleAutoPickEntrySide(boolean enable)
-    {
-        miAutoPickEntrySide.setSelected(enable);
-    }
-
-
-    public void twiddleAutoForcedStrike(boolean enable)
-    {
-        miAutoForcedStrike.setSelected(enable);
-    }
-
-
-    public void twiddleShowStatusScreen(boolean enable)
-    {
-        miShowStatusScreen.setSelected(enable);
-    }
-
-
-    public void twiddleShowDice(boolean enable)
-    {
-        miShowDice.setSelected(enable);
-    }
-
-
-    public void twiddleAntialias(boolean enable)
-    {
-        miAntialias.setSelected(enable);
+        JCheckBoxMenuItem cbmi = (JCheckBoxMenuItem)checkboxes.get(name);
+        if (cbmi != null)
+        {
+            cbmi.setSelected(enable);
+        }
     }
 
 
@@ -1392,6 +1271,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         phaseMenu.removeAll();
 
+        JMenuItem mi;
+
         mi = phaseMenu.add(undoLastSplitAction);
         mi.setMnemonic(KeyEvent.VK_U);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0));
@@ -1419,6 +1300,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
             player.getMovementRoll());
 
         phaseMenu.removeAll();
+
+        JMenuItem mi;
 
         mi = phaseMenu.add(undoLastMoveAction);
         mi.setMnemonic(KeyEvent.VK_U);
@@ -1454,6 +1337,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
         phaseMenu.removeAll();
 
+        JMenuItem mi;
+
         mi = phaseMenu.add(doneWithEngagementsAction);
         mi.setMnemonic(KeyEvent.VK_D);
         mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
@@ -1471,6 +1356,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
             game.getTurnNumber() + " : Muster Recruits ");
 
         phaseMenu.removeAll();
+
+        JMenuItem mi;
 
         mi = phaseMenu.add(undoLastRecruitAction);
         mi.setMnemonic(KeyEvent.VK_U);
@@ -1526,6 +1413,11 @@ public final class MasterBoard extends JPanel implements MouseListener,
             {
                 Legion legion = (Legion)it2.next();
                 int chitScale = 3 * scale;
+                // Avoid scaling chits at all if possible.
+                if (chitScale > 50 && chitScale < 70)
+                {
+                    chitScale = 60;
+                }
                 Marker marker = new Marker(chitScale, legion.getImageName(),
                     this, null);
                 legion.setMarker(marker);
@@ -1797,7 +1689,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             if (isPopupButton(e))
             {
                 new ShowLegion(masterFrame, legion, point,
-                    game.getAllStacksVisible() ||
+                    Game.getOption(Game.allStacksVisible) ||
                     player == game.getActivePlayer());
                 return;
             }
@@ -1862,59 +1754,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         JMenuItem source = (JMenuItem)e.getSource();
         String text = source.getText();
         boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-
-        if (text.equals(Game.sAutosave))
-        {
-            game.setAutosave(selected);
-        }
-        else if (text.equals(Game.sAllStacksVisible))
-        {
-            game.setAllStacksVisible(selected);
-        }
-        else if (text.equals(Game.sAutoRecruit))
-        {
-            game.setAutoRecruit(selected);
-        }
-        else if (text.equals(Game.sAutoPickRecruiter))
-        {
-            game.setAutoPickRecruiter(selected);
-        }
-        else if (text.equals(Game.sAutoPickMarker))
-        {
-            game.setAutoPickMarker(selected);
-        }
-        else if (text.equals(Game.sAutoPickEntrySide))
-        {
-            game.setAutoPickEntrySide(selected);
-        }
-        else if (text.equals(Game.sAutoForcedStrike))
-        {
-            game.setAutoForcedStrike(selected);
-        }
-        else if (text.equals(Game.sShowStatusScreen))
-        {
-            game.setShowStatusScreen(selected);
-        }
-        else if (text.equals(Game.sShowDice))
-        {
-            game.setShowDice(selected);
-        }
-        else if (text.equals(Game.sAntialias))
-        {
-            game.setAntialias(selected);
-        }
-        else if (text.equals(Game.sChooseMovement))
-        {
-            game.setChooseMovement(selected);
-        }
-        else if (text.equals(Game.sChooseHits))
-        {
-            game.setChooseHits(selected);
-        }
-        else if (text.equals(Game.sChooseTowers))
-        {
-            game.setChooseTowers(selected);
-        }
+        Game.setOption(text, selected);
     }
 
 
