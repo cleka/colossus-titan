@@ -21,6 +21,7 @@ public final class Options
     // Server options
     public static final String autosave = "Autosave";
     public static final String allStacksVisible = "All stacks visible";
+    public static final String logDebug = "Log debug messages";
 
 
     // Display options (client)

@@ -15,7 +15,7 @@ public final class Game
 {
     private ArrayList players = new ArrayList(6);
     private int activePlayerNum;
-    private int turnNumber = 1;  // Advance when every player has a turn
+    private int turnNumber;    // Advance when every player has a turn
     private boolean engagementInProgress;
     private boolean battleInProgress;
     private boolean summoningAngel;
@@ -32,14 +32,14 @@ public final class Game
     public static final int MOVE = 2;
     public static final int FIGHT = 3;
     public static final int MUSTER = 4;
-    private int phase = SPLIT;
+    private int phase;
 
 
     // Constants for savegames
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
-        "Colossus savegame version 6";
+        "Colossus savegame version 7";
 
     public static final String configVersion =
         "Colossus config file version 2";
@@ -112,6 +112,7 @@ public final class Game
     public void newGame()
     {
         turnNumber = 1;
+        phase = SPLIT;
         engagementInProgress = false;
         battleInProgress = false;
         summoningAngel = false;
@@ -146,8 +147,6 @@ public final class Game
 
         Log.event("Starting new game");
 
-        ArrayList playerTypes = new ArrayList();
-
         Iterator it = playerInfo.iterator();
         while (it.hasNext())
         {
@@ -155,8 +154,7 @@ public final class Game
             java.util.List values = Utils.split('~', entry);
             String name = (String)values.get(0);
             String type = (String)values.get(1);
-            addPlayer(name);
-            playerTypes.add(type);
+            addPlayer(name, type);
             Log.event("Add " + type + " player " + name);
         }
 
@@ -180,14 +178,13 @@ public final class Game
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            String type = (String)playerTypes.get(i);
+            String type = player.getType();
             if (type.equals(GetPlayers.ai))
             {
                 server.setClientOption(i, Options.autoPlay, true);
             }
             else if (type.equals(GetPlayers.human))
             {
-                server.setClientOption(i, Options.autoPlay, true);
                 server.setClientOption(i, Options.autoPlay, false);
             }
             i++;
@@ -221,13 +218,13 @@ public final class Game
             }
             while (color == null);
             colorsLeft.remove(color);
-            Log.event(player.getName() + " chooses color " + color);
             player.setColor(color);
             if (GetPlayers.byColor.equals(player.getName()))
             {
                 player.setName(color);
                 server.getClient(playerNum).setPlayerName(color);
             }
+            Log.event(player.getName() + " chooses color " + color);
             player.initMarkersAvailable();
         }
 
@@ -338,7 +335,14 @@ public final class Game
 
     public void addPlayer(String name)
     {
-        players.add(new Player(name, this));
+        addPlayer(name, GetPlayers.human);
+    }
+
+    public void addPlayer(String name, String type)
+    {
+        Player player = new Player(name, this);
+        player.setType(type);
+        addPlayer(player);
     }
 
     public void addPlayer(Player player)
@@ -467,14 +471,14 @@ public final class Game
             case 0:
                 Log.event("Draw");
                 server.allShowMessageDialog("Draw");
-                dispose();
+                //dispose();
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
                 Log.event(winnerName + " wins");
                 server.allShowMessageDialog(winnerName + " wins");
-                dispose();
+                //dispose();
                 break;
 
             default:
@@ -755,6 +759,7 @@ public final class Game
         out.println(getActivePlayerNum());
         out.println(getPhase());
 
+        // Caretaker stacks
         java.util.List creatures = Creature.getCreatures();
         Iterator it = creatures.iterator();
         while (it.hasNext())
@@ -763,11 +768,13 @@ public final class Game
             out.println(caretaker.getCount(creature));
         }
 
+        // Players
         it = players.iterator();
         while (it.hasNext())
         {
             Player player = (Player)it.next();
             out.println(player.getName());
+            out.println(player.getType());
             out.println(player.getColor());
             out.println(player.getTower());
             out.println(player.getScore());
@@ -956,6 +963,9 @@ public final class Game
                 Player player = new Player(name, this);
                 players.add(player);
 
+                String type = in.readLine();
+                player.setType(type);
+
                 String color = in.readLine();
                 player.setColor(color);
 
@@ -1010,6 +1020,22 @@ public final class Game
             }
 
             initServerAndClients();
+
+            // Set up autoPlay options from player type.
+            it = players.iterator();
+            while (it.hasNext())
+            {
+                Player player = (Player)it.next();
+                String name = player.getName();
+                if (player.getType().equals(GetPlayers.ai))
+                {
+                    server.setClientOption(name, Options.autoPlay, true);
+                }
+                else
+                {
+                    server.setClientOption(name, Options.autoPlay, false);
+                }
+            }
 
             // Battle stuff
             buf = in.readLine();

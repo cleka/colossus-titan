@@ -108,32 +108,32 @@ class SimpleAI implements AI
         // take a fourth cyclops in brush
         // (so that we can split out a cyclops and still keep 3)
         else if (recruit == Creature.gorgon
-                 && recruits.contains(Creature.cyclops)
-                 && legion.getHeight() == 6
-                 && legion.numCreature(Creature.behemoth) == 0
-                 && legion.numCreature(Creature.gargoyle) == 0)
+            && recruits.contains(Creature.cyclops)
+            && legion.getHeight() == 6
+            && legion.numCreature(Creature.behemoth) == 0
+            && legion.numCreature(Creature.gargoyle) == 0)
         {
             recruit = Creature.cyclops;
         }
         // prefer warlock over guardian (should be built in now)
         else if (recruits.contains(Creature.guardian)
-                 && recruits.contains(Creature.warlock))
+            && recruits.contains(Creature.warlock))
         {
             recruit = Creature.warlock;
         }
         // take a third lion/troll if we've got at least 1 way to desert/swamp
         // from here and we're not about to be attacked
         else if (recruits.contains(Creature.lion)
-                 && recruits.contains(Creature.ranger)
-                 && legion.numCreature(Creature.lion) == 2
-                 && getNumberOfWaysToTerrain(legion, hex, 'D') > 0)
+            && recruits.contains(Creature.ranger)
+            && legion.numCreature(Creature.lion) == 2
+            && getNumberOfWaysToTerrain(legion, hex, 'D') > 0)
         {
             recruit = Creature.lion;
         }
         else if (recruits.contains(Creature.troll)
-                 && recruits.contains(Creature.ranger)
-                 && legion.numCreature(Creature.troll) == 2
-                 && getNumberOfWaysToTerrain(legion, hex, 'S') > 0)
+            && recruits.contains(Creature.ranger)
+            && legion.numCreature(Creature.troll) == 2
+            && getNumberOfWaysToTerrain(legion, hex, 'S') > 0)
         {
             recruit = Creature.troll;
         }
@@ -167,21 +167,21 @@ class SimpleAI implements AI
                 // gargoyles, take a gargoyle
             }
             else if (game.getCaretaker().getCount(Creature.cyclops) > 6
-                     && legion.numCreature(Creature.gargoyle) < 2)
+                && legion.numCreature(Creature.gargoyle) < 2)
             {
                 recruit = Creature.gargoyle;
                 // else if there's trolls left and we don't have 2 ogres,
                 // take an ogre
             }
             else if (game.getCaretaker().getCount(Creature.troll) > 6
-                     && legion.numCreature(Creature.ogre) < 2)
+                && legion.numCreature(Creature.ogre) < 2)
             {
                 recruit = Creature.ogre;
                 // else if there's lions left and we don't have 2 lions,
                 // take a centaur
             }
             else if (game.getCaretaker().getCount(Creature.lion) > 6
-                     && legion.numCreature(Creature.centaur) < 2)
+                && legion.numCreature(Creature.centaur) < 2)
             {
                 recruit = Creature.centaur;
                 // else we don't really care; take anything
@@ -486,13 +486,8 @@ class SimpleAI implements AI
         final Creature nonsplitCreature = oddTower ? Creature.centaur
                 : Creature.ogre;
 
-        // if lots of players, keep gargoyles with titan (we need the muscle)
-        if (numPlayers > 4)
-        {
-            return CMUsplit(true, splitCreature, nonsplitCreature);
-        }
         // don't split gargoyles in tower 3 or 6 (because of the extra jungles)
-        else if ("300".equals(label) || "600".equals(label))
+        if ("300".equals(label) || "600".equals(label))
         {
             return CMUsplit(false, splitCreature, nonsplitCreature);
         }
@@ -511,7 +506,7 @@ class SimpleAI implements AI
         // otherwise, mix it up for fun
         else
         {
-            if (Game.rollDie() <= 2)
+            if (Game.rollDie() <= 3)
             {
                 return MITsplit(true, splitCreature, nonsplitCreature);
             }
@@ -525,7 +520,7 @@ class SimpleAI implements AI
 
     // Keep the gargoyles together.
     private static List CMUsplit(boolean favorTitan, Creature splitCreature,
-            Creature nonsplitCreature)
+        Creature nonsplitCreature)
     {
         LinkedList splitoffs = new LinkedList();
 
@@ -2570,8 +2565,6 @@ class SimpleAI implements AI
         final Legion legion = battle.getActiveLegion();
         ArrayList critters = legion.getCritters();
 
-Log.debug("There are " + critters.size() + " critters");
-
         // Sort critters in decreasing order of importance.  Keep
         // identical creatures together with a secondary sort by
         // creature name.
@@ -2613,6 +2606,7 @@ Log.debug("Found " + moves.size() + " moves for " + critter.getDescription());
                 ArrayList moveList = (ArrayList)it2.next();
                 CritterMove cm = (CritterMove)moveList.get(0);
                 Critter critter2 = cm.getCritter();
+Log.debug("Simulating moving " + critter2.getName() + " to " + cm.getEndingHexLabel());
                 critter2.moveToHex(cm.getEndingHex(terrain));
             }
 
@@ -2719,7 +2713,6 @@ Log.debug("perfect score is : " + perfectScore);
         if (perfectScore == 0)
         {
             // No moves, so exit.
-Log.debug("no moves");
             return null;
         }
 
@@ -3001,6 +2994,12 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
 
         // Reward adjacent friendly creatures.
         int buddies = critter.numAdjacentAllies();
+
+if (buddies > 0)
+{
+Log.debug("FOUND SOME BUDDIES!");
+}
+
         value += 15 * buddies;
 
         BattleHex entrance = BattleMap.getEntrance(terrain, masterHexLabel,
@@ -3060,7 +3059,7 @@ Log.debug("Got score " + bestScore + " in " + count + " permutations");
                 }
                 if (range != preferredRange)
                 {
-                    value -= 6 * Math.min(range, 2);
+                    value -= 6 * Math.abs(range - preferredRange);
                 }
             }
         }

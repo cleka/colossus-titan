@@ -26,14 +26,16 @@ private int mulligansLeft = 99;
     private String donorId;
     private MarkerComparator markerComparator = new MarkerComparator();
     private TreeSet markersAvailable = new TreeSet(markerComparator);
+    private String type;               // ai or human
 
-    private AI ai = new SimpleAI();  // TODO Allow pluggable AIs.
+    private AI ai = new SimpleAI();    // TODO Allow pluggable AIs.
 
 
     public Player(String name, Game game)
     {
         this.name = name;
         this.game = game;
+        type = GetPlayers.human;
     }
 
 
@@ -55,6 +57,7 @@ private int mulligansLeft = 99;
         newPlayer.ai = ai;
         newPlayer.titanEliminated = titanEliminated;
         newPlayer.donorId = donorId;
+        newPlayer.type = type;
         for (int i = 0; i < legions.size(); i++)
         {
             newPlayer.legions.add(i, ((Legion)legions.get(i)).AICopy(game));
@@ -64,6 +67,17 @@ private int mulligansLeft = 99;
         newPlayer.markersAvailable = (TreeSet) markersAvailable.clone();
 
         return newPlayer;
+    }
+
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
     }
 
 
@@ -980,24 +994,19 @@ private int mulligansLeft = 99;
 
     public String aiPickColor(Set colors)
     {
-        if (game.getServer().getClientOption(name, Options.autoPickColor))
+        // Convert favorite colors from a comma-separated string to a list.
+        String favorites = game.getServer().getClientStringOption(name,
+            Options.favoriteColors);
+        List favoriteColors = null;
+        if (favorites != null)
         {
-            // Convert favorite colors from a comma-separated string
-            // to a list.
-            String favorites = game.getServer().getClientStringOption(name,
-                Options.favoriteColors);
-            List favoriteColors = null;
-            if (favorites != null)
-            {
-                favoriteColors = Utils.split(',', favorites);
-            }
-            else
-            {
-                favoriteColors = new ArrayList();
-            }
-            return ai.pickColor(colors, favoriteColors);
+            favoriteColors = Utils.split(',', favorites);
         }
-        return null;
+        else
+        {
+            favoriteColors = new ArrayList();
+        }
+        return ai.pickColor(colors, favoriteColors);
     }
 
 

@@ -649,14 +649,15 @@ public final class MasterBoard extends JPanel implements MouseListener,
         phaseMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(phaseMenu);
 
+        // Game-wide options first
+
         JMenu gameMenu = new JMenu("Game");
         gameMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(gameMenu);
 
-        // Game-wide options first
-
         addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
         addCheckBox(gameMenu, Options.allStacksVisible, KeyEvent.VK_S);
+        addCheckBox(gameMenu, Options.logDebug, KeyEvent.VK_L);
 
         // Then per-player options
 
@@ -2330,7 +2331,6 @@ public final class MasterBoard extends JPanel implements MouseListener,
 
     public void dispose()
     {
-Log.debug("called MasterBoard.dispose()");
         setVisible(false);
         setEnabled(false);
         masterFrame.setVisible(false);

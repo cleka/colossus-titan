@@ -26,9 +26,9 @@ public final class Concede extends JDialog implements ActionListener
     private Concede(Client client, JFrame parentFrame, Legion ally,
         Legion enemy, boolean flee)
     {
-        super(parentFrame, ally.getPlayerName() + ": " + (flee ?
-            "Flee" : "Concede") + " with Legion "  + ally.getLongMarkerName() +
-            " in " + ally.getCurrentHex().getDescription() + "?", true);
+        super(parentFrame, (flee ? "Flee" : "Concede") + " with Legion " +
+            ally.getLongMarkerName() + " in " +
+            ally.getCurrentHex().getDescription() + "?", true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(gridbag);

@@ -418,6 +418,10 @@ public final class Client
         {
             setupDice(value);
         }
+        else if (name.equals(Options.logDebug))
+        {
+            Log.setShowDebug(value);
+        }
     }
 
     public void setStringOption(String optname, String value)
@@ -460,7 +464,7 @@ public final class Client
         }
         catch (IOException e)
         {
-            Log.error("Couldn't read player options from " + optionsFile);
+            Log.debug("Couldn't read player options from " + optionsFile);
             return;
         }
         syncCheckboxes();

@@ -11,7 +11,19 @@ public final class Log
     //    error -- serious program error -- message dialog or stderr
     //    fatal -- fatal program error -- message dialog or stderr
 
-    public static boolean DEBUG = true;
+
+    private static boolean showDebug = true;
+
+    public static boolean getShowDebug()
+    {
+        return showDebug;
+    }
+
+    public static void setShowDebug(boolean showDebug)
+    {
+        Log.showDebug = showDebug;
+    }
+
 
     /** Log an event. */
     public static void event(String s)
@@ -34,7 +46,7 @@ public final class Log
     /** Log a debug message. */
     public static void debug(String s)
     {
-        if (DEBUG)
+        if (showDebug)
         {
             System.out.println(s);
         }

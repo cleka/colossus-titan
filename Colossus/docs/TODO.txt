@@ -1,3 +1,7 @@
+Advance phases on space instead of 'D'?
+
+Make AI advance phase delay configurable.
+
 Attacking AI creatures need to chargest closest enemy in the last few
    turns, rather than accepting a time loss.
 
