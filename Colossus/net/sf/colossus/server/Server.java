@@ -6,7 +6,8 @@ import java.net.*;
 import javax.swing.*;
 
 import net.sf.colossus.util.Log;
-import net.sf.colossus.client.Client;
+import net.sf.colossus.client.IClient;
+import net.sf.colossus.client.ClientFactory;
 import net.sf.colossus.client.Proposal;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 
@@ -18,7 +19,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  *  @version $Id$
  *  @author David Ripton
  */
-public final class Server
+public final class Server implements IServer
 {
     private Game game;
 
@@ -55,7 +56,7 @@ public final class Server
     /** Temporary.  We will not use direct client refs later. */
     void addClient(String playerName, boolean primary)
     {
-        Client client = new Client(this, playerName, primary);
+        IClient client = ClientFactory.createClient(this, playerName, primary);
         clients.add(client);
         clientMap.put(playerName, client);
         if (primary)
@@ -70,7 +71,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.dispose();
         }
         clients.clear();
@@ -82,7 +83,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.updatePlayerInfo(getPlayerInfo());
         }
     }
@@ -92,7 +93,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.updateCreatureCount(creatureName, count);
         }
     }
@@ -103,7 +104,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.tellMovementRoll(roll);
         }
     }
@@ -147,11 +148,11 @@ public final class Server
     }
 
 
-    private Client getClient(String playerName)
+    private IClient getClient(String playerName)
     {
         if (clientMap.containsKey(playerName))
         {
-            return (Client)clientMap.get(playerName);
+            return (IClient)clientMap.get(playerName);
         }
         else
         {
@@ -183,7 +184,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.initBoard();
         }
     }
@@ -208,7 +209,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.tellLegionLocation(markerId, hexLabel);
         }
     }
@@ -218,7 +219,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.removeLegion(markerId);
         }
     }
@@ -226,7 +227,7 @@ public final class Server
 
     void showMessageDialog(String playerName, String message)
     {
-        Client client = getClient(playerName);
+        IClient client = getClient(playerName);
         client.showMessageDialog(message);
     }
 
@@ -235,7 +236,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.showMessageDialog(message);
         }
     }
@@ -245,7 +246,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.tellGameOver(message);
         }
     }
@@ -257,7 +258,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setupTurnState(game.getActivePlayerName(), 
                 game.getTurnNumber());
         }
@@ -269,7 +270,7 @@ public final class Server
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            Client client = getClient(player.getName());
+            IClient client = getClient(player.getName());
             client.setupSplit(player.getMarkersAvailable(), 
                 game.getActivePlayerName(), game.getTurnNumber());
         }
@@ -282,7 +283,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setupMove();
         }
     }
@@ -292,7 +293,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setupFight();
         }
     }
@@ -302,7 +303,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setupMuster();
         }
     }
@@ -313,7 +314,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setupBattleSummon(game.getBattle().getActivePlayerName(),
                 game.getBattle().getTurnNumber());
         }
@@ -324,7 +325,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setupBattleRecruit(game.getBattle().getActivePlayerName(),
                 game.getBattle().getTurnNumber());
         }
@@ -335,7 +336,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setupBattleMove();
         }
     }
@@ -345,7 +346,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setupBattleFight(game.getBattle().getPhase(),
                 game.getBattle().getActivePlayerName());
         }
@@ -357,7 +358,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.placeNewChit(critter.getImageName(), 
                 critter.getMarkerId().equals(game.getBattle().getDefenderId()),
                 critter.getTag(), critter.getCurrentHexLabel());
@@ -370,7 +371,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.removeDeadBattleChits();
         }
     }
@@ -381,7 +382,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.highlightEngagements();
         }
     }
@@ -393,7 +394,7 @@ public final class Server
         Legion legion = game.getLegionByMarkerId(markerId);
         if (legion.getHeight() < 7)
         {
-            Client client = getClient(playerName);
+            IClient client = getClient(playerName);
             if (client != null)
             {
                 client.askAcquireAngel(markerId, recruits);
@@ -413,7 +414,7 @@ public final class Server
 
     void createSummonAngel(Legion legion)
     {
-        Client client = getClient(legion.getPlayerName());
+        IClient client = getClient(legion.getPlayerName());
         client.createSummonAngel(legion.getMarkerId(), 
             legion.getLongMarkerName());
     }
@@ -426,7 +427,7 @@ public final class Server
         }
         else
         {
-            Client client = getClient(legion.getPlayerName());
+            IClient client = getClient(legion.getPlayerName());
             client.doReinforce(legion.getMarkerId());
         }
     }
@@ -495,7 +496,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.didRecruit(legion.getMarkerId(), recruit.getName(),
                 recruiterName, numRecruiters);
         }
@@ -507,7 +508,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.undidRecruit(legion.getMarkerId(), recruitName);
         }
     }
@@ -535,7 +536,7 @@ public final class Server
         }
         else
         {
-            Client client = getClient(ally.getPlayerName());
+            IClient client = getClient(ally.getPlayerName());
             client.askConcede(ally.getLongMarkerName(),
                 ally.getCurrentHex().getDescription(), ally.getMarkerId(),
                 enemy.getMarkerId());
@@ -568,7 +569,7 @@ public final class Server
         }
         else
         {
-            Client client = getClient(ally.getPlayerName());
+            IClient client = getClient(ally.getPlayerName());
             client.askFlee(ally.getLongMarkerName(),
                 ally.getCurrentHex().getDescription(), ally.getMarkerId(),
                 enemy.getMarkerId());
@@ -589,12 +590,12 @@ public final class Server
     void twoNegotiate(Legion attacker, Legion defender)
     {
     /* TODO Put negotiation back in.
-        Client client1 = getClient(defender.getPlayerName());
+        IClient client1 = getClient(defender.getPlayerName());
         client1.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
             defender.getMarkerId(), attacker.getCurrentHexLabel());
 
-        Client client2 = getClient(attacker.getPlayerName());
+        IClient client2 = getClient(attacker.getPlayerName());
         client2.askNegotiate(attacker.getLongMarkerName(), 
             defender.getLongMarkerName(), attacker.getMarkerId(), 
             defender.getMarkerId(), attacker.getCurrentHexLabel());
@@ -613,7 +614,7 @@ public final class Server
     /** Tell playerName about proposal. */
     void tellProposal(String playerName, Proposal proposal)
     {
-        Client client = getClient(playerName);
+        IClient client = getClient(playerName);
         client.tellProposal(proposal);
     }
 
@@ -640,7 +641,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.tellBattleMove(tag, startingHex, endingHex, undo);
         }
     }
@@ -682,7 +683,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.tellStrikeResults(striker.getDescription(), 
                 striker.getTag(), target.getDescription(), target.getTag(),
                 strikeNumber, rolls, damage, target.isDead(), false, 
@@ -713,7 +714,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.tellStrikeResults(striker.getDescription(),
                 striker.getTag(), carryTarget.getDescription(), 
                 carryTarget.getTag(), strikeNumber, rolls, carryDamageDone, 
@@ -730,7 +731,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.tellStrikeResults("hex damage", -1, target.getDescription(),
                 target.getTag(), 0, null, damage, target.isDead(), false, 
                 0, null);
@@ -742,7 +743,7 @@ public final class Server
     void askChooseStrikePenalty(SortedSet penaltyOptions)
     {
         String playerName = game.getBattle().getActivePlayerName();
-        Client client = getClient(playerName);
+        IClient client = getClient(playerName);
         ArrayList choices = new ArrayList();
         Iterator it = penaltyOptions.iterator();
         while (it.hasNext())
@@ -765,7 +766,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.initBattle(masterHexLabel, battle.getTurnNumber(),
                 battle.getActivePlayerName(), battle.getPhase(),
                 battle.getAttackerId(), battle.getDefenderId());
@@ -778,7 +779,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.cleanupBattle();
         }
     }
@@ -814,7 +815,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.undidSplit(splitoffId);
         }
     }
@@ -833,7 +834,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.undidMove(markerId, formerHexLabel, currentHexLabel);
         }
     }
@@ -931,18 +932,6 @@ public final class Server
         game.advancePhase(Constants.MUSTER, playerName);
     }
 
-    /** XXX Advance the phase without error checks, for debug only. */
-    public void forceAdvancePhase()
-    {
-        game.advancePhase(game.getPhase(), game.getActivePlayerName());
-    }
-
-    /** XXX Advance the battle phase without error checks, for debug only. */
-    public void forceAdvanceBattlePhase()
-    {
-        game.getBattle().advancePhase();
-    }
-
 
     // XXX Need to support inactive players quitting.
     // XXX If player quits while engaged, might need to set slayer.
@@ -996,7 +985,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.didSplit(hexLabel, parentId, childId, height);
         }
     }
@@ -1021,7 +1010,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.didMove(markerId, startingHexLabel, endingHexLabel, 
                 teleport);
         }
@@ -1033,7 +1022,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.addCreature(markerId, creatureName);
         }
     }
@@ -1043,7 +1032,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.removeCreature(markerId, creatureName);
         }
     }
@@ -1053,7 +1042,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setLegionContents(legion.getMarkerId(), 
                 legion.getImageNames());
         }
@@ -1061,7 +1050,7 @@ public final class Server
 
     void oneRevealLegion(Legion legion, String playerName)
     {
-        Client client = getClient(playerName);
+        IClient client = getClient(playerName);
         client.setLegionContents(legion.getMarkerId(),
             legion.getImageNames());
     }
@@ -1071,7 +1060,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             Iterator it2 = game.getAllLegions().iterator();
             while (it2.hasNext())
             {
@@ -1088,7 +1077,7 @@ public final class Server
         while (it.hasNext())
         {
             Player player = (Player)it.next();
-            Client client = getClient(player.getName());
+            IClient client = getClient(player.getName());
 
             Iterator it2 = player.getLegions().iterator();
             while (it2.hasNext())
@@ -1116,7 +1105,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.revealCreatures(legion.getMarkerId(), names);
         }
     }
@@ -1149,7 +1138,7 @@ public final class Server
     /** Used to change a player name after color is assigned. */
     void setPlayerName(String playerName, String newName)
     {
-        Client client = getClient(playerName);
+        IClient client = getClient(playerName);
         client.setPlayerName(newName);
         clientMap.remove(playerName);
         clientMap.put(newName, client);
@@ -1157,7 +1146,7 @@ public final class Server
 
     void askPickColor(String playerName, Set colorsLeft)
     {
-        Client client = getClient(playerName);
+        IClient client = getClient(playerName);
         client.askPickColor(colorsLeft);
     }
 
@@ -1175,7 +1164,7 @@ public final class Server
             Player player = (Player)it.next();
             String name = player.getName();
             String color = player.getColor();
-            Client client = getClient(name);
+            IClient client = getClient(name);
             client.setColor(color);
         }
     }
@@ -1191,7 +1180,7 @@ public final class Server
 
     void oneSetOption(String playerName, String optname, String value)
     {
-        Client client = getClient(playerName);
+        IClient client = getClient(playerName);
         client.setOption(optname, value);
     }
 
@@ -1205,7 +1194,7 @@ public final class Server
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
-            Client client = (Client)it.next();
+            IClient client = (IClient)it.next();
             client.setOption(optname, value);
         }
     }

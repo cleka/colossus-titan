@@ -30,17 +30,8 @@ loaded, with no explicit save or load menu items.
 Note that because of multiple ways to start the game (Java Web
 Start versus JRE on command line versus running a local executable 
 jar file from a GUI) it's not always obvious where to look for these
-config files.  Unix has the firm concept of a home directory for 
-each user, Windows has sort of added it over time in a half-assed
-way, but other operating systems may vary.  So the right place to
-look for a config file could be the user's home directory, or the
-Colossus starting directory (if there is one -- consider Java Web 
-Start) or maybe some centralized Java user properties directory.
-So the initial loading of the config file from the expected location 
-may fail, forcing the user to load it manually and traverse the 
-filesystem with the load dialog.  It's possible to hand-edit config
-files, but we shouldn't expect users to do this, so there should be
-GUI menus to set all options.
+config files.  We use the Colossus subdirectory under whatever 
+directory is pointed to by the Java property user.home.  
 
 It is very easy for users to view and change boolean options using 
 checkboxes.  Options with numeric or string values require slightly 
@@ -93,3 +84,6 @@ To simplify the GetPlayers dialog, and allow reusing the values from
 the previous game, we're now treating player names and types and the
 variant as server options.
 
+Note that Game.syncOptions() copies all server options to all clients,
+so that client-side clones of server functionality (e.g. Movement)
+know the correct settings for optional rules.

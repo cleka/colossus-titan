@@ -68,8 +68,6 @@ public final class MasterBoard extends JPanel
     public static final String undoAll = "Undo All";
     public static final String doneWithPhase = "Done";
 
-    public static final String forceAdvancePhase = "Force Advance Phase";
-
     public static final String takeMulligan = "Take Mulligan";
     public static final String concedeBattle = "Concede battle";
     public static final String withdrawFromGame = "Withdraw from Game";
@@ -92,7 +90,6 @@ public final class MasterBoard extends JPanel
     private AbstractAction undoLastAction;
     private AbstractAction undoAllAction;
     private AbstractAction doneWithPhaseAction;
-    private AbstractAction forceAdvancePhaseAction;
 
     private AbstractAction takeMulliganAction;
     private AbstractAction withdrawFromGameAction;
@@ -265,15 +262,6 @@ Log.debug("Called MasterBoard constructor");
                     default:
                         Log.error("Bogus phase");
                 }
-            }
-        };
-
-
-        forceAdvancePhaseAction = new AbstractAction(forceAdvancePhase)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                client.forceAdvancePhase();
             }
         };
 
@@ -1100,13 +1088,6 @@ Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
 
             highlightTallLegions();
         }
-        else if (client.isPrimary())
-        {
-            JMenuItem mi;
-            mi = phaseMenu.add(forceAdvancePhaseAction);
-            mi.setMnemonic(KeyEvent.VK_F);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
-        }
     }
 
     void setupMoveMenu()
@@ -1158,13 +1139,6 @@ Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
 
             highlightUnmovedLegions();
         }
-        else if (client.isPrimary())
-        {
-            JMenuItem mi;
-            mi = phaseMenu.add(forceAdvancePhaseAction);
-            mi.setMnemonic(KeyEvent.VK_F);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
-        }
 
         // Force showing the updated movement die.
         repaint();
@@ -1202,13 +1176,6 @@ Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
             mi.setMnemonic(KeyEvent.VK_W);
 
             highlightEngagements();
-        }
-        else if (client.isPrimary())
-        {
-            JMenuItem mi;
-            mi = phaseMenu.add(forceAdvancePhaseAction);
-            mi.setMnemonic(KeyEvent.VK_F);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         }
     }
 
@@ -1252,13 +1219,6 @@ Log.debug("MasterBoard.readMapData() for " + VariantSupport.getMapName());
             mi.setMnemonic(KeyEvent.VK_W);
 
             highlightPossibleRecruits();
-        }
-        else if (client.isPrimary())
-        {
-            JMenuItem mi;
-            mi = phaseMenu.add(forceAdvancePhaseAction);
-            mi.setMnemonic(KeyEvent.VK_F);
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
         }
     }
 

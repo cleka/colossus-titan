@@ -10,7 +10,7 @@ import java.awt.*;
 
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.Split;
-import net.sf.colossus.server.Server;
+import net.sf.colossus.server.IServer;
 import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.server.Creature;
@@ -29,11 +29,11 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  */
 
 
-public final class Client
+public final class Client implements IClient
 {
     /** This will eventually be a network interface rather than a
      *  direct reference.  So don't share this reference. */
-    private Server server;
+    private IServer server;
 
     private MasterBoard board;
     private StatusScreen statusScreen;
@@ -123,8 +123,7 @@ public final class Client
     private Strike strike = new Strike(this);
 
 
-    // XXX replace with socket
-    public Client(Server server, String playerName, boolean primary)
+    Client(IServer server, String playerName, boolean primary)
     {
         this.server = server;
         this.playerName = playerName;
@@ -2657,19 +2656,6 @@ Log.debug("found " + set.size() + " hexes");
         }
         clearUndoStack();
         server.doneWithRecruits(playerName);
-    }
-
-
-    // XXX For debug only -- remove
-    void forceAdvancePhase()
-    {
-        server.forceAdvancePhase();
-    }
-
-    // XXX For debug only -- remove
-    void forceAdvanceBattlePhase()
-    {
-        server.forceAdvanceBattlePhase();
     }
 
 

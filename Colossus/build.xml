@@ -360,10 +360,8 @@
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
         <copy file="ChangeLog" todir="${HTMLDIR}"/>
-        <copy todir="${DOCS_DIR}"> <fileset dir="docs"/>
-</copy>
-
-
+        <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>
+        <touch file="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP}"/>
 </target>
 
 

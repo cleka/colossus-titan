@@ -1,18 +1,22 @@
-Remove all excess public methods from Client/Server.
-Remove remaining public Client methods that only directly control the GUI
-   in favor of higher-level events.
-Add proxy interfaces between Client and Server.
+Add remote players to GetPlayers.
+
 Add RMI connection.
+
 Change all arguments to public Client/Server methods to String.  (Use a 
    proxy layer for this.)
 Add raw socket interface.
+
+Authenticate all remote calls to ensure that they come from the correct
+   client or server.
+
+Eliminate LegionInfo, PlayerInfo, Strike, Movement and instead use
+   slightly different versions of Game, Legion, Player, Battle, etc. 
+   on client side.
 
 Set Client movementRoll when loading during movement phase after roll.
 
 Add JUnit section to build docs.
 Document test procedures.
-
-Add remaining command-line options.  (User prefs dir?)
 
 Use SF project releases.
 
@@ -31,12 +35,9 @@ Add explicit cancel buttons to more dialogs.  (PickRecruit)
 Add "no 2s or 5s" mulligan option.
 Add optional additional handicap mulligans that can be used after turn 1.
 
-Add UI for setting server options before starting game.
 Add UI for players to specify favorite colors.
 
 Remember window positions in player .cfg file.
-
-Send creature list, summonable list, recruit tree, etc. to clients at startup.
 
 Put old, new web pages under CVS.
 Switch to new web page.
@@ -80,12 +81,13 @@ Allow players to specify that they automatically refuse to negotiate.
 Show StatusScreen and ShowLegion info in the masterboard window, rather 
    than in separate windows.
 
-Add movement and recruit animation.  Requires returning full paths for
-   moves, not just destination hex.
-
 Special-case less fear of initial 8-high enemy legions, to make AI move
    both legions out of tower in turn 1.
 
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
    account.
+
+Add movement and recruit animation.  Requires returning full paths for
+   moves, not just destination hex.
+
