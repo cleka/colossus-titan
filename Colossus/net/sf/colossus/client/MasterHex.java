@@ -154,7 +154,7 @@ public class MasterHex extends Hex
         return labelSide;
     }
 
-    void setLabelSide(int labelSide)
+    public void setLabelSide(int labelSide)
     {
         this.labelSide = labelSide;
     }
@@ -164,7 +164,7 @@ public class MasterHex extends Hex
         return exitType[i];
     }
 
-    void setExitType(int i, int exitType)
+    public void setExitType(int i, int exitType)
     {
         this.exitType[i] = exitType;
     }
@@ -194,7 +194,7 @@ public class MasterHex extends Hex
         return entranceType[i];
     }
 
-    void setEntranceType(int i, int entranceType)
+    public void setEntranceType(int i, int entranceType)
     {
         this.entranceType[i] = entranceType;
     }

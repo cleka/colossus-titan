@@ -535,9 +535,11 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    String[] terrains = { hex.getTerrain() };
+                    MasterHex hexModel = hex.getMasterHexModel();
+                    String[] terrains = { hexModel.getTerrain() };
                     new ShowAllRecruits(masterFrame, terrains, lastPoint,
-                        hex.getLabel(), scrollPane);
+                        hexModel.getLabel(), scrollPane);
+
                 }
             }
         };
@@ -549,7 +551,8 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowBattleMap(masterFrame, hex.getLabel());
+                    new ShowBattleMap(masterFrame,
+                        hex.getMasterHexModel().getLabel());
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }
@@ -911,7 +914,7 @@ public final class MasterBoard extends JPanel
                         ((i + boardParity) & 1) * (1 + 2 * (j / 2)) +
                         ((i + 1 + boardParity) & 1) * 2 *
                         ((j + 1) / 2)) *
-                        Hex.SQRT3 *
+                        GUIHex.SQRT3 *
                         scale),
                         scale,
                         isHexInverted(i, j),
@@ -1297,6 +1300,52 @@ public final class MasterBoard extends JPanel
                     }
                     if (hex.getExitType(5) != Constants.NONE ||
                         hex.getEntranceType(5) != Constants.NONE)
+                    {
+                        hex.setNeighbor(5, h[i - 1][j]);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void setupNeighbors(GUIMasterHex[][] h)
+    {
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    GUIMasterHex hex = h[i][j];
+                    MasterHex hexModel = hex.getMasterHexModel();
+
+                    if (hexModel.getExitType(0) != Constants.NONE ||
+                        hexModel.getEntranceType(0) != Constants.NONE)
+                    {
+                        hex.setNeighbor(0, h[i][j - 1]);
+                    }
+                    if (hexModel.getExitType(1) != Constants.NONE ||
+                        hexModel.getEntranceType(1) != Constants.NONE)
+                    {
+                        hex.setNeighbor(1, h[i + 1][j]);
+                    }
+                    if (hexModel.getExitType(2) != Constants.NONE ||
+                        hexModel.getEntranceType(2) != Constants.NONE)
+                    {
+                        hex.setNeighbor(2, h[i + 1][j]);
+                    }
+                    if (hexModel.getExitType(3) != Constants.NONE ||
+                        hexModel.getEntranceType(3) != Constants.NONE)
+                    {
+                        hex.setNeighbor(3, h[i][j + 1]);
+                    }
+                    if (hexModel.getExitType(4) != Constants.NONE ||
+                        hexModel.getEntranceType(4) != Constants.NONE)
+                    {
+                        hex.setNeighbor(4, h[i - 1][j]);
+                    }
+                    if (hexModel.getExitType(5) != Constants.NONE ||
+                        hexModel.getEntranceType(5) != Constants.NONE)
                     {
                         hex.setNeighbor(5, h[i - 1][j]);
                     }
@@ -1753,7 +1802,7 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                return hex.getLabel().equals(label);
+                return hex.getMasterHexModel().getLabel().equals(label);
             }
         }
         );
@@ -1813,7 +1862,8 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                if (hex.isSelected() && label.equals(hex.getLabel()))
+                if (hex.isSelected() &&
+                    label.equals(hex.getMasterHexModel().getLabel()))
                 {
                     hex.unselect();
                     hex.repaint();
@@ -1831,7 +1881,8 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                if (hex.isSelected() && labels.contains(hex.getLabel()))
+                if (hex.isSelected() &&
+                    labels.contains(hex.getMasterHexModel().getLabel()))
                 {
                     hex.unselect();
                     hex.repaint();
@@ -1848,7 +1899,8 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                if (!hex.isSelected() && label.equals(hex.getLabel()))
+                if (!hex.isSelected() &&
+                    label.equals(hex.getMasterHexModel().getLabel()))
                 {
                     hex.select();
                     hex.repaint();
@@ -1865,7 +1917,8 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                if (!hex.isSelected() && labels.contains(hex.getLabel()))
+                if (!hex.isSelected() &&
+                    labels.contains(hex.getMasterHexModel().getLabel()))
                 {
                     hex.select();
                     hex.repaint();
@@ -1882,7 +1935,7 @@ public final class MasterBoard extends JPanel
         {
             public boolean visitHex(GUIMasterHex hex)
             {
-                if (labels.contains(hex.getLabel()))
+                if (labels.contains(hex.getMasterHexModel().getLabel()))
                 {
                     hex.select();
                     hex.setSelectColor(color);
@@ -1973,7 +2026,8 @@ public final class MasterBoard extends JPanel
                 {
                     if (hex != null)
                     {
-                        actOnLegion(markerId, hex.getLabel());
+                        actOnLegion(markerId,
+                            hex.getMasterHexModel().getLabel());
                     }
                     else
                     {
@@ -1989,7 +2043,7 @@ public final class MasterBoard extends JPanel
                 if (isPopupButton(e))
                 {
                     lastPoint = point;
-                    popupMenu.setLabel(hex.getDescription());
+                    popupMenu.setLabel(hex.getMasterHexModel().getDescription());
                     popupMenu.show(e.getComponent(), point.x, point.y);
                     return;
                 }
@@ -1999,7 +2053,7 @@ public final class MasterBoard extends JPanel
                 if (client.getPlayerName().equals(
                     client.getActivePlayerName()))
                 {
-                    actOnHex(hex.getLabel());
+                    actOnHex(hex.getMasterHexModel().getLabel());
                     hex.repaint();
                     return;
                 }

@@ -31,7 +31,7 @@ import net.sf.colossus.util.ResourceLoader;
  * @author Romain Dolbeau
  */
 
-public final class GUIMasterHex extends MasterHex
+public final class GUIMasterHex extends GUIHex
 {
     private boolean inverted;
     private FontMetrics fontMetrics;
@@ -64,33 +64,19 @@ public final class GUIMasterHex extends MasterHex
     // Use two-stage initialization so that we can clone the GUIMasterHex
     // from an existing MasterHex, then add the GUI info.
 
-    GUIMasterHex()
+    /**
+     * @todo this is parallel to the code in MasterHex, BattleHex and GUIBattleHex
+     *       --> refactor
+     */
+    private GUIMasterHex[] neighbors = new GUIMasterHex[6];
+
+    GUIMasterHex(MasterHex model)
     {
-        super();
+        super(model);
     }
 
-    /** Create a near-clone of the passed MasterHex.  Need to call
-     *  init to setup GUI values, and need to setup neighbors. */
-    GUIMasterHex(MasterHex mh)
-    {
-        super();
-
-        setSelected(mh.isSelected());
-        setTerrain(mh.getTerrain());
-        setXCoord(mh.getXCoord());
-        setYCoord(mh.getYCoord());
-        setLabel(mh.getLabel());
-        setLabelSide(mh.getLabelSide());
-        for (int i = 0; i < 6; i++)
-        {
-            setEntranceType(i, mh.getEntranceType(i));
-            setExitType(i, mh.getExitType(i));
-        }
-        for (int i = 0; i < 3; i++)
-        {
-            setBaseExitType(i, mh.getBaseExitType(i));
-            setBaseExitLabel(i, mh.getBaseExitLabel(i));
-        }
+    public MasterHex getMasterHexModel() {
+        return (MasterHex)this.getHexModel();
     }
 
     void init(int cx, int cy, int scale, boolean inverted, MasterBoard board)
@@ -132,23 +118,23 @@ public final class GUIMasterHex extends MasterHex
         hexagon = makePolygon(6, xVertex, yVertex, true);
         rectBound = hexagon.getBounds();
         offCenter = new Point((int)Math.round((xVertex[0] + xVertex[1]) / 2),
-                (int)Math.round(((yVertex[0] + yVertex[3]) / 2) +
-                (inverted ? -(scale / 6.0) : (scale / 6.0))));
+            (int)Math.round(((yVertex[0] + yVertex[3]) / 2) +
+            (inverted ? -(scale / 6.0) : (scale / 6.0))));
 
         Point2D.Double center = findCenter2D();
 
         final double innerScale = 0.8;
         AffineTransform at = AffineTransform.getScaleInstance(innerScale,
-                innerScale);
+            innerScale);
         highlightBorder = (GeneralPath)hexagon.createTransformedShape(at);
 
         // Translate innerHexagon to make it concentric.
         Rectangle2D innerBounds = highlightBorder.getBounds2D();
         Point2D.Double innerCenter = new Point2D.Double(innerBounds.getX() +
-                innerBounds.getWidth() / 2.0, innerBounds.getY() +
-                innerBounds.getHeight() / 2.0);
+            innerBounds.getWidth() / 2.0, innerBounds.getY() +
+            innerBounds.getHeight() / 2.0);
         at = AffineTransform.getTranslateInstance(center.getX() -
-                innerCenter.getX(), center.getY() - innerCenter.getY());
+            innerCenter.getX(), center.getY() - innerCenter.getY());
         highlightBorder.transform(at);
 
         highlightBorder.append(hexagon, false);
@@ -167,20 +153,21 @@ public final class GUIMasterHex extends MasterHex
         g2.setFont(oldFont.deriveFont(oldFont.getSize2D() * 0.9f));
         fontMetrics = g2.getFontMetrics();
         halfFontHeight = (fontMetrics.getMaxAscent() +
-                fontMetrics.getLeading()) / 2;
+            fontMetrics.getLeading()) / 2;
 
         if (getAntialias())
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
+                RenderingHints.VALUE_ANTIALIAS_ON);
         }
         else
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_OFF);
+                RenderingHints.VALUE_ANTIALIAS_OFF);
         }
 
-        g2.setColor(getTerrainColor());
+        MasterHex model = getMasterHexModel();
+        g2.setColor(model.getTerrainColor());
         g2.fill(hexagon);
         g2.setColor(Color.black);
         g2.draw(hexagon);
@@ -198,10 +185,10 @@ public final class GUIMasterHex extends MasterHex
             // hexside inside the hexside, and the outer edge is 1/12 of a
             // hexside outside the hexside.
 
-            if (getExitType(i) != Constants.NONE)
+            if (model.getExitType(i) != Constants.NONE)
             {
                 drawGate(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
-                        getExitType(i));
+                    model.getExitType(i));
             }
 
             // Draw entrances
@@ -209,10 +196,10 @@ public final class GUIMasterHex extends MasterHex
             // they sometimes get overdrawn.  So we need to draw them
             // again from the other hex, as entrances.
 
-            if (getEntranceType(i) != Constants.NONE)
+            if (model.getEntranceType(i) != Constants.NONE)
             {
                 drawGate(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
-                        getEntranceType(i));
+                    model.getEntranceType(i));
             }
         }
 
@@ -241,44 +228,46 @@ public final class GUIMasterHex extends MasterHex
     private void paintLabel(Graphics2D g2)
     {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_OFF);
+            RenderingHints.VALUE_ANTIALIAS_OFF);
 
-        switch (getLabelSide())
+        MasterHex model = getMasterHexModel();
+        String label = model.getLabel();
+        switch (model.getLabelSide())
         {
             case 0:
-                g2.drawString(getLabel(), rectBound.x +
-                        ((rectBound.width - stringWidth(getLabel(), g2)) / 2),
-                        rectBound.y + halfFontHeight + rectBound.height / 10);
+                g2.drawString(label, rectBound.x +
+                    ((rectBound.width - stringWidth(label, g2)) / 2),
+                    rectBound.y + halfFontHeight + rectBound.height / 10);
                 break;
 
             case 1:
-                g2.drawString(getLabel(), rectBound.x + ((rectBound.width -
-                        stringWidth(getLabel(), g2)) * 5 / 6), rectBound.y +
-                        halfFontHeight + rectBound.height / 8);
+                g2.drawString(label, rectBound.x + ((rectBound.width -
+                    stringWidth(label, g2)) * 5 / 6), rectBound.y +
+                    halfFontHeight + rectBound.height / 8);
                 break;
 
             case 2:
-                g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-                        stringWidth(getLabel(), g2)) * 5 / 6, rectBound.y +
-                        halfFontHeight + rectBound.height * 7 / 8);
+                g2.drawString(label, rectBound.x + (rectBound.width -
+                    stringWidth(label, g2)) * 5 / 6, rectBound.y +
+                    halfFontHeight + rectBound.height * 7 / 8);
                 break;
 
             case 3:
-                g2.drawString(getLabel(), rectBound.x + ((rectBound.width -
-                        stringWidth(getLabel(), g2)) / 2), rectBound.y +
-                        halfFontHeight + rectBound.height * 9 / 10);
+                g2.drawString(label, rectBound.x + ((rectBound.width -
+                    stringWidth(label, g2)) / 2), rectBound.y +
+                    halfFontHeight + rectBound.height * 9 / 10);
                 break;
 
             case 4:
-                g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-                        stringWidth(getLabel(), g2)) / 6, rectBound.y +
-                        halfFontHeight + rectBound.height * 5 / 6);
+                g2.drawString(label, rectBound.x + (rectBound.width -
+                    stringWidth(label, g2)) / 6, rectBound.y +
+                    halfFontHeight + rectBound.height * 5 / 6);
                 break;
 
             case 5:
-                g2.drawString(getLabel(), rectBound.x + (rectBound.width -
-                        stringWidth(getLabel(), g2)) / 6, rectBound.y +
-                        halfFontHeight + rectBound.height / 8);
+                g2.drawString(label, rectBound.x + (rectBound.width -
+                    stringWidth(label, g2)) / 6, rectBound.y +
+                    halfFontHeight + rectBound.height / 8);
                 break;
         }
     }
@@ -287,31 +276,31 @@ public final class GUIMasterHex extends MasterHex
     {
         // Do not anti-alias text.
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_OFF);
+            RenderingHints.VALUE_ANTIALIAS_OFF);
         if (fontMetrics == null)
         {
             fontMetrics = g2.getFontMetrics();
             halfFontHeight = (fontMetrics.getMaxAscent() +
-                    fontMetrics.getLeading()) / 2;
+                fontMetrics.getLeading()) / 2;
         }
         fontMetrics = g2.getFontMetrics();
         halfFontHeight = (fontMetrics.getMaxAscent() +
-                fontMetrics.getLeading()) / 2;
-        String name = getTerrainDisplayName().toUpperCase();
+            fontMetrics.getLeading()) / 2;
+        String name = getMasterHexModel().getTerrainDisplayName().toUpperCase();
         g2.drawString(name,
-                rectBound.x + ((rectBound.width - stringWidth(name, g2)) / 2),
-                rectBound.y + halfFontHeight + rectBound.height *
-                (isInverted() ? 1 : 2) / 3);
+            rectBound.x + ((rectBound.width - stringWidth(name, g2)) / 2),
+            rectBound.y + halfFontHeight + rectBound.height *
+            (isInverted() ? 1 : 2) / 3);
     }
 
     public void repaint()
     {
         board.repaint(rectBound.x, rectBound.y, rectBound.width,
-                rectBound.height);
+            rectBound.height);
     }
 
     private void drawGate(Graphics2D g2, double vx1, double vy1, double vx2,
-            double vy2, int gateType)
+        double vy2, int gateType)
     {
         double x0;                    // first focus point
         double y0;
@@ -370,8 +359,8 @@ public final class GUIMasterHex extends MasterHex
                 rect.height = 2 * len;
 
                 Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
-                        rect.width, rect.height,
-                        Math.toDegrees(-theta), 180, Arc2D.OPEN);
+                    rect.width, rect.height,
+                    Math.toDegrees(-theta), 180, Arc2D.OPEN);
 
                 g2.setColor(Color.white);
                 g2.fill(arc);
@@ -480,11 +469,11 @@ public final class GUIMasterHex extends MasterHex
     private Image getOverlayImage()
     {
         Image overlay = null;
-        overlay = ResourceLoader.getImage(getTerrainDisplayName() +
-                (!inverted ? invertedPostfix : ""),
-                VariantSupport.getImagesDirectoriesList(),
-                rectBound.width,
-                rectBound.height);
+        overlay = ResourceLoader.getImage(getMasterHexModel().getTerrainDisplayName() +
+            (!inverted ? invertedPostfix : ""),
+            VariantSupport.getImagesDirectoriesList(),
+            rectBound.width,
+            rectBound.height);
         return overlay;
     }
 
@@ -501,12 +490,30 @@ public final class GUIMasterHex extends MasterHex
         g.setComposite(AlphaComposite.getInstance(
             AlphaComposite.SRC_OVER, 0.3f));
         g.drawImage(overlay,
-                rectBound.x,
-                rectBound.y,
-                rectBound.width,
-                rectBound.height,
-                board);
+            rectBound.x,
+            rectBound.y,
+            rectBound.width,
+            rectBound.height,
+            board);
         g.setComposite(oldComp);
         return true;
+    }
+
+    public GUIMasterHex getNeighbor(int i)
+    {
+        if (i < 0 || i > 6)
+        {
+            return null;
+        }
+        else
+        {
+            return neighbors[i];
+        }
+    }
+
+    public void setNeighbor(int i, GUIMasterHex hex)
+    {
+        neighbors[i] = hex;
+        neighbors[i].getMasterHexModel().setNeighbor(i, hex.getMasterHexModel());
     }
 }

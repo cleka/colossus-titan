@@ -44,7 +44,7 @@ import net.sf.colossus.util.ResourceLoader;
  */
 
 public final class BattleMap extends HexMap implements MouseListener,
-            WindowListener
+        WindowListener
 {
     private Point location;
     private JFrame battleFrame;
@@ -70,7 +70,7 @@ public final class BattleMap extends HexMap implements MouseListener,
     private SaveWindow saveWindow;
 
     BattleMap(Client client, String masterHexLabel, String attackerMarkerId,
-            String defenderMarkerId)
+        String defenderMarkerId)
     {
         super(masterHexLabel);
 
@@ -113,12 +113,12 @@ public final class BattleMap extends HexMap implements MouseListener,
         // BattleDice is added to frame.
 
         battleFrame.setTitle(
-                net.sf.colossus.server.Legion.getMarkerName(attackerMarkerId) +
-                " (" + attackerMarkerId +
-                ") attacks " +
-                net.sf.colossus.server.Legion.getMarkerName(defenderMarkerId) +
-                " (" + defenderMarkerId +
-                ") in " + masterHexLabel);
+            net.sf.colossus.server.Legion.getMarkerName(attackerMarkerId) +
+            " (" + attackerMarkerId +
+            ") attacks " +
+            net.sf.colossus.server.Legion.getMarkerName(defenderMarkerId) +
+            " (" + defenderMarkerId +
+            ") in " + masterHexLabel);
     }
 
     // Simple constructor for testing. 
@@ -134,7 +134,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 if (!client.getPlayerName().equals(
-                        client.getBattleActivePlayerName()))
+                    client.getBattleActivePlayerName()))
                 {
                     return;
                 }
@@ -152,7 +152,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 if (!client.getPlayerName().equals(
-                        client.getBattleActivePlayerName()))
+                    client.getBattleActivePlayerName()))
                 {
                     return;
                 }
@@ -170,7 +170,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             public void actionPerformed(ActionEvent e)
             {
                 if (!client.getPlayerName().equals(
-                        client.getBattleActivePlayerName()))
+                    client.getBattleActivePlayerName()))
                 {
                     return;
                 }
@@ -180,8 +180,8 @@ public final class BattleMap extends HexMap implements MouseListener,
                 {
                     case Constants.MOVE:
                         if (!client.getOption(Options.autoPlay) &&
-                                client.anyOffboardCreatures() &&
-                                !confirmLeavingCreaturesOffboard())
+                            client.anyOffboardCreatures() &&
+                            !confirmLeavingCreaturesOffboard())
                         {
                             return;
                         }
@@ -207,10 +207,10 @@ public final class BattleMap extends HexMap implements MouseListener,
                 options[0] = "Yes";
                 options[1] = "No";
                 int answer = JOptionPane.showOptionDialog(battleFrame,
-                        "Are you sure you wish to concede the battle?",
-                        "Confirm Concession?",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                        null, options, options[1]);
+                    "Are you sure you wish to concede the battle?",
+                    "Confirm Concession?",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[1]);
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
@@ -334,21 +334,21 @@ public final class BattleMap extends HexMap implements MouseListener,
     {
         List directories = new java.util.ArrayList();
         directories.add(Constants.defaultDirName +
-                ResourceLoader.getPathSeparator() +
-                Constants.imagesDirName);
+            ResourceLoader.getPathSeparator() +
+            Constants.imagesDirName);
 
         String[] iconNames = { Constants.battlemapIconImage,
             Constants.battlemapIconText +
-                    "-Name-" +
-                    Constants.battlemapIconTextColor,
+                "-Name-" +
+                Constants.battlemapIconTextColor,
             Constants.battlemapIconSubscript +
-                    "-Subscript-" +
-                    Constants.battlemapIconTextColor };
+                "-Subscript-" +
+                Constants.battlemapIconTextColor };
 
         Image image =
-                ResourceLoader.getCompositeImage(iconNames,
-                directories,
-                60, 60);
+            ResourceLoader.getCompositeImage(iconNames,
+            directories,
+            60, 60);
 
         if (image == null)
         {
@@ -379,8 +379,8 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
     public static BattleHex getEntrance(String terrain,
-            String masterHexLabel,
-            int entrySide)
+        String masterHexLabel,
+        int entrySide)
     {
         return HexMap.getHexByLabel(terrain, "X" + entrySide);
     }
@@ -496,10 +496,10 @@ public final class BattleMap extends HexMap implements MouseListener,
         options[0] = "Yes";
         options[1] = "No";
         int answer = JOptionPane.showOptionDialog(battleFrame,
-                "Are you sure you want to leave creatures offboard?",
-                "Confirm Leaving Creatures Offboard?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, options, options[1]);
+            "Are you sure you want to leave creatures offboard?",
+            "Confirm Leaving Creatures Offboard?",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+            null, options, options[1]);
         return (answer == JOptionPane.YES_OPTION);
     }
 
@@ -587,15 +587,15 @@ public final class BattleMap extends HexMap implements MouseListener,
         Point point = e.getPoint();
 
         BattleChit chit = getBattleChitAtPoint(point);
-        BattleHex hex = getHexContainingPoint(point);
+        GUIBattleHex hex = getHexContainingPoint(point);
         String hexLabel = "";
         if (hex != null)
         {
-            hexLabel = hex.getLabel();
+            hexLabel = hex.getHexModel().getLabel();
         }
 
         if (chit != null && client.getPlayerNameByTag(chit.getTag()).equals(
-                client.getBattleActivePlayerName()))
+            client.getBattleActivePlayerName()))
         {
             actOnCritter(chit.getTag(), hexLabel);
         }
@@ -619,10 +619,10 @@ public final class BattleMap extends HexMap implements MouseListener,
         options[0] = "Yes";
         options[1] = "No";
         int answer = JOptionPane.showOptionDialog(battleFrame,
-                "Are you sure you wish to quit?",
-                "Quit Game?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, options, options[1]);
+            "Are you sure you wish to quit?",
+            "Quit Game?",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+            null, options, options[1]);
 
         if (answer == JOptionPane.YES_OPTION)
         {
@@ -676,7 +676,6 @@ public final class BattleMap extends HexMap implements MouseListener,
     void rescale()
     {
         setupHexes();
-        setupEntrances();
 
         int chitScale = 4 * Scale.get();
         java.util.List battleChits = client.getBattleChits();

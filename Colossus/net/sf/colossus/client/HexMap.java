@@ -98,7 +98,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         {
             String terrain = terrains[t];
 
-            BattleHex[][] gameH = new BattleHex[6][6];
+            GUIBattleHex[][] gameH = new GUIBattleHex[6][6];
             List gameHexes = new ArrayList();
 
             // Initialize game state hex array.
@@ -108,21 +108,21 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 {
                     if (show[i][j])
                     {
-                        BattleHex hex = new BattleHex(i, j);
+                        GUIBattleHex hex = new GUIBattleHex(i, j);
 
                         gameH[i][j] = hex;
                         gameHexes.add(hex);
                     }
                 }
             }
-            setupNeighbors(gameH);
             setupHexesGameState(terrain, gameH, serverSideFirstLoad);
+            setupNeighbors(gameH);
 
             // Initialize non-GUI entrances
-            BattleHex[] gameEntrances = new BattleHex[6];
+            GUIBattleHex[] gameEntrances = new GUIBattleHex[6];
             for (int k = 0; k < 6; k++)
             {
-                gameEntrances[k] = new BattleHex(-1, k);
+                gameEntrances[k] = new GUIBattleHex(-1, k);
                 gameHexes.add(gameEntrances[k]);
             }
             setupEntrancesGameState(gameEntrances, gameH);
@@ -141,8 +141,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     void setupHexes()
     {
         setupHexesGUI();
-        setupNeighbors(h);
         setupHexesGameState(terrain, h, false);
+        setupNeighbors(h);
         setupEntrances();
     }
 
@@ -158,9 +158,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 if (show[i][j])
                 {
                     GUIBattleHex hex = new GUIBattleHex
-                            ((int)Math.round(cx + 3 * i * scale),
-                            (int)Math.round(cy + (2 * j + (i & 1)) *
-                            Hex.SQRT3 * scale), scale, this, i, j);
+                        ((int)Math.round(cx + 3 * i * scale),
+                        (int)Math.round(cy + (2 * j + (i & 1)) *
+                        GUIHex.SQRT3 * scale), scale, this, i, j);
 
                     h[i][j] = hex;
                     hexes.add(hex);
@@ -174,18 +174,30 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
      *  only on the high side, since they only interfere with
      *  uphill movement. */
     private static synchronized void setupHexesGameState(String terrain,
-            BattleHex[][] h, boolean serverSideFirstLoad)
+        GUIBattleHex[][] h, boolean serverSideFirstLoad)
     {
         List directories = VariantSupport.getBattlelandsDirectoriesList();
         String rndSourceName =
-                TerrainRecruitLoader.getTerrainRandomName(terrain);
+            TerrainRecruitLoader.getTerrainRandomName(terrain);
+        BattleHex[][] hexModel = new BattleHex[h.length][h[0].length];
+        for (int i = 0; i < h.length; i++)
+        {
+            for (int j = 0; j < h[0].length; j++)
+            {
+                if (show[i][j])
+                {
+                    hexModel[i][j] = new BattleHex(i,j);
+                }
+            }
+        }
         try
         {
             if ((rndSourceName == null) || (!serverSideFirstLoad))
             { // static Battlelands
                 InputStream batIS = ResourceLoader.getInputStream(
-                        terrain + ".xml", directories);
-                BattlelandLoader bl = new BattlelandLoader(batIS, h);
+                    terrain + ".xml", directories);
+
+                BattlelandLoader bl = new BattlelandLoader(batIS, hexModel);
                 List tempTowerStartList = bl.getStartList();
                 if (tempTowerStartList != null)
                 {
@@ -195,7 +207,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 subtitleMap.put(terrain, bl.getSubtitle());
             }
             else
-            { // random Battlelands
+            {// random Battlelands
 
                 /*  Commented out until ported to XML
                  Log.debug("Randomizing " + terrain + " with " + rndSourceName);
@@ -291,7 +303,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                     {
                         if (show[x][y])
                         {
-                            if (h[x][y].getTerrain().equals(hazards[i]))
+                            if (hexModel[x][y].getTerrain().equals(hazards[i]))
                             {
                                 count++;
                             }
@@ -317,8 +329,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                         {
                             for (int k = 0; k < 6; k++)
                             {
-                                if (h[x][y].getHexside(k) ==
-                                        hazardSides[i])
+                                if (hexModel[x][y].getHexside(k) ==
+                                    hazardSides[i])
                                 {
                                     count++;
                                 }
@@ -332,6 +344,16 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
                 }
             }
             hazardSideNumberMap.put(terrain, s2n);
+            // map model into GUI
+            for (int i = 0; i < hexModel.length; i++) {
+                BattleHex[] row = hexModel[i];
+                for (int j = 0; j < row.length; j++) {
+                    BattleHex hex = row[j];
+                    if (show[i][j]) {
+                        h[i][j].setHexModel(hex);
+                    }
+                }
+            }
         }
         catch (Exception e)
         {
@@ -341,7 +363,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     }
 
     /** Add references to neighbor hexes. */
-    private static void setupNeighbors(BattleHex[][] h)
+    private static void setupNeighbors(GUIBattleHex[][] h)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -383,7 +405,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         }
     }
 
-    void setupEntrances()
+    private void setupEntrances()
     {
         setupEntrancesGUI();
         setupEntrancesGameState(entrances, h);
@@ -393,17 +415,17 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     {
         // Initialize entrances.
         entrances[0] = new GUIBattleHex(cx + 15 * scale,
-                (int)Math.round(cy + 1 * scale), scale, this, -1, 0);
+            (int)Math.round(cy + 1 * scale), scale, this, -1, 0);
         entrances[1] = new GUIBattleHex(cx + 21 * scale,
-                (int)Math.round(cy + 10 * scale), scale, this, -1, 1);
+            (int)Math.round(cy + 10 * scale), scale, this, -1, 1);
         entrances[2] = new GUIBattleHex(cx + 17 * scale,
-                (int)Math.round(cy + 22 * scale), scale, this, -1, 2);
+            (int)Math.round(cy + 22 * scale), scale, this, -1, 2);
         entrances[3] = new GUIBattleHex(cx + 2 * scale,
-                (int)Math.round(cy + 21 * scale), scale, this, -1, 3);
+            (int)Math.round(cy + 21 * scale), scale, this, -1, 3);
         entrances[4] = new GUIBattleHex(cx - 3 * scale,
-                (int)Math.round(cy + 10 * scale), scale, this, -1, 4);
+            (int)Math.round(cy + 10 * scale), scale, this, -1, 4);
         entrances[5] = new GUIBattleHex(cx + 1 * scale,
-                (int)Math.round(cy + 1 * scale), scale, this, -1, 5);
+            (int)Math.round(cy + 1 * scale), scale, this, -1, 5);
 
         hexes.add(entrances[0]);
         hexes.add(entrances[1]);
@@ -413,10 +435,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         hexes.add(entrances[5]);
     }
 
-    private static void setupEntrancesGameState(BattleHex[] entrances,
-            BattleHex[][] h)
+    private static void setupEntrancesGameState(GUIBattleHex[] entrances,
+        GUIBattleHex[][] h)
     {
-        // Add neighbors to entrances.
         entrances[0].setNeighbor(3, h[3][0]);
         entrances[0].setNeighbor(4, h[4][1]);
         entrances[0].setNeighbor(5, h[5][1]);
@@ -465,7 +486,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         while (it.hasNext())
         {
             GUIBattleHex hex = (GUIBattleHex)it.next();
-            if (hex.isSelected() && label.equals(hex.getLabel()))
+            if (hex.isSelected() && label.equals(hex.getHexModel().getLabel()))
             {
                 hex.unselect();
                 hex.repaint();
@@ -480,7 +501,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         while (it.hasNext())
         {
             GUIBattleHex hex = (GUIBattleHex)it.next();
-            if (hex.isSelected() && labels.contains(hex.getLabel()))
+            if (hex.isSelected() &&
+                labels.contains(hex.getHexModel().getLabel()))
             {
                 hex.unselect();
                 hex.repaint();
@@ -494,7 +516,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         while (it.hasNext())
         {
             GUIBattleHex hex = (GUIBattleHex)it.next();
-            if (!hex.isSelected() && label.equals(hex.getLabel()))
+            if (!hex.isSelected() && label.equals(hex.getHexModel().getLabel()))
             {
                 hex.select();
                 hex.repaint();
@@ -509,7 +531,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         while (it.hasNext())
         {
             GUIBattleHex hex = (GUIBattleHex)it.next();
-            if (!hex.isSelected() && labels.contains(hex.getLabel()))
+            if (!hex.isSelected() &&
+                labels.contains(hex.getHexModel().getLabel()))
             {
                 hex.select();
                 hex.repaint();
@@ -525,7 +548,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         while (it.hasNext())
         {
             GUIBattleHex hex = (GUIBattleHex)it.next();
-            if (hex.getLabel().equals(label))
+            if (hex.getHexModel().getLabel().equals(label))
             {
                 return hex;
             }
@@ -576,16 +599,16 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             case 'x':
 
                 /* entrances */
-                BattleHex[] gameEntrances =
-                        (BattleHex[])entranceHexes.get(terrain);
-                return gameEntrances[y];
+                GUIBattleHex[] gameEntrances =
+                    (GUIBattleHex[])entranceHexes.get(terrain);
+                return gameEntrances[y].getBattleHexModel();
 
             default:
                 Log.error("Label " + label + " is invalid");
         }
         y = 6 - y - (int)Math.abs(((x - 3) / 2));
-        BattleHex[][] correctHexes = (BattleHex[][])terrainH.get(terrain);
-        return correctHexes[x][y];
+        GUIBattleHex[][] correctHexes = (GUIBattleHex[][])terrainH.get(terrain);
+        return correctHexes[x][y].getBattleHexModel();
     }
 
     /** Return the GUIBattleHex that contains the given point, or
@@ -688,7 +711,8 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             while (it.hasNext())
             {
                 GUIBattleHex hex = (GUIBattleHex)it.next();
-                if (!hex.isEntrance() && rectClip.intersects(hex.getBounds()))
+                if (!hex.getBattleHexModel().isEntrance() &&
+                    rectClip.intersects(hex.getBounds()))
                 {
                     hex.paint(g);
                 }
@@ -696,9 +720,9 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
             /* always antialias this, the font is huge */
             Object oldantialias = g2.getRenderingHint(
-                    RenderingHints.KEY_ANTIALIASING);
+                RenderingHints.KEY_ANTIALIASING);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
+                RenderingHints.VALUE_ANTIALIAS_ON);
 
             Font oldFont = g.getFont();
             FontMetrics fm;
@@ -726,7 +750,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
 
             /* reset antialiasing */
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    oldantialias);
+                oldantialias);
             g.setFont(oldFont);
         }
         catch (NullPointerException ex)
@@ -772,7 +796,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public static boolean terrainHasStartlist(String t)
     {
         java.util.List temp =
-                (java.util.List)startlistMap.get(t);
+            (java.util.List)startlistMap.get(t);
         return (!(temp == null));
     }
 
@@ -805,7 +829,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     }
 
     public static int getHazardSideCountInTerrain(char hazard,
-            String terrain)
+        String terrain)
     {
         HashMap s2n = (HashMap)hazardSideNumberMap.get(terrain);
         Object o = null;
