@@ -37,29 +37,20 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
         else
         {
             int scale = 60;
-            setLayout(null);
+            setLayout(new GridLayout(0, Math.min(
+                player.getNumMarkersAvailable(), 12)));
 
             pack();
 
             setBackground(Color.lightGray);
-            setSize((21 * scale / 20) * (Math.min(12,
-                player.getNumMarkersAvailable()) + 1), (21 * scale / 20) *
-                ((player.getNumMarkersAvailable() - 1) / 12 + 2));
             setResizable(false);
-
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width / 2 - getSize().width / 2,
-                d.height / 2 - getSize().height / 2));
-
-            int cx = scale / 2;
-            int cy = scale * 2 / 3;
 
             for (int i = 0; i < player.getNumMarkersAvailable(); i++)
             {
-                markers[i] = new Chit(cx + (i % 12) * (21 * scale / 20),
-                    cy + (i / 12) * (21 * scale / 20), scale,
-                    "images/" + player.getMarker(i) +
-                    ".gif", this);
+                markers[i] = new Chit(-1, -1, scale,  
+                    "images/" + player.getMarker(i) + ".gif", this);
+                add(markers[i]);
+                markers[i].addMouseListener(this);
             }
 
             tracker = new MediaTracker(this);
@@ -79,6 +70,13 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
                     " waitForAll was interrupted");
             }
             imagesLoaded = true;
+
+            pack();
+            
+            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+            setLocation(new Point(d.width / 2 - getSize().width / 2,
+                d.height / 2 - getSize().height / 2));
+
             setVisible(true);
             repaint();
         }
@@ -93,7 +91,6 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
         }
 
         Dimension d = getSize();
-        Rectangle rectClip = g.getClipBounds();
 
         // Create the back buffer only if we don't have a good one.
         if (offGraphics == null || d.width != offDimension.width ||
@@ -102,14 +99,6 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
             offDimension = d;
             offImage = createImage(2 * d.width, 2 * d.height);
             offGraphics = offImage.getGraphics();
-        }
-
-        for (int i = 0; i < markers.length; i++)
-        {
-            if (rectClip.intersects(markers[i].getBounds()))
-            {
-                markers[i].paint(offGraphics);
-            }
         }
 
         g.drawImage(offImage, 0, 0, this);
@@ -132,10 +121,10 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
             return;
         }
 
-        Point point = e.getPoint();
+        Object source = e.getSource();
         for (int i = 0; i < markers.length; i++)
         {
-            if (markers[i].select(point))
+            if (markers[i] == source)
             {
                 // Select that marker.
                 player.selectMarker(i);
