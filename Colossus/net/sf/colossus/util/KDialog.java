@@ -17,14 +17,28 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
     /** Only support one of JDialog's many constructor forms. */    
     public KDialog (Frame owner, String title, boolean modal)
     {
-        super(owner, title, modal);
+        // The long title goes in a label.  Just put the class 
+        // name in the title bar.
+        super(owner, modal);
+        String shortTitle = getPackageBaseName(getClass().getName());
+        setTitle(shortTitle);
 
         Container cont = super.getContentPane();
         
-        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
+        cont.setLayout(new BorderLayout());
         newContentPane = new JPanel();
-        cont.add(new JLabel(title));
-        cont.add(newContentPane);
+
+        if (title != null && title.length() > 0)
+        {
+            JLabel label = new JLabel(title);
+            cont.add(label, BorderLayout.NORTH);
+        }
+        cont.add(newContentPane, BorderLayout.CENTER);
+    }
+
+    private static String getPackageBaseName(final String packageName)
+    {
+        return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 
     public Container getContentPane()
@@ -32,12 +46,12 @@ public class KDialog extends JDialog implements MouseListener, WindowListener
         return newContentPane;
     }
 
+
     /** Place dialog relative to parentFrame's origin, offset by 
      *  point, and fully on-screen. */
     public void placeRelative(JFrame parentFrame, Point point)
     {
         Point parentOrigin = parentFrame.getLocation();
-        // XXX x had - scale, check
         Point origin = new Point(point.x + parentOrigin.x, point.y +
             parentOrigin.y);
         if (origin.x < 0)
