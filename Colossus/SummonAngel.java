@@ -49,6 +49,9 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             return;
         }
 
+        // Make sure the board is visible.
+        board.show();
+
         setResizable(false);
         addMouseListener(this);
         addWindowListener(this);
@@ -229,6 +232,10 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
             if (donor == null) 
             {
                 new MessageBox(board, "Must select a legion.");
+
+                // Make sure the board is visible.
+                board.show();
+
                 return;
             }
 
