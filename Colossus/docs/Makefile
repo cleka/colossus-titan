@@ -1,56 +1,31 @@
 # $Header$
 
 MAKEDVI=../buildtools/makedvi.sh
-DVIPS=dvips
-DVI2TTY=dvi2tty
-LATEX2HTML=latex2html
 
 SOURCES=Base FileFormat CodingStandards FAQ build Credits README Variant-HOWTO
 DESTS=$(addsuffix .ps,$(SOURCES))
 DESTSTXT=$(addsuffix .txt,$(SOURCES))
 DESTSHTML=$(addsuffix .html,$(SOURCES))
+SUBDIR=datatools
 
-all: $(DESTS) $(DESTSTXT) all-datatools
+all: $(DESTS) $(DESTSTXT) all-recursive
 
-clean: clean-datatools
+clean: clean-recursive
 	rm -f *.aux *.log *.toc *.blg *.bbl *.dvi *~
 
-distclean: clean distclean-datatools
+distclean: clean distclean-recursive
 	rm -f $(DESTS) $(DESTSTXT)
 
-html: all $(DESTSHTML) html-datatools
+html: all $(DESTSHTML) html-recursive
 
 
-htmlclean: distclean htmlclean-datatools
+htmlclean: distclean htmlclean-recursive
 	rm -rf $(basename $(DESTSHTML))
 
 
-# recursion in datatools
-all-datatools:
-	cd datatools && $(MAKE)
+# recursion in recursive
+all-recursive html-recursive clean-recursive distclean-recursive htmlclean-recursive:
+	target=`echo $@ | sed 's/-recursive//g'`
+	for subdir in $(SUBDIR); do cd $$subdir && $(MAKE) $$target; done
 
-html-datatools:
-	cd datatools && $(MAKE) html
-
-clean-datatools:
-	cd datatools && $(MAKE) clean
-
-distclean-datatools:
-	cd datatools && $(MAKE) distclean
-
-htmlclean-datatools:
-	cd datatools && $(MAKE) htmlclean
-
-## actual work below
-%.ps: %.dvi
-	$(DVIPS) $< -o $@
-
-# three passes should make all the references OK
-%.dvi: %.tex
-	$(MAKEDVI) $(basename $<)
-
-%.txt: %.dvi
-	$(DVI2TTY) $< -o $@
-
-%.html: %.tex
-	$(LATEX2HTML) $<
+include Makefile.rules
