@@ -173,14 +173,16 @@ public class MasterBoard extends Frame implements MouseListener,
         int roll, int block, int cameFrom)
     {
         // If there are enemy legions in this hex, mark it
-        // as a legal move and stop recursing.
+        // as a legal move and stop recursing.  If there is
+        // also a friendly legion there, just stop recursing.
         if (hex.getNumEnemyLegions(player) > 0)
         {
-            // XXX Mark an engagement.
-
-            hex.select();
-            Rectangle clip = new Rectangle(hex.getBounds());
-            repaint(clip.x, clip.y, clip.width, clip.height);
+            if (hex.getNumFriendlyLegions(player) == 0)
+            {
+                hex.select();
+                Rectangle clip = new Rectangle(hex.getBounds());
+                repaint(clip.x, clip.y, clip.width, clip.height);
+            }
             return;
         }
 
