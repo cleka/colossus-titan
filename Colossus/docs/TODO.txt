@@ -1,19 +1,3 @@
-Bug: 8high.xml  Legion is really 6-high but appears 7-high.
-- revealCreatures() for Gd11(28): Archangel Angel Ranger Ranger Ranger Troll* Lion* [Archangel, Angel, Ranger, Ranger, Troll, Lion]
-- Legion Gr11 flee  as they are just 5 wimps !
-- From client Green: flee ~ Gr11
-Legion Gr11 (Scales) flees from legion Gd11 (Sun)
-Legion [Unicorn, Unicorn, Unicorn, Minotaur, Ogre] is eliminated
-Gold earns 50.0 points
-- revealCreatures() for Gr11(24): Unicorn* Unicorn* Unicorn* Minotaur* Ogre [Unicorn, Unicorn, Unicorn, Minotaur, Ogre]
-- From client Gold: acquireAngel ~ Gd11 ~ Angel
-Legion Gd11 (Sun) acquires one Angel
-Phase advances to Muster
-- addCreature() Gd11(28): Archangel Angel Ranger Ranger Ranger Troll* Lion* : Angel
-net.sf.colossus.client.PredictSplitsException: Tried adding to 7-high legion
-        at net.sf.colossus.client.Node.addCreature(PredictSplits.java:891)
-Unit test based on this savegame works; timing problem?
-
 Bug: The duplicate name detection code for network players is now
    failing with the new initialization timing -- oscillating fixNames
    between dripton and dripton4
@@ -36,27 +20,14 @@ EVAL Gd01 move to Plains hex 105 = 0
 
 Bug: Loaded a game with 2 human players and 4 AIs.  Only got one board.
 
-Bug: Enemy had two stacks, one fully known and one fully unknown.  Should
-   have been fully known by process of elimination.  Example: badblack.xml
-   Unit test based on this savegame works; timing problem?
-
-Bug: The duplicate name detection code for network players is now
-   failing with the new initialization timing -- oscillating fixNames
-   between dripton and dripton4
-
-Bug: 2-high titan stack did not run away even though it could be caught
-   on 4-6 by a 6-high stack:
-
-
 Bug: Out of memory error after many consecutive Load Game actions.  Find leak.
    Not enough memory to copy history from from savegame JDOM tree to new one?
 
 The updateHistory flag used to avoid infinite loops should be an instance
    variable rather than an argument to many methods.
 
-
-EASY Compute numLegions, numMarkers, numCreatures, titan power, total point value
-   on client side rather than passing them in player info.
+EASY Compute numLegions, numMarkers, numCreatures, titan power, total point 
+   value on client side rather than passing them in player info.
 EASY Indicate which players have titan teleport in StatusScreen.
 
 EASY Disable "AIs stop when humans dead" if no human players at start of game.
