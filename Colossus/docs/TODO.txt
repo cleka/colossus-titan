@@ -1,4 +1,6 @@
-Add .jnlp file for Java Web Start to web page and document it. 
+Eliminate persistent legion.hexInfo and instead return a temporary
+   object containing all the entry sides and teleport possibilities
+   along with the possible hexes that the legion can move to.
 
 Carry cursor showing number of hits remaining. 
 

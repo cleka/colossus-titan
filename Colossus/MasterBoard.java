@@ -1380,6 +1380,7 @@ public final class MasterBoard extends JPanel
     /** Select hexes where this legion can move. */
     private void highlightMoves(Legion legion)
     {
+        legion.clearAllHexInfo();
         Set set = game.listMoves(legion, true, true, false);
         unselectAllHexes();
         selectHexesByLabels(set);
