@@ -212,6 +212,7 @@
                  keystore="${user.name}Keystore"
                  storepass="${env.JARPASSWORD}"
         />
+        <chmod file="Colossus.jar" perm="755"/>
 </target>
 
 
