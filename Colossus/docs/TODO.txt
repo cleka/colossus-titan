@@ -1,9 +1,11 @@
+Document build and test procedures.  Copy all docs to web page from
+   inst target.
+
 Put web page under CVS.
 
 Set up a local Java Web Start test config.
 
-Document build and test procedures.  Copy all docs to web page from
-   inst target.
+java2html (link from rachel.sf.net)
 
 Highlight appropriate engagement hex while engagement is being resolved.
    (Except during angel summoning.)

@@ -17,6 +17,8 @@ public final class ResourceLoader
     // A hardcoded '/' works in Unix, Windows, MacOS X, and jar files.
     private static final String pathSeparator = "/";
     private static final String imageExtension = ".gif";
+    private static ClassLoader cl =
+        net.sf.colossus.util.ResourceLoader.class.getClassLoader();
 
     /*
      * Give the String to mark directories.
@@ -121,8 +123,6 @@ public final class ResourceLoader
         try
         {
             java.net.URL url;
-            java.lang.ClassLoader cl =
-                java.lang.ClassLoader.getSystemClassLoader();
             url = cl.getResource(path +
                                  pathSeparator +
                                  filename);
@@ -141,41 +141,6 @@ public final class ResourceLoader
         return icon;
     }
 
-    // XXX Not used yet, because I haven't found a method that takes a URL
-    // and returns an InputStream that works correctly over JWS.
-    // "new ImageIcon(URL)" above works.  Unfortunately, ImageIcon passes the
-    // URL to Toolkit.getImage(), which is native, so I can't see exactly how.
-    // I really don't want to use javax.jnlp code if we can help it.
-    // Maybe make a JarURLConnection and then call getInputStream()?
-    // Or we can put the variant text files on the web site and stream them
-    // to JWS clients.  Sounds wasteful, but we'll need to do that anyway
-    // to keep variants in sync for net games.
-    // Or we can bury them in an image file using Steganography.  :->
-    private static InputStream tryLoadInputStreamFromResource(String filename, String path)
-    {
-        InputStream stream = null;
-        try
-        {
-            java.net.URL url;
-            java.lang.ClassLoader cl =
-                java.lang.ClassLoader.getSystemClassLoader();
-            url = cl.getResource(path +
-                                 pathSeparator +
-                                 filename);
-            // url will not be null even is the file doesn't exist,
-            // so we need to check if connection can be opened
-            if ((url != null) && (url.openStream() != null))
-            {
-                // The method below does not exist.
-                // stream = cl.getResourceAsStream(url);
-            }
-        }
-        catch (Exception e)
-        {
-            Log.error("ResourceLoader caught " + e);
-        }
-        return stream;
-    }
 
     /**
      * Return the first InputStream from file of name filename in the list of directories.
@@ -186,8 +151,6 @@ public final class ResourceLoader
     public static InputStream getInputStream(String filename, java.util.List directories)
     {
         InputStream stream = null;
-        java.lang.ClassLoader cl =
-            java.lang.ClassLoader.getSystemClassLoader();
         java.util.Iterator it = directories.iterator();
         while (it.hasNext() && (stream == null))
         {
@@ -195,17 +158,14 @@ public final class ResourceLoader
             if (o instanceof String)
             {
                 String path = (String)o;
-Log.event("trying path: " + o);
                 String fullPath = path + pathSeparator + filename;
                 try
                 {
-Log.event("trying FileInputStream constructor for: " + fullPath);
                     stream = new FileInputStream(fullPath);
                 } 
                 catch (Exception e) { stream = null; }
                 if (stream == null)
                 {
-Log.event("trying cl.getResourceAsStream for: " + fullPath);
                     stream = cl.getResourceAsStream(fullPath);
                 }
             }
