@@ -49,6 +49,7 @@
         <property name="DOWNLOAD_DIR" value="${HTMLDIR}/download"/>
         <property name="DOCS_DIR" value="${HTMLDIR}/docs"/>
         <property name="ZIPFILE" value="Colossus.${DSTAMP}.zip"/>
+        <property name="SERVER" value="shell1.sf.net"/>
 
 </target>
 
@@ -335,7 +336,7 @@
         </exec>
 </target>
 
-<target name="dist" depends="init,sign,changelog,tools"
+<target name="dist" depends="init,sign,tools"
         description = "Make zip file for user download">
         <zip zipfile="${ZIPFILE}" basedir="."
              excludes="**/*.sav,
@@ -360,17 +361,31 @@
 </target>
 
 
-<target name="inst" depends="init,sign,dist,changelog"
-        description = "Copy files into htdocs tree on SF"> 
+<target name="inst" depends="init,sign,dist"
+        description = "Locally Copy files into htdocs tree on SF"> 
         <copy file="Colossus.jar" todir="${HTMLDIR}"/>
         <copy file="Colossus.jnlp" todir="${HTMLDIR}"/>
         <move file="${ZIPFILE}" todir="${DOWNLOAD_DIR}"/>
-        <copy file="ChangeLog" todir="${HTMLDIR}"/>
+        <!-- XXX removed copy file="ChangeLog" todir="${HTMLDIR}"/-->
         <copy todir="${DOCS_DIR}"> <fileset dir="docs"/></copy>
         <delete> 
                 <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/> 
         </delete>
         <touch file="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP}"/>
+</target>
+
+<!-- TODO Eliminate double maintenance -->
+<target name="remote-inst" depends="init,sign,dist"
+        description = "scp files into htdocs tree on SF"> 
+        <exec command="scp Colossus.jar ${SERVER}:${HTMLDIR}"/>
+        <exec command="scp Colossus.jnlp ${SERVER}:${HTMLDIR}"/>
+        <exec command="scp ${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
+        <exec command="scp -pr docs/* ${SERVER}:${DOCS_DIR}"/>
+        <delete> 
+                <fileset dir="${DOWNLOAD_DIR}" includes = "1_LATEST_IS_*"/> 
+        </delete>
+        <touch file="${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP}"/>
+        <exec command="scp ${DOWNLOAD_DIR}/1_LATEST_IS_${DSTAMP} ${SERVER}:${DOWNLOAD_DIR}"/>
 </target>
 
 
