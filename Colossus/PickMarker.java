@@ -95,7 +95,7 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
 
         Rectangle rectClip = g.getClipBounds();
 
-        for (int i = markers.length - 1; i >= 0; i--)
+        for (int i = 0; i < markers.length; i++)
         {
             if (rectClip.intersects(markers[i].getBounds()))
             {
@@ -134,13 +134,16 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     {
     }
 
+
     public void mouseExited(MouseEvent e)
     {
     }
+
     
     public void mouseClicked(MouseEvent e)
     {
     }
+
     
     public void mouseReleased(MouseEvent e)
     {
@@ -151,9 +154,11 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     {
     }
 
+
     public void windowClosed(WindowEvent event)
     {
     }
+
 
     public void windowClosing(WindowEvent event)
     {
@@ -162,17 +167,21 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
         return;
     }
 
+
     public void windowDeactivated(WindowEvent event)
     {
     }
+
                                                          
     public void windowDeiconified(WindowEvent event)
     {
     }
 
+
     public void windowIconified(WindowEvent event)
     {
     }
+
 
     public void windowOpened(WindowEvent event)
     {
