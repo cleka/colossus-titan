@@ -51,6 +51,7 @@ public class MasterBoard extends JPanel implements MouseListener,
     private JCheckBoxMenuItem miAllStacksVisible;
     private JCheckBoxMenuItem miAutoPickRecruiter;
     private JCheckBoxMenuItem miAutosave;
+    private JCheckBoxMenuItem miAntialias;
 
     /** Last point clicked is needed for popup menus. */
     private Point lastPoint;
@@ -487,6 +488,12 @@ public class MasterBoard extends JPanel implements MouseListener,
         miShowDice.setSelected(game.getShowDice());
         miShowDice.addItemListener(this);
         optionsMenu.add(miShowDice);
+        
+        miAntialias = new JCheckBoxMenuItem(Game.sAntialias);
+        miAntialias.setMnemonic(KeyEvent.VK_N);
+        miAntialias.setSelected(game.getAntialias());
+        miAntialias.addItemListener(this);
+        optionsMenu.add(miAntialias);
 
         optionsMenu.addSeparator();
 
@@ -522,6 +529,12 @@ public class MasterBoard extends JPanel implements MouseListener,
     public void twiddleShowDice(boolean enable)
     {
         miShowDice.setSelected(enable);
+    }
+
+
+    public void twiddleAntialias(boolean enable)
+    {
+        miAntialias.setSelected(enable);
     }
 
 
@@ -1812,6 +1825,10 @@ public class MasterBoard extends JPanel implements MouseListener,
         else if (text.equals(Game.sShowDice))
         {
             game.setShowDice(selected);
+        }
+        else if (text.equals(Game.sAntialias))
+        {
+            game.setAntialias(selected);
         }
     }
 

@@ -99,8 +99,16 @@ public class MasterHex extends Hex
     public void paint(Graphics g)
     {
         Graphics2D g2 = (Graphics2D)g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_OFF);
+        if (Game.getAntialias())
+        {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        }
+        else
+        {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_OFF);
+        }
 
         if (isSelected())
         {

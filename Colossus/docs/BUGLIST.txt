@@ -30,4 +30,3 @@ Linux, Solaris, jdk1.3: Dialogs sometimes beep for no good reason.
    to help.  SplitLegion and PickRecruit (both called from Game) seem
    to be the main culprits.  Also AcquireAngel.  Doesn't seem to happen
    in Win98.
-

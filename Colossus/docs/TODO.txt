@@ -1,6 +1,7 @@
 Hook up remaining actions in MasterBoard menu.
 
-Add antialiasing option.
+Pick better-matching colors for desert and marsh, so that the colors
+   don't shift so much when antialiasing is turned on and off.
 
 Write a minimal, complete Game.loadGame() that reuses existing 
    objects as much as possible.

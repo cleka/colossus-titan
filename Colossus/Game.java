@@ -52,11 +52,13 @@ public class Game
     public static final String sAutoPickRecruiter = "Autopick recruiter";
     public static final String sShowStatusScreen = "Show game status";
     public static final String sShowDice = "Show dice";
+    public static final String sAntialias = "Antialias";
 
     // Per-player client options
     private static boolean autoPickRecruiter;
     private static boolean showDice = true;
     private static boolean showStatusScreen = true;
+    private static boolean antialias = false;
     // XXX Add default name, favorite colors by player name.
 
     // Server options
@@ -394,6 +396,18 @@ public class Game
     }
 
 
+    public static boolean getAntialias()
+    {
+        return antialias;
+    }
+
+
+    public void setAntialias(boolean antialias)
+    {
+        this.antialias = antialias;
+    }
+
+
     public void initMovementDie()
     {
         movementDie = new MovementDie(this);
@@ -705,6 +719,7 @@ public class Game
         options.setProperty(sShowDice, String.valueOf(showDice));
         options.setProperty(sShowStatusScreen, String.valueOf(
             showStatusScreen));
+        options.setProperty(sAntialias, String.valueOf(antialias));
         try
         {
             FileOutputStream out = new FileOutputStream(optionsPath);
@@ -736,21 +751,22 @@ public class Game
         }
 
         // XXX Handle partial options files?
-        autosave = (options.getProperty(sAutosave).equals("true"));
-        allStacksVisible = (options.getProperty(sAllStacksVisible).equals(
-            "true"));
-        autoPickRecruiter = (options.getProperty(sAutoPickRecruiter).equals(
-            "true"));
-        showDice = (options.getProperty(sShowDice).equals("true"));
-        showStatusScreen = (options.getProperty(sShowStatusScreen).equals(
-            "true"));
-
+        autosave = (options.getProperty(sAutosave, "false").equals("true"));
+        allStacksVisible = (options.getProperty(sAllStacksVisible,
+            "false").equals( "true"));
+        autoPickRecruiter = (options.getProperty(sAutoPickRecruiter,
+            "false").equals( "true"));
+        showDice = (options.getProperty(sShowDice, "true").equals("true"));
+        showStatusScreen = (options.getProperty(sShowStatusScreen,
+            "true").equals("true"));
+        antialias = (options.getProperty(sAntialias, "false").equals("true"));
 
         board.twiddleAutosave(autosave);
         board.twiddleAllStacksVisible(allStacksVisible);
         board.twiddleAutoPickRecruiter(autoPickRecruiter);
         board.twiddleShowStatusScreen(showStatusScreen);
         board.twiddleShowDice(showDice);
+        board.twiddleAntialias(antialias);
     }
 
 
