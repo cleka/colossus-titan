@@ -2201,29 +2201,63 @@ public class SimpleAI implements AI
     }
 
     // should be correct for most variants.
-    public String acquireAngel(String markerId, List recruits)
+    public String acquireAngel(String markerId, List angels)
     {
-        // TODO If the legion is 6 high and can recruit something better,
-        // or if the legion is a tiny scooby snack that's about to get
+        // TODO If the legion is a tiny scooby snack that's about to get
         // smooshed, turn down the angel.
 
-        java.util.List al = TerrainRecruitLoader.getAcquirableList();
-        java.util.Iterator it = al.iterator();
-        Creature c = null;
-
-        // heuristic : pick-up the most valuable of all available.
-        while (it.hasNext())
+        Creature bestAngel = getBestCreature(angels);
+        if (bestAngel == null)
         {
-            String name = (String)it.next();
-            Creature tc = Creature.getCreatureByName(name);
-            if (recruits.contains(name) &&
-                    ((c == null) || (tc.getPointValue() > c.getPointValue())))
-            {
-                c = tc;
-            }
+            return null;
         }
 
-        return (c == null ? null : c.getName());
+        // Don't take an angel if 6 high and a better recruit is available.
+        // TODO Make this also work for post-battle reinforcements
+        LegionInfo legion = client.getLegionInfo(markerId);
+        if (legion.getHeight() == 6 && legion.canRecruit())
+        {
+            List recruits = client.findEligibleRecruits(markerId,
+                    legion.getHexLabel());
+            Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
+            if (getKillValue(bestRecruit) > getKillValue(bestAngel))
+            {
+                Log.debug("AI declines acquiring to recruit " +
+                        bestRecruit.getName());
+                return null;
+            }
+        }
+        return bestAngel.getName();
+    }
+
+    /** Return the most important Creature in the list of Creatures or
+     * creature name strings.. */
+    Creature getBestCreature(List creatures)
+    {
+        if (creatures == null || creatures.isEmpty())
+        {
+            return null;
+        }
+        Creature best = null;
+        Iterator it = creatures.iterator();
+        while (it.hasNext())
+        {
+            Object ob = it.next();
+            Creature creature = null;
+            if (ob instanceof Creature)
+            {
+                creature = (Creature)ob;
+            }
+            else if (ob instanceof String)
+            {
+                creature = Creature.getCreatureByName((String)ob);
+            }
+            if (best == null || getKillValue(creature) > getKillValue(best))
+            {
+                best = creature;
+            }
+        }
+        return best;
     }
 
     /** Return a string of form angeltype:donorId, or null. */
@@ -2231,6 +2265,8 @@ public class SimpleAI implements AI
     {
         // Always summon the biggest possible angel, from the least
         // important legion that has one.
+        //
+        // TODO Sometimes leave room for recruiting.
 
         Set hexLabels = client.findSummonableAngelHexes(summonerId);
 
@@ -2349,6 +2385,7 @@ public class SimpleAI implements AI
         return bestTarget;
     }
 
+    // TODO Have this actually find the best one, not the first one.
     private BattleChit findBestAttacker(BattleChit target)
     {
         BattleChit bestAttacker = null;
