@@ -33,18 +33,9 @@ final class SocketClient implements IServer
         try
         {
             socket = new Socket(host, port);
-        }
-        catch (Exception ex)
-        {
-            Log.error(ex.toString());
-            return;
-        }
-
-        try
-        {
             out = new PrintWriter(socket.getOutputStream(), true);
         }
-        catch (IOException ex)
+        catch (Exception ex)
         {
             Log.error(ex.toString());
             return;

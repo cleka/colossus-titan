@@ -59,7 +59,7 @@ final class SocketServerThread extends Thread implements IClient
             String fromClient;
             while ((fromClient = in.readLine()) != null)
             {
-                Log.debug("From client: " + fromClient);
+                Log.debug("From client " + playerName + ": " + fromClient);
                 parseLine(fromClient);
             }
             Log.debug("End of SocketServerThread while loop");
