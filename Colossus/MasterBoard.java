@@ -145,7 +145,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
     // Do a brute-force search through the hex array, looking for
     //    a match.  Return the hex.
-    MasterHex getHexFromLabel(int label)
+    private MasterHex getHexFromLabel(int label)
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -163,7 +163,7 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
-    void unselectAllHexes()
+    public void unselectAllHexes()
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -185,7 +185,7 @@ class MasterBoard extends JFrame implements MouseListener,
     //    block == -2, use only arrows.  Do not double back in
     //    the direction you just came from.  Return the number of
     //    moves found.
-    int findMoves(MasterHex hex, Player player, Legion legion, 
+    private int findMoves(MasterHex hex, Player player, Legion legion, 
         int roll, int block, int cameFrom)
     {
         int count = 0;
@@ -272,10 +272,10 @@ class MasterBoard extends JFrame implements MouseListener,
     
     
     // Recursively find tower teleport moves from this hex.  That's
-    // all unoccupied towers except this one, plus all unoccupied
-    // hexes within 6 hexes.  Do not double back.
-    void findTowerTeleportMoves(MasterHex hex, Player player, Legion legion,
-        int roll, int cameFrom)
+    // all unoccupied hexes within 6 hexes.  Teleports to towers
+    // are handled separately.  Do not double back.
+    private void findTowerTeleportMoves(MasterHex hex, Player player, 
+        Legion legion, int roll, int cameFrom)
     {
         // This hex is the final destination.  Mark it as legal if
         // it is unoccupied.
@@ -292,8 +292,8 @@ class MasterBoard extends JFrame implements MouseListener,
         {
             for (int i = 0; i < 6; i++)
             {
-                if ((hex.getExitType(i) != MasterHex.NONE ||
-                   hex.getEntranceType(i) != MasterHex.NONE) && (i != cameFrom))
+                if (i != cameFrom && (hex.getExitType(i) != MasterHex.NONE ||
+                   hex.getEntranceType(i) != MasterHex.NONE))
                 {
                     findTowerTeleportMoves(hex.getNeighbor(i), player, legion, 
                         roll - 1, (i + 3) % 6);
@@ -304,7 +304,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
 
     // Return number of legal non-teleport moves.
-    int showMoves(Legion legion)
+    public int showMoves(Legion legion)
     {
         unselectAllHexes();
 
@@ -386,7 +386,7 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
-    void highlightUnmovedLegions()
+    public void highlightUnmovedLegions()
     {
         unselectAllHexes();
 
@@ -408,7 +408,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
 
     // Returns number of engagements found.
-    int highlightEngagements()
+    public int highlightEngagements()
     {
         int count = 0;
         Player player = game.getActivePlayer();
@@ -432,7 +432,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
     
     // Returns number of legions with summonable angels.
-    int highlightSummonableAngels(Legion legion)
+    public int highlightSummonableAngels(Legion legion)
     {
         unselectAllHexes();
 
@@ -469,7 +469,7 @@ class MasterBoard extends JFrame implements MouseListener,
 
 
     // Returns number of legions that can recruit.
-    int highlightPossibleRecruits()
+    public int highlightPossibleRecruits()
     {
         int count = 0;
         Player player = game.getActivePlayer();
@@ -494,7 +494,7 @@ class MasterBoard extends JFrame implements MouseListener,
     }
 
 
-    void finishSummoningAngel()
+    public void finishSummoningAngel()
     {
 System.out.println("MasterBoard.finishSummoningAngel");
         summoningAngel = false;
@@ -507,13 +507,13 @@ System.out.println("MasterBoard.finishSummoningAngel");
     }
 
 
-    void setSummonAngel(SummonAngel summonAngel)
+    public void setSummonAngel(SummonAngel summonAngel)
     {
         this.summonAngel = summonAngel;
     }
 
 
-    void finishBattle()
+    public void finishBattle()
     {
         show();
 
@@ -530,7 +530,7 @@ System.out.println("MasterBoard.finishSummoningAngel");
     }
 
 
-    void setupHexes()
+    private void setupHexes()
     {
         int cx = 3 * scale;
         int cy = 2 * scale;
@@ -1102,11 +1102,10 @@ System.out.println("MasterBoard.finishSummoningAngel");
                 }
             }
         }
-
     }
 
 
-    void rescale(int scale)
+    private void rescale(int scale)
     {
         this.scale = scale;
         int cx = 3 * scale;
@@ -1130,7 +1129,7 @@ System.out.println("MasterBoard.finishSummoningAngel");
 
     // This is a place-holder function, until the JDK adds the required
     // functionality.  (It's supposed to be in JDK 1.2beta4.1) 
-    void deiconify()
+    public void deiconify()
     {
     }
 
@@ -1398,21 +1397,26 @@ System.out.println("entry side was -1; setting it to 3");
     {
     }
 
+
     public void mouseReleased(MouseEvent e)
     {
     }
+
 
     public void mouseMoved(MouseEvent e)
     {
     }
 
+
     public void mouseClicked(MouseEvent e)
     {
     }
 
+
     public void mouseEntered(MouseEvent e)
     {
     }
+
 
     public void mouseExited(MouseEvent e)
     {
@@ -1423,26 +1427,32 @@ System.out.println("entry side was -1; setting it to 3");
     {
     }
 
+
     public void windowClosed(WindowEvent event)
     {
     }
+
 
     public void windowClosing(WindowEvent event)
     {
         System.exit(0);
     }
 
+
     public void windowDeactivated(WindowEvent event)
     {
     }
     
+
     public void windowDeiconified(WindowEvent event)
     {
     }
 
+
     public void windowIconified(WindowEvent event)
     {
     }
+
 
     public void windowOpened(WindowEvent event)
     {
@@ -1455,8 +1465,9 @@ System.out.println("entry side was -1; setting it to 3");
         update(g);
     }
 
+
     // This is used to fix artifacts from legions hanging outside hexes. 
-    void setEraseFlag()
+    public void setEraseFlag()
     {
         eraseFlag = true;
     }
@@ -1521,6 +1532,7 @@ System.out.println("entry side was -1; setting it to 3");
     {
         return getPreferredSize();
     }
+
 
     public Dimension getPreferredSize()
     {
