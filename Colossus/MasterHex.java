@@ -839,6 +839,7 @@ public final class MasterHex extends Hex
         }
         else
         {
+            // TODO: Make this smarter.
             return ((Integer)entrySides.first()).intValue();
         }
     }

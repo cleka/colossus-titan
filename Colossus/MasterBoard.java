@@ -523,10 +523,10 @@ public final class MasterBoard extends JPanel implements MouseListener,
         // Do not allow autosave if running as an applet.
         if (game.isApplet())
         {
-            game.setOption(Game.autosave, false);
+            game.setOption(Options.autosave, false);
         }
-        addCheckBox(gameMenu, Game.autosave, KeyEvent.VK_A);
-        addCheckBox(gameMenu, Game.allStacksVisible, KeyEvent.VK_S);
+        addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
+        addCheckBox(gameMenu, Options.allStacksVisible, KeyEvent.VK_S);
 
         // Then per-player options
 
@@ -534,35 +534,36 @@ public final class MasterBoard extends JPanel implements MouseListener,
         playerMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(playerMenu);
 
-        addCheckBox(playerMenu, Game.autoRecruit, KeyEvent.VK_R);
-        addCheckBox(playerMenu, Game.autoPickRecruiter, KeyEvent.VK_P);
-        addCheckBox(playerMenu, Game.autoPickMarker, KeyEvent.VK_M);
-        addCheckBox(playerMenu, Game.autoPickEntrySide, KeyEvent.VK_E);
-        addCheckBox(playerMenu, Game.autoForcedStrike, KeyEvent.VK_K);
-        addCheckBox(playerMenu, Game.autoMasterMove, KeyEvent.VK_A);
-        addCheckBox(playerMenu, Game.autoSplit, KeyEvent.VK_S);
-        addCheckBox(playerMenu, Game.autoFlee, KeyEvent.VK_F);
-        addCheckBox(playerMenu, Game.autoStrike, KeyEvent.VK_T);
+        addCheckBox(playerMenu, Options.autoRecruit, KeyEvent.VK_R);
+        addCheckBox(playerMenu, Options.autoPickRecruiter, KeyEvent.VK_P);
+        addCheckBox(playerMenu, Options.autoPickMarker, KeyEvent.VK_M);
+        addCheckBox(playerMenu, Options.autoPickEntrySide, KeyEvent.VK_E);
+        addCheckBox(playerMenu, Options.autoForcedStrike, KeyEvent.VK_K);
+        addCheckBox(playerMenu, Options.autoMasterMove, KeyEvent.VK_A);
+        addCheckBox(playerMenu, Options.autoSplit, KeyEvent.VK_S);
+        addCheckBox(playerMenu, Options.autoFlee, KeyEvent.VK_F);
+        addCheckBox(playerMenu, Options.autoStrike, KeyEvent.VK_T);
+        addCheckBox(playerMenu, Options.autoBattleMove, KeyEvent.VK_B);
         playerMenu.addSeparator();
-        addCheckBox(playerMenu, Game.autoPlay, KeyEvent.VK_U);
+        addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_U);
 
         // Then per-client GUI options
         JMenu graphicsMenu = new JMenu("Graphics");
         graphicsMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(graphicsMenu);
 
-        addCheckBox(graphicsMenu, Game.showStatusScreen, KeyEvent.VK_G);
-        addCheckBox(graphicsMenu, Game.showDice, KeyEvent.VK_D);
-        addCheckBox(graphicsMenu, Game.antialias, KeyEvent.VK_N);
+        addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
+        addCheckBox(graphicsMenu, Options.showDice, KeyEvent.VK_D);
+        addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
 
         // Debug menu
         JMenu debugMenu = new JMenu("Debug");
         debugMenu.setMnemonic(KeyEvent.VK_D);
         menuBar.add(debugMenu);
 
-        addCheckBox(debugMenu, Game.chooseMovement, KeyEvent.VK_M);
-        addCheckBox(debugMenu, Game.chooseHits, KeyEvent.VK_H);
-        addCheckBox(debugMenu, Game.chooseTowers, KeyEvent.VK_T);
+        addCheckBox(debugMenu, Options.chooseMovement, KeyEvent.VK_M);
+        addCheckBox(debugMenu, Options.chooseHits, KeyEvent.VK_H);
+        addCheckBox(debugMenu, Options.chooseTowers, KeyEvent.VK_T);
 
         // XXX Allow changing creature types
     }
@@ -571,7 +572,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
     public void twiddleOption(String name, boolean enable)
     {
         // Handle special cases.
-        if (name.equals(Game.autosave) && game.isApplet())
+        if (name.equals(Options.autosave) && game.isApplet())
         {
             enable = false;
         }
@@ -1693,7 +1694,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
             if (isPopupButton(e))
             {
                 new ShowLegion(masterFrame, legion, point,
-                    game.getOption(Game.allStacksVisible) ||
+                    game.getOption(Options.allStacksVisible) ||
                     player == game.getActivePlayer());
                 return;
             }

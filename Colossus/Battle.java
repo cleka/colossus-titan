@@ -78,7 +78,7 @@ public final class Battle
 
         setupPhase();
 
-        if (game != null && game.getOption(Game.showDice))
+        if (game != null && game.getOption(Options.showDice))
         {
             initBattleDice();
         }
@@ -317,11 +317,11 @@ public final class Battle
 
             // Automatically perform forced strikes if applicable.
             Player player = getActivePlayer();
-            if (player.getOption(Game.autoStrike))
+            if (player.getOption(Options.autoStrike))
             {
                 player.aiStrike(activeLegion, this);
             }
-            else if (player.getOption(Game.autoForcedStrike))
+            else if (player.getOption(Options.autoForcedStrike))
             {
                 makeForcedStrikes(false);
             }
@@ -403,7 +403,7 @@ public final class Battle
             // Allow recruiting a reinforcement.
             Creature recruit;
             Player player = defender.getPlayer();
-            if (player.getOption(Game.autoRecruit))
+            if (player.getOption(Options.autoRecruit))
             {
                 recruit = player.aiReinforce(defender);
             }
@@ -1268,7 +1268,7 @@ Game.logDebug("defender eliminated");
             map.unselectHexByLabel(label);
             Game.logEvent(carryDamage + (carryDamage == 1 ?
                 " carry available" : " carries available"));
-            if (game != null && game.getOption(Game.showDice))
+            if (game != null && game.getOption(Options.showDice))
             {
                 battleDice.setCarries(carryDamage);
                 battleDice.showRoll();
@@ -1906,7 +1906,7 @@ Game.logDebug("defender eliminated");
                     if (game != null)
                     {
                         Player player = getActivePlayer();
-                        if (player.getOption(Game.autoForcedStrike))
+                        if (player.getOption(Options.autoForcedStrike))
                         {
                             makeForcedStrikes(false);
                         }
@@ -1969,7 +1969,7 @@ Game.logDebug("defender eliminated");
                 {
                     Creature recruit;
                     Player player = legion.getPlayer();
-                    if (player.getOption(Game.autoRecruit))
+                    if (player.getOption(Options.autoRecruit))
                     {
                         recruit = player.aiReinforce(legion);
                     }

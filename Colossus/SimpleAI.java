@@ -53,7 +53,7 @@ class SimpleAI implements AI
         game.board.unselectAllHexes();
         game.updateStatusScreen();
     }
-    
+
 
     public Creature reinforce(Legion legion, Game game)
     {
@@ -1251,13 +1251,18 @@ class SimpleAI implements AI
             return false;
         }
     }
-    
-    
+
+
     /** Return true if legion should concede to enemy */
     public boolean concede(Legion legion, Legion enemy, Game game)
     {
         // XXX This is an even dumber placeholder.
         return false;
+    }
+
+
+    public void battleMove(Legion legion, Battle battle, Game game)
+    {
     }
 
 
@@ -1269,17 +1274,17 @@ class SimpleAI implements AI
             doOneStrike(legion, battle);
         }
     }
-    
-    
+
+
     private void doOneStrike(Legion legion, Battle battle)
     {
         // Simple one-ply group strike algorithm.
 
-        // First make forced strikes, including rangestrikes for 
+        // First make forced strikes, including rangestrikes for
         // rangestrikers with only one target.
         battle.makeForcedStrikes(true);
 
-        // Then create a map containing each target and the likely number 
+        // Then create a map containing each target and the likely number
         // of hits it would take if all possible creatures attacked it.
         HashMap map = new HashMap();
         Collection critters = battle.getCritters();
@@ -1309,7 +1314,7 @@ class SimpleAI implements AI
             }
         }
 
-        // Pick the most important target that can likely be killed this 
+        // Pick the most important target that can likely be killed this
         // turn.  If none can, pick the most important target.
         boolean canKillSomething = false;
         Critter bestTarget = null;
@@ -1348,8 +1353,8 @@ class SimpleAI implements AI
         }
         debugln("Best target is " + bestTarget.getDescription());
 
-        // XXX Best attacker algorithm should first look for 
-        // attackers with only one target.  (Even though forced 
+        // XXX Best attacker algorithm should first look for
+        // attackers with only one target.  (Even though forced
         // strikes should have already taken care of those,
         // something is broken.)
 
@@ -1378,7 +1383,7 @@ class SimpleAI implements AI
                 }
                 else
                 {
-                    if (bestAttacker == null || 
+                    if (bestAttacker == null ||
                         bestAttacker.possibleStrikePenalty(bestTarget) ||
                         getCombatValue(critter, terrain) <
                             getCombatValue(bestAttacker, terrain))
@@ -1392,7 +1397,7 @@ class SimpleAI implements AI
 
         // Having found the target and attacker, strike.
         // Take a carry penalty if there is still a 95%
-        // chance of killing this target. 
+        // chance of killing this target.
         bestAttacker.strike(bestTarget);
 
         // If there are any carries, apply them first to
@@ -1440,9 +1445,9 @@ class SimpleAI implements AI
         // If we still have a 95% chance to kill target even after
         // taking the penalty to carry to carryTarget, return true.
 
-        int dice = Math.min(critter.getDice(target), 
+        int dice = Math.min(critter.getDice(target),
             critter.getDice(carryTarget));
-        int strikeNumber = Math.max(critter.getStrikeNumber(target), 
+        int strikeNumber = Math.max(critter.getStrikeNumber(target),
             critter.getStrikeNumber(carryTarget));
         int hitsNeeded = target.getPower() - target.getHits();
         if (probabilityOfHitsOrMore(dice, strikeNumber, hitsNeeded) >= 0.95)
@@ -1475,11 +1480,11 @@ class SimpleAI implements AI
     }
 
 
-    private static double probabilityOfHits(int dice, int strikeNumber, 
+    private static double probabilityOfHits(int dice, int strikeNumber,
         int hits)
     {
         double p = (7.0 - strikeNumber) / 6.0;
-        return Math.pow(p, hits) * Math.pow(1 - p, dice - hits) * 
+        return Math.pow(p, hits) * Math.pow(1 - p, dice - hits) *
             choose(dice, hits);
     }
 
@@ -1488,26 +1493,26 @@ class SimpleAI implements AI
         int hits)
     {
         double total = 0.0;
-        for (int i = hits; i <= dice; i++) 
-        {
-            total += probabilityOfHits(dice, strikeNumber, i);
-        }
-        return total;
-    }
-    
-    
-    private static double probabilityOfHitsOrLess(int dice, int strikeNumber, 
-        int hits)
-    {
-        double total = 0.0;
-        for (int i = 0; i <= hits; i++) 
+        for (int i = hits; i <= dice; i++)
         {
             total += probabilityOfHits(dice, strikeNumber, i);
         }
         return total;
     }
 
-    
+
+    private static double probabilityOfHitsOrLess(int dice, int strikeNumber,
+        int hits)
+    {
+        double total = 0.0;
+        for (int i = 0; i <= hits; i++)
+        {
+            total += probabilityOfHits(dice, strikeNumber, i);
+        }
+        return total;
+    }
+
+
     /** Return the unrounded mean number of hits. */
     private static double averageNumberOfHits(int dice, int strikeNumber)
     {
@@ -1562,8 +1567,8 @@ class SimpleAI implements AI
         }
         return val;
     }
-    
-    
+
+
     public static int getKillValue(Creature creature, char terrain)
     {
         int val = creature.getPointValue();
@@ -1905,6 +1910,7 @@ class SimpleAI implements AI
             this.moves = moves;
         }
     }
+
 
     public static void debugln(String s)
     {

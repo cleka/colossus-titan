@@ -548,7 +548,7 @@ public final class Critter extends Creature
         options[0] = "Take Penalty";
         options[1] = "Do Not Take Penalty";
 
-        if (getPlayer().getOption(Game.autoStrike))
+        if (getPlayer().getOption(Options.autoStrike))
         {
             return getPlayer().aiChooseStrikePenalty(this, target,
                 carryTarget, battle);
@@ -775,7 +775,7 @@ public final class Critter extends Creature
         StringBuffer rollString = new StringBuffer(36);
 
         Game game = battle.getGame();
-        if (game != null && game.getOption(Game.chooseHits))
+        if (game != null && game.getOption(Options.chooseHits))
         {
             do
             {
@@ -841,7 +841,7 @@ public final class Critter extends Creature
         struck = true;
 
         // Display the rolls in the BattleDice dialog, if enabled.
-        if (game != null && game.getOption(Game.showDice))
+        if (game != null && game.getOption(Options.showDice))
         {
             BattleDice battleDice = battle.getBattleDice();
             if (battleDice != null)

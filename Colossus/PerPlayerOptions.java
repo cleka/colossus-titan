@@ -1,6 +1,6 @@
 import java.util.*;
 
-/** Class PerPlayerOptions holds a static set of per player options.
+/** Class PerPlayerOptions holds per player options.
  *  @version $Id$
  *  @author David Ripton
  */
@@ -11,16 +11,17 @@ public class PerPlayerOptions
 
     static
     {
-        set.add(Game.autoRecruit);
-        set.add(Game.autoPickRecruiter);
-        set.add(Game.autoPickMarker);
-        set.add(Game.autoPickEntrySide);
-        set.add(Game.autoForcedStrike);
-        set.add(Game.autoSplit);
-        set.add(Game.autoMasterMove);
-        set.add(Game.autoFlee);
-        set.add(Game.autoPlay);
-        set.add(Game.autoStrike);
+        set.add(Options.autoRecruit);
+        set.add(Options.autoPickRecruiter);
+        set.add(Options.autoPickMarker);
+        set.add(Options.autoPickEntrySide);
+        set.add(Options.autoForcedStrike);
+        set.add(Options.autoSplit);
+        set.add(Options.autoMasterMove);
+        set.add(Options.autoFlee);
+        set.add(Options.autoPlay);
+        set.add(Options.autoStrike);
+        set.add(Options.autoBattleMove);
     }
 
 

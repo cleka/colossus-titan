@@ -1,17 +1,12 @@
-Enable autoPickRecruit for reinforcements.
-
 Improve mapping of terrain types, creature nativity, and creature
    recruiting potential so that the AI can easily take these into
    account.
 
 AI: Consider recruit scarcity (last gargoyle more valuable than troll).  
-   Don't leave non-moved legion highlighted. Consider terrain when
-   deciding whether to fight.  Don't cheat and peek at the opposing 
-   stack unless all stacks are visible or some cheat option is set.
-   Add some value to flying and rangestrike to creature recruiting scores, 
-   or just make up a good value for each creature type.  Give some value 
-   to sitting in native terrain.  Get scrub snacks out of nearby 
-   opponents' good recruiting terrain, and into blocking positions.
+   Don't leave non-moved legion highlighted. Don't cheat and peek at the 
+   opposing stack unless all stacks are visible or some cheat option is set.
+   Give some value to sitting in native terrain.  Get scrub snacks out of 
+   nearby opponents' good recruiting terrain, and into blocking positions.
 
 Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
    bolts.
@@ -19,8 +14,6 @@ Scale Theodore S. Hetke's chits down to 60x60.  Fix text.  Add stars and
 Movement die should be displayed immediately when enabled, rather than
    waiting until the next turn, unless no movement die has been rolled
    yet.  Same for battledice.
-
-StatusScreen should be updated immediately upon a player death.
 
 Make MasterBoard and MasterHex pluggable.  Integrate David Lum's
    Java2D MasterBoard graphics as an option.
@@ -55,13 +48,8 @@ Add test main() to remaining dialogs.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 
-Add auto-BattleMap-move option.
-Add auto-strike option.
-
 Add ability to specify computer opponents in GetPlayers.  Also a
    way to pick which AI subclass each uses.
-
-Skip strikes that can't matter?
 
 Add keyboard legion selection?
 Add toolbars?

@@ -402,7 +402,7 @@ public final class Player implements Comparable
     {
         // It's a new turn, so once-per-turn things are allowed again.
 
-        if (game.getOption(Game.chooseMovement))
+        if (game.getOption(Options.chooseMovement))
         {
             movementRoll = PickRoll.pickRoll(game.getMasterFrame(),
                 "Pick movement roll");
@@ -784,7 +784,7 @@ public final class Player implements Comparable
     public boolean getOption(String optname)
     {
         // If autoPlay is set, all per-player options return true.
-        String value = options.getProperty(Game.autoPlay);
+        String value = options.getProperty(Options.autoPlay);
         if (value != null && value.equals("true"))
         {
             return true;
@@ -806,7 +806,6 @@ public final class Player implements Comparable
     public void setOption(String optname, boolean value)
     {
         options.setProperty(optname, String.valueOf(value));
-
         // TODO Add some triggers so that if autoPlay or autoSplit is set
         // during this player's split phase, the appropriate action
         // is called.
@@ -847,6 +846,7 @@ public final class Player implements Comparable
         {
             Game.logError("Couldn't read player options from " + optionsFile);
         }
+        syncCheckboxes();
     }
 
 
@@ -865,7 +865,7 @@ public final class Player implements Comparable
 
     public void aiSplit()
     {
-        if (getOption(Game.autoSplit))
+        if (getOption(Options.autoSplit))
         {
             ai.split(game);
         }
@@ -874,7 +874,7 @@ public final class Player implements Comparable
 
     public void aiMasterMove()
     {
-        if (getOption(Game.autoMasterMove))
+        if (getOption(Options.autoMasterMove))
         {
             ai.move(game);
         }
@@ -883,7 +883,7 @@ public final class Player implements Comparable
 
     public void aiRecruit()
     {
-        if (getOption(Game.autoRecruit))
+        if (getOption(Options.autoRecruit))
         {
             ai.muster(game);
         }
@@ -892,7 +892,7 @@ public final class Player implements Comparable
 
     public Creature aiReinforce(Legion legion)
     {
-        if (getOption(Game.autoRecruit))
+        if (getOption(Options.autoRecruit))
         {
             return ai.reinforce(legion, game);
         }
@@ -902,7 +902,7 @@ public final class Player implements Comparable
     
     public boolean aiFlee(Legion legion, Legion enemy)
     {
-        if (getOption(Game.autoFlee))
+        if (getOption(Options.autoFlee))
         {
             return ai.flee(legion, enemy, game);
         }
@@ -915,7 +915,7 @@ public final class Player implements Comparable
     
     public boolean aiConcede(Legion legion, Legion enemy)
     {
-        if (getOption(Game.autoFlee))
+        if (getOption(Options.autoFlee))
         {
             return ai.concede(legion, enemy, game);
         }
@@ -928,7 +928,7 @@ public final class Player implements Comparable
     
     public void aiStrike(Legion legion, Battle battle)
     {
-        if (getOption(Game.autoStrike))
+        if (getOption(Options.autoStrike))
         {
             ai.strike(legion, battle, game);
         }
@@ -938,12 +938,21 @@ public final class Player implements Comparable
     public boolean aiChooseStrikePenalty(Critter critter, Critter target,
         Critter carryTarget, Battle battle)
     {
-        if (getOption(Game.autoStrike))
+        if (getOption(Options.autoStrike))
         {
             return ai.chooseStrikePenalty(critter, target, carryTarget, 
                 battle, game);
         }
         return false;
+    }
+    
+    
+    public void aiBattleMove(Legion legion, Battle battle)
+    {
+        if (getOption(Options.autoBattleMove))
+        {
+            ai.battleMove(legion, battle, game);
+        }
     }
     
 

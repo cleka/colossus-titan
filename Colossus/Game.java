@@ -25,6 +25,7 @@ public final class Game
     private MovementDie movementDie;
     private SummonAngel summonAngel;
     private Caretaker caretaker = new Caretaker();
+    private Properties options = new Properties();
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -41,12 +42,13 @@ public final class Game
     /** log4j config file */
     public static final String logConfigFilename = "log.cfg";
 
+
     // Constants for savegames
     public static final String saveDirname = "saves";
     public static final String saveExtension = ".sav";
     public static final String saveGameVersion =
         "Colossus savegame version 5";
-
+    
     public static final String configVersion =
         "Colossus config file version 2";
 
@@ -54,37 +56,6 @@ public final class Game
     public static final String optionsPath = "Colossus";
     public static final String optionsSep = "-";
     public static final String optionsExtension = ".cfg";
-    private Properties options = new Properties();
-
-
-    // Option names
-
-    // Server options
-    public static final String autosave = "Autosave";
-    public static final String allStacksVisible = "All stacks visible";
-
-    // Debug options (server)
-    public static final String chooseMovement = "Choose movement roll";
-    public static final String chooseHits= "Choose number of hits";
-    public static final String chooseTowers = "Choose towers";
-    public static final String chooseCreatures = "Choose creatures";
-
-    // Graphics options (client)
-    public static final String showStatusScreen = "Show game status";
-    public static final String showDice = "Show dice";
-    public static final String antialias = "Antialias";
-
-    // AI options (player)
-    public static final String autoRecruit = "Auto recruit";
-    public static final String autoPickRecruiter = "Auto pick recruiter";
-    public static final String autoPickMarker = "Auto pick marker";
-    public static final String autoPickEntrySide = "Auto pick entry side";
-    public static final String autoForcedStrike = "Auto forced strike";
-    public static final String autoSplit = "Auto split";
-    public static final String autoMasterMove = "Auto masterboard move";
-    public static final String autoFlee = "Auto flee";
-    public static final String autoStrike = "Auto strike";
-    public static final String autoPlay = "Auto play";
 
 
     // log4j
@@ -230,7 +201,7 @@ public final class Game
         }
         board.loadInitialMarkerImages();
 
-        if (!isApplet && getOption(autosave))
+        if (!isApplet && getOption(Options.autosave))
         {
             saveGame();
         }
@@ -242,7 +213,7 @@ public final class Game
 
         updateStatusScreen();
 
-        if (getOption(showDice))
+        if (getOption(Options.showDice))
         {
             initMovementDie();
         }
@@ -286,7 +257,7 @@ public final class Game
             {
                 if (playerTower[i] == UNASSIGNED)
                 {
-                    if (getOption(chooseTowers))
+                    if (getOption(Options.chooseTowers))
                     {
                         Player player = getPlayer(i);
                         rolls[i] = PickRoll.pickRoll(masterFrame,
@@ -393,7 +364,7 @@ public final class Game
     }
 
 
-    private void setupDice(boolean enable)
+    public void setupDice(boolean enable)
     {
         if (enable)
         {
@@ -412,7 +383,7 @@ public final class Game
             }
             if (board != null)
             {
-                board.twiddleOption(showDice, false);
+                board.twiddleOption(Options.showDice, false);
             }
         }
     }
@@ -473,8 +444,6 @@ public final class Game
     }
 
 
-    /** Return the value of the boolean option given by name. Default
-     *  to false if there is no such option. */
     public boolean getOption(String name)
     {
         if (PerPlayerOptions.contains(name))
@@ -503,7 +472,6 @@ public final class Game
     }
 
 
-    /** Set option name to (a string version of) the given boolean value. */
     public void setOption(String name, boolean value)
     {
         if (PerPlayerOptions.contains(name))
@@ -515,18 +483,88 @@ public final class Game
         options.setProperty(name, String.valueOf(value));
 
         // Side effects
-        if (name.equals(showStatusScreen))
+        if (name.equals(Options.showStatusScreen))
         {
             updateStatusScreen();
         }
-        else if (name.equals(antialias))
+        else if (name.equals(Options.antialias))
         {
             Hex.setAntialias(value);
             repaintAllWindows();
         }
-        else if (name.equals(showDice))
+        else if (name.equals(Options.showDice))
         {
             setupDice(value);
+        }
+    }
+
+
+    // XXX Use separate files and methods for client and server options.
+
+    /** Save game options to a file.  The current format is standard
+     *  java.util.Properties keyword=value. */
+    public void saveOptions()
+    {
+        final String optionsFile = optionsPath + optionsExtension;
+        try
+        {
+            FileOutputStream out = new FileOutputStream(optionsFile);
+            options.store(out, configVersion);
+            out.close();
+        }
+        catch (IOException e)
+        {
+            logError("Couldn't write options to " + optionsFile);
+        }
+
+        // Save options for each player
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            player.saveOptions();
+        }
+    }
+
+
+    /** Load game options from a file. The current format is standard
+     *  java.util.Properties keyword=value */
+    public void loadOptions()
+    {
+        final String optionsFile = optionsPath + optionsExtension;
+        try
+        {
+            FileInputStream in = new FileInputStream(optionsFile);
+            options.load(in);
+        }
+        catch (IOException e)
+        {
+            logError("Couldn't read game options from " + optionsFile);
+            return;
+        }
+
+        syncCheckboxes();
+
+        // Load options for each player
+        Collection players = getPlayers();
+        Iterator it = players.iterator();
+        while (it.hasNext())
+        {
+            Player player = (Player)it.next();
+            player.loadOptions();
+        }
+        getActivePlayer().syncCheckboxes();
+    }
+
+
+    public void syncCheckboxes()
+    {
+        Enumeration en = options.propertyNames();
+        while (en.hasMoreElements())
+        {
+            String name = (String)en.nextElement();
+            boolean value = getOption(name);
+            board.twiddleOption(name, value);
         }
     }
 
@@ -716,7 +754,7 @@ public final class Game
 
             player.syncCheckboxes();
             updateStatusScreen();
-            if (!isApplet && getOption(autosave))
+            if (!isApplet && getOption(Options.autosave))
             {
                 saveGame();
             }
@@ -726,7 +764,7 @@ public final class Game
 
     public void updateStatusScreen()
     {
-        if (getOption(showStatusScreen))
+        if (getOption(Options.showStatusScreen))
         {
             if (statusScreen != null)
             {
@@ -739,7 +777,7 @@ public final class Game
         }
         else
         {
-            board.twiddleOption(showStatusScreen, false);
+            board.twiddleOption(Options.showStatusScreen, false);
             if (statusScreen != null)
             {
                 statusScreen.dispose();
@@ -1012,6 +1050,13 @@ public final class Game
                 logError("Can't load this savegame version.");
                 dispose();
             }
+            // Get rid of the status screen, so that we can create
+            // a new one with the appropriate number of players.
+            if (statusScreen != null)
+            {
+                statusScreen.dispose();
+                statusScreen = null;
+            }
 
             buf = in.readLine();
             int numPlayers = Integer.parseInt(buf);
@@ -1156,7 +1201,7 @@ public final class Game
 
             loadOptions();
 
-            if (getOption(showDice))
+            if (getOption(Options.showDice))
             {
                 initMovementDie();
                 Player player = getActivePlayer();
@@ -1172,6 +1217,9 @@ public final class Game
             setupPhase();
             board.setVisible(true);
             board.repaint();
+
+            // Setup status screen
+            updateStatusScreen();
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -1319,75 +1367,6 @@ public final class Game
 
         return (String)Collections.max(Arrays.asList(filenames), new
             StringNumComparator());
-    }
-
-
-    // XXX Use separate files and methods for client and server options.
-
-    /** Save game options to a file.  The current format is standard
-     *  java.util.Properties keyword=value. */
-    public void saveOptions()
-    {
-        final String optionsFile = optionsPath + optionsExtension;
-        try
-        {
-            FileOutputStream out = new FileOutputStream(optionsFile);
-            options.store(out, configVersion);
-            out.close();
-        }
-        catch (IOException e)
-        {
-            logError("Couldn't write options to " + optionsFile);
-        }
-
-        // Save options for each player
-        Iterator it = players.iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            player.saveOptions();
-        }
-    }
-
-
-    /** Load game options from a file. The current format is standard
-     *  java.util.Properties keyword=value */
-    public void loadOptions()
-    {
-        final String optionsFile = optionsPath + optionsExtension;
-        try
-        {
-            FileInputStream in = new FileInputStream(optionsFile);
-            options.load(in);
-        }
-        catch (IOException e)
-        {
-            logError("Couldn't read game options from " + optionsFile);
-            return;
-        }
-
-        syncCheckboxes();
-
-        // Load options for each player
-        Iterator it = players.iterator();
-        while (it.hasNext())
-        {
-            Player player = (Player)it.next();
-            player.loadOptions();
-        }
-        getActivePlayer().syncCheckboxes();
-    }
-
-
-    public void syncCheckboxes()
-    {
-        Enumeration en = options.propertyNames();
-        while (en.hasMoreElements())
-        {
-            String name = (String)en.nextElement();
-            boolean value = getOption(name);
-            board.twiddleOption(name, value);
-        }
     }
 
 
@@ -2122,7 +2101,7 @@ public final class Game
      *  already visible. */
     private boolean allRecruitersVisible(Legion legion, ArrayList recruiters)
     {
-        if (getOption(allStacksVisible))
+        if (getOption(Options.allStacksVisible))
         {
             return true;
         }
@@ -2164,7 +2143,7 @@ public final class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (player.getOption(autoPickRecruiter) ||
+        else if (player.getOption(Options.autoPickRecruiter) ||
             numEligibleRecruiters == 1 ||
             allRecruitersVisible(legion, recruiters))
         {
@@ -2313,7 +2292,7 @@ public final class Game
     {
         String name = player.getName();
         String selectedMarkerId;
-        if (player.getOption(autoPickMarker))
+        if (player.getOption(Options.autoPickMarker))
         {
             selectedMarkerId = player.getFirstAvailableMarker();
         }
@@ -2521,7 +2500,6 @@ public final class Game
         return listMoves(legion, teleport, legion.getCurrentHex(),
              legion.getPlayer().getMovementRoll());
     }
-
 
 
     /** Return set of hex labels where this legion can move.
@@ -2782,8 +2760,7 @@ public final class Game
         // Need a legion marker to split.
         if (player.getNumMarkersAvailable() == 0)
         {
-            JOptionPane.showMessageDialog(board,
-                "No markers are available.");
+            JOptionPane.showMessageDialog(board, "No markers are available.");
             return false;
         }
         // A legion must be at least 4 high to split.
@@ -2801,21 +2778,24 @@ public final class Game
             return false;
         }
 
+        int oldHeight = legion.getHeight();
+
         SplitLegion.splitLegion(masterFrame, legion,
-            player.getOption(autoPickMarker));
+            player.getOption(Options.autoPickMarker));
+
+        int newHeight = legion.getHeight();
 
         updateStatusScreen();
 
         // If we split, unselect this hex.
         MasterHex hex = legion.getCurrentHex();
-        if (legion.getHeight() < 7)
+        if (newHeight < 7)
         {
             board.unselectHexByLabel(hex.getLabel());
         }
         hex.repaint();
 
-        // XXX only return true if we actually split.
-        return true;
+        return (newHeight < oldHeight);
     }
 
 
@@ -2877,97 +2857,7 @@ public final class Game
             // has not yet moved, and this hex is a legal
             // destination, move the legion here.
             case Game.MOVE:
-                Legion legion = player.getMover();
-                // Verify that the move is legal, rather than trusting
-                // hex.isSelected().
-                if (legion != null && listMoves(legion, true).contains(
-                    hex.getLabel()))
-                {
-                    // Pick teleport or normal move if necessary.
-                    if (hex.getTeleported() && hex.canEnterViaLand())
-                    {
-                        boolean answer;
-                        if (player.getOption(autoPickEntrySide))
-                        {
-                            // Always choose to move normally rather
-                            // than teleport if auto-picking entry sides.
-                            answer = false;
-                        }
-                        else
-                        {
-                            answer = chooseWhetherToTeleport(hex);
-                        }
-                        hex.setTeleported(answer);
-                    }
-
-                    // If this is a tower hex, set the entry side
-                    // to '3', regardless.
-                    if (hex.getTerrain() == 'T')
-                    {
-                        hex.clearAllEntrySides();
-                        hex.setEntrySide(3);
-                    }
-                    // If this is a teleport to a non-tower hex,
-                    // then allow entry from all three sides.
-                    else if (hex.getTeleported())
-                    {
-                        hex.setEntrySide(1);
-                        hex.setEntrySide(3);
-                        hex.setEntrySide(5);
-                    }
-
-                    // Pick entry side if hex is enemy-occupied
-                    // and there is more than one possibility.
-                    if (hex.isOccupied() && hex.getNumEntrySides() > 1)
-                    {
-                        int side;
-                        if (player.getOption(autoPickEntrySide))
-                        {
-                            side = hex.getEntrySide();
-                        }
-                        else
-                        {
-                            side = PickEntrySide.pickEntrySide(masterFrame,
-                                hex);
-                        }
-                        hex.clearAllEntrySides();
-                        if (side == 1 || side == 3 || side == 5)
-                        {
-                            hex.setEntrySide(side);
-                        }
-                    }
-
-                    // Unless a PickEntrySide was cancelled or
-                    // disallowed, execute the move.
-                    if (!hex.isOccupied() || hex.getNumEntrySides() == 1)
-                    {
-                        // If the legion teleported, reveal a lord.
-                        if (hex.getTeleported())
-                        {
-                            // If it was a Titan teleport, that
-                            // lord must be the titan.
-                            if (hex.isOccupied())
-                            {
-                                legion.revealCreatures(Creature.titan, 1);
-                            }
-                            else
-                            {
-                                legion.revealTeleportingLord(masterFrame,
-                                    getOption(allStacksVisible));
-                            }
-                        }
-
-                        legion.moveToHex(hex);
-                        legion.getStartingHex().repaint();
-                        hex.repaint();
-                    }
-
-                    highlightUnmovedLegions();
-                }
-                else
-                {
-                    actOnMisclick();
-                }
+                doMove(hex, player, player.getMover());
                 break;
 
             // If we're fighting and there is an engagement here,
@@ -2983,7 +2873,101 @@ public final class Game
     }
 
 
-    public void doFight(MasterHex hex, Player player)
+    private void doMove(MasterHex hex, Player player, Legion legion)
+    {
+        // Verify that the move is legal, rather than trusting
+        // hex.isSelected().
+        if (legion != null && listMoves(legion, true).contains(hex.getLabel()))
+        {
+            // Pick teleport or normal move if necessary.
+            if (hex.getTeleported() && hex.canEnterViaLand())
+            {
+                boolean answer;
+                if (player.getOption(Options.autoPickEntrySide))
+                {
+                    // Always choose to move normally rather
+                    // than teleport if auto-picking entry sides.
+                    answer = false;
+                }
+                else
+                {
+                    answer = chooseWhetherToTeleport(hex);
+                }
+                hex.setTeleported(answer);
+            }
+
+            // If this is a tower hex, set the entry side
+            // to '3', regardless.
+            if (hex.getTerrain() == 'T')
+            {
+                hex.clearAllEntrySides();
+                hex.setEntrySide(3);
+            }
+            // If this is a teleport to a non-tower hex,
+            // then allow entry from all three sides.
+            else if (hex.getTeleported())
+            {
+                hex.setEntrySide(1);
+                hex.setEntrySide(3);
+                hex.setEntrySide(5);
+            }
+
+            // Pick entry side if hex is enemy-occupied
+            // and there is more than one possibility.
+            if (hex.isOccupied() && hex.getNumEntrySides() > 1)
+            {
+                int side;
+                if (player.getOption(Options.autoPickEntrySide))
+                {
+                    side = hex.getEntrySide();
+                }
+                else
+                {
+                    side = PickEntrySide.pickEntrySide(masterFrame,
+                        hex);
+                }
+                hex.clearAllEntrySides();
+                if (side == 1 || side == 3 || side == 5)
+                {
+                    hex.setEntrySide(side);
+                }
+            }
+
+            // Unless a PickEntrySide was cancelled or
+            // disallowed, execute the move.
+            if (!hex.isOccupied() || hex.getNumEntrySides() == 1)
+            {
+                // If the legion teleported, reveal a lord.
+                if (hex.getTeleported())
+                {
+                    // If it was a Titan teleport, that
+                    // lord must be the titan.
+                    if (hex.isOccupied())
+                    {
+                        legion.revealCreatures(Creature.titan, 1);
+                    }
+                    else
+                    {
+                        legion.revealTeleportingLord(masterFrame,
+                            getOption(Options.allStacksVisible));
+                    }
+                }
+
+                legion.moveToHex(hex);
+                legion.getStartingHex().repaint();
+                hex.repaint();
+            }
+
+            highlightUnmovedLegions();
+        }
+        else
+        {
+            actOnMisclick();
+        }
+    }
+
+
+    private void doFight(MasterHex hex, Player player)
     {
         if (summonAngel != null)
         {
@@ -3011,8 +2995,8 @@ public final class Game
                 // Fleeing gives half points and denies the
                 // attacker the chance to summon an angel.
 
-                boolean flees; 
-                if (defender.getPlayer().getOption(autoFlee))
+                boolean flees;
+                if (defender.getPlayer().getOption(Options.autoFlee))
                 {
                     flees = defender.getPlayer().aiFlee(defender, attacker);
                 }
@@ -3030,7 +3014,7 @@ public final class Game
             // The attacker may concede now without
             // allowing the defender a reinforcement.
             boolean concedes;
-            if (attacker.getPlayer().getOption(autoFlee))
+            if (attacker.getPlayer().getOption(Options.autoFlee))
             {
                 concedes = attacker.getPlayer().aiConcede(defender, attacker);
             }

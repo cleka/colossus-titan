@@ -11,8 +11,8 @@ Win98 1.3: setLocation() to keep ShowLegion, ShowMasterHex
    resolution is changed while the application is running.  Works
    fine on other jdks, Solaris, Linux.
 
-Solaris 1.3; Linux 1.3: JPopupMenu mnemonics don't
-   work.  They work okay in Win98 1.3.
+Solaris 1.3; Linux 1.3: JPopupMenu mnemonics don't work.  They work okay 
+   in Win98 1.3.
 
 Win98 1.3: Popup menus are not erased properly.  They erase fine
    in Linux and Solaris 1.3.
@@ -112,17 +112,3 @@ java.lang.NullPointerException
 Solaris, 1.3: Dead titan, but player keeps going.  Need to check
    for player death more often to work around this bug?  (Seen
    multiple times, but can't reproduce at will.)
-
-Solaris, 1.3.1: Start a game with fewer players.  Load a game
-   with more players.  Need to re-init status screen on load.
-   Exception occurred during event dispatching:
-java.lang.ArrayIndexOutOfBoundsException
-        at StatusScreen.setPlayerLabelBackground(StatusScreen.java:173)
-        at StatusScreen.updateStatusScreen(StatusScreen.java:206)
-        at Game.updateStatusScreen(Game.java:732)
-        at Game.advanceTurn(Game.java:717)
-        at Game.advancePhase(Game.java:595)
-
-Solaris, 1.3.1: Battle.findStrikes() seems to sometimes miss some
-   strikes, causing the AI to not strike when it should.
-
