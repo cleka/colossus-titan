@@ -1568,11 +1568,17 @@ class MasterBoard extends Frame implements MouseListener,
                                 if (hex.isOccupied() &&
                                     hex.getNumEntrySides() > 1)
                                 {
-                                    new PickEntrySide(this, hex);
+                                    // Only allow one PickEntrySide dialog.
+                                    if (!dialogLock)
+                                    {
+                                        dialogLock = true;
+                                        new PickEntrySide(this, hex);
+                                        dialogLock = false;
+                                    }
                                 }
 
-                                // Unless the PickEntrySide was cancelled,
-                                // execute the move.
+                                // Unless a PickEntrySide was cancelled or
+                                // disallowed, execute the move.
                                 if (!hex.isOccupied() ||
                                     hex.getNumEntrySides() == 1)
                                 {

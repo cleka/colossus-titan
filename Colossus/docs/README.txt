@@ -245,7 +245,7 @@ user interface for this eventually.
 
 Credits:
 
-Programming:  David Ripton  dripton@netcom.com (Put "Colossus" in subject.)
+Programming:  David Ripton  dripton@wizard.net
               David Barr
 Counter art:  Tchula Ripton
 Bug reports:  Anthony Kam, Bruce Sherrod, Augustin Ku, David Barr, 

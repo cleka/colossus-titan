@@ -212,12 +212,13 @@ class ShowDice extends Dialog implements WindowListener
         // If the dialog is moving off the right edge of the screen,
         // move it left until it fits.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        location = getLocation();
         int adj = location.x + getSize().width - d.width;
         if (adj > 0)
         {
             location.x -= adj;
+            setLocation(location);
         }
-        setLocation(location);
         setVisible(true);
         setEnabled(true);
 

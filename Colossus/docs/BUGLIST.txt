@@ -31,6 +31,18 @@ Red Hat 6.1, ibmjdk118: Occasional SIGSEGV javacore in SplitLegion, with
    native threads on.  Green threads seem okay.  Occasional SIGSEGV 
    javacore in PickRecruit, even with green threads.
 
+Red Hat 6.1, Sun 1.2.2, Blackdown 1.2.2RC4: ShowDice dialog sometimes 
+   moves from upper right corner to upper left corner.  ShowLegion
+   dialog sometimes pops up in upper left corner instead of over
+   mouse position.  These problems don't happen with ibmjdk118.
+
+Win98, JDK1.3rc1: setLocation() to keep ShowLegion, ShowMasterHex
+   dialogs from displaying past the bottom or right edge of the
+   screen isn't working.  Works fine on other JDKs, so this looks
+   like a bug with rc1.
+
+Win98, JDK1.3rc1: Tried to strike own creature.
+
 
 Current programming bugs:
 
@@ -60,3 +72,9 @@ Solaris: Makefile no longer works.  Target "classes" isn't working
 Netscape 4.7: Applet does not stop when game is over.  AppletButton 
    does not allow starting another game when game is over.
 
+Linux, ibmjdk118: Drift damage was not applied to a cyclops.
+
+Linux, ibmjdk118: Legion with angel in tower did not immediately
+   have tower teleport moves highlighted, as if player had already
+   teleported.  "Undo All Moves" fixed the problem.
+   

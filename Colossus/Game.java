@@ -51,7 +51,7 @@ public class Game
         // Renumber players in descending tower order.
         sortPlayers();
 
-        for (int i = 0; i < numPlayers; i++)
+        for (int i = numPlayers - 1; i >= 0; i--)
         {
             new PickColor(frame, this, i);
             players[i].initMarkersAvailable();
