@@ -448,8 +448,11 @@ class Legion
             numberToReveal -= excess;
         }
 
-        for (int i = numVisibleCreatures; i < numVisibleCreatures + 
-            numberToReveal; i++)
+        // Added a hard bounds check here after getting an
+        // ArrayIndexOutOfBoundsException when called from
+        // AcquireAngel
+        for (int i = numVisibleCreatures; i < 7 && i < 
+            numVisibleCreatures + numberToReveal; i++)
         {
             visibleCreatures[i] = creature;
         }
