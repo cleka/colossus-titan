@@ -106,6 +106,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
             JLabel label = (JLabel)entry.getValue();
             int count = client.getCreatureCount(name);
             int maxcount = client.getCreatureMaxCount(name);
+            int deadCount = client.getCreatureDeadCount(name);
             String color;
             if (count == 0)
             {
@@ -124,8 +125,16 @@ class CreatureCollectionView extends KDialog implements WindowListener
             String htmlTotalCount =
                 htmlColorizeOnly(Integer.toString(maxcount),
                                  "blue");
+            String htmlDeadCount =
+                htmlColorizeOnly(
+                             Creature.getCreatureByName(name).isImmortal() ?
+                             "X" :
+                             Integer.toString(deadCount),
+                             "yellow");
             String htmlSlash = htmlColorizeOnly(" / ", "black");
-            label.setText(htmlizeOnly(htmlCount + htmlSlash + htmlTotalCount));
+            label.setText(htmlizeOnly(htmlCount + htmlSlash +
+                                      htmlDeadCount + htmlSlash +
+                                      htmlTotalCount));
         }
 
         repaint();

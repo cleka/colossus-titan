@@ -26,6 +26,7 @@ import net.sf.colossus.parser.TerrainRecruitLoader;
  *  Server via the network protocol.  There is one client per player.
  *  @version $Id$
  *  @author David Ripton
+ *  @author Romain Dolbeau
  */
 
 
@@ -109,7 +110,9 @@ public final class Client implements IClient
     /** Map of creature name to Integer count.  As in Caretaker, if an entry
      *  is missing then we assume it is set to the maximum. */
     private Map creatureCounts = new HashMap();
-
+    /** Map of creature name to Integer count.  As in Caretaker, if an entry
+     *  is missing then we assume it is set to 0. */
+    private Map creatureDeadCounts = new HashMap();
 
     private int turnNumber = -1;
     private String activePlayerName = "";
@@ -704,11 +707,12 @@ public final class Client implements IClient
     }
 
 
-    public void updateCreatureCount(String creatureName, int count)
+    public void updateCreatureCount(String creatureName, int count, int deadCount)
     {
         if (creatureName != null)
         {
             creatureCounts.put(creatureName, new Integer(count));
+            creatureDeadCounts.put(creatureName, new Integer(deadCount));
         }
         updateCreatureCountDisplay();
     }
@@ -2840,6 +2844,21 @@ Log.debug(playerName + " Client.setupBattleFight()");
     int getCreatureCount(Creature creature)
     {
         return getCreatureCount(creature.getName());
+    }
+
+    int getCreatureDeadCount(String creatureName)
+    {
+        Integer count = (Integer)creatureDeadCounts.get(creatureName);
+        if (count == null)
+        {
+            return 0;
+        }
+        return count.intValue();
+    }
+
+    int getCreatureDeadCount(Creature creature)
+    {
+        return getCreatureDeadCount(creature.getName());
     }
 
     int getCreatureMaxCount(String creatureName)

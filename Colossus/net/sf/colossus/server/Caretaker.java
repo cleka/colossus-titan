@@ -8,25 +8,26 @@ import net.sf.colossus.util.Log;
 
 /**
  *
- * Class Caretaker represents the caretaker's stacks
- *
- * <P><B>TODO: </B>We should also have a graveyard -- it serves
- * no game purpose, but it is cool. Unfortunately there are several
- * ways that characters can die, not all are accounted for
+ * Class Caretaker represents the caretaker's stacks.
+ * It also contains the (preliminary) Graveyard.
  *
  * @version $Id$
  * @author Bruce Sherrod
  * @author David Ripton
  * @author Tom Fruchterman
+ * @author Romain Dolbeau
  */
 
 
 final class Caretaker implements Cloneable
 {
-    /** Mapping from String creature name to Integer count.  If the
+    /** Mapping from String creature name to Integer count. If the
      *  creature is not found, assume that we have a full count (equal
      *  to Creature.getMaxCount()) */
     private HashMap map = new HashMap();
+    /** Mapping from String creature name to Integer count. If the
+     *  creature is not found, assume that we have a 0 count */
+    private HashMap deadMap = new HashMap();
     private Game game;
 
 
@@ -51,6 +52,21 @@ final class Caretaker implements Cloneable
         return getCount(creature.getName());
     }
 
+    int getDeadCount(String creatureName)
+    {
+        Integer count = (Integer)deadMap.get(creatureName);
+        if (count == null)
+        {
+            return (0);
+        }
+        return count.intValue();
+    }
+
+    int getDeadCount(Creature creature)
+    {
+        return getDeadCount(creature.getName());
+    }
+
     void setCount(String creatureName, int count)
     {
         map.put(creatureName, new Integer(count)); 
@@ -64,7 +80,8 @@ final class Caretaker implements Cloneable
 
     void resetAllCounts()
     {
-        map.clear(); 
+        map.clear();
+        deadMap.clear();
         fullySyncDisplays();
     }
 
@@ -105,6 +122,17 @@ final class Caretaker implements Cloneable
         updateDisplays(creature.getName());
     }
 
+    void putDeadOne(Creature creature)
+    {
+        Integer count = (Integer)deadMap.get(creature.getName());
+        if (count == null)
+        {
+            count = new Integer(0);
+        }
+        deadMap.put(creature.getName(), new Integer(count.intValue() + 1));
+        updateDisplays(creature.getName());
+    }
+
     /** Update creatureName's count on all clients. */
     private void updateDisplays(String creatureName)
     {
@@ -114,7 +142,8 @@ final class Caretaker implements Cloneable
             if (creatureName != null)
             {
                 server.allUpdateCreatureCount(creatureName, 
-                    getCount(creatureName));
+                    getCount(creatureName),
+                    getDeadCount(creatureName));
             }
         }
     }

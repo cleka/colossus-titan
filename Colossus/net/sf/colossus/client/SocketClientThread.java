@@ -130,7 +130,8 @@ Log.debug("End of SocketClientThread while loop");
         {
             String creatureName = (String)args.remove(0);
             int count = Integer.parseInt((String)args.remove(0));
-            client.updateCreatureCount(creatureName, count);
+            int deadCount = Integer.parseInt((String)args.remove(0));
+            client.updateCreatureCount(creatureName, count, deadCount);
         }
         else if (method.equals(Constants.dispose))
         {

@@ -589,7 +589,8 @@ public final class Legion implements Comparable
         if (getHeight() > 0)
         {
             log.append("[");
-            // Return lords and demi-lords to the stacks.
+            // Return lords and demi-lords to the stacks,
+            // others to the Graveyard
             Iterator it = critters.iterator();
             while (it.hasNext())
             {
@@ -602,6 +603,10 @@ public final class Legion implements Comparable
                 if (critter.isImmortal())
                 {
                     game.getCaretaker().putOneBack(critter);
+                }
+                else
+                {
+                    game.getCaretaker().putDeadOne(critter);
                 }
             }
             log.append("] ");
@@ -810,7 +815,7 @@ public final class Legion implements Comparable
 
     /** Remove the creature in position i in the legion.  Return the
         removed creature. Put immortal creatures back on the stack
-        if returnImmortalToStack is true. */
+        and others to the Graveyard if returnImmortalToStack is true. */
     Creature removeCreature(int i, boolean returnImmortalToStack,
         boolean disbandIfEmpty)
     {
@@ -822,6 +827,10 @@ public final class Legion implements Comparable
             if(critter.isImmortal())
             {
                 game.getCaretaker().putOneBack(critter);
+            }
+            else
+            {
+                game.getCaretaker().putDeadOne(critter);
             }
         }
 
@@ -866,12 +875,17 @@ public final class Legion implements Comparable
         {
             return null;
         }
-        // If the creature is a lord or demi-lord, put it back in the stacks.
+        // If the creature is a lord or demi-lord, put it back in the stacks,
+        // else put it in the Graveyard
         if (returnImmortalToStack)
         {
             if(critter.isImmortal())
             {
                 game.getCaretaker().putOneBack(critter);
+            }
+            else
+            {
+                game.getCaretaker().putDeadOne(critter);
             }
         }
         return critter;

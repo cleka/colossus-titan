@@ -252,13 +252,13 @@ Log.debug("Called Server.addClient() for " + playerName);
         }
     }
 
-    void allUpdateCreatureCount(String creatureName, int count)
+    void allUpdateCreatureCount(String creatureName, int count, int deadCount)
     {
         Iterator it = clients.iterator();
         while (it.hasNext())
         {
             IClient client = (IClient)it.next();
-            client.updateCreatureCount(creatureName, count);
+            client.updateCreatureCount(creatureName, count, deadCount);
         }
     }
 

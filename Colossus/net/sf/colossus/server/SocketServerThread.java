@@ -336,10 +336,10 @@ final class SocketServerThread extends Thread implements IClient
         out.println(Constants.setColor + sep + color);
     }
 
-    public void updateCreatureCount(String creatureName, int count)
+    public void updateCreatureCount(String creatureName, int count, int deadCount)
     {
         out.println(Constants.updateCreatureCount + sep + creatureName + sep +
-            count);
+            count + sep + deadCount);
     }
 
     public void dispose()
