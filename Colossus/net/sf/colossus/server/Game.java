@@ -1091,7 +1091,7 @@ public final class Game
             file = new File(Constants.saveDirname +
                         latestSaveFilename(filenames));
         }
-        else if (filename.indexOf("/") >= 0)
+        else if (filename.indexOf("/") >= 0 || filename.indexOf("\\") >= 0)
         {
             // Already a full path
             file = new File(filename);
