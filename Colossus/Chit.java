@@ -35,7 +35,7 @@ public class Chit extends JPanel
     // XXX Is there a way to detect whether a program is running from a
     // jar file?
     public static final String pathSeparator = "/";
-    public static final String imageDirName = "images";
+    public static String imageDirName = "images";
     public static final String imageExtension = ".gif";
     public static final String invertedPrefix = "i_";
 
@@ -191,6 +191,12 @@ public class Chit extends JPanel
 
     public static void main(String [] args)
     {
+        // Allow showing chits in a different directory.
+        if (args.length > 0)
+        {
+            imageDirName = args[0];
+        }
+
         JFrame frame = new JFrame("testing Chit");
         Container contentPane = frame.getContentPane();
         int scale = 60;

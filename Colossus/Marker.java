@@ -81,6 +81,10 @@ public final class Marker extends Chit
 
         // Restore the font.
         g.setFont(oldFont);
+
+        // Draw a one-pixel-wide black border around the outside
+        // edge of the marker.
+        g.drawRect(rect.x, rect.y, rect.width, rect.height);
     }
 
 

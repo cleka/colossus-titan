@@ -302,12 +302,6 @@ public final class Legion
     }
 
 
-    public String getName()
-    {
-        return markerId;
-    }
-
-
     public String getImageName()
     {
         return markerId;
@@ -413,11 +407,11 @@ public final class Legion
         currentHex.removeLegion(this);
 
         StringBuffer log = new StringBuffer("Legion ");
-        log.append(getName());
+        log.append(getLongMarkerName());
         log.append(" ");
         if (getHeight() > 0)
         {
-            log.append("(");
+            log.append("[");
             // Return lords and demi-lords to the stacks.
             Iterator it = critters.iterator();
             while (it.hasNext())
@@ -433,7 +427,7 @@ public final class Legion
                     critter.putOneBack();
                 }
             }
-            log.append(") ");
+            log.append("] ");
         }
         log.append("is eliminated");
         Game.logEvent(log.toString());
