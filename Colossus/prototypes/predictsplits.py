@@ -33,6 +33,9 @@ def superset(big, little):
     return True
 
 def subtractLists(big, little):
+    """Return the elements of big, minus the elements of little.  If big
+       is not a superset of little, raise an exception.
+    """
     assert superset(big, little)
     li = big[:]
     for el in little:
@@ -71,16 +74,14 @@ def removeLastUncertainCreature(li):
 def minCount(lili, name):
     """lili is a list of lists.  Return the minimum number of times
        name appears in any of the lists contained in lili."""
-    min_ = sys.maxint
-    for li in lili:
-        min_ = min(li.count(name), min_)
-    # If we never saw it, reduce to zero
-    if min_ == sys.maxint:
-        min_ = 0
-    return min_
+    return min([li.count(name) for li in lili])
 
+def maxCount(lili, name):
+    """lili is a list of lists.  Return the maximum number of times
+       name appears in any of the lists contained in lili."""
+    return max([li.count(name) for li in lili])
 
-class Perms:
+class Perms(object):
     """Based on Gagan Saksena's code in online Python cookbook
        Not reentrant or thread-safe."""
     def __init__(self):
@@ -115,7 +116,7 @@ class Perms:
             alist.insert(i, blist.pop())
 
 
-class CreatureInfo:
+class CreatureInfo(object):
     def __init__(self, name, certain, atSplit):
         self.name = name
         self.certain = certain
@@ -141,7 +142,7 @@ class CreatureInfo:
         return self.name
 
 
-class Node:
+class Node(object):
     def __init__(self, markerId, turnCreated, creatures, parent):
         self.markerId = markerId        # Not unique!
         self.turnCreated = turnCreated
@@ -176,6 +177,14 @@ class Node:
     def getCertainCreatures(self):
         """Return list of CreatureInfo where certain is true."""
         return [ci for ci in self.creatures if ci.certain]
+
+    def numCertainCreatures(self):
+        """Return number of certain creatures."""
+        return len(self.getCertainCreatures())
+
+    def numUncertainCreatures(self):
+        """Return number of uncertain creatures."""
+        return self.getHeight() - self.numCertainCreatures()
 
     def allCertain(self):
         """Return True if all creatures are certain."""
@@ -398,7 +407,9 @@ class Node:
             knownKeep = []
             knownSplit = []
         knownCombo = knownKeep + knownSplit
+        all = getCreatureNames(self.creatures)
         certain = getCreatureNames(self.getCertainCreatures())
+        uncertain = subtractLists(all, certain)
         if not superset(certain, knownCombo):
             # We need to abort this split and trust that it will be redone
             # after the certainty information percolates up to the parent.
@@ -408,24 +419,38 @@ class Node:
           knownSplit)
         splitoffNames = self._chooseCreaturesToSplitOut(possibleSplits)
 
-        posSplitNames = []
-        posKeepNames = []
+        possibleKeeps = []
         for names in possibleSplits:
-            if superset(certain, names):
-                posKeepNames.append(subtractLists(certain, names))
-                posSplitNames.append(names)
+            possibleKeeps.append(subtractLists(all, names))
 
-        knownKeep = []
-        knownSplit = []
+        knownKeep2 = []
+        knownSplit2 = []
         for name in certain:
-            if not name in knownKeep:
-                minKeep = minCount(posKeepNames, name)
+            if not name in knownKeep2:
+                minKeep = minCount(possibleKeeps, name) - uncertain.count(name)
                 for unused in range(minKeep):
-                    knownKeep.append(name)
-            if not name in knownSplit:
-                minSplit = minCount(posSplitNames, name)
+                    knownKeep2.append(name)
+            if not name in knownSplit2:
+                minSplit = minCount(possibleSplits, name) - uncertain.count(
+                  name)
                 for unused in range(minSplit):
-                    knownSplit.append(name)
+                    knownSplit2.append(name)
+
+        knownKeep3 = []
+        knownSplit3 = []
+        for name in all:
+            if not name in knownKeep3:
+                minKeep = maxCount([knownKeep, knownKeep2], name)
+                for unused in range(minKeep):
+                    knownKeep3.append(name)
+            if not name in knownSplit3:
+                minSplit = maxCount([knownSplit, knownSplit2], name)
+                for unused in range(minSplit):
+                    knownSplit3.append(name)
+
+        knownKeep = knownKeep3
+        knownSplit = knownSplit3
+
 
         def _inherit_parent_certainty(certain, known, other):
             """If one of the child legions is fully known, assign the 
@@ -461,7 +486,7 @@ class Node:
                     newinfo.certain = True
             else:
                 strongList.append(newinfo)
-                # If in knownKeepNames, set certain
+                # If in knownKeep, set certain
                 if name in knownKeep:
                     knownKeep.remove(name)
                     newinfo.certain = True
@@ -527,7 +552,7 @@ class Node:
             self.removeCreature(name)
 
 
-class PredictSplits:
+class PredictSplits(object):
     def __init__(self, playerName, rootId, creatureNames):
         self.playerName = playerName
         # All creatures in root legion must be known
@@ -535,21 +560,25 @@ class PredictSplits:
         infoList = [CreatureInfo(name, True, True) for name in creatureNames]
         self.root = Node(rootId, 0, infoList, None)
 
-    def getNodes(self, node):
-        """Return all nodes in tree."""
-        nodes = [node]
-        for child in node.getChildren():
+    def getNodes(self, root=None):
+        """Return all nodes in subtree starting from root."""
+        if root is None:
+            root = self.root
+        nodes = [root]
+        for child in root.getChildren():
             nodes += self.getNodes(child)
         return nodes
 
-    def getLeaves(self, node):
-        """Return all non-empty childless nodes in tree."""
+    def getLeaves(self, root=None):
+        """Return all non-empty childless nodes in subtree starting from root."""
+        if root is None:
+            root = self.root
         leaves = []
-        if not node.hasSplit():
-            if node.getHeight() > 0:
-                leaves.append(node)
+        if not root.hasSplit():
+            if root.getHeight() > 0:
+                leaves.append(root)
         else:
-            for child in node.getChildren():
+            for child in root.getChildren():
                 leaves += self.getLeaves(child)
 
         # If duplicate markerIds, prune the older node.
@@ -569,26 +598,37 @@ class PredictSplits:
 
         return leaves
 
-    def printLeaves(self):
-        """Print all childless nodes in tree, in string order. """
-        leaves = self.getLeaves(self.root)
+    def printLeaves(self, newlines=True):
+        """Print all childless nodes in tree, in string order."""
+        leaves = self.getLeaves()
         leaves.sort(lambda a,b: cmp(str(a), str(b)))
-        print
+        if newlines: 
+            print
         for leaf in leaves:
             print leaf
-        print
+        if newlines: 
+            print
 
-    def printNodes(self):
-        """Print all nodes in tree, in string order. """
-        nodes = self.getNodes(self.root)
+    def printNodes(self, newlines=True):
+        """Print all nodes in tree, in string order."""
+        nodes = self.getNodes()
         nodes.sort(lambda a,b: cmp((a.turnCreated, a.markerId),
           (b.turnCreated, b.markerId)))
-        print
+        if newlines: 
+            print
         for node in nodes:
             print node
-        print
+        if newlines: 
+            print
 
-    def dumpAsDot(self, filename=None):
+    def _getDotLines(self, root=None):
+        li = []
+        for node in self.getNodes(root):
+            for child in node.getChildren():
+                li.append('"%s" -> "%s";' % (str(node), str(child)))
+        return li
+
+    def dumpAsDot(self, filename=None, root=None):
         """Dump all nodes in the tree in Graphviz dot format"""
         if filename is None:
             f = sys.stdout
@@ -596,17 +636,68 @@ class PredictSplits:
             f = open(filename, "w")
         li = []
         li.append("digraph G {")
-        for node in self.getNodes(self.root):
-            for child in node.getChildren():
-                li.append('"%s" -> "%s";' % (str(node), str(child)))
+        li.extend(self._getDotLines())
         li.append("}")
         s = "\n".join(li)
-        print >>f, s
+        f.write(s)
+        f.write("\n")
 
     def getLeaf(self, markerId):
         """Return the leaf node with matching markerId"""
-        leaves = self.getLeaves(self.root)
+        leaves = self.getLeaves()
         for leaf in leaves:
             if leaf.markerId == markerId:
                 return leaf
         return None
+
+    def numUncertainLegions(self):
+        count = 0
+        for node in self.getLeaves():
+            if not node.allCertain():
+                count += 1
+        return count
+
+
+class AllPredictSplits(list):
+    """List of PredictSplits objects, for convenient testing."""
+
+    def __init__(self):
+        super(list, self).__init__()
+
+    def getLeaf(self, markerId):
+        for ps in self:
+            leaf = ps.getLeaf(markerId)
+            if leaf:
+                return leaf
+        return None
+
+    def printLeaves(self):
+        print
+        for ps in self:
+            ps.printLeaves(False)
+        print
+
+    def printNodes(self):
+        print
+        for ps in self:
+            ps.printNodes(False)
+        print
+
+    def check(self):
+        """Sanity check"""
+        for ps in self:
+            assert ps.numUncertainLegions() != 1
+
+    def dumpAsDot(self, filename=None):
+        """Dump all nodes in all trees in Graphviz dot format."""
+        if filename is None:
+            f = sys.stdout
+        else:
+            f = open(filename, "w")
+        li = []
+        li.append("digraph G {")
+        for ps in self:
+            li.extend(ps._getDotLines())
+        li.append("}")
+        s = "\n".join(li)
+        print >>f, s
