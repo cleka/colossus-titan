@@ -12,7 +12,7 @@ class Legion
 {
     Chit chit;
     int height;
-    String markerId;    // Bk03, Rd12, etc.
+    private String markerId;    // Bk03, Rd12, etc.
     private String splitFrom;   // Bk03, Rd12, etc. or null
     Creature [] creatures = new Creature[8];  // 8 before initial splits
     private MasterHex currentHex;
@@ -52,6 +52,37 @@ class Legion
             pointValue += creatures[i].getPointValue();
         }
         return pointValue;
+    }
+
+
+    void addPoints(int points)
+    {
+        player.addPoints(points);        
+
+        // XXX Check for availability of angels and archangels.
+        int score = player.getScore();
+
+        while (height < 7 && score / 100 > (score - points) / 100)
+        {
+            if (score / 500 > (score - points) / 500)
+            {
+                // XXX Need archangel dialog
+                addCreature(Creature.archangel);
+                score -= 100;
+            }
+            else
+            {
+                // XXX Need angel dialog
+                addCreature(Creature.angel);
+                score -= 100;
+            }
+        }
+    }
+
+
+    String getMarkerId()
+    {
+        return markerId;
     }
 
 
@@ -111,6 +142,13 @@ class Legion
     boolean hasMoved()
     {
         return moved;
+    }
+
+
+    void removeLegion()
+    {
+        currentHex.removeLegion(this);
+        player.removeLegion(this);
     }
 
 
