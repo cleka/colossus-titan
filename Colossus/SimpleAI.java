@@ -50,19 +50,21 @@ class SimpleAI implements AI
 	if (recruits.size() == 0) return null;
 	// pick the last creature in the list (which is the best/highest recruit)
 	Creature recruit = (Creature)recruits.get(recruits.size() - 1); 
-	// take third cyclops in brush
-	if (recruit == Creature.gorgon &&
-	    recruits.contains(Creature.cyclops) &&
-	    legion.numCreature(Creature.cyclops) == 2)
+	// take third cyclops in brush 
+	if (recruit == Creature.gorgon 
+	    && recruits.contains(Creature.cyclops) 
+	    && legion.numCreature(Creature.behemoth) == 0 
+	    && legion.numCreature(Creature.cyclops) == 2)
 	{
 	    recruit = Creature.cyclops;
 	} 
-	// take 4th cyclops in brush if we're 6-high and don't have a behemoth
-	// so that we can split out a cyclops, and still keep 3 cyclops
+	// take a fourth cyclops in brush 
+	// (so that we can split out a cyclops and still keep 3)
 	else if (recruit == Creature.gorgon 
 		 && recruits.contains(Creature.cyclops) 
 		 && legion.getHeight() == 6
-		 && legion.numCreature(Creature.behemoth) == 0)
+		 && legion.numCreature(Creature.behemoth) == 0
+		 && legion.numCreature(Creature.gargoyle) == 0) 
 	{
 	    recruit = Creature.cyclops;
 	} 
@@ -106,14 +108,17 @@ class SimpleAI implements AI
 		recruit = Creature.ogre;
 	    else if (legion.numCreature(Creature.centaur) == 1)
 		recruit = Creature.centaur; 
-	    // else if there's a few cyclops left, take a gargoyle
-	    else if (game.getCaretaker().getCount(Creature.cyclops) > 6)
+	    // else if there's cyclops left and we don't have 2 gargoyles, take a gargoyle 
+	    else if (game.getCaretaker().getCount(Creature.cyclops) > 6
+		     && legion.numCreature(Creature.gargoyle) < 2 )
 		recruit = Creature.gargoyle;
-	    // else if there's a few trolls left, take an ogre 
-	    else if (game.getCaretaker().getCount(Creature.troll) > 6)
+	    // else if there's trolls left and we don't have 2 ogres, take an ogre 
+	    else if (game.getCaretaker().getCount(Creature.troll) > 6
+		     && legion.numCreature(Creature.ogre) < 2 )
 		recruit = Creature.ogre;
-	    // else if there's a few lions left, take a centaur 
-	    else if (game.getCaretaker().getCount(Creature.lion) > 6)
+	    // else if there's lions left and we don't have 2 lions, take a centaur 
+	    else if (game.getCaretaker().getCount(Creature.lion) > 6
+		     && legion.numCreature(Creature.centaur) < 2 )
 		recruit = Creature.centaur;
 	    // else we dont really care; take anything 
 	}
@@ -145,11 +150,7 @@ class SimpleAI implements AI
 		    String hexLabel = (String) moveIt.next();
 		    MasterHex hex = game.board.getHexFromLabel(hexLabel); 
 		    if (hex.getNumEnemyLegions(player) == 0)
-		    {
 			safeMoves++;
-			System.out.println("on " + roll + " " + legion 
-					   + " can move to " + hex + " safely");
-		    }
 		}
 		if (safeMoves == 0)
 		    forcedToAttack ++;
@@ -159,8 +160,12 @@ class SimpleAI implements AI
 		continue;  // we'll be forced to attack on 2 or more rolls; don't split
 	    }
 
-	    // TODO: don't split if we're about to be attacked and we need the muscle
-	    // TODO: don't split if we're about to attack and we need the muscle
+	    // TODO: don't split if we're about to be attacked and we
+	    // need the muscle 
+	    // TODO: don't split if we're about to attack and we need
+	    // the muscle 
+	    // TODO: don't split if there's no upwards recruiting
+	    // potential from our current location
 
 	    // create the new legion
 	    String selectedMarkerId = player.getFirstAvailableMarker();
@@ -492,6 +497,7 @@ class SimpleAI implements AI
 		    {
 			if (legion.numCreature(Creature.titan) > 0
 			    && game.getNumLivingPlayers() > 2)
+			    // ack! we'll fuck up our titan group
 			    value = Integer.MIN_VALUE;
 			else
 			{
@@ -507,25 +513,37 @@ class SimpleAI implements AI
 		    break;
 		case DRAW:
 		    {
-			// if not our titan, but is enemy titan, do it
-			// note: this might be an unfair use of
+			// If not our titan, but is enemy titan, do it.  
+			// This might be an unfair use of
 			// information for the AI
 			if (legion.numCreature(Creature.titan) == 0
-			    && enemyLegion.numCreature(Creature.titan) == 0)
+			    && enemyLegion.numCreature(Creature.titan) > 0)
 			{
-			    // arbitrary value for killing a player: it's worth a little
+			    // arbitrary value for killing a player
+			    // but scoring no points: it's worth a
+			    // little 
+			    // TODO: if there's only 2 players, we
+			    // should do this
 			    value += enemyPointValue / 6;
+			}
+			else
+			{
+			    // otherwise no thanks
+			    value = Integer.MIN_VALUE;
 			}
 		    }
 		    break;
 		case LOSE_BUT_INFLICT_HEAVY_LOSSES:
 		    {
-			// TODO: how important is it that we damage his group?
+			// TODO: how important is it that we damage
+			// his group?
 			value = Integer.MIN_VALUE; 
 		    }
 		    break;
 		case LOSE:
-		    value = Integer.MIN_VALUE; 
+		    {
+			value = Integer.MIN_VALUE; 
+		    }
 		    break;
 	    }
 	}
@@ -673,13 +691,13 @@ class SimpleAI implements AI
     private int estimateBattleResults(Legion attacker, Legion defender, MasterHex hex)
     {
 	int attackerPointValue = attacker.getPointValue();
-	// TODO: reduce PV slightly if titan is present and weak (and thus cant fight)
+	// TODO: reduce PV slightly if titan is present and weak (and thus can't fight)
 	// TODO: add angel call 
 	int defenderPointValue = defender.getPointValue();
-	// TODO: reduce PV slightly if titan is present and weak (and thus cant fight)
-	// TODO: add in enemy's turn 4 recruit
+	// TODO: reduce PV slightly if titan is present and weak (and thus cant' fight)
+	// TODO: add in enemy's most likely turn 4 recruit
 
-	// TODO: adjust for natives
+	// TODO: adjust for natives / terrain type
 	// TODO: adjust for entry side 
 
 	// really dumb estimator
