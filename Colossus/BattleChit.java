@@ -22,9 +22,10 @@ class BattleChit extends Chit
 
 
     BattleChit(int cx, int cy, int scale, String imageFilename,
-        Container container, Creature creature, Hex hex, Player player)
+        Container container, Creature creature, Hex hex, Player player,
+        boolean inverted)
     {
-        super(cx, cy, scale, imageFilename, container);
+        super(cx, cy, scale, imageFilename, container, inverted);
         this.creature = creature;
         this.currentHex = hex;
         this.startingHex = hex;
