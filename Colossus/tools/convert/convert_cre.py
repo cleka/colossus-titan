@@ -35,10 +35,13 @@ def print_footer():
     print '</creatures>'
 
 def handle_line(line):
+    line = line.strip()
     if line.startswith('#'):
         line = line.strip()
         if line:
-            print '<-- ' + line[1:] + ' -->'
+            print '<!-- ' + line[1:] + ' -->'
+    elif not line:  # skip blank lines
+        pass
     else:
         creature = Creature(line)
         print '    ' + str(creature)

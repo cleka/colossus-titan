@@ -41,7 +41,7 @@ def handle_line(line):
     if not line:
         pass
     elif line.startswith('#'):
-        print '<-- ' + line[1:] + ' -->'
+        print '<!-- ' + line[1:] + ' -->'
     else:
         atoms = line.split()
         if len(atoms) == 2:

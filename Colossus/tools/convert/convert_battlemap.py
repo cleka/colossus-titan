@@ -43,7 +43,7 @@ def handle_line(line):
     if not line:
         pass
     elif line.startswith('#'):
-        print '<-- ' + line[1:] + ' -->'
+        print '<!-- ' + line[1:] + ' -->'
     elif line.startswith('TOWER'):
         pass  # Dealt with this at the start
     elif line.startswith('STARTLIST'):
