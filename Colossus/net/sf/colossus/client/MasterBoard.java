@@ -365,25 +365,29 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                String [] options = new String[2];
-                options[0] = "Yes";
-                options[1] = "No";
-                int answer = JOptionPane.showOptionDialog(masterFrame,
-                    "Are you sure you with to load another game?",
-                    "Load Game?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, options, options[1]);
-
-                if (answer == JOptionPane.YES_OPTION)
+                if (!client.isGameOver())
                 {
-                    JFileChooser chooser = new JFileChooser(
-                        Constants.saveDirname);
-                    chooser.setFileFilter(new SaveGameFilter());
-                    int returnVal = chooser.showOpenDialog(masterFrame);
-                    if (returnVal == JFileChooser.APPROVE_OPTION)
+                    String [] options = new String[2];
+                    options[0] = "Yes";
+                    options[1] = "No";
+                    int answer = JOptionPane.showOptionDialog(masterFrame,
+                        "Are you sure you with to load another game?",
+                        "Load Game?",
+                        JOptionPane.YES_NO_OPTION, 
+                        JOptionPane.QUESTION_MESSAGE, null, options, 
+                        options[1]);
+                    if (answer != JOptionPane.YES_OPTION)
                     {
-                        client.loadGame(chooser.getSelectedFile().getName());
+                        return;
                     }
+                }
+
+                JFileChooser chooser = new JFileChooser(Constants.saveDirname);
+                chooser.setFileFilter(new SaveGameFilter());
+                int returnVal = chooser.showOpenDialog(masterFrame);
+                if (returnVal == JFileChooser.APPROVE_OPTION)
+                {
+                    client.loadGame(chooser.getSelectedFile().getName());
                 }
             }
         };

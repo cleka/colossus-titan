@@ -671,6 +671,7 @@ public final class Game
     {
         Player player = getActivePlayer();
         player.resetTurnState();
+        server.allSetupSplit();
 
         // If there are no markers available, or no legions tall enough
         // to split, skip forward to movement.
@@ -681,7 +682,6 @@ public final class Game
         }
         else
         {
-            server.allSetupSplit();
             player.aiSplit();
         }
     }
@@ -1172,11 +1172,6 @@ public final class Game
                 battle.init();
             }
 
-            // Setup MasterBoard
-            server.allInitBoard();
-            server.allAddMarkers();
-
-            setupPhase();
 
             server.allUpdatePlayerInfo();
 
@@ -1189,6 +1184,12 @@ public final class Game
                 server.allFullyUpdateLegionHeights();
                 server.allFullyUpdateOwnLegionContents();
             }
+
+            // Setup MasterBoard
+            server.allInitBoard();
+            server.allAddMarkers();
+
+            setupPhase();
 
             caretaker.fullySyncDisplays();
         }
