@@ -19,7 +19,16 @@ public class Game
     private int activePlayerNum;
     private int turnNumber = 1;  // Advance when every player has a turn
     private StatusScreen statusScreen;
+    private Turn turn;
     private GameApplet applet;
+    private boolean summoningAngel;
+    private SummonAngel summonAngel;
+    private Battle battle;
+    private BattleMap map;
+
+    // Keep multiple quick clicks from popping up multiples
+    // of the same dialog.
+    private boolean dialogLock;
 
     public static final int SPLIT = 1;
     public static final int MOVE = 2;
@@ -30,9 +39,15 @@ public class Game
     private boolean isApplet; 
     private boolean disposed;
 
+    // For debugging, or if the game crashes after movement
+    // has been rolled, we can force the next movement roll
+    // from the command line.
+    private int forcedMovementRoll;
+
     // XXX These should be added to the options menu.
-    private boolean autosaveEveryTurn = true;
-    private boolean allVisible;
+    private static boolean autosaveEveryTurn = true;
+    private static boolean allVisible;
+    private static boolean pickRecruiter = true;
     
 
     public Game(boolean isApplet, GameApplet applet)
@@ -70,7 +85,18 @@ public class Game
         if (!disposed)
         {
             statusScreen = new StatusScreen(this);
-            board = new MasterBoard(this, true);
+            board = new MasterBoard(this);
+            for (int i = 0; i < getNumPlayers(); i++)
+            {
+                pickInitialMarker(getPlayer(i));
+                placeInitialLegion(getPlayer(i));
+                updateStatusScreen();
+            }
+            board.loadInitialMarkerImages();
+
+            turn = new Turn(this, board);
+            board.setVisible(true);
+            board.repaint();
         }
     }
     
@@ -85,9 +111,24 @@ public class Game
             this.applet = applet;
         }
 
-        board = new MasterBoard(this, false);
+        board = new MasterBoard(this);
+        board.loadInitialMarkerImages();
         loadGame(filename);
         statusScreen = new StatusScreen(this);
+    }
+    
+    
+    // Load a saved game, and force the first movement roll.
+    public Game(boolean isApplet, GameApplet applet, String filename,
+        int forcedMovementRoll)
+    {
+        // Call the normal saved game constructor.
+        this(isApplet, applet, filename);
+
+        if (forcedMovementRoll >= 1 && forcedMovementRoll <= 6)
+        {
+            this.forcedMovementRoll = forcedMovementRoll;
+        }
     }
 
 
@@ -156,8 +197,7 @@ public class Game
 
         for (int i = 0; i < numPlayers; i++)
         {
-            Game.logEvent(players[i].getName() + " gets tower " + 
-                playerTower[i]);
+            logEvent(players[i].getName() + " gets tower " + playerTower[i]);
             players[i].setTower(playerTower[i]);
         }
     }
@@ -258,13 +298,13 @@ public class Game
         switch (remaining)
         {
             case 0:
-                Game.logEvent("Draw");
+                logEvent("Draw");
                 new MessageBox(board, "Draw");
                 dispose();
                 break;
 
             case 1:
-                Game.logEvent(players[winner].getName() + " wins");
+                logEvent(players[winner].getName() + " wins");
                 new MessageBox(board, players[winner].getName() + " wins");
                 dispose();
                 break;
@@ -299,7 +339,7 @@ public class Game
         else
         {
             board.unselectAllHexes();
-            Game.logEvent("Phase advances to " + Game.getPhaseName(phase));
+            logEvent("Phase advances to " + getPhaseName(phase));
         }
     }
 
@@ -320,7 +360,7 @@ public class Game
         }
         else
         {
-            Game.logEvent("\n" + getActivePlayer().getName() + 
+            logEvent("\n" + getActivePlayer().getName() + 
                 "'s turn, number " + turnNumber);
 
             updateStatusScreen();
@@ -599,7 +639,7 @@ public class Game
 
                     Legion legion = new Legion(3 * board.getScale(), 
                         markerId, null, board, height, 
-                        board.getHexFromLabel(hexLabel), creatures[0], 
+                        MasterBoard.getHexFromLabel(hexLabel), creatures[0],
                         creatures[1], creatures[2], creatures[3], creatures[4],
                         creatures[5], creatures[6], creatures[7], players[i]);
 
@@ -614,8 +654,22 @@ public class Game
                     players[i].addLegion(legion);
                 }
             }
+            
+            // Move all legions into their hexes.
+            for (int i = 0; i < getNumPlayers(); i++)
+            {
+                Player player = getPlayer(i);
+                for (int j = 0; j < player.getNumLegions(); j++)
+                {
+                    Legion legion = player.getLegion(j);
+                    MasterHex hex = legion.getCurrentHex();
+                    hex.addLegion(legion);
+                }
+            }
 
-            board.finishInit(false);
+            turn = new Turn(this, board);
+            board.setVisible(true);
+            board.repaint();
         }
         // FileNotFoundException, IOException, NumberFormatException
         catch (Exception e)
@@ -1369,8 +1423,8 @@ public class Game
         Critter [] recruiters = new Critter[4];
         Critter recruiter;
 
-        int numEligibleRecruiters = Game.findEligibleRecruiters(legion,
-            recruit, recruiters);
+        int numEligibleRecruiters = findEligibleRecruiters(legion, recruit, 
+            recruiters);
 
         if (numEligibleRecruiters == 1)
         {
@@ -1381,7 +1435,7 @@ public class Game
             // A warm body recruits in a tower.
             recruiter = null;
         }
-        else if (Game.allRecruitersVisible(legion, recruiters))
+        else if (allRecruitersVisible(legion, recruiters))
         {
             // If all possible recruiters are already visible, don't
             // bother picking which ones to reveal.
@@ -1389,8 +1443,13 @@ public class Game
         }
         else
         {
-            new PickRecruiter(parentFrame, legion, 
-                numEligibleRecruiters, recruiters);
+            // Only use the PickRecruiter dialog if the pickRecruiter
+            // option is true.  If it's false, just use the first one.
+            if (pickRecruiter)
+            {
+                new PickRecruiter(parentFrame, legion, numEligibleRecruiters,
+                    recruiters);
+            }
             recruiter = recruiters[0];
         }
 
@@ -1401,14 +1460,14 @@ public class Game
             legion.addCreature(recruit);
 
             // Mark the recruiter(s) as visible.
-            int numRecruiters = Game.numberOfRecruiterNeeded(recruiter,
+            int numRecruiters = numberOfRecruiterNeeded(recruiter,
                 recruit, legion.getCurrentHex().getTerrain());
             if (numRecruiters >= 1)
             {
                 legion.revealCreatures(recruiter, numRecruiters);
             }
 
-            Game.logEvent("Legion " + legion.getMarkerId() + " in " +
+            logEvent("Legion " + legion.getMarkerId() + " in " +
                 legion.getCurrentHex().getDescription() +
                 " recruits " + recruit.getName() + " with " +
                 (numRecruiters == 0 ? "nothing" :
@@ -1483,6 +1542,10 @@ public class Game
             {
                 board.dispose();
             }
+            if (map != null)
+            {
+                map.dispose();
+            }
             if (statusScreen != null)
             {
                 statusScreen.dispose();
@@ -1520,15 +1583,761 @@ public class Game
     }
 
 
+    public void pickInitialMarker(Player player)
+    {
+        do
+        {
+            new PickMarker(board, player);
+        }
+        while (player.getSelectedMarker() == null);
+
+        logEvent(player.getName() + " selected initial marker");
+    }
+
+
+    public void placeInitialLegion(Player player)
+    {
+        // Lookup coords for chit starting from player[i].getTower()
+        MasterHex hex = MasterBoard.getHexFromLabel(100 * player.getTower());
+    
+        Creature.titan.takeOne();
+        Creature.angel.takeOne();
+        Creature.ogre.takeOne();
+        Creature.ogre.takeOne();
+        Creature.centaur.takeOne();
+        Creature.centaur.takeOne();
+        Creature.gargoyle.takeOne();
+        Creature.gargoyle.takeOne();
+
+        Legion legion = new Legion(3 * MasterBoard.getScale(),
+            player.getSelectedMarker(), null, board, 8,
+            hex, Creature.titan, Creature.angel, Creature.ogre,
+            Creature.ogre, Creature.centaur, Creature.centaur,
+            Creature.gargoyle, Creature.gargoyle, player);
+    
+        player.addLegion(legion);
+        hex.addLegion(legion);
+    }
+
+
+    public void highlightUnmovedLegions()
+    {
+        board.unselectAllHexes();
+
+        Player player = getActivePlayer();
+        player.unselectLegion();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.getLegion(i);
+            if (!legion.hasMoved())
+            {
+                MasterHex hex = legion.getCurrentHex();
+                hex.select();
+            }
+        }
+
+        board.repaint();
+    }
+
+
+    public int getForcedMovementRoll()
+    {
+        return forcedMovementRoll;
+    }
+
+
+    public void clearForcedMovementRoll()
+    {
+        forcedMovementRoll = 0;
+    }
+
+
+    // Recursively find conventional moves from this hex.  Select
+    //    all legal final destinations.  If block >= 0, go only
+    //    that way.  If block == -1, use arches and arrows.  If
+    //    block == -2, use only arrows.  Do not double back in
+    //    the direction you just came from.  Return the number of
+    //    moves found.
+    private int findMoves(MasterHex hex, Player player, Legion legion,
+        int roll, int block, int cameFrom, boolean show)
+    {
+        int count = 0;
+
+        // If there are enemy legions in this hex, mark it
+        // as a legal move and stop recursing.  If there is
+        // also a friendly legion there, just stop recursing.
+        if (hex.getNumEnemyLegions(player) > 0)
+        {
+            if (hex.getNumFriendlyLegions(player) == 0)
+            {
+                if (show)
+                {
+                    hex.select();
+                    hex.repaint();
+
+                    // Set the entry side relative to the hex label.
+                    hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
+                }
+                
+            }
+            return count;
+        }
+
+        if (roll == 0)
+        {
+            // This hex is the final destination.  Mark it as legal if
+            // it is unoccupied by friendly legions.
+            for (int i = 0; i < player.getNumLegions(); i++)
+            {
+                // Account for spin cycles.
+                if (player.getLegion(i).getCurrentHex() == hex &&
+                    player.getLegion(i) != legion)
+                {
+                    return count;
+                }
+            }
+            if (show)
+            {
+                hex.select();
+                hex.repaint();
+                // Need to set entry sides even if no possible engagement,
+                // for MasterHex.chooseWhetherToTeleport()
+                hex.setEntrySide((6 + cameFrom - hex.getLabelSide()) % 6);
+            }
+
+            count++;
+            return count;
+        }
+
+
+        if (block >= 0)
+        {
+            count += findMoves(hex.getNeighbor(block), player, legion,
+                roll - 1, -2, (block + 3) % 6, show);
+        }
+        else if (block == -1)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (hex.getExitType(i) >= MasterHex.ARCH && i != cameFrom)
+                {
+                    count += findMoves(hex.getNeighbor(i), player, legion,
+                        roll - 1, -2, (i + 3) % 6, show);
+                }
+            }
+        }
+        else if (block == -2)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
+                {
+                    count += findMoves(hex.getNeighbor(i), player, legion,
+                        roll - 1, -2, (i + 3) % 6, show);
+                }
+            }
+        }
+
+        return count;
+    }
+
+
+    // Recursively find tower teleport moves from this hex.  That's
+    // all unoccupied hexes within 6 hexes.  Teleports to towers
+    // are handled separately.  Do not double back.
+    private void findTowerTeleportMoves(MasterHex hex, Player player,
+        Legion legion, int roll, int cameFrom, boolean show)
+    {
+        // This hex is the final destination.  Mark it as legal if
+        // it is unoccupied.
+
+        if (!hex.isOccupied())
+        {
+            if (show)
+            {
+                hex.select();
+                hex.repaint();
+            }
+            // Mover can choose side of entry.
+            hex.setTeleported(true);
+        }
+
+        if (roll > 0)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (i != cameFrom && (hex.getExitType(i) != MasterHex.NONE ||
+                   hex.getEntranceType(i) != MasterHex.NONE))
+                {
+                    findTowerTeleportMoves(hex.getNeighbor(i), player, legion,
+                        roll - 1, (i + 3) % 6, show);
+                }
+            }
+        }
+    }
+
+    
+    // Return number of legal non-teleport moves.
+    public int countMoves(Legion legion)
+    {
+        return countAndMaybeShowMoves(legion, false);
+    }
+    
+    
+    // Return number of legal non-teleport moves.
+    public int showMoves(Legion legion)
+    {
+        return countAndMaybeShowMoves(legion, true);
+    }
+
+
+    // Return number of legal non-teleport moves.
+    private int countAndMaybeShowMoves(Legion legion, boolean show)
+    {
+        if (show)
+        {
+            board.unselectAllHexes();
+        }
+
+        if (legion.hasMoved())
+        {
+            return 0;
+        }
+        
+        Player player = legion.getPlayer();
+
+        board.clearAllNonFriendlyOccupiedEntrySides(player);
+
+        int count = 0;
+
+        MasterHex hex = legion.getCurrentHex();
+
+        // Conventional moves
+
+        // First, look for a block.
+        int block = -1;
+        for (int j = 0; j < 6; j++)
+        {
+            if (hex.getExitType(j) == MasterHex.BLOCK)
+            {
+                // Only this path is allowed.
+                block = j;
+            }
+        }
+
+        count += findMoves(hex, player, legion, player.getMovementRoll(),
+            block, -1, show);
+
+        if (player.getMovementRoll() == 6)
+        {
+            // Tower teleport
+            if (hex.getTerrain() == 'T' && legion.numLords() > 0 &&
+                player.canTeleport())
+            {
+                // Mark every unoccupied hex within 6 hexes.
+                findTowerTeleportMoves(hex, player, legion, 6, -1, show);
+
+                // Mark every unoccupied tower.
+                for (int tower = 100; tower <= 600; tower += 100)
+                {
+                    hex = MasterBoard.getHexFromLabel(tower);
+                    if (!hex.isOccupied())
+                    {
+                        if (show)
+                        {
+                            hex.select();
+                            hex.repaint();
+                            // Mover can choose side of entry.
+                            hex.setTeleported(true);
+                        }
+                    }
+                }
+            }
+
+            // Titan teleport
+            if (player.canTitanTeleport() &&
+                legion.numCreature(Creature.titan) > 0)
+            {
+                // Mark every hex containing an enemy stack that does not
+                // already contain a friendly stack.
+                for (int i = 0; i < getNumPlayers(); i++)
+                {
+                    if (getPlayer(i) != player)
+                    {
+                        for (int j = 0; j < getPlayer(i).getNumLegions();
+                            j++)
+                        {
+                            hex = getPlayer(i).getLegion(j).getCurrentHex();
+                            if (!hex.isEngagement())
+                            {
+                                if (show)
+                                {
+                                    hex.select();
+                                    hex.repaint();
+                                    // Mover can choose side of entry.
+                                    hex.setTeleported(true);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
+
+    // Present a dialog allowing the player to enter via land or teleport.
+    private void chooseWhetherToTeleport(MasterHex hex)
+    {
+        new OptionDialog(board, "Teleport?", "Teleport?", "Teleport", 
+            "Move Normally");
+
+        // If Teleport, then leave teleported set.
+        if (OptionDialog.getLastAnswer() == OptionDialog.NO_OPTION)
+        {
+            hex.setTeleported(false);
+        }
+    }
+    
+    
+    // Returns number of engagements found.
+    public int highlightEngagements()
+    {
+        int count = 0;
+        Player player = getActivePlayer();
+
+        board.unselectAllHexes();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.getLegion(i);
+            MasterHex hex = legion.getCurrentHex();
+            if (hex.getNumEnemyLegions(player) > 0)
+            {
+                count++;
+                hex.select();
+                hex.repaint();
+            }
+        }
+
+        return count;
+    }
+
+
+    public void setSummonAngel(SummonAngel summonAngel)
+    {
+        this.summonAngel = summonAngel;
+    }
+
+
+    public SummonAngel getSummonAngel()
+    {
+        return summonAngel;
+    }
+
+
+    public void finishBattle()
+    {
+        board.show();
+
+        if (summoningAngel && summonAngel != null)
+        {
+            highlightSummonableAngels(summonAngel.getLegion());
+            summonAngel.repaint();
+        }
+        else
+        {
+            highlightEngagements();
+        }
+        battle = null;
+        map = null;
+
+        turn.setVisible(true);
+        turn.setEnabled(true);
+
+        // Insert a blank line in the log file after each battle.
+        logEvent("\n");
+    }
+
+
+    // Returns number of legions with summonable angels.
+    public int highlightSummonableAngels(Legion legion)
+    {
+        board.unselectAllHexes();
+
+        Player player = legion.getPlayer();
+        player.unselectLegion();
+
+        int count = 0;
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion candidate = player.getLegion(i);
+            if (candidate != legion)
+            {
+                MasterHex hex = candidate.getCurrentHex();
+                if ((candidate.numCreature(Creature.angel) > 0 ||
+                    candidate.numCreature(Creature.archangel) > 0) &&
+                    !hex.isEngagement())
+                {
+
+                    count++;
+                    hex.select();
+                    hex.repaint();
+                }
+            }
+        }
+
+        if (count > 0)
+        {
+            summoningAngel = true;
+        }
+
+        return count;
+    }
+    
+    
+    public void finishSummoningAngel()
+    {
+        summoningAngel = false;
+        highlightEngagements();
+        summonAngel = null;
+        if (battle != null)
+        {
+            battle.finishSummoningAngel();
+        }
+    }
+
+
+    // Returns number of legions that can recruit.
+    public int highlightPossibleRecruits()
+    {
+        int count = 0;
+        Player player = getActivePlayer();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.getLegion(i);
+            if (legion.hasMoved() && legion.canRecruit())
+            {
+                Creature [] recruits = new Creature[5];
+                if (findEligibleRecruits(legion, recruits) >= 1)
+                {
+                    MasterHex hex = legion.getCurrentHex();
+                    hex.select();
+                    hex.repaint();
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+
+    public void actOnLegion(Legion legion)                    
+    {
+        Player player = legion.getPlayer();
+
+        switch (getPhase())
+        {
+            case Game.SPLIT:
+                // Need a legion marker to split.
+                if (player.getNumMarkersAvailable() == 0)
+                {
+                    new MessageBox(board, "No markers are available.");
+                    return;
+                }
+                // Don't allow extra splits in turn 1.
+                if (getTurnNumber() == 1 && player.getNumLegions() > 1)
+                {
+                    new MessageBox(board, "Cannot split twice on Turn 1.");
+                    return;
+                }
+
+                if (!dialogLock)
+                {
+                    dialogLock = true; 
+                    new SplitLegion(board, legion, player);
+                    dialogLock = false; 
+                }
+                            
+                // Update status window.
+                updateStatusScreen();
+                // If we split, unselect this hex.
+                if (legion.getHeight() < 7)
+                {
+                    MasterHex hex = legion.getCurrentHex();
+                    hex.unselect();
+                    hex.repaint();
+                }
+                return;
+
+            case Game.MOVE:
+                // Mark this legion as active.
+                player.selectLegion(legion);
+
+                // Highlight all legal destinations
+                // for this legion.
+                showMoves(legion);
+                return;
+
+            case Game.FIGHT:
+                doFight(legion.getCurrentHex(), player);
+                break;
+
+            case Game.MUSTER:
+                if (legion.hasMoved() && legion.canRecruit())
+                {
+                    if (!dialogLock)
+                    {
+                        dialogLock = true; 
+                        new PickRecruit(board, legion);
+                        if (!legion.canRecruit())
+                        {
+                            legion.getCurrentHex().unselect();
+                            legion.getCurrentHex().repaint();
+
+                            updateStatusScreen();
+                        }
+                        dialogLock = false; 
+                    }
+                }
+
+                return;
+        }
+    }
+
+
+    public void actOnHex(MasterHex hex)
+    {
+        Player player = getActivePlayer();
+            
+        switch (getPhase())
+        {
+            // If we're moving, and have selected a legion which
+            // has not yet moved, and this hex is a legal
+            // destination, move the legion here.
+            case Game.MOVE:
+                Legion legion = player.getSelectedLegion();
+                if (legion != null && hex.isSelected())
+                {
+                    // Pick teleport or normal move if necessary.
+                    if (hex.getTeleported() && hex.canEnterViaLand())
+                    {
+                        chooseWhetherToTeleport(hex);
+                    }
+
+                    // If this is a tower hex, set the entry side
+                    // to '3', regardless.
+                    if (hex.getTerrain() == 'T')
+                    {
+                        hex.clearAllEntrySides();
+                        hex.setEntrySide(3);
+                    }
+                    // If this is a teleport to a non-tower hex,
+                    // then allow entry from all three sides.
+                    else if (hex.getTeleported())
+                    {
+                        hex.setEntrySide(1);
+                        hex.setEntrySide(3);
+                        hex.setEntrySide(5);
+                    }
+
+                    // Pick entry side if hex is enemy-occupied
+                    // and there is more than one possibility.
+                    if (hex.isOccupied() && hex.getNumEntrySides() > 1)
+                    {
+                        // Only allow one PickEntrySide dialog.
+                        if (!dialogLock)
+                        {
+                            dialogLock = true;
+                            new PickEntrySide(board, hex);
+                            dialogLock = false;
+                        }
+                    }
+
+                    // Unless a PickEntrySide was cancelled or
+                    // disallowed, execute the move.
+                    if (!hex.isOccupied() || hex.getNumEntrySides() == 1)
+                    {
+                        // If the legion teleported, reveal a lord.
+                        if (hex.getTeleported())
+                        {
+
+                            // If it was a Titan teleport, that 
+                            // lord must be the titan.
+                            if (hex.isOccupied())
+                            {
+                                legion.revealCreatures(Creature.titan, 1);
+                            }
+                            else
+                            {
+                                legion.revealTeleportingLord(board);
+                            }
+                        }
+
+                        legion.moveToHex(hex);
+                        legion.getStartingHex().repaint();
+                        hex.repaint();
+                    }
+
+                    highlightUnmovedLegions();
+                }
+                else
+                {
+                    highlightUnmovedLegions();
+                }
+                break;
+
+            // If we're fighting and there is an engagement here,
+            // resolve it.  If an angel is being summoned, mark
+            // the donor legion instead.
+            case Game.FIGHT:
+                doFight(hex, player);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
+    public void doFight(MasterHex hex, Player player)
+    {
+        if (summoningAngel)
+        {
+            Legion donor = hex.getFriendlyLegion(player);
+            player.selectLegion(donor);
+            if (summonAngel == null)
+            {
+                summonAngel = battle.getSummonAngel();
+            }
+            summonAngel.repaint();
+            donor.getMarker().repaint();
+        }
+
+        // Do not allow clicking on engagements if one is
+        // already being resolved.
+        else if (hex.isEngagement() && !dialogLock)
+        {
+            dialogLock = true;
+            Legion attacker = hex.getFriendlyLegion(player);
+            Legion defender = hex.getEnemyLegion(player);
+
+            if (defender.canFlee())
+            {
+                // Fleeing gives half points and denies the
+                // attacker the chance to summon an angel.
+                new Concede(board, defender, attacker, true);
+            }
+
+            if (hex.isEngagement())
+            {
+                // The attacker may concede now without
+                // allowing the defender a reinforcement.
+                new Concede(board, attacker, defender, false);
+
+                // The players may agree to a negotiated 
+                // settlement.
+                if (hex.isEngagement())
+                {
+                    new Negotiate(board, attacker, defender);
+                }
+
+
+                if (!hex.isEngagement())
+                {
+                    if (hex.getLegion(0) == defender &&
+                        defender.canRecruit())
+                    {
+                        // If the defender won the battle
+                        // by agreement, he may recruit.
+                        if (!dialogLock)
+                        {
+                            dialogLock = true;
+                            new PickRecruit(board, defender);
+                            dialogLock = false;
+                        }
+                    }
+                    else if (hex.getLegion(0) == attacker && 
+                        attacker.getHeight() < 7 && 
+                        player.canSummonAngel())
+                    {
+                        // If the attacker won the battle
+                        // by agreement, he may summon an
+                        // angel.
+                        summonAngel = new SummonAngel(board, attacker);
+                    }
+                }
+
+                // Battle
+                if (hex.isEngagement())
+                {
+                    // Hide turn to keep it out of the way.
+                    turn.setVisible(false);
+                    turn.setEnabled(false);
+
+                    // Reveal both legions to all players.
+                    attacker.revealAllCreatures();
+                    defender.revealAllCreatures();
+                    battle = new Battle(board, attacker, defender,
+                        hex);
+                    map = battle.getBattleMap();
+                }
+            }
+
+            highlightEngagements();
+            dialogLock = false;
+        }
+    }
+
+
+    public void actOnMisclick()
+    {
+        switch (getPhase())
+        {
+            case Game.MOVE:
+                highlightUnmovedLegions();
+                break;
+
+            case Game.FIGHT:
+                if (summoningAngel && summonAngel != null)
+                {
+                    highlightSummonableAngels(summonAngel.getLegion());
+                    summonAngel.repaint();
+                }
+                else
+                {
+                    highlightEngagements();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
     public static void main(String [] args)
     {
         if (args.length == 0)
         {
+            // Start a new game.
             new Game(false, null);
+        }
+        else if (args.length == 1)
+        {
+            // Load a game.
+            new Game(false, null, args[0]);
         }
         else
         {
-            new Game(false, null, args[0]);
+            // Load a game, and specify the next movement roll.
+            new Game(false, null, args[0], Integer.parseInt(args[1]));
         }
     }
 }

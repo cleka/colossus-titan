@@ -239,7 +239,7 @@ public class Battle
                 board.show();
 
                 summonAngel = new SummonAngel(board, attacker);
-                board.setSummonAngel(summonAngel);
+                board.getGame().setSummonAngel(summonAngel);
             }
 
             // This is the last chance to summon an angel until the

@@ -47,8 +47,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             removeAll();
             setLayout(new GridLayout(0, 5));
 
-            add(new Label(game.getActivePlayer().getName() + 
-                " : Split stacks "));
+            add(new Label(player.getName() + " : Split stacks "));
             Button button1 = new Button("Undo Last Split");
             add(button1);
             button1.addActionListener(this);
@@ -114,7 +113,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         pack();
 
         // Highlight hexes with legions that can move.
-        board.highlightUnmovedLegions();
+        game.highlightUnmovedLegions();
     }
 
     
@@ -122,7 +121,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
     {
         // Highlight hexes with engagements.
         // If there are no engagements, move forward to the muster phase.
-        if (board.highlightEngagements() < 1)
+        if (game.highlightEngagements() < 1)
         {
             advancePhase();
         }
@@ -171,7 +170,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             pack();
         
             // Highlight hexes with legions eligible to muster.
-            board.highlightPossibleRecruits();
+            game.highlightPossibleRecruits();
         }
     }
 
@@ -236,7 +235,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             player.undoLastMove();
 
             // Remove all moves from MasterBoard and show unmoved legions.
-            board.highlightUnmovedLegions();
+            game.highlightUnmovedLegions();
         }
 
         else if (e.getActionCommand().equals("Undo All Moves"))
@@ -244,7 +243,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             player.undoAllMoves();
 
             // Remove all moves from MasterBoard and show unmoved legions.
-            board.highlightUnmovedLegions();
+            game.highlightUnmovedLegions();
         }
 
         else if (e.getActionCommand().equals("Take Mulligan"))
@@ -269,7 +268,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
             {
                 // Highlight all unmoved legions, rather than the
                 // locations to which the forced-to-move legion can move. 
-                board.highlightUnmovedLegions();
+                game.highlightUnmovedLegions();
                 new MessageBox(board, "At least one legion must move.");
                 return;
             }
@@ -298,7 +297,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
                             // Highlight all unmoved legions, rather than the
                             // locations to which the forced-to-move legion 
                             // can move. 
-                            board.highlightUnmovedLegions();
+                            game.highlightUnmovedLegions();
                             new MessageBox(board, 
                                 "Split legions must be separated.");
                             return;
@@ -313,7 +312,7 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         else if (e.getActionCommand().equals("Done with Engagements"))
         {
             // Advance only if there are no unresolved engagements.
-            if (board.highlightEngagements() == 0)
+            if (game.highlightEngagements() == 0)
             {
                 advancePhase();
             }
@@ -327,14 +326,14 @@ public class Turn extends Dialog implements ActionListener, WindowListener
         {
             player.undoLastRecruit();
 
-            board.highlightPossibleRecruits();
+            game.highlightPossibleRecruits();
         }
 
         else if (e.getActionCommand().equals("Undo All Recruits"))
         {
             player.undoAllRecruits();
 
-            board.highlightPossibleRecruits();
+            game.highlightPossibleRecruits();
         }
         
         else if (e.getActionCommand().equals("End Turn"))

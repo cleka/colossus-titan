@@ -45,7 +45,7 @@ public class SummonAngel extends Dialog implements MouseListener,
 
         // Count and highlight legions with summonable angels, and put
         // board into a state where those legions can be selected.
-        if (board.highlightSummonableAngels(legion) < 1)
+        if (board.getGame().highlightSummonableAngels(legion) < 1)
         {
             cleanup(null);
             return;
@@ -144,8 +144,8 @@ public class SummonAngel extends Dialog implements MouseListener,
 
         dispose();
 
-        // Let the MasterBoard know to leave the angel-summoning state.
-        board.finishSummoningAngel();
+        // Let the game know to leave the angel-summoning state.
+        board.getGame().finishSummoningAngel();
     }
 
 

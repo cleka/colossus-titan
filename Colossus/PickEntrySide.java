@@ -163,6 +163,8 @@ public class PickEntrySide extends Dialog implements ActionListener,
     // is -1, then do not set an entry side, which will abort the move.
     private void cleanup(int side)
     {
+        laidOut = false;
+
         masterHex.clearAllEntrySides();
 
         if (side == 1 || side == 3 || side == 5)

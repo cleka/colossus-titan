@@ -238,7 +238,7 @@ public class BattleMap extends Frame implements MouseListener,
         
                             SummonAngel summonAngel = new SummonAngel(board,
                                 battle.getAttacker());
-                            board.setSummonAngel(summonAngel);
+                            board.getGame().setSummonAngel(summonAngel);
                         }
                     }
                 }
@@ -270,7 +270,7 @@ public class BattleMap extends Frame implements MouseListener,
     
             masterHex.unselect();
             masterHex.repaint();
-            board.finishBattle();
+            board.getGame().finishBattle();
         }
         catch (NullPointerException e)
         {
@@ -560,8 +560,9 @@ public class BattleMap extends Frame implements MouseListener,
             return;
         }
     
-        // Abort if called too early.
         Rectangle rectClip = g.getClipBounds();
+        
+        // Abort if called too early.
         if (rectClip == null)
         {
             return;

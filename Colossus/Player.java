@@ -332,9 +332,19 @@ public class Player
             legions[i].hideAllCreatures();
         }
 
-        movementRoll = Game.rollDie();
-        Game.logEvent(getName() + " rolled a " + movementRoll + 
-            " for movement");
+        if (game.getForcedMovementRoll() != 0)
+        {
+            movementRoll = game.getForcedMovementRoll();
+            Game.logEvent(getName() + " rolled a " + movementRoll + 
+                " for movement (forced!)");
+            game.clearForcedMovementRoll();
+        }
+        else
+        {
+            movementRoll = Game.rollDie();
+            Game.logEvent(getName() + " rolled a " + movementRoll + 
+                " for movement");
+        }
     }
 
 
