@@ -1,0 +1,6 @@
+MAP:ExtTitan.map
+TER:ExtTitan.ter
+CRE:ExtTitan8.cre
+HINT:ExtTitan.hin
+MAXPLAYERS: 8
+DEPEND: ExtTitan

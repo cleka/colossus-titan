@@ -1730,6 +1730,10 @@ public final class MasterBoard extends JPanel
 
     private void actOnLegion(String markerId, String hexLabel)
     {
+        if (!client.isMyTurn())
+        {
+            return;
+        }
         switch (client.getPhase())
         {
             case Constants.SPLIT:

@@ -196,6 +196,7 @@ public final class Constants
         "Badlands",
         "Badlands-JDG",
         "ExtTitan", 
+        "ExtTitan8", 
         "Outlands",
         "SmallTitan",
         "TG-ConceptI",
