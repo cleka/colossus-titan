@@ -59,7 +59,6 @@
 <!-- The javacc target does not support multiple .jj files in one target. -->
 <target name="parsers"
         depends="BattlelandLoader,
-                 StrategicMapLoader,
                  VariantLoader,
                  AIHintLoader,
                  BattlelandRandomizerLoader"
@@ -68,12 +67,6 @@
 
 <target name="BattlelandLoader">
         <javacc target="net/sf/colossus/parser/BattlelandLoader.jj"
-                javacchome="${env.JAVACC_HOME}"
-        />
-</target>
-
-<target name="StrategicMapLoader">
-        <javacc target="net/sf/colossus/parser/StrategicMapLoader.jj"
                 javacchome="${env.JAVACC_HOME}"
         />
 </target>
