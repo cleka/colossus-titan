@@ -2137,6 +2137,7 @@ public class SimpleAI implements AI
                 Log.debug("Legion " + legion.getMarkerId() + " flee " +
                           " as they are less than half as strong as " +
                           enemy.getMarkerId());
+                return true;
             }
             if (enemy.getHeight() == 7)
             {
