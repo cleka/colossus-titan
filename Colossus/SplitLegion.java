@@ -46,7 +46,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
         }
 
         newLegion = new Legion(scale / 5, 2 * scale, scale,
-            player.getSelectedMarker(), oldLegion.getMarkerId(), this, 0, 
+            player.getSelectedMarker(), oldLegion, this, 0, 
             oldLegion.getCurrentHex(), null, null, null, null, null, null, 
             null, null, player);
 
@@ -69,13 +69,13 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
             for (int i = 0; i < oldLegion.getHeight(); i++)
             {
                 oldChits[i] = new Chit((i + 1) * scale + (scale / 5), 
-                    scale / 2, scale, "images/" + oldLegion.creatures[i].name 
-                    + ".gif", this);
+                    scale / 2, scale, oldLegion.creatures[i].getImageName(),
+                    this);
             }
             newChits = new Chit[oldLegion.getHeight()];
             
             oldMarker = new Chit(scale / 5, scale / 2, scale, 
-                "images/" + oldLegion.getMarkerId() + ".gif", this);
+                oldLegion.getImageName(), this);
 
             tracker = new MediaTracker(this);
 
