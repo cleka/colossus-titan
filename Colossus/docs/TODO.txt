@@ -78,6 +78,9 @@ java.util.ConcurrentModificationException
 - Client.didSplit 134 Bu01 Bu07 2 24
 - From client Blue: doneWithSplits
 
+Bug: CowardSimpleAI ran out of markers, started trying to split with
+   marker "null", entered infinite loop
+
 Remove advancePhaseInternal from PhaseAdvancer; make private
 
 Remove AWT dependency from server by moving image manipulation in

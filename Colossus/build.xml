@@ -371,7 +371,7 @@
 </target>
 
 
-<target name="inst" depends="init,sign,dist,changelog"
+<target name="inst" depends="clean,init,sign,dist,changelog"
         description = "Locally copy files into htdocs tree on SF">
         <copy file="Colossus.jar" todir="${HTML_DIR}"/>
         <copy file="Colossus.jnlp" todir="${HTML_DIR}"/>
@@ -383,7 +383,7 @@
 
 <!-- TODO Eliminate double maintenance -->
 <!-- This requires rsync and a good ssh-agent setup. -->
-<target name="remote-inst" depends="init,sign,dist,changelog"
+<target name="remote-inst" depends="clean,init,sign,dist,changelog"
         description = "copy files into htdocs tree on SF">
         <exec executable="rsync">
             <arg line="-e ssh Colossus.jar ${SERVER}:${HTML_DIR}"/>
