@@ -69,7 +69,7 @@
 
 <target name="compile" depends="init"
         description = "Compile most .java files to .class files using javamake">
-        <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
+        <javamake debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="."
                 includes="**/*.java"
                 excludes="**/datatools/*.java">
             <classpath refid="project.class.path"/>
@@ -78,7 +78,7 @@
 
 <target name="compileAll" depends="init"
         description = "Compile all .java files to .class files using javamake">
-        <javamake debug="yes" deprecation="yes" target="1.4" srcdir="."
+        <javamake debug="yes" deprecation="yes" target="1.4" source="1.4" srcdir="."
                 includes="**/*.java">
             <classpath refid="project.class.path"/>
         </javamake>
