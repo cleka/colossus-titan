@@ -154,6 +154,10 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         }
 
         g.drawImage(offImage, 0, 0, this);
+
+        // XXX: Handle via super.paint() instead?
+        button1.repaint();
+        button2.repaint();
     }
     
     
