@@ -1110,7 +1110,7 @@ public final class Client implements IClient
         getLegionInfo(markerId).revealCreatures(names);
     }
 
-    /** additionaly remember the images list for later, the engagement report
+    /** additionally remember the images list for later, the engagement report
      * */
     public void revealEngagedCreatures(
         String markerId, final List names, boolean isAttacker)
@@ -1795,19 +1795,23 @@ public final class Client implements IClient
         }
         else if (reason.equals(Constants.doSplit))
         {
+            showMessageDialog(errmsg);
             kickSplit();
         }
         else if (reason.equals(Constants.doneWithSplits))
         {
-            doneWithMoves();
+            showMessageDialog(errmsg);
+            kickSplit();
         }
         else if (reason.equals(Constants.doMove))
         {
+            showMessageDialog(errmsg);
             kickMoves();
         }
         else if (reason.equals(Constants.doneWithMoves))
         {
-            doneWithRecruits();
+            showMessageDialog(errmsg);
+            kickMoves();
         }
         else if (reason.equals(Constants.doBattleMove))
         {
@@ -1826,17 +1830,17 @@ public final class Client implements IClient
         }
         else if (reason.equals(Constants.doneWithStrikes))
         {
+            showMessageDialog(errmsg);
         }
         else if (reason.equals(Constants.doneWithEngagements))
         {
+            showMessageDialog(errmsg);
         }
         else if (reason.equals(Constants.doRecruit))
         {
-            doneWithRecruits();
         }
         else if (reason.equals(Constants.doneWithRecruits))
         {
-            doneWithSplits();
         }
         else
         {
@@ -2185,6 +2189,12 @@ public final class Client implements IClient
             {
                 focusBoard();
                 defaultCursor();
+                if (!getOption(Options.autoSplit) &&
+                        (getPlayerInfo().getMarkersAvailable().size() < 1 ||
+                        findTallLegionHexes(4).isEmpty()))
+                {
+                    doneWithSplits();
+                }
             }
             else
             {
@@ -2240,6 +2250,13 @@ public final class Client implements IClient
                 aiPause();
                 ai.pickEngagement();
             }
+            else
+            {
+                if (findEngagements().isEmpty())
+                {
+                    doneWithEngagements();
+                }
+            }
         }
     }
 
@@ -2257,6 +2274,11 @@ public final class Client implements IClient
             {
                 focusBoard();
                 defaultCursor();
+                if (!getOption(Options.autoRecruit) && 
+                    getPossibleRecruitHexes().isEmpty())
+                {
+                    doneWithRecruits();
+                }
             }
         }
         updateStatusScreen();
@@ -3258,12 +3280,18 @@ public final class Client implements IClient
             }
         }
         return set;
-
     }
 
     /** Return a set of hexLabels for the active player's legions with
      *  7 or more creatures. */
     Set findTallLegionHexes()
+    {
+        return findTallLegionHexes(7);
+    }
+
+    /** Return a set of hexLabels for the active player's legions with
+     *  minHeight or more creatures. */
+    Set findTallLegionHexes(int minHeight)
     {
         Set set = new HashSet();
 
@@ -3272,7 +3300,7 @@ public final class Client implements IClient
         {
             Map.Entry entry = (Map.Entry)it.next();
             LegionInfo info = (LegionInfo)entry.getValue();
-            if (info.getHeight() >= 7 &&
+            if (info.getHeight() >= minHeight &&
                     activePlayerName.equals(info.getPlayerName()))
             {
                 set.add(info.getHexLabel());
