@@ -21,15 +21,45 @@ Bug: Complete modal lockup of defender (human network client) battlemap
 Bug: Chat window went modal and started beeping.  Killing it from the
    Graphics menu worked.
 
-Bug: Brown's turn, number 6
-We can safely split AND attack with Br02
-We can safely split AND attack with Br02
-We can safely split AND attack with Br02
-We can safely split AND attack with Br02
-(Hung here)
-
 Bug: Logic to keep ShowLegion fully onscreen also failing on RH 7.3, 1.4.0,
    Sawfish at 1600x1200
+
+Bug: Hang during AI engagement phase:
+From client Blue: doneWithMoves
+Phase advances to Fight
+in kickEngagements() summoning=false reinforcing=true acquiring=false
+0 engagements left
+From client Blue: engage ~ null
+
+Bug: Hang during AI split phase:
+Black's turn, number 35
+We can safely split AND attack with Bk01
+We can safely split AND attack with Bk01
+We can safely split AND attack with Bk01
+We can safely split AND attack with Bk01
+We can safely split AND attack with Bk01
+We can safely split AND attack with Bk01
+We can safely split AND attack with Bk01
+We can safely split AND attack with Bk01
+Not splitting Bk01 because it can't improve from here
+
+Bug: Hang during AI split phase
+From client Brown: engage ~ 134
+From client Red: flee ~ Rd06
+Legion Rd06 (Jester) flees from legion Br01 (Antlers)
+Legion Rd06 (Jester) [Ranger, Ranger] is eliminated
+Brown earns 16.0 points
+in kickEngagements() summoning=false reinforcing=false acquiring=false
+0 engagements left
+Phase advances to Muster
+Gold's turn, number 17
+From client Brown: doneWithEngagements
+Error: Brown illegally called doneWithEngagements()
+
+Caretaker Titan has excess "Titan" at top, obscured by image.  Use
+   black 6-4 titan instead?
+
+Unify command-line argument processing on client and server sides.
 
 Add link from client to LogWindow; advance scroll thumb at end of various
    phases. 

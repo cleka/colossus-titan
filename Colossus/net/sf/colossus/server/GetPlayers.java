@@ -99,21 +99,28 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         JPanel gamePane = new JPanel();
         gamePane.setBorder(new TitledBorder("Game Startup"));
-        gamePane.setLayout(new GridLayout(0, 3));
+        gamePane.setLayout(new GridLayout(0, 4));
         mainPane.add(gamePane);
         
         JButton button1 = new JButton(Constants.newGame);
         button1.setMnemonic(KeyEvent.VK_N);
         gamePane.add(button1);
         button1.addActionListener(this);
+
         JButton button2 = new JButton(Constants.loadGame);
         button2.setMnemonic(KeyEvent.VK_L);
         gamePane.add(button2);
         button2.addActionListener(this);
-        JButton button3 = new JButton(Constants.quit);
-        button3.setMnemonic(KeyEvent.VK_Q);
+
+        JButton button3 = new JButton(Constants.runClient);
+        button2.setMnemonic(KeyEvent.VK_C);
         gamePane.add(button3);
         button3.addActionListener(this);
+
+        JButton button4 = new JButton(Constants.quit);
+        button4.setMnemonic(KeyEvent.VK_Q);
+        gamePane.add(button4);
+        button4.addActionListener(this);
 
         JPanel checkboxPane = new JPanel(new GridLayout(0, 3));
         checkboxPane.setBorder(new TitledBorder("General Options"));
@@ -403,6 +410,14 @@ public final class GetPlayers extends KDialog implements WindowListener,
     }
 
 
+    private void doRunClient()
+    {
+        setVisible(false);
+        options.setOption(Constants.runClient, true);
+        dispose();
+    }
+
+
     public void windowClosing(WindowEvent e)
     {
         dispose();
@@ -476,6 +491,10 @@ public final class GetPlayers extends KDialog implements WindowListener,
         else if (e.getActionCommand().equals(Constants.loadGame))
         {
             doLoadGame();
+        }
+        else if (e.getActionCommand().equals(Constants.runClient))
+        {
+            doRunClient();
         }
         else if (e.getActionCommand().equals(Options.aiDelay))
         {

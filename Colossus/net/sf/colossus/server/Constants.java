@@ -177,6 +177,7 @@ public final class Constants
     public static final String loadGame = "Load game";
     public static final String saveGame = "Save game";
     public static final String quit = "Quit";
+    public static final String runClient = "Run network client";
 
 
     /** Available internal variants  Try to keep this list mostly

@@ -1746,7 +1746,14 @@ Log.debug(playerName + " Client.cleanupBattle()");
         {
             aiPause();
             String hexLabel = ai.pickEngagement();
-            engage(hexLabel);
+            if (hexLabel != null)
+            {
+                engage(hexLabel);
+            }
+            else
+            {
+                doneWithEngagements();
+            }
         }
     }
 
@@ -3277,7 +3284,6 @@ Log.debug(playerName + " Client.setupBattleFight()");
     }
 
 
-    /** Used for human players only. */
     void doSplit(String parentId)
     {
         this.parentId = null;

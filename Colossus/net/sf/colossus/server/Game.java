@@ -19,6 +19,7 @@ import net.sf.colossus.client.Proposal;
 import net.sf.colossus.client.BattleMap;
 import net.sf.colossus.parser.TerrainRecruitLoader;
 import net.sf.colossus.client.HexMap;
+import net.sf.colossus.client.StartClient;
 
 /**
  * Class Game gets and holds high-level data about a Titan game.
@@ -241,6 +242,14 @@ Log.debug("Called Game.initServer()");
         {
             options.clearPlayerInfo();
             loadGame(filename);
+            return;
+        }
+
+        // See if user hit the Run client button, and we should abort
+        // the server and run the client.
+        if (options.getOption(Constants.runClient))
+        {
+            StartClient.main();
             return;
         }
 
@@ -704,14 +713,15 @@ Log.debug("Called Game.newGame2()");
         switch (remaining)
         {
             case 0:
-                Log.event("Game over -- Draw");
+                Log.event("Game over -- Draw at " + new Date().getTime());
                 server.allTellGameOver("Draw");
                 setGameOver(true);
                 break;
 
             case 1:
                 String winnerName = getWinner().getName();
-                Log.event("Game over -- " + winnerName + " wins");
+                Log.event("Game over -- " + winnerName + " wins at " +
+                    new Date().getTime());
                 server.allTellGameOver(winnerName + " wins");
                 setGameOver(true);
                 break;

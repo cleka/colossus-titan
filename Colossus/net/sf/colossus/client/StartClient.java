@@ -206,4 +206,11 @@ public class StartClient extends KDialog implements WindowListener,
             connect(playerName, hostname, port);
         }
     }
+
+    /** Convenience method for calls from server side. */
+    public static void main()
+    {
+        String [] args = new String[0];
+        main(args);
+    }
 }

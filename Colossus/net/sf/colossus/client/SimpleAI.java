@@ -271,129 +271,133 @@ public class SimpleAI implements AI
         PlayerInfo player = client.getPlayerInfo(client.getPlayerName());
 
         Iterator it = player.getLegionIds().iterator();
-        outer: while (it.hasNext())
+        while (it.hasNext())
         {
             String markerId = (String)it.next();
-            LegionInfo legion = client.getLegionInfo(markerId);
+            splitOneLegion(player, markerId);
+        }
+    }
 
-            if (legion.getHeight() < 7)
+    private void splitOneLegion(PlayerInfo player, String markerId)
+    {
+        LegionInfo legion = client.getLegionInfo(markerId);
+
+        if (legion.getHeight() < 7)
+        {
+            return;
+        }
+
+        // Do not split if we're likely to be forced to attack and lose
+        // Do not split if we're likely to want to fight and we need to
+        //     be 7 high.
+        // Do not split if there's no upwards recruiting or angel
+        //     acquiring potential.
+
+        // TODO: Don't split if we're about to be attacked and we
+        // need the muscle
+
+        // Only consider this if we're not doing initial game split
+        if (legion.getHeight() == 7)
+        {
+            int forcedToAttack = 0;
+            boolean goodRecruit = false;
+            legion.sortContents();
+
+            for (int roll = 1; roll <= 6; roll++)
             {
-                continue;
-            }
-
-            // Do not split if we're likely to be forced to attack and lose
-            // Do not split if we're likely to want to fight and we need to
-            //     be 7 high.
-            // Do not split if there's no upwards recruiting or angel
-            //     acquiring potential.
-
-            // TODO: Don't split if we're about to be attacked and we
-            // need the muscle
-
-            // Only consider this if we're not doing initial game split
-            if (legion.getHeight() == 7)
-            {
-                int forcedToAttack = 0;
-                boolean goodRecruit = false;
-                legion.sortContents();
-
-                for (int roll = 1; roll <= 6; roll++)
+                Set moves = client.getMovement().listAllMoves(legion, 
+                    legion.getCurrentHex(), roll);
+                int safeMoves = 0;
+                Iterator moveIt = moves.iterator();
+                while (moveIt.hasNext())
                 {
-                    Set moves = client.getMovement().listAllMoves(legion, 
-                        legion.getCurrentHex(), roll);
-                    int safeMoves = 0;
-                    Iterator moveIt = moves.iterator();
-                    while (moveIt.hasNext())
-                    {
-                        String hexLabel = (String)moveIt.next();
-                        MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
+                    String hexLabel = (String)moveIt.next();
+                    MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
 
-                        if (client.getNumEnemyLegions(hexLabel, 
-                            player.getName()) == 0)
+                    if (client.getNumEnemyLegions(hexLabel, 
+                        player.getName()) == 0)
+                    {
+                        safeMoves++;
+                        if (!goodRecruit && couldRecruitUp(legion,
+                            hexLabel, null, hex.getTerrain()))
                         {
+                            goodRecruit = true;
+                        }
+                    }
+                    else
+                    {
+                        LegionInfo enemy = client.getLegionInfo(
+                            client.getFirstEnemyLegion(
+                            hexLabel, player.getName()));
+                        int result = estimateBattleResults(legion, true,
+                            enemy, hex);
+
+                        if (result == WIN_WITH_MINIMAL_LOSSES)
+                        {
+                            Log.debug(
+                                "We can safely split AND attack with "
+                                + legion);
                             safeMoves++;
+
+                            // Also consider acquiring angel.
                             if (!goodRecruit && couldRecruitUp(legion,
-                                hexLabel, null, hex.getTerrain()))
+                                hexLabel, enemy, hex.getTerrain()))
                             {
                                 goodRecruit = true;
                             }
                         }
-                        else
+
+                        int result2 = estimateBattleResults(legion, false,
+                            enemy, hex);
+
+                        if (result2 == WIN_WITH_MINIMAL_LOSSES && 
+                            result != WIN_WITH_MINIMAL_LOSSES && roll <= 4)
                         {
-                            LegionInfo enemy = client.getLegionInfo(
-                                client.getFirstEnemyLegion(
-                                hexLabel, player.getName()));
-                            int result = estimateBattleResults(legion, true,
-                                enemy, hex);
+                            // don't split so that we can attack!
+                            Log.debug("Not splitting " + legion +
+                                " because we want the muscle to attack");
 
-                            if (result == WIN_WITH_MINIMAL_LOSSES)
-                            {
-                                Log.debug(
-                                    "We can safely split AND attack with "
-                                    + legion);
-                                safeMoves++;
-
-                                // Also consider acquiring angel.
-                                if (!goodRecruit && couldRecruitUp(legion,
-                                    hexLabel, enemy, hex.getTerrain()))
-                                {
-                                    goodRecruit = true;
-                                }
-                            }
-
-                            int result2 = estimateBattleResults(legion, false,
-                                enemy, hex);
-
-                            if (result2 == WIN_WITH_MINIMAL_LOSSES
-                                && result != WIN_WITH_MINIMAL_LOSSES
-                                && roll <= 4)
-                            {
-                                // don't split so that we can attack!
-                                Log.debug("Not splitting " + legion +
-                                    " because we want the muscle to attack");
-
-                                forcedToAttack = 999;
-                                continue outer;
-                            }
+                            forcedToAttack = 999;
+                            return;
                         }
                     }
-
-                    if (safeMoves == 0)
-                    {
-                        forcedToAttack++;
-                    }
-                    // If we'll be forced to attack on 2 or more rolls,
-                    // don't split.
-                    if (forcedToAttack >= 2)
-                    {
-                        continue outer;
-                    }
                 }
-                if (!goodRecruit)
+
+                if (safeMoves == 0)
                 {
-                    // No point in splitting, since we can't improve.
-                    Log.debug("Not splitting " + legion +
-                        " because it can't improve from here");
-                    continue outer;
+                    forcedToAttack++;
+                }
+                // If we'll be forced to attack on 2 or more rolls,
+                // don't split.
+                if (forcedToAttack >= 2)
+                {
+                    return;
                 }
             }
-
-            String newMarkerId = pickMarker(client.getMarkersAvailable(),
-                player.getShortColor());
-
-            StringBuffer results = new StringBuffer();
-            List creatures = chooseCreaturesToSplitOut(legion);
-            it = creatures.iterator();
-            while (it.hasNext())
+            if (!goodRecruit)
             {
-                Creature creature = (Creature)it.next();
-                results.append(",");
-                results.append(creature.getName());
+                // No point in splitting, since we can't improve.
+                Log.debug("Not splitting " + legion +
+                    " because it can't improve from here");
+                return;
             }
-            client.doSplit(legion.getMarkerId(), newMarkerId, 
-                results.toString());
         }
+
+        String newMarkerId = pickMarker(client.getMarkersAvailable(),
+            player.getShortColor());
+
+        StringBuffer results = new StringBuffer();
+        List creatures = chooseCreaturesToSplitOut(legion);
+        Iterator it = creatures.iterator();
+        while (it.hasNext())
+        {
+            Creature creature = (Creature)it.next();
+            results.append(",");
+            results.append(creature.getName());
+        }
+        client.doSplit(legion.getMarkerId(), newMarkerId, results.toString());
     }
+
 
     /** Return true if the legion could recruit or acquire something
      *  better than its worst creature in hexLabel. */

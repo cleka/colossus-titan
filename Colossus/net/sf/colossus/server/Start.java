@@ -9,6 +9,7 @@ import com.werken.opt.Option;
 import com.werken.opt.CommandLine;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.client.Client;
+import net.sf.colossus.client.StartClient;
 
 
 /**
@@ -33,7 +34,8 @@ public final class Start
 
     public static void main(String [] args)
     {
-        Log.event("Start for Colossus version " + Client.getVersion());
+        Log.event("Start for Colossus version " + Client.getVersion() + 
+            " at " + new Date().getTime());
 
         // This is a werken Options, not a util Options.
         Options opts = new Options();
@@ -44,6 +46,7 @@ public final class Start
             opts.addOption('h', "help", false, "Show options help");
             opts.addOption('l', "load", true, "Load savegame");
             opts.addOption('z', "latest", false, "Load latest savegame");
+            opts.addOption('c', "client", false, "Run network client instead");
             opts.addOption('g', "go", false, "Start new game immediately");
             opts.addOption('v', "variant", true, "Set variant");
             opts.addOption('u', "nhuman", true, "Number of humans");
@@ -83,6 +86,10 @@ public final class Start
                 filename = "--latest";
             }
             game.loadGame(filename);
+        }
+        else if (cl.optIsSet('c'))
+        {
+            StartClient.main();
         }
         else
         {
