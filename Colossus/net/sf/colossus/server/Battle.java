@@ -325,8 +325,7 @@ public final class Battle
         {
             if (!isOver())
             {
-                int delay = getDelay(server, getActivePlayer().isHuman());
-                startTimer(delay);
+                advancePhaseInternal();
             }
         }
     

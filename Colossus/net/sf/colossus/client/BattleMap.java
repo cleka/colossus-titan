@@ -45,7 +45,8 @@ public final class BattleMap extends HexMap implements MouseListener,
     private SaveWindow saveWindow;
 
 
-    BattleMap(Client client, String masterHexLabel)
+    BattleMap(Client client, String masterHexLabel, String attackerMarkerId,
+        String defenderMarkerId)
     {
         super(masterHexLabel);
 
@@ -86,6 +87,9 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         // Do not call pack() or setVisible(true) until after
         // BattleDice is added to frame.
+
+        battleFrame.setTitle(attackerMarkerId + " attacks " + 
+            defenderMarkerId + " in " + masterHexLabel);
     }
 
 
@@ -211,8 +215,6 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        battleFrame.setTitle(client.getBattleActivePlayerName() +
-            " Turn " + client.getBattleTurnNumber() + " : Summon");
         phaseMenu.removeAll();
 
         requestFocus();
@@ -226,8 +228,6 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        battleFrame.setTitle(client.getBattleActivePlayerName() +
-            " Turn " + client.getBattleTurnNumber() + " : Recruit");
         if (phaseMenu != null)
         {
             phaseMenu.removeAll();
@@ -243,9 +243,6 @@ public final class BattleMap extends HexMap implements MouseListener,
         {
             return;
         }
-
-        battleFrame.setTitle(client.getBattleActivePlayerName() +
-            " Turn " + client.getBattleTurnNumber() + " : Move");
 
         phaseMenu.removeAll();
 
@@ -284,10 +281,6 @@ public final class BattleMap extends HexMap implements MouseListener,
             return;
         }
 
-        battleFrame.setTitle(client.getBattleActivePlayerName() +
-            " Turn " + client.getBattleTurnNumber() +
-            ((client.getBattlePhase() == Constants.FIGHT) ?
-            " : Strike" : " : Strikeback"));
         phaseMenu.removeAll();
 
         JMenuItem mi;

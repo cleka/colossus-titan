@@ -784,8 +784,7 @@ Log.debug("Called Game.newGame2()");
         void advancePhase()
         {
             pendingAdvancePhase = true;
-            int delay = getDelay(server, getActivePlayer().isHuman());
-            startTimer(delay);
+            advancePhaseInternal();
         }
 
         /** Advance to the next phase, with no error checking. */

@@ -2252,7 +2252,7 @@ Log.debug("Best target is null, aborting");
                 BattleChit fakeCritter = cm.getCritter();
 
                 String hexLabel = cm.getEndingHexLabel();
-                Log.debug("applymove: try " + fakeCritter + " to " + hexLabel);
+                Log.debug("try " + fakeCritter + " to " + hexLabel);
                 client.doBattleMove(fakeCritter.getTag(), hexLabel);
                 // XXX Need to test that the move was okay, and
                 // try another one if it failed.
@@ -2561,11 +2561,9 @@ Log.debug("Called findBattleMoves()");
     }
 
 
-    private Set duplicateLegionMoveChecker = new HashSet();
-
-    /** allCritterMoves is a List of sorted moveLists.  A moveList is a 
+    /** allCritterMoves is a List of sorted MoveLists.  A MoveList is a 
      *  sorted List of CritterMoves for one critter.  Return a sorted List 
-     *  of legionMoves.  A legionMove is a List of one CritterMove per
+     *  of LegionMoves.  A LegionMove is a List of one CritterMove per
      *  mobile critter in the legion, where no two critters move to the
      *  same hex. */
     List findLegionMoves(final ArrayList allCritterMoves)
@@ -2575,7 +2573,6 @@ Log.debug("Called findBattleMoves()");
 
         // Now that the list is as small as possible, start finding combos.
         List legionMoves = new ArrayList();
-        duplicateLegionMoveChecker.clear();
         final int limit = getCreatureMoveLimit();
         int [] indexes = new int[critterMoves.size()];
 
@@ -2591,10 +2588,12 @@ Log.debug("Called findBattleMoves()");
     private void nestForLoop(int [] indexes, final int level, final
         List critterMoves, List legionMoves)
     {
-        // TODO See if doing the set test at every level is faster.
+        // TODO See if doing the set test at every level is faster than
+        // always going down to level 0 then checking.
         if (level == 0)
         {
             duplicateHexChecker.clear();
+            boolean offboard = false;
             for (int j = 0; j < indexes.length; j++)
             {
                 MoveList moveList = (MoveList)critterMoves.get(j);
@@ -2603,21 +2602,30 @@ Log.debug("Called findBattleMoves()");
                     return;
                 }
                 CritterMove cm = (CritterMove)moveList.get(indexes[j]);
+                String endingHexLabel = cm.getEndingHexLabel();
+                if (endingHexLabel.startsWith("X"))
+                {
+                    offboard = true;
+                }
+                else if (duplicateHexChecker.contains(endingHexLabel))
+                {
+                    // Need to allow duplicate offboard moves, in case 2 or
+                    // more creatures cannot enter.
+                    return;
+                }
                 duplicateHexChecker.add(cm.getEndingHexLabel());
             }
-            if (duplicateHexChecker.size() == indexes.length)
+
+            LegionMove lm  = makeLegionMove(indexes, critterMoves);
+            // Put offboard moves last, so they'll be skipped if the AI
+            // runs out of time.
+            if (offboard)
             {
-                LegionMove lm  = makeLegionMove(indexes, critterMoves);
-                if (!duplicateLegionMoveChecker.contains(lm))
-                {
-                    legionMoves.add(lm);
-                    duplicateLegionMoveChecker.add(lm);
-                }
-                else
-                {
-                    // XXX Not working at all.
-Log.debug("Pruning a duplicate legion move");
-                }
+                legionMoves.add(lm);
+            }
+            else
+            {
+                legionMoves.add(0, lm);
             }
         }
         else
@@ -2708,6 +2716,39 @@ Log.debug("Pruning a duplicate legion move");
     }
 
 
+    BattleEvalConstants bec = new BattleEvalConstants();
+
+    class BattleEvalConstants
+    {
+        int OFFBOARD_DEATH_SCALE_FACTOR = -150;
+        int NATIVE_BONUS_TERRAIN = 50;
+        int NATIVE_BOG = 20;
+        int NON_NATIVE_PENALTY_TERRAIN = -100;
+        int FIRST_RANGESTRIKE_TARGET = 300;
+        int EXTRA_RANGESTRIKE_TARGET = 100;
+        int RANGESTRIKE_TITAN = 500;
+        int RANGESTRIKE_WITHOUT_PENALTY = 100;
+        int ATTACKER_ADJACENT_TO_ENEMY = 400;
+        int DEFENDER_ADJACENT_TO_ENEMY = -20;
+        int ADJACENT_TO_ENEMY_TITAN = 1300;
+        int ADJACENT_TO_RANGESTRIKER = 500;
+        int KILL_SCALE_FACTOR = 100;
+        int KILLABLE_TARGETS_SCALE_FACTOR = 10;
+        int ATTACKER_GET_KILLED_SCALE_FACTOR = -20;
+        int DEFENDER_GET_KILLED_SCALE_FACTOR = -40;
+        int ATTACKER_GET_HIT_SCALE_FACTOR = -1;
+        int DEFENDER_GET_HIT_SCALE_FACTOR = -2;
+        int TITAN_TOWER_HEIGHT_BONUS = 2000;
+        int DEFENDER_TOWER_HEIGHT_BONUS = 80;
+        int TITAN_FORWARD_EARLY_PENALTY = -10000;
+        int TITAN_BY_EDGE_OR_TREE_BONUS = 400;
+        int DEFENDER_FORWARD_EARLY_PENALTY = -60;
+        int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -300;
+        int ADJACENT_TO_BUDDY = 100;
+        int ADJACENT_TO_BUDDY_TITAN = 200;
+    }
+
+
     private int evaluateCritterMove(BattleChit critter)
     {
         final char terrain = client.getBattleTerrain();
@@ -2716,39 +2757,10 @@ Log.debug("Pruning a duplicate legion move");
             client.getMyEngagedMarkerId());
         final LegionInfo enemy = client.getLegionInfo(
             client.getBattleInactiveMarkerId());
-        final Creature creature = Creature.getCreatureByName(
-            critter.getCreatureName());
-        final int skill = creature.getSkill();
+        final int skill = critter.getSkill();
         final BattleHex hex = client.getBattleHex(critter);
         final int turn = client.getBattleTurnNumber();
 
-        // Weight constants.
-        final int OFFBOARD_DEATH_SCALE_FACTOR = -150;
-        final int NATIVE_BONUS_TERRAIN = 50;
-        final int NATIVE_BOG = 20;
-        final int NON_NATIVE_PENALTY_TERRAIN = -100;
-        final int FIRST_RANGESTRIKE_TARGET = 300;
-        final int EXTRA_RANGESTRIKE_TARGET = 100;
-        final int RANGESTRIKE_TITAN = 500;
-        final int RANGESTRIKE_WITHOUT_PENALTY = 100;
-        final int ATTACKER_ADJACENT_TO_ENEMY = 400;
-        final int DEFENDER_ADJACENT_TO_ENEMY = -20;
-        final int ADJACENT_TO_TITAN = 1300;
-        final int ADJACENT_TO_RANGESTRIKER = 500;
-        final int KILL_SCALE_FACTOR = 100;
-        final int KILLABLE_TARGETS_SCALE_FACTOR = 10;
-        final int ATTACKER_GET_KILLED_SCALE_FACTOR = -20;
-        final int DEFENDER_GET_KILLED_SCALE_FACTOR = -40;
-        final int ATTACKER_GET_HIT_SCALE_FACTOR = -1;
-        final int DEFENDER_GET_HIT_SCALE_FACTOR = -2;
-        final int TITAN_TOWER_HEIGHT_BONUS = 1000;
-        final int TITAN_FORWARD_EARLY_PENALTY = -10000;
-        final int TITAN_BY_EDGE_OR_TREE_BONUS = 400;
-        final int DEFENDER_TOWER_HEIGHT_BONUS = 80;
-        final int DEFENDER_FORWARD_EARLY_PENALTY = -60;
-        final int ATTACKER_DISTANCE_FROM_ENEMY_PENALTY = -300;
-        final int ADJACENT_TO_BUDDY = 100;
-        final int ADJACENT_TO_BUDDY_TITAN = 200;
 
         int value = 0;
 
@@ -2757,28 +2769,28 @@ Log.debug("Pruning a duplicate legion move");
         if (hex.isEntrance())
         {
             // Staying offboard to die is really bad.
-            value += OFFBOARD_DEATH_SCALE_FACTOR *
+            value += bec.OFFBOARD_DEATH_SCALE_FACTOR *
                 getCombatValue(critter, terrain);
         }
         else if (MasterHex.isNativeCombatBonus(critter.getCreature(), terrain))
         {
             if (hex.isNativeBonusTerrain())
             {
-                value += NATIVE_BONUS_TERRAIN;
+                value += bec.NATIVE_BONUS_TERRAIN;
             }
             // We want marsh natives to slightly prefer moving to bog hexes,
             // even though there's no real bonus there, to leave other hexes
             // clear for non-native allies.
             else if (hex.getTerrain() == 'o')
             {
-                value += NATIVE_BOG;
+                value += bec.NATIVE_BOG;
             }
         }
         else  // Critter is not native.
         {
             if (hex.isNonNativePenaltyTerrain())
             {
-                value += NON_NATIVE_PENALTY_TERRAIN;
+                value += bec.NON_NATIVE_PENALTY_TERRAIN;
             }
         }
 
@@ -2792,13 +2804,13 @@ Log.debug("Pruning a duplicate legion move");
             if (!client.isInContact(critter, true))
             {
                 // Rangestrikes.
-                value += FIRST_RANGESTRIKE_TARGET;
+                value += bec.FIRST_RANGESTRIKE_TARGET;
 
                 // Having multiple targets is good, in case someone else
                 // kills one.
                 if (numTargets >= 2)
                 {
-                    value += EXTRA_RANGESTRIKE_TARGET;
+                    value += bec.EXTRA_RANGESTRIKE_TARGET;
                 }
 
                 // Non-warlock skill 4 rangestrikers should slightly prefer
@@ -2813,7 +2825,7 @@ Log.debug("Pruning a duplicate legion move");
                     BattleChit target = client.getBattleChit(hexLabel);
                     if (target.isTitan())
                     {
-                        value += RANGESTRIKE_TITAN;
+                        value += bec.RANGESTRIKE_TITAN;
                     }
                     int strikeNum = client.getStrike().getStrikeNumber(critter,
                         target);
@@ -2824,7 +2836,7 @@ Log.debug("Pruning a duplicate legion move");
                 }
                 if (!penalty)
                 {
-                    value += RANGESTRIKE_WITHOUT_PENALTY;
+                    value += bec.RANGESTRIKE_WITHOUT_PENALTY;
                 }
             }
             else
@@ -2834,12 +2846,12 @@ Log.debug("Pruning a duplicate legion move");
                 // Reward being adjacent to an enemy if attacking.
                 if (legion.getMarkerId().equals(client.getAttackerMarkerId()))
                 {
-                    value += ATTACKER_ADJACENT_TO_ENEMY;
+                    value += bec.ATTACKER_ADJACENT_TO_ENEMY;
                 }
                 // Slightly penalize being adjacent to an enemy if defending.
                 else
                 {
-                    value += DEFENDER_ADJACENT_TO_ENEMY;
+                    value += bec.DEFENDER_ADJACENT_TO_ENEMY;
                 }
 
                 int killValue = 0;
@@ -2855,14 +2867,14 @@ Log.debug("Pruning a duplicate legion move");
                     // Reward being next to enemy titans.  (Banzai!)
                     if (target.isTitan())
                     {
-                        value += ADJACENT_TO_TITAN;
+                        value += bec.ADJACENT_TO_ENEMY_TITAN;
                     }
 
                     // Reward being next to a rangestriker, so it can't hang
                     // back and plink us.
                     if (target.isRangestriker() && !critter.isRangestriker())
                     {
-                        value += ADJACENT_TO_RANGESTRIKER;
+                        value += bec.ADJACENT_TO_RANGESTRIKER;
                     }
 
                     // Reward being next to an enemy that we can probably
@@ -2887,15 +2899,15 @@ Log.debug("Pruning a duplicate legion move");
                     }
                 }
 
-                value += KILL_SCALE_FACTOR * killValue +
-                    KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets;
+                value += bec.KILL_SCALE_FACTOR * killValue +
+                    bec.KILLABLE_TARGETS_SCALE_FACTOR * numKillableTargets;
 
                 int power = critter.getPower();
                 int hits = critter.getHits();
 
                 // XXX Attacking legions late in battle ignore damage.
                 if (legion.getMarkerId().equals(
-                    client.getDefenderMarkerId()) || critter.isTitan() || 
+                    client.getDefenderMarkerId()) || critter.isTitan() ||
                     turn <= 4)
                 {
                     if (hitsExpected + hits >= power)
@@ -2903,12 +2915,12 @@ Log.debug("Pruning a duplicate legion move");
                         if (legion.getMarkerId().equals(
                             client.getAttackerMarkerId()))
                         {
-                            value += ATTACKER_GET_KILLED_SCALE_FACTOR * 
+                            value += bec.ATTACKER_GET_KILLED_SCALE_FACTOR * 
                                 getKillValue(critter, terrain);
                         }
                         else
                         {
-                            value += DEFENDER_GET_KILLED_SCALE_FACTOR * 
+                            value += bec.DEFENDER_GET_KILLED_SCALE_FACTOR * 
                                 getKillValue(critter, terrain);
                         }
                     }
@@ -2917,12 +2929,12 @@ Log.debug("Pruning a duplicate legion move");
                         if (legion.getMarkerId().equals(
                             client.getAttackerMarkerId()))
                         {
-                            value += ATTACKER_GET_HIT_SCALE_FACTOR * 
+                            value += bec.ATTACKER_GET_HIT_SCALE_FACTOR * 
                                 getKillValue(critter, terrain);
                         }
                         else
                         {
-                            value += DEFENDER_GET_HIT_SCALE_FACTOR * 
+                            value += bec.DEFENDER_GET_HIT_SCALE_FACTOR * 
                                 getKillValue(critter, terrain);
                         }
                     }
@@ -2942,20 +2954,20 @@ Log.debug("Pruning a duplicate legion move");
             if (HexMap.terrainIsTower(terrain))
             {
                 // Stick to the center of the tower.
-                value += TITAN_TOWER_HEIGHT_BONUS * hex.getElevation();
+                value += bec.TITAN_TOWER_HEIGHT_BONUS * hex.getElevation();
             }
             else
             {
                 if (turn <= 4)
                 {
-                    value += TITAN_FORWARD_EARLY_PENALTY *
+                    value += bec.TITAN_FORWARD_EARLY_PENALTY *
                         client.getStrike().getRange(hex, entrance, true);
                     for (int i = 0; i < 6; i++)
                     {
                         BattleHex neighbor = hex.getNeighbor(i);
                         if (neighbor == null || neighbor.getTerrain() == 't')
                         {
-                            value += TITAN_BY_EDGE_OR_TREE_BONUS;
+                            value += bec.TITAN_BY_EDGE_OR_TREE_BONUS;
                         }
                     }
                 }
@@ -2968,7 +2980,7 @@ Log.debug("Pruning a duplicate legion move");
             if (HexMap.terrainIsTower(terrain))
             {
                 // Stick to the center of the tower.
-                value += DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation();
+                value += bec.DEFENDER_TOWER_HEIGHT_BONUS * hex.getElevation();
             }
             else
             {
@@ -2985,7 +2997,7 @@ Log.debug("Pruning a duplicate legion move");
                 }
                 if (range != preferredRange)
                 {
-                    value += DEFENDER_FORWARD_EARLY_PENALTY *
+                    value += bec.DEFENDER_FORWARD_EARLY_PENALTY *
                         Math.abs(range - preferredRange);
                 }
             }
@@ -2994,7 +3006,7 @@ Log.debug("Pruning a duplicate legion move");
         else  // Attacker, non-titan, needs to charge.
         {
             // Head for enemy creatures.
-            value += ATTACKER_DISTANCE_FROM_ENEMY_PENALTY *
+            value += bec.ATTACKER_DISTANCE_FROM_ENEMY_PENALTY *
                 client.getStrike().minRangeToEnemy(critter);
         }
 
@@ -3013,11 +3025,11 @@ Log.debug("Pruning a duplicate legion move");
                         // Buddy
                         if (other.isTitan())
                         {
-                            value += ADJACENT_TO_BUDDY_TITAN;
+                            value += bec.ADJACENT_TO_BUDDY_TITAN;
                         }
                         else
                         {
-                            value += ADJACENT_TO_BUDDY;
+                            value += bec.ADJACENT_TO_BUDDY;
                         }
                     }
                 }

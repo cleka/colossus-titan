@@ -127,6 +127,8 @@ public final class Client implements IClient
     // XXX temporary until things are synched
     private boolean tookMulligan;
 
+    private int delay = -1;
+
 
 
     public Client(String host, int port, String playerName, boolean remote)
@@ -145,14 +147,14 @@ public final class Client implements IClient
         sct.start();
     }
 
-    public boolean isRemote()
+    boolean isRemote()
     {
         return remote;
     }
 
 
     /** Take a mulligan. */
-    public void mulligan()
+    void mulligan()
     {
         undoAllMoves();   // XXX Maybe move entirely to server
         clearUndoStack();
@@ -163,7 +165,7 @@ public final class Client implements IClient
     }
 
     // XXX temp
-    public boolean tookMulligan()
+    boolean tookMulligan()
     {
         return tookMulligan;
     }
@@ -306,11 +308,17 @@ public final class Client implements IClient
         // Call here instead of from setupMove() for mulligans.
         if (isMyTurn() && getOption(Options.autoMasterMove) && !isGameOver())
         {
-            boolean again = ai.masterMove();
-            if (!again)
-            {
-                doneWithMoves();
-            }
+            doAutoMoves();
+        }
+    }
+
+    private void doAutoMoves()
+    {
+        boolean again = ai.masterMove();
+        aiPause();
+        if (!again)
+        {
+            doneWithMoves();
         }
     }
 
@@ -519,7 +527,7 @@ public final class Client implements IClient
         return numPlayers;
     }
 
-    public int getNumLivingPlayers()
+    int getNumLivingPlayers()
     {
         int total = 0;
         for (int i = 0; i < playerInfo.length; i++)
@@ -623,12 +631,12 @@ public final class Client implements IClient
     }
 
 
-    public PlayerInfo getPlayerInfo(int playerNum)
+    PlayerInfo getPlayerInfo(int playerNum)
     {
         return playerInfo[playerNum];
     }
 
-    public PlayerInfo getPlayerInfo(String name)
+    PlayerInfo getPlayerInfo(String name)
     {
         for (int i = 0; i < playerInfo.length; i++)
         {
@@ -640,7 +648,7 @@ public final class Client implements IClient
         return null;
     }
 
-    public java.util.List getPlayerNames()
+    java.util.List getPlayerNames()
     {
         java.util.List names = new ArrayList();
         for (int i = 0; i < playerInfo.length; i++)
@@ -651,7 +659,7 @@ public final class Client implements IClient
     }
 
 
-    public int getAverageLegionPointValue()
+    int getAverageLegionPointValue()
     {
         int totalValue = 0;
         int totalLegions = 0;
@@ -762,6 +770,7 @@ public final class Client implements IClient
 
     synchronized void doneWithBattleMoves()
     {
+        aiPause();
         clearUndoStack();
         server.doneWithBattleMoves();
     }
@@ -829,6 +838,7 @@ public final class Client implements IClient
 
     synchronized void doneWithStrikes()
     {
+        aiPause();
         server.doneWithStrikes();
     }
 
@@ -850,6 +860,7 @@ public final class Client implements IClient
         {
             if (getOption(Options.autoPlay))
             {
+                aiPause();
                 boolean struck = makeForcedStrikes();
                 if (!struck)
                 {
@@ -882,15 +893,14 @@ public final class Client implements IClient
         return Collections.unmodifiableList(markers);
     }
 
-    public Set getMarkersAvailable()
+    Set getMarkersAvailable()
     {
         return Collections.unmodifiableSortedSet(markersAvailable);
     }
 
 
-    /** Get this legion's info.  Create it first if necessary.
-     *  public for client-side AI -- do not call from server side. */
-    public LegionInfo getLegionInfo(String markerId)
+    /** Get this legion's info.  Create it first if necessary. */
+    LegionInfo getLegionInfo(String markerId)
     {
         LegionInfo info = (LegionInfo)legionInfo.get(markerId);
         if (info == null)
@@ -1617,6 +1627,7 @@ public final class Client implements IClient
         {
             if (getOption(Options.autoPlay))
             {
+                aiPause();
                 ai.handleCarries(carryDamage, carryTargetDescriptions);
             }
             else
@@ -1661,7 +1672,8 @@ public final class Client implements IClient
 
         if (board != null)
         {
-            map = new BattleMap(this, masterHexLabel);
+            map = new BattleMap(this, masterHexLabel, attackerMarkerId,
+                defenderMarkerId);
             JFrame frame = map.getFrame();
             battleDice = new BattleDice();
             frame.getContentPane().add(battleDice, BorderLayout.SOUTH);
@@ -1703,6 +1715,7 @@ public final class Client implements IClient
     {
         if (isMyTurn() && getOption(Options.autoPickEngagements))
         {
+            aiPause();
             String hexLabel = ai.pickEngagement();
             engage(hexLabel);
         }
@@ -1743,8 +1756,7 @@ public final class Client implements IClient
         doRecruit(markerId, recruitName, recruiterName);
     }
 
-    public void doRecruit(String markerId, String recruitName, 
-        String recruiterName)
+    void doRecruit(String markerId, String recruitName, String recruiterName)
     {
         // Call server even if some arguments are null, to get past
         // reinforcement.
@@ -1939,6 +1951,7 @@ public final class Client implements IClient
 
         if (isMyTurn() && getOption(Options.autoPickEngagements))
         {
+            aiPause();
             ai.pickEngagement();
         }
     }
@@ -2386,7 +2399,7 @@ public final class Client implements IClient
         return (playerName.equals(getPlayerNameByTag(tag)));
     }
 
-    public String getActivePlayerName()
+    String getActivePlayerName()
     {
         return activePlayerName;
     }
@@ -2401,7 +2414,7 @@ public final class Client implements IClient
         return Constants.getPhaseName(getPhase());
     }
 
-    public int getTurnNumber()
+    int getTurnNumber()
     {
         return turnNumber;
     }
@@ -2507,7 +2520,7 @@ public final class Client implements IClient
     }
 
     /** Return true if the move looks legal. */
-    public boolean doMove(String moverId, String hexLabel)
+    boolean doMove(String moverId, String hexLabel)
     {
         if (moverId == null)
         {
@@ -2596,11 +2609,7 @@ public final class Client implements IClient
 
         if (isMyTurn() && getOption(Options.autoMasterMove) && !isGameOver())
         {
-            boolean again = ai.masterMove();
-            if (!again)
-            {
-                doneWithMoves();
-            }
+            doAutoMoves();
         }
     }
 
@@ -2621,8 +2630,7 @@ public final class Client implements IClient
     }
 
     /** Return a list of Creatures. */
-    public java.util.List findEligibleRecruits(String markerId, 
-        String hexLabel)
+    java.util.List findEligibleRecruits(String markerId, String hexLabel)
     {
         java.util.List recruits = new ArrayList();
 
@@ -2672,8 +2680,7 @@ public final class Client implements IClient
     }
 
     /** Return a list of creature name strings. */
-    public java.util.List findEligibleRecruiters(String markerId, 
-        String recruitName)
+    java.util.List findEligibleRecruiters(String markerId, String recruitName)
     {
         java.util.List recruiters;
         Creature recruit = Creature.getCreatureByName(recruitName);
@@ -2734,7 +2741,7 @@ public final class Client implements IClient
     /** Return a set of hexLabels for all other unengaged legions of
      *  markerId's player that have summonables.
      * public for client-side AI -- do not call from server side. */
-    public Set findSummonableAngelHexes(String summonerId)
+    Set findSummonableAngelHexes(String summonerId)
     {
         Set set = new HashSet();
         LegionInfo summonerInfo = getLegionInfo(summonerId);
@@ -2755,12 +2762,12 @@ public final class Client implements IClient
         return set;
     }
 
-    public Movement getMovement()
+    Movement getMovement()
     {
         return movement;
     }
 
-    public synchronized Strike getStrike()
+    synchronized Strike getStrike()
     {
         return strike;
     }
@@ -2798,15 +2805,14 @@ public final class Client implements IClient
         return count.intValue();
     }
 
-    public int getCreatureCount(Creature creature)
+    int getCreatureCount(Creature creature)
     {
         return getCreatureCount(creature.getName());
     }
 
 
-    /** Returns a list of markerIds.
-     *  public for client-side AI -- do not call from server side */
-    public java.util.List getLegionsByHex(String hexLabel)
+    /** Returns a list of markerIds. */
+    java.util.List getLegionsByHex(String hexLabel)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
@@ -2815,7 +2821,7 @@ public final class Client implements IClient
             Map.Entry entry = (Map.Entry)it.next();
             LegionInfo info = (LegionInfo)entry.getValue();
             if (info != null && info.getHexLabel() != null &&
-                hexLabel.equals(info.getHexLabel()))
+                hexLabel != null && hexLabel.equals(info.getHexLabel()))
             {
                 markerIds.add(info.getMarkerId());
             }
@@ -2824,7 +2830,7 @@ public final class Client implements IClient
     }
 
     /** Returns a list of markerIds. */
-    public synchronized java.util.List getLegionsByPlayer(String name)
+    synchronized java.util.List getLegionsByPlayer(String name)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.entrySet().iterator();
@@ -2879,7 +2885,7 @@ public final class Client implements IClient
     }
 
     /** Return a set of hexLabels for all hexes with engagements. */
-    public Set findEngagements()
+    Set findEngagements()
     {
         Set set = new HashSet();
         Iterator it = MasterBoard.getAllHexLabels().iterator();
@@ -2929,7 +2935,7 @@ public final class Client implements IClient
         return false;
     }
 
-    public java.util.List getEnemyLegions(String playerName)
+    java.util.List getEnemyLegions(String playerName)
     {
         java.util.List markerIds = new ArrayList();
         Iterator it = legionInfo.values().iterator();
@@ -2945,7 +2951,7 @@ public final class Client implements IClient
         return markerIds;
     }
 
-    public java.util.List getEnemyLegions(String hexLabel, String playerName)
+    java.util.List getEnemyLegions(String hexLabel, String playerName)
     {
         java.util.List markerIds = new ArrayList();
         java.util.List legions = getLegionsByHex(hexLabel);
@@ -2961,7 +2967,7 @@ public final class Client implements IClient
         return markerIds;
     }
 
-    public String getFirstEnemyLegion(String hexLabel, String playerName)
+    String getFirstEnemyLegion(String hexLabel, String playerName)
     {
         java.util.List markerIds = getEnemyLegions(hexLabel, playerName);
         if (markerIds.isEmpty())
@@ -2972,12 +2978,12 @@ public final class Client implements IClient
     }
 
 
-    public int getNumEnemyLegions(String hexLabel, String playerName)
+    int getNumEnemyLegions(String hexLabel, String playerName)
     {
         return getEnemyLegions(hexLabel, playerName).size();
     }
 
-    public java.util.List getFriendlyLegions(String hexLabel, 
+    java.util.List getFriendlyLegions(String hexLabel, 
         String playerName)
     {
         java.util.List markerIds = new ArrayList();
@@ -2994,7 +3000,7 @@ public final class Client implements IClient
         return markerIds;
     }
 
-    public String getFirstFriendlyLegion(String hexLabel, String playerName)
+    String getFirstFriendlyLegion(String hexLabel, String playerName)
     {
         java.util.List markerIds = getFriendlyLegions(hexLabel, playerName);
         if (markerIds.isEmpty())
@@ -3101,17 +3107,19 @@ public final class Client implements IClient
         {
             return;
         }
+        aiPause();
         server.doneWithSplits();
         clearUndoStack();
         clearRecruitChits();
     }
 
-    public void doneWithMoves()
+    void doneWithMoves()
     {
         if (!isMyTurn())
         {
             return;
         }
+        aiPause();
         clearRecruitChits();
         clearUndoStack();
         server.doneWithMoves();
@@ -3123,6 +3131,7 @@ public final class Client implements IClient
         {
             return;
         }
+        aiPause();
         server.doneWithEngagements();
         clearUndoStack();
     }
@@ -3134,6 +3143,7 @@ public final class Client implements IClient
             return;
         }
         clearUndoStack();
+        aiPause();
         server.doneWithRecruits();
     }
 
@@ -3195,12 +3205,12 @@ public final class Client implements IClient
         return playerName.equals(getBattleActivePlayerName());
     }
 
-    public int getMovementRoll()
+    int getMovementRoll()
     {
         return movementRoll;
     }
 
-    public int getMulligansLeft()
+    int getMulligansLeft()
     {
         PlayerInfo info = getPlayerInfo(playerName);
         return info.getMulligansLeft();
@@ -3273,7 +3283,7 @@ public final class Client implements IClient
     }
 
     /** Called by AI, and by pickMarkerCallback() */
-    public void doSplit(String parentId, String childId, String results)
+    void doSplit(String parentId, String childId, String results)
     {
         server.doSplit(parentId, childId, results);
     }
@@ -3440,7 +3450,7 @@ public final class Client implements IClient
         return false;
     }
 
-    public void setType(final String aType)
+    private void setType(final String aType)
     {
         String type = new String(aType);
         if (type.endsWith(Constants.anyAI))
@@ -3475,6 +3485,37 @@ public final class Client implements IClient
                     ex.printStackTrace();
                 }
             }
+        }
+    }
+
+    /** Wait for aiDelay. */
+    void aiPause()
+    {
+        if (delay < 0)
+        {
+            setupDelay();
+        }
+
+        try
+        {
+            Thread.sleep(delay);
+        }
+        catch (InterruptedException ex)
+        {
+            Log.error("Client.aiPause() " + ex.toString());
+        }
+    }
+
+    private void setupDelay()
+    {
+        delay = getIntOption(Options.aiDelay);
+        if (!getOption(Options.autoPlay) || delay < Constants.MIN_AI_DELAY) 
+        {
+            delay = Constants.MIN_AI_DELAY;
+        }
+        else if (delay > Constants.MAX_AI_DELAY)
+        {
+            delay = Constants.MAX_AI_DELAY;
         }
     }
 }

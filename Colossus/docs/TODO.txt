@@ -1,13 +1,11 @@
 Bug: Need to detect failed AI battle moves and fall back to next choice.
 
-Bug: If variant loading fails due to a missing variant, need to make sure 
-   that both the server cfg file and the variant pane get reset to "Default"
-
-Bug: Loading game on AI turn causes AI client to drop?
-
 Bug: Attacked a 5-high enemy legion and it became 3-high.
 
 
+Need to initialize number of titans in caretaker based on variant max_players.
+
+AI delays within phases (between moves, strikes, etc.). 
 
 Real whole-legion battle eval function, including gang hits.
 
@@ -17,8 +15,7 @@ Refactor to eliminate duplicate code.
 
 Machine learning to tweak AI constants.
 
-Improve networking.  (Persistent servers, reporting game openings to web
-   page.)
+Improve networking.  (Persistent servers, reporting game openings to web page.)
 
 When getting both a PickRecruit and an AcquireAngel after a battle,
    make sure the PickRecruit is on top, because it's modal.
