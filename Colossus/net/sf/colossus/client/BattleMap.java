@@ -222,7 +222,7 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         phaseMenu.removeAll();
 
-        requestFocus();
+        reqFocus();
     }
 
 
@@ -238,7 +238,7 @@ public final class BattleMap extends HexMap implements MouseListener,
             phaseMenu.removeAll();
         }
 
-        requestFocus();
+        reqFocus();
     }
 
 
@@ -274,7 +274,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         if (client.getPlayerName().equals(client.getBattleActivePlayerName()))
         {
             highlightMobileCritters();
-            requestFocus();
+            reqFocus();
         }
     }
 
@@ -303,7 +303,7 @@ public final class BattleMap extends HexMap implements MouseListener,
         if (client.getPlayerName().equals(client.getBattleActivePlayerName()))
         {
             highlightCrittersWithTargets();
-            requestFocus();
+            reqFocus();
         }
     }
 
@@ -719,6 +719,15 @@ public final class BattleMap extends HexMap implements MouseListener,
         else
         {
             return -1;
+        }
+    }
+
+    void reqFocus()
+    {
+        if (client.getOption(Options.stealFocus))
+        {
+            requestFocus();
+            getFrame().toFront();
         }
     }
 }

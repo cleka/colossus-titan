@@ -3840,22 +3840,18 @@ Log.debug(playerName + " Client.initBoard()");
 
     private void focusMap()
     {
-        if (map == null)
+        if (map != null)
         {
-            return;
+            map.reqFocus();
         }
-        map.requestFocus();
-        map.getFrame().toFront();
     }
 
     private void focusBoard()
     {
-        if (board == null)
+        if (board != null)
         {
-            return;
+            board.reqFocus();
         }
-        board.requestFocus();
-        board.getFrame().toFront();
     }
 
 

@@ -569,6 +569,7 @@ public final class MasterBoard extends JPanel
         graphicsMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(graphicsMenu);
 
+        addCheckBox(graphicsMenu, Options.stealFocus, KeyEvent.VK_F);
         addCheckBox(graphicsMenu, Options.showCaretaker, KeyEvent.VK_C);
         addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
         addCheckBox(graphicsMenu, Options.showLogWindow, KeyEvent.VK_L);
@@ -1077,7 +1078,7 @@ public final class MasterBoard extends JPanel
     void setupSplitMenu()
     {
         unselectAllHexes();
-        requestFocus();
+        reqFocus();
 
         String activePlayerName = client.getActivePlayerName();
 
@@ -1120,7 +1121,7 @@ public final class MasterBoard extends JPanel
     void setupMoveMenu()
     {
         unselectAllHexes();
-        requestFocus();
+        reqFocus();
 
         String activePlayerName = client.getActivePlayerName();
         masterFrame.setTitle(activePlayerName + " Turn " +
@@ -1174,7 +1175,7 @@ public final class MasterBoard extends JPanel
     void setupFightMenu()
     {
         unselectAllHexes();
-        requestFocus();
+        reqFocus();
 
         String activePlayerName = client.getActivePlayerName();
 
@@ -1209,7 +1210,7 @@ public final class MasterBoard extends JPanel
     void setupMusterMenu()
     {
         unselectAllHexes();
-        requestFocus();
+        reqFocus();
 
         String activePlayerName = client.getActivePlayerName();
 
@@ -2032,5 +2033,14 @@ public final class MasterBoard extends JPanel
     {
         masterFrame.repaint();
         repaint();
+    }
+
+    void reqFocus()
+    {
+        if (client.getOption(Options.stealFocus))
+        {
+            requestFocus();
+            getFrame().toFront();
+        }
     }
 }

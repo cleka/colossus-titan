@@ -54,6 +54,7 @@ public final class Options
 
 
     // Display options (client only)
+    public static final String stealFocus = "Steal focus";
     public static final String showCaretaker = "Show Caretaker's stacks";
     public static final String showStatusScreen = "Show game status";
     public static final String showLogWindow = "Show log window";
