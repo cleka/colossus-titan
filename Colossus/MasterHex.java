@@ -24,29 +24,29 @@ class MasterHex
     private boolean selected;
     private MasterBoard board;
 
-    MasterHex [] neighbor = new MasterHex[6];
+    public MasterHex [] neighbor = new MasterHex[6];
     
     // B,D,H,J,m,M,P,S,T,t,W
     // Brush, Desert, Hills, Jungle, mountains, Marsh, Plains,
     // Swamp, Tower, tundra, Woods
-    char terrain;
+    public char terrain;
 
     // Middle ring: 1-42
     // Outer ring: 101-142
     // Towers: 100, 200, 300, 400, 500, 600
     // Inner ring: 1000, 2000, 3000, 4000, 5000, 6000
-    int label;
+    public int label;
 
     // n, ne, se, s, sw, nw
-    int[] exitType = new int[6];
-    int[] entranceType = new int[6];
+    public int[] exitType = new int[6];
+    public int[] entranceType = new int[6];
 
     // 0=none, 1=block, 2=arch, 3=arrow 4=arrows
-    static final int NONE = 0;
-    static final int BLOCK = 1;
-    static final int ARCH = 2;
-    static final int ARROW = 3;
-    static final int ARROWS = 4;
+    public static final int NONE = 0;
+    public static final int BLOCK = 1;
+    public static final int ARCH = 2;
+    public static final int ARROW = 3;
+    public static final int ARROWS = 4;
 
 
     MasterHex(int cx, int cy, int scale, boolean inverted, MasterBoard board)
@@ -577,7 +577,7 @@ class MasterHex
             return;
         }
 
-        int chitScale = legions[0].chit.getBounds().width;
+        int chitScale = legions[0].getChit().getBounds().width;
         Point point = getOffCenter();
 
         if (numLegions == 1)
@@ -585,36 +585,36 @@ class MasterHex
             // Place legion in the center of the hex.
             point.x -= chitScale / 2;
             point.y -= chitScale / 2;
-            legions[0].chit.setLocationAbs(point);     
+            legions[0].getChit().setLocationAbs(point);     
         }
         else if (numLegions == 2)
         {
             // Place legions in NW and SE corners.
             point.x -= 3 * chitScale / 4;
             point.y -= 3 * chitScale / 4;
-            legions[0].chit.setLocationAbs(point);
+            legions[0].getChit().setLocationAbs(point);
 
             point = getOffCenter();
             point.x -= chitScale / 4;
             point.y -= chitScale / 4;
-            legions[1].chit.setLocationAbs(point);
+            legions[1].getChit().setLocationAbs(point);
         }
         else if (numLegions == 3)
         {
             // Place legions in NW, SE, NE corners.
             point.x -= 3 * chitScale / 4;
             point.y -= 3 * chitScale / 4;
-            legions[0].chit.setLocationAbs(point);
+            legions[0].getChit().setLocationAbs(point);
 
             point = getOffCenter();
             point.x -= chitScale / 4;
             point.y -= chitScale / 4;
-            legions[1].chit.setLocationAbs(point);
+            legions[1].getChit().setLocationAbs(point);
 
             point = getOffCenter();
             point.x -= chitScale / 4;
             point.y -= chitScale;
-            legions[2].chit.setLocationAbs(point);
+            legions[2].getChit().setLocationAbs(point);
         }
     }
     
