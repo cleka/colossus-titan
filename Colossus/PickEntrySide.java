@@ -507,25 +507,7 @@ class PickEntrySide extends JDialog implements ActionListener,
             masterHex.setEntrySide(side);
         }
 
-        // Attempt to free resources to work around Java memory leaks.
-        setVisible(false);
-
-        if (offImage != null)
-        {
-            offImage.flush();
-            offGraphics.dispose();
-        }
-
         dispose();
-        System.gc();
-        try
-        {
-            finalize();
-        }
-        catch (Throwable e)
-        {
-            System.out.println("caught " + e.toString());
-        }
     }
 
 
