@@ -2,3 +2,4 @@ MAP:Unified.map
 CRE:Unified.cre
 TER:Unified.ter
 HINT:Default.hin,DefaultTowerRecruit.hin,DefaultThirdRecruit.hin,DefaultSplit.hin
+DEPEND:Abyssal6
