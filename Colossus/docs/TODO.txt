@@ -67,6 +67,9 @@ Remove advancePhaseInternal from PhaseAdvancer; make private
 Remove AWT dependency from server by moving image manipulation in
    VariantSupport to client side.
 
+Need a way to pick a variant at random, selectable from the command line for
+   stresstest.
+
 The updateHistory flag used to avoid infinite loops should be an instance
    variable rather than an argument to many methods.
 
@@ -124,6 +127,7 @@ Change Quit button in GetPlayers dialog to Cancel.  Go back to existing
    confirmation before calling dialog.
 
 L&F should not show Windows if not allowed on this platform.
+L&F needs to include GTK on Linux
 Eliminate L&F menu entirely?
 
 Add "no 2s or 5s" mulligan option.
@@ -181,3 +185,8 @@ Place SummonAngel so that it doesn't overlap any of the player's markers
 Use creature-only images without chit background, and scale onto chits,
    avoiding overlap with symbols and allowing players to easily substitute
    images without editing.
+
+Try PMD (lint tool).
+
+Dead players' markers should be zero in StatusScreen.
+

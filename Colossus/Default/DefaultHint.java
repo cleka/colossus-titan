@@ -7,6 +7,7 @@ import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.DevRandom;
 import net.sf.colossus.util.Log;
+import Default.DefaultHint;
 import java.util.*;
 
 
@@ -14,52 +15,38 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
 {
     private DevRandom rnd = new DevRandom();
 
+    // Convert list of recruits from Creature to String for easier compares.
+    public static List creaturesToStrings(List creatures)
+    {
+        List recruits = new ArrayList();
+        for (Iterator it = creatures.iterator(); it.hasNext();)
+        {
+            Object ob = it.next();
+            String str = ob.toString();
+            recruits.add(str);
+        }
+        return recruits;
+    }
+
     public String getRecruitHint(String terrain,
             LegionInfo legion,
             List recruits,
             HintOracleInterface oracle,
             String[] section)
     {
-        Log.debug("getRecruitHint in DefaultHint called");
-        Log.debug("Terrain: " + terrain);
-        Log.debug("Legion: " + legion.getContents());
-        Log.debug("Recruits: " + recruits);
-        
+        recruits = creaturesToStrings(recruits);
         List sect = Arrays.asList(section);
 
         if (terrain.equals("Brush") || terrain.equals("Jungle"))
         {
             int numCyclops = legion.numCreature("Cyclops");
-            Log.debug("Number of Cyclops: " + numCyclops);
-            Log.debug("Contains Behemoth: " + legion.contains("Behemoth"));
-            Log.debug("Recruits contains Cyclops: " + recruits.contains("Cyclops"));
-           
-            DELIBERATE COMPILE ERROR HERE!!!
-            recruits.contains is broken!!
-            
-            // N.B.!! Somehow recruits.contains("Cyclops") does not work correctly.
-            // It returns false even when the recruits list has a cyclops in it.
-            // I don't know enough java to understand why.
-            // All the other terrains are likely broken because of this as well!
-            // The if statement below marks an example.                
-            if (!recruits.contains("Cyclops") && numCyclops > 0)
-            {
-                Log.error("Probable error!!!!! recruits.contains(Cyclops) incorrectly returns FALSE!  See DefaultHint.java line 42");
-            }
-                
-            
             if (numCyclops > 0 &&
                     numCyclops < 3 &&
                     !legion.contains("Behemoth") &&
                     oracle.creatureAvailable("Behemoth") >= 2 &&
                     oracle.creatureAvailable("Cyclops") >= 1)
             {
-                Log.debug("Returned Cyclops for hint.");
                 return "Cyclops";
-            }
-            else
-            {
-                Log.debug("DID NOT Return Cyclops for hint.");
             }
         }
         else if (terrain.equals("Plains"))
@@ -196,11 +183,10 @@ public class DefaultHint implements net.sf.colossus.server.HintInterface
             }
         }
 
-        return ((Creature)recruits.get(recruits.size() - 1)).getName();
+        return (String)recruits.get(recruits.size() - 1);
     }
 
-    public List getInitialSplitHint(String label,
-            String[] section)
+    public List getInitialSplitHint(String label, String[] section)
     {
         List li = new ArrayList();
         if (label.equals("100"))

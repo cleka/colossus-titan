@@ -6,6 +6,7 @@ import net.sf.colossus.server.HintOracleInterface;
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.util.DevRandom;
+import Default.DefaultHint;
 import java.util.*;
 
 
@@ -19,6 +20,7 @@ public class TitanPlusHint implements net.sf.colossus.server.HintInterface
             HintOracleInterface oracle,
             String[] section)
     {
+        recruits = DefaultHint.creaturesToStrings(recruits);
         List sect = Arrays.asList(section);
 
         if (terrain.equals("Brush"))
@@ -80,7 +82,7 @@ public class TitanPlusHint implements net.sf.colossus.server.HintInterface
             }
         }
 
-        return ((Creature)recruits.get(recruits.size() - 1)).getName();
+        return (String)recruits.get(recruits.size() - 1);
     }
 
     public List getInitialSplitHint(String label,
