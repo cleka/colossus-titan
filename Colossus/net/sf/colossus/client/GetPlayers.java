@@ -44,6 +44,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     private JComboBox [] playerTypes = new JComboBox[6];
     private JComboBox [] playerNames = new JComboBox[6];
     private JTextArea readme = null;
+    private JScrollPane scrollPane = null;
 
     /** List of Map.Entry objects that map player names to player types */
     private static java.util.List playerInfo = new ArrayList();
@@ -180,19 +181,17 @@ public final class GetPlayers extends KDialog implements WindowListener,
         readmePane.setLayout(new GridLayout(0, 1));
         readme = new JTextArea("", 12, 60);
         readme.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(readme);
+        readme.setLineWrap(true);
+        readme.setWrapStyleWord(true);
+        scrollPane = new JScrollPane(readme);
         readmePane.add(scrollPane);
         contentPane.add(readmePane);
 
         readme.setText(VariantSupport.loadVariant(variantArray[0] + ".var",
                                                   variantArray[0]));
-        
-        // XXX Not working right.
-        JScrollBar vert = scrollPane.getVerticalScrollBar();
-        vert.setValue(vert.getMinimum());
 
         pack();
-
+        
         centerOnScreen();
 
         addWindowListener(this);
@@ -353,7 +352,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
                 { // selecting different ; remove all non-included
                     if (variantBox.getItemCount() > variantArray.length)
                         variantBox.removeItemAt(variantArray.length);
-                    readme.setText(VariantSupport.loadVariant(value + ".var", value));
+                    readme.setText(VariantSupport.loadVariant(value + ".var",
+                                                              value));
                 }
             }
             else
