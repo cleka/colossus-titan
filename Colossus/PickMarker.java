@@ -30,6 +30,7 @@ class PickMarker extends Dialog implements MouseListener, WindowListener
         if (player.getNumMarkersAvailable() == 0)
         {
             new MessageBox(parentFrame, "No markers available");
+            dispose();
         }
         else
         {
