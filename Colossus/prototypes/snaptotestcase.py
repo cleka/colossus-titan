@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.3
+# Needs Python 2.3 for optparse.  (Could use 2.2 and optik)
+# Needs PyXML
 
 """snaptotestcase.py [-j] [-p] [-t] filename
 
@@ -13,7 +15,7 @@ within the given Colossus savegame.
 __version__ = '$Id$'
 
 import sys
-from optik import OptionParser
+from optparse import OptionParser
 from xml.sax import make_parser
 from xml.sax.saxutils import DefaultHandler
 
@@ -73,11 +75,15 @@ class snapHandler(DefaultHandler):
             print '    public void testPredictSplits%s()' % (options.testcase,)
             print '    {'
 
-    def endHistory(self):
+    def printLeaves(self):
         if options.python:
             print '        aps.printLeaves()'
         else:
             print '        aps.printLeaves();'
+
+    def endHistory(self):
+        self.printLeaves()
+        if not options.python:
             print '    }'
 
     def startReveal(self, attrs):
@@ -158,12 +164,14 @@ class snapHandler(DefaultHandler):
         numSplitoffs = len(self.creatureNames)
         if options.python:
             if self.printTurn():
+                self.printLeaves()
                 print '        turn = %s' % (self.turn,)
                 print '        print "\\nTurn", turn'
             print '        aps.getLeaf("%s").split(%s, "%s", %s)' % (
                 self.parentId, numSplitoffs, self.childId, self.turn)
         else:
             if self.printTurn():
+                self.printLeaves()
                 print '        turn = %s;' % (self.turn,)
                 print '        Log.debug("Turn " + turn);'
             print '        aps.getLeaf("%s").split(%s, "%s", %s);' % (

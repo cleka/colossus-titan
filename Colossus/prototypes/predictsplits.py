@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python2.2
 
 __version__ = "$Id$"
 
@@ -25,11 +25,11 @@ def creatureComp(creature1, creature2):
     return cmp(creature1.name, creature2.name)
 
 def superset(big, little):
-    """Return 1 if list big is a superset of list little."""
+    """Return True if list big is a superset of list little."""
     for el in little:
         if big.count(el) < little.count(el):
-            return 0
-    return 1
+            return False
+    return True
 
 def subtractLists(big, little):
     li = big[:]
@@ -46,12 +46,12 @@ def numCreature(li, creatureName):
 
 def removeCreatureByName(li, creatureName):
     """Remove the first CreatureInfo matching the passed name.
-       Return 1 if found, 0 if not."""
+       Return True if found, False if not."""
     for ci in li:
         if ci.name == creatureName:
             li.remove(ci)
-            return 1
-    return 0
+            return True
+    return False
 
 def getCreatureInfo(li, creatureName):
     """Return the first CreatureInfo that matches the passed name."""
@@ -68,11 +68,14 @@ def getCreatureNames(li):
 
 def removeLastUncertainCreature(li):
     li.reverse()
+    i = 0
     for ci in li:
         if not ci.certain:
-            li.remove(ci)
+            del li[i]    # li.remove(ci) can remove the wrong one
             li.reverse()
             return
+        i += 1
+    li.reverse()
     raise RuntimeError, "No uncertain creatures"
 
 def mergeCreatureInfoLists(li1, li2):
@@ -209,16 +212,16 @@ class Node:
         return li
 
     def allCertain(self):
-        """Return true if all creatures are certain."""
+        """Return True if all creatures are certain."""
         for ci in self.creatures:
             if not ci.certain:
-                return 0
-        return 1
+                return False
+        return True
 
     def setAllCertain(self):
         """Set all creatures to certain."""
         for ci in self.creatures:
-            ci.certain = 1
+            ci.certain = True
 
     def getAtSplitCreatures(self):
         """Return list of CreatureInfo where atSplit is true."""
@@ -268,17 +271,17 @@ class Node:
         return len(self.creatures)
 
 
-    def revealSomeCreatures(self, li):
-        """li is a list of creature names"""
-        print "revealSomeCreatures() for", self, li
+    def revealSomeCreatures(self, cnl):
+        """cnl is a list of creature names"""
+        print "revealSomeCreatures() for", self, cnl
 
-        li2 = []
-        for name in li:
-            li2.append(CreatureInfo(name, 1, 1))
+        cil = []
+        for name in cnl:
+            cil.append(CreatureInfo(name, True, True))
 
         # Use a copy rather than the original so we can remove
         # creatures as we check for multiples.
-        dupe = copy.deepcopy(li2)
+        dupe = copy.deepcopy(cil)
 
         # Confirm that all creatures that were certain still fit
         # along with the revealed creatures.
@@ -289,6 +292,7 @@ class Node:
                 dupe.remove(ci)
             else:
                 count += 1
+        print "count is", count, "height is", self.getHeight()
 
         if count > self.getHeight():
             err = ("Certainty error in Node.revealSomeCreatures() count=%d "
@@ -302,18 +306,18 @@ class Node:
             # No need -- we already know everything.
             return
 
-        dupe = copy.deepcopy(li2)
+        dupe = copy.deepcopy(cil)
         count = 0
         for ci in dupe:
-            ci.certain = 1
-            ci.atSplit = 1   # If not atSplit, would be certain.
+            ci.certain = True
+            ci.atSplit = True   # If not atSplit, would be certain.
             if numCreature(self.creatures, ci.name) < numCreature(dupe,
                     ci.name):
                 self.creatures.append(ci)
                 count += 1
 
-        # Ensure that the creatures in li are now marked as certain
-        dupe = copy.deepcopy(li2)
+        # Ensure that the creatures in cnl are now marked as certain
+        dupe = copy.deepcopy(cil)
         certain = self.getCertain()
         for ci in certain:
             if ci in dupe:
@@ -321,20 +325,22 @@ class Node:
         for ci in dupe:
             for ci2 in self.creatures:
                 if not ci2.certain and ci2.name == ci.name:
-                    ci2.certain = 1
+                    ci2.certain = True
                     break
 
+        print "revealSomeCreatures() before remove", self
         # Need to remove count uncertain creatures.
         for unused in range(count):
             removeLastUncertainCreature(self.creatures)
-        print "self is", self
-        self.parent.tellChildContents(self)
+        print "end revealSomeCreatures()", self
+        if self.parent is not None:
+            self.parent.tellChildContents(self)
 
     def revealAllCreatures(self, li):
         """li is a list of creature names"""
         li2 = []
         for name in li:
-            li2.append(CreatureInfo(name, 1, 1))
+            li2.append(CreatureInfo(name, True, True))
 
         # Confirm that all creatures that were certain are there.
         certain = self.getCertain()
@@ -345,21 +351,21 @@ class Node:
         self.revealSomeCreatures(li)
 
     def childCreaturesMatch(self):
-        """Return true if creatures in children are consistent with self."""
+        """Return True if creatures in children are consistent with self."""
         if self.child1 == None:
-            return 1
+            return True
         all = (self.child1.getAtSplitCreatures() + self.child1.removed +
                 self.child2.getAtSplitCreatures() + self.child2.removed)
         for ci in all:
             if numCreature(all, ci.name) != numCreature(
                     self.creatures, ci.name):
-                return 0
-        return 1
+                return False
+        return True
 
 
     def isLegalInitialSplitoff(self):
         if self.getHeight() != 4:
-            return 0
+            return False
         names = self.getCreatureNames()
         return (names.count("Titan") + names.count("Angel") == 1)
 
@@ -477,20 +483,20 @@ class Node:
         weakList = []
         for ci in self.creatures:
             name = ci.name
-            newinfo = CreatureInfo(name, 0, 1)
+            newinfo = CreatureInfo(name, False, True)
             if name in splitoffNames:
                 weakList.append(newinfo)
                 splitoffNames.remove(name)
                 # If in knownSplit, set certain
                 if name in knownSplitNames:
                     knownSplitNames.remove(name)
-                    newinfo.certain = 1
+                    newinfo.certain = True
             else:
                 strongList.append(newinfo)
                 # If in knownKeep, set certain
                 if name in knownKeepNames:
                     knownKeepNames.remove(name)
-                    newinfo.certain = 1
+                    newinfo.certain = True
 
         afterSplit1 = []
         afterSplit2 = []
@@ -569,7 +575,7 @@ class Node:
         print "addCreature()", self, ':', creatureName
         if (self.getHeight() >= 7 and self.child1 == None):
             raise RuntimeError, "Tried adding to 7-high legion"
-        ci = CreatureInfo(creatureName, 1, 0)
+        ci = CreatureInfo(creatureName, True, False)
         self.creatures.append(ci)
 
 
@@ -600,7 +606,7 @@ class PredictSplits:
 
         infoList = []
         for name in creatureNames:
-            info = CreatureInfo(name, 1, 1)
+            info = CreatureInfo(name, True, True)
             infoList.append(info)
         self.root = Node(rootId, 0, infoList, None)
 
@@ -2173,6 +2179,660 @@ class PredictSplitsTestCase(unittest.TestCase):
         aps.getLeaf("Br09").addCreature("Gorgon")
         aps.printLeaves()
 
+
+    def testPredictSplits6(self):
+        print "\ntest 6 begins"
+        ps = PredictSplits("Gd", "Gd08", ['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        aps.add_ps(ps)
+        aps.getLeaf("Gd08").revealAllCreatures(['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        ps = PredictSplits("Bu", "Bu06", ['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        aps.add_ps(ps)
+        aps.getLeaf("Bu06").revealAllCreatures(['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        ps = PredictSplits("Bk", "Bk08", ['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        aps.add_ps(ps)
+        aps.getLeaf("Bk08").revealAllCreatures(['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        ps = PredictSplits("Gr", "Gr12", ['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        aps.add_ps(ps)
+        aps.getLeaf("Gr12").revealAllCreatures(['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        ps = PredictSplits("Rd", "Rd09", ['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        aps.add_ps(ps)
+        aps.getLeaf("Rd09").revealAllCreatures(['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        ps = PredictSplits("Br", "Br02", ['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        aps.add_ps(ps)
+        aps.getLeaf("Br02").revealAllCreatures(['Titan', 'Angel', 'Gargoyle', 'Gargoyle', 'Centaur', 'Centaur', 'Ogre', 'Ogre'])
+        aps.printLeaves()
+        turn = 1
+        print "\nTurn", turn
+        aps.getLeaf("Gd08").split(4, "Gd10", 1)
+        aps.getLeaf("Gd08").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Gd08").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Gd08").addCreature("Troll")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Gd10").addCreature("Centaur")
+        aps.getLeaf("Bu06").split(4, "Bu11", 1)
+        aps.getLeaf("Bu06").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Bu06").addCreature("Troll")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Bu11").addCreature("Lion")
+        aps.getLeaf("Bk08").split(4, "Bk01", 1)
+        aps.getLeaf("Bk08").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bk01").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Bk01").addCreature("Ogre")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bk08").addCreature("Warlock")
+        aps.getLeaf("Gr12").split(4, "Gr06", 1)
+        aps.getLeaf("Gr06").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Gr06").addCreature("Ogre")
+        aps.getLeaf("Gr12").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Gr12").addCreature("Lion")
+        aps.getLeaf("Rd09").split(4, "Rd07", 1)
+        aps.getLeaf("Rd09").revealSomeCreatures(['Gargoyle'])
+        aps.getLeaf("Rd09").addCreature("Gargoyle")
+        aps.getLeaf("Rd07").revealSomeCreatures(['Gargoyle'])
+        aps.getLeaf("Rd07").addCreature("Gargoyle")
+        aps.getLeaf("Br02").split(4, "Br11", 1)
+        aps.getLeaf("Br02").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Br02").addCreature("Cyclops")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Gd10").addCreature("Cyclops")
+        aps.getLeaf("Bu06").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bu06").addCreature("Warlock")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Lion'])
+        aps.getLeaf("Bu11").addCreature("Lion")
+        aps.getLeaf("Bk01").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Bk01").addCreature("Centaur")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Bk08").addCreature("Centaur")
+        aps.getLeaf("Gr12").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Gr12").addCreature("Ogre")
+        aps.getLeaf("Rd09").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Rd09").addCreature("Warlock")
+        aps.getLeaf("Br02").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Br02").addCreature("Cyclops")
+        aps.getLeaf("Br11").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Br11").addCreature("Centaur")
+        aps.getLeaf("Gd08").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Gd08").addCreature("Troll")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Gd10").addCreature("Cyclops")
+        aps.getLeaf("Bu06").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bu06").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bu06").addCreature("Warlock")
+        aps.getLeaf("Bk01").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Bk01").addCreature("Troll")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Bk08").addCreature("Cyclops")
+        aps.getLeaf("Gr12").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Gr12").addCreature("Centaur")
+        aps.getLeaf("Rd07").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Rd07").addCreature("Cyclops")
+        aps.getLeaf("Br11").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Br11").addCreature("Ogre")
+        aps.printLeaves()
+        turn = 4
+        print "\nTurn", turn
+        aps.getLeaf("Gd10").split(2, "Gd01", 4)
+        aps.getLeaf("Gd08").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Gd08").addCreature("Centaur")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Gd10").addCreature("Cyclops")
+        aps.getLeaf("Bu06").split(2, "Bu12", 4)
+        aps.getLeaf("Bu06").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Bu06").addCreature("Troll")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Bu11").addCreature("Lion")
+        aps.getLeaf("Bk01").split(2, "Bk07", 4)
+        aps.getLeaf("Bk08").split(2, "Bk02", 4)
+        aps.getLeaf("Bk01").revealSomeCreatures(['Ogre', 'Ogre', 'Ogre'])
+        aps.getLeaf("Bk01").addCreature("Minotaur")
+        aps.getLeaf("Bk07").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Bk07").addCreature("Centaur")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Bk08").addCreature("Cyclops")
+        aps.getLeaf("Gr06").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Gr06").addCreature("Cyclops")
+        aps.getLeaf("Rd09").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Rd09").addCreature("Troll")
+        aps.getLeaf("Br02").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Br02").addCreature("Ogre")
+        aps.printLeaves()
+        turn = 5
+        print "\nTurn", turn
+        aps.getLeaf("Gd08").split(2, "Gd03", 5)
+        aps.getLeaf("Gd10").revealSomeCreatures(['Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Gd10").addCreature("Behemoth")
+        aps.getLeaf("Bu11").split(2, "Bu10", 5)
+        aps.getLeaf("Bu11").revealSomeCreatures(['Gargoyle'])
+        aps.getLeaf("Bu11").addCreature("Gargoyle")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Bk08").addCreature("Lion")
+        aps.getLeaf("Gr12").split(2, "Gr07", 5)
+        aps.getLeaf("Gr12").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Gr12").addCreature("Troll")
+        aps.getLeaf("Rd09").split(2, "Rd06", 5)
+        aps.getLeaf("Rd09").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Rd09").addCreature("Cyclops")
+        aps.getLeaf("Rd07").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Rd07").addCreature("Cyclops")
+        aps.getLeaf("Br02").split(2, "Br10", 5)
+        aps.getLeaf("Br11").revealSomeCreatures(['Centaur', 'Centaur', 'Centaur'])
+        aps.getLeaf("Br11").addCreature("Warbear")
+        aps.getLeaf("Gd10").revealAllCreatures(['Angel', 'Behemoth', 'Cyclops', 'Cyclops', 'Cyclops', 'Centaur', 'Centaur'])
+        aps.getLeaf("Gr12").revealAllCreatures(['Angel', 'Troll', 'Lion', 'Centaur', 'Ogre', 'Ogre'])
+        aps.getLeaf("Gr12").removeCreature("Centaur")
+        aps.getLeaf("Gr12").removeCreature("Troll")
+        aps.getLeaf("Gr12").removeCreature("Angel")
+        aps.getLeaf("Gr12").removeCreature("Ogre")
+        aps.getLeaf("Gd10").removeCreature("Angel")
+        aps.getLeaf("Gd10").removeCreature("Centaur")
+        aps.getLeaf("Gr12").removeCreature("Lion")
+        aps.getLeaf("Gr12").removeCreature("Ogre")
+        aps.getLeaf("Gd10").revealAllCreatures(['Behemoth', 'Cyclops', 'Cyclops', 'Cyclops', 'Centaur'])
+        aps.getLeaf("Gd10").addCreature("Angel")
+        aps.getLeaf("Gd08").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Gd08").addCreature("Troll")
+        aps.getLeaf("Bu12").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Bu12").addCreature("Ogre")
+        aps.printLeaves()
+        turn = 6
+        print "\nTurn", turn
+        aps.getLeaf("Bk08").split(2, "Bk02", 6)
+        aps.getLeaf("Bk01").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Bk01").addCreature("Troll")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bk08").addCreature("Warlock")
+        aps.getLeaf("Gr06").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Gr06").addCreature("Cyclops")
+        aps.getLeaf("Rd07").split(2, "Rd08", 6)
+        aps.getLeaf("Rd09").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Rd09").addCreature("Cyclops")
+        aps.getLeaf("Br11").split(2, "Br04", 6)
+        aps.getLeaf("Br02").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Br02").addCreature("Troll")
+        aps.getLeaf("Br11").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Br11").addCreature("Troll")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Gd10").addCreature("Centaur")
+        aps.getLeaf("Bu06").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Bu06").addCreature("Troll")
+        aps.getLeaf("Bu12").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Bu12").addCreature("Troll")
+        aps.printLeaves()
+        turn = 7
+        print "\nTurn", turn
+        aps.getLeaf("Bk01").split(2, "Bk05", 7)
+        aps.getLeaf("Bk08").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bk08").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bk08").addCreature("Warlock")
+        aps.getLeaf("Gr06").split(2, "Gr04", 7)
+        aps.getLeaf("Gr06").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Gr06").addCreature("Cyclops")
+        aps.getLeaf("Rd09").split(2, "Rd05", 7)
+        aps.getLeaf("Rd07").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Rd07").addCreature("Cyclops")
+        aps.getLeaf("Br02").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Br02").addCreature("Troll")
+        aps.getLeaf("Br10").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Br10").addCreature("Cyclops")
+        aps.printLeaves()
+        turn = 8
+        print "\nTurn", turn
+        aps.getLeaf("Gd10").split(2, "Gd09", 8)
+        aps.getLeaf("Gd03").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Gd03").addCreature("Lion")
+        aps.getLeaf("Gd08").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Gd08").addCreature("Ranger")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Gd10").addCreature("Guardian")
+        aps.getLeaf("Bk08").split(2, "Bk10", 8)
+        aps.getLeaf("Bk08").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bk01").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Bk01").addCreature("Troll")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Bk08").addCreature("Cyclops")
+        aps.getLeaf("Bk10").revealSomeCreatures(['Lion'])
+        aps.getLeaf("Bk10").addCreature("Lion")
+        aps.getLeaf("Br02").split(2, "Br01", 8)
+        aps.getLeaf("Br01").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Br01").addCreature("Ogre")
+        aps.getLeaf("Br10").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Br10").addCreature("Cyclops")
+        aps.getLeaf("Br11").revealSomeCreatures(['Warbear'])
+        aps.getLeaf("Br11").addCreature("Warbear")
+        aps.printLeaves()
+        turn = 9
+        print "\nTurn", turn
+        aps.getLeaf("Gd08").split(2, "Gd06", 9)
+        aps.getLeaf("Gd08").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Gd08").addCreature("Ranger")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Gd10").addCreature("Gorgon")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Lion', 'Lion'])
+        aps.getLeaf("Bu11").addCreature("Ranger")
+        aps.getLeaf("Bu12").revealSomeCreatures(['Ogre', 'Ogre', 'Ogre'])
+        aps.getLeaf("Bu12").addCreature("Minotaur")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Bk08").addCreature("Cyclops")
+        aps.getLeaf("Gr04").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Gr04").addCreature("Cyclops")
+        aps.getLeaf("Gr06").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Gr06").addCreature("Gorgon")
+        aps.getLeaf("Rd07").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Rd07").addCreature("Gorgon")
+        aps.getLeaf("Rd09").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Rd09").addCreature("Troll")
+        aps.getLeaf("Br11").split(2, "Br03", 9)
+        aps.getLeaf("Br02").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Br02").addCreature("Cyclops")
+        aps.getLeaf("Br04").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Br04").addCreature("Lion")
+        aps.printLeaves()
+        turn = 10
+        print "\nTurn", turn
+        aps.getLeaf("Gd10").split(2, "Gd11", 10)
+        aps.getLeaf("Gd03").addCreature("Centaur")
+        aps.getLeaf("Gd08").revealSomeCreatures(['Troll', 'Troll', 'Troll'])
+        aps.getLeaf("Gd08").addCreature("Guardian")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Behemoth'])
+        aps.getLeaf("Gd10").addCreature("Behemoth")
+        aps.getLeaf("Bu06").split(2, "Bu10", 10)
+        aps.getLeaf("Bu11").split(2, "Bu03", 10)
+        aps.getLeaf("Bu06").addCreature("Angel")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Lion', 'Lion'])
+        aps.getLeaf("Bu11").addCreature("Ranger")
+        aps.getLeaf("Bu12").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Bu12").addCreature("Troll")
+        aps.getLeaf("Bk02").addCreature("Centaur")
+        aps.getLeaf("Gr06").split(2, "Gr05", 10)
+        aps.getLeaf("Gr06").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Gr06").addCreature("Gorgon")
+        aps.getLeaf("Rd07").split(2, "Rd11", 10)
+        aps.getLeaf("Rd07").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Rd07").addCreature("Gorgon")
+        aps.getLeaf("Br02").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Br02").addCreature("Gorgon")
+        aps.getLeaf("Br03").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Br03").addCreature("Troll")
+        aps.printLeaves()
+        turn = 11
+        print "\nTurn", turn
+        aps.getLeaf("Gd08").split(2, "Gd01", 11)
+        aps.getLeaf("Gd03").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Gd03").addCreature("Lion")
+        aps.getLeaf("Gd08").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Gd08").addCreature("Ranger")
+        aps.getLeaf("Bu10").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Bu10").addCreature("Troll")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Lion', 'Lion'])
+        aps.getLeaf("Bu11").addCreature("Minotaur")
+        aps.getLeaf("Gr06").revealSomeCreatures(['Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Gr06").addCreature("Guardian")
+        aps.getLeaf("Br02").split(2, "Br12", 11)
+        aps.getLeaf("Br01").revealSomeCreatures(['Ogre', 'Ogre', 'Ogre'])
+        aps.getLeaf("Br01").addCreature("Minotaur")
+        aps.getLeaf("Br03").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Br03").addCreature("Ogre")
+        aps.getLeaf("Br04").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Br04").addCreature("Centaur")
+        aps.getLeaf("Br11").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Br11").addCreature("Troll")
+        aps.getLeaf("Gd08").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Gd08").addCreature("Warbear")
+        aps.getLeaf("Gd11").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Gd11").addCreature("Cyclops")
+        aps.getLeaf("Bu03").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Bu03").addCreature("Cyclops")
+        aps.getLeaf("Bu12").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Bu12").addCreature("Troll")
+        aps.printLeaves()
+        turn = 12
+        print "\nTurn", turn
+        aps.getLeaf("Bk08").split(2, "Bk10", 12)
+        aps.getLeaf("Bk02").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Bk02").addCreature("Lion")
+        aps.getLeaf("Gr06").split(2, "Gr12", 12)
+        aps.getLeaf("Gr06").revealSomeCreatures(['Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Gr06").addCreature("Behemoth")
+        aps.getLeaf("Rd07").revealSomeCreatures(['Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Rd07").addCreature("Behemoth")
+        aps.getLeaf("Br01").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Br01").addCreature("Troll")
+        aps.getLeaf("Br02").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Br02").addCreature("Gorgon")
+        aps.getLeaf("Br03").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Br03").addCreature("Troll")
+        aps.getLeaf("Br04").revealSomeCreatures(['Lion'])
+        aps.getLeaf("Br04").addCreature("Lion")
+        aps.getLeaf("Br11").revealSomeCreatures(['Centaur'])
+        aps.getLeaf("Br11").addCreature("Centaur")
+        aps.getLeaf("Br12").addCreature("Ogre")
+        aps.printLeaves()
+        turn = 13
+        print "\nTurn", turn
+        aps.getLeaf("Gd08").split(2, "Gd07", 13)
+        aps.getLeaf("Gd10").revealSomeCreatures(['Gorgon'])
+        aps.getLeaf("Gd10").addCreature("Gorgon")
+        aps.getLeaf("Bu11").split(2, "Bu03", 13)
+        aps.getLeaf("Bu12").split(2, "Bu05", 13)
+        aps.getLeaf("Bu10").addCreature("Gargoyle")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Minotaur'])
+        aps.getLeaf("Bu11").addCreature("Minotaur")
+        aps.getLeaf("Bu12").revealSomeCreatures(['Minotaur'])
+        aps.getLeaf("Bu12").addCreature("Minotaur")
+        aps.getLeaf("Bk08").addCreature("Centaur")
+        aps.getLeaf("Br11").split(2, "Br10", 13)
+        aps.getLeaf("Br01").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Br01").addCreature("Troll")
+        aps.getLeaf("Br03").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Br03").addCreature("Ranger")
+        aps.getLeaf("Br10").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Br10").addCreature("Lion")
+        aps.getLeaf("Br11").revealSomeCreatures(['Warbear', 'Warbear'])
+        aps.getLeaf("Br11").addCreature("Giant")
+        aps.getLeaf("Br12").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Br12").addCreature("Troll")
+        aps.printLeaves()
+        turn = 14
+        print "\nTurn", turn
+        aps.getLeaf("Gd10").split(2, "Gd01", 14)
+        aps.getLeaf("Gd08").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Gd08").addCreature("Ranger")
+        aps.getLeaf("Bu10").revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        aps.getLeaf("Bu10").addCreature("Cyclops")
+        aps.getLeaf("Bu12").revealSomeCreatures(['Troll', 'Troll', 'Troll'])
+        aps.getLeaf("Bu12").addCreature("Wyvern")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bk02").revealAllCreatures(['Lion', 'Centaur', 'Centaur', 'Centaur'])
+        aps.getLeaf("Br10").revealAllCreatures(['Lion', 'Centaur', 'Centaur'])
+        aps.getLeaf("Br10").removeCreature("Centaur")
+        aps.getLeaf("Br10").removeCreature("Centaur")
+        aps.getLeaf("Bk02").removeCreature("Centaur")
+        aps.getLeaf("Br10").removeCreature("Lion")
+        aps.getLeaf("Bk02").revealAllCreatures(['Lion', 'Centaur', 'Centaur'])
+        aps.getLeaf("Bk01").removeCreature("Angel")
+        aps.getLeaf("Bk02").addCreature("Angel")
+        aps.getLeaf("Bk02").revealSomeCreatures(['Centaur', 'Centaur'])
+        aps.getLeaf("Bk02").addCreature("Lion")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Bk08").addCreature("Cyclops")
+        aps.getLeaf("Gr06").revealSomeCreatures(['Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Gr06").addCreature("Behemoth")
+        aps.getLeaf("Rd07").split(2, "Rd12", 14)
+        aps.getLeaf("Rd09").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Rd09").addCreature("Ranger")
+        aps.getLeaf("Br01").revealSomeCreatures(['Ogre', 'Ogre', 'Ogre'])
+        aps.getLeaf("Br01").addCreature("Minotaur")
+        aps.getLeaf("Br02").revealSomeCreatures(['Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Br02").addCreature("Guardian")
+        aps.getLeaf("Br03").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Br03").addCreature("Warbear")
+        aps.getLeaf("Br11").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Br11").addCreature("Troll")
+        aps.getLeaf("Br12").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Br12").addCreature("Ogre")
+        aps.getLeaf("Gd08").addCreature("Angel")
+        aps.getLeaf("Gd11").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Gd11").addCreature("Gorgon")
+        aps.printLeaves()
+        turn = 15
+        print "\nTurn", turn
+        aps.getLeaf("Bu12").split(2, "Bu01", 15)
+        aps.getLeaf("Bu06").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Bu06").addCreature("Ranger")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Minotaur', 'Minotaur'])
+        aps.getLeaf("Bu11").addCreature("Unicorn")
+        aps.getLeaf("Bk08").split(2, "Bk11", 15)
+        aps.getLeaf("Bk08").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Bk08").addCreature("Cyclops")
+        aps.getLeaf("Bk10").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Bk10").addCreature("Cyclops")
+        aps.getLeaf("Gr06").revealAllCreatures(['Titan', 'Guardian', 'Behemoth', 'Behemoth', 'Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Rd09").revealAllCreatures(['Titan', 'Warlock', 'Cyclops', 'Cyclops', 'Ranger', 'Troll', 'Troll'])
+        aps.getLeaf("Rd09").removeCreature("Ranger")
+        aps.getLeaf("Rd09").removeCreature("Cyclops")
+        aps.getLeaf("Gr06").removeCreature("Behemoth")
+        aps.getLeaf("Gr06").removeCreature("Cyclops")
+        aps.getLeaf("Rd09").removeCreature("Cyclops")
+        aps.getLeaf("Rd09").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Rd09").addCreature("Ranger")
+        aps.getLeaf("Rd09").removeCreature("Ranger")
+        aps.getLeaf("Gr06").removeCreature("Behemoth")
+        aps.getLeaf("Gr06").removeCreature("Cyclops")
+        aps.getLeaf("Rd09").removeCreature("Troll")
+        aps.getLeaf("Gr06").removeCreature("Guardian")
+        aps.getLeaf("Gr06").removeCreature("Cyclops")
+        aps.getLeaf("Gr06").removeCreature("Titan")
+        aps.getLeaf("Rd09").revealAllCreatures(['Titan', 'Warlock', 'Troll'])
+        aps.getLeaf("Rd09").addCreature("Angel")
+        aps.getLeaf("Br01").split(2, "Br09", 15)
+        aps.getLeaf("Br02").split(2, "Br10", 15)
+        aps.getLeaf("Br11").split(2, "Br04", 15)
+        aps.getLeaf("Gd01").addCreature("Ogre")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Guardian'])
+        aps.getLeaf("Gd10").addCreature("Guardian")
+        aps.getLeaf("Bu03").revealSomeCreatures(['Lion', 'Lion'])
+        aps.getLeaf("Bu03").addCreature("Minotaur")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Bk08").addCreature("Cyclops")
+        aps.getLeaf("Bk10").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Bk10").addCreature("Gorgon")
+        aps.getLeaf("Rd09").revealAllCreatures(['Titan', 'Angel', 'Warlock', 'Troll'])
+        aps.getLeaf("Bk02").revealAllCreatures(['Angel', 'Lion', 'Lion', 'Centaur', 'Centaur'])
+        aps.getLeaf("Bk02").removeCreature("Centaur")
+        aps.getLeaf("Rd07").removeCreature("Angel")
+        aps.getLeaf("Rd09").addCreature("Angel")
+        aps.getLeaf("Bk02").removeCreature("Angel")
+        aps.getLeaf("Bk02").removeCreature("Lion")
+        aps.getLeaf("Bk02").removeCreature("Centaur")
+        aps.getLeaf("Bk02").removeCreature("Lion")
+        aps.getLeaf("Rd09").revealAllCreatures(['Titan', 'Angel', 'Angel', 'Warlock', 'Troll'])
+        aps.getLeaf("Rd09").addCreature("Angel")
+        aps.getLeaf("Br01").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Br01").addCreature("Warbear")
+        aps.getLeaf("Br04").revealSomeCreatures(['Troll'])
+        aps.getLeaf("Br04").addCreature("Troll")
+        aps.getLeaf("Br09").revealSomeCreatures(['Ogre', 'Ogre'])
+        aps.getLeaf("Br09").addCreature("Troll")
+        aps.getLeaf("Gd01").revealSomeCreatures(['Gorgon'])
+        aps.getLeaf("Gd01").addCreature("Gorgon")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Gd10").addCreature("Gargoyle")
+        aps.printLeaves()
+        turn = 17
+        print "\nTurn", turn
+        aps.getLeaf("Bu11").split(2, "Bu01", 17)
+        aps.getLeaf("Bu10").revealSomeCreatures(['Gargoyle'])
+        aps.getLeaf("Bu10").addCreature("Gargoyle")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Bu11").addCreature("Ranger")
+        aps.getLeaf("Bk08").split(2, "Bk11", 17)
+        aps.getLeaf("Rd07").revealAllCreatures(['Behemoth', 'Gorgon', 'Gorgon', 'Cyclops'])
+        aps.getLeaf("Gd11").revealAllCreatures(['Gorgon', 'Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Gd11").removeCreature("Gorgon")
+        aps.getLeaf("Gd11").removeCreature("Cyclops")
+        aps.getLeaf("Rd07").removeCreature("Gorgon")
+        aps.getLeaf("Gd11").removeCreature("Cyclops")
+        aps.getLeaf("Rd07").removeCreature("Behemoth")
+        aps.getLeaf("Rd07").removeCreature("Cyclops")
+        aps.getLeaf("Rd09").removeCreature("Angel")
+        aps.getLeaf("Rd07").addCreature("Angel")
+        aps.getLeaf("Gd11").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Gd11").addCreature("Gargoyle")
+        aps.getLeaf("Gd11").removeCreature("Cyclops")
+        aps.getLeaf("Gd11").removeCreature("Gargoyle")
+        aps.getLeaf("Rd07").removeCreature("Gorgon")
+        aps.getLeaf("Rd07").revealAllCreatures(['Angel'])
+        aps.getLeaf("Rd07").addCreature("Angel")
+        aps.getLeaf("Br03").split(2, "Br12", 17)
+        aps.getLeaf("Br02").revealSomeCreatures(['Cyclops', 'Cyclops', 'Cyclops'])
+        aps.getLeaf("Br02").addCreature("Behemoth")
+        aps.getLeaf("Br09").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Br09").addCreature("Ogre")
+        aps.printLeaves()
+        turn = 18
+        print "\nTurn", turn
+        aps.getLeaf("Gd10").split(2, "Gd02", 18)
+        aps.getLeaf("Gd01").revealSomeCreatures(['Ogre'])
+        aps.getLeaf("Gd01").addCreature("Ogre")
+        aps.getLeaf("Bu01").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Bu01").addCreature("Ranger")
+        aps.getLeaf("Bu10").revealSomeCreatures(['Gargoyle'])
+        aps.getLeaf("Bu10").addCreature("Gargoyle")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Minotaur', 'Minotaur'])
+        aps.getLeaf("Bu11").addCreature("Unicorn")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Cyclops'])
+        aps.getLeaf("Bk08").addCreature("Gargoyle")
+        aps.getLeaf("Rd07").revealAllCreatures(['Angel', 'Angel'])
+        aps.getLeaf("Br10").revealAllCreatures(['Gorgon', 'Gorgon'])
+        aps.getLeaf("Br10").removeCreature("Gorgon")
+        aps.getLeaf("Br10").removeCreature("Gorgon")
+        aps.getLeaf("Rd07").removeCreature("Angel")
+        aps.getLeaf("Rd07").revealAllCreatures(['Angel'])
+        aps.getLeaf("Br01").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Br01").addCreature("Ranger")
+        aps.getLeaf("Br04").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Br04").addCreature("Ranger")
+        aps.getLeaf("Br11").revealSomeCreatures(['Warbear', 'Warbear'])
+        aps.getLeaf("Br11").addCreature("Unicorn")
+        aps.getLeaf("Gd01").revealSomeCreatures(['Gorgon'])
+        aps.getLeaf("Gd01").addCreature("Gorgon")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Behemoth', 'Behemoth'])
+        aps.getLeaf("Gd10").addCreature("Serpent")
+        aps.getLeaf("Bu01").revealSomeCreatures(['Lion'])
+        aps.getLeaf("Bu01").addCreature("Lion")
+        aps.printLeaves()
+        turn = 19
+        print "\nTurn", turn
+        aps.getLeaf("Br01").split(2, "Br10", 19)
+        aps.getLeaf("Br02").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Br02").addCreature("Gorgon")
+        aps.getLeaf("Br03").revealSomeCreatures(['Warbear'])
+        aps.getLeaf("Br03").addCreature("Warbear")
+        aps.getLeaf("Br04").revealSomeCreatures(['Troll', 'Troll', 'Troll'])
+        aps.getLeaf("Br04").addCreature("Guardian")
+        aps.getLeaf("Gd10").revealAllCreatures(['Serpent', 'Angel', 'Guardian', 'Behemoth', 'Behemoth', 'Cyclops'])
+        aps.getLeaf("Rd09").revealAllCreatures(['Titan', 'Angel', 'Angel', 'Warlock', 'Troll'])
+        aps.getLeaf("Gd10").removeCreature("Angel")
+        aps.getLeaf("Rd09").removeCreature("Angel")
+        aps.getLeaf("Gd10").removeCreature("Guardian")
+        aps.getLeaf("Gd08").removeCreature("Angel")
+        aps.getLeaf("Gd10").addCreature("Angel")
+        aps.getLeaf("Rd09").removeCreature("Angel")
+        aps.getLeaf("Rd09").removeCreature("Troll")
+        aps.getLeaf("Rd09").removeCreature("Warlock")
+        aps.getLeaf("Gd10").removeCreature("Behemoth")
+        aps.getLeaf("Gd10").removeCreature("Angel")
+        aps.getLeaf("Rd09").removeCreature("Titan")
+        aps.getLeaf("Gd10").removeCreature("Cyclops")
+        aps.getLeaf("Gd10").revealAllCreatures(['Serpent', 'Behemoth'])
+        aps.getLeaf("Gd10").addCreature("Angel")
+        aps.getLeaf("Gd10").revealSomeCreatures(['Serpent'])
+        aps.getLeaf("Gd10").addCreature("Serpent")
+        aps.printLeaves()
+        turn = 20
+        print "\nTurn", turn
+        aps.getLeaf("Bu06").split(2, "Bu07", 20)
+        aps.getLeaf("Bu11").split(2, "Bu02", 20)
+        aps.getLeaf("Bu01").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Bu01").addCreature("Ranger")
+        aps.getLeaf("Bu02").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Bu02").addCreature("Ranger")
+        aps.getLeaf("Bu12").revealSomeCreatures(['Troll', 'Troll', 'Troll'])
+        aps.getLeaf("Bu12").addCreature("Wyvern")
+        aps.getLeaf("Br02").split(2, "Br05", 20)
+        aps.getLeaf("Br01").addCreature("Angel")
+        aps.getLeaf("Br01").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Br01").addCreature("Ranger")
+        aps.getLeaf("Br02").revealSomeCreatures(['Gorgon'])
+        aps.getLeaf("Br02").addCreature("Gorgon")
+        aps.getLeaf("Br03").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Br03").addCreature("Ranger")
+        aps.getLeaf("Br04").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Br04").addCreature("Ranger")
+        aps.getLeaf("Bu06").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Bu06").addCreature("Ranger")
+        aps.printLeaves()
+        turn = 21
+        print "\nTurn", turn
+        aps.getLeaf("Br01").split(2, "Br05", 21)
+        aps.getLeaf("Br01").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Br01").addCreature("Ranger")
+        aps.getLeaf("Gd01").revealSomeCreatures(['Gorgon'])
+        aps.getLeaf("Gd01").addCreature("Gorgon")
+        aps.printLeaves()
+        turn = 22
+        print "\nTurn", turn
+        aps.getLeaf("Bu10").split(2, "Bu04", 22)
+        aps.getLeaf("Bu01").revealSomeCreatures(['Lion', 'Lion'])
+        aps.getLeaf("Bu01").addCreature("Ranger")
+        aps.getLeaf("Bu12").revealSomeCreatures(['Troll', 'Troll', 'Troll'])
+        aps.getLeaf("Bu12").addCreature("Guardian")
+        aps.getLeaf("Bk10").revealSomeCreatures(['Cyclops', 'Cyclops'])
+        aps.getLeaf("Bk10").addCreature("Gorgon")
+        aps.getLeaf("Br03").split(2, "Br06", 22)
+        aps.getLeaf("Br01").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Br01").addCreature("Ranger")
+        aps.getLeaf("Br03").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Br03").addCreature("Ranger")
+        aps.getLeaf("Br05").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Br05").addCreature("Ranger")
+        aps.getLeaf("Br11").revealSomeCreatures(['Unicorn'])
+        aps.getLeaf("Br11").addCreature("Unicorn")
+        aps.printLeaves()
+        turn = 23
+        print "\nTurn", turn
+        aps.getLeaf("Gd01").split(2, "Gd02", 23)
+        aps.getLeaf("Bu12").split(2, "Bu02", 23)
+        aps.getLeaf("Bu01").revealSomeCreatures(['Lion'])
+        aps.getLeaf("Bu01").addCreature("Lion")
+        aps.getLeaf("Bu06").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Bu06").addCreature("Ranger")
+        aps.getLeaf("Bu07").revealSomeCreatures(['Troll', 'Troll'])
+        aps.getLeaf("Bu07").addCreature("Ranger")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Unicorn'])
+        aps.getLeaf("Bu11").addCreature("Unicorn")
+        aps.getLeaf("Br01").split(2, "Br07", 23)
+        aps.getLeaf("Br11").split(2, "Br12", 23)
+        aps.getLeaf("Br01").revealSomeCreatures(['Minotaur'])
+        aps.getLeaf("Br01").addCreature("Minotaur")
+        aps.getLeaf("Br02").revealSomeCreatures(['Behemoth'])
+        aps.getLeaf("Br02").addCreature("Behemoth")
+        aps.getLeaf("Br03").revealSomeCreatures(['Warbear', 'Warbear'])
+        aps.getLeaf("Br03").addCreature("Giant")
+        aps.getLeaf("Br05").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Br05").addCreature("Ranger")
+        aps.getLeaf("Br07").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Br07").addCreature("Ranger")
+        aps.getLeaf("Br11").revealSomeCreatures(['Unicorn'])
+        aps.getLeaf("Br11").addCreature("Unicorn")
+        aps.printLeaves()
+        turn = 24
+        print "\nTurn", turn
+        aps.getLeaf("Bu01").split(2, "Bu08", 24)
+        aps.getLeaf("Bu07").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Bu07").addCreature("Lion")
+        aps.getLeaf("Bu11").revealSomeCreatures(['Minotaur', 'Minotaur'])
+        aps.getLeaf("Bu11").addCreature("Unicorn")
+        aps.getLeaf("Bk08").revealSomeCreatures(['Titan'])
+        aps.getLeaf("Bk08").addCreature("Warlock")
+        aps.getLeaf("Br03").split(2, "Br09", 24)
+        aps.getLeaf("Br05").revealSomeCreatures(['Ranger'])
+        aps.getLeaf("Br05").addCreature("Lion")
+        aps.printLeaves()
+
+    def testPredictSplits7(self):
+        print "\ntest 7 begins"
+        creatures = []
+        creatures.append(CreatureInfo('Angel', True, True))
+        creatures.append(CreatureInfo('Gargoyle', True, True))
+        creatures.append(CreatureInfo('Centaur', True, True))
+        creatures.append(CreatureInfo('Centaur', False, True))
+        creatures.append(CreatureInfo('Centaur', True, False))
+        n = Node("Gd10", 1, creatures, None)
+        n.revealSomeCreatures(['Gargoyle', 'Gargoyle'])
+        print n
+        #assert(n.allCertain())
+        print "\ntest 7 ends"
 
 if __name__ == "__main__":
     unittest.main()
