@@ -406,6 +406,9 @@
         </exec>
 
         <exec executable="scp">
+            <arg line="ChangeLog ${SERVER}:${HTMLDIR}"/>
+        </exec>
+        <exec executable="scp">
             <arg line="${ZIPFILE} ${SERVER}:${DOWNLOAD_DIR}"/>
         </exec>
         <exec executable="ssh">
