@@ -76,7 +76,7 @@ class OptionDialog extends Dialog implements ActionListener
 
 
     // Unit test.
-    public static void main(String args[])
+    public static void main(String [] args)
     {
         new OptionDialog(new Frame(), "Title", "Yes or No?", "Yes", "No");
 
