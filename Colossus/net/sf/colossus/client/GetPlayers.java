@@ -12,9 +12,9 @@ import net.sf.colossus.util.Split;
 import net.sf.colossus.util.Log;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Options;
 import net.sf.colossus.server.Constants;
 import net.sf.colossus.server.SaveGameFilter;
-import net.sf.colossus.server.Game;
 import net.sf.colossus.client.VariantSupport;
 
 /**
@@ -26,7 +26,7 @@ import net.sf.colossus.client.VariantSupport;
 
 
 public final class GetPlayers extends KDialog implements WindowListener,
-    ActionListener
+    ActionListener, ItemListener
 {
     public static final String newGame = "New Game";
     public static final String loadGame = "Load Game";
@@ -36,67 +36,44 @@ public final class GetPlayers extends KDialog implements WindowListener,
     public static final String byColor = "<By color>";
     public static final String username = System.getProperty("user.name",
         byColor);
-    private static String [] nameChoices = { byColor, username, none };
 
     private JFrame parentFrame;
 
     private JComboBox [] playerTypes = new JComboBox[6];
     private JComboBox [] playerNames = new JComboBox[6];
-    private JEditorPane readme = null;
+    private JEditorPane readme = new JEditorPane();
     private JScrollPane scrollPane = null;
 
-    /** List of Map.Entry objects that map player names to player types */
-    private static java.util.List playerStuff = new ArrayList();
-
-    private static String anyAI = "A Random AI";
-    /* aiList should match the class name of available AI */
-    private static String[] aiList = { "SimpleAI", "CowardSimpleAI" };
-    /* default AI should be one of aiList or anyAI */
-    public static String defaultAI = anyAI;
-
-    /** list of available Variant */
-    private static String[] variantArray =
-    {
-        "Default",
-        "TitanPlus",
-        "ExtTitan", 
-        "Badlands",
-        "Outlands",
-        "Undead",
-        "TG-SetII",
-        "TG-ConceptI",
-        "TG-ConceptIII"
-    };
     private JComboBox variantBox;
-    private java.util.List variantList;
 
-    private GetPlayers(JFrame parentFrame)
+    /** This is Game's options, which we will modify directly. */
+    private Options options;
+
+    private Container checkboxPane;
+
+
+    /** Clear options to abort */
+    public GetPlayers(JFrame parentFrame, Options options)
     {
         super(parentFrame, "Player Setup", true);
 
-        int ainum = 0;
-        for (int i = 0 ; i < aiList.length ; i++) 
-        {
-            if (!(aiList[i].equals("")))
-            {
-                ainum++;
-            }
-        }
+        this.options = options;
+
         // Use a Vector because JComboBox does not know about Lists.
         Vector typeChoices = new Vector();
         typeChoices.add("Human");
         typeChoices.add("None");
-        for (int i = 0 ; i < aiList.length ; i++) 
+        for (int i = 0 ; i < Constants.numAITypes; i++) 
         {
-            if (!(aiList[i].equals("")))
+            if (!(Constants.aiArray[i].equals("")))
             {
-                typeChoices.add(aiList[i]);
+                typeChoices.add(Constants.aiArray[i]);
             }
         }
         // Only show random AI choice if more than one AI.
-        if (ainum >= 2)
+        if (Constants.numAITypes >= 2)
         {
-            typeChoices.add(anyAI);
+            typeChoices.add(Constants.anyAI);
         }
 
         this.parentFrame = parentFrame;
@@ -117,24 +94,54 @@ public final class GetPlayers extends KDialog implements WindowListener,
             playerPane.add(new JLabel(s));
             
             JComboBox playerType = new JComboBox(typeChoices);
-            if (i == 0)
+            
+            String type = options.getStringOption(Options.playerType + i);
+            if (type == null || type.length() == 0)
             {
-                playerType.setSelectedItem("Human");
+                if (i == 0)
+                {
+                    type = "Human";
+                }
+                else
+                {
+                    type = Constants.defaultAI;
+                }
             }
-            else
-            {
-                playerType.setSelectedItem(defaultAI);
-            }
+            playerType.setSelectedItem(type);
+
             playerPane.add(playerType);
             playerType.addActionListener(this);
             playerTypes[i] = playerType;
 
+
+            String name = options.getStringOption(Options.playerName + i);
+            if (name == null || name.length() == 0)
+            {
+                name = none;
+            }
+            if (name.startsWith(byColor))
+            {
+                name = byColor;
+            }
+
+            // Use a Vector because JComboBox does not know about Lists.
+            Vector nameChoices = new Vector();
+            nameChoices.add(name);
+            if (!nameChoices.contains(byColor))
+            {
+                nameChoices.add(byColor);
+            }
+            if (!nameChoices.contains(username))
+            {
+                nameChoices.add(username);
+            }
+            if (!nameChoices.contains(none))
+            {
+                nameChoices.add(none);
+            }
+
             JComboBox playerName = new JComboBox(nameChoices);
             playerName.setEditable(true);
-            if (i == 0)
-            {
-                playerName.setSelectedItem(username);
-            }
             playerPane.add(playerName);
             playerName.addActionListener(this);
             playerNames[i] = playerName;
@@ -142,11 +149,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         Container gamePane = new Container();
         gamePane.setLayout(new GridLayout(0, 3));
-        Container variantPane = new Container();
-        variantPane.setLayout(new GridLayout(0, 2));
-
         contentPane.add(gamePane);
-        contentPane.add(variantPane);
         
         JButton button1 = new JButton(newGame);
         button1.setMnemonic(KeyEvent.VK_N);
@@ -160,32 +163,56 @@ public final class GetPlayers extends KDialog implements WindowListener,
         button3.setMnemonic(KeyEvent.VK_Q);
         gamePane.add(button3);
         button3.addActionListener(this);
+
+        checkboxPane = new JPanel();
+        checkboxPane.setLayout(new GridLayout(0, 3));
+        contentPane.add(checkboxPane);
         
-        variantBox = new JComboBox(variantArray);
-        variantBox.addActionListener(this);
-        variantBox.setSelectedItem(variantArray[0]);
-        variantList = new ArrayList();
-        for(int i = 0; i < variantArray.length; i++)
+        addCheckbox(Options.autosave);
+        addCheckbox(Options.logDebug);
+        addCheckbox(Options.balancedTowers);
+        addCheckbox(Options.allStacksVisible);
+        addCheckbox(Options.autoStop);
+        addCheckbox(Options.autoQuit);
+
+
+        Container delayPane = new JPanel();
+        BoxLayout delayLayout = new BoxLayout(delayPane, BoxLayout.X_AXIS);
+        delayPane.setLayout(delayLayout);
+        JButton delayButton = new JButton(options.aiDelay);
+        delayButton.addActionListener(this);
+        delayPane.add(delayButton);
+        contentPane.add(delayPane);
+        
+
+        Container variantPane = new Container();
+        variantPane.setLayout(new GridLayout(0, 2));
+        contentPane.add(variantPane);
+
+        String variantName = options.getStringOption(Options.variant);
+        // XXX Make sure chosen variant is in the list.
+        if (variantName == null || variantName.length() == 0)
         {
-            variantList.add(variantArray[i]);
+            // Default variant
+            variantName = Constants.variantArray[0];
         }
+
+        variantBox = new JComboBox(Constants.variantArray);
+        variantBox.addActionListener(this);
+        variantBox.setSelectedItem(variantName);
         variantPane.add(variantBox);
-        JButton buttonVariant =
-            new JButton(loadVariant);
+        JButton buttonVariant = new JButton(loadVariant);
         variantPane.add(buttonVariant);
         buttonVariant.addActionListener(this);
 
         JPanel readmePane = new JPanel();
         readmePane.setLayout(new GridLayout(0, 1));
-        readme = new JEditorPane();
         readme.setEditable(false);
         scrollPane = new JScrollPane(readme);
         readmePane.add(scrollPane);
         contentPane.add(readmePane);
 
-        Document doc =
-            VariantSupport.loadVariant(variantArray[0] + ".var",
-                                       variantArray[0]);
+        Document doc = VariantSupport.loadVariant(variantName);
         readme.setContentType((String)doc.getProperty(
             ResourceLoader.keyContentType));
         readme.setDocument(doc);
@@ -199,21 +226,23 @@ public final class GetPlayers extends KDialog implements WindowListener,
     }
 
 
-    /** Return a List of Strings containing tilde-separated name/type. */
-    public static java.util.List getPlayers(JFrame parentFrame)
+    private void addCheckbox(String optname)
     {
-        new GetPlayers(parentFrame);
-        return playerStuff;
+        JCheckBox cb = new JCheckBox(optname);
+        cb.setSelected(options.getOption(optname));
+        cb.addItemListener(this);
+        checkboxPane.add(cb);
     }
 
 
     /** Start new game if values are legal. */
     private void validateInputs()
     {
-        playerStuff.clear();
-        Set namesTaken = new HashSet();
+        options.clearPlayerInfo();
+
         int numPlayers = 0;
-        Random aiRand = new Random();
+        java.util.List names = new ArrayList();
+        java.util.List types = new ArrayList();
 
         for (int i = 0; i < 6; i++)
         {
@@ -227,28 +256,35 @@ public final class GetPlayers extends KDialog implements WindowListener,
                     name = name + i;
                 }
                 // Duplicate names are not allowed.
-                if (namesTaken.contains(name))
+                if (names.contains(name))
                 {
+                    options.clearPlayerInfo();
                     return;
                 }
-                if (type.equals(anyAI))
-                {
-                    type = aiList[aiRand.nextInt(aiList.length)];
-                }
                 numPlayers++;
-                String entry = name + "~" + type;
-                playerStuff.add(entry);
-                namesTaken.add(name);
+                names.add(name);
+                types.add(type);
             }
         }
 
         // Exit if there aren't enough unique player names.
-        if (numPlayers < 1 || playerStuff.size() != numPlayers)
+        if (numPlayers < 1 || names.size() != numPlayers)
         {
+            options.clearPlayerInfo();
             return;
         }
 
-        // Will eliminate modal dialog, allowing game to start.
+        // Okay.  Copy names and types to options.
+        for (int i = 0; i < numPlayers; i++)
+        {
+            String name = (String)names.get(i);
+            options.setOption(Options.playerName + i, name);
+
+            String type = (String)types.get(i);
+            options.setOption(Options.playerType + i, type);
+        }
+
+        // Eliminate modal dialog, allowing game to start.
         dispose();
     }
 
@@ -260,10 +296,9 @@ public final class GetPlayers extends KDialog implements WindowListener,
         int returnVal = chooser.showOpenDialog(parentFrame);
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
-            playerStuff.clear();
+            options.clearPlayerInfo();
             // Set key to "load game" and value to savegame filename.
-            playerStuff.add(loadGame + "~" +
-                chooser.getSelectedFile().getName());
+            options.setOption(loadGame, chooser.getSelectedFile().getName());
             dispose();
         }
     }
@@ -300,7 +335,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         javax.swing.JFileChooser varChooser = new JFileChooser(".");
         varChooser.setFileFilter(new varFileFilter());
         varChooser.setDialogTitle(
-                   "Choose your variant (or cancel for default game)");
+            "Choose your variant (or cancel for default game)");
         int returnVal = varChooser.showOpenDialog(varChooser);
         String varName = Constants.defaultVARFile;
         if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION)
@@ -308,7 +343,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
             File varFile = varChooser.getSelectedFile();
             Document doc = VariantSupport.loadVariant(varFile);
             readme.setContentType((String)doc.getProperty(
-                ResourceLoader.keyContentType));
+            ResourceLoader.keyContentType));
             readme.setDocument(doc);
         }
     }
@@ -317,7 +352,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
     {
         if (e.getActionCommand().equals(quit))
         {
-            playerStuff.clear();
+            options.clear();
             dispose();
         }
         else if (e.getActionCommand().equals(newGame))
@@ -328,17 +363,28 @@ public final class GetPlayers extends KDialog implements WindowListener,
         {
             doLoadGame();
         }
+        else if (e.getActionCommand().equals(Options.aiDelay))
+        {
+            final int oldDelay = options.getIntOption(Options.aiDelay);
+            final int newDelay = PickIntValue.pickIntValue(parentFrame,
+                oldDelay, "Pick AI Delay", 0, 3000);
+            if (newDelay != oldDelay)
+            {
+                options.setOption(Options.aiDelay, newDelay);
+            }
+        }
         else if (e.getActionCommand().startsWith(loadVariant))
         {
             doLoadVariant();
             String varName = VariantSupport.getVarName();
-            if (!(variantList.contains(varName)))
+            if (!(Constants.getVariantList().contains(varName)))
             {
-                String buttonName =
-                    varName.substring(0,
-                                      varName.lastIndexOf(".var"));
-                if (variantBox.getItemCount() > variantArray.length)
-                    variantBox.removeItemAt(variantArray.length);
+                String buttonName = varName.substring(0, 
+                    varName.lastIndexOf(".var"));
+                if (variantBox.getItemCount() > Constants.numVariants)
+                {
+                    variantBox.removeItemAt(Constants.numVariants);
+                }
                 variantBox.addItem(buttonName);
                 variantBox.setSelectedItem(buttonName);
             }
@@ -355,41 +401,47 @@ public final class GetPlayers extends KDialog implements WindowListener,
                 }
                 else
                 { // selecting different ; remove all non-included
-                    if (variantBox.getItemCount() > variantArray.length)
-                        variantBox.removeItemAt(variantArray.length);
-                    Document doc =
-                        VariantSupport.loadVariant(value + ".var",
-                                                   value);
-                    readme.setContentType((String)doc.getProperty(
-                        ResourceLoader.keyContentType));
+                    if (variantBox.getItemCount() > Constants.numVariants)
+                    {
+                        variantBox.removeItemAt(Constants.numVariants);
+                    }
+                    Document doc = VariantSupport.loadVariant(value);
+                    String prop = (String)doc.getProperty(
+                           ResourceLoader.keyContentType);
+                    readme.setContentType(prop);
                     readme.setDocument(doc);
                 }
             }
             else
-            for (int i = 0; i < 6; i++)
             {
-                JComboBox box = playerTypes[i];
-                if (box == source)
+                for (int i = 0; i < 6; i++)
                 {
-                    // If player type was changed to none, also change player
-                    // name to none.
-                    String value = (String)box.getSelectedItem();
-                    if (value.equals(none))
+                    JComboBox box = playerTypes[i];
+                    if (box == source)
                     {
-                        playerNames[i].setSelectedItem(none);
+                        // If player type was changed to none, also change 
+                        // player name to none.
+                        String value = (String)box.getSelectedItem();
+                        if (value.equals(none))
+                        {
+                            playerNames[i].setSelectedItem(none);
+                        }
                     }
-                }
+    
+                    box = playerNames[i];
+                    if (box == source)
+                    {
+                        // If player name was changed to none, also change player
+                        // type to none.
+                        String value = (String)box.getSelectedItem();
+                        if (value.equals(none))
+                        {
+                            playerTypes[i].setSelectedItem(none);
+                        }
+                    }
 
-                box = playerNames[i];
-                if (box == source)
-                {
-                    // If player name was changed to none, also change player
-                    // type to none.
-                    String value = (String)box.getSelectedItem();
-                    if (value.equals(none))
-                    {
-                        playerTypes[i].setSelectedItem(none);
-                    }
+                    // XXX If player type was changed away from none, change 
+                    // player name away from none?
                 }
             }
         }
@@ -404,5 +456,14 @@ public final class GetPlayers extends KDialog implements WindowListener,
     public Dimension getPreferredSize()
     {
         return getMinimumSize();
+    }
+
+
+    public void itemStateChanged(ItemEvent e)
+    {
+        JCheckBox source = (JCheckBox)e.getSource();
+        String text = source.getText();
+        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+        options.setOption(text, selected);
     }
 }

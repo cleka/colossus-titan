@@ -1,11 +1,21 @@
+Fix variant option, command-line variant loading.  
+Remove extra variant loads. 
+
+Fix autoStop.
+
+Fix unit tests for server options.
+
 Add JUnit section to build docs.
 Document test procedures.
 
 Mention werken.opts in docs.
 Add remaining command-line options.
-Fix unit tests for command-line options.
 
-Bug: Fix timing of option loading at start of game.
+Initialize player lines in GetPlayers from options.
+
+Save/load/test scale.
+
+Bug: All stacks visible is broken.
 
 Bug: 6-AI game, one AI (dripton) showed a SummonAngel dialog rather than
    picking itself.  Loaded autoplay=false from cfg file and overrode isAI()?
@@ -14,6 +24,9 @@ Bug: Undo move with a recruitChit showing, not cleared.
 
 Bug: Still getting excess Acquire dialog, for 6-high legion that earns two
    angels, but angel is not added.
+
+L&F menu should indicate current L&F somehow, not show Windows if not
+   allowed on this platform.
 
 Change some dialogs to show info in a label instead of the title (so
    the dialog is wide enough) and add explicit cancel buttons.

@@ -32,27 +32,17 @@ public final class Options
     // Server options
     public static final String autosave = "Autosave";
     public static final String logDebug = "Log debug messages";
+    public static final String balancedTowers = "Balanced starting towers";
     public static final String allStacksVisible = "All stacks visible";
-    public static final String aiDelay = "AI delay";
     public static final String autoStop = "AIs stop when humans dead";
     public static final String autoQuit = "Auto quit when game over";
-    public static final String balancedTowers = "Balanced starting towers";
+    public static final String aiDelay = "AI delay";  // int
+    public static final String variant = "Variant";   // string
 
-    private static final String [] serverOptions = 
-    { 
-        autosave, 
-        logDebug, 
-        allStacksVisible, 
-        aiDelay,
-        autoStop,
-        autoQuit, 
-        balancedTowers 
-    };
+    // Will add player numbers 0-5 to the the of these.
+    public static final String playerName = "Player name ";
+    public static final String playerType = "Player type ";
 
-    public static List getServerOptions()
-    {
-        return Collections.unmodifiableList(Arrays.asList(serverOptions));
-    }
 
 
     // Display options (client)
@@ -177,5 +167,32 @@ public final class Options
     public Enumeration propertyNames()
     {
         return props.propertyNames();
+    }
+
+
+    /** Remove all playerName and playerType entries. */
+    public void clearPlayerInfo()
+    {
+        Enumeration en = props.propertyNames();
+        while (en.hasMoreElements())
+        {
+            String name = (String)en.nextElement();
+            if (name.startsWith(playerName) || name.startsWith(playerType))
+            {
+                props.remove(name);
+            }
+        }
+    }
+
+
+    /** Wipe everything. */
+    public void clear()
+    {
+        props.clear();
+    }
+
+    public boolean isEmpty()
+    {
+        return props.isEmpty();
     }
 }

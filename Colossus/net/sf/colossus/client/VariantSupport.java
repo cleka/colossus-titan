@@ -9,7 +9,7 @@ import java.io.*;
 import javax.swing.text.*;
 
 /**
- * Class VariantSupport hold the members and functions required to support Variant in Colossus
+ * Class VariantSupport hold the members and functions required to support Variants in Colossus
  * @version $Id$
  * @author Romain Dolbeau
  */
@@ -22,6 +22,17 @@ public final class VariantSupport
     private static String recruitName = Constants.defaultTERFile;
     private static String creaturesName = Constants.defaultCREFile;
     private static java.util.List dependUpon = null;
+
+
+    /**
+     * Load a Colossus Variant by name.
+     * @param variantName The name of the variant.
+     * @return A Document describing the variant.
+     */
+    public static Document loadVariant(String variantName)
+    {
+        return loadVariant(variantName + ".var", variantName);
+    }
 
     /**
      * Load a Colossus Variant from the specified File

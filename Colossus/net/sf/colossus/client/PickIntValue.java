@@ -6,44 +6,41 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import net.sf.colossus.util.Options;
 import net.sf.colossus.util.KDialog;
 
-
 /** 
- *  Allows picking a new AI delay.
- *  @version $Id$ 
+ *  Allows picking any integer value
+ *  @version $Id$
  *  @author David Ripton
  */
 
-final class PickDelay extends KDialog implements WindowListener,
+final class PickIntValue extends KDialog implements WindowListener,
     ChangeListener, ActionListener
 {
-    private static int newDelay;
+    private static int newValue;
+    private static int oldValue;
+
     // A JSpinner would be better, but is not supported until JDK 1.4.
     private JSlider slider;
-    private Client client;
 
 
-    private PickDelay(JFrame parentFrame, Client client, int oldDelay)
+    private PickIntValue(JFrame parentFrame, int oldValue, String title,
+        int min, int max)
     {
-        super(parentFrame, "Set AI Delay in ms", false);
+        super(parentFrame, title, true);
 
-        this.client = client;
+        this.oldValue = oldValue;
 
         setBackground(Color.lightGray);
+
         addWindowListener(this);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
-        if (oldDelay < 0)
-        {
-            oldDelay = 0;
-        }
-        slider = new JSlider(JSlider.HORIZONTAL, 0, 3000, oldDelay);
-        slider.setMajorTickSpacing(1000);
-        slider.setMinorTickSpacing(250);
+        slider = new JSlider(JSlider.HORIZONTAL, min, max, oldValue);
+        slider.setMajorTickSpacing((max - min) / 4);
+        slider.setMinorTickSpacing((max - min) / 16);
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);
         contentPane.add(slider);
@@ -67,15 +64,19 @@ final class PickDelay extends KDialog implements WindowListener,
         repaint();
     }
 
-    static void pickDelay(JFrame parentFrame, Client client, int oldDelay)
+    /** Return the new value if the user accepted it, or oldValue if
+     *  user cancelled the dialog. */
+    static int pickIntValue(JFrame parentFrame, int oldValue, String title,
+        int min, int max)
     {
-        new PickDelay(parentFrame, client, oldDelay);
+        new PickIntValue(parentFrame, oldValue, title, min, max);
+        return newValue;
     }
 
 
     public void stateChanged(ChangeEvent e)
     {
-        newDelay = slider.getValue();
+        newValue = slider.getValue();
     }
 
     public void actionPerformed(ActionEvent e)
@@ -83,19 +84,11 @@ final class PickDelay extends KDialog implements WindowListener,
         if (e.getActionCommand().equals("Accept"))
         {
             dispose();
-            if (client != null)
-            {
-                client.setOption(Options.aiDelay, newDelay);
-            }
         }
         else if (e.getActionCommand().equals("Cancel"))
         {
-            newDelay = -1;
+            newValue = oldValue;
             dispose();
-            if (client != null)
-            {
-                client.setOption(Options.aiDelay, newDelay);
-            }
         }
     }
 }

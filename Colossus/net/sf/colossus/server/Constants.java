@@ -72,6 +72,7 @@ public final class Constants
 
     public static final int MIN_DELAY = 0;      //in ms
     public static final int MAX_DELAY = 5000;
+    public static final int DEFAULT_DELAY = 300;
 
     // Entry sides
     public static final String bottom = "Bottom";
@@ -105,4 +106,40 @@ public final class Constants
 
     // XXX Not used everywhere yet, so don't change it.
     public static final int MAX_PLAYERS = 6;
+
+    public static final String anyAI = "A Random AI";
+    public static final String defaultAI = anyAI;
+    public static final String[] aiArray = { "SimpleAI", "CowardSimpleAI" };
+    public static final int numAITypes = aiArray.length;
+
+    /** Available internal variants */
+    public static final String [] variantArray =
+    {
+        "Default",
+        "TitanPlus",
+        "ExtTitan", 
+        "Badlands",
+        "Outlands",
+        "Undead",
+        "TG-SetII",
+        "TG-ConceptI",
+        "TG-ConceptIII"
+    };
+
+    public static final int numVariants = variantArray.length;
+
+    private static final java.util.List variantList = new ArrayList();
+
+    // static initializer
+    {
+        for (int i = 0; i < variantArray.length; i++)
+        {
+            variantList.add(variantArray[i]);
+        }
+    }
+
+    public static java.util.List getVariantList()
+    {
+        return Collections.unmodifiableList(variantList);
+    }
 }

@@ -177,21 +177,22 @@ public final class Game
     }
 
 
-    /** Fill in values from command-line args if possible. */
-    private java.util.List getPlayerStuffFromCommandLine(CommandLine cl)
+    /** Modify options from command-line args if possible.  Clear
+     *  options to abort if something is wrong. */
+    private void setupOptionsFromCommandLine(CommandLine cl)
     {
         int numHumans = 1;
         int numAIs = 5;
-        java.util.List playerStuff = new ArrayList();
 
         if (cl.optIsSet('v'))
         {
-            String variant = cl.getOptValue('v');
-            // TODO Load variant
+            String variantName = cl.getOptValue('v');
+            // XXX Check that this variant is in the list.
+            options.setOption(Options.variant, variantName);
         }
         if (cl.optIsSet('q'))
         {
-            // TODO Set the option and don't let cfg file overwrite.
+            options.setOption(Options.autoQuit, true);
         }
         if (cl.optIsSet('u'))
         {
@@ -203,12 +204,13 @@ public final class Game
             String buf = cl.getOptValue('i');
             numAIs = Integer.parseInt(buf);
         }
-        // Punt if values are bogus.
+        // Quit if values are bogus.
         if (numHumans < 0 || numAIs < 0 ||
             numHumans + numAIs > Constants.MAX_PLAYERS)
         {
             Log.error("Illegal number of players");
-            return playerStuff;
+            options.clear();
+            return;
         }
 
         for (int i = 0; i < numHumans; i++)
@@ -222,15 +224,40 @@ public final class Game
             {
                 name = GetPlayers.byColor + i;
             }
-            playerStuff.add(name + '~' + "Human"); 
+            options.setOption(Options.playerName + i, name);
+            options.setOption(Options.playerType + i, "Human");
         }
-        for (int i = 0; i < numAIs; i++)
+        for (int j = numHumans; j < numAIs + numHumans; j++)
         {
-            String name = GetPlayers.byColor + (i + Constants.MAX_PLAYERS);
-            playerStuff.add(name + '~' + GetPlayers.defaultAI); 
+            String name = GetPlayers.byColor + j;
+            options.setOption(Options.playerName + j, name);
+            options.setOption(Options.playerType + j, Constants.defaultAI);
         }
-        return playerStuff;
     }
+
+    private void addPlayersFromOptions()
+    {
+        for (int i = 0; i < Constants.MAX_PLAYERS; i++)
+        {
+            String name = options.getStringOption(Options.playerName + i);
+            String type = options.getStringOption(Options.playerType + i);
+
+            if (type == Constants.anyAI)
+            {
+                int whichAI = rollDie(Constants.numAITypes) - 1;
+                type = Constants.aiArray[whichAI];
+            }
+
+            if (name != null && type != null && !type.equals(GetPlayers.none))
+            {
+                addPlayer(name, type);
+                Log.event("Add " + type + " player " + name);
+            }
+        }
+        // No longer need the player name and type options. 
+        options.clearPlayerInfo();
+    }
+
 
     /** Start a new game. */
     void newGame()
@@ -241,21 +268,22 @@ public final class Game
         caretaker.resetAllCounts();
         players.clear();
 
-        java.util.List playerStuff = new ArrayList();
+        // Need to load options early, so we can use them to initialize
+        // GetPlayers, and easily override them from command line.
+        options.loadOptions();
 
         if (cl != null)
         {
-            playerStuff = getPlayerStuffFromCommandLine(cl);
+            setupOptionsFromCommandLine(cl);
         }
 
-        if (!cl.optIsSet('s'))
+        // XXX Load game options 'l' and 'z' are handled separately.
+        if (!options.isEmpty() && !cl.optIsSet('s')) 
         {
-            JFrame frame = new JFrame();
-            // TODO Push option settings into GetPlayers
-            playerStuff = GetPlayers.getPlayers(frame);
+            new GetPlayers(new JFrame(), options);
         }
 
-        if (playerStuff.isEmpty())
+        if (options.isEmpty())
         {
             // Bad input, or user selected Quit.
             dispose();
@@ -263,31 +291,22 @@ public final class Game
 
         // See if user hit the Load game button, and we should
         // load a game instead of starting a new one.
-        if (playerStuff.size() == 1)
+        String filename = options.getStringOption(GetPlayers.loadGame);
+        if (filename != null && filename.length() > 0)
         {
-            String entry = (String)playerStuff.get(0);
-            java.util.List values = Split.split('~', entry);
-            String key = (String)values.get(0);
-            if (key.equals(GetPlayers.loadGame))
-            {
-                String filename = (String)values.get(1);
-                loadGame(filename);
-                return;
-            }
+            options.clearPlayerInfo();
+            loadGame(filename);
+            return;
         }
+
+        options.saveOptions();
+
+        // XXX Load variant only if not already loaded.
+        VariantSupport.loadVariant(options.getStringOption(Options.variant));
 
         Log.event("Starting new game");
 
-        Iterator it = playerStuff.iterator();
-        while (it.hasNext())
-        {
-            String entry = (String)it.next();
-            java.util.List values = Split.split('~', entry);
-            String name = (String)values.get(0);
-            String type = (String)values.get(1);
-            addPlayer(name, type);
-            Log.event("Add " + type + " player " + name);
-        }
+        addPlayersFromOptions();
 
         initAndLoadData();
         initServerAndClients();
@@ -296,7 +315,6 @@ public final class Game
         // so that we can avoid showing boards for non-primary AI players.
         syncAutoPlay();
 
-        options.loadOptions();
         syncOptions();
 
         server.allInitBoard();
@@ -541,15 +559,6 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
         return server;
     }
 
-    int getNumPlayers()
-    {
-        return players.size();
-    }
-
-    void addPlayer(String name)
-    {
-        addPlayer(name, "Human");
-    }
 
     void addPlayer(String name, String type)
     {
@@ -561,6 +570,12 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
     void addPlayer(Player player)
     {
         players.add(player);
+    }
+
+
+    int getNumPlayers()
+    {
+        return players.size();
     }
 
     int getNumLivingPlayers()
@@ -1265,8 +1280,6 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
             server.allSetColor();
 
             syncAutoPlay();
-
-            options.loadOptions();
             syncOptions();
 
             // Battle stuff

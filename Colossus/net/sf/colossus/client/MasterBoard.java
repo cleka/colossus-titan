@@ -90,7 +90,6 @@ public final class MasterBoard extends JPanel
     public static final String viewHexRecruitTree = "View Hex Recruit Tree";
     public static final String viewBattleMap = "View Battle Map";
     public static final String changeScale = "Change Scale";
-    public static final String changeAIDelay = "Change AI Delay";
 
     public static final String about = "About";
     
@@ -116,7 +115,6 @@ public final class MasterBoard extends JPanel
     private AbstractAction viewHexRecruitTreeAction;
     private AbstractAction viewBattleMapAction;
     private AbstractAction changeScaleAction;
-    private AbstractAction changeAIDelayAction;
 
     private AbstractAction aboutAction;
 
@@ -487,9 +485,9 @@ public final class MasterBoard extends JPanel
             public void actionPerformed(ActionEvent e)
             {
                 final int oldScale = Scale.get();
-                final int newScale = PickScale.pickScale(masterFrame,
-                    oldScale);
-                if (newScale != oldScale && newScale != -1)
+                final int newScale = PickIntValue.pickIntValue(masterFrame,
+                    oldScale, "Pick scale", 5, 25);
+                if (newScale != oldScale)
                 {
                     client.setOption(Options.scale, newScale);
                     Scale.set(newScale);
@@ -498,14 +496,6 @@ public final class MasterBoard extends JPanel
             }
         };
 
-        changeAIDelayAction = new AbstractAction(changeAIDelay)
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                PickDelay.pickDelay(masterFrame, client, 
-                    client.getIntOption(Options.aiDelay));
-            }
-        };
 
         aboutAction = new AbstractAction(about)
         {
@@ -543,7 +533,7 @@ public final class MasterBoard extends JPanel
         mi.setMnemonic(KeyEvent.VK_B);
     }
 
-    private ItemListener m_oItemListener = new MasterBoardItemHandler();
+    private ItemListener itemHandler = new MasterBoardItemHandler();
 
     private void addCheckBox(JMenu menu, String name, int mnemonic)
     {
@@ -551,7 +541,7 @@ public final class MasterBoard extends JPanel
         cbmi.setMnemonic(mnemonic);
         cbmi.setSelected(client.getOption(name));
 
-        cbmi.addItemListener(m_oItemListener);
+        cbmi.addItemListener(itemHandler);
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
     }
@@ -591,24 +581,6 @@ public final class MasterBoard extends JPanel
         phaseMenu.setMnemonic(KeyEvent.VK_P);
         menuBar.add(phaseMenu);
 
-        // Game-wide options first
-
-        JMenu gameMenu = new JMenu("Game");
-        gameMenu.setMnemonic(KeyEvent.VK_G);
-        menuBar.add(gameMenu);
-
-        // TODO If not primary, still show the checkboxes, but don't
-        // allow changing them.
-        if (client.isPrimary())
-        {
-            addCheckBox(gameMenu, Options.allStacksVisible, KeyEvent.VK_S);
-            addCheckBox(gameMenu, Options.balancedTowers, KeyEvent.VK_B);
-            addCheckBox(gameMenu, Options.autosave, KeyEvent.VK_A);
-            addCheckBox(gameMenu, Options.autoQuit, KeyEvent.VK_Q);
-            addCheckBox(gameMenu, Options.logDebug, KeyEvent.VK_L);
-            mi = gameMenu.add(changeAIDelayAction);
-            mi.setMnemonic(KeyEvent.VK_D);
-        }
 
         // Then per-player options
 
@@ -625,8 +597,6 @@ public final class MasterBoard extends JPanel
         addCheckBox(playerMenu, Options.autoSummonAngels, KeyEvent.VK_O);
         addCheckBox(playerMenu, Options.autoAcquireAngels, KeyEvent.VK_A);
         addCheckBox(playerMenu, Options.autoPickRecruiter, KeyEvent.VK_U);
-        playerMenu.addSeparator();
-        addCheckBox(playerMenu, Options.autoPlay, KeyEvent.VK_P);
 
         // Then per-client GUI options
         JMenu graphicsMenu = new JMenu("Graphics");

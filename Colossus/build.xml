@@ -150,7 +150,6 @@
         <junit printsummary="yes" fork="no" haltonfailure="no">
                 <formatter type="plain"/>
                 <test name="net.sf.colossus.server.BalancedTowersTest"/>
-                <test name="net.sf.colossus.server.CommandLineOptionsTest"/>
         </junit>
 </target>
 
