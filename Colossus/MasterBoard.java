@@ -10,8 +10,8 @@ import java.io.*;
  * @author David Ripton
  */
 
-public final class MasterBoard extends JPanel implements MouseListener,
-    WindowListener, ItemListener
+public final class MasterBoard 
+	extends JPanel 
 {
     /** For easy of mapping to the GUI, hexes will be stored
      *  in a 15x8 array, with some empty elements. */
@@ -140,8 +140,8 @@ public final class MasterBoard extends JPanel implements MouseListener,
         setOpaque(true);
         setupIcon();
         setBackground(Color.black);
-        masterFrame.addWindowListener(this);
-        addMouseListener(this);
+        masterFrame.addWindowListener(new MasterBoardWindowHandler());
+        addMouseListener(new MasterBoardMouseHandler());
 
         setupHexes();
 
@@ -602,13 +602,19 @@ public final class MasterBoard extends JPanel implements MouseListener,
         mi.setMnemonic(KeyEvent.VK_B);
     }
 
+	private ItemListener m_oItemListener = new MasterBoardItemHandler();
 
     private void addCheckBox(JMenu menu, String name, int mnemonic)
     {
         JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name);
         cbmi.setMnemonic(mnemonic);
         cbmi.setSelected(client.getOption(name));
-        cbmi.addItemListener(this);
+
+		// Its a little wasteful to create a separate object
+		// but a little cleaner to have a separate inner class
+		// ditto for mouse and window listeners, where we saved
+		// LOC by extending adapter
+        cbmi.addItemListener(m_oItemListener);
         menu.add(cbmi);
         checkboxes.put(name, cbmi);
     }
@@ -687,6 +693,7 @@ public final class MasterBoard extends JPanel implements MouseListener,
         graphicsMenu.setMnemonic(KeyEvent.VK_G);
         menuBar.add(graphicsMenu);
 
+        addCheckBox(graphicsMenu, Options.showCaretaker, KeyEvent.VK_C);
         addCheckBox(graphicsMenu, Options.showStatusScreen, KeyEvent.VK_G);
         addCheckBox(graphicsMenu, Options.showDice, KeyEvent.VK_D);
         addCheckBox(graphicsMenu, Options.antialias, KeyEvent.VK_N);
@@ -2074,77 +2081,79 @@ public final class MasterBoard extends JPanel implements MouseListener,
             e.isAltDown());
     }
 
+	class MasterBoardMouseHandler extends MouseAdapter
+		{
+			public void mousePressed(MouseEvent e)
+				{
+					Point point = e.getPoint();
+					Marker marker = getMarkerAtPoint(point);
+					if (marker != null)
+					{
+						String markerId = marker.getId();
+						Legion legion = game.getLegionByMarkerId(markerId);
+						String playerName = legion.getPlayerName();
 
-    public void mousePressed(MouseEvent e)
-    {
-        Point point = e.getPoint();
-        Marker marker = getMarkerAtPoint(point);
-        if (marker != null)
-        {
-            String markerId = marker.getId();
-            Legion legion = game.getLegionByMarkerId(markerId);
-            String playerName = legion.getPlayerName();
+						// Move the clicked-on marker to the top of the z-order.
+						client.setMarker(markerId, marker);
 
-            // Move the clicked-on marker to the top of the z-order.
-            client.setMarker(markerId, marker);
+						// What to do depends on which mouse button was used
+						// and the current phase of the turn.
 
-            // What to do depends on which mouse button was used
-            // and the current phase of the turn.
+						// Right-click means to show the contents of the
+						// legion.
+						if (isPopupButton(e))
+						{
+							// TODO We need a client-side legion class that doesn't
+							// know the full contents of every enemy legion.
+							legion.sortCritters();
+							new ShowLegion(masterFrame, legion, point,
+										   client.getOption(Options.allStacksVisible) ||
+										   playerName == client.getPlayerName());
+							return;
+						}
+						else
+						{
+							// Only the current player can manipulate his legions.
+							if (playerName.equals(client.getPlayerName()) &&
+								playerName.equals(game.getActivePlayerName()))
+							{
+								actOnLegion(legion);
+								return;
+							}
+						}
+					}
 
-            // Right-click means to show the contents of the
-            // legion.
-            if (isPopupButton(e))
-            {
-                // TODO We need a client-side legion class that doesn't
-                // know the full contents of every enemy legion.
-                legion.sortCritters();
-                new ShowLegion(masterFrame, legion, point,
-                    client.getOption(Options.allStacksVisible) ||
-                    playerName == client.getPlayerName());
-                return;
-            }
-            else
-            {
-                // Only the current player can manipulate his legions.
-                if (playerName.equals(client.getPlayerName()) &&
-                    playerName.equals(game.getActivePlayerName()))
-                {
-                    actOnLegion(legion);
-                    return;
-                }
-            }
-        }
+					// No hits on chits, so check map.
 
-        // No hits on chits, so check map.
+					GUIMasterHex hex = getHexContainingPoint(point);
+					if (hex != null)
+					{
+						if (isPopupButton(e))
+						{
+							lastPoint = point;
+							popupMenu.setLabel(hex.getDescription());
+							popupMenu.show(e.getComponent(), point.x, point.y);
 
-        GUIMasterHex hex = getHexContainingPoint(point);
-        if (hex != null)
-        {
-            if (isPopupButton(e))
-            {
-                lastPoint = point;
-                popupMenu.setLabel(hex.getDescription());
-                popupMenu.show(e.getComponent(), point.x, point.y);
+							return;
+						}
 
-                return;
-            }
+						// Otherwise, the action to take depends on the phase.
+						// Only the current player can manipulate game state.
+						if (client.getPlayerName().equals(game.getActivePlayerName()))
+						{
+							actOnHex(hex.getLabel());
+							hex.repaint();
+							return;
+						}
+					}
 
-            // Otherwise, the action to take depends on the phase.
-            // Only the current player can manipulate game state.
-            if (client.getPlayerName().equals(game.getActivePlayerName()))
-            {
-                actOnHex(hex.getLabel());
-                hex.repaint();
-                return;
-            }
-        }
-
-        // No hits on chits or map, so re-highlight.
-        if (client.getPlayerName().equals(game.getActivePlayerName()))
-        {
-            actOnMisclick();
-        }
-    }
+					// No hits on chits or map, so re-highlight.
+					if (client.getPlayerName().equals(game.getActivePlayerName()))
+					{
+						actOnMisclick();
+					}
+				}
+		}
 
 
     private void actOnLegion(Legion legion)
@@ -2207,64 +2216,24 @@ public final class MasterBoard extends JPanel implements MouseListener,
         }
     }
 
+	class MasterBoardItemHandler implements ItemListener
+	{
+		public void itemStateChanged(ItemEvent e)
+		{
+			JMenuItem source = (JMenuItem)e.getSource();
+			String text = source.getText();
+			boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+			client.setOption(text, selected);
+		}
+	}
 
-
-
-
-
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-
-    public void mouseEntered(MouseEvent e)
-    {
-    }
-
-    public void mouseExited(MouseEvent e)
-    {
-    }
-
-    public void itemStateChanged(ItemEvent e)
-    {
-        JMenuItem source = (JMenuItem)e.getSource();
-        String text = source.getText();
-        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-        client.setOption(text, selected);
-    }
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-    public void windowClosing(WindowEvent e)
-    {
-        game.dispose();
-    }
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-    public void windowOpened(WindowEvent e)
-    {
-    }
-
+	class MasterBoardWindowHandler extends WindowAdapter
+	{
+		public void windowClosing(WindowEvent e)
+		{
+			game.dispose();
+		}
+	}
 
     public void paintComponent(Graphics g)
     {
