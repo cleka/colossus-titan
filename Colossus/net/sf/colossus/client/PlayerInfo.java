@@ -12,6 +12,8 @@ import java.util.TreeSet;
 import net.sf.colossus.xmlparser.TerrainRecruitLoader;
 import net.sf.colossus.server.Player;
 import net.sf.colossus.util.Split;
+import net.sf.colossus.server.Constants;
+import net.sf.colossus.util.Log;
 
 
 /**
@@ -29,6 +31,7 @@ public final class PlayerInfo
     private String name;
     private String tower;
     private String color;
+    private String type;
     private String playersElim;
     private int numLegions;
     private int numCreatures;
@@ -63,6 +66,8 @@ public final class PlayerInfo
         setTower((String)data.remove(0));
 
         setColor((String)data.remove(0));
+        
+        setType((String)data.remove(0));  
 
         setPlayersElim((String)data.remove(0));
 
@@ -85,6 +90,14 @@ public final class PlayerInfo
         {
             setMarkersAvailable(data);
         }
+        
+        /*
+        Log.debug("Player info " + infoString);
+        Log.debug("player color " + color);
+        Log.debug("player type " + type);
+        Log.debug("players elim " + playersElim);
+        Log.debug("player legions " + numLegions);
+         **/
     }
 
     void setDead(boolean dead)
@@ -95,6 +108,11 @@ public final class PlayerInfo
     boolean isDead()
     {
         return dead;
+    }
+    
+    boolean isAI()
+    {
+        return type.endsWith(Constants.ai);
     }
 
     void setName(String name)
@@ -121,10 +139,20 @@ public final class PlayerInfo
     {
         this.color = color;
     }
-
+    
     String getColor()
     {
         return color;
+    }
+    
+    void setType(String type)
+    {
+        this.type = type;
+    }
+       
+    String getType()
+    {
+        return type;
     }
 
     String getShortColor()

@@ -64,8 +64,13 @@
         />
 </target>
 
+<taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake">
+  <classpath>
+  <pathelement path="${netbeans.library.path}" /> 
+  <pathelement path="${netbeans.filesystems.path}" /> 
+  </classpath>
+  </taskdef>
 
-<taskdef name="javamake" classname="com.sun.tools.javamake.ant.JavaMake"/>
 
 <target name="compile" depends="init"
         description = "Compile most .java files to .class files using javamake">

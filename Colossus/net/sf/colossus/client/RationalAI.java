@@ -1532,22 +1532,7 @@ public class RationalAI extends SimpleAI implements AI
 
     private boolean isHumanLegion(LegionInfo legion)
     {
-        String name = legion.getPlayerInfo().getName();
-
-        // XXX
-        // BAD! way to guess if player is an AI.
-        // Look at the name, and if it is a standard color
-        // assume this is an AI.
-        // Better would be to ask the server via Player.isHuman() but this
-        // would require updating the server socket protocol
-        for (int i = 0; i < Constants.colorNames.length; i++)
-        {
-            if (Constants.colorNames[i].equals(name))
-            {
-                return false;
-            }
-        }
-        return true;
+        return !legion.getPlayerInfo().isAI();
     }
 
     static class BattleResults

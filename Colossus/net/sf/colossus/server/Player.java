@@ -761,6 +761,7 @@ public final class Player implements Comparable
         li.add(name);
         li.add(getTower());
         li.add(getColor());
+        li.add(getType());
         li.add(getPlayersElim());
         li.add("" + getNumLegions());
         li.add("" + getNumCreatures());
