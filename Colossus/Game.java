@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.io.*;
+import java.util.*;
 
 /**
  * Class Game gets and holds high-level data about a Titan game.
@@ -71,6 +73,15 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
         addWindowListener(this);
         setVisible(true);
+    }
+    
+    
+    // Load a saved game.
+    Game(String filename)
+    {
+        loadGame(filename);
+
+        initStatusScreen(false);
     }
 
 
@@ -274,7 +285,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
     }
 
 
-    private void initStatusScreen()
+    private void initStatusScreen(boolean newgame)
     {
         contentPane = getContentPane();
         setVisible(false);
@@ -316,17 +327,22 @@ public class Game extends JFrame implements WindowListener, ActionListener
             contentPane.add(new JLabel(
                 String.valueOf(100 * players[i].getTower())));
             contentPane.add(new JLabel(players[i].getColor()));
-            elimLabel[i] = new JLabel("");
+            elimLabel[i] = new JLabel(players[i].getPlayersElim());
             contentPane.add(elimLabel[i]);
-            legionsLabel[i] = new JLabel("");
+            legionsLabel[i] = new JLabel(String.valueOf(
+                players[i].getNumLegions()));
             contentPane.add(legionsLabel[i]);
-            markersLabel[i] = new JLabel("12");
+            markersLabel[i] = new JLabel(String.valueOf(
+                players[i].getNumMarkersAvailable()));
             contentPane.add(markersLabel[i]);
-            creaturesLabel[i] = new JLabel("8");
+            creaturesLabel[i] = new JLabel(String.valueOf(
+                players[i].getNumCreatures()));
             contentPane.add(creaturesLabel[i]);
-            titanLabel[i] = new JLabel("6");
+            titanLabel[i] = new JLabel(String.valueOf(
+                players[i].getTitanPower()));
             contentPane.add(titanLabel[i]);
-            scoreLabel[i] = new JLabel("0");
+            scoreLabel[i] = new JLabel(String.valueOf(
+                players[i].getScore()));
             contentPane.add(scoreLabel[i]);
         }
 
@@ -339,7 +355,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
         setVisible(true);
 
-        board = new MasterBoard(this);
+        board = new MasterBoard(this, newgame);
     }
 
 
@@ -512,12 +528,180 @@ public class Game extends JFrame implements WindowListener, ActionListener
         }
 
         updateStatusScreen();
+
+        // XXX temporary test
+        saveGame();
     }
 
 
     public int getTurnNumber()
     {
         return turnNumber;
+    }
+
+
+    // Create a text file describing this game's state.
+    // Format:
+    //     Number of players
+    //     Turn number
+    //     Whose turn
+    //     Current phase
+    //     Creature counts
+    //     Player 1:
+    //         Name
+    //         Color
+    //         Starting tower
+    //         Score
+    //         Players eliminated
+    //         Number of Legions 
+    //         Legion 1: 
+    //             Marker id
+    //             Height
+    //             Creatures
+    //             Number of visible creatures
+    //             Visible creatures
+    //             ...
+    //     ...
+    private void saveGame()
+    {
+        // XXX Need dialog to pick filename.
+        Date date = new Date();
+        String filename = date.getTime() + ".sav";
+        FileWriter fileWriter;
+        try
+        {
+            fileWriter = new FileWriter(filename);
+        }
+        catch (IOException e)
+        {
+            System.out.println(e.toString());
+            System.out.println("Couldn't open " + filename);
+            return;
+        }
+        PrintWriter out = new PrintWriter(fileWriter);
+
+        out.println(getNumPlayers());
+        out.println(getTurnNumber());
+        out.println(getActivePlayerNum());
+        out.println(getPhase());
+
+        for (int i = 0; i < Creature.creatures.length; i++)
+        {
+            out.println(Creature.creatures[i].getCount());
+        }
+
+        for (int i = 0; i < getNumPlayers(); i++)
+        {
+            Player player = getPlayer(i);
+            out.println(player.getName());
+            out.println(player.getColor());
+            out.println(player.getTower());
+            out.println(player.getScore());
+            out.println(player.getPlayersElim());
+            out.println(player.getNumLegions());
+
+            for (int j = 0; j < player.getNumLegions(); j++)
+            {
+                Legion legion = player.getLegion(j);
+                out.println(legion.getMarkerId());
+
+                out.println(legion.getHeight());
+                for (int k = 0; k < legion.getHeight(); k++)
+                {
+                    out.println(legion.getCritter(k).getName());
+                    out.println(legion.getCritter(k).isVisible());
+                }
+            }
+        }
+        
+        if (out.checkError()) 
+        {
+            System.out.println("Write error " + filename);
+            // XXX Delete the partial file?
+            return;
+        }
+    }
+
+
+    private void loadGame(String filename)
+    {
+        // XXX Need a dialog to pick the savegame's filename, and 
+        //     confirmation if there's already a game in progress.
+         
+        try
+        {
+            FileReader fileReader = new FileReader(filename);
+            BufferedReader in = new BufferedReader(fileReader);
+            String buf = new String();
+
+            buf = in.readLine();
+            numPlayers = Integer.parseInt(buf);
+
+            buf = in.readLine();
+            turnNumber = Integer.parseInt(buf);
+
+            buf = in.readLine();
+            activePlayerNum = Integer.parseInt(buf);
+
+            buf = in.readLine();
+            phase = Integer.parseInt(buf);
+
+            for (int i = 0; i < Creature.creatures.length; i++)
+            {
+                buf = in.readLine();
+                int count = Integer.parseInt(buf);
+                Creature.creatures[i].setCount(count);
+            }
+
+            for (int i = 0; i < numPlayers; i++)
+            {
+                String name = in.readLine();
+                players[i] = new Player(name, this);
+                
+                String color = in.readLine();
+                players[i].setColor(color);
+                
+                buf = in.readLine();
+                int tower = Integer.parseInt(buf);
+                players[i].setTower(tower);
+                
+                buf = in.readLine();
+                int score = Integer.parseInt(buf);
+                players[i].setScore(score);
+                
+                String playersElim = in.readLine();
+                players[i].setPlayersElim(playersElim);
+                
+                buf = in.readLine();
+                int numLegions = Integer.parseInt(buf);
+                players[i].setNumLegions(numLegions);
+
+                for (int j = 0; j < numLegions; j++)
+                {
+                    String markerId = in.readLine();
+    
+                    buf = in.readLine();
+                    int height = Integer.parseInt(buf);
+                    Creature [] creatures = new Creature[height];
+
+                    for (int k = 0; k < height; k++)
+                    {
+                        buf = in.readLine();
+                        creatures[k] = Creature.getCreatureFromName(buf);
+                        buf = in.readLine();
+                        boolean visible = Boolean.valueOf(buf).booleanValue();
+                        // XXX set up critter
+                    }
+                }
+            }
+        }
+        // FileNotFoundException, IOException, NumberFormatException
+        catch (Exception e)
+        {
+            System.out.println(e.toString());
+            // XXX Ask for another file?  Start new game?
+            System.exit(1);
+        }
     }
 
 
@@ -577,7 +761,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
             // Change this window into a status screen, and then
             //     move on to the first player's first turn.
-            initStatusScreen();
+            initStatusScreen(true);
         }
         else
         {
@@ -599,6 +783,13 @@ public class Game extends JFrame implements WindowListener, ActionListener
             System.out.println("Default l&f left in place");
         }
 
-        Game game = new Game();
+        if (args.length == 0)
+        {
+            Game game = new Game();
+        }
+        else
+        {
+            Game game = new Game(args[0]);
+        }
     }
 }
