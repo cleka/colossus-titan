@@ -484,7 +484,8 @@ Log.debug("End of SocketClientThread while loop");
         }
         else
         {
-            Log.error("Bogus packet");
+            Log.error("Bogus packet (Client, method: " +
+                      method + ", args: " + args + ")");
         }
     }
 

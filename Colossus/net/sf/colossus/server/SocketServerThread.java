@@ -309,7 +309,8 @@ final class SocketServerThread extends Thread implements IClient
         }
         else
         {
-            Log.error("Bogus packet");
+            Log.error("Bogus packet (Server, method: " +
+                      method + ", args: " + args + ")");
         }
     }
 
