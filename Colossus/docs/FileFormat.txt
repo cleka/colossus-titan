@@ -47,7 +47,7 @@ as the labels for the first 9 towers.
 WARNING: The way the Hex are displayed (pointy part upside or
 downside) depend on the parity of the X+Y sum. It is possible
 to create a perfectly legit MAP where all the Hex are upside-down !
-Should this happen, the only way fo tix this 'feature' currently,
+Should this happen, the only way to fix this 'feature' currently,
 is to move everything one column right _or_ one row down, i.e.,
 force the reversal of the parity. Sorry about that, the problem
 hasn't yet been solved.
@@ -129,16 +129,19 @@ ACQUIRABLE is the literal string ACQUIRABLE
 <acquirable_name> is the name of the Creature to consider as an Acquirable
 <terrain_letter> is an (optional) comma-separated list of terrain
 letter (see above) that restrict the availability of the Acquirable.
-If the list is ommited, the Acquirable can bre recruited everywhere.
+If the list is ommited, the Acquirable can be recruited everywhere.
 
 Note that all <point_value> must be even multiple of the first
 <point_value> ; other values are erroneous and will be flagged
-as such.
+as such. Also, the first acquirable creature should be a Lord,
+and is recruited in the starting stack (it's the 'primary'
+acquirable creature.
 
 Multiple line can be present, in which case, the behavior is
 the same as if all the Acquirable where on one line. Order of
 Acquirable is not important, except for the first one, which
-defines the reference for <point_value>.
+defines the reference for <point_value> and the primary
+acquirable creature.
 
 3) CRE file format (default file used: Default/Default.cre)
 
