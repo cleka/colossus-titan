@@ -39,7 +39,6 @@ public class BattleMap extends JFrame implements MouseListener,
 
     private static int scale = 30;
     private static int chitScale = 2 * scale;
-    private Dimension preferredSize;
 
     private Legion attacker;
     private Legion defender;
@@ -69,8 +68,8 @@ public class BattleMap extends JFrame implements MouseListener,
     Legion donor = null;
 
 
-    public BattleMap(Legion attacker, Legion defender, MasterHex masterHex, 
-        int entrySide, MasterBoard board)
+    public BattleMap(MasterBoard board, Legion attacker, Legion defender, 
+        MasterHex masterHex, int entrySide)
     {
         super(attacker.getMarkerId() + " attacks " + defender.getMarkerId());
 
@@ -79,26 +78,15 @@ public class BattleMap extends JFrame implements MouseListener,
         this.masterHex = masterHex;
         this.terrain = masterHex.getTerrain();
         this.board = board;
-
-        // All tower attacks come from the bottom side (3)
-        if (terrain == 'T')
-        {
-            this.entrySide = 3;
-        }
-        else
-        {
-            this.entrySide = entrySide;
-        }
+        this.entrySide = entrySide;
 
         getContentPane().setLayout(null);
 
-        preferredSize = new Dimension(30 * scale, 30 * scale);
         pack();
-        setSize(preferredSize);
+        setSize(getPreferredSize());
         setIconImage(Toolkit.getDefaultToolkit().getImage(
             Creature.colossus.getImageName()));
 
-        setResizable(false);
         setBackground(java.awt.Color.white);
         addWindowListener(this);
         addMouseListener(this);
@@ -130,14 +118,13 @@ public class BattleMap extends JFrame implements MouseListener,
         for (int i = attackerHeight; i < numChits; i++)
         {
             chits[i] = new BattleChit(0, 0, chitScale,
-                defender.getCreature(i - attackerHeight).getImageName(), this,
-                defender.getCreature(i - attackerHeight), entrance,
+                defender.getCreature(i - attackerHeight).getImageName(), 
+                this, defender.getCreature(i - attackerHeight), entrance,
                 defender, true, this);
             tracker.addImage(chits[i].getImage(), 0);
             entrance.addChit(chits[i]);
         }
         entrance.alignChits();
-
 
         try
         {
@@ -1908,21 +1895,26 @@ System.out.println("defender's titan eliminated");
     {
     }
 
+
     public void mouseReleased(MouseEvent e)
     {
     }
+
 
     public void mouseMoved(MouseEvent e)
     {
     }
 
+
     public void mouseClicked(MouseEvent e)
     {
     }
 
+
     public void mouseEntered(MouseEvent e)
     {
     }
+
 
     public void mouseExited(MouseEvent e)
     {
@@ -1933,26 +1925,32 @@ System.out.println("defender's titan eliminated");
     {
     }
 
+
     public void windowClosed(WindowEvent e)
     {
     }
+
 
     public void windowClosing(WindowEvent e)
     {
         System.exit(0);
     }
 
+
     public void windowDeactivated(WindowEvent e)
     {
     }
+
 
     public void windowDeiconified(WindowEvent e)
     {
     }
 
+
     public void windowIconified(WindowEvent e)
     {
     }
+
 
     public void windowOpened(WindowEvent e)
     {
@@ -2025,13 +2023,15 @@ System.out.println("defender's titan eliminated");
 
     public Dimension getMinimumSize()
     {
-        return preferredSize;
+        return getPreferredSize();
     }
+
 
     public Dimension getPreferredSize()
     {
-        return preferredSize;
+        return new Dimension(30 * scale, 30 * scale);
     }
+
 
     public Dimension getMapSize()
     {
@@ -2055,6 +2055,6 @@ System.out.println("defender's titan eliminated");
             Creature.minotaur, null, player2);
         MasterHex hex = new MasterHex(0, 0, 0, false, null);
         hex.setTerrain('J');
-        new BattleMap(attacker, defender, hex, 3, null);
+        new BattleMap(null, attacker, defender, hex, 3);
     }
 }
