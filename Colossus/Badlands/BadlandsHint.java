@@ -112,7 +112,8 @@ public class BadlandsHint implements net.sf.colossus.server.HintInterface
                 }
             }
         }
-        else if (terrain.equals("Tower"))
+        else if (terrain.equals("Tower") || terrain.equals("TowerAlt"))
+        // TowerAlt is in Badlands-JDG
         {
             if (recruits.contains("Warlock"))
             {

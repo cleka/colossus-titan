@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<variant name="Badlands-JDG">
+    <terrain_recruits filename="Badlands-JDGTer.xml" />
+    <strategic_map filename="Badlands-JDGMap.xml" />
+    <creatures filename="DefaultCre.xml" />
+    <hint classname="Badlands.BadlandsHint" />
+    <depends>
+        <depend variant="Badlands" />
+    </depends>
+</variant>
