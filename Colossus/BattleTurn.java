@@ -163,7 +163,6 @@ System.out.println("placeNewChit");
         else
         {
             removeAll();
-            setTitle(getActivePlayer().getName() + " Turn " + turnNumber);
             setLayout(new GridLayout(0, 2));
 
             add(new Label(getActivePlayer().getName() +
