@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class AcquireAngel allows a player to acquire an angel or archangel.
@@ -19,6 +19,9 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
     private Legion legion;
     private Chit [] markers;
     private Container contentPane;
+    private Graphics gBack;
+    private Dimension offDimension;
+    private Image offImage;
 
 
     AcquireAngel(JFrame parentFrame, Legion legion, boolean archangel)
@@ -40,7 +43,6 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
         int scale = 60;
         contentPane = getContentPane();
         contentPane.setLayout(null);
-        setBackground(java.awt.Color.lightGray);
 
         numEligible = findEligibleRecruits(legion, recruits, archangel);
         if (numEligible == 0)
@@ -50,6 +52,7 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
         }
 
         pack();
+        setBackground(java.awt.Color.lightGray);
         setSize(scale * (numEligible + 1), (21 * scale / 10));
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -138,22 +141,41 @@ class AcquireAngel extends JDialog implements MouseListener, WindowListener
     }
 
 
-    public void paint(Graphics g)
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
 
+        Dimension d = getSize();
         Rectangle rectClip = g.getClipBounds();
 
-        for (int i = numEligible - 1; i >= 0; i--)
+        // Create the back buffer only if we don't have a good one.
+        if (gBack == null || d.width != offDimension.width ||
+            d.height != offDimension.height)
+        {
+            offDimension = d;
+            offImage = createImage(2 * d.width, 2 * d.height);
+            gBack = offImage.getGraphics();
+        }
+
+        for (int i = 0; i < numEligible; i++)
         {
             if (rectClip.intersects(markers[i].getBounds()))
             {
-                markers[i].paint(g);
+                markers[i].paint(gBack);
             }
         }
+
+        g.drawImage(offImage, 0, 0, this);
+    }
+
+
+    public void paint(Graphics g)
+    {
+        // Double-buffer everything.
+        update(g);
     }
 
 

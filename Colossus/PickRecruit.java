@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class PickRecruit allows a player to pick a creature to recruit.
@@ -20,6 +20,9 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     private Chit [] markers;
     private int [] counts;
     private int scale = 60;
+    private Graphics gBack;
+    private Dimension offDimension;
+    private Image offImage;
 
 
     PickRecruit(JFrame parentFrame, Legion legion)
@@ -44,7 +47,6 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         addWindowListener(this);
 
         getContentPane().setLayout(null);
-        setBackground(java.awt.Color.lightGray);
 
         numEligible = findEligibleRecruits(legion, recruits);
         if (numEligible == 0)
@@ -54,6 +56,8 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
         }
 
         pack();
+
+        setBackground(java.awt.Color.lightGray);
         setSize(scale * (numEligible + 1), (23 * scale / 10));
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -392,26 +396,45 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     }
 
 
-    public void paint(Graphics g)
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
 
+        Dimension d = getSize();
         Rectangle rectClip = g.getClipBounds();
 
-        for (int i = numEligible - 1; i >= 0; i--)
+        // Create the back buffer only if we don't have a good one.
+        if (gBack == null || d.width != offDimension.width ||
+        d.height != offDimension.height)
+        {
+            offDimension = d;
+            offImage = createImage(2 * d.width, 2 * d.height);
+            gBack = offImage.getGraphics();
+        }
+
+        for (int i = 0; i < numEligible;  i++)
         {
             if (rectClip.intersects(markers[i].getBounds()))
             {
-                markers[i].paint(g);
+                markers[i].paint(gBack);
             }
 
             String countLabel = Integer.toString(counts[i]);
-            g.drawString(countLabel, scale * (21 * i + 20) / 20 -
-                g.getFontMetrics().stringWidth(countLabel) / 2, 2 * scale);
+            gBack.drawString(countLabel, scale * (21 * i + 20) / 20 -
+                gBack.getFontMetrics().stringWidth(countLabel) / 2, 2 * scale);
         }
+
+        g.drawImage(offImage, 0, 0, this);
+    }
+
+    
+    public void paint(Graphics g)
+    {
+        // Double-buffer everything.
+        update(g);
     }
 
 
@@ -442,13 +465,16 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     {
     }
 
+
     public void mouseExited(MouseEvent e)
     {
     }
+
     
     public void mouseClicked(MouseEvent e)
     {
     }
+
     
     public void mouseReleased(MouseEvent e)
     {
@@ -459,26 +485,32 @@ class PickRecruit extends JDialog implements MouseListener, WindowListener
     {
     }
 
+
     public void windowClosed(WindowEvent event)
     {
     }
+
 
     public void windowClosing(WindowEvent event)
     {
         dispose();
     }
 
+
     public void windowDeactivated(WindowEvent event)
     {
     }
+
                                                          
     public void windowDeiconified(WindowEvent event)
     {
     }
 
+
     public void windowIconified(WindowEvent event)
     {
     }
+
 
     public void windowOpened(WindowEvent event)
     {

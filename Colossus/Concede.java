@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
@@ -25,6 +25,9 @@ class Concede extends JDialog implements ActionListener
     private Chit friendMarker;
     private Chit enemyMarker;
     private Container contentPane;
+    private Graphics gBack;
+    private Dimension offDimension;
+    private Image offImage;
 
 
     Concede(JFrame parentFrame, Legion friend, Legion enemy, boolean flee)
@@ -36,7 +39,6 @@ class Concede extends JDialog implements ActionListener
         setResizable(false);
         contentPane = getContentPane();
         contentPane.setLayout(null);
-        setBackground(java.awt.Color.lightGray);
 
         this.parentFrame = parentFrame;
         this.friend = friend;
@@ -44,6 +46,8 @@ class Concede extends JDialog implements ActionListener
         this.flee = flee;
 
         pack();
+
+        setBackground(java.awt.Color.lightGray);
         setSize(getPreferredSize());
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -110,16 +114,28 @@ class Concede extends JDialog implements ActionListener
     }
 
 
-    public void paint(Graphics g)
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
 
-        friendMarker.paint(g);
+        Dimension d = getSize();
+        Rectangle rectClip = g.getClipBounds();
 
-        enemyMarker.paint(g);
+        // Create the back buffer only if we don't have a good one.
+        if (gBack == null || d.width != offDimension.width ||
+            d.height != offDimension.height)
+        {
+            offDimension = d;
+            offImage = createImage(2 * d.width, 2 * d.height);
+            gBack = offImage.getGraphics();
+        }
+
+        friendMarker.paint(gBack);
+
+        enemyMarker.paint(gBack);
 
         // ArrayIndexOutOfBoundsException when an angel is acquired?
         for (int i = friend.getHeight() - 1; i >= 0; i--)
@@ -131,7 +147,7 @@ class Concede extends JDialog implements ActionListener
                     scale / 2, scale, friend.getCreature(i).getImageName(),
                     this, false);
             }
-            friendChits[i].paint(g);
+            friendChits[i].paint(gBack);
         }
         for (int i = enemy.getHeight() - 1; i >= 0; i--)
         {
@@ -142,13 +158,12 @@ class Concede extends JDialog implements ActionListener
                     this, false);
             }
 
-            enemyChits[i].paint(g);
+            enemyChits[i].paint(gBack);
         }
 
         if (!laidOut)
         {
             Insets insets = getInsets();
-            Dimension d = getSize();
             button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right, 
@@ -156,6 +171,14 @@ class Concede extends JDialog implements ActionListener
             laidOut = true;
         }
 
+        g.drawImage(offImage, 0, 0, this);
+    }
+
+
+    public void paint(Graphics g)
+    {
+        // Double-buffer everything.
+        update(g);
     }
 
 

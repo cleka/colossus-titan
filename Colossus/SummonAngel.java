@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class SummonAngel allows a player to Summon an angel or archangel.
@@ -26,6 +26,9 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
     private Chit archangelChit;
     private boolean imagesLoaded = false;
     private Legion donor;
+    private Graphics gBack;
+    private Dimension offDimension;
+    private Image offImage;
 
 
     SummonAngel(MasterBoard board, Legion legion)
@@ -57,9 +60,10 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
         Container contentPane = getContentPane();
         contentPane.setLayout(null);
-        setBackground(java.awt.Color.lightGray);
 
         pack();
+
+        setBackground(java.awt.Color.lightGray);
         setSize(getPreferredSize());
             
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -122,11 +126,23 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
     }
 
 
-    public void paint(Graphics g)
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
+        }
+
+        Dimension d = getSize();
+        Rectangle rectClip = g.getClipBounds();
+
+        // Create the back buffer only if we don't have a good one.
+        if (gBack == null || d.width != offDimension.width ||
+            d.height != offDimension.height)
+        {
+            offDimension = d;
+            offImage = createImage(2 * d.width, 2 * d.height);
+            gBack = offImage.getGraphics();
         }
 
         donor = player.getSelectedLegion();
@@ -139,13 +155,12 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
             archangelChit.setDead(archangels == 0);
         }
 
-        angelChit.paint(g);
-        archangelChit.paint(g);
+        angelChit.paint(gBack);
+        archangelChit.paint(gBack);
 
         if (!laidOut)
         {
             Insets insets = getInsets();
-            Dimension d = getSize();
             button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right, 
@@ -155,6 +170,15 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
 
         button1.repaint();
         button2.repaint();
+
+        g.drawImage(offImage, 0, 0, this);
+    }
+
+
+    public void paint(Graphics g)
+    {
+        // Double-buffer everything.
+        update(g);
     }
 
 
@@ -183,17 +207,21 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
         }
     }
 
+
     public void mouseEntered(MouseEvent e)
     {
     }
 
+
     public void mouseExited(MouseEvent e)
     {
     }
+
                             
     public void mouseClicked(MouseEvent e)
     {
     }
+
                                             
     public void mouseReleased(MouseEvent e)
     {
@@ -204,26 +232,32 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
     {
     }
 
+
     public void windowClosed(WindowEvent event)
     {
     }
+
 
     public void windowClosing(WindowEvent event)
     {
         cleanup(false);
     }
 
+
     public void windowDeactivated(WindowEvent event)
     {
     }
+
                                                          
     public void windowDeiconified(WindowEvent event)
     {
     }
 
+
     public void windowIconified(WindowEvent event)
     {
     }
+
 
     public void windowOpened(WindowEvent event)
     {
@@ -284,6 +318,7 @@ class SummonAngel extends JDialog implements MouseListener, ActionListener,
     {
         return getPreferredSize();
     }
+
 
     public Dimension getPreferredSize()
     {

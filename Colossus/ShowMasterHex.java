@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class ShowMasterHex displays the terrain type and recruits for a MasterHex.
@@ -17,7 +17,10 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
     private int numChits;
     private int [] numToRecruit;
     private int [] count;
-    int scale = 60;
+    private int scale = 60;
+    private Graphics gBack;
+    private Dimension offDimension;
+    private Image offImage;
 
 
     ShowMasterHex(JFrame parentFrame, MasterHex hex, Point point)
@@ -28,6 +31,8 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
         numChits = hex.getNumRecruitTypes();
         
         pack();
+
+        setBackground(java.awt.Color.lightGray);
         setSize(3 * scale, numChits * scale + 3 * scale / 4);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
@@ -56,7 +61,6 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
         setLocation(origin);
         
         getContentPane().setLayout(null);
-        setBackground(java.awt.Color.lightGray);
 
         addMouseListener(this);
 
@@ -100,34 +104,51 @@ class ShowMasterHex extends JDialog implements MouseListener, WindowListener
     }
 
 
-    public void paint(Graphics g)
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
 
-        // No need to mess around with clipping rectangles, since
-        //    this window is ephemeral.
-        
-        FontMetrics fontMetrics = g.getFontMetrics();
+        Dimension d = getSize();
+
+        // Create the back buffer only if we don't have a good one.
+        if (gBack == null || d.width != offDimension.width ||
+            d.height != offDimension.height)
+        {
+            offDimension = d;
+            offImage = createImage(2 * d.width, 2 * d.height);
+            gBack = offImage.getGraphics();
+        }
+
+        FontMetrics fontMetrics = gBack.getFontMetrics();
         int fontHeight = fontMetrics.getMaxAscent() + fontMetrics.getLeading();
 
         for (int i = 0; i < numChits; i++)
         {
-            chits[i].paint(g);
+            chits[i].paint(gBack);
 
             if (numToRecruit[i] > 0)
             {
                 String numToRecruitLabel = Integer.toString(numToRecruit[i]);
-                g.drawString(numToRecruitLabel, scale / 3, (i + 1) * scale +
-                    fontHeight / 2);
+                gBack.drawString(numToRecruitLabel, scale / 3, (i + 1) * scale 
+                    + fontHeight / 2);
             }
 
             String countLabel = Integer.toString(count[i]);
-            g.drawString(countLabel, 7 * scale / 3, (i + 1) * scale + 
+            gBack.drawString(countLabel, 7 * scale / 3, (i + 1) * scale + 
                 fontHeight / 2);
         }
+
+        g.drawImage(offImage, 0, 0, this);
+    }
+
+
+    public void paint(Graphics g)
+    {
+        // Double-buffer everything.
+        update(g);
     }
 
 

@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class Negotiate allows two players to settle an engagement.
@@ -24,6 +24,9 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
     private JButton button2;
     private boolean laidOut = false;
     private Container contentPane;
+    private Graphics gBack;
+    private Dimension offDimension;
+    private Image offImage;
 
 
     Negotiate(JFrame parentFrame, Legion attacker, Legion defender)
@@ -34,7 +37,6 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         setResizable(false);
         contentPane = getContentPane();
         contentPane.setLayout(null);
-        setBackground(java.awt.Color.lightGray);
 
         this.attacker = attacker;
         this.defender = defender;
@@ -43,6 +45,7 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
         imagesLoaded = false;
 
         pack();
+        setBackground(java.awt.Color.lightGray);
         setSize(getPreferredSize());
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -109,36 +112,55 @@ class Negotiate extends JDialog implements MouseListener, ActionListener
     }
 
 
-    public void paint(Graphics g)
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
 
-        attackerMarker.paint(g);
+        Dimension d = getSize();
+        Rectangle rectClip = g.getClipBounds();
 
-        defenderMarker.paint(g);
-
-        for (int i = attacker.getHeight() - 1; i >= 0; i--)
+        // Create the back buffer only if we don't have a good one.
+        if (gBack == null || d.width != offDimension.width ||
+            d.height != offDimension.height)
         {
-            attackerChits[i].paint(g);
+            offDimension = d;
+            offImage = createImage(2 * d.width, 2 * d.height);
+            gBack = offImage.getGraphics();
         }
-        for (int i = defender.getHeight() - 1; i >= 0; i--)
+
+        attackerMarker.paint(gBack);
+        defenderMarker.paint(gBack);
+
+        for (int i = 0; i < attacker.getHeight(); i++)
         {
-            defenderChits[i].paint(g);
+            attackerChits[i].paint(gBack);
+        }
+        for (int i = 0; i < defender.getHeight(); i++)
+        {
+            defenderChits[i].paint(gBack);
         }
 
         if (!laidOut)
         {
             Insets insets = getInsets(); 
-            Dimension d = getSize();
             button1.setBounds(insets.left + d.width / 9, 3 * d.height / 4 - 
                 insets.bottom, d.width / 3, d.height / 8);
             button2.setBounds(5 * d.width / 9 - insets.right, 
                 3 * d.height / 4 - insets.bottom, d.width / 3, d.height / 8);
             laidOut = true;
         }
+
+        g.drawImage(offImage, 0, 0, this);
+    }
+    
+    
+    public void paint(Graphics g)
+    {
+        // Double-buffer everything.
+        update(g);
     }
 
 

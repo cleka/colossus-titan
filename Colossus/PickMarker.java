@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
 import java.io.*;
+import javax.swing.*;
 
 /**
  * Class PickMarker allows a player to pick a legion marker.
@@ -16,6 +16,9 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     private MediaTracker tracker;
     private boolean imagesLoaded;
     private Player player;
+    private Graphics gBack;
+    private Dimension offDimension;
+    private Image offImage;
 
 
     PickMarker(JFrame parentFrame, Player player)
@@ -39,9 +42,10 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
         {
             int scale = 60;
             getContentPane().setLayout(null);
-            setBackground(java.awt.Color.lightGray);
 
             pack();
+
+            setBackground(java.awt.Color.lightGray);
             setSize((21 * scale / 20) * (Math.min(12, 
                 player.getNumMarkersAvailable()) + 1), (21 * scale / 20) * 
                 ((player.getNumMarkersAvailable() - 1) / 12 + 2));
@@ -86,22 +90,41 @@ class PickMarker extends JDialog implements MouseListener, WindowListener
     }
 
 
-    public void paint(Graphics g)
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
 
+        Dimension d = getSize();
         Rectangle rectClip = g.getClipBounds();
+
+        // Create the back buffer only if we don't have a good one.
+        if (gBack == null || d.width != offDimension.width ||
+            d.height != offDimension.height)
+        {
+            offDimension = d;
+            offImage = createImage(2 * d.width, 2 * d.height);
+            gBack = offImage.getGraphics();
+        }
 
         for (int i = 0; i < markers.length; i++)
         {
             if (rectClip.intersects(markers[i].getBounds()))
             {
-                markers[i].paint(g);
+                markers[i].paint(gBack);
             }
         }
+
+        g.drawImage(offImage, 0, 0, this);
+    }
+    
+    
+    public void paint(Graphics g)
+    {
+        // Double-buffer everything.
+        update(g);
     }
 
 

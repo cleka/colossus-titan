@@ -1,6 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 /**
  * Class ShowLegion displays the chits of the Creatures in a Legion
@@ -14,6 +14,9 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
     private boolean imagesLoaded;
     private Legion legion;
     private Chit [] chits;
+    private Graphics gBack;
+    private Dimension offDimension;
+    private Image offImage;
 
 
     ShowLegion(JFrame parentFrame, Legion legion, Point point)
@@ -21,7 +24,10 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         super(parentFrame, "Contents of Legion " + legion.getMarkerId(), false);
 
         int scale = 60;
+
         pack();
+
+        setBackground(java.awt.Color.lightGray);
         setSize(2 * scale / 5 + scale * legion.getHeight(), 8 * scale / 5);
 
         // Place dialog relative to parentFrame's origin, and fully on-screen.
@@ -50,7 +56,6 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
         setLocation(origin);
         
         getContentPane().setLayout(null);
-        setBackground(java.awt.Color.lightGray);
 
         addMouseListener(this);
 
@@ -88,19 +93,37 @@ class ShowLegion extends JDialog implements MouseListener, WindowListener
     }
 
 
-    public void paint(Graphics g)
+    public void update(Graphics g)
     {
         if (!imagesLoaded)
         {
             return;
         }
 
-        // No need to mess around with clipping rectangles, since
-        //    this window is ephemeral.
-        for (int i = legion.getHeight() - 1; i >= 0; i--)
+        Dimension d = getSize();
+
+        // Create the back buffer only if we don't have a good one.
+        if (gBack == null || d.width != offDimension.width ||
+            d.height != offDimension.height)
         {
-            chits[i].paint(g);
+            offDimension = d;
+            offImage = createImage(2 * d.width, 2 * d.height);
+            gBack = offImage.getGraphics();
         }
+
+        for (int i = 0; i < legion.getHeight(); i++)
+        {
+            chits[i].paint(gBack);
+        }
+
+        g.drawImage(offImage, 0, 0, this);
+    }
+
+
+    public void paint(Graphics g)
+    {
+        // Double-buffer everything.
+        update(g);
     }
 
 
