@@ -22,9 +22,14 @@ class Chit
     // Flag to mark chit as dead and paint it with an "X" through it.
     private boolean dead = false;
 
+    // We need to track whether we're running as an applet to load
+    // images correctly.  setApplet() should be called before any
+    // objects of this class (or its children) are created.
+    protected static boolean isApplet = false;
+
 
     Chit(int cx, int cy, int scale, String imageFilename,
-        Container container, boolean isApplet)
+        Container container)
     {
         rect = new Rectangle(cx, cy, scale, scale);
         this.container = container;
@@ -58,6 +63,12 @@ class Chit
         }
     }
 
+
+    public static void setApplet(boolean isApplet)
+    {
+        Chit.isApplet = isApplet;
+    }
+    
 
     void rescale(int scale)
     {
