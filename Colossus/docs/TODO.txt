@@ -19,7 +19,6 @@ Send creature list, summonable list, recruit tree, etc. to clients at startup.
 Put old, new web pages under CVS.
 Switch to new web page.
 
-Fix pic used for minimized icon.  (Needs text.)
 Include an .ico file for Windows.  (ImageMagick can autogenerate one.)
 Maybe have a separate icons directory rather than reusing the ones
    in Default/images?

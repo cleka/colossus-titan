@@ -1540,8 +1540,12 @@ public final class MasterBoard extends JPanel
         directories.add(Constants.defaultDirName +
                         ResourceLoader.getPathSeparator() +
                         Constants.imagesDirName);
+
+        String[] iconNames = { "Colossus", "Colossus-Name-black"};
         
-        Image image = ResourceLoader.getImage("Colossus", directories);
+        Image image =
+            ResourceLoader.getCompositeImage(iconNames,
+                                             directories);
         
         if (image == null)
         {
