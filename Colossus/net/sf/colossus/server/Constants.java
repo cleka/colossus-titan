@@ -26,7 +26,7 @@ public final class Constants
 
     /** Base path for all external game data files. */
     public static final String gameDataPath = 
-        System.getProperty("user.home") + "/Colossus/";
+        System.getProperty("user.home") + "/.colossus/";
 
     // Constants related to the options config files
     public static final String optionsPath = gameDataPath;
