@@ -39,6 +39,12 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
 
         PickMarker pickmarker = new PickMarker(parentFrame, player);
 
+        if (player.markerSelected == null)
+        {
+            dispose();
+            return;
+        }
+
         newLegion = new Legion(scale / 5, 2 * scale, scale,
             player.markerSelected, oldLegion.markerId, this, 0, 
             oldLegion.currentHex, null, null, null, null, null, null, 
