@@ -2148,17 +2148,20 @@ public class SimpleAI implements AI
             }
             if (enemy.getHeight() == 7)
             {
-                java.util.List recruits =
+                java.util.List recruits = 
                     client.findEligibleRecruits(enemy.getMarkerId(),
                                       legion.getCurrentHex().getLabel());
-                Creature best = (Creature)recruits.get(recruits.size() - 1);
-                int lValue = enemy.getPointValue();
-                if (best.getPointValue() > (lValue / enemy.getHeight()))
+                if (recruits.size() > 0)
                 {
-                    Log.debug("Legion " + legion.getMarkerId() + " flee " +
-                              " to prevent " + enemy.getMarkerId() +
-                              " to be able to recruit " + best.getName());
-                    return true;
+                    Creature best = (Creature)recruits.get(recruits.size() -1);
+                    int lValue = enemy.getPointValue();
+                    if (best.getPointValue() > (lValue / enemy.getHeight()))
+                    {
+                        Log.debug("Legion " + legion.getMarkerId() + " flee " +
+                                  " to prevent " + enemy.getMarkerId() +
+                                  " to be able to recruit " + best.getName());
+                        return true;
+                    }
                 }
             }
             if (enemy.hasTitan())
