@@ -7,7 +7,7 @@ Behemoth  12     4     false false false false false false true  false false fal
 Paladin    3     4     false false false false false false false false false false false false false    25    Paladins
 Colossus  15     4     false false false true  false false true  false false false false false false    10            Colossi
 Wraith     10    3     false true  true  false false false false false false false false false false    21    Wraiths 
-GostDragon 10    3     false true  true  false false false false false false false false false false    18    GostDragons
+GhostDragon 10    3     false true  true  false false false false false false false false false false    18    GhostDragons
 Zombie     9     2     false false true  false false false false false false false false false false    28    Zombies
 RedDragon 16     3     true  true  false false false false true  true  false false false false false    18    RedDragons
 Skeleton   6     2     false false true  false false false false false false false false false false    21    Skeletons
