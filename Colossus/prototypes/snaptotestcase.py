@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-# Needs Python 2.3 for optparse.  (Could use 2.2 and optik)
+# Needs Python 2.3
 # Needs PyXML
 
 """snaptotestcase.py [-j] [-p] [-t] filename
@@ -18,17 +18,19 @@ import sys
 from optparse import OptionParser
 from xml.sax import make_parser
 from xml.sax.saxutils import DefaultHandler
-
-
-(True, False) = (1, 0)
+from sets import Set
+import wrap
 
 options = None
 
 def normalize_whitespace(text):
     return ' '.join(text.split())
 
+def wrap_line(line):
+    return wrap.wrap_line(line)
 
-class snapHandler(DefaultHandler):
+
+class SnapHandler(DefaultHandler):
     def __init__(self):
         DefaultHandler.__init__(self)
         self.inReveal = False
@@ -36,7 +38,8 @@ class snapHandler(DefaultHandler):
         self.inCreature = False
         self.creatureNames = None
         self.creatureName = None
-        self.doneTurn = {}
+        self.doneTurn = Set()
+        self.legions = Set()
 
     def startElement(self, name, attrs):
         if name == "History":
@@ -71,27 +74,67 @@ class snapHandler(DefaultHandler):
 
     def startHistory(self, attrs):
         if options.python:
-            print '    def testPredictSplits%s(self):' % (options.testcase,)
-            print '        print "\\ntest %s begins"' % (options.testcase,)
+            print "    def testPredictSplits%s(self):" % options.testcase
+            print "        print '\\ntest %s begins'" % options.testcase
+            print
+            print "        aps = AllPredictSplits()"
         else:
-            print '    public void testPredictSplits%s()' % (options.testcase,)
+            print '    public void testPredictSplits%s()' % options.testcase
             print '    {'
 
     def printLeaves(self):
         if options.python:
-            print '        aps.printLeaves()'
+            print "        aps.printLeaves()"
         else:
             print '        aps.printLeaves();'
 
-    def endHistory(self):
-        self.printLeaves()
+    def addAsserts(self):
+        sorted = list(self.legions)
+        sorted.sort()
         if options.python:
-            print '        print "\\ntest %s ends"' % (options.testcase,)
+            longstr = "aps.getLeaf('%s').numUncertainCreatures(), 0"
+            for legion in sorted:
+                expr = longstr % legion
+                print "        self.assertEqual(%s)" % expr
         else:
+            longstr = 'aps.getLeaf("%s").numUncertainCreatures(), 0'
+            for legion in sorted:
+                expr = longstr % legion
+                print '        assertEquals(%s);' % expr
+
+    def printLeavesAndAddAsserts(self):
+        self.printLeaves()
+        self.addAsserts()
+        self.doneTurn.add(self.turn)
+
+
+    def printTurnHeader(self):
+        if not self.turn in self.doneTurn:
+            self.printLeavesAndAddAsserts()
+            if options.python:
+                print
+                print "        turn = %s" % self.turn
+                print "        print '\\nTurn', turn"
+            else:
+                print
+                print '        turn = %s;' % self.turn
+                print '        Log.debug("Turn " + turn);'
+
+    def endHistory(self):
+        self.printLeavesAndAddAsserts()
+        if options.python:
+            print
+            print "        print '\\ntest %s ends'" % options.testcase
+        else:
+            print
+            print '        Log.debug("\\ntest %s ends");'
             print '    }'
 
     def startReveal(self, attrs):
+        self.turn = attrs.get("turn")
+        self.printTurnHeader()
         self.markerId = attrs.get("markerId")
+        self.legions.add(self.markerId)
         self.wholeLegion = attrs.get("wholeLegion")
         self.allPlayers = attrs.get("allPlayers")
         self.creatureNames = []
@@ -107,22 +150,24 @@ class snapHandler(DefaultHandler):
     def doReveal(self):
         if options.python:
             if len(self.creatureNames) == 8:
-                print '        ps = PredictSplits("%s", "%s", %s)' % (
+                line = "        ps = PredictSplits('%s', '%s', %s)" % (
                     self.markerId[:2], self.markerId, self.creatureNames)
-                print '        aps.add_ps(ps)'
-            print '        aps.getLeaf("%s").revealCreatures(%s)' % (
+                print wrap_line(line)
+                print "        aps.append(ps)"
+            line = "        aps.getLeaf('%s').revealCreatures(%s)" % (
                 self.markerId, self.creatureNames)
+            print wrap_line(line)
         else:
             if len(self.creatureNames) == 8:
                 print '        cnl.clear();'
                 for name in self.creatureNames:
-                    print '        cnl.add("%s");' % (name,)
+                    print '        cnl.add("%s");' % name
                 print '        ps = new PredictSplits("%s", "%s", cnl);' % (
                     self.markerId[:2], self.markerId)
-                print '        aps.add_ps(ps);'
+                print '        aps.add(ps);'
             print '        cnl.clear();'
             for name in self.creatureNames:
-                print '        cnl.add("%s"); ' % (name,)
+                print '        cnl.add("%s"); ' % name
             print '        aps.getLeaf("%s").revealCreatures(cnl);' % (
                 self.markerId, )
 
@@ -145,9 +190,11 @@ class snapHandler(DefaultHandler):
 
 
     def startSplit(self, attrs):
+        self.turn = attrs.get("turn")
+        self.printTurnHeader()
         self.parentId = attrs.get("parentId")
         self.childId = attrs.get("childId")
-        self.turn = attrs.get("turn")
+        self.legions.add(self.childId)
         self.creatureNames = []
         self.inSplit = True
 
@@ -157,36 +204,25 @@ class snapHandler(DefaultHandler):
             self.creatureNames = None
             self.inSplit = False
 
-    def printTurn(self):
-        return not self.doneTurn.has_key(self.turn)
-
     def doSplit(self):
         numSplitoffs = len(self.creatureNames)
         if options.python:
-            if self.printTurn():
-                self.printLeaves()
-                print '        turn = %s' % (self.turn,)
-                print '        print "\\nTurn", turn'
-            print '        aps.getLeaf("%s").split(%s, "%s", turn)' % (
+            print "        aps.getLeaf('%s').split(%s, '%s', turn)" % (
                 self.parentId, numSplitoffs, self.childId)
         else:
-            if self.printTurn():
-                self.printLeaves()
-                print '        turn = %s;' % (self.turn,)
-                print '        Log.debug("Turn " + turn);'
             print '        aps.getLeaf("%s").split(%s, "%s", turn);' % (
                 self.parentId, numSplitoffs, self.childId)
-        self.doneTurn[self.turn] = 1
-            
 
     def startAddCreature(self, attrs):
+        self.turn = attrs.get("turn")
+        self.printTurnHeader()
         self.markerId = attrs.get("markerId")
         self.creatureName = attrs.get("creatureName")
         self.doAddCreature()
 
     def doAddCreature(self):
         if options.python:
-            print '        aps.getLeaf("%s").addCreature("%s")' % (
+            print "        aps.getLeaf('%s').addCreature('%s')" % (
                 self.markerId, self.creatureName)
         else:
             print '        aps.getLeaf("%s").addCreature("%s");' % (
@@ -194,13 +230,15 @@ class snapHandler(DefaultHandler):
 
 
     def startRemoveCreature(self, attrs):
+        self.turn = attrs.get("turn")
+        self.printTurnHeader()
         self.markerId = attrs.get("markerId")
         self.creatureName = attrs.get("creatureName")
         self.doRemoveCreature()
 
     def doRemoveCreature(self):
         if options.python:
-            print '        aps.getLeaf("%s").removeCreature("%s")' % (
+            print "        aps.getLeaf('%s').removeCreature('%s')" % (
                 self.markerId, self.creatureName)
         else:
             print '        aps.getLeaf("%s").removeCreature("%s");' % (
@@ -208,27 +246,18 @@ class snapHandler(DefaultHandler):
 
 
     def startMerge(self, attrs):
+        self.turn = attrs.get("turn")
         self.splitoffId = attrs.get("splitoffId")
         self.survivorId = attrs.get("survivorId")
-        self.turn = attrs.get("turn")
         self.doMerge()
 
     def doMerge(self):
         if options.python:
-            if self.printTurn():
-                print '        turn = %s' % (self.turn,)
-                print '        print "\\nTurn", turn'
-            print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), turn)' \
+            print "        aps.getLeaf('%s').merge(aps.getLeaf('%s'), turn)" \
               % (self.survivorId, self.splitoffId)
         else:
-            if self.printTurn():
-                print '        turn = %s;' % (self.turn,)
-                print '        Log.debug("Turn " + turn);'
             print '        aps.getLeaf("%s").merge(aps.getLeaf("%s"), turn);' \
               % (self.survivorId, self.splitoffId)
-        self.doneTurn[self.turn] = 1
-
-
 
 def main():
     usage = "usage: %prog [options] filename"
@@ -243,17 +272,17 @@ def main():
     (options, args) = optik.parse_args()
     if len(args) > 1:
         optik.error("incorrect number of arguments")
+        return 1
 
     if len(args) == 0:
         infile = sys.stdin
     else:
         infile = open(args[0])
 
-    dh = snapHandler()
     parser = make_parser()
-    parser.setContentHandler(dh)
+    parser.setContentHandler(SnapHandler())
     parser.parse(infile)
+    return 0
 
 if __name__ == '__main__':
-    main()
-
+    sys.exit(main())
