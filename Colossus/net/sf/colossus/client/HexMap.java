@@ -508,6 +508,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D)g;
 
         // Abort if called too early.
         Rectangle rectClip = g.getClipBounds();
@@ -526,6 +527,10 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             }
         }
 
+        /* always antialias this, the font is huge */
+        Object oldantialias = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_ON);
 
         Font oldFont = g.getFont();
         FontMetrics fm;
@@ -539,16 +544,18 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         g.setFont(ResourceLoader.defaultFont.deriveFont((float)48));
         fm = g.getFontMetrics();
         int tma = fm.getMaxAscent();
-        g.drawString(dn, 4, 4 + tma);
+        g.drawString(dn, 80, 4 + tma);
         
         if (sub != null)
         {
             g.setFont(ResourceLoader.defaultFont.deriveFont((float)24));
             fm = g.getFontMetrics();
             int tma2 = fm.getMaxAscent();
-            g.drawString(sub, 4, 4 + tma + 8 + tma2);
+            g.drawString(sub, 80, 4 + tma + 8 + tma2);
         }
-        
+        /* reset antialiasing */
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            oldantialias);
         g.setFont(oldFont);
     }
 
