@@ -39,6 +39,7 @@ public final class Options
     public static final String aiDelay = "AI delay";  // int
     public static final String variant = "Variant";   // string
     // t-port option
+    public static final String noFirstTurnT2TTeleport = "No tower-to-tower Teleport on first turn";
     public static final String noFirstTurnTeleport = "No Teleport on first turn";
     public static final String towerToTowerTeleportOnly = "Tower-to-Tower Teleport only";
     public static final String noTowerTeleport = "No Tower Teleport";

@@ -105,6 +105,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
         teleportPane.setBorder(new TitledBorder("Teleport Options"));
         contentPane.add(teleportPane);
 
+        addCheckbox(Options.noFirstTurnT2TTeleport, teleportPane);
         addCheckbox(Options.noFirstTurnTeleport, teleportPane);
         addCheckbox(Options.noTitanTeleport, teleportPane);
         addCheckbox(Options.towerToTowerTeleportOnly, teleportPane);

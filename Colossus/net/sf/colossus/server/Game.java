@@ -2007,6 +2007,9 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
                     Constants.NOWHERE, ignoreFriends));
             }
 
+            if (!(options.getOption(Options.noFirstTurnT2TTeleport) &&
+                  (turnNumber == 1)))
+            {
             // Mark every unoccupied tower.
             Set towerSet = MasterBoard.getTowerSet();
             Iterator it = towerSet.iterator();
@@ -2022,6 +2025,7 @@ Log.debug("Called Game.assignTowers() with balanced = " + balanced);
                         set.add(hexLabel);
                     }
                 }
+            }
             }
         }
 
