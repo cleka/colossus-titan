@@ -1937,33 +1937,27 @@ public class Game
     }
 
 
-    // Return the number of types of angels that can be acquired.
-    public static int findEligibleAngels(Legion legion, ArrayList recruits,
+    /** Return a list of names of angel types that can be acquired. */
+    public static ArrayList findEligibleAngels(Legion legion, 
         boolean archangel)
     {
         if (legion.getHeight() >= 7)
         {
-            return 0;
+            return null;
         }
 
-        recruits.add(Creature.angel);
-        if (archangel)
+        ArrayList recruits = new ArrayList();
+
+        if (Creature.angel.getCount() >= 1)
         {
-            recruits.add(Creature.archangel);
+            recruits.add(Creature.angel.toString());
         }
-
-        // Check for availability of chits.
-        Iterator it = recruits.iterator();
-        while (it.hasNext())
+        if (archangel && Creature.archangel.getCount() >= 1)
         {
-            Creature recruit = (Creature)it.next();
-            if (recruit.getCount() < 1)
-            {
-                it.remove();
-            }
+            recruits.add(Creature.archangel.toString());
         }
 
-        return recruits.size();
+        return recruits;
     }
 
 
@@ -2019,13 +2013,17 @@ public class Game
 
     public void pickInitialMarker(Player player)
     {
+        String name = player.getName();
+        String selectedMarker;
         do
         {
-            new PickMarker(masterFrame, player);
+            selectedMarker = PickMarker.pickMarker(masterFrame, 
+                name, player.getMarkersAvailable());
         }
-        while (player.getSelectedMarker() == null);
+        while (selectedMarker == null);
 
-        logEvent(player.getName() + " selected initial marker");
+        player.selectMarker(selectedMarker);
+        logEvent(name + " selected initial marker");
     }
 
 

@@ -47,9 +47,5 @@ Linux, Solaris, jdk1.3: Dialogs sometimes beep for no good reason.
    Added setVisible(false) before dispose() calls, which doesn't seem
    to help.  SplitLegion and PickRecruit (both called from Game) seem
    to be the main culprits.  Also AcquireAngel.  Doesn't seem to happen
-   in Windows.
-
-Solaris, jdk1.3: A couple of cliff and wall hexsides are clipped in 
-   ShowBattleMap and PickEntrySide, but not in BattleMap.  Repaint
-   from other side isn't working right.
+   in Win98.
 

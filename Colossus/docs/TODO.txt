@@ -9,6 +9,8 @@ Write a minimal, complete Game.loadGame() that reuses existing
 
 Show movement die roll graphically.
 
+Highlight teleport and normal moves differently.
+
 Disable file-related options when running as an applet.
 
 Add per-player option menu, with results saved to playername.cfg
@@ -16,11 +18,18 @@ Add per-player option menu, with results saved to playername.cfg
 Add chits and hexes to containers and use layout managers to place
    chits?  Difficulties with overlapping hexes, stacked chits.
 
-Change Hex.xVertex and yVertex to doubles?
+Change more modal dialogs to use a factory that returns a value,
+   rather than a public constructor and a call to a mutator.  This
+   should allow eliminating dialogLock in the callers, reduce
+   global access from dialogs to game objects, and allow dialog
+   results to be more easily replicated by network and computer
+   dialog replacements.  All parameters into the dialogs should
+   be read-only or clones.
 
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 Add auto-recruit option.
 Add auto-forced-strike option.
+Add auto-pick-legion-markers option.
 Add auto-pick-entry-side option.
 Add auto-move option.
 Add auto-strike option.
@@ -36,13 +45,9 @@ Add keyboard legion selection?
 Add toolbars?
 Add tooltips?
 
-Copy entrySide and teleported from MasterHex to Legion.
-
 Should be able to undo moves until an engagement is resolved.
    If no engagements, should be able to undo recruits, then
    undo moves.  "Done with Engagements" shouldn't be necessary.
-
-Separate the battlemap out into a common HexMap class? 
 
 Finish XML savegame file.  Write saveGameXML and loadGameXML.
 

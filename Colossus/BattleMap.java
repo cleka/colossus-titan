@@ -9,20 +9,12 @@ import javax.swing.*;
  * @author David Ripton
  */
 
-public class BattleMap extends JPanel implements MouseListener,
+public class BattleMap extends HexMap implements MouseListener,
     WindowListener
 {
-    private static BattleHex[][] h = new BattleHex[6][6];
-    private ArrayList hexes = new ArrayList(27);
-
-    // ne, e, se, sw, w, nw
-    private BattleHex [] entrances = new BattleHex[6];
-
-    private int scale;
     private int chitScale;
 
     private MasterBoard board;
-    private MasterHex masterHex;
     private Battle battle;
 
     private static Point location;
@@ -47,7 +39,9 @@ public class BattleMap extends JPanel implements MouseListener,
 
     public BattleMap(MasterBoard board, MasterHex masterHex, Battle battle)
     {
-        battleFrame = new JFrame(battle.getAttacker().getMarkerId() + 
+        super(masterHex);
+
+        battleFrame = new JFrame(battle.getAttacker().getMarkerId() +
             " (" + battle.getAttacker().getPlayer().getName() +
             ") attacks " + battle.getDefender().getMarkerId() + " (" +
             battle.getDefender().getPlayer().getName() + ")" + " in " +
@@ -61,23 +55,17 @@ public class BattleMap extends JPanel implements MouseListener,
             defender.getMarkerId() + " (" + defender.getPlayer().getName() +
             ")" + " in " + masterHex.getDescription());
 
-        this.masterHex = masterHex;
         this.board = board;
         this.battle = battle;
 
         Container contentPane = battleFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
 
-        scale = getScale();
         chitScale = 2 * scale;
 
         battleFrame.setSize(getPreferredSize());
 
         setupIcon();
-
-        setOpaque(true);
-
-        setBackground(Color.white);
 
         battleFrame.addWindowListener(this);
         addMouseListener(this);
@@ -85,14 +73,11 @@ public class BattleMap extends JPanel implements MouseListener,
         setupActions();
         setupTopMenu();
 
-        // Initialize the hexmap.
-        SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), this, hexes);
-        SetupBattleHexes.setupNeighbors(h);
         setupEntrances();
 
         placeLegion(attacker, false);
         placeLegion(defender, true);
-        
+
         if (location == null)
         {
             location = new Point(0, 2 * scale);
@@ -157,7 +142,7 @@ public class BattleMap extends JPanel implements MouseListener,
     {
         menuBar = new JMenuBar();
         battleFrame.setJMenuBar(menuBar);
-        
+
         // Phase menu items change by phase and will be set up later.
         phaseMenu = new JMenu("Phase");
         phaseMenu.setMnemonic(KeyEvent.VK_P);
@@ -202,8 +187,8 @@ public class BattleMap extends JPanel implements MouseListener,
 
         battle.recruitReinforcement();
     }
-    
-    
+
+
     public void setupMove()
     {
         // If there are no legal moves, move on.
@@ -213,7 +198,7 @@ public class BattleMap extends JPanel implements MouseListener,
         }
         else
         {
-            battleFrame.setTitle(battle.getActivePlayer().getName() + 
+            battleFrame.setTitle(battle.getActivePlayer().getName() +
                 " Turn " + battle.getTurnNumber() + " : Move");
 
             phaseMenu.removeAll();
@@ -225,13 +210,13 @@ public class BattleMap extends JPanel implements MouseListener,
             mi = phaseMenu.add(undoAllMovesAction);
             mi.setMnemonic(KeyEvent.VK_A);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-            
+
             mi = phaseMenu.add(doneWithMovesAction);
             mi.setMnemonic(KeyEvent.VK_D);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
             phaseMenu.addSeparator();
-            
+
             mi = phaseMenu.add(concedeBattleAction);
             mi.setMnemonic(KeyEvent.VK_C);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
@@ -251,7 +236,7 @@ public class BattleMap extends JPanel implements MouseListener,
         else
         {
             battleFrame.setTitle(battle.getActivePlayer().getName() +
-                ((battle.getPhase() == Battle.FIGHT) ? 
+                ((battle.getPhase() == Battle.FIGHT) ?
                 " : Strike" : " : Strikeback"));
 
             phaseMenu.removeAll();
@@ -261,14 +246,14 @@ public class BattleMap extends JPanel implements MouseListener,
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0));
 
             phaseMenu.addSeparator();
-            
+
             mi = phaseMenu.add(concedeBattleAction);
             mi.setMnemonic(KeyEvent.VK_C);
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
         }
     }
-    
-    
+
+
     public JFrame getFrame()
     {
         return battleFrame;
@@ -309,8 +294,6 @@ public class BattleMap extends JPanel implements MouseListener,
         critter.addBattleInfo(entrance, this, chit, battle);
         entrance.addCritter(critter);
 
-        entrance.alignChits();
-
         chit.repaint();
     }
 
@@ -329,202 +312,20 @@ public class BattleMap extends JPanel implements MouseListener,
             critter.addBattleInfo(entrance, this, chit, battle);
             entrance.addCritter(critter);
         }
-        entrance.alignChits();
-    }
-
-
-    public void unselectAllHexes()
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            BattleHex hex = (BattleHex)it.next();
-            if (hex.isSelected())
-            {
-                hex.unselect();
-                hex.repaint();
-            }
-        }
-    }
-
-
-    public void unselectHexByLabel(String label)
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            BattleHex hex = (BattleHex)it.next();
-            if (hex.isSelected() && label.equals(hex.getLabel()))
-            {
-                hex.unselect();
-                hex.repaint();
-                return;
-            }
-        }
-    }
-
-
-    public void unselectHexesByLabels(Set labels)
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            BattleHex hex = (BattleHex)it.next();
-            if (hex.isSelected() && labels.contains(hex.getLabel()))
-            {
-                hex.unselect();
-                hex.repaint();
-            }
-        }
-    }
-
-
-    public void selectHexByLabel(String label)
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            BattleHex hex = (BattleHex)it.next();
-            if (!hex.isSelected() && label.equals(hex.getLabel()))
-            {
-                hex.select();
-                hex.repaint();
-                return;
-            }
-        }
-    }
-
-
-    public void selectHexesByLabels(Set labels)
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            BattleHex hex = (BattleHex)it.next();
-            if (!hex.isSelected() && labels.contains(hex.getLabel()))
-            {
-                hex.select();
-                hex.repaint();
-            }
-        }
-    }
-
-
-    public static int getScale()
-    {
-        int scale;
-
-        // Make sure the map fits on the screen.
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        if (d.height < 1000)
-        {
-            scale = 30 * d.height / 1000;
-        }
-        else
-        {
-            scale = 30;
-        }
-
-        return scale;
-    }
-
-
-    private void setupEntrances()
-    {
-        int cx = 6 * scale;
-        int cy = 3 * scale;
-
-        // Initialize entrances.
-        entrances[0] = new BattleHex(cx + 19 * scale,
-            cy + 5 * scale, scale, this, -1, 0);
-        entrances[1] = new BattleHex(cx + 25 * scale,
-            cy + 16 * scale, scale, this, -1, 1);
-        entrances[2] = new BattleHex(cx + 22 * scale,
-            cy + 26 * scale, scale, this, -1, 2);
-        entrances[3] = new BattleHex(cx + 6 * scale,
-            cy + 25 * scale, scale, this, -1, 3);
-        entrances[4] = new BattleHex(cx + 1 * scale,
-            cy + 16 * scale, scale, this, -1, 4);
-        entrances[5] = new BattleHex(cx + 5 * scale,
-            cy + 5 * scale, scale, this, -1, 5);
-
-        // Add neighbors to entrances.
-        entrances[0].setNeighbor(3, h[3][0]);
-        entrances[0].setNeighbor(4, h[4][1]);
-        entrances[0].setNeighbor(5, h[5][1]);
-
-        entrances[1].setNeighbor(3, h[5][1]);
-        entrances[1].setNeighbor(4, h[5][2]);
-        entrances[1].setNeighbor(5, h[5][3]);
-        entrances[1].setNeighbor(0, h[5][4]);
-
-        entrances[2].setNeighbor(4, h[5][4]);
-        entrances[2].setNeighbor(5, h[4][5]);
-        entrances[2].setNeighbor(0, h[3][5]);
-
-        entrances[3].setNeighbor(5, h[3][5]);
-        entrances[3].setNeighbor(0, h[2][5]);
-        entrances[3].setNeighbor(1, h[1][4]);
-        entrances[3].setNeighbor(2, h[0][4]);
-
-        entrances[4].setNeighbor(0, h[0][4]);
-        entrances[4].setNeighbor(1, h[0][3]);
-        entrances[4].setNeighbor(2, h[0][2]);
-
-        entrances[5].setNeighbor(1, h[0][2]);
-        entrances[5].setNeighbor(2, h[1][1]);
-        entrances[5].setNeighbor(3, h[2][1]);
-        entrances[5].setNeighbor(4, h[3][0]);
     }
 
 
     public BattleHex getEntrance(Legion legion)
     {
-        if (legion == battle.getAttacker())
+        Legion attacker = battle.getAttacker();
+        if (legion == attacker)
         {
-            return entrances[masterHex.getEntrySide()];
+            return entrances[attacker.getEntrySide()];
         }
         else
         {
-            return entrances[(masterHex.getEntrySide() + 3) % 6];
+            return entrances[(attacker.getEntrySide() + 3) % 6];
         }
-    }
-
-
-    /** Do a brute-force search through the hex array, looking for
-     *  a match.  Return the hex, or null. */
-    public BattleHex getHexFromLabel(String label)
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            BattleHex hex = (BattleHex)it.next();
-            if (hex.getLabel().equals(label))
-            {
-                return hex;
-            }
-        }
-
-        System.out.println("Could not find hex " + label);
-        return null;
-    }
-
-
-    /** Return the BattleHex that contains the given point, or
-     *    null if none does. */
-    private BattleHex getHexContainingPoint(Point point)
-    {
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            BattleHex hex = (BattleHex)it.next();
-            if (hex.contains(point))
-            {
-                return hex;
-            }
-        }
-
-        return null;
     }
 
 
@@ -545,12 +346,6 @@ public class BattleMap extends JPanel implements MouseListener,
         }
 
         return null;
-    }
-
-
-    public static BattleHex getCenterTowerHex()
-    {
-        return h[3][2];
     }
 
 
@@ -580,36 +375,6 @@ public class BattleMap extends JPanel implements MouseListener,
     }
 
 
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-
-
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-
-
-    public void mouseEntered(MouseEvent e)
-    {
-    }
-
-
-    public void mouseExited(MouseEvent e)
-    {
-    }
-
-
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-
     public void windowClosing(WindowEvent e)
     {
         if (board != null)
@@ -617,26 +382,6 @@ public class BattleMap extends JPanel implements MouseListener,
             board.getGame().dispose();
         }
         battle.cleanup();
-    }
-
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-
-    public void windowDeiconified(WindowEvent e)
-    {
-    }
-
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-
-    public void windowOpened(WindowEvent e)
-    {
     }
 
 
@@ -649,16 +394,6 @@ public class BattleMap extends JPanel implements MouseListener,
         if (rectClip == null)
         {
             return;
-        }
-
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            BattleHex hex = (BattleHex)it.next();
-            if (rectClip.intersects(hex.getBounds()))
-            {
-                hex.paint(g);
-            }
         }
 
         // Draw chits from back to front.
@@ -681,20 +416,7 @@ public class BattleMap extends JPanel implements MouseListener,
         // Save location for next object.
         location = getLocation();
 
-        battleFrame.setVisible(false);
         battleFrame.dispose();
-    }
-
-
-    public Dimension getMinimumSize()
-    {
-        return getPreferredSize();
-    }
-
-
-    public Dimension getPreferredSize()
-    {
-        return new Dimension(30 * scale, 28 * scale);
     }
 
 

@@ -10,90 +10,79 @@ import javax.swing.*;
  */
 
 
-public class PickMarker extends JDialog implements MouseListener, WindowListener
+public class PickMarker extends JDialog implements MouseListener, 
+    WindowListener
 {
     private ArrayList markers = new ArrayList();
-    private Player player;
+    private static final int scale = 60;
+    private static String markerId;
 
 
-    public PickMarker(JFrame parentFrame, Player player)
+    private PickMarker(JFrame parentFrame, String name, 
+        Collection markerIds)
     {
-        super(parentFrame, player.getName() + ": Pick Legion Marker", true);
-
-        this.player = player;
+        super(parentFrame, name + ": Pick Legion Marker", true);
 
         addMouseListener(this);
         addWindowListener(this);
 
-        if (player.getNumMarkersAvailable() == 0)
+        Container contentPane = getContentPane();
+
+        int numAvailable = markerIds.size();
+        contentPane.setLayout(new GridLayout(0, Math.min(numAvailable, 12)));
+
+        pack();
+
+        setBackground(Color.lightGray);
+        setResizable(false);
+
+        Iterator it = markerIds.iterator();
+        while (it.hasNext())
         {
-            JOptionPane.showMessageDialog(parentFrame, "No markers available");
-            setVisible(false);
-            dispose();
+            String markerId = (String)it.next();
+            Chit marker = new Chit(scale, markerId, this);
+            markers.add(marker);
+            contentPane.add(marker);
+            marker.addMouseListener(this);
         }
-        else
+
+        pack();
+        
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
+            d.height / 2 - getSize().height / 2));
+
+        setVisible(true);
+    }
+
+
+    /** Return the chosen marker id, or null if none are available or
+     *  the player aborts the selection. */
+    public static String pickMarker(JFrame parentFrame, String name, 
+        Collection markerIds)
+    {
+        if (markerIds.isEmpty())
         {
-            int scale = 60;
-
-            Container contentPane = getContentPane();
-
-            contentPane.setLayout(new GridLayout(0, Math.min(
-                player.getNumMarkersAvailable(), 12)));
-
-            pack();
-
-            setBackground(Color.lightGray);
-            setResizable(false);
-
-            Collection markerIds = player.getMarkersAvailable();
-            
-            Iterator it = markerIds.iterator();
-            while (it.hasNext())
-            {
-                String markerId = (String)it.next();
-                Chit marker = new Chit(scale, markerId, this);
-                markers.add(marker);
-                contentPane.add(marker);
-                marker.addMouseListener(this);
-            }
-
-            pack();
-            
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width / 2 - getSize().width / 2,
-                d.height / 2 - getSize().height / 2));
-
-            setVisible(true);
-            repaint();
+            return null;
         }
+
+        markerId = null;
+
+        new PickMarker(parentFrame, name, markerIds);
+
+        return markerId;
     }
 
 
     public void mousePressed(MouseEvent e)
     {
-        if (player.getNumMarkersAvailable() == 0)
-        {
-            player.clearSelectedMarker();
-            setVisible(false);
-            dispose();
-            return;
-        }
-
         Object source = e.getSource();
-        Iterator it = markers.iterator();
-        while (it.hasNext())
+        int i = markers.indexOf(source);
+        if (i != -1)
         {
-            Chit marker = (Chit)it.next();
-            if (marker == source)
-            {
-                // Select that marker.
-                player.selectMarker(marker.getId());
-
-                // Then exit.
-                setVisible(false);
-                dispose();
-                return;
-            }
+            Chit chit = (Chit)markers.get(i);
+            markerId = chit.getId();
+            dispose();
         }
     }
 
@@ -130,10 +119,7 @@ public class PickMarker extends JDialog implements MouseListener, WindowListener
 
     public void windowClosing(WindowEvent e)
     {
-        player.clearSelectedMarker();
-        setVisible(false);
         dispose();
-        return;
     }
 
 
@@ -160,7 +146,6 @@ public class PickMarker extends JDialog implements MouseListener, WindowListener
     public static void main(String [] args)
     {
         JFrame frame = new JFrame("testing PickMarker");
-        int scale = 60;
         frame.setSize(new Dimension(20 * scale, 20 * scale));
         frame.pack();
         frame.setVisible(true);
@@ -170,6 +155,10 @@ public class PickMarker extends JDialog implements MouseListener, WindowListener
         player.setColor("Red");
         player.initMarkersAvailable();
 
-        new PickMarker(frame, player);
+        String choice = PickMarker.pickMarker(frame, player.getName(),
+            player.getMarkersAvailable());
+        // XXX Pass a deep clone rather than the original list.
+        // Or at least call Collections.unmodifyableSortedSet()
+        System.out.println("Chose " + choice);
     }
 }

@@ -37,13 +37,17 @@ public class SplitLegion extends JDialog implements MouseListener,
         this.player = player;
         this.parentFrame = parentFrame;
 
-        new PickMarker(parentFrame, player);
+        String selectedMarker = PickMarker.pickMarker(parentFrame,
+            player.getName(), player.getMarkersAvailable());
 
-        if (player.getSelectedMarker() == null)
+        if (selectedMarker == null)
         {
-            setVisible(false);
             dispose();
             return;
+        }
+        else
+        {
+            player.selectMarker(selectedMarker);
         }
        
         pack();
@@ -58,90 +62,80 @@ public class SplitLegion extends JDialog implements MouseListener,
         setBackground(Color.lightGray);
         setResizable(false);
 
-        // If there were no markers left to pick, exit.
-        if (player.getSelectedMarker() == null)
+        addMouseListener(this);
+        addWindowListener(this);
+
+        oldMarker = new Marker(scale, oldLegion.getImageName(), this,
+            oldLegion);
+        constraints.gridx = GridBagConstraints.RELATIVE;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        gridbag.setConstraints(oldMarker, constraints);
+        contentPane.add(oldMarker);
+
+        Collection critters = oldLegion.getCritters();
+        Iterator it = critters.iterator();
+        while (it.hasNext())
         {
-            setVisible(false);
-            dispose();
+            Critter critter = (Critter)it.next();
+            Chit chit = new Chit(scale, critter.getImageName(), this);
+            oldChits.add(chit);
+            gridbag.setConstraints(chit, constraints);
+            contentPane.add(chit);
+            chit.addMouseListener(this);
+        }
+   
+        constraints.gridx = GridBagConstraints.RELATIVE;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        gridbag.setConstraints(newMarker, constraints);
+        contentPane.add(newMarker);
+
+        JButton button1 = new JButton("Done");
+        button1.setMnemonic(KeyEvent.VK_D);
+        JButton button2 = new JButton("Cancel");
+        button2.setMnemonic(KeyEvent.VK_C);
+
+         // Attempt to center the buttons.
+        int chitWidth = Math.max(oldLegion.getHeight(),
+            newLegion.getHeight()) + 1;
+        if (chitWidth < 4)
+        {
+            constraints.gridwidth = 1;
         }
         else
         {
-            addMouseListener(this);
-            addWindowListener(this);
-
-            oldMarker = new Marker(scale, oldLegion.getImageName(), this,
-                oldLegion);
-            constraints.gridx = GridBagConstraints.RELATIVE;
-            constraints.gridy = 0;
-            constraints.gridwidth = 1;
-            gridbag.setConstraints(oldMarker, constraints);
-            contentPane.add(oldMarker);
-
-            Collection critters = oldLegion.getCritters();
-            Iterator it = critters.iterator();
-            while (it.hasNext())
-            {
-                Critter critter = (Critter)it.next();
-                Chit chit = new Chit(scale, critter.getImageName(), this);
-                oldChits.add(chit);
-                gridbag.setConstraints(chit, constraints);
-                contentPane.add(chit);
-                chit.addMouseListener(this);
-            }
-       
-            constraints.gridx = GridBagConstraints.RELATIVE;
-            constraints.gridy = 1;
-            constraints.gridwidth = 1;
-            gridbag.setConstraints(newMarker, constraints);
-            contentPane.add(newMarker);
-
-            JButton button1 = new JButton("Done");
-            button1.setMnemonic(KeyEvent.VK_D);
-            JButton button2 = new JButton("Cancel");
-            button2.setMnemonic(KeyEvent.VK_C);
-
-             // Attempt to center the buttons.
-            int chitWidth = Math.max(oldLegion.getHeight(),
-                newLegion.getHeight()) + 1;
-            if (chitWidth < 4)
-            {
-                constraints.gridwidth = 1;
-            }
-            else
-            {
-                constraints.gridwidth = 2;
-            }
-            int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2; 
-            if (leadSpace < 0)
-            {
-                leadSpace = 0;
-            }
-
-            constraints.gridx = leadSpace;
-            constraints.gridy = 2;
-            gridbag.setConstraints(button1, constraints);
-            contentPane.add(button1);
-            button1.addActionListener(this);
-            constraints.gridx = leadSpace + constraints.gridwidth;
-            gridbag.setConstraints(button2, constraints);
-            contentPane.add(button2);
-            button2.addActionListener(this);
-
-            pack();
-
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            setLocation(new Point(d.width / 2 - getSize().width / 2,
-                d.height / 2 - getSize().height / 2));
-
-            setVisible(true);
+            constraints.gridwidth = 2;
         }
+        int leadSpace = (chitWidth - 2 * constraints.gridwidth) / 2; 
+        if (leadSpace < 0)
+        {
+            leadSpace = 0;
+        }
+
+        constraints.gridx = leadSpace;
+        constraints.gridy = 2;
+        gridbag.setConstraints(button1, constraints);
+        contentPane.add(button1);
+        button1.addActionListener(this);
+        constraints.gridx = leadSpace + constraints.gridwidth;
+        gridbag.setConstraints(button2, constraints);
+        contentPane.add(button2);
+        button2.addActionListener(this);
+
+        pack();
+
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(new Point(d.width / 2 - getSize().width / 2,
+            d.height / 2 - getSize().height / 2));
+
+        setVisible(true);
     }
 
 
     private void cancel()
     {
         newLegion.recombine(oldLegion, true);
-        setVisible(false);
         dispose();
     }
 
@@ -307,7 +301,6 @@ public class SplitLegion extends JDialog implements MouseListener,
             }
 
             // Exit.
-            setVisible(false);
             dispose();
 
             Game.logEvent(newLegion.getHeight() + 

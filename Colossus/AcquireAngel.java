@@ -13,36 +13,23 @@ import java.util.*;
 public class AcquireAngel extends JDialog implements MouseListener,
     WindowListener
 {
-    private int numEligible;
-    private ArrayList recruits = new ArrayList();
-    private Player player;
-    private Legion legion;
     private ArrayList chits = new ArrayList();
+    private static final int scale = 60;
+    private static String recruit;
+    private ArrayList recruits;
 
 
-    public AcquireAngel(JFrame parentFrame, Legion legion, boolean archangel)
+    private AcquireAngel(JFrame parentFrame, String name, ArrayList recruits)
     {
-        super(parentFrame, legion.getPlayer().getName() +
-            ": Acquire Angel", true);
+        super(parentFrame, name + ": Acquire Angel", true);
 
-        this.legion = legion;
-        player = legion.getPlayer();
+        this.recruits = recruits;
 
         addMouseListener(this);
         addWindowListener(this);
 
-        int scale = 60;
-
         Container contentPane = getContentPane();
         contentPane.setLayout(new FlowLayout());
-
-        numEligible = Game.findEligibleAngels(legion, recruits, archangel);
-        if (numEligible == 0)
-        {
-            setVisible(false);
-            dispose();
-            return;
-        }
 
         pack();
         setBackground(Color.lightGray);
@@ -51,7 +38,8 @@ public class AcquireAngel extends JDialog implements MouseListener,
         Iterator it = recruits.iterator();
         while (it.hasNext())
         {
-            Creature recruit = (Creature)it.next();
+            String creatureName = (String)it.next();
+            Creature recruit = Creature.getCreatureFromName(creatureName);
             Chit chit = new Chit(scale, recruit.getImageName(), this);
             chits.add(chit);
             contentPane.add(chit);
@@ -69,23 +57,32 @@ public class AcquireAngel extends JDialog implements MouseListener,
     }
 
 
+    public static String acquireAngel(JFrame parentFrame, String name,
+        ArrayList recruits)
+    {
+        if (recruits.isEmpty())
+        {
+            return null;
+        }
+
+        recruit = null;
+
+        new AcquireAngel(parentFrame, name, recruits);
+
+        return recruit;
+    }
+
+
     public void mousePressed(MouseEvent e)
     {
         Object source = e.getSource();
         int i = chits.indexOf(source);
         if (i != -1)
         {
-            // Select that marker.
-            Creature creature = (Creature)recruits.get(i);
-            legion.addCreature(creature, true);
-
-            Game.logEvent("Legion " + legion.getMarkerId() +
-                " acquired an " + creature.getName());
+            recruit = (String)recruits.get(i);
 
             // Then exit.
-            setVisible(false);
             dispose();
-            return;
         }
     }
 
@@ -122,7 +119,6 @@ public class AcquireAngel extends JDialog implements MouseListener,
 
     public void windowClosing(WindowEvent e)
     {
-        setVisible(false);
         dispose();
     }
 

@@ -166,8 +166,8 @@ public class MasterHex extends Hex
                 break;
         }
 
-        // The word "MOUNTAINS" needs to be printed in the wide part of the hex,
-        // with a smaller font.
+        // The word "MOUNTAINS" needs to be printed in the wide part of 
+        // the hex, with a smaller font.
         if (name.equals("MOUNTAINS"))
         {
             Font oldFont = g2.getFont();

@@ -684,6 +684,12 @@ public class Critter extends Creature
             }
         }
 
+        Game.logEvent(name + " in " + currentHex.getLabel() +
+            " strikes " + target.getName() + " in " +
+            targetHex.getLabel() + " with strike number " +
+            strikeNumber + " : " + rollString + ": " + damage +
+            (damage == 1 ? " hit" : " hits"));
+
         int carryDamage = target.wound(damage);
         if (!carryPossible)
         {
@@ -694,7 +700,7 @@ public class Critter extends Creature
         if (carryDamage > 0)
         {
             Game.logEvent(carryDamage + (carryDamage == 1 ?
-                "carry available" : "carries available"));
+                " carry available" : " carries available"));
             battle.setCarryDamage(carryDamage);
             battle.highlightCarries();
         }
@@ -710,12 +716,6 @@ public class Critter extends Creature
                 rolls, damage, carryDamage);
             battleDice.setup();
         }
-
-        Game.logEvent(name + " in " + currentHex.getLabel() +
-            " strikes " + target.getName() + " in " +
-            targetHex.getLabel() + " with strike number " +
-            strikeNumber + " : " + rollString + ": " + damage +
-            (damage == 1 ? " hit" : " hits"));
     }
 
 

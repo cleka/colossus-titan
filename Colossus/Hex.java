@@ -56,12 +56,6 @@ public abstract class Hex
     }
 
 
-    public Point getCenter()
-    {
-        return center;
-    }  
-    
-    
     public char getTerrain()
     {
         return terrain;

@@ -111,7 +111,11 @@ public class Legion
             }
             int score = player.getScore();
             int tmpScore = score;
+            // It's practically impossible to get more than one archangel
+            // from a single battle.
             boolean didArchangel = false;
+
+            ArrayList recruits; 
 
             while (getHeight() < 7 && tmpScore / 100 > (score - points) / 100)
             {
@@ -119,15 +123,42 @@ public class Legion
                     !didArchangel)
                 {
                     // Allow Archangel.
-                    new AcquireAngel(masterFrame, this, true);
+                    recruits = Game.findEligibleAngels(this, true);
+                    String type = AcquireAngel.acquireAngel(masterFrame, 
+                        player.getName(), recruits);
                     tmpScore -= 100;
-                    didArchangel = true;
+                    if (type != null && recruits.contains(type))
+                    {
+                        Creature angel = Creature.getCreatureFromName(type);
+                        if (angel != null)
+                        {
+                            addCreature(angel, true);
+                            Game.logEvent("Legion " + getMarkerId() +
+                                " acquired an " + type);
+                            if (type.equals("Archangel"))
+                            {
+                                didArchangel = true;
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     // Disallow Archangel.
-                    new AcquireAngel(masterFrame, this, false);
+                    recruits = Game.findEligibleAngels(this, false);
+                    String type = AcquireAngel.acquireAngel(masterFrame, 
+                        player.getName(), recruits);
                     tmpScore -= 100;
+                    if (type != null && recruits.contains(type))
+                    {
+                        Creature angel = Creature.getCreatureFromName(type);
+                        if (angel != null)
+                        {
+                            addCreature(angel, true);
+                            Game.logEvent("Legion " + getMarkerId() +
+                                " acquired an " + type);
+                        }
+                    }
                 }
             }
         }
@@ -295,24 +326,28 @@ public class Legion
 
         StringBuffer log = new StringBuffer("Legion ");
         log.append(getName());
-        log.append(" (");
-
-        // Return lords and demi-lords to the stacks.
-        Iterator it = critters.iterator();
-        while (it.hasNext())
+        log.append(" ");
+        if (getHeight() > 0)
         {
-            Critter critter = (Critter)it.next();
-            log.append(critter.getName());
-            if (it.hasNext())
+            log.append("(");
+            // Return lords and demi-lords to the stacks.
+            Iterator it = critters.iterator();
+            while (it.hasNext())
             {
-                log.append(", ");
+                Critter critter = (Critter)it.next();
+                log.append(critter.getName());
+                if (it.hasNext())
+                {
+                    log.append(", ");
+                }
+                if (critter.isImmortal())
+                {
+                    critter.putOneBack();
+                }
             }
-            if (critter.isImmortal())
-            {
-                critter.putOneBack();
-            }
+            log.append(")");
         }
-        log.append(") is eliminated");
+        log.append(" is eliminated");
         Game.logEvent(log.toString());
 
         // Free up the legion marker.
@@ -349,8 +384,9 @@ public class Legion
     public void undoMove()
     {
         // If this legion teleported, allow teleporting again.
-        if (currentHex.getTeleported())
+        if (teleported)
         {
+            teleported = false;
             player.allowTeleport();
         }
         currentHex.removeLegion(this);
@@ -460,6 +496,12 @@ public class Legion
     public MasterHex getStartingHex()
     {
         return startingHex;
+    }
+
+
+    public int getEntrySide()
+    {
+        return entrySide;
     }
 
 

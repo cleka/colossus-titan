@@ -414,11 +414,11 @@ public class Battle
     }
 
 
-    private static Set findUnoccupiedTowerHexes()
+    private Set findUnoccupiedTowerHexes()
     {
         HashSet set = new HashSet();
 
-        BattleHex centerHex = BattleMap.getCenterTowerHex();
+        BattleHex centerHex = map.getCenterHex();
 
         if (!centerHex.isOccupied())
         {
@@ -1051,7 +1051,7 @@ public class Battle
             String label = target.getCurrentHex().getLabel();
             map.unselectHexByLabel(label);
             Game.logEvent(carryDamage + (carryDamage == 1 ?
-                "carry available" : "carries available"));
+                " carry available" : " carries available"));
             if (game.getShowDice())
             {
                 battleDice.setCarries(carryDamage);
@@ -1639,7 +1639,6 @@ public class Battle
     {
         if (battleDice != null)
         {
-            battleDice.setVisible(false);
             battleDice.dispose();
         }
         battleDice = null;
@@ -1758,8 +1757,6 @@ public class Battle
                         {
                             masterFrame.setState(JFrame.NORMAL);
                         }
-                        // XXX And bring it to the front.
-                        //board.getFrame().show();
 
                         SummonAngel summonAngel = new SummonAngel(board,
                             getAttacker());

@@ -1,14 +1,25 @@
+import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 /**
- * Class SetupBattleHexes initializes hex contents for a Titan battlemap.
+ * Class HexMap displays a basic battle map.
  * @version $Id$
  * @author David Ripton
  */
 
-public class SetupBattleHexes
+public class HexMap extends JPanel implements MouseListener, WindowListener
 {
-    public static final boolean[][] show =
+    private BattleHex [][] h = new BattleHex[6][6];
+    private ArrayList hexes = new ArrayList(27);
+    protected static int scale;
+    protected MasterHex masterHex;
+
+    // ne, e, se, sw, w, nw
+    protected BattleHex [] entrances = new BattleHex[6];
+
+    private static final boolean[][] show =
     {
         {false,false,true,true,true,false},
         {false,true,true,true,true,false},
@@ -19,14 +30,43 @@ public class SetupBattleHexes
     };
 
 
-    public static void setupHexes(BattleHex [][] h, char terrain, 
-        BattleMap map, ArrayList hexes)
+    public HexMap(MasterHex masterHex)
     {
-        int scale = BattleMap.getScale();
+        this.masterHex = masterHex;
+        scale = findScale();
+        setOpaque(true);
+        setBackground(Color.white);
+        setupHexes();
+        setupNeighbors();
+    }
+
+
+    public static int findScale()
+    {
+        int scale;
+
+        // Make sure the map fits on the screen.
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        if (d.height < 1000)
+        {
+            scale = 30 * d.height / 1000;
+        }
+        else
+        {
+            scale = 30;
+        }
+
+        return scale;
+    }
+
+
+    private void setupHexes()
+    {
+        char terrain = masterHex.getTerrain();
 
         int cx = 6 * scale;
         int cy = 3 * scale;
-        
+
         // Initialize hex array.
         for (int i = 0; i < h.length; i++)
         {
@@ -37,7 +77,7 @@ public class SetupBattleHexes
                     BattleHex hex = new BattleHex
                         ((int) Math.round(cx + 3 * i * scale),
                         (int) Math.round(cy + (2 * j + (i & 1)) *
-                        Hex.SQRT3 * scale), scale, map, i, j);
+                        Hex.SQRT3 * scale), scale, this, i, j);
                     hex.setXCoord(i);
                     hex.setYCoord(j);
 
@@ -310,12 +350,10 @@ public class SetupBattleHexes
                 break;
         }
     }
-        
 
-    /** Add references to neighbor hexes. Since the hex array is static, 
-        and neighbor data does not change with terrain, this should only
-        be done once. */
-    public static void setupNeighbors(BattleHex [][] h)
+
+    /** Add references to neighbor hexes. */
+    private void setupNeighbors()
     {
         for (int i = 0; i < h.length; i++)
         {
@@ -355,5 +393,289 @@ public class SetupBattleHexes
                 }
             }
         }
+    }
+
+
+    protected void setupEntrances()
+    {
+        int cx = 6 * scale;
+        int cy = 3 * scale;
+
+        // Initialize entrances.
+        entrances[0] = new BattleHex(cx + 15 * scale,
+            (int) Math.round(cy + 1 * scale), scale, this, -1, 0);
+        entrances[1] = new BattleHex(cx + 21 * scale,
+            (int) Math.round(cy + 10 * scale), scale, this, -1, 1);
+        entrances[2] = new BattleHex(cx + 17 * scale,
+            (int) Math.round(cy + 22 * scale), scale, this, -1, 2);
+        entrances[3] = new BattleHex(cx + 2 * scale,
+            (int) Math.round(cy + 21 * scale), scale, this, -1, 3);
+        entrances[4] = new BattleHex(cx - 3 * scale,
+            (int) Math.round(cy + 10 * scale), scale, this, -1, 4);
+        entrances[5] = new BattleHex(cx + 1 * scale,
+            (int) Math.round(cy + 1 * scale), scale, this, -1, 5);
+
+        // Add neighbors to entrances.
+        entrances[0].setNeighbor(3, h[3][0]);
+        entrances[0].setNeighbor(4, h[4][1]);
+        entrances[0].setNeighbor(5, h[5][1]);
+
+        entrances[1].setNeighbor(3, h[5][1]);
+        entrances[1].setNeighbor(4, h[5][2]);
+        entrances[1].setNeighbor(5, h[5][3]);
+        entrances[1].setNeighbor(0, h[5][4]);
+
+        entrances[2].setNeighbor(4, h[5][4]);
+        entrances[2].setNeighbor(5, h[4][5]);
+        entrances[2].setNeighbor(0, h[3][5]);
+
+        entrances[3].setNeighbor(5, h[3][5]);
+        entrances[3].setNeighbor(0, h[2][5]);
+        entrances[3].setNeighbor(1, h[1][4]);
+        entrances[3].setNeighbor(2, h[0][4]);
+
+        entrances[4].setNeighbor(0, h[0][4]);
+        entrances[4].setNeighbor(1, h[0][3]);
+        entrances[4].setNeighbor(2, h[0][2]);
+
+        entrances[5].setNeighbor(1, h[0][2]);
+        entrances[5].setNeighbor(2, h[1][1]);
+        entrances[5].setNeighbor(3, h[2][1]);
+        entrances[5].setNeighbor(4, h[3][0]);
+    }
+
+
+    public void unselectAllHexes()
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.isSelected())
+            {
+                hex.unselect();
+                hex.repaint();
+            }
+        }
+    }
+
+
+    public void unselectHexByLabel(String label)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.isSelected() && label.equals(hex.getLabel()))
+            {
+                hex.unselect();
+                hex.repaint();
+                return;
+            }
+        }
+    }
+
+
+    public void unselectHexesByLabels(Set labels)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.isSelected() && labels.contains(hex.getLabel()))
+            {
+                hex.unselect();
+                hex.repaint();
+            }
+        }
+    }
+
+
+    public void selectHexByLabel(String label)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            if (!hex.isSelected() && label.equals(hex.getLabel()))
+            {
+                hex.select();
+                hex.repaint();
+                return;
+            }
+        }
+    }
+
+
+    public void selectHexesByLabels(Set labels)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            if (!hex.isSelected() && labels.contains(hex.getLabel()))
+            {
+                hex.select();
+                hex.repaint();
+            }
+        }
+    }
+
+
+    /** Do a brute-force search through the hex array, looking for
+     *  a match.  Return the hex, or null. */
+    public BattleHex getHexFromLabel(String label)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.getLabel().equals(label))
+            {
+                return hex;
+            }
+        }
+
+        System.out.println("Could not find hex " + label);
+        return null;
+    }
+
+
+    /** Return the BattleHex that contains the given point, or
+     *  null if none does. */
+    protected BattleHex getHexContainingPoint(Point point)
+    {
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            if (hex.contains(point))
+            {
+                return hex;
+            }
+        }
+
+        return null;
+    }
+
+
+    /** Return the hex that is defined as the center of the map,
+     *  for defender tower entry purposes. */
+    public BattleHex getCenterHex()
+    {
+        return h[3][2];
+    }
+
+
+    public void mousePressed(MouseEvent e)
+    {
+    }
+
+
+    public void mouseReleased(MouseEvent e)
+    {
+    }
+
+
+    public void mouseClicked(MouseEvent e)
+    {
+    }
+
+
+    public void mouseEntered(MouseEvent e)
+    {
+    }
+
+
+    public void mouseExited(MouseEvent e)
+    {
+    }
+
+
+    public void windowActivated(WindowEvent e)
+    {
+    }
+
+
+    public void windowClosed(WindowEvent e)
+    {
+    }
+
+
+    public void windowClosing(WindowEvent e)
+    {
+    }
+
+
+    public void windowDeactivated(WindowEvent e)
+    {
+    }
+
+
+    public void windowDeiconified(WindowEvent e)
+    {
+    }
+
+
+    public void windowIconified(WindowEvent e)
+    {
+    }
+
+
+    public void windowOpened(WindowEvent e)
+    {
+    }
+
+
+    public void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+
+        // Abort if called too early.
+        Rectangle rectClip = g.getClipBounds();
+        if (rectClip == null)
+        {
+            return;
+        }
+
+        Iterator it = hexes.iterator();
+        while (it.hasNext())
+        {
+            BattleHex hex = (BattleHex)it.next();
+            if (rectClip.intersects(hex.getBounds()))
+            {
+                hex.paint(g);
+            }
+        }
+    }
+
+
+    public Dimension getMinimumSize()
+    {
+        return getPreferredSize();
+    }
+
+
+    public Dimension getPreferredSize()
+    {
+        return new Dimension(30 * scale, 30 * scale);
+    }
+
+
+    public static void main(String [] args)
+    {
+        MasterHex hex = new MasterHex(0, 0, 0, false, null);
+        hex.setTerrain('D');
+
+        JFrame window = new JFrame("Hex Map for " + hex.getTerrainName());
+        Container contentPane = window.getContentPane();
+        contentPane.setLayout(new BorderLayout());
+
+        HexMap hexMap = new HexMap(hex);
+
+        contentPane.add(hexMap, BorderLayout.CENTER);
+        window.pack();
+        window.setResizable(false);
+        window.setVisible(true);
     }
 }

@@ -10,63 +10,50 @@ import java.util.*;
  * @author David Ripton
  */
 
-public class PickEntrySide extends JPanel implements ActionListener,
+public class PickEntrySide extends HexMap implements ActionListener,
     WindowListener
 {
-    private static BattleHex [][] h = new BattleHex[6][6];
-    private static ArrayList hexes = new ArrayList(27);
-
-    private static int scale;
-
-    private static MasterHex masterHex;
-
     private static JButton button5;  // left
     private static JButton button3;  // bottom
     private static JButton button1;  // right
 
     private static boolean laidOut;
-    private static boolean hexesReady;
 
     private JDialog dialog;
 
 
     public PickEntrySide(JFrame parentFrame, MasterHex masterHex)
     {
+        super(masterHex);
         dialog = new JDialog(parentFrame, "Pick entry side", true);
 
         // Reinitialize these every time, since they're static.
         laidOut = false;
-        hexesReady = false;
-
-        this.masterHex = masterHex;
 
         Container contentPane = dialog.getContentPane();
 
         contentPane.setLayout(null);
 
-        scale = BattleMap.getScale();
-
-
         if (masterHex.canEnterViaSide(5))
         {
             button5 = new JButton("Left");
-            button5.setMnemonic(KeyEvent.VK_L); 
+            button5.setMnemonic(KeyEvent.VK_L);
             contentPane.add(button5);
             button5.addActionListener(this);
         }
-        
+
         if (masterHex.canEnterViaSide(3))
         {
             button3 = new JButton("Bottom");
-            button3.setMnemonic(KeyEvent.VK_B); 
+            button3.setMnemonic(KeyEvent.VK_B);
             contentPane.add(button3);
             button3.addActionListener(this);
         }
-        
+
         if (masterHex.canEnterViaSide(1))
         {
             button1 = new JButton("Right");
-            button1.setMnemonic(KeyEvent.VK_R); 
+            button1.setMnemonic(KeyEvent.VK_R);
             contentPane.add(button1);
             button1.addActionListener(this);
         }
@@ -79,30 +66,24 @@ public class PickEntrySide extends JPanel implements ActionListener,
 
         dialog.setSize(getPreferredSize());
         dialog.setResizable(false);
-        setOpaque(true);
-        setBackground(Color.white);
         dialog.setBackground(Color.white);
-
-        SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), null, hexes);
-        hexesReady = true;
-
         dialog.setVisible(true);
     }
-    
+
 
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
 
-        Dimension d = getSize();
-
         // Abort if called too early.
         Rectangle rectClip = g.getClipBounds();
-        if (rectClip == null || !hexesReady)
+        if (rectClip == null)
         {
             return;
         }
-        
+
+        Dimension d = getSize();
+
         if (!laidOut)
         {
             int cx = 6 * scale;
@@ -127,18 +108,6 @@ public class PickEntrySide extends JPanel implements ActionListener,
             laidOut = true;
         }
 
-        Iterator it = hexes.iterator();
-        while (it.hasNext())
-        {
-            BattleHex hex = (BattleHex)it.next();
-            {
-                if (rectClip.intersects(hex.getBounds()))
-                {
-                    hex.paint(g);
-                }
-            }
-        }
-
         if (button1 != null)
         {
             button1.repaint();
@@ -151,18 +120,6 @@ public class PickEntrySide extends JPanel implements ActionListener,
         {
             button5.repaint();
         }
-    }
-
-
-    public Dimension getMinimumSize()
-    {
-        return getPreferredSize();
-    }
-
-
-    public Dimension getPreferredSize()
-    {
-        return new Dimension(30 * scale, 30 * scale);
     }
 
 
@@ -200,40 +157,10 @@ public class PickEntrySide extends JPanel implements ActionListener,
     }
 
 
-    public void windowActivated(WindowEvent e)
-    {
-    }
-
-
-    public void windowOpened(WindowEvent e)
-    {
-    }
-
-
-    public void windowClosed(WindowEvent e)
-    {
-    }
-
-
     public void windowClosing(WindowEvent e)
     {
         // Abort the move.
         cleanup(-1);
-    }
-
-
-    public void windowDeactivated(WindowEvent e)
-    {
-    }
-
-
-    public void windowIconified(WindowEvent e)
-    {
-    }
-
-
-    public void windowDeiconified(WindowEvent e)
-    {
     }
 
 

@@ -10,7 +10,7 @@ import java.awt.geom.*;
 
 public class BattleHex extends Hex
 {
-    private BattleMap map;
+    private HexMap map;
 
     private String name;
 
@@ -32,11 +32,13 @@ public class BattleHex extends Hex
 
     private BattleHex [] neighbors = new BattleHex[6];
 
+    private int chitScale;
+
     private int xCoord;
     private int yCoord;
 
     // Hex labels are:
-    // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.  
+    // A1-A3, B1-B4, C1-C5, D1-D6, E1-E5, F1-F4.
     // Letters increase left to right; numbers increase bottom to top.
 
     /** Movement costs */
@@ -46,7 +48,7 @@ public class BattleHex extends Hex
 
 
 
-    public BattleHex(int cx, int cy, int scale, BattleMap map, int xCoord, 
+    public BattleHex(int cx, int cy, int scale, HexMap map, int xCoord,
         int yCoord)
     {
         this.map = map;
@@ -54,6 +56,7 @@ public class BattleHex extends Hex
         this.yCoord = yCoord;
         this.scale = scale;
         len = scale / 3.0;
+        chitScale = 2 * scale;
 
         xVertex[0] = cx;
         yVertex[0] = cy;
@@ -156,16 +159,16 @@ public class BattleHex extends Hex
     }
 
 
-    public void drawHexside(Graphics2D g2, double vx1, double vy1, double vx2, 
+    public void drawHexside(Graphics2D g2, double vx1, double vy1, double vx2,
         double vy2, char hexsideType)
     {
-        double x0;                  // first focus point
+        double x0;                     // first focus point
         double y0;
-        double x1;                  // second focus point
+        double x1;                     // second focus point
         double y1;
-        double x2;                  // center point
+        double x2;                     // center point
         double y2;
-        double theta;            // gate angle
+        double theta;                  // gate angle
         double [] x = new double[4];   // hexside points
         double [] y = new double[4];   // hexside points
 
@@ -313,8 +316,6 @@ public class BattleHex extends Hex
     public void removeCritter(Critter critter)
     {
         critters.remove(critter);
-
-        // Reposition all chits within the hex.
         alignChits();
     }
 
@@ -325,15 +326,14 @@ public class BattleHex extends Hex
     }
 
 
-    public void alignChits()
+    private void alignChits()
     {
         if (critters.isEmpty())
         {
             return;
         }
 
-        int chitScale = getCritter().getChit().getBounds().width;
-        Point point = getCenter();
+        Point point = new Point(center);
 
         // Cascade chits diagonally.
         point.x -= chitScale * (1 + (critters.size())) >> 2;
@@ -543,8 +543,8 @@ public class BattleHex extends Hex
         char terrain = getTerrain();
 
         // Check to see if the hex is occupied or totally impassable.
-        if (isOccupied() || terrain == 't' || (terrain == 'v' && 
-            !creature.getName().equals("Dragon")) || (terrain == 'o' && 
+        if (isOccupied() || terrain == 't' || (terrain == 'v' &&
+            !creature.getName().equals("Dragon")) || (terrain == 'o' &&
             !creature.isNativeBog()))
         {
             return IMPASSIBLE_COST;
@@ -553,7 +553,7 @@ public class BattleHex extends Hex
         char hexside = getHexside(cameFrom);
 
         // Non-fliers may not cross cliffs.
-        if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') && 
+        if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') &&
             !creature.isFlier())
         {
             return IMPASSIBLE_COST;
