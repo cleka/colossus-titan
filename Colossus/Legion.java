@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.util.*;
 import java.io.*;
 
 /**
@@ -49,7 +48,7 @@ class Legion
     }
 
 
-    int getPointValue()
+    public int getPointValue()
     {
         int pointValue = 0;
         for (int i = 0; i < height; i++)
@@ -60,7 +59,7 @@ class Legion
     }
 
 
-    void addPoints(int points)
+    public void addPoints(int points)
     {
         if (player != null)
         {
@@ -90,25 +89,25 @@ class Legion
     }
 
 
-    String getMarkerId()
+    public String getMarkerId()
     {
         return markerId;
     }
 
 
-    String getImageName()
+    public String getImageName()
     {
         return "images" + File.separator + markerId + ".gif";
     }
 
 
-    Chit getMarker()
+    public Chit getMarker()
     {
         return marker;
     }
 
 
-    boolean canFlee()
+    public boolean canFlee()
     {
         for (int i = 0; i < height; i++)
         {
@@ -121,7 +120,7 @@ class Legion
     }
 
 
-    int numCreature(Creature creature)
+    public int numCreature(Creature creature)
     {
         int count = 0;
         for (int i = 0; i < height; i++)
@@ -135,7 +134,7 @@ class Legion
     }
 
 
-    int numLords()
+    public int numLords()
     {
         int count = 0;
         for (int i = 0; i < height; i++)
@@ -149,37 +148,37 @@ class Legion
     }
 
 
-    int getHeight()
+    public int getHeight()
     {
         return height;
     }
 
 
-    void setHeight(int height)
+    public void setHeight(int height)
     {
         this.height = height;
     }
 
 
-    Player getPlayer()
+    public Player getPlayer()
     {
         return player;
     }
 
 
-    boolean hasMoved()
+    public boolean hasMoved()
     {
         return moved;
     }
 
 
-    void removeLegion()
+    public void removeLegion()
     {
         player.removeLegion(this);
     }
 
 
-    void moveToHex(MasterHex hex)
+    public void moveToHex(MasterHex hex)
     {
         currentHex.removeLegion(this);
         currentHex = hex;
@@ -194,7 +193,7 @@ class Legion
     }
 
 
-    void undoMove()
+    public void undoMove()
     {
         // If this legion teleported, allow teleporting again.
         if (currentHex.getEntrySide() == -1)
@@ -208,7 +207,7 @@ class Legion
     }
 
 
-    void commitMove()
+    public void commitMove()
     {
         startingHex = currentHex;
         moved = false;
@@ -217,13 +216,13 @@ class Legion
     }
 
 
-    boolean recruited()
+    public boolean recruited()
     {
         return recruited;
     }
 
 
-    boolean canRecruit()
+    public boolean canRecruit()
     {
         if (recruited || height > 6)
         {
@@ -234,19 +233,19 @@ class Legion
     }
 
 
-    void markRecruited()
+    public void markRecruited()
     {
         recruited = true;
     }
 
 
-    void clearRecruited()
+    public void clearRecruited()
     {
         recruited = false;
     }
 
 
-    void undoRecruit()
+    public void undoRecruit()
     {
         if (recruited())
         {
@@ -265,31 +264,31 @@ class Legion
     }
 
 
-    boolean summoned()
+    public boolean summoned()
     {
         return summoned;
     }
 
     
-    void markSummoned()
+    public void markSummoned()
     {
         summoned = true;
     }
 
 
-    MasterHex getCurrentHex()
+    public MasterHex getCurrentHex()
     {
         return currentHex;
     }
 
 
-    MasterHex getStartingHex()
+    public MasterHex getStartingHex()
     {
         return startingHex;
     }
 
 
-    void addCreature(Creature creature)
+    public void addCreature(Creature creature)
     {
         if (creature.getCount() > 0)
         {
@@ -300,7 +299,7 @@ class Legion
     }
 
 
-    void removeCreature(int i)
+    public void removeCreature(int i)
     {
         if (i < 0 && i > height - 1)
         {
@@ -328,7 +327,7 @@ class Legion
     }
     
     
-    void removeCreature(Creature creature)
+    public void removeCreature(Creature creature)
     {
         for (int i = 0; i < height; i++)
         {
@@ -341,7 +340,7 @@ class Legion
     }
 
 
-    Creature getCreature(int i)
+    public Creature getCreature(int i)
     {
         if (i > height - 1)
         {
@@ -354,14 +353,14 @@ class Legion
     }
 
 
-    void setCreature(int i, Creature creature)
+    public void setCreature(int i, Creature creature)
     {
         creatures[i] = creature;
     }
 
 
     // Recombine this legion into another legion.
-    void recombine(Legion legion)
+    public void recombine(Legion legion)
     {
         for (int i = 0; i < height; i++)
         {
