@@ -813,8 +813,9 @@ Log.debug(playerName + " Called Client.leaveCarryMode()");
         return chits;
     }
 
-    synchronized void markOffboardCreaturesDead()
+    void markOffboardCreaturesDead()
     {
+Log.debug(playerName + " Called Client.markOffboardCreaturesDead()");
         Iterator it = getActiveBattleChits().iterator();
         while (it.hasNext())
         {
@@ -2046,6 +2047,8 @@ Log.debug("Client.tellStrikeResults() " + strikerTag + " " + targetTag + " " + s
     public synchronized void setupBattleFight(int battlePhase,
         String battleActivePlayerName)
     {
+Log.debug(playerName + " Called setupBattleFight() " + battlePhase + " " + battleActivePlayerName);
+
         this.battlePhase = battlePhase;
         setBattleActivePlayerName(battleActivePlayerName);
         if (battlePhase == Constants.FIGHT)
