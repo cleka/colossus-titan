@@ -31,6 +31,7 @@ class Negotiate extends Dialog implements MouseListener, ActionListener
 
         setResizable(false);
         setLayout(null);
+        setBackground(java.awt.Color.lightGray);
 
         this.attacker = attacker;
         this.defender = defender;

@@ -31,6 +31,7 @@ class SplitLegion extends Dialog implements MouseListener, ActionListener
 
         setResizable(false);
         setLayout(null);
+        setBackground(java.awt.Color.lightGray);
 
         this.oldLegion = oldLegion;
         this.player = player;

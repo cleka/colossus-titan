@@ -43,6 +43,7 @@ public class Game extends Frame implements WindowListener, ActionListener
                      - getSize().height / 2));
         
         setLayout(new GridLayout(0, 2));
+        setBackground(java.awt.Color.white);
 
         for (int i = 0; i < 6; i++)
         {

@@ -48,6 +48,7 @@ class ShowLegion extends Dialog implements MouseListener, WindowListener
         setLocation(origin);
         
         setLayout(null);
+        setBackground(java.awt.Color.lightGray);
 
         pack();
         addMouseListener(this);

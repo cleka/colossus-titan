@@ -37,6 +37,8 @@ class BattleTurn extends Dialog implements ActionListener
         this.attacker = attacker;
         this.defender = defender;
         activeLegion = defender;
+        
+        setBackground(java.awt.Color.lightGray);
 
         setupMoveDialog();
 

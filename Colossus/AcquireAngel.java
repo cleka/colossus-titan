@@ -37,6 +37,7 @@ class AcquireAngel extends Dialog implements MouseListener, WindowListener
 
         int scale = 60;
         setLayout(null);
+        setBackground(java.awt.Color.lightGray);
 
         numEligible = findEligibleRecruits(legion, recruits, archangel);
         if (numEligible == 0)

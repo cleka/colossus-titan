@@ -53,6 +53,7 @@ class SummonAngel extends Dialog implements MouseListener, ActionListener,
         addMouseListener(this);
         addWindowListener(this);
         setLayout(null);
+        setBackground(java.awt.Color.lightGray);
 
         setSize(getPreferredSize());
             

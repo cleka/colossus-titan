@@ -33,6 +33,7 @@ class Concede extends Dialog implements ActionListener
 
         setResizable(false);
         setLayout(null);
+        setBackground(java.awt.Color.lightGray);
 
         this.parentFrame = parentFrame;
         this.friend = friend;
@@ -89,6 +90,7 @@ class Concede extends Dialog implements ActionListener
         {
             new MessageBox(parentFrame, "waitForAll was interrupted");
         }
+
 
         button1 = new Button(flee ? "Flee" : "Concede");
         button2 = new Button(flee ? "Don't Flee" : "Don't Concede");

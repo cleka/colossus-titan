@@ -23,6 +23,8 @@ class Turn extends Dialog implements ActionListener
         this.game = game;
         this.board = board;
 
+        setBackground(java.awt.Color.lightGray);
+
         setupSplitDialog();
 
         // This is necessary to prevent a visible resize.
