@@ -33,6 +33,10 @@ public class PickEntrySide extends Dialog implements ActionListener,
     {
         super(parentFrame, "Pick entry side", true);
 
+        // Reinitialize these every time, since they're static.
+        laidOut = false;
+        hexesReady = false;
+
         this.masterHex = masterHex;
 
         setLayout(null);
@@ -163,8 +167,6 @@ public class PickEntrySide extends Dialog implements ActionListener,
     // is -1, then do not set an entry side, which will abort the move.
     private void cleanup(int side)
     {
-        laidOut = false;
-
         masterHex.clearAllEntrySides();
 
         if (side == 1 || side == 3 || side == 5)
