@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
 import java.io.*;
 import java.util.*;
 
@@ -11,7 +10,7 @@ import java.util.*;
  */
 
 
-public class Game extends JFrame implements WindowListener, ActionListener
+public class Game extends Frame implements WindowListener, ActionListener
 {
     private int numPlayers;
     private Player [] players;
@@ -25,24 +24,23 @@ public class Game extends JFrame implements WindowListener, ActionListener
     public static final int MUSTER = 4;
     private int phase = SPLIT;
 
-    private JTextField [] tf = new JTextField[6];
+    private TextField [] tf = new TextField[6];
     private int currentColor;  // state holder during color choice
-    private JLabel [] colorLabel = new JLabel[6];
-    private JButton [] colorButton = new JButton[6];
-    private JLabel [] activeLabel;
-    private JLabel [] elimLabel;
-    private JLabel [] legionsLabel;
-    private JLabel [] markersLabel;
-    private JLabel [] creaturesLabel;
-    private JLabel [] titanLabel;
-    private JLabel [] scoreLabel;
-    private Container contentPane;
+    private Label [] colorLabel = new Label[6];
+    private Button [] colorButton = new Button[6];
+    private Label [] activeLabel;
+    private Label [] elimLabel;
+    private Label [] legionsLabel;
+    private Label [] markersLabel;
+    private Label [] creaturesLabel;
+    private Label [] titanLabel;
+    private Label [] scoreLabel;
 
 
-    Game()
+    public Game()
     {
         super("Player Setup");
-        setBackground(java.awt.Color.white);
+        setBackground(java.awt.Color.lightGray);
         pack();
         setSize(300, 250);
         try
@@ -61,22 +59,21 @@ public class Game extends JFrame implements WindowListener, ActionListener
         setLocation(new Point(d.width / 2 - getSize().width / 2, d.height / 2
                      - getSize().height / 2));
 
-        contentPane = getContentPane();
-        contentPane.setLayout(new GridLayout(0, 2));
+        setLayout(new GridLayout(0, 2));
 
         for (int i = 0; i < 6; i++)
         {
             String s = "Player " + (i + 1) + " Name";
-            contentPane.add(new JLabel(s));
-            tf[i] = new JTextField(20);
-            contentPane.add(tf[i]);
+            add(new Label(s));
+            tf[i] = new TextField(20);
+            add(tf[i]);
         }
 
-        JButton button1 = new JButton("OK");
-        contentPane.add(button1);
+        Button button1 = new Button("OK");
+        add(button1);
         button1.addActionListener(this);
-        JButton button2 = new JButton("Quit");
-        contentPane.add(button2);
+        Button button2 = new Button("Quit");
+        add(button2);
         button2.addActionListener(this);
 
         addWindowListener(this);
@@ -85,10 +82,10 @@ public class Game extends JFrame implements WindowListener, ActionListener
     
     
     // Load a saved game.
-    Game(String filename)
+    public Game(String filename)
     {
         super("Player Setup");
-        setBackground(java.awt.Color.white);
+        setBackground(java.awt.Color.lightGray);
         pack();
         try
         {
@@ -197,14 +194,13 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
     private void chooseColors()
     {
-        contentPane = getContentPane();
-        contentPane.removeAll();
+        removeAll();
         setTitle("Choose Colors");
-        contentPane.setLayout(new GridLayout(0, 3));
+        setLayout(new GridLayout(0, 3));
 
-        contentPane.add(new JLabel("Tower"));
-        contentPane.add(new JLabel("Name"));
-        contentPane.add(new JLabel("Color"));
+        add(new Label("Tower"));
+        add(new Label("Name"));
+        add(new Label("Color"));
 
         // Sort in increasing tower order
         for (int i = 1; i <= 6; i++)
@@ -213,43 +209,43 @@ public class Game extends JFrame implements WindowListener, ActionListener
             {
                 if (players[j].getTower() == i)
                 {
-                    contentPane.add(new JLabel(String.valueOf(100 * i)));
-                    contentPane.add(new JLabel(players[j].getName()));
-                    colorLabel[j] = new JLabel("");
-                    contentPane.add(colorLabel[j]);
+                    add(new Label(String.valueOf(100 * i)));
+                    add(new Label(players[j].getName()));
+                    colorLabel[j] = new Label("");
+                    add(colorLabel[j]);
                 }
             }
         }
 
-        colorButton[0] = new JButton("Black");
+        colorButton[0] = new Button("Black");
         colorButton[0].setBackground(Color.black);
         colorButton[0].setForeground(Color.white);
-        colorButton[1] = new JButton("Blue");
+        colorButton[1] = new Button("Blue");
         colorButton[1].setBackground(Color.blue);
         colorButton[1].setForeground(Color.white);
-        colorButton[2] = new JButton("Brown");
+        colorButton[2] = new Button("Brown");
         colorButton[2].setBackground(new Color(180, 90, 0));
         colorButton[2].setForeground(Color.white);
-        colorButton[3] = new JButton("Gold");
+        colorButton[3] = new Button("Gold");
         colorButton[3].setBackground(Color.yellow);
-        colorButton[4] = new JButton("Green");
+        colorButton[4] = new Button("Green");
         colorButton[4].setBackground(Color.green);
-        colorButton[5] = new JButton("Red");
+        colorButton[5] = new Button("Red");
         colorButton[5].setBackground(Color.red);
         for (int i = 0; i < 6; i++)
         {
-            contentPane.add(colorButton[i]);
+            add(colorButton[i]);
             colorButton[i].addActionListener(this);
         }
 
-        JButton button1 = new JButton("Done");
-        contentPane.add(button1);
+        Button button1 = new Button("Done");
+        add(button1);
         button1.addActionListener(this);
-        JButton button2 = new JButton("Restart");
-        contentPane.add(button2);
+        Button button2 = new Button("Restart");
+        add(button2);
         button2.addActionListener(this);
-        JButton button3 = new JButton("Quit");
-        contentPane.add(button3);
+        Button button3 = new Button("Quit");
+        add(button3);
         button3.addActionListener(this);
 
         // Center dialog on screen.
@@ -278,11 +274,11 @@ public class Game extends JFrame implements WindowListener, ActionListener
     {
         // Turn off the button that was just used.
         int i = 0;
-        while (colorButton[i].getText() != color)
+        while (colorButton[i].getLabel() != color)
         {
             i++;
         }
-        colorButton[i].setText("");
+        colorButton[i].setLabel("");
         colorButton[i].setBackground(Color.lightGray);
         colorButton[i].setForeground(Color.black);
         colorButton[i].removeActionListener(this);
@@ -315,12 +311,10 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
     private void initStatusScreen(boolean newgame)
     {
-        contentPane = getContentPane();
         setVisible(false);
-        contentPane.removeAll();
+        removeAll();
         setTitle("Game Status");
-        contentPane = getContentPane();
-        contentPane.setLayout(new GridLayout(0, 10));
+        setLayout(new GridLayout(0, 10));
 
         // Need to sort players in descending tower order
         sortPlayers();
@@ -328,50 +322,50 @@ public class Game extends JFrame implements WindowListener, ActionListener
         // active, player name, tower, color, colors eliminated, legions,
         //     markers, creatures, titan power, score
 
-        contentPane.add(new JLabel(""));
-        contentPane.add(new JLabel("Player "));
-        contentPane.add(new JLabel("Tower "));
-        contentPane.add(new JLabel("Color "));
-        contentPane.add(new JLabel("Elim "));
-        contentPane.add(new JLabel("Legions "));
-        contentPane.add(new JLabel("Markers "));
-        contentPane.add(new JLabel("Creatures "));
-        contentPane.add(new JLabel("Titan Power "));
-        contentPane.add(new JLabel("Score"));
+        add(new Label(""));
+        add(new Label("Player "));
+        add(new Label("Tower "));
+        add(new Label("Color "));
+        add(new Label("Elim "));
+        add(new Label("Legions "));
+        add(new Label("Markers "));
+        add(new Label("Creatures "));
+        add(new Label("Titan Power "));
+        add(new Label("Score"));
 
-        activeLabel = new JLabel[numPlayers];
-        elimLabel = new JLabel[numPlayers];
-        legionsLabel = new JLabel[numPlayers];
-        markersLabel = new JLabel[numPlayers];
-        creaturesLabel = new JLabel[numPlayers];
-        titanLabel = new JLabel[numPlayers];
-        scoreLabel = new JLabel[numPlayers];
+        activeLabel = new Label[numPlayers];
+        elimLabel = new Label[numPlayers];
+        legionsLabel = new Label[numPlayers];
+        markersLabel = new Label[numPlayers];
+        creaturesLabel = new Label[numPlayers];
+        titanLabel = new Label[numPlayers];
+        scoreLabel = new Label[numPlayers];
 
         for (int i = 0; i < numPlayers; i++)
         {
-            activeLabel[i] = new JLabel(" ");
-            contentPane.add(activeLabel[i]);
-            contentPane.add(new JLabel(players[i].getName()));
-            contentPane.add(new JLabel(
+            activeLabel[i] = new Label(" ");
+            add(activeLabel[i]);
+            add(new Label(players[i].getName()));
+            add(new Label(
                 String.valueOf(100 * players[i].getTower())));
-            contentPane.add(new JLabel(players[i].getColor()));
-            elimLabel[i] = new JLabel(players[i].getPlayersElim());
-            contentPane.add(elimLabel[i]);
-            legionsLabel[i] = new JLabel(String.valueOf(
+            add(new Label(players[i].getColor()));
+            elimLabel[i] = new Label(players[i].getPlayersElim());
+            add(elimLabel[i]);
+            legionsLabel[i] = new Label(String.valueOf(
                 players[i].getNumLegions()));
-            contentPane.add(legionsLabel[i]);
-            markersLabel[i] = new JLabel(String.valueOf(
+            add(legionsLabel[i]);
+            markersLabel[i] = new Label(String.valueOf(
                 players[i].getNumMarkersAvailable()));
-            contentPane.add(markersLabel[i]);
-            creaturesLabel[i] = new JLabel(String.valueOf(
+            add(markersLabel[i]);
+            creaturesLabel[i] = new Label(String.valueOf(
                 players[i].getNumCreatures()));
-            contentPane.add(creaturesLabel[i]);
-            titanLabel[i] = new JLabel(String.valueOf(
+            add(creaturesLabel[i]);
+            titanLabel[i] = new Label(String.valueOf(
                 players[i].getTitanPower()));
-            contentPane.add(titanLabel[i]);
-            scoreLabel[i] = new JLabel(String.valueOf(
+            add(titanLabel[i]);
+            scoreLabel[i] = new Label(String.valueOf(
                 players[i].getScore()));
-            contentPane.add(scoreLabel[i]);
+            add(scoreLabel[i]);
         }
 
         pack();
@@ -508,13 +502,12 @@ public class Game extends JFrame implements WindowListener, ActionListener
         switch (remaining)
         {
             case 0:
-                JOptionPane.showMessageDialog(board, "draw");
+                new MessageBox(board, "draw");
                 System.exit(0);
                 break;
 
             case 1:
-                JOptionPane.showMessageDialog(board,
-                    players[winner].getName() + " wins");
+                new MessageBox(board, players[winner].getName() + " wins");
                 System.exit(0);
                 break;
 
@@ -560,7 +553,7 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
         updateStatusScreen();
 
-        // XXX temporary test
+        // XXX This should be removed eventually.
         saveGame();
     }
 
@@ -813,19 +806,19 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand() == "Quit")
+        if (e.getActionCommand().equals("Quit"))
         {
             System.exit(0);
         }
-        else if (e.getActionCommand() == "OK")
+        else if (e.getActionCommand().equals("OK"))
         {
             validateInputs();
         }
-        else if (e.getActionCommand() == "Restart")
+        else if (e.getActionCommand().equals("Restart"))
         {
             chooseColors();
         }
-        else if (e.getActionCommand() == "Done")
+        else if (e.getActionCommand().equals("Done"))
         {
             // Make sure all colors are assigned before continuing.
             for (int i = 0; i < numPlayers; i++)
@@ -850,16 +843,6 @@ public class Game extends JFrame implements WindowListener, ActionListener
 
     public static void main(String args[])
     {
-        // Use the system look and feel rather than the cross-platform one.
-        try
-        {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }
-        catch (Exception ex_ignored)
-        {
-            System.out.println("Default l&f left in place");
-        }
-
         if (args.length == 0)
         {
             Game game = new Game();
