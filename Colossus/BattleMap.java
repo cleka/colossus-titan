@@ -1225,6 +1225,7 @@ public class BattleMap extends Frame implements MouseListener,
         dispose();
         masterHex.unselect();
         masterHex.repaint();
+        board.finishBattle();
     }
 
 
