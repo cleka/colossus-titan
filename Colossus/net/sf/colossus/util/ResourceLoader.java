@@ -16,7 +16,7 @@ public final class ResourceLoader
     // File.separator does not work in jar files, except in Unix.
     // A hardcoded '/' works in Unix, Windows, MacOS X, and jar files.
     private static final String pathSeparator = "/";
-    private static final String imageExtension = ".gif";
+    private static final String[] imageExtension = { ".png", ".gif" };
     private static ClassLoader cl =
         net.sf.colossus.util.ResourceLoader.class.getClassLoader();
 
@@ -45,15 +45,18 @@ public final class ResourceLoader
             if (o instanceof String)
             {
                 String path = (String)o;
-                image = tryLoadImageFromFile(filename +
-                                        imageExtension, path);
-                if (image == null)
+                for (int i = 0 ; i < imageExtension.length ; i++)
                 {
-                    ImageIcon temp = tryLoadImageIconFromResource(filename +
-                                                         imageExtension, path);
-                    if (temp != null)
+                    image = tryLoadImageFromFile(filename +
+                                                 imageExtension[i], path);
+                    if (image == null)
                     {
-                        image = temp.getImage();
+                        ImageIcon temp = tryLoadImageIconFromResource(
+                                         filename + imageExtension[i], path);
+                        if (temp != null)
+                        {
+                            image = temp.getImage();
+                        }
                     }
                 }
             }
@@ -77,16 +80,19 @@ public final class ResourceLoader
             if (o instanceof String)
             {
                 String path = (String)o;
-                Image temp  = tryLoadImageFromFile(filename +
-                                              imageExtension, path);
-                if (temp == null)
+                for (int i = 0 ; i < imageExtension.length ; i++)
                 {
-                    icon = tryLoadImageIconFromResource(filename +
-                                               imageExtension, path);
-                }
-                else
-                {
-                    icon = new ImageIcon(temp);
+                    Image temp  = tryLoadImageFromFile(
+                                  filename + imageExtension[i], path);
+                    if (temp == null)
+                    {
+                        icon = tryLoadImageIconFromResource(
+                               filename + imageExtension[i], path);
+                    }
+                    else
+                    {
+                        icon = new ImageIcon(temp);
+                    }
                 }
             }
         }
