@@ -2,6 +2,7 @@ package ExtTitan;
 
 import net.sf.colossus.client.LegionInfo;
 import net.sf.colossus.server.HintOracleInterface;
+import net.sf.colossus.server.Creature;
 import java.util.List;
 
 public class ExtTitanHint implements net.sf.colossus.server.HintInterface
@@ -12,7 +13,7 @@ public class ExtTitanHint implements net.sf.colossus.server.HintInterface
                                  HintOracleInterface oracle,
                                  String[] section)
     {
-        return (String)recruits.get(recruits.size() - 1);
+        return ((Creature)recruits.get(recruits.size() - 1)).getName();
     }
     public List getInitialSplitHint(String label,
                                     String[] section)
