@@ -6,6 +6,7 @@ import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import java.awt.geom.*;
+import java.awt.image.*;
 import java.net.*;
 import net.sf.colossus.util.ResourceLoader;
 import net.sf.colossus.server.Constants;
@@ -106,20 +107,27 @@ class Chit extends JPanel
     {
         Graphics2D g2 = (Graphics2D)g;
         super.paintComponent(g2);
+        Image image = icon.getImage();
 
         if (inverted)
         {
-            g2.drawImage(icon.getImage(), 
-                rect.x, rect.y, rect.x + rect.width, rect.y + rect.height,
-                rect.width, rect.height, 0, 0,
-                container);
+            int width = icon.getIconWidth();
+            int height = icon.getIconHeight();
+            BufferedImage bi = new BufferedImage(width, height,
+                                                 BufferedImage.TYPE_INT_RGB);
+            Graphics2D biContext = bi.createGraphics();
+            biContext.drawImage(image, 0, 0, null);
+            
+            double theta = Math.PI;
+            AffineTransform at = AffineTransform.getRotateInstance(theta);
+            AffineTransformOp ato = new AffineTransformOp(at,
+                                        AffineTransformOp.TYPE_BILINEAR);
+            BufferedImage bi2 = ato.createCompatibleDestImage(bi, null);
+            bi2 = ato.filter(bi, bi2);
+            image = bi2;
         }
-        else
-        {
-            g2.drawImage(icon.getImage(), rect.x, rect.y, rect.width,
-                rect.height, container);
-        }
-
+        g2.drawImage(icon.getImage(), rect.x, rect.y, rect.width,
+                     rect.height, container);
         if (isDead())
         {
             // Draw a triple-wide red X.

@@ -143,7 +143,6 @@ public final class VariantSupport
             }
         }
         directories.add(Constants.defaultDirName);
-        directories.add(".");
         return directories;
     }
 
