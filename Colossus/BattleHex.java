@@ -439,6 +439,7 @@ class BattleHex extends Hex
 
     }
 
+
     Color getTerrainColor()
     {
         switch (getTerrain())
@@ -476,6 +477,7 @@ class BattleHex extends Hex
         this.hexsides[i] = hexside;
     }
 
+
     char getHexside(int i)
     {
         if (i < 0 || i > 5)
@@ -487,6 +489,7 @@ class BattleHex extends Hex
             return hexsides[i];
         }
     }
+
 
     // Return the flip side of hexside i.
     char getOppositeHexside(int i)
@@ -508,6 +511,7 @@ class BattleHex extends Hex
         this.elevation = elevation;
     }
 
+
     int getElevation()
     {
         return elevation;
@@ -520,11 +524,8 @@ class BattleHex extends Hex
         {
             neighbors[i] = hex;
         }
-        else
-        {
-            System.out.println("bad setNeighbor " + i);
-        }
     }
+
 
     BattleHex getNeighbor(int i)
     {
