@@ -214,6 +214,14 @@ class MasterBoard extends Frame implements MouseListener,
             }
             hex.select();
             hex.repaint();
+            if (hex.inverted())
+            {
+                hex.setEntrySide((cameFrom + 3) % 6);
+            }
+            else
+            {
+                hex.setEntrySide(cameFrom);
+            }
             count++;
             return count;
         }
@@ -264,6 +272,8 @@ class MasterBoard extends Frame implements MouseListener,
         {
             hex.select();
             hex.repaint();
+            // Mover can choose side of entry.
+            hex.setEntrySide(-1);
         }
 
         if (roll > 0)
@@ -316,7 +326,8 @@ class MasterBoard extends Frame implements MouseListener,
         if (player.getMovementRoll() == 6)
         {
             // Tower teleport
-            if (hex.getTerrain() == 'T' && legion.numLords() > 0)
+            if (hex.getTerrain() == 'T' && legion.numLords() > 0 &&
+                player.canTeleport())
             {
                 // Mark every unoccupied hex within 6 hexes.
                 findTowerTeleportMoves(hex, player, legion, 6, -1);
@@ -349,6 +360,8 @@ class MasterBoard extends Frame implements MouseListener,
                                 getCurrentHex();
                             hex.select();
                             hex.repaint();
+                            // Mover can choose side of entry.
+                            hex.setEntrySide(-1);
                         }
                     }
                 }
@@ -1287,9 +1300,13 @@ System.out.println("summonAngel is null");
                                     // Battle
                                     if (hex.isEngagement())
                                     {
-                                        // XXX: Calculate entry side.
+                                        if (hex.getEntrySide() == -1)
+                                        {
+                                            // XXX: Need PickEntrySide dialog.
+                                            hex.setEntrySide(3);
+                                        }
                                         map = new BattleMap(attacker, defender, 
-                                            hex, 'b', this);
+                                            hex, hex.getEntrySide(), this);
                                     }
                                 }
                             }
