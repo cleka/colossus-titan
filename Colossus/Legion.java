@@ -78,7 +78,8 @@ class Legion
         }
         else
         {
-            // XXX Need to skip this when loading game
+            // When loading a game, we handle revealing visible creatures
+            // after legion creation.
             hideAllCreatures();
         }
     }
@@ -428,6 +429,19 @@ class Legion
             return critters[i];
         }
     }
+    
+    
+    public Critter getCritter(Creature creature)
+    {
+        for (int i = 0; i < height; i++)
+        {
+            if (critters[i].getName().equals(creature.getName()))
+            {
+                return critters[i];
+            }
+        }
+        return null;
+    }
 
 
     public void setCreature(int i, Creature creature)
@@ -490,8 +504,8 @@ class Legion
         int numberAlreadyRevealed = 0;
         for (int i = 0; i < height; i++)
         {
-            if (critters[i].getCreature() == creature && 
-                critters[i].isVisible())
+            if (critters[i].getCreature().getName().equals(
+                creature.getName()) && critters[i].isVisible())
             {
                 numberAlreadyRevealed++;
             }
@@ -505,8 +519,8 @@ class Legion
 
         for (int i = 0; i < height; i++)
         {
-            if (critters[i].getCreature() == creature && 
-                !critters[i].isVisible())
+            if (critters[i].getCreature().getName().equals(
+                creature.getName()) && !critters[i].isVisible())
             {
                 critters[i].setVisible(true);
                 numberToReveal--;
