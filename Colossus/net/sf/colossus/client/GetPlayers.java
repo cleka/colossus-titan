@@ -36,7 +36,6 @@ public final class GetPlayers extends JDialog implements WindowListener,
     public static final String byColor = "<By color>";
     public static final String username = System.getProperty("user.name",
         byColor);
-    private static String [] typeChoices = null;
     private static String [] nameChoices = { byColor, username, none };
 
     private JFrame parentFrame;
@@ -73,7 +72,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         /* not reliable yet */
         // aiList = getAIList();
 
-        int ainum = 0, j = 0;
+        int ainum = 0;
         for (int i = 0 ; i < aiList.length ; i++) 
         {
             if (!(aiList[i].equals("")))
@@ -81,22 +80,20 @@ public final class GetPlayers extends JDialog implements WindowListener,
                 ainum++;
             }
         }
-        typeChoices = new String[3 + ainum];
-        typeChoices[0] = "Human";
-        typeChoices[1] = "None";
-        j = 2;
+        Vector typeChoices = new Vector();
+        typeChoices.add("Human");
+        typeChoices.add("None");
         for (int i = 0 ; i < aiList.length ; i++) 
         {
             if (!(aiList[i].equals("")))
             {
-                typeChoices[j] = aiList[i];
+                typeChoices.add(aiList[i]);
             }
-            j++;
         }
         // Only show random AI choice if more than one AI.
         if (ainum >= 2)
         {
-            typeChoices[2 + ainum] = anyAI;
+            typeChoices.add(anyAI);
         }
 
         this.parentFrame = parentFrame;
