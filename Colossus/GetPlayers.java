@@ -41,7 +41,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
         /* get the list of the available AI */
         /* not reliable yet */
         //String[] aiList = getAIList();
-        String[] aiList = { "SimpleAI" }; 
+        String[] aiList = { "SimpleAI", "MinimaxAI" }; 
         /* should match the class name of available AI */
 
         int ainum = 0, j = 0;

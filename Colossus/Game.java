@@ -107,6 +107,7 @@ public final class Game extends GameSource
         newGame.engagementInProgress = engagementInProgress;
         newGame.battleInProgress = battleInProgress;
         newGame.summoningAngel = summoningAngel;
+        newGame.server = server;
 
         return newGame;
     }

@@ -210,7 +210,7 @@ public final class Legion
     public static Legion getStartingLegion(String markerId, String hexLabel,
         String playerName, Game game)
     {
-	Legion oLegion = 
+        Legion oLegion = 
             new Legion(markerId, null, hexLabel, hexLabel, Creature.titan,
                        Creature.angel, Creature.ogre, Creature.ogre,
                        Creature.centaur, Creature.centaur, Creature.gargoyle,
