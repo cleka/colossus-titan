@@ -209,28 +209,28 @@ public class BattleMap extends Frame implements MouseListener,
 
         tracker = new MediaTracker(this);
 
-        chits[0] = new Chit(100, 100, 60, "Angel.gif", this);
-        chits[1] = new Chit(120, 120, 60, "Archange.gif", this);
-        chits[2] = new Chit(140, 140, 60, "Behemoth.gif", this);
-        chits[3] = new Chit(160, 160, 60, "Centaur.gif", this);
-        chits[4] = new Chit(180, 180, 60, "Colossus.gif", this);
-        chits[5] = new Chit(200, 200, 60, "Cyclops.gif", this);
-        chits[6] = new Chit(220, 220, 60, "Gargoyle.gif", this);
-        chits[7] = new Chit(240, 240, 60, "Giant.gif", this);
-        chits[8] = new Chit(260, 260, 60, "Gorgon.gif", this);
-        chits[9] = new Chit(280, 280, 60, "Griffon.gif", this);
-        chits[10] = new Chit(300, 300, 60, "Guardian.gif", this);
-        chits[11] = new Chit(320, 320, 60, "Hydra.gif", this);
-        chits[12] = new Chit(340, 340, 60, "Lion.gif", this);
-        chits[13] = new Chit(360, 360, 60, "Minotaur.gif", this);
-        chits[14] = new Chit(380, 380, 60, "Ogre.gif", this);
-        chits[15] = new Chit(400, 400, 60, "Ranger.gif", this);
-        chits[16] = new Chit(420, 420, 60, "Serpent.gif", this);
-        chits[17] = new Chit(460, 460, 60, "Titan.gif", this);
-        chits[18] = new Chit(480, 480, 60, "Troll.gif", this);
-        chits[19] = new Chit(500, 500, 60, "Unicorn.gif", this);
-        chits[20] = new Chit(520, 520, 60, "Warbear.gif", this);
-        chits[21] = new Chit(540, 540, 60, "Warlock.gif", this);
+        chits[0] = new Chit(100, 100, 60, "images/Angel.gif", this);
+        chits[1] = new Chit(120, 120, 60, "images/Archangel.gif", this);
+        chits[2] = new Chit(140, 140, 60, "images/Behemoth.gif", this);
+        chits[3] = new Chit(160, 160, 60, "images/Centaur.gif", this);
+        chits[4] = new Chit(180, 180, 60, "images/Colossus.gif", this);
+        chits[5] = new Chit(200, 200, 60, "images/Cyclops.gif", this);
+        chits[6] = new Chit(220, 220, 60, "images/Gargoyle.gif", this);
+        chits[7] = new Chit(240, 240, 60, "images/Giant.gif", this);
+        chits[8] = new Chit(260, 260, 60, "images/Gorgon.gif", this);
+        chits[9] = new Chit(280, 280, 60, "images/Griffon.gif", this);
+        chits[10] = new Chit(300, 300, 60, "images/Guardian.gif", this);
+        chits[11] = new Chit(320, 320, 60, "images/Hydra.gif", this);
+        chits[12] = new Chit(340, 340, 60, "images/Lion.gif", this);
+        chits[13] = new Chit(360, 360, 60, "images/Minotaur.gif", this);
+        chits[14] = new Chit(380, 380, 60, "images/Ogre.gif", this);
+        chits[15] = new Chit(400, 400, 60, "images/Ranger.gif", this);
+        chits[16] = new Chit(420, 420, 60, "images/Serpent.gif", this);
+        chits[17] = new Chit(460, 460, 60, "images/Titan.gif", this);
+        chits[18] = new Chit(480, 480, 60, "images/Troll.gif", this);
+        chits[19] = new Chit(500, 500, 60, "images/Unicorn.gif", this);
+        chits[20] = new Chit(520, 520, 60, "images/Warbear.gif", this);
+        chits[21] = new Chit(540, 540, 60, "images/Warlock.gif", this);
 
         for (int i = 0; i < 22; i++)
         {
