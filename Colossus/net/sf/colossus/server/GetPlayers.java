@@ -20,7 +20,7 @@ import net.sf.colossus.client.PickIntValue;
 
 /**
  * Class GetPlayers is a dialog used to enter players' 
- *   names, types, variant, etc. 
+ *   names, types, variant, etc.
  * @version $Id$
  * @author David Ripton
  * @author Romain Dolbeau
@@ -85,42 +85,22 @@ public final class GetPlayers extends KDialog implements WindowListener,
             Log.error(ex.toString());
         }
 
+        JTabbedPane tabbedPane = new JTabbedPane();
+
         Box allPlayersPane = new Box(BoxLayout.Y_AXIS);
-        allPlayersPane.setBorder(new TitledBorder("Players"));
-        mainPane.add(allPlayersPane);
+        tabbedPane.addTab("Players", allPlayersPane);
+        mainPane.add(tabbedPane);
         for (int i = 0; i < Constants.MAX_MAX_PLAYERS; i++)
         {
             doOnePlayer(i, allPlayersPane);
         }
 
-        JPanel gamePane = new JPanel();
-        gamePane.setBorder(new TitledBorder("Game Startup"));
-        gamePane.setLayout(new GridLayout(0, 4));
-        mainPane.add(gamePane);
-
-        JButton button1 = new JButton(Constants.newGame);
-        button1.setMnemonic(KeyEvent.VK_N);
-        gamePane.add(button1);
-        button1.addActionListener(this);
-
-        JButton button2 = new JButton(Constants.loadGame);
-        button2.setMnemonic(KeyEvent.VK_L);
-        gamePane.add(button2);
-        button2.addActionListener(this);
-
-        JButton button3 = new JButton(Constants.runClient);
-        button2.setMnemonic(KeyEvent.VK_C);
-        gamePane.add(button3);
-        button3.addActionListener(this);
-
-        JButton button4 = new JButton(Constants.quit);
-        button4.setMnemonic(KeyEvent.VK_Q);
-        gamePane.add(button4);
-        button4.addActionListener(this);
+        Box optionPane = new Box(BoxLayout.Y_AXIS);
+        tabbedPane.addTab("Options", optionPane);
 
         JPanel checkboxPane = new JPanel(new GridLayout(0, 3));
-        checkboxPane.setBorder(new TitledBorder("General Options"));
-        mainPane.add(checkboxPane);
+        checkboxPane.setBorder(new TitledBorder("General"));
+        optionPane.add(checkboxPane);
 
         addCheckbox(Options.autosave, checkboxPane);
         addCheckbox(Options.logDebug, checkboxPane);
@@ -130,8 +110,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         addCheckbox(Options.autoQuit, checkboxPane);
 
         JPanel teleportPane = new JPanel(new GridLayout(0, 2));
-        teleportPane.setBorder(new TitledBorder("Teleport Options"));
-        mainPane.add(teleportPane);
+        teleportPane.setBorder(new TitledBorder("Teleport"));
+        optionPane.add(teleportPane);
 
         addCheckbox(Options.noFirstTurnT2TTeleport, teleportPane);
         addCheckbox(Options.noFirstTurnTeleport, teleportPane);
@@ -140,8 +120,8 @@ public final class GetPlayers extends KDialog implements WindowListener,
         addCheckbox(Options.noTowerTeleport, teleportPane);
 
         JPanel rulesOptionsPane = new JPanel(new GridLayout(0, 2));
-        rulesOptionsPane.setBorder(new TitledBorder("Rules Options"));
-        mainPane.add(rulesOptionsPane);
+        rulesOptionsPane.setBorder(new TitledBorder("Rules"));
+        optionPane.add(rulesOptionsPane);
 
         addCheckbox(Options.cumulativeSlow, rulesOptionsPane);
         addCheckbox(Options.oneHexAllowed, rulesOptionsPane);
@@ -149,7 +129,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
 
         JPanel aiTimePane = new JPanel(new FlowLayout());
         aiTimePane.setBorder(new TitledBorder("AI Timing"));
-        mainPane.add(aiTimePane);
+        optionPane.add(aiTimePane);
 
         oldDelay = options.getIntOption(Options.aiDelay);
         if (oldDelay < Constants.MIN_AI_DELAY ||
@@ -199,20 +179,53 @@ public final class GetPlayers extends KDialog implements WindowListener,
         buttonVariant.addActionListener(this);
 
         JPanel readmePane = new JPanel();
+        JScrollPane readmeScrollPane = new JScrollPane(readmePane,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         readmePane.setLayout(new GridLayout(0, 1));
         readme.setEditable(false);
         // Must be tall enough for biggest variant readme file.
-        Dimension readmeSize = new Dimension(600, 2000);
-        readmePane.setMaximumSize(readmeSize);
-        readmePane.setPreferredSize(readmeSize);
+        Dimension readmeMaxSize = new Dimension(600, 2000);
+        Dimension readmePrefSize = new Dimension(600, 2000);
+        Dimension readmeScrollMaxSize = new Dimension(600, 2000);
+        Dimension readmeScrollPrefSize = new Dimension(600, 500);
+        readmePane.setMaximumSize(readmeMaxSize);
+        readmePane.setPreferredSize(readmePrefSize);
+        readmeScrollPane.setMaximumSize(readmeScrollMaxSize);
+        readmeScrollPane.setPreferredSize(readmeScrollPrefSize);
         readmePane.add(readme);
-        mainPane.add(readmePane);
+        tabbedPane.addTab("Variant README", readmeScrollPane);
 
         Document doc = VariantSupport.loadVariant(variantName, true);
         readme.setContentType((String)doc.getProperty(
                 ResourceLoader.keyContentType));
         readme.setDocument(doc);
         options.setOption(Options.variant, variantName);
+
+        JPanel gamePane = new JPanel();
+        gamePane.setBorder(new TitledBorder("Game Startup"));
+        gamePane.setLayout(new GridLayout(0, 4));
+        mainPane.add(gamePane);
+
+        JButton button1 = new JButton(Constants.newGame);
+        button1.setMnemonic(KeyEvent.VK_N);
+        gamePane.add(button1);
+        button1.addActionListener(this);
+
+        JButton button2 = new JButton(Constants.loadGame);
+        button2.setMnemonic(KeyEvent.VK_L);
+        gamePane.add(button2);
+        button2.addActionListener(this);
+
+        JButton button3 = new JButton(Constants.runClient);
+        button2.setMnemonic(KeyEvent.VK_C);
+        gamePane.add(button3);
+        button3.addActionListener(this);
+
+        JButton button4 = new JButton(Constants.quit);
+        button4.setMnemonic(KeyEvent.VK_Q);
+        gamePane.add(button4);
+        button4.addActionListener(this);
 
         enablePlayers();
 
@@ -570,7 +583,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
                     JComboBox box = playerTypes[i];
                     if (box == source)
                     {
-                        // If player type was changed to none, also change 
+                        // If player type was changed to none, also change
                         // player name to none.
                         String value = (String)box.getSelectedItem();
                         if (value.equals(Constants.none))
@@ -589,7 +602,7 @@ public final class GetPlayers extends KDialog implements WindowListener,
                         {
                             playerNames[i].setSelectedItem(Constants.username);
                         }
-                        // If player type was changed away from none, also 
+                        // If player type was changed away from none, also
                         // change player name to something else.
                         else if (playerNames[i].getSelectedItem().equals(
                                 Constants.none))
@@ -601,14 +614,14 @@ public final class GetPlayers extends KDialog implements WindowListener,
                     box = playerNames[i];
                     if (box == source)
                     {
-                        // If player name was changed to none, also change 
+                        // If player name was changed to none, also change
                         // player type to none.
                         String value = (String)box.getSelectedItem();
                         if (value.equals(Constants.none))
                         {
                             playerTypes[i].setSelectedItem(Constants.none);
                         }
-                        // If player type was changed away from none, also 
+                        // If player type was changed away from none, also
                         // change player name to something else.
                         else if (playerTypes[i].getSelectedItem().equals(
                                 Constants.none))
