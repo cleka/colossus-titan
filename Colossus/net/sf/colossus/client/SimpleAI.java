@@ -2477,7 +2477,7 @@ Log.debug("Best target is null, aborting");
 
     static int getTitanCombatValue(int power)
     {
-        int val = power * 4;
+        int val = power * Creature.getCreatureByName("Titan").getSkill();
         if (power < 9)
         {
             val -= (6 + 2 * (9 - power));
@@ -2524,11 +2524,11 @@ Log.debug("Best target is null, aborting");
     static int getKillValue(Creature creature, char terrain)
     {
         int val = 10 * creature.getPointValue();
-        if (creature.getSkill() == 4)
+        if (creature.getSkill() >= 4)
         {
             val += 2;
         }
-        if (creature.getSkill() == 2)
+        if (creature.getSkill() <= 2)
         {
             val += 1;
         }
