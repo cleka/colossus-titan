@@ -8,18 +8,22 @@ import java.awt.event.*;
  */
 
 
-class SummonAngel extends Dialog implements ActionListener, WindowListener
+class SummonAngel extends Dialog implements MouseListener, ActionListener,
+    WindowListener
 {
     private int numEligible = 0;
     private Creature [] recruits;
     private MediaTracker tracker;
     private Player player;
     private Legion legion;
-    MasterBoard board;
-    Button button1;
-    Button button2;
+    private MasterBoard board;
+    private Button button1;
+    private Button button2;
     private final int scale = 60;
-    boolean laidOut = false;
+    private boolean laidOut = false;
+    private Chit angelChit;
+    private Chit archangelChit;
+    private boolean imagesLoaded = false;
 
 
     SummonAngel(MasterBoard board, Legion legion)
@@ -46,6 +50,7 @@ class SummonAngel extends Dialog implements ActionListener, WindowListener
         }
 
         setResizable(false);
+        addMouseListener(this);
         addWindowListener(this);
         setLayout(null);
 
@@ -55,6 +60,27 @@ class SummonAngel extends Dialog implements ActionListener, WindowListener
         setLocation(new Point(d.width / 2 - getSize().width / 2, 
             d.height / 2 - getSize().height / 2));
 
+        angelChit = new Chit(2 * scale, scale, scale, 
+            Creature.angel.getImageName(),
+            this);
+        archangelChit = new Chit(5 * scale, scale, scale, 
+            Creature.archangel.getImageName(), this);
+        // X out chits since no legion is selected.
+        angelChit.setDead(true);
+        archangelChit.setDead(true);
+
+        tracker = new MediaTracker(this);
+        tracker.addImage(angelChit.getImage(), 0);
+        tracker.addImage(archangelChit.getImage(), 0);
+        try
+        {
+            tracker.waitForAll();
+        }
+        catch (InterruptedException e)
+        {
+            new MessageBox(board, "waitForAll was interrupted");
+        }
+
         button1 = new Button("Summon");
         button2 = new Button("Cancel");
         add(button1);
@@ -63,6 +89,7 @@ class SummonAngel extends Dialog implements ActionListener, WindowListener
         button2.addActionListener(this);
 
         pack();
+        imagesLoaded = true;
         setVisible(true);
         repaint();
     }
@@ -70,6 +97,24 @@ class SummonAngel extends Dialog implements ActionListener, WindowListener
 
     public void paint(Graphics g)
     {
+        if (!imagesLoaded)
+        {
+            return;
+        }
+
+        Legion donor = player.getSelectedLegion();
+        if (donor != null)
+        {
+            int angels = donor.numCreature(Creature.angel);
+            angelChit.setDead(angels == 0);
+
+            int archangels = donor.numCreature(Creature.archangel);
+            archangelChit.setDead(archangels == 0);
+        }
+
+        angelChit.paint(g);
+        archangelChit.paint(g);
+
         if (!laidOut)
         {
             Insets insets = getInsets();
@@ -80,6 +125,55 @@ class SummonAngel extends Dialog implements ActionListener, WindowListener
                 7 * d.height / 8 - insets.bottom, d.width / 3, d.height / 8);
         }
     }
+
+
+    public void mousePressed(MouseEvent e)
+    {
+        Legion donor = player.getSelectedLegion();
+        if (donor == null)
+        {
+            return;
+        }
+
+        Point point = e.getPoint();
+
+        if (angelChit.select(point) && !angelChit.isDead())
+        {
+            donor.removeCreature(Creature.angel);
+            legion.addCreature(Creature.angel);
+            // Only one angel can be summoned per turn.
+            player.disallowSummoningAngel();
+            board.finishSummoningAngel();
+            dispose();
+        }
+        
+        else if (archangelChit.select(point) && !archangelChit.isDead())
+        {
+            donor.removeCreature(Creature.archangel);
+            legion.addCreature(Creature.archangel);
+            // Only one angel can be summoned per turn.
+            player.disallowSummoningAngel();
+            board.finishSummoningAngel();
+            dispose();
+        }
+    }
+
+    public void mouseEntered(MouseEvent e)
+    {
+    }
+
+    public void mouseExited(MouseEvent e)
+    {
+    }
+                            
+    public void mouseClicked(MouseEvent e)
+    {
+    }
+                                            
+    public void mouseReleased(MouseEvent e)
+    {
+    }
+    
 
     public void windowActivated(WindowEvent event)
     {
@@ -146,9 +240,9 @@ class SummonAngel extends Dialog implements ActionListener, WindowListener
             }
             else
             {
-                // XXX: If both are available, let the player choose.
-                donor.removeCreature(Creature.archangel);
-                legion.addCreature(Creature.archangel);
+                // XXX: If both are available, make the player choose.
+                new MessageBox(board, "Select angel or archangel.");
+                return;
             }
 
             // Only one angel can be summoned per turn.
@@ -164,6 +258,7 @@ class SummonAngel extends Dialog implements ActionListener, WindowListener
         }
     }
 
+
     public Dimension getMinimumSize()
     {
         return getPreferredSize();
@@ -171,6 +266,6 @@ class SummonAngel extends Dialog implements ActionListener, WindowListener
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(8 * scale, 2 * scale);
+        return new Dimension(8 * scale, 3 * scale);
     }
 }
