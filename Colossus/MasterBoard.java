@@ -71,7 +71,7 @@ public class MasterBoard extends Frame implements MouseListener,
         //System.out.println("Creating a MasterBoard.");
 
         pack();
-        setSize(700, 700);
+        setSize(1000, 1000);
         setBackground(java.awt.Color.white);
         setVisible(true);
         addWindowListener(new InnerWindowAdapter());
@@ -325,7 +325,7 @@ public class MasterBoard extends Frame implements MouseListener,
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(700, 700);
+        return new Dimension(1000, 1000);
     }
 
 
