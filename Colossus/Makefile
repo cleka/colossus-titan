@@ -1,16 +1,20 @@
 # Makefile for Titan
 # dripton  June 26, 1998
 
-JC = javac -J-Djavac.pipe.output=true -g -verbose -deprecation
-#JC = javac -J-Djavac.pipe.output=true -O:interclass
+JC = javac -depend -J-Djavac.pipe.output=true -g -deprecation
+#JC = javac -depend -J-Djavac.pipe.output=true -O:interclass
 
-all: BattleMap.class Chit.class Concede.class Creature.class Game.class \
-    Hex.class Legion.class MasterBoard.class MasterHex.class MessageBox.class \
-    Negotiate.class PickMarker.class PickRecruit.class Player.class \
-    ShowLegion.class SplitLegion.class SummonAngel.class Turn.class
+all: BattleMap.class BattleChit.class Chit.class Concede.class Creature.class \
+    Game.class Hex.class Legion.class MasterBoard.class MasterHex.class \
+    MessageBox.class Negotiate.class PickMarker.class PickRecruit.class \
+    Player.class ShowLegion.class SplitLegion.class SummonAngel.class \
+    Turn.class
 
 BattleMap.class: BattleMap.java
 	$(JC) BattleMap.java
+
+BattleChit.class: BattleChit.java
+	$(JC) BattleChit.java
 
 Chit.class: Chit.java
 	$(JC) Chit.java
@@ -24,8 +28,8 @@ Creature.class: Creature.java
 Game.class: Game.java
 	$(JC) Game.java
 
-Hex.class: BattleMap.java
-	$(JC) BattleMap.java
+Hex.class: Hex.java
+	$(JC) Hex.java
 
 Legion.class: Legion.java
 	$(JC) Legion.java
