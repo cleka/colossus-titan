@@ -175,6 +175,7 @@ public final class ResourceLoader
     {
         Image image = null;
         String mapKey = getMapKey(filename, directories);
+        mapKey = mapKey + "(" + width + "," + height + ")";
         Object cached = imageCache.get(mapKey);
         if ((cached != null) && (cached instanceof Image))
         {
@@ -244,6 +245,7 @@ public final class ResourceLoader
     {
         ImageIcon icon = null;
         String mapKey = getMapKey(filename, directories);
+        mapKey = mapKey + "(" + width + "," + height + ")";
         Object cached = imageCache.get(mapKey);
         if ((cached != null) && (cached instanceof Image))
         {
@@ -399,7 +401,8 @@ public final class ResourceLoader
      * @param directories List of directories to search (in order).
      * @return The InputStream, or null if it was not found.
      */
-    public static InputStream getInputStream(String filename, java.util.List directories)
+    public static InputStream getInputStream(String filename,
+            java.util.List directories)
     {
         return getInputStream(filename, directories, server != null, false);
     }
@@ -411,7 +414,8 @@ public final class ResourceLoader
      * @param remote Ask the server for the stream.
      * @return The InputStream, or null if it was not found.
      */
-    public static InputStream getInputStream(String filename, java.util.List directories, boolean remote, boolean cachedOnly)
+    public static InputStream getInputStream(String filename,
+            java.util.List directories, boolean remote, boolean cachedOnly)
     {
         String mapKey = getMapKey(filename, directories);
         Object cached = fileCache.get(mapKey);
@@ -472,7 +476,6 @@ public final class ResourceLoader
         {
             synchronized (fileCache)
             {
-
                 if (cached != null)
                 {
                     data = (byte[])cached;
@@ -720,20 +723,12 @@ public final class ResourceLoader
      * @param directories List of directories.
      * @return A String to use as a key when storing/loading in a cache the specified file from the specified list of directories.
      */
-    private static String getMapKey(String filename, java.util.List directories)
+    private static String getMapKey(String filename,
+            java.util.List directories)
     {
-        StringBuffer buf = new StringBuffer(filename);
-        Iterator it = directories.iterator();
-        while (it.hasNext())
-        {
-            Object o = it.next();
-            if (o instanceof String)
-            {
-                buf.append(",");
-                buf.append(o);
-            }
-        }
-        return buf.toString();
+        String[] filenames = new String[1];
+        filenames[0] = filename;
+        return getMapKey(filenames, directories);
     }
 
     /**
@@ -742,7 +737,8 @@ public final class ResourceLoader
      * @param directories List of directories.
      * @return A String to use as a key when storing/loading in a cache the specified array of name of files from the specified list of directories.
      */
-    private static String getMapKey(String[] filenames, java.util.List directories)
+    private static String getMapKey(String[] filenames,
+            java.util.List directories)
     {
         StringBuffer buf = new StringBuffer(filenames[0]);
         for (int i = 1; i < filenames.length; i++)
@@ -773,8 +769,8 @@ public final class ResourceLoader
             java.util.List directories, int width, int height)
     {
         BufferedImage bi;
-        String mapKey = getMapKey(filenames, directories) +
-                "(" + width + "," + height + ")";
+        String mapKey = getMapKey(filenames, directories);
+        mapKey = mapKey + "(" + width + "," + height + ")";
         Object cached = imageCache.get(mapKey);
 
         if ((cached != null) && (cached instanceof Image))
@@ -796,7 +792,7 @@ public final class ResourceLoader
             }
             if (tempImage[i] == null)
             {
-                tempImage[i] = tryBuildingInexistantImage(filenames[i],
+                tempImage[i] = tryBuildingNonexistentImage(filenames[i],
                         width, height,
                         directories);
             }
@@ -829,20 +825,20 @@ public final class ResourceLoader
      * Try to build an image when there is no source file to create it. Includes generation of some dynamic layers of images for composite image building.
      * @see #getCompositeImage(String[], java.util.List)
      * @param filename The name of the missing file.
-     * @param basew Width of the image to create.
-     * @param baseh Height of the image to create.
+     * @param width Width of the image to create.
+     * @param height Height of the image to create.
      * @param directories List of searched directories.
      * @return The generated Image.
      */
-    private synchronized static Image tryBuildingInexistantImage(
-            String filename, int basew, int baseh, java.util.List directories)
+    private synchronized static Image tryBuildingNonexistentImage(
+            String filename, int width, int height, java.util.List directories)
     {
         Image tempImage = null;
 
         if (filename.startsWith("Plain-"))
         {
             tempImage =
-                    createPlainImage(basew, baseh,
+                    createPlainImage(width, height,
                     colorFromFilename(filename,
                     "Plain-"));
         }
@@ -850,7 +846,7 @@ public final class ResourceLoader
         {
             int val = numberFromFilename(filename, "Power-");
             tempImage =
-                    createNumberImage(basew, baseh, val, false,
+                    createNumberImage(width, height, val, false,
                     colorFromFilename(filename,
                     "Power-"));
         }
@@ -858,7 +854,7 @@ public final class ResourceLoader
         {
             int val = numberFromFilename(filename, "Skill-");
             tempImage =
-                    createNumberImage(basew, baseh, val, true,
+                    createNumberImage(width, height, val, true,
                     colorFromFilename(filename,
                     "Skill-"));
         }
@@ -874,7 +870,7 @@ public final class ResourceLoader
                     createColorizedImage(prefix + "Base",
                     colorFromFilename(filename,
                     prefix),
-                    directories, basew, baseh);
+                    directories, width, height);
         }
         if (filename.indexOf("-Name") != -1)
         {
@@ -882,7 +878,7 @@ public final class ResourceLoader
                     filename.substring(0,
                     filename.indexOf("-Name"));
             tempImage =
-                    createNameImage(basew, baseh, name, false,
+                    createNameImage(width, height, name, false,
                     colorFromFilename(filename,
                     name + "-Name"));
         }
@@ -892,7 +888,7 @@ public final class ResourceLoader
                     filename.substring(0,
                     filename.indexOf("-Subscript"));
             tempImage =
-                    createNameImage(basew, baseh, name, true,
+                    createNameImage(width, height, name, true,
                     colorFromFilename(filename,
                     name + "-Subscript"));
         }
@@ -900,10 +896,11 @@ public final class ResourceLoader
         if (tempImage == null)
         {
             Log.warn("WARNING: creation failed for " + filename);
-            return createPlainImage(basew, baseh, Color.white, true);
+            return createPlainImage(width, height, Color.white, true);
         }
         waitOnImage(tempImage);
         String mapKey = getMapKey(filename, directories);
+        mapKey = mapKey + "(" + width + "," + height + ")";
         imageCache.put(mapKey, tempImage);
         return(tempImage);
     }
@@ -1356,8 +1353,7 @@ public final class ResourceLoader
      * @param data File content to add.
      */
     public static void putIntoFileCache(String filename,
-            java.util.List directories,
-            byte[] data)
+            java.util.List directories, byte[] data)
     {
         String mapKey = getMapKey(filename, directories);
         fileCache.put(mapKey, data);
