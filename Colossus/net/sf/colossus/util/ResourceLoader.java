@@ -443,10 +443,7 @@ public final class ResourceLoader
             }
             if (bi != null)
             {
-		synchronized (imageCache)
-		{
-		    imageCache.put(mapKey, bi);
-		}
+		imageCache.put(mapKey, bi);
             }
         }
         return bi;
