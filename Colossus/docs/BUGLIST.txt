@@ -1,0 +1,58 @@
+Suspected Java bugs:
+
+Win95, jdk 1.1.7, 1.2, 1.2.1: OutOfMemory error -- Image memory leak.
+   Fixed in 1.1.8 and 1.2.2
+
+Win95, 1.1.7: BattleTurn: "Done with Mov..."; default button size is
+   too small for its label.
+
+Red Hat 6.1, kaffe 1.05
+   Background colors are different.  (e.g. white instead of black.)  They're 
+      being set rather than defaulted, so this looks like a kaffe bug.
+   Some clicks are rejected as though not inside chits or hexes even though
+      they are.  Sometimes a second click works; sometimes it takes several
+      tries.  Hit testing problems in kaffe?
+   Problems with PickMarker at the start of the game.  The first player's
+      markers are not displayed, but clicking in the place where they
+      should be works.  Some clicks are repeatedly missed, which prevents
+      progressing to the game.
+
+Blackdown 117v3: Legion markers on the MasterBoard or BattleMap do not 
+   display correctly on a remote Linux or Solaris X display (need to
+   test with Win98 and X-Win32).  The same GIFs display fine in dialogs.
+   1.2pre2 works correctly, though the GIFs load a bit slowly.  ibmjdk118
+   works fine.
+
+jar files made in Linux ibmjdk118 won't execute directly on Solaris JDK 1.2.2.
+   They'll run on Windows (JDK 1.3beta), and with "java -jar" on Solaris. 
+   Bad magic numbers?  Problem with jexec?
+
+Red Hat 6.1, ibmjdk118: Occasional SIGSEGV javacore in SplitLegion, with 
+   native threads on.  Green threads seem okay.  Occasional SIGSEGV 
+   javacore in PickRecruit, even with green threads.
+
+
+Current programming bugs:
+
+Win98, Linux, Solaris; jdk 1.1.7, 1.2, 1.3b, ibm118, kaffe 1.0b5, etc.: 
+   Sometimes not all targets are highlighted on the first click on a
+   potential striker.  Both hex.select() and hex.repaint() are being 
+   called, but the repaint is occasionally failing.  Clicking again 
+   almost always highlights the rest; a third click always seems to
+   work.  Extra repaint() calls don't help.  This looks like some kind 
+   of AWT thread sync issue, but I'm calling select() and repaint()
+   directly from the mousePressed() event handler like I'm supposed to.
+
+Concession timing.  If both players want to concede, the non-phasing
+   player (usually?) has the right to concede first.  Concessions
+   aren't allowed in the middle of strikes.  Etc.
+Striking continues after concession, until the normal time to check for
+   creature (and then player) death.
+
+Solaris: Makefile no longer works.  Target "classes" isn't working
+   properly.  Why not?  It works fine under Linux.  Both use GNU make 
+   3.77.
+
+Netscape 4.7: Applet does not stop when game is over.  AppletButton 
+   does not allow starting another game when game is over.
+
