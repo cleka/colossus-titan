@@ -584,12 +584,6 @@ public final class Server
     }
 
 
-    public void tryToConcede(String markerId)
-    {
-        game.getBattle().concede(markerId);
-    }
-
-
     void twoNegotiate(Legion attacker, Legion defender)
     {
     /* TODO Put negotiation back in.

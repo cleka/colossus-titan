@@ -159,11 +159,31 @@ public final class Client
         server.engage(land);
     }
 
+    String getMyEngagedMarkerId()
+    {
+        String markerId = null;
+        if (isMyLegion(attackerMarkerId))
+        {
+            markerId = attackerMarkerId;
+        }
+        else if (isMyLegion(defenderMarkerId))
+        {
+            markerId = defenderMarkerId;
+        }
+        return markerId;
+    }
+
     /** Legion concedes. */
     void concede()
     {
-        server.tryToConcede(playerName);
+        server.concede(getMyEngagedMarkerId());
     }
+
+    void doNotConcede()
+    {
+        server.doNotConcede(getMyEngagedMarkerId());
+    }
+
 
     /** Cease negotiations and fight a battle in land. */
     void fight(String land)
@@ -1216,11 +1236,11 @@ Log.debug("called Client.acquireAngelCallback()");
     {
         if (answer)
         {
-            server.concede(markerId);
+            concede();
         }
         else
         {
-            server.doNotConcede(markerId);
+            doNotConcede();
         }
     }
 
