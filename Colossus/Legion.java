@@ -13,22 +13,22 @@ class Legion
     Chit chit;
     int height;
     private String markerId;    // Bk03, Rd12, etc.
-    private String splitFrom;   // Bk03, Rd12, etc. or null
+    private Legion splitFrom;
     Creature [] creatures = new Creature[8];  // 8 before initial splits
     private MasterHex currentHex;
     private MasterHex startingHex;
     private boolean moved = false;
     private Player player;
 
-    Legion(int cx, int cy, int scale, String markerId, String splitFrom,
+    Legion(int cx, int cy, int scale, String markerId, Legion splitFrom,
         Container container, int height, MasterHex currentHex, 
         Creature creature0, Creature creature1, Creature creature2, 
         Creature creature3, Creature creature4, Creature creature5, 
         Creature creature6, Creature creature7, Player player)
     {
         this.markerId = markerId;
-        String imageFilename = "images/" + markerId + ".gif";
-        this.chit = new Chit(cx, cy, scale, imageFilename, container);
+        this.splitFrom = splitFrom;
+        this.chit = new Chit(cx, cy, scale, getImageName(), container);
         this.height = height;
         this.currentHex = currentHex;
         this.startingHex = currentHex;
@@ -59,21 +59,32 @@ class Legion
     {
         player.addPoints(points);        
 
-        // XXX Check for availability of angels and archangels.
         int score = player.getScore();
 
         while (height < 7 && score / 100 > (score - points) / 100)
         {
             if (score / 500 > (score - points) / 500)
             {
-                // XXX Need archangel dialog
-                addCreature(Creature.archangel);
+                // XXX Need archangel / angel dialog
+                if (Creature.archangel.getCount() > 0)
+                {
+                    Creature.archangel.takeOne();
+                    addCreature(Creature.archangel);
+                }
+                else
+                {
+                    Creature.angel.takeOne();
+                    addCreature(Creature.angel);
+                }
                 score -= 100;
             }
             else
             {
-                // XXX Need angel dialog
-                addCreature(Creature.angel);
+                if (Creature.angel.getCount() > 0)
+                {
+                    Creature.angel.takeOne();
+                    addCreature(Creature.angel);
+                }
                 score -= 100;
             }
         }
@@ -86,11 +97,17 @@ class Legion
     }
 
 
+    String getImageName()
+    {
+        return "images/" + markerId + ".gif";
+    }
+
+
     boolean canFlee()
     {
         for (int i = 0; i < height; i++)
         {
-            if (creatures[i].lord)
+            if (creatures[i].isLord())
             {
                 return false;
             }
@@ -118,7 +135,7 @@ class Legion
         int count = 0;
         for (int i = 0; i < height; i++)
         {
-            if (creatures[i].lord)
+            if (creatures[i].isLord())
             {
                 count++;
             }
@@ -185,7 +202,25 @@ class Legion
 
     void addCreature(Creature creature)
     {
-        height++;
-        creatures[height - 1] = creature;
+        if (creature.getCount() > 0)
+        {
+            creature.takeOne();
+            height++;
+            creatures[height - 1] = creature;
+        }
+    }
+
+
+    // Recombine this legion into another legion.
+    void recombine(Legion legion)
+    {
+        for (int i = 0; i < height; i++)
+        {
+            creatures[i].putOneBack();
+            legion.addCreature(creatures[i]); 
+        }
+        // Prevent double-returning lords to stacks.
+        height = 0;
+        removeLegion();
     }
 }
