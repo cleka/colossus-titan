@@ -8,6 +8,7 @@ import java.util.*;
 
 import net.sf.colossus.server.Creature;
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Options;
 
 
 /** 
@@ -38,6 +39,10 @@ class CreatureCollectionView extends KDialog implements WindowListener
 
         pack();
 
+        if (location == null)
+        {
+            loadLocation();
+        }
         if (location == null)
         {
             upperRightCorner();
@@ -128,11 +133,27 @@ class CreatureCollectionView extends KDialog implements WindowListener
         return sb.toString();
     }
 
+    private void loadLocation()
+    {
+        int x = client.getIntOption(Options.creatureCollectionViewLocX);
+        int y = client.getIntOption(Options.creatureCollectionViewLocY);
+        if (x > 0 && y > 0)
+        {
+            location = new Point(x, y);
+        }
+    }
+
+    private void saveLocation()
+    {
+        location = getLocation();
+        client.setOption(Options.creatureCollectionViewLocX, location.x);
+        client.setOption(Options.creatureCollectionViewLocY, location.y);
+    }
 
     public void dispose()
     {
         super.dispose();
-        location = getLocation();
+        saveLocation();
     }
 
     void rescale()

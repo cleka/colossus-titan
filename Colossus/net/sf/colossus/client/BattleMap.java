@@ -66,6 +66,10 @@ public final class BattleMap extends HexMap implements MouseListener,
 
         if (location == null)
         {
+            loadLocation();
+        }
+        if (location == null)
+        {
             location = new Point(0, 4 * Scale.get());
         }
         battleFrame.setLocation(location);
@@ -655,10 +659,26 @@ public final class BattleMap extends HexMap implements MouseListener,
     }
 
 
+    private void loadLocation()
+    {
+        int x = client.getIntOption(Options.battleMapLocX);
+        int y = client.getIntOption(Options.battleMapLocY);
+        if (x > 0 && y > 0)
+        {
+            location = new Point(x, y);
+        }
+    }
+
+    private void saveLocation()
+    {
+        location = battleFrame.getLocation();
+        client.setOption(Options.battleMapLocX, location.x);
+        client.setOption(Options.battleMapLocY, location.y);
+    }
+
     void dispose()
     {
-        // Save location for next object.
-        location = getLocation();
+        saveLocation();
 
         if (battleFrame != null)
         {

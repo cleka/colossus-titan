@@ -1,6 +1,7 @@
 package net.sf.colossus.util;
 
 import net.sf.colossus.server.Server;
+import net.sf.colossus.client.Client;
 
 
 /** Logging functions.
@@ -22,8 +23,10 @@ public final class Log
     private static boolean toWindow = false;
     private static boolean toRemote = false;
     private static LogWindow logWindow;
-    /** For remote logging. */
+    /** Server, for remote logging. */
     private static Server server;
+    /** First local client, for log window. */
+    private static Client client;
 
 
     public static boolean getShowDebug()
@@ -61,6 +64,11 @@ public final class Log
         Log.server = server;
     }
 
+    public static void setClient(Client client)
+    {
+        Log.client = client;
+    }
+
     public static boolean isToRemote()
     {
         return toRemote;
@@ -88,11 +96,11 @@ public final class Log
         {
             System.out.println(s);
         }
-        if (toWindow)
+        if (toWindow && client != null)
         {
             if (logWindow == null)
             {
-                logWindow = new LogWindow();
+                logWindow = new LogWindow(client);
             }
             logWindow.append(s + "\n");
         }

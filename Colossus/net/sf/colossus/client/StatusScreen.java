@@ -150,11 +150,19 @@ final class StatusScreen extends KDialog implements WindowListener
 
         pack();
 
+        if (size == null)
+        {
+            loadSize();
+        }
         if (size != null)
         {
             setSize(size);
         }
 
+        if (location == null)
+        {
+            loadLocation();
+        }
         if (location == null)
         {
             lowerRightCorner();
@@ -167,6 +175,7 @@ final class StatusScreen extends KDialog implements WindowListener
 
         setVisible(true);
     }
+
 
     private void setPlayerLabelBackground(int i, Color color)
     {
@@ -221,12 +230,43 @@ final class StatusScreen extends KDialog implements WindowListener
         repaint();
     }
 
+    private void loadSize()
+    {
+        int x = client.getIntOption(Options.statusScreenSizeX);
+        int y = client.getIntOption(Options.statusScreenSizeY);
+        size = new Dimension(x, y);
+    }
+
+    private void saveSize()
+    {
+        size = getSize();
+        client.setOption(Options.statusScreenSizeX, (int)size.getWidth());
+        client.setOption(Options.statusScreenSizeY, (int)size.getHeight());
+    }
+
+    private void loadLocation()
+    {
+        int x = client.getIntOption(Options.statusScreenLocX);
+        int y = client.getIntOption(Options.statusScreenLocY);
+        if (x > 0 && y > 0)
+        {
+            location = new Point(x, y);
+        }
+    }
+
+    private void saveLocation()
+    {
+        location = getLocation();
+        client.setOption(Options.statusScreenLocX, location.x);
+        client.setOption(Options.statusScreenLocY, location.y);
+    }
+
 
     public void dispose()
     {
-        location = getLocation();
-        size = getSize();
         super.dispose();
+        saveSize();
+        saveLocation();
     }
 
 

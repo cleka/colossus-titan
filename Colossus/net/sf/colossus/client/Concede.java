@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.*;
 
 import net.sf.colossus.util.KDialog;
+import net.sf.colossus.util.Options;
 
 /**
  * Class Concede allows a player to flee or concede before starting a Battle.
@@ -123,6 +124,10 @@ final class Concede extends KDialog implements ActionListener, WindowListener
 
         if (location == null)
         {
+            loadLocation();
+        }
+        if (location == null)
+        {
             centerOnScreen();
             location = getLocation();
         }
@@ -164,9 +169,27 @@ final class Concede extends KDialog implements ActionListener, WindowListener
     }
 
 
-    private void cleanup(boolean answer)
+    private void loadLocation()
+    {
+        int x = client.getIntOption(Options.concedeLocX);
+        int y = client.getIntOption(Options.concedeLocY);
+        if (x > 0 && y > 0)
+        {
+            location = new Point(x, y);
+        }
+    }
+
+    private void saveLocation()
     {
         location = getLocation();
+        client.setOption(Options.concedeLocX, location.x);
+        client.setOption(Options.concedeLocY, location.y);
+    }
+
+
+    private void cleanup(boolean answer)
+    {
+        saveLocation();
         dispose();
         if (flee)
         {

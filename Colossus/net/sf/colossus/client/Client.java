@@ -385,8 +385,9 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         return options.getStringOption(optname);
     }
 
-    /** Return -1 if the option's value has not been set. */
-    int getIntOption(String optname)
+    /** Return -1 if the option's value has not been set.  
+        public for LogWindow */
+    public int getIntOption(String optname)
     {
         return options.getIntOption(optname);
     }
@@ -407,12 +408,14 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
         }
     }
 
-    void setOption(String optname, boolean value)
+    /** public for LogWindow */
+    public void setOption(String optname, boolean value)
     {
         setOption(optname, String.valueOf(value));
     }
 
-    void setOption(String optname, int value)
+    /** public for LogWindow */
+    public void setOption(String optname, int value)
     {
         setOption(optname, String.valueOf(value));
     }
@@ -1091,6 +1094,7 @@ public final class Client extends UnicastRemoteObject implements IRMIClient
             disposeMasterBoard();
             board = new MasterBoard(this);
             board.requestFocus();
+            Log.setClient(this);
         }
     }
 

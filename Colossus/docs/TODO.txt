@@ -1,3 +1,7 @@
+Remember window positions in player .cfg file.
+   Ensure that windows are placed on screen and at usable size.
+   Do LogWindow.
+
 Bug: Repaints missed on some remote players' masterboard moves.
 Bug: Remote player sometimes sees all of AI's trial battle moves.
 
@@ -45,8 +49,6 @@ Add "no 2s or 5s" mulligan option.
 Add optional additional handicap mulligans that can be used after turn 1.
 
 Add UI for players to specify favorite colors.
-
-Remember window positions in player .cfg file.
 
 Put old, new web pages under CVS.
 Switch to new web page.
