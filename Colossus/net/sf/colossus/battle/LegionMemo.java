@@ -39,6 +39,11 @@ public class LegionMemo implements Serializable
     {
         return m_strMarkerId;
     }
+
+    public String getColor()
+    {
+        return m_strMarkerId.substring(0, 2);
+    }
     
 /**
  * Get the value of m_strParentMarkerId.
@@ -76,13 +81,33 @@ public class LegionMemo implements Serializable
     {
         return (m_strCritters.length >= (n + 1)) ? m_strCritters[n] : null;
     }
+
+
+/**
+ * Get the nth (0-indexed) critter name or null if we don't have that many
+ * @return nth critter name or null
+ */
+    public String[] getCritters()
+    {
+        return m_strCritters;
+    }
+
+
+
+/**
+ */
+    public int getCritterCount()
+    {
+        return m_strCritters.length;
+    }
+
     
 /**
  * Get the value of m_strPlayerName.
  * @return value of m_strPlayerName.
  */
     public String getPlayerName() 
-    {
+   {
         return m_strPlayerName;
     }
 
