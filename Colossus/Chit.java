@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.*;
+import java.awt.image.*;
 
 /**
  * Class Chit implements the GUI for a Titan chit representing
@@ -14,6 +15,7 @@ class Chit
     private boolean selected = false;
     private Rectangle rect;
     private Container container;
+    public static final double DEG_TO_RAD = Math.PI / 180;
 
     // Offset of the mouse cursor within the chit.
     private int dx = 0;
@@ -22,12 +24,28 @@ class Chit
     // Flag to mark chit as dead and paint it with an "X" through it.
     private boolean dead = false;
 
+
+    Chit(int cx, int cy, int scale, String imageFilename,
+        Container container, boolean inverted)
+    {
+        rect = new Rectangle(cx, cy, scale, scale);
+        this.container = container;
+
+        Image sourceImage = 
+            Toolkit.getDefaultToolkit().getImage(imageFilename);
+        ImageFilter filter = new RotateFilter(inverted ? 180 * DEG_TO_RAD : 0);
+        ImageProducer producer = new 
+            FilteredImageSource(sourceImage.getSource(), filter);
+        image = Toolkit.getDefaultToolkit().createImage(producer);
+    }
+
     Chit(int cx, int cy, int scale, String imageFilename,
         Container container)
     {
         rect = new Rectangle(cx, cy, scale, scale);
-        image = Toolkit.getDefaultToolkit().getImage(imageFilename);
         this.container = container;
+        Image image = 
+            Toolkit.getDefaultToolkit().getImage(imageFilename);
     }
 
 
