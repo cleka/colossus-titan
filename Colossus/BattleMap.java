@@ -128,7 +128,7 @@ public class BattleMap extends Frame implements MouseListener,
         }
         catch (InterruptedException e)
         {
-            System.out.println("waitForAll was interrupted");
+            new MessageBox(this, "waitForAll was interrupted");
         }
         imagesLoaded = true;
 
@@ -392,7 +392,8 @@ public class BattleMap extends Frame implements MouseListener,
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally.
         Creature creature = chit.getCreature();
-        if (count == 0 && creature.rangeStrikes())
+        if (count == 0 && creature.rangeStrikes() && turn.getPhase() !=
+            turn.STRIKEBACK)
         {
             int skill = creature.getSkill();
 
@@ -486,19 +487,19 @@ public class BattleMap extends Frame implements MouseListener,
 
         if (xDist >= 2 * yDist)
         {
-            return (int) Math.round(xDist + 1);
+            return (int) Math.ceil(xDist + 1);
         }
         else if (xDist >= yDist)
         {
-            return (int) Math.round(xDist + 2); 
+            return (int) Math.floor(xDist + 2);
         }
         else if (yDist >= 2 * xDist)
         {
-            return (int) Math.round(yDist + 1);
+            return (int) Math.ceil(yDist + 1);
         }
         else
         {
-            return (int) Math.round(yDist + 2);
+            return (int) Math.floor(yDist + 2);
         }
     }
 
@@ -524,6 +525,24 @@ public class BattleMap extends Frame implements MouseListener,
         }
         
         // XXX: LOS code.
+        int x1 = currentHex.getXCoord();
+        float y1 = currentHex.getYCoord();
+        int x2 = targetHex.getXCoord();
+        float y2 = targetHex.getYCoord();
+
+        // Hexes with odd X coordinates are pushed down half a hex.
+        if ((x1 & 1) == 1)
+        {
+            y1 += 0.5;
+        }
+        if ((x2 & 1) == 1)
+        {
+            y2 += 0.5;
+        }
+        
+        float xDist = x2 - x1;
+        float yDist = y2 - y1;
+
         // XXX: Terrain penalties.
         return penalty;
     }
