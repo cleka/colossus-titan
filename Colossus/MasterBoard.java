@@ -1591,7 +1591,7 @@ public class MasterBoard extends Frame implements MouseListener,
                     if (legion != null && hex.isSelected())
                     {
                         // Pick teleport or normal move if necessary.
-                        if (hex.teleported() && hex.canEnterViaLand())
+                        if (hex.getTeleported() && hex.canEnterViaLand())
                         {
                             hex.chooseWhetherToTeleport();
                         }
@@ -1605,7 +1605,7 @@ public class MasterBoard extends Frame implements MouseListener,
                         }
                         // If this is a teleport to a non-tower hex,
                         // then allow entry from all three sides.
-                        else if (hex.teleported())
+                        else if (hex.getTeleported())
                         {
                             hex.setEntrySide(1);
                             hex.setEntrySide(3);
@@ -1632,7 +1632,7 @@ public class MasterBoard extends Frame implements MouseListener,
                             hex.getNumEntrySides() == 1)
                         {
                             // If the legion teleported, reveal a lord.
-                            if (hex.teleported())
+                            if (hex.getTeleported())
                             {
 
                                 // If it was a Titan teleport, that 

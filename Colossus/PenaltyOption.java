@@ -62,4 +62,23 @@ public class PenaltyOption
             return 0;
         }
     }
+
+
+    // Sort an array of penalty options by number of dice (ascending), then by
+    //    strike number (descending).
+    public static void sort(PenaltyOption [] penaltyOptions, int numPenaltyOptions)
+    {
+        for (int i = 0; i < numPenaltyOptions - 1; i++)
+        {
+            for (int j = i + 1; j < numPenaltyOptions; j++)
+            {
+                if (penaltyOptions[i].compareTo(penaltyOptions[j]) > 0)
+                {
+                    PenaltyOption temp = penaltyOptions[i];
+                    penaltyOptions[i] = penaltyOptions[j];
+                    penaltyOptions[j] = temp;
+                }
+            }
+        }
+    }
 }

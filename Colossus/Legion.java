@@ -244,10 +244,10 @@ public class Legion
 
     public void moveToHex(MasterHex hex)
     {
-        boolean teleported = hex.teleported();
+        boolean teleported = hex.getTeleported();
         Game.logEvent("Legion " + getMarkerId() + " in " +
             currentHex.getDescription() + 
-            (teleported ?  " teleports " : " moves ") + 
+            (teleported ? " teleports " : " moves ") + 
             "to " + hex.getDescription());
 
         currentHex.removeLegion(this);
@@ -260,14 +260,13 @@ public class Legion
         {
             player.disallowTeleport();
         }
-
     }
 
 
     public void undoMove()
     {
         // If this legion teleported, allow teleporting again.
-        if (currentHex.teleported())
+        if (currentHex.getTeleported())
         {
             player.allowTeleport();
         }
@@ -288,7 +287,7 @@ public class Legion
     }
 
 
-    public boolean recruited()
+    public boolean hasRecruited()
     {
         return recruited;
     }
@@ -322,7 +321,7 @@ public class Legion
 
     public void undoRecruit()
     {
-        if (recruited())
+        if (hasRecruited())
         {
             Critter critter = critters[height - 1];
 
@@ -365,7 +364,7 @@ public class Legion
     }
 
 
-    public boolean summoned()
+    public boolean hasSummoned()
     {
         return summoned;
     }

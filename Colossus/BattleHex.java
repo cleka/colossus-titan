@@ -620,14 +620,14 @@ public class BattleHex extends Hex
 
         // Non-fliers may not cross cliffs.
         if ((hexside == 'c' || getOppositeHexside(cameFrom) == 'c') && 
-            !creature.flies())
+            !creature.isFlier())
         {
             return 5;
         }
 
         // Check for a slowing hexside.
         if ((hexside == 'w' || (hexside == 's' && !creature.isNativeSlope()))
-            && !creature.flies() &&
+            && !creature.isFlier() &&
             elevation > getNeighbor(cameFrom).getElevation())
         {
             // All hexes where this applies happen to have no
@@ -640,7 +640,7 @@ public class BattleHex extends Hex
         if ((terrain == 'r' && !creature.isNativeBramble()) ||
             (terrain == 'd' && !creature.isNativeDrift()) ||
             (terrain == 's' && !creature.isNativeSandDune() &&
-            !creature.flies()))
+            !creature.isFlier()))
         {
             return 2;
         }

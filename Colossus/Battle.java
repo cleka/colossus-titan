@@ -266,7 +266,7 @@ public class Battle
     // This is called from MasterBoard after the SummonAngel finishes.
     public void finishSummoningAngel()
     {
-        if (attacker.summoned())
+        if (attacker.hasSummoned())
         {
             map.placeNewChit(attacker);
         }
@@ -296,7 +296,7 @@ public class Battle
     }
 
 
-    public boolean chitSelected()
+    public boolean isChitSelected()
     {
         return chitSelected;
     }
@@ -399,7 +399,7 @@ public class Battle
     {
         map.unselectAllHexes();
 
-        if (!critter.hasMoved() && !critter.inContact(false))
+        if (!critter.hasMoved() && !critter.isInContact(false))
         {
             if (masterHex.getTerrain() == 'T' && getTurnNumber() == 1 &&
                 getActivePlayer() == getDefender().getPlayer())
@@ -409,7 +409,7 @@ public class Battle
             else
             {
                 findMoves(critter.getCurrentHex(), critter,
-                    critter.flies(), critter.getSkill(), -1);
+                    critter.isFlier(), critter.getSkill(), -1);
             }
         }
     }
@@ -497,7 +497,7 @@ public class Battle
             Critter critter = getCritter(i);
             if (critter.getPlayer() == player)
             {
-                if (!critter.hasMoved() && !critter.inContact(false))
+                if (!critter.hasMoved() && !critter.isInContact(false))
                 {
                     count++;
                     BattleHex hex = critter.getCurrentHex();
@@ -558,7 +558,7 @@ public class Battle
     }
 
 
-    public boolean forcedStrikesRemain()
+    public boolean isForcedStrikeRemaining()
     {
         Player player = getActivePlayer();
 
@@ -567,7 +567,7 @@ public class Battle
             Critter critter = critters[i];
             if (critter.getPlayer() == player)
             {
-                if (critter.inContact(false) && !critter.hasStruck())
+                if (critter.isInContact(false) && !critter.hasStruck())
                 {
                     return true;
                 }
@@ -844,7 +844,7 @@ public class Battle
 
         // Then do rangestrikes if applicable.  Rangestrikes are not allowed
         // if the creature can strike normally.
-        if (!critter.inContact(true) && critter.rangeStrikes() &&
+        if (!critter.isInContact(true) && critter.isRangestriker() &&
             getPhase() != Battle.STRIKEBACK)
         {
             for (int i = 0; i < getNumCritters(); i++)
@@ -857,7 +857,7 @@ public class Battle
                     // Can't rangestrike if it can be struck normally.
                     if (!targetHex.isSelected())
                     {
-                        if (rangestrikePossible(critter, target))
+                        if (isRangestrikePossible(critter, target))
                         {
                             if (highlight)
                             {
@@ -994,7 +994,7 @@ public class Battle
 
     // Check LOS, going to the left of hexspines if argument left is true, or
     // to the right if it is false.
-    private boolean LOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
+    private boolean isLOSBlockedDir(BattleHex initialHex, BattleHex currentHex,
         BattleHex finalHex, boolean left, int strikeElevation,
         boolean strikerAtop, boolean strikerAtopCliff, boolean midObstacle,
         boolean midCliff, boolean midChit, int totalObstacles)
@@ -1139,7 +1139,7 @@ public class Battle
             midChit = true;
         }
 
-        return LOSBlockedDir(initialHex, nextHex, finalHex, left,
+        return isLOSBlockedDir(initialHex, nextHex, finalHex, left,
             strikeElevation, strikerAtop, strikerAtopCliff,
             midObstacle, midCliff, midChit, totalObstacles);
     }
@@ -1148,7 +1148,7 @@ public class Battle
     // Check to see if the LOS from hex1 to hex2 is blocked.  If the LOS
     // lies along a hexspine, check both and return true only if both are
     // blocked.
-    public boolean LOSBlocked(BattleHex hex1, BattleHex hex2)
+    private boolean isLOSBlocked(BattleHex hex1, BattleHex hex2)
     {
         if (hex1 == hex2)
         {
@@ -1186,21 +1186,21 @@ public class Battle
         if (yDist == 0 || Math.abs(yDist) == 1.5 * Math.abs(xDist))
         {
             // Hexspine; try both sides.
-            return (LOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
+            return (isLOSBlockedDir(hex1, hex1, hex2, true, strikeElevation,
                 false, false, false, false, false, 0) &&
-                LOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
+                isLOSBlockedDir(hex1, hex1, hex2, false, strikeElevation,
                 false, false, false, false, false, 0));
         }
         else
         {
-            return LOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
+            return isLOSBlockedDir(hex1, hex1, hex2, toLeft(xDist, yDist),
                 strikeElevation, false, false, false, false, false, 0);
         }
     }
 
 
     // Return true if the rangestrike is possible.
-    public boolean rangestrikePossible(Critter critter, Critter target)
+    public boolean isRangestrikePossible(Critter critter, Critter target)
     {
         BattleHex currentHex = critter.getCurrentHex();
         BattleHex targetHex = target.getCurrentHex();
@@ -1218,7 +1218,7 @@ public class Battle
         // Only warlocks can rangestrike at range 2, rangestrike Lords,
         // or rangestrike without LOS.
         else if (!critter.getName().equals("Warlock") && (range < 3 ||
-            target.isLord() || LOSBlocked(currentHex, targetHex)))
+            target.isLord() || isLOSBlocked(currentHex, targetHex)))
         {
             clear = false;
         }

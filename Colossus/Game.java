@@ -424,6 +424,22 @@ public class Game
     }
 
 
+    private class SaveGameFilter implements FilenameFilter
+    {
+        public boolean accept(File dir, String name)
+        {
+            if (name.endsWith(".sav"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+
     // Try to load a game from ./filename first, then from saves/filename.
     // If the filename is "--latest" then load the latest savegame found in
     // saves/ 

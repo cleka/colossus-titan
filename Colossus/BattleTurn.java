@@ -51,7 +51,7 @@ public class BattleTurn extends Dialog implements ActionListener,
             // Allow recruiting a reinforcement.
             new PickRecruit(map, battle.getDefender());
 
-            if (battle.getDefender().recruited())
+            if (battle.getDefender().hasRecruited())
             {
                 map.placeNewChit(battle.getDefender());
             }
@@ -174,7 +174,7 @@ public class BattleTurn extends Dialog implements ActionListener,
         else if (e.getActionCommand().equals("Done with Strikes"))
         {
             // Advance only if there are no unresolved strikes.
-            if (battle.forcedStrikesRemain())
+            if (battle.isForcedStrikeRemaining())
             {
                 battle.highlightChitsWithTargets();
                 new MessageBox(parentFrame, "Engaged creatures must strike.");

@@ -1131,7 +1131,7 @@ public class MasterHex extends Hex
     }
 
 
-    public boolean teleported()
+    public boolean getTeleported()
     {
         return teleported;
     }
@@ -1169,11 +1169,5 @@ public class MasterHex extends Hex
         {
             clearTeleported();
         }
-    }
-
-
-    public boolean inverted()
-    {
-        return inverted;
     }
 }

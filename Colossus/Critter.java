@@ -30,7 +30,7 @@ public class Critter extends Creature
     public Critter(Creature creature, boolean visible, Legion legion)
     {
         super(creature.name, creature.power, creature.skill, 
-            creature.rangeStrikes, creature.flies, creature.nativeBramble, 
+            creature.rangestrikes, creature.flies, creature.nativeBramble, 
             creature.nativeDrift, creature.nativeBog, 
             creature.nativeSandDune, creature.nativeSlope, creature.lord, 
             creature.demilord, creature.count, creature.pluralName);
@@ -294,7 +294,7 @@ public class Critter extends Creature
 
 
     // Dead critters count as being in contact only if countDead is true.
-    public boolean inContact(boolean countDead)
+    public boolean isInContact(boolean countDead)
     {
         return (numInContact(countDead) > 0);
     }
@@ -335,7 +335,7 @@ public class Critter extends Creature
 
         int dice = getPower();
 
-        boolean rangestrike = !inContact(true);
+        boolean rangestrike = !isInContact(true);
         if (rangestrike)
         {
             dice /= 2;
@@ -389,7 +389,7 @@ public class Critter extends Creature
 
         int attackerSkill = getSkill();
 
-        boolean rangestrike = !inContact(true);
+        boolean rangestrike = !isInContact(true);
 
         // Skill can be modified by terrain.
         if (!rangestrike)
@@ -475,7 +475,7 @@ public class Critter extends Creature
     public int getStrikeNumber(Critter target)
     {
         BattleHex targetHex = target.getCurrentHex();
-        boolean rangestrike = !inContact(true);
+        boolean rangestrike = !isInContact(true);
 
         int attackerSkill = getAttackerSkill(target);
         int defenderSkill = target.getSkill();
@@ -529,26 +529,6 @@ public class Critter extends Creature
             "Take Penalty", "Do Not Take Penalty");
 
         return (OptionDialog.getLastAnswer() == OptionDialog.YES_OPTION);
-    }
-
-
-    // Sort penalty options by number of dice (ascending), then by
-    //    strike number (descending).
-    private void sortPenaltyOptions(PenaltyOption [] penaltyOptions,
-        int numPenaltyOptions)
-    {
-        for (int i = 0; i < numPenaltyOptions - 1; i++)
-        {
-            for (int j = i + 1; j < numPenaltyOptions; j++)
-            {
-                if (penaltyOptions[i].compareTo(penaltyOptions[j]) > 0)
-                {
-                    PenaltyOption temp = penaltyOptions[i];
-                    penaltyOptions[i] = penaltyOptions[j];
-                    penaltyOptions[j] = temp;
-                }
-            }
-        }
     }
 
 
@@ -647,7 +627,7 @@ public class Critter extends Creature
 
             // Sort penalty options by number of dice (ascending), then by
             //    strike number (descending).
-            sortPenaltyOptions(penaltyOptions, numPenaltyOptions);
+            PenaltyOption.sort(penaltyOptions, numPenaltyOptions);
 
 
             // Find the group of PenaltyOptions with identical dice and

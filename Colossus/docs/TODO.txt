@@ -5,9 +5,14 @@ Add server menu for save game, load game, new game, autosave, visible
    PickRecruits vs.  always reveal the biggest/smallest possible 
    recruiter.  Read option defaults from a config file.
 
+Improve savegame file.  XML?
+
 Fix concession timing.
 
 Client-server networking.
+
+Add client config file to store default name, favorite colors, 
+   favorite servers, etc.
 
 Chat window.
 

@@ -757,7 +757,7 @@ public class BattleMap extends Frame implements MouseListener,
             switch (battle.getPhase())
             {
                 case Battle.MOVE:
-                    if (battle.chitSelected())
+                    if (battle.isChitSelected())
                     {
                         battle.getCritter(0).moveToHex(hex);
                         battle.clearChitSelected();
@@ -771,7 +771,7 @@ public class BattleMap extends Frame implements MouseListener,
                     {
                         battle.applyCarries(hex.getCritter());
                     }
-                    else if (battle.chitSelected())
+                    else if (battle.isChitSelected())
                     {
                         battle.getCritter(0).strike(hex.getCritter());
                         battle.clearChitSelected();

@@ -22,16 +22,6 @@ public class Hex
     protected String label;
 
 
-    public boolean select(Point point)
-    {
-        if (hexagon.contains(point))
-        {
-            selected = !selected;
-            return true;
-        }
-        return false;
-    }
-
 
     public void select()
     {
@@ -48,12 +38,6 @@ public class Hex
     public boolean isSelected()
     {
         return selected;
-    }
-
-
-    public boolean isSelected(Point point)
-    {
-        return (contains(point) && isSelected());
     }
 
 

@@ -10,7 +10,7 @@ public class Creature
     protected String pluralName;
     protected int power;
     protected int skill;
-    protected boolean rangeStrikes;
+    protected boolean rangestrikes;
     protected boolean flies;
     protected boolean nativeBramble;
     protected boolean nativeDrift;
@@ -103,7 +103,7 @@ public class Creature
         serpent, titan, troll, unicorn, warbear, warlock, wyvern};
 
 
-    public Creature(String name, int power, int skill, boolean rangeStrikes,
+    public Creature(String name, int power, int skill, boolean rangestrikes,
         boolean flies, boolean nativeBramble, boolean nativeDrift,
         boolean nativeBog, boolean nativeSandDune, boolean nativeSlope,
         boolean lord, boolean demilord, int count, String pluralName)
@@ -111,7 +111,7 @@ public class Creature
         this.name = name;
         this.power = power;
         this.skill = skill;
-        this.rangeStrikes = rangeStrikes;
+        this.rangestrikes = rangestrikes;
         this.flies = flies;
         this.nativeBramble = nativeBramble;
         this.nativeDrift = nativeDrift;
@@ -219,13 +219,13 @@ public class Creature
     }
 
 
-    public boolean rangeStrikes()
+    public boolean isRangestriker()
     {
-        return rangeStrikes;
+        return rangestrikes;
     }
 
 
-    public boolean flies()
+    public boolean isFlier()
     {
         return flies;
     }
