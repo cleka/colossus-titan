@@ -1,7 +1,3 @@
-import java.awt.*;
-import java.util.*;
-import java.io.*;
-
 /**
  * Class Creature represents a Titan Character
  * @version $Id$
