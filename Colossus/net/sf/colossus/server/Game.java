@@ -80,7 +80,6 @@ public final class Game
         }
     }
 
-    // XXX temp
     void initServerAndClients()
     {
         if (server == null)
@@ -94,7 +93,7 @@ public final class Game
         for (int i = 0; i < getNumPlayers(); i++)
         {
             Player player = (Player)players.get(i);
-            server.addClient(i, player.getName());
+            server.addClient(player.getName());
         }
     }
 
@@ -150,7 +149,7 @@ public final class Game
         caretaker.resetAllCounts();
         players.clear();
 
-        // XXX Temporary hotseat startup code
+        // Temporary hotseat startup code
         JFrame frame = new JFrame();
         java.util.List playerInfo = GetPlayers.getPlayers(frame);
         if (playerInfo.isEmpty())
@@ -188,11 +187,6 @@ public final class Game
             Log.event("Add " + type + " player " + name);
         }
 
-        assignTowers();
-
-        // Renumber players in descending tower order.
-        Collections.sort(players);
-        activePlayerNum = 0;
 
         // We need to set the autoPlay option before loading the board,
         // so that we can avoid showing boards for AI players.
@@ -210,16 +204,24 @@ public final class Game
             Player player = (Player)it.next();
             if (player.isAI())
             {
-                server.setClientOption(i, Options.autoPlay, true);
+                server.setClientOption(player.getName(), Options.autoPlay,
+                    true);
             }
             else if (player.isHuman())
             {
-                server.setClientOption(i, Options.autoPlay, false);
+                server.setClientOption(player.getName(), Options.autoPlay,
+                    false);
             }
             i++;
         }
 
         server.allInitBoard();
+
+        assignTowers();
+
+        // Renumber players in descending tower order.
+        Collections.sort(players);
+        activePlayerNum = 0;
 
         assignColors();
     }
@@ -241,8 +243,7 @@ public final class Game
             Player player = (Player)players.get(i);
             if (player.isHuman())
             {
-            if (player.isHuman())
-                colorPickOrder.add(new Integer(i));
+                colorPickOrder.add(player.getName());
             }
         }
         for (int i = getNumPlayers() - 1; i >= 0; i--)
@@ -250,7 +251,7 @@ public final class Game
             Player player = (Player)players.get(i);
             if (player.isAI())
             {
-                colorPickOrder.add(new Integer(i));
+                colorPickOrder.add(player.getName());
             }
         }
 
@@ -266,24 +267,23 @@ public final class Game
         }
         else
         {
-            Integer integer = (Integer)colorPickOrder.removeFirst();
-            int i = integer.intValue();
-            server.askPickColor(i, colorsLeft);
+            String playerName = (String)colorPickOrder.removeFirst();
+            server.askPickColor(playerName, colorsLeft);
         }
     }
 
     /** playerNum chooses color */
-    void assignColor(int playerNum, String color)
+    void assignColor(String playerName, String color)
     {
         // XXX Only let the player whose turn it is pick.
 
-        Player player = (Player)players.get(playerNum);
+        Player player = getPlayer(playerName);
         colorsLeft.remove(color);
         player.setColor(color);
-        if (GetPlayers.byColor.equals(player.getName()))
+        if (player.getName().startsWith(GetPlayers.byColor))
         {
+            server.setPlayerName(player.getName(), color);
             player.setName(color);
-            server.setPlayerName(playerNum, color);
         }
         Log.event(player.getName() + " chooses color " + color);
         player.initMarkersAvailable();
@@ -908,7 +908,6 @@ public final class Game
         if (out.checkError())
         {
             Log.error("Write error " + filename);
-            // XXX Delete the partial file?
             return;
         }
     }

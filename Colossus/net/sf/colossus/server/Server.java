@@ -23,9 +23,6 @@ public final class Server
     private Game game;
     private Critter striker;
 
-    // XXX How do we keep track of which client goes with which player?
-    // Sort by tower number when the game starts?
-
     // XXX Need to verify that various requests came from the correct
     // client for that player.
 
@@ -44,9 +41,9 @@ public final class Server
 
 
     /** Temporary.  We will not use direct client refs later. */
-    void addClient(int playerNum, String playerName)
+    void addClient(String playerName)
     {
-        clients.add(new Client(this, playerNum, playerName));
+        clients.add(new Client(this, playerName));
     }
 
 
@@ -172,11 +169,6 @@ public final class Server
         return null;
     }
 
-    private Client getClient(int playerNum)
-    {
-        return (Client)clients.get(playerNum);
-    }
-
 
     boolean getClientOption(String playerName, String optname)
     {
@@ -188,41 +180,31 @@ public final class Server
         return false;
     }
 
-    boolean getClientOption(int playerNum, String optname)
-    {
-        Client client = getClient(playerNum);
-        if (client != null)
-        {
-            return client.getOption(optname);
-        }
-        return false;
-    }
-
-    /** Return the number of the first human-controlled client, or -1 if
+    /** Return the name of the first human-controlled client, or null if
      *  all clients are AI-controlled. */
-    private int getFirstHumanClientNum()
+    private String getFirstHumanClientName()
     {
         for (int i = 0; i < game.getNumPlayers(); i++)
         {
             Player player = game.getPlayer(i);
             if (player.isHuman())
             {
-                return i;
+                return player.getName();
             }
         }
-        return -1;
+        return null;
     }
 
     /** Get the option from the first human-controlled client.  If there 
      *  are none, get the option from the first AI-controlled client. */
     boolean getClientOption(String optname)
     {
-        int clientNum = getFirstHumanClientNum();
-        if (clientNum == -1)
+        String clientName = getFirstHumanClientName();
+        if (clientName == null)
         {
-            clientNum = 0;
+            clientName = game.getPlayer(0).getName();
         }
-        return getClientOption(clientNum, optname);
+        return getClientOption(clientName, optname);
     }
 
     String getClientStringOption(String playerName, String optname)
@@ -245,29 +227,18 @@ public final class Server
         return -1;
     }
 
-    int getClientIntOption(int playerNum, String optname)
-    {
-        Client client = getClient(playerNum);
-        if (client != null)
-        {
-            return client.getIntOption(optname);
-        }
-        return -1;
-    }
-
     /** Get the option from the first human-controlled client.  If there 
      *  are none, get the option from the first AI-controlled client. */
     int getClientIntOption(String optname)
     {
-        int clientNum = getFirstHumanClientNum();
-        if (clientNum == -1)
+        String clientName = getFirstHumanClientName();
+        if (clientName == null)
         {
-            clientNum = 0;
+            clientName = game.getPlayer(0).getName();
         }
-        return getClientIntOption(clientNum, optname);
+        return getClientIntOption(clientName, optname);
     }
 
-    /** XXX temp */
     void setClientOption(String playerName, String optname,
         boolean value)
     {
@@ -278,15 +249,6 @@ public final class Server
         }
     }
 
-    void setClientOption(int playerNum, String optname,
-        boolean value)
-    {
-        Client client = getClient(playerNum);
-        if (client != null)
-        {
-            client.setOption(optname, value);
-        }
-    }
 
     /** XXX temp */
     void allInitBoard()
@@ -1465,21 +1427,21 @@ public final class Server
     }
 
 
-    void setPlayerName(int playerNum, String name)
+    void setPlayerName(String playerName, String name)
     {
-        Client client = getClient(playerNum);
+        Client client = getClient(playerName);
         client.setPlayerName(name);
     }
 
-    void askPickColor(int playerNum, Set colorsLeft)
+    void askPickColor(String playerName, Set colorsLeft)
     {
-        Client client = getClient(playerNum);
+        Client client = getClient(playerName);
         client.askPickColor(colorsLeft);
     }
 
-    public void assignColor(int playerNum, String color)
+    public void assignColor(String playerName, String color)
     {
-        game.assignColor(playerNum, color);
+        game.assignColor(playerName, color);
     }
 
     public String getHexForLegion(String markerId)

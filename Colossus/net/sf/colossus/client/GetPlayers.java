@@ -214,6 +214,11 @@ public final class GetPlayers extends JDialog implements WindowListener,
             String type = (String)(playerTypes[i].getSelectedItem());
             if (name.length() > 0 && !name.equals(none) && !type.equals(none))
             {
+                // Make byColor names unique by appending row number.
+                if (name.equals(byColor))
+                {
+                    name = name + i;
+                }
                 // Duplicate names are not allowed.
                 if (namesTaken.contains(name))
                 {
@@ -226,10 +231,7 @@ public final class GetPlayers extends JDialog implements WindowListener,
                 numPlayers++;
                 String entry = name + "~" + type;
                 playerInfo.add(entry);
-                if (!name.equals(byColor))
-                {
-                    namesTaken.add(name);
-                }
+                namesTaken.add(name);
             }
         }
 

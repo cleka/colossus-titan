@@ -67,9 +67,6 @@ public final class Client
     private Properties options = new Properties();
 
     /** Player who owns this client. */
-    int playerNum;
-
-    /** Player who owns this client. */
     String playerName;
 
     /** Last movement roll for any player. */
@@ -85,10 +82,9 @@ public final class Client
 
 
     /** Temporary constructor. */
-    public Client(Server server, int playerNum, String playerName)
+    public Client(Server server, String playerName)
     {
         this.server = server;
-        this.playerNum = playerNum;
         this.playerName = playerName;
     }
 
@@ -775,12 +771,6 @@ public final class Client
     public String getPlayerName()
     {
         return playerName;
-    }
-
-    // TODO Make this non-public.  Have Server track client IDs itself.
-    public int getPlayerNum()
-    {
-        return playerNum;
     }
 
     public void setPlayerName(String playerName)
@@ -1925,7 +1915,7 @@ Log.debug("Calling BattleMap.highlightCarries with " + carryTargets.size() +
         }
         while (color == null);
 
-        server.assignColor(playerNum, color);
+        server.assignColor(playerName, color);
     }
 }
 
