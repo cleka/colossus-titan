@@ -538,7 +538,6 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     /** Look for the Hex matching the Label in the terrain static map */
     public static BattleHex getHexByLabel(String terrain, String label)
     {
-        Log.debug("HexMap.getHexByLabel() " + terrain + " " + label);
         int x = 0;
         int y = Integer.parseInt(new String(label.substring(1)));
         switch (label.charAt(0))
