@@ -16,7 +16,7 @@ class ShowLegion extends Dialog implements MouseListener
 
     ShowLegion(Frame parentFrame, Legion legion, Point point)
     {
-        super(parentFrame, "Contents of Legion " + legion.markerId, true);
+        super(parentFrame, "Contents of Legion " + legion.getMarkerId(), true);
 
         int scale = 60;
         setLocation(new Point(point.x - scale, point.y - scale));
@@ -42,7 +42,7 @@ class ShowLegion extends Dialog implements MouseListener
 
         for (int i = 0; i < legion.getHeight(); i++)
         {
-            tracker.addImage(chits[i].image, 0);
+            tracker.addImage(chits[i].getImage(), 0);
         }
 
         try
