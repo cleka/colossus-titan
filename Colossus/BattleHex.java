@@ -15,6 +15,16 @@ class Hex
     private int[] yVertex = new int[6];
     private Polygon p;
     private Rectangle rectBound;
+    private Creature creature;
+    private int elevation = 0;
+
+    // p, r, s, t, o, v, d
+    // plain, bramble, sand, tree, bog, volcano, drift
+    private char terrain = 'p';
+
+    // d, c, s, w
+    // dune, cliff, slope, wall
+    private char [] hexside = new char[6];
 
 
     Hex(int cx, int cy, int scale)
@@ -39,6 +49,11 @@ class Hex
         // one pixel short.
         rectBound = new Rectangle(xVertex[5], yVertex[0], xVertex[2] - 
                         xVertex[5] + 1, yVertex[3] - yVertex[0] + 1);
+
+        for (int i = 0; i < 6; i++)
+        {
+            hexside[i] = ' ';
+        }
     }
 
     
@@ -105,9 +120,39 @@ class Hex
         return rectBound;
     }
 
+
     public boolean contains(Point point)
     {
         return (p.contains(point));
     }
-    
+
+
+    void setCreature(Creature creature)
+    {
+        this.creature = creature;
+    }
+
+
+    void removeCreature()
+    {
+        this.creature = null;
+    }
+
+
+    Creature getCreature()
+    {
+        return creature;
+    }
+
+
+    char getTerrain()
+    {
+        return terrain;
+    }
+
+
+    char getHexside(int i)
+    {
+        return hexside[i];
+    }
 }
