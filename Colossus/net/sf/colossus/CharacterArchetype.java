@@ -78,6 +78,12 @@ public class CharacterArchetype
 	    return characters;
 	}
 
+    public static String[] getCharactersArray()
+	{
+	    return strCharactersArray;
+	}
+
+
     /** We are borrowing this new object to help re-implemnent the old
      * Caretaker object in the main code. So this isn't the real
      * caretakers stack, we are just borrowing it because it has the
