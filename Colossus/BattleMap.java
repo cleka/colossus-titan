@@ -593,6 +593,7 @@ public class BattleMap extends JFrame implements MouseListener,
         }
         target.setHits(totalDamage);
         target.checkForDeath();
+        target.getCurrentHex().unselect();
         target.repaint();
     }
 
