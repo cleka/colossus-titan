@@ -33,7 +33,7 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
     // XXX Also Need entrances in non-GUI maps.
     private static Map terrainH = new HashMap();
     private static Map terrainHexes = new HashMap();
-
+    private static Map entrancesHex = new HashMap();
 
     /** ne, e, se, sw, w, nw */
     private GUIBattleHex [] entrances = new GUIBattleHex[6];
@@ -83,14 +83,14 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
             setupNeighbors(gameH);
 
             // Initialize non-GUI entrances
-            BattleHex [] gameEntrances = new BattleHex[6];
+            BattleHex[] gameEntrances = new BattleHex[6];
             for (int k = 0; k < 6; k++)
             {
                 gameEntrances[k] = new BattleHex(-1, k);
                 gameHexes.add(gameEntrances[k]);
             }
             setupEntrancesGameState(gameEntrances, gameH);
-
+            entrancesHex.put(new Character(terrain), gameEntrances);
             // Add hexes to both the [][] and ArrayList maps.
             terrainH.put(new Character(terrain), gameH);
             terrainHexes.put(new Character(terrain), gameHexes);
@@ -367,24 +367,49 @@ public class HexMap extends JPanel implements MouseListener, WindowListener
         return null;
     }
 
-    /** Do a brute-force search through the this terrain's static non-GUI
-     *  hexes, looking for a match.  Return the hex, or null. */
+    /** Look for the Hex matching the Label in the terrain static map */
     public static BattleHex getHexByLabel(char terrain, String label)
     {
-        java.util.List correctHexes = (java.util.List)terrainHexes.get(
-            new Character(terrain));
-        Iterator it = correctHexes.iterator();
-        while (it.hasNext())
+        int x = 0, y = Integer.parseInt(new String(label.substring(1)));
+        switch (label.charAt(0))
         {
-            BattleHex hex = (BattleHex)it.next();
-            if (hex.getLabel().equals(label))
-            {
-                return hex;
-            }
+        case 'A':
+        case 'a':
+            x = 0;
+            break;
+        case 'B':
+        case 'b':
+            x = 1;
+            break;
+        case 'C':
+        case 'c':
+            x = 2;
+            break;
+        case 'D':
+        case 'd':
+            x = 3;
+            break;
+        case 'E':
+        case 'e':
+            x = 4;
+            break;
+        case 'F':
+        case 'f':
+            x = 5;
+            break;
+        case 'X':
+        case 'x':
+            /* entrances */
+            BattleHex[] gameEntrances = (BattleHex[])entrancesHex.get(
+                                                new Character(terrain));
+            return gameEntrances[y];
+        default:
+            Log.error("Label " + label + " is invalid");
         }
-
-        Log.error("Could not find hex " + label);
-        return null;
+        y = 6 - y - (int)Math.abs(((x - 3) / 2));
+        BattleHex[][] correctHexes = (BattleHex[][])terrainH.get(
+                                          new Character(terrain));
+        return correctHexes[x][y];
     }
 
     /** Return the GUIBattleHex that contains the given point, or
