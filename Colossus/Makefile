@@ -26,6 +26,7 @@ all: BattleMap.class \
      PickRecruit.class \
      Player.class \
      ShowLegion.class \
+     ShowMasterHex.class \
      SplitLegion.class \
      SummonAngel.class \
      Turn.class
@@ -80,6 +81,9 @@ Player.class: Player.java
 
 ShowLegion.class: ShowLegion.java
 	$(JC) ShowLegion.java
+
+ShowMasterHex.class: ShowMasterHex.java
+	$(JC) ShowMasterHex.java
 
 SplitLegion.class: SplitLegion.java
 	$(JC) SplitLegion.java
