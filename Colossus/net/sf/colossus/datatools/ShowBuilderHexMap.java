@@ -193,7 +193,16 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
     /* Printable */
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex)
     {
-        paintComponent(graphics);
+        if (pageIndex >= 1)
+        {
+            return Printable.NO_SUCH_PAGE;
+        }
+
+        Graphics2D g2 = (Graphics2D)graphics;
+        g2.scale(.5, .5);
+
+        g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+        paint(g2);
 
         return Printable.PAGE_EXISTS;
     }
@@ -374,7 +383,7 @@ final class ShowBuilderHexMap extends BuilderHexMap implements WindowListener,
         mi.setMnemonic(KeyEvent.VK_O);
         mi = fileMenu.add(saveBattlelandAsAction);
         mi.setMnemonic(KeyEvent.VK_S);
-        //mi = fileMenu.add(printBattlelandAction);
+        mi = fileMenu.add(printBattlelandAction);
         mi = fileMenu.add(showBattlelandAction);
         mi = fileMenu.add(eraseAction);
         mi = fileMenu.add(randomizeAction);
