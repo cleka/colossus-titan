@@ -2150,7 +2150,7 @@ public class SimpleAI implements AI
             {
                 java.util.List recruits =
                     client.findEligibleRecruits(enemy.getMarkerId(),
-                                      enemy.getCurrentHex().getTerrainName());
+                                      legion.getCurrentHex().getLabel());
                 Creature best = (Creature)recruits.get(recruits.size() - 1);
                 int lValue = enemy.getPointValue();
                 if (best.getPointValue() > (lValue / enemy.getHeight()))
