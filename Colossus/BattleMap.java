@@ -1292,15 +1292,20 @@ public class BattleMap extends Frame implements MouseListener,
         {
             // Nobody gets any points.
 System.out.println("mutual Titan kill");
-            attacker.getPlayer().die(null);
+            // Make defender die first, to simplify turn advancing.
             defender.getPlayer().die(null);
+            attacker.getPlayer().die(null);
             cleanup();
         }
 
         // Check for single Titan elimination.
         else if (attacker.getPlayer().isTitanEliminated())
         {
-            if (!defenderElim)
+            if (defenderElim)
+            {
+                defender.removeLegion();
+            }
+            else
             {
                 defender.addPoints(defenderPoints);
             }
@@ -1310,7 +1315,11 @@ System.out.println("attacker's titan eliminated");
         }
         else if (defender.getPlayer().isTitanEliminated())
         {
-            if (!attackerElim)
+            if (attackerElim)
+            {
+                attacker.removeLegion();
+            }
+            else
             {
                 attacker.addPoints(defenderPoints);
             }
