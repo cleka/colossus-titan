@@ -15,6 +15,7 @@ class Hex
     private int[] yVertex = new int[6];
     private Polygon p;
     private Rectangle rectBound;
+    private double l;
 
     private BattleMap map;
 
@@ -32,7 +33,7 @@ class Hex
     // d, c, s, w, space
     // dune, cliff, slope, wall, no obstacle
     // The hexside is marked only in the higher hex.
-    private char [] hexside = new char[6];
+    private char [] hexsides = new char[6];
 
     private Hex [] neighbors = new Hex[6];
 
@@ -45,6 +46,7 @@ class Hex
         this.map = map;
         this.xCoord = xCoord;
         this.yCoord = yCoord;
+        l = scale / 3.0;
 
         selected = false;
 
@@ -69,13 +71,15 @@ class Hex
 
         for (int i = 0; i < 6; i++)
         {
-            hexside[i] = ' ';
+            hexsides[i] = ' ';
         }
     }
 
 
     void rescale(int cx, int cy, int scale)
     {
+        l = scale / 3.0;
+
         xVertex[0] = cx;
         yVertex[0] = cy;
         xVertex[1] = cx + 2 * scale;
@@ -126,14 +130,181 @@ class Hex
             fontMetrics.stringWidth(name)) / 2,
             rectBound.y + (fontMetrics.getHeight() + rectBound.height) / 2);
 
-        // XXX: Draw hexside features.
+        // Draw hexside features.
+        for (int i = 0; i < 6; i++)
+        {
+            char hexside = hexsides[i];
+            if (hexside != ' ')
+            {
+                int n = (i + 1) % 6;
+                drawHexside(g, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
+                    hexside);
+            }
+        }
+
+        // Draw them again from the other side.
+        for (int i = 0; i < 6; i++)
+        {
+            char hexside = getOppositeHexside(i);
+            if (hexside != ' ')
+            {
+                int n = (i + 1) % 6;
+                drawHexside(g, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
+                    hexside);
+            }
+        }
     }
 
 
     void repaint()
     {
-        map.repaint(rectBound.x, rectBound.y, rectBound.width,
-            rectBound.height);
+        // If an entrance needs repainting, paint the whole map.
+        if (xCoord == -1)
+        {
+            map.repaint();
+        }
+        else
+        {
+            map.repaint(rectBound.x, rectBound.y, rectBound.width,
+                rectBound.height);
+        }
+    }
+
+
+    void drawHexside(Graphics g, int vx1, int vy1, int vx2, int vy2, char
+        hexsideType)
+    {
+        int x0;                  // first focus point
+        int y0;
+        int x1;                  // second focus point
+        int y1;
+        int x2;                  // center point
+        int y2;
+        double theta;            // gate angle
+        int [] x = new int[4];   // hexside points
+        int [] y = new int[4];   // hexside points
+
+
+        x0 = vx1 + (vx2 - vx1) / 6;
+        y0 = vy1 + (vy2 - vy1) / 6;
+        x1 = vx1 + (vx2 - vx1) / 3;
+        y1 = vy1 + (vy2 - vy1) / 3;
+
+        theta = Math.atan2(vy2 - vy1, vx2 - vx1);
+
+        switch(hexsideType)
+        {
+            case 'c':     // cliff -- triangles
+                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
+                y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
+                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                g.setColor(java.awt.Color.white);
+                g.fillPolygon(x, y, 3);
+                g.setColor(java.awt.Color.black);
+                g.drawPolyline(x, y, 3);
+
+                for (int j = 1; j < 3; j++)
+                {
+                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
+                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
+                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
+                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
+
+                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                    x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                        Math.sin(theta));
+                    y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                        Math.cos(theta));
+                    x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+                    
+                    g.setColor(java.awt.Color.white);
+                    g.fillPolygon(x, y, 3);
+                    g.setColor(java.awt.Color.black);
+                    g.drawPolyline(x, y, 3);
+                }
+                break;
+
+            case 'd':     // XXX: dune --  arcs
+                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
+                y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
+                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                g.setColor(java.awt.Color.white);
+                g.fillPolygon(x, y, 3);
+                g.setColor(java.awt.Color.black);
+                g.drawPolyline(x, y, 3);
+
+                for (int j = 1; j < 3; j++)
+                {
+                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
+                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
+                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
+                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
+
+                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                    x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                        Math.sin(theta));
+                    y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                        Math.cos(theta));
+                    x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+                    
+                    g.setColor(java.awt.Color.white);
+                    g.fillPolygon(x, y, 3);
+                    g.setColor(java.awt.Color.black);
+                    g.drawPolyline(x, y, 3);
+                }
+                break;
+
+            case 's':     // XXX: slope -- lines
+                break;
+
+            case 'w':     // XXX: wall --  blocks
+                x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                x[1] = (int) Math.round((x0 + x1) / 2 + l * Math.sin(theta));
+                y[1] = (int) Math.round((y0 + y1) / 2 - l * Math.cos(theta));
+                x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+
+                g.setColor(java.awt.Color.white);
+                g.fillPolygon(x, y, 3);
+                g.setColor(java.awt.Color.black);
+                g.drawPolyline(x, y, 3);
+
+                for (int j = 1; j < 3; j++)
+                {
+                    x0 = vx1 + (vx2 - vx1) * (2 + 3 * j) / 12;
+                    y0 = vy1 + (vy2 - vy1) * (2 + 3 * j) / 12;
+                    x1 = vx1 + (vx2 - vx1) * (4 + 3 * j) / 12;
+                    y1 = vy1 + (vy2 - vy1) * (4 + 3 * j) / 12;
+
+                    x[0] = (int) Math.round(x0 - l * Math.sin(theta));
+                    y[0] = (int) Math.round(y0 + l * Math.cos(theta));
+                    x[1] = (int) Math.round((x0 + x1) / 2 + l * 
+                        Math.sin(theta));
+                    y[1] = (int) Math.round((y0 + y1) / 2 - l * 
+                        Math.cos(theta));
+                    x[2] = (int) Math.round(x1 - l * Math.sin(theta));
+                    y[2] = (int) Math.round(y1 + l * Math.cos(theta));
+                    
+                    g.setColor(java.awt.Color.white);
+                    g.fillPolygon(x, y, 3);
+                    g.setColor(java.awt.Color.black);
+                    g.drawPolyline(x, y, 3);
+                }
+                break;
+        }
     }
 
 
@@ -367,7 +538,7 @@ class Hex
 
     void setHexside(int i, char hexside)
     {
-        this.hexside[i] = hexside;
+        this.hexsides[i] = hexside;
     }
 
     char getHexside(int i)
@@ -378,7 +549,7 @@ class Hex
         }
         else
         {
-            return hexside[i];
+            return hexsides[i];
         }
     }
 
