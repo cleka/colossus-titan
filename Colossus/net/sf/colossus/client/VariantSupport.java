@@ -150,6 +150,20 @@ public final class VariantSupport
             Creature.loadCreatures();
             loadTerrainsAndRecruits();
         }
+        else
+        {
+            if (tempVarName.equals(Constants.defaultVARFile))
+            {
+                Log.error("Default Variant Loading Failed, aborting !");
+                System.exit(1);
+            }
+            else
+            {
+                Log.debug("Trying to load Default instead...");
+                varREADME = loadVariant(Constants.defaultVARFile,
+                                        Constants.defaultDirName);
+            }
+        }
 
         return varREADME;
     }
