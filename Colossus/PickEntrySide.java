@@ -28,7 +28,7 @@ class PickEntrySide extends JDialog implements ActionListener,
     private Graphics offGraphics;
     private Dimension offDimension;
 
-    private static int scale = 30;
+    private static int scale;
 
     private MasterHex masterHex;
     private char terrain;
@@ -48,6 +48,17 @@ class PickEntrySide extends JDialog implements ActionListener,
         this.terrain = masterHex.getTerrain();
 
         getContentPane().setLayout(null);
+
+        // Make sure the board fits on the screen.
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        if (d.height < 1000)
+        {
+            scale = 30 * d.height / 1000;
+        }
+        else
+        {
+            scale = 30;
+        }
 
         if (masterHex.canEnterViaSide(5))
         {
