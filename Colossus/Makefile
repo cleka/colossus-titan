@@ -6,8 +6,8 @@ JC = javac -J-Djavac.pipe.output=true -g -verbose -deprecation
 
 all: BattleMap.class Chit.class Concede.class Creature.class Game.class \
     Hex.class Legion.class MasterBoard.class MasterHex.class MessageBox.class \
-    PickMarker.class PickRecruit.class Player.class ShowLegion.class \
-    SplitLegion.class Turn.class
+    Negotiate.class PickMarker.class PickRecruit.class Player.class \
+    ShowLegion.class SplitLegion.class Turn.class
 
 BattleMap.class: BattleMap.java
 	$(JC) BattleMap.java
@@ -38,6 +38,9 @@ MasterHex.class: MasterHex.java
 
 MessageBox.class: MessageBox.java
 	$(JC) MessageBox.java
+
+Negotiate.class: Negotiate.java
+	$(JC) Negotiate.java
 
 PickMarker.class: PickMarker.java
 	$(JC) PickMarker.java
