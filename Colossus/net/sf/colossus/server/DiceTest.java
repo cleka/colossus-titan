@@ -11,7 +11,7 @@ import junit.framework.*;
  */
 public class DiceTest extends TestCase
 {
-    private int trials = 1000;
+    private int trials = 10000;
     double epsilon = 0.000001;
 
     public DiceTest(String name)
@@ -19,7 +19,8 @@ public class DiceTest extends TestCase
         super(name);
     }
 
-    /* Commented out because it's so slow.
+    // Commented out because it's so slow.
+    /*
     public void testDevRandom()
     {
         System.out.println("testDevRandom()");
@@ -33,6 +34,21 @@ public class DiceTest extends TestCase
     }
     */
 
+    // Comented out because not everyone has a /tmp/random :-)
+    /*
+    public void testTmpRandom()
+    {
+        System.out.println("testTmpRandom()");
+        int [] rolls = new int[trials];
+        Dice.init("/tmp/random");
+        for (int i = 0; i < trials; i++)
+        {
+            rolls[i] = Dice.rollDie();
+        }
+        run4Tests(rolls, true);
+    }
+    */
+    
     public void testDevUrandom()
     {
         System.out.println("testDevUrandom()");
@@ -95,9 +111,9 @@ public class DiceTest extends TestCase
         int r = countZeros(ms);
         int M = countRuns(ms);
         int n = trials;
-        double meanM = (2.0 * r * (n - r) / n) + 1;
+        double meanM = (2.0 * r * (n - r) / n) + 1.;
         double varianceM = ((2.0 * r) * (n - r) / n / n * 
-                ((2 * r) * (n - r) - n)) / (n - 1);
+                ((2 * r) * (n - r) - n)) / (n - 1.);
         System.out.println("r=" + r + " M=" + M + " mean=" + meanM + " var=" +
             varianceM);
         failIfAbnormal(M, meanM, varianceM, random); 
@@ -108,10 +124,10 @@ public class DiceTest extends TestCase
      */
     void signTest(int [] rolls, boolean random)
     {
-        double P = countPositiveDiffs(rolls);
-        double m = countNonZeroDiffs(rolls);
-        double meanP = m / 2;
-        double varianceP = m / 12;
+        double P = (double)countPositiveDiffs(rolls);
+        double m = (double)countNonZeroDiffs(rolls);
+        double meanP = m / 2.;
+        double varianceP = m / 12.;
         System.out.println("P=" + P + " m=" + m + " mean=" + meanP + " var=" +
             varianceP);
         failIfAbnormal(P, meanP, varianceP, random); 
@@ -119,10 +135,10 @@ public class DiceTest extends TestCase
 
     void runsTest(int [] rolls, boolean random)
     {
-        double R = countRunsExcludingZeros(rolls);
-        double m = countNonZeroDiffs(rolls);
-        double meanR = (2 * m + 1) / 3;
-        double varianceR = (16 * m - 13) / 90;
+        double R = (double)countRunsExcludingZeros(rolls);
+        double m = (double)countNonZeroDiffs(rolls);
+        double meanR = ((2. * m) + 1.) / 3.;
+        double varianceR = ((16. * m) - 13.) / 90.;
         System.out.println("R=" + R + " m=" + m + " mean=" + meanR + " var=" +
             varianceR);
         failIfAbnormal(R, meanR, varianceR, random); 
@@ -145,8 +161,7 @@ public class DiceTest extends TestCase
         System.out.println("S=" + S + " mean=" + meanS + " var=" + varianceS);
         failIfAbnormal(S, meanS, varianceS, random); 
     }
-
-
+    
     double findMedian(int [] rolls)
     {
         int [] copy = (int [])rolls.clone();
@@ -222,9 +237,9 @@ public class DiceTest extends TestCase
     int countNonZeroDiffs(int [] rolls)
     {
         int count = 0;
-        for (int i = 0; i < rolls.length - 1; i++)
+        for (int i = 1; i < rolls.length ; i++)
         {
-            if (rolls[i + 1] != rolls[i])
+            if (rolls[i] != rolls[i - 1])
             {
                  count++;
             }
@@ -237,26 +252,23 @@ public class DiceTest extends TestCase
         int count = 0;
         // states: 1 = positive, -1 = negative
         int state = 0;
-        int lastNonZeroIndex = 0;
-        for (int i = 0; i < rolls.length; i++)
+        for (int i = 1; i < rolls.length; i++)
         {
-            if (i == 0 || rolls[i] > rolls[lastNonZeroIndex])
+            if (rolls[i] > rolls[i - 1])
             {
                  if (state != 1)
                  {
                      count++;
                  }
                  state = 1;
-                 lastNonZeroIndex = i;
             }
-            else if (rolls[i] < rolls[lastNonZeroIndex])
+            else if (rolls[i] < rolls[i - 1])
             {
                  if (state != -1)
                  {
                      count++;
                  }
                  state = -1;
-                 lastNonZeroIndex = i;
             }
         }
         return count;
@@ -275,10 +287,19 @@ public class DiceTest extends TestCase
     {
         double sd = Math.sqrt(variance);
         double z = (val - mean) / sd;
-        System.out.println("sd=" + sd + " z=" + z);
+        System.out.print("sd=" + sd + " z=" + z);
         if (random && Math.abs(z) > 3)
         {
+            System.out.println(" (FAIL)");
             fail();
+        }
+        else if (!random && Math.abs(z) > 3)
+        {
+            System.out.println(" (EXPECTED FAIL)");
+        }
+        else
+        {
+            System.out.println(" (SUCCESS)");
         }
     }
 
