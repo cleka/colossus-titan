@@ -54,6 +54,7 @@ class MasterBoard extends JFrame implements MouseListener,
     private SummonAngel summonAngel;
     private BattleMap map;
     private Container contentPane;
+    private Turn turn;
 
 
     public MasterBoard(Game game)
@@ -143,7 +144,7 @@ class MasterBoard extends JFrame implements MouseListener,
         setVisible(true);
         repaint();
 
-        new Turn(this, game, this);
+        turn = new Turn(this, game, this);
     }
 
 
@@ -571,6 +572,10 @@ class MasterBoard extends JFrame implements MouseListener,
             highlightEngagements();
         }
         map = null;
+
+        // Make turn visible again.
+        turn.setVisible(true);
+        turn.setEnabled(true);
     }
 
 
@@ -1425,6 +1430,10 @@ class MasterBoard extends JFrame implements MouseListener,
                                     // Battle
                                     if (hex.isEngagement())
                                     {
+                                        // Hide turn to keep it out of the way.
+                                        turn.setVisible(false);
+                                        turn.setEnabled(false);
+
                                         map = new BattleMap(this, attacker, 
                                             defender, hex, hex.getEntrySide());
                                     }
