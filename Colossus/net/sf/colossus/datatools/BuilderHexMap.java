@@ -59,6 +59,11 @@ public class BuilderHexMap extends JPanel implements MouseListener, WindowListen
         setupNeighbors(h);
     }
 
+    BattleHex[][] getBattleHexArray()
+    {
+        return h;
+    }
+
     private void setupHexesGUI()
     {
         hexes.clear();

@@ -1,8 +1,8 @@
 ### BattlelandsBuilder ### README FILE ###
 
-BattlelandsBuilder is a (crude) tools to create Battlelands
-for use with the "Colossus" Game. It requires a JDK or
-JRE >= 1.2.1.
+BattlelandsBuilder is a (crude) tool to interactively
+create Battlelands for use with the "Colossus" Game.
+It requires a JDK or JRE >= 1.2.1.
 
 See <http://colossus.sourceforge.net/>
 

@@ -1,0 +1,449 @@
+options
+{
+  IGNORE_CASE = false;
+  STATIC = false;
+  LOOKAHEAD = 8;
+  FORCE_LA_CHECK = true;
+}
+
+
+PARSER_BEGIN(BattlelandRandomizerLoader)
+package net.sf.colossus.parser;
+
+import java.util.*;
+
+import net.sf.colossus.util.Log;
+import net.sf.colossus.client.BattleHex;
+
+/**
+ * BattlelandRandomizerLoader create a randomized Battleland from a description file.
+ * @author Romain Dolbeau
+ * @version $Id$
+ * @see net.sf.colossus.client.BattleHex
+ */
+public class BattlelandRandomizerLoader
+{
+    private static final boolean[][] show =
+    {
+        {false,false,true,true,true,false},
+        {false,true,true,true,true,false},
+        {false,true,true,true,true,true},
+        {true,true,true,true,true,true},
+        {false,true,true,true,true,true},
+        {false,true,true,true,true,false}
+    };
+    private static final Random rand = new Random();
+
+    private class randomTerrain implements Comparable
+    {
+        private final char terrain;
+        private final double prob;
+        private final double[] e_prob = new double[3];
+
+        private double percent(double val)
+        {
+            if (val < 0.)
+                return 0.;
+            if (val > 100.)
+                return 100.;
+            return val;
+        }
+        private double percent(double val, double sum)
+        {
+            return ((val * 100.) / sum);
+        }
+        randomTerrain(char t)
+        {
+            terrain = t;
+            prob = 100.;
+            e_prob[0] = 100.;
+            e_prob[1] = 0.;
+            e_prob[2] = 0.;
+        }
+        randomTerrain(char t, double p)
+        {
+            terrain = t;
+            prob = percent(p);
+            e_prob[0] = 100.;
+            e_prob[1] = 0.;
+            e_prob[2] = 0.;
+        }
+        randomTerrain(char t, int e)
+        {
+            terrain = t;
+            prob = 100.;
+            e_prob[0] = 0.;
+            e_prob[1] = 0.;
+            e_prob[2] = 0.;
+            if ((e < 1) || (e > 2))
+                e_prob[0] = 100.;
+            else
+                e_prob[e] = 100.;
+        }
+        randomTerrain(char t, double p, int e)
+        {
+            terrain = t;
+            prob = percent(p);
+            e_prob[0] = 0.;
+            e_prob[1] = 0.;
+            e_prob[2] = 0.;
+            if ((e < 1) || (e > 2))
+                e_prob[0] = 100.;
+            else
+                e_prob[e] = 100.;
+        }
+        randomTerrain(char t, double p1, double p2, double p3)
+        {
+            double sum = p1+p2+p3;
+            terrain = t;
+            prob = 100.;
+            e_prob[0] = percent(p1,sum);
+            e_prob[1] = percent(p2,sum);
+            e_prob[2] = percent(p3,sum);
+        }
+        randomTerrain(char t, double p, double p1, double p2, double p3)
+        {
+            double sum = p1+p2+p3;
+            terrain = t;
+            prob = percent(p);
+            e_prob[0] = percent(p1,sum);
+            e_prob[1] = percent(p2,sum);
+            e_prob[2] = percent(p3,sum);
+        }
+        public String toString()
+        {
+            String s =  "Terrain '" + terrain + "'";
+            if (prob < 100.)
+                s = s + " (" + prob + "%)";
+            s = s + " [" + e_prob[0] + "/" + e_prob[1] + "/" + e_prob[2] + "]";
+            return s;
+        }
+        public int compareTo(Object o)
+        {
+            randomTerrain other = (randomTerrain)o;
+            if (other.prob != prob)
+            {
+                return (prob > other.prob ? -1 : 1);
+            }
+            return 0;
+        }
+    }
+    private class address implements Comparable
+    {
+        final int x;
+        final int y;
+        address(int ox, int oy)
+        {
+            x = ox; y = oy;
+        }
+        public String toString()
+        {
+            return "(" + x + "," + y + ")";
+        }
+        public int compareTo(Object o)
+        {
+            address other = (address)o;
+            if (other.x != x)
+            {
+                return (x < other.x ? -1 : 1);
+            }
+            if (other.y != y)
+            {
+                return (y < other.y ? -1 : 1);
+            }
+            return 0;
+        }
+    }
+    private boolean exist(address a)
+    {
+        return (a.x >= 0) && (a.x < show.length) &&
+               (a.y >= 0) && (a.y < show[0].length) &&
+               (show[a.x][a.y]);
+    }
+    private class range
+    {
+        final int min;
+        final int max;
+        range(int mi, int ma)
+        {
+            min = mi; max = ma;
+        }
+    }
+    private void resolveOne(BattleHex[][] h, List al, randomTerrain t)
+    {
+        if (al.isEmpty())
+            return;
+        double result = rand.nextDouble() * 100.;
+        if (result >= t.prob)
+            return;
+        int pos = rand.nextInt(al.size());
+        address a = (address)al.remove(pos);
+        BattleHex hex = h[a.x][a.y];
+        hex.setTerrain(t.terrain);
+        result = rand.nextDouble() * 100.;
+        hex.setElevation(0);
+        if (result > t.e_prob[0])
+            hex.setElevation(1);
+        if (result > (t.e_prob[0] + t.e_prob[1]))
+            hex.setElevation(2);
+    }
+    private void resolveAll(BattleHex[][] h, List al, List tl)
+    {
+        Iterator it = tl.iterator();
+        while (it.hasNext())
+        {
+            randomTerrain rt = (randomTerrain)it.next();
+            resolveOne(h, al, rt);
+        }
+    }
+}
+
+PARSER_END(BattlelandRandomizerLoader)
+
+SKIP :
+{
+        " "
+  |     "\r"
+  |     "\t"
+}
+
+TOKEN :
+{
+        < COMMENT : "#"(<NOTNEWLINE>)*"\r" | "#"(<NOTNEWLINE>)*"\n" >
+|       < #NOTNEWLINE : ~["\n","\r"] >
+}
+
+String z_comment() :
+{}
+{
+    <COMMENT>
+    {
+        return(new String(token.image));
+    }
+}
+
+TOKEN :
+{
+    < EOL: "\n" >
+|   < AREA : "AREA" >
+|   < TERRAINS : "TERRAINS" >
+|   < INSIDE : "inside" >
+|   < LEFTDEFENSE : "leftdefense" >
+|   < UPPERDEFENSE : "upperdefense" >
+|   < LOWERDEFENSE : "lowerdefense" >
+}
+
+TOKEN :
+{
+    < NUMBER : (<DIGIT>)+ >
+|   < FPNUMBER : (<DIGIT>)+<DOT>(<DIGIT>)* >
+|   < DIGIT : ["0" - "9"] >
+|   < COMMA : "," >
+|   < DOT : "." >
+|   < OPENPAR : "(" >
+|   < CLOSEPAR : ")" >
+|   < CARET : "-" >
+}
+
+TOKEN :
+{
+    < TERRAIN : ["a"-"z","A"-"Z"] >
+}
+
+char z_terrain() :
+{}
+{
+    <TERRAIN>
+    { return(token.image.charAt(0)); }
+}
+
+int z_number() :
+{}
+{
+    <NUMBER>
+    { return(Integer.parseInt(token.image)); }
+}
+
+double z_fpnumber() :
+{}
+{
+    <FPNUMBER>
+    { return(Double.parseDouble(token.image)); }
+}
+
+address z_address() :
+{
+    int x,y;
+    List al;
+}
+{
+    <OPENPAR> (x = z_number()) <COMMA> (y = z_number()) <CLOSEPAR>
+    {
+        return new address(x,y);
+    }
+}
+
+range z_range() :
+{
+    int a,b;
+}
+{
+    (a = z_number()) <CARET> (b = z_number())
+    { return new range(a,b); }
+}
+
+List z_listAddress() :
+{
+    address ad;
+    List al;
+    int x,y;
+    range r1, r2;
+    int i,j;
+}
+{
+    <OPENPAR> <INSIDE> <CLOSEPAR> (al = z_listAddress())
+    { // hard-coded value
+        for (i = 1; i <= 4 ; i++)
+            for (j = 2; j <= 3 ; j++)
+                al.add(new address(i,j));
+        al.add(new address(3,1));
+        for (i = 2; i <= 4 ; i++)
+            al.add(new address(i,4));
+        return(al);
+    }
+|   <OPENPAR> <LEFTDEFENSE> <CLOSEPAR> (al = z_listAddress())
+    { // hard-coded value
+        for (i = 2; i <= 4 ; i++)
+            al.add(new address(0,i));
+        return(al);
+    }
+|   <OPENPAR> <UPPERDEFENSE> <CLOSEPAR> (al = z_listAddress())
+    { // hard-coded value
+        al.add(new address(3,0));
+        for (i = 4; i <= 5 ; i++)
+            al.add(new address(i,1));
+        return(al);
+    }
+|   <OPENPAR> <LOWERDEFENSE> <CLOSEPAR> (al = z_listAddress())
+    { // hard-coded value
+        al.add(new address(5,4));
+        for (i = 3; i <= 4 ; i++)
+            al.add(new address(i,5));
+        return(al);
+    }
+|   (ad = z_address()) (al = z_listAddress())
+    {
+        if (exist(ad))
+            al.add(ad);
+        return(al);
+    }
+|   <OPENPAR> (r1 = z_range()) <COMMA> (y = z_number()) <CLOSEPAR> (al = z_listAddress())
+    {
+        for (i = r1.min ; i <= r1.max ; i++)
+        {
+            ad = new address(i,y);
+            if (exist(ad))
+                al.add(ad);
+        }
+        return al;
+    }
+|   <OPENPAR> (x = z_number()) <COMMA> (r2 = z_range()) <CLOSEPAR> (al = z_listAddress())
+    {
+        for (i = r2.min ; i <= r2.max ; i++)
+        {
+            ad = new address(x,i);
+            if (exist(ad))
+                al.add(ad);
+        }
+        return al;
+    }
+|   <OPENPAR> (r1 = z_range()) <COMMA> (r2 = z_range()) <CLOSEPAR> (al = z_listAddress())
+    {
+        for (i = r1.min ; i <= r1.max ; i++)
+        for (j = r2.min ; j <= r2.max ; j++)
+        {
+            ad = new address(i,j);
+            if (exist(ad))
+                al.add(ad);
+        }
+        return al;
+    }
+|   /* empty */
+    { return new ArrayList(); }
+}
+
+List z_listTerrain() :
+{
+    char t;
+    int e;
+    List tl;
+    double p,p1,p2,p3;
+}
+{
+    (t = z_terrain()) <COMMA> (p = z_fpnumber()) <COMMA> (p1 = z_fpnumber()) <COMMA> (p2 = z_fpnumber()) <COMMA> (p3 = z_fpnumber()) (tl = z_listTerrain())
+    {
+        randomTerrain rt = new randomTerrain(t, p, p1, p2, p3);
+        tl.add(rt);
+        return tl;
+    }
+|   (t = z_terrain()) <COMMA> (p1 = z_fpnumber()) <COMMA> (p2 = z_fpnumber()) <COMMA> (p3 = z_fpnumber()) (tl = z_listTerrain())
+    {
+        randomTerrain rt = new randomTerrain(t, p1, p2, p3);
+        tl.add(rt);
+        return tl;
+    }
+|   (t = z_terrain()) <COMMA> (p = z_fpnumber()) <COMMA> (e = z_number()) (tl = z_listTerrain())
+    {
+        randomTerrain rt = new randomTerrain(t, p, e);
+        tl.add(rt);
+        return tl;
+    }
+|   (t = z_terrain()) <COMMA> (p = z_fpnumber()) (tl = z_listTerrain())
+    {
+        randomTerrain rt = new randomTerrain(t, p);
+        tl.add(rt);
+        return tl;
+    }
+|   (t = z_terrain()) <COMMA> (e = z_number()) (tl = z_listTerrain())
+    {
+        randomTerrain rt = new randomTerrain(t, e);
+        tl.add(rt);
+        return tl;
+    }
+|   (t = z_terrain()) (tl = z_listTerrain())
+    {
+        randomTerrain rt = new randomTerrain(t);
+        tl.add(rt);
+        return tl;
+    }
+|   /* empty */
+    { return new ArrayList(); }
+}
+
+int oneArea(BattleHex h[][]) :
+{
+    List al;
+    List tl;
+    String s;
+}
+{
+    <AREA> (al = z_listAddress()) <TERRAINS> (tl = z_listTerrain())
+    {
+        Collections.sort(al);
+        //System.err.println("Using area: " + al + ", terrains: " + tl);
+        resolveAll(h, al, tl);
+        return(0);
+    }
+|   <EOL>
+    {
+        return(0);
+    }
+|   (s = z_comment())
+    {
+        return(0);
+    }
+|   <EOF>
+    {
+        return(-1);
+    }
+}

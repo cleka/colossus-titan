@@ -1,0 +1,65 @@
+### BattlelandsRandomizer ### README FILE ###
+
+BattlelandsRandomizer is a (very crude) tool to randomly
+create Battlelands for use with the "Colossus" Game.
+It requires a JDK or JRE >= 1.2.1.
+
+See <http://colossus.sourceforge.net/>
+
+BattlelandsRandomizer use an input file that describe
+the properties of the future Battleland, and generate
+one random Battleland. At the moment, it's a purely
+static, text-based process.
+
+It's not finished yet, as no inter-hexagon hazard
+are generated yet (such as slope, ...).
+
+Properties are line of the form:
+
+AREA <list_of_hex> TERRAINS <list_of_hazards>
+
+where
+
+* AREA and TERRAINS are the literal strings AREA and TERRAINS
+
+* <list_of_hex> is a list of hex from the following available forms:
+    (<number>,<number>)
+    (<range>,<range>)
+    (<number>,<range>)
+    (<range>,<number>)
+    (inside)
+    (leftdefense)
+    (upperdefense)
+    (lowerdefense)
+    where <number> is a number between 0 and 5, and <range> is of the form
+        <number>-<number>
+    i.e. a range of number between 0 and 5. The other four forms are literal
+    string, and represent everything but the most outside Hex, and the 3
+    lines of 3 hexagons representing the defense entry lines (left,
+    upper-right, and lower-right respectively).
+
+* <list_of_hazards> is a list of Hazard from the following available forms:
+    <hazard_letter>
+    <hazard_letter>,<probability>
+    <hazard_letter>,<elevation>
+    <hazard_letter>,<probability_elevation_0>,<probability_elevation_1>,<probability_elevation_2>
+    <hazard_letter>,<probability>,<probability_elevation_0>,<probability_elevation_1>,<probability_elevation_2>
+    where <hazard_letter> is a letter representing a Hazard ('r' for Brush, and so on, see BattleHex.java), <probability> is a float number representing the
+    percentile of chance of the hazard being present (a numerical point
+    _must_ be present for all probability), <elevation> is a hard-coded
+    elevation (integer between 0 and 2), and the three
+    <probability_elevation_X> are the odds of the terrain being at elevation
+    0, 1 and 2 respectively (it's better is the sum is 100., but they will
+    be normalized to percentile values).
+
+BattlelandsRandomizer will then, for each AREA, try to put the
+Hazard in any one of the Hex in the AREA. An Hex will not receive
+two hazards, but if an Hex is present multiple times in the same
+AREA, it may receive one Hazard per occurence of the Hex. In this
+case, only the last Hazard is used.
+
+AERAs are processed in order, so an Hex that appears in multiple
+AREAS may also receive multiple Hazards. In this case alsom
+only the last Hazard is used.
+
+File Version: $Header$
