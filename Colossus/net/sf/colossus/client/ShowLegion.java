@@ -45,12 +45,16 @@ final class ShowLegion extends KDialog implements MouseListener,
         while (it.hasNext())
         {
             String imageName = (String)it.next();
-
             boolean sure = ((Boolean)it2.next()).booleanValue();
-            
             Chit chit = new Chit(scale, imageName, this, false, !sure);
             contentPane.add(chit);
             chit.addMouseListener(this);
+        }
+
+        // This fixes a repaint bug under Linux.
+        if (imageNames.size() == 1)
+        {
+            contentPane.add(Box.createRigidArea(new Dimension(scale, scale)));
         }
 
         pack();
