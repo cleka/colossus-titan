@@ -1434,12 +1434,18 @@ public class SimpleAI implements AI
         return value;
     }
 
+    protected static final int WIN_WITH_MINIMAL_LOSSES = 0;
+    protected static final int WIN_WITH_HEAVY_LOSSES = 1;
+    protected static final int DRAW = 2;
+    protected static final int LOSE_BUT_INFLICT_HEAVY_LOSSES = 3;
+    protected static final int LOSE = 4;
 
-    private static final int WIN_WITH_MINIMAL_LOSSES = 0;
-    private static final int WIN_WITH_HEAVY_LOSSES = 1;
-    private static final int DRAW = 2;
-    private static final int LOSE_BUT_INFLICT_HEAVY_LOSSES = 3;
-    private static final int LOSE = 4;
+    /* can be overloaded by subclass -> not final */
+
+    protected static double RATIO_WIN_MINIMAL_LOSS = 1.30;
+    protected static double RATIO_WIN_HEAVY_LOSS = 1.15;
+    protected static double RATIO_DRAW = 0.85;
+    protected static double RATIO_LOSE_HEAVY_LOSS = 0.70;
 
     private static int estimateBattleResults(Legion attacker, Legion defender,
         MasterHex hex)
@@ -1496,19 +1502,19 @@ public class SimpleAI implements AI
         // really dumb estimator
         double ratio = (double)attackerPointValue / (double)defenderPointValue;
 
-        if (ratio >= 1.30)
+        if (ratio >= RATIO_WIN_MINIMAL_LOSS)
         {
             return WIN_WITH_MINIMAL_LOSSES;
         }
-        else if (ratio >= 1.15)
+        else if (ratio >= RATIO_WIN_HEAVY_LOSS)
         {
             return WIN_WITH_HEAVY_LOSSES;
         }
-        else if (ratio >= 0.85)
+        else if (ratio >= RATIO_DRAW)
         {
             return DRAW;
         }
-        else if (ratio >= 0.70)
+        else if (ratio >= RATIO_LOSE_HEAVY_LOSS)
         {
             return LOSE_BUT_INFLICT_HEAVY_LOSSES;
         }
