@@ -1,8 +1,9 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import javax.swing.*;
 import java.util.*;
-
+//import java.lang.reflect.*;  Needed?
 
 /**
  * Class GetPlayers is a dialog used to enter players' names.
@@ -14,15 +15,14 @@ import java.util.*;
 public final class GetPlayers extends JDialog implements WindowListener,
     ActionListener
 {
+    public static final int maxAIsupported = 16;
     public static String newGame = "New Game";
     public static String loadGame = "Load Game";
     public static String quit = "Quit";
-    public static String human = "Human";
-    public static String ai = "AI";
     public static String none = "None";
     public static String byColor = "<By color>";
     public static String username = System.getProperty("user.name", byColor);
-    public static String [] typeChoices = { ai, human, none };
+    public static String [] typeChoices = null;;
     public static String [] nameChoices = { byColor, username, none };
 
     private JFrame parentFrame;
@@ -37,6 +37,33 @@ public final class GetPlayers extends JDialog implements WindowListener,
     private GetPlayers(JFrame parentFrame)
     {
         super(parentFrame, "Player Setup", true);
+
+        /* get the list of the available AI */
+        /* not reliable yet */
+        //String[] aiList = getAIList();
+        String[] aiList = { "SimpleAI" }; 
+        /* should match the class name of available AI */
+
+        int ainum = 0, j = 0;
+        for (int i = 0 ; i < aiList.length ; i++) 
+        {
+            if (!(aiList[i].equals("")))
+            {
+                ainum++;
+            }
+        }
+        typeChoices = new String[2 + ainum];
+        typeChoices[0] = "Human";
+        typeChoices[1] = "None";
+        j = 2;
+        for (int i = 0 ; i < aiList.length ; i++) 
+        {
+            if (!(aiList[i].equals("")))
+            {
+                typeChoices[j] = aiList[i];
+            }
+            j++;
+        }
 
         this.parentFrame = parentFrame;
         setBackground(Color.lightGray);
@@ -54,7 +81,11 @@ public final class GetPlayers extends JDialog implements WindowListener,
             JComboBox playerType = new JComboBox(typeChoices);
             if (i == 0)
             {
-                playerType.setSelectedItem(human);
+                playerType.setSelectedItem("Human");
+            }
+            else
+            {
+                playerType.setSelectedItem(aiList[0]);
             }
             contentPane.add(playerType);
             playerType.addActionListener(this);
@@ -278,4 +309,83 @@ public final class GetPlayers extends JDialog implements WindowListener,
         }
         System.exit(0);
     }
+
+    class AIFilenameFilter implements FilenameFilter 
+    {
+        public boolean accept(File dir, String name) 
+        {
+            if (name.endsWith("AI.class"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public String getDescription() 
+        {
+            return("Filter file that ends in AI.class");
+        }
+    }
+
+    /*
+    public String[] getAIList() 
+    { // not working properly yet.
+        String [] aiList = new String[maxAIsupported];
+        File simpleAIFile = new File("SimpleAI.class");
+        int ainum = 0;
+        for (int i = 0; i < maxAIsupported; i++)
+        {
+            aiList[i] = "";
+        }
+        
+        Class interfaceAIClass = null;
+        try 
+        {
+            interfaceAIClass = Class.forName("AI");
+        } 
+        catch (Exception e) 
+        {
+            System.out.println("Checking AI interface failed : " + e);
+            System.exit(1);
+        }
+
+        String [] tempAIList = simpleAIFile.getAbsoluteFile().
+            getParentFile().list(new AIFilenameFilter());
+        for (int i = 0; i < tempAIList.length ; i++) 
+        {
+            if ((!tempAIList[i].equals("AI.class")) && 
+                (ainum < maxAIsupported)) 
+            {
+                String aiClassName = tempAIList[i].substring(0, 
+                    tempAIList[i].lastIndexOf(".class"));
+                Class aiClass = null;
+
+                System.out.print("Checking AI by the name of " + aiClassName);
+                try 
+                {
+                    aiClass = Class.forName(aiClassName);
+                } 
+                catch (Exception e) 
+                {
+                    System.out.println(" ; Checking failed : " + e);
+                    System.exit(1);
+                }
+                if (interfaceAIClass.isAssignableFrom(aiClass)) 
+                {
+                    System.out.println(" ; success");
+                    aiList[ainum] = aiClassName; ainum++;
+                }
+                else
+                {
+                    System.out.println(" ; failure");
+                }
+            }
+        }
+        return(aiList);
+    }
+    */
+
 }

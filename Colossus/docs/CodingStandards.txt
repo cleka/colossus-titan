@@ -72,7 +72,11 @@ you took out somehow got back in, you'll know.  And you'll also
 be able to write a better check-in comment because you won't
 forget about that other change you made yesterday.
 
-10. Otherwise just try to follow the existing format.  A foolish
+10. Fully brace conditionals, even if the clause is only one line
+and doesn't technically need braces.  This makes the code taller,
+but easier to read and change.
+
+11. Otherwise just try to follow the existing format.  A foolish
 consistency may be the hobgoblin of little minds, but it sure
 makes code easier to read.
 

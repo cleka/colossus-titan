@@ -83,7 +83,7 @@ public final class Game extends GameSource
 
 
     /**
-     * MaKe a deep copy for the AI to use.
+     * Make a deep copy for the AI to use.
      * This preserves all game state but throws away a lot of the UI stuff
      */
     public Game AICopy()
@@ -183,11 +183,11 @@ public final class Game extends GameSource
         {
             Player player = (Player)it.next();
             String type = player.getType();
-            if (type.equals(GetPlayers.ai))
+            if (type.endsWith("AI"))
             {
                 server.setClientOption(i, Options.autoPlay, true);
             }
-            else if (type.equals(GetPlayers.human))
+            else if (type.equals("Human"))
             {
                 server.setClientOption(i, Options.autoPlay, false);
             }
@@ -205,11 +205,11 @@ public final class Game extends GameSource
         // Let human players pick colors first, followed by AI players.
         for (i = getNumPlayers() - 1; i >= 0; i--)
         {
-            pickPlayerColor(i, GetPlayers.human, colorsLeft, frame);
+            pickPlayerColor(i, "Human", colorsLeft, frame);
         }
         for (i = getNumPlayers() - 1; i >= 0; i--)
         {
-            pickPlayerColor(i, GetPlayers.ai, colorsLeft, frame);
+            pickPlayerColor(i, "AllAI", colorsLeft, frame);
         }
 
         it = players.iterator();
@@ -241,7 +241,15 @@ public final class Game extends GameSource
         JFrame frame)
     {
         Player player = (Player)players.get(i);
-        if (!type.equals(player.getType()))
+        if (player.getType().equals("none"))
+        {
+            return;
+        }
+        if (player.getType().equals("Human") && (!type.equals("Human")))
+        {
+            return;
+        }
+        if (!player.getType().equals("Human") && (type.equals("Human")))
         {
             return;
         }
@@ -357,7 +365,7 @@ public final class Game extends GameSource
 
     public void addPlayer(String name)
     {
-        addPlayer(name, GetPlayers.human);
+        addPlayer(name, "Human");
     }
 
     public void addPlayer(String name, String type)
@@ -696,7 +704,8 @@ public final class Game extends GameSource
 
 
     /** Create a text file describing this game's state, in
-     *  file filename.
+     *  file filename.  We don't use XML yet because we don't 
+     *  want to require everyone to install a parser.
      *  Format:
      *     Savegame version string
      *     Number of players
@@ -1056,7 +1065,7 @@ public final class Game extends GameSource
             {
                 Player player = (Player)it.next();
                 String name = player.getName();
-                if (player.getType().equals(GetPlayers.ai))
+                if (player.getType().endsWith("AI"))
                 {
                     server.setClientOption(name, Options.autoPlay, true);
                 }

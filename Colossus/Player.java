@@ -17,8 +17,7 @@ public final class Player implements Comparable
     private boolean summoned;
     private boolean teleported;
     private String playersEliminated;  // RdBkGr
-// XXX DEBUG XXX FIXME XXX
-private int mulligansLeft = 99;
+    private int mulligansLeft = 1;
     private int movementRoll;          // 0 if movement has not been rolled.
     private ArrayList legions = new ArrayList();
     private boolean dead;
@@ -26,7 +25,7 @@ private int mulligansLeft = 99;
     private String donorId;
     private MarkerComparator markerComparator = new MarkerComparator();
     private TreeSet markersAvailable = new TreeSet(markerComparator);
-    private String type;               // ai or human
+    private String type;               // "Human" or ".*AI"
 
     private AI ai = new SimpleAI();    // TODO Allow pluggable AIs.
 
@@ -35,7 +34,7 @@ private int mulligansLeft = 99;
     {
         this.name = name;
         this.game = game;
-        type = GetPlayers.human;
+        type = "Human";
     }
 
 
@@ -78,6 +77,24 @@ private int mulligansLeft = 99;
     public void setType(String type)
     {
         this.type = type;
+        if (type.endsWith("AI"))
+        {
+            if (!(ai.getClass().getName().equals(type))) 
+            {
+                System.out.println("Changing player " + name + " from " +
+                    ai.getClass().getName() + " to " + type);
+                try 
+                {
+                    ai = (AI)Class.forName(type).getDeclaredConstructor(
+                        new Class[0]).newInstance(new Object[0]);
+                } 
+                catch (Exception e) 
+                {
+                    System.out.println("Failed to change player " + name +
+                        " from " + ai.getClass().getName() + " to " + type);
+                }
+            }
+        }
     }
 
 
