@@ -224,15 +224,6 @@ final class StatusScreen extends KDialog implements WindowListener
         if (nameLabel[i].getBackground() != color)
         {
             nameLabel[i].setBackground(color);
-            towerLabel[i].setBackground(color);
-            colorLabel[i].setBackground(color);
-            elimLabel[i].setBackground(color);
-            legionsLabel[i].setBackground(color);
-            markersLabel[i].setBackground(color);
-            creaturesLabel[i].setBackground(color);
-            valueLabel[i].setBackground(color);
-            titanLabel[i].setBackground(color);
-            scoreLabel[i].setBackground(color);
         }
     }
 
