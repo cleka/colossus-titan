@@ -261,7 +261,7 @@ public class GUIBattleHex extends BattleHex
                     g2.setColor(Color.white);
                     Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
                         rect.width, rect.height,
-                        ((2 * Math.PI - theta) * RAD_TO_DEG), 180,
+                        Math.toDegrees(2 * Math.PI - theta), 180,
                         Arc2D.OPEN);
                     g2.fill(arc);
                     g2.setColor(Color.black);

@@ -393,8 +393,7 @@ public final class GUIMasterHex extends MasterHex
 
                 Arc2D.Double arc = new Arc2D.Double(rect.x, rect.y,
                     rect.width, rect.height,
-                    ((2 * Math.PI - theta) * RAD_TO_DEG), 180,
-                    Arc2D.OPEN);
+                    Math.toDegrees(-theta), 180, Arc2D.OPEN);
 
                 g2.setColor(Color.white);
                 g2.fill(arc);

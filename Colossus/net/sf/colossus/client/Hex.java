@@ -14,7 +14,6 @@ import java.awt.geom.*;
 public abstract class Hex
 {
     public static final double SQRT3 = Math.sqrt(3.0);
-    public static final double RAD_TO_DEG = 180 / Math.PI;
 
     // The hex vertexes are numbered like this:
     //
