@@ -371,7 +371,7 @@ public class BattleMap extends JFrame implements MouseListener,
         Player player = turn.getActivePlayer();
         for (int i = 0; i < numChits; i++)
         {
-            if (chits[i].getCurrentHex().getXCoord() == -1 &&
+            if (chits[i].getCurrentHex().isEntrance() &&
                 chits[i].getPlayer() == player)
             {
                 chits[i].setDead(true);
@@ -1226,6 +1226,7 @@ public class BattleMap extends JFrame implements MouseListener,
                 if (legion.getPlayer().canSummonAngel())
                 {
                     // Make sure the MasterBoard is visible.
+                    // XXX: board.deiconify() when it becomes available
                     board.show();
 
                     SummonAngel summonAngel = new SummonAngel(board, attacker);
@@ -1266,7 +1267,7 @@ public class BattleMap extends JFrame implements MouseListener,
                 
                 // After turn 1, offboard chits are returned to the stacks or
                 //   the stack they were summoned from, with no points awarded.
-                if (chits[i].getCurrentHex().getXCoord() == -1 && 
+                if (chits[i].getCurrentHex().isEntrance() && 
                     turn.getTurnNumber() > 1)
                 {
                     if (creature == Creature.angel || creature == 
