@@ -1216,6 +1216,7 @@ public class BattleMap extends JFrame implements MouseListener,
                 {
                     // Make sure the MasterBoard is visible.
                     board.deiconify();
+System.out.println("board.show()");
                     board.show();
 
                     SummonAngel summonAngel = new SummonAngel(board, attacker);
