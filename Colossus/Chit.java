@@ -39,15 +39,6 @@ class Chit
         image = Toolkit.getDefaultToolkit().createImage(producer);
     }
 
-    Chit(int cx, int cy, int scale, String imageFilename,
-        Container container)
-    {
-        rect = new Rectangle(cx, cy, scale, scale);
-        this.container = container;
-        Image image = 
-            Toolkit.getDefaultToolkit().getImage(imageFilename);
-    }
-
 
     void rescale(int scale)
     {
