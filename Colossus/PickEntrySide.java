@@ -79,6 +79,7 @@ public class PickEntrySide extends JPanel implements ActionListener,
 
         dialog.setSize(getPreferredSize());
         dialog.setResizable(false);
+        setOpaque(true);
         setBackground(Color.white);
         dialog.setBackground(Color.white);
 

@@ -31,7 +31,7 @@ public class Battle
     private MasterBoard board;
     private MasterHex masterHex;
     private SummonAngel summonAngel;
-    private ShowDice showDice;
+    private BattleDice battleDice;
 
     private int turnNumber = 1;
     private int phase = MOVE;
@@ -54,7 +54,10 @@ public class Battle
         this.masterHex = masterHex;
         this.defender = defender;
         this.attacker = attacker;
-        this.game = board.getGame();
+        if (board != null)
+        {
+            this.game = board.getGame();
+        }
 
         activeLegion = defender;
 
@@ -66,9 +69,9 @@ public class Battle
         // XXX Assumes that battles load at the beginning of a phase.
         map.setupPhase();
 
-        if (game.getShowShowDice())
+        if (getShowDice())
         {
-            showDice = new ShowDice(board.getGame());
+            initBattleDice();
         }
     }
 
@@ -1001,7 +1004,7 @@ public class Battle
     }
 
     /** Return the set of hex labels for hexes with valid carry targets. */
-    public Set findCarries()
+    public Set findCarryTargets()
     {
         HashSet set = new HashSet();
 
@@ -1021,7 +1024,7 @@ public class Battle
 
     public int highlightCarries()
     {
-        Set set = findCarries();
+        Set set = findCarryTargets();
         map.unselectAllHexes();
         map.selectHexesByLabels(set);
         return set.size();
@@ -1039,7 +1042,7 @@ public class Battle
             " hits carry to ") + target.getName() + " in " + 
             target.getCurrentHex().getLabel());
 
-        if (carryDamage <= 0 || findCarries().isEmpty())
+        if (carryDamage <= 0 || findCarryTargets().isEmpty())
         {
             clearAllCarries();
         }
@@ -1047,14 +1050,11 @@ public class Battle
         {
             String label = target.getCurrentHex().getLabel();
             map.unselectHexByLabel(label);
-            if (game.getShowShowDice())
+            Game.logEvent(carryDamage + "carries available");
+            if (game.getShowDice())
             {
-                if (showDice == null)
-                {
-                    showDice = new ShowDice(board.getGame());
-                }
-                showDice.setCarries(carryDamage);
-                showDice.setup();
+                battleDice.setCarries(carryDamage);
+                battleDice.setup();
             }
         }
     }
@@ -1609,30 +1609,38 @@ public class Battle
     }
 
 
-    public ShowDice getShowDice()
+    public boolean getShowDice()
     {
-        if (game.getShowShowDice())
+        if (game != null)
         {
-            if (showDice == null)
-            {
-                showDice = new ShowDice(board.getGame());
-            }
-            return showDice;
+            return game.getShowDice();
         }
         else
         {
-            return null;
+            return true;
         }
     }
 
 
-    public void clearShowDice()
+    public BattleDice getBattleDice()
     {
-        if (showDice != null)
+        return battleDice;
+    }
+
+
+    public void initBattleDice()
+    {
+        battleDice = new BattleDice(game);
+    }
+
+
+    public void disposeBattleDice()
+    {
+        if (battleDice != null)
         {
-            showDice.dispose();
+            battleDice.dispose();
         }
-        showDice = null;
+        battleDice = null;
     }
 
 
@@ -1772,7 +1780,10 @@ public class Battle
             legion.healAllCreatures();
         }
 
-        game.finishBattle();
+        if (game != null)
+        {
+            game.finishBattle();
+        }
     }
 
 

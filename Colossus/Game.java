@@ -55,11 +55,11 @@ public class Game
     public static final String sAllStacksVisible = "All stacks visible";
     public static final String sAutoPickRecruiter = "Autopick recruiter";
     public static final String sShowStatusScreen = "Show game status";
-    public static final String sShowShowDice = "Show dice";
+    public static final String sShowDice = "Show dice";
 
     // Per-player client options
     private static boolean autoPickRecruiter;
-    private static boolean showShowDice = true;
+    private static boolean showDice = true;
     private static boolean showStatusScreen = true;
     // XXX Add default name, favorite colors by player name.
 
@@ -338,27 +338,35 @@ public class Game
     }
 
 
-    public boolean getShowShowDice()
+    public boolean getShowDice()
     {
-        return showShowDice;
+        return showDice;
     }
 
 
-    public void setShowShowDice(boolean showShowDice)
+    public void setShowDice(boolean showDice)
     {
-        boolean previous = this.showShowDice;
-        if (showShowDice != previous)
+        boolean previous = this.showDice;
+        if (showDice != previous)
         {
-            this.showShowDice = showShowDice;
-            if (!showShowDice)
+            this.showDice = showDice;
+
+            if (showDice)
             {
                 if (battle != null)
                 {
-                    battle.clearShowDice();
+                    battle.initBattleDice();
+                }
+            }
+            else
+            {
+                if (battle != null)
+                {
+                    battle.disposeBattleDice();
                 }
                 if (board != null)
                 {
-                    board.disableShowShowDice();
+                    board.twiddleShowDice(false);
                 }
             }
         }
@@ -488,7 +496,7 @@ public class Game
         }
         else
         {
-            board.disableShowStatusScreen();
+            board.twiddleShowStatusScreen(false);
             statusScreen.dispose();
             this.statusScreen = null;
         }
@@ -640,7 +648,7 @@ public class Game
             allStacksVisible));
         options.setProperty(sAutoPickRecruiter, String.valueOf(
             autoPickRecruiter));
-        options.setProperty(sShowShowDice, String.valueOf(showShowDice));
+        options.setProperty(sShowDice, String.valueOf(showDice));
         options.setProperty(sShowStatusScreen, String.valueOf(
             showStatusScreen));
         try
@@ -651,7 +659,6 @@ public class Game
         }
         catch (Exception e)
         {
-            System.out.println(e.toString());
             System.out.println("Couldn't write options to " + optionsPath);
         }
     }
@@ -670,7 +677,6 @@ public class Game
         }
         catch (Exception e)
         {
-            System.out.println(e.toString());
             System.out.println("Couldn't read options from " + optionsPath);
             return;
         }
@@ -681,9 +687,16 @@ public class Game
             "true"));
         autoPickRecruiter = (options.getProperty(sAutoPickRecruiter).equals(
             "true"));
-        showShowDice = (options.getProperty(sShowShowDice).equals("true"));
+        showDice = (options.getProperty(sShowDice).equals("true"));
         showStatusScreen = (options.getProperty(sShowStatusScreen).equals(
             "true"));
+
+
+        board.twiddleAutosave(autosave);
+        board.twiddleAllStacksVisible(allStacksVisible);
+        board.twiddleAutoPickRecruiter(autoPickRecruiter);
+        board.twiddleShowStatusScreen(showStatusScreen);
+        board.twiddleShowDice(showDice);
     }
 
 
@@ -1022,7 +1035,7 @@ public class Game
                     String markerId = in.readLine();
 
                     buf = in.readLine();
-                    int hexLabel = Integer.parseInt(buf);
+                    String hexLabel = buf;
 
                     buf = in.readLine();
                     int height = Integer.parseInt(buf);
@@ -1206,7 +1219,7 @@ public class Game
 
 
     /** Return the number of the given recruiter needed to muster the given
-      * recruit in the given terrain.  Return an impossible big number
+      * recruit in the given terrain.  Return an impossibly big number
       * if the recruiter can't muster that recruit in that terrain. */
     public static int numberOfRecruiterNeeded(Creature recruiter, Creature
         recruit, char terrain)
@@ -2021,7 +2034,8 @@ public class Game
     public void placeInitialLegion(Player player)
     {
         // Lookup coords for chit starting from player[i].getTower()
-        MasterHex hex = MasterBoard.getHexFromLabel(100 * player.getTower());
+        MasterHex hex = MasterBoard.getHexFromLabel(String.valueOf(
+            100 * player.getTower()));
 
         Creature.titan.takeOne();
         Creature.angel.takeOne();
@@ -2266,7 +2280,7 @@ public class Game
                 // Mark every unoccupied tower.
                 for (int tower = 100; tower <= 600; tower += 100)
                 {
-                    hex = MasterBoard.getHexFromLabel(tower);
+                    hex = MasterBoard.getHexFromLabel(String.valueOf(tower));
                     if (!hex.isOccupied())
                     {
                         set.add(hex.getLabel());

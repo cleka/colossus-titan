@@ -25,16 +25,6 @@ Concession timing.  If both players want to concede, the non-phasing
 Striking continues after concession, until the normal time to check for
    creature (and then player) death.
 
-Linux, ibmjdk118: Drift damage was not applied to a cyclops.
-
-Linux, ibmjdk118: Legion with angel in tower did not immediately
-   have tower teleport moves highlighted, as if player had already
-   teleported.  "Undo All Moves" fixed the problem.
-
-Linux, ibmjdk118: Angel summoned into battle can move on top of
-   any of its allies which has not moved yet, because their hexes
-   are highlighted.
-
 Solaris, jdk1.3: Tried to strike allied <creature>
 
 Solaris, jdk1.3: Sometimes moving a chit onto its own hex in battle
@@ -58,9 +48,4 @@ Solaris, jdk1.3: Square (red, black, or white) in NW corner of board
 
 Solaris, jdk1.3: BattleMap menu is not immediately active.  It takes a
    few seconds to wake up.
-
-Win98, jdk1.3: ShowDice steals keyboard focus from BattleMap.  Fixed by
-   change to JFrame?
-
-Solaris, jdk1.3: showDice option has no effect in the middle of a battle.
 

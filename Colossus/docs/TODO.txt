@@ -1,6 +1,6 @@
 Hook up remaining actions in MasterBoard menu.
 
-Clean up ShowDice tracking.
+Save size/position of StatusScreen, ShowBattleDice
 
 Show movement die roll graphically.
 
@@ -19,13 +19,11 @@ Should be able to undo moves until an engagement is resolved.
 
 Separate the battlemap out into a common HexMap class? 
 
-Allow dismissing StatusScreen and ShowDice.
-
 Finish XML savegame file.  Write saveGameXML and loadGameXML.
 
 Highlight selected legion better. 
 Differently-highlight hexes where a legion could move if
-   a friendly stack were not already there.
+   a friendly stack were not already there?
 
 Color code StatusScreen better.
 

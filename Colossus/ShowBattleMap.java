@@ -41,6 +41,7 @@ public class ShowBattleMap extends JPanel implements WindowListener,
         dialog.pack();
 
         dialog.setResizable(false);
+        setOpaque(true);
         setBackground(Color.white);
 
         SetupBattleHexes.setupHexes(h, masterHex.getTerrain(), null, hexes);

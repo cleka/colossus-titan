@@ -115,7 +115,7 @@ public class MasterHex extends Hex
         if (fontMetrics == null)
         {
             fontMetrics = g.getFontMetrics();
-            halfFontHeight = (fontMetrics.getMaxAscent() + 
+            halfFontHeight = (fontMetrics.getMaxAscent() +
                 fontMetrics.getLeading()) >> 1;
             name = getTerrainName().toUpperCase();
         }
@@ -137,21 +137,21 @@ public class MasterHex extends Hex
             case 2:
                 g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) * 4 / 5,
-                    rectBound.y + halfFontHeight + 
+                    rectBound.y + halfFontHeight +
                     rectBound.height * 4 / 5);
                 break;
 
             case 3:
                 g.drawString(label, rectBound.x + ((rectBound.width -
                     fontMetrics.stringWidth(label)) >> 1),
-                    rectBound.y + halfFontHeight + 
+                    rectBound.y + halfFontHeight +
                     rectBound.height * 9 / 10);
                 break;
 
             case 4:
                 g.drawString(label, rectBound.x + (rectBound.width -
                     fontMetrics.stringWidth(label)) / 5,
-                    rectBound.y + halfFontHeight + 
+                    rectBound.y + halfFontHeight +
                     rectBound.height * 4 / 5);
                 break;
 
@@ -525,7 +525,7 @@ public class MasterHex extends Hex
         }
 
         Legion legion0 = (Legion)legions.get(0);
-        Marker marker = legion0.getMarker(); 
+        Marker marker = legion0.getMarker();
         if (marker == null)
         {
             return;
@@ -552,7 +552,7 @@ public class MasterHex extends Hex
             point.x -= chitScale >> 2;
             point.y -= chitScale >> 2;
             Legion legion1 = (Legion)legions.get(1);
-            marker = legion1.getMarker(); 
+            marker = legion1.getMarker();
             marker.setLocation(point);
         }
         else if (numLegions == 3)
@@ -566,14 +566,14 @@ public class MasterHex extends Hex
             point.x -= chitScale >> 2;
             point.y -= chitScale >> 2;
             Legion legion1 = (Legion)legions.get(1);
-            marker = legion1.getMarker(); 
+            marker = legion1.getMarker();
             marker.setLocation(point);
 
             point = new Point(startingPoint);
             point.x -= chitScale >> 2;
             point.y -= chitScale;
             Legion legion2 = (Legion)legions.get(2);
-            marker = legion2.getMarker(); 
+            marker = legion2.getMarker();
             marker.setLocation(point);
         }
 
@@ -594,29 +594,13 @@ public class MasterHex extends Hex
     {
         legions.remove(legion);
 
-        // Write over the bounding area of the hex with the background 
-        // color, to prevent artifacts from chits that used to hang outside 
+        // Write over the bounding area of the hex with the background
+        // color, to prevent artifacts from chits that used to hang outside
         // the hex boundary.
         if (getNumLegions() >= 1)
         {
             // Reposition all legions within the hex.
             alignLegions();
-        }
-    }
-
-    /** Combines all split-off legions in the hex into the parent legion. */
-    public void recombineAllLegions()
-    {
-        Iterator it = legions.iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            Legion parent = legion.getParent();
-            if (legions.contains(parent))
-            {
-                legion.recombine(parent, false);
-                it.remove();
-            }
         }
     }
 

@@ -265,7 +265,7 @@ public class Player implements Comparable
     /** Return the number of this player's legions that have moved. */
     public int legionsMoved()
     {
-        int total = 0;
+        int count = 0;
 
         Iterator it = legions.iterator();
         while (it.hasNext())
@@ -273,11 +273,11 @@ public class Player implements Comparable
             Legion legion = (Legion)it.next();
             if (legion.hasMoved())
             {
-                total++;
+                count++;
             }
         }
 
-        return total;
+        return count;
     }
 
 
@@ -420,7 +420,26 @@ public class Player implements Comparable
         }
     }
 
-    
+
+    /** Return true if two or more of this player's legions share 
+     *  a hex and they have a legal non-teleport move. */
+    public boolean splitLegionHasForcedMove()
+    {
+        Iterator it = legions.iterator();
+        while (it.hasNext())
+        {
+            Legion legion = (Legion)it.next();
+            MasterHex hex = legion.getCurrentHex();
+            if (hex.getNumFriendlyLegions(this) > 1 && 
+                game.countConventionalMoves(legion) > 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public void undoLastRecruit()
     {
         if (lastLegionRecruited != null)
@@ -535,16 +554,16 @@ public class Player implements Comparable
     
     public int getNumCreatures()
     {
-        int total = 0;
+        int count = 0;
 
         Iterator it = legions.iterator();
         while (it.hasNext())
         {
             Legion legion = (Legion)it.next();
-            total += legion.getHeight();
+            count += legion.getHeight();
         }
 
-        return total;
+        return count;
     }
 
 
