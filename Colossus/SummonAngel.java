@@ -34,6 +34,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
         player = legion.getPlayer();
         this.client = client;
         this.board = client.getBoard();
+        String markerId = legion.getMarkerId();
 
         // Paranoia
         if (!legion.canSummonAngel())
@@ -44,7 +45,7 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
         // Count and highlight legions with summonable angels, and put
         // board into a state where those legions can be selected.
-        if (board.highlightSummonableAngels(legion) < 1)
+        if (board.highlightSummonableAngels(markerId) < 1)
         {
             cleanup(null, null);
             return;
@@ -64,13 +65,15 @@ public final class SummonAngel extends JDialog implements MouseListener,
 
         int scale = 4 * Scale.get();
 
-        angelChit = new Chit(scale, Creature.getCreatureByName("Angel").getImageName(), this);
+        angelChit = new Chit(scale, 
+            Creature.getCreatureByName("Angel").getImageName(), this);
         constraints.gridy = 0;
         gridbag.setConstraints(angelChit, constraints);
         contentPane.add(angelChit);
         angelChit.addMouseListener(this);
 
-        archangelChit = new Chit(scale, Creature.getCreatureByName("Archangel").getImageName(),
+        archangelChit = new Chit(scale, 
+            Creature.getCreatureByName("Archangel").getImageName(),
             this);
         constraints.gridy = 0;
         gridbag.setConstraints(archangelChit, constraints);
@@ -117,6 +120,11 @@ public final class SummonAngel extends JDialog implements MouseListener,
     public Legion getLegion()
     {
         return legion;
+    }
+
+    public String getMarkerId()
+    {
+        return legion.getMarkerId();
     }
 
     private void cleanup(Legion donor, Creature angel)
@@ -201,7 +209,8 @@ public final class SummonAngel extends JDialog implements MouseListener,
         }
 
         int angels = donor.numCreature(Creature.getCreatureByName("Angel"));
-        int archangels = donor.numCreature(Creature.getCreatureByName("Archangel"));
+        int archangels = donor.numCreature(
+            Creature.getCreatureByName("Archangel"));
 
         angelChit.setDead(angels == 0);
         archangelChit.setDead(archangels == 0);
@@ -219,8 +228,10 @@ public final class SummonAngel extends JDialog implements MouseListener,
                 return;
             }
 
-            int angels = donor.numCreature(Creature.getCreatureByName("Angel"));
-            int archangels = donor.numCreature(Creature.getCreatureByName("Archangel"));
+            int angels = donor.numCreature(
+                Creature.getCreatureByName("Angel"));
+            int archangels = donor.numCreature(
+                Creature.getCreatureByName("Archangel"));
 
             if (angels == 0 && archangels == 0)
             {

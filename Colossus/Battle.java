@@ -1226,7 +1226,7 @@ public final class Battle
         while (repeat);
     }
 
-    /* Return true if okay, or false if forced strikes remain. */
+    /** Return true if okay, or false if forced strikes remain. */
     public boolean doneWithStrikes()
     {
         // Advance only if there are no unresolved strikes.

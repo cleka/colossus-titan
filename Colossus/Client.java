@@ -118,7 +118,8 @@ public final class Client
     /** Take a mulligan. Returns the roll, or -1 on error. */
     int mulligan()
     {
-        return -1;
+        clearRecruitChits();
+        return server.mulligan(playerName);
     }
 
     /** Normally move legion to land entering on entrySide. */
@@ -1196,10 +1197,11 @@ public final class Client
         }
     }
 
-
     /** Used for human players only, not the AI. */
-    public void doMuster(Legion legion)
+    public void doMuster(String markerId)
     {
+        // XXX Remove direct legion reference
+        Legion legion = server.getGame().getLegionByMarkerId(markerId);
         if (legion.hasMoved() && legion.canRecruit())
         {
             legion.sortCritters();
@@ -1399,6 +1401,7 @@ public final class Client
         return server.getGame().getBattle().getPhase();
     }
 
+
     public int getBattleTurnNumber()
     {
         return server.getGame().getBattle().getTurnNumber();
@@ -1482,6 +1485,127 @@ public final class Client
     public String getPlayerNameByTag(int tag)
     {
         return server.getPlayerNameByTag(tag);
+    }
+
+
+
+    public String getActivePlayerName()
+    {
+        return server.getGame().getActivePlayerName();
+    }
+
+    public int getPhase()
+    {
+        return server.getGame().getPhase();
+    }
+
+    public int getTurnNumber()
+    {
+        return server.getGame().getTurnNumber();
+    }
+
+    public void doSplit(String markerId)
+    {
+        server.getGame().doSplit(markerId);
+    }
+
+    public boolean doMove(String markerId, String hexLabel)
+    {
+        return server.getGame().doMove(markerId, hexLabel);
+    }
+
+    public void advancePhase(int oldPhase)
+    {
+        server.getGame().advancePhase(oldPhase);
+    }
+
+    /** Return a list of Creatures. */
+    public ArrayList findEligibleRecruits(String markerId, String hexLabel)
+    {
+        return server.getGame().findEligibleRecruits(markerId, hexLabel);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findAllEligibleRecruitHexes()
+    {
+        return server.getGame().findAllEligibleRecruitHexes();
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findSummonableAngels(String markerId)
+    {
+        return server.getGame().findSummonableAngels(markerId);
+    }
+
+    /** Return a set of hexLabels. */
+    public Set findEngagements()
+    {
+        return server.getGame().findEngagements();
+    }
+
+    /** Return a set of hexLabels. */
+    public Set listMoves(String markerId)
+    {
+        return server.getGame().listMoves(markerId);
+    }
+
+    public java.util.List getAllLegionIds()
+    {
+        return server.getGame().getAllLegionIds();
+    }
+
+    /** XXX temp */
+    public Legion getLegionByMarkerId(String markerId)
+    {
+        return server.getGame().getLegionByMarkerId(markerId);
+    }
+
+    /** XXX temp */
+    public Player getActivePlayer()
+    {
+        return server.getGame().getActivePlayer();
+    }
+
+    /** XXX temp */
+    public Caretaker getCaretaker()
+    {
+        return server.getGame().getCaretaker();
+    }
+
+
+    public ArrayList getLegionMarkerIds(String hexLabel)
+    {
+        return server.getGame().getLegionMarkerIds(hexLabel);
+    }
+
+    public Set findAllUnmovedLegionHexes()
+    {
+        return server.getGame().findAllUnmovedLegionHexes();
+    }
+
+    public Set findTallLegionHexes()
+    {
+        return server.getGame().findTallLegionHexes();
+    }
+
+    public void newGame()
+    {
+        server.getGame().newGame();
+    }
+
+    public void loadGame(String filename)
+    {
+        server.getGame().loadGame(filename);
+    }
+
+    public void saveGame()
+    {
+        server.getGame().saveGame();
+    }
+
+    public void saveGame(String filename)
+    {
+        server.getGame().saveGame(filename);
     }
 
 

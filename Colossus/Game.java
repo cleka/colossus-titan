@@ -55,7 +55,7 @@ public final class Game extends GameSource
 
     public void initAndLoadData()
     {
-	Creature.loadCreatures(); /* try to load creatures */
+        Creature.loadCreatures(); /* try to load creatures */
         try /* try to load the Recruits database */
         {
             String recruitName = GetPlayers.getRecruitName();
@@ -105,7 +105,7 @@ public final class Game extends GameSource
     /** Temporary to avoid having to rename this everywhere.*/
     public void initBoard()
     {
-	initAndLoadData();
+        initAndLoadData();
         initServerAndClients();
         server.allInitBoard();
     }
@@ -209,7 +209,7 @@ public final class Game extends GameSource
         }
 
         // XXX temp
-	initAndLoadData();
+        initAndLoadData();
         initServerAndClients();
 
         server.loadOptions();
@@ -1010,7 +1010,7 @@ public final class Game extends GameSource
             summoningAngel = false;
             gameOver = false;
 
-	    initAndLoadData(); // _before_ Creatures get read
+            initAndLoadData(); // _before_ Creatures get read
 
             buf = in.readLine();
             int numPlayers = Integer.parseInt(buf);
@@ -1369,15 +1369,11 @@ public final class Game extends GameSource
         return(trl.numberOfRecruiterNeeded(recruiter,recruit,terrain));
     }
 
-    /** Return a list of eligible recruits, as Creatures. */
-    public ArrayList findEligibleRecruits(Legion legion)
-    {
-        return findEligibleRecruits(legion, legion.getCurrentHexLabel());
-    }
 
     /** Return a list of eligible recruits, as Creatures. */
-    public ArrayList findEligibleRecruits(Legion legion, String hexLabel)
+    public ArrayList findEligibleRecruits(String markerId, String hexLabel)
     {
+        Legion legion = getLegionByMarkerId(markerId);
         ArrayList recruits;
 
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
@@ -1386,8 +1382,8 @@ public final class Game extends GameSource
         // Towers are a special case.
         if (terrain == 'T')
         {
-	    recruits = getPossibleRecruits(terrain);
-	    if (legion.numCreature(Creature.getCreatureByName("Titan")) < 1 &&
+            recruits = getPossibleRecruits(terrain);
+            if (legion.numCreature(Creature.getCreatureByName("Titan")) < 1 &&
                 legion.numCreature((Creature)recruits.get(4)) < 1)
             { /* no Titan, no itself */ 
                 recruits.remove(4);
@@ -1489,10 +1485,11 @@ public final class Game extends GameSource
 
     /** Return a list of eligible recruiters. Use Critters instead
      *  of Creatures so that Titan power is shown properly. */
-    public ArrayList findEligibleRecruiters(Legion legion, Creature recruit)
+    public ArrayList findEligibleRecruiters(String markerId, Creature recruit)
     {
         ArrayList recruiters = new ArrayList(4);
 
+        Legion legion = getLegionByMarkerId(markerId);
         String hexLabel = legion.getCurrentHexLabel();
         MasterHex hex = MasterBoard.getHexByLabel(hexLabel);
         char terrain = hex.getTerrain();
@@ -1505,10 +1502,12 @@ public final class Game extends GameSource
             Creature warlockOrNot = (Creature)possibleRecruiters.get(4);
             Creature guardianOrNot = (Creature)possibleRecruiters.get(3);
             if (recruit.getName().equals(warlockOrNot.getName()))
-		{
-		    if (legion.numCreature(Creature.getCreatureByName("Titan")) >= 1)
+            {
+                if (legion.numCreature(Creature.getCreatureByName("Titan")) 
+                    >= 1)
                 {
-                    recruiters.add(legion.getCritter(Creature.getCreatureByName("Titan")));
+                    recruiters.add(legion.getCritter(
+                        Creature.getCreatureByName("Titan")));
                 }
                 if (legion.numCreature(warlockOrNot) >= 1)
                 {
@@ -1534,38 +1533,6 @@ public final class Game extends GameSource
                     }
                 }
             }
-            /*
-            if (recruit.getName().equals("Warlock"))
-            {
-                if (legion.numCreature(Creature.titan) >= 1)
-                {
-                    recruiters.add(legion.getCritter(Creature.titan));
-                }
-                if (legion.numCreature(Creature.warlock) >= 1)
-                {
-                    recruiters.add(legion.getCritter(Creature.warlock));
-                }
-            }
-            else if (recruit.getName().equals("Guardian"))
-            {
-                java.util.List creatures = Creature.getCreatures();
-                Iterator it = creatures.iterator();
-                while (it.hasNext())
-                {
-                    Creature creature = (Creature)it.next();
-                    if (creature.getName().equals("Guardian") &&
-                        legion.numCreature(creature) >= 1)
-                    {
-                        recruiters.add(legion.getCritter(creature));
-                    }
-                    else if (!creature.isImmortal() &&
-                        legion.numCreature(creature) >= 3)
-                    {
-                        recruiters.add(legion.getCritter(creature));
-                    }
-                }
-            }
-            */
         }
         else
         {
@@ -1623,7 +1590,8 @@ public final class Game extends GameSource
     public void doRecruit(Creature recruit, Legion legion)
     {
         // Pick the recruiter(s) if necessary.
-        ArrayList recruiters = findEligibleRecruiters(legion, recruit);
+        ArrayList recruiters = findEligibleRecruiters(legion.getMarkerId(), 
+            recruit);
         Creature recruiter;
         Player player = legion.getPlayer();
 
@@ -1690,7 +1658,8 @@ public final class Game extends GameSource
         {
             recruits.add(Creature.getCreatureByName("Angel").toString());
         }
-        if (archangel && caretaker.getCount(Creature.getCreatureByName("Archangel")) >= 1)
+        if (archangel && caretaker.getCount(
+            Creature.getCreatureByName("Archangel")) >= 1)
         {
             recruits.add(Creature.getCreatureByName("Archangel").toString());
         }
@@ -1739,21 +1708,21 @@ public final class Game extends GameSource
 
         caretaker.takeOne(Creature.getCreatureByName("Titan"));
         caretaker.takeOne(Creature.getCreatureByName("Angel"));
-	Creature[] startCre = trl.getStartingCreatures();
-	caretaker.takeOne(startCre[2]);
-	caretaker.takeOne(startCre[2]);
-	caretaker.takeOne(startCre[0]);
-	caretaker.takeOne(startCre[0]);
-	caretaker.takeOne(startCre[1]);
-	caretaker.takeOne(startCre[1]);
-	/*
+        Creature[] startCre = trl.getStartingCreatures();
+        caretaker.takeOne(startCre[2]);
+        caretaker.takeOne(startCre[2]);
+        caretaker.takeOne(startCre[0]);
+        caretaker.takeOne(startCre[0]);
+        caretaker.takeOne(startCre[1]);
+        caretaker.takeOne(startCre[1]);
+        /*
         caretaker.takeOne(Creature.getCreatureByName("Ogre"));
         caretaker.takeOne(Creature.getCreatureByName("Ogre"));
         caretaker.takeOne(Creature.getCreatureByName("Centaur"));
         caretaker.takeOne(Creature.getCreatureByName("Centaur"));
         caretaker.takeOne(Creature.getCreatureByName("Gargoyle"));
         caretaker.takeOne(Creature.getCreatureByName("Gargoyle"));
-	*/
+        */
 
         Legion legion = Legion.getStartingLegion(selectedMarkerId,
             hexLabel, player.getName(), this);
@@ -1901,6 +1870,11 @@ public final class Game extends GameSource
         return listMoves(legion, false, false, false).size();
     }
 
+    public Set listMoves(String markerId)
+    {
+        Legion legion = getLegionByMarkerId(markerId);
+        return listMoves(legion, true, true, false);
+    }
 
     /** Return set of hex labels where this legion can move.
      *  Include teleport moves only if teleport is true.
@@ -1915,12 +1889,15 @@ public final class Game extends GameSource
              ignoreFriends);
     }
 
-
     /** Return set of hex labels where this legion can move.
      *  Include teleport moves only if teleport is true. */
     public Set listMoves(Legion legion, boolean teleport, MasterHex hex,
         int movementRoll, boolean affectEntrySides, boolean ignoreFriends)
     {
+        if (affectEntrySides)
+        {
+            legion.clearAllHexInfo();
+        }
         HashSet set = new HashSet();
         if (legion.hasMoved())
         {
@@ -2169,9 +2146,10 @@ public final class Game extends GameSource
         aiSetupEngagements();
     }
 
-
-    public Set findSummonableAngels(Legion legion)
+    /** Return a set of hexLabels. */
+    public Set findSummonableAngels(String markerId)
     {
+        Legion legion = getLegionByMarkerId(markerId);
         HashSet set = new HashSet();
         Iterator it = legion.getPlayer().getLegions().iterator();
         while (it.hasNext())
@@ -2180,8 +2158,9 @@ public final class Game extends GameSource
             if (candidate != legion)
             {
                 String hexLabel = candidate.getCurrentHexLabel();
-                if ((candidate.numCreature(Creature.getCreatureByName("Angel")) > 0 ||
-                    candidate.numCreature(Creature.getCreatureByName("Archangel")) > 0) &&
+                if ((candidate.numCreature(Creature.getCreatureByName("Angel"))
+                    > 0 || candidate.numCreature(
+                    Creature.getCreatureByName("Archangel")) > 0) &&
                     !isEngagement(hexLabel))
                 {
                     set.add(hexLabel);
@@ -2192,9 +2171,13 @@ public final class Game extends GameSource
     }
 
 
+
     /** Only used for human players, not for auto splits */
-    public boolean doSplit(Legion legion, Player player)
+    public boolean doSplit(String markerId)
     {
+        Legion legion = getLegionByMarkerId(markerId);
+        Player player = legion.getPlayer();
+
         // Need a legion marker to split.
         if (player.getNumMarkersAvailable() == 0)
         {
@@ -2339,7 +2322,8 @@ public final class Game extends GameSource
                     // lord must be the titan.
                     if (isOccupied(hexLabel))
                     {
-                        legion.revealCreatures(Creature.getCreatureByName("Titan"), 1);
+                        legion.revealCreatures(
+                            Creature.getCreatureByName("Titan"), 1);
                     }
                     else
                     {
@@ -2352,6 +2336,11 @@ public final class Game extends GameSource
                 legion.moveToHex(hex);
                 moved = true;
             }
+        }
+        if (moved)
+        {
+            server.allRepaintHex(legion.getStartingHexLabel());
+            server.allRepaintHex(hexLabel);
         }
         return moved;
     }
@@ -2927,4 +2916,72 @@ public final class Game extends GameSource
     {
         return m_oListener;
     }
+
+    public int mulligan()
+    {
+        if (getPhase() != MOVE)
+        {
+            return -1;
+        }
+        Player player = getActivePlayer();
+        player.takeMulligan();
+        setupPhase();
+        return player.getMovementRoll();
+    }
+
+
+    public Set findAllEligibleRecruitHexes()
+    {
+        Player player = getActivePlayer();
+        HashSet set = new HashSet();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.getLegion(i);
+            if (legion.hasMoved() && legion.canRecruit())
+            {
+                String markerId = legion.getMarkerId();
+                String hexLabel = legion.getCurrentHexLabel();
+                if (findEligibleRecruits(markerId, hexLabel).size() > 0)
+                {
+                    set.add(hexLabel);
+                }
+            }
+        }
+        return set;
+    }
+
+
+    public Set findAllUnmovedLegionHexes()
+    {
+        Player player = getActivePlayer();
+        HashSet set = new HashSet();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.getLegion(i);
+            if (!legion.hasMoved()) 
+            {
+                set.add(legion.getCurrentHexLabel());
+            }
+        }
+        return set;
+    }
+
+    public Set findTallLegionHexes()
+    {
+        Player player = getActivePlayer();
+        HashSet set = new HashSet();
+
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.getLegion(i);
+            if (legion.getHeight() >= 7)
+            {
+                set.add(legion.getCurrentHexLabel());
+            }
+        }
+        return set;
+    }
+
 }

@@ -1,6 +1,6 @@
 Add a window that shows the recruiting tree.
 
-Version stamping, maybe showing up in an About menu.
+Version stamping, showing up in an About menu.
 
 Allow dragging chits in addition to clicking source and destination.
 
@@ -11,8 +11,6 @@ Eliminate persistent legion.hexInfo and instead return a temporary
 Consider switching from make to Ant to better handle packages.
 
 Confirmation prompt to avoid skipping recruits?
-
-Allow first human player to control game options, load game, etc.
 
 Split GUI classes from model classes.
 
@@ -62,11 +60,6 @@ All parameters passed into dialogs should be read-only or clones, with
 Add "no 2s or 5s" mulligan option.  (Per player, or global, or both?)
 Add optional additional handicap mulligans that can be used after turn 1.
 
-Add keyboard legion/critter selection?  (Previous, next, unselect keys)
-Add toolbars?
-Add tooltips?
-
-Highlight selected legion better.
 Highlight teleport and normal moves differently, and show entry sides.
 Differently-highlight hexes where a legion could move if
    a friendly stack were not already there?

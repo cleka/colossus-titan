@@ -81,29 +81,38 @@ public class Chit extends JPanel
 
         // This syntax works with either images in a jar file or images
         // in the local filesystem.
-	
-	try {
-	    java.net.URL url = getClass().getResource(imageFilename);
-	    if (url != null)
-	    {
-		Image image = Toolkit.getDefaultToolkit().getImage(url);
-		if (image != null)
-		    icon = new ImageIcon(image);
-	    }
-	    if (icon == null)
-	    { /* try direct file access */
-		Image image = Toolkit.getDefaultToolkit().getImage(imageFilename);
-		if (image != null)
-		    icon = new ImageIcon(image);
-	    }
-	    if (icon == null)
-	    {
-		throw new FileNotFoundException(imageFilename);
-	    }
-	} catch (Exception e) {
-	    System.out.println("Couldn't get image :" + e);
-	    System.exit(1);
-	}
+        
+        try 
+        {
+            java.net.URL url = getClass().getResource(imageFilename);
+            if (url != null)
+            {
+                Image image = Toolkit.getDefaultToolkit().getImage(url);
+                if (image != null)
+                {
+                    icon = new ImageIcon(image);
+                }
+            }
+            if (icon == null)
+            {
+                // try direct file access
+                Image image = Toolkit.getDefaultToolkit().getImage(
+                    imageFilename);
+                if (image != null)
+                {
+                    icon = new ImageIcon(image);
+                }
+            }
+            if (icon == null)
+            {
+                throw new FileNotFoundException(imageFilename);
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.out.println("Couldn't get image :" + e);
+            System.exit(1);
+        }
 
         return icon;
     }
@@ -229,46 +238,6 @@ public class Chit extends JPanel
         buf.append(imageExtension);
         return buf.toString();
     }
-
-    /*
-    public static void main(String [] args)
-    {
-        // Allow showing chits in a different directory.
-        if (args.length > 0)
-        {
-            imageDirName = args[0];
-        }
-
-        JFrame frame = new JFrame("testing Chit");
-        Container contentPane = frame.getContentPane();
-
-        File dir = new File(imageDirName);
-        if (!dir.exists() || !dir.isDirectory())
-        {
-            Log.error("No images directory");
-            return;
-        }
-        String [] filenames = dir.list();
-        int sqrt = (int)Math.floor(Math.sqrt(filenames.length));
-        contentPane.setLayout(new GridLayout(sqrt, 0));
-        Arrays.sort(filenames);
-        int extLen = imageExtension.length();
-        for (int i = 0; i < filenames.length; i++)
-        {
-            if (filenames[i].endsWith(imageExtension))
-            {
-                String basename = filenames[i].substring(0,
-                    filenames[i].length() - extLen);
-                Chit chit = new Chit(4 * Scale.get(), basename, frame);
-                contentPane.add(chit);
-            }
-        }
-
-        frame.pack();
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-    */
 }
 
 

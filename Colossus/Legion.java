@@ -695,7 +695,8 @@ public final class Legion extends GameSource implements Comparable
     public boolean canRecruit()
     {
         if (recruitName != null || getHeight() > 6 || getPlayer().isDead() ||
-            game.findEligibleRecruits(this).isEmpty())
+            game.findEligibleRecruits(getMarkerId(), 
+            getCurrentHexLabel()).isEmpty())
         {
             return false;
         }

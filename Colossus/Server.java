@@ -908,6 +908,18 @@ public final class Server
         client.setupPlayerLabel();
     }
 
+    // XXX Need to verify that the request came from the correct
+    // client, rather than trusting the passed playerName.
+    /** Return the new die roll, or -1 on error. */
+    public int mulligan(String playerName)
+    {
+        if (!playerName.equals(game.getActivePlayerName()))
+        {
+            return -1;
+        }
+        return game.mulligan();
+    }
+
 
     public static void main(String [] args)
     {

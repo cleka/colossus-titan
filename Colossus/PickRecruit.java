@@ -41,7 +41,8 @@ public final class PickRecruit extends JDialog implements MouseListener,
         this.legion = legion;
         Game game = legion.getGame();
 
-        recruits = game.findEligibleRecruits(legion);
+        recruits = game.findEligibleRecruits(legion.getMarkerId(),
+            legion.getCurrentHexLabel());
         int numEligible = recruits.size();
 
         addMouseListener(this);
@@ -201,30 +202,4 @@ public final class PickRecruit extends JDialog implements MouseListener,
     public void windowOpened(WindowEvent e)
     {
     }
-
-    /*
-    public static void main(String [] args)
-    {
-        JFrame frame = new JFrame("testing PickRecruit");
-        int scale = Scale.get();
-        frame.setSize(new Dimension(80 * scale, 80 * scale));
-        frame.pack();
-        frame.setVisible(true);
-
-        Game game = new Game();
-        game.initBoard();
-        MasterHex hex = MasterBoard.getHexByLabel("130");
-        game.addPlayer("Test");
-        Player player = game.getPlayer(0);
-        Legion legion = new Legion("Bk01", null, hex.getLabel(),
-            hex.getLabel(), Creature.titan, Creature.gargoyle,
-            Creature.gargoyle, Creature.cyclops, Creature.cyclops, null,
-            null, null, player.getName(), game);
-        player.addLegion(legion);
-
-        Creature creature = PickRecruit.pickRecruit(frame, legion);
-        System.out.println("Recruited " + creature);
-        System.exit(0);
-    }
-    */
 }

@@ -23,7 +23,7 @@ public final class Player implements Comparable
     private boolean dead;
     private boolean titanEliminated;
     private String donorId;
-    private MarkerComparator markerComparator = new MarkerComparator();
+    private final MarkerComparator markerComparator = new MarkerComparator();
     private TreeSet markersAvailable = new TreeSet(markerComparator);
     private String type;               // "Human" or ".*AI"
 

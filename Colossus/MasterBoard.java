@@ -48,9 +48,6 @@ public final class MasterBoard extends JPanel
         {false, false, false, true, true, false, false, false}
     };
 
-    // XXX This direct Game reference needs to be eliminated.
-    private Game game;
-
     private Client client;
 
     private JFrame masterFrame;
@@ -130,9 +127,6 @@ public final class MasterBoard extends JPanel
     {
         this.client = client;
 
-        // XXX temporary
-        this.game = client.getGame();
-
         masterFrame = new JFrame("MasterBoard");
         masterFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         contentPane = masterFrame.getContentPane();
@@ -168,16 +162,10 @@ public final class MasterBoard extends JPanel
     public MasterBoard AICopy(Game game)
     {
         MasterBoard newBoard = new MasterBoard();
-        newBoard.setGame(game);
         newBoard.setupActions();
         return newBoard;
     }
 
-
-    public void setGame(Game game)
-    {
-        this.game = game;
-    }
 
     public void setClient(Client client)
     {
@@ -191,23 +179,19 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = game.getActivePlayer();
+                Player player = client.getActivePlayer();
                 if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
 
-                int phase = game.getPhase();
+                int phase = client.getPhase();
                 switch(phase)
                 {
                     case Game.SPLIT:
-                        // Peek at the undo stack so we know where to align
-                        String splitoffId = (String)Client.topUndoStack();
-                        Legion splitoff = game.getLegionByMarkerId(splitoffId);
-                        String hexLabel = splitoff.getCurrentHexLabel();
                         player.undoLastSplit();
-                        alignLegions(hexLabel);
-                        highlightTallLegions(player);
+                        alignAllLegions();
+                        highlightTallLegions();
                         repaint();
                         break;
 
@@ -232,20 +216,19 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = game.getActivePlayer();
+                Player player = client.getActivePlayer();
                 if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
 
-                int phase = game.getPhase();
+                int phase = client.getPhase();
                 switch(phase)
                 {
                     case Game.SPLIT:
-                        // peek at the undo stack so we know where to align
                         player.undoAllSplits();
                         alignAllLegions();
-                        highlightTallLegions(player);
+                        highlightTallLegions();
                         repaint();
                         break;
 
@@ -271,25 +254,25 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = game.getActivePlayer();
+                Player player = client.getActivePlayer();
                 if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
                 }
 
-                int phase = game.getPhase();
+                int phase = client.getPhase();
                 switch(phase)
                 {
                     case Game.SPLIT:
                         // Initial legions must be split.
-                        if (game.getTurnNumber() == 1 &&
+                        if (client.getTurnNumber() == 1 &&
                             player.getNumLegions() == 1)
                         {
                             client.showMessageDialog("Must split.");
                         }
                         else
                         {
-                            game.advancePhase(Game.SPLIT);
+                            client.advancePhase(Game.SPLIT);
                         }
                         break;
 
@@ -319,16 +302,16 @@ public final class MasterBoard extends JPanel
                             {
                                 player.undoAllSplits();
                                 client.clearRecruitChits();
-                                game.advancePhase(Game.MOVE);
+                                client.advancePhase(Game.MOVE);
                             }
                         }
                         break;
 
                     case Game.FIGHT:
                         // Advance only if there are no unresolved engagements.
-                        if (game.findEngagements().size() == 0)
+                        if (client.findEngagements().size() == 0)
                         {
-                            game.advancePhase(Game.FIGHT);
+                            client.advancePhase(Game.FIGHT);
                         }
                         else
                         {
@@ -341,7 +324,7 @@ public final class MasterBoard extends JPanel
                         player.commitMoves();
                         // Mulligans are only allowed on turn 1.
                         player.setMulligansLeft(0);
-                        game.advancePhase(Game.MUSTER);
+                        client.advancePhase(Game.MUSTER);
                         break;
                 }
             }
@@ -352,24 +335,12 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = game.getActivePlayer();
-                if (!player.getName().equals(client.getPlayerName()))
+                if (client.mulligan() == -1)
                 {
-                    return;
+                    Log.error("Illegal mulligan.");
                 }
-                client.clearRecruitChits();
-                player.takeMulligan();
-
-                // Reroll movement die.  Remove Take Mulligan option
-                // if applicable.
-                game.setupPhase();
             }
         };
-
-
-
-
-
 
 
         // TODO Let inactive players withdraw from the game.
@@ -377,7 +348,7 @@ public final class MasterBoard extends JPanel
         {
             public void actionPerformed(ActionEvent e)
             {
-                Player player = game.getActivePlayer();
+                Player player = client.getActivePlayer();
                 if (!player.getName().equals(client.getPlayerName()))
                 {
                     return;
@@ -394,7 +365,7 @@ public final class MasterBoard extends JPanel
                 if (answer == JOptionPane.YES_OPTION)
                 {
                    player.die(null, true);
-                   game.advancePhase(game.getPhase());
+                   client.advancePhase(client.getPhase());
                 }
             }
         };
@@ -406,7 +377,9 @@ public final class MasterBoard extends JPanel
                 GUIMasterHex hex = getHexContainingPoint(lastPoint);
                 if (hex != null)
                 {
-                    new ShowMasterHex(masterFrame, game, hex, lastPoint);
+                    // XXX Remove direct caretaker reference.
+                    new ShowMasterHex(masterFrame, client.getCaretaker(), 
+                        hex, lastPoint);
                     // Work around a Windows JDK 1.3 bug.
                     hex.repaint();
                 }
@@ -442,7 +415,7 @@ public final class MasterBoard extends JPanel
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
-                    game.newGame();
+                    client.newGame();
                 }
             }
         };
@@ -467,7 +440,7 @@ public final class MasterBoard extends JPanel
                     int returnVal = chooser.showOpenDialog(masterFrame);
                     if (returnVal == JFileChooser.APPROVE_OPTION)
                     {
-                        game.loadGame(chooser.getSelectedFile().getName());
+                        client.loadGame(chooser.getSelectedFile().getName());
                     }
                 }
             }
@@ -479,7 +452,7 @@ public final class MasterBoard extends JPanel
             {
                 // XXX Offer the ability to re-use a save filename,
                 // rather than always making a new one?
-                game.saveGame();
+                client.saveGame();
             }
         };
 
@@ -504,7 +477,7 @@ public final class MasterBoard extends JPanel
                     {
                         path.append(Game.saveExtension);
                     }
-                    game.saveGame(path.toString());
+                    client.saveGame(path.toString());
                 }
             }
         };
@@ -532,7 +505,7 @@ public final class MasterBoard extends JPanel
 
                 if (answer == JOptionPane.YES_OPTION)
                 {
-                    game.dispose();
+                    System.exit(0);
                 }
             }
         };
@@ -692,8 +665,7 @@ public final class MasterBoard extends JPanel
             playerLabel = new JLabel(playerName);
         }
 
-        Player player = game.getPlayer(playerName);
-        String colorName = player.getColor();
+        String colorName = client.getColor();
         // If we call this before player colors are chosen, just use
         // the defaults.
         if (colorName != null)
@@ -1067,10 +1039,10 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         requestFocus();
 
-        Player player = game.getActivePlayer();
+        Player player = client.getActivePlayer();
 
         masterFrame.setTitle(player.getName() + " Turn " +
-            game.getTurnNumber() + " : Split stacks");
+            client.getTurnNumber() + " : Split stacks");
 
         phaseMenu.removeAll();
 
@@ -1095,7 +1067,7 @@ public final class MasterBoard extends JPanel
 
         if (client.getPlayerName().equals(player.getName()))
         {
-            highlightTallLegions(player);
+            highlightTallLegions();
         }
     }
 
@@ -1105,9 +1077,9 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         requestFocus();
 
-        Player player = game.getActivePlayer();
+        Player player = client.getActivePlayer();
         masterFrame.setTitle(player.getName() + " Turn " +
-            game.getTurnNumber() + " : Movement Roll: " +
+            client.getTurnNumber() + " : Movement Roll: " +
             player.getMovementRoll());
 
         phaseMenu.removeAll();
@@ -1151,10 +1123,10 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         requestFocus();
 
-        String activePlayerName = game.getActivePlayerName();
+        String activePlayerName = client.getActivePlayerName();
 
         masterFrame.setTitle(activePlayerName + " Turn " +
-            game.getTurnNumber() + " : Resolve Engagements ");
+            client.getTurnNumber() + " : Resolve Engagements ");
 
         phaseMenu.removeAll();
 
@@ -1181,10 +1153,10 @@ public final class MasterBoard extends JPanel
         unselectAllHexes();
         requestFocus();
 
-        String activePlayerName = game.getActivePlayerName();
+        String activePlayerName = client.getActivePlayerName();
 
         masterFrame.setTitle(activePlayerName + " Turn " +
-            game.getTurnNumber() + " : Muster Recruits ");
+            client.getTurnNumber() + " : Muster Recruits ");
 
         phaseMenu.removeAll();
 
@@ -1223,15 +1195,13 @@ public final class MasterBoard extends JPanel
     /** Create markers for all existing legions. */
     public void loadInitialMarkerImages()
     {
-        Iterator it = game.getAllLegionIds().iterator();
+        Iterator it = client.getAllLegionIds().iterator();
         while (it.hasNext())
         {
             String markerId = (String)it.next();
             client.addMarker(markerId);
-            Legion legion = game.getLegionByMarkerId(markerId);
-            String hexLabel = legion.getCurrentHexLabel();
-            alignLegions(hexLabel);
         }
+        alignAllLegions();
         masterFrame.setVisible(true);
         repaint();
     }
@@ -1244,8 +1214,8 @@ public final class MasterBoard extends JPanel
         {
             return;
         }
-        ArrayList markerIds = game.getLegionMarkerIds(hexLabel);
-        Player player = game.getActivePlayer();
+        ArrayList markerIds = client.getLegionMarkerIds(hexLabel);
+        Player player = client.getActivePlayer();
         if (player == null)
         {
             return;
@@ -1349,61 +1319,39 @@ public final class MasterBoard extends JPanel
     }
 
 
-    private void highlightTallLegions(Player player)
+    private void highlightTallLegions()
     {
-        HashSet set = new HashSet();
-
-        Iterator it = player.getLegions().iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            if (legion.getHeight() >= 7)
-            {
-                MasterHex hex = legion.getCurrentHex();
-                set.add(hex.getLabel());
-            }
-        }
-        selectHexesByLabels(set);
+        selectHexesByLabels(client.findTallLegionHexes());
     }
 
     private void highlightUnmovedLegions()
     {
         unselectAllHexes();
-        Player player = game.getActivePlayer();
-        HashSet set = new HashSet();
-        Iterator it = player.getLegions().iterator();
-        while (it.hasNext())
-        {
-            Legion legion = (Legion)it.next();
-            if (!legion.hasMoved())
-            {
-                set.add(legion.getCurrentHexLabel());
-            }
-        }
-        selectHexesByLabels(set);
+        Player player = client.getActivePlayer();
+        selectHexesByLabels(client.findAllUnmovedLegionHexes());
         repaint();
     }
 
 
     /** Select hexes where this legion can move. */
-    private void highlightMoves(Legion legion)
+    private void highlightMoves(String markerId)
     {
-        legion.clearAllHexInfo();
-        Set set = game.listMoves(legion, true, true, false);
+        Set set = client.listMoves(markerId);
         unselectAllHexes();
         selectHexesByLabels(set);
-        showBestRecruit(legion, set);
+        showBestRecruit(markerId, set);
     }
 
 
-    private void showBestRecruit(Legion legion, Set set)
+    private void showBestRecruit(String markerId, Set set)
     {
         client.clearRecruitChits();
         Iterator it = set.iterator();
         while (it.hasNext())
         {
             String hexLabel = (String)it.next();
-            ArrayList recruits = game.findEligibleRecruits(legion, hexLabel);
+            ArrayList recruits = client.findEligibleRecruits(markerId, 
+                hexLabel);
             if (recruits != null && recruits.size() > 0)
             {
                 Creature recruit = (Creature)recruits.get(recruits.size() - 1);
@@ -1416,16 +1364,16 @@ public final class MasterBoard extends JPanel
     /** Return number of engagements found. */
     public void highlightEngagements()
     {
-        Set set = game.findEngagements();
+        Set set = client.findEngagements();
         unselectAllHexes();
         selectHexesByLabels(set);
     }
 
 
     /** Return number of legions with summonable angels. */
-    public int highlightSummonableAngels(Legion legion)
+    public int highlightSummonableAngels(String markerId)
     {
-        Set set = game.findSummonableAngels(legion);
+        Set set = client.findSummonableAngels(markerId);
         unselectAllHexes();
         selectHexesByLabels(set);
         return set.size();
@@ -1434,30 +1382,7 @@ public final class MasterBoard extends JPanel
 
     private void highlightPossibleRecruits()
     {
-        int count = 0;
-        Player player = game.getActivePlayer();
-
-        HashSet set = new HashSet();
-
-        for (int i = 0; i < player.getNumLegions(); i++)
-        {
-            Legion legion = player.getLegion(i);
-            if (legion.hasMoved() && legion.canRecruit())
-            {
-                ArrayList recruits = game.findEligibleRecruits(legion);
-                if (!recruits.isEmpty())
-                {
-                    MasterHex hex = getHexByLabel(legion.getCurrentHexLabel());
-                    set.add(hex.getLabel());
-                    count++;
-                }
-            }
-        }
-
-        if (count > 0)
-        {
-            selectHexesByLabels(set);
-        }
+        selectHexesByLabels(client.findAllEligibleRecruitHexes());
     }
 
 
@@ -1473,7 +1398,7 @@ public final class MasterBoard extends JPanel
         {
             Log.error(e.toString() + " Couldn't find " +
                 Creature.getCreatureByName("Colossus").getImageName());
-            game.dispose();
+            System.exit(1);
         }
     }
 
@@ -1662,7 +1587,7 @@ public final class MasterBoard extends JPanel
 
     public void actOnMisclick()
     {
-        switch (game.getPhase())
+        switch (client.getPhase())
         {
             case Game.MOVE:
                 client.clearRecruitChits();
@@ -1674,7 +1599,7 @@ public final class MasterBoard extends JPanel
                 SummonAngel summonAngel = client.getSummonAngel();
                 if (summonAngel != null)
                 {
-                    highlightSummonableAngels(summonAngel.getLegion());
+                    highlightSummonableAngels(summonAngel.getMarkerId());
                     summonAngel.repaint();
                 }
                 else
@@ -1712,10 +1637,12 @@ public final class MasterBoard extends JPanel
         {
             Point point = e.getPoint();
             Marker marker = getMarkerAtPoint(point);
+            GUIMasterHex hex = getHexContainingPoint(point);
             if (marker != null)
             {
                 String markerId = marker.getId();
-                Legion legion = game.getLegionByMarkerId(markerId);
+                // XXX Remove direct legion reference
+                Legion legion = client.getLegionByMarkerId(markerId);
                 String playerName = legion.getPlayerName();
 
                 // Move the clicked-on marker to the top of the z-order.
@@ -1727,7 +1654,7 @@ public final class MasterBoard extends JPanel
                 // Right-click means to show the contents of the legion.
                 if (isPopupButton(e))
                 {
-                    // TODO We need a client-side legion class that doesn't
+                    // XXX We need a client-side legion class that doesn't
                     // know the full contents of every enemy legion.
                     legion.sortCritters();
                     new ShowLegion(masterFrame, legion, point,
@@ -1739,16 +1666,15 @@ public final class MasterBoard extends JPanel
                 {
                     // Only the current player can manipulate his legions.
                     if (playerName.equals(client.getPlayerName()) &&
-                        playerName.equals(game.getActivePlayerName()))
+                        playerName.equals(client.getActivePlayerName()))
                     {
-                        actOnLegion(legion);
+                        actOnLegion(markerId, hex.getLabel());
                         return;
                     }
                 }
             }
 
             // No hits on chits, so check map.
-            GUIMasterHex hex = getHexContainingPoint(point);
             if (hex != null)
             {
                 if (isPopupButton(e))
@@ -1761,7 +1687,8 @@ public final class MasterBoard extends JPanel
 
                 // Otherwise, the action to take depends on the phase.
                 // Only the current player can manipulate game state.
-                if (client.getPlayerName().equals(game.getActivePlayerName()))
+                if (client.getPlayerName().equals(
+                    client.getActivePlayerName()))
                 {
                     actOnHex(hex.getLabel());
                     hex.repaint();
@@ -1770,7 +1697,7 @@ public final class MasterBoard extends JPanel
             }
 
             // No hits on chits or map, so re-highlight.
-            if (client.getPlayerName().equals(game.getActivePlayerName()))
+            if (client.getPlayerName().equals(client.getActivePlayerName()))
             {
                 actOnMisclick();
             }
@@ -1778,35 +1705,33 @@ public final class MasterBoard extends JPanel
     }
 
 
-    private void actOnLegion(Legion legion)
+    private void actOnLegion(String markerId, String hexLabel)
     {
-        switch (game.getPhase())
+        switch (client.getPhase())
         {
             case Game.SPLIT:
-                game.doSplit(legion, legion.getPlayer());
+                client.doSplit(markerId);
                 break;
 
             case Game.MOVE:
-                client.setMoverId(legion.getMarkerId());
-                getGUIHexByLabel(legion.getCurrentHexLabel()).repaint();
-                highlightMoves(legion);
+                client.setMoverId(markerId);
+                getGUIHexByLabel(hexLabel).repaint();
+                highlightMoves(markerId);
                 break;
 
             case Game.FIGHT:
-                client.doFight(legion.getCurrentHexLabel());
+                client.doFight(hexLabel);
                 break;
 
             case Game.MUSTER:
-                client.doMuster(legion);
+                client.doMuster(markerId);
                 break;
         }
     }
 
     private void actOnHex(String hexLabel)
     {
-        Player player = game.getActivePlayer();
-
-        switch (game.getPhase())
+        switch (client.getPhase())
         {
             // If we're moving, and have selected a legion which
             // has not yet moved, and this hex is a legal
@@ -1814,11 +1739,8 @@ public final class MasterBoard extends JPanel
             case Game.MOVE:
                 client.clearRecruitChits();
                 String moverId = client.getMoverId();
-                if (game.doMove(moverId, hexLabel))
+                if (client.doMove(moverId, hexLabel))
                 {
-                    Legion mover = game.getLegionByMarkerId(moverId);
-                    getGUIHexByLabel(hexLabel).repaint();
-                    getGUIHexByLabel(mover.getStartingHexLabel()).repaint();
                     highlightUnmovedLegions();
                 }
                 else
@@ -1867,7 +1789,7 @@ public final class MasterBoard extends JPanel
 
             if (answer == JOptionPane.YES_OPTION)
             {
-                game.dispose();
+                System.exit(0);
             }
         }
     }
@@ -1965,14 +1887,5 @@ public final class MasterBoard extends JPanel
         masterFrame.setVisible(false);
         masterFrame.setEnabled(false);
         masterFrame.dispose();
-    }
-
-
-    public static void main(String [] args)
-    {
-        Game game = new Game();
-	game.initAndLoadData();
-        game.initServerAndClients();
-        new MasterBoard(game.getServer().getClient(0));
     }
 }

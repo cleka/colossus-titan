@@ -84,7 +84,8 @@ class SimpleAI implements AI
     protected static Creature chooseRecruit(Game game, Legion legion,
         MasterHex hex)
     {
-        List recruits = game.findEligibleRecruits(legion, hex.getLabel());
+        List recruits = game.findEligibleRecruits(legion.getMarkerId(), 
+            hex.getLabel());
 
         if (recruits.size() == 0)
         {
@@ -324,7 +325,8 @@ class SimpleAI implements AI
         Critter weakest = legion.getCritter(legion.getHeight() - 1);
 
         // Consider recruiting.
-        ArrayList recruits = game.findEligibleRecruits(legion, hexLabel);
+        ArrayList recruits = game.findEligibleRecruits(legion.getMarkerId(), 
+            hexLabel);
         if (!recruits.isEmpty())
         {
             Creature bestRecruit = (Creature)recruits.get(recruits.size() - 1);
@@ -1245,8 +1247,8 @@ class SimpleAI implements AI
                     continue;
                 }
 
-                List nextRecruits = game.findEligibleRecruits(legion,
-                    nextLabel);
+                List nextRecruits = game.findEligibleRecruits(
+                    legion.getMarkerId(), nextLabel);
 
                 if (nextRecruits.size() == 0)
                 {
@@ -1695,7 +1697,8 @@ class SimpleAI implements AI
                 currentScore / 100);
             // Can't use Legion.getRecruit() because it checks for
             // 7-high legions.
-            boolean canRecruit = !game.findEligibleRecruits(enemy).isEmpty();
+            boolean canRecruit = !game.findEligibleRecruits(
+                enemy.getMarkerId(), enemy.getCurrentHexLabel()).isEmpty();
             if (height == 7 && (canAcquireAngel || canRecruit))
             {
                 return true;
@@ -1736,7 +1739,7 @@ class SimpleAI implements AI
     /** Return a string of form angeltype:donorId, or null. */
     public String summonAngel(Legion summoner, Game game)
     {
-        Set set = game.findSummonableAngels(summoner);
+        Set set = game.findSummonableAngels(summoner.getMarkerId());
 
         // Always summon the biggest possible angel, from the least
         // important legion that has one.  TODO Make this smarter.

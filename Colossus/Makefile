@@ -69,6 +69,10 @@ JARFILE = Colossus.jar
 
 jar : $(JARFILE)
 
+version : 
+	echo `date +%Y%m%d` > version
+
+
 # Create jar file
 $(JARFILE): StrategicMapLoader.java TerrainRecruitLoader.java \
 	CreatureLoader.java BattlelandLoader.java \
