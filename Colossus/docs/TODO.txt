@@ -1,17 +1,8 @@
-Move java files into a src subdirectory, and class files into a classes
-   subdirectory, and fix the Makefile to deal with it cleanly.  (Maybe
-   have a top-level Makefile that calls src/Makefile?)
-
-Make a CVS repository.  Move it to sourceforge.
-
 Add server menu for save game, load game, new game, autosave, visible stacks 
    option, ability to create or dismiss status screen.  Read option defaults 
    from a config file.
 
 Fix concession timing.
-
-Show die rolls and number of carries in a window.  Need pictures of
-   dice, with different colors for hits and misses.
 
 Split GUI classes from model classes.
 

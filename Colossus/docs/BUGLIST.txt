@@ -43,6 +43,10 @@ Win98, Linux, Solaris; jdk 1.1.7, 1.2, 1.3b, ibm118, kaffe 1.0b5, etc.:
    of AWT thread sync issue, but I'm calling select() and repaint()
    directly from the mousePressed() event handler like I'm supposed to.
 
+Linux, ibmjdk118: 2 possible carries, ogre was highlighted as a carry
+   target, but clicking on it did not apply damage and wasted the
+   carry.
+
 Concession timing.  If both players want to concede, the non-phasing
    player (usually?) has the right to concede first.  Concessions
    aren't allowed in the middle of strikes.  Etc.
