@@ -144,7 +144,7 @@ public final class MasterHex extends Hex
         // Draw exits and entrances
         for (int i = inverted ? 0 : 1; i < 6; i += 2)
         {
-            int n = nextHexsideNum(i);
+            int n = (i + 1) % 6;
 
             // Draw exits
             // There are up to 3 gates to draw.  Each is 1/6 of a hexside
@@ -181,7 +181,7 @@ public final class MasterHex extends Hex
         {
             fontMetrics = g2.getFontMetrics();
             halfFontHeight = (fontMetrics.getMaxAscent() +
-                fontMetrics.getLeading()) >> 1;
+                fontMetrics.getLeading()) / 2;
             name = getTerrainName().toUpperCase();
         }
 
@@ -189,7 +189,7 @@ public final class MasterHex extends Hex
         {
             case 0:
                 g2.drawString(label, rectBound.x +
-                    ((rectBound.width - fontMetrics.stringWidth(label)) >> 1),
+                    ((rectBound.width - fontMetrics.stringWidth(label)) / 2),
                     rectBound.y + halfFontHeight + rectBound.height / 10);
                 break;
 
@@ -208,7 +208,7 @@ public final class MasterHex extends Hex
 
             case 3:
                 g2.drawString(label, rectBound.x + ((rectBound.width -
-                    fontMetrics.stringWidth(label)) >> 1),
+                    fontMetrics.stringWidth(label)) / 2),
                     rectBound.y + halfFontHeight +
                     rectBound.height * 9 / 10);
                 break;
@@ -240,10 +240,10 @@ public final class MasterHex extends Hex
             g2.setFont(font);
             FontMetrics fontMetrics = g2.getFontMetrics();
             halfFontHeight = (fontMetrics.getMaxAscent() +
-                fontMetrics.getLeading()) >> 1;
+                fontMetrics.getLeading()) / 2;
 
             g2.drawString(name, rectBound.x + ((rectBound.width -
-                fontMetrics.stringWidth(name)) >> 1),
+                fontMetrics.stringWidth(name)) / 2),
                 rectBound.y + halfFontHeight + rectBound.height * 2 / 3);
 
             g2.setFont(oldFont);
@@ -251,8 +251,8 @@ public final class MasterHex extends Hex
         else
         {
             g2.drawString(name, rectBound.x + ((rectBound.width -
-                fontMetrics.stringWidth(name)) >> 1),
-                rectBound.y + halfFontHeight + (rectBound.height >> 1));
+                fontMetrics.stringWidth(name)) / 2),
+                rectBound.y + halfFontHeight + (rectBound.height / 2));
         }
     }
 
@@ -603,7 +603,7 @@ public final class MasterHex extends Hex
         if (numLegions == 1)
         {
             // Place legion in the center of the hex.
-            int chitScale2 = chitScale >> 1;
+            int chitScale2 = chitScale / 2;
             point.x -= chitScale2;
             point.y -= chitScale2;
             marker.setLocation(point);
@@ -611,7 +611,7 @@ public final class MasterHex extends Hex
         else if (numLegions == 2)
         {
             // Place legions in NW and SE corners.
-            int chitScale4 = chitScale >> 2;
+            int chitScale4 = chitScale / 4;
             point.x -= 3 * chitScale4;
             point.y -= 3 * chitScale4;
             marker.setLocation(point);
@@ -631,7 +631,7 @@ public final class MasterHex extends Hex
         else if (numLegions == 3)
         {
             // Place legions in NW, SE, NE corners.
-            int chitScale4 = chitScale >> 2;
+            int chitScale4 = chitScale / 4;
             point.x -= 3 * chitScale4;
             point.y -= 3 * chitScale4;
             marker.setLocation(point);

@@ -68,7 +68,7 @@ public final class Marker extends Chit
             String name = oldFont.getName();
             int size = oldFont.getSize();
             int style = oldFont.getStyle();
-            font = new Font(name, style, (3 * size) >> 1);
+            font = new Font(name, style, 3 * size / 2);
             g.setFont(font);
             FontMetrics fontMetrics = g.getFontMetrics();
             // XXX getAscent() seems to return too large a number
@@ -81,7 +81,7 @@ public final class Marker extends Chit
             g.setFont(font);
         }
 
-        int x = rect.x + ((rect.width * 3) >> 2) - (fontWidth >> 1);
+        int x = rect.x + rect.width * 3 / 4 - fontWidth / 2;
         int y = rect.y + rect.height * 2 / 3 + fontHeight / 2;
 
         // Provide a high-contrast background for the number.

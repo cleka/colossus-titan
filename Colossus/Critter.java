@@ -433,7 +433,7 @@ public final class Critter extends Creature
         if (rangestrike)
         {
             // Divide power in half, rounding down.
-            dice >>= 1;
+            dice /= 2;
 
             // Dragon rangestriking from volcano: +2
             if (name.equals("Dragon") && currentHex.getTerrain() == 'v')

@@ -2301,8 +2301,7 @@ public final class Game
             {
                 set.add(hex.getLabel());
                 // Set the entry side relative to the hex label.
-                hex.setEntrySide(Hex.hexsideNum(cameFrom -
-                    hex.getLabelSide()));
+                hex.setEntrySide(cameFrom - hex.getLabelSide() % 6);
             }
             return set;
         }
@@ -2325,7 +2324,7 @@ public final class Game
 
             // Need to set entry sides even if no possible engagement,
             // for chooseWhetherToTeleport()
-            hex.setEntrySide(Hex.hexsideNum(cameFrom - hex.getLabelSide()));
+            hex.setEntrySide((cameFrom - hex.getLabelSide()) % 6);
 
             return set;
         }
@@ -2334,7 +2333,7 @@ public final class Game
         if (block >= 0)
         {
             set.addAll(findNormalMoves(hex.getNeighbor(block), player, legion,
-                roll - 1, ARROWS_ONLY, Hex.oppositeHexsideNum(block)));
+                roll - 1, ARROWS_ONLY, (block + 3) % 6));
         }
         else if (block == ARCHES_AND_ARROWS)
         {
@@ -2344,7 +2343,7 @@ public final class Game
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), player,
                         legion, roll - 1, ARROWS_ONLY,
-                        Hex.oppositeHexsideNum(i)));
+                        (i + 3) % 6));
                 }
             }
         }
@@ -2355,7 +2354,7 @@ public final class Game
                 if (hex.getExitType(i) >= MasterHex.ARROW && i != cameFrom)
                 {
                     set.addAll(findNormalMoves(hex.getNeighbor(i), player,
-                    legion, roll - 1, ARROWS_ONLY, Hex.oppositeHexsideNum(i)));
+                    legion, roll - 1, ARROWS_ONLY, (i + 3) % 6));
                 }
             }
         }
@@ -2391,7 +2390,7 @@ public final class Game
                    hex.getEntranceType(i) != MasterHex.NONE))
                 {
                     set.addAll(findTowerTeleportMoves(hex.getNeighbor(i),
-                        player, legion, roll - 1, Hex.oppositeHexsideNum(i)));
+                        player, legion, roll - 1, (i + 3) % 6));
                 }
             }
         }

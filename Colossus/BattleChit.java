@@ -69,14 +69,14 @@ public final class BattleChit extends Chit
 
             // Provide a high-contrast background for the number.
             g.setColor(Color.white);
-            g.fillRect(rect.x + ((rect.width - fontWidth) >> 1),
-                rect.y + ((rect.height - fontHeight) >> 1),
+            g.fillRect(rect.x + (rect.width - fontWidth) / 2,
+                rect.y + (rect.height - fontHeight) / 2,
                 fontWidth, fontHeight);
 
             // Show number of hits taken in red.
             g.setColor(Color.red);
-            g.drawString(hitString, rect.x + ((rect.width - fontWidth) >> 1),
-                rect.y + ((rect.height + fontHeight) >> 1));
+            g.drawString(hitString, rect.x + (rect.width - fontWidth) / 2,
+                rect.y + (rect.height + fontHeight) / 2);
 
             // Restore the font.
             g.setFont(oldFont);

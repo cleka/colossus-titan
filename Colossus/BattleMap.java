@@ -305,13 +305,14 @@ public final class BattleMap extends HexMap implements MouseListener,
     public BattleHex getEntrance(Legion legion)
     {
         Legion attacker = battle.getAttacker();
+        int side = attacker.getEntrySide();
         if (legion == attacker)
         {
-            return entrances[attacker.getEntrySide()];
+            return entrances[side];
         }
         else
         {
-            return entrances[Hex.oppositeHexsideNum(attacker.getEntrySide())];
+            return entrances[(side + 3) % 6];
         }
     }
 

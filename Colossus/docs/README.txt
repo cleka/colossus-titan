@@ -23,34 +23,35 @@ Running the game requires the following:
 
    (Colossus used to run under JDK 1.1, but I recently made some
    changes that break backwards compatibility.  Sorry, but those
-   changes were necessary to plug some major memory leaks, make 
+   changes were necessary to plug some major memory leaks, make
    popup menus show up properly under Linux and Solaris, etc.)
 
    Colossus should also run as an applet in a web browser, as long
    as your browser is new enough to support JDK 1.2 applets.  That
    probably means downloading a recent version of Sun's Java plug-in
    (included with the JRE), since most browsers come with out-of-date
-   Java virtual machines.
+   Java virtual machines.  If you're downloading the JRE, you might
+   as well use the JRE itself rather than the plug-in.
 
-   Win32, Solaris, and Linux versions of the JDK and JRE are freely
-   downloadable from java.sun.com.  Another Linux port is available
-   from www.blackdown.org.  Info on other ports is available here:
-   http://java.sun.com/cgi-bin/java-ports.cgi
+   Win32, Solaris, and x86 Linux versions of the JDK and JRE are
+   freely downloadable from java.sun.com.  Another Linux port is
+   available from www.blackdown.org.  Info on other ports is
+   available at http://java.sun.com/cgi-bin/java-ports.cgi
 
    Here's my impression of how well various Java environments run
    Colossus.  When I say that one is buggy, I mean that it has
-   obvious problems running Colossus, not that it's worthless in
+   serious problems running Colossus, not that it's worthless in
    general.  All the Java environments have strong and weak points,
    but the AWT is usually a weak point.
 
-   Windows: Sun's JDK 1.3 is good.  1.2.2 is okay.  1.2.0 and 
-      1.2.1 have very serious memory leaks in the image handling 
+   Windows: Sun's JDK 1.3 is good.  1.2.2 is okay.  1.2.0 and
+      1.2.1 have very serious memory leaks in the image handling
       code, so I recommend upgrading to 1.3.
 
    Solaris Sparc: Sun's JDK 1.3 is good.  1.2.x is okay.
 
-   Linux: Sun 1.3 and Blackdown 1.3 FCS are good.  Sun and 
-      Blackdown 1.2.2 versions are okay.  IBM's JDK 1.3 is 
+   x86 Linux: Sun 1.3 and Blackdown 1.3 FCS are good.  Sun and
+      Blackdown 1.2.2 versions are okay.  IBM's JDK 1.3 is
       buggy.  kaffe is not yet fully compatible with JDK 1.2.
 
    If you have something else, you might find bugs that I haven't.
@@ -73,7 +74,7 @@ Running the game requires the following:
    option-click on a Macintosh and the second mouse button on a PC would
    fire the same Java event.  They don't.  Because I don't have a Mac,
    I don't know if Colossus works correctly on one.  If you have a Mac
-   with a one-button mouse, please let me know how things work.  I'm 
+   with a one-button mouse, please let me know how things work.  I'm
    in the process of adding menus and hotkeys to duplicate right-button
    functionality.
 
@@ -94,8 +95,9 @@ doesn't work, pop up a command prompt, cd to the directory where
 you unzipped the zip file, and try typing "java -jar Colossus.jar"
 
 Another alternative is to run Colossus as an applet.  Point your
-web browser to the included index.html file, and hope it works.  If
-it doesn't, you probably need to install Sun's Java plug-in.
+web browser to the included Colossus_applet_plug.html file, and hope
+it works.  If it doesn't, you probably need to install Sun's Java
+plug-in.
 
 Once you get things running, a dialog should pop up, allowing you to
 type in up to six player names.  Put names in some of the boxes, then
@@ -105,32 +107,31 @@ tower number.  Pick colors for each player.  If you misclick, click
 "Restart"  When every player has a color, click "Done"
 
 Now a window will pop up for each player, letting him pick his initial legion
-marker.  (You'll notice that right now the legion markers are just colored
-squares with numbers from 1 to 12 in them.  Feel free to draw new ones.)
-Pick one.
+marker.  Pick one.
 
-After each player has picked his initial legion marker, the BattleMap window
+After each player has picked his initial legion marker, the MasterBoard window
 will pop up.  You'll see each player's initial legion marker sitting in a
-tower hex.  You'll also see a small windows in the lower right corner of the 
-screen.  This is the Game Status window, which tracks each player's score, 
+tower hex.  You'll also see a small window in the lower right corner of the
+screen.  This is the Game Status window, which tracks each player's score,
 number of legion markers remaining, etc.
 
 You can right-click on a legion to see its contents. (Unless you've selected
-"All stacks visible" on the top menu, the contents of other players' legions 
-are hidden, except for those creatures which have recently been revealed via 
-fighting, recruiting, or teleporting).  You can right-click on a hex to call 
-up a menu, which lets you either see what you can recruit in that hex, or 
+"All stacks visible" on the top menu, the contents of other players' legions
+are hidden, except for those creatures which have recently been revealed via
+fighting, recruiting, or teleporting).  You can right-click on a hex to call
+up a menu, which lets you either see what you can recruit in that hex, or
 its battle map.
 
 The active player first needs to split his initial 8-high legion.  You'll
 notice that the hex containing the active player's legion is lit up as a
 reminder; in future turns this will happen for all 7-high legions.  (It's
-also legal to split legions with 4-6 characters in them.)  Click on the
-legion.  A dialog will come up to let you pick the new legion marker to use.
-Then another dialog will come up, allowing you to move characters between the
-two legions.  The game will not let you leave the split phase until each of
-your legions contains three Creatures and one Lord.  When you're ready, 
-select "Done with Splits" from the Phase menu.
+also legal to split legions with 4-6 characters in them, even though they
+are not highlighted.)  Click on the legion.  A dialog will come up to let
+you pick the new legion marker to use.  Then another dialog will come up,
+allowing you to move characters between the two legions.  The game will
+not let you leave the split phase on the first turn until each of your
+legions contains three Creatures and one Lord.  When you're ready, select
+"Done with Splits" from the Phase menu.
 
 Next comes the movement phase.  The game will tell you your movement roll.
 Click on a legion, and the places it can move will light up.  Click on one of
@@ -157,30 +158,34 @@ when more than one is possible.)  The defender goes first.  Click on each
 character, and the places it can move light up.  Click on one of those
 places, and the character moves there.  Repeat until all characters are
 on-board, unless you'd like to leave some off-board to die for some reason.
-The "Undo Last Move" and "Undo All Moves" menu options are available.  When 
-done moving, click "Done with Moves"  The attacker repeats the process, 
+The "Undo Last Move" and "Undo All Moves" menu options are available.  When
+done moving, click "Done with Moves"  The attacker repeats the process,
 except that after he finishes moving, it's strike time.
 
 Any creatures adjacent to an enemy must strike; rangestrikers with an enemy in
-range and line of sight may strike.  Click the striker, and all his legal
-targets light up.  Pick one, and he tries to strike it.  (If it's legal to
-take a strike penalty in order to carry, then a dialog will pop up to ask if
-you want to do so.)  The number of hits are displayed on the target.  If the
-target is dead, it will have a big "X" displayed over it.  If there is excess
-damage that can legally carry over, then the legal carry target(s) will light
-up, and the striking player needs to pick which one to carry to, or click
-somewhere else to decline the carry.  This process can repeat.  There's no way
-to undo strikes.  When done striking, choose "Done with Strikes"
+range and line of sight may strike.  (If you turn on the "Auto forced strike"
+option, then creatures that are forced to strike and have only one legal
+target will strike first without any intervention on your part.)  Click the
+striker, and all his legal targets light up.  Pick one, and he tries to strike
+it.  (If it's legal to take a strike penalty in order to carry, then a dialog
+will pop up to ask if you want to do so.)  The number of hits are displayed on
+the target.  If the target is dead, it will have a big "X" displayed over it.
+If there is excess damage that can legally carry over, then the legal carry
+target(s) will light up, and the striking player needs to pick which one to
+carry to, or click somewhere else to decline the carry.  This process can
+repeat.  There's no way to undo strikes.  When done striking, choose "Done
+with Strikes"
 
 After the strike phase, the other player gets a strikeback phase.  It's
 identical to the strike phase, except that rangestrikes are not allowed.
 
 The first turn after he kills an opposing character, the attacker may be
 allowed to summon an angel or archangel, if there is one available in an
-unengaged legion, and he hasn't yet summoned an angel this turn.  If so, 
-a dialog will appear and all MasterBoard hexes with summonable angels will 
-light up.  The attacker must click on one of those hexes, then select the 
-angel or archangel as appropriate in the dialog.
+unengaged legion, and he hasn't yet summoned an angel this turn, and the
+legion doesn't already have seven creatures.  If so, a dialog will appear
+and all MasterBoard hexes with summonable angels will light up.  The
+attacker must click on one of those hexes, then select the angel or
+archangel as appropriate in the dialog.
 
 During turn 4 of the battle, the defender may be allowed to muster a recruit.
 If so, a dialog will pop up showing the legal recruits.  If desired, pick one.
@@ -190,11 +195,11 @@ acquiring one or more angels or archangels.  If the winner didn't summon
 an angel or recruit a reinforcement earlier, he will get another choice if
 eligible.
 
-After all engagements are resolved, choose "Done with Engagements" to 
+After all engagements are resolved, choose "Done with Engagements" to
 proceed to the mustering phase.  Legions that moved and can recruit will
 light up.  Click on each one and choose a recruit.  If more than one type of
 creature is capable of summoning that recruit, you'll have to choose the
-recruiter(s), unless the "Autopick recruiter" option has been selected.  
+recruiter(s), unless the "Autopick recruiter" option has been selected.
 When done, click "Done with Turn" and pass the mouse to the next player.
 
 The game ends when zero or one Titans remain.  The last player standing is
@@ -218,13 +223,13 @@ in particular) are still off.  Bruno Wolff's Titan Errata and Clarifications
 at http://www.uwm.edu/~bruno/titan/errata.shtml is a good place to check for
 rules issues.
 
-There is currently some very rough save / load game code in place.  Unless
-you turn off the Autosave option, the game produces a numbered .sav file 
-in the saves/ subdirectory every turn.  If you start a new game with 
-"java -jar Colossus.jar filename.sav" instead of just "java -jar Colossus" 
-then the save file will be loaded.  "java -jar Colossus.jar --latest" will 
-load the most recent save game in the saves/ subdirectory.  You'll want to 
-manually delete all those save files from time to time.
+Unless you turn off the Autosave option, the game produces a numbered .sav 
+file in the saves/ subdirectory every turn.  If you start a new game with
+"java -jar Colossus.jar filename.sav" instead of just "java -jar Colossus"
+then the save file will be loaded.  "java -jar Colossus.jar --latest" will
+load the most recent save game in the saves/ subdirectory -- this is useful
+if the game crashes.  Or you can just use the Load option on the File menu.  
+You'll want to manually delete all those save files from time to time.
 
 
 Credits:

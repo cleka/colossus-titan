@@ -116,7 +116,7 @@ public final class BattleHex extends Hex
             int n;
             if (hexside != ' ')
             {
-                n = nextHexsideNum(i);
+                n = (i + 1) % 6;
                 drawHexside(g2, xVertex[i], yVertex[i], xVertex[n], yVertex[n],
                     hexside);
             }
@@ -125,7 +125,7 @@ public final class BattleHex extends Hex
             hexside = getOppositeHexside(i);
             if (hexside != ' ')
             {
-                n = nextHexsideNum(i);
+                n = (i + 1) % 6;
                 drawHexside(g2, xVertex[n], yVertex[n], xVertex[i], yVertex[i],
                     hexside);
             }
@@ -142,13 +142,13 @@ public final class BattleHex extends Hex
         FontMetrics fontMetrics = g2.getFontMetrics();
 
         g2.drawString(name, rectBound.x + ((rectBound.width -
-            fontMetrics.stringWidth(name)) >> 1),
-            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 1));
+            fontMetrics.stringWidth(name)) / 2),
+            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 2));
 
         // Show hex label in upper left corner.
         g2.drawString(label, rectBound.x + (rectBound.width -
             fontMetrics.stringWidth(label)) / 3,
-            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) >> 2));
+            rectBound.y + ((fontMetrics.getHeight() + rectBound.height) / 4));
     }
 
 
@@ -350,8 +350,8 @@ public final class BattleHex extends Hex
         int chitScale = map.getChitScale();
 
         // Cascade chits diagonally.
-        int chitScale4 = chitScale >> 2;
-        int offset = (chitScale * (1 + (critters.size()))) >> 2;
+        int chitScale4 = chitScale / 4;
+        int offset = (chitScale * (1 + (critters.size()))) / 4;
         point.x -= offset;
         point.y -= offset;
 
@@ -491,7 +491,7 @@ public final class BattleHex extends Hex
         BattleHex neighbor = getNeighbor(i);
         if (neighbor != null)
         {
-            hexside = neighbor.getHexside(oppositeHexsideNum(i));
+            hexside = neighbor.getHexside((i + 3) % 6);
         }
 
         return hexside;

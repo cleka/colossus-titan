@@ -457,7 +457,7 @@ public final class Battle
                 BattleHex neighbor = hex.getNeighbor(i);
                 if (neighbor != null)
                 {
-                    int reverseDir = Hex.oppositeHexsideNum(i);
+                    int reverseDir = (i + 3) % 6;
 
                     int entryCost = neighbor.getEntryCost(creature,
                         reverseDir);
