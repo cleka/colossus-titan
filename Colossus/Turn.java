@@ -32,8 +32,8 @@ class Turn extends Dialog implements ActionListener
     
     void setupSplitDialog()
     {
-        setTitle(game.getActivePlayer().getName() + " Turn " +
-            game.getTurnNumber());
+        Player player = game.getActivePlayer();
+        setTitle(player.getName() + " Turn " + game.getTurnNumber());
         removeAll();
         setLayout(new GridLayout(0, 2));
 
@@ -47,6 +47,19 @@ class Turn extends Dialog implements ActionListener
         // Place this window in the upper right corner.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width - getSize().width, 0));
+
+        // Highlight hexes with 7 high legions.
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.legions[i];
+            if (legion.getHeight() >= 7)
+            {
+                MasterHex hex = board.getHexFromLabel(legion.getCurrentHex());
+                hex.select();
+                Rectangle clip = new Rectangle(hex.getBounds());
+                board.repaint(clip.x, clip.y, clip.width, clip.height);
+            }
+        }
     }
 
 
@@ -124,6 +137,26 @@ class Turn extends Dialog implements ActionListener
         // Place this window in the upper right corner.
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(new Point(d.width - getSize().width, 0));
+        
+        // Highlight hexes with legions eligible to muster.
+
+        Player player = game.getActivePlayer();
+        for (int i = 0; i < player.getNumLegions(); i++)
+        {
+            Legion legion = player.legions[i];
+            if (legion.getHeight() < 7 && legion.hasMoved())
+            {
+                Creature [] recruits = new Creature[5];
+                if (PickRecruit.findEligibleRecruits(legion, recruits) >= 1)
+                {
+                    MasterHex hex = 
+                        board.getHexFromLabel(legion.getCurrentHex());
+                    hex.select();
+                    Rectangle clip = new Rectangle(hex.getBounds());
+                    board.repaint(clip.x, clip.y, clip.width, clip.height);
+                }
+            }
+        }
     }
     
 
