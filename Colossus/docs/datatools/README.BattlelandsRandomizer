@@ -14,32 +14,40 @@ static, text-based process.
 It's not finished yet, as no inter-hexagon hazard
 are generated yet (such as slope, ...).
 
-Properties are line of the form:
+Properties are line of one of the two forms:
 
 AREA <list_of_hex> TERRAINS <list_of_hazards>
+LABEL <label> = <list_of_hex>
 
 where
 
-* AREA and TERRAINS are the literal strings AREA and TERRAINS
+* AREA, TERRAINS and LABEL are the strings literals ; = is the character literal '='.
 
 * <list_of_hex> is a list of hex from the following available forms:
+
     (<number>,<number>)
     (<range>,<range>)
     (<number>,<range>)
     (<range>,<number>)
     <hex_label>
+    (<label>)
     (inside)
     (leftdefense)
     (upperdefense)
     (lowerdefense)
+    SOMEOF(<number>,<list_of_hex>)
+
     where <number> is a number between 0 and 5, and <range> is of the form
         <number>-<number>
     i.e. a range of number between 0 and 5.
     <hex_label> is simply the label displayed on the Battlemap (F4, C3,...)
-    The other four forms are literal
+    <label> is a label defined previously with a LABEL statement (see below)
+    The other four forms are literal (similar to labels)
     string, and represent everything but the most outside Hex, and the 3
     lines of 3 hexagons representing the defense entry lines (left,
     upper-right, and lower-right respectively).
+    SOMEOF is a literal string ; result is a list of <number> hexes taken
+    randomly from the <list_of_hex> in parameter.
 
 * <list_of_hazards> is a list of Hazard from the following available forms:
     <hazard_letter>
@@ -54,6 +62,9 @@ where
     <probability_elevation_X> are the odds of the terrain being at elevation
     0, 1 and 2 respectively (it's better is the sum is 100., but they will
     be normalized to percentile values).
+
+* <label> is a lowercase-only string, that act afterwards as it was the list of
+    Hex on the right side of the '=' character.
 
 BattlelandsRandomizer will then, for each AREA, try to put the
 Hazard in any one of the Hex in the AREA. An Hex will not receive

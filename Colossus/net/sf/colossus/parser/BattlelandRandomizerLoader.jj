@@ -34,6 +34,8 @@ public class BattlelandRandomizerLoader
     };
     private static final Random rand = new Random();
 
+    Hashtable labels = new Hashtable();
+
     private class randomTerrain implements Comparable
     {
         private final char terrain;
@@ -227,6 +229,8 @@ TOKEN :
     < EOL: "\n" >
 |   < AREA : "AREA" >
 |   < TERRAINS : "TERRAINS" >
+|   < KEYLABEL : "LABEL" >
+|   < SOMEOF : "SOMEOF" >
 |   < INSIDE : "inside" >
 |   < LEFTDEFENSE : "leftdefense" >
 |   < UPPERDEFENSE : "upperdefense" >
@@ -237,12 +241,13 @@ TOKEN :
 {
     < NUMBER : (<DIGIT>)+ >
 |   < FPNUMBER : (<DIGIT>)+<DOT>(<DIGIT>)* >
-|   < DIGIT : ["0" - "9"] >
+|   < #DIGIT : ["0" - "9"] >
 |   < COMMA : "," >
 |   < DOT : "." >
 |   < OPENPAR : "(" >
 |   < CLOSEPAR : ")" >
 |   < CARET : "-" >
+|   < EQUAL : "=" >
 }
 
 TOKEN :
@@ -250,6 +255,18 @@ TOKEN :
     < LABEL : ["A"-"F","a"-"f"]["1"-"6"] >
 |   < TERRAIN : ["a"-"z","A"-"Z"] >
 
+}
+
+TOKEN :
+{
+    < USERLABEL : (["a"-"z"])+ >
+}
+
+String z_label() :
+{}
+{
+    <USERLABEL>
+    { return new String(token.image); }
 }
 
 char z_terrain() :
@@ -337,13 +354,32 @@ range z_range() :
 List z_listAddress() :
 {
     address ad;
-    List al;
+    List al, al2;
     int x,y;
     range r1, r2;
     int i,j;
+    String s;
 }
 {
-    <OPENPAR> <INSIDE> <CLOSEPAR> (al = z_listAddress())
+    <SOMEOF> <OPENPAR> (x = z_number()) <COMMA> (al2 = z_listAddress()) <CLOSEPAR> (al = z_listAddress())
+    {
+        while (!al2.isEmpty() && (x > 0))
+        {
+            ad = (address)al2.remove(rand.nextInt(al2.size()));
+            al.add(ad);
+            x--;
+        }
+        return al;
+    }
+|   <OPENPAR> (s = z_label()) <CLOSEPAR> (al = z_listAddress())
+    {
+        List ll = (List)labels.get(s);
+        Iterator it = ll.iterator();
+        while (it.hasNext())
+            al.add(it.next());
+        return al;
+    }
+|   <OPENPAR> <INSIDE> <CLOSEPAR> (al = z_listAddress())
     { // hard-coded value
         for (i = 1; i <= 4 ; i++)
             for (j = 2; j <= 3 ; j++)
@@ -474,6 +510,11 @@ int oneArea(BattleHex h[][]) :
         Collections.sort(al);
         //System.err.println("Using area: " + al + ", terrains: " + tl);
         resolveAll(h, al, tl);
+        return(1);
+    }
+|   <KEYLABEL> (s = z_label()) <EQUAL> (al = z_listAddress())
+    {
+        labels.put(s, al);
         return(0);
     }
 |   <EOL>
