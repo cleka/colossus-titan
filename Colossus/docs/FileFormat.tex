@@ -218,14 +218,16 @@ where:
 and $\langle$optional\_condition$\rangle$ is an optional condition builded with the following $\langle$condition\_node$\rangle$:
 
 \begin{itemize}
-\item \texttt{( $\langle$condition\_node$\rangle$ AND $\langle$condition\_node$\rangle$ )} : both condition must be true
-\item \texttt{( $\langle$condition\_node$\rangle$ OR $\langle$condition\_node$\rangle$ )} : one condition at least must be true
-\item \texttt{( NOT $\langle$condition\_node$\rangle$)} : the condition must be false
+\item \texttt{( $\langle$condition\_node$\rangle$ AND $\langle$condition\_node$\rangle$ )} : both condition must be true.
+\item \texttt{( $\langle$condition\_node$\rangle$ OR $\langle$condition\_node$\rangle$ )} : one condition at least must be true.
+\item \texttt{( NOT $\langle$condition\_node$\rangle$)} : the condition must be false.
 \item \texttt{( CANREACH $\langle$terrain\_letter$\rangle$ )} : The recruiting stack can reach at least one terrain of type $\langle$terrain\_letter$\rangle$ in the next turn.
-\item \texttt{( HASCREATURE $\langle$creature\_name$\rangle$ )} : The stack already has one creature by the name of $\langle$creature\_name$\rangle$
-\item \texttt{( RANDOM $\langle$decimal\_value$\rangle$ )} : True (100 * $\langle$decimal\_value$\rangle$) \% of the time ($\langle$decimal\_value$\rangle$ must be between 0.0 and 1.0)
+\item \texttt{( HASCREATURE $\langle$creature\_name$\rangle$ )} : The stack already has one creature by the name of $\langle$creature\_name$\rangle$.
+\item \texttt{( RANDOM $\langle$decimal\_value$\rangle$ )} : True (100 * $\langle$decimal\_value$\rangle$) \% of the time ($\langle$decimal\_value$\rangle$ must be between 0.0 and 1.0).
 \item \texttt{( $\langle$number$\rangle$ $\langle$creature\_name$\rangle$ AVAILABLE )} : At least $\langle$number$\rangle$ of the creature $\langle$creature\_name$\rangle$ are available in the caretaker's stack.
-\item \texttt{( CANRECRUIT $\langle$creature\_name$\rangle$ )} : The stack can also recruit the creature $\langle$creature\_name$\rangle$
+\item \texttt{( CANRECRUIT $\langle$creature\_name$\rangle$ )} : The stack can also recruit the creature $\langle$creature\_name$\rangle$.
+\item \texttt{( HEIGHTIS $\langle$number$\rangle$ )} : The stack is exactly $\langle$number$\rangle$ in height.
+\item \texttt{( LABELIS $\langle$hex\_label$\rangle$ )} : The stack is in hex $\langle$hex\_label$\rangle$.
 \end{itemize}
 
 \section{\texttt{VAR} file format (default file used: ``Default/Default.var'')}

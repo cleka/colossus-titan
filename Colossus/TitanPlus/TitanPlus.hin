@@ -1,0 +1,14 @@
+RECRUIT B Cyclops   2 Cyclops  ((NOT (HASCREATURE Behemoth)) AND
+                                (2 Behemoth AVAILABLE))
+RECRUIT P Lion      2 Lion     (((CANREACH D) AND
+                                 (NOT (HASCREATURE Griffon))) AND
+                                (2 Griffon AVAILABLE))
+RECRUIT M Troll     2 Troll    (((CANREACH S) AND
+                                 (NOT (HASCREATURE Wyvern))) AND
+                                (2 Wyvern AVAILABLE))
+RECRUIT T Cyclops   2 Cyclops  (NOT ((CANRECRUIT Warlock) OR
+                                     (CANRECRUIT Guardian)))
+RECRUIT T Troll     2 Troll    (NOT ((CANRECRUIT Warlock) OR
+                                     (CANRECRUIT Guardian)))
+RECRUIT T Lion      2 Lion     (NOT ((CANRECRUIT Warlock) OR
+                                     (CANRECRUIT Guardian)))

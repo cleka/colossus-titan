@@ -1826,6 +1826,14 @@ public class SimpleAI implements AI
         {
             return recruits.contains(Creature.getCreatureByName(name));
         }
+        public int stackHeight()
+        {
+            return legion.getHeight();
+        }
+        public String hexLabel()
+        {
+            return hex.getLabel();
+        }
     }
 
     private Creature getVariantRecruitHint(LegionInfo legion,
@@ -1845,12 +1853,13 @@ public class SimpleAI implements AI
         
         if (!(recruits.contains(recruit)))
         {
-            Log.warn("Invalid Hint for this variant !");
+            Log.warn("HINT: Invalid Hint for this variant ! (can't recruit " +
+                     recruitName +")");
             return ((Creature)recruits.get(recruits.size() - 1));
         }
         if (!(basic.equals(recruit.getName())))
         {
-            Log.debug("GRAPH: (" + hex.getLabel() +
+            Log.debug("HINT: (" + hex.getLabel() +
                       ") variant hint suggest recruiting " +
                       recruitName + " instead of " + basic);
         }

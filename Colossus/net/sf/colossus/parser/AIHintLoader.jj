@@ -220,6 +220,31 @@ public class AIHintLoader
         }
     }
 
+    private class ConditionTreeNode_HeightIs extends ConditionTreeNode_Leaf
+    {
+        int h;
+
+        public ConditionTreeNode_HeightIs(int h)
+        {
+            super();
+            this.h = h;
+        }
+        
+        public boolean isTrue()
+        {
+            if (oracle != null)
+            {
+                return (oracle.stackHeight() == h);
+            }
+            return false;
+        }
+
+        public String toString()
+        {
+            return "( stack height is " + h + " )";
+        }
+    }
+
     private class ConditionTreeNode_CanRecruit extends ConditionTreeNode_Leaf
     {
         String name;
@@ -242,6 +267,31 @@ public class AIHintLoader
         public String toString()
         {
             return "( stack can recruit " + name + " )";
+        }
+    }
+
+    private class ConditionTreeNode_LabelIs extends ConditionTreeNode_Leaf
+    {
+        String name;
+        
+        public ConditionTreeNode_LabelIs(String name)
+        {
+            super();
+            this.name = name;
+        }
+        
+        public boolean isTrue()
+        {
+            if (oracle != null)
+            {
+                return oracle.hexLabel().equals(name);
+            }
+            return false;
+        }
+
+        public String toString()
+        {
+            return "( stack is in hex " + name + " )";
         }
     }
 
@@ -438,7 +488,9 @@ TOKEN :
     < RECRUIT : "RECRUIT" >
 |   < CANREACH : "CANREACH" >
 |   < HASCREATURE : "HASCREATURE" >
+|   < HEIGHTIS : "HEIGHTIS" >
 |   < CANRECRUIT : "CANRECRUIT" >
+|   < LABELIS : "LABELIS" >
 |   < AVAILABLE : "AVAILABLE" >
 |   < RANDOM : "RANDOM" >
 |   < OR : "OR" >
@@ -574,6 +626,14 @@ ConditionTreeNode h_condnode() :
     {
         return new ConditionTreeNode_CanRecruit(name);
     }
+|   <OPENPAR> <HEIGHTIS> (n = h_number()) <CLOSEPAR>
+    {
+        return new ConditionTreeNode_HeightIs(n);
+    }
+|   <OPENPAR> <LABELIS> (name = h_chaine()) <CLOSEPAR>
+    {
+        return new ConditionTreeNode_LabelIs(name);
+    }
 }
 
 recruitHintData h_recruit_hint() :
@@ -616,7 +676,7 @@ int oneHint() :
 
         temp.add(recruitHint);
 
-        Log.debug("Recruit hint : in " + recruitHint.getTerrain() +
+        Log.debug("HINT: Recruit hint in " + recruitHint.getTerrain() +
                   " with " + recruitHint.getNumber() + " " + 
                   recruitHint.getRecruiter() + " get a " + 
                   recruitHint.getRecruitee() +
