@@ -25,7 +25,27 @@ class CreatureCollectionView extends KDialog implements WindowListener
     /** hash by creature name to the label that displays the count */
     Map countMap = new HashMap();
     private SaveWindow saveWindow;
-
+    private final static Font countFont =
+        new Font("Monospaced", Font.PLAIN, 12);
+    private final static String baseString = "--/--/--";
+    private final static JLabel baseLabel =
+        new JLabel(baseString, SwingConstants.CENTER);
+    private final static JLabel legendLabel =
+        new JLabel(htmlizeOnly(
+                               htmlColorizeOnly("Values are: ", "black") +
+                               htmlColorizeOnly("In Stack/", "black") +
+                               htmlColorizeOnly("Total", "blue") +
+                               htmlColorizeOnly("/", "black") +
+                               /*
+                                 htmlColorizeOnly("In Game", "green") +
+                                 htmlColorizeOnly("/", "black") +
+                               */
+                               htmlColorizeOnly("Dead", "red")));
+    
+    static
+    {
+        baseLabel.setFont(countFont);
+    }
 
     CreatureCollectionView(JFrame frame, Client client)
     {
@@ -38,14 +58,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
         JPanel panel = makeCreaturePanel();
         getContentPane().add(panel, BorderLayout.CENTER);
 
-        JLabel label = new JLabel(
-            htmlizeOnly(
-                htmlColorizeOnly("Values are: ", "black") +
-                htmlColorizeOnly("In Stack / ", "black") +
-                htmlColorizeOnly("Dead", "red") +
-                htmlColorizeOnly(" / ", "black") +
-                htmlColorizeOnly("Total", "blue")));
-        getContentPane().add(label, BorderLayout.SOUTH);
+        getContentPane().add(legendLabel, BorderLayout.SOUTH);
 
         addWindowListener(this);
 
@@ -73,6 +86,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
     /** the count for an individual creature */
     class CreatureCount extends JPanel
     {
+        JLabel label;
+
         CreatureCount(String name)
         {
             super(new BorderLayout());
@@ -80,15 +95,23 @@ class CreatureCollectionView extends KDialog implements WindowListener
             setBorder(BorderFactory.createLineBorder(Color.black));
 
             Chit chit = new Chit(4 * Scale.get(), name, this);
-            JLabel label = new JLabel((
-                Integer.toString(client.getCreatureCount(name)) + " / " +
-                Integer.toString(client.getCreatureMaxCount(name))),
-                SwingConstants.CENTER);
+            label = new JLabel(baseString, SwingConstants.CENTER);
+            label.setFont(countFont);
             countMap.put(name, label);
 
             // jikes whines because add is defined in both JPanel and JDialog.
             this.add(chit, BorderLayout.CENTER);
             this.add(label, BorderLayout.SOUTH);
+        }
+
+        public Dimension getPreferredSize()
+        {
+            Dimension labelDim = label.getPreferredSize();
+            int minX = 4 * Scale.get() + 1;
+            int minY = 4 * Scale.get() + (int)labelDim.getHeight() + 1;
+            if (minX < (int)labelDim.getWidth() + 2)
+                minX = (int)labelDim.getWidth() + 2;
+            return new Dimension(minX, minY);
         }
     }
 
@@ -96,7 +119,8 @@ class CreatureCollectionView extends KDialog implements WindowListener
     {
         java.util.List creatures = Creature.getCreatures();
         JPanel creaturePanel = 
-            new JPanel(new GridLayout(5, creatures.size() / 5));
+            new JPanel(/* new GridLayout(5, creatures.size() / 5) */
+                       new FlowLayout(FlowLayout.LEFT, 2, 2));
         Iterator it = creatures.iterator();
         while (it.hasNext())
         {
@@ -118,6 +142,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
             int count = client.getCreatureCount(name);
             int maxcount = client.getCreatureMaxCount(name);
             int deadCount = client.getCreatureDeadCount(name);
+            int inGameCount = maxcount - (deadCount + count);
             String color;
             if (count == 0)
             {
@@ -132,26 +157,34 @@ class CreatureCollectionView extends KDialog implements WindowListener
                 color = "black";
             }
             String htmlCount =
-                htmlColorizeOnly(Integer.toString(count), color);
+                htmlColorizeOnly((count < 10 ? "0" : "") + 
+                                 Integer.toString(count), color);
             String htmlTotalCount =
-                htmlColorizeOnly(Integer.toString(maxcount),
+                htmlColorizeOnly((maxcount < 10 ? "0" : "") + 
+                                 Integer.toString(maxcount),
                                  "blue");
             String htmlDeadCount =
                 htmlColorizeOnly(
                              Creature.getCreatureByName(name).isImmortal() ?
-                             "X" :
+                             "--" :
+                             (deadCount < 10 ? "0" : "") + 
                              Integer.toString(deadCount),
                              "red");
-            String htmlSlash = htmlColorizeOnly(" / ", "black");
+            String htmlInGameCount =
+                htmlColorizeOnly((inGameCount < 10 ? "0" : "") + 
+                                 Integer.toString(inGameCount),
+                                 "green");
+            String htmlSlash = htmlColorizeOnly("/", "black");
             label.setText(htmlizeOnly(htmlCount + htmlSlash +
-                                      htmlDeadCount + htmlSlash +
-                                      htmlTotalCount));
+                                      htmlTotalCount + htmlSlash +
+                                      /* htmlInGameCount + htmlSlash + */
+                                      htmlDeadCount));
         }
 
         repaint();
     }
 
-    private String htmlColorizeOnly(String input, String color)
+    private static String htmlColorizeOnly(String input, String color)
     {
         StringBuffer sb = new StringBuffer("<font color=");
         sb.append(color);
@@ -161,7 +194,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
         return sb.toString();
     }
 
-    private String htmlizeOnly(String input)
+    private static String htmlizeOnly(String input)
     {
         StringBuffer sb = new StringBuffer("<html>");
         sb.append(input);
@@ -170,7 +203,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
     }
 
     /** Wrap the input string with html font color tags. */
-    private String htmlColorize(String input, String color)
+    private static String htmlColorize(String input, String color)
     {
         return htmlizeOnly(htmlColorizeOnly(input, color));
     }
@@ -187,6 +220,7 @@ class CreatureCollectionView extends KDialog implements WindowListener
         getContentPane().removeAll();
         JPanel panel = makeCreaturePanel();
         getContentPane().add(panel, BorderLayout.CENTER);
+        getContentPane().add(legendLabel, BorderLayout.SOUTH);
         pack();
         upperRightCorner();
         location = getLocation();
@@ -196,5 +230,22 @@ class CreatureCollectionView extends KDialog implements WindowListener
     public void windowClosing(WindowEvent e)
     {
         dispose();
+    }
+
+    public Dimension getPreferredSize()
+    {
+        java.util.List creatures = Creature.getCreatures();
+        /* default : 5 creatures wide */
+        
+        int minSingleX = (4 * Scale.get()) + 8;
+        if (minSingleX < (int)baseLabel.getPreferredSize().getWidth() + 8)
+            minSingleX = (int)baseLabel.getPreferredSize().getWidth() + 8;
+
+        int minX = minSingleX * 5;
+        int minY = (((4 * Scale.get()) + 8 +
+                     (int)baseLabel.getPreferredSize().getHeight()) *
+                    ((creatures.size() + 4 ) / 5)) + 60;
+        
+        return new Dimension(minX, minY);
     }
 }
