@@ -1,0 +1,26 @@
+#NAME      POWER SKILL RANGE FLY BRAMBLE DRIFT BOG SANDDUN SLOPE VOLCN RIVER STONE TREE  WATER MGCMSL SUMON LORD DEMILORD COUNT PLURALNAME BASECOLOR
+Angel      6     4     false true  false false false false false false false false false false false true  true  false    999    Angels     giantBlue
+Archangel  9     4     false true  false false false false false false false false false false false true  true  false    999    Archangels hydraOrange
+Behemoth   8     3     false false true  false false false false false false false false false false false false false    999    Behemoths  behemothGreen
+Centaur    3     4     false false false false false false false false true  false false false false false false false    999    Centaurs   centaurGold
+Colossus  10     4     false false false true  false false true  false false false false false false false false false    999    Colossi    colossusPink
+Cyclops    9     2     false false true  false false false false false false false false false false false false false    999    Cyclopes   behemothGreen
+Dragon     9     3     true  true  false false false false true  true  false false false false false false false false    999    Dragons    red
+Gargoyle   4     3     false true  true  false false false false false false false false false false false false false    999    Gargoyles  black
+Giant      7     4     true  false false true  false false false false false false false false false false false false    999    Giants     giantBlue
+Gorgon     6     3     true  true  true  false false false false false false false false false false false false false    999    Gorgons    black
+Griffon    5     4     false true  false false false true  false false false false false false false false false false    999    Griffons   hydraOrange
+Guardian  12     2     false true  false false false false false false false false false false false false false true     999    Guardians  colossusPink
+Hydra     10     3     true  false false false true  true  false false false false false false false false false false    999    Hydrae     hydraOrange
+Lion       5     3     false false false false false true  true  false true  false false false false false false false    999    Lions      red
+Minotaur   4     4     true  false false false false false true  false false false false false false false false false    999    Minotaurs  ogreRed
+Ogre       6     2     false false false false true  false true  false false false false false false false false false    999    Ogres      ogreRed
+Ranger     4     4     true  true  false false true  false false false true  false false false false false false false    999    Rangers    colossusPink
+Serpent   18     2     false false true  false false false false false false false false false false false false false    999    Serpents   hydraOrange
+# Titan is (-1,4), as its strength varies
+Titan     -1     3     false false false false false false false false false false false false false false true  false    6    Titans     black
+Troll      8     2     false false false true  true  false false false false false false false false false false false    999    Trolls     giantBlue
+Unicorn    6     4     false false false false false false true  false true  false false false false false false false    999    Unicorns   hydraOrange
+Warbear    6     3     false false false true  false false false false true  false false false false false false false    999    Warbears   centaurGold
+Warlock    5     4     true  false false false false false false false false false false false true  false false true     999    Warlocks   hydraOrange
+Wyvern     7     3     false true  false false true  false false false false false false false false false false false    999    Wyverns    colossusPink
