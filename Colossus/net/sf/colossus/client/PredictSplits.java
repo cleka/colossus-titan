@@ -71,14 +71,15 @@ public final class PredictSplits
                             throw new PredictSplitsException(
                                 "Two leaf nodes with same markerId and turn");
                         }
-                    }
-                    else if (leaf1.getTurnCreated() < leaf2.getTurnCreated())
-                    {
-                        prunes.add(new Integer(i));
-                    }
-                    else
-                    {
-                        prunes.add(new Integer(j));
+                        else if (leaf1.getTurnCreated() < 
+                                 leaf2.getTurnCreated())
+                        {
+                            prunes.add(new Integer(i));
+                        }
+                        else
+                        {
+                            prunes.add(new Integer(j));
+                        }
                     }
                 }
             }
