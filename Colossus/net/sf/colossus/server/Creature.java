@@ -91,7 +91,8 @@ public class Creature implements Comparable
         /* warn about likely inapropriate combinations */
         if (waterDwelling && nativeSandDune)
         {
-            Log.warn("Creature " + name + " is both a Water Dweller and native to Sand and Dune.");
+            Log.warn("Creature " + name + 
+                " is both a Water Dweller and native to Sand and Dune.");
         }
     }
 
@@ -126,7 +127,6 @@ public class Creature implements Comparable
     /** Call immediately after loading variant, before using creatures. */
     public static void loadCreatures()
     {
-Log.debug("Creature.loadCreatures()");
         try 
         {
             creatures.clear();

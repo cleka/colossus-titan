@@ -32,6 +32,8 @@ Bug: Got two "All humans eliminated" dialogs -- one for human and one
    for last AI.  (With stop when all humans eliminated option set.)
    Eliminated the dialog.  Put back?
 
+Bug: LOSTest is failing.
+
 Disable "AIs stop when humans dead" if no human players at start of game.
 
 Add link from client to LogWindow; advance scroll thumb at end of various

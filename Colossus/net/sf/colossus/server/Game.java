@@ -58,7 +58,8 @@ public final class Game
     private int port = Constants.defaultPort;
 
 
-    Game()
+    /** Public only for JUnit test setup. */
+    public Game()
     {
     }
 
