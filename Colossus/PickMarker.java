@@ -10,10 +10,11 @@ import java.awt.event.*;
 
 class PickMarker extends Dialog implements MouseListener, WindowListener
 {
-    Chit [] markers;
-    MediaTracker tracker;
-    boolean imagesLoaded;
-    Player player;
+    private Chit [] markers;
+    private MediaTracker tracker;
+    private boolean imagesLoaded;
+    private Player player;
+
 
     PickMarker(Frame parentFrame, Player player)
     {
