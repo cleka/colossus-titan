@@ -50,6 +50,7 @@ public class MasterBoard extends Frame implements MouseListener,
     private static Game game;
     private boolean eraseFlag = false;
     private boolean summoningAngel = false;
+    private SummonAngel summonAngel;
 
 
     public MasterBoard(Game game)
@@ -437,6 +438,7 @@ public class MasterBoard extends Frame implements MouseListener,
     {
         summoningAngel = false;
         highlightEngagements();
+        summonAngel = null;
     }
 
 
@@ -1183,6 +1185,7 @@ public class MasterBoard extends Frame implements MouseListener,
                                 Legion attacker =
                                     hex.getFriendlyLegion(player);
                                 player.selectLegion(attacker);
+                                summonAngel.repaint();
                             }
                             else if (hex.isEngagement())
                             {
@@ -1217,18 +1220,21 @@ public class MasterBoard extends Frame implements MouseListener,
 
                                     if (hex.isEngagement() == false)
                                     {
-                                        if (hex.getLegion(0) == defender)
+                                        if (hex.getLegion(0) == defender &&
+                                            defender.getHeight() < 7)
                                         {
                                             // If the defender won the battle 
                                             // by agreement, he may recruit.
                                             new PickRecruit(this, defender);
                                         }
-                                        else 
+                                        else if (hex.getLegion(0) == attacker
+                                            && attacker.getHeight() < 7)
                                         {
                                             // If the attacker won the battle 
                                             // by agreement, he may summon 
                                             // an angel.
-                                            new SummonAngel(this, attacker);
+                                            summonAngel = new
+                                                SummonAngel(this, attacker);
                                         }
                                     }
 
